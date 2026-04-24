@@ -43,6 +43,25 @@ export default function Home() {
             </Link>
           </li>
           <li>
+            <Link
+              href="/r"
+              style={{
+                display: "block",
+                padding: "16px 20px",
+                border: "1px solid #2a3347",
+                borderRadius: 8,
+                background: "#161b27",
+                color: "#e2e8f0",
+                textDecoration: "none",
+              }}
+            >
+              <strong>R</strong>
+              <div style={{ color: "#94a3b8", fontSize: 13, marginTop: 4 }}>
+                Run R in the browser via WebR.
+              </div>
+            </Link>
+          </li>
+          <li>
             <span
               style={{
                 display: "block",
