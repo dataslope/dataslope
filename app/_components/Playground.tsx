@@ -46,8 +46,6 @@ interface PlotlyAPI {
   ): Promise<unknown>;
 }
 
-type Mode = "light" | "dark" | "system";
-
 const ALL_THEMES = [
   { value: "dracula", label: "Dracula" },
   { value: "monokai", label: "Monokai" },
@@ -60,14 +58,6 @@ const ALL_THEMES = [
   { value: "mdn-like", label: "MDN-like" },
 ];
 
-const DARK_THEMES = new Set([
-  "dracula",
-  "monokai",
-  "material-darker",
-  "nord",
-  "tomorrow-night-eighties",
-  "solarized dark",
-]);
 const LIGHT_THEMES = new Set(["eclipse", "mdn-like", "solarized light"]);
 
 interface ThemePalette {
@@ -149,13 +139,8 @@ function applyThemePalette(theme: string): void {
   root.style.setProperty("--text-muted", p.muted);
 }
 
-function applyMode(mode: Mode): void {
-  const resolved =
-    mode === "system"
-      ? window.matchMedia("(prefers-color-scheme: light)").matches
-        ? "light"
-        : "dark"
-      : mode;
+function applyMode(theme: string): void {
+  const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", resolved);
 }
 
@@ -373,8 +358,6 @@ function ExamplesDropdown({ open, examples, onPick }: ExamplesDropdownProps) {
 }
 
 interface SettingsPanelProps {
-  mode: Mode;
-  setMode: (m: Mode) => void;
   fontSize: number;
   setFontSize: (n: number) => void;
   outputFontSizeEnabled: boolean;
@@ -388,8 +371,6 @@ interface SettingsPanelProps {
 }
 
 function SettingsPanel({
-  mode,
-  setMode,
   fontSize,
   setFontSize,
   outputFontSizeEnabled,
@@ -424,44 +405,6 @@ function SettingsPanel({
           </button>
         </div>
         <div className="settings-body">
-          <div className="setting-row">
-            <div className="setting-label">Appearance</div>
-            <div className="mode-toggle">
-              <button
-                type="button"
-                className={`mode-btn${mode === "light" ? " active" : ""}`}
-                onClick={() => setMode("light")}
-              >
-                <svg viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-                </svg>
-                Light
-              </button>
-              <button
-                type="button"
-                className={`mode-btn${mode === "dark" ? " active" : ""}`}
-                onClick={() => setMode("dark")}
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-                Dark
-              </button>
-              <button
-                type="button"
-                className={`mode-btn${mode === "system" ? " active" : ""}`}
-                onClick={() => setMode("system")}
-              >
-                <svg viewBox="0 0 24 24">
-                  <rect x="2" y="3" width="20" height="14" rx="2" />
-                  <path d="M8 21h8M12 17v4" />
-                </svg>
-                System
-              </button>
-            </div>
-          </div>
-
           <div className="setting-row">
             <div className="setting-label">Editor Font Size</div>
             <div className="font-size-row">
@@ -578,7 +521,6 @@ export interface PlaygroundProps {
 export default function Playground({ adapter }: PlaygroundProps) {
   // ─── Initial settings (persisted in localStorage, namespaced per-language) ─
   const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
-  const [mode, setModeState] = useState<Mode>("system");
   const [fontSize, setFontSizeState] = useState<number>(13);
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
@@ -627,7 +569,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
     document.title = adapter.documentTitle;
     document.body.classList.add("pg-active");
 
-    const savedMode = (localStorage.getItem(storageKey("mode")) as Mode | null) ?? "system";
     const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? 13) || 13;
     const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? "dracula";
     const savedOutputEnabled =
@@ -640,13 +581,12 @@ export default function Playground({ adapter }: PlaygroundProps) {
        useState initialisers because that would cause a hydration mismatch
        between SSR (no `window`) and CSR. */
     /* eslint-disable react-hooks/set-state-in-effect */
-    setModeState(savedMode);
     setFontSizeState(savedSize);
     setOutputFontSizeEnabledState(savedOutputEnabled);
     setOutputFontSizeState(savedOutputSize);
     setEditorThemeState(savedTheme);
     /* eslint-enable react-hooks/set-state-in-effect */
-    applyMode(savedMode);
+    applyMode(savedTheme);
     applyThemePalette(savedTheme);
     document.documentElement.style.setProperty(
       "--cm-font-size",
@@ -657,15 +597,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
       `${savedOutputEnabled ? savedOutputSize : savedSize}px`,
     );
 
-    const mql = window.matchMedia("(prefers-color-scheme: light)");
-    const onSysChange = () => {
-      if ((localStorage.getItem(storageKey("mode")) ?? "system") === "system") {
-        applyMode("system");
-      }
-    };
-    mql.addEventListener("change", onSysChange);
     return () => {
-      mql.removeEventListener("change", onSysChange);
       document.body.classList.remove("pg-active");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -743,6 +675,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
   useEffect(() => {
     editorRef.current?.setOption("theme", editorTheme);
     applyThemePalette(editorTheme);
+    applyMode(editorTheme);
   }, [editorTheme]);
 
   // Update the editor font size via CSS variable. This is what makes the
@@ -765,27 +698,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
       `${effective}px`,
     );
   }, [outputFontSizeEnabled, outputFontSize, fontSize]);
-
-  useEffect(() => {
-    applyMode(mode);
-  }, [mode]);
-
-  // Auto-pick a sensible editor theme when the user toggles light/dark mode.
-  const setMode = useCallback(
-    (m: Mode) => {
-      setModeState(m);
-      localStorage.setItem(storageKey("mode"), m);
-      if (m === "light" && DARK_THEMES.has(editorTheme)) {
-        setEditorThemeState("eclipse");
-        localStorage.setItem(storageKey("editortheme"), "eclipse");
-      } else if (m === "dark" && LIGHT_THEMES.has(editorTheme)) {
-        setEditorThemeState("dracula");
-        localStorage.setItem(storageKey("editortheme"), "dracula");
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editorTheme, adapter.id],
-  );
 
   const setFontSize = useCallback(
     (n: number) => {
@@ -1059,8 +971,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
 
         {settingsOpen && (
           <SettingsPanel
-            mode={mode}
-            setMode={setMode}
             fontSize={fontSize}
             setFontSize={setFontSize}
             outputFontSizeEnabled={outputFontSizeEnabled}
@@ -1111,7 +1021,14 @@ export default function Playground({ adapter }: PlaygroundProps) {
             <div className="editor-wrap">
               <textarea ref={textareaRef} defaultValue="" />
             </div>
-            <div className="resizer" ref={resizerRef} />
+            <div
+              className="resizer"
+              ref={resizerRef}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Drag to resize editor and output panes"
+              title="Drag to resize"
+            />
           </div>
 
           <div className="output-pane">
