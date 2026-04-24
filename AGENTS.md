@@ -4,43 +4,61 @@ Guidance for AI coding agents (and humans) contributing to this repository.
 
 ## What this project is
 
-A small Next.js 15 (App Router, TypeScript) app that hosts browser-based
+A small Next.js 16 (App Router, TypeScript) app that hosts browser-based
 language playgrounds at dedicated routes. Today it ships:
 
 - `/` — landing page (`app/page.tsx`).
-- `/python` — the Python playground, served from `public/python.html` via a
-  rewrite defined in `next.config.ts`.
+- `/python` — Python playground powered by Pyodide (WebAssembly).
+- `/r` — R playground powered by WebR (WebAssembly).
 
-A `/postgres` playground is planned and should follow the same pattern.
+Both playgrounds are React client components built on top of the shared
+`Playground` component in `app/_components/Playground.tsx`. A `/postgres`
+playground is planned and should follow the same React + npm pattern.
 
 ## Conventions
 
-- **Keep self-contained playgrounds as static HTML in `public/`.** The Python
-  playground is one ~64 KB HTML file with inline CSS/JS that loads Pyodide,
-  CodeMirror, and Plotly from CDNs. Do **not** rewrite it into React
-  components unless explicitly asked. To expose it at a clean URL, add a
-  rewrite in `next.config.ts` (`/foo` → `/foo.html`).
-- **Routes use the App Router** (`app/<segment>/page.tsx`). Use this form
-  when a playground genuinely benefits from React/SSR; otherwise prefer the
-  static-HTML pattern above.
+- **Build playgrounds with React and npm packages, not static HTML.** Each
+  playground lives at `app/<name>/page.tsx`, renders the shared
+  `<Playground adapter={...} />`, and pulls its runtime in from npm. Do
+  **not** introduce static HTML files in `public/` for new playgrounds —
+  there is no longer a `public/` rewrite pattern.
+- **Add a language adapter, not a new UI.** New playgrounds implement the
+  `LanguageAdapter` interface in `app/_components/types.ts` (examples,
+  packages, `init()` and a `run()` that emits output cells). The shared
+  `Playground` component handles the editor, settings, output rendering,
+  and theming.
 - **TypeScript is strict** (`tsconfig.json`). Don't disable strict mode or
   add `any` to silence errors; fix the underlying type instead.
-- **No new dependencies unless necessary.** The whole point of the
-  static-HTML approach is to avoid pulling Pyodide/CodeMirror into the bundle.
+- **Add new dependencies deliberately.** Prefer existing libraries before
+  adding new ones, and avoid pulling in heavyweight runtimes that
+  duplicate something already wired up.
 - **Don't introduce build/lint/test tooling beyond what's already configured**
   (`next build`, `next lint`).
 
 ## Adding a new playground
 
-Prefer the drop-in static HTML pattern:
+1. Implement a `LanguageAdapter` in
+   `app/_components/runtime/<name>.tsx`. The adapter owns runtime init
+   (`init()`) and execution (`run(code, emit)`), plus the example list and
+   package metadata shown in the UI.
+2. Create the route at `app/<name>/page.tsx`:
 
-1. Put the self-contained HTML at `public/<name>.html`.
-2. Add `{ source: "/<name>", destination: "/<name>.html" }` to the `rewrites()`
-   array in `next.config.ts`.
+   ```tsx
+   "use client";
+   import Playground from "../_components/Playground";
+   import { fooAdapter } from "../_components/runtime/foo";
+
+   export default function FooPage() {
+     return <Playground adapter={fooAdapter} />;
+   }
+   ```
+
 3. Link to it from the landing page in `app/page.tsx`.
 
-Only reach for `app/<name>/page.tsx` when the playground needs React state,
-data fetching, or other Next.js features.
+Install runtime libraries from npm whenever possible. Some WebAssembly
+runtimes still need to fetch their `.wasm` / stdlib assets from a CDN at
+runtime — that's fine — but the JavaScript loader itself should come from
+an npm dependency.
 
 ## Verifying changes
 
@@ -61,8 +79,9 @@ npm run dev
 
 ## Things to avoid
 
-- Don't move `public/python.html` or rename it without updating the rewrite
-  in `next.config.ts`; the URL `/python` is the public contract.
-- Don't add server-side processing for the Python playground — execution
-  happens entirely in the browser via Pyodide (WebAssembly).
-- Don't commit `node_modules/`, `.next/`, or `.env*` files (see `.gitignore`).
+- Don't create new playgrounds as static HTML files in `public/`. Build
+  them as React routes under `app/<name>/page.tsx`.
+- Don't add server-side processing for the language playgrounds —
+  execution happens entirely in the browser via WebAssembly.
+- Don't commit `node_modules/`, `.next/`, or `.env*` files (see
+  `.gitignore`).

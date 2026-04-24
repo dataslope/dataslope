@@ -329,10 +329,73 @@ async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
   return btoa(binary);
 }
 
+/** Base R packages that ship with WebR — never need to be installed. */
+const R_BUILTIN_PACKAGES = new Set([
+  "base", "compiler", "datasets", "graphics", "grDevices", "grid",
+  "methods", "parallel", "splines", "stats", "stats4", "tcltk",
+  "tools", "utils", "translations",
+]);
+
+/** Best-effort scan for `library(pkg)` / `require(pkg)` /
+ *  `requireNamespace("pkg")` calls so we can preinstall packages from the
+ *  WebR repository before executing user code. Strips comments first so
+ *  commented-out calls are ignored. */
+function extractLibraryCalls(code: string): string[] {
+  const stripped = code
+    .split("\n")
+    .map((line) => {
+      // Remove anything after an unescaped `#` (R comment). This is a
+      // heuristic that ignores `#` inside strings, which is acceptable for
+      // package detection — false positives are filtered by name validity
+      // below and false negatives just fall through to the original error.
+      const idx = line.indexOf("#");
+      return idx >= 0 ? line.slice(0, idx) : line;
+    })
+    .join("\n");
+
+  const re =
+    /\b(?:library|require|requireNamespace|loadNamespace)\s*\(\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z_.][A-Za-z0-9_.]*))/g;
+  const found = new Set<string>();
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(stripped)) !== null) {
+    const name = m[1] ?? m[2] ?? m[3];
+    if (!name) continue;
+    if (!/^[A-Za-z][A-Za-z0-9_.]*$/.test(name)) continue;
+    if (R_BUILTIN_PACKAGES.has(name)) continue;
+    found.add(name);
+  }
+  return [...found];
+}
+
 class WebRRuntime implements LanguageRuntime {
+  /** Packages we've already installed (or attempted to install) so we
+   *  don't pay the round-trip on every Run click. */
+  private readonly installedPackages = new Set<string>();
+
   constructor(private webR: WebRInstance) {}
 
+  /** Install any WebR packages referenced by `library(...)` / `require(...)`
+   *  in `code` that we haven't already installed. Errors are non-fatal — we
+   *  let the user's code surface the underlying load error. Returns any
+   *  warning text to surface as stderr. */
+  private async ensurePackages(code: string): Promise<string> {
+    const referenced = extractLibraryCalls(code);
+    const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
+    if (toInstall.length === 0) return "";
+    // Optimistically mark as installed so failures don't retry every run.
+    for (const p of toInstall) this.installedPackages.add(p);
+    try {
+      await this.webR.installPackages(toInstall);
+      return "";
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return `Failed to auto-install R package(s) [${toInstall.join(", ")}]: ${msg}\n`;
+    }
+  }
+
   async run(code: string, emit: EmitOutput): Promise<void> {
+    const installWarnings = await this.ensurePackages(code);
+
     const shelter: WebRShelter = await new this.webR.Shelter();
     try {
       const result = await shelter.captureR(code, {
@@ -341,7 +404,7 @@ class WebRRuntime implements LanguageRuntime {
 
       // Stream stdout / stderr (output is in the order it was produced).
       let stdoutBuf = "";
-      let stderrBuf = "";
+      let stderrBuf = installWarnings;
       for (const o of result.output) {
         if (o.type === "stdout") stdoutBuf += o.data + "\n";
         else if (o.type === "stderr") stderrBuf += o.data + "\n";

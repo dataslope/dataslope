@@ -362,6 +362,20 @@ class PyodideRuntime implements LanguageRuntime {
     this.pyodide.setStdout({ batched: (s) => { stdout += s + "\n"; } });
     this.pyodide.setStderr({ batched: (s) => { stderr += s + "\n"; } });
 
+    // Auto-install any Pyodide packages referenced by the user's imports
+    // (e.g. `import sklearn` triggers loading of scikit-learn). This makes
+    // every package shipped in the Pyodide distribution work out of the
+    // box without a manual `micropip.install`.
+    try {
+      await this.pyodide.loadPackagesFromImports(code);
+    } catch (err) {
+      // Surface the error as stderr but still try to run the code so the
+      // user sees the underlying ImportError too.
+      stderr += `Failed to auto-load packages: ${
+        err instanceof Error ? err.message : String(err)
+      }\n`;
+    }
+
     await this.pyodide.runPythonAsync("_display_outputs.clear()");
 
     // Wrap user code with Plotly intercept so fig.show() captures JSON instead

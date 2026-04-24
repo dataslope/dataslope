@@ -345,6 +345,10 @@ interface SettingsPanelProps {
   setMode: (m: Mode) => void;
   fontSize: number;
   setFontSize: (n: number) => void;
+  outputFontSizeEnabled: boolean;
+  setOutputFontSizeEnabled: (b: boolean) => void;
+  outputFontSize: number;
+  setOutputFontSize: (n: number) => void;
   editorTheme: string;
   setEditorTheme: (t: string) => void;
   language: string; // e.g. "python" / "r" — used only for the preview snippet
@@ -356,6 +360,10 @@ function SettingsPanel({
   setMode,
   fontSize,
   setFontSize,
+  outputFontSizeEnabled,
+  setOutputFontSizeEnabled,
+  outputFontSize,
+  setOutputFontSize,
   editorTheme,
   setEditorTheme,
   language,
@@ -439,6 +447,33 @@ function SettingsPanel({
           </div>
 
           <div className="setting-row">
+            <label className="setting-checkbox-row">
+              <input
+                type="checkbox"
+                checked={outputFontSizeEnabled}
+                onChange={(e) => setOutputFontSizeEnabled(e.target.checked)}
+              />
+              <span>Use Different Font Size for Outputs</span>
+            </label>
+            <div
+              className={`font-size-row${outputFontSizeEnabled ? "" : " disabled"}`}
+            >
+              <input
+                type="range"
+                className="fs-slider"
+                min={10}
+                max={22}
+                step={1}
+                value={outputFontSize}
+                onChange={(e) => setOutputFontSize(Number(e.target.value))}
+                disabled={!outputFontSizeEnabled}
+                aria-label="Output font size"
+              />
+              <span className="font-size-val">{outputFontSize}px</span>
+            </div>
+          </div>
+
+          <div className="setting-row">
             <div className="setting-label">Editor Theme</div>
             <div className="theme-select-wrap">
               <select
@@ -513,6 +548,9 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
   const [mode, setModeState] = useState<Mode>("system");
   const [fontSize, setFontSizeState] = useState<number>(13);
+  const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
+    useState<boolean>(false);
+  const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
 
   // ─── UI state ───────────────────────────────────────────────────────────
@@ -559,6 +597,11 @@ export default function Playground({ adapter }: PlaygroundProps) {
     const savedMode = (localStorage.getItem(storageKey("mode")) as Mode | null) ?? "system";
     const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? 13) || 13;
     const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+    const savedOutputEnabled =
+      localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
+    const savedOutputSize =
+      Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
+      savedSize;
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch
@@ -566,6 +609,8 @@ export default function Playground({ adapter }: PlaygroundProps) {
     /* eslint-disable react-hooks/set-state-in-effect */
     setModeState(savedMode);
     setFontSizeState(savedSize);
+    setOutputFontSizeEnabledState(savedOutputEnabled);
+    setOutputFontSizeState(savedOutputSize);
     setEditorThemeState(savedTheme);
     /* eslint-enable react-hooks/set-state-in-effect */
     applyMode(savedMode);
@@ -573,6 +618,10 @@ export default function Playground({ adapter }: PlaygroundProps) {
     document.documentElement.style.setProperty(
       "--cm-font-size",
       `${savedSize}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--output-font-size",
+      `${savedOutputEnabled ? savedOutputSize : savedSize}px`,
     );
 
     const mql = window.matchMedia("(prefers-color-scheme: light)");
@@ -664,6 +713,16 @@ export default function Playground({ adapter }: PlaygroundProps) {
     editorRef.current?.refresh();
   }, [fontSize]);
 
+  // Apply the output font size: when the toggle is off we mirror the editor
+  // font size so the output cells stay visually consistent.
+  useEffect(() => {
+    const effective = outputFontSizeEnabled ? outputFontSize : fontSize;
+    document.documentElement.style.setProperty(
+      "--output-font-size",
+      `${effective}px`,
+    );
+  }, [outputFontSizeEnabled, outputFontSize, fontSize]);
+
   useEffect(() => {
     applyMode(mode);
   }, [mode]);
@@ -689,6 +748,24 @@ export default function Playground({ adapter }: PlaygroundProps) {
     (n: number) => {
       setFontSizeState(n);
       localStorage.setItem(storageKey("fontsize"), String(n));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
+  const setOutputFontSizeEnabled = useCallback(
+    (b: boolean) => {
+      setOutputFontSizeEnabledState(b);
+      localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
+  const setOutputFontSize = useCallback(
+    (n: number) => {
+      setOutputFontSizeState(n);
+      localStorage.setItem(storageKey("outputfontsize"), String(n));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter.id],
@@ -929,6 +1006,10 @@ export default function Playground({ adapter }: PlaygroundProps) {
             setMode={setMode}
             fontSize={fontSize}
             setFontSize={setFontSize}
+            outputFontSizeEnabled={outputFontSizeEnabled}
+            setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+            outputFontSize={outputFontSize}
+            setOutputFontSize={setOutputFontSize}
             editorTheme={editorTheme}
             setEditorTheme={setEditorTheme}
             language={adapter.id}

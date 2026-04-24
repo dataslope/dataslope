@@ -43,6 +43,7 @@ export interface PlotlyAPI {
 
 export interface PyodideInterface {
   loadPackage(packages: string | string[]): Promise<unknown>;
+  loadPackagesFromImports(code: string): Promise<unknown>;
   pyimport(name: string): {
     install(name: string | string[]): Promise<void>;
   };
