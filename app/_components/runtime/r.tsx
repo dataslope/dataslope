@@ -161,6 +161,143 @@ ggplot(df, aes(x = x, y = y, colour = group)) +
         legend.title     = element_text(colour = "#e2e8f0"))
 `,
   },
+  {
+    key: "dplyr_pipeline",
+    title: "dplyr Pipeline",
+    desc: "filter, mutate, group_by, summarise",
+    code: `library(dplyr)
+
+set.seed(1)
+sales <- data.frame(
+  region   = sample(c("North", "South", "East", "West"), 200, replace = TRUE),
+  product  = sample(c("Widget A", "Widget B", "Widget C"), 200, replace = TRUE),
+  units    = sample(1:50, 200, replace = TRUE),
+  price    = round(runif(200, 5, 80), 2)
+)
+
+summary_tbl <- sales |>
+  mutate(revenue = units * price) |>
+  filter(revenue > 100) |>
+  group_by(region, product) |>
+  summarise(
+    orders        = n(),
+    total_units   = sum(units),
+    total_revenue = round(sum(revenue), 2),
+    avg_price     = round(mean(price), 2),
+    .groups       = "drop"
+  ) |>
+  arrange(desc(total_revenue))
+
+print(summary_tbl, n = 12)
+`,
+  },
+  {
+    key: "tidyr_pivot",
+    title: "tidyr Pivot",
+    desc: "pivot_longer / pivot_wider",
+    code: `library(tidyr)
+library(dplyr)
+
+wide <- tibble(
+  city = c("NYC", "SF", "LA", "CHI"),
+  Jan  = c(34, 52, 65, 28),
+  Feb  = c(36, 55, 66, 30),
+  Mar  = c(45, 58, 70, 38),
+  Apr  = c(55, 60, 73, 50)
+)
+
+cat("Wide format:\\n")
+print(wide)
+
+long <- wide |>
+  pivot_longer(cols = Jan:Apr, names_to = "month", values_to = "temp_f")
+
+cat("\\nLong format (first 10 rows):\\n")
+print(head(long, 10))
+
+cat("\\nMonthly average across cities:\\n")
+long |>
+  group_by(month) |>
+  summarise(avg_temp = mean(temp_f), .groups = "drop") |>
+  print()
+
+cat("\\nBack to wide via pivot_wider:\\n")
+long |>
+  pivot_wider(names_from = month, values_from = temp_f) |>
+  print()
+`,
+  },
+  {
+    key: "ggplot_bar",
+    title: "ggplot2 Bar Chart",
+    desc: "Grouped bars with facets",
+    code: `library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+set.seed(7)
+quarters <- c("Q1", "Q2", "Q3", "Q4")
+df <- expand_grid(
+  quarter = factor(quarters, levels = quarters),
+  region  = c("North", "South", "East", "West")
+) |>
+  mutate(revenue = round(runif(n(), 30, 90), 0))
+
+ggplot(df, aes(x = quarter, y = revenue, fill = region)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  scale_fill_manual(values = c(North = "#4f8ef7",
+                               South = "#34d399",
+                               East  = "#f59e0b",
+                               West  = "#f472b6")) +
+  labs(title = "Regional Revenue by Quarter ($M)",
+       x = "Quarter", y = "Revenue ($M)") +
+  theme_minimal(base_size = 13) +
+  theme(plot.background  = element_rect(fill = "#0f1117", colour = NA),
+        panel.background = element_rect(fill = "#161b27", colour = NA),
+        panel.grid.major = element_line(colour = "#2a3347"),
+        panel.grid.minor = element_blank(),
+        axis.text        = element_text(colour = "#94a3b8"),
+        axis.title       = element_text(colour = "#e2e8f0"),
+        plot.title       = element_text(colour = "#e2e8f0"),
+        legend.text      = element_text(colour = "#94a3b8"),
+        legend.title     = element_text(colour = "#e2e8f0"))
+`,
+  },
+  {
+    key: "stringr_lubridate",
+    title: "stringr & lubridate",
+    desc: "String and date helpers",
+    code: `library(stringr)
+library(lubridate)
+library(dplyr)
+
+logs <- tibble(
+  raw = c(
+    "2024-01-15 09:42:01 INFO  user=alice action=login",
+    "2024-01-15 09:43:18 WARN  user=bob   action=retry",
+    "2024-02-02 14:08:55 ERROR user=carol action=upload",
+    "2024-02-19 22:01:09 INFO  user=dave  action=logout",
+    "2024-03-04 06:30:44 ERROR user=eve   action=upload"
+  )
+)
+
+parsed <- logs |>
+  mutate(
+    timestamp = ymd_hms(str_extract(raw, "^\\\\S+ \\\\S+")),
+    level     = str_extract(raw, "INFO|WARN|ERROR"),
+    user      = str_match(raw, "user=(\\\\S+)")[, 2],
+    action    = str_match(raw, "action=(\\\\S+)")[, 2],
+    weekday   = wday(timestamp, label = TRUE, abbr = FALSE),
+    month     = month(timestamp, label = TRUE, abbr = FALSE)
+  ) |>
+  select(timestamp, weekday, month, level, user, action)
+
+print(parsed)
+
+cat("\\nCounts by level:\\n")
+parsed |> count(level) |> print()
+`,
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -339,7 +476,15 @@ class WebRRuntime implements LanguageRuntime {
 
     const shelter: Shelter = await new this.webR.Shelter();
     try {
+      // `withAutoprint: true` makes top-level expressions in user code
+      // behave like they would at an interactive R console — values that
+      // would normally be auto-printed (e.g. the result of a `ggplot(...)`
+      // pipeline) get sent through `print()`, which is what causes ggplot
+      // to actually draw on the canvas device. Without this, ggplot
+      // returns its plot object as `result.result` and no image is ever
+      // emitted.
       const result = await shelter.captureR(code, {
+        withAutoprint: true,
         captureGraphics: { width: 720, height: 432 },
       });
 

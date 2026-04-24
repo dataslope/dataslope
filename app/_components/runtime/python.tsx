@@ -1,4 +1,3 @@
-import type { PyodideInterface } from "pyodide";
 import type {
   EmitOutput,
   ExampleSnippet,
@@ -8,14 +7,13 @@ import type {
   PlotlyFigure,
 } from "../types";
 
-// Pyodide is published as an npm package, but its WebAssembly runtime,
-// Python stdlib, and built-in packages are large (~50 MB) and ship as
-// separate assets that Pyodide fetches at runtime from a configurable
-// `indexURL`. We import the JS loader from npm and point it at the
-// official jsDelivr-hosted assets — this keeps the Next.js bundle small
-// while still pinning to the version locked in package.json.
-const PYODIDE_VERSION = "v0.27.3";
-const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
+// Pyodide is loaded inside a dedicated Web Worker (see
+// `runtime/pyodide-worker.ts`). The worker pulls `pyodide.js` from the
+// CDN via `importScripts`, which keeps the Next.js / Turbopack bundler
+// from ever touching Pyodide's internal `await import(e)` (which would
+// otherwise fail with "Cannot find module as expression is too dynamic")
+// AND keeps Python execution off the main thread so the UI stays
+// responsive while user code runs.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -319,106 +317,47 @@ const PACKAGES: PackageInfo[] = [
   { cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.1", desc: "Testing framework — run via micropip install" },
 ];
 
-interface PyDisplayDataframe { type: "dataframe"; html: string }
-interface PyDisplayHtml { type: "html"; html: string }
-interface PyDisplayImage { type: "image"; data: string }
-interface PyDisplayStdout { type: "stdout"; text: string }
-type PyDisplayOutput = PyDisplayDataframe | PyDisplayHtml | PyDisplayImage | PyDisplayStdout;
-
-function isStringArray(v: unknown): v is string[] {
-  return Array.isArray(v) && v.every((x) => typeof x === "string");
+// ─── Worker protocol — must stay in sync with `pyodide-worker.ts`. ─────
+type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
+interface OutputCellMessage {
+  type: OutputCellType;
+  content: string;
+  plot?: PlotlyFigure;
 }
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "init-error"; message: string }
+  | { kind: "output"; id: number; cell: OutputCellMessage }
+  | { kind: "done"; id: number }
+  | { kind: "error"; id: number; message: string };
 
-function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
-  return Array.isArray(v);
-}
+class PyodideWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
 
-class PyodideRuntime implements LanguageRuntime {
-  constructor(private pyodide: PyodideInterface) {}
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    let stdout = "";
-    let stderr = "";
-    this.pyodide.setStdout({ batched: (s: string) => { stdout += s + "\n"; } });
-    this.pyodide.setStderr({ batched: (s: string) => { stderr += s + "\n"; } });
-
-    // Auto-install any Pyodide packages referenced by the user's imports
-    // (e.g. `import sklearn` triggers loading of scikit-learn). This makes
-    // every package shipped in the Pyodide distribution work out of the
-    // box without a manual `micropip.install`.
-    try {
-      await this.pyodide.loadPackagesFromImports(code);
-    } catch (err) {
-      // Surface the error as stderr but still try to run the code so the
-      // user sees the underlying ImportError too.
-      stderr += `Failed to auto-load packages: ${
-        err instanceof Error ? err.message : String(err)
-      }\n`;
-    }
-
-    await this.pyodide.runPythonAsync("_display_outputs.clear()");
-
-    // Wrap user code with Plotly intercept so fig.show() captures JSON instead
-    // of trying to open a browser tab.
-    const wrappedCode = `
-import json as _json
-import plotly as _plotly
-
-_plotly_json_outputs = []
-_orig_plotly_show = _plotly.io.show
-
-def _patched_plotly_show(fig, *args, **kwargs):
-    _plotly_json_outputs.append(_json.dumps(fig.to_dict()))
-
-_plotly.io.show = _patched_plotly_show
-try:
-    import plotly.graph_objects as _go
-    _orig_go_show = _go.Figure.show
-    def _patched_go_show(self, *args, **kwargs):
-        _plotly_json_outputs.append(_json.dumps(self.to_dict()))
-    _go.Figure.show = _patched_go_show
-except: pass
-
-${code}
-
-_plotly.io.show = _orig_plotly_show
-try: _go.Figure.show = _orig_go_show
-except: pass
-`;
-
-    await this.pyodide.runPythonAsync(wrappedCode);
-
-    const displayProxy = this.pyodide.globals.get("_display_outputs");
-    const displayOutputsRaw = displayProxy.toJs({
-      dict_converter: Object.fromEntries,
-    });
-    displayProxy.destroy();
-
-    const plotlyProxy = this.pyodide.globals.get("_plotly_json_outputs");
-    const plotlyOutputsRaw = plotlyProxy.toJs();
-    plotlyProxy.destroy();
-
-    if (stdout.trim()) emit({ type: "stdout", content: stdout.trim() });
-    if (stderr.trim()) emit({ type: "stderr", content: stderr.trim() });
-
-    if (isPyDisplayOutputs(displayOutputsRaw)) {
-      for (const out of displayOutputsRaw) {
-        if (out.type === "dataframe" || out.type === "html") {
-          emit({ type: "html", content: out.html });
-        } else if (out.type === "image") {
-          emit({ type: "image", content: out.data });
-        } else if (out.type === "stdout") {
-          emit({ type: "stdout", content: out.text });
+    const id = ++this.nextId;
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        // Ignore messages from earlier or unrelated runs.
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") {
+          return;
         }
-      }
-    }
-
-    if (isStringArray(plotlyOutputsRaw)) {
-      for (const jsonStr of plotlyOutputsRaw) {
-        const fig = JSON.parse(jsonStr) as PlotlyFigure;
-        emit({ type: "plot", content: jsonStr, plot: fig });
-      }
-    }
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(msg.cell);
+          return;
+        }
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code });
+    });
   }
 }
 
@@ -437,7 +376,7 @@ export const pythonAdapter: LanguageAdapter = {
       <a href="https://pyodide.org" target="_blank" rel="noreferrer">
         Pyodide
       </a>
-      . Use{" "}
+      , inside a Web Worker so they don&apos;t block the UI. Use{" "}
       <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
         import micropip; await micropip.install(&apos;pkg&apos;)
       </code>{" "}
@@ -446,54 +385,36 @@ export const pythonAdapter: LanguageAdapter = {
   ),
   importSnippet: (name) => `import ${name}`,
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading Pyodide…");
-    // Dynamic import keeps the heavy Pyodide loader out of the SSR bundle
-    // and only fetches it when the playground page actually mounts.
-    const { loadPyodide } = await import("pyodide");
-    const pyodide = await loadPyodide({ indexURL: PYODIDE_INDEX_URL });
+    setLoadingMessage("Starting Python worker…");
+    // Standard Web Worker construction pattern that Next.js / Turbopack
+    // recognises: it bundles the worker as a separate chunk. The worker
+    // itself avoids the bundler's dynamic-import handling by loading
+    // Pyodide via `importScripts` from the CDN — this requires a classic
+    // (non-module) worker, so we deliberately omit `{ type: "module" }`.
+    const worker = new Worker(
+      new URL("./pyodide-worker.ts", import.meta.url),
+    );
 
-    setLoadingMessage("Installing packages…");
-    await pyodide.loadPackage(["numpy", "pandas", "matplotlib"]);
-    await pyodide.loadPackage("micropip");
-    const micropip = pyodide.pyimport("micropip");
-    await micropip.install("plotly");
-
-    // Set up display() and a matplotlib show() patch that captures figures as
-    // base64 PNGs into _display_outputs.
-    await pyodide.runPythonAsync(`
-import sys, io, base64, json
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
-_display_outputs = []
-
-def display(obj):
-    import pandas as pd
-    if isinstance(obj, pd.DataFrame):
-        _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
-    elif hasattr(obj, "_repr_html_"):
-        h = obj._repr_html_()
-        if h:
-            _display_outputs.append({"type": "html", "html": h})
-    else:
-        _display_outputs.append({"type": "stdout", "text": repr(obj)})
-
-import builtins
-builtins.display = display
-
-_original_show = plt.show
-def _patched_show(*args, **kwargs):
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=plt.gcf().get_facecolor())
-    buf.seek(0)
-    img_b64 = base64.b64encode(buf.read()).decode()
-    _display_outputs.append({"type": "image", "data": img_b64})
-    plt.clf()
-    plt.close("all")
-plt.show = _patched_show
-`);
-
-    return new PyodideRuntime(pyodide);
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new PyodideWorkerRuntime(worker));
+        } else if (msg.kind === "init-error") {
+          worker.removeEventListener("message", onMessage);
+          worker.terminate();
+          reject(new Error(msg.message));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "Pyodide worker failed to start"));
+      });
+      worker.postMessage({ kind: "init" });
+    });
   },
 };

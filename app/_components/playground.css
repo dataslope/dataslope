@@ -87,6 +87,45 @@ body.pg-active {
 
 .header-sep { flex: 1; }
 
+/* Dropdown that lets the user switch between playgrounds (sits where the
+   plain-text title used to be in the header). Styled to look like a
+   subtle button rather than a default <select>. */
+.playground-switcher {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  padding: 4px 26px 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 13px) 50%,
+    calc(100% - 8px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.playground-switcher:hover {
+  background-color: var(--bg3);
+  border-color: var(--border);
+}
+.playground-switcher:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+.playground-switcher option {
+  background: var(--bg2);
+  color: var(--text);
+}
+
 .status-pill {
   display: flex; align-items: center; gap: 6px;
   padding: 4px 10px; border-radius: 20px;
