@@ -55,11 +55,6 @@ export interface LanguageAdapter {
   readyStatus: string;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
-  /** External JS asset URLs to load before the runtime initialises. Loaded in
-   *  order. */
-  scripts: string[];
-  /** External CSS asset URLs (CodeMirror, themes, etc.). */
-  stylesheets: string[];
   examples: ExampleSnippet[];
   packages: PackageInfo[];
   /** Render-only: footer note shown at the bottom of the packages drawer. */

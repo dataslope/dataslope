@@ -9,11 +9,22 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
+// CodeMirror v5 stylesheets — these are pure CSS so importing them at the
+// top of a "use client" component is safe (Next.js extracts them at build
+// time and they don't touch `window`).
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/dracula.css";
+import "codemirror/theme/monokai.css";
+import "codemirror/theme/material-darker.css";
+import "codemirror/theme/nord.css";
+import "codemirror/theme/tomorrow-night-eighties.css";
+import "codemirror/theme/solarized.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/theme/mdn-like.css";
 import type {
+  CodeMirrorAPI,
   CodeMirrorEditor,
-  PlotlyAPI,
 } from "./runtime/globals";
-import { loadScripts, loadStylesheets } from "./runtime/loader";
 import type {
   ExampleSnippet,
   LanguageAdapter,
@@ -22,6 +33,16 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "./types";
+
+/** Minimal Plotly surface we use for rendering chart cells. */
+interface PlotlyAPI {
+  newPlot(
+    el: HTMLElement,
+    data: unknown[],
+    layout?: Record<string, unknown>,
+    config?: Record<string, unknown>,
+  ): Promise<unknown>;
+}
 
 type Mode = "light" | "dark" | "system";
 
@@ -160,18 +181,27 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const Plotly = window.Plotly as PlotlyAPI | undefined;
-    if (!Plotly) return;
-    const layout = {
-      ...PLOTLY_DARK_DEFAULTS,
-      ...(figure.layout ?? {}),
+    let cancelled = false;
+    void (async () => {
+      // Plotly is heavy and only needed when a chart actually renders, so
+      // we lazy-load the npm package on demand.
+      const mod = await import("plotly.js-dist-min");
+      if (cancelled || !ref.current) return;
+      const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
+      const layout = {
+        ...PLOTLY_DARK_DEFAULTS,
+        ...(figure.layout ?? {}),
+      };
+      void Plotly.newPlot(el, figure.data, layout, {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
+      });
+    })();
+    return () => {
+      cancelled = true;
     };
-    void Plotly.newPlot(el, figure.data, layout, {
-      responsive: true,
-      displayModeBar: true,
-      displaylogo: false,
-      modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
-    });
   }, [figure]);
   return <div ref={ref} className="plotly-chart" />;
 }
@@ -643,13 +673,23 @@ export default function Playground({ adapter }: PlaygroundProps) {
     let cancelled = false;
     (async () => {
       try {
-        loadStylesheets(adapter.stylesheets);
-        await loadScripts(adapter.scripts);
+        // Dynamically import CodeMirror v5 and its modes/addons/keymap.
+        // These touch `window` at import time, so we can't import them
+        // statically in a "use client" file (Next.js still SSRs the
+        // module on the server during the initial render pass).
+        const codeMirrorMod = await import("codemirror");
+        await Promise.all([
+          import("codemirror/mode/python/python"),
+          import("codemirror/mode/r/r"),
+          import("codemirror/addon/edit/closebrackets"),
+          import("codemirror/addon/edit/matchbrackets"),
+          import("codemirror/addon/comment/comment"),
+          import("codemirror/keymap/sublime"),
+        ]);
         if (cancelled) return;
 
         // Initialise CodeMirror once the script is on the page.
-        const CM = window.CodeMirror;
-        if (!CM) throw new Error("CodeMirror failed to load");
+        const CM = (codeMirrorMod.default ?? codeMirrorMod) as unknown as CodeMirrorAPI;
         if (textareaRef.current && !editorRef.current) {
           const editor = CM.fromTextArea(textareaRef.current, {
             mode: adapter.codeMirrorMode,

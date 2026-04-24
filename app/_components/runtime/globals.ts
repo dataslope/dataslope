@@ -1,5 +1,6 @@
-// Minimal global type declarations for the third-party scripts we load from
-// CDNs. We only declare the surface area that the playground actually uses.
+// Type declarations for the third-party JavaScript libraries we import from
+// npm. CodeMirror v5 ships without TypeScript typings, so we narrowly
+// describe just the surface area the playground actually uses.
 
 export interface CodeMirrorEditor {
   setValue(value: string): void;
@@ -30,68 +31,4 @@ export interface CodeMirrorAPI {
     el: HTMLTextAreaElement,
     options: CodeMirrorOptions,
   ): CodeMirrorEditor;
-}
-
-export interface PlotlyAPI {
-  newPlot(
-    el: HTMLElement,
-    data: unknown[],
-    layout?: Record<string, unknown>,
-    config?: Record<string, unknown>,
-  ): Promise<unknown>;
-}
-
-export interface PyodideInterface {
-  loadPackage(packages: string | string[]): Promise<unknown>;
-  loadPackagesFromImports(code: string): Promise<unknown>;
-  pyimport(name: string): {
-    install(name: string | string[]): Promise<void>;
-  };
-  runPythonAsync(code: string): Promise<unknown>;
-  setStdout(opts: { batched: (s: string) => void }): void;
-  setStderr(opts: { batched: (s: string) => void }): void;
-  globals: {
-    get(name: string): {
-      toJs(opts?: { dict_converter?: (e: Iterable<[string, unknown]>) => unknown }): unknown;
-      destroy(): void;
-    };
-  };
-}
-
-export type LoadPyodideFn = (opts: { indexURL: string }) => Promise<PyodideInterface>;
-
-// WebR — narrow surface we use from the ESM module loaded at runtime.
-export interface WebRShelter {
-  captureR(
-    code: string,
-    options?: { captureGraphics?: boolean | { width?: number; height?: number } },
-  ): Promise<{
-    result: WebRObject;
-    output: { type: "stdout" | "stderr"; data: string }[];
-    images: ImageBitmap[];
-  }>;
-  purge(): Promise<void>;
-}
-
-export interface WebRObject {
-  type: string;
-  toJs(): Promise<unknown>;
-}
-
-export interface WebRInstance {
-  init(): Promise<void>;
-  installPackages(names: string[]): Promise<void>;
-  evalRVoid(code: string): Promise<void>;
-  Shelter: new () => WebRShelter;
-}
-
-export type WebRConstructor = new (options?: Record<string, unknown>) => WebRInstance;
-
-declare global {
-  interface Window {
-    CodeMirror?: CodeMirrorAPI;
-    Plotly?: PlotlyAPI;
-    loadPyodide?: LoadPyodideFn;
-    __WebR?: WebRConstructor;
-  }
 }

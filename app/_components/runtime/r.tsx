@@ -1,3 +1,4 @@
+import type { Shelter, WebR as WebRClass } from "webr";
 import type {
   EmitOutput,
   ExampleSnippet,
@@ -5,66 +6,6 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
-import type { WebRInstance, WebRShelter } from "./globals";
-import { CODEMIRROR_SCRIPTS, CODEMIRROR_STYLES } from "./python";
-
-const WEBR_VERSION = "v0.5.4";
-const WEBR_LOADER_TAG_ID = "__webr_module_loader__";
-
-/**
- * WebR is distributed as an ES module on the CDN. Import it via an inline
- * `<script type="module">` so the Next.js bundler never sees the URL — the
- * import happens entirely in the browser. The loader stores the WebR class on
- * `window.__WebR` and dispatches a `webr-loaded` event when ready.
- */
-function loadWebRModule(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.__WebR) return Promise.resolve();
-
-  return new Promise<void>((resolve, reject) => {
-    const existing = document.getElementById(WEBR_LOADER_TAG_ID);
-    if (existing) {
-      window.addEventListener("webr-loaded", () => resolve(), { once: true });
-      window.addEventListener(
-        "webr-load-error",
-        (e: Event) =>
-          reject(
-            new Error(
-              (e as CustomEvent<{ message: string }>).detail?.message ??
-                "WebR failed to load",
-            ),
-          ),
-        { once: true },
-      );
-      return;
-    }
-    const s = document.createElement("script");
-    s.type = "module";
-    s.id = WEBR_LOADER_TAG_ID;
-    s.textContent = `
-      try {
-        const mod = await import("https://webr.r-wasm.org/${WEBR_VERSION}/webr.mjs");
-        window.__WebR = mod.WebR;
-        window.dispatchEvent(new Event("webr-loaded"));
-      } catch (err) {
-        window.dispatchEvent(new CustomEvent("webr-load-error", { detail: { message: String(err) } }));
-      }
-    `;
-    window.addEventListener("webr-loaded", () => resolve(), { once: true });
-    window.addEventListener(
-      "webr-load-error",
-      (e: Event) =>
-        reject(
-          new Error(
-            (e as CustomEvent<{ message: string }>).detail?.message ??
-              "WebR failed to load",
-          ),
-        ),
-      { once: true },
-    );
-    document.head.appendChild(s);
-  });
-}
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -372,7 +313,7 @@ class WebRRuntime implements LanguageRuntime {
    *  don't pay the round-trip on every Run click. */
   private readonly installedPackages = new Set<string>();
 
-  constructor(private webR: WebRInstance) {}
+  constructor(private webR: WebRClass) {}
 
   /** Install any WebR packages referenced by `library(...)` / `require(...)`
    *  in `code` that we haven't already installed. Errors are non-fatal — we
@@ -396,7 +337,7 @@ class WebRRuntime implements LanguageRuntime {
   async run(code: string, emit: EmitOutput): Promise<void> {
     const installWarnings = await this.ensurePackages(code);
 
-    const shelter: WebRShelter = await new this.webR.Shelter();
+    const shelter: Shelter = await new this.webR.Shelter();
     try {
       const result = await shelter.captureR(code, {
         captureGraphics: { width: 720, height: 432 },
@@ -406,8 +347,8 @@ class WebRRuntime implements LanguageRuntime {
       let stdoutBuf = "";
       let stderrBuf = installWarnings;
       for (const o of result.output) {
-        if (o.type === "stdout") stdoutBuf += o.data + "\n";
-        else if (o.type === "stderr") stderrBuf += o.data + "\n";
+        if (o.type === "stdout") stdoutBuf += String(o.data) + "\n";
+        else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
       }
       if (stdoutBuf.trim()) emit({ type: "stdout", content: stdoutBuf.trim() });
       if (stderrBuf.trim()) emit({ type: "stderr", content: stderrBuf.trim() });
@@ -420,17 +361,19 @@ class WebRRuntime implements LanguageRuntime {
       }
 
       // If the top-level value is a data.frame, render it as an HTML table.
-      if (result.result && result.result.type === "list") {
-        try {
-          const js = await result.result.toJs();
+      // RObject.type() is asynchronous through the worker proxy.
+      try {
+        const t = await result.result.type();
+        if (t === "list") {
+          const js = (await result.result.toJs()) as unknown;
           const rows = rowsFromDataFrame(js);
           if (rows) {
             const html = dataFrameToHtml(rows);
             if (html) emit({ type: "html", content: html });
           }
-        } catch {
-          /* not convertible — ignore */
         }
+      } catch {
+        /* not convertible — ignore */
       }
     } finally {
       await shelter.purge();
@@ -445,10 +388,6 @@ export const rAdapter: LanguageAdapter = {
   documentTitle: "R Playground",
   readyStatus: "R 4.4 ready",
   codeMirrorMode: "r",
-  // CodeMirror is the same bundle Python uses; WebR loads via inline ESM
-  // import so it doesn't need to appear in `scripts`.
-  scripts: CODEMIRROR_SCRIPTS,
-  stylesheets: CODEMIRROR_STYLES,
   examples: EXAMPLES,
   packages: PACKAGES,
   packagesFooter: (
@@ -467,13 +406,12 @@ export const rAdapter: LanguageAdapter = {
   importSnippet: (name) => `library(${name})`,
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading WebR…");
-    await loadWebRModule();
-    if (!window.__WebR) {
-      throw new Error("WebR module loaded but constructor missing");
-    }
+    // Dynamic import keeps WebR (and its bundled service-worker code) out
+    // of the SSR bundle and only fetches it on the client.
+    const { WebR } = await import("webr");
 
     setLoadingMessage("Initialising R runtime…");
-    const webR: WebRInstance = new window.__WebR();
+    const webR: WebRClass = new WebR();
     await webR.init();
 
     setLoadingMessage("Configuring graphics device…");
