@@ -228,6 +228,9 @@ body.pg-active {
 .run-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }
 
 .run-btn svg { width: 12px; height: 12px; fill: white; flex-shrink: 0; }
+.run-btn.running { opacity: 0.75; cursor: not-allowed; }
+.run-btn-spinner { animation: pg-spin 0.75s linear infinite; }
+@keyframes pg-spin { to { transform: rotate(360deg); } }
 
 .editor-wrap {
   flex: 1; overflow: hidden; position: relative;
