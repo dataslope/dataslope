@@ -1090,16 +1090,22 @@ export default function Playground({ adapter }: PlaygroundProps) {
               <span className="kbd">⌘ Enter</span>
               <button
                 type="button"
-                className="run-btn"
-                disabled={!loaded}
+                className={`run-btn${statusState === "running" ? " running" : ""}`}
+                disabled={!loaded || statusState === "running"}
                 onClick={() => {
                   void runCode();
                 }}
               >
-                <svg viewBox="0 0 12 12">
-                  <polygon points="2,1 11,6 2,11" />
-                </svg>
-                Run
+                {statusState === "running" ? (
+                  <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                    <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 12 12">
+                    <polygon points="2,1 11,6 2,11" />
+                  </svg>
+                )}
+                {statusState === "running" ? "Running…" : "Run"}
               </button>
             </div>
             <div className="editor-wrap">
