@@ -33,6 +33,8 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "./types";
+import { PLAYGROUNDS } from "./playgrounds";
+import { useRouter } from "next/navigation";
 
 /** Minimal Plotly surface we use for rendering chart cells. */
 interface PlotlyAPI {
@@ -587,6 +589,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const router = useRouter();
 
   // ─── Runtime state ──────────────────────────────────────────────────────
   const [loadingMessage, setLoadingMessage] = useState(
@@ -986,7 +989,21 @@ export default function Playground({ adapter }: PlaygroundProps) {
         <header className="pg-header">
           <div className="logo">
             <div className="logo-icon">{adapter.logoText}</div>
-            {adapter.displayName}
+            <select
+              className="playground-switcher"
+              aria-label="Switch playground"
+              value={adapter.id}
+              onChange={(e) => {
+                const next = PLAYGROUNDS.find((p) => p.id === e.target.value);
+                if (next && next.id !== adapter.id) router.push(next.href);
+              }}
+            >
+              {PLAYGROUNDS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="header-sep" />
 
