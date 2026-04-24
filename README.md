@@ -6,29 +6,36 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | ----------- | ----------- | -------------------------------------------------------- |
 | `/`         | ✅ live      | Landing page linking to each playground.                 |
 | `/python`   | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
+| `/r`        | ✅ live      | R playground powered by [WebR][webr] (WASM).             |
 | `/postgres` | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
+[webr]: https://docs.r-wasm.org/webr/latest/
 
 ## Project structure
 
 ```
 .
-├── app/                  # Next.js App Router
+├── app/                          # Next.js App Router
 │   ├── layout.tsx
-│   └── page.tsx          # Landing page (/)
-├── public/
-│   └── python.html       # Self-contained Python playground (served at /python)
-├── next.config.ts        # Defines the /python → /python.html rewrite
+│   ├── page.tsx                  # Landing page (/)
+│   ├── _components/              # Shared React components
+│   │   ├── Playground.tsx        # The playground UI (editor + output + settings)
+│   │   ├── playground.css
+│   │   └── runtime/
+│   │       ├── python.tsx        # Python language adapter (Pyodide)
+│   │       └── r.tsx             # R language adapter (WebR)
+│   ├── python/page.tsx           # /python route — renders <Playground adapter={pythonAdapter} />
+│   └── r/page.tsx                # /r route     — renders <Playground adapter={rAdapter} />
+├── next.config.ts
 ├── package.json
 └── tsconfig.json
 ```
 
-The Python playground is intentionally kept as a single self-contained HTML
-file in `public/python.html`. It loads CodeMirror, Plotly, and Pyodide from
-public CDNs, so no bundler integration is required. A Next.js
-[rewrite](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites)
-in `next.config.ts` maps the user-facing URL `/python` to that file.
+Each playground is a React client component that renders the shared
+`Playground` UI with a language-specific adapter. The adapter wires up the
+WebAssembly runtime (Pyodide for Python, WebR for R), provides example
+snippets, and lists the packages available in that runtime.
 
 ## Getting started
 
@@ -43,6 +50,7 @@ Then open:
 
 - http://localhost:3000/ — landing page
 - http://localhost:3000/python — Python playground
+- http://localhost:3000/r — R playground
 
 ## Scripts
 
@@ -55,27 +63,35 @@ Then open:
 
 ## Adding a new playground (e.g. `/postgres`)
 
-You have two options, mirroring how `/python` is wired up today.
+Playgrounds are built as native Next.js routes using React and npm packages:
 
-**Option A — drop-in static HTML (matches `/python`)**
+1. Create a language adapter at `app/_components/runtime/<name>.tsx` that
+   implements the `LanguageAdapter` interface from
+   `app/_components/types.ts`. The adapter is responsible for initialising
+   the runtime and turning user code into output cells.
+2. Add the route at `app/<name>/page.tsx`:
 
-1. Add your self-contained HTML file at `public/postgres.html`.
-2. Add a rewrite in `next.config.ts`:
+   ```tsx
+   "use client";
+   import Playground from "../_components/Playground";
+   import { postgresAdapter } from "../_components/runtime/postgres";
 
-   ```ts
-   { source: "/postgres", destination: "/postgres.html" },
+   export default function PostgresPage() {
+     return <Playground adapter={postgresAdapter} />;
+   }
    ```
 
-3. Add a link to it from `app/page.tsx`.
+3. Link to it from the landing page in `app/page.tsx`.
 
-**Option B — native Next.js route**
-
-1. Create `app/postgres/page.tsx` (and any client components it needs).
-2. Add a link to it from `app/page.tsx`.
+Prefer installing runtime libraries from npm. Only fall back to a CDN
+`<script>` tag if a library genuinely cannot be installed/bundled (some
+WebAssembly runtimes still require fetching their `.wasm` and stdlib assets
+from a CDN at runtime — that's fine, but the JavaScript loader itself
+should come from an npm package).
 
 ## Deployment
 
-The app is a standard Next.js 15 project and deploys to any Next.js-compatible
+The app is a standard Next.js project and deploys to any Next.js-compatible
 host. The simplest path is [Vercel](https://vercel.com/):
 
 1. Push this repo to GitHub.

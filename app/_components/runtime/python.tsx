@@ -1,3 +1,4 @@
+import type { PyodideInterface } from "pyodide";
 import type {
   EmitOutput,
   ExampleSnippet,
@@ -6,36 +7,15 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "../types";
-import type { PyodideInterface } from "./globals";
-import { loadScripts, loadStylesheets } from "./loader";
 
-const CDN_CM = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16";
-
-export const CODEMIRROR_SCRIPTS: string[] = [
-  `${CDN_CM}/codemirror.min.js`,
-  `${CDN_CM}/mode/python/python.min.js`,
-  `${CDN_CM}/mode/r/r.min.js`,
-  `${CDN_CM}/addon/edit/closebrackets.min.js`,
-  `${CDN_CM}/addon/edit/matchbrackets.min.js`,
-  `${CDN_CM}/addon/comment/comment.min.js`,
-  `${CDN_CM}/keymap/sublime.min.js`,
-];
-
-export const CODEMIRROR_STYLES: string[] = [
-  `${CDN_CM}/codemirror.min.css`,
-  `${CDN_CM}/theme/dracula.min.css`,
-  `${CDN_CM}/theme/monokai.min.css`,
-  `${CDN_CM}/theme/material-darker.min.css`,
-  `${CDN_CM}/theme/nord.min.css`,
-  `${CDN_CM}/theme/tomorrow-night-eighties.min.css`,
-  `${CDN_CM}/theme/solarized.min.css`,
-  `${CDN_CM}/theme/eclipse.min.css`,
-  `${CDN_CM}/theme/mdn-like.min.css`,
-];
-
+// Pyodide is published as an npm package, but its WebAssembly runtime,
+// Python stdlib, and built-in packages are large (~50 MB) and ship as
+// separate assets that Pyodide fetches at runtime from a configurable
+// `indexURL`. We import the JS loader from npm and point it at the
+// official jsDelivr-hosted assets — this keeps the Next.js bundle small
+// while still pinning to the version locked in package.json.
 const PYODIDE_VERSION = "v0.27.3";
-const PYODIDE_INDEX = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
-const PLOTLY_SRC = "https://cdn.plot.ly/plotly-2.35.2.min.js";
+const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -359,8 +339,22 @@ class PyodideRuntime implements LanguageRuntime {
   async run(code: string, emit: EmitOutput): Promise<void> {
     let stdout = "";
     let stderr = "";
-    this.pyodide.setStdout({ batched: (s) => { stdout += s + "\n"; } });
-    this.pyodide.setStderr({ batched: (s) => { stderr += s + "\n"; } });
+    this.pyodide.setStdout({ batched: (s: string) => { stdout += s + "\n"; } });
+    this.pyodide.setStderr({ batched: (s: string) => { stderr += s + "\n"; } });
+
+    // Auto-install any Pyodide packages referenced by the user's imports
+    // (e.g. `import sklearn` triggers loading of scikit-learn). This makes
+    // every package shipped in the Pyodide distribution work out of the
+    // box without a manual `micropip.install`.
+    try {
+      await this.pyodide.loadPackagesFromImports(code);
+    } catch (err) {
+      // Surface the error as stderr but still try to run the code so the
+      // user sees the underlying ImportError too.
+      stderr += `Failed to auto-load packages: ${
+        err instanceof Error ? err.message : String(err)
+      }\n`;
+    }
 
     await this.pyodide.runPythonAsync("_display_outputs.clear()");
 
@@ -435,8 +429,6 @@ export const pythonAdapter: LanguageAdapter = {
   documentTitle: "Python Playground",
   readyStatus: "Python 3.12 ready",
   codeMirrorMode: "python",
-  scripts: [...CODEMIRROR_SCRIPTS, PLOTLY_SRC, `${PYODIDE_INDEX}pyodide.js`],
-  stylesheets: CODEMIRROR_STYLES,
   examples: EXAMPLES,
   packages: PACKAGES,
   packagesFooter: (
@@ -454,11 +446,11 @@ export const pythonAdapter: LanguageAdapter = {
   ),
   importSnippet: (name) => `import ${name}`,
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    if (!window.loadPyodide) {
-      throw new Error("loadPyodide not available — script failed to load");
-    }
     setLoadingMessage("Loading Pyodide…");
-    const pyodide = await window.loadPyodide({ indexURL: PYODIDE_INDEX });
+    // Dynamic import keeps the heavy Pyodide loader out of the SSR bundle
+    // and only fetches it when the playground page actually mounts.
+    const { loadPyodide } = await import("pyodide");
+    const pyodide = await loadPyodide({ indexURL: PYODIDE_INDEX_URL });
 
     setLoadingMessage("Installing packages…");
     await pyodide.loadPackage(["numpy", "pandas", "matplotlib"]);
@@ -505,9 +497,3 @@ plt.show = _patched_show
     return new PyodideRuntime(pyodide);
   },
 };
-
-// Re-export so other adapters (R) can reuse the same CodeMirror bundle.
-export async function loadCodeMirrorAssets(): Promise<void> {
-  loadStylesheets(CODEMIRROR_STYLES);
-  await loadScripts(CODEMIRROR_SCRIPTS);
-}

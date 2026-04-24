@@ -9,11 +9,22 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
+// CodeMirror v5 stylesheets — these are pure CSS so importing them at the
+// top of a "use client" component is safe (Next.js extracts them at build
+// time and they don't touch `window`).
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/dracula.css";
+import "codemirror/theme/monokai.css";
+import "codemirror/theme/material-darker.css";
+import "codemirror/theme/nord.css";
+import "codemirror/theme/tomorrow-night-eighties.css";
+import "codemirror/theme/solarized.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/theme/mdn-like.css";
 import type {
+  CodeMirrorAPI,
   CodeMirrorEditor,
-  PlotlyAPI,
 } from "./runtime/globals";
-import { loadScripts, loadStylesheets } from "./runtime/loader";
 import type {
   ExampleSnippet,
   LanguageAdapter,
@@ -22,6 +33,16 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "./types";
+
+/** Minimal Plotly surface we use for rendering chart cells. */
+interface PlotlyAPI {
+  newPlot(
+    el: HTMLElement,
+    data: unknown[],
+    layout?: Record<string, unknown>,
+    config?: Record<string, unknown>,
+  ): Promise<unknown>;
+}
 
 type Mode = "light" | "dark" | "system";
 
@@ -160,18 +181,27 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const Plotly = window.Plotly as PlotlyAPI | undefined;
-    if (!Plotly) return;
-    const layout = {
-      ...PLOTLY_DARK_DEFAULTS,
-      ...(figure.layout ?? {}),
+    let cancelled = false;
+    void (async () => {
+      // Plotly is heavy and only needed when a chart actually renders, so
+      // we lazy-load the npm package on demand.
+      const mod = await import("plotly.js-dist-min");
+      if (cancelled || !ref.current) return;
+      const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
+      const layout = {
+        ...PLOTLY_DARK_DEFAULTS,
+        ...(figure.layout ?? {}),
+      };
+      void Plotly.newPlot(el, figure.data, layout, {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
+      });
+    })();
+    return () => {
+      cancelled = true;
     };
-    void Plotly.newPlot(el, figure.data, layout, {
-      responsive: true,
-      displayModeBar: true,
-      displaylogo: false,
-      modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
-    });
   }, [figure]);
   return <div ref={ref} className="plotly-chart" />;
 }
@@ -345,6 +375,10 @@ interface SettingsPanelProps {
   setMode: (m: Mode) => void;
   fontSize: number;
   setFontSize: (n: number) => void;
+  outputFontSizeEnabled: boolean;
+  setOutputFontSizeEnabled: (b: boolean) => void;
+  outputFontSize: number;
+  setOutputFontSize: (n: number) => void;
   editorTheme: string;
   setEditorTheme: (t: string) => void;
   language: string; // e.g. "python" / "r" — used only for the preview snippet
@@ -356,6 +390,10 @@ function SettingsPanel({
   setMode,
   fontSize,
   setFontSize,
+  outputFontSizeEnabled,
+  setOutputFontSizeEnabled,
+  outputFontSize,
+  setOutputFontSize,
   editorTheme,
   setEditorTheme,
   language,
@@ -439,6 +477,33 @@ function SettingsPanel({
           </div>
 
           <div className="setting-row">
+            <label className="setting-checkbox-row">
+              <input
+                type="checkbox"
+                checked={outputFontSizeEnabled}
+                onChange={(e) => setOutputFontSizeEnabled(e.target.checked)}
+              />
+              <span>Use Different Font Size for Outputs</span>
+            </label>
+            <div
+              className={`font-size-row${outputFontSizeEnabled ? "" : " disabled"}`}
+            >
+              <input
+                type="range"
+                className="fs-slider"
+                min={10}
+                max={22}
+                step={1}
+                value={outputFontSize}
+                onChange={(e) => setOutputFontSize(Number(e.target.value))}
+                disabled={!outputFontSizeEnabled}
+                aria-label="Output font size"
+              />
+              <span className="font-size-val">{outputFontSize}px</span>
+            </div>
+          </div>
+
+          <div className="setting-row">
             <div className="setting-label">Editor Theme</div>
             <div className="theme-select-wrap">
               <select
@@ -513,6 +578,9 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
   const [mode, setModeState] = useState<Mode>("system");
   const [fontSize, setFontSizeState] = useState<number>(13);
+  const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
+    useState<boolean>(false);
+  const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
 
   // ─── UI state ───────────────────────────────────────────────────────────
@@ -559,6 +627,11 @@ export default function Playground({ adapter }: PlaygroundProps) {
     const savedMode = (localStorage.getItem(storageKey("mode")) as Mode | null) ?? "system";
     const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? 13) || 13;
     const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+    const savedOutputEnabled =
+      localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
+    const savedOutputSize =
+      Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
+      savedSize;
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch
@@ -566,6 +639,8 @@ export default function Playground({ adapter }: PlaygroundProps) {
     /* eslint-disable react-hooks/set-state-in-effect */
     setModeState(savedMode);
     setFontSizeState(savedSize);
+    setOutputFontSizeEnabledState(savedOutputEnabled);
+    setOutputFontSizeState(savedOutputSize);
     setEditorThemeState(savedTheme);
     /* eslint-enable react-hooks/set-state-in-effect */
     applyMode(savedMode);
@@ -573,6 +648,10 @@ export default function Playground({ adapter }: PlaygroundProps) {
     document.documentElement.style.setProperty(
       "--cm-font-size",
       `${savedSize}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--output-font-size",
+      `${savedOutputEnabled ? savedOutputSize : savedSize}px`,
     );
 
     const mql = window.matchMedia("(prefers-color-scheme: light)");
@@ -594,13 +673,23 @@ export default function Playground({ adapter }: PlaygroundProps) {
     let cancelled = false;
     (async () => {
       try {
-        loadStylesheets(adapter.stylesheets);
-        await loadScripts(adapter.scripts);
+        // Dynamically import CodeMirror v5 and its modes/addons/keymap.
+        // These touch `window` at import time, so we can't import them
+        // statically in a "use client" file (Next.js still SSRs the
+        // module on the server during the initial render pass).
+        const codeMirrorMod = await import("codemirror");
+        await Promise.all([
+          import("codemirror/mode/python/python"),
+          import("codemirror/mode/r/r"),
+          import("codemirror/addon/edit/closebrackets"),
+          import("codemirror/addon/edit/matchbrackets"),
+          import("codemirror/addon/comment/comment"),
+          import("codemirror/keymap/sublime"),
+        ]);
         if (cancelled) return;
 
         // Initialise CodeMirror once the script is on the page.
-        const CM = window.CodeMirror;
-        if (!CM) throw new Error("CodeMirror failed to load");
+        const CM = (codeMirrorMod.default ?? codeMirrorMod) as unknown as CodeMirrorAPI;
         if (textareaRef.current && !editorRef.current) {
           const editor = CM.fromTextArea(textareaRef.current, {
             mode: adapter.codeMirrorMode,
@@ -664,6 +753,16 @@ export default function Playground({ adapter }: PlaygroundProps) {
     editorRef.current?.refresh();
   }, [fontSize]);
 
+  // Apply the output font size: when the toggle is off we mirror the editor
+  // font size so the output cells stay visually consistent.
+  useEffect(() => {
+    const effective = outputFontSizeEnabled ? outputFontSize : fontSize;
+    document.documentElement.style.setProperty(
+      "--output-font-size",
+      `${effective}px`,
+    );
+  }, [outputFontSizeEnabled, outputFontSize, fontSize]);
+
   useEffect(() => {
     applyMode(mode);
   }, [mode]);
@@ -689,6 +788,24 @@ export default function Playground({ adapter }: PlaygroundProps) {
     (n: number) => {
       setFontSizeState(n);
       localStorage.setItem(storageKey("fontsize"), String(n));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
+  const setOutputFontSizeEnabled = useCallback(
+    (b: boolean) => {
+      setOutputFontSizeEnabledState(b);
+      localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
+  const setOutputFontSize = useCallback(
+    (n: number) => {
+      setOutputFontSizeState(n);
+      localStorage.setItem(storageKey("outputfontsize"), String(n));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter.id],
@@ -929,6 +1046,10 @@ export default function Playground({ adapter }: PlaygroundProps) {
             setMode={setMode}
             fontSize={fontSize}
             setFontSize={setFontSize}
+            outputFontSizeEnabled={outputFontSizeEnabled}
+            setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+            outputFontSize={outputFontSize}
+            setOutputFontSize={setOutputFontSize}
             editorTheme={editorTheme}
             setEditorTheme={setEditorTheme}
             language={adapter.id}
