@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Playground</title>
+
+<!-- CodeMirror -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/nord.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/solarized.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/mdn-like.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/keymap/sublime.min.js"></script>
+
+<!-- Plotly -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<!-- Pyodide -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.3/full/pyodide.js"></script>
+
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --border: #2a3347;
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --text-muted: #94a3b8;
+    --accent: oklch(68% 0.18 250);
+    --accent-glow: oklch(68% 0.18 250 / 0.15);
+    --green: oklch(68% 0.18 145);
+    --red: oklch(62% 0.18 15);
+    --yellow: oklch(78% 0.16 85);
+    --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+    --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+    --radius: 8px;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  /* ─── Light mode — only non-variable overrides remain ─── */
+  html[data-theme="light"] .pyodide-loading {
+    background: var(--bg);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    overflow: hidden;
+  }
+
+  /* ─── Layout ─── */
+  .app {
+    display: grid;
+    grid-template-rows: 48px 1fr;
+    height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .logo-icon {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+    font-family: var(--font-mono);
+  }
+
+  .header-sep { flex: 1; }
+
+  .status-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-family: var(--font-mono);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+  .status-pill.loading { border-color: var(--yellow); color: var(--yellow); }
+  .status-pill.ready   { border-color: var(--green);  color: var(--green);  }
+  .status-pill.running { border-color: var(--accent); color: var(--accent); }
+  .status-pill.error   { border-color: var(--red);    color: var(--red);    }
+
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
+  .status-pill.loading .status-dot {
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .status-pill.running .status-dot {
+    animation: pulse 0.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ─── Examples dropdown ─── */
+  .examples-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: var(--radius);
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); font-family: var(--font-ui); font-size: 13px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .examples-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .examples-dropdown {
+    position: absolute; top: 52px; right: 60px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: 0 8px 32px #0008;
+    width: 220px; z-index: 100; overflow: hidden;
+    display: none;
+  }
+  .examples-dropdown.open { display: block; }
+
+  .example-item {
+    padding: 10px 14px; cursor: pointer;
+    color: var(--text-muted); font-size: 13px;
+    transition: all 0.1s;
+    border-bottom: 1px solid var(--border);
+  }
+  .example-item:last-child { border-bottom: none; }
+  .example-item:hover { background: var(--bg3); color: var(--text); }
+  .example-item .ex-title { font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .example-item .ex-desc  { font-size: 11px; color: var(--text-dim); }
+
+  /* ─── Main panes ─── */
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* ─── Editor pane ─── */
+  .editor-pane {
+    display: flex; flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .pane-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 12px; height: 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    flex-shrink: 0;
+  }
+
+  .pane-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+
+  .pane-bar-sep { flex: 1; }
+
+  .kbd {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-dim); padding: 2px 5px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: var(--bg3);
+  }
+
+  .run-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: var(--radius);
+    background: var(--accent); border: none;
+    color: white; font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .run-btn:hover { filter: brightness(1.1); }
+  .run-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }
+
+  .run-btn svg { width: 12px; height: 12px; fill: white; flex-shrink: 0; }
+
+  .editor-wrap {
+    flex: 1; overflow: hidden; position: relative;
+  }
+
+  .CodeMirror {
+    height: 100% !important;
+    font-family: var(--font-mono) !important;
+    font-size: 13.5px !important;
+    line-height: 1.7 !important;
+    background: var(--bg) !important;
+  }
+  .CodeMirror-scroll { height: 100%; }
+  .CodeMirror-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; }
+  .CodeMirror-linenumber { color: var(--text-dim) !important; }
+
+  /* ─── Output pane ─── */
+  .output-pane {
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .output-body {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .out-cell { flex-shrink: 0; }
+
+  .output-body::-webkit-scrollbar { width: 6px; }
+  .output-body::-webkit-scrollbar-track { background: transparent; }
+  .output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Welcome state */
+  .welcome {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; gap: 10px; color: var(--text-dim); text-align: center; padding: 32px;
+  }
+  .welcome-icon { font-size: 32px; opacity: 0.5; }
+  .welcome h3 { font-size: 15px; color: var(--text-muted); font-weight: 500; }
+  .welcome p  { font-size: 12px; line-height: 1.6; max-width: 240px; }
+
+  /* Output cells */
+  .out-cell {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeSlide 0.2s ease;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .out-cell-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; font-family: var(--font-mono);
+    color: var(--text-dim);
+  }
+  .out-cell-header .cell-type { font-weight: 600; }
+  .out-cell-header .cell-time { margin-left: auto; }
+
+  .out-cell.stdout .out-cell-header { border-left: 3px solid var(--green); }
+  .out-cell.stderr .out-cell-header { border-left: 3px solid var(--red); }
+  .out-cell.html   .out-cell-header { border-left: 3px solid var(--accent); }
+  .out-cell.plot   .out-cell-header { border-left: 3px solid var(--yellow); }
+  .out-cell.image  .out-cell-header { border-left: 3px solid var(--yellow); }
+
+  .out-cell-body { padding: 12px; }
+
+  .out-cell.stdout .out-cell-body {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+    color: var(--text); white-space: pre-wrap; word-break: break-word;
+  }
+  .out-cell.stderr .out-cell-body {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+    color: var(--red); white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* DataFrame tables */
+  .out-cell.html .out-cell-body {
+    overflow-x: auto;
+    padding: 0;
+  }
+  .dataframe-wrap { overflow-x: auto; padding: 12px; }
+
+  .out-cell.html table {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text);
+    width: 100%;
+    min-width: max-content;
+  }
+  .out-cell.html th {
+    padding: 7px 14px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .out-cell.html td {
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+    color: var(--text-muted);
+  }
+  .out-cell.html tr:hover td { background: var(--bg3); }
+  .out-cell.html tr:last-child td { border-bottom: none; }
+
+  /* Plotly chart */
+  .out-cell.plot .out-cell-body { padding: 0; }
+  .plotly-chart { width: 100%; height: 380px; }
+
+  /* Matplotlib image */
+  .out-cell.image .out-cell-body { text-align: center; }
+  .out-cell.image img { max-width: 100%; border-radius: 4px; }
+
+  /* Clear button */
+  .clear-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 12px; font-family: var(--font-ui);
+    padding: 4px 10px; border-radius: var(--radius); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ─── Settings button ─── */
+  .settings-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: var(--radius);
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+  .settings-btn:hover { border-color: var(--accent); color: var(--text); }
+  .settings-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+  /* ─── Settings overlay ─── */
+  .settings-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: transparent;
+    display: none;
+  }
+  .settings-overlay.open { display: block; }
+
+  /* ─── Settings panel ─── */
+  .settings-panel {
+    position: absolute; top: 52px; right: 16px;
+    width: 300px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 16px 48px #0009, 0 2px 8px #0004;
+    overflow: hidden;
+    animation: settingsDrop 0.18s cubic-bezier(0.34, 1.2, 0.64, 1);
+    transform-origin: top right;
+  }
+  @keyframes settingsDrop {
+    from { opacity: 0; transform: scale(0.92) translateY(-6px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .settings-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-title {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .settings-close {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--bg3); border: none;
+    color: var(--text-dim); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: all 0.12s;
+  }
+  .settings-close:hover { background: var(--border); color: var(--text); }
+
+  .settings-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Setting row */
+  .setting-row { display: flex; flex-direction: column; gap: 8px; }
+  .setting-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    background: var(--bg3); border-radius: 8px; padding: 3px; gap: 3px;
+  }
+  .mode-btn {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 7px 4px; border-radius: 6px; border: none;
+    background: transparent; color: var(--text-dim);
+    font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .mode-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; flex-shrink: 0; }
+  .mode-btn:hover { color: var(--text); }
+  .mode-btn.active {
+    background: var(--bg2); color: var(--text);
+    box-shadow: 0 1px 4px #0003;
+  }
+  html[data-theme="light"] .mode-btn.active {
+    box-shadow: 0 1px 4px #0001, 0 0 0 1px var(--border);
+  }
+
+  /* Font size slider */
+  .font-size-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .font-size-val {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--accent); min-width: 30px; text-align: right;
+  }
+  input[type="range"].fs-slider {
+    flex: 1; height: 4px; appearance: none;
+    background: var(--bg3); border-radius: 2px; outline: none;
+    cursor: pointer;
+  }
+  input[type="range"].fs-slider::-webkit-slider-runnable-track {
+    height: 4px; border-radius: 2px;
+  }
+  input[type="range"].fs-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent);
+    margin-top: -6px;
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    transition: box-shadow 0.15s;
+  }
+  input[type="range"].fs-slider:hover::-webkit-slider-thumb {
+    box-shadow: 0 0 0 5px var(--accent-glow);
+  }
+
+  /* Theme select */
+  .theme-select-wrap { position: relative; }
+  .theme-select {
+    width: 100%; padding: 8px 30px 8px 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: var(--font-ui); font-size: 13px;
+    appearance: none; cursor: pointer; outline: none;
+    transition: border-color 0.15s;
+  }
+  .theme-select:hover, .theme-select:focus { border-color: var(--accent); }
+  .theme-select-arrow {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    pointer-events: none; color: var(--text-dim);
+  }
+  .theme-select-arrow svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* Theme preview strip */
+  .theme-preview {
+    border-radius: 6px; overflow: hidden;
+    border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5;
+    padding: 8px 10px;
+    background: #282a36; color: #f8f8f2;
+    transition: all 0.2s;
+    white-space: pre;
+  }
+
+  /* ─── Packages drawer ─── */
+  .pkg-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: #0005;
+    display: none; backdrop-filter: blur(2px);
+  }
+  .pkg-overlay.open { display: block; }
+
+  .pkg-drawer {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 380px; background: var(--bg2);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 32px #0006;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .pkg-overlay.open .pkg-drawer { transform: translateX(0); }
+
+  .pkg-drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .pkg-drawer-title {
+    font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pkg-count-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    background: var(--accent-glow); color: var(--accent);
+    border-radius: 10px; border: 1px solid var(--accent);
+  }
+
+  .pkg-search-wrap {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .pkg-search {
+    width: 100%; padding: 7px 10px 7px 32px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: var(--font-ui); font-size: 13px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .pkg-search:focus { border-color: var(--accent); }
+  .pkg-search-icon {
+    position: absolute; left: 26px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); pointer-events: none;
+  }
+  .pkg-search-icon svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .pkg-body {
+    flex: 1; overflow-y: auto; padding: 8px 0;
+  }
+  .pkg-body::-webkit-scrollbar { width: 5px; }
+  .pkg-body::-webkit-scrollbar-track { background: transparent; }
+  .pkg-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .pkg-category-label {
+    padding: 10px 16px 4px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+
+  .pkg-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 16px; cursor: default;
+    transition: background 0.1s;
+    border-radius: 0;
+  }
+  .pkg-item:hover { background: var(--bg3); }
+
+  .pkg-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; margin-top: 1px;
+  }
+  .pkg-info { flex: 1; min-width: 0; }
+  .pkg-name {
+    font-family: var(--font-mono); font-size: 12.5px;
+    font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pkg-version {
+    font-size: 10px; color: var(--text-dim); font-weight: 400;
+    font-family: var(--font-ui);
+  }
+  .pkg-desc { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
+
+  .pkg-copy-btn {
+    flex-shrink: 0; padding: 3px 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text-dim);
+    font-size: 10px; font-family: var(--font-mono);
+    cursor: pointer; transition: all 0.12s; margin-top: 4px;
+  }
+  .pkg-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .pkg-copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  .pkg-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text-dim);
+    flex-shrink: 0; line-height: 1.5;
+  }
+  .pkg-footer a { color: var(--accent); text-decoration: none; }
+  .pkg-footer a:hover { text-decoration: underline; }
+
+  /* Loading overlay */
+  .pyodide-loading {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; z-index: 999;
+    transition: opacity 0.4s;
+  }
+  .pyodide-loading.hidden { opacity: 0; pointer-events: none; }
+
+  .loading-logo { font-family: var(--font-mono); font-size: 28px; font-weight: 700;
+    background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .loading-bar-wrap {
+    width: 240px; height: 3px; background: var(--border); border-radius: 2px;
+    overflow: hidden;
+  }
+  .loading-bar {
+    height: 100%; background: linear-gradient(90deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
+    border-radius: 2px;
+    animation: loadBar 2.5s ease-in-out infinite;
+  }
+  @keyframes loadBar {
+    0%   { width: 5%; margin-left: 0; }
+    50%  { width: 60%; margin-left: 20%; }
+    100% { width: 5%; margin-left: 95%; }
+  }
+  .loading-msg { font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); }
+
+  /* Install banner */
+  .install-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 12px; font-family: var(--font-mono); color: var(--text-dim);
+    animation: fadeSlide 0.2s ease;
+  }
+  .install-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--yellow); animation: pulse 0.8s ease-in-out infinite; flex-shrink: 0;
+  }
+
+  /* Resizer */
+  .resizer {
+    width: 4px; background: transparent; cursor: col-resize;
+    transition: background 0.15s; position: absolute; top: 0; bottom: 0;
+    right: -2px; z-index: 10;
+  }
+  .resizer:hover, .resizer.dragging { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- Pyodide loading overlay -->
+<div class="pyodide-loading" id="loadingOverlay">
+  <div class="loading-logo">py</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-msg" id="loadingMsg">Initializing Python runtime…</div>
+</div>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">py</div>
+      Python Playground
+    </div>
+    <div class="header-sep"></div>
+    <div style="position:relative">
+      <button class="examples-btn" id="examplesBtn" onclick="toggleExamples()">        <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M2 2h12v2H2zm0 4h8v2H2zm0 4h10v2H2z"/></svg>
+        Examples
+      </button>
+      <div class="examples-dropdown" id="examplesDropdown">
+        <div class="example-item" onclick="loadExample('hello')">
+          <div class="ex-title">Hello World</div>
+          <div class="ex-desc">Basic print, math & strings</div>
+        </div>
+        <div class="example-item" onclick="loadExample('dataframe')">
+          <div class="ex-title">Pandas DataFrame</div>
+          <div class="ex-desc">Create & display a DataFrame</div>
+        </div>
+        <div class="example-item" onclick="loadExample('plotly_line')">
+          <div class="ex-title">Plotly Line Chart</div>
+          <div class="ex-desc">Interactive time-series plot</div>
+        </div>
+        <div class="example-item" onclick="loadExample('plotly_bar')">
+          <div class="ex-title">Plotly Bar Chart</div>
+          <div class="ex-desc">Grouped bar chart with colors</div>
+        </div>
+        <div class="example-item" onclick="loadExample('plotly_scatter')">
+          <div class="ex-title">Plotly Scatter</div>
+          <div class="ex-desc">Scatter with regression trend</div>
+        </div>
+        <div class="example-item" onclick="loadExample('matplotlib')">
+          <div class="ex-title">Matplotlib</div>
+          <div class="ex-desc">Static chart as image</div>
+        </div>
+        <div class="example-item" onclick="loadExample('numpy_stats')">
+          <div class="ex-title">NumPy Statistics</div>
+          <div class="ex-desc">Arrays & statistical ops</div>
+        </div>
+        <div class="example-item" onclick="loadExample('sklearn')">
+          <div class="ex-title">Scikit-learn</div>
+          <div class="ex-desc">Linear regression example</div>
+        </div>
+      </div>
+    </div>
+    <!-- Packages button -->
+    <button class="examples-btn" onclick="togglePackages()" title="Available Packages">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z"/></svg>
+      Packages
+    </button>
+
+    <!-- Settings -->
+    <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()" title="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+
+    <!-- Settings overlay & panel -->
+    <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()">
+      <div class="settings-panel" onclick="event.stopPropagation()">
+        <div class="settings-header">
+          <span class="settings-title">Settings</span>
+          <button class="settings-close" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="settings-body">
+
+          <!-- Appearance -->
+          <div class="setting-row">
+            <div class="setting-label">Appearance</div>
+            <div class="mode-toggle">
+              <button class="mode-btn" id="modeLight" onclick="setMode('light')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                Light
+              </button>
+              <button class="mode-btn" id="modeDark" onclick="setMode('dark')">
+                <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                Dark
+              </button>
+              <button class="mode-btn active" id="modeSystem" onclick="setMode('system')">
+                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                System
+              </button>
+            </div>
+          </div>
+
+          <!-- Font size -->
+          <div class="setting-row">
+            <div class="setting-label">Editor Font Size</div>
+            <div class="font-size-row">
+              <input type="range" class="fs-slider" id="fontSizeSlider"
+                min="10" max="22" step="1" value="13"
+                oninput="setFontSize(this.value)">
+              <span class="font-size-val" id="fontSizeVal">13px</span>
+            </div>
+          </div>
+
+          <!-- Editor theme -->
+          <div class="setting-row">
+            <div class="setting-label">Editor Theme</div>
+            <div class="theme-select-wrap">
+              <select class="theme-select" id="themeSelect" onchange="setEditorTheme(this.value)">
+                <option value="dracula">Dracula</option>
+                <option value="monokai">Monokai</option>
+                <option value="material-darker">Material Darker</option>
+                <option value="nord">Nord</option>
+                <option value="tomorrow-night-eighties">Tomorrow Night</option>
+                <option value="solarized dark">Solarized Dark</option>
+                <option value="solarized light">Solarized Light</option>
+                <option value="eclipse">Eclipse</option>
+                <option value="mdn-like">MDN-like</option>
+              </select>
+              <span class="theme-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span>
+            </div>
+            <div class="theme-preview" id="themePreview"><span style="color:#ff79c6">def</span> <span style="color:#50fa7b">greet</span>(<span style="color:#ffb86c">name</span>):
+  <span style="color:#ff79c6">return</span> <span style="color:#f1fa8c">f"Hello, {name}!"</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="status-pill loading" id="statusPill">
+      <div class="status-dot"></div>
+      <span id="statusText">Loading…</span>
+    </div>
+  </header>
+
+  <!-- Packages drawer (outside header, full viewport) -->
+  <div class="pkg-overlay" id="pkgOverlay" onclick="closePkgDrawer(event)">
+    <div class="pkg-drawer" onclick="event.stopPropagation()">
+      <div class="pkg-drawer-header">
+        <div class="pkg-drawer-title">
+          Available Packages
+          <span class="pkg-count-badge" id="pkgCountBadge">0</span>
+        </div>
+        <button class="settings-close" onclick="closePkgDrawer()">✕</button>
+      </div>
+      <div class="pkg-search-wrap" style="position:relative">
+        <span class="pkg-search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+        <input class="pkg-search" id="pkgSearch" type="text" placeholder="Search packages…" oninput="filterPackages(this.value)">
+      </div>
+      <div class="pkg-body" id="pkgBody"></div>
+      <div class="pkg-footer">
+        Packages run in WebAssembly via <a href="https://pyodide.org" target="_blank">Pyodide</a>. Use <code style="font-family:var(--font-mono);font-size:11px">import micropip; await micropip.install('pkg')</code> for pure-Python PyPI packages.
+      </div>
+    </div>
+  </div>
+
+  <!-- Panes -->
+  <div class="panes" id="panes">
+    <!-- Editor -->
+    <div class="editor-pane" id="editorPane" style="position:relative">
+      <div class="pane-bar">
+        <span class="pane-label">Editor</span>
+        <div class="pane-bar-sep"></div>
+        <span class="kbd">⌘ Enter</span>
+        <button class="run-btn" id="runBtn" disabled onclick="runCode()">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Run
+        </button>
+      </div>
+      <div class="editor-wrap">
+        <textarea id="editor"></textarea>
+      </div>
+      <div class="resizer" id="resizer"></div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-pane" id="outputPane">
+      <div class="pane-bar">
+        <span class="pane-label">Output</span>
+        <div class="pane-bar-sep"></div>
+        <button class="clear-btn" onclick="clearOutput()">Clear</button>
+      </div>
+      <div class="output-body" id="outputBody">
+        <div class="welcome" id="welcomeMsg">
+          <div class="welcome-icon">⌬</div>
+          <h3>Run your code to see output</h3>
+          <p>Supports text, Pandas DataFrames, Plotly charts, Matplotlib figures, and more.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Examples ───────────────────────────────────────────────────────────────
+const EXAMPLES = {
+  hello: `# Hello, Python Playground!
+import sys, math
+
+print("Python", sys.version.split()[0])
+print("π ≈", math.pi)
+print("e ≈", math.e)
+
+for i in range(1, 6):
+    stars = "★" * i
+    print(f"  {i}: {stars}")
+
+msg = "Hello, World!"
+print("\\n" + "─" * 30)
+print(msg.center(30))
+print("─" * 30)
+`,
+
+  dataframe: `import pandas as pd
+import numpy as np
+
+# Create a sample sales DataFrame
+np.random.seed(42)
+months = ["Jan","Feb","Mar","Apr","May","Jun"]
+products = ["Widget A","Widget B","Widget C"]
+
+data = {
+    "Month": months * 3,
+    "Product": [p for p in products for _ in months],
+    "Revenue": np.random.randint(10000, 80000, 18),
+    "Units": np.random.randint(50, 500, 18),
+    "Margin %": np.round(np.random.uniform(0.15, 0.45, 18), 2),
+}
+
+df = pd.DataFrame(data)
+df["Avg Price"] = (df["Revenue"] / df["Units"]).round(2)
+
+print("Sales Summary")
+print("─" * 40)
+display(df.groupby("Product")[["Revenue","Units"]].sum())
+print()
+print("Full data (first 10 rows):")
+display(df.head(10))
+`,
+
+  plotly_line: `import plotly.graph_objects as go
+import numpy as np
+
+# Simulate time-series data
+np.random.seed(7)
+days = np.arange(1, 91)
+series_a = 100 + np.cumsum(np.random.randn(90) * 2)
+series_b = 90  + np.cumsum(np.random.randn(90) * 1.5)
+series_c = 110 + np.cumsum(np.random.randn(90) * 2.5)
+
+fig = go.Figure()
+for name, vals, color in [
+    ("Product A", series_a, "#4f8ef7"),
+    ("Product B", series_b, "#34d399"),
+    ("Product C", series_c, "#f59e0b"),
+]:
+    fig.add_trace(go.Scatter(
+        x=days, y=vals, name=name,
+        line=dict(color=color, width=2),
+        hovertemplate=f"Day %{{x}}<br>{name}: %{{y:.1f}}<extra></extra>"
+    ))
+
+fig.update_layout(
+    title="90-Day Performance Trends",
+    xaxis_title="Day", yaxis_title="Value",
+    legend=dict(x=0, y=1),
+    height=400,
+)
+fig.show()
+`,
+
+  plotly_bar: `import plotly.graph_objects as go
+
+quarters = ["Q1", "Q2", "Q3", "Q4"]
+regions  = {
+    "North": [42, 55, 61, 78],
+    "South": [38, 47, 52, 65],
+    "East":  [51, 60, 70, 82],
+    "West":  [29, 41, 48, 57],
+}
+colors = ["#4f8ef7", "#34d399", "#f59e0b", "#f472b6"]
+
+fig = go.Figure()
+for (region, vals), color in zip(regions.items(), colors):
+    fig.add_trace(go.Bar(
+        name=region, x=quarters, y=vals,
+        marker_color=color,
+        hovertemplate=f"{region}<br>%{{x}}: %{{y}}M<extra></extra>"
+    ))
+
+fig.update_layout(
+    barmode="group",
+    title="Regional Revenue by Quarter ($M)",
+    xaxis_title="Quarter", yaxis_title="Revenue ($M)",
+    height=400,
+)
+fig.show()
+`,
+
+  plotly_scatter: `import plotly.graph_objects as go
+import numpy as np
+
+np.random.seed(42)
+n = 80
+x = np.random.uniform(0, 100, n)
+y = 2.5 * x + np.random.randn(n) * 15 + 30
+sizes = np.random.uniform(8, 24, n)
+category = np.random.choice(["Alpha","Beta","Gamma"], n)
+color_map = {"Alpha":"#4f8ef7","Beta":"#34d399","Gamma":"#f59e0b"}
+
+fig = go.Figure()
+for cat in ["Alpha","Beta","Gamma"]:
+    mask = category == cat
+    fig.add_trace(go.Scatter(
+        x=x[mask], y=y[mask], mode="markers",
+        name=cat,
+        marker=dict(size=sizes[mask], color=color_map[cat], opacity=0.75, line=dict(width=1, color="white")),
+        hovertemplate=f"{cat}<br>x=%{{x:.1f}}, y=%{{y:.1f}}<extra></extra>"
+    ))
+
+# Trend line
+m, b = np.polyfit(x, y, 1)
+xs = np.linspace(0, 100, 200)
+fig.add_trace(go.Scatter(
+    x=xs, y=m*xs+b, mode="lines", name="Trend",
+    line=dict(color="white", width=1.5, dash="dash"), opacity=0.5
+))
+
+fig.update_layout(title="Scatter with Trend Line", height=420,
+    xaxis_title="X", yaxis_title="Y")
+fig.show()
+`,
+
+  matplotlib: `import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), facecolor="#0f1117")
+fig.suptitle("Matplotlib Output", color="#e2e8f0", fontsize=14, fontweight="bold")
+
+# Histogram
+np.random.seed(0)
+data = np.random.normal(0, 1, 2000)
+ax1 = axes[0]
+ax1.hist(data, bins=40, color="#4f8ef7", edgecolor="none", alpha=0.85)
+ax1.set_title("Normal Distribution", color="#e2e8f0")
+ax1.set_facecolor("#161b27")
+ax1.tick_params(colors="#64748b")
+for sp in ax1.spines.values(): sp.set_edgecolor("#2a3347")
+
+# Sine waves
+ax2 = axes[1]
+t = np.linspace(0, 4 * np.pi, 500)
+ax2.plot(t, np.sin(t),   color="#4f8ef7", linewidth=2, label="sin")
+ax2.plot(t, np.cos(t),   color="#34d399", linewidth=2, label="cos")
+ax2.plot(t, np.sin(2*t), color="#f59e0b", linewidth=2, label="sin 2x", linestyle="--")
+ax2.set_title("Trig Functions", color="#e2e8f0")
+ax2.set_facecolor("#161b27")
+ax2.tick_params(colors="#64748b")
+ax2.legend(facecolor="#1e2535", edgecolor="#2a3347", labelcolor="#94a3b8")
+for sp in ax2.spines.values(): sp.set_edgecolor("#2a3347")
+
+plt.tight_layout()
+plt.show()
+`,
+
+  numpy_stats: `import numpy as np
+
+np.random.seed(99)
+data = np.random.normal(loc=50, scale=10, size=1000)
+
+print("═" * 38)
+print("  Descriptive Statistics")
+print("═" * 38)
+print(f"  Count  : {len(data):>10,}")
+print(f"  Mean   : {np.mean(data):>10.4f}")
+print(f"  Median : {np.median(data):>10.4f}")
+print(f"  Std    : {np.std(data):>10.4f}")
+print(f"  Var    : {np.var(data):>10.4f}")
+print(f"  Min    : {np.min(data):>10.4f}")
+print(f"  Max    : {np.max(data):>10.4f}")
+print(f"  P25    : {np.percentile(data, 25):>10.4f}")
+print(f"  P75    : {np.percentile(data, 75):>10.4f}")
+print("═" * 38)
+
+# Matrix operations
+A = np.random.randint(1, 9, (4, 4))
+B = np.random.randint(1, 9, (4, 4))
+print("\\nMatrix A @ B =")
+print(A @ B)
+print("\\nDet(A) =", round(np.linalg.det(A), 4))
+print("Eigenvalues(A) =", np.linalg.eigvals(A).round(3))
+`,
+
+  sklearn: `from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+import pandas as pd
+
+# Generate synthetic housing data
+np.random.seed(42)
+n = 200
+sqft    = np.random.uniform(500, 3500, n)
+rooms   = np.random.randint(1, 6, n)
+age     = np.random.randint(1, 40, n)
+price   = 80000 + sqft * 120 + rooms * 8000 - age * 500 + np.random.randn(n) * 20000
+
+X = np.column_stack([sqft, rooms, age])
+y = price
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("Linear Regression — Housing Price Model")
+print("─" * 42)
+print(f"  R²  score : {r2_score(y_test, y_pred):.4f}")
+print(f"  RMSE      : \${mean_squared_error(y_test, y_pred)**0.5:,.0f}")
+print()
+features = ["Sq Ft", "Rooms", "Age"]
+print("  Coefficients:")
+for f, c in zip(features, model.coef_):
+    print(f"    {f:<8} : {c:+.2f}")
+print(f"  Intercept  : {model.intercept_:+,.0f}")
+`,
+};
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let pyodide = null;
+let cm = null;
+let outputCount = 0;
+
+// ─── CodeMirror ──────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", () => {
+  cm = CodeMirror.fromTextArea(document.getElementById("editor"), {
+    mode: "python",
+    theme: "dracula",
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    keyMap: "sublime",
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    lineWrapping: false,
+    extraKeys: {
+      "Cmd-Enter":   () => runCode(),
+      "Ctrl-Enter":  () => runCode(),
+    }
+  });
+  cm.setValue(EXAMPLES.hello);
+  cm.setSize("100%", "100%");
+
+  // Apply saved settings to CodeMirror
+  if (window._savedEditorTheme) cm.setOption("theme", window._savedEditorTheme);
+  if (window._savedFontSize) {
+    cm.getWrapperElement().style.fontSize = window._savedFontSize + "px";
+    cm.refresh();
+  }
+
+  initResizer();
+});
+
+// ─── Resizer ─────────────────────────────────────────────────────────────────
+function initResizer() {
+  const resizer = document.getElementById("resizer");
+  const panes   = document.getElementById("panes");
+  let dragging = false, startX, startFrac;
+
+  resizer.addEventListener("mousedown", e => {
+    dragging = true;
+    startX = e.clientX;
+    startFrac = document.getElementById("editorPane").offsetWidth / panes.offsetWidth;
+    resizer.classList.add("dragging");
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  });
+  window.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    const frac = Math.min(0.8, Math.max(0.2,
+      startFrac + (e.clientX - startX) / panes.offsetWidth));
+    panes.style.gridTemplateColumns = `${frac * 100}% 1fr`;
+  });
+  window.addEventListener("mouseup", () => {
+    if (!dragging) return;
+    dragging = false;
+    resizer.classList.remove("dragging");
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  });
+}
+
+// ─── Examples dropdown ───────────────────────────────────────────────────────
+function toggleExamples() {
+  document.getElementById("examplesDropdown").classList.toggle("open");
+}
+document.addEventListener("click", e => {
+  if (!e.target.closest("#examplesBtn") && !e.target.closest("#examplesDropdown")) {
+    document.getElementById("examplesDropdown").classList.remove("open");
+  }
+});
+function loadExample(key) {
+  cm.setValue(EXAMPLES[key]);
+  document.getElementById("examplesDropdown").classList.remove("open");
+}
+
+// ─── Status ──────────────────────────────────────────────────────────────────
+function setStatus(state, text) {
+  const pill = document.getElementById("statusPill");
+  const span = document.getElementById("statusText");
+  pill.className = "status-pill " + state;
+  span.textContent = text;
+}
+
+// ─── Pyodide init ────────────────────────────────────────────────────────────
+async function initPyodide() {
+  const loadingMsg = document.getElementById("loadingMsg");
+  try {
+    loadingMsg.textContent = "Loading Pyodide…";
+    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.3/full/" });
+
+    loadingMsg.textContent = "Installing packages…";
+    await pyodide.loadPackage(["numpy", "pandas", "matplotlib"]);
+
+    // Install plotly via micropip (it's a pure Python package)
+    await pyodide.loadPackage("micropip");
+    const micropip = pyodide.pyimport("micropip");
+    await micropip.install("plotly");
+
+    // Patch display/show
+    await pyodide.runPythonAsync(`
+import sys, io, base64, json
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+# Custom display function
+_display_outputs = []
+
+def display(obj):
+    import pandas as pd
+    if isinstance(obj, pd.DataFrame):
+        _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
+    elif hasattr(obj, "_repr_html_"):
+        h = obj._repr_html_()
+        if h:
+            _display_outputs.append({"type": "html", "html": h})
+    else:
+        _display_outputs.append({"type": "stdout", "text": repr(obj)})
+
+import builtins
+builtins.display = display
+
+# Patch plt.show to capture matplotlib figures
+_original_show = plt.show
+def _patched_show(*args, **kwargs):
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=plt.gcf().get_facecolor())
+    buf.seek(0)
+    img_b64 = base64.b64encode(buf.read()).decode()
+    _display_outputs.append({"type": "image", "data": img_b64})
+    plt.clf()
+    plt.close("all")
+plt.show = _patched_show
+`);
+
+    document.getElementById("loadingOverlay").classList.add("hidden");
+    document.getElementById("runBtn").disabled = false;
+    setStatus("ready", "Python 3.12 ready");
+  } catch (err) {
+    loadingMsg.textContent = "Failed to load: " + err.message;
+    setStatus("error", "Load failed");
+  }
+}
+
+// ─── Run code ────────────────────────────────────────────────────────────────
+async function runCode() {
+  if (!pyodide) return;
+  const code = cm.getValue().trim();
+  if (!code) return;
+
+  const runBtn = document.getElementById("runBtn");
+  runBtn.disabled = true;
+  setStatus("running", "Running…");
+
+  const welcomeMsg = document.getElementById("welcomeMsg");
+  if (welcomeMsg) welcomeMsg.remove();
+
+  const t0 = performance.now();
+
+  try {
+    // Clear previous display outputs
+    await pyodide.runPythonAsync("_display_outputs.clear()");
+
+    // Capture stdout/stderr
+    let stdout = "", stderr = "";
+
+    pyodide.setStdout({ batched: s => stdout += s + "\n" });
+    pyodide.setStderr({ batched: s => stderr += s + "\n" });
+
+    // Check if code uses plotly.show / fig.show → intercept
+    const wrappedCode = `
+import json as _json
+import plotly as _plotly
+
+_plotly_json_outputs = []
+_orig_plotly_show = _plotly.io.show
+
+def _patched_plotly_show(fig, *args, **kwargs):
+    _plotly_json_outputs.append(_json.dumps(fig.to_dict()))
+
+_plotly.io.show = _patched_plotly_show
+try:
+    import plotly.graph_objects as _go
+    _orig_go_show = _go.Figure.show
+    def _patched_go_show(self, *args, **kwargs):
+        _plotly_json_outputs.append(_json.dumps(self.to_dict()))
+    _go.Figure.show = _patched_go_show
+except: pass
+
+${code}
+
+_plotly.io.show = _orig_plotly_show
+try: _go.Figure.show = _orig_go_show
+except: pass
+`;
+
+    await pyodide.runPythonAsync(wrappedCode);
+
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(2) + "s";
+
+    // Collect display outputs
+    const displayOutputsRaw = pyodide.globals.get("_display_outputs");
+    const displayOutputs = displayOutputsRaw.toJs({ dict_converter: Object.fromEntries });
+    displayOutputsRaw.destroy();
+
+    const plotlyOutputsRaw = pyodide.globals.get("_plotly_json_outputs");
+    const plotlyOutputs = plotlyOutputsRaw.toJs();
+    plotlyOutputsRaw.destroy();
+
+    // Render stdout
+    if (stdout.trim()) renderCell("stdout", "stdout", stdout.trim(), elapsed);
+
+    // Render stderr
+    if (stderr.trim()) renderCell("stderr", "stderr", stderr.trim(), elapsed);
+
+    // Render display outputs
+    for (const out of displayOutputs) {
+      if (out.type === "dataframe" || out.type === "html") {
+        renderCell("html", "html", out.html, elapsed);
+      } else if (out.type === "image") {
+        renderCell("image", "image", out.data, elapsed);
+      } else if (out.type === "stdout") {
+        renderCell("stdout", "stdout", out.text, elapsed);
+      }
+    }
+
+    // Render plotly
+    for (const jsonStr of plotlyOutputs) {
+      renderPlotly(JSON.parse(jsonStr), elapsed);
+    }
+
+    setStatus("ready", `Done in ${elapsed}`);
+  } catch (err) {
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(2) + "s";
+    const msg = err.message || String(err);
+    renderCell("stderr", "stderr", msg, elapsed);
+    setStatus("error", "Error");
+    setTimeout(() => setStatus("ready", "Python 3.12 ready"), 3000);
+  }
+
+  runBtn.disabled = false;
+}
+
+// ─── Output rendering ────────────────────────────────────────────────────────
+function renderCell(cls, type, content, elapsed) {
+  const id = "cell-" + (++outputCount);
+  const typeLabels = { stdout: "OUTPUT", stderr: "ERROR", html: "DATAFRAME", image: "FIGURE", plot: "CHART" };
+  const label = typeLabels[type] || type.toUpperCase();
+
+  const cell = document.createElement("div");
+  cell.className = "out-cell " + cls;
+  cell.id = id;
+
+  let bodyHTML = "";
+  if (type === "image") {
+    bodyHTML = `<img src="data:image/png;base64,${content}" alt="matplotlib figure">`;
+  } else if (type === "html") {
+    bodyHTML = `<div class="dataframe-wrap">${content}</div>`;
+  } else {
+    bodyHTML = document.createTextNode(content).textContent;
+  }
+
+  cell.innerHTML = `
+    <div class="out-cell-header">
+      <span class="cell-type">${label}</span>
+      <span class="cell-time">${elapsed}</span>
+    </div>
+    <div class="out-cell-body">${type === "image" ? `<img src="data:image/png;base64,${content}" alt="figure">` : type === "html" ? `<div class="dataframe-wrap">${content}</div>` : `<span></span>`}</div>
+  `;
+
+  if (type === "stdout" || type === "stderr") {
+    cell.querySelector(".out-cell-body span").textContent = content;
+  }
+
+  document.getElementById("outputBody").appendChild(cell);
+  scrollOutputToBottom();
+
+  // Images render asynchronously — re-scroll once loaded so the bottom of the
+  // figure is in view.
+  if (type === "image") {
+    const img = cell.querySelector("img");
+    if (img) img.addEventListener("load", scrollOutputToBottom, { once: true });
+  }
+}
+
+function renderPlotly(figJson, elapsed) {
+  const id = "plot-" + (++outputCount);
+  const cell = document.createElement("div");
+  cell.className = "out-cell plot";
+  cell.innerHTML = `
+    <div class="out-cell-header">
+      <span class="cell-type">CHART</span>
+      <span class="cell-time">${elapsed}</span>
+    </div>
+    <div class="out-cell-body">
+      <div id="${id}" class="plotly-chart"></div>
+    </div>
+  `;
+  document.getElementById("outputBody").appendChild(cell);
+  scrollOutputToBottom();
+
+  // Apply dark theme to plotly
+  const layout = Object.assign({
+    paper_bgcolor: "#0f1117",
+    plot_bgcolor:  "#161b27",
+    font: { color: "#e2e8f0", family: "Inter, system-ui, sans-serif" },
+    xaxis: { gridcolor: "#2a3347", linecolor: "#2a3347", zerolinecolor: "#2a3347" },
+    yaxis: { gridcolor: "#2a3347", linecolor: "#2a3347", zerolinecolor: "#2a3347" },
+    margin: { l: 48, r: 24, t: 48, b: 48 },
+  }, figJson.layout || {});
+
+  // Ensure layout has dark defaults only if not set
+  if (!(figJson.layout || {}).paper_bgcolor) layout.paper_bgcolor = "#0f1117";
+  if (!(figJson.layout || {}).plot_bgcolor)  layout.plot_bgcolor  = "#161b27";
+
+  Plotly.newPlot(id, figJson.data, layout, {
+    responsive: true,
+    displayModeBar: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
+  }).then(scrollOutputToBottom);
+}
+
+function scrollOutputToBottom() {
+  const body = document.getElementById("outputBody");
+  if (!body) return;
+  // Defer to next frame so appended content is measured before we scroll.
+  requestAnimationFrame(() => {
+    body.scrollTop = body.scrollHeight;
+  });
+}
+
+function clearOutput() {
+  const body = document.getElementById("outputBody");
+  body.innerHTML = "";
+  outputCount = 0;
+  setStatus("ready", "Python 3.12 ready");
+}
+
+// ─── Packages panel ──────────────────────────────────────────────────────────
+const PACKAGES = [
+  // Scientific
+  { cat:"Scientific Computing", icon:"🔢", color:"#4f8ef7", name:"numpy",      ver:"1.26",  desc:"N-dimensional arrays, linear algebra, FFT, random sampling" },
+  { cat:"Scientific Computing", icon:"📐", color:"#4f8ef7", name:"scipy",      ver:"1.12",  desc:"Optimization, integration, interpolation, signal processing" },
+  { cat:"Scientific Computing", icon:"🧮", color:"#4f8ef7", name:"sympy",      ver:"1.12",  desc:"Symbolic mathematics — algebra, calculus, equation solving" },
+
+  // Data
+  { cat:"Data & Analysis",      icon:"🐼", color:"#34d399", name:"pandas",     ver:"2.2",   desc:"DataFrames, Series, data manipulation and analysis" },
+  { cat:"Data & Analysis",      icon:"📊", color:"#34d399", name:"statsmodels",ver:"0.14",  desc:"Statistical models, hypothesis tests, time series analysis" },
+  { cat:"Data & Analysis",      icon:"🗃️", color:"#34d399", name:"pyarrow",    ver:"15.0",  desc:"Apache Arrow columnar data, Parquet file I/O" },
+
+  // Visualization
+  { cat:"Visualization",        icon:"📈", color:"#f59e0b", name:"matplotlib", ver:"3.8",   desc:"2D plotting — line, bar, scatter, histogram, heatmap, etc." },
+  { cat:"Visualization",        icon:"🎨", color:"#f59e0b", name:"plotly",     ver:"5.20",  desc:"Interactive charts — line, bar, scatter, 3D, maps" },
+  { cat:"Visualization",        icon:"🌊", color:"#f59e0b", name:"seaborn",    ver:"0.13",  desc:"Statistical visualization built on Matplotlib" },
+  { cat:"Visualization",        icon:"✦",  color:"#f59e0b", name:"altair",     ver:"5.2",   desc:"Declarative statistical visualization (Vega-Altair)" },
+  { cat:"Visualization",        icon:"🖼️", color:"#f59e0b", name:"pillow",     ver:"10.2",  desc:"Image processing — open, transform, save images" },
+
+  // ML / AI
+  { cat:"Machine Learning",     icon:"🤖", color:"#a78bfa", name:"scikit-learn",ver:"1.4",  desc:"Classification, regression, clustering, model selection" },
+  { cat:"Machine Learning",     icon:"🌲", color:"#a78bfa", name:"xgboost",    ver:"2.0",   desc:"Gradient boosting — fast and accurate tree models" },
+
+  // Text & Data Formats
+  { cat:"Text & Formats",       icon:"📝", color:"#f472b6", name:"regex",      ver:"2.5",   desc:"Advanced regular expressions beyond the standard `re`" },
+  { cat:"Text & Formats",       icon:"🧬", color:"#f472b6", name:"lxml",       ver:"5.1",   desc:"Fast XML/HTML parsing and XPath querying" },
+  { cat:"Text & Formats",       icon:"📋", color:"#f472b6", name:"openpyxl",   ver:"3.1",   desc:"Read and write Excel .xlsx files" },
+  { cat:"Text & Formats",       icon:"📄", color:"#f472b6", name:"pyyaml",     ver:"6.0",   desc:"YAML file parsing and serialization" },
+  { cat:"Text & Formats",       icon:"🗜️", color:"#f472b6", name:"msgpack",    ver:"1.0",   desc:"Fast binary serialization format" },
+
+  // Networking & Utilities
+  { cat:"Utilities",            icon:"🌐", color:"#60a5fa", name:"requests",   ver:"2.31",  desc:"HTTP requests (via micropip — pure Python)" },
+  { cat:"Utilities",            icon:"🔐", color:"#60a5fa", name:"cryptography",ver:"42.0", desc:"Cryptographic recipes and primitives" },
+  { cat:"Utilities",            icon:"⚙️", color:"#60a5fa", name:"attrs",      ver:"23.2",  desc:"Classes without boilerplate — define clean data classes" },
+  { cat:"Utilities",            icon:"🏎️", color:"#60a5fa", name:"numba",      ver:"0.59",  desc:"JIT compiler for numerical Python (LLVM-based)" },
+  { cat:"Utilities",            icon:"📦", color:"#60a5fa", name:"packaging",  ver:"24.0",  desc:"Version parsing and specifiers (PEP 440/508)" },
+  { cat:"Utilities",            icon:"🧪", color:"#60a5fa", name:"pytest",     ver:"8.1",   desc:"Testing framework — run via micropip install" },
+];
+
+let pkgVisible = PACKAGES;
+
+function renderPackages(list) {
+  const body = document.getElementById("pkgBody");
+  body.innerHTML = "";
+  document.getElementById("pkgCountBadge").textContent = list.length;
+
+  const byCategory = {};
+  for (const p of list) {
+    (byCategory[p.cat] = byCategory[p.cat] || []).push(p);
+  }
+
+  for (const [cat, pkgs] of Object.entries(byCategory)) {
+    const label = document.createElement("div");
+    label.className = "pkg-category-label";
+    label.textContent = cat;
+    body.appendChild(label);
+
+    for (const p of pkgs) {
+      const item = document.createElement("div");
+      item.className = "pkg-item";
+      item.innerHTML = `
+        <div class="pkg-icon" style="background:${p.color}22">${p.icon}</div>
+        <div class="pkg-info">
+          <div class="pkg-name">${p.name} <span class="pkg-version">v${p.ver}</span></div>
+          <div class="pkg-desc">${p.desc}</div>
+        </div>
+        <button class="pkg-copy-btn" onclick="copyImport(this,'${p.name}')">import</button>
+      `;
+      body.appendChild(item);
+    }
+  }
+
+  if (list.length === 0) {
+    body.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px">No packages match your search.</div>`;
+  }
+}
+
+function filterPackages(q) {
+  const lq = q.toLowerCase();
+  pkgVisible = PACKAGES.filter(p =>
+    p.name.includes(lq) || p.desc.toLowerCase().includes(lq) || p.cat.toLowerCase().includes(lq)
+  );
+  renderPackages(pkgVisible);
+}
+
+function copyImport(btn, name) {
+  const snippet = `import ${name}`;
+  navigator.clipboard.writeText(snippet).catch(() => {});
+  btn.textContent = "✓ copied";
+  btn.classList.add("copied");
+  setTimeout(() => { btn.textContent = "import"; btn.classList.remove("copied"); }, 1500);
+}
+
+function togglePackages() {
+  const overlay = document.getElementById("pkgOverlay");
+  const isOpen = overlay.classList.contains("open");
+  if (isOpen) { overlay.classList.remove("open"); }
+  else {
+    document.getElementById("pkgSearch").value = "";
+    renderPackages(PACKAGES);
+    overlay.classList.add("open");
+  }
+}
+function closePkgDrawer(e) {
+  if (!e || e.target === document.getElementById("pkgOverlay")) {
+    document.getElementById("pkgOverlay").classList.remove("open");
+  }
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
+// Full palette per theme: bg/bg2/bg3/border/text/dim/muted + syntax colors
+const THEME_PREVIEWS = {
+  "dracula": {
+    bg:"#282a36", bg2:"#21222c", bg3:"#343746", border:"#44475a",
+    text:"#f8f8f2", dim:"#6272a4", muted:"#bd93f9",
+    kw:"#ff79c6", fn:"#50fa7b", arg:"#ffb86c", str:"#f1fa8c",
+  },
+  "monokai": {
+    bg:"#272822", bg2:"#1e1f1c", bg3:"#3e3d32", border:"#49483e",
+    text:"#f8f8f2", dim:"#75715e", muted:"#ae81ff",
+    kw:"#f92672", fn:"#a6e22e", arg:"#fd971f", str:"#e6db74",
+  },
+  "material-darker": {
+    bg:"#212121", bg2:"#1a1a1a", bg3:"#2d2d2d", border:"#3d3d3d",
+    text:"#eeffff", dim:"#546e7a", muted:"#82aaff",
+    kw:"#c792ea", fn:"#82aaff", arg:"#ffcb6b", str:"#c3e88d",
+  },
+  "nord": {
+    bg:"#2e3440", bg2:"#272c36", bg3:"#3b4252", border:"#434c5e",
+    text:"#d8dee9", dim:"#4c566a", muted:"#88c0d0",
+    kw:"#81a1c1", fn:"#88c0d0", arg:"#d08770", str:"#a3be8c",
+  },
+  "tomorrow-night-eighties": {
+    bg:"#2d2d2d", bg2:"#252525", bg3:"#393939", border:"#515151",
+    text:"#cccccc", dim:"#777777", muted:"#cc99cc",
+    kw:"#cc99cc", fn:"#6699cc", arg:"#f99157", str:"#99cc99",
+  },
+  "solarized dark": {
+    bg:"#002b36", bg2:"#00212b", bg3:"#073642", border:"#094b5a",
+    text:"#839496", dim:"#586e75", muted:"#657b83",
+    kw:"#859900", fn:"#268bd2", arg:"#cb4b16", str:"#2aa198",
+  },
+  "solarized light": {
+    bg:"#fdf6e3", bg2:"#eee8d5", bg3:"#f5efdc", border:"#ddd6c0",
+    text:"#657b83", dim:"#93a1a1", muted:"#586e75",
+    kw:"#859900", fn:"#268bd2", arg:"#cb4b16", str:"#2aa198",
+  },
+  "eclipse": {
+    bg:"#ffffff", bg2:"#f5f5f5", bg3:"#ebebeb", border:"#d8d8d8",
+    text:"#1a1a1a", dim:"#aaaaaa", muted:"#555555",
+    kw:"#7f0055", fn:"#0000c0", arg:"#6a3e3e", str:"#2a00ff",
+  },
+  "mdn-like": {
+    bg:"#ffffff", bg2:"#f9f9fb", bg3:"#f0f0f4", border:"#dcdce0",
+    text:"#333333", dim:"#aaaaaa", muted:"#666666",
+    kw:"#a71d5d", fn:"#005cc5", arg:"#e36209", str:"#032f62",
+  },
+};
+
+function updateThemePreview(theme) {
+  const p = THEME_PREVIEWS[theme] || THEME_PREVIEWS["dracula"];
+  const preview = document.getElementById("themePreview");
+  preview.style.background = p.bg;
+  preview.style.color = p.text;
+  preview.innerHTML = `<span style="color:${p.kw}">def</span> <span style="color:${p.fn}">greet</span>(<span style="color:${p.arg}">name</span>):\n  <span style="color:${p.kw}">return</span> <span style="color:${p.str}">f"Hello, {name}!"</span>`;
+}
+
+function applyThemePalette(theme) {
+  const p = THEME_PREVIEWS[theme] || THEME_PREVIEWS["dracula"];
+  const root = document.documentElement;
+  root.style.setProperty("--bg",         p.bg);
+  root.style.setProperty("--bg2",        p.bg2);
+  root.style.setProperty("--bg3",        p.bg3);
+  root.style.setProperty("--border",     p.border);
+  root.style.setProperty("--text",       p.text);
+  root.style.setProperty("--text-dim",   p.dim);
+  root.style.setProperty("--text-muted", p.muted);
+  // Also fix loading overlay bg
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.background = p.bg;
+}
+
+function setMode(mode) {
+  localStorage.setItem("py_mode", mode);
+  applyMode(mode);
+  ["modeLight","modeDark","modeSystem"].forEach(id => document.getElementById(id).classList.remove("active"));
+  document.getElementById({ light:"modeLight", dark:"modeDark", system:"modeSystem" }[mode]).classList.add("active");
+
+  // Auto-switch editor theme for light mode
+  const themeSelect = document.getElementById("themeSelect");
+  if (mode === "light" && ["dracula","monokai","material-darker","nord","tomorrow-night-eighties","solarized dark"].includes(themeSelect.value)) {
+    setEditorTheme("eclipse");
+    themeSelect.value = "eclipse";
+  } else if (mode === "dark" && ["eclipse","mdn-like","solarized light"].includes(themeSelect.value)) {
+    setEditorTheme("dracula");
+    themeSelect.value = "dracula";
+  }
+}
+
+function applyMode(mode) {
+  const resolved = mode === "system"
+    ? (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")
+    : mode;
+  document.documentElement.setAttribute("data-theme", resolved);
+}
+
+function setFontSize(size) {
+  localStorage.setItem("py_fontsize", size);
+  document.getElementById("fontSizeVal").textContent = size + "px";
+  if (cm) {
+    cm.getWrapperElement().style.fontSize = size + "px";
+    cm.refresh();
+  }
+}
+
+function setEditorTheme(theme) {
+  localStorage.setItem("py_editortheme", theme);
+  if (cm) cm.setOption("theme", theme);
+  updateThemePreview(theme);
+  applyThemePalette(theme);
+}
+
+function toggleSettings() {
+  document.getElementById("settingsOverlay").classList.toggle("open");
+}
+function closeSettings() {
+  document.getElementById("settingsOverlay").classList.remove("open");
+}
+
+function initSettings() {
+  // Mode
+  const savedMode = localStorage.getItem("py_mode") || "system";
+  applyMode(savedMode);
+  ["modeLight","modeDark","modeSystem"].forEach(id => document.getElementById(id).classList.remove("active"));
+  document.getElementById({ light:"modeLight", dark:"modeDark", system:"modeSystem" }[savedMode]).classList.add("active");
+
+  // System theme change listener
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+    if ((localStorage.getItem("py_mode") || "system") === "system") applyMode("system");
+  });
+
+  // Font size
+  const savedSize = parseInt(localStorage.getItem("py_fontsize") || "13");
+  document.getElementById("fontSizeSlider").value = savedSize;
+  document.getElementById("fontSizeVal").textContent = savedSize + "px";
+
+  // Editor theme
+  const savedTheme = localStorage.getItem("py_editortheme") || "dracula";
+  document.getElementById("themeSelect").value = savedTheme;
+  updateThemePreview(savedTheme);
+  applyThemePalette(savedTheme);
+
+  // Apply to CM after init (CM not ready yet at this point — applied in DOMContentLoaded)
+  window._savedEditorTheme = savedTheme;
+  window._savedFontSize    = savedSize;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+initSettings();
+initPyodide();
+</script>
+</body>
+</html>
