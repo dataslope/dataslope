@@ -18,4 +18,5 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "javascript", label: "JavaScript Playground", href: "/javascript" },
   { id: "typescript", label: "TypeScript Playground", href: "/typescript" },
   { id: "php", label: "PHP Playground", href: "/php" },
+  { id: "c", label: "C Playground", href: "/c" },
 ];

@@ -14,6 +14,9 @@ language playgrounds at dedicated routes. Today it ships:
   the `AsyncFunction` constructor).
 - `/typescript` — TypeScript playground (transpiled in-browser using the
   official `typescript` compiler API, then executed natively).
+- `/c` — C playground (compiled in-browser to WebAssembly using clang via
+  [`@wasmer/sdk`](https://www.npmjs.com/package/@wasmer/sdk), then
+  executed in a sandboxed Wasmer/WASI runtime).
 
 All playgrounds are React client components built on top of the shared
 `Playground` component in `app/_components/Playground.tsx`.
@@ -27,7 +30,6 @@ React + npm pattern when implemented:
 |---|---|---|
 | `/sqlite` | SQLite | [`sql.js`](https://www.npmjs.com/package/sql.js) (SQLite compiled to WebAssembly) or [`@sqlite.org/sqlite-wasm`](https://www.npmjs.com/package/@sqlite.org/sqlite-wasm) |
 | `/postgres` | PostgreSQL | [`@electric-sql/pglite`](https://www.npmjs.com/package/@electric-sql/pglite) (PostgreSQL compiled to WebAssembly) |
-| `/c` | C | [LLVM / Clang via WebAssembly](https://mbebenita.github.io/WasmExplorer/) or [`wasm-clang`](https://www.npmjs.com/package/wasm-clang) |
 
 This table is guidance, not a mandate — pick the npm package that best fits
 the playground's needs when you implement it.
