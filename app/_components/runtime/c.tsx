@@ -364,17 +364,40 @@ async function loadWasmerSdk(): Promise<WasmerSdk> {
     // Dynamic import keeps the SDK out of the SSR bundle — at module
     // init it touches `Worker` and `SharedArrayBuffer`.
     const mod = (await import("@wasmer/sdk")) as unknown as WasmerSdk;
+
+    // `workerUrl` must resolve to a same-origin URL: the threadpool
+    // spawns its workers via `new Worker(url, { type: "module" })`, and
+    // some browsers refuse cross-origin module worker scripts even when
+    // the CDN sends permissive CORS headers. Failing the spawn drops
+    // the task's response channel, surfacing as "oneshot canceled" the
+    // moment the user clicks Run.
+    //
+    // We sidestep that by fetching the bootstrap from the CDN once and
+    // re-serving it as a `blob:` URL, which counts as same-origin to
+    // the document that created it. The bootstrap then dynamically
+    // imports the main SDK from `sdkUrl` (still on jsDelivr — module
+    // worker `import()` honours CORS, so cross-origin is fine here).
+    const workerSource = await fetch(`${WASMER_SDK_CDN}/worker.mjs`).then(
+      (r) => {
+        if (!r.ok) {
+          throw new Error(
+            `Failed to fetch Wasmer worker bootstrap (HTTP ${r.status}).`,
+          );
+        }
+        return r.text();
+      },
+    );
+    const workerBlobUrl = URL.createObjectURL(
+      new Blob([workerSource], { type: "text/javascript" }),
+    );
+
     await mod.init({
-      // Resolve the SDK's own `.wasm` and worker bootstrap script
-      // against jsDelivr instead of Next.js so we don't have to teach
-      // webpack how to emit them. jsDelivr serves both with permissive
-      // CORS / CORP headers, which is what COEP=require-corp needs.
-      //
-      // `workerUrl` must point to the Web Worker bootstrap (`worker.mjs`),
-      // not the main module. The worker dynamically imports the main SDK
-      // at runtime using `sdkUrl`, which is why both URLs are provided.
+      // Resolve the SDK's own `.wasm` against jsDelivr so we don't
+      // have to teach webpack how to emit it. jsDelivr serves it with
+      // permissive CORS / CORP headers, which is what COEP=require-corp
+      // needs.
       module: new URL(`${WASMER_SDK_CDN}/wasmer_js_bg.wasm`),
-      workerUrl: new URL(`${WASMER_SDK_CDN}/worker.mjs`),
+      workerUrl: workerBlobUrl,
       sdkUrl: new URL(`${WASMER_SDK_CDN}/index.mjs`),
     });
     return mod;

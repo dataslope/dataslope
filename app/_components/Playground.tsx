@@ -1183,18 +1183,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Menu.Portal>
             </Menu.Root>
 
-            <button
-              type="button"
-              className="header-btn"
-              onClick={() => setPackagesOpen(true)}
-              title="Available Packages"
-              aria-label="Packages"
-            >
-              <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                <path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z" />
-              </svg>
-              <span className="btn-label">Packages</span>
-            </button>
+            {adapter.packages.length > 0 && (
+              <button
+                type="button"
+                className="header-btn"
+                onClick={() => setPackagesOpen(true)}
+                title="Available Packages"
+                aria-label="Packages"
+              >
+                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
+                  <path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z" />
+                </svg>
+                <span className="btn-label">Packages</span>
+              </button>
+            )}
 
             <Popover.Root>
               <Popover.Trigger
@@ -1330,16 +1332,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </div>
                   </details>
 
-                  <button
-                    type="button"
-                    className="mobile-menu-action"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setPackagesOpen(true);
-                    }}
-                  >
-                    <span>Packages</span>
-                  </button>
+                  {adapter.packages.length > 0 && (
+                    <button
+                      type="button"
+                      className="mobile-menu-action"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setPackagesOpen(true);
+                      }}
+                    >
+                      <span>Packages</span>
+                    </button>
+                  )}
 
                   {/* Information — collapsible inline section */}
                   <details className="mobile-menu-section">
