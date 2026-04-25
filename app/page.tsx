@@ -5,6 +5,7 @@ import {
   SiPostgresql,
   SiJavascript,
   SiTypescript,
+  SiPhp,
 } from "react-icons/si";
 import styles from "./home.module.css";
 
@@ -47,6 +48,16 @@ function TypeScriptLogo() {
     <SiTypescript
       className={styles.logoSvg}
       style={{ color: "#3178C6" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function PhpLogo() {
+  return (
+    <SiPhp
+      className={styles.logoSvg}
+      style={{ color: "#777BB4" }}
       aria-hidden="true"
     />
   );
@@ -117,6 +128,19 @@ export default function Home() {
                 <strong>TypeScript</strong>
                 <span className={styles.cardDesc}>
                   Transpile TypeScript in the browser, then run it natively.
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/php" className={styles.card}>
+              <span className={styles.logo}>
+                <PhpLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>PHP</strong>
+                <span className={styles.cardDesc}>
+                  Run PHP in the browser via php-wasm.
                 </span>
               </span>
             </Link>

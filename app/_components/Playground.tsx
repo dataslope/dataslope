@@ -719,6 +719,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           import("codemirror/mode/python/python"),
           import("codemirror/mode/r/r"),
           import("codemirror/mode/javascript/javascript"),
+          // The PHP mode depends on htmlmixed, which itself depends on
+          // xml, css, and javascript (already loaded above), and on
+          // clike for inline C-style syntax inside <?php blocks.
+          import("codemirror/mode/xml/xml"),
+          import("codemirror/mode/css/css"),
+          import("codemirror/mode/clike/clike"),
+          import("codemirror/mode/htmlmixed/htmlmixed"),
+          import("codemirror/mode/php/php"),
           import("codemirror/addon/edit/closebrackets"),
           import("codemirror/addon/edit/matchbrackets"),
           import("codemirror/addon/comment/comment"),
