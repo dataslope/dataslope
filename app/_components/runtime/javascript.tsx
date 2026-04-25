@@ -139,21 +139,9 @@ console.log(\`\\nAverage score: \${avg.toFixed(1)}\`);
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // Built-ins are always available — no install needed.
-  { cat: "Globals", icon: "🌐", color: "#facc15", name: "console", ver: "—", desc: "Standard logging API. Output is captured into the playground's output pane." },
-  { cat: "Globals", icon: "⏱️", color: "#facc15", name: "performance", ver: "—", desc: "High-resolution timestamps via performance.now()." },
-  { cat: "Globals", icon: "🎲", color: "#facc15", name: "Math", ver: "—", desc: "Standard maths helpers — Math.PI, Math.random, Math.sqrt, …" },
-  { cat: "Globals", icon: "📅", color: "#facc15", name: "Date", ver: "—", desc: "Date and time values." },
-  { cat: "Globals", icon: "🔁", color: "#facc15", name: "Promise", ver: "—", desc: "Async primitives — Promise.all, Promise.race, etc." },
-  { cat: "Built-in types", icon: "📦", color: "#34d399", name: "Array", ver: "—", desc: "Array methods: map, filter, reduce, flatMap, …" },
-  { cat: "Built-in types", icon: "🗺️", color: "#34d399", name: "Map", ver: "—", desc: "Keyed collections with insertion order preserved." },
-  { cat: "Built-in types", icon: "🧩", color: "#34d399", name: "Set", ver: "—", desc: "Unique-value collections." },
-  { cat: "Built-in types", icon: "📄", color: "#34d399", name: "JSON", ver: "—", desc: "JSON.parse / JSON.stringify." },
-  { cat: "Built-in types", icon: "🔠", color: "#34d399", name: "RegExp", ver: "—", desc: "Regular expressions." },
-  { cat: "Web APIs", icon: "🌍", color: "#60a5fa", name: "fetch", ver: "—", desc: "Make HTTP requests (subject to CORS in the browser)." },
-  { cat: "Web APIs", icon: "💾", color: "#60a5fa", name: "structuredClone", ver: "—", desc: "Deep clone any structured-clonable value." },
-  { cat: "Web APIs", icon: "🔐", color: "#60a5fa", name: "crypto", ver: "—", desc: "Web Crypto API — randomUUID, subtle.digest, …" },
-  { cat: "Web APIs", icon: "📡", color: "#60a5fa", name: "URL", ver: "—", desc: "Parse and build URLs." },
+  // JavaScript runs natively in the browser — all standard globals
+  // (console, Math, Date, Promise, fetch, etc.) are always available
+  // without any import statement, so there are no packages to list here.
 ];
 
 /** Format `console.log`-style argument lists the way browsers/Node do:

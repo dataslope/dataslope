@@ -9,11 +9,14 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | `/r`          | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
 | `/javascript` | ✅ live      | JavaScript playground (runs natively in the browser).    |
 | `/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
+| `/php`        | ✅ live      | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
+| `/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
 | `/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
 [webr]: https://docs.r-wasm.org/webr/latest/
 [ts]: https://www.typescriptlang.org/
+[wasmer]: https://wasmer.io/
 
 ## Project structure
 
@@ -29,11 +32,20 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   │       ├── python.tsx        # Python language adapter (Pyodide)
 │   │       ├── r.tsx             # R language adapter (WebR)
 │   │       ├── javascript.tsx    # JavaScript language adapter (native)
-│   │       └── typescript.tsx    # TypeScript language adapter (in-browser tsc)
-│   ├── python/page.tsx           # /python route     — renders <Playground adapter={pythonAdapter} />
-│   ├── r/page.tsx                # /r route          — renders <Playground adapter={rAdapter} />
-│   ├── javascript/page.tsx       # /javascript route — renders <Playground adapter={javascriptAdapter} />
-│   └── typescript/page.tsx       # /typescript route — renders <Playground adapter={typescriptAdapter} />
+│   │       ├── typescript.tsx    # TypeScript language adapter (in-browser tsc)
+│   │       ├── php.tsx           # PHP language adapter (php-wasm)
+│   │       └── c.tsx             # C language adapter (clang/clang via Wasmer)
+│   ├── python/page.tsx           # /python route
+│   ├── r/page.tsx                # /r route
+│   ├── javascript/page.tsx       # /javascript route
+│   ├── typescript/page.tsx       # /typescript route
+│   ├── php/page.tsx              # /php route
+│   └── c/page.tsx                # /c route
+├── __tests__/
+│   ├── javascript.test.ts        # JavaScript runtime execution tests
+│   ├── typescript.test.ts        # TypeScript transpile + execution tests
+│   └── adapters.test.ts          # Adapter configuration tests (all playgrounds)
+├── vitest.config.ts
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
@@ -61,6 +73,8 @@ Then open:
 - http://localhost:3000/r — R playground
 - http://localhost:3000/javascript — JavaScript playground
 - http://localhost:3000/typescript — TypeScript playground
+- http://localhost:3000/php — PHP playground
+- http://localhost:3000/c — C playground
 
 ## Editor settings
 
@@ -82,6 +96,21 @@ language). The following settings are available via the ⚙ icon in the header:
 | `npm run build` | Build the production bundle.      |
 | `npm run start` | Run the production server.        |
 | `npm run lint`  | Run ESLint via `next lint`.       |
+| `npm test`      | Run the Vitest test suite.        |
+
+## Testing
+
+The test suite covers:
+
+- **JavaScript runtime** — executes code snippets through the same `AsyncFunction` path the playground uses and asserts on stdout / stderr output.
+- **TypeScript runtime** — transpiles with the TypeScript compiler API then executes, verifying type-stripping, generics, top-level `await`, and error reporting.
+- **Adapter configuration** — validates that every adapter has required fields (`id`, `examples`, `exportFormats`, `runtimeInfo`) and that examples are non-empty with unique keys.
+
+```bash
+npm test
+```
+
+The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, PHP) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
 
 ## Adding a new playground (e.g. `/postgres`)
 

@@ -55,6 +55,7 @@ interface WasmerSdk {
   init(options?: {
     module?: URL | string;
     workerUrl?: URL | string;
+    sdkUrl?: URL | string;
     log?: string;
   }): Promise<unknown>;
   Wasmer: {
@@ -368,8 +369,13 @@ async function loadWasmerSdk(): Promise<WasmerSdk> {
       // against jsDelivr instead of Next.js so we don't have to teach
       // webpack how to emit them. jsDelivr serves both with permissive
       // CORS / CORP headers, which is what COEP=require-corp needs.
+      //
+      // `workerUrl` must point to the Web Worker bootstrap (`worker.mjs`),
+      // not the main module. The worker dynamically imports the main SDK
+      // at runtime using `sdkUrl`, which is why both URLs are provided.
       module: new URL(`${WASMER_SDK_CDN}/wasmer_js_bg.wasm`),
-      workerUrl: new URL(`${WASMER_SDK_CDN}/index.mjs`),
+      workerUrl: new URL(`${WASMER_SDK_CDN}/worker.mjs`),
+      sdkUrl: new URL(`${WASMER_SDK_CDN}/index.mjs`),
     });
     return mod;
   })();

@@ -179,21 +179,9 @@ foreach ($letters as $ch => $n) {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // PHP standard library highlights — these are always available, so
-  // there's no install step.
-  { cat: "Strings", icon: "🔤", color: "#facc15", name: "str_replace", ver: "core", desc: "Replace all occurrences of a search string in a subject." },
-  { cat: "Strings", icon: "🔤", color: "#facc15", name: "sprintf", ver: "core", desc: "Format a string with printf-style placeholders." },
-  { cat: "Strings", icon: "🔤", color: "#facc15", name: "preg_match", ver: "PCRE", desc: "Perl-compatible regular expression matching." },
-  { cat: "Arrays", icon: "📦", color: "#34d399", name: "array_map", ver: "core", desc: "Apply a callback to the elements of an array." },
-  { cat: "Arrays", icon: "📦", color: "#34d399", name: "array_filter", ver: "core", desc: "Filter array elements with a callback." },
-  { cat: "Arrays", icon: "📦", color: "#34d399", name: "array_reduce", ver: "core", desc: "Reduce an array to a single value with a callback." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "abs / round / floor / ceil", ver: "core", desc: "Standard arithmetic helpers." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "M_PI / M_E", ver: "core", desc: "Mathematical constants." },
-  { cat: "JSON", icon: "📄", color: "#f472b6", name: "json_decode", ver: "core", desc: "Decode a JSON string to a PHP value." },
-  { cat: "JSON", icon: "📄", color: "#f472b6", name: "json_encode", ver: "core", desc: "Encode a PHP value as JSON." },
-  { cat: "Date / time", icon: "📅", color: "#fb923c", name: "date", ver: "core", desc: "Format a Unix timestamp." },
-  { cat: "Date / time", icon: "📅", color: "#fb923c", name: "DateTime", ver: "core", desc: "Object-oriented date / time API." },
-  { cat: "Files", icon: "💾", color: "#a78bfa", name: "file_get_contents", ver: "core", desc: "Read a file (or URL) into a string." },
+  // All PHP standard-library functions and constants (str_replace,
+  // sprintf, M_PI, array_map, json_decode, etc.) are globally available
+  // without any require or include — there are no packages to install.
 ];
 
 class PhpRuntime implements LanguageRuntime {
