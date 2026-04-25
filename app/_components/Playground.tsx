@@ -705,9 +705,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // Initialise CodeMirror once the script is on the page.
         const CM = (codeMirrorMod.default ?? codeMirrorMod) as unknown as CodeMirrorAPI;
         if (textareaRef.current && !editorRef.current) {
+          // Read the persisted theme directly so the editor is created with
+          // the same theme that the rest of the UI was hydrated with.
+          // Otherwise CodeMirror would briefly render with the default
+          // `editorTheme` state ("dracula") while the surrounding UI uses
+          // the saved theme, producing a visible mismatch on load.
+          const initialTheme =
+            localStorage.getItem(storageKey("editortheme")) ?? "dracula";
           const editor = CM.fromTextArea(textareaRef.current, {
             mode: adapter.codeMirrorMode,
-            theme: editorTheme,
+            theme: initialTheme,
             lineNumbers: true,
             indentUnit: 2,
             tabSize: 2,
@@ -1195,10 +1202,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <Menu.Portal>
               <Menu.Positioner sideOffset={6} align="end">
                 <Menu.Popup className="bui-popup mobile-menu-popup">
-                  <Menu.GroupLabel className="mobile-menu-group-label">
-                    Switch playground
-                  </Menu.GroupLabel>
                   <Menu.Group>
+                    <Menu.GroupLabel className="mobile-menu-group-label">
+                      Switch playground
+                    </Menu.GroupLabel>
                     {PLAYGROUNDS.map((p) => (
                       <Menu.Item
                         key={p.id}
@@ -1346,8 +1353,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
                 Loading{" "}
-                <strong>“{pendingExample?.title}”</strong> will overwrite the
-                code currently in the editor. This can&rsquo;t be undone.
+                <strong>“{pendingExample?.title}”</strong>{" "}
+                will overwrite the code currently in the editor. This
+                can&rsquo;t be undone.
               </AlertDialog.Description>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
