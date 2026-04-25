@@ -37,6 +37,15 @@ import type {
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useRouter } from "next/navigation";
+// Base UI primitives — used for menus, popovers, dialogs, and toasts so
+// that the playground gets consistent positioning, focus management,
+// and natural enter/exit animations out of the box.
+import { Menu } from "@base-ui-components/react/menu";
+import { Popover } from "@base-ui-components/react/popover";
+import { Dialog } from "@base-ui-components/react/dialog";
+import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Toast } from "@base-ui-components/react/toast";
+import { Select } from "@base-ui-components/react/select";
 
 /** Minimal Plotly surface we use for rendering chart cells. */
 interface PlotlyAPI {
@@ -212,8 +221,9 @@ function PackagesDrawer({
 }: PackagesDrawerProps) {
   const [query, setQuery] = useState("");
 
-  // The drawer fully unmounts when closed (see `if (!open) return null`
-  // below), so internal state naturally resets — no effect needed to clear it.
+  // The drawer fully unmounts when closed (Base UI's Dialog handles
+  // mount/unmount via `open`), so internal state naturally resets — no
+  // effect needed to clear it.
 
   const filtered = useMemo(() => {
     const lq = query.toLowerCase();
@@ -233,135 +243,108 @@ function PackagesDrawer({
     return grouped;
   }, [filtered]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="pkg-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
       }}
     >
-      <div className="pkg-drawer" onClick={(e) => e.stopPropagation()}>
-        <div className="pkg-drawer-header">
-          <div>
-            <div className="pkg-drawer-title">
-              Available Packages
-              <span className="pkg-count-badge">{filtered.length}</span>
-            </div>
-            <div className="pkg-drawer-hint">
-              Click on a package to import it into your editor.
-            </div>
-          </div>
-          <button
-            type="button"
-            className="settings-close"
-            onClick={onClose}
-            aria-label="Close packages"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="pkg-search-wrap">
-          <span className="pkg-search-icon">
-            <svg viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-          </span>
-          <input
-            className="pkg-search"
-            type="text"
-            placeholder="Search packages…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <div className="pkg-body">
-          {filtered.length === 0 && (
-            <div
-              style={{
-                padding: 32,
-                textAlign: "center",
-                color: "var(--text-dim)",
-                fontSize: 13,
-              }}
-            >
-              No packages match your search.
-            </div>
-          )}
-          {Object.entries(byCategory).map(([cat, pkgs]) => (
-            <div key={cat}>
-              <div className="pkg-category-label">{cat}</div>
-              {pkgs.map((p) => (
-                <button
-                  type="button"
-                  className="pkg-item"
-                  key={p.name}
-                  onClick={() => onPickPackage(p)}
-                >
-                  <div
-                    className="pkg-icon"
-                    style={{ background: `${p.color}22` }}
-                  >
-                    {p.icon}
-                  </div>
-                  <div className="pkg-info">
-                    <div className="pkg-name">
-                      {p.name}{" "}
-                      <span className="pkg-version">v{p.ver}</span>
-                    </div>
-                    <div className="pkg-desc">{p.desc}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="pkg-footer">{footer}</div>
-      </div>
-    </div>
-  );
-}
-
-interface ExamplesDropdownProps {
-  open: boolean;
-  examples: ExampleSnippet[];
-  onPick: (example: ExampleSnippet) => void;
-}
-
-function ExamplesDropdown({ open, examples, onPick }: ExamplesDropdownProps) {
-  if (!open) return null;
-  return (
-    <div className="examples-dropdown">
-      {examples.map((ex) => (
-        <div
-          key={ex.key}
-          className="example-item"
-          onClick={() => onPick(ex)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") onPick(ex);
-          }}
+      <Dialog.Portal>
+        <Dialog.Backdrop className="pkg-overlay" />
+        <Dialog.Popup
+          className="pkg-drawer"
+          aria-label="Available packages"
         >
-          <div className="ex-title">{ex.title}</div>
-          <div className="ex-desc">{ex.desc}</div>
-        </div>
-      ))}
-    </div>
+          <div className="pkg-drawer-header">
+            <div>
+              <Dialog.Title className="pkg-drawer-title">
+                Available Packages
+                <span className="pkg-count-badge">{filtered.length}</span>
+              </Dialog.Title>
+              <Dialog.Description className="pkg-drawer-hint">
+                Click on a package to import it into your editor.
+              </Dialog.Description>
+            </div>
+            <Dialog.Close
+              className="settings-close"
+              aria-label="Close packages"
+            >
+              ✕
+            </Dialog.Close>
+          </div>
+          <div className="pkg-search-wrap">
+            <span className="pkg-search-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </span>
+            <input
+              className="pkg-search"
+              type="text"
+              placeholder="Search packages…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <div className="pkg-body">
+            {filtered.length === 0 && (
+              <div
+                style={{
+                  padding: 32,
+                  textAlign: "center",
+                  color: "var(--text-dim)",
+                  fontSize: 13,
+                }}
+              >
+                No packages match your search.
+              </div>
+            )}
+            {Object.entries(byCategory).map(([cat, pkgs]) => (
+              <div key={cat}>
+                <div className="pkg-category-label">{cat}</div>
+                {pkgs.map((p) => (
+                  <button
+                    type="button"
+                    className="pkg-item"
+                    key={p.name}
+                    onClick={() => onPickPackage(p)}
+                  >
+                    <div
+                      className="pkg-icon"
+                      style={{ background: `${p.color}22` }}
+                    >
+                      {p.icon}
+                    </div>
+                    <div className="pkg-info">
+                      <div className="pkg-name">
+                        {p.name}{" "}
+                        <span className="pkg-version">v{p.ver}</span>
+                      </div>
+                      <div className="pkg-desc">{p.desc}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="pkg-footer">{footer}</div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
-interface InfoPopoverProps {
-  open: boolean;
-  info: RuntimeInfo;
-}
+/* The Examples menu, Export menu, and Info popover are rendered inline
+   at their call-sites using Base UI's Menu and Popover primitives.
+   Those primitives portal to the document body, sidestepping the
+   `overflow:hidden` clipping on `.header-actions` that previously hid
+   the legacy custom dropdowns. */
 
-function InfoPopover({ open, info }: InfoPopoverProps) {
-  if (!open) return null;
+function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   return (
-    <div className="info-popover">
+    <>
       <div className="info-popover-row">
         <span className="info-popover-label">Language</span>
         <span className="info-popover-val">
@@ -381,43 +364,12 @@ function InfoPopover({ open, info }: InfoPopoverProps) {
         </span>
       </div>
       {info.notes && <div className="info-popover-notes">{info.notes}</div>}
-    </div>
-  );
-}
-
-interface ExportDropdownProps {
-  open: boolean;
-  formats: ExportFormat[];
-  onPick: (format: ExportFormat) => void;
-}
-
-function ExportDropdown({ open, formats, onPick }: ExportDropdownProps) {
-  if (!open) return null;
-  return (
-    <div className="examples-dropdown export-dropdown">
-      {formats.map((fmt) => (
-        <div
-          key={fmt.extension}
-          className="example-item export-item"
-          onClick={() => onPick(fmt)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") onPick(fmt);
-          }}
-        >
-          <span className="ext-badge">.{fmt.extension}</span>
-          <div className="export-item-text">
-            <div className="ex-title">{fmt.label}</div>
-            <div className="ex-desc">Download as .{fmt.extension}</div>
-          </div>
-        </div>
-      ))}
-    </div>
+    </>
   );
 }
 
 interface SettingsPanelProps {
+  open: boolean;
   fontSize: number;
   setFontSize: (n: number) => void;
   outputFontSizeEnabled: boolean;
@@ -431,6 +383,7 @@ interface SettingsPanelProps {
 }
 
 function SettingsPanel({
+  open,
   fontSize,
   setFontSize,
   outputFontSizeEnabled,
@@ -446,24 +399,24 @@ function SettingsPanel({
   const fnName = SAMPLE_FN_NAME[language] ?? "greet";
 
   return (
-    <div
-      className="settings-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
       }}
     >
-      <div className="settings-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="settings-header">
-          <span className="settings-title">Settings</span>
-          <button
-            type="button"
-            className="settings-close"
-            onClick={onClose}
-            aria-label="Close settings"
-          >
-            ✕
-          </button>
-        </div>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="settings-overlay" />
+        <Dialog.Popup className="settings-panel" aria-label="Settings">
+          <div className="settings-header">
+            <Dialog.Title className="settings-title">Settings</Dialog.Title>
+            <Dialog.Close
+              className="settings-close"
+              aria-label="Close settings"
+            >
+              ✕
+            </Dialog.Close>
+          </div>
         <div className="settings-body">
           <div className="setting-row">
             <div className="setting-label">Editor Font Size</div>
@@ -569,8 +522,9 @@ function SettingsPanel({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -578,7 +532,42 @@ export interface PlaygroundProps {
   adapter: LanguageAdapter;
 }
 
-export default function Playground({ adapter }: PlaygroundProps) {
+export default function Playground(props: PlaygroundProps) {
+  // The Toast.Provider needs to be a parent of any component that uses
+  // `Toast.useToastManager()`, so the actual playground body lives in
+  // `PlaygroundInner` while this wrapper just sets up the provider /
+  // viewport.
+  return (
+    <Toast.Provider timeout={2400}>
+      <PlaygroundInner {...props} />
+      <Toast.Portal>
+        <Toast.Viewport className="toast-viewport">
+          <ToastList />
+        </Toast.Viewport>
+      </Toast.Portal>
+    </Toast.Provider>
+  );
+}
+
+function ToastList() {
+  const { toasts } = Toast.useToastManager();
+  return toasts.map((toast) => (
+    <Toast.Root
+      key={toast.id}
+      toast={toast}
+      className={`toast toast-${toast.data?.kind ?? "info"}`}
+    >
+      <Toast.Title className="toast-title">{toast.title}</Toast.Title>
+      {toast.description && (
+        <Toast.Description className="toast-desc">
+          {toast.description}
+        </Toast.Description>
+      )}
+    </Toast.Root>
+  ));
+}
+
+function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Initial settings (persisted in localStorage, namespaced per-language) ─
   const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
   const [fontSize, setFontSizeState] = useState<number>(13);
@@ -588,27 +577,19 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
 
   // ─── UI state ───────────────────────────────────────────────────────────
-  const [examplesOpen, setExamplesOpen] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [toast, setToast] = useState<
-    { msg: string; kind: "info" | "warn" } | null
-  >(null);
-  const toastTimerRef = useRef<number | null>(null);
+  // Confirm dialog shown when picking an example would discard editor
+  // contents the user has already typed.
+  const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
+    null,
+  );
+  const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
-      setToast({ msg, kind });
-      if (toastTimerRef.current != null) {
-        window.clearTimeout(toastTimerRef.current);
-      }
-      toastTimerRef.current = window.setTimeout(() => {
-        setToast(null);
-        toastTimerRef.current = null;
-      }, 2400);
+      toastManager.add({ title: msg, data: { kind } });
     },
-    [],
+    [toastManager],
   );
   const [mobileTab, setMobileTab] = useState<"editor" | "output">("editor");
   const router = useRouter();
@@ -621,7 +602,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
-  const [statusText, setStatusText] = useState("Loading…");
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const outputCounter = useRef(0);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
@@ -753,13 +733,11 @@ export default function Playground({ adapter }: PlaygroundProps) {
         runtimeRef.current = rt;
         setLoaded(true);
         setStatusState("ready");
-        setStatusText(adapter.readyStatus);
       } catch (err) {
         if (cancelled) return;
         const msg = err instanceof Error ? err.message : String(err);
         setLoadingMessage(`Failed to load: ${msg}`);
         setStatusState("error");
-        setStatusText("Load failed");
       }
     })();
     return () => {
@@ -843,7 +821,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
     if (!code) return;
 
     setStatusState("running");
-    setStatusText("Running…");
 
     const t0 = performance.now();
     const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
@@ -861,7 +838,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
         })),
       ]);
       setStatusState("ready");
-      setStatusText(adapter.readyStatus);
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const msg = err instanceof Error ? err.message : String(err);
@@ -880,10 +856,8 @@ export default function Playground({ adapter }: PlaygroundProps) {
         },
       ]);
       setStatusState("error");
-      setStatusText("Error");
       window.setTimeout(() => {
         setStatusState("ready");
-        setStatusText(adapter.readyStatus);
       }, 3000);
     } finally {
       // On narrow viewports the panes share the screen via a tab switcher;
@@ -891,7 +865,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [adapter.readyStatus]);
+  }, []);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -905,15 +879,30 @@ export default function Playground({ adapter }: PlaygroundProps) {
     outputCounter.current = 0;
     if (loaded) {
       setStatusState("ready");
-      setStatusText(adapter.readyStatus);
     }
-  }, [adapter.readyStatus, loaded]);
+  }, [loaded]);
 
-  const loadExample = useCallback((ex: ExampleSnippet) => {
+  // Apply an example to the editor immediately. Use `requestExample` for
+  // user-initiated picks so we can prompt before discarding work.
+  const applyExample = useCallback((ex: ExampleSnippet) => {
     editorRef.current?.setValue(ex.code);
-    setExamplesOpen(false);
     editorRef.current?.focus();
   }, []);
+
+  const requestExample = useCallback(
+    (ex: ExampleSnippet) => {
+      const current = editorRef.current?.getValue().trim() ?? "";
+      // Prompt only when the editor has user content that isn't already
+      // identical to the chosen example. We always allow the very first
+      // example (index 0) load when the buffer matches the default code.
+      if (current.length > 0 && current !== ex.code.trim()) {
+        setPendingExample(ex);
+        return;
+      }
+      applyExample(ex);
+    },
+    [applyExample],
+  );
 
   const importPackage = useCallback(
     (pkg: PackageInfo) => {
@@ -947,7 +936,6 @@ export default function Playground({ adapter }: PlaygroundProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setExportOpen(false);
     },
     [adapter.exportBaseFilename],
   );
@@ -1002,53 +990,9 @@ export default function Playground({ adapter }: PlaygroundProps) {
     };
   }, []);
 
-  // Close examples dropdown when clicking outside.
-  useEffect(() => {
-    if (!examplesOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        !target?.closest(".examples-dropdown") &&
-        !target?.closest("[data-examples-trigger]")
-      ) {
-        setExamplesOpen(false);
-      }
-    };
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
-  }, [examplesOpen]);
-
-  // Close export dropdown when clicking outside.
-  useEffect(() => {
-    if (!exportOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        !target?.closest(".export-dropdown") &&
-        !target?.closest("[data-export-trigger]")
-      ) {
-        setExportOpen(false);
-      }
-    };
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
-  }, [exportOpen]);
-
-  // Close info popover when clicking outside.
-  useEffect(() => {
-    if (!infoOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        !target?.closest(".info-popover") &&
-        !target?.closest("[data-info-trigger]")
-      ) {
-        setInfoOpen(false);
-      }
-    };
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
-  }, [infoOpen]);
+  // Base UI's Menu / Popover handle outside clicks, focus management,
+  // and Escape themselves, so the legacy click-outside effects for the
+  // examples / export / info dropdowns are no longer needed.
 
   const typeLabel: Record<OutputCell["type"], string> = {
     stdout: "OUTPUT",
@@ -1076,31 +1020,54 @@ export default function Playground({ adapter }: PlaygroundProps) {
         <header className="pg-header">
           <div className="logo">
             <div className="logo-icon">{adapter.logoText}</div>
-            <select
-              className="playground-switcher"
-              aria-label="Switch playground"
+            <Select.Root
               value={adapter.id}
-              onChange={(e) => {
-                const next = PLAYGROUNDS.find((p) => p.id === e.target.value);
+              onValueChange={(value) => {
+                const next = PLAYGROUNDS.find((p) => p.id === value);
                 if (next && next.id !== adapter.id) router.push(next.href);
               }}
             >
-              {PLAYGROUNDS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+              <Select.Trigger
+                className="playground-switcher"
+                aria-label="Switch playground"
+              >
+                <Select.Value />
+                <Select.Icon className="playground-switcher-icon">
+                  <svg viewBox="0 0 12 12" width={10} height={10}>
+                    <polyline
+                      points="2,4 6,8 10,4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </Select.Icon>
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
+                  <Select.Popup className="bui-select-popup">
+                    {PLAYGROUNDS.map((p) => (
+                      <Select.Item
+                        key={p.id}
+                        value={p.id}
+                        className="bui-select-item"
+                      >
+                        <Select.ItemText>{p.label}</Select.ItemText>
+                      </Select.Item>
+                    ))}
+                  </Select.Popup>
+                </Select.Positioner>
+              </Select.Portal>
+            </Select.Root>
           </div>
           <div className="header-sep" />
 
-          <div className="header-actions">
-            <div className="header-action-wrap">
-              <button
-                type="button"
+          {/* Desktop action group — hidden on narrow viewports in favour
+              of the consolidated mobile menu below. */}
+          <div className="header-actions desktop-only">
+            <Menu.Root>
+              <Menu.Trigger
                 className="header-btn"
-                data-examples-trigger
-                onClick={() => setExamplesOpen((v) => !v)}
                 title="Examples"
                 aria-label="Examples"
               >
@@ -1108,20 +1075,28 @@ export default function Playground({ adapter }: PlaygroundProps) {
                   <path d="M2 2h12v2H2zm0 4h8v2H2zm0 4h10v2H2z" />
                 </svg>
                 <span className="btn-label">Examples</span>
-              </button>
-              <ExamplesDropdown
-                open={examplesOpen}
-                examples={adapter.examples}
-                onPick={loadExample}
-              />
-            </div>
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner sideOffset={6} align="start">
+                  <Menu.Popup className="bui-popup examples-dropdown">
+                    {adapter.examples.map((ex) => (
+                      <Menu.Item
+                        key={ex.key}
+                        className="example-item"
+                        onClick={() => requestExample(ex)}
+                      >
+                        <div className="ex-title">{ex.title}</div>
+                        <div className="ex-desc">{ex.desc}</div>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
 
-            <div className="header-action-wrap">
-              <button
-                type="button"
+            <Menu.Root>
+              <Menu.Trigger
                 className="header-btn"
-                data-export-trigger
-                onClick={() => setExportOpen((v) => !v)}
                 title="Export code"
                 aria-label="Export"
               >
@@ -1129,13 +1104,29 @@ export default function Playground({ adapter }: PlaygroundProps) {
                   <path d="M8 1l3 3h-2v5H7V4H5l3-3zM2 11h12v2H2z" />
                 </svg>
                 <span className="btn-label">Export</span>
-              </button>
-              <ExportDropdown
-                open={exportOpen}
-                formats={adapter.exportFormats}
-                onPick={exportCode}
-              />
-            </div>
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner sideOffset={6} align="start">
+                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    {adapter.exportFormats.map((fmt) => (
+                      <Menu.Item
+                        key={fmt.extension}
+                        className="example-item export-item"
+                        onClick={() => exportCode(fmt)}
+                      >
+                        <span className="ext-badge">.{fmt.extension}</span>
+                        <div className="export-item-text">
+                          <div className="ex-title">{fmt.label}</div>
+                          <div className="ex-desc">
+                            Download as .{fmt.extension}
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
 
             <button
               type="button"
@@ -1150,12 +1141,9 @@ export default function Playground({ adapter }: PlaygroundProps) {
               <span className="btn-label">Packages</span>
             </button>
 
-            <div className="header-action-wrap">
-              <button
-                type="button"
+            <Popover.Root>
+              <Popover.Trigger
                 className="header-btn icon-only"
-                data-info-trigger
-                onClick={() => setInfoOpen((v) => !v)}
                 title="Runtime info"
                 aria-label="Runtime info"
               >
@@ -1164,14 +1152,20 @@ export default function Playground({ adapter }: PlaygroundProps) {
                   <line x1="12" y1="11" x2="12" y2="16" />
                   <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none" />
                 </svg>
-              </button>
-              <InfoPopover open={infoOpen} info={adapter.runtimeInfo} />
-            </div>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup info-popover">
+                    <RuntimeInfoContent info={adapter.runtimeInfo} />
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
 
             <button
               type="button"
               className="header-btn icon-only"
-              onClick={() => setSettingsOpen((v) => !v)}
+              onClick={() => setSettingsOpen(true)}
               title="Settings"
               aria-label="Settings"
             >
@@ -1182,26 +1176,151 @@ export default function Playground({ adapter }: PlaygroundProps) {
             </button>
           </div>
 
-          <div className={`status-pill ${statusState}`}>
-            <div className="status-dot" />
-            <span>{statusText}</span>
-          </div>
+          {/* Mobile-only consolidated menu — replaces the header buttons
+              on narrow viewports. The playground switcher stays on the
+              left so the user can always tell which playground they're
+              in at a glance. */}
+          <Menu.Root>
+            <Menu.Trigger
+              className="header-btn icon-only mobile-only mobile-menu-btn"
+              title="Menu"
+              aria-label="Open menu"
+            >
+              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="4" y1="7" x2="20" y2="7" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="17" x2="20" y2="17" />
+              </svg>
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner sideOffset={6} align="end">
+                <Menu.Popup className="bui-popup mobile-menu-popup">
+                  <Menu.GroupLabel className="mobile-menu-group-label">
+                    Switch playground
+                  </Menu.GroupLabel>
+                  <Menu.Group>
+                    {PLAYGROUNDS.map((p) => (
+                      <Menu.Item
+                        key={p.id}
+                        className="mobile-menu-item"
+                        onClick={() => {
+                          if (p.id !== adapter.id) router.push(p.href);
+                        }}
+                      >
+                        <span>{p.label}</span>
+                        {p.id === adapter.id && (
+                          <span className="mobile-menu-check" aria-hidden="true">
+                            ✓
+                          </span>
+                        )}
+                      </Menu.Item>
+                    ))}
+                  </Menu.Group>
+                  <Menu.Separator className="mobile-menu-separator" />
+
+                  <Menu.SubmenuRoot>
+                    <Menu.SubmenuTrigger className="mobile-menu-item">
+                      <span>Examples</span>
+                      <span className="mobile-menu-chev" aria-hidden="true">
+                        ›
+                      </span>
+                    </Menu.SubmenuTrigger>
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={4} align="start">
+                        <Menu.Popup className="bui-popup examples-dropdown mobile-submenu">
+                          {adapter.examples.map((ex) => (
+                            <Menu.Item
+                              key={ex.key}
+                              className="example-item"
+                              onClick={() => requestExample(ex)}
+                            >
+                              <div className="ex-title">{ex.title}</div>
+                              <div className="ex-desc">{ex.desc}</div>
+                            </Menu.Item>
+                          ))}
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.SubmenuRoot>
+
+                  <Menu.SubmenuRoot>
+                    <Menu.SubmenuTrigger className="mobile-menu-item">
+                      <span>Export</span>
+                      <span className="mobile-menu-chev" aria-hidden="true">
+                        ›
+                      </span>
+                    </Menu.SubmenuTrigger>
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={4} align="start">
+                        <Menu.Popup className="bui-popup examples-dropdown export-dropdown mobile-submenu">
+                          {adapter.exportFormats.map((fmt) => (
+                            <Menu.Item
+                              key={fmt.extension}
+                              className="example-item export-item"
+                              onClick={() => exportCode(fmt)}
+                            >
+                              <span className="ext-badge">.{fmt.extension}</span>
+                              <div className="export-item-text">
+                                <div className="ex-title">{fmt.label}</div>
+                                <div className="ex-desc">
+                                  Download as .{fmt.extension}
+                                </div>
+                              </div>
+                            </Menu.Item>
+                          ))}
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.SubmenuRoot>
+
+                  <Menu.Item
+                    className="mobile-menu-item"
+                    onClick={() => setPackagesOpen(true)}
+                  >
+                    <span>Packages</span>
+                  </Menu.Item>
+
+                  <Menu.SubmenuRoot>
+                    <Menu.SubmenuTrigger className="mobile-menu-item">
+                      <span>Information</span>
+                      <span className="mobile-menu-chev" aria-hidden="true">
+                        ›
+                      </span>
+                    </Menu.SubmenuTrigger>
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={4} align="start">
+                        <Menu.Popup className="bui-popup info-popover mobile-submenu">
+                          <RuntimeInfoContent info={adapter.runtimeInfo} />
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.SubmenuRoot>
+
+                  <Menu.Item
+                    className="mobile-menu-item"
+                    onClick={() => setSettingsOpen(true)}
+                  >
+                    <span>Settings</span>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         </header>
 
-        {settingsOpen && (
-          <SettingsPanel
-            fontSize={fontSize}
-            setFontSize={setFontSize}
-            outputFontSizeEnabled={outputFontSizeEnabled}
-            setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-            outputFontSize={outputFontSize}
-            setOutputFontSize={setOutputFontSize}
-            editorTheme={editorTheme}
-            setEditorTheme={setEditorTheme}
-            language={adapter.id}
-            onClose={() => setSettingsOpen(false)}
-          />
-        )}
+        <SettingsPanel
+          open={settingsOpen}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          outputFontSizeEnabled={outputFontSizeEnabled}
+          setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+          outputFontSize={outputFontSize}
+          setOutputFontSize={setOutputFontSize}
+          editorTheme={editorTheme}
+          setEditorTheme={setEditorTheme}
+          language={adapter.id}
+          onClose={() => setSettingsOpen(false)}
+        />
 
         <PackagesDrawer
           open={packagesOpen}
@@ -1211,7 +1330,42 @@ export default function Playground({ adapter }: PlaygroundProps) {
           onPickPackage={importPackage}
         />
 
-        {toast && <div className={`toast toast-${toast.kind}`}>{toast.msg}</div>}
+        {/* Confirm dialog shown when picking an example would discard
+            existing editor contents. */}
+        <AlertDialog.Root
+          open={pendingExample !== null}
+          onOpenChange={(next) => {
+            if (!next) setPendingExample(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Discard current code?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                Loading{" "}
+                <strong>“{pendingExample?.title}”</strong> will overwrite the
+                code currently in the editor. This can&rsquo;t be undone.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    if (pendingExample) applyExample(pendingExample);
+                    setPendingExample(null);
+                  }}
+                >
+                  Discard &amp; load
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
 
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
           <button
