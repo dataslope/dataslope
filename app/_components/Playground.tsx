@@ -378,6 +378,8 @@ interface SettingsPanelProps {
   setOutputFontSize: (n: number) => void;
   editorTheme: string;
   setEditorTheme: (t: string) => void;
+  wordWrap: boolean;
+  setWordWrap: (b: boolean) => void;
   language: string; // e.g. "python" / "r" — used only for the preview snippet
   onClose: () => void;
 }
@@ -392,6 +394,8 @@ function SettingsPanel({
   setOutputFontSize,
   editorTheme,
   setEditorTheme,
+  wordWrap,
+  setWordWrap,
   language,
   onClose,
 }: SettingsPanelProps) {
@@ -521,6 +525,17 @@ function SettingsPanel({
               )}
             </div>
           </div>
+
+          <div className="setting-row">
+            <label className="setting-checkbox-row">
+              <input
+                type="checkbox"
+                checked={wordWrap}
+                onChange={(e) => setWordWrap(e.target.checked)}
+              />
+              <span>Word Wrap</span>
+            </label>
+          </div>
         </div>
         </Dialog.Popup>
       </Dialog.Portal>
@@ -575,6 +590,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
+  const [wordWrap, setWordWrapState] = useState<boolean>(true);
 
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
@@ -655,6 +671,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const savedOutputSize =
       Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
       savedSize;
+    const savedWordWrap =
+      localStorage.getItem(storageKey("wordwrap")) !== "false";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch
@@ -664,6 +682,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setOutputFontSizeEnabledState(savedOutputEnabled);
     setOutputFontSizeState(savedOutputSize);
     setEditorThemeState(savedTheme);
+    setWordWrapState(savedWordWrap);
     /* eslint-enable react-hooks/set-state-in-effect */
     applyMode(savedTheme);
     applyThemePalette(savedTheme);
@@ -712,6 +731,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           // the saved theme, producing a visible mismatch on load.
           const initialTheme =
             localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+          const initialWordWrap =
+            localStorage.getItem(storageKey("wordwrap")) !== "false";
           const editor = CM.fromTextArea(textareaRef.current, {
             mode: adapter.codeMirrorMode,
             theme: initialTheme,
@@ -722,7 +743,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             keyMap: "sublime",
             autoCloseBrackets: true,
             matchBrackets: true,
-            lineWrapping: false,
+            lineWrapping: initialWordWrap,
             extraKeys: {
               "Cmd-Enter": () => runRef.current(),
               "Ctrl-Enter": () => runRef.current(),
@@ -761,6 +782,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     applyThemePalette(editorTheme);
     applyMode(editorTheme);
   }, [editorTheme]);
+
+  // Push word-wrap changes into CodeMirror after init.
+  useEffect(() => {
+    editorRef.current?.setOption("lineWrapping", wordWrap);
+  }, [wordWrap]);
 
   // Update the editor font size via CSS variable. This is what makes the
   // slider actually take effect — previously the inline-style approach was
@@ -814,6 +840,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (t: string) => {
       setEditorThemeState(t);
       localStorage.setItem(storageKey("editortheme"), t);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
+  const setWordWrap = useCallback(
+    (b: boolean) => {
+      setWordWrapState(b);
+      localStorage.setItem(storageKey("wordwrap"), String(b));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter.id],
@@ -1325,6 +1360,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           setOutputFontSize={setOutputFontSize}
           editorTheme={editorTheme}
           setEditorTheme={setEditorTheme}
+          wordWrap={wordWrap}
+          setWordWrap={setWordWrap}
           language={adapter.id}
           onClose={() => setSettingsOpen(false)}
         />

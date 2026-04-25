@@ -6,7 +6,7 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | ----------- | ----------- | -------------------------------------------------------- |
 | `/`         | ✅ live      | Landing page linking to each playground.                 |
 | `/python`   | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
-| `/r`        | ✅ live      | R playground powered by [WebR][webr] (WASM).             |
+| `/r`        | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
 | `/postgres` | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
@@ -51,6 +51,18 @@ Then open:
 - http://localhost:3000/ — landing page
 - http://localhost:3000/python — Python playground
 - http://localhost:3000/r — R playground
+
+## Editor settings
+
+Each playground persists its settings in `localStorage` (namespaced per
+language). The following settings are available via the ⚙ icon in the header:
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| Editor Font Size | 13 px | Font size used in the code editor. |
+| Output Font Size | (same as editor) | Optionally use a different font size in the output pane. |
+| Editor Theme | Dracula | Colour theme for the code editor. |
+| Word Wrap | On | Wrap long lines in the editor instead of scrolling horizontally. |
 
 ## Scripts
 
