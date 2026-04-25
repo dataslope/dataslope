@@ -301,11 +301,8 @@ parsed |> count(level) |> print()
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // Core
-  { cat: "Base R", icon: "📚", color: "#4f8ef7", name: "base", ver: "4.4", desc: "Built-in functions: arithmetic, vectors, control flow, I/O" },
-  { cat: "Base R", icon: "📊", color: "#4f8ef7", name: "stats", ver: "4.4", desc: "Statistical functions: lm, glm, t.test, distributions" },
-  { cat: "Base R", icon: "📈", color: "#4f8ef7", name: "graphics", ver: "4.4", desc: "Base graphics: plot, hist, barplot, lines" },
-  { cat: "Base R", icon: "🔧", color: "#4f8ef7", name: "utils", ver: "4.4", desc: "Utilities: head, tail, str, summary, install.packages" },
+  // Base R packages (base, stats, graphics, utils) are auto-loaded in
+  // every R session and need no library() call — they are omitted here.
   // Tidyverse
   { cat: "Tidyverse", icon: "🧰", color: "#34d399", name: "tidyverse", ver: "2.0", desc: "Meta-package: ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr" },
   { cat: "Tidyverse", icon: "📐", color: "#34d399", name: "dplyr", ver: "1.1", desc: "Grammar of data manipulation: filter, mutate, summarise, group_by" },
