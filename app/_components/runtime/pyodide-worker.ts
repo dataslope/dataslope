@@ -23,7 +23,7 @@ declare const self: DedicatedWorkerGlobalScope & {
   loadPyodide: (opts: { indexURL: string }) => Promise<PyodideInterface>;
 };
 
-const PYODIDE_VERSION = "v0.27.3";
+const PYODIDE_VERSION = "v0.29.3";
 const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
 
 // Load the Pyodide JS loader synchronously into the worker scope. This is

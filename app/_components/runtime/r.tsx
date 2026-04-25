@@ -532,6 +532,13 @@ export const rAdapter: LanguageAdapter = {
   logoText: "R",
   documentTitle: "R Playground",
   readyStatus: "R 4.4 ready",
+  runtimeInfo: {
+    language: "R",
+    version: "4.4",
+    engine: "WebR",
+    engineUrl: "https://docs.r-wasm.org/webr/latest/",
+    notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
+  },
   codeMirrorMode: "r",
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -553,6 +560,13 @@ export const rAdapter: LanguageAdapter = {
     </>
   ),
   importSnippet: (name) => `library(${name})`,
+  hasImport(code, name) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(
+      `\\b(?:library|require|requireNamespace|loadNamespace)\\s*\\(\\s*["']?${escaped}["']?\\s*[,)]`,
+    );
+    return re.test(code);
+  },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading WebR…");
     // Dynamic import keeps WebR (and its bundled service-worker code) out

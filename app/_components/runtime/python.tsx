@@ -286,35 +286,35 @@ print(f"  Intercept  : {model.intercept_:+,.0f}")
 
 const PACKAGES: PackageInfo[] = [
   // Scientific
-  { cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "1.26", desc: "N-dimensional arrays, linear algebra, FFT, random sampling" },
-  { cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.12", desc: "Optimization, integration, interpolation, signal processing" },
-  { cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.12", desc: "Symbolic mathematics — algebra, calculus, equation solving" },
+  { cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "2.2", desc: "N-dimensional arrays, linear algebra, FFT, random sampling" },
+  { cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.14", desc: "Optimization, integration, interpolation, signal processing" },
+  { cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.13", desc: "Symbolic mathematics — algebra, calculus, equation solving" },
   // Data
-  { cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "2.2", desc: "DataFrames, Series, data manipulation and analysis" },
+  { cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "2.3", desc: "DataFrames, Series, data manipulation and analysis" },
   { cat: "Data & Analysis", icon: "📊", color: "#34d399", name: "statsmodels", ver: "0.14", desc: "Statistical models, hypothesis tests, time series analysis" },
-  { cat: "Data & Analysis", icon: "🗃️", color: "#34d399", name: "pyarrow", ver: "15.0", desc: "Apache Arrow columnar data, Parquet file I/O" },
+  { cat: "Data & Analysis", icon: "🗃️", color: "#34d399", name: "pyarrow", ver: "22.0", desc: "Apache Arrow columnar data, Parquet file I/O" },
   // Visualization
   { cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.8", desc: "2D plotting — line, bar, scatter, histogram, heatmap, etc." },
-  { cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.20", desc: "Interactive charts — line, bar, scatter, 3D, maps" },
+  { cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.24", desc: "Interactive charts — line, bar, scatter, 3D, maps" },
   { cat: "Visualization", icon: "🌊", color: "#f59e0b", name: "seaborn", ver: "0.13", desc: "Statistical visualization built on Matplotlib" },
-  { cat: "Visualization", icon: "✦", color: "#f59e0b", name: "altair", ver: "5.2", desc: "Declarative statistical visualization (Vega-Altair)" },
-  { cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "10.2", desc: "Image processing — open, transform, save images" },
+  { cat: "Visualization", icon: "✦", color: "#f59e0b", name: "altair", ver: "6.0", desc: "Declarative statistical visualization (Vega-Altair)" },
+  { cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "11.3", desc: "Image processing — open, transform, save images" },
   // ML / AI
-  { cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.4", desc: "Classification, regression, clustering, model selection" },
-  { cat: "Machine Learning", icon: "🌲", color: "#a78bfa", name: "xgboost", ver: "2.0", desc: "Gradient boosting — fast and accurate tree models" },
+  { cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.7", desc: "Classification, regression, clustering, model selection" },
+  { cat: "Machine Learning", icon: "🌲", color: "#a78bfa", name: "xgboost", ver: "2.1", desc: "Gradient boosting — fast and accurate tree models" },
   // Text & Data Formats
-  { cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2.5", desc: "Advanced regular expressions beyond the standard `re`" },
-  { cat: "Text & Formats", icon: "🧬", color: "#f472b6", name: "lxml", ver: "5.1", desc: "Fast XML/HTML parsing and XPath querying" },
+  { cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2024.11", desc: "Advanced regular expressions beyond the standard `re`" },
+  { cat: "Text & Formats", icon: "🧬", color: "#f472b6", name: "lxml", ver: "6.0", desc: "Fast XML/HTML parsing and XPath querying" },
   { cat: "Text & Formats", icon: "📋", color: "#f472b6", name: "openpyxl", ver: "3.1", desc: "Read and write Excel .xlsx files" },
   { cat: "Text & Formats", icon: "📄", color: "#f472b6", name: "pyyaml", ver: "6.0", desc: "YAML file parsing and serialization" },
-  { cat: "Text & Formats", icon: "🗜️", color: "#f472b6", name: "msgpack", ver: "1.0", desc: "Fast binary serialization format" },
+  { cat: "Text & Formats", icon: "🗜️", color: "#f472b6", name: "msgpack", ver: "1.1", desc: "Fast binary serialization format" },
   // Networking & Utilities
-  { cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.31", desc: "HTTP requests (via micropip — pure Python)" },
-  { cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "42.0", desc: "Cryptographic recipes and primitives" },
-  { cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "23.2", desc: "Classes without boilerplate — define clean data classes" },
+  { cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.32", desc: "HTTP requests (via micropip — pure Python)" },
+  { cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "46.0", desc: "Cryptographic recipes and primitives" },
+  { cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "25.2", desc: "Classes without boilerplate — define clean data classes" },
   { cat: "Utilities", icon: "🏎️", color: "#60a5fa", name: "numba", ver: "0.59", desc: "JIT compiler for numerical Python (LLVM-based)" },
-  { cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "24.0", desc: "Version parsing and specifiers (PEP 440/508)" },
-  { cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.1", desc: "Testing framework — run via micropip install" },
+  { cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "24.2", desc: "Version parsing and specifiers (PEP 440/508)" },
+  { cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.3", desc: "Testing framework — run via micropip install" },
 ];
 
 // ─── Worker protocol — must stay in sync with `pyodide-worker.ts`. ─────
@@ -366,7 +366,14 @@ export const pythonAdapter: LanguageAdapter = {
   displayName: "Python Playground",
   logoText: "py",
   documentTitle: "Python Playground",
-  readyStatus: "Python 3.12 ready",
+  readyStatus: "Python 3.13 ready",
+  runtimeInfo: {
+    language: "Python",
+    version: "3.13",
+    engine: "Pyodide 0.29",
+    engineUrl: "https://pyodide.org",
+    notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
+  },
   codeMirrorMode: "python",
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -388,6 +395,17 @@ export const pythonAdapter: LanguageAdapter = {
     </>
   ),
   importSnippet: (name) => `import ${name}`,
+  hasImport(code, name) {
+    // Match `import name`, `import name as alias`, `import a, name`,
+    // and `from name import ...` — anchored at the start of a line so
+    // imports that appear in strings or comments mid-line are ignored.
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(
+      `^\\s*(?:from\\s+${escaped}(?:\\.[\\w.]+)?\\s+import\\b|import\\s+(?:[\\w.]+\\s*,\\s*)*${escaped}(?:\\s+as\\s+\\w+)?\\s*(?:,|$|#))`,
+      "m",
+    );
+    return re.test(code);
+  },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting Python worker…");
     // Standard Web Worker construction pattern that Next.js / Turbopack

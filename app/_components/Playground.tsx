@@ -33,6 +33,7 @@ import type {
   OutputCell,
   PackageInfo,
   PlotlyFigure,
+  RuntimeInfo,
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useRouter } from "next/navigation";
@@ -197,20 +198,19 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
 interface PackagesDrawerProps {
   open: boolean;
   packages: PackageInfo[];
-  importSnippet: (name: string) => string;
   footer: ReactNode;
   onClose: () => void;
+  onPickPackage: (pkg: PackageInfo) => void;
 }
 
 function PackagesDrawer({
   open,
   packages,
-  importSnippet,
   footer,
   onClose,
+  onPickPackage,
 }: PackagesDrawerProps) {
   const [query, setQuery] = useState("");
-  const [copied, setCopied] = useState<string | null>(null);
 
   // The drawer fully unmounts when closed (see `if (!open) return null`
   // below), so internal state naturally resets — no effect needed to clear it.
@@ -235,14 +235,6 @@ function PackagesDrawer({
 
   if (!open) return null;
 
-  const handleCopy = (name: string) => {
-    void navigator.clipboard
-      .writeText(importSnippet(name))
-      .catch(() => undefined);
-    setCopied(name);
-    window.setTimeout(() => setCopied((c) => (c === name ? null : c)), 1500);
-  };
-
   return (
     <div
       className="pkg-overlay"
@@ -252,9 +244,14 @@ function PackagesDrawer({
     >
       <div className="pkg-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="pkg-drawer-header">
-          <div className="pkg-drawer-title">
-            Available Packages
-            <span className="pkg-count-badge">{filtered.length}</span>
+          <div>
+            <div className="pkg-drawer-title">
+              Available Packages
+              <span className="pkg-count-badge">{filtered.length}</span>
+            </div>
+            <div className="pkg-drawer-hint">
+              Click on a package to import it into your editor.
+            </div>
           </div>
           <button
             type="button"
@@ -297,7 +294,12 @@ function PackagesDrawer({
             <div key={cat}>
               <div className="pkg-category-label">{cat}</div>
               {pkgs.map((p) => (
-                <div className="pkg-item" key={p.name}>
+                <button
+                  type="button"
+                  className="pkg-item"
+                  key={p.name}
+                  onClick={() => onPickPackage(p)}
+                >
                   <div
                     className="pkg-icon"
                     style={{ background: `${p.color}22` }}
@@ -311,14 +313,7 @@ function PackagesDrawer({
                     </div>
                     <div className="pkg-desc">{p.desc}</div>
                   </div>
-                  <button
-                    type="button"
-                    className={`pkg-copy-btn${copied === p.name ? " copied" : ""}`}
-                    onClick={() => handleCopy(p.name)}
-                  >
-                    {copied === p.name ? "✓ copied" : "import"}
-                  </button>
-                </div>
+                </button>
               ))}
             </div>
           ))}
@@ -358,6 +353,38 @@ function ExamplesDropdown({ open, examples, onPick }: ExamplesDropdownProps) {
   );
 }
 
+interface InfoPopoverProps {
+  open: boolean;
+  info: RuntimeInfo;
+}
+
+function InfoPopover({ open, info }: InfoPopoverProps) {
+  if (!open) return null;
+  return (
+    <div className="info-popover">
+      <div className="info-popover-row">
+        <span className="info-popover-label">Language</span>
+        <span className="info-popover-val">
+          {info.language} {info.version}
+        </span>
+      </div>
+      <div className="info-popover-row">
+        <span className="info-popover-label">Runtime</span>
+        <span className="info-popover-val">
+          {info.engineUrl ? (
+            <a href={info.engineUrl} target="_blank" rel="noreferrer">
+              {info.engine}
+            </a>
+          ) : (
+            info.engine
+          )}
+        </span>
+      </div>
+      {info.notes && <div className="info-popover-notes">{info.notes}</div>}
+    </div>
+  );
+}
+
 interface ExportDropdownProps {
   open: boolean;
   formats: ExportFormat[];
@@ -371,7 +398,7 @@ function ExportDropdown({ open, formats, onPick }: ExportDropdownProps) {
       {formats.map((fmt) => (
         <div
           key={fmt.extension}
-          className="example-item"
+          className="example-item export-item"
           onClick={() => onPick(fmt)}
           role="button"
           tabIndex={0}
@@ -379,8 +406,11 @@ function ExportDropdown({ open, formats, onPick }: ExportDropdownProps) {
             if (e.key === "Enter") onPick(fmt);
           }}
         >
-          <div className="ex-title">{fmt.label}</div>
-          <div className="ex-desc">Download .{fmt.extension} file</div>
+          <span className="ext-badge">.{fmt.extension}</span>
+          <div className="export-item-text">
+            <div className="ex-title">{fmt.label}</div>
+            <div className="ex-desc">Download as .{fmt.extension}</div>
+          </div>
         </div>
       ))}
     </div>
@@ -561,7 +591,25 @@ export default function Playground({ adapter }: PlaygroundProps) {
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [toast, setToast] = useState<
+    { msg: string; kind: "info" | "warn" } | null
+  >(null);
+  const toastTimerRef = useRef<number | null>(null);
+  const showToast = useCallback(
+    (msg: string, kind: "info" | "warn" = "info") => {
+      setToast({ msg, kind });
+      if (toastTimerRef.current != null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+      toastTimerRef.current = window.setTimeout(() => {
+        setToast(null);
+        toastTimerRef.current = null;
+      }, 2400);
+    },
+    [],
+  );
   const [mobileTab, setMobileTab] = useState<"editor" | "output">("editor");
   const router = useRouter();
 
@@ -587,10 +635,29 @@ export default function Playground({ adapter }: PlaygroundProps) {
   // without being re-bound on every render.
   const runRef = useRef<() => void>(() => undefined);
 
-  const scrollOutputToBottom = useCallback(() => {
+  // The id of the first output cell produced by the most recent run.
+  // The auto-scroll effect uses it to scroll that cell into view rather
+  // than jumping all the way to the end of the scroll container.
+  const newRunFirstIdRef = useRef<number | null>(null);
+
+  const scrollToLatestOutput = useCallback(() => {
     const el = outputBodyRef.current;
     if (!el) return;
     requestAnimationFrame(() => {
+      const id = newRunFirstIdRef.current;
+      if (id != null) {
+        const target = el.querySelector<HTMLElement>(
+          `[data-cell-id="${id}"]`,
+        );
+        if (target) {
+          // Scroll so the cell sits ~64px below the top of the output area,
+          // giving the header a small breathing room without overshooting
+          // into the bottom padding.
+          const top = target.offsetTop - 64;
+          el.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+          return;
+        }
+      }
       el.scrollTop = el.scrollHeight;
     });
   }, []);
@@ -780,6 +847,8 @@ export default function Playground({ adapter }: PlaygroundProps) {
 
     const t0 = performance.now();
     const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
+    const firstId = outputCounter.current + 1;
+    newRunFirstIdRef.current = firstId;
     try {
       await rt.run(code, (cell) => collected.push(cell));
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
@@ -792,7 +861,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
         })),
       ]);
       setStatusState("ready");
-      setStatusText(`Done in ${elapsed}`);
+      setStatusText(adapter.readyStatus);
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const msg = err instanceof Error ? err.message : String(err);
@@ -846,6 +915,26 @@ export default function Playground({ adapter }: PlaygroundProps) {
     editorRef.current?.focus();
   }, []);
 
+  const importPackage = useCallback(
+    (pkg: PackageInfo) => {
+      const editor = editorRef.current;
+      if (!editor) return;
+      const current = editor.getValue();
+      if (adapter.hasImport(current, pkg.name)) {
+        showToast(`${pkg.name} is already imported.`, "warn");
+        return;
+      }
+      const snippet = adapter.importSnippet(pkg.name);
+      const next = current.length === 0 ? `${snippet}\n` : `${snippet}\n${current}`;
+      editor.setValue(next);
+      // Position the cursor right after the inserted line so the user lands
+      // back where work in progress can continue.
+      editor.setCursor({ line: 1, ch: 0 });
+      showToast(`Imported ${pkg.name}.`);
+    },
+    [adapter, showToast],
+  );
+
   const exportCode = useCallback(
     (format: ExportFormat) => {
       const code = editorRef.current?.getValue() ?? "";
@@ -865,8 +954,8 @@ export default function Playground({ adapter }: PlaygroundProps) {
 
   // Auto-scroll output on new cells.
   useEffect(() => {
-    scrollOutputToBottom();
-  }, [outputs, scrollOutputToBottom]);
+    scrollToLatestOutput();
+  }, [outputs, scrollToLatestOutput]);
 
   // ─── Resizer ────────────────────────────────────────────────────────────
   const panesRef = useRef<HTMLDivElement | null>(null);
@@ -945,6 +1034,22 @@ export default function Playground({ adapter }: PlaygroundProps) {
     return () => document.removeEventListener("click", onDocClick);
   }, [exportOpen]);
 
+  // Close info popover when clicking outside.
+  useEffect(() => {
+    if (!infoOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        !target?.closest(".info-popover") &&
+        !target?.closest("[data-info-trigger]")
+      ) {
+        setInfoOpen(false);
+      }
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [infoOpen]);
+
   const typeLabel: Record<OutputCell["type"], string> = {
     stdout: "OUTPUT",
     stderr: "ERROR",
@@ -989,69 +1094,93 @@ export default function Playground({ adapter }: PlaygroundProps) {
           </div>
           <div className="header-sep" />
 
-          <div style={{ position: "relative" }}>
+          <div className="header-actions">
+            <div className="header-action-wrap">
+              <button
+                type="button"
+                className="header-btn"
+                data-examples-trigger
+                onClick={() => setExamplesOpen((v) => !v)}
+                title="Examples"
+                aria-label="Examples"
+              >
+                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
+                  <path d="M2 2h12v2H2zm0 4h8v2H2zm0 4h10v2H2z" />
+                </svg>
+                <span className="btn-label">Examples</span>
+              </button>
+              <ExamplesDropdown
+                open={examplesOpen}
+                examples={adapter.examples}
+                onPick={loadExample}
+              />
+            </div>
+
+            <div className="header-action-wrap">
+              <button
+                type="button"
+                className="header-btn"
+                data-export-trigger
+                onClick={() => setExportOpen((v) => !v)}
+                title="Export code"
+                aria-label="Export"
+              >
+                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
+                  <path d="M8 1l3 3h-2v5H7V4H5l3-3zM2 11h12v2H2z" />
+                </svg>
+                <span className="btn-label">Export</span>
+              </button>
+              <ExportDropdown
+                open={exportOpen}
+                formats={adapter.exportFormats}
+                onPick={exportCode}
+              />
+            </div>
+
             <button
               type="button"
-              className="examples-btn"
-              data-examples-trigger
-              onClick={() => setExamplesOpen((v) => !v)}
+              className="header-btn"
+              onClick={() => setPackagesOpen(true)}
+              title="Available Packages"
+              aria-label="Packages"
             >
               <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                <path d="M2 2h12v2H2zm0 4h8v2H2zm0 4h10v2H2z" />
+                <path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z" />
               </svg>
-              Examples
+              <span className="btn-label">Packages</span>
             </button>
-            <ExamplesDropdown
-              open={examplesOpen}
-              examples={adapter.examples}
-              onPick={loadExample}
-            />
-          </div>
 
-          <div style={{ position: "relative" }}>
+            <div className="header-action-wrap">
+              <button
+                type="button"
+                className="header-btn icon-only"
+                data-info-trigger
+                onClick={() => setInfoOpen((v) => !v)}
+                title="Runtime info"
+                aria-label="Runtime info"
+              >
+                <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="12" y1="11" x2="12" y2="16" />
+                  <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
+              <InfoPopover open={infoOpen} info={adapter.runtimeInfo} />
+            </div>
+
             <button
               type="button"
-              className="examples-btn"
-              data-export-trigger
-              onClick={() => setExportOpen((v) => !v)}
-              title="Export code"
+              className="header-btn icon-only"
+              onClick={() => setSettingsOpen((v) => !v)}
+              title="Settings"
+              aria-label="Settings"
             >
-              <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                <path d="M8 1l3 3h-2v5H7V4H5l3-3zM2 11h12v2H2z" />
+              <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              Export
             </button>
-            <ExportDropdown
-              open={exportOpen}
-              formats={adapter.exportFormats}
-              onPick={exportCode}
-            />
           </div>
-
-          <button
-            type="button"
-            className="examples-btn"
-            onClick={() => setPackagesOpen(true)}
-            title="Available Packages"
-          >
-            <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-              <path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z" />
-            </svg>
-            Packages
-          </button>
-
-          <button
-            type="button"
-            className="settings-btn"
-            onClick={() => setSettingsOpen((v) => !v)}
-            title="Settings"
-            aria-label="Settings"
-          >
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-          </button>
 
           <div className={`status-pill ${statusState}`}>
             <div className="status-dot" />
@@ -1077,10 +1206,12 @@ export default function Playground({ adapter }: PlaygroundProps) {
         <PackagesDrawer
           open={packagesOpen}
           packages={adapter.packages}
-          importSnippet={adapter.importSnippet}
           footer={adapter.packagesFooter}
           onClose={() => setPackagesOpen(false)}
+          onPickPackage={importPackage}
         />
+
+        {toast && <div className={`toast toast-${toast.kind}`}>{toast.msg}</div>}
 
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
           <button
@@ -1171,11 +1302,12 @@ export default function Playground({ adapter }: PlaygroundProps) {
                 outputs.map((cell) => (
                   <div
                     key={cell.id}
+                    data-cell-id={cell.id}
                     className={`out-cell ${cell.type}`}
                   >
                     <div className="out-cell-header">
                       <span className="cell-type">{typeLabel[cell.type]}</span>
-                      <span className="cell-time">{cell.elapsed}</span>
+                      <span className="cell-time">Done in {cell.elapsed}</span>
                     </div>
                     <div className="out-cell-body">
                       {cell.type === "image" ? (
@@ -1185,7 +1317,7 @@ export default function Playground({ adapter }: PlaygroundProps) {
                         <img
                           src={`data:image/png;base64,${cell.content}`}
                           alt="figure"
-                          onLoad={scrollOutputToBottom}
+                          onLoad={scrollToLatestOutput}
                         />
                       ) : cell.type === "html" ? (
                         <div

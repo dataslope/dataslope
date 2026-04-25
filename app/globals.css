@@ -1,0 +1,15 @@
+/* Global resets shared by every route. Removes the default 8px body margin
+   that browsers add so full-viewport pages (home, playground) sit flush
+   against the window edges. */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: #0f1117;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}

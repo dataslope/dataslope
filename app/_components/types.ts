@@ -34,6 +34,14 @@ export interface PackageInfo {
   desc: string;
 }
 
+export interface RuntimeInfo {
+  language: string;
+  version: string;
+  engine: string;
+  engineUrl?: string;
+  notes?: string;
+}
+
 export interface ExportFormat {
   /** File extension without the leading dot, e.g. "py" or "r". */
   extension: string;
@@ -62,6 +70,9 @@ export interface LanguageAdapter {
   documentTitle: string;
   /** Status text shown after init succeeds. */
   readyStatus: string;
+  /** Human-readable runtime details shown by the header's info popup
+   *  (e.g. "Python 3.13 via Pyodide", "R 4.4 via WebR"). */
+  runtimeInfo: RuntimeInfo;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
   examples: ExampleSnippet[];
@@ -73,8 +84,13 @@ export interface LanguageAdapter {
   exportBaseFilename: string;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
-  /** Build the snippet that the "import" copy button puts on the clipboard. */
+  /** Build the snippet inserted at the top of the editor when the user
+   *  clicks a package in the packages drawer. */
   importSnippet(packageName: string): string;
+  /** Returns true if `code` already imports `packageName` — used to skip
+   *  the insertion (and surface a "already imported" toast) when the
+   *  relevant import statement is present. */
+  hasImport(code: string, packageName: string): boolean;
   /** Initialise the runtime. Called once after scripts/stylesheets load. */
   init(setLoadingMessage: (message: string) => void): Promise<LanguageRuntime>;
 }

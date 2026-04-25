@@ -2,6 +2,11 @@
 // npm. CodeMirror v5 ships without TypeScript typings, so we narrowly
 // describe just the surface area the playground actually uses.
 
+export interface CodeMirrorPosition {
+  line: number;
+  ch: number;
+}
+
 export interface CodeMirrorEditor {
   setValue(value: string): void;
   getValue(): string;
@@ -10,6 +15,7 @@ export interface CodeMirrorEditor {
   getWrapperElement(): HTMLElement;
   refresh(): void;
   focus(): void;
+  setCursor(pos: CodeMirrorPosition): void;
 }
 
 export interface CodeMirrorOptions {
