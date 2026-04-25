@@ -27,6 +27,7 @@ import type {
 } from "./runtime/globals";
 import type {
   ExampleSnippet,
+  ExportFormat,
   LanguageAdapter,
   LanguageRuntime,
   OutputCell,
@@ -357,6 +358,35 @@ function ExamplesDropdown({ open, examples, onPick }: ExamplesDropdownProps) {
   );
 }
 
+interface ExportDropdownProps {
+  open: boolean;
+  formats: ExportFormat[];
+  onPick: (format: ExportFormat) => void;
+}
+
+function ExportDropdown({ open, formats, onPick }: ExportDropdownProps) {
+  if (!open) return null;
+  return (
+    <div className="examples-dropdown export-dropdown">
+      {formats.map((fmt) => (
+        <div
+          key={fmt.extension}
+          className="example-item"
+          onClick={() => onPick(fmt)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onPick(fmt);
+          }}
+        >
+          <div className="ex-title">{fmt.label}</div>
+          <div className="ex-desc">Download .{fmt.extension} file</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface SettingsPanelProps {
   fontSize: number;
   setFontSize: (n: number) => void;
@@ -529,8 +559,10 @@ export default function Playground({ adapter }: PlaygroundProps) {
 
   // ─── UI state ───────────────────────────────────────────────────────────
   const [examplesOpen, setExamplesOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"editor" | "output">("editor");
   const router = useRouter();
 
   // ─── Runtime state ──────────────────────────────────────────────────────
@@ -784,6 +816,11 @@ export default function Playground({ adapter }: PlaygroundProps) {
         setStatusState("ready");
         setStatusText(adapter.readyStatus);
       }, 3000);
+    } finally {
+      // On narrow viewports the panes share the screen via a tab switcher;
+      // surface the result tab automatically once the run is done so the
+      // user doesn't have to swipe back themselves.
+      setMobileTab("output");
     }
   }, [adapter.readyStatus]);
 
@@ -808,6 +845,23 @@ export default function Playground({ adapter }: PlaygroundProps) {
     setExamplesOpen(false);
     editorRef.current?.focus();
   }, []);
+
+  const exportCode = useCallback(
+    (format: ExportFormat) => {
+      const code = editorRef.current?.getValue() ?? "";
+      const blob = new Blob([code], { type: format.mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${adapter.exportBaseFilename}.${format.extension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setExportOpen(false);
+    },
+    [adapter.exportBaseFilename],
+  );
 
   // Auto-scroll output on new cells.
   useEffect(() => {
@@ -875,6 +929,22 @@ export default function Playground({ adapter }: PlaygroundProps) {
     return () => document.removeEventListener("click", onDocClick);
   }, [examplesOpen]);
 
+  // Close export dropdown when clicking outside.
+  useEffect(() => {
+    if (!exportOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        !target?.closest(".export-dropdown") &&
+        !target?.closest("[data-export-trigger]")
+      ) {
+        setExportOpen(false);
+      }
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [exportOpen]);
+
   const typeLabel: Record<OutputCell["type"], string> = {
     stdout: "OUTPUT",
     stderr: "ERROR",
@@ -938,6 +1008,26 @@ export default function Playground({ adapter }: PlaygroundProps) {
             />
           </div>
 
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              className="examples-btn"
+              data-export-trigger
+              onClick={() => setExportOpen((v) => !v)}
+              title="Export code"
+            >
+              <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
+                <path d="M8 1l3 3h-2v5H7V4H5l3-3zM2 11h12v2H2z" />
+              </svg>
+              Export
+            </button>
+            <ExportDropdown
+              open={exportOpen}
+              formats={adapter.exportFormats}
+              onPick={exportCode}
+            />
+          </div>
+
           <button
             type="button"
             className="examples-btn"
@@ -992,7 +1082,28 @@ export default function Playground({ adapter }: PlaygroundProps) {
           onClose={() => setPackagesOpen(false)}
         />
 
-        <div className="panes" ref={panesRef}>
+        <div className="mobile-tabs" role="tablist" aria-label="Pane">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileTab === "editor"}
+            className={`mobile-tab${mobileTab === "editor" ? " active" : ""}`}
+            onClick={() => setMobileTab("editor")}
+          >
+            Editor
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileTab === "output"}
+            className={`mobile-tab${mobileTab === "output" ? " active" : ""}`}
+            onClick={() => setMobileTab("output")}
+          >
+            Output
+          </button>
+        </div>
+
+        <div className="panes" data-mobile-tab={mobileTab} ref={panesRef}>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">Editor</span>
@@ -1033,7 +1144,11 @@ export default function Playground({ adapter }: PlaygroundProps) {
 
           <div className="output-pane">
             <div className="pane-bar">
-              <span className="pane-label">Output</span>
+              <span className="pane-label">
+                {outputs.length === 0
+                  ? "Output"
+                  : `${outputs.length} ${outputs.length === 1 ? "Output" : "Outputs"}`}
+              </span>
               <div className="pane-bar-sep" />
               <button
                 type="button"
