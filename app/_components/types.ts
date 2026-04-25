@@ -34,6 +34,15 @@ export interface PackageInfo {
   desc: string;
 }
 
+export interface ExportFormat {
+  /** File extension without the leading dot, e.g. "py" or "r". */
+  extension: string;
+  /** Label shown in the export dropdown, e.g. "Python (.py)". */
+  label: string;
+  /** MIME type used when constructing the download Blob. */
+  mimeType: string;
+}
+
 /** Emitter passed to `runtime.run` so the adapter can stream cells as they
  *  become available. */
 export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
@@ -57,6 +66,11 @@ export interface LanguageAdapter {
   codeMirrorMode: string;
   examples: ExampleSnippet[];
   packages: PackageInfo[];
+  /** Formats offered by the "Export" dropdown. The editor's current contents
+   *  are written to a client-side download with the chosen extension. */
+  exportFormats: ExportFormat[];
+  /** Base filename (without extension) used when exporting, e.g. "script". */
+  exportBaseFilename: string;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
   /** Build the snippet that the "import" copy button puts on the clipboard. */

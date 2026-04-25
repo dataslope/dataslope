@@ -370,6 +370,10 @@ export const pythonAdapter: LanguageAdapter = {
   codeMirrorMode: "python",
   examples: EXAMPLES,
   packages: PACKAGES,
+  exportFormats: [
+    { extension: "py", label: "Python (.py)", mimeType: "text/x-python" },
+  ],
+  exportBaseFilename: "script",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

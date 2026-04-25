@@ -535,6 +535,10 @@ export const rAdapter: LanguageAdapter = {
   codeMirrorMode: "r",
   examples: EXAMPLES,
   packages: PACKAGES,
+  exportFormats: [
+    { extension: "r", label: "R (.r)", mimeType: "text/x-r-source" },
+  ],
+  exportBaseFilename: "script",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}
