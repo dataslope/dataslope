@@ -6,5 +6,9 @@ export default defineConfig({
     // are tagged as "browser" and skipped in the Node environment.
     // Run the full test suite with:  npm test
     environment: "node",
+    // E2E tests live in `e2e/` and are run by Playwright
+    // (`npm run test:e2e`). Keep Vitest from picking them up so that
+    // `npm test` stays a fast Node-only check.
+    exclude: ["node_modules/**", "dist/**", ".next/**", "e2e/**"],
   },
 });
