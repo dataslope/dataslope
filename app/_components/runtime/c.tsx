@@ -6,7 +6,7 @@ import type {
   PackageInfo,
 } from "../types";
 
-// Run C in the browser via @wasmer/sdk + the `wasmer/clang` package
+// Run C in the browser via @wasmer/sdk + the `clang/clang` package
 // from the Wasmer registry. The user's source is written into a
 // virtual filesystem mounted at `/home`, clang compiles it to a
 // WASI-targeted `.wasm`, then we re-load that binary as a fresh
@@ -266,7 +266,7 @@ class CRuntime implements LanguageRuntime {
   ) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // Locate the clang command in the package. `wasmer/clang` exposes
+    // Locate the clang command in the package. `clang/clang` exposes
     // its compiler as the package entrypoint, but we also fall back to
     // a named "clang" command so this keeps working if the package
     // layout changes upstream.
@@ -275,7 +275,7 @@ class CRuntime implements LanguageRuntime {
     if (!clangCmd) {
       emit({
         type: "stderr",
-        content: "wasmer/clang package did not expose a clang command.",
+        content: "clang/clang package did not expose a clang command.",
       });
       return;
     }
@@ -385,8 +385,8 @@ export const cAdapter: LanguageAdapter = {
   runtimeInfo: {
     language: "C",
     version: "C17 (clang)",
-    engine: "Wasmer + wasmer/clang",
-    engineUrl: "https://wasmer.io/wasmer/clang",
+    engine: "Wasmer + clang/clang",
+    engineUrl: "https://wasmer.io/clang/clang",
     notes:
       "C is compiled in your browser by clang (WebAssembly), and the resulting WASI binary is then executed in a sandboxed Wasmer runtime — no server roundtrip.",
   },
@@ -424,7 +424,7 @@ export const cAdapter: LanguageAdapter = {
     const sdk = await loadWasmerSdk();
 
     setLoadingMessage("Fetching clang from the Wasmer registry (this can take a moment on first load)…");
-    const clang = await sdk.Wasmer.fromRegistry("wasmer/clang");
+    const clang = await sdk.Wasmer.fromRegistry("clang/clang");
 
     return new CRuntime(sdk, clang);
   },
