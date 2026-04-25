@@ -6,6 +6,7 @@ import {
   SiJavascript,
   SiTypescript,
   SiPhp,
+  SiC,
 } from "react-icons/si";
 import styles from "./home.module.css";
 
@@ -58,6 +59,16 @@ function PhpLogo() {
     <SiPhp
       className={styles.logoSvg}
       style={{ color: "#777BB4" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function CLogo() {
+  return (
+    <SiC
+      className={styles.logoSvg}
+      style={{ color: "#A8B9CC" }}
       aria-hidden="true"
     />
   );
@@ -141,6 +152,19 @@ export default function Home() {
                 <strong>PHP</strong>
                 <span className={styles.cardDesc}>
                   Run PHP in the browser via php-wasm.
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/c" className={styles.card}>
+              <span className={styles.logo}>
+                <CLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>C</strong>
+                <span className={styles.cardDesc}>
+                  Compile and run C in the browser via clang (WebAssembly).
                 </span>
               </span>
             </Link>
