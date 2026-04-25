@@ -29,6 +29,7 @@ import { javascriptAdapter } from "../app/_components/runtime/javascript";
 import { typescriptAdapter } from "../app/_components/runtime/typescript";
 import { phpAdapter } from "../app/_components/runtime/php";
 import { cAdapter } from "../app/_components/runtime/c";
+import { cppAdapter } from "../app/_components/runtime/cpp";
 
 // Python and R adapters import from "webr" / reference workers; we test
 // their exports separately once we have a proper mocking story.
@@ -38,6 +39,7 @@ const ADAPTERS = [
   { name: "TypeScript", adapter: typescriptAdapter },
   { name: "PHP", adapter: phpAdapter },
   { name: "C", adapter: cAdapter },
+  { name: "C++", adapter: cppAdapter },
 ];
 
 describe("LanguageAdapter shape", () => {
@@ -165,5 +167,25 @@ describe("PHP adapter specifics", () => {
     const hello = phpAdapter.examples.find((e) => e.key === "hello");
     expect(hello).toBeTruthy();
     expect(hello!.code.trimStart()).toMatch(/^<\?php/);
+  });
+});
+
+describe("C++ adapter specifics", () => {
+  it("id is 'cpp'", () => expect(cppAdapter.id).toBe("cpp"));
+
+  it("importSnippet wraps in #include", () => {
+    expect(cppAdapter.importSnippet("iostream")).toBe("#include <iostream>");
+  });
+
+  it("hasImport detects existing includes", () => {
+    expect(cppAdapter.hasImport("#include <iostream>", "iostream")).toBe(true);
+    expect(cppAdapter.hasImport("// no include", "iostream")).toBe(false);
+  });
+
+  it("hello-world example uses iostream and main()", () => {
+    const hello = cppAdapter.examples.find((e) => e.key === "hello");
+    expect(hello).toBeTruthy();
+    expect(hello!.code).toContain("#include <iostream>");
+    expect(hello!.code).toMatch(/int\s+main\s*\(/);
   });
 });

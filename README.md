@@ -11,6 +11,7 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | `/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
 | `/php`        | ✅ live      | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
 | `/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
+| `/cpp`        | ✅ live      | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
 | `/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
@@ -34,13 +35,15 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   │       ├── javascript.tsx    # JavaScript language adapter (native)
 │   │       ├── typescript.tsx    # TypeScript language adapter (in-browser tsc)
 │   │       ├── php.tsx           # PHP language adapter (php-wasm)
-│   │       └── c.tsx             # C language adapter (clang/clang via Wasmer)
+│   │       ├── c.tsx             # C language adapter (clang/clang via Wasmer)
+│   │       └── cpp.tsx           # C++ language adapter (clang/clang via Wasmer)
 │   ├── python/page.tsx           # /python route
 │   ├── r/page.tsx                # /r route
 │   ├── javascript/page.tsx       # /javascript route
 │   ├── typescript/page.tsx       # /typescript route
 │   ├── php/page.tsx              # /php route
-│   └── c/page.tsx                # /c route
+│   ├── c/page.tsx                # /c route
+│   └── cpp/page.tsx              # /cpp route
 ├── __tests__/
 │   ├── javascript.test.ts        # JavaScript runtime execution tests
 │   ├── typescript.test.ts        # TypeScript transpile + execution tests
@@ -75,6 +78,7 @@ Then open:
 - http://localhost:3000/typescript — TypeScript playground
 - http://localhost:3000/php — PHP playground
 - http://localhost:3000/c — C playground
+- http://localhost:3000/cpp — C++ playground
 
 ## Editor settings
 
@@ -110,7 +114,7 @@ The test suite covers:
 npm test
 ```
 
-The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, PHP) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
+The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, C++, PHP) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
 
 ## Adding a new playground (e.g. `/postgres`)
 

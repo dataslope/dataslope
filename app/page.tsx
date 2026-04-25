@@ -7,6 +7,7 @@ import {
   SiTypescript,
   SiPhp,
   SiC,
+  SiCplusplus,
 } from "react-icons/si";
 import styles from "./home.module.css";
 
@@ -69,6 +70,16 @@ function CLogo() {
     <SiC
       className={styles.logoSvg}
       style={{ color: "#A8B9CC" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function CppLogo() {
+  return (
+    <SiCplusplus
+      className={styles.logoSvg}
+      style={{ color: "#00599C" }}
       aria-hidden="true"
     />
   );
@@ -165,6 +176,19 @@ export default function Home() {
                 <strong>C</strong>
                 <span className={styles.cardDesc}>
                   Compile and run C in the browser via clang (WebAssembly).
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/cpp" className={styles.card}>
+              <span className={styles.logo}>
+                <CppLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>C++</strong>
+                <span className={styles.cardDesc}>
+                  Compile and run C++ in the browser via clang (WebAssembly).
                 </span>
               </span>
             </Link>
