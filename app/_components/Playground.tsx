@@ -595,6 +595,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Mobile consolidated-menu drawer. We render this as a Dialog (bottom
+  // sheet) instead of a Menu so its inline sub-sections (Examples,
+  // Information, …) can't be cut off the side of a narrow viewport.
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -715,6 +719,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           import("codemirror/mode/python/python"),
           import("codemirror/mode/r/r"),
           import("codemirror/mode/javascript/javascript"),
+          // The PHP mode depends on htmlmixed, which itself depends on
+          // xml, css, and javascript (already loaded above), and on
+          // clike for inline C-style syntax inside <?php blocks.
+          import("codemirror/mode/xml/xml"),
+          import("codemirror/mode/css/css"),
+          import("codemirror/mode/clike/clike"),
+          import("codemirror/mode/htmlmixed/htmlmixed"),
+          import("codemirror/mode/php/php"),
           import("codemirror/addon/edit/closebrackets"),
           import("codemirror/addon/edit/matchbrackets"),
           import("codemirror/addon/comment/comment"),
@@ -1220,11 +1232,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </div>
 
           {/* Mobile-only consolidated menu — replaces the header buttons
-              on narrow viewports. The playground switcher stays on the
-              left so the user can always tell which playground they're
-              in at a glance. */}
-          <Menu.Root>
-            <Menu.Trigger
+              on narrow viewports. We render it as a Dialog (bottom-sheet
+              drawer) rather than a Menu with nested submenus, so that
+              sections like "Examples" and "Information" stay inside the
+              viewport instead of popping out to the side and getting
+              clipped on narrow phones. The playground switcher stays on
+              the left of the header so the user can always tell which
+              playground they're in at a glance. */}
+          <Dialog.Root
+            open={mobileMenuOpen}
+            onOpenChange={setMobileMenuOpen}
+          >
+            <Dialog.Trigger
               className="header-btn icon-only mobile-only mobile-menu-btn"
               title="Menu"
               aria-label="Open menu"
@@ -1234,101 +1253,121 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <line x1="4" y1="12" x2="20" y2="12" />
                 <line x1="4" y1="17" x2="20" y2="17" />
               </svg>
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner sideOffset={6} align="end">
-                <Menu.Popup className="bui-popup mobile-menu-popup">
-                  {/* The playground switcher dropdown in the top-left of
-                      the header is visible on mobile too, so we don't
-                      duplicate it here. */}
-                  <Menu.SubmenuRoot>
-                    <Menu.SubmenuTrigger className="mobile-menu-item">
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Backdrop className="pkg-overlay mobile-menu-backdrop" />
+              <Dialog.Popup
+                className="mobile-menu-drawer"
+                aria-label="Menu"
+              >
+                <div className="mobile-menu-handle" aria-hidden="true" />
+                <div className="mobile-menu-drawer-header">
+                  <Dialog.Title className="mobile-menu-drawer-title">
+                    Menu
+                  </Dialog.Title>
+                  <Dialog.Close
+                    className="settings-close"
+                    aria-label="Close menu"
+                  >
+                    ✕
+                  </Dialog.Close>
+                </div>
+                <div className="mobile-menu-drawer-body">
+                  {/* Examples — collapsible inline section */}
+                  <details className="mobile-menu-section">
+                    <summary className="mobile-menu-section-summary">
                       <span>Examples</span>
                       <span className="mobile-menu-chev" aria-hidden="true">
                         ›
                       </span>
-                    </Menu.SubmenuTrigger>
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={4} align="start">
-                        <Menu.Popup className="bui-popup examples-dropdown mobile-submenu">
-                          {adapter.examples.map((ex) => (
-                            <Menu.Item
-                              key={ex.key}
-                              className="example-item"
-                              onClick={() => requestExample(ex)}
-                            >
-                              <div className="ex-title">{ex.title}</div>
-                              <div className="ex-desc">{ex.desc}</div>
-                            </Menu.Item>
-                          ))}
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.SubmenuRoot>
+                    </summary>
+                    <div className="mobile-menu-section-body">
+                      {adapter.examples.map((ex) => (
+                        <button
+                          type="button"
+                          key={ex.key}
+                          className="example-item"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            requestExample(ex);
+                          }}
+                        >
+                          <div className="ex-title">{ex.title}</div>
+                          <div className="ex-desc">{ex.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </details>
 
-                  <Menu.SubmenuRoot>
-                    <Menu.SubmenuTrigger className="mobile-menu-item">
+                  {/* Export — collapsible inline section */}
+                  <details className="mobile-menu-section">
+                    <summary className="mobile-menu-section-summary">
                       <span>Export</span>
                       <span className="mobile-menu-chev" aria-hidden="true">
                         ›
                       </span>
-                    </Menu.SubmenuTrigger>
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={4} align="start">
-                        <Menu.Popup className="bui-popup examples-dropdown export-dropdown mobile-submenu">
-                          {adapter.exportFormats.map((fmt) => (
-                            <Menu.Item
-                              key={fmt.extension}
-                              className="example-item export-item"
-                              onClick={() => exportCode(fmt)}
-                            >
-                              <span className="ext-badge">.{fmt.extension}</span>
-                              <div className="export-item-text">
-                                <div className="ex-title">{fmt.label}</div>
-                                <div className="ex-desc">
-                                  Download as .{fmt.extension}
-                                </div>
-                              </div>
-                            </Menu.Item>
-                          ))}
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.SubmenuRoot>
+                    </summary>
+                    <div className="mobile-menu-section-body">
+                      {adapter.exportFormats.map((fmt) => (
+                        <button
+                          type="button"
+                          key={fmt.extension}
+                          className="example-item export-item"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            exportCode(fmt);
+                          }}
+                        >
+                          <span className="ext-badge">.{fmt.extension}</span>
+                          <div className="export-item-text">
+                            <div className="ex-title">{fmt.label}</div>
+                            <div className="ex-desc">
+                              Download as .{fmt.extension}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </details>
 
-                  <Menu.Item
-                    className="mobile-menu-item"
-                    onClick={() => setPackagesOpen(true)}
+                  <button
+                    type="button"
+                    className="mobile-menu-action"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setPackagesOpen(true);
+                    }}
                   >
                     <span>Packages</span>
-                  </Menu.Item>
+                  </button>
 
-                  <Menu.SubmenuRoot>
-                    <Menu.SubmenuTrigger className="mobile-menu-item">
+                  {/* Information — collapsible inline section */}
+                  <details className="mobile-menu-section">
+                    <summary className="mobile-menu-section-summary">
                       <span>Information</span>
                       <span className="mobile-menu-chev" aria-hidden="true">
                         ›
                       </span>
-                    </Menu.SubmenuTrigger>
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={4} align="start">
-                        <Menu.Popup className="bui-popup info-popover mobile-submenu">
-                          <RuntimeInfoContent info={adapter.runtimeInfo} />
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.SubmenuRoot>
+                    </summary>
+                    <div className="mobile-menu-section-body info-popover">
+                      <RuntimeInfoContent info={adapter.runtimeInfo} />
+                    </div>
+                  </details>
 
-                  <Menu.Item
-                    className="mobile-menu-item"
-                    onClick={() => setSettingsOpen(true)}
+                  <button
+                    type="button"
+                    className="mobile-menu-action"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setSettingsOpen(true);
+                    }}
                   >
                     <span>Settings</span>
-                  </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+                  </button>
+                </div>
+              </Dialog.Popup>
+            </Dialog.Portal>
+          </Dialog.Root>
         </header>
 
         <SettingsPanel

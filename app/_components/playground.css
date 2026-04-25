@@ -947,39 +947,148 @@ input[type="range"].fs-slider:disabled {
   outline: none;
 }
 
-/* ─── Mobile consolidated menu ─── */
+/* ─── Mobile consolidated menu (bottom-sheet drawer) ───
+   On narrow viewports the header collapses into a single hamburger
+   button that opens this Dialog. We render Examples / Export /
+   Information as inline collapsible sections inside the drawer so
+   nothing has to pop out to the side and risk being cut off. */
 .mobile-menu-btn { color: var(--text); }
-.mobile-menu-popup {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 12px 40px #0009;
-  width: 240px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+
+.mobile-menu-backdrop {
+  /* Inherits position/colour from .pkg-overlay; keep it opaque enough
+     that the editor underneath fades away on the small mobile screen. */
+  z-index: 320;
 }
-.mobile-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+
+.mobile-menu-drawer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 321;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 32px #0008;
+  display: flex; flex-direction: column;
+  max-height: 85vh;
+  outline: none;
+  /* Slide up from the bottom; Base UI flips data-starting-style /
+     data-ending-style during open/close. */
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.mobile-menu-drawer[data-starting-style],
+.mobile-menu-drawer[data-ending-style] {
+  transform: translateY(100%);
+}
+
+.mobile-menu-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 8px auto 0;
+}
+
+.mobile-menu-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 8px;
+}
+.mobile-menu-drawer-title {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.mobile-menu-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px 16px;
+  display: flex; flex-direction: column;
+  gap: 4px;
+}
+.mobile-menu-drawer-body::-webkit-scrollbar { width: 5px; }
+.mobile-menu-drawer-body::-webkit-scrollbar-track { background: transparent; }
+.mobile-menu-drawer-body::-webkit-scrollbar-thumb {
+  background: var(--border); border-radius: 3px;
+}
+
+.mobile-menu-action {
+  display: flex; align-items: center; justify-content: space-between;
   gap: 10px;
-  padding: 9px 10px;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 12px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-ui);
   color: var(--text);
+  background: transparent;
+  border: none;
   cursor: pointer;
   outline: none;
   user-select: none;
+  text-align: left;
+  width: 100%;
 }
-.mobile-menu-item[data-highlighted],
-.mobile-menu-item:hover,
-.mobile-menu-item[data-popup-open] {
+.mobile-menu-action:hover,
+.mobile-menu-action:focus-visible {
   background: var(--bg3);
 }
-.mobile-menu-chev { color: var(--text-dim); font-size: 16px; line-height: 1; }
-.mobile-submenu { max-width: calc(100vw - 24px); }
+
+.mobile-menu-section {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mobile-menu-section[open] {
+  background: var(--bg);
+}
+.mobile-menu-section-summary {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.mobile-menu-section-summary::-webkit-details-marker { display: none; }
+.mobile-menu-section-summary:hover,
+.mobile-menu-section-summary:focus-visible {
+  background: var(--bg3);
+  outline: none;
+}
+.mobile-menu-section[open] > .mobile-menu-section-summary .mobile-menu-chev {
+  transform: rotate(90deg);
+}
+.mobile-menu-chev {
+  color: var(--text-dim);
+  font-size: 16px; line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.mobile-menu-section-body {
+  padding: 4px 4px 8px;
+  display: flex; flex-direction: column;
+}
+/* The example/export items inside the drawer are rendered as buttons
+   (not Menu.Items), so reset the default button chrome and let the
+   shared `.example-item` styles take over. */
+.mobile-menu-section-body > button.example-item {
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--text-muted);
+}
+/* Reset the popover chrome when the runtime-info block is rendered
+   inline inside an accordion section instead of in its own popover. */
+.mobile-menu-section-body.info-popover {
+  position: static;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  max-width: none;
+  padding: 8px 12px 4px;
+}
 
 /* ─── Packages drawer animation (Base UI Dialog) ─── */
 .pkg-overlay {
