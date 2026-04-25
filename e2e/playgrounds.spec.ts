@@ -108,6 +108,21 @@ test.describe("Playgrounds (fast)", () => {
       `unexpected stderr: ${stderr?.body ?? ""}`,
     ).toBeUndefined();
   });
+
+  test("C++ compiles and runs the default example", async ({ page }) => {
+    await page.goto("/cpp");
+    await waitForRuntimeReady(page);
+    const cells = await runAndCollectOutput(page);
+    // The default Hello World example prints "Hello, C++ Playground!".
+    const stdout = cells.find((c) => c.type === "stdout");
+    expect(stdout, "expected a stdout cell").toBeTruthy();
+    expect(stdout!.body).toContain("Hello, C++ Playground!");
+    const stderr = cells.find((c) => c.type === "stderr");
+    expect(
+      stderr,
+      `unexpected stderr: ${stderr?.body ?? ""}`,
+    ).toBeUndefined();
+  });
 });
 
 test.describe("Packages button visibility", () => {
@@ -149,6 +164,16 @@ test.describe("Packages button visibility", () => {
     page,
   }) => {
     await page.goto("/c");
+    await waitForRuntimeReady(page);
+    await expect(
+      page.getByRole("button", { name: "Packages" }).first(),
+    ).toBeVisible();
+  });
+
+  test("C++ playground shows the Packages button (stdlib headers)", async ({
+    page,
+  }) => {
+    await page.goto("/cpp");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),
