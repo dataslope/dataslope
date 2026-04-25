@@ -151,7 +151,47 @@ body.pg-active {
 }
 @keyframes pg-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-/* ─── Examples dropdown ─── */
+/* ─── Header action group ─────────────────────────────────────────────── */
+/* Examples / Export / Packages / Info / Settings live in a single segmented
+   group on the right so they read as a related cluster of actions. */
+.header-actions {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.header-action-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.header-actions > * + *,
+.header-actions > .header-action-wrap + .header-action-wrap > .header-btn,
+.header-actions > .header-action-wrap + .header-btn,
+.header-actions > .header-btn + .header-action-wrap > .header-btn,
+.header-actions > .header-btn + .header-btn {
+  border-left: 1px solid var(--border);
+}
+
+.header-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: transparent; border: none; border-radius: 0;
+  color: var(--text-muted); font-family: var(--font-ui); font-size: 13px;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.header-btn:hover { background: var(--bg3); color: var(--text); }
+.header-btn.icon-only { padding: 5px 10px; }
+.header-btn.icon-only svg {
+  fill: none; stroke: currentColor; flex-shrink: 0;
+}
+
+/* Legacy class kept for any straggling callers; mirrors .header-btn so
+   nothing breaks if a future component reuses it. */
 .examples-btn {
   display: flex; align-items: center; gap: 6px;
   padding: 5px 12px; border-radius: var(--radius);
@@ -162,7 +202,9 @@ body.pg-active {
 .examples-btn:hover { border-color: var(--accent); color: var(--text); }
 
 .examples-dropdown {
-  position: absolute; top: 52px; right: 60px;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: var(--radius); box-shadow: 0 8px 32px #0008;
   width: 220px; z-index: 100; overflow: hidden;
@@ -261,9 +303,10 @@ body.pg-active {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  /* Extra bottom padding lets the user scroll the final output well above
-     the fold so the last cell is easy to read. */
-  padding: 16px 16px 360px 16px;
+  /* Modest bottom padding — the auto-scroll places the most recent output
+     near the top of the viewport, so users no longer need huge slack
+     below the last cell. */
+  padding: 16px 16px 32px 16px;
   display: flex; flex-direction: column; gap: 12px;
 }
 .out-cell { flex-shrink: 0; }
@@ -373,15 +416,33 @@ body.pg-active {
 }
 .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
-/* ─── Settings button ─── */
-.settings-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: var(--radius);
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+/* ─── Info popover ─── */
+.info-popover {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: 0 8px 32px #0008;
+  width: 240px; z-index: 100; overflow: hidden;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 8px;
+  animation: pg-fadeSlide 0.18s ease;
 }
-.settings-btn:hover { border-color: var(--accent); color: var(--text); }
-.settings-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.info-popover-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px;
+}
+.info-popover-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--text-dim);
+}
+.info-popover-val {
+  font-size: 12.5px; color: var(--text); font-family: var(--font-mono);
+}
+.info-popover-val a { color: var(--accent); text-decoration: none; }
+.info-popover-val a:hover { text-decoration: underline; }
+.info-popover-notes {
+  font-size: 11.5px; color: var(--text-dim); line-height: 1.5;
+  border-top: 1px solid var(--border); padding-top: 8px;
+}
 
 /* ─── Settings overlay ─── */
 .settings-overlay {
@@ -530,6 +591,10 @@ input[type="range"].fs-slider:disabled {
   font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em;
   display: flex; align-items: center; gap: 8px;
 }
+.pkg-drawer-hint {
+  font-size: 11.5px; color: var(--text-dim); margin-top: 4px;
+  line-height: 1.45;
+}
 .pkg-count-badge {
   font-size: 10px; font-weight: 600; padding: 2px 7px;
   background: var(--accent-glow); color: var(--accent);
@@ -571,11 +636,20 @@ input[type="range"].fs-slider:disabled {
 
 .pkg-item {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 8px 16px; cursor: default;
+  padding: 8px 16px;
+  width: 100%;
+  background: transparent; border: none;
+  color: inherit; font: inherit; text-align: left;
+  cursor: pointer;
   transition: background 0.1s;
   border-radius: 0;
 }
 .pkg-item:hover { background: var(--bg3); }
+.pkg-item:focus-visible {
+  outline: none;
+  background: var(--bg3);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
 
 .pkg-icon {
   width: 28px; height: 28px; border-radius: 6px;
@@ -594,16 +668,6 @@ input[type="range"].fs-slider:disabled {
 }
 .pkg-desc { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
 
-.pkg-copy-btn {
-  flex-shrink: 0; padding: 3px 8px;
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 5px; color: var(--text-dim);
-  font-size: 10px; font-family: var(--font-mono);
-  cursor: pointer; transition: all 0.12s; margin-top: 4px;
-}
-.pkg-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-.pkg-copy-btn.copied { border-color: var(--green); color: var(--green); }
-
 .pkg-footer {
   padding: 10px 16px;
   border-top: 1px solid var(--border);
@@ -612,6 +676,32 @@ input[type="range"].fs-slider:disabled {
 }
 .pkg-footer a { color: var(--accent); text-decoration: none; }
 .pkg-footer a:hover { text-decoration: underline; }
+
+/* ─── Toast ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  box-shadow: 0 12px 32px #0008;
+  z-index: 500;
+  animation: pg-toast-in 0.18s ease;
+}
+.toast-warn {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+@keyframes pg-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
 
 /* Loading overlay */
 .pyodide-loading {
@@ -680,7 +770,37 @@ input[type="range"].fs-slider:disabled {
   right: auto;
   left: 0;
   top: calc(100% + 6px);
-  width: 200px;
+  width: 220px;
+}
+
+.export-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.export-item-text {
+  min-width: 0;
+  flex: 1;
+}
+
+/* File-extension badge — gradient rounded rectangle that mirrors the
+   playground header's "py"/"R" logo so future formats (.pdf, .csv, …)
+   slot in with the same visual language. */
+.ext-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* ─── Mobile tab bar (hidden on desktop) ─────────────────────────────────
@@ -726,6 +846,13 @@ input[type="range"].fs-slider:disabled {
     padding: 0 12px;
   }
   .pg-header::-webkit-scrollbar { display: none; }
+
+  /* Collapse the header button group to icons only — the segmented border
+     stays so the buttons still read as a single cluster. */
+  .header-actions .btn-label {
+    display: none;
+  }
+  .header-btn { padding: 5px 10px; }
 
   .mobile-tabs {
     display: flex;
