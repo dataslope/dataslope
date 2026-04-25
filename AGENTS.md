@@ -11,9 +11,24 @@ language playgrounds at dedicated routes. Today it ships:
 - `/python` — Python playground powered by Pyodide (WebAssembly).
 - `/r` — R playground powered by WebR (WebAssembly).
 
-Both playgrounds are React client components built on top of the shared
-`Playground` component in `app/_components/Playground.tsx`. A `/postgres`
-playground is planned and should follow the same React + npm pattern.
+All playgrounds are React client components built on top of the shared
+`Playground` component in `app/_components/Playground.tsx`.
+
+### Planned playgrounds
+
+The following playgrounds are on the roadmap and should follow the same
+React + npm pattern when implemented:
+
+| Route | Language | Suggested runtime / npm package |
+|---|---|---|
+| `/javascript` | JavaScript | Native browser `Function` / `eval` sandbox (no extra runtime needed) |
+| `/typescript` | TypeScript | [`@typescript/vfs`](https://www.npmjs.com/package/@typescript/vfs) + TypeScript compiler API, or [ts-morph](https://www.npmjs.com/package/ts-morph) |
+| `/sqlite` | SQLite | [`sql.js`](https://www.npmjs.com/package/sql.js) (SQLite compiled to WebAssembly) or [`@sqlite.org/sqlite-wasm`](https://www.npmjs.com/package/@sqlite.org/sqlite-wasm) |
+| `/postgres` | PostgreSQL | [`@electric-sql/pglite`](https://www.npmjs.com/package/@electric-sql/pglite) (PostgreSQL compiled to WebAssembly) |
+| `/c` | C | [LLVM / Clang via WebAssembly](https://mbebenita.github.io/WasmExplorer/) or [`wasm-clang`](https://www.npmjs.com/package/wasm-clang) |
+
+This table is guidance, not a mandate — pick the npm package that best fits
+the playground's needs when you implement it.
 
 ## Conventions
 
@@ -55,10 +70,20 @@ playground is planned and should follow the same React + npm pattern.
 
 3. Link to it from the landing page in `app/page.tsx`.
 
-Install runtime libraries from npm whenever possible. Some WebAssembly
-runtimes still need to fetch their `.wasm` / stdlib assets from a CDN at
-runtime — that's fine — but the JavaScript loader itself should come from
-an npm dependency.
+Install runtime libraries from npm whenever possible. Some runtimes (e.g.
+WebAssembly-based ones like Pyodide, WebR, PGlite) need to fetch their
+`.wasm` / stdlib assets from a CDN at runtime — that's fine — but the
+JavaScript loader itself should come from an npm dependency.
+
+**Execution model by language type:**
+
+- **WebAssembly runtimes** (Python, R, SQLite, PostgreSQL, C): load a `.wasm`
+  binary at runtime; the JS wrapper comes from npm.
+- **Native browser runtimes** (JavaScript): execute directly in the browser
+  sandbox (e.g. via `Function` or a sandboxed `<iframe>`); no extra runtime
+  package is needed.
+- **Transpiled runtimes** (TypeScript): compile to JS in-browser using the
+  TypeScript compiler API from npm, then execute the output natively.
 
 ## Verifying changes
 
@@ -82,6 +107,7 @@ npm run dev
 - Don't create new playgrounds as static HTML files in `public/`. Build
   them as React routes under `app/<name>/page.tsx`.
 - Don't add server-side processing for the language playgrounds —
-  execution happens entirely in the browser via WebAssembly.
+  execution happens entirely in the browser (via WebAssembly, native browser
+  APIs, or in-browser compilation depending on the language).
 - Don't commit `node_modules/`, `.next/`, or `.env*` files (see
   `.gitignore`).
