@@ -10,6 +10,10 @@ language playgrounds at dedicated routes. Today it ships:
 - `/` — landing page (`app/page.tsx`).
 - `/python` — Python playground powered by Pyodide (WebAssembly).
 - `/r` — R playground powered by WebR (WebAssembly).
+- `/javascript` — JavaScript playground (runs natively in the browser via
+  the `AsyncFunction` constructor).
+- `/typescript` — TypeScript playground (transpiled in-browser using the
+  official `typescript` compiler API, then executed natively).
 
 All playgrounds are React client components built on top of the shared
 `Playground` component in `app/_components/Playground.tsx`.
@@ -21,8 +25,6 @@ React + npm pattern when implemented:
 
 | Route | Language | Suggested runtime / npm package |
 |---|---|---|
-| `/javascript` | JavaScript | Native browser `Function` / `eval` sandbox (no extra runtime needed) |
-| `/typescript` | TypeScript | [`@typescript/vfs`](https://www.npmjs.com/package/@typescript/vfs) + TypeScript compiler API, or [ts-morph](https://www.npmjs.com/package/ts-morph) |
 | `/sqlite` | SQLite | [`sql.js`](https://www.npmjs.com/package/sql.js) (SQLite compiled to WebAssembly) or [`@sqlite.org/sqlite-wasm`](https://www.npmjs.com/package/@sqlite.org/sqlite-wasm) |
 | `/postgres` | PostgreSQL | [`@electric-sql/pglite`](https://www.npmjs.com/package/@electric-sql/pglite) (PostgreSQL compiled to WebAssembly) |
 | `/c` | C | [LLVM / Clang via WebAssembly](https://mbebenita.github.io/WasmExplorer/) or [`wasm-clang`](https://www.npmjs.com/package/wasm-clang) |

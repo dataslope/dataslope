@@ -7,6 +7,7 @@ declare module "codemirror" {
 }
 declare module "codemirror/mode/python/python";
 declare module "codemirror/mode/r/r";
+declare module "codemirror/mode/javascript/javascript";
 declare module "codemirror/addon/edit/closebrackets";
 declare module "codemirror/addon/edit/matchbrackets";
 declare module "codemirror/addon/comment/comment";

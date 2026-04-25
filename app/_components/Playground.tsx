@@ -714,6 +714,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         await Promise.all([
           import("codemirror/mode/python/python"),
           import("codemirror/mode/r/r"),
+          import("codemirror/mode/javascript/javascript"),
           import("codemirror/addon/edit/closebrackets"),
           import("codemirror/addon/edit/matchbrackets"),
           import("codemirror/addon/comment/comment"),
@@ -1237,29 +1238,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <Menu.Portal>
               <Menu.Positioner sideOffset={6} align="end">
                 <Menu.Popup className="bui-popup mobile-menu-popup">
-                  <Menu.Group>
-                    <Menu.GroupLabel className="mobile-menu-group-label">
-                      Switch playground
-                    </Menu.GroupLabel>
-                    {PLAYGROUNDS.map((p) => (
-                      <Menu.Item
-                        key={p.id}
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          if (p.id !== adapter.id) router.push(p.href);
-                        }}
-                      >
-                        <span>{p.label}</span>
-                        {p.id === adapter.id && (
-                          <span className="mobile-menu-check" aria-hidden="true">
-                            ✓
-                          </span>
-                        )}
-                      </Menu.Item>
-                    ))}
-                  </Menu.Group>
-                  <Menu.Separator className="mobile-menu-separator" />
-
+                  {/* The playground switcher dropdown in the top-left of
+                      the header is visible on mobile too, so we don't
+                      duplicate it here. */}
                   <Menu.SubmenuRoot>
                     <Menu.SubmenuTrigger className="mobile-menu-item">
                       <span>Examples</span>

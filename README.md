@@ -2,15 +2,18 @@
 
 A [Next.js](https://nextjs.org/) app that hosts browser-based language playgrounds.
 
-| Route       | Status      | Description                                              |
-| ----------- | ----------- | -------------------------------------------------------- |
-| `/`         | ✅ live      | Landing page linking to each playground.                 |
-| `/python`   | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
-| `/r`        | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
-| `/postgres` | 🔜 planned  | PostgreSQL playground (to be added).                     |
+| Route         | Status      | Description                                              |
+| ------------- | ----------- | -------------------------------------------------------- |
+| `/`           | ✅ live      | Landing page linking to each playground.                 |
+| `/python`     | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
+| `/r`          | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
+| `/javascript` | ✅ live      | JavaScript playground (runs natively in the browser).    |
+| `/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
+| `/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
 [webr]: https://docs.r-wasm.org/webr/latest/
+[ts]: https://www.typescriptlang.org/
 
 ## Project structure
 
@@ -24,9 +27,13 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   │   ├── playground.css
 │   │   └── runtime/
 │   │       ├── python.tsx        # Python language adapter (Pyodide)
-│   │       └── r.tsx             # R language adapter (WebR)
-│   ├── python/page.tsx           # /python route — renders <Playground adapter={pythonAdapter} />
-│   └── r/page.tsx                # /r route     — renders <Playground adapter={rAdapter} />
+│   │       ├── r.tsx             # R language adapter (WebR)
+│   │       ├── javascript.tsx    # JavaScript language adapter (native)
+│   │       └── typescript.tsx    # TypeScript language adapter (in-browser tsc)
+│   ├── python/page.tsx           # /python route     — renders <Playground adapter={pythonAdapter} />
+│   ├── r/page.tsx                # /r route          — renders <Playground adapter={rAdapter} />
+│   ├── javascript/page.tsx       # /javascript route — renders <Playground adapter={javascriptAdapter} />
+│   └── typescript/page.tsx       # /typescript route — renders <Playground adapter={typescriptAdapter} />
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
@@ -34,8 +41,9 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 
 Each playground is a React client component that renders the shared
 `Playground` UI with a language-specific adapter. The adapter wires up the
-WebAssembly runtime (Pyodide for Python, WebR for R), provides example
-snippets, and lists the packages available in that runtime.
+runtime — WebAssembly (Pyodide for Python, WebR for R), the native
+browser engine (JavaScript), or in-browser transpilation (TypeScript) —
+and provides example snippets and the package list.
 
 ## Getting started
 
@@ -51,6 +59,8 @@ Then open:
 - http://localhost:3000/ — landing page
 - http://localhost:3000/python — Python playground
 - http://localhost:3000/r — R playground
+- http://localhost:3000/javascript — JavaScript playground
+- http://localhost:3000/typescript — TypeScript playground
 
 ## Editor settings
 

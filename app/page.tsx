@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { SiPython, SiR, SiPostgresql } from "react-icons/si";
+import {
+  SiPython,
+  SiR,
+  SiPostgresql,
+  SiJavascript,
+  SiTypescript,
+} from "react-icons/si";
 import styles from "./home.module.css";
 
 // We use the official brand glyphs from `react-icons/si` rather than
@@ -21,6 +27,26 @@ function RLogo() {
     <SiR
       className={styles.logoSvg}
       style={{ color: "#276DC3" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function JavaScriptLogo() {
+  return (
+    <SiJavascript
+      className={styles.logoSvg}
+      style={{ color: "#F7DF1E" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function TypeScriptLogo() {
+  return (
+    <SiTypescript
+      className={styles.logoSvg}
+      style={{ color: "#3178C6" }}
       aria-hidden="true"
     />
   );
@@ -65,6 +91,32 @@ export default function Home() {
                 <strong>R</strong>
                 <span className={styles.cardDesc}>
                   Run R in the browser via WebR.
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/javascript" className={styles.card}>
+              <span className={styles.logo}>
+                <JavaScriptLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>JavaScript</strong>
+                <span className={styles.cardDesc}>
+                  Run JavaScript natively in the browser.
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/typescript" className={styles.card}>
+              <span className={styles.logo}>
+                <TypeScriptLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>TypeScript</strong>
+                <span className={styles.cardDesc}>
+                  Transpile TypeScript in the browser, then run it natively.
                 </span>
               </span>
             </Link>

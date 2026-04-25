@@ -15,4 +15,6 @@ export interface PlaygroundEntry {
 export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "python", label: "Python Playground", href: "/python" },
   { id: "r", label: "R Playground", href: "/r" },
+  { id: "javascript", label: "JavaScript Playground", href: "/javascript" },
+  { id: "typescript", label: "TypeScript Playground", href: "/typescript" },
 ];
