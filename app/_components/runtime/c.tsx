@@ -5,6 +5,12 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
+import {
+  loadClangPackage,
+  loadWasmerSdk,
+  type WasmerPackage,
+  type WasmerSdk,
+} from "./wasmer-sdk";
 
 // Run C in the browser via @wasmer/sdk + the `clang/clang` package
 // from the Wasmer registry. The user's source is written into a
@@ -16,54 +22,12 @@ import type {
 // `SharedArrayBuffer`, which means the document hosting this
 // playground must be cross-origin-isolated. The `/c` route gets the
 // required COOP/COEP headers from `next.config.ts`.
-
-const WASMER_SDK_VERSION = "0.10.0";
-const WASMER_SDK_CDN = `https://cdn.jsdelivr.net/npm/@wasmer/sdk@${WASMER_SDK_VERSION}/dist`;
-
-// Narrow shape of the @wasmer/sdk module we consume. The SDK ships its
-// own `.d.ts`, but we import it dynamically (it touches `Worker` /
-// `SharedArrayBuffer` at module init time) so we describe just the
-// pieces we actually use here.
-type DirectoryInit = Record<string, string | Uint8Array>;
-interface WasmerDirectory {
-  writeFile(path: string, contents: string | Uint8Array): Promise<void>;
-  readFile(path: string): Promise<Uint8Array>;
-}
-interface WasmerOutput {
-  code: number;
-  ok: boolean;
-  stdout: string;
-  stderr: string;
-}
-interface WasmerInstance {
-  wait(): Promise<WasmerOutput>;
-}
-interface WasmerCommand {
-  run(options?: WasmerSpawnOptions): Promise<WasmerInstance>;
-}
-interface WasmerSpawnOptions {
-  args?: string[];
-  env?: Record<string, string>;
-  mount?: Record<string, DirectoryInit | WasmerDirectory>;
-  cwd?: string;
-}
-interface WasmerPackage {
-  readonly entrypoint?: WasmerCommand;
-  readonly commands: Record<string, WasmerCommand>;
-}
-interface WasmerSdk {
-  init(options?: {
-    module?: URL | string;
-    workerUrl?: URL | string;
-    sdkUrl?: URL | string;
-    log?: string;
-  }): Promise<unknown>;
-  Wasmer: {
-    fromRegistry(specifier: string): Promise<WasmerPackage>;
-    fromWasm(binary: Uint8Array): WasmerPackage;
-  };
-  Directory: new (init?: DirectoryInit) => WasmerDirectory;
-}
+//
+// SDK initialization and the `clang/clang` package fetch are both
+// handled by `./wasmer-sdk.ts`, which is shared with the C++
+// playground. That keeps `init(...)` truly singleton across the page
+// lifetime so navigating between `/c` and `/cpp` doesn't disturb the
+// already-running threadpool.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -355,55 +319,9 @@ class CRuntime implements LanguageRuntime {
 
 // Track init across re-renders so React Strict Mode (or repeated
 // navigation back to /c) doesn't try to call the SDK's `init()` twice
-// — it throws if invoked more than once per page load.
-let sdkInitPromise: Promise<WasmerSdk> | null = null;
-
-async function loadWasmerSdk(): Promise<WasmerSdk> {
-  if (sdkInitPromise) return sdkInitPromise;
-  sdkInitPromise = (async () => {
-    // Dynamic import keeps the SDK out of the SSR bundle — at module
-    // init it touches `Worker` and `SharedArrayBuffer`.
-    const mod = (await import("@wasmer/sdk")) as unknown as WasmerSdk;
-
-    // `workerUrl` must resolve to a same-origin URL: the threadpool
-    // spawns its workers via `new Worker(url, { type: "module" })`, and
-    // some browsers refuse cross-origin module worker scripts even when
-    // the CDN sends permissive CORS headers. Failing the spawn drops
-    // the task's response channel, surfacing as "oneshot canceled" the
-    // moment the user clicks Run.
-    //
-    // We sidestep that by fetching the bootstrap from the CDN once and
-    // re-serving it as a `blob:` URL, which counts as same-origin to
-    // the document that created it. The bootstrap then dynamically
-    // imports the main SDK from `sdkUrl` (still on jsDelivr — module
-    // worker `import()` honours CORS, so cross-origin is fine here).
-    const workerSource = await fetch(`${WASMER_SDK_CDN}/worker.mjs`).then(
-      (r) => {
-        if (!r.ok) {
-          throw new Error(
-            `Failed to fetch Wasmer worker bootstrap (HTTP ${r.status}).`,
-          );
-        }
-        return r.text();
-      },
-    );
-    const workerBlobUrl = URL.createObjectURL(
-      new Blob([workerSource], { type: "text/javascript" }),
-    );
-
-    await mod.init({
-      // Resolve the SDK's own `.wasm` against jsDelivr so we don't
-      // have to teach webpack how to emit it. jsDelivr serves it with
-      // permissive CORS / CORP headers, which is what COEP=require-corp
-      // needs.
-      module: new URL(`${WASMER_SDK_CDN}/wasmer_js_bg.wasm`),
-      workerUrl: workerBlobUrl,
-      sdkUrl: new URL(`${WASMER_SDK_CDN}/index.mjs`),
-    });
-    return mod;
-  })();
-  return sdkInitPromise;
-}
+// — it throws if invoked more than once per page load. The promise
+// itself is a process-wide singleton kept in `./wasmer-sdk.ts` and
+// shared with the C++ playground.
 
 export const cAdapter: LanguageAdapter = {
   id: "c",
@@ -453,7 +371,7 @@ export const cAdapter: LanguageAdapter = {
     const sdk = await loadWasmerSdk();
 
     setLoadingMessage("Fetching clang from the Wasmer registry (this can take a moment on first load)…");
-    const clang = await sdk.Wasmer.fromRegistry("clang/clang");
+    const clang = await loadClangPackage(sdk);
 
     return new CRuntime(sdk, clang);
   },
