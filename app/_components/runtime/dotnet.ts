@@ -110,13 +110,16 @@ export function loadDotnet(
 
     setLoadingMessage("Initialising .NET runtime…");
     const host = await dotnetBuilder
-      .withResourceLoader((_type, name, _defaultUri, _integrity, _behavior) => {
+      .withResourceLoader((_type, name) => {
         // Redirect every framework asset fetch to our /_dotnet/ bundle.
         // The runtime auto-discovers dotnet.boot.js relative to dotnet.js,
         // so all asset names (including "dotnet.boot.js") map here correctly.
         return `${RUNTIME_BUNDLE_BASE}${name}`;
       })
       .create();
+    host.setModuleImports("main.js", {
+      getOrigin: () => window.location.origin,
+    });
 
     setLoadingMessage("Loading Roslyn (C# scripting engine)…");
     const exports = await host.getAssemblyExports("ScriptRunner");
