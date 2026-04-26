@@ -123,6 +123,18 @@ test.describe("Playgrounds (fast)", () => {
       `unexpected stderr: ${stderr?.body ?? ""}`,
     ).toBeUndefined();
   });
+
+  test("Java compiles and runs the default example", async ({ page }) => {
+    await page.goto("/java");
+    await waitForRuntimeReady(page);
+    const cells = await runAndCollectOutput(page);
+    // The default Hello World example prints "Hello, Java Playground!".
+    // CheerpJ may emit -Xlint warnings on stderr from javac; we only
+    // assert that stdout includes the greeting.
+    const stdout = cells.find((c) => c.type === "stdout");
+    expect(stdout, "expected a stdout cell").toBeTruthy();
+    expect(stdout!.body).toContain("Hello, Java Playground!");
+  });
 });
 
 test.describe("Packages button visibility", () => {
@@ -177,6 +189,16 @@ test.describe("Packages button visibility", () => {
     page,
   }) => {
     await page.goto("/cpp");
+    await waitForRuntimeReady(page);
+    await expect(
+      page.getByRole("button", { name: "Packages" }).first(),
+    ).toBeVisible();
+  });
+
+  test("Java playground shows the Packages button (JDK packages)", async ({
+    page,
+  }) => {
+    await page.goto("/java");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),
