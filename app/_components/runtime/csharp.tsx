@@ -128,10 +128,17 @@ async Task<Resource<T>> Load<T>(string name, int ms, T data)
 Console.WriteLine("Loading three resources in parallel…");
 var sw = Stopwatch.StartNew();
 
-var results = await Task.WhenAll(
-    Load("alpha",  80, new[] { "1", "2", "3" }.AsEnumerable()),
-    Load("beta",   40, Enumerable.Repeat("ok", 1)),
-    Load("gamma", 120, new[] { "payload" }.AsEnumerable()));
+// Kick off all three tasks before awaiting any of them so they run concurrently.
+var taskAlpha = Load("alpha",  80, new[] { "1", "2", "3" }.AsEnumerable());
+var taskBeta  = Load("beta",   40, Enumerable.Repeat("ok", 1));
+var taskGamma = Load("gamma", 120, new[] { "payload" }.AsEnumerable());
+
+var results = new[]
+{
+    await taskAlpha,
+    await taskBeta,
+    await taskGamma,
+};
 
 sw.Stop();
 
