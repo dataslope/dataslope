@@ -227,6 +227,15 @@ function findMainClassName(source: string): string {
   const classRegex = /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
   const classes: { name: string; start: number; isPublic: boolean }[] = [];
   for (let m; (m = classRegex.exec(cleaned)) !== null; ) {
+    // Skip nested classes — count unmatched `{` before this match to get
+    // brace depth; depth > 0 means we are inside another class body.
+    // String/char literals and comments have already been stripped from
+    // `cleaned`, so stray braces from those sources are not a concern.
+    const prefix = cleaned.slice(0, m.index);
+    const depth =
+      (prefix.match(/\{/g) ?? []).length - (prefix.match(/\}/g) ?? []).length;
+    if (depth > 0) continue;
+
     const before = cleaned.slice(Math.max(0, m.index - 16), m.index);
     classes.push({
       name: m[1],
