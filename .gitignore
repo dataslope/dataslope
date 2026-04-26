@@ -43,3 +43,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 script-runner-src/obj/
+script-runner-src/__pycache__/

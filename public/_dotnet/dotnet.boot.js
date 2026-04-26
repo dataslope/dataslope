@@ -368,6 +368,10 @@ export const config = {
         "virtualPath": "/System.ObjectModel.dll"
       },
       {
+        "name": "System.Private.CoreLib.dll",
+        "virtualPath": "/System.Private.CoreLib.dll"
+      },
+      {
         "name": "System.Private.DataContractSerialization.dll",
         "virtualPath": "/System.Private.DataContractSerialization.dll"
       },
