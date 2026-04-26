@@ -282,6 +282,14 @@ class JavaRuntime implements LanguageRuntime {
     //    println sink to hook). We wrap+restore in a try/finally so a
     //    thrown error during `await` can't leave the page's console
     //    permanently patched.
+    //
+    //    CheerpJ forwards each underlying `write` call as one
+    //    `console.log` invocation and includes the chunk's own newline
+    //    bytes in the string (so `println("x")` arrives as "x\n").
+    //    `printf("%a %b%n", …)` triggers several writes per logical
+    //    line. We therefore concatenate the args verbatim — adding our
+    //    own "\n" per call would produce a blank line between every
+    //    chunk (the bug fixed here).
     const runWithCapture = async (
       fn: () => Promise<number>,
     ): Promise<{ exitCode: number; stdout: string; stderr: string }> => {
@@ -290,10 +298,10 @@ class JavaRuntime implements LanguageRuntime {
       let stdout = "";
       let stderr = "";
       console.log = (...args: unknown[]) => {
-        stdout += args.map(String).join(" ") + "\n";
+        stdout += args.map(String).join(" ");
       };
       console.error = (...args: unknown[]) => {
-        stderr += args.map(String).join(" ") + "\n";
+        stderr += args.map(String).join(" ");
       };
       try {
         const exitCode = await fn();

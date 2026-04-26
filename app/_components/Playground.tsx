@@ -368,6 +368,28 @@ function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   );
 }
 
+// Small clipboard / "copy to clipboard" glyph reused by the editor and
+// output cell headers. Stroked rather than filled so it visually matches
+// the existing pane-bar icons.
+function CopyIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="5" y="5" width="9" height="9" rx="1.5" />
+      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
+    </svg>
+  );
+}
+
 interface SettingsPanelProps {
   open: boolean;
   fontSize: number;
@@ -995,6 +1017,60 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.exportBaseFilename],
   );
 
+  // Copy arbitrary text to the clipboard. Prefers the async Clipboard API
+  // and falls back to the legacy `execCommand("copy")` path so the button
+  // still works in non-secure contexts (e.g. http:// dev hosts) where
+  // `navigator.clipboard` is unavailable. Surfaces success/failure via a
+  // toast so the action has clear visual feedback.
+  const copyToClipboard = useCallback(
+    async (text: string, label: string) => {
+      const fallback = () => {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-1000px";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          return ok;
+        } catch {
+          return false;
+        }
+      };
+
+      let ok = false;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          ok = true;
+        } else {
+          ok = fallback();
+        }
+      } catch {
+        ok = fallback();
+      }
+      if (ok) {
+        showToast(`${label} copied to clipboard.`);
+      } else {
+        showToast(`Could not copy ${label.toLowerCase()}.`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const copyEditor = useCallback(() => {
+    const code = editorRef.current?.getValue() ?? "";
+    if (!code) {
+      showToast("Editor is empty.", "warn");
+      return;
+    }
+    void copyToClipboard(code, "Code");
+  }, [copyToClipboard, showToast]);
+
   // Auto-scroll output on new cells.
   useEffect(() => {
     scrollToLatestOutput();
@@ -1056,6 +1132,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     image: "FIGURE",
     plot: "CHART",
   };
+
+  // The output cell shows a copy button only when its content is plain
+  // text or HTML markup that is meaningful to copy. Skipping image/plot
+  // cells avoids exposing the raw base64 PNG / Plotly JSON blob behind a
+  // misleading "Copy" affordance.
+  const isCopyableCell = (cell: OutputCell) =>
+    cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
   return (
     <div className="pg-root">
@@ -1462,6 +1545,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <div className="pane-bar">
               <span className="pane-label">Editor</span>
               <div className="pane-bar-sep" />
+              <button
+                type="button"
+                className="icon-btn"
+                title="Copy code to clipboard"
+                aria-label="Copy code to clipboard"
+                onClick={copyEditor}
+              >
+                <CopyIcon />
+              </button>
               <span className="kbd">⌘ Enter</span>
               <button
                 type="button"
@@ -1531,6 +1623,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <div className="out-cell-header">
                       <span className="cell-type">{typeLabel[cell.type]}</span>
                       <span className="cell-time">Done in {cell.elapsed}</span>
+                      {isCopyableCell(cell) && (
+                        <button
+                          type="button"
+                          className="icon-btn out-cell-copy"
+                          title="Copy output to clipboard"
+                          aria-label="Copy output to clipboard"
+                          onClick={() =>
+                            void copyToClipboard(
+                              cell.content,
+                              cell.type === "stderr" ? "Error" : "Output",
+                            )
+                          }
+                        >
+                          <CopyIcon />
+                        </button>
+                      )}
                     </div>
                     <div className="out-cell-body">
                       {cell.type === "image" ? (

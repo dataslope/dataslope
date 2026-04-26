@@ -46,8 +46,6 @@ foreach (var name in names)
     desc: "Filter, group and reduce a list of records",
     code: `using System.Linq;
 
-record Sale(string Product, string Region, decimal Revenue);
-
 var sales = new List<Sale>
 {
     new("Widget A", "North", 42_000m),
@@ -72,6 +70,8 @@ foreach (var row in byProduct)
 var top = sales.Where(s => s.Revenue >= 40_000m)
                .Select(s => $"{s.Product} ({s.Region})");
 Console.WriteLine($"\\nTop performers (>= $40k): {string.Join(", ", top)}");
+
+record Sale(string Product, string Region, decimal Revenue);
 `,
   },
   {
@@ -79,6 +79,14 @@ Console.WriteLine($"\\nTop performers (>= $40k): {string.Join(", ", top)}");
     title: "Generics",
     desc: "A tiny generic Stack<T> with extension methods",
     code: `using System.Linq;
+
+var ints = new Stack<int>();
+foreach (var i in new[] { 1, 2, 3, 4, 5 }) ints.Push(i);
+ints.Drain("ints (LIFO)");
+
+var words = new Stack<string>();
+foreach (var w in new[] { "the", "quick", "brown", "fox" }) words.Push(w);
+words.Drain("words (LIFO)");
 
 class Stack<T>
 {
@@ -103,14 +111,6 @@ static class StackExtensions
         Console.WriteLine(string.Join(" ", parts));
     }
 }
-
-var ints = new Stack<int>();
-foreach (var i in new[] { 1, 2, 3, 4, 5 }) ints.Push(i);
-ints.Drain("ints (LIFO)");
-
-var words = new Stack<string>();
-foreach (var w in new[] { "the", "quick", "brown", "fox" }) words.Push(w);
-words.Drain("words (LIFO)");
 `,
   },
   {
@@ -118,8 +118,6 @@ words.Drain("words (LIFO)");
     title: "Async / Await",
     desc: "Parallel async work with Task.WhenAll",
     code: `using System.Diagnostics;
-
-record Resource<T>(string Name, T Data, long LoadedInMs);
 
 async Task<Resource<T>> Load<T>(string name, int ms, T data)
 {
@@ -142,18 +140,15 @@ foreach (var r in results)
     Console.WriteLine($"  {r.Name}: {r.LoadedInMs}ms — [{string.Join(", ", r.Data)}]");
 }
 Console.WriteLine($"\\nTotal wall time: {sw.ElapsedMilliseconds}ms (parallel)");
+
+record Resource<T>(string Name, T Data, long LoadedInMs);
 `,
   },
   {
     key: "patterns",
     title: "Pattern Matching",
     desc: "Switch expressions over a discriminated hierarchy",
-    code: `abstract record Shape;
-record Circle(double Radius)                         : Shape;
-record Rect(double Width, double Height)             : Shape;
-record Triangle(double Base, double Height)          : Shape;
-
-double Area(Shape s) => s switch
+    code: `double Area(Shape s) => s switch
 {
     Circle   { Radius: var r }                  => Math.PI * r * r,
     Rect     { Width: var w, Height: var h }    => w * h,
@@ -173,6 +168,11 @@ foreach (var s in shapes)
     var name = s.GetType().Name.PadRight(8);
     Console.WriteLine($"{name} area = {Area(s):F3}");
 }
+
+abstract record Shape;
+record Circle(double Radius)                         : Shape;
+record Rect(double Width, double Height)             : Shape;
+record Triangle(double Base, double Height)          : Shape;
 `,
   },
 ];
