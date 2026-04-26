@@ -135,6 +135,16 @@ test.describe("Playgrounds (fast)", () => {
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, Java Playground!");
   });
+
+  test("C# compiles and runs the default example", async ({ page }) => {
+    await page.goto("/csharp");
+    await waitForRuntimeReady(page);
+    const cells = await runAndCollectOutput(page);
+    // The default Hello World example prints "Hello, C# Playground!".
+    const stdout = cells.find((c) => c.type === "stdout");
+    expect(stdout, "expected a stdout cell").toBeTruthy();
+    expect(stdout!.body).toContain("Hello, C# Playground!");
+  });
 });
 
 test.describe("Packages button visibility", () => {
@@ -199,6 +209,16 @@ test.describe("Packages button visibility", () => {
     page,
   }) => {
     await page.goto("/java");
+    await waitForRuntimeReady(page);
+    await expect(
+      page.getByRole("button", { name: "Packages" }).first(),
+    ).toBeVisible();
+  });
+
+  test("C# playground shows the Packages button (BCL namespaces)", async ({
+    page,
+  }) => {
+    await page.goto("/csharp");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),

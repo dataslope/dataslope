@@ -21,4 +21,5 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "c", label: "C Playground", href: "/c" },
   { id: "cpp", label: "C++ Playground", href: "/cpp" },
   { id: "java", label: "Java Playground", href: "/java" },
+  { id: "csharp", label: "C# Playground", href: "/csharp" },
 ];
