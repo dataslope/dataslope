@@ -129,7 +129,7 @@ Console.WriteLine("Loading three resources in parallel…");
 var sw = Stopwatch.StartNew();
 
 var results = await Task.WhenAll(
-    Load("alpha",  80, new[] { 1, 2, 3 }.AsEnumerable()),
+    Load("alpha",  80, new[] { "1", "2", "3" }.AsEnumerable()),
     Load("beta",   40, Enumerable.Repeat("ok", 1)),
     Load("gamma", 120, new[] { "payload" }.AsEnumerable()));
 
