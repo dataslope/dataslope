@@ -41,7 +41,7 @@ for target_name, target in deps.get("targets", {}).items():
             basename = runtime_lib.split("/")[-1]
             if not basename.endswith(".dll"):
                 continue
-            entry = {"name": basename, "virtualPath": "/" + basename}
+            entry = {"name": basename, "virtualPath": basename}
             target_list = core_assemblies if is_runtime_pack else user_assemblies
             if any(e["name"] == basename for e in target_list):
                 continue
