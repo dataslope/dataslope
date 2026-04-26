@@ -13,6 +13,7 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | `/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
 | `/cpp`        | ✅ live      | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
 | `/java`       | ✅ live      | Java playground powered by [CheerpJ][cheerpj] — OpenJDK + `javac` running in WebAssembly. |
+| `/csharp`     | ✅ live      | C# playground powered by [Roslyn][roslyn] running on the [.NET WebAssembly runtime][dotnetwasm] (Mono). |
 | `/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
@@ -20,6 +21,8 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 [ts]: https://www.typescriptlang.org/
 [wasmer]: https://wasmer.io/
 [cheerpj]: https://cheerpj.com/
+[roslyn]: https://github.com/dotnet/roslyn
+[dotnetwasm]: https://learn.microsoft.com/dotnet/core/wasm/
 
 ## Project structure
 
@@ -39,7 +42,8 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   │       ├── php.tsx           # PHP language adapter (php-wasm)
 │   │       ├── c.tsx             # C language adapter (clang/clang via Wasmer)
 │   │       ├── cpp.tsx           # C++ language adapter (clang/clang via Wasmer)
-│   │       └── java.tsx          # Java language adapter (CheerpJ)
+│   │       ├── java.tsx          # Java language adapter (CheerpJ)
+│   │       └── csharp.tsx        # C# language adapter (Roslyn on .NET WebAssembly)
 │   ├── python/page.tsx           # /python route
 │   ├── r/page.tsx                # /r route
 │   ├── javascript/page.tsx       # /javascript route
@@ -47,7 +51,8 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   ├── php/page.tsx              # /php route
 │   ├── c/page.tsx                # /c route
 │   ├── cpp/page.tsx              # /cpp route
-│   └── java/page.tsx             # /java route
+│   ├── java/page.tsx             # /java route
+│   └── csharp/page.tsx           # /csharp route
 ├── __tests__/
 │   ├── javascript.test.ts        # JavaScript runtime execution tests
 │   ├── typescript.test.ts        # TypeScript transpile + execution tests
@@ -84,6 +89,7 @@ Then open:
 - http://localhost:3000/c — C playground
 - http://localhost:3000/cpp — C++ playground
 - http://localhost:3000/java — Java playground
+- http://localhost:3000/csharp — C# playground
 
 ## Editor settings
 
@@ -119,7 +125,7 @@ The test suite covers:
 npm test
 ```
 
-The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, C++, PHP, Java) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
+The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, C++, PHP, Java, C#) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
 
 ## Adding a new playground (e.g. `/postgres`)
 

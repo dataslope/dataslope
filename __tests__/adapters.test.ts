@@ -31,6 +31,7 @@ import { phpAdapter } from "../app/_components/runtime/php";
 import { cAdapter } from "../app/_components/runtime/c";
 import { cppAdapter } from "../app/_components/runtime/cpp";
 import { javaAdapter } from "../app/_components/runtime/java";
+import { csharpAdapter } from "../app/_components/runtime/csharp";
 
 // Python and R adapters import from "webr" / reference workers; we test
 // their exports separately once we have a proper mocking story.
@@ -42,6 +43,7 @@ const ADAPTERS = [
   { name: "C", adapter: cAdapter },
   { name: "C++", adapter: cppAdapter },
   { name: "Java", adapter: javaAdapter },
+  { name: "C#", adapter: csharpAdapter },
 ];
 
 describe("LanguageAdapter shape", () => {
@@ -245,5 +247,64 @@ describe("Java adapter specifics", () => {
 
   it("exports as a .java file", () => {
     expect(javaAdapter.exportFormats[0].extension).toBe("java");
+  });
+});
+
+describe("C# adapter specifics", () => {
+  it("id is 'csharp'", () => expect(csharpAdapter.id).toBe("csharp"));
+
+  it("importSnippet wraps in `using ...;`", () => {
+    expect(csharpAdapter.importSnippet("System.Linq")).toBe(
+      "using System.Linq;",
+    );
+  });
+
+  it("hasImport detects existing using directives", () => {
+    expect(csharpAdapter.hasImport("using System.Linq;", "System.Linq")).toBe(
+      true,
+    );
+    expect(
+      csharpAdapter.hasImport("using   System.Linq  ;", "System.Linq"),
+    ).toBe(true);
+  });
+
+  it("hasImport detects `using static`", () => {
+    expect(
+      csharpAdapter.hasImport("using static System.Math;", "System.Math"),
+    ).toBe(true);
+  });
+
+  it("hasImport detects aliased usings", () => {
+    expect(
+      csharpAdapter.hasImport("using Math = System.Math;", "System.Math"),
+    ).toBe(true);
+  });
+
+  it("hasImport returns false when the namespace is not imported", () => {
+    expect(csharpAdapter.hasImport("// no import", "System.Linq")).toBe(false);
+  });
+
+  it("hasImport does not match unrelated namespaces with the same prefix", () => {
+    // `using System.Linq.Expressions;` should NOT match a query for
+    // `System` — substring matching would otherwise confuse the
+    // packages drawer's "already imported?" check.
+    expect(
+      csharpAdapter.hasImport(
+        "using System.Linq.Expressions;",
+        "System.Collections.Generic",
+      ),
+    ).toBe(false);
+  });
+
+  it("hello-world example uses Console.WriteLine", () => {
+    const hello = csharpAdapter.examples.find((e) => e.key === "hello");
+    expect(hello).toBeTruthy();
+    expect(hello!.code).toContain("Console.WriteLine");
+  });
+
+  it("exports include both .csx and .cs", () => {
+    const exts = csharpAdapter.exportFormats.map((f) => f.extension);
+    expect(exts).toContain("csx");
+    expect(exts).toContain("cs");
   });
 });
