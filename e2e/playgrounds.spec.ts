@@ -4,10 +4,10 @@ import { test, expect, type Page } from "@playwright/test";
 // waits for the runtime to finish initializing (Run becomes enabled),
 // presses Run on the default Hello World example, and asserts that the
 // expected output snippet shows up in the output pane. This is what
-// catches regressions like the Wasmer SDK "oneshot canceled" error
-// where the page renders but execution silently fails.
+// catches regressions where the page renders but execution silently
+// fails.
 //
-// The Wasmer-, Pyodide- and WebR-backed playgrounds fetch real
+// The browsercc-, Pyodide- and WebR-backed playgrounds fetch real
 // runtimes from a CDN on first load, so the per-test timeouts in
 // `playwright.config.ts` are intentionally generous.
 
@@ -96,9 +96,9 @@ test.describe("Playgrounds (fast)", () => {
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     // The default Hello World example prints "Hello, C Playground!".
-    // Anything else (in particular "oneshot canceled" stderr) means
-    // the threadpool failed to spawn — exactly the regression this
-    // test exists to catch.
+    // Anything else (in particular a clang error or runtime crash)
+    // means the browsercc toolchain or WASI shim failed to initialize
+    // — exactly the regression this test exists to catch.
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, C Playground!");

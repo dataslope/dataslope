@@ -184,10 +184,10 @@ describe("C++ adapter specifics", () => {
 
   it("hello-world example uses cstdio and main()", () => {
     // The default Hello World example deliberately avoids <iostream>
-    // because compiling libc++-heavy templates with the wasm-targeted
-    // clang in this package is dramatically slower than compiling C —
-    // see the long-form note in `app/_components/runtime/cpp.tsx`.
-    // iostream-using examples still appear further down the list.
+    // so the very first run is fast even before browsercc's prebuilt
+    // libc++ PCH has finished downloading — see the file-header note
+    // in `app/_components/runtime/cpp.tsx`. iostream-using examples
+    // still appear further down the list.
     const hello = cppAdapter.examples.find((e) => e.key === "hello");
     expect(hello).toBeTruthy();
     expect(hello!.code).toContain("#include <cstdio>");
