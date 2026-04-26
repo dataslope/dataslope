@@ -9,9 +9,11 @@ import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
 
 // Run Java in the browser via CheerpJ
 // (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
-// WebAssembly. CheerpJ ships a real `tools.jar`, so we drive `javac`
-// (`com.sun.tools.javac.Main`) on user source at runtime, then run the
-// compiled main class with `cheerpjRunMain` — exactly the JavaFiddle
+// WebAssembly. CheerpJ does not ship `tools.jar`, so we bundle a
+// Java 8 `tools.jar` at `public/tools.jar` (served at `/tools.jar`,
+// mounted by CheerpJ as `/app/tools.jar`); we then drive `javac`
+// (`com.sun.tools.javac.Main`) on user source at runtime and run the
+// compiled main class with `cheerpjRunMain` — the JavaFiddle
 // approach (https://github.com/leaningtech/javafiddle).
 //
 // This adapter targets Java 8 because that is what CheerpJ's bundled
@@ -199,10 +201,11 @@ const PACKAGES: PackageInfo[] = [
   { cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8", desc: "BigInteger and BigDecimal arbitrary-precision arithmetic." },
 ];
 
-// CheerpJ's classpath: tools.jar is bundled at /app/tools.jar (it
-// contains com.sun.tools.javac.Main), and we compile user code into
-// /files/. Both must be on the classpath when running both javac and
-// the user's main class.
+// CheerpJ's classpath: tools.jar is bundled in this app at
+// `public/tools.jar` (served at `/tools.jar`, mounted by CheerpJ as
+// `/app/tools.jar`) — it contains com.sun.tools.javac.Main — and we
+// compile user code into /files/. Both must be on the classpath when
+// running both javac and the user's main class.
 const CLASSPATH = "/app/tools.jar:/files/";
 const SOURCE_DIR = "/str/";
 const OUTPUT_DIR = "/files/";

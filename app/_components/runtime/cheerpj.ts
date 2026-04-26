@@ -4,10 +4,15 @@
 // compiled to WebAssembly that runs entirely in the browser — the same
 // "everything in the browser" approach used by Pyodide (Python),
 // WebR (R), php-wasm (PHP), and browsercc (C/C++) elsewhere in this
-// repo. CheerpJ ships a real `tools.jar`, so we can drive `javac`
-// (`com.sun.tools.javac.Main`) on user source at runtime, then run the
-// resulting class with `cheerpjRunMain` — exactly what JavaFiddle does
-// (https://github.com/leaningtech/javafiddle).
+// repo. We bundle a Java 8 `tools.jar` at `public/tools.jar` (served
+// at `/tools.jar`, mounted by CheerpJ as `/app/tools.jar`), so we can
+// drive `javac` (`com.sun.tools.javac.Main`) on user source at
+// runtime, then run the resulting class with `cheerpjRunMain` —
+// exactly what JavaFiddle does
+// (https://github.com/leaningtech/javafiddle). CheerpJ itself does
+// not ship `tools.jar`; without our bundled copy `cheerpjRunMain`
+// would fail with "Could not find or load main class
+// com.sun.tools.javac.Main".
 //
 // CheerpJ is distributed as a non-module loader script that injects
 // globals (`cheerpjInit`, `cheerpjRunMain`, `cheerpjAddStringFile`,
