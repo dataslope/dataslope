@@ -117,6 +117,9 @@ export function loadDotnet(
         return `${RUNTIME_BUNDLE_BASE}${name}`;
       })
       .create();
+    host.setModuleImports("main.js", {
+      getOrigin: () => window.location.origin,
+    });
 
     setLoadingMessage("Loading Roslyn (C# scripting engine)…");
     const exports = await host.getAssemblyExports("ScriptRunner");
