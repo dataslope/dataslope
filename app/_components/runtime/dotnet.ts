@@ -4,11 +4,12 @@
 // the same spirit as Pyodide for Python, WebR for R, browsercc for
 // C/C++, CheerpJ for Java and php-wasm for PHP.
 //
-// We load the runtime + a precompiled C# script host bundle from
-// jsDelivr — the bundle ships:
-//   - dotnet.js              (Microsoft's public Mono boot script)
+// The runtime bundle lives in public/_dotnet/ and ships:
+//   - dotnet.js              (Microsoft's Mono boot script, ES module)
 //   - dotnet.runtime.js      (the JS half of the runtime)
+//   - dotnet.native.js       (the Emscripten-generated JS)
 //   - dotnet.native.wasm     (the WASM half of the runtime)
+//   - dotnet.boot.js         (boot config listing all required assemblies)
 //   - System.* / Microsoft.CodeAnalysis.* assemblies
 //   - a tiny ScriptRunner.dll that wraps Microsoft.CodeAnalysis.CSharp
 //     .Scripting.CSharpScript.RunAsync and exposes it to JS via the
@@ -20,13 +21,11 @@
 // gzipped) we cache the bootstrap across React strict-mode mounts
 // and across navigation between the home page and the C# playground.
 //
-// The runtime is loaded as a non-module IIFE script so it can attach
-// `globalThis.dotnet` regardless of bundler hoisting; we then read
-// that global, call `dotnet.create()`, and pull the JS-exported
-// `ScriptRunner.RunScript` out of it.
+// dotnet.js is an ES module; we load it with a dynamic import() so
+// the module's internal relative imports (dotnet.runtime.js, etc.)
+// resolve correctly against the /_dotnet/ public path.
 
-const RUNTIME_VERSION = "9.0.0";
-const RUNTIME_BUNDLE_BASE = `https://cdn.jsdelivr.net/npm/@dataslope/csharp-script-runner@${RUNTIME_VERSION}/dist/`;
+const RUNTIME_BUNDLE_BASE = "/_dotnet/";
 const BOOT_SCRIPT_URL = `${RUNTIME_BUNDLE_BASE}dotnet.js`;
 
 export interface CSharpScriptResult {
@@ -43,12 +42,19 @@ export interface DotnetApi {
   runScript(code: string): Promise<CSharpScriptResult>;
 }
 
-interface DotnetBootHostBuilder {
-  withConfig(config: Record<string, unknown>): DotnetBootHostBuilder;
+/** dotnet.js exports a `dotnet` DotnetHostBuilder as an ES-module named export. */
+interface DotnetHostBuilder {
+  withConfig(config: Record<string, unknown>): DotnetHostBuilder;
   withResourceLoader(
-    loader: (type: string, name: string, defaultUri: string) => string,
-  ): DotnetBootHostBuilder;
-  create(): Promise<DotnetBootHost>;
+    loader: (
+      type: string,
+      name: string,
+      defaultUri: string,
+      integrity: string,
+      behavior: string,
+    ) => string | null | undefined,
+  ): DotnetHostBuilder;
+  create(): Promise<RuntimeAPI>;
 }
 
 /** Mono's `getAssemblyExports` returns a deeply nested record keyed by
@@ -59,25 +65,25 @@ type AssemblyExportNode =
   | ((...args: unknown[]) => unknown)
   | { [key: string]: AssemblyExportNode };
 
-interface DotnetBootHost {
+interface RuntimeAPI {
   setModuleImports(moduleName: string, imports: Record<string, unknown>): void;
   getAssemblyExports(
     assemblyName: string,
   ): Promise<Record<string, AssemblyExportNode>>;
-  runMain(mainAssemblyName: string, args: string[]): Promise<number>;
+  runMain(mainAssemblyName?: string, args?: string[]): Promise<number>;
+  runMainAndExit(mainAssemblyName?: string, args?: string[]): Promise<void>;
 }
 
-interface DotnetGlobal {
-  /** Mono's documented JS API entry-point: returns a host-builder
-   *  that we configure and then `.create()` to start the runtime. */
-  dotnet: DotnetBootHostBuilder;
+/** Shape of dotnet.js's ES-module named exports. */
+interface DotnetModule {
+  dotnet: DotnetHostBuilder;
 }
 
 let dotnetPromise: Promise<DotnetApi> | null = null;
 
-/** Inject the bootstrap script (once per page), build a host with the
- *  bundled C# script runner, and resolve with a `runScript` function
- *  the C# adapter calls for every Run press. */
+/** Dynamically import the boot script (once per page), configure the
+ *  runtime to load all assets from /_dotnet/, and resolve with a
+ *  `runScript` function the C# adapter calls for every Run press. */
 export function loadDotnet(
   setLoadingMessage: (message: string) => void,
 ): Promise<DotnetApi> {
@@ -88,26 +94,27 @@ export function loadDotnet(
     }
 
     setLoadingMessage("Loading .NET runtime (Mono WebAssembly)…");
-    await injectBootScript();
 
-    const dotnetGlobal = (window as unknown as Partial<DotnetGlobal>).dotnet;
-    if (!dotnetGlobal) {
+    // dotnet.js is an ES module that exports a `dotnet` DotnetHostBuilder.
+    // Dynamic import() lets the module's internal relative imports
+    // (dotnet.runtime.js, dotnet.native.js) resolve against /_dotnet/.
+    const dotnetModule = (await import(
+      /* webpackIgnore: true */ BOOT_SCRIPT_URL
+    )) as DotnetModule;
+    const dotnetBuilder = dotnetModule.dotnet;
+    if (!dotnetBuilder) {
       throw new Error(
-        "Failed to load .NET runtime: `dotnet` global was not registered after the boot script ran.",
+        "Failed to load .NET runtime: `dotnet` export was not found in dotnet.js.",
       );
     }
 
     setLoadingMessage("Initialising .NET runtime…");
-    const host = await dotnetGlobal
-      .withResourceLoader((_type, _name, defaultUri) => {
-        // Resolve every framework asset against our CDN bundle so the
-        // runtime never hits a relative `_framework/` URL.
-        try {
-          const url = new URL(defaultUri, RUNTIME_BUNDLE_BASE);
-          return url.toString();
-        } catch {
-          return RUNTIME_BUNDLE_BASE + defaultUri;
-        }
+    const host = await dotnetBuilder
+      .withResourceLoader((_type, name, _defaultUri, _integrity, _behavior) => {
+        // Redirect every framework asset fetch to our /_dotnet/ bundle.
+        // The runtime auto-discovers dotnet.boot.js relative to dotnet.js,
+        // so all asset names (including "dotnet.boot.js") map here correctly.
+        return `${RUNTIME_BUNDLE_BASE}${name}`;
       })
       .create();
 
@@ -152,37 +159,6 @@ function lookupExport(
     cursor = cursor[path[i]];
   }
   return typeof cursor === "function" ? cursor : undefined;
-}
-
-function injectBootScript(): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${BOOT_SCRIPT_URL}"]`,
-    );
-    if (existing) {
-      if ((window as unknown as Partial<DotnetGlobal>).dotnet) {
-        resolve();
-        return;
-      }
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener(
-        "error",
-        () => reject(new Error(`Failed to load ${BOOT_SCRIPT_URL}`)),
-        { once: true },
-      );
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = BOOT_SCRIPT_URL;
-    script.async = true;
-    script.addEventListener("load", () => resolve(), { once: true });
-    script.addEventListener(
-      "error",
-      () => reject(new Error(`Failed to load ${BOOT_SCRIPT_URL}`)),
-      { once: true },
-    );
-    document.head.appendChild(script);
-  });
 }
 
 function parseScriptResult(raw: unknown): CSharpScriptResult {
