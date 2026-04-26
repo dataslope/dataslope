@@ -5,18 +5,17 @@ import { defineConfig, devices } from "@playwright/test";
 // is reused across local runs so an interactive `next dev` session
 // doesn't conflict with `npm run test:e2e`.
 //
-// The `/c` route depends on cross-origin-isolated headers (set in
-// `next.config.ts`) so the Wasmer SDK can use `SharedArrayBuffer`,
-// and several playgrounds dynamically import scripts from CDNs at
-// runtime — both work fine with the shipped Chromium.
+// Several playgrounds dynamically import scripts from CDNs at runtime
+// (browsercc for /c and /cpp, Pyodide for /python, WebR for /r,
+// php-wasm for /php), which works fine with the shipped Chromium.
 
 const PORT = Number(process.env.E2E_PORT ?? 3457);
 
 export default defineConfig({
   testDir: "./e2e",
-  // Per-playground initialization (Wasmer fetching clang, Pyodide, WebR)
-  // is the slow part — give each test enough headroom to finish even on
-  // a cold cache.
+  // Per-playground initialization (browsercc fetching the clang/lld
+  // toolchain, Pyodide, WebR) is the slow part — give each test enough
+  // headroom to finish even on a cold cache.
   timeout: 180_000,
   expect: { timeout: 30_000 },
   fullyParallel: false,

@@ -6,56 +6,41 @@ import type {
   PackageInfo,
 } from "../types";
 import {
-  loadClangPackage,
-  loadWasmerSdk,
-  type WasmerDirectory,
-  type WasmerPackage,
-  type WasmerSdk,
-} from "./wasmer-sdk";
+  loadBrowsercc,
+  loadCppPch,
+  loadWasiShim,
+  runWasiModule,
+  type BrowserccApi,
+  type WasiShim,
+} from "./browsercc";
 
-// Run C++ in the browser via @wasmer/sdk + the `clang/clang` package
-// from the Wasmer registry. Same machinery as the C playground (see
-// `./c.tsx` for the long-form notes), but the clang driver is put into
-// C++ mode via `--driver-mode=g++` so it auto-links libc++/libc++abi
-// and accepts C++-only syntax (templates, iostream, RAII, ...).
+// Run C++ in the browser via `browsercc`
+// (https://github.com/BertalanD/browsercc) — same toolchain as the C
+// playground (see `./c.tsx` for the long-form notes), but the input
+// file name uses a `.cpp` extension so clang's driver picks C++ mode
+// (auto-linking libc++/libc++abi and accepting C++-only syntax like
+// templates, iostream, RAII, ...).
 //
-// The Wasmer SDK uses a Web Worker threadpool backed by
-// `SharedArrayBuffer`, which means the document hosting this
-// playground must be cross-origin-isolated. The `/cpp` route gets the
-// required COOP/COEP headers from `next.config.ts`.
+// Compile speed: parsing the libc++ headers (iostream, vector, map,
+// ...) on every run would make each Run click feel slow. browsercc
+// ships a prebuilt `bits/stdc++.h.pch` that pre-parses the entire
+// standard library; calling `getPrecompiledHeader(flags)` returns its
+// bytes when the supplied flags are PCH-compatible (currently exactly
+// `-O2 -std=c++20 -fno-exceptions`). We pin this playground to those
+// flags so every user compile gets the fast path.
 //
-// SDK initialization and the `clang/clang` package fetch are both
-// handled by `./wasmer-sdk.ts`, which is shared with the C playground.
-// That keeps `init(...)` truly singleton across the page lifetime so
-// navigating between `/c` and `/cpp` doesn't disturb the
-// already-running threadpool — without this sharing, the second
-// adapter to load would clobber the threadpool's worker URL and
-// newly-spawned commands (notably the heavier C++ compile) would hang
-// waiting for a worker that never picked up the job.
-//
-// Compile speed: the wasm32-wasi clang in this package is itself a
-// wasm binary running inside the browser's WASI sandbox, and parsing
-// libc++ headers (iostream, vector, map, ...) for every run takes long
-// enough that iostream-using Hello World was effectively hanging on
-// the spinner. We work around that with a precompiled header (PCH)
-// that pre-parses the entire `PACKAGES` header set ONCE per page load
-// and is then re-used as `-include-pch` on every user compile. The
-// PCH build is kicked off in the background as soon as the clang
-// package is available so it's almost always done by the time the
-// user clicks Run; `run()` awaits the PCH promise before compiling so
-// the first run is correct even if the user is fast on the trigger.
+// The PCH is a 19 MB download, so we kick it off in the background as
+// soon as the toolchain is available and reuse the same buffer for
+// every subsequent compile via `loadCppPch` in `./browsercc.ts`.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
     key: "hello",
     title: "Hello World",
     desc: "cstdio printf with a range-based for over an array",
-    // Default example uses <cstdio> because it's the smallest possible
-    // first-run surface — no libc++ at all, so it's instantaneous even
-    // before the background precompiled-header build has finished. The
-    // iostream-heavy examples below benefit directly from that PCH and
-    // run quickly once it's ready (which is normally before the user
-    // has finished switching examples).
+    // Default example uses <cstdio> (no libc++) so the very first run
+    // is fast even before the prebuilt PCH download has finished. The
+    // iostream-using examples below benefit from the PCH directly.
     code: `#include <cstdio>
 
 int main() {
@@ -235,232 +220,99 @@ const PACKAGES: PackageInfo[] = [
   // Highlights from the C++ standard library — always available, no
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
-  { cat: "I/O", icon: "🖨️", color: "#facc15", name: "iostream", ver: "C++17", desc: "std::cin, std::cout, std::cerr stream I/O." },
-  { cat: "I/O", icon: "📝", color: "#facc15", name: "iomanip", ver: "C++17", desc: "std::setw, std::setprecision, std::fixed manipulators." },
-  { cat: "I/O", icon: "🧵", color: "#facc15", name: "sstream", ver: "C++17", desc: "std::istringstream, std::ostringstream string streams." },
-  { cat: "Strings", icon: "🔤", color: "#fb923c", name: "string", ver: "C++17", desc: "std::string and std::string_view." },
-  { cat: "Containers", icon: "📦", color: "#34d399", name: "vector", ver: "C++17", desc: "std::vector dynamic array." },
-  { cat: "Containers", icon: "🗺️", color: "#34d399", name: "map", ver: "C++17", desc: "Ordered std::map and std::multimap." },
-  { cat: "Containers", icon: "🪣", color: "#34d399", name: "unordered_map", ver: "C++17", desc: "Hash-based std::unordered_map." },
-  { cat: "Algorithms", icon: "🔁", color: "#60a5fa", name: "algorithm", ver: "C++17", desc: "std::sort, std::find, std::for_each, ..." },
-  { cat: "Algorithms", icon: "➕", color: "#60a5fa", name: "numeric", ver: "C++17", desc: "std::accumulate, std::iota, std::reduce." },
-  { cat: "Memory", icon: "🧠", color: "#a78bfa", name: "memory", ver: "C++17", desc: "std::unique_ptr, std::shared_ptr, std::make_unique." },
-  { cat: "Memory", icon: "🧰", color: "#a78bfa", name: "utility", ver: "C++17", desc: "std::move, std::pair, std::swap." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "cmath", ver: "C++17", desc: "std::sin, std::cos, std::sqrt, std::pow." },
-  { cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "stdexcept", ver: "C++17", desc: "Standard exception types: runtime_error, logic_error, ..." },
+  { cat: "I/O", icon: "🖨️", color: "#facc15", name: "iostream", ver: "C++20", desc: "std::cin, std::cout, std::cerr stream I/O." },
+  { cat: "I/O", icon: "📝", color: "#facc15", name: "iomanip", ver: "C++20", desc: "std::setw, std::setprecision, std::fixed manipulators." },
+  { cat: "I/O", icon: "🧵", color: "#facc15", name: "sstream", ver: "C++20", desc: "std::istringstream, std::ostringstream string streams." },
+  { cat: "Strings", icon: "🔤", color: "#fb923c", name: "string", ver: "C++20", desc: "std::string and std::string_view." },
+  { cat: "Containers", icon: "📦", color: "#34d399", name: "vector", ver: "C++20", desc: "std::vector dynamic array." },
+  { cat: "Containers", icon: "🗺️", color: "#34d399", name: "map", ver: "C++20", desc: "Ordered std::map and std::multimap." },
+  { cat: "Containers", icon: "🪣", color: "#34d399", name: "unordered_map", ver: "C++20", desc: "Hash-based std::unordered_map." },
+  { cat: "Algorithms", icon: "🔁", color: "#60a5fa", name: "algorithm", ver: "C++20", desc: "std::sort, std::find, std::for_each, ..." },
+  { cat: "Algorithms", icon: "➕", color: "#60a5fa", name: "numeric", ver: "C++20", desc: "std::accumulate, std::iota, std::reduce." },
+  { cat: "Memory", icon: "🧠", color: "#a78bfa", name: "memory", ver: "C++20", desc: "std::unique_ptr, std::shared_ptr, std::make_unique." },
+  { cat: "Memory", icon: "🧰", color: "#a78bfa", name: "utility", ver: "C++20", desc: "std::move, std::pair, std::swap." },
+  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "cmath", ver: "C++20", desc: "std::sin, std::cos, std::sqrt, std::pow." },
+  { cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "stdexcept", ver: "C++20", desc: "Standard exception types: runtime_error, logic_error, ..." },
 ];
 
-// Headers we precompile into a shared PCH at init time. This list is
-// intentionally aligned with `PACKAGES` above (minus the C-style
-// headers, which clang parses fast on their own) — anything a user is
-// likely to `#include` from the Packages drawer is already parsed, so
-// only their own code has to go through the front end at run time.
-const PCH_HEADERS = [
-  "iostream",
-  "iomanip",
-  "sstream",
-  "string",
-  "vector",
-  "map",
-  "unordered_map",
-  "algorithm",
-  "numeric",
-  "memory",
-  "utility",
-  "cmath",
-  "stdexcept",
-];
+// Compile flags for every C++ run. These are pinned to the exact set
+// that browsercc's `getPrecompiledHeader` accepts so the prebuilt
+// libc++ PCH gets used on every compile (see the file-header note).
+// Changing any of these three flags would silently disable the PCH and
+// make every Run noticeably slower.
+const CPP_COMPILE_FLAGS = ["-O2", "-std=c++20", "-fno-exceptions"];
 
-// Compile flags that MUST match between the PCH build and every user
-// compile that consumes it — clang refuses to load a PCH whose target
-// triple, language standard, or other invariants don't line up.
-const COMMON_COMPILE_ARGS = [
-  "--driver-mode=g++",
-  "--target=wasm32-wasi",
-  "-std=c++17",
-  "-O0",
-];
+// Path inside the compiler sandbox where the PCH is mounted. The user
+// code never sees this path; we just point clang at it via
+// `-include-pch` so libc++ headers don't have to be re-parsed on every
+// run.
+const PCH_VFS_PATH = "/include/bits/stdc++.h.pch";
 
 class CppRuntime implements LanguageRuntime {
-  // Persistent in-memory directory holding the built `common.pch`.
-  // Resolves to `null` (rather than rejecting) if the PCH build fails,
-  // so a broken PCH degrades to "compiles work but slowly" instead of
-  // breaking the playground entirely.
-  private pchPromise: Promise<WasmerDirectory | null>;
+  // Resolves to the PCH ArrayBuffer when ready, or `null` if the PCH
+  // download failed (in which case we just compile without it — slower
+  // but still correct).
+  private pchPromise: Promise<ArrayBuffer | null>;
 
   constructor(
-    private sdk: WasmerSdk,
-    private clang: WasmerPackage,
+    private api: BrowserccApi,
+    private shim: WasiShim,
   ) {
-    this.pchPromise = this.buildPch().catch((err) => {
-      console.warn(
-        "[cpp] Precompiled-header build failed; falling back to per-run header parsing.",
-        err,
-      );
-      return null;
-    });
-  }
-
-  // Compile a single header file (`#include`-ing every entry in
-  // `PCH_HEADERS`) into a clang precompiled header. Runs once per page
-  // load; the resulting Directory is mounted read-only into every
-  // subsequent user compile.
-  private async buildPch(): Promise<WasmerDirectory> {
-    const clangCmd =
-      this.clang.commands["clang"] ?? this.clang.entrypoint;
-    if (!clangCmd) {
-      throw new Error(
-        "clang/clang package did not expose a clang command for PCH build.",
-      );
-    }
-
-    const dir = new this.sdk.Directory();
-    const headerSource =
-      PCH_HEADERS.map((h) => `#include <${h}>`).join("\n") + "\n";
-    await dir.writeFile("common.hpp", headerSource);
-
-    const compile = await clangCmd.run({
-      args: [
-        ...COMMON_COMPILE_ARGS,
-        // `-x c++-header` tells clang the input is a header that should
-        // be emitted as a PCH rather than compiled to an object file.
-        "-x",
-        "c++-header",
-        "-o",
-        "common.pch",
-        "common.hpp",
-      ],
-      mount: { "/pch": dir },
-      cwd: "/pch",
-    });
-    const result = await compile.wait();
-    if (!result.ok) {
-      throw new Error(
-        `PCH compile exited with code ${result.code}: ${result.stderr || result.stdout}`,
-      );
-    }
-    return dir;
+    // Kick off the PCH download in the background so it's almost
+    // certainly cached by the time the user clicks Run.
+    this.pchPromise = loadCppPch(api, CPP_COMPILE_FLAGS);
   }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // Locate the clang command in the package. `clang/clang` exposes
-    // its compiler as the package entrypoint, but we also fall back to
-    // a named "clang" command so this keeps working if the package
-    // layout changes upstream.
-    const clangCmd =
-      this.clang.commands["clang"] ?? this.clang.entrypoint;
-    if (!clangCmd) {
-      emit({
-        type: "stderr",
-        content: "clang/clang package did not expose a clang command.",
-      });
-      return;
-    }
-
-    // Wait for the background PCH build to settle. In the steady state
-    // this is already resolved and adds no measurable latency; on the
-    // very first run it absorbs whatever's left of the one-time PCH
-    // compile, which is still much faster than re-parsing libc++ on
-    // every run.
+    // Wait for the background PCH download to settle. In the steady
+    // state this is already resolved and adds no measurable latency;
+    // on the very first run it just absorbs whatever's left of the
+    // one-time fetch.
     const pch = await this.pchPromise;
 
-    // Each run gets a fresh virtual filesystem so leftover artifacts
-    // from a previous compilation don't bleed in.
-    const home = new this.sdk.Directory();
-    await home.writeFile("main.cpp", code);
-
-    // 1) Compile main.cpp -> main.wasm with clang in C++ driver mode
-    //    (--driver-mode=g++) targeting WASI. C++ driver mode is what
-    //    makes clang treat inputs as C++ AND auto-link libc++/libc++abi
-    //    — without it, we'd have to pass `-x c++ -lc++ -lc++abi`
-    //    ourselves.
-    //
-    // We deliberately compile at `-O0`. The clang in this Wasmer
-    // package is itself a wasm32-wasi binary running inside the
-    // browser's WASI sandbox, and its mid/back-end optimizer is
-    // dramatically slower in that environment than native clang.
-    // `-O0` finishes the same Hello World quickly, and the produced
-    // binary is plenty fast for an interactive playground; we trade
-    // runtime perf we don't need for compile time we very much do.
-    //
-    // When the precompiled header is available we prepend
-    // `-include-pch /pch/common.pch`, which makes clang skip parsing
-    // the (heavy) libc++ headers that the PCH already covers. User
-    // `#include`s of those same headers are no-ops thanks to standard
-    // header guards, so existing examples don't need to change.
-    const args = [...COMMON_COMPILE_ARGS];
-    const mount: Record<string, WasmerDirectory> = { "/home": home };
+    const flags = [...CPP_COMPILE_FLAGS];
+    const extraFiles: Record<string, string | ArrayBuffer> = {};
     if (pch) {
-      args.push("-include-pch", "/pch/common.pch");
-      mount["/pch"] = pch;
+      flags.push("-include-pch", PCH_VFS_PATH);
+      extraFiles[PCH_VFS_PATH] = pch;
     }
-    args.push("-o", "main.wasm", "main.cpp");
 
-    const compile = await clangCmd.run({
-      args,
-      mount,
-      cwd: "/home",
+    // 1) Compile main.cpp -> WebAssembly module via browsercc. The
+    //    `.cpp` extension is what tells clang to use C++ driver mode
+    //    (auto-link libc++, accept C++-only syntax).
+    const { compileOutput, module } = await this.api.compile({
+      source: code,
+      fileName: "main.cpp",
+      flags,
+      extraFiles,
     });
-    const compileResult = await compile.wait();
 
-    if (compileResult.stdout) {
-      emit({ type: "stdout", content: compileResult.stdout.replace(/\n+$/, "") });
+    const trimmedDiag = compileOutput.replace(/\n+$/, "");
+    if (trimmedDiag) {
+      emit({ type: "stderr", content: trimmedDiag });
     }
-    if (compileResult.stderr) {
-      emit({ type: "stderr", content: compileResult.stderr.replace(/\n+$/, "") });
-    }
-    if (!compileResult.ok) {
-      emit({
-        type: "stderr",
-        content: `clang exited with code ${compileResult.code}.`,
-      });
+    if (!module) {
+      // `module === null` means clang or wasm-ld returned a non-zero
+      // exit code; the diagnostics above already say why.
       return;
     }
 
-    // 2) Read the produced .wasm back out of the mounted directory and
-    //    instantiate it as a standalone WASI program.
-    let wasmBytes: Uint8Array;
-    try {
-      wasmBytes = await home.readFile("main.wasm");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      emit({ type: "stderr", content: `Could not read compiled binary: ${msg}` });
-      return;
+    // 2) Run the compiled module in a WASI sandbox.
+    const { exitCode, stdout, stderr } = await runWasiModule(module, this.shim);
+    if (stdout) {
+      emit({ type: "stdout", content: stdout.replace(/\n+$/, "") });
     }
-
-    const program = this.sdk.Wasmer.fromWasm(wasmBytes);
-    const programCmd = program.entrypoint;
-    if (!programCmd) {
+    if (stderr) {
+      emit({ type: "stderr", content: stderr.replace(/\n+$/, "") });
+    }
+    if (exitCode !== 0) {
       emit({
         type: "stderr",
-        content: "Compiled module has no entrypoint to run.",
-      });
-      return;
-    }
-
-    const runInstance = await programCmd.run({});
-    const runResult = await runInstance.wait();
-
-    if (runResult.stdout) {
-      emit({ type: "stdout", content: runResult.stdout.replace(/\n+$/, "") });
-    }
-    if (runResult.stderr) {
-      emit({ type: "stderr", content: runResult.stderr.replace(/\n+$/, "") });
-    }
-    if (!runResult.ok) {
-      emit({
-        type: "stderr",
-        content: `Program exited with code ${runResult.code}.`,
+        content: `Program exited with code ${exitCode}.`,
       });
     }
   }
 }
-
-// Track init across re-renders so React Strict Mode (or repeated
-// navigation back to /cpp) doesn't try to call the SDK's `init()`
-// twice — it throws if invoked more than once per page load. The
-// promise itself is a process-wide singleton kept in `./wasmer-sdk.ts`
-// and shared with the C playground.
 
 export const cppAdapter: LanguageAdapter = {
   id: "cpp",
@@ -470,11 +322,11 @@ export const cppAdapter: LanguageAdapter = {
   readyStatus: "C++ ready",
   runtimeInfo: {
     language: "C++",
-    version: "C++17 (clang)",
-    engine: "Wasmer + clang/clang",
-    engineUrl: "https://wasmer.io/clang/clang",
+    version: "C++20 (clang via browsercc)",
+    engine: "browsercc (clang + lld + WASI sysroot)",
+    engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C++ is compiled in your browser by clang (WebAssembly) in C++ driver mode, and the resulting WASI binary is then executed in a sandboxed Wasmer runtime — no server roundtrip. Code is built at -O0. To keep iostream- and STL-heavy snippets fast, the standard headers from the Packages drawer are pre-parsed once per page load into a precompiled header (PCH) that's reused on every subsequent run.",
+      "C++ is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim — no server roundtrip. Code is built at -O2 with -fno-exceptions, which lets the playground reuse browsercc's prebuilt libc++ precompiled header so iostream- and STL-heavy snippets compile quickly.",
   },
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
@@ -496,7 +348,7 @@ export const cppAdapter: LanguageAdapter = {
       >
         C++ standard library
       </a>{" "}
-      and ship with clang&apos;s WASI sysroot — no install step needed.
+      and ship with browsercc&apos;s WASI sysroot — no install step needed.
     </>
   ),
   importSnippet: (name) => `#include <${name}>`,
@@ -506,12 +358,8 @@ export const cppAdapter: LanguageAdapter = {
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading Wasmer SDK…");
-    const sdk = await loadWasmerSdk();
-
-    setLoadingMessage("Fetching clang from the Wasmer registry (this can take a moment on first load)…");
-    const clang = await loadClangPackage(sdk);
-
-    return new CppRuntime(sdk, clang);
+    setLoadingMessage("Loading browsercc clang toolchain (this can take a moment on first load)…");
+    const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
+    return new CppRuntime(api, shim);
   },
 };

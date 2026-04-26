@@ -6,28 +6,28 @@ import type {
   PackageInfo,
 } from "../types";
 import {
-  loadClangPackage,
-  loadWasmerSdk,
-  type WasmerPackage,
-  type WasmerSdk,
-} from "./wasmer-sdk";
+  loadBrowsercc,
+  loadWasiShim,
+  runWasiModule,
+  type BrowserccApi,
+  type WasiShim,
+} from "./browsercc";
 
-// Run C in the browser via @wasmer/sdk + the `clang/clang` package
-// from the Wasmer registry. The user's source is written into a
-// virtual filesystem mounted at `/home`, clang compiles it to a
-// WASI-targeted `.wasm`, then we re-load that binary as a fresh
-// Wasmer module and execute it via `runWasix`.
+// Run C in the browser via `browsercc`
+// (https://github.com/BertalanD/browsercc), which ships a precompiled
+// clang/lld toolchain plus a WASI sysroot (libc, headers) as plain
+// static assets. The user's source is handed to browsercc's `compile`,
+// which produces a WebAssembly module; we then execute it with
+// `@bjorn3/browser_wasi_shim` to capture stdout/stderr.
 //
-// The Wasmer SDK uses a Web Worker threadpool backed by
-// `SharedArrayBuffer`, which means the document hosting this
-// playground must be cross-origin-isolated. The `/c` route gets the
-// required COOP/COEP headers from `next.config.ts`.
+// Browsercc's `compile` infers the language from the input file name's
+// extension, so we pass `main.c` here and clang treats the input as C
+// (the C++ adapter does the same with `main.cpp`).
 //
-// SDK initialization and the `clang/clang` package fetch are both
-// handled by `./wasmer-sdk.ts`, which is shared with the C++
-// playground. That keeps `init(...)` truly singleton across the page
-// lifetime so navigating between `/c` and `/cpp` doesn't disturb the
-// already-running threadpool.
+// Library + WASI-shim loading is centralised in `./browsercc.ts`, and
+// the resulting module is a process-wide singleton so navigating
+// between `/c` and `/cpp` reuses the same already-fetched ~95 MB
+// toolchain instead of re-downloading it.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -224,104 +224,67 @@ const PACKAGES: PackageInfo[] = [
   { cat: "Diagnostics", icon: "❗", color: "#f472b6", name: "errno.h", ver: "C99", desc: "errno + perror for system error reporting." },
 ];
 
+// Compile flags shared across every C run. browsercc invokes the
+// underlying compiler as `clang++`, which puts the driver into g++
+// mode and would otherwise compile `.c` files as C++ — that breaks
+// idiomatic C like the implicit `void*` -> `T*` conversion from
+// `malloc`. `--driver-mode=gcc` flips the driver back to plain clang
+// so the `.c` extension is honoured and C-only flags are accepted.
+// We use `-std=gnu17` (rather than `-std=c17`) so common GNU
+// extensions in the standard headers — most visibly `M_PI`, `M_E`
+// and friends in `<math.h>` — remain visible to user code.
+// `-O2` matches what browsercc's PCH was built against (and produces
+// nicer binaries than `-O0` without measurable extra wait), and
+// `-Wall` surfaces obvious bugs in the user's snippet.
+const C_COMPILE_FLAGS = ["--driver-mode=gcc", "-O2", "-Wall", "-std=gnu17"];
+
 class CRuntime implements LanguageRuntime {
   constructor(
-    private sdk: WasmerSdk,
-    private clang: WasmerPackage,
+    private api: BrowserccApi,
+    private shim: WasiShim,
   ) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // Locate the clang command in the package. `clang/clang` exposes
-    // its compiler as the package entrypoint, but we also fall back to
-    // a named "clang" command so this keeps working if the package
-    // layout changes upstream.
-    const clangCmd =
-      this.clang.commands["clang"] ?? this.clang.entrypoint;
-    if (!clangCmd) {
-      emit({
-        type: "stderr",
-        content: "clang/clang package did not expose a clang command.",
-      });
-      return;
-    }
-
-    // Each run gets a fresh virtual filesystem so leftover artifacts
-    // from a previous compilation don't bleed in.
-    const home = new this.sdk.Directory();
-    await home.writeFile("main.c", code);
-
-    // 1) Compile main.c -> main.wasm with clang targeting WASI.
-    const compile = await clangCmd.run({
-      args: [
-        "--target=wasm32-wasi",
-        "-O2",
-        "-o",
-        "main.wasm",
-        "main.c",
-      ],
-      mount: { "/home": home },
-      cwd: "/home",
+    // 1) Compile main.c -> WebAssembly module via browsercc. The
+    //    extension on `fileName` is what tells clang to treat the input
+    //    as C (rather than the default C++ driver mode).
+    const { compileOutput, module } = await this.api.compile({
+      source: code,
+      fileName: "main.c",
+      flags: C_COMPILE_FLAGS,
     });
-    const compileResult = await compile.wait();
 
-    if (compileResult.stdout) {
-      emit({ type: "stdout", content: compileResult.stdout.replace(/\n+$/, "") });
+    // browsercc combines clang's stdout and stderr in `compileOutput`.
+    // Surface non-empty diagnostics so warnings + errors are visible
+    // even on a successful build.
+    const trimmedDiag = compileOutput.replace(/\n+$/, "");
+    if (trimmedDiag) {
+      emit({ type: "stderr", content: trimmedDiag });
     }
-    if (compileResult.stderr) {
-      emit({ type: "stderr", content: compileResult.stderr.replace(/\n+$/, "") });
-    }
-    if (!compileResult.ok) {
-      emit({
-        type: "stderr",
-        content: `clang exited with code ${compileResult.code}.`,
-      });
+    if (!module) {
+      // `module === null` means clang or wasm-ld returned a non-zero
+      // exit code; the diagnostics above already say why.
       return;
     }
 
-    // 2) Read the produced .wasm back out of the mounted directory and
-    //    instantiate it as a standalone WASI program.
-    let wasmBytes: Uint8Array;
-    try {
-      wasmBytes = await home.readFile("main.wasm");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      emit({ type: "stderr", content: `Could not read compiled binary: ${msg}` });
-      return;
+    // 2) Run the compiled module in a WASI sandbox and forward
+    //    stdout/stderr. We emit each stream as a single cell to match
+    //    the rest of the playground adapters.
+    const { exitCode, stdout, stderr } = await runWasiModule(module, this.shim);
+    if (stdout) {
+      emit({ type: "stdout", content: stdout.replace(/\n+$/, "") });
     }
-
-    const program = this.sdk.Wasmer.fromWasm(wasmBytes);
-    const programCmd = program.entrypoint;
-    if (!programCmd) {
+    if (stderr) {
+      emit({ type: "stderr", content: stderr.replace(/\n+$/, "") });
+    }
+    if (exitCode !== 0) {
       emit({
         type: "stderr",
-        content: "Compiled module has no entrypoint to run.",
-      });
-      return;
-    }
-
-    const runInstance = await programCmd.run({});
-    const runResult = await runInstance.wait();
-
-    if (runResult.stdout) {
-      emit({ type: "stdout", content: runResult.stdout.replace(/\n+$/, "") });
-    }
-    if (runResult.stderr) {
-      emit({ type: "stderr", content: runResult.stderr.replace(/\n+$/, "") });
-    }
-    if (!runResult.ok) {
-      emit({
-        type: "stderr",
-        content: `Program exited with code ${runResult.code}.`,
+        content: `Program exited with code ${exitCode}.`,
       });
     }
   }
 }
-
-// Track init across re-renders so React Strict Mode (or repeated
-// navigation back to /c) doesn't try to call the SDK's `init()` twice
-// — it throws if invoked more than once per page load. The promise
-// itself is a process-wide singleton kept in `./wasmer-sdk.ts` and
-// shared with the C++ playground.
 
 export const cAdapter: LanguageAdapter = {
   id: "c",
@@ -331,11 +294,11 @@ export const cAdapter: LanguageAdapter = {
   readyStatus: "C ready",
   runtimeInfo: {
     language: "C",
-    version: "C17 (clang)",
-    engine: "Wasmer + clang/clang",
-    engineUrl: "https://wasmer.io/clang/clang",
+    version: "C17 (clang via browsercc)",
+    engine: "browsercc (clang + lld + WASI sysroot)",
+    engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C is compiled in your browser by clang (WebAssembly), and the resulting WASI binary is then executed in a sandboxed Wasmer runtime — no server roundtrip.",
+      "C is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim — no server roundtrip.",
   },
   // CodeMirror's clike mode handles C syntax. `text/x-csrc` is the
   // standard MIME alias for C inside that mode.
@@ -357,7 +320,7 @@ export const cAdapter: LanguageAdapter = {
       >
         C standard library
       </a>{" "}
-      and ship with clang&apos;s WASI sysroot — no install step needed.
+      and ship with browsercc&apos;s WASI sysroot — no install step needed.
     </>
   ),
   importSnippet: (name) => `#include <${name}>`,
@@ -367,12 +330,8 @@ export const cAdapter: LanguageAdapter = {
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading Wasmer SDK…");
-    const sdk = await loadWasmerSdk();
-
-    setLoadingMessage("Fetching clang from the Wasmer registry (this can take a moment on first load)…");
-    const clang = await loadClangPackage(sdk);
-
-    return new CRuntime(sdk, clang);
+    setLoadingMessage("Loading browsercc clang toolchain (this can take a moment on first load)…");
+    const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
+    return new CRuntime(api, shim);
   },
 };
