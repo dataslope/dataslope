@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "UgVfCVJ0MCI=",
+  "success": true,
+  "projectFilePath": "/home/runner/work/dataslope-playground/dataslope-playground/script-runner-src/ScriptRunner.csproj",
+  "expectedPackageFiles": [
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.codeanalysis.analyzers/3.11.0/microsoft.codeanalysis.analyzers.3.11.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.codeanalysis.common/4.14.0/microsoft.codeanalysis.common.4.14.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.codeanalysis.csharp/4.14.0/microsoft.codeanalysis.csharp.4.14.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.codeanalysis.csharp.scripting/4.14.0/microsoft.codeanalysis.csharp.scripting.4.14.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.codeanalysis.scripting.common/4.14.0/microsoft.codeanalysis.scripting.common.4.14.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/system.collections.immutable/9.0.0/system.collections.immutable.9.0.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/system.reflection.metadata/9.0.0/system.reflection.metadata.9.0.0.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.netcore.app.ref/10.0.7/microsoft.netcore.app.ref.10.0.7.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.netcore.app.runtime.mono.browser-wasm/10.0.7/microsoft.netcore.app.runtime.mono.browser-wasm.10.0.7.nupkg.sha512",
+    "/tmp/codeql-scratch-7430b0ed97d6c56e/dbs/csharp/working/packages/microsoft.aspnetcore.app.ref/10.0.5/microsoft.aspnetcore.app.ref.10.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}
