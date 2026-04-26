@@ -36,16 +36,24 @@ const EXAMPLES: ExampleSnippet[] = [
   {
     key: "hello",
     title: "Hello World",
-    desc: "iostream, std::string, range-based for",
-    code: `#include <iostream>
-#include <string>
+    desc: "cstdio printf with a range-based for over an array",
+    // The default example deliberately uses <cstdio> rather than
+    // <iostream>. Compiling iostream-using C++ with the wasm-targeted
+    // clang in this package is dramatically slower than compiling C —
+    // the user-reported "C++ playground hangs" symptom was the spinner
+    // sitting on a libc++ template-instantiation pass that takes many
+    // minutes to clear. printf-based Hello World finishes in well
+    // under a minute, which is what we want for a fresh page load.
+    // The iostream-heavy examples below still run; they're just opt-in.
+    code: `#include <cstdio>
 
 int main() {
-    std::cout << "Hello, C++ Playground!\\n";
-    std::cout << "Compiled with clang -> WebAssembly, run in your browser.\\n\\n";
+    std::printf("Hello, C++ Playground!\\n");
+    std::printf("Compiled with clang -> WebAssembly, run in your browser.\\n\\n");
 
-    for (const std::string &name : {"Ada", "Linus", "Grace"}) {
-        std::cout << "  hello, " << name << "!\\n";
+    const char *names[] = {"Ada", "Linus", "Grace"};
+    for (const char *name : names) {
+        std::printf("  hello, %s!\\n", name);
     }
 
     return 0;
@@ -262,12 +270,23 @@ class CppRuntime implements LanguageRuntime {
     //    makes clang treat inputs as C++ AND auto-link libc++/libc++abi
     //    — without it, we'd have to pass `-x c++ -lc++ -lc++abi`
     //    ourselves.
+    //
+    // We deliberately compile at `-O0`. The clang in this Wasmer
+    // package is itself a wasm32-wasi binary running inside the
+    // browser's WASI sandbox, and its mid/back-end optimizer is
+    // dramatically slower in that environment than native clang —
+    // enough that compiling iostream-heavy C++ at `-O2` runs for many
+    // minutes (in practice, the user sees the spinner spin forever).
+    // `-O0` finishes the same Hello World in well under a minute, and
+    // the produced binary is plenty fast for an interactive
+    // playground; we trade runtime perf we don't need for compile
+    // time we very much do.
     const compile = await clangCmd.run({
       args: [
         "--driver-mode=g++",
         "--target=wasm32-wasi",
         "-std=c++17",
-        "-O2",
+        "-O0",
         "-o",
         "main.wasm",
         "main.cpp",
@@ -348,7 +367,7 @@ export const cppAdapter: LanguageAdapter = {
     engine: "Wasmer + clang/clang",
     engineUrl: "https://wasmer.io/clang/clang",
     notes:
-      "C++ is compiled in your browser by clang (WebAssembly) in C++ driver mode, and the resulting WASI binary is then executed in a sandboxed Wasmer runtime — no server roundtrip.",
+      "C++ is compiled in your browser by clang (WebAssembly) in C++ driver mode, and the resulting WASI binary is then executed in a sandboxed Wasmer runtime — no server roundtrip. Code is built at -O0; iostream and other libc++-heavy headers compile noticeably slower than printf-based equivalents.",
   },
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
