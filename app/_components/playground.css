@@ -456,6 +456,31 @@ body.pg-active {
 }
 .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
+/* Icon-only buttons (e.g. the "copy to clipboard" affordance in the
+   editor pane bar and each output cell header). Sized to match the
+   surrounding pane-bar text controls without dominating them. */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  background: transparent; border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.icon-btn:hover {
+  color: var(--text); border-color: var(--border); background: var(--bg3);
+}
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px;
+}
+.icon-btn svg { display: block; }
+
+/* Anchor the cell-header copy button on the right edge regardless of
+   whether `cell-time` (which uses `margin-left: auto`) is present. */
+.out-cell-header .out-cell-copy { margin-left: 4px; }
+
 /* ─── Info popover ─── */
 .info-popover {
   position: absolute; top: calc(100% + 6px); right: 0;
