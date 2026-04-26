@@ -8,6 +8,7 @@ import {
   SiPhp,
   SiC,
   SiCplusplus,
+  SiOpenjdk,
 } from "react-icons/si";
 import styles from "./home.module.css";
 
@@ -80,6 +81,16 @@ function CppLogo() {
     <SiCplusplus
       className={styles.logoSvg}
       style={{ color: "#00599C" }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function JavaLogo() {
+  return (
+    <SiOpenjdk
+      className={styles.logoSvg}
+      style={{ color: "#ED8B00" }}
       aria-hidden="true"
     />
   );
@@ -189,6 +200,19 @@ export default function Home() {
                 <strong>C++</strong>
                 <span className={styles.cardDesc}>
                   Compile and run C++ in the browser via clang (WebAssembly).
+                </span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/java" className={styles.card}>
+              <span className={styles.logo}>
+                <JavaLogo />
+              </span>
+              <span className={styles.cardText}>
+                <strong>Java</strong>
+                <span className={styles.cardDesc}>
+                  Compile and run Java in the browser via CheerpJ (OpenJDK).
                 </span>
               </span>
             </Link>

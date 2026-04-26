@@ -30,6 +30,7 @@ import { typescriptAdapter } from "../app/_components/runtime/typescript";
 import { phpAdapter } from "../app/_components/runtime/php";
 import { cAdapter } from "../app/_components/runtime/c";
 import { cppAdapter } from "../app/_components/runtime/cpp";
+import { javaAdapter } from "../app/_components/runtime/java";
 
 // Python and R adapters import from "webr" / reference workers; we test
 // their exports separately once we have a proper mocking story.
@@ -40,6 +41,7 @@ const ADAPTERS = [
   { name: "PHP", adapter: phpAdapter },
   { name: "C", adapter: cAdapter },
   { name: "C++", adapter: cppAdapter },
+  { name: "Java", adapter: javaAdapter },
 ];
 
 describe("LanguageAdapter shape", () => {
@@ -192,5 +194,56 @@ describe("C++ adapter specifics", () => {
     expect(hello).toBeTruthy();
     expect(hello!.code).toContain("#include <cstdio>");
     expect(hello!.code).toMatch(/int\s+main\s*\(/);
+  });
+});
+
+describe("Java adapter specifics", () => {
+  it("id is 'java'", () => expect(javaAdapter.id).toBe("java"));
+
+  it("importSnippet wraps in import ...;", () => {
+    expect(javaAdapter.importSnippet("java.util")).toBe("import java.util.*;");
+  });
+
+  it("hasImport detects existing wildcard imports", () => {
+    expect(javaAdapter.hasImport("import java.util.*;", "java.util")).toBe(true);
+  });
+
+  it("hasImport detects existing single-class imports", () => {
+    expect(
+      javaAdapter.hasImport("import java.util.HashMap;", "java.util"),
+    ).toBe(true);
+  });
+
+  it("hasImport tolerates extra whitespace", () => {
+    expect(
+      javaAdapter.hasImport("import   java.util  .  * ;", "java.util"),
+    ).toBe(true);
+  });
+
+  it("hasImport returns false when the package is not imported", () => {
+    expect(javaAdapter.hasImport("// no import", "java.util")).toBe(false);
+  });
+
+  it("hasImport does not match unrelated packages with the same prefix", () => {
+    // Substring-style false positives would be a real footgun (e.g. a
+    // user clicking `java.util` after `import java.util.concurrent.*;`
+    // would otherwise have its insertion silently skipped).
+    expect(
+      javaAdapter.hasImport("import java.util.concurrent.*;", "java.util"),
+    ).toBe(false);
+    // Sanity check: the same-package query still matches.
+    expect(
+      javaAdapter.hasImport("import java.util.concurrent.*;", "java.util.concurrent"),
+    ).toBe(true);
+  });
+
+  it("hello-world example contains a public static void main", () => {
+    const hello = javaAdapter.examples.find((e) => e.key === "hello");
+    expect(hello).toBeTruthy();
+    expect(hello!.code).toMatch(/public\s+static\s+void\s+main\s*\(/);
+  });
+
+  it("exports as a .java file", () => {
+    expect(javaAdapter.exportFormats[0].extension).toBe("java");
   });
 });
