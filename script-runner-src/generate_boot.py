@@ -37,15 +37,15 @@ for target_name, target in deps.get("targets", {}).items():
         continue
     for pkg_name, pkg_info in target.items():
         is_runtime_pack = "runtimepack." in pkg_name
-        for runtime_lib in pkg_info.get("runtime", {}).keys():
+        for runtime_lib in list(pkg_info.get("runtime", {}).keys()) + list(pkg_info.get("native", {}).keys()):
             basename = runtime_lib.split("/")[-1]
             if not basename.endswith(".dll"):
                 continue
             entry = {"name": basename, "virtualPath": "/" + basename}
-            if is_runtime_pack:
-                core_assemblies.append(entry)
-            else:
-                user_assemblies.append(entry)
+            target_list = core_assemblies if is_runtime_pack else user_assemblies
+            if any(e["name"] == basename for e in target_list):
+                continue
+            target_list.append(entry)
 
 boot_config = {
     "mainAssemblyName": "ScriptRunner.dll",
