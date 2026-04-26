@@ -134,8 +134,11 @@ test.describe("Packages button visibility", () => {
     // Desktop button: rendered only when packages.length > 0.
     await expect(page.getByRole("button", { name: "Packages" })).toHaveCount(0);
 
-    // Mobile button lives inside the menu drawer. Open it via the
-    // hamburger and verify the Packages action is omitted.
+    // Mobile button lives inside the menu drawer, which only exists in
+    // the layout at the mobile breakpoint (≤768px in `playground.css`).
+    // Shrink the viewport so the hamburger becomes visible, then open
+    // it and verify the Packages action is omitted.
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.locator(".mobile-menu-btn").click();
     await expect(
       page.locator(".mobile-menu-drawer-body").getByText("Packages", {
