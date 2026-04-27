@@ -11,6 +11,6 @@
 //
 //   git tag v1.0.2-cdn-assets && git push origin v1.0.2-cdn-assets
 
-export const CDN_ASSETS_TAG = "v1.0.2-cdn-assets";
+export const CDN_ASSETS_TAG = "v1.0.3-cdn-assets";
 
 export const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/subwaymatch/dataslope-playground@${CDN_ASSETS_TAG}/cdn-assets`;
