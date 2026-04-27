@@ -91,7 +91,7 @@ async function initPyodide(): Promise<void> {
   // Set up display() and a matplotlib show() patch that captures figures
   // as base64 PNGs into _display_outputs.
   await pyodide.runPythonAsync(`
-import sys, io, base64, json
+import sys, io, base64, json, ast as _ast
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -122,6 +122,23 @@ def _patched_show(*args, **kwargs):
     plt.clf()
     plt.close("all")
 plt.show = _patched_show
+
+def _execute_with_last_display(code):
+    """Execute user code, auto-displaying the last expression like Jupyter."""
+    _globals = globals()
+    tree = _ast.parse(code)
+    if tree.body and isinstance(tree.body[-1], _ast.Expr):
+        last_expr = tree.body.pop()
+        if tree.body:
+            _ast.fix_missing_locations(tree)
+            exec(compile(tree, "<string>", "exec"), _globals)
+        expr_tree = _ast.Expression(body=last_expr.value)
+        _ast.fix_missing_locations(expr_tree)
+        result = eval(compile(expr_tree, "<string>", "eval"), _globals)
+        if result is not None:
+            display(result)
+    else:
+        exec(compile(tree, "<string>", "exec"), _globals)
 `);
 
   post({ kind: "ready" });
@@ -147,8 +164,14 @@ async function runCode(id: number, code: string): Promise<void> {
 
   await pyodide.runPythonAsync("_display_outputs.clear()");
 
+  // Pass the user code as a Python string to avoid template-literal escaping
+  // issues and to let _execute_with_last_display parse it with the ast module.
+  pyodide.globals.set("_user_code_str", code);
+
   // Wrap user code with a Plotly intercept so `fig.show()` captures the
-  // figure JSON instead of trying to open a browser tab.
+  // figure JSON instead of trying to open a browser tab.  The user code is
+  // executed via _execute_with_last_display so that the last expression is
+  // auto-displayed (Jupyter-style) when it evaluates to a non-None value.
   const wrappedCode = `
 import json as _json
 import plotly as _plotly
@@ -168,7 +191,7 @@ try:
     _go.Figure.show = _patched_go_show
 except: pass
 
-${code}
+_execute_with_last_display(_user_code_str)
 
 _plotly.io.show = _orig_plotly_show
 try: _go.Figure.show = _orig_go_show
