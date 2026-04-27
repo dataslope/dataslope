@@ -9,8 +9,8 @@
 // CDN_ASSETS_TAG to a new version, then create a matching Git tag
 // and push it so jsDelivr can resolve the new files:
 //
-//   git tag v1.0.1-cdn-assets && git push origin v1.0.1-cdn-assets
+//   git tag v1.0.2-cdn-assets && git push origin v1.0.2-cdn-assets
 
-export const CDN_ASSETS_TAG = "v1.0.1-cdn-assets";
+export const CDN_ASSETS_TAG = "v1.0.2-cdn-assets";
 
 export const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/subwaymatch/dataslope-playground@${CDN_ASSETS_TAG}/cdn-assets`;
