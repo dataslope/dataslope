@@ -121,16 +121,17 @@ import matplotlib.pyplot as plt
 
 _display_outputs = []
 
-def display(obj):
+def display(*objs):
     import pandas as pd
-    if isinstance(obj, pd.DataFrame):
-        _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
-    elif hasattr(obj, "_repr_html_"):
-        h = obj._repr_html_()
-        if h:
-            _display_outputs.append({"type": "html", "html": h})
-    else:
-        _display_outputs.append({"type": "stdout", "text": repr(obj)})
+    for obj in objs:
+        if isinstance(obj, pd.DataFrame):
+            _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
+        elif hasattr(obj, "_repr_html_"):
+            h = obj._repr_html_()
+            if h:
+                _display_outputs.append({"type": "html", "html": h})
+        else:
+            _display_outputs.append({"type": "stdout", "text": repr(obj)})
 
 import builtins
 builtins.display = display
