@@ -43,7 +43,8 @@ interface OutputCellMessage {
 // ─── Protocol ──────────────────────────────────────────────────────────
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string };
+  | { kind: "run"; id: number; code: string }
+  | { kind: "complete"; id: number; line: string; column: number };
 
 type OutMessage =
   | { kind: "loading"; message: string }
@@ -51,7 +52,13 @@ type OutMessage =
   | { kind: "init-error"; message: string }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | {
+      kind: "complete-result";
+      id: number;
+      completions: string[];
+      replaceLength: number;
+    };
 
 function post(msg: OutMessage) {
   self.postMessage(msg);
@@ -82,9 +89,25 @@ async function initPyodide(): Promise<void> {
   post({ kind: "loading", message: "Loading Pyodide…" });
   pyodide = await self.loadPyodide({ indexURL: PYODIDE_INDEX_URL });
 
+  // Pyodide 0.29's package loader writes its progress messages
+  // ("Loading numpy, …", "pandas already loaded from default channel",
+  // "No new packages to load", …) through Python's `sys.stdout`. Once
+  // `runCode()` installs a `setStdout({ batched })` capture, those
+  // messages would otherwise be conflated with the user's real `print`
+  // output. Provide explicit callbacks so the loader noise stays out of
+  // user-visible output cells.
+  const pkgCallbacks = {
+    messageCallback: (m: string) => {
+      console.log("[pyodide:loadPackage]", m);
+    },
+    errorCallback: (m: string) => {
+      console.error("[pyodide:loadPackage]", m);
+    },
+  };
+
   post({ kind: "loading", message: "Installing packages…" });
-  await pyodide.loadPackage(["numpy", "pandas", "matplotlib"]);
-  await pyodide.loadPackage("micropip");
+  await pyodide.loadPackage(["numpy", "pandas", "matplotlib"], pkgCallbacks);
+  await pyodide.loadPackage("micropip", pkgCallbacks);
   const micropip = pyodide.pyimport("micropip");
   await micropip.install("plotly");
 
@@ -139,6 +162,46 @@ def _execute_with_last_display(code):
             display(result)
     else:
         exec(compile(tree, "<string>", "exec"), _globals)
+
+# ─── Autocomplete via stdlib rlcompleter ─────────────────────────────
+import re as _re
+import rlcompleter as _rlcompleter
+
+# Identifier optionally followed by attribute accesses (e.g. "pd.DataFr").
+_COMPLETION_FRAGMENT_RE = _re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*\\.?[A-Za-z_]?[A-Za-z0-9_]*$")
+
+def _python_completions(line, column):
+    """Return (completions, replace_length) for the prefix ending at (line, column).
+
+    Uses rlcompleter.Completer against the live globals() so that
+    user-defined names and imported modules are completable.
+    """
+    text = line[:column]
+    m = _COMPLETION_FRAGMENT_RE.search(text)
+    if not m:
+        return [], 0
+    fragment = m.group()
+    completer = _rlcompleter.Completer(globals())
+    seen = []
+    seen_set = set()
+    i = 0
+    # rlcompleter.complete returns successive matches until it returns None.
+    while True:
+        try:
+            match = completer.complete(fragment, i)
+        except Exception:
+            break
+        if match is None:
+            break
+        # rlcompleter appends "(" for callables and "." for modules — strip
+        # those so the inserted text is just the identifier; the user can
+        # decide whether to add parentheses themselves.
+        clean = match.rstrip("(").rstrip(".")
+        if clean and clean not in seen_set:
+            seen_set.add(clean)
+            seen.append(clean)
+        i += 1
+    return seen, len(fragment)
 `);
 
   post({ kind: "ready" });
@@ -153,9 +216,18 @@ async function runCode(id: number, code: string): Promise<void> {
   pyodide.setStderr({ batched: (s: string) => { stderr += s + "\n"; } });
 
   // Auto-install any Pyodide packages referenced by the user's imports
-  // (e.g. `import sklearn` triggers loading of scikit-learn).
+  // (e.g. `import sklearn` triggers loading of scikit-learn). Suppress the
+  // loader's progress messages so they don't pollute the captured user
+  // stdout — see the comment on `pkgCallbacks` in `initPyodide()`.
   try {
-    await pyodide.loadPackagesFromImports(code);
+    await pyodide.loadPackagesFromImports(code, {
+      messageCallback: (m: string) => {
+        console.log("[pyodide:loadPackage]", m);
+      },
+      errorCallback: (m: string) => {
+        console.error("[pyodide:loadPackage]", m);
+      },
+    });
   } catch (err) {
     stderr += `Failed to auto-load packages: ${
       err instanceof Error ? err.message : String(err)
@@ -233,6 +305,52 @@ except: pass
   }
 }
 
+async function completeCode(
+  id: number,
+  line: string,
+  column: number,
+): Promise<void> {
+  if (!pyodide) throw new Error("Pyodide is not initialised");
+
+  // Make the request available to the Python helper without worrying
+  // about quoting or escaping the user's text.
+  pyodide.globals.set("_complete_line", line);
+  pyodide.globals.set("_complete_column", column);
+
+  const resultProxy = await pyodide.runPythonAsync(
+    "_python_completions(_complete_line, _complete_column)",
+  );
+  const result = resultProxy.toJs();
+  if (typeof resultProxy.destroy === "function") {
+    resultProxy.destroy();
+  }
+
+  let completions: string[] = [];
+  let replaceLength = 0;
+  if (Array.isArray(result) && result.length === 2) {
+    const [list, len] = result as [unknown, unknown];
+    if (Array.isArray(list)) {
+      completions = list.filter((s): s is string => typeof s === "string");
+    }
+    if (typeof len === "number") {
+      replaceLength = len;
+    }
+  }
+
+  post({ kind: "complete-result", id, completions, replaceLength });
+}
+
+// Pyodide is not reentrant — serialise all run/complete requests behind a
+// single promise chain so a completion request that arrives while a run is
+// in progress can't interleave Python execution.
+let workQueue: Promise<unknown> = Promise.resolve();
+
+function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const next = workQueue.then(task, task);
+  workQueue = next.catch(() => {});
+  return next;
+}
+
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   const msg = ev.data;
   if (msg.kind === "init") {
@@ -250,7 +368,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
 
   if (msg.kind === "run") {
     const { id, code } = msg;
-    (async () => {
+    enqueue(async () => {
       try {
         if (initPromise) await initPromise;
         await runCode(id, code);
@@ -262,6 +380,22 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
           message: err instanceof Error ? err.message : String(err),
         });
       }
-    })();
+    });
+    return;
+  }
+
+  if (msg.kind === "complete") {
+    const { id, line, column } = msg;
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        await completeCode(id, line, column);
+      } catch {
+        // Completions are best-effort — return an empty list rather than
+        // surfacing the error to the user.
+        post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
+      }
+    });
+    return;
   }
 });

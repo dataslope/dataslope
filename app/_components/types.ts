@@ -55,8 +55,19 @@ export interface ExportFormat {
  *  become available. */
 export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
 
+export interface CompletionResult {
+  /** Suggested completions for the current cursor prefix. */
+  list: string[];
+  /** Number of characters before the cursor that should be replaced when
+   *  inserting a completion (i.e. the length of the matched prefix). */
+  replaceLength: number;
+}
+
 export interface LanguageRuntime {
   run(code: string, emit: EmitOutput): Promise<void>;
+  /** Optional: compute completions for the given line up to ``column``.
+   *  Adapters that don't implement autocomplete simply omit this. */
+  complete?(line: string, column: number): Promise<CompletionResult>;
 }
 
 export interface LanguageAdapter {
