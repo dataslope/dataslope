@@ -89,8 +89,8 @@ interface DotnetModule {
 let dotnetPromise: Promise<DotnetApi> | null = null;
 
 /** Dynamically import the boot script (once per page), configure the
- *  runtime to load all assets from /_dotnet/, and resolve with a
- *  `runScript` function the C# adapter calls for every Run press. */
+ *  runtime to load all assets from the jsDelivr CDN bundle, and
+ *  resolve with a `runScript` function the C# adapter calls for every Run press. */
 export function loadDotnet(
   setLoadingMessage: (message: string) => void,
 ): Promise<DotnetApi> {
@@ -125,7 +125,9 @@ export function loadDotnet(
       })
       .create();
     host.setModuleImports("main.js", {
-      getOrigin: () => window.location.origin,
+      // Expose the CDN _dotnet/ base URL so Runner.cs can fetch metadata
+      // reference DLLs directly from jsDelivr rather than from the app origin.
+      getDotnetBundleBaseUrl: () => RUNTIME_BUNDLE_BASE,
     });
 
     setLoadingMessage("Loading Roslyn (C# scripting engine)…");

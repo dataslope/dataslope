@@ -2,7 +2,7 @@
 
 This directory contains the source for the .NET 10 WebAssembly ScriptRunner
 that powers the `/csharp` playground. The compiled output lives in
-`public/_dotnet/`.
+`cdn-assets/_dotnet/` (served via jsDelivr — see `app/_components/runtime/cdn.ts`).
 
 ## Building
 
@@ -10,7 +10,7 @@ Requires .NET 10 SDK with the `wasm-tools` workload:
 
 ```bash
 dotnet workload install wasm-tools
-dotnet publish -c Release -o ../public/_dotnet/
+dotnet publish -c Release -o ../cdn-assets/_dotnet/
 python3 generate_boot.py  # regenerates dotnet.boot.js from deps.json
 ```
 
