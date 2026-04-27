@@ -1,14 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  headers: async () => [
-    {
-      source: "/_dotnet/:path*",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
-  ],
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
