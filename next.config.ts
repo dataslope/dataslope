@@ -1,14 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  headers: async () => [
-    {
-      source: "/_dotnet/:path*",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
-  ],
-};
+// Static assets (_dotnet runtime bundle, tools.jar) are served from
+// jsDelivr CDN (see app/_components/runtime/cdn.ts) so Vercel never
+// handles those large files. No custom headers are needed here.
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

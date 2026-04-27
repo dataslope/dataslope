@@ -4,7 +4,8 @@
 // the same spirit as Pyodide for Python, WebR for R, browsercc for
 // C/C++, CheerpJ for Java and php-wasm for PHP.
 //
-// The runtime bundle lives in public/_dotnet/ and ships:
+// The runtime bundle lives in cdn-assets/_dotnet/ (served via
+// jsDelivr — see cdn.ts) and ships:
 //   - dotnet.js              (Microsoft's Mono boot script, ES module)
 //   - dotnet.runtime.js      (the JS half of the runtime)
 //   - dotnet.native.js       (the Emscripten-generated JS)
@@ -23,9 +24,11 @@
 //
 // dotnet.js is an ES module; we load it with a dynamic import() so
 // the module's internal relative imports (dotnet.runtime.js, etc.)
-// resolve correctly against the /_dotnet/ public path.
+// resolve correctly against the jsDelivr CDN path.
 
-const RUNTIME_BUNDLE_BASE = "/_dotnet/";
+import { CDN_BASE_URL } from "./cdn";
+
+const RUNTIME_BUNDLE_BASE = `${CDN_BASE_URL}/_dotnet/`;
 const BOOT_SCRIPT_URL = `${RUNTIME_BUNDLE_BASE}dotnet.js`;
 
 export interface CSharpScriptResult {
@@ -97,7 +100,8 @@ export function loadDotnet(
 
     // dotnet.js is an ES module that exports a `dotnet` DotnetHostBuilder.
     // Dynamic import() lets the module's internal relative imports
-    // (dotnet.runtime.js, dotnet.native.js) resolve against /_dotnet/.
+    // (dotnet.runtime.js, dotnet.native.js) resolve against the jsDelivr
+    // CDN path.
     const dotnetModule = (await import(
       /* webpackIgnore: true */ BOOT_SCRIPT_URL
     )) as DotnetModule;
@@ -111,7 +115,7 @@ export function loadDotnet(
     setLoadingMessage("Initialising .NET runtime…");
     const host = await dotnetBuilder
       .withResourceLoader((_type, name) => {
-        // Redirect every framework asset fetch to our /_dotnet/ bundle.
+        // Redirect every framework asset fetch to our jsDelivr CDN bundle.
         // The runtime auto-discovers dotnet.boot.js relative to dotnet.js,
         // so all asset names (including "dotnet.boot.js") map here correctly.
         return `${RUNTIME_BUNDLE_BASE}${name}`;

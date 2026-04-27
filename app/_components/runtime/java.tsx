@@ -10,13 +10,13 @@ import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
 // Run Java in the browser via CheerpJ
 // (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
 // WebAssembly. CheerpJ does not ship `tools.jar`, so we bundle a
-// Java 8 `tools.jar` at `public/tools.jar` (served at `/tools.jar`,
+// Java 8 `tools.jar` under cdn-assets/tools.jar (served via jsDelivr,
 // mounted by CheerpJ as `/app/tools.jar`); we then drive `javac`
 // (`com.sun.tools.javac.Main`) on user source at runtime and run the
 // compiled main class with `cheerpjRunMain` — the JavaFiddle
 // approach (https://github.com/leaningtech/javafiddle).
 //
-// This adapter targets Java 8 because that is what CheerpJ's bundled
+// This adapter targets Java 8 because that is what the bundled
 // `tools.jar` compiles against. Java 8 is the lingua franca of
 // online Java tutorials (lambdas, streams, Optional, java.time are
 // all there) — so the playground covers what most learners need
@@ -201,9 +201,9 @@ const PACKAGES: PackageInfo[] = [
   { cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8", desc: "BigInteger and BigDecimal arbitrary-precision arithmetic." },
 ];
 
-// CheerpJ's classpath: tools.jar is bundled in this app at
-// `public/tools.jar` (served at `/tools.jar`, mounted by CheerpJ as
-// `/app/tools.jar`) — it contains com.sun.tools.javac.Main — and we
+// CheerpJ's classpath: tools.jar is fetched from jsDelivr (see
+// cheerpj.ts) and pre-mounted in CheerpJ's virtual FS at
+// `/app/tools.jar` — it contains com.sun.tools.javac.Main — and we
 // compile user code into /files/. Both must be on the classpath when
 // running both javac and the user's main class.
 const CLASSPATH = "/app/tools.jar:/files/";
