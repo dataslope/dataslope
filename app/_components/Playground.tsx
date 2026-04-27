@@ -404,6 +404,8 @@ interface SettingsPanelProps {
   setEditorTheme: (t: string) => void;
   wordWrap: boolean;
   setWordWrap: (b: boolean) => void;
+  clearBeforeRun: boolean;
+  setClearBeforeRun: (b: boolean) => void;
   language: string; // e.g. "python" / "r" — used only for the preview snippet
   onClose: () => void;
 }
@@ -420,6 +422,8 @@ function SettingsPanel({
   setEditorTheme,
   wordWrap,
   setWordWrap,
+  clearBeforeRun,
+  setClearBeforeRun,
   language,
   onClose,
 }: SettingsPanelProps) {
@@ -560,6 +564,17 @@ function SettingsPanel({
               <span>Word Wrap</span>
             </label>
           </div>
+
+          <div className="setting-row">
+            <label className="setting-checkbox-row">
+              <input
+                type="checkbox"
+                checked={clearBeforeRun}
+                onChange={(e) => setClearBeforeRun(e.target.checked)}
+              />
+              <span>Clear Output Before Running</span>
+            </label>
+          </div>
         </div>
         </Dialog.Popup>
       </Dialog.Portal>
@@ -615,6 +630,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
+  const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
 
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
@@ -701,6 +717,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
+    const savedClearBeforeRun =
+      localStorage.getItem(storageKey("clearbeforerun")) === "true";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch
@@ -711,6 +729,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setOutputFontSizeState(savedOutputSize);
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
+    setClearBeforeRunState(savedClearBeforeRun);
     /* eslint-enable react-hooks/set-state-in-effect */
     applyMode(savedTheme);
     applyThemePalette(savedTheme);
@@ -937,6 +956,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.id],
   );
 
+  const setClearBeforeRun = useCallback(
+    (b: boolean) => {
+      setClearBeforeRunState(b);
+      localStorage.setItem(storageKey("clearbeforerun"), String(b));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [adapter.id],
+  );
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -946,6 +974,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     if (!code) return;
 
     setStatusState("running");
+
+    if (clearBeforeRun) {
+      setOutputs([]);
+      outputCounter.current = 0;
+    }
 
     const t0 = performance.now();
     const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
@@ -990,7 +1023,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, []);
+  }, [clearBeforeRun]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -1517,6 +1550,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           setEditorTheme={setEditorTheme}
           wordWrap={wordWrap}
           setWordWrap={setWordWrap}
+          clearBeforeRun={clearBeforeRun}
+          setClearBeforeRun={setClearBeforeRun}
           language={adapter.id}
           onClose={() => setSettingsOpen(false)}
         />
