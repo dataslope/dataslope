@@ -4,8 +4,8 @@
 // compiled to WebAssembly that runs entirely in the browser — the same
 // "everything in the browser" approach used by Pyodide (Python),
 // WebR (R), php-wasm (PHP), and browsercc (C/C++) elsewhere in this
-// repo. We bundle a Java 8 `tools.jar` under cdn-assets/tools.jar
-// (served via jsDelivr — see cdn.ts) and pre-load it into CheerpJ's
+// repo. We bundle a Java 8 `tools.jar` under `public/tools.jar`
+// (served by Next.js at `/tools.jar`) and pre-load it into CheerpJ's
 // virtual FS at `/app/tools.jar`, so we can drive `javac`
 // (`com.sun.tools.javac.Main`) on user source at runtime, then run
 // the resulting class with `cheerpjRunMain` — exactly what JavaFiddle
@@ -13,6 +13,10 @@
 // does not ship `tools.jar`; without our bundled copy `cheerpjRunMain`
 // would fail with "Could not find or load main class
 // com.sun.tools.javac.Main".
+//
+// tools.jar lives in `public/` (rather than `cdn-assets/` like the
+// .NET runtime bundle) because jsDelivr does not serve `.jar` files,
+// so we cannot host it on a GitHub-tag-backed CDN.
 //
 // CheerpJ is distributed as a non-module loader script that injects
 // globals (`cheerpjInit`, `cheerpjRunMain`, `cheerpjAddStringFile`,
@@ -23,11 +27,12 @@
 // `status: "none"` suppresses CheerpJ's own loading banner — the
 // playground UI already renders its own.
 
-import { CDN_BASE_URL } from "./cdn";
-
 const CHEERPJ_VERSION = "4.3";
 const CHEERPJ_LOADER_URL = `https://cjrtnc.leaningtech.com/${CHEERPJ_VERSION}/loader.js`;
-const TOOLS_JAR_CDN_URL = `${CDN_BASE_URL}/tools.jar`;
+// Served by Next.js from public/tools.jar — jsDelivr does not support
+// .jar files, so we cannot host this on the same GitHub-tag-backed
+// CDN as the .NET runtime bundle (see cdn.ts).
+const TOOLS_JAR_URL = "/tools.jar";
 
 // ─── Public types ──────────────────────────────────────────────────────
 
@@ -77,14 +82,16 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
           throw new Error("CheerpJ globals missing after init.");
         }
 
-        // Fetch tools.jar from jsDelivr and mount it in CheerpJ's virtual FS
-        // at /app/tools.jar so javac (com.sun.tools.javac.Main) can find it
-        // on the classpath. tools.jar lives in cdn-assets/ (outside Next.js's
-        // public/ folder) so Vercel never serves it; jsDelivr does instead.
-        const toolsJarResp = await fetch(TOOLS_JAR_CDN_URL);
+        // Fetch tools.jar from /tools.jar (Next.js public/) and mount it
+        // in CheerpJ's virtual FS at /app/tools.jar so javac
+        // (com.sun.tools.javac.Main) can find it on the classpath.
+        // tools.jar lives in public/ because jsDelivr does not serve
+        // .jar files, so we cannot host it on the same GitHub-tag-backed
+        // CDN as the .NET runtime bundle.
+        const toolsJarResp = await fetch(TOOLS_JAR_URL);
         if (!toolsJarResp.ok) {
           throw new Error(
-            `Failed to fetch tools.jar from CDN (HTTP ${toolsJarResp.status}): ${TOOLS_JAR_CDN_URL}`,
+            `Failed to fetch tools.jar (HTTP ${toolsJarResp.status}): ${TOOLS_JAR_URL}`,
           );
         }
         w.cheerpjAddStringFile(

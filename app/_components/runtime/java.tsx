@@ -10,7 +10,7 @@ import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
 // Run Java in the browser via CheerpJ
 // (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
 // WebAssembly. CheerpJ does not ship `tools.jar`, so we bundle a
-// Java 8 `tools.jar` under cdn-assets/tools.jar (served via jsDelivr,
+// Java 8 `tools.jar` in `public/tools.jar` (served by Next.js,
 // mounted by CheerpJ as `/app/tools.jar`); we then drive `javac`
 // (`com.sun.tools.javac.Main`) on user source at runtime and run the
 // compiled main class with `cheerpjRunMain` — the JavaFiddle
@@ -201,7 +201,7 @@ const PACKAGES: PackageInfo[] = [
   { cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8", desc: "BigInteger and BigDecimal arbitrary-precision arithmetic." },
 ];
 
-// CheerpJ's classpath: tools.jar is fetched from jsDelivr (see
+// CheerpJ's classpath: tools.jar is fetched from /tools.jar (see
 // cheerpj.ts) and pre-mounted in CheerpJ's virtual FS at
 // `/app/tools.jar` — it contains com.sun.tools.javac.Main — and we
 // compile user code into /files/. Both must be on the classpath when
