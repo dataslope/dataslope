@@ -21,6 +21,8 @@ import "codemirror/theme/tomorrow-night-eighties.css";
 import "codemirror/theme/solarized.css";
 import "codemirror/theme/eclipse.css";
 import "codemirror/theme/mdn-like.css";
+// CodeMirror's show-hint addon ships its own popup stylesheet.
+import "codemirror/addon/hint/show-hint.css";
 import type {
   CodeMirrorAPI,
   CodeMirrorEditor,
@@ -752,6 +754,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           import("codemirror/addon/edit/closebrackets"),
           import("codemirror/addon/edit/matchbrackets"),
           import("codemirror/addon/comment/comment"),
+          import("codemirror/addon/hint/show-hint"),
           import("codemirror/keymap/sublime"),
         ]);
         if (cancelled) return;
@@ -768,6 +771,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             localStorage.getItem(storageKey("editortheme")) ?? "dracula";
           const initialWordWrap =
             localStorage.getItem(storageKey("wordwrap")) !== "false";
+          const triggerAutocomplete = () => {
+            // The runtime might not be ready yet (e.g. immediately after
+            // page load); the registered hint helper just resolves to
+            // null in that case so it's safe to always trigger.
+            editorRef.current?.showHint({ completeSingle: false });
+          };
           const editor = CM.fromTextArea(textareaRef.current, {
             mode: adapter.codeMirrorMode,
             theme: initialTheme,
@@ -782,11 +791,50 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             extraKeys: {
               "Cmd-Enter": () => runRef.current(),
               "Ctrl-Enter": () => runRef.current(),
+              "Ctrl-Space": triggerAutocomplete,
             },
           });
           editor.setValue(adapter.examples[0]?.code ?? "");
           editor.setSize("100%", "100%");
           editorRef.current = editor;
+
+          // Register a hint helper for the adapter's mode that defers to
+          // the runtime's `complete()` (when implemented). Helpers can
+          // return a promise — show-hint awaits it before showing the
+          // popup, which is exactly what we need for the worker round-trip.
+          CM.registerHelper(
+            "hint",
+            adapter.codeMirrorMode,
+            async (cm: CodeMirrorEditor) => {
+              const rt = runtimeRef.current;
+              if (!rt || typeof rt.complete !== "function") return null;
+              const cur = cm.getCursor();
+              const lineText = cm.getLine(cur.line);
+              try {
+                const res = await rt.complete(lineText, cur.ch);
+                if (!res || res.list.length === 0) return null;
+                return {
+                  list: res.list,
+                  from: CM.Pos(cur.line, cur.ch - res.replaceLength),
+                  to: CM.Pos(cur.line, cur.ch),
+                };
+              } catch {
+                return null;
+              }
+            },
+          );
+
+          // Auto-trigger the popup after the user types `.` so that
+          // `pd.<Tab>` style attribute completion feels natural without
+          // requiring an explicit Ctrl-Space.
+          editor.on("inputRead", ((_cm: unknown, change: unknown) => {
+            const c = change as { text?: string[]; origin?: string };
+            if (c.origin !== "+input") return;
+            const text = c.text?.[0];
+            if (text === ".") {
+              triggerAutocomplete();
+            }
+          }) as (...args: unknown[]) => void);
         }
 
         const rt = await adapter.init((m) => {

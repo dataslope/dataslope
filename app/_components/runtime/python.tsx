@@ -1,4 +1,5 @@
 import type {
+  CompletionResult,
   EmitOutput,
   ExampleSnippet,
   LanguageAdapter,
@@ -330,7 +331,13 @@ type WorkerOutMessage =
   | { kind: "init-error"; message: string }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | {
+      kind: "complete-result";
+      id: number;
+      completions: string[];
+      replaceLength: number;
+    };
 
 class PyodideWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
@@ -357,6 +364,21 @@ class PyodideWorkerRuntime implements LanguageRuntime {
       };
       this.worker.addEventListener("message", onMessage);
       this.worker.postMessage({ kind: "run", id, code });
+    });
+  }
+
+  async complete(line: string, column: number): Promise<CompletionResult> {
+    const id = ++this.nextId;
+    return new Promise<CompletionResult>((resolve) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "complete-result") return;
+        if (msg.id !== id) return;
+        this.worker.removeEventListener("message", onMessage);
+        resolve({ list: msg.completions, replaceLength: msg.replaceLength });
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "complete", id, line, column });
     });
   }
 }

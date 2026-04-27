@@ -16,6 +16,10 @@ export interface CodeMirrorEditor {
   refresh(): void;
   focus(): void;
   setCursor(pos: CodeMirrorPosition): void;
+  getCursor(): CodeMirrorPosition;
+  getLine(line: number): string;
+  showHint(options?: Record<string, unknown>): void;
+  on(event: string, handler: (...args: unknown[]) => void): void;
 }
 
 export interface CodeMirrorOptions {
@@ -29,7 +33,18 @@ export interface CodeMirrorOptions {
   autoCloseBrackets?: boolean;
   matchBrackets?: boolean;
   lineWrapping?: boolean;
-  extraKeys?: Record<string, () => void>;
+  extraKeys?: Record<string, string | (() => void)>;
+}
+
+export interface CodeMirrorHint {
+  text: string;
+  displayText?: string;
+}
+
+export interface CodeMirrorHintResult {
+  list: CodeMirrorHint[] | string[];
+  from: CodeMirrorPosition;
+  to: CodeMirrorPosition;
 }
 
 export interface CodeMirrorAPI {
@@ -37,4 +52,13 @@ export interface CodeMirrorAPI {
     el: HTMLTextAreaElement,
     options: CodeMirrorOptions,
   ): CodeMirrorEditor;
+  Pos(line: number, ch: number): CodeMirrorPosition;
+  registerHelper(
+    type: string,
+    mode: string,
+    helper: (
+      cm: CodeMirrorEditor,
+    ) => CodeMirrorHintResult | Promise<CodeMirrorHintResult | null | undefined> | null | undefined,
+  ): void;
+  commands: Record<string, (cm: CodeMirrorEditor) => void>;
 }
