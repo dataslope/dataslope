@@ -995,6 +995,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           elapsed,
         })),
       ]);
+      if (collected.length === 0) {
+        showToast("Code ran successfully — no output.");
+      }
       setStatusState("ready");
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
@@ -1023,7 +1026,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [clearBeforeRun]);
+  }, [clearBeforeRun, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -1688,7 +1691,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </button>
             </div>
             <div className="output-body" ref={outputBodyRef}>
-              {outputs.length === 0 ? (
+              {outputs.length === 0 && statusState !== "running" ? (
                 <div className="welcome">
                   <div className="welcome-icon">⌬</div>
                   <h3>Run your code to see output</h3>
