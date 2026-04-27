@@ -24,12 +24,15 @@
 //
 // dotnet.js is an ES module; we load it with a dynamic import() so
 // the module's internal relative imports (dotnet.runtime.js, etc.)
-// resolve correctly against the jsDelivr CDN path.
+// resolve correctly against the jsDelivr CDN path. We also pass an
+// explicit dotnet.boot.js URL and resource loader so assemblies are
+// fetched from jsDelivr rather than falling back to the app origin.
 
 import { CDN_BASE_URL } from "./cdn";
 
 const RUNTIME_BUNDLE_BASE = `${CDN_BASE_URL}/_dotnet/`;
 const BOOT_SCRIPT_URL = `${RUNTIME_BUNDLE_BASE}dotnet.js`;
+const BOOT_CONFIG_URL = `${RUNTIME_BUNDLE_BASE}dotnet.boot.js`;
 
 export interface CSharpScriptResult {
   stdout: string;
@@ -48,6 +51,7 @@ export interface DotnetApi {
 /** dotnet.js exports a `dotnet` DotnetHostBuilder as an ES-module named export. */
 interface DotnetHostBuilder {
   withConfig(config: Record<string, unknown>): DotnetHostBuilder;
+  withConfigSrc(configSrc: string): DotnetHostBuilder;
   withResourceLoader(
     loader: (
       type: string,
@@ -114,11 +118,10 @@ export function loadDotnet(
 
     setLoadingMessage("Initialising .NET runtime…");
     const host = await dotnetBuilder
+      .withConfigSrc(BOOT_CONFIG_URL)
       .withResourceLoader((_type, name) => {
         // Redirect every framework asset fetch to our jsDelivr CDN bundle.
-        // The runtime auto-discovers dotnet.boot.js relative to dotnet.js,
-        // so all asset names (including "dotnet.boot.js") map here correctly.
-        return `${RUNTIME_BUNDLE_BASE}${name}`;
+        return new URL(name.replace(/^\.?\//, ""), RUNTIME_BUNDLE_BASE).href;
       })
       .create();
     host.setModuleImports("main.js", {
