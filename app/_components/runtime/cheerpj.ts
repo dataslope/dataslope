@@ -84,7 +84,7 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         const toolsJarResp = await fetch(TOOLS_JAR_CDN_URL);
         if (!toolsJarResp.ok) {
           throw new Error(
-            `Failed to fetch tools.jar from CDN (HTTP ${toolsJarResp.status}).`,
+            `Failed to fetch tools.jar from CDN (HTTP ${toolsJarResp.status}): ${TOOLS_JAR_CDN_URL}`,
           );
         }
         w.cheerpjAddStringFile(
