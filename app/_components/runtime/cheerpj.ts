@@ -9,10 +9,11 @@
 // virtual FS at `/app/tools.jar`, so we can drive `javac`
 // (`com.sun.tools.javac.Main`) on user source at runtime, then run
 // the resulting class with `cheerpjRunMain` — exactly what JavaFiddle
-// does (https://github.com/leaningtech/javafiddle). CheerpJ itself
-// does not ship `tools.jar`; without our bundled copy `cheerpjRunMain`
-// would fail with "Could not find or load main class
-// com.sun.tools.javac.Main".
+// does (https://github.com/leaningtech/javafiddle). CheerpJ maps `/app`
+// to the hosting app, so `/app/tools.jar` is fetched from this Next.js
+// app's `/tools.jar`. CheerpJ itself does not ship `tools.jar`; without
+// our bundled copy `cheerpjRunMain` would fail with "Could not find or
+// load main class com.sun.tools.javac.Main".
 //
 // tools.jar lives in `public/` (rather than `cdn-assets/` like the
 // .NET runtime bundle) because jsDelivr does not serve `.jar` files,
@@ -29,11 +30,6 @@
 
 const CHEERPJ_VERSION = "4.3";
 const CHEERPJ_LOADER_URL = `https://cjrtnc.leaningtech.com/${CHEERPJ_VERSION}/loader.js`;
-// Served by Next.js from public/tools.jar — jsDelivr does not support
-// .jar files, so we cannot host this on the same GitHub-tag-backed
-// CDN as the .NET runtime bundle (see cdn.ts).
-const TOOLS_JAR_URL = "/tools.jar";
-
 // ─── Public types ──────────────────────────────────────────────────────
 
 /** Narrow slice of the CheerpJ globals we actually consume. */
@@ -81,23 +77,6 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         ) {
           throw new Error("CheerpJ globals missing after init.");
         }
-
-        // Fetch tools.jar from /tools.jar (Next.js public/) and mount it
-        // in CheerpJ's virtual FS at /app/tools.jar so javac
-        // (com.sun.tools.javac.Main) can find it on the classpath.
-        // tools.jar lives in public/ because jsDelivr does not serve
-        // .jar files, so we cannot host it on the same GitHub-tag-backed
-        // CDN as the .NET runtime bundle.
-        const toolsJarResp = await fetch(TOOLS_JAR_URL);
-        if (!toolsJarResp.ok) {
-          throw new Error(
-            `Failed to fetch tools.jar (HTTP ${toolsJarResp.status}): ${TOOLS_JAR_URL}`,
-          );
-        }
-        w.cheerpjAddStringFile(
-          "/app/tools.jar",
-          new Uint8Array(await toolsJarResp.arrayBuffer()),
-        );
 
         resolve({
           cheerpjRunMain: w.cheerpjRunMain.bind(w),
