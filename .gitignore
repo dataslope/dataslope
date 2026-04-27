@@ -42,5 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+script-runner-src/bin/
 script-runner-src/obj/
 script-runner-src/__pycache__/
