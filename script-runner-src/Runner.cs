@@ -17,8 +17,8 @@ public partial class Runner
 {
     private static MetadataReference[]? cachedReferences;
 
-    [JSImport("getOrigin", "main.js")]
-    internal static partial string GetOrigin();
+    [JSImport("getDotnetBundleBaseUrl", "main.js")]
+    internal static partial string GetDotnetBundleBaseUrl();
 
     [JSExport]
     [return: JSMarshalAs<JSType.Promise<JSType.String>>]
@@ -121,7 +121,7 @@ public partial class Runner
         if (cachedReferences != null)
             return cachedReferences;
 
-        using var http = new HttpClient { BaseAddress = new Uri(GetOrigin()) };
+        using var http = new HttpClient { BaseAddress = new Uri(GetDotnetBundleBaseUrl()) };
         var references = new List<MetadataReference>();
         var assemblyNames = AppDomain.CurrentDomain.GetAssemblies()
             .Where(assembly => !assembly.IsDynamic)
@@ -134,13 +134,13 @@ public partial class Runner
         {
             try
             {
-                var bytes = await http.GetByteArrayAsync($"/_dotnet/{name}.dll");
+                var bytes = await http.GetByteArrayAsync($"{name}.dll");
                 references.Add(MetadataReference.CreateFromImage(bytes));
             }
             catch
             {
                 // Some runtime-generated assemblies have no matching file in
-                // the shipped bundle; Roslyn only needs the ones we can load.
+                // the CDN bundle; Roslyn only needs the ones we can load.
             }
         }
 
