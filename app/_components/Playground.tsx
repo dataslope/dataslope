@@ -150,6 +150,8 @@ const PLAYGROUND_ICON_COLORS: Record<string, string> = {
   csharp: "#9b4f96",
 };
 
+const MOBILE_EDITOR_TAB = "editor" as const;
+
 /** Minimal Plotly surface we use for rendering chart cells. */
 interface PlotlyAPI {
   newPlot(
@@ -1076,7 +1078,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [toastManager],
   );
-  const [mobileTab, setMobileTab] = useState<"editor" | "output">("editor");
+  const [mobileTab, setMobileTab] = useState<"editor" | "output">(
+    MOBILE_EDITOR_TAB,
+  );
   // Use useSyncExternalStore so the macOS detection runs only on the
   // client without triggering a cascading effect on mount. The server
   // snapshot returns false (Ctrl Enter) so the kbd hint matches what a
@@ -1552,7 +1556,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const applyExample = useCallback(
     (ex: ExampleSnippet) => {
       editorRef.current?.setValue(ex.code);
-      setMobileTab("editor");
+      setMobileTab(MOBILE_EDITOR_TAB);
       editorRef.current?.focus();
       showToast(`Loaded ${ex.title} in the editor.`);
     },
@@ -1598,7 +1602,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (!editor) return;
       const current = editor.getValue();
       if (adapter.hasImport(current, pkg.name)) {
-        setMobileTab("editor");
+        setMobileTab(MOBILE_EDITOR_TAB);
         showToast(`${pkg.name} is already imported.`, "warn");
         return;
       }
@@ -1608,7 +1612,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // Position the cursor right after the inserted line so the user lands
       // back where work in progress can continue.
       editor.setCursor({ line: 1, ch: 0 });
-      setMobileTab("editor");
+      setMobileTab(MOBILE_EDITOR_TAB);
       showToast(`Imported ${pkg.name}.`);
     },
     [adapter, showToast],

@@ -1343,13 +1343,12 @@ input[type="range"].fs-slider:disabled {
   .resizer { display: none; }
 
   /* Hide the CodeMirror line-number gutter on mobile. The narrow
-     gutter would otherwise show as an empty vertical bar on the left
-     edge of the editor (line numbers don't fit visibly at this width)
+      gutter would otherwise show as an empty vertical bar on the left
+      edge of the editor (line numbers don't fit visibly at this width)
      and shift the code into a horizontally-scrolling overflow that
      clips the start of each line. We zero out the sizer's left margin
-     so the editor content takes the full width. */
+      so the editor content takes the full width. */
   .CodeMirror-gutters { display: none !important; }
-  .CodeMirror-linenumbers { display: none !important; }
   .CodeMirror-sizer { margin-left: 0 !important; }
 }
 
@@ -1412,6 +1411,8 @@ input[type="range"].fs-slider:disabled {
 .mobile-drawer-viewport {
   position: fixed;
   inset: 0;
+  /* All mobile Drawer popups inherit layering from the viewport so
+     nested sheets can share one bottom-anchored stacking model. */
   z-index: 321;
   pointer-events: none;
 }
