@@ -287,35 +287,336 @@ print(f"  Intercept  : {model.intercept_:+,.0f}")
 
 const PACKAGES: PackageInfo[] = [
   // Scientific
-  { cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "2.2", desc: "N-dimensional arrays, linear algebra, FFT, random sampling" },
-  { cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.14", desc: "Optimization, integration, interpolation, signal processing" },
-  { cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.13", desc: "Symbolic mathematics — algebra, calculus, equation solving" },
+  {
+    cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "2.2",
+    desc: "N-dimensional arrays, linear algebra, FFT, random sampling",
+    example: `import numpy as np
+
+a = np.arange(1, 10).reshape(3, 3)
+print("matrix:")
+print(a)
+print("sum:", a.sum())
+print("eigenvalues:", np.linalg.eigvals(a).round(3))
+`,
+  },
+  {
+    cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.14",
+    desc: "Optimization, integration, interpolation, signal processing",
+    example: `from scipy import integrate, optimize
+import numpy as np
+
+area, _ = integrate.quad(lambda x: np.sin(x) ** 2, 0, np.pi)
+print(f"∫ sin²(x) dx from 0..π = {area:.6f}")
+
+minimum = optimize.minimize_scalar(lambda x: (x - 3) ** 2 + 1)
+print(f"min at x={minimum.x:.4f}, f={minimum.fun:.4f}")
+`,
+  },
+  {
+    cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.13",
+    desc: "Symbolic mathematics — algebra, calculus, equation solving",
+    example: `from sympy import symbols, expand, diff, integrate
+
+x = symbols("x")
+expr = (x + 1) ** 3
+print("expand:", expand(expr))
+print("d/dx:  ", diff(expr, x))
+print("∫ dx:  ", integrate(expr, x))
+`,
+  },
   // Data
-  { cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "2.3", desc: "DataFrames, Series, data manipulation and analysis" },
-  { cat: "Data & Analysis", icon: "📊", color: "#34d399", name: "statsmodels", ver: "0.14", desc: "Statistical models, hypothesis tests, time series analysis" },
-  { cat: "Data & Analysis", icon: "🗃️", color: "#34d399", name: "pyarrow", ver: "22.0", desc: "Apache Arrow columnar data, Parquet file I/O" },
+  {
+    cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "2.3",
+    desc: "DataFrames, Series, data manipulation and analysis",
+    example: `import pandas as pd
+
+df = pd.DataFrame({
+    "name": ["Ada", "Linus", "Grace", "Hopper"],
+    "age":  [36, 54, 40, 85],
+    "team": ["A", "B", "A", "B"],
+})
+print(df)
+print()
+print(df.groupby("team")["age"].mean())
+`,
+  },
+  {
+    cat: "Data & Analysis", icon: "📊", color: "#34d399", name: "statsmodels", ver: "0.14",
+    desc: "Statistical models, hypothesis tests, time series analysis",
+    example: `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 2.0 * x + 1.0 + rng.normal(scale=0.5, size=x.size)
+
+X = sm.add_constant(x)
+model = sm.OLS(y, X).fit()
+print(model.summary().tables[1])
+`,
+  },
+  {
+    cat: "Data & Analysis", icon: "🗃️", color: "#34d399", name: "pyarrow", ver: "22.0",
+    desc: "Apache Arrow columnar data, Parquet file I/O",
+    example: `import pyarrow as pa
+
+table = pa.table({
+    "name": ["Ada", "Linus", "Grace"],
+    "age":  [36, 54, 40],
+})
+print(table)
+print("schema:", table.schema)
+`,
+  },
   // Visualization
-  { cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.8", desc: "2D plotting — line, bar, scatter, histogram, heatmap, etc." },
-  { cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.24", desc: "Interactive charts — line, bar, scatter, 3D, maps" },
-  { cat: "Visualization", icon: "🌊", color: "#f59e0b", name: "seaborn", ver: "0.13", desc: "Statistical visualization built on Matplotlib" },
-  { cat: "Visualization", icon: "✦", color: "#f59e0b", name: "altair", ver: "6.0", desc: "Declarative statistical visualization (Vega-Altair)" },
-  { cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "11.3", desc: "Image processing — open, transform, save images" },
+  {
+    cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.8",
+    desc: "2D plotting — line, bar, scatter, histogram, heatmap, etc.",
+    example: `import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2 * np.pi, 200)
+plt.plot(x, np.sin(x), label="sin")
+plt.plot(x, np.cos(x), label="cos")
+plt.legend()
+plt.title("sin / cos")
+plt.show()
+`,
+  },
+  {
+    cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.24",
+    desc: "Interactive charts — line, bar, scatter, 3D, maps",
+    example: `import plotly.express as px
+
+fig = px.bar(
+    x=["A", "B", "C", "D"],
+    y=[10, 7, 14, 4],
+    title="Counts",
+)
+fig.show()
+`,
+  },
+  {
+    cat: "Visualization", icon: "🌊", color: "#f59e0b", name: "seaborn", ver: "0.13",
+    desc: "Statistical visualization built on Matplotlib",
+    example: `import seaborn as sns
+import matplotlib.pyplot as plt
+
+tips = sns.load_dataset("tips")
+sns.boxplot(data=tips, x="day", y="total_bill")
+plt.title("Bill by day")
+plt.show()
+`,
+  },
+  {
+    cat: "Visualization", icon: "✦", color: "#f59e0b", name: "altair", ver: "6.0",
+    desc: "Declarative statistical visualization (Vega-Altair)",
+    example: `import altair as alt
+import pandas as pd
+
+df = pd.DataFrame({"x": list("ABCDE"), "y": [3, 1, 4, 1, 5]})
+chart = alt.Chart(df).mark_bar().encode(x="x", y="y")
+chart.show()
+`,
+  },
+  {
+    cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "11.3",
+    desc: "Image processing — open, transform, save images",
+    example: `from PIL import Image, ImageDraw
+
+img = Image.new("RGB", (200, 80), "white")
+draw = ImageDraw.Draw(img)
+draw.rectangle([10, 10, 190, 70], outline="black", width=2)
+draw.text((30, 30), "Hello, Pillow!", fill="black")
+print("size:", img.size, "mode:", img.mode)
+`,
+  },
   // ML / AI
-  { cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.7", desc: "Classification, regression, clustering, model selection" },
-  { cat: "Machine Learning", icon: "🌲", color: "#a78bfa", name: "xgboost", ver: "2.1", desc: "Gradient boosting — fast and accurate tree models" },
+  {
+    cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.7",
+    desc: "Classification, regression, clustering, model selection",
+    example: `from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, random_state=0)
+clf = LogisticRegression(max_iter=200).fit(Xtr, ytr)
+print(f"accuracy: {clf.score(Xte, yte):.3f}")
+`,
+  },
+  {
+    cat: "Machine Learning", icon: "🌲", color: "#a78bfa", name: "xgboost", ver: "2.1",
+    desc: "Gradient boosting — fast and accurate tree models",
+    example: `import xgboost as xgb
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, random_state=0)
+model = xgb.XGBClassifier(n_estimators=20, max_depth=3).fit(Xtr, ytr)
+print(f"accuracy: {model.score(Xte, yte):.3f}")
+`,
+  },
   // Text & Data Formats
-  { cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2024.11", desc: "Advanced regular expressions beyond the standard `re`" },
-  { cat: "Text & Formats", icon: "🧬", color: "#f472b6", name: "lxml", ver: "6.0", desc: "Fast XML/HTML parsing and XPath querying" },
-  { cat: "Text & Formats", icon: "📋", color: "#f472b6", name: "openpyxl", ver: "3.1", desc: "Read and write Excel .xlsx files" },
-  { cat: "Text & Formats", icon: "📄", color: "#f472b6", name: "pyyaml", ver: "6.0", desc: "YAML file parsing and serialization" },
-  { cat: "Text & Formats", icon: "🗜️", color: "#f472b6", name: "msgpack", ver: "1.1", desc: "Fast binary serialization format" },
+  {
+    cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2024.11",
+    desc: "Advanced regular expressions beyond the standard \`re\`",
+    example: `import regex
+
+text = "Order 123 placed on 2024-05-12, total $42.95."
+for m in regex.finditer(r"\\d+(?:\\.\\d+)?", text):
+    print(m.group(), "@", m.start())
+`,
+  },
+  {
+    cat: "Text & Formats", icon: "🧬", color: "#f472b6", name: "lxml", ver: "6.0",
+    desc: "Fast XML/HTML parsing and XPath querying",
+    example: `from lxml import etree
+
+xml = """<users>
+  <user id="1"><name>Ada</name></user>
+  <user id="2"><name>Linus</name></user>
+</users>"""
+root = etree.fromstring(xml)
+for name in root.xpath("//user/name/text()"):
+    print(name)
+`,
+  },
+  {
+    cat: "Text & Formats", icon: "📋", color: "#f472b6", name: "openpyxl", ver: "3.1",
+    desc: "Read and write Excel .xlsx files",
+    example: `from openpyxl import Workbook
+from io import BytesIO
+
+wb = Workbook()
+ws = wb.active
+ws.title = "demo"
+ws.append(["name", "score"])
+ws.append(["Ada", 95])
+ws.append(["Linus", 88])
+
+buf = BytesIO()
+wb.save(buf)
+print(f"workbook size: {len(buf.getvalue())} bytes")
+`,
+  },
+  {
+    cat: "Text & Formats", icon: "📄", color: "#f472b6", name: "pyyaml", ver: "6.0",
+    desc: "YAML file parsing and serialization",
+    example: `import yaml
+
+text = """
+name: Ada
+skills:
+  - math
+  - code
+"""
+data = yaml.safe_load(text)
+print(data)
+print("re-emitted:")
+print(yaml.safe_dump(data, sort_keys=False))
+`,
+  },
+  {
+    cat: "Text & Formats", icon: "🗜️", color: "#f472b6", name: "msgpack", ver: "1.1",
+    desc: "Fast binary serialization format",
+    example: `import msgpack
+
+data = {"name": "Ada", "skills": ["math", "code"], "age": 36}
+packed = msgpack.packb(data)
+print(f"packed: {len(packed)} bytes")
+print("unpacked:", msgpack.unpackb(packed))
+`,
+  },
   // Networking & Utilities
-  { cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.32", desc: "HTTP requests (via micropip — pure Python)" },
-  { cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "46.0", desc: "Cryptographic recipes and primitives" },
-  { cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "25.2", desc: "Classes without boilerplate — define clean data classes" },
-  { cat: "Utilities", icon: "🏎️", color: "#60a5fa", name: "numba", ver: "0.59", desc: "JIT compiler for numerical Python (LLVM-based)" },
-  { cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "24.2", desc: "Version parsing and specifiers (PEP 440/508)" },
-  { cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.3", desc: "Testing framework — run via micropip install" },
+  {
+    cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.32",
+    desc: "HTTP requests (via micropip — pure Python)",
+    example: `# Note: real network calls are blocked in the browser sandbox; this
+# example shows the request-construction API instead of executing it.
+import requests
+
+req = requests.Request("GET", "https://api.example.com/users",
+                       params={"q": "ada"}).prepare()
+print("URL:    ", req.url)
+print("method: ", req.method)
+`,
+  },
+  {
+    cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "46.0",
+    desc: "Cryptographic recipes and primitives",
+    example: `from cryptography.fernet import Fernet
+
+key = Fernet.generate_key()
+f = Fernet(key)
+token = f.encrypt(b"secret message")
+print("token:    ", token)
+print("decrypted:", f.decrypt(token))
+`,
+  },
+  {
+    cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "25.2",
+    desc: "Classes without boilerplate — define clean data classes",
+    example: `import attrs
+
+@attrs.define
+class Point:
+    x: float
+    y: float
+
+p = Point(3.0, 4.0)
+print(p)
+print("fields:", [f.name for f in attrs.fields(Point)])
+`,
+  },
+  {
+    cat: "Utilities", icon: "🏎️", color: "#60a5fa", name: "numba", ver: "0.59",
+    desc: "JIT compiler for numerical Python (LLVM-based)",
+    example: `from numba import njit
+import numpy as np
+
+@njit
+def sum_squares(n):
+    total = 0.0
+    for i in range(n):
+        total += i * i
+    return total
+
+print("sum of squares 0..999:", sum_squares(1000))
+`,
+  },
+  {
+    cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "24.2",
+    desc: "Version parsing and specifiers (PEP 440/508)",
+    example: `from packaging.version import Version
+from packaging.specifiers import SpecifierSet
+
+v = Version("2.3.1")
+print(f"version: {v}, major={v.major}, minor={v.minor}")
+spec = SpecifierSet(">=2.0,<3.0")
+print(f"{v} satisfies {spec}? {v in spec}")
+`,
+  },
+  {
+    cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.3",
+    desc: "Testing framework — run via micropip install",
+    example: `# A minimal pytest-style sanity check. In a real project these would
+# live in a test_*.py file and be discovered by 'pytest'.
+import pytest
+
+def add(a, b):
+    return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+    with pytest.raises(TypeError):
+        add("a", 1)  # type: ignore[arg-type]
+
+test_add()
+print("test_add passed")
+`,
+  },
 ];
 
 // ─── Worker protocol — must stay in sync with `pyodide-worker.ts`. ─────

@@ -189,16 +189,171 @@ const PACKAGES: PackageInfo[] = [
   // Highlights from the Java 8 standard library — always available, no
   // install step. Clicking inserts the corresponding `import` at the
   // top of the editor.
-  { cat: "Collections", icon: "📦", color: "#34d399", name: "java.util", ver: "Java 8", desc: "List, Map, Set, ArrayList, HashMap, TreeMap, Optional, ..." },
-  { cat: "Collections", icon: "🌊", color: "#34d399", name: "java.util.stream", ver: "Java 8", desc: "Stream, Collectors, IntStream — functional pipelines." },
-  { cat: "Collections", icon: "🔁", color: "#34d399", name: "java.util.function", ver: "Java 8", desc: "Function, Predicate, Supplier, Consumer functional interfaces." },
-  { cat: "Concurrency", icon: "🧵", color: "#a78bfa", name: "java.util.concurrent", ver: "Java 8", desc: "ExecutorService, ConcurrentHashMap, CompletableFuture." },
-  { cat: "I/O", icon: "🖨️", color: "#facc15", name: "java.io", ver: "Java 8", desc: "PrintStream, BufferedReader, InputStream, OutputStream." },
-  { cat: "I/O", icon: "📁", color: "#facc15", name: "java.nio.file", ver: "Java 8", desc: "Path, Paths, Files modern file APIs." },
-  { cat: "Time", icon: "📅", color: "#60a5fa", name: "java.time", ver: "Java 8", desc: "LocalDate, LocalDateTime, Duration, Instant." },
-  { cat: "Strings", icon: "🔤", color: "#fb923c", name: "java.text", ver: "Java 8", desc: "DecimalFormat, NumberFormat, MessageFormat formatters." },
-  { cat: "Strings", icon: "🔍", color: "#fb923c", name: "java.util.regex", ver: "Java 8", desc: "Pattern and Matcher for regular expressions." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8", desc: "BigInteger and BigDecimal arbitrary-precision arithmetic." },
+  {
+    cat: "Collections", icon: "📦", color: "#34d399", name: "java.util", ver: "Java 8",
+    desc: "List, Map, Set, ArrayList, HashMap, TreeMap, Optional, ...",
+    example: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> ages = new HashMap<>();
+        ages.put("Ada", 36);
+        ages.put("Linus", 54);
+        ages.put("Grace", 40);
+        for (Map.Entry<String, Integer> e : ages.entrySet()) {
+            System.out.println(e.getKey() + " -> " + e.getValue());
+        }
+    }
+}
+`,
+  },
+  {
+    cat: "Collections", icon: "🌊", color: "#34d399", name: "java.util.stream", ver: "Java 8",
+    desc: "Stream, Collectors, IntStream — functional pipelines.",
+    example: `import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> nums = Arrays.asList(5, 2, 8, 1, 9, 3, 7, 4, 6);
+        int sumOfEvens = nums.stream()
+            .filter(n -> n % 2 == 0)
+            .mapToInt(Integer::intValue)
+            .sum();
+        System.out.println("sum of evens = " + sumOfEvens);
+    }
+}
+`,
+  },
+  {
+    cat: "Collections", icon: "🔁", color: "#34d399", name: "java.util.function", ver: "Java 8",
+    desc: "Function, Predicate, Supplier, Consumer functional interfaces.",
+    example: `import java.util.function.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Function<Integer, Integer> square = x -> x * x;
+        Predicate<Integer> isEven = n -> n % 2 == 0;
+        for (int i = 1; i <= 5; i++) {
+            System.out.println(i + "^2 = " + square.apply(i)
+                + " (even? " + isEven.test(i) + ")");
+        }
+    }
+}
+`,
+  },
+  {
+    cat: "Concurrency", icon: "🧵", color: "#a78bfa", name: "java.util.concurrent", ver: "Java 8",
+    desc: "ExecutorService, ConcurrentHashMap, CompletableFuture.",
+    example: `import java.util.concurrent.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+        for (String w : new String[]{"red", "blue", "red", "green", "red"}) {
+            map.merge(w, 1, Integer::sum);
+        }
+        map.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+}
+`,
+  },
+  {
+    cat: "I/O", icon: "🖨️", color: "#facc15", name: "java.io", ver: "Java 8",
+    desc: "PrintStream, BufferedReader, InputStream, OutputStream.",
+    example: `import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        pw.println("line 1");
+        pw.println("line 2");
+        pw.flush();
+        System.out.print(sw.toString());
+    }
+}
+`,
+  },
+  {
+    cat: "I/O", icon: "📁", color: "#facc15", name: "java.nio.file", ver: "Java 8",
+    desc: "Path, Paths, Files modern file APIs.",
+    example: `import java.nio.file.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Path p = Paths.get("/tmp/example/data.txt");
+        System.out.println("path     = " + p);
+        System.out.println("filename = " + p.getFileName());
+        System.out.println("parent   = " + p.getParent());
+    }
+}
+`,
+  },
+  {
+    cat: "Time", icon: "📅", color: "#60a5fa", name: "java.time", ver: "Java 8",
+    desc: "LocalDate, LocalDateTime, Duration, Instant.",
+    example: `import java.time.*;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println("now: " + now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        Duration d = Duration.ofHours(36).plusMinutes(15);
+        System.out.println("36h15m = " + d.toMinutes() + " minutes");
+    }
+}
+`,
+  },
+  {
+    cat: "Strings", icon: "🔤", color: "#fb923c", name: "java.text", ver: "Java 8",
+    desc: "DecimalFormat, NumberFormat, MessageFormat formatters.",
+    example: `import java.text.*;
+
+public class Main {
+    public static void main(String[] args) {
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+        System.out.println(df.format(1234567.891));
+        System.out.println(MessageFormat.format(
+            "{0} ordered {1} item(s).", "Ada", 3));
+    }
+}
+`,
+  },
+  {
+    cat: "Strings", icon: "🔍", color: "#fb923c", name: "java.util.regex", ver: "Java 8",
+    desc: "Pattern and Matcher for regular expressions.",
+    example: `import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Pattern p = Pattern.compile("\\\\d+");
+        Matcher m = p.matcher("Order 123 placed on 2024-05-12.");
+        while (m.find()) {
+            System.out.println("matched: " + m.group() + " @ " + m.start());
+        }
+    }
+}
+`,
+  },
+  {
+    cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8",
+    desc: "BigInteger and BigDecimal arbitrary-precision arithmetic.",
+    example: `import java.math.*;
+
+public class Main {
+    public static void main(String[] args) {
+        BigInteger fact = BigInteger.ONE;
+        for (int i = 1; i <= 30; i++) fact = fact.multiply(BigInteger.valueOf(i));
+        System.out.println("30! = " + fact);
+
+        BigDecimal a = new BigDecimal("0.1").add(new BigDecimal("0.2"));
+        System.out.println("0.1 + 0.2 = " + a);
+    }
+}
+`,
+  },
 ];
 
 // CheerpJ's classpath: tools.jar is fetched from /tools.jar (see

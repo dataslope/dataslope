@@ -72,6 +72,8 @@ import {
   Trash2,
   Sliders,
   Palette,
+  Play,
+  FileCode,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
@@ -79,13 +81,35 @@ import {
   SiR,
   SiJavascript,
   SiTypescript,
-  SiPhp,
-  SiC,
   SiCplusplus,
   SiOpenjdk,
   SiSharp,
 } from "react-icons/si";
+import { DiPhp } from "react-icons/di";
 import type { IconType } from "react-icons";
+
+/** Custom inline icon for the C playground. Mirrors the Streamline
+ *  "C language logo (solid)" mark — kept as a tiny inline component so
+ *  the C playground can opt into a more recognisable language glyph
+ *  than the generic devicon. */
+function CLanguageLogoSolidIcon({ size }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      aria-hidden="true"
+    >
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M11.199.914a1.5 1.5 0 0 1 1.602 0l8.5 5.369A1.5 1.5 0 0 1 22 7.55v8.898a1.5 1.5 0 0 1-.699 1.268l-8.5 5.368a1.5 1.5 0 0 1-1.602 0l-8.5-5.368A1.5 1.5 0 0 1 2 16.449V7.55a1.5 1.5 0 0 1 .699-1.268zm1.722 14.096a3.14 3.14 0 0 0 1.583-1.08l2.746 1.57a6.283 6.283 0 1 1 0-7l-2.746 1.57a3.142 3.142 0 1 0-1.583 4.94"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
 
 /** Per-playground logos shown in the playground-switcher dropdown.
  *  Looked up by playground id; falls back to the adapter's two-character
@@ -95,11 +119,20 @@ const PLAYGROUND_ICONS: Record<string, IconType> = {
   r: SiR,
   javascript: SiJavascript,
   typescript: SiTypescript,
-  php: SiPhp,
-  c: SiC,
+  php: DiPhp,
+  c: CLanguageLogoSolidIcon as unknown as IconType,
   cpp: SiCplusplus,
   java: SiOpenjdk,
   csharp: SiSharp,
+};
+
+/** Per-language relative size multiplier for the language logo icons.
+ *  Some icons read "heavier" than the others at the default size, so we
+ *  fine-tune them per playground. Defaults to 1 when unspecified. */
+const PLAYGROUND_ICON_SIZE_FACTOR: Record<string, number> = {
+  python: 0.9,
+  typescript: 0.9,
+  csharp: 0.9,
 };
 
 /** Brand colors used for the playground language icons in the switcher
@@ -426,6 +459,7 @@ interface PackagesDrawerProps {
   footer: ReactNode;
   onClose: () => void;
   onPickPackage: (pkg: PackageInfo) => void;
+  onPickPackageExample: (pkg: PackageInfo) => void;
 }
 
 function PackagesDrawer({
@@ -434,6 +468,7 @@ function PackagesDrawer({
   footer,
   onClose,
   onPickPackage,
+  onPickPackageExample,
 }: PackagesDrawerProps) {
   const [query, setQuery] = useState("");
 
@@ -521,26 +556,45 @@ function PackagesDrawer({
               <div key={cat}>
                 <div className="pkg-category-label">{cat}</div>
                 {pkgs.map((p) => (
-                  <button
-                    type="button"
-                    className="pkg-item"
-                    key={p.name}
-                    onClick={() => onPickPackage(p)}
-                  >
-                    <div
-                      className="pkg-icon"
-                      style={{ background: `${p.color}22` }}
+                  <div className="pkg-item-row" key={p.name}>
+                    <button
+                      type="button"
+                      className="pkg-item"
+                      onClick={() => onPickPackage(p)}
                     >
-                      {p.icon}
-                    </div>
-                    <div className="pkg-info">
-                      <div className="pkg-name">
-                        {p.name}{" "}
-                        <span className="pkg-version">v{p.ver}</span>
+                      <div
+                        className="pkg-icon"
+                        style={{ background: `${p.color}22` }}
+                      >
+                        {p.icon}
                       </div>
-                      <div className="pkg-desc">{p.desc}</div>
-                    </div>
-                  </button>
+                      <div className="pkg-info">
+                        <div className="pkg-name">
+                          {p.name}{" "}
+                          <span className="pkg-version">v{p.ver}</span>
+                        </div>
+                        <div className="pkg-desc">{p.desc}</div>
+                      </div>
+                    </button>
+                    {p.example && (
+                      <button
+                        type="button"
+                        className="pkg-example-btn"
+                        onClick={(e) => {
+                          // Stop the click from also triggering the
+                          // outer pkg-item onClick (which would import
+                          // the package as a side-effect).
+                          e.stopPropagation();
+                          onPickPackageExample(p);
+                        }}
+                        title={`Load example using ${p.name}`}
+                        aria-label={`Load example using ${p.name}`}
+                      >
+                        <FileCode size={13} aria-hidden="true" />
+                        <span>Example</span>
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             ))}
@@ -731,15 +785,17 @@ function SettingsPanel({
       <Dialog.Portal>
         <Dialog.Backdrop className="settings-overlay" />
         <Dialog.Popup className="settings-panel" aria-label="Settings">
-          <div className="settings-header">
-            <Dialog.Title className="settings-title">Settings</Dialog.Title>
-            <Dialog.Close
-              className="settings-close"
-              aria-label="Close settings"
-            >
-              ✕
-            </Dialog.Close>
-          </div>
+          {/* The Settings icon in the header already signals what panel
+              this is, so we omit a redundant "Settings" title and let
+              the tabs serve as the panel's header. The close button is
+              floated over the tab strip so it remains reachable. */}
+          <Dialog.Title className="settings-sr-title">Settings</Dialog.Title>
+          <Dialog.Close
+            className="settings-close settings-close-floating"
+            aria-label="Close settings"
+          >
+            ✕
+          </Dialog.Close>
 
           <Tabs.Root
             value={tab}
@@ -1022,6 +1078,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     "Initializing runtime…",
   );
   const [loaded, setLoaded] = useState(false);
+  // Two-phase teardown for the loading overlay: when `loaded` flips
+  // true we keep the overlay mounted briefly so its CSS opacity
+  // transition can play out (avoids the "blink" effect on languages
+  // that initialise quickly), then unmount it once the fade completes.
+  // `loadingFading` is derived from `loaded` and `showLoadingOverlay`
+  // so we don't have to setState() directly inside an effect.
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
+  const loadingFading = loaded && showLoadingOverlay;
+  useEffect(() => {
+    if (!loaded) return;
+    const id = window.setTimeout(() => setShowLoadingOverlay(false), 400);
+    return () => window.clearTimeout(id);
+  }, [loaded]);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -1485,6 +1554,24 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [applyExample],
   );
 
+  // Wraps a package's `example` snippet in the same ExampleSnippet shape
+  // the existing requestExample flow expects, so the discard-confirm
+  // dialog can be reused without duplication. Closes the packages
+  // drawer first so the dialog isn't covered by the open Sheet.
+  const requestPackageExample = useCallback(
+    (pkg: PackageInfo) => {
+      if (!pkg.example) return;
+      setPackagesOpen(false);
+      requestExample({
+        key: `pkg-example-${pkg.name}`,
+        title: `${pkg.name} example`,
+        desc: pkg.desc,
+        code: pkg.example,
+      });
+    },
+    [requestExample],
+  );
+
   const importPackage = useCallback(
     (pkg: PackageInfo) => {
       const editor = editorRef.current;
@@ -1685,11 +1772,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   return (
     <div className="pg-root">
-      {!loaded && (
+      {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
             statusState === "error" ? " has-error" : ""
-          }`}
+          }${loadingFading ? " hidden" : ""}`}
           role="status"
           aria-live="polite"
         >
@@ -1739,8 +1826,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             >
               {(() => {
                 const Icon = PLAYGROUND_ICONS[adapter.id];
+                const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
                 return Icon ? (
-                  <Icon size={18} aria-hidden="true" />
+                  <Icon size={Math.round(18 * factor)} aria-hidden="true" />
                 ) : (
                   adapter.logoText
                 );
@@ -1775,6 +1863,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
                       const color = PLAYGROUND_ICON_COLORS[p.id];
+                      const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
                       return (
                         <Select.Item
                           key={p.id}
@@ -1787,7 +1876,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                               style={{ color }}
                               aria-hidden="true"
                             >
-                              <Icon size={16} />
+                              <Icon size={Math.round(16 * factor)} />
                             </span>
                           )}
                           <Select.ItemText>{p.label}</Select.ItemText>
@@ -2074,6 +2163,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           footer={adapter.packagesFooter}
           onClose={() => setPackagesOpen(false)}
           onPickPackage={importPackage}
+          onPickPackageExample={requestPackageExample}
         />
 
         {/* Confirm dialog shown when picking an example would discard
@@ -2241,9 +2331,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
                   </svg>
                 ) : (
-                  <svg viewBox="0 0 12 12">
-                    <polygon points="2,1 11,6 2,11" />
-                  </svg>
+                  <Play size={12} aria-hidden="true" />
                 )}
                 {statusState === "running" ? "Running…" : "Run"}
               </button>

@@ -304,27 +304,184 @@ const PACKAGES: PackageInfo[] = [
   // Base R packages (base, stats, graphics, utils) are auto-loaded in
   // every R session and need no library() call — they are omitted here.
   // Tidyverse
-  { cat: "Tidyverse", icon: "🧰", color: "#34d399", name: "tidyverse", ver: "2.0", desc: "Meta-package: ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr" },
-  { cat: "Tidyverse", icon: "📐", color: "#34d399", name: "dplyr", ver: "1.1", desc: "Grammar of data manipulation: filter, mutate, summarise, group_by" },
-  { cat: "Tidyverse", icon: "🎨", color: "#34d399", name: "ggplot2", ver: "3.5", desc: "Declarative graphics — layered grammar of plots" },
-  { cat: "Tidyverse", icon: "🧹", color: "#34d399", name: "tidyr", ver: "1.3", desc: "Reshape & tidy data: pivot_longer, pivot_wider, separate" },
-  { cat: "Tidyverse", icon: "📥", color: "#34d399", name: "readr", ver: "2.1", desc: "Fast CSV/TSV reading with type inference" },
+  {
+    cat: "Tidyverse", icon: "🧰", color: "#34d399", name: "tidyverse", ver: "2.0",
+    desc: "Meta-package: ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr",
+    example: `library(tidyverse)
+
+mtcars |>
+  as_tibble(rownames = "model") |>
+  filter(cyl == 6) |>
+  select(model, mpg, hp, wt) |>
+  arrange(desc(mpg))
+`,
+  },
+  {
+    cat: "Tidyverse", icon: "📐", color: "#34d399", name: "dplyr", ver: "1.1",
+    desc: "Grammar of data manipulation: filter, mutate, summarise, group_by",
+    example: `library(dplyr)
+
+mtcars |>
+  group_by(cyl) |>
+  summarise(mean_mpg = mean(mpg), n = n()) |>
+  arrange(cyl)
+`,
+  },
+  {
+    cat: "Tidyverse", icon: "🎨", color: "#34d399", name: "ggplot2", ver: "3.5",
+    desc: "Declarative graphics — layered grammar of plots",
+    example: `library(ggplot2)
+
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 2.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "MPG vs. Weight", color = "Cylinders")
+`,
+  },
+  {
+    cat: "Tidyverse", icon: "🧹", color: "#34d399", name: "tidyr", ver: "1.3",
+    desc: "Reshape & tidy data: pivot_longer, pivot_wider, separate",
+    example: `library(tidyr)
+library(dplyr)
+
+wide <- tibble(id = 1:3, jan = c(10, 20, 30), feb = c(15, 25, 35))
+long <- wide |> pivot_longer(c(jan, feb), names_to = "month", values_to = "value")
+print(long)
+`,
+  },
+  {
+    cat: "Tidyverse", icon: "📥", color: "#34d399", name: "readr", ver: "2.1",
+    desc: "Fast CSV/TSV reading with type inference",
+    example: `library(readr)
+
+csv <- "name,age\\nAda,36\\nLinus,54\\nGrace,40\\n"
+df <- read_csv(csv, show_col_types = FALSE)
+print(df)
+`,
+  },
   // Data
-  { cat: "Data & Tables", icon: "⚡", color: "#f59e0b", name: "data.table", ver: "1.15", desc: "Fast aggregations, joins, in-place modifications" },
-  { cat: "Data & Tables", icon: "🗂️", color: "#f59e0b", name: "tibble", ver: "3.2", desc: "Modern reimagining of data.frame" },
+  {
+    cat: "Data & Tables", icon: "⚡", color: "#f59e0b", name: "data.table", ver: "1.15",
+    desc: "Fast aggregations, joins, in-place modifications",
+    example: `library(data.table)
+
+dt <- as.data.table(mtcars, keep.rownames = "model")
+dt[cyl == 6, .(model, mpg, hp)][order(-mpg)]
+`,
+  },
+  {
+    cat: "Data & Tables", icon: "🗂️", color: "#f59e0b", name: "tibble", ver: "3.2",
+    desc: "Modern reimagining of data.frame",
+    example: `library(tibble)
+
+t <- tibble(
+  name  = c("Ada", "Linus", "Grace"),
+  age   = c(36, 54, 40),
+  team  = c("A", "B", "A"),
+)
+print(t)
+`,
+  },
   // Modelling
-  { cat: "Modelling", icon: "🤖", color: "#a78bfa", name: "caret", ver: "6.0", desc: "Classification and regression training framework" },
-  { cat: "Modelling", icon: "🌲", color: "#a78bfa", name: "randomForest", ver: "4.7", desc: "Breiman & Cutler's random forests for classification & regression" },
-  { cat: "Modelling", icon: "🧮", color: "#a78bfa", name: "MASS", ver: "7.3", desc: "Modern Applied Statistics with S — rlm, lda, qda, mvrnorm" },
+  {
+    cat: "Modelling", icon: "🤖", color: "#a78bfa", name: "caret", ver: "6.0",
+    desc: "Classification and regression training framework",
+    example: `library(caret)
+
+set.seed(1)
+idx <- createDataPartition(iris$Species, p = 0.7, list = FALSE)
+train <- iris[idx, ]; test <- iris[-idx, ]
+fit <- train(Species ~ ., data = train, method = "rpart")
+print(confusionMatrix(predict(fit, test), test$Species)$overall["Accuracy"])
+`,
+  },
+  {
+    cat: "Modelling", icon: "🌲", color: "#a78bfa", name: "randomForest", ver: "4.7",
+    desc: "Breiman & Cutler's random forests for classification & regression",
+    example: `library(randomForest)
+
+set.seed(1)
+fit <- randomForest(Species ~ ., data = iris, ntree = 50)
+print(fit)
+`,
+  },
+  {
+    cat: "Modelling", icon: "🧮", color: "#a78bfa", name: "MASS", ver: "7.3",
+    desc: "Modern Applied Statistics with S — rlm, lda, qda, mvrnorm",
+    example: `library(MASS)
+
+fit <- rlm(stack.loss ~ ., data = stackloss)
+print(summary(fit)$coefficients)
+`,
+  },
   // Visualization
-  { cat: "Visualization", icon: "🌊", color: "#f472b6", name: "lattice", ver: "0.22", desc: "Trellis graphics — multi-panel conditioning plots" },
-  { cat: "Visualization", icon: "🖼️", color: "#f472b6", name: "scales", ver: "1.3", desc: "Scaling helpers used throughout ggplot2" },
+  {
+    cat: "Visualization", icon: "🌊", color: "#f472b6", name: "lattice", ver: "0.22",
+    desc: "Trellis graphics — multi-panel conditioning plots",
+    example: `library(lattice)
+
+xyplot(mpg ~ wt | factor(cyl), data = mtcars,
+       layout = c(3, 1),
+       main = "MPG vs. Weight by Cylinders")
+`,
+  },
+  {
+    cat: "Visualization", icon: "🖼️", color: "#f472b6", name: "scales", ver: "1.3",
+    desc: "Scaling helpers used throughout ggplot2",
+    example: `library(scales)
+
+cat("currency: ", dollar(c(1.5, 12, 12345.67)), "\\n")
+cat("percent:  ", percent(c(0.05, 0.25, 0.872)), "\\n")
+cat("number:   ", comma(1234567), "\\n")
+`,
+  },
   // Strings & dates
-  { cat: "Strings & Dates", icon: "🔤", color: "#60a5fa", name: "stringr", ver: "1.5", desc: "Consistent, simple wrappers for string operations" },
-  { cat: "Strings & Dates", icon: "🗓️", color: "#60a5fa", name: "lubridate", ver: "1.9", desc: "Make working with dates and times easier" },
+  {
+    cat: "Strings & Dates", icon: "🔤", color: "#60a5fa", name: "stringr", ver: "1.5",
+    desc: "Consistent, simple wrappers for string operations",
+    example: `library(stringr)
+
+s <- c("Ada Lovelace", "Linus Torvalds", "Grace Hopper")
+str_to_upper(s)
+str_extract(s, "^[A-Z][a-z]+")
+str_length(s)
+`,
+  },
+  {
+    cat: "Strings & Dates", icon: "🗓️", color: "#60a5fa", name: "lubridate", ver: "1.9",
+    desc: "Make working with dates and times easier",
+    example: `library(lubridate)
+
+d <- ymd("2024-05-12") + months(3) + days(10)
+cat("date:    ", format(d), "\\n")
+cat("weekday: ", wday(d, label = TRUE), "\\n")
+`,
+  },
   // I/O
-  { cat: "I/O & Formats", icon: "📋", color: "#fbbf24", name: "jsonlite", ver: "1.8", desc: "JSON parser and generator optimised for statistical data" },
-  { cat: "I/O & Formats", icon: "📄", color: "#fbbf24", name: "yaml", ver: "2.3", desc: "Read and write YAML files" },
+  {
+    cat: "I/O & Formats", icon: "📋", color: "#fbbf24", name: "jsonlite", ver: "1.8",
+    desc: "JSON parser and generator optimised for statistical data",
+    example: `library(jsonlite)
+
+json <- toJSON(list(name = "Ada", skills = c("math", "code"), age = 36),
+               pretty = TRUE, auto_unbox = TRUE)
+cat(json)
+cat("\\nparsed: \\n")
+print(fromJSON(json))
+`,
+  },
+  {
+    cat: "I/O & Formats", icon: "📄", color: "#fbbf24", name: "yaml", ver: "2.3",
+    desc: "Read and write YAML files",
+    example: `library(yaml)
+
+text <- "name: Ada\\nskills:\\n  - math\\n  - code\\n"
+data <- yaml.load(text)
+print(data)
+cat("\\nre-emitted:\\n")
+cat(as.yaml(data))
+`,
+  },
 ];
 
 /** Render an R object (returned by captureR.result) as either an HTML table

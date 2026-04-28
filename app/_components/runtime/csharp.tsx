@@ -150,16 +150,141 @@ const PACKAGES: PackageInfo[] = [
   // Highlights from the .NET base class library — always available
   // through Roslyn's scripting host, no install step. Clicking
   // inserts the corresponding `using` at the top of the editor.
-  { cat: "Core",        icon: "📦", color: "#34d399", name: "System",                     ver: ".NET 9", desc: "Console, String, Math, primitive types and exceptions." },
-  { cat: "Collections", icon: "🗂️", color: "#34d399", name: "System.Collections.Generic",  ver: ".NET 9", desc: "List<T>, Dictionary<TKey, TValue>, HashSet<T>, Queue<T>." },
-  { cat: "Collections", icon: "🌊", color: "#34d399", name: "System.Linq",                 ver: ".NET 9", desc: "Where, Select, GroupBy, OrderBy and other LINQ operators." },
-  { cat: "Async",       icon: "⚡", color: "#a78bfa", name: "System.Threading.Tasks",      ver: ".NET 9", desc: "Task, Task<T>, Task.WhenAll, async / await primitives." },
-  { cat: "I/O",         icon: "📁", color: "#facc15", name: "System.IO",                   ver: ".NET 9", desc: "Stream, MemoryStream, StringReader/Writer (no disk access)." },
-  { cat: "Text",        icon: "🔤", color: "#fb923c", name: "System.Text",                 ver: ".NET 9", desc: "StringBuilder, Encoding, Rune utilities." },
-  { cat: "Text",        icon: "🔍", color: "#fb923c", name: "System.Text.RegularExpressions", ver: ".NET 9", desc: "Regex, Match, MatchCollection." },
-  { cat: "Text",        icon: "📝", color: "#fb923c", name: "System.Text.Json",            ver: ".NET 9", desc: "JsonSerializer, JsonDocument, JsonNode." },
-  { cat: "Math",        icon: "🎲", color: "#60a5fa", name: "System.Numerics",             ver: ".NET 9", desc: "BigInteger, Complex, Vector<T>." },
-  { cat: "Time",        icon: "📅", color: "#60a5fa", name: "System.Diagnostics",          ver: ".NET 9", desc: "Stopwatch and other diagnostics helpers." },
+  {
+    cat: "Core", icon: "📦", color: "#34d399", name: "System", ver: ".NET 9",
+    desc: "Console, String, Math, primitive types and exceptions.",
+    example: `using System;
+
+Console.WriteLine($"Hello, {Environment.UserName ?? "world"}!");
+Console.WriteLine($"Math.PI = {Math.PI:F4}");
+Console.WriteLine($"|-3.5|  = {Math.Abs(-3.5)}");
+`,
+  },
+  {
+    cat: "Collections", icon: "🗂️", color: "#34d399", name: "System.Collections.Generic", ver: ".NET 9",
+    desc: "List<T>, Dictionary<TKey, TValue>, HashSet<T>, Queue<T>.",
+    example: `using System;
+using System.Collections.Generic;
+
+var ages = new Dictionary<string, int> {
+    ["Ada"] = 36, ["Linus"] = 54, ["Grace"] = 40,
+};
+ages["Hopper"] = 85;
+foreach (var (name, age) in ages) {
+    Console.WriteLine($"{name} -> {age}");
+}
+`,
+  },
+  {
+    cat: "Collections", icon: "🌊", color: "#34d399", name: "System.Linq", ver: ".NET 9",
+    desc: "Where, Select, GroupBy, OrderBy and other LINQ operators.",
+    example: `using System;
+using System.Linq;
+
+int[] numbers = { 5, 2, 8, 1, 9, 3, 7, 4, 6 };
+
+var evens = numbers.Where(n => n % 2 == 0).OrderBy(n => n);
+Console.WriteLine("evens: " + string.Join(", ", evens));
+Console.WriteLine("sum: "   + numbers.Sum());
+Console.WriteLine("avg: "   + numbers.Average());
+`,
+  },
+  {
+    cat: "Async", icon: "⚡", color: "#a78bfa", name: "System.Threading.Tasks", ver: ".NET 9",
+    desc: "Task, Task<T>, Task.WhenAll, async / await primitives.",
+    example: `using System;
+using System.Threading.Tasks;
+
+async Task<int> SquareAsync(int x) {
+    await Task.Delay(50);
+    return x * x;
+}
+
+var results = await Task.WhenAll(SquareAsync(2), SquareAsync(3), SquareAsync(4));
+Console.WriteLine("squares: " + string.Join(", ", results));
+`,
+  },
+  {
+    cat: "I/O", icon: "📁", color: "#facc15", name: "System.IO", ver: ".NET 9",
+    desc: "Stream, MemoryStream, StringReader/Writer (no disk access).",
+    example: `using System;
+using System.IO;
+
+using var ms = new MemoryStream();
+using (var w = new StreamWriter(ms, leaveOpen: true)) {
+    w.WriteLine("line 1");
+    w.WriteLine("line 2");
+}
+ms.Position = 0;
+using var r = new StreamReader(ms);
+Console.WriteLine(r.ReadToEnd());
+`,
+  },
+  {
+    cat: "Text", icon: "🔤", color: "#fb923c", name: "System.Text", ver: ".NET 9",
+    desc: "StringBuilder, Encoding, Rune utilities.",
+    example: `using System;
+using System.Text;
+
+var sb = new StringBuilder();
+for (int i = 1; i <= 3; i++) sb.AppendLine($"line {i}");
+Console.Write(sb.ToString());
+
+byte[] bytes = Encoding.UTF8.GetBytes("héllo");
+Console.WriteLine($"utf-8 bytes: {bytes.Length}");
+`,
+  },
+  {
+    cat: "Text", icon: "🔍", color: "#fb923c", name: "System.Text.RegularExpressions", ver: ".NET 9",
+    desc: "Regex, Match, MatchCollection.",
+    example: `using System;
+using System.Text.RegularExpressions;
+
+var input = "Order 123 was placed on 2024-05-12.";
+foreach (Match m in Regex.Matches(input, @"\\d+")) {
+    Console.WriteLine($"matched: {m.Value} at {m.Index}");
+}
+`,
+  },
+  {
+    cat: "Text", icon: "📝", color: "#fb923c", name: "System.Text.Json", ver: ".NET 9",
+    desc: "JsonSerializer, JsonDocument, JsonNode.",
+    example: `using System;
+using System.Text.Json;
+
+var person = new { Name = "Ada", Age = 36, Skills = new[] { "math", "code" } };
+string json = JsonSerializer.Serialize(person,
+    new JsonSerializerOptions { WriteIndented = true });
+Console.WriteLine(json);
+`,
+  },
+  {
+    cat: "Math", icon: "🎲", color: "#60a5fa", name: "System.Numerics", ver: ".NET 9",
+    desc: "BigInteger, Complex, Vector<T>.",
+    example: `using System;
+using System.Numerics;
+
+BigInteger fact = 1;
+for (int i = 1; i <= 30; i++) fact *= i;
+Console.WriteLine($"30! = {fact}");
+
+var c = new Complex(3, 4);
+Console.WriteLine($"|3+4i| = {c.Magnitude}");
+`,
+  },
+  {
+    cat: "Time", icon: "📅", color: "#60a5fa", name: "System.Diagnostics", ver: ".NET 9",
+    desc: "Stopwatch and other diagnostics helpers.",
+    example: `using System;
+using System.Diagnostics;
+
+var sw = Stopwatch.StartNew();
+long sum = 0;
+for (int i = 0; i < 1_000_000; i++) sum += i;
+sw.Stop();
+Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
+`,
+  },
 ];
 
 class CSharpRuntime implements LanguageRuntime {
