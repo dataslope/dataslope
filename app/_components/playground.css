@@ -1367,13 +1367,18 @@ input[type="range"].fs-slider:disabled {
      line. Hiding only the gutters strip leaves the per-line wrappers
      visible (the line-numbers appear to "float" over the code on the
      left edge), so we hide both, zero out the sizer's left margin so
-     the code takes the full width, and reset each line's left padding
-     so the first character isn't pushed away from the edge. */
+     the code takes the full width, and add a slight horizontal inset
+     on each line so tapping near the edge to position the caret /
+     start a selection is easier (without the inset the very first
+     character sits flush against the screen edge). */
   .CodeMirror-gutters { display: none !important; }
   .CodeMirror-gutter-wrapper { display: none !important; }
   .CodeMirror-sizer { margin-left: 0 !important; }
   .CodeMirror pre.CodeMirror-line,
-  .CodeMirror pre.CodeMirror-line-like { padding-left: 4px !important; }
+  .CodeMirror pre.CodeMirror-line-like {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
 }
 
 /* ─── Base UI popups (shared positioner -> popup styling) ──────────────
@@ -1606,17 +1611,14 @@ input[type="range"].fs-slider:disabled {
    A bottom-anchored band that signals "code is running". The band uses
    a vertical alpha mask so it fades completely to transparent at the
    top (no hard horizontal seam against the output panel) and uses the
-   theme accent / a complementary hue so it always matches the active
-   editor theme. Two animations layer inside it:
-     • A diagonal "data slope" sweep — gradient stripes scrolling along
-       a slight downward angle, evoking the Dataslope name.
-     • A pulsing data-flow line that travels left-to-right across the
-       middle of the band.
-   Both run noticeably faster than the previous wave animation. */
+   theme accent so it always matches the active editor theme. Inside the
+   band, two overlapping sine-wave SVG paths scroll horizontally to
+   evoke a smoothly flowing data stream, paired with an accent glow and
+   a bright "packet" line that streaks across the middle. */
 .dataslope-run-overlay {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 72px;
+  height: 44px;
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
@@ -1633,23 +1635,34 @@ input[type="range"].fs-slider:disabled {
   transform: translateY(0);
 }
 
-/* Diagonal scrolling stripes — the "slope" half of Dataslope. Tinted
-   with the editor accent so it inherits the current theme. */
-.dataslope-slope {
+/* Smooth sine-wave SVG layer — replaces the previous diagonal stripe
+   pattern so the motion reads as a flowing curve rather than a stack
+   of hard "spikes". The path is wider than the viewBox so a simple
+   translateX loop produces a seamless scroll. */
+.dataslope-waves {
   position: absolute;
   inset: 0;
-  background-image: repeating-linear-gradient(
-    115deg,
-    color-mix(in oklab, var(--accent) 28%, transparent) 0 14px,
-    transparent 14px 36px
-  );
-  background-size: 200% 100%;
-  animation: dataslopeSlope 1.4s linear infinite;
-  opacity: 0.55;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.dataslope-wave {
+  fill: color-mix(in oklab, var(--accent) 40%, transparent);
+  transform: translateX(0);
+  will-change: transform;
+}
+.dataslope-wave--back {
+  fill: color-mix(in oklab, var(--accent) 22%, transparent);
+  animation: dataslopeWaveBack 2.4s linear infinite;
+}
+.dataslope-wave--front {
+  fill: color-mix(in oklab, var(--accent) 45%, transparent);
+  animation: dataslopeWaveFront 1.4s linear infinite;
 }
 
 /* Soft accent glow that tints the bottom edge of the band so the
-   stripes sit on a colored base rather than the raw panel background. */
+   waves sit on a colored base rather than the raw panel background. */
 .dataslope-glow {
   position: absolute;
   inset: 0;
@@ -1665,7 +1678,7 @@ input[type="range"].fs-slider:disabled {
 .dataslope-stream {
   position: absolute;
   left: 0; right: 0;
-  bottom: 18px;
+  bottom: 12px;
   height: 2px;
   background: linear-gradient(
     90deg,
@@ -1677,9 +1690,13 @@ input[type="range"].fs-slider:disabled {
   animation: dataslopeStream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
-@keyframes dataslopeSlope {
-  from { background-position: 0% 0%; }
-  to   { background-position: 100% 0%; }
+@keyframes dataslopeWaveBack {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-240px); }
+}
+@keyframes dataslopeWaveFront {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-240px); }
 }
 @keyframes dataslopePulse {
   from { opacity: 0.45; }
@@ -1692,6 +1709,13 @@ input[type="range"].fs-slider:disabled {
   100% { transform: translateX(100%); opacity: 0; }
 }
 
+/* Default: the dedicated mobile-variant overlay is hidden. The media
+   query below re-enables it on narrow viewports and hides the
+   in-output-pane instance, so only one overlay is ever painted at a
+   time. This rule MUST come before the @media block so the media-query
+   `display: block` wins on mobile (later same-specificity rules win). */
+.dataslope-run-overlay.dataslope-run-overlay--mobile { display: none; }
+
 @media (max-width: 768px) {
   /* On mobile the overlay anchors to the visible viewport edge so it
      remains visible while code is running, even if the user is on the
@@ -1699,7 +1723,7 @@ input[type="range"].fs-slider:disabled {
      panes (outside the tab-switched panes), while the desktop instance
      stays inside `.output-pane` and is hidden on narrow viewports. */
   .dataslope-run-overlay {
-    height: 64px;
+    height: 38px;
   }
   .output-pane > .dataslope-run-overlay { display: none; }
   .dataslope-run-overlay.dataslope-run-overlay--mobile {
@@ -1709,7 +1733,6 @@ input[type="range"].fs-slider:disabled {
     z-index: 330;
   }
 }
-.dataslope-run-overlay.dataslope-run-overlay--mobile { display: none; }
 
 /* ─── Settings panel animation (Base UI Dialog) ─── */
 .settings-overlay {
