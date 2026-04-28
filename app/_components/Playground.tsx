@@ -2019,13 +2019,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </div>
 
           {/* Mobile-only consolidated menu — replaces the header buttons
-              on narrow viewports. We render it as a Dialog (bottom-sheet
-              drawer) rather than a Menu with nested submenus, so that
-              sections like "Examples" and "Information" stay inside the
-              viewport instead of popping out to the side and getting
-              clipped on narrow phones. The playground switcher stays on
-              the left of the header so the user can always tell which
-              playground they're in at a glance. */}
+              on narrow viewports. Base UI Drawer keeps the main menu and
+              nested sections as bottom sheets so they stay within the
+              viewport on narrow phones. */}
           <Drawer.Root
             open={mobileMenuOpen}
             onOpenChange={setMobileMenuOpen}
@@ -2172,18 +2168,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                  {adapter.packages.length > 0 && (
-                    <button
-                      type="button"
-                      className="mobile-menu-action"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setPackagesOpen(true);
-                      }}
-                    >
-                      <span>Packages</span>
-                    </button>
-                  )}
+                      {adapter.packages.length > 0 && (
+                        <button
+                          type="button"
+                          className="mobile-menu-action"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setPackagesOpen(true);
+                          }}
+                        >
+                          <span>Packages</span>
+                        </button>
+                      )}
 
                       <Drawer.Root swipeDirection="down">
                         <Drawer.Trigger className="mobile-menu-action">
@@ -2224,16 +2220,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                  <button
-                    type="button"
-                    className="mobile-menu-action"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setSettingsOpen(true);
-                    }}
-                  >
-                    <span>Settings</span>
-                  </button>
+                      <button
+                        type="button"
+                        className="mobile-menu-action"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setSettingsOpen(true);
+                        }}
+                      >
+                        <span>Settings</span>
+                      </button>
                     </div>
                   </Drawer.Content>
                 </Drawer.Popup>

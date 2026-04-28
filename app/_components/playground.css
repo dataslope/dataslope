@@ -413,11 +413,11 @@ body.pg-active {
 /* Welcome state */
 .welcome {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; gap: 4px; color: var(--text-dim); text-align: center; padding: 32px;
+  height: 100%; gap: 6px; color: var(--text-dim); text-align: center; padding: 32px;
 }
 .welcome-icon { font-size: 32px; opacity: 0.5; }
 .welcome h3 { font-size: 15px; color: var(--text-muted); font-weight: 500; margin: 0; }
-.welcome p  { font-size: 12px; line-height: 1.45; max-width: 240px; margin: 0; }
+.welcome p  { font-size: 12px; line-height: 1.5; max-width: 240px; margin: 0; }
 
 /* Output cells — minimal chrome. A single colored left accent identifies the
    cell type; the header's darker background separates it from the body. No
@@ -1444,6 +1444,10 @@ input[type="range"].fs-slider:disabled {
 .mobile-menu-drawer[data-ending-style] {
   transform: translateY(100%);
 }
+/* Base UI marks parent drawers with `data-nested-drawer-open` and exposes
+   `--nested-drawers` as the number of child drawers currently in front.
+   Each stacked parent peeks upward by 10px and scales down by 3.5% per
+   nested level, keeping all mobile sheets anchored to the bottom. */
 .mobile-menu-drawer[data-nested-drawer-open] {
   transform:
     translateY(calc(var(--nested-drawers, 0) * -10px))
@@ -1516,10 +1520,6 @@ input[type="range"].fs-slider:disabled {
   transition: transform 0.15s ease;
 }
 
-.mobile-menu-section-body {
-  padding: 4px 4px 8px;
-  display: flex; flex-direction: column;
-}
 .mobile-menu-drawer-body > button.example-item {
   background: transparent;
   border: none;
