@@ -61,6 +61,7 @@ import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
+import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,
   ArrowDownToLine,
@@ -657,6 +658,20 @@ function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
       </div>
       {info.notes && <div className="info-popover-notes">{info.notes}</div>}
     </>
+  );
+}
+
+function DataslopeRunOverlay({ running }: { running: boolean }) {
+  return (
+    <div
+      className={`dataslope-run-overlay${running ? " active" : ""}`}
+      aria-hidden="true"
+    >
+      <div className="dataslope-wave dataslope-wave-a" />
+      <div className="dataslope-wave dataslope-wave-b" />
+      <div className="dataslope-wave dataslope-wave-c" />
+      <div className="dataslope-ridge" />
+    </div>
   );
 }
 
@@ -1534,10 +1549,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // Apply an example to the editor immediately. Use `requestExample` for
   // user-initiated picks so we can prompt before discarding work.
-  const applyExample = useCallback((ex: ExampleSnippet) => {
-    editorRef.current?.setValue(ex.code);
-    editorRef.current?.focus();
-  }, []);
+  const applyExample = useCallback(
+    (ex: ExampleSnippet) => {
+      editorRef.current?.setValue(ex.code);
+      setMobileTab("editor");
+      editorRef.current?.focus();
+      showToast(`Loaded ${ex.title}.`);
+    },
+    [showToast],
+  );
 
   const requestExample = useCallback(
     (ex: ExampleSnippet) => {
@@ -1578,6 +1598,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (!editor) return;
       const current = editor.getValue();
       if (adapter.hasImport(current, pkg.name)) {
+        setMobileTab("editor");
         showToast(`${pkg.name} is already imported.`, "warn");
         return;
       }
@@ -1587,6 +1608,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // Position the cursor right after the inserted line so the user lands
       // back where work in progress can continue.
       editor.setCursor({ line: 1, ch: 0 });
+      setMobileTab("editor");
       showToast(`Imported ${pkg.name}.`);
     },
     [adapter, showToast],
@@ -2004,11 +2026,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               clipped on narrow phones. The playground switcher stays on
               the left of the header so the user can always tell which
               playground they're in at a glance. */}
-          <Dialog.Root
+          <Drawer.Root
             open={mobileMenuOpen}
             onOpenChange={setMobileMenuOpen}
+            swipeDirection="down"
           >
-            <Dialog.Trigger
+            <Drawer.Trigger
               className="header-btn icon-only mobile-only mobile-menu-btn"
               title="Menu"
               aria-label="Open menu"
@@ -2018,82 +2041,136 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <line x1="4" y1="12" x2="20" y2="12" />
                 <line x1="4" y1="17" x2="20" y2="17" />
               </svg>
-            </Dialog.Trigger>
-            <Dialog.Portal>
-              <Dialog.Backdrop className="pkg-overlay mobile-menu-backdrop" />
-              <Dialog.Popup
-                className="mobile-menu-drawer"
-                aria-label="Menu"
-              >
-                <div className="mobile-menu-handle" aria-hidden="true" />
-                <div className="mobile-menu-drawer-header">
-                  <Dialog.Title className="mobile-menu-drawer-title">
-                    Menu
-                  </Dialog.Title>
-                  <Dialog.Close
-                    className="settings-close"
-                    aria-label="Close menu"
-                  >
-                    ✕
-                  </Dialog.Close>
-                </div>
-                <div className="mobile-menu-drawer-body">
-                  {/* Examples — collapsible inline section */}
-                  <details className="mobile-menu-section">
-                    <summary className="mobile-menu-section-summary">
-                      <span>Examples</span>
-                      <span className="mobile-menu-chev" aria-hidden="true">
-                        ›
-                      </span>
-                    </summary>
-                    <div className="mobile-menu-section-body">
-                      {adapter.examples.map((ex) => (
-                        <button
-                          type="button"
-                          key={ex.key}
-                          className="example-item"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            requestExample(ex);
-                          }}
-                        >
-                          <div className="ex-title">{ex.title}</div>
-                          <div className="ex-desc">{ex.desc}</div>
-                        </button>
-                      ))}
+            </Drawer.Trigger>
+            <Drawer.Portal>
+              <Drawer.Backdrop className="pkg-overlay mobile-menu-backdrop" />
+              <Drawer.Viewport className="mobile-drawer-viewport">
+                <Drawer.Popup
+                  className="mobile-menu-drawer"
+                  aria-label="Menu"
+                >
+                  <Drawer.Content>
+                    <div className="mobile-menu-handle" aria-hidden="true" />
+                    <div className="mobile-menu-drawer-header">
+                      <Drawer.Title className="mobile-menu-drawer-title">
+                        Menu
+                      </Drawer.Title>
+                      <Drawer.Close
+                        className="settings-close"
+                        aria-label="Close menu"
+                      >
+                        ✕
+                      </Drawer.Close>
                     </div>
-                  </details>
+                    <div className="mobile-menu-drawer-body">
+                      <Drawer.Root swipeDirection="down">
+                        <Drawer.Trigger className="mobile-menu-action">
+                          <span>Examples</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                          <Drawer.Backdrop
+                            className="pkg-overlay mobile-menu-backdrop"
+                            forceRender
+                          />
+                          <Drawer.Viewport className="mobile-drawer-viewport">
+                            <Drawer.Popup
+                              className="mobile-menu-drawer mobile-menu-nested-drawer"
+                              aria-label="Examples"
+                            >
+                              <Drawer.Content>
+                                <div className="mobile-menu-handle" aria-hidden="true" />
+                                <div className="mobile-menu-drawer-header">
+                                  <Drawer.Title className="mobile-menu-drawer-title">
+                                    Examples
+                                  </Drawer.Title>
+                                  <Drawer.Close
+                                    className="settings-close"
+                                    aria-label="Close examples"
+                                  >
+                                    ✕
+                                  </Drawer.Close>
+                                </div>
+                                <div className="mobile-menu-drawer-body">
+                                  {adapter.examples.map((ex) => (
+                                    <button
+                                      type="button"
+                                      key={ex.key}
+                                      className="example-item"
+                                      onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        requestExample(ex);
+                                      }}
+                                    >
+                                      <div className="ex-title">{ex.title}</div>
+                                      <div className="ex-desc">{ex.desc}</div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Popup>
+                          </Drawer.Viewport>
+                        </Drawer.Portal>
+                      </Drawer.Root>
 
-                  {/* Export — collapsible inline section */}
-                  <details className="mobile-menu-section">
-                    <summary className="mobile-menu-section-summary">
-                      <span>Export</span>
-                      <span className="mobile-menu-chev" aria-hidden="true">
-                        ›
-                      </span>
-                    </summary>
-                    <div className="mobile-menu-section-body">
-                      {adapter.exportFormats.map((fmt) => (
-                        <button
-                          type="button"
-                          key={fmt.extension}
-                          className="example-item export-item"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            exportCode(fmt);
-                          }}
-                        >
-                          <span className="ext-badge">.{fmt.extension}</span>
-                          <div className="export-item-text">
-                            <div className="ex-title">{fmt.label}</div>
-                            <div className="ex-desc">
-                              Download as .{fmt.extension}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </details>
+                      <Drawer.Root swipeDirection="down">
+                        <Drawer.Trigger className="mobile-menu-action">
+                          <span>Export</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                          <Drawer.Backdrop
+                            className="pkg-overlay mobile-menu-backdrop"
+                            forceRender
+                          />
+                          <Drawer.Viewport className="mobile-drawer-viewport">
+                            <Drawer.Popup
+                              className="mobile-menu-drawer mobile-menu-nested-drawer"
+                              aria-label="Export"
+                            >
+                              <Drawer.Content>
+                                <div className="mobile-menu-handle" aria-hidden="true" />
+                                <div className="mobile-menu-drawer-header">
+                                  <Drawer.Title className="mobile-menu-drawer-title">
+                                    Export
+                                  </Drawer.Title>
+                                  <Drawer.Close
+                                    className="settings-close"
+                                    aria-label="Close export"
+                                  >
+                                    ✕
+                                  </Drawer.Close>
+                                </div>
+                                <div className="mobile-menu-drawer-body">
+                                  {adapter.exportFormats.map((fmt) => (
+                                    <button
+                                      type="button"
+                                      key={fmt.extension}
+                                      className="example-item export-item"
+                                      onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        exportCode(fmt);
+                                      }}
+                                    >
+                                      <span className="ext-badge">.{fmt.extension}</span>
+                                      <div className="export-item-text">
+                                        <div className="ex-title">{fmt.label}</div>
+                                        <div className="ex-desc">
+                                          Download as .{fmt.extension}
+                                        </div>
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Popup>
+                          </Drawer.Viewport>
+                        </Drawer.Portal>
+                      </Drawer.Root>
 
                   {adapter.packages.length > 0 && (
                     <button
@@ -2108,18 +2185,44 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </button>
                   )}
 
-                  {/* Information — collapsible inline section */}
-                  <details className="mobile-menu-section">
-                    <summary className="mobile-menu-section-summary">
-                      <span>Information</span>
-                      <span className="mobile-menu-chev" aria-hidden="true">
-                        ›
-                      </span>
-                    </summary>
-                    <div className="mobile-menu-section-body info-popover">
-                      <RuntimeInfoContent info={adapter.runtimeInfo} />
-                    </div>
-                  </details>
+                      <Drawer.Root swipeDirection="down">
+                        <Drawer.Trigger className="mobile-menu-action">
+                          <span>Information</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                          <Drawer.Backdrop
+                            className="pkg-overlay mobile-menu-backdrop"
+                            forceRender
+                          />
+                          <Drawer.Viewport className="mobile-drawer-viewport">
+                            <Drawer.Popup
+                              className="mobile-menu-drawer mobile-menu-nested-drawer"
+                              aria-label="Information"
+                            >
+                              <Drawer.Content>
+                                <div className="mobile-menu-handle" aria-hidden="true" />
+                                <div className="mobile-menu-drawer-header">
+                                  <Drawer.Title className="mobile-menu-drawer-title">
+                                    Information
+                                  </Drawer.Title>
+                                  <Drawer.Close
+                                    className="settings-close"
+                                    aria-label="Close information"
+                                  >
+                                    ✕
+                                  </Drawer.Close>
+                                </div>
+                                <div className="mobile-menu-drawer-body info-popover">
+                                  <RuntimeInfoContent info={adapter.runtimeInfo} />
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Popup>
+                          </Drawer.Viewport>
+                        </Drawer.Portal>
+                      </Drawer.Root>
 
                   <button
                     type="button"
@@ -2131,10 +2234,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   >
                     <span>Settings</span>
                   </button>
-                </div>
-              </Dialog.Popup>
-            </Dialog.Portal>
-          </Dialog.Root>
+                    </div>
+                  </Drawer.Content>
+                </Drawer.Popup>
+              </Drawer.Viewport>
+            </Drawer.Portal>
+          </Drawer.Root>
         </header>
 
         <SettingsPanel
@@ -2430,6 +2535,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 ))
               )}
             </div>
+            <DataslopeRunOverlay running={statusState === "running"} />
           </div>
         </div>
       </div>

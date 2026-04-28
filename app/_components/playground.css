@@ -390,6 +390,7 @@ body.pg-active {
   background: var(--bg);
   min-height: 0;
   min-width: 0;
+  position: relative;
 }
 
 .output-body {
@@ -412,11 +413,11 @@ body.pg-active {
 /* Welcome state */
 .welcome {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; gap: 10px; color: var(--text-dim); text-align: center; padding: 32px;
+  height: 100%; gap: 4px; color: var(--text-dim); text-align: center; padding: 32px;
 }
 .welcome-icon { font-size: 32px; opacity: 0.5; }
-.welcome h3 { font-size: 15px; color: var(--text-muted); font-weight: 500; }
-.welcome p  { font-size: 12px; line-height: 1.6; max-width: 240px; }
+.welcome h3 { font-size: 15px; color: var(--text-muted); font-weight: 500; margin: 0; }
+.welcome p  { font-size: 12px; line-height: 1.45; max-width: 240px; margin: 0; }
 
 /* Output cells — minimal chrome. A single colored left accent identifies the
    cell type; the header's darker background separates it from the body. No
@@ -1348,6 +1349,8 @@ input[type="range"].fs-slider:disabled {
      clips the start of each line. We zero out the sizer's left margin
      so the editor content takes the full width. */
   .CodeMirror-gutters { display: none !important; }
+  .CodeMirror-linenumbers,
+  .CodeMirror-linenumber { display: none !important; }
   .CodeMirror-sizer { margin-left: 0 !important; }
 }
 
@@ -1396,10 +1399,9 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* ─── Mobile consolidated menu (bottom-sheet drawer) ───
-   On narrow viewports the header collapses into a single hamburger
-   button that opens this Dialog. We render Examples / Export /
-   Information as inline collapsible sections inside the drawer so
-   nothing has to pop out to the side and risk being cut off. */
+    On narrow viewports the header collapses into a single hamburger
+    button that opens this Drawer. Examples / Export / Information are
+    nested bottom drawers so expanded content doesn't distort the menu. */
 .mobile-menu-btn { color: var(--text); }
 
 .mobile-menu-backdrop {
@@ -1408,10 +1410,16 @@ input[type="range"].fs-slider:disabled {
   z-index: 320;
 }
 
+.mobile-drawer-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 321;
+  pointer-events: none;
+}
+
 .mobile-menu-drawer {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  z-index: 321;
   background: var(--bg2);
   border-top: 1px solid var(--border);
   border-top-left-radius: 16px;
@@ -1430,10 +1438,22 @@ input[type="range"].fs-slider:disabled {
   /* Slide up from the bottom; Base UI flips data-starting-style /
      data-ending-style during open/close. */
   transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: auto;
 }
 .mobile-menu-drawer[data-starting-style],
 .mobile-menu-drawer[data-ending-style] {
   transform: translateY(100%);
+}
+.mobile-menu-drawer[data-nested-drawer-open] {
+  transform:
+    translateY(calc(var(--nested-drawers, 0) * -10px))
+    scale(calc(1 - (var(--nested-drawers, 0) * 0.035)));
+  opacity: 0.72;
+}
+
+.mobile-menu-nested-drawer {
+  max-height: 78vh;
+  max-height: 78dvh;
 }
 
 .mobile-menu-handle {
@@ -1490,32 +1510,6 @@ input[type="range"].fs-slider:disabled {
   background: var(--bg3);
 }
 
-.mobile-menu-section {
-  border-radius: 8px;
-  overflow: hidden;
-}
-.mobile-menu-section[open] {
-  background: var(--bg);
-}
-.mobile-menu-section-summary {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px;
-  padding: 12px 12px;
-  font-size: 14px;
-  color: var(--text);
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-}
-.mobile-menu-section-summary::-webkit-details-marker { display: none; }
-.mobile-menu-section-summary:hover,
-.mobile-menu-section-summary:focus-visible {
-  background: var(--bg3);
-  outline: none;
-}
-.mobile-menu-section[open] > .mobile-menu-section-summary .mobile-menu-chev {
-  transform: rotate(90deg);
-}
 .mobile-menu-chev {
   color: var(--text-dim);
   font-size: 16px; line-height: 1;
@@ -1526,10 +1520,7 @@ input[type="range"].fs-slider:disabled {
   padding: 4px 4px 8px;
   display: flex; flex-direction: column;
 }
-/* The example/export items inside the drawer are rendered as buttons
-   (not Menu.Items), so reset the default button chrome and let the
-   shared `.example-item` styles take over. */
-.mobile-menu-section-body > button.example-item {
+.mobile-menu-drawer-body > button.example-item {
   background: transparent;
   border: none;
   width: 100%;
@@ -1537,9 +1528,7 @@ input[type="range"].fs-slider:disabled {
   font: inherit;
   color: var(--text-muted);
 }
-/* Reset the popover chrome when the runtime-info block is rendered
-   inline inside an accordion section instead of in its own popover. */
-.mobile-menu-section-body.info-popover {
+.mobile-menu-drawer-body.info-popover {
   position: static;
   background: transparent;
   border: none;
@@ -1565,6 +1554,101 @@ input[type="range"].fs-slider:disabled {
 .pkg-drawer[data-starting-style],
 .pkg-drawer[data-ending-style] {
   transform: translateX(100%);
+}
+
+@media (max-width: 768px) {
+  .pkg-drawer {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 85vh;
+    max-height: 85dvh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -8px 32px #0008;
+  }
+  .pkg-drawer[data-starting-style],
+  .pkg-drawer[data-ending-style] {
+    transform: translateY(100%);
+  }
+}
+
+/* ─── Dataslope running overlay ─── */
+.dataslope-run-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 86px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  z-index: 4;
+  background:
+    linear-gradient(0deg, var(--bg) 0%, transparent 100%),
+    linear-gradient(90deg, oklch(68% 0.18 250 / 0.08), oklch(68% 0.18 145 / 0.1));
+}
+.dataslope-run-overlay.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.dataslope-wave {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -26px;
+  height: 76px;
+  border-radius: 50% 50% 0 0;
+  filter: blur(10px);
+  opacity: 0.55;
+  transform: skewY(-7deg);
+  will-change: transform;
+}
+.dataslope-wave-a {
+  background: oklch(68% 0.18 250 / 0.24);
+  animation: dataslopeWave 5.6s ease-in-out infinite alternate;
+}
+.dataslope-wave-b {
+  bottom: -34px;
+  background: oklch(68% 0.18 145 / 0.22);
+  animation: dataslopeWave 6.8s ease-in-out infinite alternate-reverse;
+}
+.dataslope-wave-c {
+  bottom: -42px;
+  background: oklch(78% 0.16 85 / 0.14);
+  animation: dataslopeWave 8s ease-in-out infinite alternate;
+}
+.dataslope-ridge {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), oklch(68% 0.18 145), transparent);
+  opacity: 0.38;
+  transform: rotate(-2deg);
+  animation: dataslopeRidge 2.8s ease-in-out infinite;
+}
+@keyframes dataslopeWave {
+  from { transform: translateX(-3%) translateY(8px) skewY(-7deg) rotate(-1deg); }
+  to   { transform: translateX(3%) translateY(-6px) skewY(-4deg) rotate(1deg); }
+}
+@keyframes dataslopeRidge {
+  0%, 100% { transform: translateX(-4%) rotate(-2deg); opacity: 0.25; }
+  50%      { transform: translateX(4%) rotate(-3.5deg); opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .dataslope-run-overlay {
+    position: fixed;
+    height: 74px;
+    z-index: 330;
+  }
 }
 
 /* ─── Settings panel animation (Base UI Dialog) ─── */
