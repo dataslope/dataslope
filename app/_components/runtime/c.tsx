@@ -294,7 +294,7 @@ export const cAdapter: LanguageAdapter = {
   readyStatus: "C ready",
   runtimeInfo: {
     language: "C",
-    version: "C17 (clang via browsercc)",
+    version: "C17 (201710L)",
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:

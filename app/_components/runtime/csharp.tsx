@@ -196,7 +196,7 @@ export const csharpAdapter: LanguageAdapter = {
   readyStatus: "C# ready",
   runtimeInfo: {
     language: "C#",
-    version: "C# 12 on .NET 9 (Mono WebAssembly)",
+    version: "C# 13",
     engine: "Roslyn (CSharpScript) on Mono / .NET WebAssembly",
     engineUrl: "https://learn.microsoft.com/dotnet/core/wasm/",
     notes:

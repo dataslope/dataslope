@@ -319,7 +319,7 @@ export const cppAdapter: LanguageAdapter = {
   readyStatus: "C++ ready",
   runtimeInfo: {
     language: "C++",
-    version: "C++20 (clang via browsercc)",
+    version: "C++20 (202002L)",
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:

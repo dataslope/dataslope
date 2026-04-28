@@ -388,10 +388,10 @@ export const pythonAdapter: LanguageAdapter = {
   displayName: "Python Playground",
   logoText: "py",
   documentTitle: "Python Playground",
-  readyStatus: "Python 3.13 ready",
+  readyStatus: "Python 3.13.2 ready",
   runtimeInfo: {
     language: "Python",
-    version: "3.13",
+    version: "3.13.2",
     engine: "Pyodide 0.29",
     engineUrl: "https://pyodide.org",
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",

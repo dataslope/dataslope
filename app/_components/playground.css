@@ -51,7 +51,7 @@ body.pg-active {
 /* ─── Layout ─── */
 .pg-app {
   display: grid;
-  grid-template-rows: 48px 1fr;
+  grid-template-rows: 40px 1fr;
   height: 100vh;
 }
 
@@ -77,11 +77,11 @@ body.pg-active {
 }
 
 .logo-icon {
-  width: 20px; height: 20px;
+  width: 24px; height: 24px;
   background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
   border-radius: 5px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: white;
+  font-size: 12px; font-weight: 700; color: white;
   font-family: var(--font-mono);
 }
 
@@ -188,11 +188,9 @@ body.pg-active {
 .header-actions {
   display: flex;
   align-items: stretch;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
-  /* No `overflow: hidden` — that would clip portalled popovers in older
-     versions and any non-portalled descendants. */
+  background: transparent;
+  /* No outer border — buttons are separated by subtle vertical
+     dividers between siblings instead. */
 }
 
 .header-action-wrap {
@@ -211,7 +209,7 @@ body.pg-active {
 
 .header-btn {
   display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px;
+  padding: 4px 12px;
   background: transparent; border: none; border-radius: 0;
   color: var(--text-muted); font-family: var(--font-ui); font-size: 13px;
   cursor: pointer; transition: background 0.15s, color 0.15s;
@@ -221,10 +219,10 @@ body.pg-active {
   outline: none;
   background: var(--bg3);
   color: var(--text);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  box-shadow: inset 0 0 0 1px var(--text-muted);
 }
 .header-btn[data-popup-open] { background: var(--bg3); color: var(--text); }
-.header-btn.icon-only { padding: 5px 10px; }
+.header-btn.icon-only { padding: 4px 10px; }
 /* The settings-cog SVG draws via stroke and explicitly sets fill="none",
    so we don't need a global rule that forces fill:none on every icon-only
    SVG — doing so blanks out filled glyphs (e.g. react-icons' FaInfo).
@@ -233,16 +231,8 @@ body.pg-active {
   fill: none; stroke: currentColor; flex-shrink: 0;
 }
 
-/* First/last in the segmented group should still get rounded corners
-   (since the wrapper is no longer `overflow: hidden`, clip via radius). */
-.header-actions > :first-child {
-  border-top-left-radius: calc(var(--radius) - 1px);
-  border-bottom-left-radius: calc(var(--radius) - 1px);
-}
-.header-actions > :last-child {
-  border-top-right-radius: calc(var(--radius) - 1px);
-  border-bottom-right-radius: calc(var(--radius) - 1px);
-}
+/* No outer border on the action group, so first/last buttons don't
+   need rounded corners — they remain flush with the header. */
 
 /* Visibility helpers — desktop / mobile. */
 .mobile-only { display: none; }
@@ -315,17 +305,26 @@ body.pg-active {
 
 .kbd {
   font-family: var(--font-mono); font-size: 10px;
-  /* Use a higher-contrast text + border so the keyboard hint stays
-     legible on both very dark and very light editor themes. The
-     previous --text-dim color blended into --bg3 on themes like Nord
-     and Solarized Light. */
-  color: var(--text);
+  /* Subtle border + dim text so the keyboard hint blends with the
+     pane bar instead of competing with the Run button. Still readable
+     on both light and dark themes. */
+  color: var(--text-muted);
   padding: 2px 6px;
-  border: 1px solid var(--text-muted);
+  border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+.kbd-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.kbd-plus {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 600;
 }
 
 .run-btn {
@@ -494,20 +493,18 @@ body.pg-active {
 .out-cell.image .out-cell-body { text-align: center; }
 .out-cell.image img { max-width: 100%; border-radius: 4px; }
 
-/* Clear button — use a higher-contrast text color and visible border so
-   it remains readable across light and dark editor themes (the previous
-   --text-dim/--border combination disappeared into the pane bar on
-   themes like Nord, Material Palenight, and Solarized Light). */
+/* Clear button — uses a subtle border that blends with the pane bar
+   while keeping the label readable across editor themes. */
 .clear-btn {
   display: inline-flex; align-items: center; gap: 5px;
-  background: transparent; border: 1px solid var(--text-muted);
-  color: var(--text); font-size: 12px; font-family: var(--font-ui);
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 12px; font-family: var(--font-ui);
   font-weight: 500;
   padding: 4px 10px; border-radius: var(--radius); cursor: pointer;
   transition: all 0.15s;
 }
 .clear-btn svg { flex-shrink: 0; }
-.clear-btn:hover { border-color: var(--red); color: var(--red); background: var(--bg); }
+.clear-btn:hover { border-color: var(--text-muted); color: var(--text); background: var(--bg); }
 
 /* Icon-only buttons (e.g. the "copy to clipboard" affordance in the
    editor pane bar and each output cell header). Sized to match the
@@ -591,7 +588,7 @@ body.pg-active {
 
 .settings-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px 12px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -640,11 +637,13 @@ body.pg-active {
 .settings-tab:hover { color: var(--text); background: var(--bg3); }
 .settings-tab[data-selected] {
   color: var(--text);
-  border-bottom-color: var(--accent);
+  background: var(--bg3);
+  border-bottom-color: var(--text);
+  font-weight: 600;
 }
 .settings-tab:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 2px var(--accent);
+  box-shadow: inset 0 0 0 2px var(--text-muted);
 }
 .settings-tab svg { flex-shrink: 0; }
 
@@ -764,9 +763,9 @@ body.pg-active {
   }
   .settings-tab svg { width: 18px; height: 18px; }
   .settings-tab[data-selected] {
-    border-color: var(--accent);
-    background: var(--accent-glow);
-    color: var(--accent);
+    border-color: var(--border);
+    background: var(--bg3);
+    color: var(--text);
   }
   .settings-tab-label {
     /* Visually hidden — keep available to assistive tech via aria. */
@@ -845,6 +844,8 @@ input[type="range"].fs-slider:disabled {
 }
 .bui-switch {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   width: 34px;
   height: 20px;
   border-radius: 999px;
@@ -1073,10 +1074,7 @@ input[type="range"].fs-slider:disabled {
   font-size: clamp(56px, 14vw, 180px);
   line-height: 1;
   letter-spacing: -0.04em;
-  color: transparent;
-  background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
-  -webkit-background-clip: text;
-          background-clip: text;
+  color: var(--text);
 }
 @keyframes pg-loadHero {
   from { transform: translateX(0); }
@@ -1094,7 +1092,7 @@ input[type="range"].fs-slider:disabled {
   width: 100%;
 }
 .loading-quip {
-  font-size: 13px; color: var(--text-muted);
+  font-size: 13px; color: var(--text);
   font-family: var(--font-ui);
   text-align: center;
   min-height: 1.4em;
@@ -1111,7 +1109,7 @@ input[type="range"].fs-slider:disabled {
   overflow: hidden;
 }
 .loading-bar {
-  height: 100%; background: linear-gradient(90deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
+  height: 100%; background: var(--text);
   border-radius: 2px;
   animation: pg-loadBar 2.5s ease-in-out infinite;
 }
@@ -1531,7 +1529,7 @@ input[type="range"].fs-slider:disabled {
 }
 .confirm-desc {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text);
   line-height: 1.55;
   margin: 0;
 }
@@ -1555,7 +1553,7 @@ input[type="range"].fs-slider:disabled {
 .confirm-btn-secondary {
   background: transparent;
   border-color: var(--border);
-  color: var(--text-muted);
+  color: var(--text);
 }
 .confirm-btn-secondary:hover {
   background: var(--bg3);
@@ -1570,7 +1568,7 @@ input[type="range"].fs-slider:disabled {
 }
 .confirm-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--bg2), 0 0 0 4px var(--accent);
+  box-shadow: 0 0 0 2px var(--bg2), 0 0 0 4px var(--text-muted);
 }
 
 /* ─── Toast viewport (Base UI Toast — stacked / hover-to-expand) ───

@@ -992,6 +992,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
     null,
   );
+  // Confirmations for the two destructive actions in the Settings
+  // panel — using Base UI AlertDialog for both rather than the native
+  // window.confirm so they look consistent with the rest of the UI.
+  const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
+  const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
+    useState(false);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -1367,11 +1373,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Clear every localStorage entry (across all playgrounds) and reload
   // so the freshly cleared state takes effect everywhere — including
   // saved editor contents, theme, and any future per-playground keys.
+  // Confirmation is handled by a Base UI AlertDialog rendered below;
+  // by the time this callback fires the user has already opted in.
   const clearAllLocalStorage = useCallback(() => {
-    const ok = window.confirm(
-      "This will permanently delete every saved setting and code snippet across all playgrounds. Continue?",
-    );
-    if (!ok) return;
     try {
       localStorage.clear();
     } catch {
@@ -1736,7 +1740,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               {(() => {
                 const Icon = PLAYGROUND_ICONS[adapter.id];
                 return Icon ? (
-                  <Icon size={14} aria-hidden="true" />
+                  <Icon size={18} aria-hidden="true" />
                 ) : (
                   adapter.logoText
                 );
@@ -2060,8 +2064,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           setClearBeforeRun={setClearBeforeRun}
           language={adapter.id}
           onClose={() => setSettingsOpen(false)}
-          onRestoreDefaults={restoreDefaultSettings}
-          onClearLocalStorage={clearAllLocalStorage}
+          onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+          onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
         />
 
         <PackagesDrawer
@@ -2110,6 +2114,77 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        {/* Confirm restoring built-in defaults — non-destructive but
+            still nukes any custom settings, so confirm first. */}
+        <AlertDialog.Root
+          open={confirmRestoreOpen}
+          onOpenChange={setConfirmRestoreOpen}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Restore default settings?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                This will reset the editor font size, theme, word wrap, and
+                run/output preferences for this playground to their built-in
+                defaults. Your saved code is not affected.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    restoreDefaultSettings();
+                    setConfirmRestoreOpen(false);
+                  }}
+                >
+                  Restore defaults
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
+        {/* Confirm wiping every localStorage entry across all playgrounds —
+            this is destructive (saved code, themes, settings, …) so the
+            confirmation lives in a Base UI AlertDialog rather than the
+            native window.confirm to match the rest of the UI. */}
+        <AlertDialog.Root
+          open={confirmClearStorageOpen}
+          onOpenChange={setConfirmClearStorageOpen}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Clear all localStorage data?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                This will permanently delete every saved setting and code
+                snippet across <strong>all playgrounds</strong>. The page
+                will reload immediately. This can&rsquo;t be undone.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    clearAllLocalStorage();
+                  }}
+                >
+                  Clear &amp; reload
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
           <button
             type="button"
@@ -2146,10 +2221,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <CopyIcon />
               </button>
               <span
-                className="kbd"
+                className="kbd-group"
                 title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
               >
-                {isMac ? "⌘ Enter" : "Ctrl Enter"}
+                <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                <span className="kbd-plus" aria-hidden="true">+</span>
+                <kbd className="kbd">Enter</kbd>
               </span>
               <button
                 type="button"

@@ -363,7 +363,7 @@ export const javaAdapter: LanguageAdapter = {
   readyStatus: "Java ready",
   runtimeInfo: {
     language: "Java",
-    version: "Java 8 (OpenJDK via CheerpJ)",
+    version: "Java 8 (Update 492)",
     engine: "CheerpJ (OpenJDK + javac, WebAssembly)",
     engineUrl: "https://cheerpj.com/",
     notes:
