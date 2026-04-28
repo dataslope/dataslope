@@ -498,114 +498,123 @@ function PackagesDrawer({
   }, [filtered]);
 
   return (
-    <Dialog.Root
+    <Drawer.Root
       open={open}
       onOpenChange={(next) => {
         if (!next) onClose();
       }}
+      swipeDirection="down"
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="pkg-overlay" />
-        <Dialog.Popup
-          className="pkg-drawer"
-          aria-label="Available packages"
-        >
-          <div className="pkg-drawer-header">
-            <div>
-              <Dialog.Title className="pkg-drawer-title">
-                Available Packages
-                <span className="pkg-count-badge">{filtered.length}</span>
-              </Dialog.Title>
-              <Dialog.Description className="pkg-drawer-hint">
-                Click on a package to import it into your editor.
-              </Dialog.Description>
-            </div>
-            <Dialog.Close
-              className="settings-close"
-              aria-label="Close packages"
-            >
-              ✕
-            </Dialog.Close>
-          </div>
-          <div className="pkg-search-wrap">
-            <span className="pkg-search-icon">
-              <svg viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-            </span>
-            <input
-              className="pkg-search"
-              type="text"
-              placeholder="Search packages…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-          <div className="pkg-body">
-            {filtered.length === 0 && (
-              <div
-                style={{
-                  padding: 32,
-                  textAlign: "center",
-                  color: "var(--text-dim)",
-                  fontSize: 13,
-                }}
-              >
-                No packages match your search.
+      <Drawer.Portal>
+        <Drawer.Backdrop className="pkg-overlay" />
+        <Drawer.Viewport className="mobile-drawer-viewport pkg-drawer-viewport">
+          <Drawer.Popup
+            className="pkg-drawer"
+            aria-label="Available packages"
+          >
+            <Drawer.Content className="pkg-drawer-content">
+              {/* Visible drag handle on mobile (matches the other
+                  bottom-sheet drawers); hidden via CSS on desktop where
+                  the panel slides in from the right and isn't dragged. */}
+              <div className="mobile-menu-handle" aria-hidden="true" />
+              <div className="pkg-drawer-header">
+                <div>
+                  <Drawer.Title className="pkg-drawer-title">
+                    Available Packages
+                    <span className="pkg-count-badge">{filtered.length}</span>
+                  </Drawer.Title>
+                  <Drawer.Description className="pkg-drawer-hint">
+                    Click on a package to import it into your editor.
+                  </Drawer.Description>
+                </div>
+                <Drawer.Close
+                  className="settings-close"
+                  aria-label="Close packages"
+                >
+                  ✕
+                </Drawer.Close>
               </div>
-            )}
-            {Object.entries(byCategory).map(([cat, pkgs]) => (
-              <div key={cat}>
-                <div className="pkg-category-label">{cat}</div>
-                {pkgs.map((p) => (
-                  <div className="pkg-item-row" key={p.name}>
-                    <button
-                      type="button"
-                      className="pkg-item"
-                      onClick={() => onPickPackage(p)}
-                    >
-                      <div
-                        className="pkg-icon"
-                        style={{ background: `${p.color}22` }}
-                      >
-                        {p.icon}
+              <div className="pkg-search-wrap">
+                <span className="pkg-search-icon">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                  </svg>
+                </span>
+                <input
+                  className="pkg-search"
+                  type="text"
+                  placeholder="Search packages…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <div className="pkg-body">
+                {filtered.length === 0 && (
+                  <div
+                    style={{
+                      padding: 32,
+                      textAlign: "center",
+                      color: "var(--text-dim)",
+                      fontSize: 13,
+                    }}
+                  >
+                    No packages match your search.
+                  </div>
+                )}
+                {Object.entries(byCategory).map(([cat, pkgs]) => (
+                  <div key={cat}>
+                    <div className="pkg-category-label">{cat}</div>
+                    {pkgs.map((p) => (
+                      <div className="pkg-item-row" key={p.name}>
+                        <button
+                          type="button"
+                          className="pkg-item"
+                          onClick={() => onPickPackage(p)}
+                        >
+                          <div
+                            className="pkg-icon"
+                            style={{ background: `${p.color}22` }}
+                          >
+                            {p.icon}
+                          </div>
+                          <div className="pkg-info">
+                            <div className="pkg-name">
+                              {p.name}{" "}
+                              <span className="pkg-version">v{p.ver}</span>
+                            </div>
+                            <div className="pkg-desc">{p.desc}</div>
+                          </div>
+                        </button>
+                        {p.example && (
+                          <button
+                            type="button"
+                            className="pkg-example-btn"
+                            onClick={(e) => {
+                              // Stop the click from also triggering the
+                              // outer pkg-item onClick (which would import
+                              // the package as a side-effect).
+                              e.stopPropagation();
+                              onPickPackageExample(p);
+                            }}
+                            title={`Load example using ${p.name}`}
+                            aria-label={`Load example using ${p.name}`}
+                          >
+                            <FileCode size={13} aria-hidden="true" />
+                            <span>Example</span>
+                          </button>
+                        )}
                       </div>
-                      <div className="pkg-info">
-                        <div className="pkg-name">
-                          {p.name}{" "}
-                          <span className="pkg-version">v{p.ver}</span>
-                        </div>
-                        <div className="pkg-desc">{p.desc}</div>
-                      </div>
-                    </button>
-                    {p.example && (
-                      <button
-                        type="button"
-                        className="pkg-example-btn"
-                        onClick={(e) => {
-                          // Stop the click from also triggering the
-                          // outer pkg-item onClick (which would import
-                          // the package as a side-effect).
-                          e.stopPropagation();
-                          onPickPackageExample(p);
-                        }}
-                        title={`Load example using ${p.name}`}
-                        aria-label={`Load example using ${p.name}`}
-                      >
-                        <FileCode size={13} aria-hidden="true" />
-                        <span>Example</span>
-                      </button>
-                    )}
+                    ))}
                   </div>
                 ))}
               </div>
-            ))}
-          </div>
-          <div className="pkg-footer">{footer}</div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+              <div className="pkg-footer">{footer}</div>
+            </Drawer.Content>
+          </Drawer.Popup>
+        </Drawer.Viewport>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 
@@ -663,16 +672,25 @@ function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   );
 }
 
-function DataslopeRunOverlay({ running }: { running: boolean }) {
+function DataslopeRunOverlay({
+  running,
+  variant,
+}: {
+  running: boolean;
+  variant?: "mobile";
+}) {
+  const cls = [
+    "dataslope-run-overlay",
+    running ? "active" : "",
+    variant === "mobile" ? "dataslope-run-overlay--mobile" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <div
-      className={`dataslope-run-overlay${running ? " active" : ""}`}
-      aria-hidden="true"
-    >
-      <div className="dataslope-wave dataslope-wave-a" />
-      <div className="dataslope-wave dataslope-wave-b" />
-      <div className="dataslope-wave dataslope-wave-c" />
-      <div className="dataslope-ridge" />
+    <div className={cls} aria-hidden="true">
+      <div className="dataslope-glow" />
+      <div className="dataslope-slope" />
+      <div className="dataslope-stream" />
     </div>
   );
 }
@@ -2538,6 +2556,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <DataslopeRunOverlay running={statusState === "running"} />
           </div>
         </div>
+        {/* A second instance of the overlay rendered outside the
+            tab-switched `.panes` so it stays visible on mobile while
+            code is running, regardless of whether the user is on the
+            Editor or Output tab. CSS hides this variant on desktop and
+            hides the in-output-pane instance on mobile, so only one
+            overlay is ever painted at a time. */}
+        <DataslopeRunOverlay
+          running={statusState === "running"}
+          variant="mobile"
+        />
       </div>
     </div>
   );
