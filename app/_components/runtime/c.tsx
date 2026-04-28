@@ -212,16 +212,160 @@ const PACKAGES: PackageInfo[] = [
   // Highlights from the C standard library — always available, no
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
-  { cat: "I/O", icon: "🖨️", color: "#facc15", name: "stdio.h", ver: "C99", desc: "printf, scanf, fopen, fread, fwrite, ..." },
-  { cat: "Memory", icon: "📦", color: "#34d399", name: "stdlib.h", ver: "C99", desc: "malloc / free, qsort, atoi, exit, rand." },
-  { cat: "Strings", icon: "🔤", color: "#fb923c", name: "string.h", ver: "C99", desc: "memcpy, memset, strlen, strcmp, strcpy, ..." },
-  { cat: "Strings", icon: "🔠", color: "#fb923c", name: "ctype.h", ver: "C99", desc: "isalpha, isdigit, tolower, toupper, ..." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "math.h", ver: "C99", desc: "sin, cos, sqrt, pow, log, M_PI, M_E." },
-  { cat: "Math", icon: "🔢", color: "#60a5fa", name: "stdint.h", ver: "C99", desc: "Fixed-width integer types: int32_t, uint64_t, ..." },
-  { cat: "Math", icon: "✅", color: "#60a5fa", name: "stdbool.h", ver: "C99", desc: "The bool, true, and false macros." },
-  { cat: "Time", icon: "📅", color: "#a78bfa", name: "time.h", ver: "C99", desc: "time, clock, strftime, struct tm." },
-  { cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "assert.h", ver: "C99", desc: "assert(condition) for runtime checks." },
-  { cat: "Diagnostics", icon: "❗", color: "#f472b6", name: "errno.h", ver: "C99", desc: "errno + perror for system error reporting." },
+  {
+    cat: "I/O", icon: "🖨️", color: "#facc15", name: "stdio.h", ver: "C99",
+    desc: "printf, scanf, fopen, fread, fwrite, ...",
+    example: `#include <stdio.h>
+
+int main(void) {
+    printf("Hello, %s! %d squared = %d\\n", "stdio", 7, 7 * 7);
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Memory", icon: "📦", color: "#34d399", name: "stdlib.h", ver: "C99",
+    desc: "malloc / free, qsort, atoi, exit, rand.",
+    example: `#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int *xs = malloc(4 * sizeof(int));
+    for (int i = 0; i < 4; i++) xs[i] = (i + 1) * 10;
+    for (int i = 0; i < 4; i++) printf("xs[%d] = %d\\n", i, xs[i]);
+    free(xs);
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Strings", icon: "🔤", color: "#fb923c", name: "string.h", ver: "C99",
+    desc: "memcpy, memset, strlen, strcmp, strcpy, ...",
+    example: `#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char dst[32];
+    strcpy(dst, "hello");
+    strcat(dst, ", world!");
+    printf("%s (length %zu)\\n", dst, strlen(dst));
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Strings", icon: "🔠", color: "#fb923c", name: "ctype.h", ver: "C99",
+    desc: "isalpha, isdigit, tolower, toupper, ...",
+    example: `#include <stdio.h>
+#include <ctype.h>
+
+int main(void) {
+    const char *s = "Hello123";
+    for (const char *p = s; *p; p++) {
+        printf("%c: alpha=%d digit=%d upper=%c\\n",
+               *p, isalpha((unsigned char)*p),
+               isdigit((unsigned char)*p),
+               toupper((unsigned char)*p));
+    }
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Math", icon: "🎲", color: "#60a5fa", name: "math.h", ver: "C99",
+    desc: "sin, cos, sqrt, pow, log, M_PI, M_E.",
+    example: `#include <stdio.h>
+#include <math.h>
+
+int main(void) {
+    printf("pi  = %.6f\\n", M_PI);
+    printf("sqrt(2) = %.6f\\n", sqrt(2.0));
+    printf("sin(pi/2) = %.6f\\n", sin(M_PI / 2));
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Math", icon: "🔢", color: "#60a5fa", name: "stdint.h", ver: "C99",
+    desc: "Fixed-width integer types: int32_t, uint64_t, ...",
+    example: `#include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
+
+int main(void) {
+    int32_t  a = -2147483648;
+    uint64_t b = 18000000000000000000ULL;
+    printf("a = %" PRId32 "\\n", a);
+    printf("b = %" PRIu64 "\\n", b);
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Math", icon: "✅", color: "#60a5fa", name: "stdbool.h", ver: "C99",
+    desc: "The bool, true, and false macros.",
+    example: `#include <stdio.h>
+#include <stdbool.h>
+
+bool is_even(int n) { return n % 2 == 0; }
+
+int main(void) {
+    for (int i = 0; i < 5; i++) {
+        printf("%d is %s\\n", i, is_even(i) ? "even" : "odd");
+    }
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Time", icon: "📅", color: "#a78bfa", name: "time.h", ver: "C99",
+    desc: "time, clock, strftime, struct tm.",
+    example: `#include <stdio.h>
+#include <time.h>
+
+int main(void) {
+    time_t now = time(NULL);
+    struct tm *t = gmtime(&now);
+    char buf[64];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S UTC", t);
+    printf("Now: %s\\n", buf);
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "assert.h", ver: "C99",
+    desc: "assert(condition) for runtime checks.",
+    example: `#include <stdio.h>
+#include <assert.h>
+
+int divide(int a, int b) {
+    assert(b != 0 && "denominator must be non-zero");
+    return a / b;
+}
+
+int main(void) {
+    printf("10 / 2 = %d\\n", divide(10, 2));
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Diagnostics", icon: "❗", color: "#f472b6", name: "errno.h", ver: "C99",
+    desc: "errno + perror for system error reporting.",
+    example: `#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+int main(void) {
+    FILE *f = fopen("/no/such/file", "r");
+    if (!f) {
+        printf("fopen failed: errno=%d (%s)\\n", errno, strerror(errno));
+    }
+    return 0;
+}
+`,
+  },
 ];
 
 // Compile flags shared across every C run. browsercc invokes the

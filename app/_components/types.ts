@@ -32,6 +32,11 @@ export interface PackageInfo {
   name: string;
   ver: string;
   desc: string;
+  /** Optional short example snippet that demonstrates the package.
+   *  When present, the packages drawer renders an "Example" icon button
+   *  that loads this snippet into the editor (with the standard
+   *  discard-confirm dialog). */
+  example?: string;
 }
 
 export interface RuntimeInfo {

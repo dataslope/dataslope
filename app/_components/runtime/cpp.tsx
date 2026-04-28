@@ -217,19 +217,213 @@ const PACKAGES: PackageInfo[] = [
   // Highlights from the C++ standard library — always available, no
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
-  { cat: "I/O", icon: "🖨️", color: "#facc15", name: "iostream", ver: "C++20", desc: "std::cin, std::cout, std::cerr stream I/O." },
-  { cat: "I/O", icon: "📝", color: "#facc15", name: "iomanip", ver: "C++20", desc: "std::setw, std::setprecision, std::fixed manipulators." },
-  { cat: "I/O", icon: "🧵", color: "#facc15", name: "sstream", ver: "C++20", desc: "std::istringstream, std::ostringstream string streams." },
-  { cat: "Strings", icon: "🔤", color: "#fb923c", name: "string", ver: "C++20", desc: "std::string and std::string_view." },
-  { cat: "Containers", icon: "📦", color: "#34d399", name: "vector", ver: "C++20", desc: "std::vector dynamic array." },
-  { cat: "Containers", icon: "🗺️", color: "#34d399", name: "map", ver: "C++20", desc: "Ordered std::map and std::multimap." },
-  { cat: "Containers", icon: "🪣", color: "#34d399", name: "unordered_map", ver: "C++20", desc: "Hash-based std::unordered_map." },
-  { cat: "Algorithms", icon: "🔁", color: "#60a5fa", name: "algorithm", ver: "C++20", desc: "std::sort, std::find, std::for_each, ..." },
-  { cat: "Algorithms", icon: "➕", color: "#60a5fa", name: "numeric", ver: "C++20", desc: "std::accumulate, std::iota, std::reduce." },
-  { cat: "Memory", icon: "🧠", color: "#a78bfa", name: "memory", ver: "C++20", desc: "std::unique_ptr, std::shared_ptr, std::make_unique." },
-  { cat: "Memory", icon: "🧰", color: "#a78bfa", name: "utility", ver: "C++20", desc: "std::move, std::pair, std::swap." },
-  { cat: "Math", icon: "🎲", color: "#60a5fa", name: "cmath", ver: "C++20", desc: "std::sin, std::cos, std::sqrt, std::pow." },
-  { cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "stdexcept", ver: "C++20", desc: "Standard exception types: runtime_error, logic_error, ..." },
+  {
+    cat: "I/O", icon: "🖨️", color: "#facc15", name: "iostream", ver: "C++20",
+    desc: "std::cin, std::cout, std::cerr stream I/O.",
+    example: `#include <iostream>
+
+int main() {
+    std::cout << "Hello, iostream!" << std::endl;
+    std::cout << "1 + 2 = " << 1 + 2 << std::endl;
+    return 0;
+}
+`,
+  },
+  {
+    cat: "I/O", icon: "📝", color: "#facc15", name: "iomanip", ver: "C++20",
+    desc: "std::setw, std::setprecision, std::fixed manipulators.",
+    example: `#include <iostream>
+#include <iomanip>
+
+int main() {
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "pi  = " << 3.1415926535 << "\\n";
+    std::cout << std::setw(8) << 42 << "|" << std::setw(8) << "hi" << "\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "I/O", icon: "🧵", color: "#facc15", name: "sstream", ver: "C++20",
+    desc: "std::istringstream, std::ostringstream string streams.",
+    example: `#include <iostream>
+#include <sstream>
+#include <string>
+
+int main() {
+    std::istringstream in("10 20 30");
+    int sum = 0, x;
+    while (in >> x) sum += x;
+    std::ostringstream out;
+    out << "sum = " << sum;
+    std::cout << out.str() << std::endl;
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Strings", icon: "🔤", color: "#fb923c", name: "string", ver: "C++20",
+    desc: "std::string and std::string_view.",
+    example: `#include <iostream>
+#include <string>
+
+int main() {
+    std::string s = "Hello";
+    s += ", world!";
+    std::cout << s << " (length " << s.size() << ")\\n";
+    std::cout << "upper-H index = " << s.find('H') << "\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Containers", icon: "📦", color: "#34d399", name: "vector", ver: "C++20",
+    desc: "std::vector dynamic array.",
+    example: `#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> v{3, 1, 4, 1, 5, 9, 2, 6};
+    v.push_back(5);
+    for (int x : v) std::cout << x << ' ';
+    std::cout << "\\nsize = " << v.size() << std::endl;
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Containers", icon: "🗺️", color: "#34d399", name: "map", ver: "C++20",
+    desc: "Ordered std::map and std::multimap.",
+    example: `#include <iostream>
+#include <map>
+#include <string>
+
+int main() {
+    std::map<std::string, int> ages{{"ada", 36}, {"linus", 54}};
+    ages["grace"] = 40;
+    for (auto& [name, age] : ages) {
+        std::cout << name << " -> " << age << "\\n";
+    }
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Containers", icon: "🪣", color: "#34d399", name: "unordered_map", ver: "C++20",
+    desc: "Hash-based std::unordered_map.",
+    example: `#include <iostream>
+#include <unordered_map>
+#include <string>
+
+int main() {
+    std::unordered_map<std::string, int> counts;
+    for (auto w : {"red", "blue", "red", "green", "blue", "red"}) counts[w]++;
+    for (auto& [k, v] : counts) std::cout << k << ": " << v << "\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Algorithms", icon: "🔁", color: "#60a5fa", name: "algorithm", ver: "C++20",
+    desc: "std::sort, std::find, std::for_each, ...",
+    example: `#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> v{5, 2, 8, 1, 9, 3};
+    std::sort(v.begin(), v.end());
+    auto it = std::find(v.begin(), v.end(), 8);
+    for (int x : v) std::cout << x << ' ';
+    std::cout << "\\nfound 8 at index "
+              << std::distance(v.begin(), it) << "\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Algorithms", icon: "➕", color: "#60a5fa", name: "numeric", ver: "C++20",
+    desc: "std::accumulate, std::iota, std::reduce.",
+    example: `#include <iostream>
+#include <vector>
+#include <numeric>
+
+int main() {
+    std::vector<int> v(5);
+    std::iota(v.begin(), v.end(), 1);
+    int sum = std::accumulate(v.begin(), v.end(), 0);
+    std::cout << "sum(1..5) = " << sum << std::endl;
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Memory", icon: "🧠", color: "#a78bfa", name: "memory", ver: "C++20",
+    desc: "std::unique_ptr, std::shared_ptr, std::make_unique.",
+    example: `#include <iostream>
+#include <memory>
+
+struct Point { int x, y; };
+
+int main() {
+    auto p = std::make_unique<Point>(Point{3, 4});
+    std::cout << "p = (" << p->x << ", " << p->y << ")\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Memory", icon: "🧰", color: "#a78bfa", name: "utility", ver: "C++20",
+    desc: "std::move, std::pair, std::swap.",
+    example: `#include <iostream>
+#include <utility>
+#include <string>
+
+int main() {
+    std::pair<std::string, int> kv{"answer", 42};
+    int a = 1, b = 2;
+    std::swap(a, b);
+    std::cout << kv.first << " = " << kv.second
+              << " (a=" << a << ", b=" << b << ")\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Math", icon: "🎲", color: "#60a5fa", name: "cmath", ver: "C++20",
+    desc: "std::sin, std::cos, std::sqrt, std::pow.",
+    example: `#include <iostream>
+#include <cmath>
+
+int main() {
+    std::cout << "sqrt(2) = " << std::sqrt(2.0) << "\\n";
+    std::cout << "2^10    = " << std::pow(2, 10) << "\\n";
+    std::cout << "sin(0)  = " << std::sin(0.0) << "\\n";
+    return 0;
+}
+`,
+  },
+  {
+    cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "stdexcept", ver: "C++20",
+    desc: "Standard exception types: runtime_error, logic_error, ...",
+    example: `#include <iostream>
+#include <stdexcept>
+
+int safe_divide(int a, int b) {
+    if (b == 0) throw std::runtime_error("division by zero");
+    return a / b;
+}
+
+int main() {
+    try {
+        std::cout << safe_divide(10, 0) << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "caught: " << e.what() << std::endl;
+    }
+    return 0;
+}
+`,
+  },
 ];
 
 // Compile flags for every C++ run. These are pinned to the exact set
