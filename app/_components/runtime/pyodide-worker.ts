@@ -124,6 +124,8 @@ _display_outputs = []
 def display(*objs):
     import pandas as pd
     for obj in objs:
+        if obj is None:
+            continue
         if isinstance(obj, pd.DataFrame):
             _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
         elif hasattr(obj, "_repr_html_"):
