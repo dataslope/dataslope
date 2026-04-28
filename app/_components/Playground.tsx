@@ -300,14 +300,37 @@ const SAMPLE_FN_NAME: Record<string, string> = {
   r: "greet",
 };
 
-/** Detect macOS so we can show the user the actual modifier key combo
- *  for the run shortcut (⌘ Enter on macOS, Ctrl Enter everywhere else).
- *  Defaults to Windows/Linux semantics during SSR and on the very first
- *  client paint — the value is upgraded after mount via `useIsMac`. */
+/** Built-in defaults for the per-language playground settings. Used both
+ *  when hydrating an unconfigured playground from localStorage and when
+ *  the user clicks "Restore default settings", so the two paths can
+ *  never drift out of sync. */
+const DEFAULT_PLAYGROUND_SETTINGS = {
+  fontSize: 13,
+  outputFontSize: 13,
+  outputFontSizeEnabled: false,
+  editorTheme: "dracula",
+  wordWrap: true,
+  clearBeforeRun: false,
+} as const;
+
+/** Detect desktop macOS so we can show the user the actual modifier
+ *  key combo for the run shortcut (⌘ Enter on macOS, Ctrl Enter
+ *  everywhere else). iOS/iPadOS are intentionally excluded — they
+ *  rarely have a physical keyboard, and when they do they typically
+ *  use Ctrl-style external keyboards.
+ *  Defaults to false during SSR and on the very first client paint —
+ *  the value is upgraded after mount via `useSyncExternalStore`. */
 function detectIsMac(): boolean {
   if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent || navigator.platform || "";
-  return /Mac|iPhone|iPad|iPod/i.test(ua);
+  const platform = navigator.platform || "";
+  const ua = navigator.userAgent || "";
+  // Some recent Safari builds report "MacIntel" for iPad as well, so
+  // disambiguate via touch-points like Apple recommends.
+  const isIpadOS =
+    /^Mac/.test(platform) && (navigator.maxTouchPoints ?? 0) > 1;
+  if (isIpadOS) return false;
+  if (/iPhone|iPad|iPod/i.test(ua)) return false;
+  return /Mac/i.test(platform) || /Macintosh/i.test(ua);
 }
 
 function applyThemePalette(theme: string): void {
@@ -1042,8 +1065,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     document.title = adapter.documentTitle;
     document.body.classList.add("pg-active");
 
-    const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? 13) || 13;
-    const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+    const D = DEFAULT_PLAYGROUND_SETTINGS;
+    const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) || D.fontSize;
+    const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? D.editorTheme;
     const savedOutputEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
@@ -1322,21 +1346,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // unrelated localStorage entries are intentionally left alone — the
   // separate "Clear all localStorage" action handles those.
   const restoreDefaultSettings = useCallback(() => {
-    const defaults = {
-      fontsize: 13,
-      outputfontsize: 13,
-      outputfontsize_enabled: false,
-      editortheme: "dracula",
-      wordwrap: true,
-      clearbeforerun: false,
-    } as const;
-
-    setFontSize(defaults.fontsize);
-    setOutputFontSize(defaults.outputfontsize);
-    setOutputFontSizeEnabled(defaults.outputfontsize_enabled);
-    setEditorTheme(defaults.editortheme);
-    setWordWrap(defaults.wordwrap);
-    setClearBeforeRun(defaults.clearbeforerun);
+    const D = DEFAULT_PLAYGROUND_SETTINGS;
+    setFontSize(D.fontSize);
+    setOutputFontSize(D.outputFontSize);
+    setOutputFontSizeEnabled(D.outputFontSizeEnabled);
+    setEditorTheme(D.editorTheme);
+    setWordWrap(D.wordWrap);
+    setClearBeforeRun(D.clearBeforeRun);
     showToast("Default settings restored.");
   }, [
     setFontSize,
@@ -1352,11 +1368,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // so the freshly cleared state takes effect everywhere — including
   // saved editor contents, theme, and any future per-playground keys.
   const clearAllLocalStorage = useCallback(() => {
-    const ok =
-      typeof window !== "undefined" &&
-      window.confirm(
-        "This will permanently delete every saved setting and code snippet across all playgrounds. Continue?",
-      );
+    const ok = window.confirm(
+      "This will permanently delete every saved setting and code snippet across all playgrounds. Continue?",
+    );
     if (!ok) return;
     try {
       localStorage.clear();
@@ -1630,21 +1644,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // still initialising. The cadence is intentionally a touch slower than
   // the moving-text animation so the text isn't constantly twitching.
   // We always start at index 0 so the SSR HTML and the first client
-  // paint match (avoiding a hydration mismatch); the random seed is
-  // applied on mount via the interval's first tick (which jumps to a
-  // random offset before settling into the +1 cadence).
+  // paint match (avoiding a hydration mismatch). The random offset is
+  // captured once on mount in a ref and applied on the first interval
+  // tick, so subsequent effect re-runs (e.g. when statusState flips)
+  // don't re-roll the start position.
   const [quipIndex, setQuipIndex] = useState<number>(0);
+  const quipSeedRef = useRef<number>(-1);
+  useEffect(() => {
+    if (quipSeedRef.current < 0) {
+      quipSeedRef.current = Math.floor(Math.random() * LOADING_QUIPS.length);
+    }
+  }, []);
   useEffect(() => {
     if (loaded || statusState === "error") return;
-    const seed = Math.floor(Math.random() * LOADING_QUIPS.length);
     let tick = 0;
     const id = window.setInterval(() => {
       tick += 1;
-      // First tick: jump to a random starting quip so different page
-      // loads don't all begin with the same line. Subsequent ticks
-      // advance by one for predictable rotation.
+      // First tick: jump to the random starting quip captured on mount
+      // so different page loads don't all begin with the same line.
+      // Subsequent ticks advance by one for predictable rotation.
       setQuipIndex(
-        tick === 1 ? seed : (prev) => (prev + 1) % LOADING_QUIPS.length,
+        tick === 1
+          ? Math.max(0, quipSeedRef.current)
+          : (prev) => (prev + 1) % LOADING_QUIPS.length,
       );
     }, 2200);
     return () => {
