@@ -1554,7 +1554,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       editorRef.current?.setValue(ex.code);
       setMobileTab("editor");
       editorRef.current?.focus();
-      showToast(`Loaded ${ex.title}.`);
+      showToast(`Loaded ${ex.title}. Switched to Editor tab.`);
     },
     [showToast],
   );
