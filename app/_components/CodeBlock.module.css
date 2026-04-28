@@ -1,0 +1,366 @@
+/* Standalone executable code-block, intended to be embedded inside
+   long-form learning pages (e.g. fumadocs MDX). Visually compact, no
+   sidebars / toolbars / themes / packages drawer — just an editor, a
+   Run button, a Reset button, and a stdout/stderr panel. Multiple
+   blocks targeting the same language adapter share a single runtime
+   via the registry, so a page with five Python blocks loads one
+   Pyodide worker, not five.
+
+   Styling intentionally mirrors the main playground (dark palette,
+   Inter / JetBrains Mono, accent-coloured Run button, left-border
+   output cells) so a code block dropped into an MDX page reads as
+   "the playground, in miniature". The design tokens below are the
+   same hex values as `:root` in `playground.css`, duplicated here so
+   the component works even when the playground stylesheet isn't
+   loaded on the surrounding page. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+.codeBlock {
+  /* Same tokens as playground.css `:root` — scoped to this component
+     so it doesn't leak onto the surrounding learning page. */
+  --cb-bg: #0f1117;
+  --cb-bg2: #161b27;
+  --cb-bg3: #1e2535;
+  --cb-border: #2a3347;
+  --cb-text: #e2e8f0;
+  --cb-text-dim: #64748b;
+  --cb-text-muted: #94a3b8;
+  --cb-accent: oklch(68% 0.18 250);
+  --cb-green: oklch(68% 0.18 145);
+  --cb-red: oklch(62% 0.18 15);
+  --cb-yellow: oklch(78% 0.16 85);
+  --cb-font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  --cb-font-mono:
+    "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+  --cb-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  background: var(--cb-bg);
+  color: var(--cb-text);
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius);
+  overflow: hidden;
+  font-family: var(--cb-font-ui);
+  margin: 1rem 0;
+}
+
+/* ─── Header (id, language, status dot) ───────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 36px;
+  background: var(--cb-bg2);
+  border-bottom: 1px solid var(--cb-border);
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.headerId {
+  font-family: var(--cb-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cb-text-dim);
+}
+
+.headerLine {
+  flex: 0 0 32px;
+  height: 1px;
+  background: var(--cb-border);
+}
+
+.headerLang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cb-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.headerLang svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.headerSpacer {
+  flex: 1 1 auto;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cb-bg3);
+  border: 1px solid var(--cb-border);
+  flex: 0 0 auto;
+}
+.statusDot[data-status="loading"] {
+  background: var(--cb-yellow);
+  border-color: transparent;
+  animation: cb-pulse 1.2s ease-in-out infinite;
+}
+.statusDot[data-status="running"] {
+  background: var(--cb-accent);
+  border-color: transparent;
+  animation: cb-pulse 1s ease-in-out infinite;
+}
+.statusDot[data-status="ready"] {
+  background: var(--cb-green);
+  border-color: transparent;
+}
+.statusDot[data-status="error"] {
+  background: var(--cb-red);
+  border-color: transparent;
+}
+
+@keyframes cb-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ─── Editor ──────────────────────────────────────────────────────── */
+
+.editor {
+  background: var(--cb-bg);
+}
+
+/* Match the main playground's CodeMirror sizing/typography but allow
+   the editor to grow with content (we don't have a fixed-height pane
+   here). The dracula theme styles syntax colours; we only override
+   layout-related properties. */
+.editor :global(.CodeMirror) {
+  height: auto;
+  min-height: 60px;
+  font-family: var(--cb-font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
+}
+.editor :global(.CodeMirror-scroll) {
+  min-height: 60px;
+}
+
+/* ─── Action bar ──────────────────────────────────────────────────── */
+
+.actionBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--cb-bg2);
+  border-top: 1px solid var(--cb-border);
+  flex-shrink: 0;
+}
+
+.runBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  background: var(--cb-accent);
+  border: none;
+  color: white;
+  font-family: var(--cb-font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.runBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.runBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.runBtnIcon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--cb-border);
+  border-radius: 4px;
+  color: var(--cb-text-dim);
+  font-family: var(--cb-font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+.resetBtn:hover:not(:disabled) {
+  background: var(--cb-bg3);
+  color: var(--cb-text);
+}
+.resetBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kbdHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.kbd {
+  font-family: var(--cb-font-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.kbdPlus {
+  font-family: var(--cb-font-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.actionBarSpacer {
+  flex: 1 1 auto;
+}
+
+.statusText {
+  font-size: 11px;
+  color: var(--cb-text-dim);
+  font-family: var(--cb-font-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.statusText[data-status="error"] {
+  color: var(--cb-red);
+}
+
+/* ─── Output ──────────────────────────────────────────────────────── */
+
+.output {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--cb-bg);
+  border-top: 1px solid var(--cb-border);
+  max-height: 320px;
+  overflow: auto;
+}
+
+.output::-webkit-scrollbar {
+  width: 6px;
+}
+.output::-webkit-scrollbar-track {
+  background: transparent;
+}
+.output::-webkit-scrollbar-thumb {
+  background: var(--cb-border);
+  border-radius: 3px;
+}
+
+.outputEmpty {
+  color: var(--cb-text-dim);
+  font-style: italic;
+  font-family: var(--cb-font-ui);
+  font-size: 12px;
+}
+
+.outCell {
+  border-radius: var(--cb-radius);
+  overflow: hidden;
+  background: var(--cb-bg2);
+  animation: cb-fadeSlide 0.2s ease;
+}
+@keyframes cb-fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.outCellStdout {
+  border-left: 3px solid var(--cb-green);
+}
+.outCellStderr {
+  border-left: 3px solid var(--cb-red);
+}
+.outCellHtml {
+  border-left: 3px solid var(--cb-accent);
+}
+.outCellImage {
+  border-left: 3px solid var(--cb-yellow);
+}
+
+.outCellHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: var(--cb-bg2);
+  border-bottom: 1px solid var(--cb-border);
+  font-size: 10px;
+  font-family: var(--cb-font-mono);
+  color: var(--cb-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.outCellTime {
+  margin-left: auto;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--cb-text-dim);
+}
+
+.outCellBody {
+  padding: 10px 12px;
+  font-family: var(--cb-font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--cb-text);
+}
+
+.outCellStderr .outCellBody {
+  color: var(--cb-red);
+}
+
+.outCellHtml :global(img),
+.outCellHtml :global(svg) {
+  max-width: 100%;
+}
