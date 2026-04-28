@@ -52,7 +52,12 @@ body.pg-active {
 .pg-app {
   display: grid;
   grid-template-rows: 40px 1fr;
+  /* Use the dynamic viewport height on mobile browsers so that the
+     bottom of the layout (e.g. the last output cell on the Output tab)
+     remains reachable when the URL bar is visible. `100vh` falls back
+     for browsers that don't support `dvh`. */
   height: 100vh;
+  height: 100dvh;
 }
 
 /* ─── Header ─── */
@@ -961,7 +966,7 @@ input[type="range"].fs-slider:disabled {
 
 .pkg-drawer-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -970,8 +975,8 @@ input[type="range"].fs-slider:disabled {
   display: flex; align-items: center; gap: 8px;
 }
 .pkg-drawer-hint {
-  font-size: 11.5px; color: var(--text-dim); margin-top: 4px;
-  line-height: 1.45;
+  font-size: 11.5px; color: var(--text-dim); margin-top: 2px;
+  line-height: 1.4;
 }
 .pkg-count-badge {
   font-size: 10px; font-weight: 600; padding: 2px 7px;
@@ -1335,6 +1340,15 @@ input[type="range"].fs-slider:disabled {
 
   /* The drag-to-resize divider doesn't make sense in a tabbed layout. */
   .resizer { display: none; }
+
+  /* Hide the CodeMirror line-number gutter on mobile. The narrow
+     gutter would otherwise show as an empty vertical bar on the left
+     edge of the editor (line numbers don't fit visibly at this width)
+     and shift the code into a horizontally-scrolling overflow that
+     clips the start of each line. We zero out the sizer's left margin
+     so the editor content takes the full width. */
+  .CodeMirror-gutters { display: none !important; }
+  .CodeMirror-sizer { margin-left: 0 !important; }
 }
 
 /* ─── Base UI popups (shared positioner -> popup styling) ──────────────
@@ -1404,7 +1418,14 @@ input[type="range"].fs-slider:disabled {
   border-top-right-radius: 16px;
   box-shadow: 0 -8px 32px #0008;
   display: flex; flex-direction: column;
+  /* Cap the drawer at the dynamic viewport height so it always fits
+     within the visible area even when the mobile browser's URL bar
+     is showing. `vh` falls back for browsers without `dvh` support. */
   max-height: 85vh;
+  max-height: 85dvh;
+  /* Required so the inner `.mobile-menu-drawer-body` can actually
+     overflow-scroll when accordion sections expand past the cap. */
+  min-height: 0;
   outline: none;
   /* Slide up from the bottom; Base UI flips data-starting-style /
      data-ending-style during open/close. */
@@ -1433,6 +1454,10 @@ input[type="range"].fs-slider:disabled {
 
 .mobile-menu-drawer-body {
   flex: 1;
+  /* Allow the flex item to shrink below its content size so
+     `overflow-y: auto` can actually take effect when accordion
+     sections (Examples / Export) expand past the drawer cap. */
+  min-height: 0;
   overflow-y: auto;
   padding: 4px 8px 16px;
   display: flex; flex-direction: column;
