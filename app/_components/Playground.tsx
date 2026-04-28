@@ -134,6 +134,11 @@ const PLAYGROUND_ICON_SIZE_FACTOR: Record<string, number> = {
   python: 0.9,
   typescript: 0.9,
   csharp: 0.9,
+  // The DiPhp glyph has noticeable internal whitespace around the logo,
+  // so it visually reads smaller than the other language marks at the
+  // same nominal size. Bump it up so it matches the optical weight of
+  // the surrounding icons.
+  php: 1.4,
 };
 
 /** Brand colors used for the playground language icons in the switcher
@@ -689,7 +694,23 @@ function DataslopeRunOverlay({
   return (
     <div className={cls} aria-hidden="true">
       <div className="dataslope-glow" />
-      <div className="dataslope-slope" />
+      <svg
+        className="dataslope-waves"
+        viewBox="0 0 240 40"
+        preserveAspectRatio="none"
+      >
+        {/* Two overlapping smooth sine-curves animated horizontally.
+            Each path is twice the viewBox width so it can scroll
+            seamlessly via a translateX animation. */}
+        <path
+          className="dataslope-wave dataslope-wave--back"
+          d="M0 26 C 20 14, 40 14, 60 26 S 100 38, 120 26 S 160 14, 180 26 S 220 38, 240 26 S 280 14, 300 26 S 340 38, 360 26 S 400 14, 420 26 S 460 38, 480 26 L 480 40 L 0 40 Z"
+        />
+        <path
+          className="dataslope-wave dataslope-wave--front"
+          d="M0 30 C 20 20, 40 20, 60 30 S 100 40, 120 30 S 160 20, 180 30 S 220 40, 240 30 S 280 20, 300 30 S 340 40, 360 30 S 400 20, 420 30 S 460 40, 480 30 L 480 40 L 0 40 Z"
+        />
+      </svg>
       <div className="dataslope-stream" />
     </div>
   );
@@ -2454,7 +2475,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
                   </svg>
                 ) : (
-                  <Play size={12} aria-hidden="true" />
+                  <Play size={10} aria-hidden="true" />
                 )}
                 {statusState === "running" ? "Running…" : "Run"}
               </button>
