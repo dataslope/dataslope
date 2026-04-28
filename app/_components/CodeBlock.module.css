@@ -46,6 +46,22 @@
   margin: 1rem 0;
 }
 
+/* Light-mode chrome — applied when the docs theme is "light". The
+   token values are picked to match the IntelliJ IDEA CodeMirror theme
+   (which is used as the editor theme in light mode) so the editor
+   blends into the surrounding pane bars instead of looking like a dark
+   inset on a light page. */
+.codeBlock[data-cb-theme="light"] {
+  --cb-bg: #ffffff;
+  --cb-bg2: #f5f5f5;
+  --cb-bg3: #ebebeb;
+  --cb-border: #d8d8d8;
+  --cb-text: #1f2937;
+  --cb-text-dim: #6b7280;
+  --cb-text-muted: #4b5563;
+  --cb-accent: oklch(58% 0.2 250);
+}
+
 /* ─── Header (id, language, status dot) ───────────────────────────── */
 
 .header {
@@ -177,7 +193,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: filter 0.15s;
+  transition: all 0.15s;
 }
 .runBtn:hover:not(:disabled) {
   filter: brightness(1.1);
@@ -185,10 +201,27 @@
 .runBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  filter: none;
 }
-.runBtnIcon {
-  font-size: 10px;
-  line-height: 1;
+.runBtn svg {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  fill: white;
+  stroke: white;
+}
+.runBtnRunning {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+.runBtnSpinner {
+  animation: cb-spin 0.75s linear infinite;
+  fill: none !important;
+}
+@keyframes cb-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .resetBtn {
@@ -218,21 +251,23 @@
   cursor: not-allowed;
 }
 
-.kbdHint {
+/* Keyboard-shortcut hint — same look as the main playground's
+   `.kbd`/`.kbd-group`/`.kbd-plus` so the action bar reads as the
+   playground in miniature. */
+.kbdGroup {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-left: 4px;
 }
 
 .kbd {
   font-family: var(--cb-font-mono);
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--cb-text-dim);
   padding: 2px 6px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--cb-border);
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--cb-bg);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -240,8 +275,41 @@
 .kbdPlus {
   font-family: var(--cb-font-mono);
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--cb-text-dim);
   font-weight: 600;
+}
+
+/* Icon-only buttons (copy code, copy output) — sized to match the
+   surrounding action-bar / cell-header text controls. Mirrors the main
+   playground's `.icon-btn`. */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cb-radius);
+  color: var(--cb-text-dim);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+.iconBtn:hover {
+  color: var(--cb-text);
+  border-color: var(--cb-border);
+  background: var(--cb-bg3);
+}
+.iconBtn:focus-visible {
+  outline: 2px solid var(--cb-accent);
+  outline-offset: 1px;
+}
+.iconBtn svg {
+  display: block;
 }
 
 .actionBarSpacer {
@@ -264,6 +332,10 @@
 
 /* ─── Output ──────────────────────────────────────────────────────── */
 
+/* Don't clip the whole output column — instead each cell decides for
+   itself whether to grow or to scroll (see `.outCellBody` rules below
+   for image/html/plot caps). This way a tall matplotlib figure no
+   longer bleeds past a 320px window with no scrollbar in sight. */
 .output {
   display: flex;
   flex-direction: column;
@@ -271,19 +343,6 @@
   padding: 12px;
   background: var(--cb-bg);
   border-top: 1px solid var(--cb-border);
-  max-height: 320px;
-  overflow: auto;
-}
-
-.output::-webkit-scrollbar {
-  width: 6px;
-}
-.output::-webkit-scrollbar-track {
-  background: transparent;
-}
-.output::-webkit-scrollbar-thumb {
-  background: var(--cb-border);
-  border-radius: 3px;
 }
 
 .outputEmpty {
@@ -323,7 +382,7 @@
   border-left: 3px solid var(--cb-yellow);
 }
 .outCellPlot {
-  border-left: 3px solid var(--cb-accent);
+  border-left: 3px solid var(--cb-yellow);
 }
 
 .outCellHeader {
@@ -341,12 +400,24 @@
   font-weight: 600;
 }
 
+.outCellType {
+  font-weight: 600;
+}
+
 .outCellTime {
   margin-left: auto;
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0;
   color: var(--cb-text-dim);
+}
+
+/* Anchor the cell-header copy button on the right edge regardless of
+   whether `outCellTime` (which uses `margin-left: auto`) is present. */
+.outCellCopy {
+  margin-left: 4px;
+  width: 22px;
+  height: 22px;
 }
 
 .outCellBody {
@@ -363,6 +434,26 @@
   color: var(--cb-red);
 }
 
+/* Cap the body height for visually heavy cells so a giant figure /
+   wide DataFrame / Plotly chart stays inside the page flow but is
+   still fully reachable via a scrollbar. Plain text cells (stdout /
+   stderr) intentionally have no cap so short outputs read inline. */
+.outCellHtml .outCellBody {
+  padding: 0;
+  max-height: 480px;
+  overflow: auto;
+}
+.outCellImage .outCellBody {
+  text-align: center;
+  max-height: 600px;
+  overflow: auto;
+}
+.outCellPlot .outCellBody {
+  padding: 0;
+  max-height: 600px;
+  overflow: auto;
+}
+
 .outCellHtml :global(img),
 .outCellHtml :global(svg) {
   max-width: 100%;
@@ -370,6 +461,49 @@
 
 .outCellPlot :global(.js-plotly-plot) {
   width: 100%;
+}
+
+/* ─── DataFrame tables ─── */
+
+/* Mirrors `.dataframe-wrap` + `.out-cell.html table` in playground.css
+   so a DataFrame rendered inside a learning code block matches the
+   playground's table chrome (accent-coloured headers, hover rows,
+   horizontal scroll for wide frames). */
+.dataframeWrap {
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.dataframeWrap :global(table) {
+  border-collapse: collapse;
+  font-family: var(--cb-font-mono);
+  font-size: 12.5px;
+  color: var(--cb-text);
+  width: 100%;
+  min-width: max-content;
+}
+.dataframeWrap :global(th) {
+  padding: 7px 14px;
+  background: var(--cb-bg3);
+  border-bottom: 1px solid var(--cb-border);
+  border-right: 1px solid var(--cb-border);
+  text-align: left;
+  font-weight: 600;
+  color: var(--cb-accent);
+  white-space: nowrap;
+}
+.dataframeWrap :global(td) {
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--cb-border);
+  border-right: 1px solid var(--cb-border);
+  white-space: nowrap;
+  color: var(--cb-text-muted);
+}
+.dataframeWrap :global(tr:hover td) {
+  background: var(--cb-bg3);
+}
+.dataframeWrap :global(tr:last-child td) {
+  border-bottom: none;
 }
 
 /* ─── Initialization code (read-only, collapsible) ────────────────── */
@@ -444,7 +578,9 @@
    case where pointer-modality detection isn't available.
 */
 @media (hover: none) and (pointer: coarse), (max-width: 540px) {
-  .kbdHint {
+  .kbd,
+  .kbdGroup,
+  .kbdPlus {
     display: none;
   }
 }

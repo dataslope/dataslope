@@ -10,7 +10,43 @@
  * generation to Fumadocs's own JS files, so we don't accidentally pay
  * for utilities we never use.
  */
+/* Pull in the same Inter weights the playground bundles, so the docs
+   typography matches the playground chrome and doesn't wait on the
+   system fallback while Fumadocs's default font loads. The `@import`
+   must precede the tailwind/fumadocs imports below — `@import` rules
+   are required to come before any non-`@import`/`@layer`/`@charset`
+   at-rule, including the inlined CSS pulled in by tailwindcss. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 @import "tailwindcss";
 @source "../../node_modules/fumadocs-ui/dist/**/*.js";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+
+/* Override Fumadocs's default sans stack inside the /learn route with
+   Inter and apply slightly tight letter-spacing for a more polished
+   editorial feel. We scope to `body` (which is shared, but layout-CSS
+   imports here are scoped to the /learn bundle by Next.js so they
+   don't leak into other routes). */
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family:
+    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  letter-spacing: -0.011em;
+}
+
+/* Tighten headings a touch more — Inter looks crispest with negative
+   tracking at display sizes. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+}

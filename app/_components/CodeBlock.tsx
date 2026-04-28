@@ -25,6 +25,7 @@ import {
 // reads as "the playground, in miniature".
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
+import "codemirror/theme/idea.css";
 
 import type {
   LanguageAdapter,
@@ -103,6 +104,94 @@ function detectIsMac(): boolean {
   const platform = navigator.platform || "";
   const ua = navigator.userAgent || "";
   return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
+}
+
+// Detect the active colour scheme on `<html>`. Fumadocs uses next-themes
+// with `attribute: "class"`, so light/dark is reflected as the `dark`
+// class (or absence thereof) on the document root. We fall back to the
+// OS-level preference in case the page is rendered outside fumadocs.
+function detectIsDark(): boolean {
+  if (typeof document === "undefined") return true;
+  const root = document.documentElement;
+  if (root.classList.contains("dark")) return true;
+  if (root.classList.contains("light")) return false;
+  if (root.dataset.theme === "dark") return true;
+  if (root.dataset.theme === "light") return false;
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  return true;
+}
+
+// Subscribe to <html> class / data-theme mutations so we can re-render
+// when the user toggles the docs theme. Pairs with `useSyncExternalStore`
+// to stay SSR-safe (snapshot defaults to `true` / dark on the server).
+function useIsDark(): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      if (typeof document === "undefined") return () => {};
+      const observer = new MutationObserver(notify);
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "data-theme"],
+      });
+      const mql =
+        typeof window !== "undefined" && window.matchMedia
+          ? window.matchMedia("(prefers-color-scheme: dark)")
+          : null;
+      mql?.addEventListener?.("change", notify);
+      return () => {
+        observer.disconnect();
+        mql?.removeEventListener?.("change", notify);
+      };
+    },
+    () => detectIsDark(),
+    () => true,
+  );
+}
+
+// Map the document's colour scheme to the matching CodeMirror theme name.
+// Light docs → IntelliJ IDEA, dark docs → Dracula.
+function cmThemeFor(isDark: boolean): string {
+  return isDark ? "dracula" : "idea";
+}
+
+// Small clipboard / "copy to clipboard" glyph reused by the action bar
+// and the output-cell headers. Stroke-only so it inherits the current
+// text colour and reads as part of the surrounding chrome.
+function CopyIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="5" y="5" width="9" height="9" rx="1.5" />
+      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
+    </svg>
+  );
+}
+
+// Solid Play triangle, sized to match the lucide `Play` icon used in the
+// main playground's Run button.
+function PlayIcon() {
+  return (
+    <svg
+      viewBox="0 0 12 12"
+      width="10"
+      height="10"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M2.5 1.5 L10 6 L2.5 10.5 Z" />
+    </svg>
+  );
 }
 
 // Brand-coloured glyph for the adapter's language. Falls back to a
@@ -191,6 +280,12 @@ export default function CodeBlock({
     () => false,
   );
 
+  // Track the active docs colour scheme so the CodeMirror theme can flip
+  // between IntelliJ IDEA (light) and Dracula (dark) when the user
+  // toggles the docs theme.
+  const isDark = useIsDark();
+  const cmTheme = cmThemeFor(isDark);
+
   // ─── Editor mount ──────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
@@ -199,8 +294,12 @@ export default function CodeBlock({
         if (cancelled || !textareaRef.current || editorRef.current) return;
         const editor = CM.fromTextArea(textareaRef.current, {
           mode: adapter.codeMirrorMode,
-          theme: "dracula",
+          theme: cmThemeFor(detectIsDark()),
           lineNumbers: true,
+          // When init code is present, the user-editable region's line
+          // numbers continue from where the init block left off so the
+          // combined code reads as a single contiguous program.
+          firstLineNumber: hasInit ? initLineCount + 1 : 1,
           indentUnit: 2,
           tabSize: 2,
           indentWithTabs: false,
@@ -233,8 +332,20 @@ export default function CodeBlock({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sync the CodeMirror theme whenever the docs colour scheme flips.
+  useEffect(() => {
+    editorRef.current?.setOption("theme", cmTheme);
+    initEditorRef.current?.setOption("theme", cmTheme);
+  }, [cmTheme]);
+
   // Mount the read-only init editor lazily, the first time the panel
   // is expanded — keeps the cost zero for collapsed init blocks.
+  // The cleanup tears the editor down whenever the panel collapses (the
+  // host `<div>` is unmounted by the conditional render in JSX, taking
+  // the underlying textarea with it). Without resetting `initEditorRef`
+  // here, a re-expand would keep the stale editor reference alive and
+  // skip mounting a fresh CodeMirror instance, leaving only the bare
+  // textarea fallback visible.
   useEffect(() => {
     if (!hasInit || !initExpanded) return;
     let cancelled = false;
@@ -245,7 +356,7 @@ export default function CodeBlock({
         }
         const editor = CM.fromTextArea(initTextareaRef.current, {
           mode: adapter.codeMirrorMode,
-          theme: "dracula",
+          theme: cmThemeFor(detectIsDark()),
           lineNumbers: true,
           indentUnit: 2,
           tabSize: 2,
@@ -264,6 +375,11 @@ export default function CodeBlock({
       });
     return () => {
       cancelled = true;
+      // toTextArea restores the original textarea so React can safely
+      // unmount it; clearing the ref ensures the next expand mounts a
+      // fresh editor instead of bailing on the stale reference.
+      initEditorRef.current?.toTextArea?.();
+      initEditorRef.current = null;
     };
     // adapter.codeMirrorMode is stable per adapter; trimmedInit is stable
     // per render of this CodeBlock (init code never changes at runtime).
@@ -347,12 +463,39 @@ export default function CodeBlock({
     setStatusMessage("");
   }, [initialCode]);
 
+  // Copy the current contents of the user-editable editor (not the init
+  // block) to the clipboard. Mirrors the Playground's editor copy
+  // affordance, including the legacy `execCommand` fallback for browsers
+  // / contexts where the async Clipboard API is unavailable.
+  const copyEditor = useCallback(async () => {
+    const code =
+      editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else if (typeof document !== "undefined") {
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+    } catch {
+      // Clipboard failures are non-fatal — silently ignore so a missing
+      // permission doesn't surface as a runtime error in the page.
+    }
+  }, []);
+
   const isBusy = status === "loading" || status === "running";
 
   // ─── Render ────────────────────────────────────────────────────────────
   return (
     <div
       className={styles.codeBlock}
+      data-cb-theme={isDark ? "dark" : "light"}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
     >
       <div className={styles.header}>
@@ -430,21 +573,54 @@ export default function CodeBlock({
       >
         <button
           type="button"
-          className={styles.runBtn}
+          className={`${styles.runBtn}${isBusy ? ` ${styles.runBtnRunning}` : ""}`}
           onClick={() => run()}
           disabled={isBusy}
         >
-          <span className={styles.runBtnIcon} aria-hidden>
-            ▶
-          </span>
-          <span>{isBusy ? "Running…" : "Run"}</span>
-          {!isBusy && (
-            <span className={styles.kbdHint} aria-hidden>
-              <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-              <span className={styles.kbdPlus}>+</span>
-              <kbd className={styles.kbd}>Enter</kbd>
-            </span>
+          {isBusy ? (
+            <svg
+              viewBox="0 0 12 12"
+              className={styles.runBtnSpinner}
+              aria-hidden
+            >
+              <circle
+                cx="6"
+                cy="6"
+                r="4.5"
+                fill="none"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeDasharray="14 8"
+              />
+            </svg>
+          ) : (
+            <PlayIcon />
           )}
+          <span>{isBusy ? "Running…" : "Run"}</span>
+        </button>
+        {!isBusy && (
+          <span
+            className={styles.kbdGroup}
+            title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+          >
+            <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+            <span className={styles.kbdPlus} aria-hidden="true">
+              +
+            </span>
+            <kbd className={styles.kbd}>Enter</kbd>
+          </span>
+        )}
+        <button
+          type="button"
+          className={styles.iconBtn}
+          title="Copy code to clipboard"
+          aria-label="Copy code to clipboard"
+          onClick={() => {
+            void copyEditor();
+          }}
+        >
+          <CopyIcon />
         </button>
         <button
           type="button"
@@ -466,7 +642,13 @@ export default function CodeBlock({
       {outputs.length > 0 && (
         <div className={styles.output} aria-live="polite">
           {outputs.map((cell) => (
-            <OutputCellView key={cell.id} cell={cell} />
+            <OutputCellView
+              key={cell.id}
+              cell={cell}
+              onCopy={(content) => {
+                void copyToClipboard(content);
+              }}
+            />
           ))}
         </div>
       )}
@@ -474,7 +656,46 @@ export default function CodeBlock({
   );
 }
 
-function OutputCellView({ cell }: { cell: OutputCell }) {
+// Shared clipboard helper used by the per-output-cell copy buttons.
+// Mirrors the editor's `copyEditor` fallback path so both code paths
+// behave identically across browsers.
+async function copyToClipboard(text: string): Promise<void> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else if (typeof document !== "undefined") {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  } catch {
+    // Non-fatal — see CodeBlock.copyEditor for rationale.
+  }
+}
+
+// Cell-type → playground-style header label. Keeping these in sync with
+// `Playground.tsx`'s `typeLabel` map ensures a code block's outputs read
+// identically to the playground's outputs.
+const CELL_TYPE_LABEL: Record<OutputCell["type"], string> = {
+  stdout: "OUTPUT",
+  stderr: "ERROR",
+  html: "DATAFRAME",
+  image: "FIGURE",
+  plot: "CHART",
+};
+
+function OutputCellView({
+  cell,
+  onCopy,
+}: {
+  cell: OutputCell;
+  onCopy: (content: string) => void;
+}) {
   // Renders text (stdout/stderr), HTML (e.g. dataframes from Python/R),
   // base64 PNG images (e.g. matplotlib figures), and Plotly figures —
   // matching what the main playground supports so a code block dropped
@@ -494,29 +715,41 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
         return `${styles.outCell} ${styles.outCellStdout}`;
     }
   })();
-  const headerLabel =
-    cell.type === "stderr"
-      ? "stderr"
-      : cell.type === "html"
-        ? "html"
-        : cell.type === "image"
-          ? "image"
-          : cell.type === "plot"
-            ? "plot"
-            : "stdout";
+  const headerLabel = CELL_TYPE_LABEL[cell.type];
+  // Only text-ish cells are sensibly copyable. Skipping image/plot
+  // cells avoids exposing the raw base64 PNG / Plotly JSON blob behind
+  // a misleading "Copy" affordance — same rule the playground uses.
+  const isCopyable =
+    cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
   return (
     <div className={wrapperClass}>
       <div className={styles.outCellHeader}>
-        <span>{headerLabel}</span>
-        {cell.elapsed && <span className={styles.outCellTime}>{cell.elapsed}</span>}
+        <span className={styles.outCellType}>{headerLabel}</span>
+        {cell.elapsed && (
+          <span className={styles.outCellTime}>{cell.elapsed}</span>
+        )}
+        {isCopyable && (
+          <button
+            type="button"
+            className={`${styles.iconBtn} ${styles.outCellCopy}`}
+            title="Copy output to clipboard"
+            aria-label="Copy output to clipboard"
+            onClick={() => onCopy(cell.content)}
+          >
+            <CopyIcon />
+          </button>
+        )}
       </div>
       <div className={styles.outCellBody}>
         {cell.type === "html" ? (
           // Same trust assumption as the main playground: HTML cells are
           // produced by the embedded runtime executing code the user
           // themselves typed in this very widget.
-          <div dangerouslySetInnerHTML={{ __html: cell.content }} />
+          <div
+            className={styles.dataframeWrap}
+            dangerouslySetInnerHTML={{ __html: cell.content }}
+          />
         ) : cell.type === "image" ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

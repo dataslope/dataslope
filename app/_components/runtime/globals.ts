@@ -20,12 +20,19 @@ export interface CodeMirrorEditor {
   getLine(line: number): string;
   showHint(options?: Record<string, unknown>): void;
   on(event: string, handler: (...args: unknown[]) => void): void;
+  /** Tear the editor down and restore the original `<textarea>`. Used
+   *  when React unmounts the host element so we don't leak DOM nodes. */
+  toTextArea?(): void;
 }
 
 export interface CodeMirrorOptions {
   mode: string;
   theme: string;
   lineNumbers?: boolean;
+  /** Line number shown for the first line. CodeMirror defaults to 1; we
+   *  override this for code blocks with init-code so the user-editable
+   *  region's gutter continues from where the init block left off. */
+  firstLineNumber?: number;
   indentUnit?: number;
   tabSize?: number;
   indentWithTabs?: boolean;
