@@ -26,7 +26,12 @@ import {
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 
-import type { LanguageAdapter, LanguageRuntime, OutputCell } from "./types";
+import type {
+  LanguageAdapter,
+  LanguageRuntime,
+  OutputCell,
+  PlotlyFigure,
+} from "./types";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import { getSharedRuntime } from "./runtimeRegistry";
 import styles from "./CodeBlock.module.css";
@@ -36,7 +41,9 @@ type Status = "idle" | "loading" | "ready" | "running" | "error";
 interface CodeBlockProps {
   /** Language adapter that describes the runtime to use. The same
    *  adapter instance can be passed to multiple `CodeBlock`s on the
-   *  same page; they share one underlying runtime. */
+   *  same page; they share one underlying runtime, but each block
+   *  always executes against a freshly-reset state — variables defined
+   *  in one block are never visible to another. */
   adapter: LanguageAdapter;
   /** Initial source the editor is populated with. The Reset button
    *  restores the editor to this value. */
@@ -44,6 +51,12 @@ interface CodeBlockProps {
   /** Optional human-readable label shown in the header. Defaults to
    *  an auto-generated one like "PyBlock-49b7". */
   label?: string;
+  /** Optional read-only initialization code prepended (verbatim) to the
+   *  user-editable code on every Run. Rendered in a collapsed-by-default
+   *  panel above the editor — handy for setting up imports or sample
+   *  data without cluttering the snippet the learner is meant to focus
+   *  on. The init code is not modifiable from the UI. */
+  initCode?: string;
 }
 
 // Promise that resolves once CodeMirror v5 + the modes used by the
@@ -135,12 +148,15 @@ export default function CodeBlock({
   adapter,
   initialCode,
   label,
+  initCode,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
   const headerLabel = label ?? blockId;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const editorRef = useRef<CodeMirrorEditor | null>(null);
+  const initTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const initEditorRef = useRef<CodeMirrorEditor | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
   // Sequence number lets us drop output from a previous run if the
   // user clicks Run again while one is in flight.
@@ -152,6 +168,12 @@ export default function CodeBlock({
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
+  const [initExpanded, setInitExpanded] = useState(false);
+
+  const initPanelId = `${blockId}-init`;
+  const trimmedInit = initCode?.trimEnd() ?? "";
+  const hasInit = trimmedInit.length > 0;
+  const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
 
   // Use the same SSR-safe pattern as Playground so the keyboard
   // shortcut hint matches what the freshly hydrated page would show.
@@ -203,10 +225,53 @@ export default function CodeBlock({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Mount the read-only init editor lazily, the first time the panel
+  // is expanded — keeps the cost zero for collapsed init blocks.
+  useEffect(() => {
+    if (!hasInit || !initExpanded) return;
+    let cancelled = false;
+    loadCodeMirror()
+      .then((CM) => {
+        if (cancelled || !initTextareaRef.current || initEditorRef.current) {
+          return;
+        }
+        const editor = CM.fromTextArea(initTextareaRef.current, {
+          mode: adapter.codeMirrorMode,
+          theme: "dracula",
+          lineNumbers: true,
+          indentUnit: 2,
+          tabSize: 2,
+          indentWithTabs: false,
+          lineWrapping: true,
+          // "nocursor" disables both editing AND focus, so the read-only
+          // editor reads as a code listing rather than a disabled input.
+          readOnly: "nocursor",
+        });
+        editor.setValue(trimmedInit);
+        editor.setSize("100%", "auto");
+        initEditorRef.current = editor;
+      })
+      .catch(() => {
+        // Non-fatal: the textarea fallback will still display the code.
+      });
+    return () => {
+      cancelled = true;
+    };
+    // adapter.codeMirrorMode is stable per adapter; trimmedInit is stable
+    // per render of this CodeBlock (init code never changes at runtime).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasInit, initExpanded]);
+
   // ─── Run / Reset ───────────────────────────────────────────────────────
   const run = useCallback(async () => {
-    const code =
+    const userCode =
       editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
+    // Init code is prepended verbatim — every adapter resets state at the
+    // start of run(), so init effectively executes inside the same fresh
+    // scope as the user code. Authors are responsible for providing
+    // syntactically-compatible init (e.g. top-level `using`/`#include`
+    // for compiled languages).
+    const code = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
@@ -258,7 +323,7 @@ export default function CodeBlock({
       setStatus("error");
       setStatusMessage(message);
     }
-  }, [adapter]);
+  }, [adapter, hasInit, trimmedInit]);
 
   // Keep the ref pointing at the latest handler so the editor's keymap
   // (registered once at mount) always invokes the current closure.
@@ -299,6 +364,47 @@ export default function CodeBlock({
           aria-label={statusMessage || status}
         />
       </div>
+
+      {hasInit && (
+        <div className={styles.initWrap}>
+          <button
+            type="button"
+            className={styles.initToggle}
+            aria-expanded={initExpanded}
+            aria-controls={initPanelId}
+            onClick={() => setInitExpanded((v) => !v)}
+          >
+            <span
+              className={`${styles.initCaret} ${
+                initExpanded ? styles.initCaretOpen : ""
+              }`}
+              aria-hidden
+            >
+              ▶
+            </span>
+            <span className={styles.initLabel}>
+              Initialization code ({adapter.runtimeInfo.language})
+            </span>
+            <span className={styles.initMeta}>
+              {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
+            </span>
+          </button>
+          {initExpanded && (
+            <div
+              id={initPanelId}
+              className={styles.initEditor}
+              aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
+            >
+              <textarea
+                ref={initTextareaRef}
+                defaultValue={trimmedInit}
+                spellCheck={false}
+                readOnly
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={styles.editor}>
         <textarea
@@ -361,9 +467,11 @@ export default function CodeBlock({
 }
 
 function OutputCellView({ cell }: { cell: OutputCell }) {
-  // Minimal renderer: this component intentionally only supports text
-  // (stdout/stderr) and HTML — the rich plot/image cells emitted by
-  // some runtimes can be added later as the learning pages need them.
+  // Renders text (stdout/stderr), HTML (e.g. dataframes from Python/R),
+  // base64 PNG images (e.g. matplotlib figures), and Plotly figures —
+  // matching what the main playground supports so a code block dropped
+  // into a learning page can show the same dynamic outputs as the
+  // playground itself.
   const wrapperClass = (() => {
     switch (cell.type) {
       case "stderr":
@@ -372,6 +480,8 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
         return `${styles.outCell} ${styles.outCellHtml}`;
       case "image":
         return `${styles.outCell} ${styles.outCellImage}`;
+      case "plot":
+        return `${styles.outCell} ${styles.outCellPlot}`;
       default:
         return `${styles.outCell} ${styles.outCellStdout}`;
     }
@@ -383,7 +493,9 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
         ? "html"
         : cell.type === "image"
           ? "image"
-          : "stdout";
+          : cell.type === "plot"
+            ? "plot"
+            : "stdout";
 
   return (
     <div className={wrapperClass}>
@@ -404,10 +516,73 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
             alt=""
             style={{ maxWidth: "100%" }}
           />
+        ) : cell.type === "plot" && cell.plot ? (
+          <PlotlyChart figure={cell.plot} />
         ) : (
           cell.content
         )}
       </div>
     </div>
   );
+}
+
+/** Minimal Plotly surface used for chart cells. Mirrors `Playground`'s
+ *  `PlotlyChart`/`PlotlyAPI` so both consumers render charts the same
+ *  way; kept in sync by hand because extracting a shared module would
+ *  require bumping `Playground.tsx`'s import surface for no behavioural
+ *  benefit. */
+interface PlotlyAPI {
+  newPlot(
+    el: HTMLElement,
+    data: unknown[],
+    layout?: Record<string, unknown>,
+    config?: Record<string, unknown>,
+  ): Promise<unknown>;
+}
+
+const PLOTLY_DARK_DEFAULTS = {
+  paper_bgcolor: "#0f1117",
+  plot_bgcolor: "#161b27",
+  font: { color: "#e2e8f0", family: "Inter, system-ui, sans-serif" },
+  xaxis: {
+    gridcolor: "#2a3347",
+    linecolor: "#2a3347",
+    zerolinecolor: "#2a3347",
+  },
+  yaxis: {
+    gridcolor: "#2a3347",
+    linecolor: "#2a3347",
+    zerolinecolor: "#2a3347",
+  },
+  margin: { l: 48, r: 24, t: 48, b: 48 },
+};
+
+function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let cancelled = false;
+    void (async () => {
+      // Plotly is heavy and only needed when a chart actually renders —
+      // lazy-import the npm package on demand.
+      const mod = await import("plotly.js-dist-min");
+      if (cancelled || !ref.current) return;
+      const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
+      const layout = {
+        ...PLOTLY_DARK_DEFAULTS,
+        ...(figure.layout ?? {}),
+      };
+      void Plotly.newPlot(el, figure.data, layout, {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [figure]);
+  return <div ref={ref} style={{ width: "100%" }} />;
 }

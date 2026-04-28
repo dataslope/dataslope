@@ -1,0 +1,16 @@
+/* Tailwind v4 + Fumadocs UI styles, scoped to the /learn route.
+ *
+ * Why a separate stylesheet?
+ *
+ * The rest of this app uses CSS modules + plain CSS — no Tailwind. By
+ * importing Tailwind's preflight (`@import 'tailwindcss'`) and the
+ * Fumadocs UI presets only from `app/learn/layout.tsx`, Next.js scopes
+ * this stylesheet to the /learn chunk and keeps it out of the
+ * /playground bundle. The narrow `@source` glob limits utility-class
+ * generation to Fumadocs's own JS files, so we don't accidentally pay
+ * for utilities we never use.
+ */
+@import "tailwindcss";
+@source "../../node_modules/fumadocs-ui/dist/**/*.js";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";

@@ -45,3 +45,6 @@ next-env.d.ts
 script-runner-src/bin/
 script-runner-src/obj/
 script-runner-src/__pycache__/
+
+# fumadocs-mdx generated source (rebuilt on every build/dev start)
+.source/

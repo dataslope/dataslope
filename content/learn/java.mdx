@@ -1,0 +1,42 @@
+---
+title: Java
+description: Compile and run Java in the browser via javac + the JVM under CheerpJ.
+---
+
+Java is compiled with **javac** and executed on the JVM, all running
+in your browser through **CheerpJ**. The JVM is large, so the first
+Run in a session takes a moment to boot.
+
+## Hello, world
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+        for (int i = 1; i <= 3; i++) {
+            System.out.println("  i = " + i);
+        }
+    }
+}
+`}
+/>
+
+## Collections and streams
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = Arrays.asList(3, 1, 4, 1, 5, 9, 2, 6, 5, 3);
+        int sum = xs.stream().mapToInt(Integer::intValue).sum();
+        double mean = xs.stream().mapToInt(Integer::intValue).average().orElse(0);
+        System.out.println("sum:  " + sum);
+        System.out.println("mean: " + mean);
+    }
+}
+`}
+/>

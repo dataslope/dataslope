@@ -1,0 +1,43 @@
+---
+title: C++
+description: Compile and run C++ in the browser via clang++ on browsercc.
+---
+
+C++ source is compiled to WebAssembly with **clang++** (via
+`browsercc`). Standard library headers like `<iostream>`, `<vector>`,
+and `<algorithm>` are available.
+
+## Hello, world
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+
+int main() {
+    std::cout << "Hello, C++!" << std::endl;
+    return 0;
+}
+`}
+/>
+
+## STL: vectors and algorithms
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+int main() {
+    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+    std::sort(xs.begin(), xs.end());
+    int sum = std::accumulate(xs.begin(), xs.end(), 0);
+
+    std::cout << "sorted:";
+    for (int x : xs) std::cout << " " << x;
+    std::cout << "\\nsum: " << sum << "\\n";
+    return 0;
+}
+`}
+/>

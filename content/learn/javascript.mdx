@@ -1,0 +1,45 @@
+---
+title: JavaScript
+description: JavaScript runs natively in the browser. Top-level await is supported.
+---
+
+JavaScript runs directly in your browser — no WebAssembly runtime to
+download. Each block is evaluated inside its own `AsyncFunction`
+scope, so `let`/`const` declarations don't leak across blocks.
+
+## Hello, world
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const greet = (who) => \`Hello, \${who}!\`;
+console.log(greet("learner"));
+console.log("π ≈", Math.PI.toFixed(4));
+`}
+/>
+
+## Top-level await
+
+User code is wrapped in an `async` function, so you can `await`
+promises directly at the top level.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await wait(50);
+console.log("Done waiting!");
+`}
+/>
+
+## Working with arrays
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const sales = [
+  { product: "A", revenue: 42000 },
+  { product: "B", revenue: 51000 },
+  { product: "C", revenue: 29000 },
+];
+const total = sales.reduce((s, r) => s + r.revenue, 0);
+console.log("Total revenue:", total.toLocaleString());
+`}
+/>

@@ -1,0 +1,36 @@
+---
+title: TypeScript
+description: TypeScript transpiled to JavaScript on the fly and executed in your browser.
+---
+
+TypeScript is type-checked-and-transpiled to JavaScript using the
+TypeScript compiler shipped with the page, then executed the same way
+the [JavaScript](/learn/javascript) blocks are.
+
+## Types and interfaces
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`interface Point { x: number; y: number }
+const p: Point = { x: 3, y: 4 };
+const dist = Math.hypot(p.x, p.y);
+console.log(\`distance = \${dist}\`);
+`}
+/>
+
+## Generics
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
+  return items.map((it) => it[key]);
+}
+
+const users = [
+  { id: 1, name: "Ada" },
+  { id: 2, name: "Linus" },
+  { id: 3, name: "Grace" },
+];
+console.log(pluck(users, "name"));
+`}
+/>

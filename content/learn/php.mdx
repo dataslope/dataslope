@@ -1,0 +1,37 @@
+---
+title: PHP
+description: Run PHP in the browser via php-wasm.
+---
+
+PHP runs through **php-wasm** — a WebAssembly build of the PHP
+interpreter. Each block executes in a fresh process, so superglobals
+and class definitions don't carry over.
+
+## Hello, world
+
+<CodeBlock
+  adapter="php"
+  initialCode={`<?php
+echo "Hello from PHP " . PHP_VERSION . "!\\n";
+
+$names = ["Ada", "Linus", "Grace"];
+foreach ($names as $i => $name) {
+    echo ($i + 1) . ". $name\\n";
+}
+`}
+/>
+
+## Arrays and JSON
+
+<CodeBlock
+  adapter="php"
+  initialCode={`<?php
+$people = [
+    ["name" => "Ada",   "score" => 92],
+    ["name" => "Linus", "score" => 88],
+    ["name" => "Grace", "score" => 95],
+];
+usort($people, fn($a, $b) => $b["score"] - $a["score"]);
+echo json_encode($people, JSON_PRETTY_PRINT);
+`}
+/>

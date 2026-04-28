@@ -1,0 +1,23 @@
+/**
+ * Default MDX components for the Fumadocs-powered `/learn` route.
+ *
+ * Fumadocs's `getMDXComponents()` provides the standard set (headings,
+ * tables, callouts, code blocks, etc.). We extend it with our own
+ * `<CodeBlock>` so MDX authors can drop an executable code block into
+ * any lesson:
+ *
+ * ```mdx
+ * <CodeBlock adapter="python" initialCode={`print("hello")`} />
+ * ```
+ */
+import defaultMdxComponents from "fumadocs-ui/mdx";
+import type { MDXComponents } from "mdx/types";
+import MdxCodeBlock from "@/app/_components/MdxCodeBlock";
+
+export function getMDXComponents(components?: MDXComponents): MDXComponents {
+  return {
+    ...defaultMdxComponents,
+    CodeBlock: MdxCodeBlock,
+    ...components,
+  };
+}

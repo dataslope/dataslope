@@ -1,0 +1,36 @@
+---
+title: C#
+description: Compile and run C# in the browser via Roslyn on the .NET WebAssembly runtime.
+---
+
+C# is compiled by **Roslyn** running on the **.NET WebAssembly
+runtime**. Top-level statements are supported, so you can write
+scripts without a wrapping class.
+
+## Hello, world
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+Console.WriteLine("Hello, C#!");
+for (int i = 1; i <= 3; i++) {
+    Console.WriteLine($"  i = {i}");
+}
+`}
+/>
+
+## LINQ over collections
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+using System.Linq;
+
+var xs = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
+var sorted = xs.OrderBy(x => x).ToArray();
+Console.WriteLine($"sorted: [{string.Join(", ", sorted)}]");
+Console.WriteLine($"sum:    {xs.Sum()}");
+Console.WriteLine($"mean:   {xs.Average():F2}");
+`}
+/>

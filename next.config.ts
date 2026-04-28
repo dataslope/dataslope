@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 
 // The C# .NET runtime bundle (cdn-assets/_dotnet/) is served from
@@ -12,6 +13,8 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 // any stale cached requests or third-party links pointing at the old
 // app-origin /_dotnet/ path.
 const nextConfig: NextConfig = {
+  // Treat MDX files under content/ as page sources via fumadocs-mdx.
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   redirects: async () => [
     {
       source: "/_dotnet/:path*",
@@ -21,4 +24,7 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default nextConfig;
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);
+
