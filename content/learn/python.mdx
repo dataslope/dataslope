@@ -1,0 +1,80 @@
+---
+title: Python
+description: Run Python in the browser via Pyodide. NumPy, Pandas, Matplotlib, and Plotly are all available.
+---
+
+The Python runtime is **Pyodide 3.13** running inside a Web Worker so
+your code doesn't block the UI. Each block below runs against a fresh
+global scope — variables you define in one block won't leak into the
+next.
+
+## Variables and printing
+
+Python doesn't need type declarations — assigning with `=` creates the
+binding. Try editing the multiplier and re-running.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`x = "3" * 3 + "3"
+print(x)
+print("len(x) =", len(x))
+print("x.upper() =", x.upper())
+`}
+/>
+
+## DataFrames render as tables
+
+Anything passed to `display()` (or returned as the last expression of a
+block) is rendered with its rich representation. For a Pandas
+`DataFrame` that means an HTML table.
+
+The block below has *initialization code* — click "▸ Initialization
+code (Python)" to see what's running before your snippet.
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({'A': [1, 2, 3], 'B': ['Hello', 'Bye', 'World']})`}
+  initialCode={`# 'df' was created by the initialization code above.
+print("Shape:", df.shape)
+display(df)
+`}
+/>
+
+## Matplotlib figures
+
+`plt.show()` captures the current figure as an inline PNG.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2 * np.pi, 200)
+plt.figure(figsize=(6, 3))
+plt.plot(x, np.sin(x), label="sin")
+plt.plot(x, np.cos(x), label="cos")
+plt.legend()
+plt.title("Trig functions")
+plt.show()
+`}
+/>
+
+## Interactive Plotly charts
+
+Plotly figures render as fully interactive charts — the same rendering
+path the [Python Playground](/playground/python) uses.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.graph_objects as go
+import numpy as np
+
+t = np.linspace(0, 10, 200)
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=np.sin(t), name="sin", mode="lines"))
+fig.add_trace(go.Scatter(x=t, y=np.cos(t), name="cos", mode="lines"))
+fig.update_layout(title="Hover, zoom, and pan")
+fig.show()
+`}
+/>

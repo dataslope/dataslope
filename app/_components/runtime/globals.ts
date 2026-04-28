@@ -34,6 +34,10 @@ export interface CodeMirrorOptions {
   matchBrackets?: boolean;
   lineWrapping?: boolean;
   extraKeys?: Record<string, string | (() => void)>;
+  /** When set, the editor cannot be edited. `"nocursor"` additionally
+   *  disables focus, which is the standard CodeMirror v5 way to render
+   *  a code listing that still highlights syntax. */
+  readOnly?: boolean | "nocursor";
 }
 
 export interface CodeMirrorHint {

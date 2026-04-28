@@ -1,0 +1,16 @@
+{
+  "title": "Learn",
+  "pages": [
+    "index",
+    "---",
+    "python",
+    "r",
+    "javascript",
+    "typescript",
+    "php",
+    "c",
+    "cpp",
+    "java",
+    "csharp"
+  ]
+}

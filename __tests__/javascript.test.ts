@@ -139,4 +139,29 @@ console.log(sum);
     expect(stdout).toContain("2,4");
     expect(stdout).toContain("15");
   });
+
+  // Each `<CodeBlock>` is supposed to be independent of every other
+  // block on the same page — variables defined in block A must not be
+  // visible in block B even when both blocks share the same runtime
+  // instance via `runtimeRegistry`. The JS adapter achieves this by
+  // running every snippet inside its own `AsyncFunction` scope, which
+  // is what we exercise here: two consecutive `runJS()` calls (which
+  // build a fresh AsyncFunction per call) must not see each other's
+  // top-level `let`/`const`/`var` declarations.
+  it("isolates top-level declarations across runs", async () => {
+    await runJS(`var leaked = 42; let alsoLeaked = "x"; const cLeaked = true;`);
+    const cells = await runJS(`
+      try { void leaked; console.log("leaked-visible"); } catch (e) { console.log("ReferenceError:leaked"); }
+      try { void alsoLeaked; console.log("alsoLeaked-visible"); } catch (e) { console.log("ReferenceError:alsoLeaked"); }
+      try { void cLeaked; console.log("cLeaked-visible"); } catch (e) { console.log("ReferenceError:cLeaked"); }
+    `);
+    const stdout = cells
+      .filter((c) => c.type === "stdout")
+      .map((c) => c.content)
+      .join("\n");
+    expect(stdout).toContain("ReferenceError:leaked");
+    expect(stdout).toContain("ReferenceError:alsoLeaked");
+    expect(stdout).toContain("ReferenceError:cLeaked");
+    expect(stdout).not.toContain("-visible");
+  });
 });

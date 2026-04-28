@@ -1,0 +1,41 @@
+---
+title: C
+description: Compile and run C in the browser via clang on browsercc.
+---
+
+C source is compiled to WebAssembly with **clang** (via `browsercc`)
+and the resulting module is executed in your browser. The toolchain
+downloads the first time you click Run.
+
+## Hello, world
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    printf("Hello, C!\\n");
+    for (int i = 1; i <= 5; i++) {
+        printf("  i = %d\\n", i);
+    }
+    return 0;
+}
+`}
+/>
+
+## Working with arrays
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+    int n = sizeof(xs) / sizeof(xs[0]);
+    long sum = 0;
+    for (int i = 0; i < n; i++) sum += xs[i];
+    printf("n = %d, sum = %ld, mean = %.2f\\n", n, sum, (double)sum / n);
+    return 0;
+}
+`}
+/>

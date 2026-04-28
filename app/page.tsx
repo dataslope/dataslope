@@ -14,12 +14,17 @@ export default function Home() {
         <p className={styles.subtitle}>
           A growing collection of browser-based developer tools.
         </p>
-        <Link href="/playground" className={styles.cta}>
-          Open the Playground
-          <span aria-hidden="true" className={styles.arrow}>
-            →
-          </span>
-        </Link>
+        <div className={styles.ctas}>
+          <Link href="/playground" className={styles.cta}>
+            Open the Playground
+            <span aria-hidden="true" className={styles.arrow}>
+              →
+            </span>
+          </Link>
+          <Link href="/learn" className={styles.ctaSecondary}>
+            Browse Learn
+          </Link>
+        </div>
       </div>
     </main>
   );

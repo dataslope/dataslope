@@ -1,0 +1,35 @@
+---
+title: Learn
+description: Browser-based, executable language tutorials powered by Dataslope's playgrounds.
+---
+
+Welcome to **Dataslope · Learn** — a growing collection of executable
+tutorials for the languages and runtimes shipped in the
+[Playground](/playground).
+
+Every code block on these pages runs entirely in your browser. There's
+no server round-trip — the same WebAssembly runtimes that power the
+playground (Pyodide, WebR, php-wasm, browsercc, CheerpJ, .NET wasm)
+are loaded on demand.
+
+## Languages
+
+- [Python](/learn/python) — Pyodide 3.13 with NumPy, Pandas, Matplotlib, Plotly
+- [R](/learn/r) — WebR 4.5 with rich graphics and data frames
+- [JavaScript](/learn/javascript) — native browser execution
+- [TypeScript](/learn/typescript) — TypeScript transpiled in the browser
+- [PHP](/learn/php) — php-wasm
+- [C](/learn/c) — clang via browsercc
+- [C++](/learn/cpp) — clang++ via browsercc
+- [Java](/learn/java) — javac + the JVM via CheerpJ
+- [C#](/learn/csharp) — Roslyn on .NET wasm
+
+## How code blocks work
+
+- Each `<CodeBlock>` is independent. State you set in one block is
+  **never** visible from another, even within the same page.
+- Many blocks ship with collapsed *initialization code* that runs
+  before your edits — handy for setting up imports or sample data.
+- Outputs render the same way the playground does: `stdout` / `stderr`
+  text, HTML tables (Pandas, R `data.frame`), images (Matplotlib,
+  base R graphics), and interactive Plotly charts.

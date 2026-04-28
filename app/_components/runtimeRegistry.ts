@@ -8,10 +8,16 @@
 // workers / CheerpJ instances / WebR runtimes on the same page.
 //
 // This module memoises the `init()` promise per adapter id so all
-// `CodeBlock`s targeting the same adapter share one underlying runtime
-// (and one set of mutable globals — like a notebook). It also lets us
-// reuse the in-flight init across blocks that mount nearly
-// simultaneously.
+// `CodeBlock`s targeting the same adapter share one underlying runtime.
+// It also lets us reuse the in-flight init across blocks that mount
+// nearly simultaneously.
+//
+// Sharing the runtime does NOT share state across blocks — every adapter
+// resets its global scope at the start of each `run()` (Python wipes
+// `globals()`, R wipes `.GlobalEnv`, JS/TS execute in a fresh function
+// scope, and the compiled languages recompile from scratch). So each
+// block always executes against a freshly-initialised state, even though
+// the underlying runtime instance is shared for performance.
 
 import type { LanguageAdapter, LanguageRuntime } from "./types";
 

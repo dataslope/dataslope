@@ -332,6 +332,18 @@ body.pg-active {
   font-weight: 600;
 }
 
+/* On touch devices the user can't press Ctrl/Cmd+Enter, so hide the
+   shortcut hint. Desktop touchscreens with a mouse keep the hint via
+   the pointer-modality query; very narrow viewports also drop it as a
+   defensive fallback for browsers without modality support. */
+@media (hover: none) and (pointer: coarse), (max-width: 540px) {
+  .kbd,
+  .kbd-group,
+  .kbd-plus {
+    display: none;
+  }
+}
+
 .run-btn {
   display: flex; align-items: center; gap: 6px;
   padding: 5px 14px;

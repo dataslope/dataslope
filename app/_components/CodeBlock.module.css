@@ -322,6 +322,9 @@
 .outCellImage {
   border-left: 3px solid var(--cb-yellow);
 }
+.outCellPlot {
+  border-left: 3px solid var(--cb-accent);
+}
 
 .outCellHeader {
   display: flex;
@@ -363,4 +366,85 @@
 .outCellHtml :global(img),
 .outCellHtml :global(svg) {
   max-width: 100%;
+}
+
+.outCellPlot :global(.js-plotly-plot) {
+  width: 100%;
+}
+
+/* ─── Initialization code (read-only, collapsible) ────────────────── */
+
+.initWrap {
+  background: var(--cb-bg2);
+  border-bottom: 1px solid var(--cb-border);
+}
+
+.initToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: var(--cb-text-dim);
+  font-family: var(--cb-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-align: left;
+}
+.initToggle:hover {
+  color: var(--cb-text);
+  background: var(--cb-bg3);
+}
+.initCaret {
+  display: inline-block;
+  font-size: 9px;
+  width: 10px;
+  transition: transform 0.15s ease;
+}
+.initCaretOpen {
+  transform: rotate(90deg);
+}
+.initLabel {
+  flex: 1;
+}
+.initMeta {
+  color: var(--cb-text-dim);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.initEditor {
+  border-top: 1px solid var(--cb-border);
+  background: var(--cb-bg);
+}
+.initEditor :global(.CodeMirror) {
+  height: auto;
+  min-height: 30px;
+  font-family: var(--cb-font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
+  cursor: not-allowed;
+}
+.initEditor :global(.CodeMirror-cursor) {
+  display: none !important;
+}
+
+/* ─── Mobile: hide the keyboard-shortcut hint on touch devices ────── */
+/*
+   On phones/tablets the user is interacting via touch, so the
+   "Cmd/Ctrl + Enter" hint is irrelevant — drop it. We use the
+   pointer-modality query so desktop touchscreens (which still have a
+   mouse) keep the hint. The narrow-viewport fallback catches the rare
+   case where pointer-modality detection isn't available.
+*/
+@media (hover: none) and (pointer: coarse), (max-width: 540px) {
+  .kbdHint {
+    display: none;
+  }
 }
