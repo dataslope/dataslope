@@ -55,7 +55,15 @@ interface CodeBlockProps {
    *  user-editable code on every Run. Rendered in a collapsed-by-default
    *  panel above the editor — handy for setting up imports or sample
    *  data without cluttering the snippet the learner is meant to focus
-   *  on. The init code is not modifiable from the UI. */
+   *  on. The init code is not modifiable from the UI.
+   *
+   *  Caveat: the prepend is purely textual, so the init must be valid
+   *  at the *top level* of the target language (e.g. `import` /
+   *  `using` / `#include` directives, top-level statements, or — for
+   *  languages without top-level statements like Java — a complete
+   *  declaration that the user code can reference). Authors are
+   *  responsible for syntactic compatibility; runtime errors caused by
+   *  invalid init will surface as ordinary stderr cells. */
   initCode?: string;
 }
 
