@@ -98,7 +98,7 @@ async function runTS(code: string): Promise<OutputCell[]> {
   ) => (...params: unknown[]) => Promise<unknown>;
 
   try {
-    const fn = new AsyncFn("console", outputText);
+    const fn = new AsyncFn("console", `"use strict";\n${outputText}`);
     await fn(sandboxConsole);
     flushStdout();
     flushStderr();

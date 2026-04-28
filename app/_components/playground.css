@@ -756,18 +756,7 @@ input[type="range"].fs-slider:disabled {
 .pkg-footer a:hover { text-decoration: underline; }
 
 /* ─── Toast ─── */
-/* Layout is supplied by `.toast-viewport` (Base UI Toast). The `.toast`
-   rule below only handles the visual chrome of an individual toast. */
-.toast {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #111827;
-  padding: 14px 40px 14px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-family: var(--font-ui);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
-}
+/* Toast styles live further down (near the toast-viewport rule). */
 
 /* Loading overlay */
 .pyodide-loading {
@@ -1245,50 +1234,165 @@ input[type="range"].fs-slider:disabled {
   box-shadow: 0 0 0 2px var(--bg2), 0 0 0 4px var(--accent);
 }
 
-/* ─── Toast viewport (Base UI Toast) ─── */
+/* ─── Toast viewport (Base UI Toast — stacked / hover-to-expand) ───
+   Modeled on Base UI's docs hero demo so multiple toasts stack into
+   a single card with the older ones peeking from behind, and expand
+   into a vertical column when the viewport is hovered or focused. */
 .toast-viewport {
   position: fixed;
+  z-index: 500;
   bottom: 16px;
   right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 500;
-  pointer-events: none;
-  width: 360px;
+  width: 320px;
   max-width: calc(100vw - 32px);
+  margin: 0;
 }
+
 .toast {
-  pointer-events: auto;
-  position: relative;
-  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  --gap: 0.75rem;
+  --peek: 0.65rem;
+  --scale: calc(max(0, 1 - (var(--toast-index) * 0.1)));
+  --shrink: calc(1 - var(--scale));
+  --height: var(--toast-frontmost-height, var(--toast-height));
+  --offset-y: calc(
+    var(--toast-offset-y) * -1 + (var(--toast-index) * var(--gap) * -1) +
+      var(--toast-swipe-movement-y)
+  );
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  margin: 0;
+  width: 100%;
+  height: var(--height);
+  box-sizing: border-box;
+  padding: 0.75rem 2.25rem 0.75rem 0.875rem;
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.18), 0 1px 4px rgb(0 0 0 / 0.08);
+  background-clip: padding-box;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.4;
+  transform-origin: bottom center;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: calc(1000 - var(--toast-index));
+  transform: translateX(var(--toast-swipe-movement-x))
+    translateY(
+      calc(
+        var(--toast-swipe-movement-y) - (var(--toast-index) * var(--peek)) -
+          (var(--shrink) * var(--height))
+      )
+    )
+    scale(var(--scale));
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s,
+    height 0.15s;
 }
+
+html[data-theme="light"] .toast {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.10), 0 1px 4px rgb(0 0 0 / 0.06);
+}
+
+.toast[data-expanded] {
+  transform: translateX(var(--toast-swipe-movement-x))
+    translateY(var(--offset-y));
+  height: var(--toast-height);
+}
+
 .toast[data-starting-style],
 .toast[data-ending-style] {
-  opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(150%);
 }
-.toast-title { font-weight: 600; color: #111827; }
-.toast-desc { color: #6b7280; font-size: 12px; margin-top: 3px; }
-.toast-warn { border-left: 3px solid #f59e0b; }
+
+.toast[data-limited] { opacity: 0; }
+
+.toast[data-ending-style] {
+  opacity: 0;
+}
+.toast[data-ending-style][data-swipe-direction="up"] {
+  transform: translateY(calc(var(--toast-swipe-movement-y) - 150%));
+}
+.toast[data-ending-style][data-swipe-direction="left"] {
+  transform: translateX(calc(var(--toast-swipe-movement-x) - 150%))
+    translateY(var(--offset-y));
+}
+.toast[data-ending-style][data-swipe-direction="right"] {
+  transform: translateX(calc(var(--toast-swipe-movement-x) + 150%))
+    translateY(var(--offset-y));
+}
+.toast[data-ending-style][data-swipe-direction="down"] {
+  transform: translateY(calc(var(--toast-swipe-movement-y) + 150%));
+}
+
+/* Bridge below each stacked toast so the swipe-to-dismiss hit area
+   is continuous with the next toast in the stack. */
+.toast::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: calc(var(--gap) + 1px);
+}
+
+/* `Toast.Content` hides overflow from taller toasts while the stack
+   is collapsed, and fades out the older toasts so only the front
+   one is visible. */
+.toast-content {
+  overflow: hidden;
+  transition: opacity 0.25s;
+}
+.toast-content[data-behind] { opacity: 0; }
+.toast-content[data-expanded] { opacity: 1; }
+
+.toast-title {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text);
+  margin: 0;
+}
+.toast-desc {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* "warn" toasts get an accent stripe but otherwise inherit theme colors. */
+.toast-warn { border-left: 3px solid var(--yellow); }
+
 .toast-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
   border: none;
-  cursor: pointer;
-  color: #9ca3af;
-  padding: 3px;
   border-radius: 4px;
+  color: var(--text-dim);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  font-size: 14px;
 }
-.toast-close:hover { color: #374151; background: #f3f4f6; }
-@keyframes pg-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.toast-close:hover { color: var(--text); background: var(--bg3); }
+
+/* ─── Dark editor themes — force white text on top-bar controls and
+   the empty-output welcome heading so they remain legible against the
+   editor-themed background (which can use a colored "muted" hue that
+   doesn't read as a UI label). Light themes keep the existing palette. */
+html[data-theme="dark"] .header-btn { color: #ffffff; }
+html[data-theme="dark"] .header-btn:hover,
+html[data-theme="dark"] .header-btn:focus-visible,
+html[data-theme="dark"] .header-btn[data-popup-open] { color: #ffffff; }
+html[data-theme="dark"] .welcome h3 { color: #ffffff; }

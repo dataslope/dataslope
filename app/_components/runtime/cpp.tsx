@@ -37,19 +37,16 @@ const EXAMPLES: ExampleSnippet[] = [
   {
     key: "hello",
     title: "Hello World",
-    desc: "cstdio printf with a range-based for over an array",
-    // Default example uses <cstdio> (no libc++) so the very first run
-    // is fast even before the prebuilt PCH download has finished. The
-    // iostream-using examples below benefit from the PCH directly.
-    code: `#include <cstdio>
+    desc: "iostream with a range-based for over an array",
+    code: `#include <iostream>
 
 int main() {
-    std::printf("Hello, C++ Playground!\\n");
-    std::printf("Compiled with clang -> WebAssembly, run in your browser.\\n\\n");
+    std::cout << "Hello, C++ Playground!\\n";
+    std::cout << "Compiled with clang -> WebAssembly, run in your browser.\\n\\n";
 
     const char *names[] = {"Ada", "Linus", "Grace"};
     for (const char *name : names) {
-        std::printf("  hello, %s!\\n", name);
+        std::cout << "  hello, " << name << "!\\n";
     }
 
     return 0;

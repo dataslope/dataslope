@@ -471,6 +471,13 @@ class WebRRuntime implements LanguageRuntime {
   async run(code: string, emit: EmitOutput): Promise<void> {
     const installWarnings = await this.ensurePackages(code);
 
+    // Wipe variables left over from prior runs so each execution starts
+    // from a fresh `.GlobalEnv` — matches the playground's "no
+    // preserved state across runs" model.
+    await this.webR.evalRVoid(
+      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
+    );
+
     const shelter: Shelter = await new this.webR.Shelter();
     try {
       // `withAutoprint: true` makes top-level expressions in user code

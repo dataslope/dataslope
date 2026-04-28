@@ -59,7 +59,7 @@ async function runJS(code: string): Promise<OutputCell[]> {
   ) => (...params: unknown[]) => Promise<unknown>;
 
   try {
-    const fn = new AsyncFn("console", code);
+    const fn = new AsyncFn("console", `"use strict";\n${code}`);
     await fn(sandboxConsole);
     flushStdout();
     flushStderr();

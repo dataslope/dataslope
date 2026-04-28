@@ -341,7 +341,10 @@ class TypeScriptRuntime implements LanguageRuntime {
     ) => Promise<unknown>;
 
     try {
-      const fn = new AsyncFunction("console", outputText);
+      // Prepend "use strict" so implicit-global assignments fail loudly
+      // instead of leaking onto `globalThis` between runs — the
+      // playground's contract is "fresh state per execution".
+      const fn = new AsyncFunction("console", `"use strict";\n${outputText}`);
       const result = await fn(sandboxConsole);
       flushStdout();
       flushStderr();
