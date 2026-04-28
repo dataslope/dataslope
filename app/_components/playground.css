@@ -963,6 +963,24 @@ input[type="range"].fs-slider:disabled {
   box-shadow: -8px 0 32px #0006;
   display: flex; flex-direction: column;
   outline: none;
+  /* The Base UI Drawer.Viewport ancestor has `pointer-events: none`
+     so nested drawers can share the same bottom-anchored stack; the
+     popup itself needs to opt back in to receive clicks. */
+  pointer-events: auto;
+}
+
+.pkg-drawer-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* The drag handle is only meaningful for the bottom-sheet (mobile)
+   presentation; hide it for the right-anchored desktop side panel. */
+.pkg-drawer > .mobile-menu-handle { display: none; }
+@media (max-width: 768px) {
+  .pkg-drawer > .mobile-menu-handle { display: block; }
 }
 
 .pkg-drawer-header {
@@ -1342,14 +1360,20 @@ input[type="range"].fs-slider:disabled {
   /* The drag-to-resize divider doesn't make sense in a tabbed layout. */
   .resizer { display: none; }
 
-  /* Hide the CodeMirror line-number gutter on mobile. The narrow
-      gutter would otherwise show as an empty vertical bar on the left
-      edge of the editor (line numbers don't fit visibly at this width)
-     and shift the code into a horizontally-scrolling overflow that
-     clips the start of each line. We zero out the sizer's left margin
-      so the editor content takes the full width. */
+  /* Hide the CodeMirror line-number gutter on mobile. CodeMirror v5
+     paints line numbers in two places: the absolutely-positioned
+     `.CodeMirror-gutters` strip on the left, AND a per-line
+     `.CodeMirror-gutter-wrapper` that floats on top of each rendered
+     line. Hiding only the gutters strip leaves the per-line wrappers
+     visible (the line-numbers appear to "float" over the code on the
+     left edge), so we hide both, zero out the sizer's left margin so
+     the code takes the full width, and reset each line's left padding
+     so the first character isn't pushed away from the edge. */
   .CodeMirror-gutters { display: none !important; }
+  .CodeMirror-gutter-wrapper { display: none !important; }
   .CodeMirror-sizer { margin-left: 0 !important; }
+  .CodeMirror pre.CodeMirror-line,
+  .CodeMirror pre.CodeMirror-line-like { padding-left: 4px !important; }
 }
 
 /* ─── Base UI popups (shared positioner -> popup styling) ──────────────
@@ -1578,78 +1602,114 @@ input[type="range"].fs-slider:disabled {
   }
 }
 
-/* ─── Dataslope running overlay ─── */
+/* ─── Dataslope running overlay ───
+   A bottom-anchored band that signals "code is running". The band uses
+   a vertical alpha mask so it fades completely to transparent at the
+   top (no hard horizontal seam against the output panel) and uses the
+   theme accent / a complementary hue so it always matches the active
+   editor theme. Two animations layer inside it:
+     • A diagonal "data slope" sweep — gradient stripes scrolling along
+       a slight downward angle, evoking the Dataslope name.
+     • A pulsing data-flow line that travels left-to-right across the
+       middle of the band.
+   Both run noticeably faster than the previous wave animation. */
 .dataslope-run-overlay {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 86px;
+  height: 72px;
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.45s ease, transform 0.45s ease;
+  transform: translateY(8px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
   z-index: 4;
-  background:
-    linear-gradient(0deg, var(--bg) 0%, transparent 100%),
-    linear-gradient(90deg, oklch(68% 0.18 250 / 0.08), oklch(68% 0.18 145 / 0.1));
+  /* Vertical alpha mask: fully opaque at the bottom, fully transparent
+     at the top so the band blends into whatever sits above it. */
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+          mask-image: linear-gradient(to top, #000 35%, transparent 100%);
 }
 .dataslope-run-overlay.active {
   opacity: 1;
   transform: translateY(0);
 }
-.dataslope-wave {
+
+/* Diagonal scrolling stripes — the "slope" half of Dataslope. Tinted
+   with the editor accent so it inherits the current theme. */
+.dataslope-slope {
   position: absolute;
-  left: -20%;
-  right: -20%;
-  bottom: -26px;
-  height: 76px;
-  border-radius: 50% 50% 0 0;
-  filter: blur(10px);
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    115deg,
+    color-mix(in oklab, var(--accent) 28%, transparent) 0 14px,
+    transparent 14px 36px
+  );
+  background-size: 200% 100%;
+  animation: dataslopeSlope 1.4s linear infinite;
   opacity: 0.55;
-  transform: skewY(-7deg);
-  will-change: transform;
 }
-.dataslope-wave-a {
-  background: oklch(68% 0.18 250 / 0.24);
-  animation: dataslopeWave 5.6s ease-in-out infinite alternate;
-}
-.dataslope-wave-b {
-  bottom: -34px;
-  background: oklch(68% 0.18 145 / 0.22);
-  animation: dataslopeWave 6.8s ease-in-out infinite alternate-reverse;
-}
-.dataslope-wave-c {
-  bottom: -42px;
-  background: oklch(78% 0.16 85 / 0.14);
-  animation: dataslopeWave 8s ease-in-out infinite alternate;
-}
-.dataslope-ridge {
+
+/* Soft accent glow that tints the bottom edge of the band so the
+   stripes sit on a colored base rather than the raw panel background. */
+.dataslope-glow {
   position: absolute;
-  left: -8%;
-  right: -8%;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 110%,
+      color-mix(in oklab, var(--accent) 40%, transparent) 0%,
+      transparent 70%);
+  animation: dataslopePulse 0.9s ease-in-out infinite alternate;
+}
+
+/* A bright, narrow data-flow line that streaks across the band.
+   This is the "data" half of the metaphor — a packet flying through. */
+.dataslope-stream {
+  position: absolute;
+  left: 0; right: 0;
   bottom: 18px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), oklch(68% 0.18 145), transparent);
-  opacity: 0.38;
-  transform: rotate(-2deg);
-  animation: dataslopeRidge 2.8s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--accent) 80%, white 20%) 50%,
+    transparent 100%);
+  filter: blur(0.5px);
+  transform: translateX(-100%);
+  animation: dataslopeStream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
-@keyframes dataslopeWave {
-  from { transform: translateX(-3%) translateY(8px) skewY(-7deg) rotate(-1deg); }
-  to   { transform: translateX(3%) translateY(-6px) skewY(-4deg) rotate(1deg); }
+
+@keyframes dataslopeSlope {
+  from { background-position: 0% 0%; }
+  to   { background-position: 100% 0%; }
 }
-@keyframes dataslopeRidge {
-  0%, 100% { transform: translateX(-4%) rotate(-2deg); opacity: 0.25; }
-  50%      { transform: translateX(4%) rotate(-3.5deg); opacity: 0.5; }
+@keyframes dataslopePulse {
+  from { opacity: 0.45; }
+  to   { opacity: 0.85; }
+}
+@keyframes dataslopeStream {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
 }
 
 @media (max-width: 768px) {
+  /* On mobile the overlay anchors to the visible viewport edge so it
+     remains visible while code is running, even if the user is on the
+     Editor tab. The `.mobile` variant is rendered as a sibling of the
+     panes (outside the tab-switched panes), while the desktop instance
+     stays inside `.output-pane` and is hidden on narrow viewports. */
   .dataslope-run-overlay {
+    height: 64px;
+  }
+  .output-pane > .dataslope-run-overlay { display: none; }
+  .dataslope-run-overlay.dataslope-run-overlay--mobile {
+    display: block;
     position: fixed;
-    height: 74px;
+    left: 0; right: 0; bottom: 0;
     z-index: 330;
   }
 }
+.dataslope-run-overlay.dataslope-run-overlay--mobile { display: none; }
 
 /* ─── Settings panel animation (Base UI Dialog) ─── */
 .settings-overlay {
