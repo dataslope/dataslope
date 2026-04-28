@@ -212,12 +212,6 @@ def _python_completions(line, column):
 # wiped before the next run so each execution starts from a fresh state.
 # Built-ins, the helpers defined above, and the standard \`__name__\` /
 # \`__doc__\` / \`__loader__\` module attributes are preserved.
-_PG_PROTECTED_NAMES = set(globals().keys()) | {
-    "__name__", "__doc__", "__package__", "__loader__", "__spec__",
-    "__builtins__", "__file__", "__cached__",
-    "_user_code_str", "_complete_line", "_complete_column",
-}
-
 def _pg_reset_user_globals():
     """Delete any global introduced by previously-run user code."""
     g = globals()
@@ -226,6 +220,18 @@ def _pg_reset_user_globals():
             del g[name]
         except KeyError:
             pass
+
+# Snapshot taken *after* _pg_reset_user_globals is defined so that
+# both _PG_PROTECTED_NAMES and _pg_reset_user_globals are included.
+_PG_PROTECTED_NAMES = set(globals().keys()) | {
+    "__name__", "__doc__", "__package__", "__loader__", "__spec__",
+    "__builtins__", "__file__", "__cached__",
+    "_user_code_str", "_complete_line", "_complete_column",
+    # Explicitly guard the set and the reset helper themselves —
+    # set(globals().keys()) above already captures them, but listing them
+    # here makes the intent obvious and guards against future reordering.
+    "_PG_PROTECTED_NAMES", "_pg_reset_user_globals",
+}
 `);
 
   post({ kind: "ready" });
