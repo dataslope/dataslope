@@ -296,7 +296,7 @@ export const phpAdapter: LanguageAdapter = {
   readyStatus: "PHP ready",
   runtimeInfo: {
     language: "PHP",
-    version: "8.x",
+    version: "8.3.11",
     engine: "php-wasm",
     engineUrl: "https://github.com/seanmorris/php-wasm",
     notes:

@@ -535,10 +535,10 @@ export const rAdapter: LanguageAdapter = {
   displayName: "R Playground",
   logoText: "R",
   documentTitle: "R Playground",
-  readyStatus: "R 4.4 ready",
+  readyStatus: "R 4.5.1 ready",
   runtimeInfo: {
     language: "R",
-    version: "4.4",
+    version: "4.5.1",
     engine: "WebR",
     engineUrl: "https://docs.r-wasm.org/webr/latest/",
     notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
