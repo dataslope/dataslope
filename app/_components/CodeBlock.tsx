@@ -1,0 +1,413 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import {
+  SiPython,
+  SiR,
+  SiJavascript,
+  SiTypescript,
+  SiPhp,
+  SiC,
+  SiCplusplus,
+  SiOpenjdk,
+  SiSharp,
+} from "react-icons/si";
+// CodeMirror core + the dracula theme — same default the main
+// playground uses, so a code block embedded inside a learning page
+// reads as "the playground, in miniature".
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/dracula.css";
+
+import type { LanguageAdapter, LanguageRuntime, OutputCell } from "./types";
+import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
+import { getSharedRuntime } from "./runtimeRegistry";
+import styles from "./CodeBlock.module.css";
+
+type Status = "idle" | "loading" | "ready" | "running" | "error";
+
+interface CodeBlockProps {
+  /** Language adapter that describes the runtime to use. The same
+   *  adapter instance can be passed to multiple `CodeBlock`s on the
+   *  same page; they share one underlying runtime. */
+  adapter: LanguageAdapter;
+  /** Initial source the editor is populated with. The Reset button
+   *  restores the editor to this value. */
+  initialCode: string;
+  /** Optional human-readable label shown in the header. Defaults to
+   *  an auto-generated one like "PyBlock-49b7". */
+  label?: string;
+}
+
+// Promise that resolves once CodeMirror v5 + the modes used by the
+// supported language adapters have finished loading. Cached at module
+// scope so a page with many code blocks pays the import cost once.
+let cmLoadPromise: Promise<CodeMirrorAPI> | null = null;
+function loadCodeMirror(): Promise<CodeMirrorAPI> {
+  if (cmLoadPromise) return cmLoadPromise;
+  cmLoadPromise = (async () => {
+    const codeMirrorMod = await import("codemirror");
+    await Promise.all([
+      import("codemirror/mode/python/python"),
+      import("codemirror/mode/r/r"),
+      import("codemirror/mode/javascript/javascript"),
+      import("codemirror/mode/xml/xml"),
+      import("codemirror/mode/css/css"),
+      import("codemirror/mode/clike/clike"),
+      import("codemirror/mode/htmlmixed/htmlmixed"),
+      import("codemirror/mode/php/php"),
+      import("codemirror/addon/edit/closebrackets"),
+      import("codemirror/addon/edit/matchbrackets"),
+    ]);
+    return (codeMirrorMod.default ??
+      (codeMirrorMod as unknown)) as CodeMirrorAPI;
+  })().catch((err) => {
+    // Don't cache failure — a later mount can retry.
+    cmLoadPromise = null;
+    throw err;
+  });
+  return cmLoadPromise;
+}
+
+// Match the convention of the existing playground for shortcut hints.
+function detectIsMac(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const platform = navigator.platform || "";
+  const ua = navigator.userAgent || "";
+  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
+}
+
+// Brand-coloured glyph for the adapter's language. Falls back to a
+// neutral monogram so future adapters render reasonably without
+// having to update this map first.
+function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
+  switch (adapter.id) {
+    case "python":
+      return <SiPython style={{ color: "#3776AB" }} aria-hidden />;
+    case "r":
+      return <SiR style={{ color: "#276DC3" }} aria-hidden />;
+    case "javascript":
+      return <SiJavascript style={{ color: "#E0B400" }} aria-hidden />;
+    case "typescript":
+      return <SiTypescript style={{ color: "#3178C6" }} aria-hidden />;
+    case "php":
+      return <SiPhp style={{ color: "#777BB4" }} aria-hidden />;
+    case "c":
+      return <SiC style={{ color: "#A8B9CC" }} aria-hidden />;
+    case "cpp":
+      return <SiCplusplus style={{ color: "#00599C" }} aria-hidden />;
+    case "java":
+      return <SiOpenjdk style={{ color: "#ED8B00" }} aria-hidden />;
+    case "csharp":
+      return <SiSharp style={{ color: "#9B4F96" }} aria-hidden />;
+    default:
+      return <span aria-hidden>{adapter.logoText}</span>;
+  }
+}
+
+// Stable short id derived from React's useId so the SSR markup
+// matches the client. We squash the colon-separated id down to a
+// short hex-like suffix and prefix it with the adapter logo text
+// (e.g. "PyBlock-49b7").
+function useBlockId(adapter: LanguageAdapter): string {
+  const reactId = useId();
+  return useMemo(() => {
+    let h = 0;
+    for (let i = 0; i < reactId.length; i++) {
+      h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
+    }
+    const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
+    const prefix =
+      adapter.logoText.charAt(0).toUpperCase() +
+      adapter.logoText.slice(1).toLowerCase();
+    return `${prefix}Block-${suffix}`;
+  }, [reactId, adapter.logoText]);
+}
+
+export default function CodeBlock({
+  adapter,
+  initialCode,
+  label,
+}: CodeBlockProps) {
+  const blockId = useBlockId(adapter);
+  const headerLabel = label ?? blockId;
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const editorRef = useRef<CodeMirrorEditor | null>(null);
+  const runtimeRef = useRef<LanguageRuntime | null>(null);
+  // Sequence number lets us drop output from a previous run if the
+  // user clicks Run again while one is in flight.
+  const runSeqRef = useRef(0);
+  // Stable ref to the latest run() so the CodeMirror keymap closure
+  // (created once at mount) always invokes the current handler.
+  const runRef = useRef<() => void>(() => {});
+
+  const [status, setStatus] = useState<Status>("idle");
+  const [statusMessage, setStatusMessage] = useState<string>("");
+  const [outputs, setOutputs] = useState<OutputCell[]>([]);
+
+  // Use the same SSR-safe pattern as Playground so the keyboard
+  // shortcut hint matches what the freshly hydrated page would show.
+  const isMac = useSyncExternalStore(
+    () => () => {},
+    () => detectIsMac(),
+    () => false,
+  );
+
+  // ─── Editor mount ──────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    loadCodeMirror()
+      .then((CM) => {
+        if (cancelled || !textareaRef.current || editorRef.current) return;
+        const editor = CM.fromTextArea(textareaRef.current, {
+          mode: adapter.codeMirrorMode,
+          theme: "dracula",
+          lineNumbers: true,
+          indentUnit: 2,
+          tabSize: 2,
+          indentWithTabs: false,
+          autoCloseBrackets: true,
+          matchBrackets: true,
+          lineWrapping: true,
+          extraKeys: {
+            "Cmd-Enter": () => runRef.current(),
+            "Ctrl-Enter": () => runRef.current(),
+          },
+        });
+        editor.setValue(initialCode);
+        editor.setSize("100%", "auto");
+        editorRef.current = editor;
+      })
+      .catch((err) => {
+        // Editor failed to load — fall back to the textarea so the
+        // user can still see / edit the code.
+        if (cancelled) return;
+        setStatus("error");
+        setStatusMessage(
+          err instanceof Error ? err.message : "Failed to load editor",
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+    // We intentionally only mount the editor once per CodeBlock instance.
+    // adapter / initialCode are captured by the ref-based callbacks below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Run / Reset ───────────────────────────────────────────────────────
+  const run = useCallback(async () => {
+    const code =
+      editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
+    const mySeq = ++runSeqRef.current;
+
+    setOutputs([]);
+    setStatus("loading");
+    setStatusMessage("Initialising runtime…");
+
+    try {
+      if (!runtimeRef.current) {
+        runtimeRef.current = await getSharedRuntime(adapter, (msg) => {
+          if (runSeqRef.current === mySeq) setStatusMessage(msg);
+        });
+      }
+      if (runSeqRef.current !== mySeq) return;
+
+      setStatus("running");
+      setStatusMessage("Running…");
+
+      let nextOutputId = 0;
+      const startedAt = performance.now();
+      await runtimeRef.current.run(code, (cell) => {
+        if (runSeqRef.current !== mySeq) return;
+        const elapsedMs = performance.now() - startedAt;
+        const elapsed =
+          elapsedMs < 1000
+            ? `${elapsedMs.toFixed(0)}ms`
+            : `${(elapsedMs / 1000).toFixed(2)}s`;
+        const fullCell: OutputCell = {
+          id: ++nextOutputId,
+          elapsed,
+          ...cell,
+        };
+        setOutputs((prev) => [...prev, fullCell]);
+      });
+      if (runSeqRef.current !== mySeq) return;
+      setStatus("ready");
+      setStatusMessage("Done");
+    } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
+      const message = err instanceof Error ? err.message : String(err);
+      setOutputs((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          type: "stderr",
+          content: message,
+          elapsed: "",
+        },
+      ]);
+      setStatus("error");
+      setStatusMessage(message);
+    }
+  }, [adapter]);
+
+  // Keep the ref pointing at the latest handler so the editor's keymap
+  // (registered once at mount) always invokes the current closure.
+  useEffect(() => {
+    runRef.current = run;
+  }, [run]);
+
+  const reset = useCallback(() => {
+    runSeqRef.current++;
+    editorRef.current?.setValue(initialCode);
+    setOutputs([]);
+    setStatus("idle");
+    setStatusMessage("");
+  }, [initialCode]);
+
+  const isBusy = status === "loading" || status === "running";
+
+  // ─── Render ────────────────────────────────────────────────────────────
+  return (
+    <div
+      className={styles.codeBlock}
+      aria-label={`${adapter.runtimeInfo.language} executable code block`}
+    >
+      <div className={styles.header}>
+        <span className={styles.headerId}># {headerLabel}</span>
+        <span className={styles.headerLine} aria-hidden />
+        <span className={styles.headerLang}>
+          <LanguageGlyph adapter={adapter} />
+          <span>
+            {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
+          </span>
+        </span>
+        <span className={styles.headerSpacer} />
+        <span
+          className={styles.statusDot}
+          data-status={status}
+          title={statusMessage || status}
+          aria-label={statusMessage || status}
+        />
+      </div>
+
+      <div className={styles.editor}>
+        <textarea
+          ref={textareaRef}
+          defaultValue={initialCode}
+          spellCheck={false}
+          aria-label={`${adapter.runtimeInfo.language} source code`}
+        />
+      </div>
+
+      <div
+        className={styles.actionBar}
+        role="toolbar"
+        aria-label="Code block actions"
+      >
+        <button
+          type="button"
+          className={styles.runBtn}
+          onClick={() => run()}
+          disabled={isBusy}
+        >
+          <span className={styles.runBtnIcon} aria-hidden>
+            ▶
+          </span>
+          <span>{isBusy ? "Running…" : "Run"}</span>
+          {!isBusy && (
+            <span className={styles.kbdHint} aria-hidden>
+              <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+              <span className={styles.kbdPlus}>+</span>
+              <kbd className={styles.kbd}>Enter</kbd>
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          className={styles.resetBtn}
+          onClick={reset}
+          disabled={isBusy}
+        >
+          <span aria-hidden>↻</span>
+          <span>Reset</span>
+        </button>
+        <span className={styles.actionBarSpacer} />
+        {statusMessage && (
+          <span className={styles.statusText} data-status={status}>
+            {statusMessage}
+          </span>
+        )}
+      </div>
+
+      {outputs.length > 0 && (
+        <div className={styles.output} aria-live="polite">
+          {outputs.map((cell) => (
+            <OutputCellView key={cell.id} cell={cell} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OutputCellView({ cell }: { cell: OutputCell }) {
+  // Minimal renderer: this component intentionally only supports text
+  // (stdout/stderr) and HTML — the rich plot/image cells emitted by
+  // some runtimes can be added later as the learning pages need them.
+  const wrapperClass = (() => {
+    switch (cell.type) {
+      case "stderr":
+        return `${styles.outCell} ${styles.outCellStderr}`;
+      case "html":
+        return `${styles.outCell} ${styles.outCellHtml}`;
+      case "image":
+        return `${styles.outCell} ${styles.outCellImage}`;
+      default:
+        return `${styles.outCell} ${styles.outCellStdout}`;
+    }
+  })();
+  const headerLabel =
+    cell.type === "stderr"
+      ? "stderr"
+      : cell.type === "html"
+        ? "html"
+        : cell.type === "image"
+          ? "image"
+          : "stdout";
+
+  return (
+    <div className={wrapperClass}>
+      <div className={styles.outCellHeader}>
+        <span>{headerLabel}</span>
+        {cell.elapsed && <span className={styles.outCellTime}>{cell.elapsed}</span>}
+      </div>
+      <div className={styles.outCellBody}>
+        {cell.type === "html" ? (
+          // Same trust assumption as the main playground: HTML cells are
+          // produced by the embedded runtime executing code the user
+          // themselves typed in this very widget.
+          <div dangerouslySetInnerHTML={{ __html: cell.content }} />
+        ) : cell.type === "image" ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`data:image/png;base64,${cell.content}`}
+            alt=""
+            style={{ maxWidth: "100%" }}
+          />
+        ) : (
+          cell.content
+        )}
+      </div>
+    </div>
+  );
+}
