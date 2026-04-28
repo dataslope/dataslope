@@ -382,7 +382,7 @@
   border-left: 3px solid var(--cb-yellow);
 }
 .outCellPlot {
-  border-left: 3px solid var(--cb-yellow);
+  border-left: 3px solid var(--cb-accent);
 }
 
 .outCellHeader {
