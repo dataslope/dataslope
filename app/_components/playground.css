@@ -77,11 +77,11 @@ body.pg-active {
 }
 
 .logo-icon {
-  width: 24px; height: 24px;
+  width: 20px; height: 20px;
   background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
-  border-radius: 6px;
+  border-radius: 5px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: white;
+  font-size: 11px; font-weight: 700; color: white;
   font-family: var(--font-mono);
 }
 
@@ -225,7 +225,11 @@ body.pg-active {
 }
 .header-btn[data-popup-open] { background: var(--bg3); color: var(--text); }
 .header-btn.icon-only { padding: 5px 10px; }
-.header-btn.icon-only svg {
+/* The settings-cog SVG draws via stroke and explicitly sets fill="none",
+   so we don't need a global rule that forces fill:none on every icon-only
+   SVG — doing so blanks out filled glyphs (e.g. react-icons' FaInfo).
+   The cog's own inline attributes still take precedence. */
+.header-btn.icon-only svg.stroke-icon {
   fill: none; stroke: currentColor; flex-shrink: 0;
 }
 
@@ -311,9 +315,17 @@ body.pg-active {
 
 .kbd {
   font-family: var(--font-mono); font-size: 10px;
-  color: var(--text-dim); padding: 2px 5px;
-  border: 1px solid var(--border); border-radius: 4px;
-  background: var(--bg3);
+  /* Use a higher-contrast text + border so the keyboard hint stays
+     legible on both very dark and very light editor themes. The
+     previous --text-dim color blended into --bg3 on themes like Nord
+     and Solarized Light. */
+  color: var(--text);
+  padding: 2px 6px;
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  background: var(--bg);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .run-btn {
@@ -482,14 +494,20 @@ body.pg-active {
 .out-cell.image .out-cell-body { text-align: center; }
 .out-cell.image img { max-width: 100%; border-radius: 4px; }
 
-/* Clear button */
+/* Clear button — use a higher-contrast text color and visible border so
+   it remains readable across light and dark editor themes (the previous
+   --text-dim/--border combination disappeared into the pane bar on
+   themes like Nord, Material Palenight, and Solarized Light). */
 .clear-btn {
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-dim); font-size: 12px; font-family: var(--font-ui);
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid var(--text-muted);
+  color: var(--text); font-size: 12px; font-family: var(--font-ui);
+  font-weight: 500;
   padding: 4px 10px; border-radius: var(--radius); cursor: pointer;
   transition: all 0.15s;
 }
-.clear-btn:hover { border-color: var(--red); color: var(--red); }
+.clear-btn svg { flex-shrink: 0; }
+.clear-btn:hover { border-color: var(--red); color: var(--red); background: var(--bg); }
 
 /* Icon-only buttons (e.g. the "copy to clipboard" affordance in the
    editor pane bar and each output cell header). Sized to match the
@@ -560,19 +578,22 @@ body.pg-active {
    relative to a now-discarded settings-overlay container). */
 .settings-panel {
   position: fixed; top: 52px; right: 16px; z-index: 201;
-  width: 300px;
+  width: 540px; max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 80px);
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 16px 48px #0009, 0 2px 8px #0004;
   overflow: hidden;
   transform-origin: top right;
+  display: flex; flex-direction: column;
 }
 
 .settings-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 16px 12px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 .settings-title {
   font-size: 13px; font-weight: 600; color: var(--text);
@@ -587,7 +608,180 @@ body.pg-active {
 }
 .settings-close:hover { background: var(--border); color: var(--text); }
 
+/* Tabs layout: horizontal text+icon tabs above the panel body on
+   desktop, vertical icon-only tabs along the left side on mobile. The
+   shared structure means the same Tabs.Root can drive both. */
+.settings-tabs {
+  display: flex; flex-direction: column;
+  flex: 1; min-height: 0;
+}
+.settings-tabs-list {
+  display: flex; flex-direction: row;
+  gap: 2px;
+  padding: 6px 10px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg2);
+}
+.settings-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  border-radius: 4px 4px 0 0;
+}
+.settings-tab:hover { color: var(--text); background: var(--bg3); }
+.settings-tab[data-selected] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.settings-tab:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.settings-tab svg { flex-shrink: 0; }
+
+.settings-panel-pane {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+}
+
 .settings-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 20px; }
+.settings-body-themes { padding: 14px 16px; }
+
+/* Restore-defaults / clear-localStorage actions. Sit at the bottom of
+   the General tab, separated from the rest by a divider so they don't
+   read as just-another-toggle. */
+.settings-actions {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.settings-action-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.settings-action-btn:hover {
+  background: var(--bg2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.settings-action-btn svg { flex-shrink: 0; color: currentColor; }
+.settings-action-danger:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Editor-themes tab — grid of preview cards. */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.theme-card {
+  display: flex; flex-direction: column;
+  padding: 0;
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  font-family: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.theme-card:hover { border-color: var(--text-muted); }
+.theme-card:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.theme-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.theme-card-preview {
+  border-bottom: 1px solid;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  white-space: pre;
+  overflow: hidden;
+  min-height: 70px;
+}
+.theme-card-label {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+.theme-card-name { letter-spacing: -0.01em; }
+.theme-card-check { color: var(--accent); font-weight: 700; }
+
+/* On narrow viewports the settings panel takes (almost) the full screen
+   and the tabs switch to a left-side icon-only rail so the body has
+   more vertical room. The labels are visually hidden but kept in the
+   DOM for screen readers. */
+@media (max-width: 768px) {
+  .settings-panel {
+    top: 8px; right: 8px; left: 8px;
+    width: auto; max-width: none;
+    max-height: calc(100vh - 16px);
+  }
+  .settings-tabs {
+    flex-direction: row;
+  }
+  .settings-tabs-list {
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 6px;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .settings-tab {
+    padding: 10px;
+    margin-bottom: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    justify-content: center;
+  }
+  .settings-tab svg { width: 18px; height: 18px; }
+  .settings-tab[data-selected] {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .settings-tab-label {
+    /* Visually hidden — keep available to assistive tech via aria. */
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Setting row */
 .setting-row { display: flex; flex-direction: column; gap: 8px; }
@@ -826,22 +1020,94 @@ input[type="range"].fs-slider:disabled {
 /* ─── Toast ─── */
 /* Toast styles live further down (near the toast-viewport rule). */
 
-/* Loading overlay */
+/* Loading overlay — full-screen splash shown until the runtime finishes
+   booting. Layout: huge horizontally-scrolling title text fills the
+   middle of the viewport (faded out at the left/right edges via a CSS
+   mask), and a witty status line + full-width indeterminate progress
+   bar are pinned to the bottom. */
 .pyodide-loading {
   position: fixed; inset: 0;
   background: var(--bg);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 16px; z-index: 999;
+  display: flex; flex-direction: column;
+  align-items: stretch; justify-content: center;
+  z-index: 999;
   transition: opacity 0.4s;
+  overflow: hidden;
 }
 .pyodide-loading.hidden { opacity: 0; pointer-events: none; }
 
-.loading-logo { font-family: var(--font-mono); font-size: 28px; font-weight: 700;
+/* Big horizontally-moving title text. The track holds 4 copies of the
+   title so something is always on-screen as it translates. The mask on
+   the parent fades the text out toward the left/right edges so it
+   doesn't visually slam into the viewport boundaries. */
+.loading-hero {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+          mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+}
+.loading-hero-track {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1.5em;
+  white-space: nowrap;
+  animation: pg-loadHero 18s linear infinite;
+  will-change: transform;
+}
+.loading-hero-text {
+  font-family: var(--font-ui);
+  font-weight: 900;
+  font-size: clamp(56px, 14vw, 180px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: transparent;
   background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+          background-clip: text;
+}
+@keyframes pg-loadHero {
+  from { transform: translateX(0); }
+  /* Each copy of the text is one quarter of the total track width plus
+     the inter-copy gap; translating by -25% slides exactly one copy
+     out the left, leaving the loop seamless. */
+  to   { transform: translateX(-25%); }
+}
+
+/* Bottom strip: small witty message + full-width indeterminate progress
+   bar. Sits flush against the bottom of the viewport. */
+.loading-bottom {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 0 24px 16px;
+  width: 100%;
+}
+.loading-quip {
+  font-size: 13px; color: var(--text-muted);
+  font-family: var(--font-ui);
+  text-align: center;
+  min-height: 1.4em;
+  line-height: 1.4;
+  /* Soft cross-fade so consecutive quips don't snap. */
+  animation: pg-quipFade 0.5s ease;
+}
+@keyframes pg-quipFade {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .loading-bar-wrap {
-  width: 240px; height: 3px; background: var(--border); border-radius: 2px;
+  width: 100%; height: 3px; background: var(--border); border-radius: 2px;
   overflow: hidden;
 }
 .loading-bar {
@@ -854,7 +1120,12 @@ input[type="range"].fs-slider:disabled {
   50%  { width: 60%; margin-left: 20%; }
   100% { width: 5%; margin-left: 95%; }
 }
-.loading-msg { font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); }
+
+/* Error state — pause the moving text and surface the failure message
+   in red via the bottom strip. */
+.pyodide-loading.has-error .loading-hero-track { animation-play-state: paused; }
+.pyodide-loading.has-error .loading-bar { animation-play-state: paused; background: var(--red); }
+.pyodide-loading.has-error .loading-quip { color: var(--red); font-weight: 500; }
 
 /* Resizer — draggable divider between editor and output panes. A persistent
    grip indicator makes it discoverable without requiring the user to hover to
