@@ -678,7 +678,7 @@ body.pg-active {
   border-radius: 4px 4px 0 0;
 }
 .settings-tab:hover { background: var(--bg3); }
-.settings-tab[data-selected] {
+.settings-tab[data-active] {
   color: var(--accent);
   background: var(--bg3);
   border-bottom-color: var(--accent);
@@ -805,7 +805,7 @@ body.pg-active {
     justify-content: center;
   }
   .settings-tab svg { width: 18px; height: 18px; }
-  .settings-tab[data-selected] {
+  .settings-tab[data-active] {
     border-color: var(--accent);
     background: var(--bg3);
     color: var(--accent);
