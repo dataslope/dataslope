@@ -367,6 +367,16 @@ body.pg-active {
   line-height: 1.7 !important;
   background: var(--bg) !important;
   font-variant-ligatures: none !important;
+  font-feature-settings:
+    "calt" 0,
+    "liga" 0,
+    "clig" 0,
+    "dlig" 0 !important;
+}
+.CodeMirror pre,
+.CodeMirror span {
+  font-variant-ligatures: inherit !important;
+  font-feature-settings: inherit !important;
 }
 .CodeMirror-scroll { height: 100%; }
 .CodeMirror-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; }
