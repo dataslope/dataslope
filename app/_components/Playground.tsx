@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import "./playground.css";
@@ -59,13 +60,18 @@ import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Switch } from "@base-ui-components/react/switch";
+import { Tabs } from "@base-ui-components/react/tabs";
 import {
   Library,
   ArrowDownToLine,
   Package,
   ALargeSmall,
-  SwatchBook,
   Timer,
+  Eraser,
+  RotateCcw,
+  Trash2,
+  Sliders,
+  Palette,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
@@ -262,10 +268,47 @@ const THEME_PREVIEWS: Record<string, ThemePalette> = {
   },
 };
 
+/** Cheeky one-liners cycled below the loading hero while the runtime
+ *  initialises. We rotate through them on a timer so the loading screen
+ *  doesn't feel as static as the previous "Loading pyodide… / Installing
+ *  packages" wall of text. */
+const LOADING_QUIPS: string[] = [
+  "Bribing the WebAssembly elves with cookies…",
+  "Convincing electrons to behave for a few seconds…",
+  "Polishing semicolons and warming up the runtime…",
+  "Asking the parser nicely to be on its best behavior…",
+  "Inflating bytecode like a tiny digital balloon…",
+  "Negotiating with the JIT for a discount…",
+  "Stretching before the first execution lap…",
+  "Teaching the heap some new manners…",
+  "Wiring up the standard library, one cable at a time…",
+  "Loading dependencies — and a healthy dose of optimism…",
+  "Fetching brain cells from the CDN…",
+  "Spinning up the hamster wheel — please clap…",
+  "Composing a haiku for your first run…",
+  "Reticulating splines (it's a thing)…",
+  "Brewing a fresh pot of bytes…",
+  "Untangling pointers (don't ask)…",
+  "Rolling 1d20 against load times — nat 20!",
+  "Counting to infinity. Twice. Quickly.",
+  "Reading the manual. Don't tell anyone.",
+  "Compressing entropy into adorable little packets…",
+];
+
 const SAMPLE_FN_NAME: Record<string, string> = {
   python: "greet",
   r: "greet",
 };
+
+/** Detect macOS so we can show the user the actual modifier key combo
+ *  for the run shortcut (⌘ Enter on macOS, Ctrl Enter everywhere else).
+ *  Defaults to Windows/Linux semantics during SSR and on the very first
+ *  client paint — the value is upgraded after mount via `useIsMac`. */
+function detectIsMac(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || navigator.platform || "";
+  return /Mac|iPhone|iPad|iPod/i.test(ua);
+}
 
 function applyThemePalette(theme: string): void {
   const p = THEME_PREVIEWS[theme] ?? THEME_PREVIEWS.dracula;
@@ -287,17 +330,22 @@ function applyMode(theme: string): void {
 /** Build the empty-state output-panel blurb based on what the runtime
  *  can actually produce. Every runtime supports plain text; richer
  *  outputs (data frames / charts / figures) are advertised only when the
- *  adapter explicitly enables them via `outputCapabilities`. */
+ *  adapter explicitly enables them via `outputCapabilities`. Returns an
+ *  empty string for text-only runtimes so the welcome panel doesn't
+ *  show a noisy "Supports text output." line for languages that have no
+ *  richer outputs to brag about. */
 function buildCapabilitiesBlurb(
   caps: LanguageAdapter["outputCapabilities"],
 ): string {
-  const items = ["text"];
+  const items: string[] = [];
   if (caps?.dataframes) items.push("data frames");
   if (caps?.charts) items.push("charts");
   if (caps?.figures) items.push("figures");
-  if (items.length === 1) return "Supports text output.";
-  if (items.length === 2) return `Supports ${items[0]} and ${items[1]}.`;
-  return `Supports ${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}.`;
+  if (items.length === 0) return "";
+  if (items.length === 1) return `Supports text and ${items[0]}.`;
+  if (items.length === 2)
+    return `Supports text, ${items[0]}, and ${items[1]}.`;
+  return `Supports text, ${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}.`;
 }
 
 // Plotly dark layout defaults applied to every chart when the user doesn't
@@ -557,6 +605,55 @@ function CopyIcon() {
   );
 }
 
+/** Build the language-specific syntax-highlighted snippet shown inside
+ *  each editor-theme preview card. Extracted so the previews tab can
+ *  render the same snippet for every theme without duplicating JSX. */
+function ThemePreviewSnippet({
+  palette,
+  language,
+}: {
+  palette: ThemePalette;
+  language: string;
+}) {
+  const fnName = SAMPLE_FN_NAME[language] ?? "greet";
+  return (
+    <>
+      <span style={{ color: palette.kw }}>
+        {language === "r" ? fnName : "def"}
+      </span>{" "}
+      {language === "r" ? (
+        <>
+          <span style={{ color: palette.kw }}>&lt;-</span>{" "}
+          <span style={{ color: palette.fn }}>function</span>(
+          <span style={{ color: palette.arg }}>name</span>) {"{"}
+        </>
+      ) : (
+        <>
+          <span style={{ color: palette.fn }}>{fnName}</span>(
+          <span style={{ color: palette.arg }}>name</span>):
+        </>
+      )}
+      {"\n  "}
+      {language === "r" ? (
+        <>
+          <span style={{ color: palette.fn }}>paste0</span>(
+          <span style={{ color: palette.str }}>{`"Hello, "`}</span>
+          , name,{" "}
+          <span style={{ color: palette.str }}>{`"!"`}</span>)
+          {"\n}"}
+        </>
+      ) : (
+        <>
+          <span style={{ color: palette.kw }}>return</span>{" "}
+          <span style={{ color: palette.str }}>
+            {`f"Hello, {name}!"`}
+          </span>
+        </>
+      )}
+    </>
+  );
+}
+
 interface SettingsPanelProps {
   open: boolean;
   fontSize: number;
@@ -573,6 +670,8 @@ interface SettingsPanelProps {
   setClearBeforeRun: (b: boolean) => void;
   language: string; // e.g. "python" / "r" — used only for the preview snippet
   onClose: () => void;
+  onRestoreDefaults: () => void;
+  onClearLocalStorage: () => void;
 }
 
 function SettingsPanel({
@@ -591,9 +690,13 @@ function SettingsPanel({
   setClearBeforeRun,
   language,
   onClose,
+  onRestoreDefaults,
+  onClearLocalStorage,
 }: SettingsPanelProps) {
-  const palette = THEME_PREVIEWS[editorTheme] ?? THEME_PREVIEWS.dracula;
-  const fnName = SAMPLE_FN_NAME[language] ?? "greet";
+  // Active settings tab. Persisted only for the lifetime of the dialog —
+  // re-opening the panel always starts on "general" so the user lands on
+  // the most-used controls first.
+  const [tab, setTab] = useState<string>("general");
 
   return (
     <Dialog.Root
@@ -614,143 +717,173 @@ function SettingsPanel({
               ✕
             </Dialog.Close>
           </div>
-        <div className="settings-body">
-          <div className="setting-row">
-            <div className="setting-label">
-              <ALargeSmall size={14} aria-hidden="true" />
-              <span>Editor Font Size</span>
-            </div>
-            <div className="font-size-row">
-              <input
-                type="range"
-                className="fs-slider"
-                min={10}
-                max={22}
-                step={1}
-                value={fontSize}
-                onChange={(e) => setFontSize(Number(e.target.value))}
-              />
-              <span className="font-size-val">{fontSize}px</span>
-            </div>
-          </div>
 
-          <div className="setting-row">
-            <label className="setting-checkbox-row">
-              <input
-                type="checkbox"
-                checked={outputFontSizeEnabled}
-                onChange={(e) => setOutputFontSizeEnabled(e.target.checked)}
-              />
-              <span>Use Different Font Size for Outputs</span>
-            </label>
-            <div
-              className={`font-size-row${outputFontSizeEnabled ? "" : " disabled"}`}
-            >
-              <input
-                type="range"
-                className="fs-slider"
-                min={10}
-                max={22}
-                step={1}
-                value={outputFontSize}
-                onChange={(e) => setOutputFontSize(Number(e.target.value))}
-                disabled={!outputFontSizeEnabled}
-                aria-label="Output font size"
-              />
-              <span className="font-size-val">{outputFontSize}px</span>
-            </div>
-          </div>
+          <Tabs.Root
+            value={tab}
+            onValueChange={(v) => setTab(String(v))}
+            className="settings-tabs"
+          >
+            {/* Vertical icon-only tabs on mobile, horizontal text+icon
+                tabs on desktop. The same Tabs.List handles both via CSS. */}
+            <Tabs.List className="settings-tabs-list" aria-label="Settings sections">
+              <Tabs.Tab value="general" className="settings-tab">
+                <Sliders size={14} aria-hidden="true" />
+                <span className="settings-tab-label">General</span>
+              </Tabs.Tab>
+              <Tabs.Tab value="themes" className="settings-tab">
+                <Palette size={14} aria-hidden="true" />
+                <span className="settings-tab-label">Editor Themes</span>
+              </Tabs.Tab>
+            </Tabs.List>
 
-          <div className="setting-row">
-            <div className="setting-label">
-              <SwatchBook size={14} aria-hidden="true" />
-              <span>Editor Theme</span>
-            </div>
-            <div className="theme-select-wrap">
-              <select
-                className="theme-select"
-                value={editorTheme}
-                onChange={(e) => setEditorTheme(e.target.value)}
-              >
-                {ALL_THEMES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-              <span className="theme-select-arrow">
-                <svg viewBox="0 0 12 12">
-                  <polyline points="2,4 6,8 10,4" />
-                </svg>
-              </span>
-            </div>
-            <div
-              className="theme-preview"
-              style={{ background: palette.bg, color: palette.text }}
-            >
-              <span style={{ color: palette.kw }}>
-                {language === "r" ? fnName : "def"}
-              </span>{" "}
-              {language === "r" ? (
-                <>
-                  <span style={{ color: palette.kw }}>&lt;-</span>{" "}
-                  <span style={{ color: palette.fn }}>function</span>(
-                  <span style={{ color: palette.arg }}>name</span>) {"{"}
-                </>
-              ) : (
-                <>
-                  <span style={{ color: palette.fn }}>{fnName}</span>(
-                  <span style={{ color: palette.arg }}>name</span>):
-                </>
-              )}
-              {"\n  "}
-              {language === "r" ? (
-                <>
-                  <span style={{ color: palette.fn }}>paste0</span>(
-                  <span style={{ color: palette.str }}>
-                    {`"Hello, "`}
-                  </span>
-                  , name,{" "}
-                  <span style={{ color: palette.str }}>{`"!"`}</span>)
-                  {"\n}"}
-                </>
-              ) : (
-                <>
-                  <span style={{ color: palette.kw }}>return</span>{" "}
-                  <span style={{ color: palette.str }}>
-                    {`f"Hello, {name}!"`}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
+            <Tabs.Panel value="general" className="settings-panel-pane">
+              <div className="settings-body">
+                <div className="setting-row">
+                  <div className="setting-label">
+                    <ALargeSmall size={14} aria-hidden="true" />
+                    <span>Editor Font Size</span>
+                  </div>
+                  <div className="font-size-row">
+                    <input
+                      type="range"
+                      className="fs-slider"
+                      min={10}
+                      max={22}
+                      step={1}
+                      value={fontSize}
+                      onChange={(e) => setFontSize(Number(e.target.value))}
+                    />
+                    <span className="font-size-val">{fontSize}px</span>
+                  </div>
+                </div>
 
-          <div className="setting-row">
-            <label className="setting-switch-row">
-              <span>Word Wrap</span>
-              <Switch.Root
-                checked={wordWrap}
-                onCheckedChange={setWordWrap}
-                className="bui-switch"
-              >
-                <Switch.Thumb className="bui-switch-thumb" />
-              </Switch.Root>
-            </label>
-          </div>
+                <div className="setting-row">
+                  <label className="setting-checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={outputFontSizeEnabled}
+                      onChange={(e) =>
+                        setOutputFontSizeEnabled(e.target.checked)
+                      }
+                    />
+                    <span>Use Different Font Size for Outputs</span>
+                  </label>
+                  <div
+                    className={`font-size-row${
+                      outputFontSizeEnabled ? "" : " disabled"
+                    }`}
+                  >
+                    <input
+                      type="range"
+                      className="fs-slider"
+                      min={10}
+                      max={22}
+                      step={1}
+                      value={outputFontSize}
+                      onChange={(e) =>
+                        setOutputFontSize(Number(e.target.value))
+                      }
+                      disabled={!outputFontSizeEnabled}
+                      aria-label="Output font size"
+                    />
+                    <span className="font-size-val">{outputFontSize}px</span>
+                  </div>
+                </div>
 
-          <div className="setting-row">
-            <label className="setting-switch-row">
-              <span>Clear Output Before Running</span>
-              <Switch.Root
-                checked={clearBeforeRun}
-                onCheckedChange={setClearBeforeRun}
-                className="bui-switch"
-              >
-                <Switch.Thumb className="bui-switch-thumb" />
-              </Switch.Root>
-            </label>
-          </div>
-        </div>
+                <div className="setting-row">
+                  <label className="setting-switch-row">
+                    <span>Word Wrap</span>
+                    <Switch.Root
+                      checked={wordWrap}
+                      onCheckedChange={setWordWrap}
+                      className="bui-switch"
+                    >
+                      <Switch.Thumb className="bui-switch-thumb" />
+                    </Switch.Root>
+                  </label>
+                </div>
+
+                <div className="setting-row">
+                  <label className="setting-switch-row">
+                    <span>Clear Output Before Running</span>
+                    <Switch.Root
+                      checked={clearBeforeRun}
+                      onCheckedChange={setClearBeforeRun}
+                      className="bui-switch"
+                    >
+                      <Switch.Thumb className="bui-switch-thumb" />
+                    </Switch.Root>
+                  </label>
+                </div>
+
+                <div className="settings-actions">
+                  <button
+                    type="button"
+                    className="settings-action-btn"
+                    onClick={onRestoreDefaults}
+                  >
+                    <RotateCcw size={14} aria-hidden="true" />
+                    <span>Restore default settings</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="settings-action-btn settings-action-danger"
+                    onClick={onClearLocalStorage}
+                  >
+                    <Trash2 size={14} aria-hidden="true" />
+                    <span>Clear all localStorage data</span>
+                  </button>
+                </div>
+              </div>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="themes" className="settings-panel-pane">
+              <div className="settings-body settings-body-themes">
+                <div className="theme-grid" role="radiogroup" aria-label="Editor theme">
+                  {ALL_THEMES.map((t) => {
+                    const palette =
+                      THEME_PREVIEWS[t.value] ?? THEME_PREVIEWS.dracula;
+                    const selected = editorTheme === t.value;
+                    return (
+                      <button
+                        key={t.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        className={`theme-card${selected ? " selected" : ""}`}
+                        onClick={() => setEditorTheme(t.value)}
+                      >
+                        <div
+                          className="theme-card-preview"
+                          style={{
+                            background: palette.bg,
+                            color: palette.text,
+                            borderColor: palette.border,
+                          }}
+                        >
+                          <ThemePreviewSnippet
+                            palette={palette}
+                            language={language}
+                          />
+                        </div>
+                        <div className="theme-card-label">
+                          <span className="theme-card-name">{t.label}</span>
+                          {selected && (
+                            <span
+                              className="theme-card-check"
+                              aria-hidden="true"
+                            >
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </Tabs.Panel>
+          </Tabs.Root>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -844,6 +977,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [toastManager],
   );
   const [mobileTab, setMobileTab] = useState<"editor" | "output">("editor");
+  // Use useSyncExternalStore so the macOS detection runs only on the
+  // client without triggering a cascading effect on mount. The server
+  // snapshot returns false (Ctrl Enter) so the kbd hint matches what a
+  // freshly hydrated page sees on Windows/Linux.
+  const isMac = useSyncExternalStore(
+    () => () => {},
+    () => detectIsMac(),
+    () => false,
+  );
   const router = useRouter();
 
   // ─── Runtime state ──────────────────────────────────────────────────────
@@ -1173,6 +1315,58 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.id],
   );
 
+  // Restore the editor settings (font size, theme, word wrap, clear-
+  // before-run, output font size) to their built-in defaults. Drops the
+  // matching localStorage entries so a future page load also starts
+  // from defaults. The user's saved code, examples, and any other
+  // unrelated localStorage entries are intentionally left alone — the
+  // separate "Clear all localStorage" action handles those.
+  const restoreDefaultSettings = useCallback(() => {
+    const defaults = {
+      fontsize: 13,
+      outputfontsize: 13,
+      outputfontsize_enabled: false,
+      editortheme: "dracula",
+      wordwrap: true,
+      clearbeforerun: false,
+    } as const;
+
+    setFontSize(defaults.fontsize);
+    setOutputFontSize(defaults.outputfontsize);
+    setOutputFontSizeEnabled(defaults.outputfontsize_enabled);
+    setEditorTheme(defaults.editortheme);
+    setWordWrap(defaults.wordwrap);
+    setClearBeforeRun(defaults.clearbeforerun);
+    showToast("Default settings restored.");
+  }, [
+    setFontSize,
+    setOutputFontSize,
+    setOutputFontSizeEnabled,
+    setEditorTheme,
+    setWordWrap,
+    setClearBeforeRun,
+    showToast,
+  ]);
+
+  // Clear every localStorage entry (across all playgrounds) and reload
+  // so the freshly cleared state takes effect everywhere — including
+  // saved editor contents, theme, and any future per-playground keys.
+  const clearAllLocalStorage = useCallback(() => {
+    const ok =
+      typeof window !== "undefined" &&
+      window.confirm(
+        "This will permanently delete every saved setting and code snippet across all playgrounds. Continue?",
+      );
+    if (!ok) return;
+    try {
+      localStorage.clear();
+    } catch {
+      // localStorage might be unavailable in private mode; continue to
+      // the reload anyway so the user at least gets a fresh page.
+    }
+    window.location.reload();
+  }, []);
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -1432,6 +1626,32 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const isCopyableCell = (cell: OutputCell) =>
     cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
+  // Rotate through the witty loading messages while the runtime is
+  // still initialising. The cadence is intentionally a touch slower than
+  // the moving-text animation so the text isn't constantly twitching.
+  // We always start at index 0 so the SSR HTML and the first client
+  // paint match (avoiding a hydration mismatch); the random seed is
+  // applied on mount via the interval's first tick (which jumps to a
+  // random offset before settling into the +1 cadence).
+  const [quipIndex, setQuipIndex] = useState<number>(0);
+  useEffect(() => {
+    if (loaded || statusState === "error") return;
+    const seed = Math.floor(Math.random() * LOADING_QUIPS.length);
+    let tick = 0;
+    const id = window.setInterval(() => {
+      tick += 1;
+      // First tick: jump to a random starting quip so different page
+      // loads don't all begin with the same line. Subsequent ticks
+      // advance by one for predictable rotation.
+      setQuipIndex(
+        tick === 1 ? seed : (prev) => (prev + 1) % LOADING_QUIPS.length,
+      );
+    }, 2200);
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [loaded, statusState]);
+
   const capabilitiesBlurb = useMemo(
     () => buildCapabilitiesBlurb(adapter.outputCapabilities),
     [adapter.outputCapabilities],
@@ -1441,13 +1661,46 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     <div className="pg-root">
       {!loaded && (
         <div
-          className={`pyodide-loading${statusState === "error" ? "" : ""}`}
+          className={`pyodide-loading${
+            statusState === "error" ? " has-error" : ""
+          }`}
+          role="status"
+          aria-live="polite"
         >
-          <div className="loading-logo">{adapter.logoText}</div>
-          <div className="loading-bar-wrap">
-            <div className="loading-bar" />
+          {/* Hero — gigantic horizontally-moving title with faded
+              left/right edges. The text repeats so there is always
+              something visible mid-translate, and the surrounding mask
+              fades the strip into the background at both ends. */}
+          <div className="loading-hero" aria-hidden="true">
+            <div className="loading-hero-track">
+              <span className="loading-hero-text">
+                {adapter.displayName}
+              </span>
+              <span className="loading-hero-text">
+                {adapter.displayName}
+              </span>
+              <span className="loading-hero-text">
+                {adapter.displayName}
+              </span>
+              <span className="loading-hero-text">
+                {adapter.displayName}
+              </span>
+            </div>
           </div>
-          <div className="loading-msg">{loadingMessage}</div>
+
+          {/* Witty quip + indeterminate progress bar pinned to the
+              bottom of the viewport. On error we surface the failure
+              message instead of the rotating quip. */}
+          <div className="loading-bottom">
+            <div className="loading-quip">
+              {statusState === "error"
+                ? loadingMessage
+                : LOADING_QUIPS[quipIndex]}
+            </div>
+            <div className="loading-bar-wrap">
+              <div className="loading-bar" />
+            </div>
+          </div>
         </div>
       )}
 
@@ -1461,7 +1714,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               {(() => {
                 const Icon = PLAYGROUND_ICONS[adapter.id];
                 return Icon ? (
-                  <Icon size={22} aria-hidden="true" />
+                  <Icon size={14} aria-hidden="true" />
                 ) : (
                   adapter.logoText
                 );
@@ -1621,7 +1874,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               title="Settings"
               aria-label="Settings"
             >
-              <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
@@ -1785,6 +2038,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           setClearBeforeRun={setClearBeforeRun}
           language={adapter.id}
           onClose={() => setSettingsOpen(false)}
+          onRestoreDefaults={restoreDefaultSettings}
+          onClearLocalStorage={clearAllLocalStorage}
         />
 
         <PackagesDrawer
@@ -1868,7 +2123,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               >
                 <CopyIcon />
               </button>
-              <span className="kbd">⌘ Enter</span>
+              <span
+                className="kbd"
+                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+              >
+                {isMac ? "⌘ Enter" : "Ctrl Enter"}
+              </span>
               <button
                 type="button"
                 className={`run-btn${statusState === "running" ? " running" : ""}`}
@@ -1914,8 +2174,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 type="button"
                 className="clear-btn"
                 onClick={clearOutput}
+                title="Clear output"
+                aria-label="Clear output"
               >
-                Clear
+                <Eraser size={13} aria-hidden="true" />
+                <span>Clear</span>
               </button>
             </div>
             <div className="output-body" ref={outputBodyRef}>
@@ -1923,7 +2186,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <div className="welcome">
                   <div className="welcome-icon">⌬</div>
                   <h3>Run your code to see output</h3>
-                  <p>{capabilitiesBlurb}</p>
+                  {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
                 </div>
               ) : (
                 outputs.map((cell) => (
