@@ -88,6 +88,15 @@ export interface LanguageAdapter {
   codeMirrorMode: string;
   examples: ExampleSnippet[];
   packages: PackageInfo[];
+  /** Output channels that this runtime can emit beyond plain text.
+   *  Used by the playground's empty-state blurb so we don't promise
+   *  capabilities the runtime can't deliver (e.g. Java only emits
+   *  text). All runtimes implicitly support text. */
+  outputCapabilities?: {
+    dataframes?: boolean;
+    charts?: boolean;
+    figures?: boolean;
+  };
   /** Formats offered by the "Export" dropdown. The editor's current contents
    *  are written to a client-side download with the chosen extension. */
   exportFormats: ExportFormat[];

@@ -399,6 +399,7 @@ export const pythonAdapter: LanguageAdapter = {
   codeMirrorMode: "python",
   examples: EXAMPLES,
   packages: PACKAGES,
+  outputCapabilities: { dataframes: true, charts: true, figures: true },
   exportFormats: [
     { extension: "py", label: "Python (.py)", mimeType: "text/x-python" },
   ],

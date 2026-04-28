@@ -546,6 +546,7 @@ export const rAdapter: LanguageAdapter = {
   codeMirrorMode: "r",
   examples: EXAMPLES,
   packages: PACKAGES,
+  outputCapabilities: { dataframes: true, figures: true },
   exportFormats: [
     { extension: "r", label: "R (.r)", mimeType: "text/x-r-source" },
   ],

@@ -16,11 +16,21 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import "codemirror/theme/monokai.css";
 import "codemirror/theme/material-darker.css";
+import "codemirror/theme/material-palenight.css";
 import "codemirror/theme/nord.css";
 import "codemirror/theme/tomorrow-night-eighties.css";
 import "codemirror/theme/solarized.css";
 import "codemirror/theme/eclipse.css";
 import "codemirror/theme/mdn-like.css";
+import "codemirror/theme/ayu-mirage.css";
+import "codemirror/theme/gruvbox-dark.css";
+import "codemirror/theme/oceanic-next.css";
+import "codemirror/theme/panda-syntax.css";
+import "codemirror/theme/darcula.css";
+import "codemirror/theme/zenburn.css";
+import "codemirror/theme/lucario.css";
+import "codemirror/theme/idea.css";
+import "codemirror/theme/base16-light.css";
 // CodeMirror's show-hint addon ships its own popup stylesheet.
 import "codemirror/addon/hint/show-hint.css";
 import type {
@@ -48,6 +58,57 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
+import { Switch } from "@base-ui-components/react/switch";
+import {
+  Library,
+  ArrowDownToLine,
+  Package,
+  ALargeSmall,
+  SwatchBook,
+  Timer,
+} from "lucide-react";
+import { FaInfo } from "react-icons/fa";
+import {
+  SiPython,
+  SiR,
+  SiJavascript,
+  SiTypescript,
+  SiPhp,
+  SiC,
+  SiCplusplus,
+  SiOpenjdk,
+  SiSharp,
+} from "react-icons/si";
+import type { IconType } from "react-icons";
+
+/** Per-playground logos shown in the playground-switcher dropdown.
+ *  Looked up by playground id; falls back to the adapter's two-character
+ *  glyph when no icon is registered. */
+const PLAYGROUND_ICONS: Record<string, IconType> = {
+  python: SiPython,
+  r: SiR,
+  javascript: SiJavascript,
+  typescript: SiTypescript,
+  php: SiPhp,
+  c: SiC,
+  cpp: SiCplusplus,
+  java: SiOpenjdk,
+  csharp: SiSharp,
+};
+
+/** Brand colors used for the playground language icons in the switcher
+ *  dropdown — keeps each language visually distinct at a glance. */
+const PLAYGROUND_ICON_COLORS: Record<string, string> = {
+  python: "#3776ab",
+  r: "#276dc3",
+  javascript: "#f7df1e",
+  typescript: "#3178c6",
+  php: "#777bb4",
+  c: "#a8b9cc",
+  cpp: "#00599c",
+  java: "#ed8b00",
+  csharp: "#9b4f96",
+};
 
 /** Minimal Plotly surface we use for rendering chart cells. */
 interface PlotlyAPI {
@@ -63,15 +124,31 @@ const ALL_THEMES = [
   { value: "dracula", label: "Dracula" },
   { value: "monokai", label: "Monokai" },
   { value: "material-darker", label: "Material Darker" },
+  { value: "material-palenight", label: "Material Palenight" },
   { value: "nord", label: "Nord" },
   { value: "tomorrow-night-eighties", label: "Tomorrow Night" },
+  { value: "ayu-mirage", label: "Ayu Mirage" },
+  { value: "gruvbox-dark", label: "Gruvbox Dark" },
+  { value: "oceanic-next", label: "Oceanic Next" },
+  { value: "panda-syntax", label: "Panda" },
+  { value: "darcula", label: "Darcula" },
+  { value: "zenburn", label: "Zenburn" },
+  { value: "lucario", label: "Lucario" },
   { value: "solarized dark", label: "Solarized Dark" },
   { value: "solarized light", label: "Solarized Light" },
   { value: "eclipse", label: "Eclipse" },
   { value: "mdn-like", label: "MDN-like" },
+  { value: "idea", label: "IntelliJ IDEA" },
+  { value: "base16-light", label: "Base16 Light" },
 ];
 
-const LIGHT_THEMES = new Set(["eclipse", "mdn-like", "solarized light"]);
+const LIGHT_THEMES = new Set([
+  "eclipse",
+  "mdn-like",
+  "solarized light",
+  "idea",
+  "base16-light",
+]);
 
 interface ThemePalette {
   bg: string;
@@ -133,6 +210,56 @@ const THEME_PREVIEWS: Record<string, ThemePalette> = {
     text: "#333333", dim: "#aaaaaa", muted: "#666666",
     kw: "#a71d5d", fn: "#005cc5", arg: "#e36209", str: "#032f62",
   },
+  "material-palenight": {
+    bg: "#292d3e", bg2: "#222533", bg3: "#3a3f58", border: "#444a66",
+    text: "#a6accd", dim: "#676e95", muted: "#82aaff",
+    kw: "#c792ea", fn: "#82aaff", arg: "#ffcb6b", str: "#c3e88d",
+  },
+  "ayu-mirage": {
+    bg: "#1f2430", bg2: "#191e2a", bg3: "#2a3041", border: "#343b4f",
+    text: "#cbccc6", dim: "#5c6773", muted: "#73d0ff",
+    kw: "#ffa759", fn: "#ffd580", arg: "#ffcc66", str: "#bae67e",
+  },
+  "gruvbox-dark": {
+    bg: "#282828", bg2: "#1d2021", bg3: "#3c3836", border: "#504945",
+    text: "#ebdbb2", dim: "#7c6f64", muted: "#83a598",
+    kw: "#fb4934", fn: "#b8bb26", arg: "#fabd2f", str: "#b8bb26",
+  },
+  "oceanic-next": {
+    bg: "#1b2b34", bg2: "#16242c", bg3: "#283a44", border: "#34434d",
+    text: "#cdd3de", dim: "#65737e", muted: "#6699cc",
+    kw: "#c594c5", fn: "#6699cc", arg: "#f99157", str: "#99c794",
+  },
+  "panda-syntax": {
+    bg: "#292a2b", bg2: "#1f2021", bg3: "#34353a", border: "#42434a",
+    text: "#e6e6e6", dim: "#676b79", muted: "#ff75b5",
+    kw: "#ff75b5", fn: "#19f9d8", arg: "#ffb86c", str: "#19f9d8",
+  },
+  darcula: {
+    bg: "#2b2b2b", bg2: "#232323", bg3: "#3c3f41", border: "#4d4d4d",
+    text: "#a9b7c6", dim: "#606366", muted: "#9876aa",
+    kw: "#cc7832", fn: "#ffc66d", arg: "#9876aa", str: "#6a8759",
+  },
+  zenburn: {
+    bg: "#3f3f3f", bg2: "#353535", bg3: "#494949", border: "#555555",
+    text: "#dcdccc", dim: "#7f9f7f", muted: "#dca3a3",
+    kw: "#f0dfaf", fn: "#dfaf8f", arg: "#dcdccc", str: "#cc9393",
+  },
+  lucario: {
+    bg: "#2b3e50", bg2: "#1f2e3d", bg3: "#3a4f63", border: "#4c5f73",
+    text: "#f8f8f2", dim: "#5c98cd", muted: "#72c05d",
+    kw: "#ff6541", fn: "#a6e22e", arg: "#e7c547", str: "#e7db74",
+  },
+  idea: {
+    bg: "#ffffff", bg2: "#f5f5f5", bg3: "#ebebeb", border: "#d8d8d8",
+    text: "#000000", dim: "#999999", muted: "#660e7a",
+    kw: "#000080", fn: "#0000ff", arg: "#660e7a", str: "#008000",
+  },
+  "base16-light": {
+    bg: "#f5f5f5", bg2: "#e8e8e8", bg3: "#dcdcdc", border: "#cccccc",
+    text: "#202020", dim: "#b0b0b0", muted: "#705050",
+    kw: "#90a959", fn: "#6a9fb5", arg: "#aa759f", str: "#a06e3b",
+  },
 };
 
 const SAMPLE_FN_NAME: Record<string, string> = {
@@ -155,6 +282,22 @@ function applyThemePalette(theme: string): void {
 function applyMode(theme: string): void {
   const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", resolved);
+}
+
+/** Build the empty-state output-panel blurb based on what the runtime
+ *  can actually produce. Every runtime supports plain text; richer
+ *  outputs (data frames / charts / figures) are advertised only when the
+ *  adapter explicitly enables them via `outputCapabilities`. */
+function buildCapabilitiesBlurb(
+  caps: LanguageAdapter["outputCapabilities"],
+): string {
+  const items = ["text"];
+  if (caps?.dataframes) items.push("data frames");
+  if (caps?.charts) items.push("charts");
+  if (caps?.figures) items.push("figures");
+  if (items.length === 1) return "Supports text output.";
+  if (items.length === 2) return `Supports ${items[0]} and ${items[1]}.`;
+  return `Supports ${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}.`;
 }
 
 // Plotly dark layout defaults applied to every chart when the user doesn't
@@ -473,7 +616,10 @@ function SettingsPanel({
           </div>
         <div className="settings-body">
           <div className="setting-row">
-            <div className="setting-label">Editor Font Size</div>
+            <div className="setting-label">
+              <ALargeSmall size={14} aria-hidden="true" />
+              <span>Editor Font Size</span>
+            </div>
             <div className="font-size-row">
               <input
                 type="range"
@@ -516,7 +662,10 @@ function SettingsPanel({
           </div>
 
           <div className="setting-row">
-            <div className="setting-label">Editor Theme</div>
+            <div className="setting-label">
+              <SwatchBook size={14} aria-hidden="true" />
+              <span>Editor Theme</span>
+            </div>
             <div className="theme-select-wrap">
               <select
                 className="theme-select"
@@ -577,24 +726,28 @@ function SettingsPanel({
           </div>
 
           <div className="setting-row">
-            <label className="setting-checkbox-row">
-              <input
-                type="checkbox"
-                checked={wordWrap}
-                onChange={(e) => setWordWrap(e.target.checked)}
-              />
+            <label className="setting-switch-row">
               <span>Word Wrap</span>
+              <Switch.Root
+                checked={wordWrap}
+                onCheckedChange={setWordWrap}
+                className="bui-switch"
+              >
+                <Switch.Thumb className="bui-switch-thumb" />
+              </Switch.Root>
             </label>
           </div>
 
           <div className="setting-row">
-            <label className="setting-checkbox-row">
-              <input
-                type="checkbox"
-                checked={clearBeforeRun}
-                onChange={(e) => setClearBeforeRun(e.target.checked)}
-              />
+            <label className="setting-switch-row">
               <span>Clear Output Before Running</span>
+              <Switch.Root
+                checked={clearBeforeRun}
+                onCheckedChange={setClearBeforeRun}
+                className="bui-switch"
+              >
+                <Switch.Thumb className="bui-switch-thumb" />
+              </Switch.Root>
             </label>
           </div>
         </div>
@@ -852,9 +1005,25 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               "Ctrl-Space": triggerAutocomplete,
             },
           });
-          editor.setValue(adapter.examples[0]?.code ?? "");
+          editor.setValue(
+            localStorage.getItem(storageKey("code")) ??
+              adapter.examples[0]?.code ??
+              "",
+          );
           editor.setSize("100%", "100%");
           editorRef.current = editor;
+
+          // Persist editor contents to localStorage on every change so a
+          // page refresh (or accidental tab close) doesn't lose work in
+          // progress. Saved per playground via `storageKey("code")`.
+          editor.on("change", ((cm: CodeMirrorEditor) => {
+            try {
+              localStorage.setItem(storageKey("code"), cm.getValue());
+            } catch {
+              // Quota exceeded / private mode — silently ignore so a
+              // failed write doesn't break editing.
+            }
+          }) as (...args: unknown[]) => void);
 
           // Register a hint helper for the adapter's mode that defers to
           // the runtime's `complete()` (when implemented). Helpers can
@@ -1263,6 +1432,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const isCopyableCell = (cell: OutputCell) =>
     cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
+  const capabilitiesBlurb = useMemo(
+    () => buildCapabilitiesBlurb(adapter.outputCapabilities),
+    [adapter.outputCapabilities],
+  );
+
   return (
     <div className="pg-root">
       {!loaded && (
@@ -1280,7 +1454,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            <div className="logo-icon">{adapter.logoText}</div>
+            <div
+              className="logo-icon"
+              style={{ color: PLAYGROUND_ICON_COLORS[adapter.id] }}
+            >
+              {(() => {
+                const Icon = PLAYGROUND_ICONS[adapter.id];
+                return Icon ? (
+                  <Icon size={22} aria-hidden="true" />
+                ) : (
+                  adapter.logoText
+                );
+              })()}
+            </div>
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {
@@ -1307,15 +1493,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               <Select.Portal>
                 <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
                   <Select.Popup className="bui-select-popup">
-                    {PLAYGROUNDS.map((p) => (
-                      <Select.Item
-                        key={p.id}
-                        value={p.id}
-                        className="bui-select-item"
-                      >
-                        <Select.ItemText>{p.label}</Select.ItemText>
-                      </Select.Item>
-                    ))}
+                    {PLAYGROUNDS.map((p) => {
+                      const Icon = PLAYGROUND_ICONS[p.id];
+                      const color = PLAYGROUND_ICON_COLORS[p.id];
+                      return (
+                        <Select.Item
+                          key={p.id}
+                          value={p.id}
+                          className="bui-select-item"
+                        >
+                          {Icon && (
+                            <span
+                              className="bui-select-item-icon"
+                              style={{ color }}
+                              aria-hidden="true"
+                            >
+                              <Icon size={16} />
+                            </span>
+                          )}
+                          <Select.ItemText>{p.label}</Select.ItemText>
+                        </Select.Item>
+                      );
+                    })}
                   </Select.Popup>
                 </Select.Positioner>
               </Select.Portal>
@@ -1332,9 +1531,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 title="Examples"
                 aria-label="Examples"
               >
-                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                  <path d="M2 2h12v2H2zm0 4h8v2H2zm0 4h10v2H2z" />
-                </svg>
+                <Library size={14} aria-hidden="true" />
                 <span className="btn-label">Examples</span>
               </Menu.Trigger>
               <Menu.Portal>
@@ -1361,9 +1558,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 title="Export code"
                 aria-label="Export"
               >
-                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                  <path d="M8 1l3 3h-2v5H7V4H5l3-3zM2 11h12v2H2z" />
-                </svg>
+                <ArrowDownToLine size={14} aria-hidden="true" />
                 <span className="btn-label">Export</span>
               </Menu.Trigger>
               <Menu.Portal>
@@ -1397,9 +1592,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 title="Available Packages"
                 aria-label="Packages"
               >
-                <svg viewBox="0 0 16 16" width={13} height={13} fill="currentColor">
-                  <path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 1.8l4.5 2.2L8 7.2 3.5 5 8 2.8zM2 6.1l5 2.5v5.3L2 11.4V6.1zm6 7.8V8.6l5-2.5v5.3l-5 2.5z" />
-                </svg>
+                <Package size={14} aria-hidden="true" />
                 <span className="btn-label">Packages</span>
               </button>
             )}
@@ -1410,11 +1603,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 title="Runtime info"
                 aria-label="Runtime info"
               >
-                <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <line x1="12" y1="11" x2="12" y2="16" />
-                  <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none" />
-                </svg>
+                <FaInfo size={13} aria-hidden="true" />
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Positioner sideOffset={6} align="end">
@@ -1734,9 +1923,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <div className="welcome">
                   <div className="welcome-icon">⌬</div>
                   <h3>Run your code to see output</h3>
-                  <p>
-                    Supports text, data frames, charts, and figures.
-                  </p>
+                  <p>{capabilitiesBlurb}</p>
                 </div>
               ) : (
                 outputs.map((cell) => (
@@ -1747,7 +1934,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   >
                     <div className="out-cell-header">
                       <span className="cell-type">{typeLabel[cell.type]}</span>
-                      <span className="cell-time">Done in {cell.elapsed}</span>
+                      <span className="cell-time">
+                        <Timer size={12} aria-hidden="true" />
+                        <span>Done in {cell.elapsed}</span>
+                      </span>
                       {isCopyableCell(cell) && (
                         <button
                           type="button"
