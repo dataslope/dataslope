@@ -5,16 +5,16 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 | Route         | Status      | Description                                              |
 | ------------- | ----------- | -------------------------------------------------------- |
 | `/`           | ✅ live      | Landing page linking to each playground.                 |
-| `/python`     | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
-| `/r`          | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
-| `/javascript` | ✅ live      | JavaScript playground (runs natively in the browser).    |
-| `/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
-| `/php`        | ✅ live      | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
-| `/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
-| `/cpp`        | ✅ live      | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
-| `/java`       | ✅ live      | Java playground powered by [CheerpJ][cheerpj] — OpenJDK + `javac` running in WebAssembly. |
-| `/csharp`     | ✅ live      | C# playground powered by [Roslyn][roslyn] running on the [.NET WebAssembly runtime][dotnetwasm] (Mono). |
-| `/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
+| `/playground/python`     | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
+| `/playground/r`          | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
+| `/playground/javascript` | ✅ live      | JavaScript playground (runs natively in the browser).    |
+| `/playground/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
+| `/playground/php`        | ✅ live      | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
+| `/playground/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
+| `/playground/cpp`        | ✅ live      | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
+| `/playground/java`       | ✅ live      | Java playground powered by [CheerpJ][cheerpj] — OpenJDK + `javac` running in WebAssembly. |
+| `/playground/csharp`     | ✅ live      | C# playground powered by [Roslyn][roslyn] running on the [.NET WebAssembly runtime][dotnetwasm] (Mono). |
+| `/playground/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
 
 [pyodide]: https://pyodide.org/
 [webr]: https://docs.r-wasm.org/webr/latest/
@@ -30,7 +30,7 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 .
 ├── app/                          # Next.js App Router
 │   ├── layout.tsx
-│   ├── page.tsx                  # Landing page (/)
+│   ├── page.tsx                  # Landing page (/) — links to /playground
 │   ├── _components/              # Shared React components
 │   │   ├── Playground.tsx        # The playground UI (editor + output + settings)
 │   │   ├── playground.css
@@ -44,15 +44,15 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 │   │       ├── cpp.tsx           # C++ language adapter (clang/clang via Wasmer)
 │   │       ├── java.tsx          # Java language adapter (CheerpJ)
 │   │       └── csharp.tsx        # C# language adapter (Roslyn on .NET WebAssembly)
-│   ├── python/page.tsx           # /python route
-│   ├── r/page.tsx                # /r route
-│   ├── javascript/page.tsx       # /javascript route
-│   ├── typescript/page.tsx       # /typescript route
-│   ├── php/page.tsx              # /php route
-│   ├── c/page.tsx                # /c route
-│   ├── cpp/page.tsx              # /cpp route
-│   ├── java/page.tsx             # /java route
-│   └── csharp/page.tsx           # /csharp route
+│   ├── playground/python/page.tsx
+│   ├── playground/r/page.tsx
+│   ├── playground/javascript/page.tsx
+│   ├── playground/typescript/page.tsx
+│   ├── playground/php/page.tsx
+│   ├── playground/c/page.tsx
+│   ├── playground/cpp/page.tsx
+│   ├── playground/java/page.tsx
+│   └── playground/csharp/page.tsx
 ├── __tests__/
 │   ├── javascript.test.ts        # JavaScript runtime execution tests
 │   ├── typescript.test.ts        # TypeScript transpile + execution tests
@@ -81,15 +81,15 @@ npm run dev
 Then open:
 
 - http://localhost:3000/ — landing page
-- http://localhost:3000/python — Python playground
-- http://localhost:3000/r — R playground
-- http://localhost:3000/javascript — JavaScript playground
-- http://localhost:3000/typescript — TypeScript playground
-- http://localhost:3000/php — PHP playground
-- http://localhost:3000/c — C playground
-- http://localhost:3000/cpp — C++ playground
-- http://localhost:3000/java — Java playground
-- http://localhost:3000/csharp — C# playground
+- http://localhost:3000/playground/python — Python playground
+- http://localhost:3000/playground/r — R playground
+- http://localhost:3000/playground/javascript — JavaScript playground
+- http://localhost:3000/playground/typescript — TypeScript playground
+- http://localhost:3000/playground/php — PHP playground
+- http://localhost:3000/playground/c — C playground
+- http://localhost:3000/playground/cpp — C++ playground
+- http://localhost:3000/playground/java — Java playground
+- http://localhost:3000/playground/csharp — C# playground
 
 ## Editor settings
 
@@ -127,7 +127,7 @@ npm test
 
 The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, C++, PHP, Java, C#) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
 
-## Adding a new playground (e.g. `/postgres`)
+## Adding a new playground (e.g. `/playground/postgres`)
 
 Playgrounds are built as native Next.js routes using React and npm packages:
 
@@ -135,7 +135,7 @@ Playgrounds are built as native Next.js routes using React and npm packages:
    implements the `LanguageAdapter` interface from
    `app/_components/types.ts`. The adapter is responsible for initialising
    the runtime and turning user code into output cells.
-2. Add the route at `app/<name>/page.tsx`:
+2. Add the route at `app/playground/<name>/page.tsx`:
 
    ```tsx
    "use client";
@@ -147,7 +147,7 @@ Playgrounds are built as native Next.js routes using React and npm packages:
    }
    ```
 
-3. Link to it from the landing page in `app/page.tsx`.
+3. Link to it from the playground index in `app/playground/page.tsx`.
 
 Prefer installing runtime libraries from npm. Only fall back to a CDN
 `<script>` tag if a library genuinely cannot be installed/bundled (some

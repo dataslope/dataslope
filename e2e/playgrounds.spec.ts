@@ -62,7 +62,7 @@ async function runAndCollectOutput(page: Page) {
 
 test.describe("Playgrounds (fast)", () => {
   test("JavaScript runs the default example", async ({ page }) => {
-    await page.goto("/javascript");
+    await page.goto("/playground/javascript");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     const stdout = cells.find((c) => c.type === "stdout");
@@ -72,7 +72,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("TypeScript runs the default example", async ({ page }) => {
-    await page.goto("/typescript");
+    await page.goto("/playground/typescript");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     const stdout = cells.find((c) => c.type === "stdout");
@@ -82,7 +82,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("PHP runs the default example", async ({ page }) => {
-    await page.goto("/php");
+    await page.goto("/playground/php");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     const stdout = cells.find((c) => c.type === "stdout");
@@ -92,7 +92,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("C compiles and runs the default example", async ({ page }) => {
-    await page.goto("/c");
+    await page.goto("/playground/c");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     // The default Hello World example prints "Hello, C Playground!".
@@ -110,7 +110,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("C++ compiles and runs the default example", async ({ page }) => {
-    await page.goto("/cpp");
+    await page.goto("/playground/cpp");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     // The default Hello World example prints "Hello, C++ Playground!".
@@ -125,7 +125,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("Java compiles and runs the default example", async ({ page }) => {
-    await page.goto("/java");
+    await page.goto("/playground/java");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     // The default Hello World example prints "Hello, Java Playground!".
@@ -137,7 +137,7 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("C# compiles and runs the default example", async ({ page }) => {
-    await page.goto("/csharp");
+    await page.goto("/playground/csharp");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
     // The default Hello World example prints "Hello, C# Playground!".
@@ -151,7 +151,7 @@ test.describe("Packages button visibility", () => {
   test("PHP playground hides the Packages button (no installable packages)", async ({
     page,
   }) => {
-    await page.goto("/php");
+    await page.goto("/playground/php");
     await waitForRuntimeReady(page);
     // Desktop button: rendered only when packages.length > 0.
     await expect(page.getByRole("button", { name: "Packages" })).toHaveCount(0);
@@ -172,7 +172,7 @@ test.describe("Packages button visibility", () => {
   test("JavaScript playground hides the Packages button (native runtime)", async ({
     page,
   }) => {
-    await page.goto("/javascript");
+    await page.goto("/playground/javascript");
     await waitForRuntimeReady(page);
     await expect(page.getByRole("button", { name: "Packages" })).toHaveCount(0);
   });
@@ -180,7 +180,7 @@ test.describe("Packages button visibility", () => {
   test("TypeScript playground hides the Packages button (transpile-only)", async ({
     page,
   }) => {
-    await page.goto("/typescript");
+    await page.goto("/playground/typescript");
     await waitForRuntimeReady(page);
     await expect(page.getByRole("button", { name: "Packages" })).toHaveCount(0);
   });
@@ -188,7 +188,7 @@ test.describe("Packages button visibility", () => {
   test("C playground shows the Packages button (stdlib headers)", async ({
     page,
   }) => {
-    await page.goto("/c");
+    await page.goto("/playground/c");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),
@@ -198,7 +198,7 @@ test.describe("Packages button visibility", () => {
   test("C++ playground shows the Packages button (stdlib headers)", async ({
     page,
   }) => {
-    await page.goto("/cpp");
+    await page.goto("/playground/cpp");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),
@@ -208,7 +208,7 @@ test.describe("Packages button visibility", () => {
   test("Java playground shows the Packages button (JDK packages)", async ({
     page,
   }) => {
-    await page.goto("/java");
+    await page.goto("/playground/java");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),
@@ -218,7 +218,7 @@ test.describe("Packages button visibility", () => {
   test("C# playground shows the Packages button (BCL namespaces)", async ({
     page,
   }) => {
-    await page.goto("/csharp");
+    await page.goto("/playground/csharp");
     await waitForRuntimeReady(page);
     await expect(
       page.getByRole("button", { name: "Packages" }).first(),

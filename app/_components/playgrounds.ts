@@ -1,7 +1,7 @@
 // Registry of available language playgrounds. Used by the header
 // dropdown so users can navigate between playgrounds, and by any other
 // component that needs the canonical list (e.g. the landing page in the
-// future). Keep in sync with the routes defined under `app/<id>/`.
+// future). Keep in sync with the routes defined under `app/playground/<id>/`.
 
 export interface PlaygroundEntry {
   /** Stable id matching the LanguageAdapter id and the route segment. */
@@ -13,13 +13,13 @@ export interface PlaygroundEntry {
 }
 
 export const PLAYGROUNDS: PlaygroundEntry[] = [
-  { id: "python", label: "Python Playground", href: "/python" },
-  { id: "r", label: "R Playground", href: "/r" },
-  { id: "javascript", label: "JavaScript Playground", href: "/javascript" },
-  { id: "typescript", label: "TypeScript Playground", href: "/typescript" },
-  { id: "php", label: "PHP Playground", href: "/php" },
-  { id: "c", label: "C Playground", href: "/c" },
-  { id: "cpp", label: "C++ Playground", href: "/cpp" },
-  { id: "java", label: "Java Playground", href: "/java" },
-  { id: "csharp", label: "C# Playground", href: "/csharp" },
+  { id: "python", label: "Python Playground", href: "/playground/python" },
+  { id: "r", label: "R Playground", href: "/playground/r" },
+  { id: "javascript", label: "JavaScript Playground", href: "/playground/javascript" },
+  { id: "typescript", label: "TypeScript Playground", href: "/playground/typescript" },
+  { id: "php", label: "PHP Playground", href: "/playground/php" },
+  { id: "c", label: "C Playground", href: "/playground/c" },
+  { id: "cpp", label: "C++ Playground", href: "/playground/cpp" },
+  { id: "java", label: "Java Playground", href: "/playground/java" },
+  { id: "csharp", label: "C# Playground", href: "/playground/csharp" },
 ];

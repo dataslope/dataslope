@@ -27,9 +27,8 @@ const themeBootstrapScript = `
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
     var path = location.pathname;
-    var id = path.indexOf("/python") === 0 ? "python"
-           : path.indexOf("/r") === 0 ? "r"
-           : null;
+    var m = path.match(/^\/playground\/([^/?#]+)/);
+    var id = m ? m[1] : null;
     if (!id) return;
     var theme = localStorage.getItem("pg_" + id + "_editortheme");
     if (!theme || !palettes[theme]) return;
