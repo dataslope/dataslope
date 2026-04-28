@@ -1349,8 +1349,7 @@ input[type="range"].fs-slider:disabled {
      clips the start of each line. We zero out the sizer's left margin
      so the editor content takes the full width. */
   .CodeMirror-gutters { display: none !important; }
-  .CodeMirror-linenumbers,
-  .CodeMirror-linenumber { display: none !important; }
+  .CodeMirror-linenumbers { display: none !important; }
   .CodeMirror-sizer { margin-left: 0 !important; }
 }
 
