@@ -366,6 +366,7 @@ body.pg-active {
   font-size: var(--cm-font-size, 13.5px) !important;
   line-height: 1.7 !important;
   background: var(--bg) !important;
+  font-variant-ligatures: none !important;
 }
 .CodeMirror-scroll { height: 100%; }
 .CodeMirror-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; }
