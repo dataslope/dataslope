@@ -205,6 +205,27 @@ def _python_completions(line, column):
             seen.append(clean)
         i += 1
     return seen, len(fragment)
+
+# ─── Per-run global reset ─────────────────────────────────────────────
+# Snapshot the names that exist after worker init — anything introduced
+# by user code (variables, functions, classes, modules they import) is
+# wiped before the next run so each execution starts from a fresh state.
+# Built-ins, the helpers defined above, and the standard \`__name__\` /
+# \`__doc__\` / \`__loader__\` module attributes are preserved.
+_PG_PROTECTED_NAMES = set(globals().keys()) | {
+    "__name__", "__doc__", "__package__", "__loader__", "__spec__",
+    "__builtins__", "__file__", "__cached__",
+    "_user_code_str", "_complete_line", "_complete_column",
+}
+
+def _pg_reset_user_globals():
+    """Delete any global introduced by previously-run user code."""
+    g = globals()
+    for name in [n for n in list(g.keys()) if n not in _PG_PROTECTED_NAMES]:
+        try:
+            del g[name]
+        except KeyError:
+            pass
 `);
 
   post({ kind: "ready" });
@@ -237,7 +258,7 @@ async function runCode(id: number, code: string): Promise<void> {
     }\n`;
   }
 
-  await pyodide.runPythonAsync("_display_outputs.clear()");
+  await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear()");
 
   // Pass the user code as a Python string to avoid template-literal escaping
   // issues and to let _execute_with_last_display parse it with the ast module.

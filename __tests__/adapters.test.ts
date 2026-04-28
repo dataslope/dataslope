@@ -186,15 +186,10 @@ describe("C++ adapter specifics", () => {
     expect(cppAdapter.hasImport("// no include", "iostream")).toBe(false);
   });
 
-  it("hello-world example uses cstdio and main()", () => {
-    // The default Hello World example deliberately avoids <iostream>
-    // so the very first run is fast even before browsercc's prebuilt
-    // libc++ PCH has finished downloading — see the file-header note
-    // in `app/_components/runtime/cpp.tsx`. iostream-using examples
-    // still appear further down the list.
+  it("hello-world example uses iostream and main()", () => {
     const hello = cppAdapter.examples.find((e) => e.key === "hello");
     expect(hello).toBeTruthy();
-    expect(hello!.code).toContain("#include <cstdio>");
+    expect(hello!.code).toContain("#include <iostream>");
     expect(hello!.code).toMatch(/int\s+main\s*\(/);
   });
 });

@@ -114,44 +114,6 @@ static class StackExtensions
 `,
   },
   {
-    key: "async",
-    title: "Async / Await",
-    desc: "Parallel async work with Task.WhenAll",
-    code: `using System.Diagnostics;
-
-async Task<Resource<T>> Load<T>(string name, int ms, T data)
-{
-    await Task.Delay(ms);
-    return new Resource<T>(name, data, ms);
-}
-
-Console.WriteLine("Loading three resources in parallel…");
-var sw = Stopwatch.StartNew();
-
-// Kick off all three tasks before awaiting any of them so they run concurrently.
-var taskAlpha = Load("alpha",  80, new[] { "1", "2", "3" }.AsEnumerable());
-var taskBeta  = Load("beta",   40, Enumerable.Repeat("ok", 1));
-var taskGamma = Load("gamma", 120, new[] { "payload" }.AsEnumerable());
-
-var results = new[]
-{
-    await taskAlpha,
-    await taskBeta,
-    await taskGamma,
-};
-
-sw.Stop();
-
-foreach (var r in results)
-{
-    Console.WriteLine($"  {r.Name}: {r.LoadedInMs}ms — [{string.Join(", ", r.Data)}]");
-}
-Console.WriteLine($"\\nTotal wall time: {sw.ElapsedMilliseconds}ms (parallel)");
-
-record Resource<T>(string Name, T Data, long LoadedInMs);
-`,
-  },
-  {
     key: "patterns",
     title: "Pattern Matching",
     desc: "Switch expressions over a discriminated hierarchy",

@@ -229,7 +229,10 @@ class JavaScriptRuntime implements LanguageRuntime {
 
     // `AsyncFunction` lets user code use top-level `await`. Wrapping in
     // its own scope means user `var`/`let` declarations don't leak onto
-    // `globalThis`.
+    // `globalThis`. We also enable strict mode so implicit-global
+    // assignments (`foo = 1` without `var`/`let`) throw instead of
+    // silently persisting onto `globalThis` between runs — keeping the
+    // playground's "fresh state per execution" guarantee.
     const AsyncFunction = Object.getPrototypeOf(
       async function () {},
     ).constructor as new (...args: string[]) => (
@@ -237,7 +240,7 @@ class JavaScriptRuntime implements LanguageRuntime {
     ) => Promise<unknown>;
 
     try {
-      const fn = new AsyncFunction("console", code);
+      const fn = new AsyncFunction("console", `"use strict";\n${code}`);
       const result = await fn(sandboxConsole);
       flushStdout();
       flushStderr();

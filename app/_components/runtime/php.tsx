@@ -27,6 +27,10 @@ interface PhpWebInstance extends EventTarget {
    *  argument is treated as a template — start with `<?php` to enter
    *  PHP mode). Resolves once the script finishes. */
   run(code: string): Promise<unknown>;
+  /** Reset the underlying PHP interpreter so user-defined variables,
+   *  functions, classes, constants, and superglobals from a previous
+   *  `run()` don't leak into the next one. */
+  refresh(): Promise<unknown>;
 }
 
 interface PhpOutputEvent extends Event {
@@ -204,6 +208,15 @@ class PhpRuntime implements LanguageRuntime {
     this.php.addEventListener("error", onError);
 
     try {
+      // Reset the interpreter so variables / functions / classes /
+      // constants from a previous run can't leak into this one — the
+      // playground guarantees a fresh execution state per Run click.
+      try {
+        await this.php.refresh();
+      } catch {
+        // `refresh` is best-effort; if it ever fails, fall through to
+        // running the user code anyway rather than blocking the run.
+      }
       // php-wasm internally prepends `?>` to the script, so user code
       // that begins with `<?php` enters PHP mode immediately.
       await this.php.run(code);
