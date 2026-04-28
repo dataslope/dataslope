@@ -188,20 +188,63 @@ const PACKAGES: PackageInfo[] = [
   // without any require or include — there are no packages to install.
 ];
 
+// PHP error message lines look like:
+//   "PHP Parse error:  syntax error, unexpected ..."
+//   "PHP Fatal error:  Uncaught Error: ..."
+//   "PHP Warning:  Division by zero ..."
+//   "PHP Notice:  Undefined variable ..."
+//   "PHP Deprecated: ..."
+// php-wasm in CGI/web mode mixes these into the stdout stream rather
+// than emitting them as `error` events, so we partition the captured
+// output into "looks like a diagnostic" lines (routed to a stderr cell)
+// and everything else (the script's normal stdout). Trailing context
+// lines that start with whitespace (file/line-number annotations) stick
+// to the most recent diagnostic so multi-line messages stay together.
+const PHP_DIAGNOSTIC_RE =
+  /^(PHP\s+)?(Parse error|Fatal error|Warning|Notice|Deprecated|Strict Standards|Catchable fatal error)\b/i;
+
+function splitPhpDiagnostics(raw: string): { stdout: string; stderr: string } {
+  if (!raw) return { stdout: "", stderr: "" };
+  const lines = raw.split("\n");
+  const stdoutLines: string[] = [];
+  const stderrLines: string[] = [];
+  let mode: "stdout" | "stderr" = "stdout";
+  for (const line of lines) {
+    if (PHP_DIAGNOSTIC_RE.test(line)) {
+      mode = "stderr";
+      stderrLines.push(line);
+    } else if (mode === "stderr" && /^\s+\S/.test(line)) {
+      // Indented continuation of the previous diagnostic (e.g. stack
+      // frames after "Stack trace:").
+      stderrLines.push(line);
+    } else if (mode === "stderr" && line.trim() === "") {
+      // A blank line ends the diagnostic block; subsequent non-error
+      // text falls back to stdout.
+      mode = "stdout";
+    } else {
+      stdoutLines.push(line);
+    }
+  }
+  return {
+    stdout: stdoutLines.join("\n"),
+    stderr: stderrLines.join("\n"),
+  };
+}
+
 class PhpRuntime implements LanguageRuntime {
   constructor(private php: PhpWebInstance) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    let stdoutBuf = "";
-    let stderrBuf = "";
+    let outputBuf = "";
+    let errorBuf = "";
 
     const onOutput = (event: Event) => {
       const detail = (event as PhpOutputEvent).detail;
-      if (detail) stdoutBuf += detail.join("");
+      if (detail) outputBuf += detail.join("");
     };
     const onError = (event: Event) => {
       const detail = (event as PhpOutputEvent).detail;
-      if (detail) stderrBuf += detail.join("");
+      if (detail) errorBuf += detail.join("");
     };
 
     this.php.addEventListener("output", onOutput);
@@ -222,14 +265,24 @@ class PhpRuntime implements LanguageRuntime {
       await this.php.run(code);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      stderrBuf += message + "\n";
+      errorBuf += message + "\n";
     } finally {
       this.php.removeEventListener("output", onOutput);
       this.php.removeEventListener("error", onError);
     }
 
-    const stdout = stdoutBuf.replace(/\n+$/, "");
-    const stderr = stderrBuf.replace(/\n+$/, "");
+    // php-wasm forwards PHP's CGI-style diagnostics (Parse / Fatal /
+    // Warning / Notice / Deprecated) through the `output` event rather
+    // than `error`, so split them out here and surface them in a
+    // dedicated stderr cell (which the playground renders with a red
+    // left border) instead of letting them blend into normal stdout.
+    const { stdout: splitStdout, stderr: splitStderr } =
+      splitPhpDiagnostics(outputBuf);
+    const stdout = splitStdout.replace(/\n+$/, "");
+    const stderr = [splitStderr, errorBuf]
+      .filter((s) => s)
+      .join("\n")
+      .replace(/\n+$/, "");
     if (stdout) emit({ type: "stdout", content: stdout });
     if (stderr) emit({ type: "stderr", content: stderr });
   }
