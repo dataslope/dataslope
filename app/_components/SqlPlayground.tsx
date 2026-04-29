@@ -94,7 +94,7 @@ const dbScopedKey = (dbId: string, k: string) =>
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
-  version: "3.46",
+  version: "3.49",
   engine: "sql.js 1.13",
   engineUrl: "https://sql.js.org/",
   notes:

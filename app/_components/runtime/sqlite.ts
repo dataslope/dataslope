@@ -104,8 +104,12 @@ export async function createSqliteEngine(
   }
 
   function listFromMaster(type: "table" | "view"): string[] {
+    // Defensive allowlist even though the TS signature narrows the
+    // input — keeps the implementation robust if the function is ever
+    // re-exported or called from looser-typed code.
+    const kind = type === "view" ? "view" : "table";
     const res = require().exec(
-      `SELECT name FROM sqlite_master WHERE type = '${type}' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
+      `SELECT name FROM sqlite_master WHERE type = '${kind}' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
     );
     if (res.length === 0) return [];
     return res[0].values.map((row) => String(row[0]));
@@ -126,9 +130,17 @@ export async function createSqliteEngine(
       return listFromMaster("view");
     },
     previewTable(name: string, limit = 200) {
-      // `limit` is a bound parameter; the table name is quoted because
-      // SQLite does not allow parameter binding for identifiers.
-      const safeLimit = Math.max(1, Math.min(10_000, Math.floor(limit)));
+      // The table name is a SQLite identifier — sql.js does not allow
+      // parameter binding for identifiers, so we quote it instead. The
+      // `limit` is coerced into a finite integer in [1, 10_000] before
+      // being interpolated, which makes the value safe to embed: any
+      // non-numeric input (NaN, Infinity, strings, …) collapses to a
+      // fixed integer literal, so no user-controlled SQL can be
+      // injected via this path.
+      const n = Number(limit);
+      const safeLimit = Number.isFinite(n)
+        ? Math.max(1, Math.min(10_000, Math.floor(n)))
+        : 200;
       return require().exec(
         `SELECT * FROM ${quoteIdent(name)} LIMIT ${safeLimit}`,
       );
