@@ -85,7 +85,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--cb-font-mono);
+  font-family: var(--cb-font-ui);
   font-weight: 500;
   letter-spacing: 0.04em;
   /* Use the muted-most token + reduced opacity so the header ID reads
@@ -111,18 +111,19 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  /* Same subtle treatment as `.headerId` so both ends of the header
-     read as quiet metadata bars rather than headlines. */
   color: var(--cb-text-dim);
   font-size: 11px;
   font-weight: 500;
-  opacity: 0.7;
 }
 
 .headerLang svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+}
+
+.headerLangText {
+  opacity: 0.7;
 }
 
 /* On narrow viewports the language + version text would crowd the
@@ -207,12 +208,7 @@
   position: relative;
 }
 
-/* Flex row containing the actual controls (Run, Reset, Copy…). Sits
-   above the RunOverlay (z-index 0) so the sine wave reads as a
-   background animation behind the buttons. The strip is intentionally
-   transparent so the running wave animation stays visible behind the
-   controls — the white/dark output box that appears below on Run is
-   what the user reads, the wave is decorative chrome. */
+/* Flex row containing the actual controls (Run, Reset, Copy…). */
 .actionBarButtons {
   display: flex;
   align-items: center;
@@ -394,8 +390,14 @@
   padding: 12px;
   background: var(--cb-bg);
   border-top: 1px solid var(--cb-border);
-  max-height: 60vh;
+  max-height: 68vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.outputRunning {
+  min-height: 84px;
+  padding-bottom: 48px;
 }
 
 .outputEmpty {
@@ -410,6 +412,7 @@
   overflow: hidden;
   background: var(--cb-bg2);
   animation: cb-fadeSlide 0.2s ease;
+  flex: 0 0 auto;
 }
 @keyframes cb-fadeSlide {
   from {
@@ -640,14 +643,16 @@
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────
    A bottom-anchored band that signals "code is running". Mirrors the
-   main playground's `.dataslope-run-overlay` but shorter (28 px vs
-   44 px) so it fits the compact code-block chrome without overwhelming
-   the editor area. Uses `--cb-accent` so the colour always tracks the
-   block's theme token. */
+   main playground's `.dataslope-run-overlay` but shorter so it fits the
+   compact code-block output area without overwhelming content. Uses
+   `--cb-accent` so the colour always tracks the block's theme token. */
 
 .runOverlay {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
   overflow: hidden;
   pointer-events: none;
   opacity: 0;

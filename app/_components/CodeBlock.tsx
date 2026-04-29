@@ -10,7 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box } from "lucide-react";
+import { Box, RotateCcw } from "lucide-react";
 import { Toast } from "@base-ui-components/react/toast";
 import {
   LANGUAGE_ICONS,
@@ -649,7 +649,6 @@ function CodeBlockInner({
         role="toolbar"
         aria-label="Code block actions"
       >
-        <RunOverlay active={isBusy} />
         <div className={styles.actionBarButtons}>
           <button
             type="button"
@@ -697,7 +696,7 @@ function CodeBlockInner({
             onClick={reset}
             disabled={isBusy}
           >
-            <span aria-hidden>↻</span>
+            <RotateCcw size={13} strokeWidth={2.4} aria-hidden />
             <span>Reset</span>
           </button>
           <button
@@ -721,7 +720,10 @@ function CodeBlockInner({
       </div>
 
       {(outputs.length > 0 || isBusy) && (
-        <div className={styles.output} aria-live="polite">
+        <div
+          className={`${styles.output}${isBusy ? ` ${styles.outputRunning}` : ""}`}
+          aria-live="polite"
+        >
           {outputs.map((cell) => (
             <OutputCellView
               key={cell.id}
@@ -731,6 +733,7 @@ function CodeBlockInner({
               }}
             />
           ))}
+          <RunOverlay active={isBusy} />
         </div>
       )}
     </div>
