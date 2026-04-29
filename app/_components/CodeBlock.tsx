@@ -20,6 +20,7 @@ import {
   SiOpenjdk,
   SiSharp,
 } from "react-icons/si";
+import { Toast } from "@base-ui-components/react/toast";
 // CodeMirror core + the dracula theme — same default the main
 // playground uses, so a code block embedded inside a learning page
 // reads as "the playground, in miniature".
@@ -241,7 +242,85 @@ function useBlockId(adapter: LanguageAdapter): string {
   }, [reactId, adapter.logoText]);
 }
 
-export default function CodeBlock({
+// ToastList renders all active toasts into the viewport.  It must be
+// rendered inside a Toast.Provider context (supplied by the CodeBlock
+// wrapper below) so that Toast.useToastManager() works.
+function ToastList() {
+  const { toasts } = Toast.useToastManager();
+  return toasts.map((toast) => (
+    <Toast.Root
+      key={toast.id}
+      toast={toast}
+      className={styles.toastRoot}
+    >
+      <Toast.Content className={styles.toastContent}>
+        <Toast.Title className={styles.toastTitle}>{toast.title}</Toast.Title>
+        <Toast.Close className={styles.toastClose} aria-label="Dismiss">
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </Toast.Close>
+      </Toast.Content>
+    </Toast.Root>
+  ));
+}
+
+// Sine-wave running overlay — anchored to the bottom of the code block
+// and shorter (28 px) than the full playground variant (44 px).
+function RunOverlay({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
+      aria-hidden="true"
+    >
+      <div className={styles.runGlow} />
+      <svg
+        className={styles.runWaves}
+        viewBox="0 0 240 28"
+        preserveAspectRatio="none"
+      >
+        {/* Two overlapping smooth sine-curves animated horizontally.
+            Each path is wider than the viewBox so it scrolls seamlessly. */}
+        <path
+          className={styles.runWaveBack}
+          d="M0 18 C 20 10, 40 10, 60 18 S 100 26, 120 18 S 160 10, 180 18 S 220 26, 240 18 S 280 10, 300 18 S 340 26, 360 18 S 400 10, 420 18 S 460 26, 480 18 L 480 28 L 0 28 Z"
+        />
+        <path
+          className={styles.runWaveFront}
+          d="M0 21 C 20 14, 40 14, 60 21 S 100 28, 120 21 S 160 14, 180 21 S 220 28, 240 21 S 280 14, 300 21 S 340 28, 360 21 S 400 14, 420 21 S 460 28, 480 21 L 480 28 L 0 28 Z"
+        />
+      </svg>
+      <div className={styles.runStream} />
+    </div>
+  );
+}
+
+// Public export — wraps the inner component with a Toast.Provider so
+// that Toast.useToastManager() works inside CodeBlockInner.
+export default function CodeBlock(props: CodeBlockProps) {
+  return (
+    <Toast.Provider timeout={2400}>
+      <Toast.Portal>
+        <Toast.Viewport className={styles.toastViewport}>
+          <ToastList />
+        </Toast.Viewport>
+      </Toast.Portal>
+      <CodeBlockInner {...props} />
+    </Toast.Provider>
+  );
+}
+
+function CodeBlockInner({
   adapter,
   initialCode,
   label,
@@ -249,6 +328,8 @@ export default function CodeBlock({
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
   const headerLabel = label ?? blockId;
+
+  const toastManager = Toast.useToastManager();
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const editorRef = useRef<CodeMirrorEditor | null>(null);
@@ -467,6 +548,7 @@ export default function CodeBlock({
   // block) to the clipboard. Mirrors the Playground's editor copy
   // affordance, including the legacy `execCommand` fallback for browsers
   // / contexts where the async Clipboard API is unavailable.
+  // On success or failure, fires a toast identical to the playground's.
   const copyEditor = useCallback(async () => {
     const code =
       editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
@@ -483,11 +565,12 @@ export default function CodeBlock({
         document.execCommand("copy");
         document.body.removeChild(ta);
       }
+      toastManager.add({ title: "Code copied to clipboard." });
     } catch {
       // Clipboard failures are non-fatal — silently ignore so a missing
       // permission doesn't surface as a runtime error in the page.
     }
-  }, []);
+  }, [toastManager]);
 
   const isBusy = status === "loading" || status === "running";
 
@@ -613,6 +696,15 @@ export default function CodeBlock({
         )}
         <button
           type="button"
+          className={styles.resetBtn}
+          onClick={reset}
+          disabled={isBusy}
+        >
+          <span aria-hidden>↻</span>
+          <span>Reset</span>
+        </button>
+        <button
+          type="button"
           className={styles.iconBtn}
           title="Copy code to clipboard"
           aria-label="Copy code to clipboard"
@@ -622,15 +714,6 @@ export default function CodeBlock({
         >
           <CopyIcon />
         </button>
-        <button
-          type="button"
-          className={styles.resetBtn}
-          onClick={reset}
-          disabled={isBusy}
-        >
-          <span aria-hidden>↻</span>
-          <span>Reset</span>
-        </button>
         <span className={styles.actionBarSpacer} />
         {statusMessage && (
           <span className={styles.statusText} data-status={status}>
@@ -638,6 +721,8 @@ export default function CodeBlock({
           </span>
         )}
       </div>
+
+      <RunOverlay active={status === "running"} />
 
       {outputs.length > 0 && (
         <div className={styles.output} aria-live="polite">
