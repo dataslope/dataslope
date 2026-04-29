@@ -39,6 +39,17 @@ export interface SqliteEngine {
    *  collide with reserved words; sql.js does not expose a parameter
    *  binding for identifiers, so quoting is the only viable option. */
   previewTable: (name: string, limit?: number) => QueryExecResult[];
+  /** `PRAGMA table_info(<name>)` — used by the sidebar context-menu
+   *  "View Structure" action to render the column list of a table or
+   *  view in the results pane. */
+  describeTable: (name: string) => QueryExecResult[];
+  /** `SELECT COUNT(*) FROM <name>` — used by the sidebar context-menu
+   *  "Count Rows" action. */
+  countRows: (name: string) => QueryExecResult[];
+  /** `DROP TABLE`/`DROP VIEW` — used by the sidebar context-menu
+   *  "Drop" action. The kind is restricted to a fixed allowlist so the
+   *  resulting statement can never be coerced into something else. */
+  dropEntity: (name: string, kind: "table" | "view") => void;
   /** The sample database currently loaded into memory. */
   activeSample: () => SqliteSampleDatabase;
 }
@@ -144,6 +155,24 @@ export async function createSqliteEngine(
       return require().exec(
         `SELECT * FROM ${quoteIdent(name)} LIMIT ${safeLimit}`,
       );
+    },
+    describeTable(name: string) {
+      // `PRAGMA table_info(<name>)` returns one row per column with
+      // (cid, name, type, notnull, dflt_value, pk). Identifier is
+      // quoted to defend against reserved-word collisions.
+      return require().exec(`PRAGMA table_info(${quoteIdent(name)})`);
+    },
+    countRows(name: string) {
+      return require().exec(
+        `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)}`,
+      );
+    },
+    dropEntity(name: string, kind: "table" | "view") {
+      // Restrict `kind` to the fixed allowlist defensively even though
+      // the TS signature narrows the input — callers may forward
+      // looser-typed values from UI events.
+      const k = kind === "view" ? "VIEW" : "TABLE";
+      require().run(`DROP ${k} IF EXISTS ${quoteIdent(name)}`);
     },
     activeSample() {
       return active;
