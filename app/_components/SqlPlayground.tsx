@@ -1986,7 +1986,7 @@ function SchemaItem({
               }}
             >
               <div className="ex-title">View Structure</div>
-              <div className="ex-desc">PRAGMA table_info({name})</div>
+              <div className="ex-desc">PRAGMA table_info({quotedName})</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
