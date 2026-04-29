@@ -631,14 +631,17 @@ function SqlPlaygroundInner() {
       setTables(engine.listTables());
       setViews(engine.listViews());
 
-      const newTabs = loadTabs(sample.id, sample.defaultTabs);
+      const newTabs = sample.defaultTabs.map((seed) => ({
+        ...seed,
+        id: newTabId(),
+      }));
       setTabs(newTabs);
       tabsRef.current = newTabs;
-      const newActive = loadActiveTabId(sample.id, newTabs);
+      saveTabs(sample.id, newTabs);
+      const newActive = newTabs[0].id;
       setActiveTabId(newActive);
       const editor = editorRef.current;
-      const t = newTabs.find((x) => x.id === newActive);
-      if (editor && t) editor.setValue(t.code);
+      if (editor) editor.setValue(newTabs[0].code);
       setResult(null);
       showToast(`Loaded ${sample.filename}.`);
     },
@@ -857,6 +860,17 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, next);
     setActiveTabId(tab.id);
   }, [tabs, activeDbId]);
+
+  const addTabWithCode = useCallback(
+    (title: string, code: string) => {
+      const tab: QueryTab = { id: newTabId(), title, code };
+      const next = [...tabsRef.current, tab];
+      setTabs(next);
+      saveTabs(activeDbIdRef.current, next);
+      setActiveTabId(tab.id);
+    },
+    [],
+  );
 
   const closeTab = useCallback(
     (id: string) => {
@@ -1104,7 +1118,7 @@ function SqlPlaygroundInner() {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            <span className="brand-name">DataSlope</span>
+            <a href="/" className="brand-name">Dataslope</a>
             <Select.Root
               value={PLAYGROUND_ID}
               onValueChange={(value) => {
@@ -1450,6 +1464,7 @@ function SqlPlaygroundInner() {
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
+                    onOpenInTab={addTabWithCode}
                   />
                 ))}
                 {tables.length === 0 && (
@@ -1468,6 +1483,7 @@ function SqlPlaygroundInner() {
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
+                    onOpenInTab={addTabWithCode}
                   />
                 ))}
                 {views.length === 0 && (
@@ -1923,6 +1939,7 @@ interface SchemaItemProps {
   onCount: (name: string, kind: "table" | "view") => void;
   onCopy: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
+  onOpenInTab: (title: string, sql: string) => void;
 }
 
 function SchemaItem({
@@ -1933,8 +1950,12 @@ function SchemaItem({
   onCount,
   onCopy,
   onDrop,
+  onOpenInTab,
 }: SchemaItemProps) {
   const Icon = kind === "view" ? Eye : Table2;
+  // SQL strings mirrored from the engine so the tab contents exactly
+  // match what is run against the database.
+  const quotedName = `"${name.replace(/"/g, '""')}"`;
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger
@@ -1956,21 +1977,39 @@ function SchemaItem({
           <ContextMenu.Popup className="bui-popup examples-dropdown">
             <ContextMenu.Item
               className="example-item"
-              onClick={() => onStructure(name, kind)}
+              onClick={() => {
+                onStructure(name, kind);
+                onOpenInTab(
+                  `Structure: ${name}`,
+                  `PRAGMA table_info(${quotedName});`,
+                );
+              }}
             >
               <div className="ex-title">View Structure</div>
               <div className="ex-desc">PRAGMA table_info({name})</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => onPreview(name, kind)}
+              onClick={() => {
+                onPreview(name, kind);
+                onOpenInTab(
+                  `Preview: ${name}`,
+                  `SELECT * FROM ${quotedName} LIMIT 200;`,
+                );
+              }}
             >
               <div className="ex-title">Preview Data</div>
               <div className="ex-desc">First 200 rows</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => onCount(name, kind)}
+              onClick={() => {
+                onCount(name, kind);
+                onOpenInTab(
+                  `Count: ${name}`,
+                  `SELECT COUNT(*) AS row_count FROM ${quotedName};`,
+                );
+              }}
             >
               <div className="ex-title">Count Rows</div>
               <div className="ex-desc">SELECT COUNT(*)</div>
