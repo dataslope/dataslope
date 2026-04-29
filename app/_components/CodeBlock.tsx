@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  startTransition,
   useCallback,
   useEffect,
   useId,
@@ -565,7 +566,9 @@ function CodeBlockInner({
         document.execCommand("copy");
         document.body.removeChild(ta);
       }
-      toastManager.add({ title: "Code copied to clipboard." });
+      startTransition(() => {
+        toastManager.add({ title: "Code copied to clipboard." });
+      });
     } catch {
       // Clipboard failures are non-fatal — silently ignore so a missing
       // permission doesn't surface as a runtime error in the page.

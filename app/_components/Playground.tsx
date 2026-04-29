@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -1113,7 +1114,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
-      toastManager.add({ title: msg, data: { kind } });
+      startTransition(() => {
+        toastManager.add({ title: msg, data: { kind } });
+      });
     },
     [toastManager],
   );
