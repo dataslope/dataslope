@@ -79,82 +79,10 @@ import {
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
-  SiPython,
-  SiR,
-  SiJavascript,
-  SiTypescript,
-  SiCplusplus,
-  SiOpenjdk,
-  SiSharp,
-} from "react-icons/si";
-import { DiPhp } from "react-icons/di";
-import type { IconType } from "react-icons";
-
-/** Custom inline icon for the C playground. Mirrors the Streamline
- *  "C language logo (solid)" mark — kept as a tiny inline component so
- *  the C playground can opt into a more recognisable language glyph
- *  than the generic devicon. */
-function CLanguageLogoSolidIcon({ size }: { size?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      aria-hidden="true"
-    >
-      <path
-        fill="currentColor"
-        fillRule="evenodd"
-        d="M11.199.914a1.5 1.5 0 0 1 1.602 0l8.5 5.369A1.5 1.5 0 0 1 22 7.55v8.898a1.5 1.5 0 0 1-.699 1.268l-8.5 5.368a1.5 1.5 0 0 1-1.602 0l-8.5-5.368A1.5 1.5 0 0 1 2 16.449V7.55a1.5 1.5 0 0 1 .699-1.268zm1.722 14.096a3.14 3.14 0 0 0 1.583-1.08l2.746 1.57a6.283 6.283 0 1 1 0-7l-2.746 1.57a3.142 3.142 0 1 0-1.583 4.94"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-/** Per-playground logos shown in the playground-switcher dropdown.
- *  Looked up by playground id; falls back to the adapter's two-character
- *  glyph when no icon is registered. */
-const PLAYGROUND_ICONS: Record<string, IconType> = {
-  python: SiPython,
-  r: SiR,
-  javascript: SiJavascript,
-  typescript: SiTypescript,
-  php: DiPhp,
-  c: CLanguageLogoSolidIcon as unknown as IconType,
-  cpp: SiCplusplus,
-  java: SiOpenjdk,
-  csharp: SiSharp,
-};
-
-/** Per-language relative size multiplier for the language logo icons.
- *  Some icons read "heavier" than the others at the default size, so we
- *  fine-tune them per playground. Defaults to 1 when unspecified. */
-const PLAYGROUND_ICON_SIZE_FACTOR: Record<string, number> = {
-  python: 0.9,
-  typescript: 0.9,
-  csharp: 0.9,
-  // The DiPhp glyph has noticeable internal whitespace around the logo,
-  // so it visually reads smaller than the other language marks at the
-  // same nominal size. Bump it up so it matches the optical weight of
-  // the surrounding icons.
-  php: 1.4,
-};
-
-/** Brand colors used for the playground language icons in the switcher
- *  dropdown — keeps each language visually distinct at a glance. */
-const PLAYGROUND_ICON_COLORS: Record<string, string> = {
-  python: "#3776ab",
-  r: "#276dc3",
-  javascript: "#f7df1e",
-  typescript: "#3178c6",
-  php: "#777bb4",
-  c: "#a8b9cc",
-  cpp: "#00599c",
-  java: "#ed8b00",
-  csharp: "#9b4f96",
-};
+  LANGUAGE_ICONS as PLAYGROUND_ICONS,
+  LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
+  LANGUAGE_ICON_COLORS as PLAYGROUND_ICON_COLORS,
+} from "./languageIcons";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 
@@ -1888,20 +1816,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            <div
-              className="logo-icon"
-              style={{ color: PLAYGROUND_ICON_COLORS[adapter.id] }}
-            >
-              {(() => {
-                const Icon = PLAYGROUND_ICONS[adapter.id];
-                const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
-                return Icon ? (
-                  <Icon size={Math.round(18 * factor)} aria-hidden="true" />
-                ) : (
-                  adapter.logoText
-                );
-              })()}
-            </div>
+            {/* Placeholder for the DataSlope brand logo image. The
+                per-language icon previously rendered here was removed
+                so the brand mark can sit in this slot once available. */}
+            <span className="brand-name">DataSlope</span>
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {

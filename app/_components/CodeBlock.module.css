@@ -52,18 +52,18 @@
 }
 
 /* Light-mode chrome — applied when the docs theme is "light". The
-   token values are picked to match the IntelliJ IDEA CodeMirror theme
+   token values are picked to match the IntelliJ IDEA editor theme
    (which is used as the editor theme in light mode) so the editor
    blends into the surrounding pane bars instead of looking like a dark
    inset on a light page. */
 .codeBlock[data-cb-theme="light"] {
   --cb-bg: #ffffff;
-  --cb-bg2: #f5f5f5;
-  --cb-bg3: #ebebeb;
-  --cb-border: #d8d8d8;
-  --cb-text: #1f2937;
-  --cb-text-dim: #6b7280;
-  --cb-text-muted: #4b5563;
+  --cb-bg2: #f7f8fa;
+  --cb-bg3: #ebecf0;
+  --cb-border: #ebecf0;
+  --cb-text: #000000;
+  --cb-text-dim: #6c707e;
+  --cb-text-muted: #4f5258;
   --cb-accent: oklch(58% 0.2 250);
 }
 
@@ -82,10 +82,23 @@
 }
 
 .headerId {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--cb-font-mono);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.04em;
+  /* Use the muted-most token + reduced opacity so the header ID reads
+     as a subtle label rather than competing with the editor / output
+     content for attention. */
   color: var(--cb-text-dim);
+  opacity: 0.7;
+}
+
+.headerIdIcon {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
 }
 
 .headerLine {
@@ -98,15 +111,26 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--cb-text-muted);
+  /* Same subtle treatment as `.headerId` so both ends of the header
+     read as quiet metadata bars rather than headlines. */
+  color: var(--cb-text-dim);
   font-size: 11px;
   font-weight: 500;
+  opacity: 0.7;
 }
 
 .headerLang svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+}
+
+/* On narrow viewports the language + version text would crowd the
+   header, so collapse it to the icon-only mark. */
+@media (max-width: 540px) {
+  .headerLangText {
+    display: none;
+  }
 }
 
 .headerSpacer {
@@ -185,23 +209,23 @@
 
 /* Flex row containing the actual controls (Run, Reset, Copy…). Sits
    above the RunOverlay (z-index 0) so the sine wave reads as a
-   background animation behind the buttons. The solid background keeps
-   buttons fully opaque so the wave animation doesn't bleed through
-   transparent button backgrounds. */
+   background animation behind the buttons. The strip is intentionally
+   transparent so the running wave animation stays visible behind the
+   controls — the white/dark output box that appears below on Run is
+   what the user reads, the wave is decorative chrome. */
 .actionBarButtons {
   display: flex;
   align-items: center;
   gap: 8px;
   position: relative;
   z-index: 1;
-  background: var(--cb-bg2);
 }
 
 .runBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 14px;
+  padding: 3px 14px;
   border-radius: 4px;
   background: var(--cb-accent);
   border: none;
@@ -245,7 +269,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 3px 10px;
   background: transparent;
   border: 1px solid var(--cb-border);
   border-radius: 4px;
@@ -356,10 +380,13 @@
 
 /* ─── Output ──────────────────────────────────────────────────────── */
 
-/* Don't clip the whole output column — instead each cell decides for
-   itself whether to grow or to scroll (see `.outCellBody` rules below
-   for image/html/plot caps). This way a tall matplotlib figure no
-   longer bleeds past a 320px window with no scrollbar in sight. */
+/* Cap the overall output column height — without this, a code block
+   that emits many cells (or a single very tall one) can grow far past
+   the viewport and force the surrounding page to scroll just to reach
+   the action bar. Capping at ~60vh keeps the output panel reachable
+   while still letting individual cells render at a reasonable size.
+   The per-cell caps (`.outCellBody` rules below) still apply for
+   visually heavy single cells. */
 .output {
   display: flex;
   flex-direction: column;
@@ -367,6 +394,8 @@
   padding: 12px;
   background: var(--cb-bg);
   border-top: 1px solid var(--cb-border);
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .outputEmpty {

@@ -1,16 +1,10 @@
 import Link from "next/link";
+import { SiPostgresql } from "react-icons/si";
 import {
-  SiPython,
-  SiR,
-  SiPostgresql,
-  SiJavascript,
-  SiTypescript,
-  SiPhp,
-  SiC,
-  SiCplusplus,
-  SiOpenjdk,
-  SiSharp,
-} from "react-icons/si";
+  LANGUAGE_ICONS,
+  LANGUAGE_ICON_COLORS,
+  LANGUAGE_ICON_SIZE_FACTOR,
+} from "../_components/languageIcons";
 import styles from "./home.module.css";
 
 export const metadata = {
@@ -18,105 +12,90 @@ export const metadata = {
   description: "Browser-based language playgrounds.",
 };
 
-// We use the official brand glyphs from `react-icons/si` rather than
-// hand-rolled SVGs — those tended to render with merged colours (the
-// Python and PostgreSQL logos in particular looked muddy). Each icon
-// gets its brand colour applied via the `color` style.
-function PythonLogo() {
-  return (
-    <SiPython
-      className={styles.logoSvg}
-      style={{ color: "#3776AB" }}
-      aria-hidden="true"
-    />
-  );
+// One row per playground card. Icons + brand colours are looked up
+// from the shared `languageIcons` module so the playground header,
+// the playground switcher, and this index page all stay in sync.
+interface CardEntry {
+  id: string;
+  href: string;
+  title: string;
+  desc: string;
+  disabled?: boolean;
 }
 
-function RLogo() {
-  return (
-    <SiR
-      className={styles.logoSvg}
-      style={{ color: "#276DC3" }}
-      aria-hidden="true"
-    />
-  );
-}
+const CARDS: CardEntry[] = [
+  {
+    id: "python",
+    href: "/playground/python",
+    title: "Python",
+    desc: "Run Python in the browser via Pyodide.",
+  },
+  {
+    id: "r",
+    href: "/playground/r",
+    title: "R",
+    desc: "Run R in the browser via WebR.",
+  },
+  {
+    id: "javascript",
+    href: "/playground/javascript",
+    title: "JavaScript",
+    desc: "Run JavaScript natively in the browser.",
+  },
+  {
+    id: "typescript",
+    href: "/playground/typescript",
+    title: "TypeScript",
+    desc: "Transpile TypeScript in the browser, then run it natively.",
+  },
+  {
+    id: "php",
+    href: "/playground/php",
+    title: "PHP",
+    desc: "Run PHP in the browser via php-wasm.",
+  },
+  {
+    id: "c",
+    href: "/playground/c",
+    title: "C",
+    desc: "Compile and run C in the browser via clang (WebAssembly).",
+  },
+  {
+    id: "cpp",
+    href: "/playground/cpp",
+    title: "C++",
+    desc: "Compile and run C++ in the browser via clang (WebAssembly).",
+  },
+  {
+    id: "java",
+    href: "/playground/java",
+    title: "Java",
+    desc: "Compile and run Java in the browser via CheerpJ (OpenJDK).",
+  },
+  {
+    id: "csharp",
+    href: "/playground/csharp",
+    title: "C#",
+    desc: "Compile and run C# in the browser via Roslyn on .NET WebAssembly.",
+  },
+];
 
-function JavaScriptLogo() {
+// Render the brand icon for a given language adapter id. Falls back to
+// the literal id when no glyph is registered, so a future adapter shows
+// up reasonably without a code change here.
+function LanguageLogo({ id }: { id: string }) {
+  const Icon = LANGUAGE_ICONS[id];
+  const color = LANGUAGE_ICON_COLORS[id];
+  const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
+  if (!Icon) return null;
   return (
-    <SiJavascript
+    <Icon
       className={styles.logoSvg}
-      style={{ color: "#F7DF1E" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function TypeScriptLogo() {
-  return (
-    <SiTypescript
-      className={styles.logoSvg}
-      style={{ color: "#3178C6" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function PhpLogo() {
-  return (
-    <SiPhp
-      className={styles.logoSvg}
-      style={{ color: "#777BB4" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function CLogo() {
-  return (
-    <SiC
-      className={styles.logoSvg}
-      style={{ color: "#A8B9CC" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function CppLogo() {
-  return (
-    <SiCplusplus
-      className={styles.logoSvg}
-      style={{ color: "#00599C" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function JavaLogo() {
-  return (
-    <SiOpenjdk
-      className={styles.logoSvg}
-      style={{ color: "#ED8B00" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function CSharpLogo() {
-  return (
-    <SiSharp
-      className={styles.logoSvg}
-      style={{ color: "#9B4F96" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function PostgresLogo() {
-  return (
-    <SiPostgresql
-      className={styles.logoSvg}
-      style={{ color: "#4169E1" }}
+      style={{
+        color,
+        width: `${Math.round(32 * factor)}px`,
+        height: `${Math.round(32 * factor)}px`,
+      }}
       aria-hidden="true"
     />
   );
@@ -129,127 +108,27 @@ export default function Home() {
         <h1 className={styles.title}>Playground</h1>
         <p className={styles.subtitle}>Browser-based language playgrounds.</p>
         <ul className={styles.list}>
-          <li>
-            <Link href="/playground/python" className={styles.card}>
-              <span className={styles.logo}>
-                <PythonLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>Python</strong>
-                <span className={styles.cardDesc}>
-                  Run Python in the browser via Pyodide.
+          {CARDS.map((card) => (
+            <li key={card.id}>
+              <Link href={card.href} className={styles.card}>
+                <span className={styles.logo}>
+                  <LanguageLogo id={card.id} />
                 </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/r" className={styles.card}>
-              <span className={styles.logo}>
-                <RLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>R</strong>
-                <span className={styles.cardDesc}>
-                  Run R in the browser via WebR.
+                <span className={styles.cardText}>
+                  <strong>{card.title}</strong>
+                  <span className={styles.cardDesc}>{card.desc}</span>
                 </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/javascript" className={styles.card}>
-              <span className={styles.logo}>
-                <JavaScriptLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>JavaScript</strong>
-                <span className={styles.cardDesc}>
-                  Run JavaScript natively in the browser.
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/typescript" className={styles.card}>
-              <span className={styles.logo}>
-                <TypeScriptLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>TypeScript</strong>
-                <span className={styles.cardDesc}>
-                  Transpile TypeScript in the browser, then run it natively.
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/php" className={styles.card}>
-              <span className={styles.logo}>
-                <PhpLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>PHP</strong>
-                <span className={styles.cardDesc}>
-                  Run PHP in the browser via php-wasm.
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/c" className={styles.card}>
-              <span className={styles.logo}>
-                <CLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>C</strong>
-                <span className={styles.cardDesc}>
-                  Compile and run C in the browser via clang (WebAssembly).
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/cpp" className={styles.card}>
-              <span className={styles.logo}>
-                <CppLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>C++</strong>
-                <span className={styles.cardDesc}>
-                  Compile and run C++ in the browser via clang (WebAssembly).
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/java" className={styles.card}>
-              <span className={styles.logo}>
-                <JavaLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>Java</strong>
-                <span className={styles.cardDesc}>
-                  Compile and run Java in the browser via CheerpJ (OpenJDK).
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/playground/csharp" className={styles.card}>
-              <span className={styles.logo}>
-                <CSharpLogo />
-              </span>
-              <span className={styles.cardText}>
-                <strong>C#</strong>
-                <span className={styles.cardDesc}>
-                  Compile and run C# in the browser via Roslyn on .NET WebAssembly.
-                </span>
-              </span>
-            </Link>
-          </li>
+              </Link>
+            </li>
+          ))}
           <li>
             <span className={`${styles.card} ${styles.cardDisabled}`}>
               <span className={styles.logo}>
-                <PostgresLogo />
+                <SiPostgresql
+                  className={styles.logoSvg}
+                  style={{ color: "#4169E1" }}
+                  aria-hidden="true"
+                />
               </span>
               <span className={styles.cardText}>
                 <strong>PostgreSQL</strong>
