@@ -1411,6 +1411,11 @@ input[type="range"].fs-slider:disabled {
    positioner — we use these to drive natural enter/exit animations. */
 .bui-popup {
   outline: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px #0008;
+  overflow: hidden;
   z-index: 200;
   transform-origin: var(--transform-origin, top center);
   transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.32, 0.72, 0, 1);
