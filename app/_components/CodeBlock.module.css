@@ -185,13 +185,16 @@
 
 /* Flex row containing the actual controls (Run, Reset, Copy…). Sits
    above the RunOverlay (z-index 0) so the sine wave reads as a
-   background animation behind the buttons. */
+   background animation behind the buttons. The solid background keeps
+   buttons fully opaque so the wave animation doesn't bleed through
+   transparent button backgrounds. */
 .actionBarButtons {
   display: flex;
   align-items: center;
   gap: 8px;
   position: relative;
   z-index: 1;
+  background: var(--cb-bg2);
 }
 
 .runBtn {

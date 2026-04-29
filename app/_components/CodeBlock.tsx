@@ -294,11 +294,11 @@ function RunOverlay({ active }: { active: boolean }) {
             Each path is wider than the viewBox so it scrolls seamlessly. */}
         <path
           className={styles.runWaveBack}
-          d="M0 18 C 20 10, 40 10, 60 18 S 100 26, 120 18 S 160 10, 180 18 S 220 26, 240 18 S 280 10, 300 18 S 340 26, 360 18 S 400 10, 420 18 S 460 26, 480 18 L 480 28 L 0 28 Z"
+          d="M0 18 C 20 14, 40 14, 60 18 S 100 22, 120 18 S 160 14, 180 18 S 220 22, 240 18 S 280 14, 300 18 S 340 22, 360 18 S 400 14, 420 18 S 460 22, 480 18 L 480 28 L 0 28 Z"
         />
         <path
           className={styles.runWaveFront}
-          d="M0 21 C 20 14, 40 14, 60 21 S 100 28, 120 21 S 160 14, 180 21 S 220 28, 240 21 S 280 14, 300 21 S 340 28, 360 21 S 400 14, 420 21 S 460 28, 480 21 L 480 28 L 0 28 Z"
+          d="M0 21 C 20 17, 40 17, 60 21 S 100 25, 120 21 S 160 17, 180 21 S 220 25, 240 21 S 280 17, 300 21 S 340 25, 360 21 S 400 17, 420 21 S 460 25, 480 21 L 480 28 L 0 28 Z"
         />
       </svg>
       <div className={styles.runStream} />

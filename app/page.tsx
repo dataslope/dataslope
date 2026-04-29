@@ -29,14 +29,14 @@ export default function Home() {
           A growing collection of browser-based developer tools.
         </p>
         <div className={styles.ctas}>
-          <Link href="/playground" className={styles.cta}>
-            Open the Playground
+          <Link href="/learn" className={styles.cta}>
+            Browse Learn
             <span aria-hidden="true" className={styles.arrow}>
               →
             </span>
           </Link>
-          <Link href="/learn" className={styles.ctaSecondary}>
-            Browse Learn
+          <Link href="/playground" className={styles.ctaSecondary}>
+            Open the Playground
           </Link>
           <a
             href="https://github.com/subwaymatch/dataslope-playground/"
