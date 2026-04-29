@@ -1241,6 +1241,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 className="playground-switcher"
                 aria-label="Switch playground"
               >
+                {(() => {
+                  const Icon = PLAYGROUND_ICONS[adapter.id];
+                  const color = PLAYGROUND_ICON_COLORS[adapter.id];
+                  const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
+                  return Icon ? (
+                    <span
+                      className="playground-switcher-lang-icon"
+                      style={{ color }}
+                      aria-hidden="true"
+                    >
+                      <Icon size={Math.round(16 * factor)} />
+                    </span>
+                  ) : null;
+                })()}
                 <Select.Value />
                 <Select.Icon className="playground-switcher-icon">
                   <svg viewBox="0 0 12 12" width={10} height={10}>

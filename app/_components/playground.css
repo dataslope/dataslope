@@ -127,6 +127,11 @@ body.pg-active {
   color: var(--text-dim);
   display: inline-flex;
 }
+.playground-switcher-lang-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
 
 /* Base UI Select popup (used by the playground switcher). */
 .bui-select-popup {
