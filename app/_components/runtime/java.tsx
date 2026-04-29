@@ -190,7 +190,11 @@ const PACKAGES: PackageInfo[] = [
   // install step. Clicking inserts the corresponding `import` at the
   // top of the editor.
   {
-    cat: "Collections", icon: "📦", color: "#34d399", name: "java.util", ver: "Java 8",
+    cat: "Collections",
+    icon: "📦",
+    color: "#34d399",
+    name: "java.util",
+    ver: "Java 8",
     desc: "List, Map, Set, ArrayList, HashMap, TreeMap, Optional, ...",
     example: `import java.util.*;
 
@@ -208,7 +212,11 @@ public class Main {
 `,
   },
   {
-    cat: "Collections", icon: "🌊", color: "#34d399", name: "java.util.stream", ver: "Java 8",
+    cat: "Collections",
+    icon: "🌊",
+    color: "#34d399",
+    name: "java.util.stream",
+    ver: "Java 8",
     desc: "Stream, Collectors, IntStream — functional pipelines.",
     example: `import java.util.*;
 import java.util.stream.*;
@@ -226,7 +234,11 @@ public class Main {
 `,
   },
   {
-    cat: "Collections", icon: "🔁", color: "#34d399", name: "java.util.function", ver: "Java 8",
+    cat: "Collections",
+    icon: "🔁",
+    color: "#34d399",
+    name: "java.util.function",
+    ver: "Java 8",
     desc: "Function, Predicate, Supplier, Consumer functional interfaces.",
     example: `import java.util.function.*;
 
@@ -243,7 +255,11 @@ public class Main {
 `,
   },
   {
-    cat: "Concurrency", icon: "🧵", color: "#a78bfa", name: "java.util.concurrent", ver: "Java 8",
+    cat: "Concurrency",
+    icon: "🧵",
+    color: "#a78bfa",
+    name: "java.util.concurrent",
+    ver: "Java 8",
     desc: "ExecutorService, ConcurrentHashMap, CompletableFuture.",
     example: `import java.util.concurrent.*;
 
@@ -259,7 +275,11 @@ public class Main {
 `,
   },
   {
-    cat: "I/O", icon: "🖨️", color: "#facc15", name: "java.io", ver: "Java 8",
+    cat: "I/O",
+    icon: "🖨️",
+    color: "#facc15",
+    name: "java.io",
+    ver: "Java 8",
     desc: "PrintStream, BufferedReader, InputStream, OutputStream.",
     example: `import java.io.*;
 
@@ -276,7 +296,11 @@ public class Main {
 `,
   },
   {
-    cat: "I/O", icon: "📁", color: "#facc15", name: "java.nio.file", ver: "Java 8",
+    cat: "I/O",
+    icon: "📁",
+    color: "#facc15",
+    name: "java.nio.file",
+    ver: "Java 8",
     desc: "Path, Paths, Files modern file APIs.",
     example: `import java.nio.file.*;
 
@@ -291,7 +315,11 @@ public class Main {
 `,
   },
   {
-    cat: "Time", icon: "📅", color: "#60a5fa", name: "java.time", ver: "Java 8",
+    cat: "Time",
+    icon: "📅",
+    color: "#60a5fa",
+    name: "java.time",
+    ver: "Java 8",
     desc: "LocalDate, LocalDateTime, Duration, Instant.",
     example: `import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -307,7 +335,11 @@ public class Main {
 `,
   },
   {
-    cat: "Strings", icon: "🔤", color: "#fb923c", name: "java.text", ver: "Java 8",
+    cat: "Strings",
+    icon: "🔤",
+    color: "#fb923c",
+    name: "java.text",
+    ver: "Java 8",
     desc: "DecimalFormat, NumberFormat, MessageFormat formatters.",
     example: `import java.text.*;
 
@@ -322,7 +354,11 @@ public class Main {
 `,
   },
   {
-    cat: "Strings", icon: "🔍", color: "#fb923c", name: "java.util.regex", ver: "Java 8",
+    cat: "Strings",
+    icon: "🔍",
+    color: "#fb923c",
+    name: "java.util.regex",
+    ver: "Java 8",
     desc: "Pattern and Matcher for regular expressions.",
     example: `import java.util.regex.*;
 
@@ -338,7 +374,11 @@ public class Main {
 `,
   },
   {
-    cat: "Math", icon: "🎲", color: "#60a5fa", name: "java.math", ver: "Java 8",
+    cat: "Math",
+    icon: "🎲",
+    color: "#60a5fa",
+    name: "java.math",
+    ver: "Java 8",
     desc: "BigInteger and BigDecimal arbitrary-precision arithmetic.",
     example: `import java.math.*;
 
@@ -379,7 +419,8 @@ function findMainClassName(source: string): string {
     .replace(/"(?:\\.|[^"\\])*"/g, '""')
     .replace(/'(?:\\.|[^'\\])*'/g, "''");
 
-  const classRegex = /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
+  const classRegex =
+    /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
   const classes: { name: string; start: number; isPublic: boolean }[] = [];
   for (let m; (m = classRegex.exec(cleaned)) !== null; ) {
     // Skip nested classes — count unmatched `{` before this match to get
@@ -395,8 +436,9 @@ function findMainClassName(source: string): string {
     classes.push({
       name: m[1],
       start: m.index,
-      isPublic: /\bpublic\s+(?:final\s+|abstract\s+)?$/.test(before) ||
-                /\bpublic\s+/.test(cleaned.slice(m.index, m.index + m[0].length)),
+      isPublic:
+        /\bpublic\s+(?:final\s+|abstract\s+)?$/.test(before) ||
+        /\bpublic\s+/.test(cleaned.slice(m.index, m.index + m[0].length)),
     });
   }
   if (classes.length === 0) return "Main";
@@ -407,7 +449,9 @@ function findMainClassName(source: string): string {
   for (let i = 0; i < classes.length; i++) {
     const start = classes[i].start;
     const end = i + 1 < classes.length ? classes[i + 1].start : cleaned.length;
-    if (/\bpublic\s+static\s+void\s+main\s*\(/.test(cleaned.slice(start, end))) {
+    if (
+      /\bpublic\s+static\s+void\s+main\s*\(/.test(cleaned.slice(start, end))
+    ) {
       return classes[i].name;
     }
   }
@@ -518,7 +562,7 @@ export const javaAdapter: LanguageAdapter = {
   readyStatus: "Java ready",
   runtimeInfo: {
     language: "Java",
-    version: "Java 8 (Update 492)",
+    version: "8 (Update 492)",
     engine: "CheerpJ (OpenJDK + javac, WebAssembly)",
     engineUrl: "https://cheerpj.com/",
     notes:
@@ -530,7 +574,11 @@ export const javaAdapter: LanguageAdapter = {
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [
-    { extension: "java", label: "Java source (.java)", mimeType: "text/x-java-source" },
+    {
+      extension: "java",
+      label: "Java source (.java)",
+      mimeType: "text/x-java-source",
+    },
   ],
   exportBaseFilename: "Main",
   packagesFooter: (
@@ -556,7 +604,9 @@ export const javaAdapter: LanguageAdapter = {
     ).test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading CheerpJ (OpenJDK + javac in WebAssembly — this can take a moment on first load)…");
+    setLoadingMessage(
+      "Loading CheerpJ (OpenJDK + javac in WebAssembly — this can take a moment on first load)…",
+    );
     const api = await loadCheerpJ();
     return new JavaRuntime(api);
   },

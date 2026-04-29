@@ -213,7 +213,11 @@ const PACKAGES: PackageInfo[] = [
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
   {
-    cat: "I/O", icon: "🖨️", color: "#facc15", name: "stdio.h", ver: "C99",
+    cat: "I/O",
+    icon: "🖨️",
+    color: "#facc15",
+    name: "stdio.h",
+    ver: "C99",
     desc: "printf, scanf, fopen, fread, fwrite, ...",
     example: `#include <stdio.h>
 
@@ -224,7 +228,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Memory", icon: "📦", color: "#34d399", name: "stdlib.h", ver: "C99",
+    cat: "Memory",
+    icon: "📦",
+    color: "#34d399",
+    name: "stdlib.h",
+    ver: "C99",
     desc: "malloc / free, qsort, atoi, exit, rand.",
     example: `#include <stdio.h>
 #include <stdlib.h>
@@ -239,7 +247,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Strings", icon: "🔤", color: "#fb923c", name: "string.h", ver: "C99",
+    cat: "Strings",
+    icon: "🔤",
+    color: "#fb923c",
+    name: "string.h",
+    ver: "C99",
     desc: "memcpy, memset, strlen, strcmp, strcpy, ...",
     example: `#include <stdio.h>
 #include <string.h>
@@ -254,7 +266,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Strings", icon: "🔠", color: "#fb923c", name: "ctype.h", ver: "C99",
+    cat: "Strings",
+    icon: "🔠",
+    color: "#fb923c",
+    name: "ctype.h",
+    ver: "C99",
     desc: "isalpha, isdigit, tolower, toupper, ...",
     example: `#include <stdio.h>
 #include <ctype.h>
@@ -272,7 +288,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Math", icon: "🎲", color: "#60a5fa", name: "math.h", ver: "C99",
+    cat: "Math",
+    icon: "🎲",
+    color: "#60a5fa",
+    name: "math.h",
+    ver: "C99",
     desc: "sin, cos, sqrt, pow, log, M_PI, M_E.",
     example: `#include <stdio.h>
 #include <math.h>
@@ -286,7 +306,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Math", icon: "🔢", color: "#60a5fa", name: "stdint.h", ver: "C99",
+    cat: "Math",
+    icon: "🔢",
+    color: "#60a5fa",
+    name: "stdint.h",
+    ver: "C99",
     desc: "Fixed-width integer types: int32_t, uint64_t, ...",
     example: `#include <stdio.h>
 #include <stdint.h>
@@ -302,7 +326,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Math", icon: "✅", color: "#60a5fa", name: "stdbool.h", ver: "C99",
+    cat: "Math",
+    icon: "✅",
+    color: "#60a5fa",
+    name: "stdbool.h",
+    ver: "C99",
     desc: "The bool, true, and false macros.",
     example: `#include <stdio.h>
 #include <stdbool.h>
@@ -318,7 +346,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Time", icon: "📅", color: "#a78bfa", name: "time.h", ver: "C99",
+    cat: "Time",
+    icon: "📅",
+    color: "#a78bfa",
+    name: "time.h",
+    ver: "C99",
     desc: "time, clock, strftime, struct tm.",
     example: `#include <stdio.h>
 #include <time.h>
@@ -334,7 +366,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "assert.h", ver: "C99",
+    cat: "Diagnostics",
+    icon: "🛑",
+    color: "#f472b6",
+    name: "assert.h",
+    ver: "C99",
     desc: "assert(condition) for runtime checks.",
     example: `#include <stdio.h>
 #include <assert.h>
@@ -351,7 +387,11 @@ int main(void) {
 `,
   },
   {
-    cat: "Diagnostics", icon: "❗", color: "#f472b6", name: "errno.h", ver: "C99",
+    cat: "Diagnostics",
+    icon: "❗",
+    color: "#f472b6",
+    name: "errno.h",
+    ver: "C99",
     desc: "errno + perror for system error reporting.",
     example: `#include <stdio.h>
 #include <errno.h>
@@ -438,7 +478,7 @@ export const cAdapter: LanguageAdapter = {
   readyStatus: "C ready",
   runtimeInfo: {
     language: "C",
-    version: "C17 (201710L)",
+    version: "17 (201710L)",
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
@@ -474,7 +514,9 @@ export const cAdapter: LanguageAdapter = {
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading browsercc clang toolchain (this can take a moment on first load)…");
+    setLoadingMessage(
+      "Loading browsercc clang toolchain (this can take a moment on first load)…",
+    );
     const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
     return new CRuntime(api, shim);
   },

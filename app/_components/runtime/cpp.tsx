@@ -218,7 +218,11 @@ const PACKAGES: PackageInfo[] = [
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
   {
-    cat: "I/O", icon: "🖨️", color: "#facc15", name: "iostream", ver: "C++20",
+    cat: "I/O",
+    icon: "🖨️",
+    color: "#facc15",
+    name: "iostream",
+    ver: "C++20",
     desc: "std::cin, std::cout, std::cerr stream I/O.",
     example: `#include <iostream>
 
@@ -230,7 +234,11 @@ int main() {
 `,
   },
   {
-    cat: "I/O", icon: "📝", color: "#facc15", name: "iomanip", ver: "C++20",
+    cat: "I/O",
+    icon: "📝",
+    color: "#facc15",
+    name: "iomanip",
+    ver: "C++20",
     desc: "std::setw, std::setprecision, std::fixed manipulators.",
     example: `#include <iostream>
 #include <iomanip>
@@ -244,7 +252,11 @@ int main() {
 `,
   },
   {
-    cat: "I/O", icon: "🧵", color: "#facc15", name: "sstream", ver: "C++20",
+    cat: "I/O",
+    icon: "🧵",
+    color: "#facc15",
+    name: "sstream",
+    ver: "C++20",
     desc: "std::istringstream, std::ostringstream string streams.",
     example: `#include <iostream>
 #include <sstream>
@@ -262,7 +274,11 @@ int main() {
 `,
   },
   {
-    cat: "Strings", icon: "🔤", color: "#fb923c", name: "string", ver: "C++20",
+    cat: "Strings",
+    icon: "🔤",
+    color: "#fb923c",
+    name: "string",
+    ver: "C++20",
     desc: "std::string and std::string_view.",
     example: `#include <iostream>
 #include <string>
@@ -277,7 +293,11 @@ int main() {
 `,
   },
   {
-    cat: "Containers", icon: "📦", color: "#34d399", name: "vector", ver: "C++20",
+    cat: "Containers",
+    icon: "📦",
+    color: "#34d399",
+    name: "vector",
+    ver: "C++20",
     desc: "std::vector dynamic array.",
     example: `#include <iostream>
 #include <vector>
@@ -292,7 +312,11 @@ int main() {
 `,
   },
   {
-    cat: "Containers", icon: "🗺️", color: "#34d399", name: "map", ver: "C++20",
+    cat: "Containers",
+    icon: "🗺️",
+    color: "#34d399",
+    name: "map",
+    ver: "C++20",
     desc: "Ordered std::map and std::multimap.",
     example: `#include <iostream>
 #include <map>
@@ -309,7 +333,11 @@ int main() {
 `,
   },
   {
-    cat: "Containers", icon: "🪣", color: "#34d399", name: "unordered_map", ver: "C++20",
+    cat: "Containers",
+    icon: "🪣",
+    color: "#34d399",
+    name: "unordered_map",
+    ver: "C++20",
     desc: "Hash-based std::unordered_map.",
     example: `#include <iostream>
 #include <unordered_map>
@@ -324,7 +352,11 @@ int main() {
 `,
   },
   {
-    cat: "Algorithms", icon: "🔁", color: "#60a5fa", name: "algorithm", ver: "C++20",
+    cat: "Algorithms",
+    icon: "🔁",
+    color: "#60a5fa",
+    name: "algorithm",
+    ver: "C++20",
     desc: "std::sort, std::find, std::for_each, ...",
     example: `#include <iostream>
 #include <vector>
@@ -342,7 +374,11 @@ int main() {
 `,
   },
   {
-    cat: "Algorithms", icon: "➕", color: "#60a5fa", name: "numeric", ver: "C++20",
+    cat: "Algorithms",
+    icon: "➕",
+    color: "#60a5fa",
+    name: "numeric",
+    ver: "C++20",
     desc: "std::accumulate, std::iota, std::reduce.",
     example: `#include <iostream>
 #include <vector>
@@ -358,7 +394,11 @@ int main() {
 `,
   },
   {
-    cat: "Memory", icon: "🧠", color: "#a78bfa", name: "memory", ver: "C++20",
+    cat: "Memory",
+    icon: "🧠",
+    color: "#a78bfa",
+    name: "memory",
+    ver: "C++20",
     desc: "std::unique_ptr, std::shared_ptr, std::make_unique.",
     example: `#include <iostream>
 #include <memory>
@@ -373,7 +413,11 @@ int main() {
 `,
   },
   {
-    cat: "Memory", icon: "🧰", color: "#a78bfa", name: "utility", ver: "C++20",
+    cat: "Memory",
+    icon: "🧰",
+    color: "#a78bfa",
+    name: "utility",
+    ver: "C++20",
     desc: "std::move, std::pair, std::swap.",
     example: `#include <iostream>
 #include <utility>
@@ -390,7 +434,11 @@ int main() {
 `,
   },
   {
-    cat: "Math", icon: "🎲", color: "#60a5fa", name: "cmath", ver: "C++20",
+    cat: "Math",
+    icon: "🎲",
+    color: "#60a5fa",
+    name: "cmath",
+    ver: "C++20",
     desc: "std::sin, std::cos, std::sqrt, std::pow.",
     example: `#include <iostream>
 #include <cmath>
@@ -404,7 +452,11 @@ int main() {
 `,
   },
   {
-    cat: "Diagnostics", icon: "🛑", color: "#f472b6", name: "stdexcept", ver: "C++20",
+    cat: "Diagnostics",
+    icon: "🛑",
+    color: "#f472b6",
+    name: "stdexcept",
+    ver: "C++20",
     desc: "Standard exception types: runtime_error, logic_error, ...",
     example: `#include <iostream>
 #include <stdexcept>
@@ -513,7 +565,7 @@ export const cppAdapter: LanguageAdapter = {
   readyStatus: "C++ ready",
   runtimeInfo: {
     language: "C++",
-    version: "C++20 (202002L)",
+    version: "20 (202002L)",
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
@@ -549,7 +601,9 @@ export const cppAdapter: LanguageAdapter = {
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading browsercc clang toolchain (this can take a moment on first load)…");
+    setLoadingMessage(
+      "Loading browsercc clang toolchain (this can take a moment on first load)…",
+    );
     const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
     return new CppRuntime(api, shim);
   },
