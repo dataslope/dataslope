@@ -36,8 +36,8 @@ html[data-theme="light"] .pyodide-loading {
 
 .pg-root *, .pg-root *::before, .pg-root *::after { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
+body.pg-active {
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
@@ -1849,6 +1849,13 @@ input[type="range"].fs-slider:disabled {
 .confirm-btn-secondary:hover {
   background: var(--bg3);
   color: var(--text);
+}
+.confirm-btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.confirm-btn-primary:hover {
+  filter: brightness(1.1);
 }
 .confirm-btn-danger {
   background: var(--red);

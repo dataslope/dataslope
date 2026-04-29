@@ -52,6 +52,7 @@ import "codemirror/addon/hint/show-hint.css";
 import { useRouter } from "next/navigation";
 import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Dialog } from "@base-ui-components/react/dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
@@ -65,7 +66,13 @@ import {
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
   LANGUAGE_ICON_COLORS as PLAYGROUND_ICON_COLORS,
 } from "./languageIcons";
-import { applyMode, applyThemePalette } from "./playgroundTheme";
+import {
+  applyMode,
+  applyThemePalette,
+  clearThemePalette,
+  getStoredEditorTheme,
+  setStoredEditorTheme,
+} from "./playgroundTheme";
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
@@ -365,7 +372,7 @@ function SqlPlaygroundInner() {
       Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) ||
       D.fontSize;
     const savedTheme =
-      localStorage.getItem(storageKey("editortheme")) ?? D.editorTheme;
+      getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
     const savedOutputEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
@@ -406,6 +413,7 @@ function SqlPlaygroundInner() {
 
     return () => {
       document.body.classList.remove("pg-active");
+      clearThemePalette();
     };
   }, []);
 
@@ -431,7 +439,7 @@ function SqlPlaygroundInner() {
           codeMirrorMod) as unknown as CodeMirrorAPI;
         if (textareaRef.current && !editorRef.current) {
           const initialTheme =
-            localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+            getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
           const initialWordWrap =
             localStorage.getItem(storageKey("wordwrap")) !== "false";
           const editor = CM.fromTextArea(textareaRef.current, {
@@ -572,7 +580,7 @@ function SqlPlaygroundInner() {
   }, []);
   const setEditorTheme = useCallback((t: string) => {
     setEditorThemeState(t);
-    localStorage.setItem(storageKey("editortheme"), t);
+    setStoredEditorTheme(t);
   }, []);
   const setWordWrap = useCallback((b: boolean) => {
     setWordWrapState(b);
@@ -927,6 +935,45 @@ function SqlPlaygroundInner() {
     },
     [tabs, activeDbId],
   );
+
+  const duplicateTab = useCallback(
+    (id: string) => {
+      const idx = tabs.findIndex((t) => t.id === id);
+      if (idx < 0) return;
+      const source = tabs[idx];
+      const copy: QueryTab = {
+        ...source,
+        id: newTabId(),
+        title: `${source.title} Copy`,
+      };
+      const next = [...tabs.slice(0, idx + 1), copy, ...tabs.slice(idx + 1)];
+      setTabs(next);
+      saveTabs(activeDbId, next);
+      setActiveTabId(copy.id);
+    },
+    [tabs, activeDbId],
+  );
+
+  const closeOtherTabs = useCallback(
+    (id: string) => {
+      const target = tabs.find((t) => t.id === id);
+      if (!target) return;
+      const next = [target];
+      setTabs(next);
+      saveTabs(activeDbId, next);
+      setActiveTabId(target.id);
+    },
+    [tabs, activeDbId],
+  );
+
+  const closeAllTabs = useCallback(() => {
+    const fresh = [{ id: newTabId(), title: "Query 1", code: "" }];
+    setTabs(fresh);
+    saveTabs(activeDbId, fresh);
+    setActiveTabId(fresh[0].id);
+    const editor = editorRef.current;
+    if (editor) editor.setValue("");
+  }, [activeDbId]);
 
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findSampleDatabase(activeDbId);
@@ -1340,8 +1387,8 @@ function SqlPlaygroundInner() {
                 Restore default settings?
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
-                This will reset the editor font size, theme, word wrap, and
-                run/result preferences for the SQLite playground to their
+                This will reset SQLite&apos;s editor font size, word wrap,
+                run/result preferences, and the shared editor theme to their
                 built-in defaults. Your saved queries are not affected.
               </AlertDialog.Description>
               <div className="confirm-actions">
@@ -1581,6 +1628,9 @@ function SqlPlaygroundInner() {
                       onActivate={() => setActiveTabId(t.id)}
                       onClose={() => closeTab(t.id)}
                       onRename={(name) => renameTab(t.id, name)}
+                      onDuplicate={() => duplicateTab(t.id)}
+                      onCloseOthers={() => closeOtherTabs(t.id)}
+                      onCloseAll={closeAllTabs}
                     />
                   ))}
                   <button
@@ -1593,45 +1643,45 @@ function SqlPlaygroundInner() {
                     <Plus size={12} aria-hidden="true" />
                   </button>
                 </div>
-                <div className="sql-toolbar">
-                  <span
-                    className="kbd-group"
-                    title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-                  >
-                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                    <span className="kbd-plus" aria-hidden="true">
-                      +
-                    </span>
-                    <kbd className="kbd">Enter</kbd>
-                  </span>
-                  <button
-                    type="button"
-                    className={`run-btn${statusState === "running" ? " running" : ""}`}
-                    disabled={!loaded || statusState === "running"}
-                    onClick={runActiveTab}
-                  >
-                    {statusState === "running" ? (
-                      <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                        <circle
-                          cx="6"
-                          cy="6"
-                          r="4.5"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeDasharray="14 8"
-                        />
-                      </svg>
-                    ) : (
-                      <Play size={10} aria-hidden="true" />
-                    )}
-                    {statusState === "running" ? "Running…" : "Run"}
-                  </button>
-                </div>
               </div>
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
+              </div>
+              <div className="sql-toolbar">
+                <span
+                  className="kbd-group"
+                  title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                >
+                  <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                  <span className="kbd-plus" aria-hidden="true">
+                    +
+                  </span>
+                  <kbd className="kbd">Enter</kbd>
+                </span>
+                <button
+                  type="button"
+                  className={`run-btn${statusState === "running" ? " running" : ""}`}
+                  disabled={!loaded || statusState === "running"}
+                  onClick={runActiveTab}
+                >
+                  {statusState === "running" ? (
+                    <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                      <circle
+                        cx="6"
+                        cy="6"
+                        r="4.5"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeDasharray="14 8"
+                      />
+                    </svg>
+                  ) : (
+                    <Play size={10} aria-hidden="true" />
+                  )}
+                  {statusState === "running" ? "Running…" : "Run"}
+                </button>
               </div>
             </div>
           </div>
@@ -1647,58 +1697,119 @@ interface SqlTabProps {
   onActivate: () => void;
   onClose: () => void;
   onRename: (name: string) => void;
+  onDuplicate: () => void;
+  onCloseOthers: () => void;
+  onCloseAll: () => void;
 }
 
-function SqlTab({ tab, active, onActivate, onClose, onRename }: SqlTabProps) {
-  const promptRename = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const next = window.prompt("Rename tab", tab.title);
-    if (next !== null) onRename(next);
-  }, [tab.title, onRename]);
+function SqlTab({
+  tab,
+  active,
+  onActivate,
+  onClose,
+  onRename,
+  onDuplicate,
+  onCloseOthers,
+  onCloseAll,
+}: SqlTabProps) {
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [draftTitle, setDraftTitle] = useState(tab.title);
+
+  const openRename = useCallback(() => {
+    setDraftTitle(tab.title);
+    setRenameOpen(true);
+  }, [tab.title]);
+
+  const submitRename = useCallback(() => {
+    onRename(draftTitle);
+    setRenameOpen(false);
+  }, [draftTitle, onRename]);
 
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger
-        render={(props) => (
-          <button
-            type="button"
-            {...props}
-            className={`sql-tab${active ? " active" : ""}`}
-            onClick={onActivate}
-            aria-selected={active}
-            role="tab"
-          >
-            <span className="sql-tab-title">{tab.title}</span>
-            <button
-              type="button"
-              className="sql-tab-close"
-              aria-label={`Close ${tab.title}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
+    <>
+      <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup sql-rename-popup">
+            <Dialog.Title className="confirm-title">Rename query tab</Dialog.Title>
+            <Dialog.Description className="confirm-desc">
+              Choose a short name for this query tab.
+            </Dialog.Description>
+            <form
+              className="sql-rename-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submitRename();
               }}
             >
-              <X size={10} aria-hidden="true" />
-            </button>
-          </button>
-        )}
-      />
-      <ContextMenu.Portal>
-        <ContextMenu.Positioner sideOffset={6}>
-          <ContextMenu.Popup className="bui-popup">
-            <ContextMenu.Item
-              className="example-item"
-              onClick={promptRename}
+              <input
+                className="sql-rename-input"
+                value={draftTitle}
+                onChange={(e) => setDraftTitle(e.target.value)}
+                autoFocus
+              />
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button type="submit" className="confirm-btn confirm-btn-primary">
+                  Rename
+                </button>
+              </div>
+            </form>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <ContextMenu.Root>
+        <ContextMenu.Trigger
+          render={(props) => (
+            <button
+              type="button"
+              {...props}
+              className={`sql-tab${active ? " active" : ""}`}
+              onClick={onActivate}
+              aria-selected={active}
+              role="tab"
             >
-              <div className="ex-title">Rename</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item className="example-item" onClick={onClose}>
-              <div className="ex-title">Close</div>
-            </ContextMenu.Item>
-          </ContextMenu.Popup>
-        </ContextMenu.Positioner>
-      </ContextMenu.Portal>
-    </ContextMenu.Root>
+              <span className="sql-tab-title">{tab.title}</span>
+              <button
+                type="button"
+                className="sql-tab-close"
+                aria-label={`Close ${tab.title}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+              >
+                <X size={10} aria-hidden="true" />
+              </button>
+            </button>
+          )}
+        />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner sideOffset={6}>
+            <ContextMenu.Popup className="bui-popup">
+              <ContextMenu.Item className="example-item" onClick={openRename}>
+                <div className="ex-title">Rename</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item className="example-item" onClick={onDuplicate}>
+                <div className="ex-title">Duplicate</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item className="example-item" onClick={onClose}>
+                <div className="ex-title">Close</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item className="example-item" onClick={onCloseOthers}>
+                <div className="ex-title">Close Others</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item className="example-item" onClick={onCloseAll}>
+                <div className="ex-title">Close All</div>
+              </ContextMenu.Item>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+    </>
   );
 }
 

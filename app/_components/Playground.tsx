@@ -77,6 +77,9 @@ import {
 import {
   applyMode,
   applyThemePalette,
+  clearThemePalette,
+  getStoredEditorTheme,
+  setStoredEditorTheme,
 } from "./playgroundTheme";
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
@@ -541,7 +544,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) || D.fontSize;
-    const savedTheme = localStorage.getItem(storageKey("editortheme")) ?? D.editorTheme;
+    const savedTheme = getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
     const savedOutputEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
@@ -576,6 +579,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
     return () => {
       document.body.classList.remove("pg-active");
+      clearThemePalette();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);
@@ -619,7 +623,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           // `editorTheme` state ("dracula") while the surrounding UI uses
           // the saved theme, producing a visible mismatch on load.
           const initialTheme =
-            localStorage.getItem(storageKey("editortheme")) ?? "dracula";
+            getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
           const initialWordWrap =
             localStorage.getItem(storageKey("wordwrap")) !== "false";
           const triggerAutocomplete = () => {
@@ -789,7 +793,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setEditorTheme = useCallback(
     (t: string) => {
       setEditorThemeState(t);
-      localStorage.setItem(storageKey("editortheme"), t);
+      setStoredEditorTheme(t);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter.id],
@@ -1706,9 +1710,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 Restore default settings?
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
-                This will reset the editor font size, theme, word wrap, and
-                run/output preferences for this playground to their built-in
-                defaults. Your saved code is not affected.
+                This will reset this playground&apos;s editor font size, word wrap,
+                run/output preferences, and the shared editor theme to their
+                built-in defaults. Your saved code is not affected.
               </AlertDialog.Description>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">

@@ -45,6 +45,8 @@ export const LIGHT_THEMES = new Set([
   "base16-light",
 ]);
 
+export const PLAYGROUND_EDITOR_THEME_STORAGE_KEY = "pg_editor_theme";
+
 export interface ThemePalette {
   bg: string;
   bg2: string;
@@ -170,6 +172,46 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--text", p.text);
   root.style.setProperty("--text-dim", p.dim);
   root.style.setProperty("--text-muted", p.muted);
+}
+
+export function clearThemePalette(): void {
+  const root = document.documentElement;
+  for (const name of [
+    "--bg",
+    "--bg2",
+    "--bg3",
+    "--border",
+    "--text",
+    "--text-dim",
+    "--text-muted",
+  ]) {
+    root.style.removeProperty(name);
+  }
+  root.removeAttribute("data-theme");
+}
+
+export function getStoredEditorTheme(legacyKey?: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const shared = localStorage.getItem(PLAYGROUND_EDITOR_THEME_STORAGE_KEY);
+    if (shared) return shared;
+    const legacy = legacyKey ? localStorage.getItem(legacyKey) : null;
+    if (legacy) {
+      localStorage.setItem(PLAYGROUND_EDITOR_THEME_STORAGE_KEY, legacy);
+      return legacy;
+    }
+  } catch {
+    // localStorage unavailable — fall back to defaults.
+  }
+  return null;
+}
+
+export function setStoredEditorTheme(theme: string): void {
+  try {
+    localStorage.setItem(PLAYGROUND_EDITOR_THEME_STORAGE_KEY, theme);
+  } catch {
+    // localStorage unavailable — state still updates for this session.
+  }
 }
 
 /** Toggle `data-theme` on `<html>` so light-mode-only CSS overrides
