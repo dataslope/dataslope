@@ -26,11 +26,8 @@ const themeBootstrapScript = `
       "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",dim:"#aaaaaa",muted:"#666666"}
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
-    var path = location.pathname;
-    var m = path.match(/^\/playground\/([^/?#]+)/);
-    var id = m ? m[1] : null;
-    if (!id) return;
-    var theme = localStorage.getItem("pg_" + id + "_editortheme");
+    if (!/^\/playground(?:\/|$)/.test(location.pathname)) return;
+    var theme = localStorage.getItem("pg_editor_theme");
     if (!theme || !palettes[theme]) return;
     var p = palettes[theme];
     var r = document.documentElement;

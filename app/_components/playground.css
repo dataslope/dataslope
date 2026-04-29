@@ -36,8 +36,8 @@ html[data-theme="light"] .pyodide-loading {
 
 .pg-root *, .pg-root *::before, .pg-root *::after { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
+body.pg-active {
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
