@@ -194,6 +194,24 @@ function formatCellValue(v: unknown): string {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// Pagination defaults — applied per result set. The "All" option
+// (value = 0) renders every row at once and hides the page navigator.
+// The chosen size is persisted across reloads so the user's preference
+// survives navigation between databases and tabs.
+// ────────────────────────────────────────────────────────────────────────
+
+const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
+  { value: 25, label: "25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 250, label: "250" },
+  { value: 500, label: "500" },
+  { value: 0, label: "All" },
+];
+
+const DEFAULT_PAGE_SIZE = 50;
+
+// ────────────────────────────────────────────────────────────────────────
 // Component
 // ────────────────────────────────────────────────────────────────────────
 
@@ -718,6 +736,114 @@ function SqlPlaygroundInner() {
     [],
   );
 
+  // ─── Sidebar context-menu actions ───────────────────────────────────
+  // Each handler accepts the entity `kind` so SchemaItem can dispatch
+  // any action through one uniform callback signature, and we use it
+  // to label the result-pane source.
+  const describeEntity = useCallback(
+    (name: string, kind: "table" | "view") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const label = kind === "view" ? "View structure" : "Structure";
+      setStatusState("running");
+      const t0 = performance.now();
+      try {
+        const sets = engine.describeTable(name);
+        const elapsedMs = performance.now() - t0;
+        setResult({
+          sets,
+          elapsedMs,
+          source: `${label}: ${name}`,
+        });
+        setStatusState("ready");
+      } catch (err) {
+        const elapsedMs = performance.now() - t0;
+        const msg = err instanceof Error ? err.message : String(err);
+        setResult({
+          sets: [],
+          elapsedMs,
+          error: msg,
+          source: `${label}: ${name}`,
+        });
+        setStatusState("error");
+        window.setTimeout(() => setStatusState("ready"), 3000);
+      }
+    },
+    [],
+  );
+
+  const countEntityRows = useCallback(
+    (name: string, kind: "table" | "view") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const label = kind === "view" ? "View row count" : "Row count";
+      setStatusState("running");
+      const t0 = performance.now();
+      try {
+        const sets = engine.countRows(name);
+        const elapsedMs = performance.now() - t0;
+        setResult({
+          sets,
+          elapsedMs,
+          source: `${label}: ${name}`,
+        });
+        setStatusState("ready");
+      } catch (err) {
+        const elapsedMs = performance.now() - t0;
+        const msg = err instanceof Error ? err.message : String(err);
+        setResult({
+          sets: [],
+          elapsedMs,
+          error: msg,
+          source: `${label}: ${name}`,
+        });
+        setStatusState("error");
+        window.setTimeout(() => setStatusState("ready"), 3000);
+      }
+    },
+    [],
+  );
+
+  const copyEntityName = useCallback(
+    (name: string) => {
+      // Best-effort: clipboard API requires a secure context, so fall
+      // through silently in environments where it is unavailable.
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(name)
+          .then(() => showToast(`Copied "${name}".`))
+          .catch(() => showToast("Couldn't copy to clipboard.", "warn"));
+      } else {
+        showToast("Clipboard not available in this browser.", "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const dropEntity = useCallback(
+    (name: string, kind: "table" | "view") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const label = kind === "view" ? "view" : "table";
+      if (typeof window !== "undefined") {
+        const ok = window.confirm(
+          `Drop ${label} "${name}"? This change is in-memory only and will be undone next page load.`,
+        );
+        if (!ok) return;
+      }
+      try {
+        engine.dropEntity(name, kind);
+        setTables(engine.listTables());
+        setViews(engine.listViews());
+        showToast(`Dropped ${label} "${name}".`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Drop failed: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
   // ─── Tab actions ────────────────────────────────────────────────────
   const addTab = useCallback(() => {
     const nextNum = tabs.length + 1;
@@ -836,6 +962,76 @@ function SqlPlaygroundInner() {
       resizer.classList.remove("dragging");
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
+    };
+    resizer.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      resizer.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+
+  // ─── Sidebar resizer (horizontal, between sidebar and panes) ────────
+  // The sidebar width is persisted as a CSS custom property on the
+  // `.sql-shell` element and mirrored to localStorage so it survives
+  // reloads. We clamp into a sane range so the user can't accidentally
+  // hide the sidebar entirely or push the editor off-screen.
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const shell = shellRef.current;
+    const resizer = sidebarResizerRef.current;
+    if (!shell || !resizer) return;
+    // Hydrate from localStorage on mount.
+    try {
+      const saved = Number(localStorage.getItem(storageKey("sidebar_w")));
+      if (Number.isFinite(saved) && saved >= 160 && saved <= 600) {
+        shell.style.setProperty("--sql-sidebar-width", `${saved}px`);
+      }
+    } catch {
+      // ignore
+    }
+    let dragging = false;
+    let startX = 0;
+    let startW = 0;
+    const onDown = (e: MouseEvent) => {
+      dragging = true;
+      startX = e.clientX;
+      // Read the actual rendered width rather than the CSS variable so
+      // the first drag from the default value doesn't snap.
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      startW = sidebar?.offsetWidth ?? 240;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const shellWidth = shell.offsetWidth;
+      const maxW = Math.max(200, Math.min(600, shellWidth - 320));
+      const next = Math.max(
+        160,
+        Math.min(maxW, startW + (e.clientX - startX)),
+      );
+      shell.style.setProperty("--sql-sidebar-width", `${next}px`);
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      resizer.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      const w = sidebar?.offsetWidth;
+      if (w) {
+        try {
+          localStorage.setItem(storageKey("sidebar_w"), String(w));
+        } catch {
+          // ignore
+        }
+      }
     };
     resizer.addEventListener("mousedown", onDown);
     window.addEventListener("mousemove", onMove);
@@ -1167,7 +1363,7 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        <div className="sql-shell">
+        <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
               <Select.Root
@@ -1230,16 +1426,16 @@ function SqlPlaygroundInner() {
               <div className="sql-tree-section">
                 <div className="sql-tree-label">TABLES ({tables.length})</div>
                 {tables.map((name) => (
-                  <button
+                  <SchemaItem
                     key={`t-${name}`}
-                    type="button"
-                    className="sql-tree-item"
-                    onClick={() => previewTable(name, "table")}
-                    title={`Preview ${name}`}
-                  >
-                    <Table2 size={12} aria-hidden="true" />
-                    <span>{name}</span>
-                  </button>
+                    name={name}
+                    kind="table"
+                    onPreview={previewTable}
+                    onStructure={describeEntity}
+                    onCount={countEntityRows}
+                    onCopy={copyEntityName}
+                    onDrop={dropEntity}
+                  />
                 ))}
                 {tables.length === 0 && (
                   <div className="sql-tree-empty">No tables.</div>
@@ -1248,16 +1444,16 @@ function SqlPlaygroundInner() {
               <div className="sql-tree-section">
                 <div className="sql-tree-label">VIEWS ({views.length})</div>
                 {views.map((name) => (
-                  <button
+                  <SchemaItem
                     key={`v-${name}`}
-                    type="button"
-                    className="sql-tree-item"
-                    onClick={() => previewTable(name, "view")}
-                    title={`Preview ${name}`}
-                  >
-                    <Eye size={12} aria-hidden="true" />
-                    <span>{name}</span>
-                  </button>
+                    name={name}
+                    kind="view"
+                    onPreview={previewTable}
+                    onStructure={describeEntity}
+                    onCount={countEntityRows}
+                    onCopy={copyEntityName}
+                    onDrop={dropEntity}
+                  />
                 ))}
                 {views.length === 0 && (
                   <div className="sql-tree-empty">No views.</div>
@@ -1269,6 +1465,15 @@ function SqlPlaygroundInner() {
               {RUNTIME_INFO.engine}
             </div>
           </aside>
+
+          <div
+            className="sql-sidebar-resizer"
+            ref={sidebarResizerRef}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Drag to resize tables panel"
+            title="Drag to resize"
+          />
 
           <div className="sql-panes" ref={panesRef}>
             <div className="sql-results-pane" ref={resultsPaneRef}>
@@ -1519,6 +1724,46 @@ function ResultView({
 }
 
 function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
+  const totalRows = set.values.length;
+  const [pageSize, setPageSize] = useState<number>(() => {
+    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
+    const saved = Number(
+      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+    );
+    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
+      ? saved
+      : DEFAULT_PAGE_SIZE;
+  });
+  const [page, setPage] = useState<number>(0);
+
+  // Reset to the first page whenever the underlying data changes (a
+  // fresh query lands here, or the user shrinks the page size below
+  // the current offset).
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setPage(0);
+  }, [set]);
+
+  const persistPageSize = useCallback((n: number) => {
+    setPageSize(n);
+    setPage(0);
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(n));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // pageSize === 0 (the "All" option) disables pagination entirely.
+  const effectivePageSize = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
+  const totalPages = Math.max(1, Math.ceil(totalRows / effectivePageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const start = safePage * effectivePageSize;
+  const end = Math.min(totalRows, start + effectivePageSize);
+  const visible = pageSize > 0 ? set.values.slice(start, end) : set.values;
+  const showPager = totalRows > 0 && (pageSize === 0 || totalRows > pageSize);
+
   return (
     <div className="sql-result-set">
       {index > 0 && (
@@ -1534,8 +1779,8 @@ function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
             </tr>
           </thead>
           <tbody>
-            {set.values.map((row, ri) => (
-              <tr key={ri}>
+            {visible.map((row, ri) => (
+              <tr key={start + ri}>
                 {row.map((v, ci) => (
                   <td
                     key={ci}
@@ -1549,6 +1794,190 @@ function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
           </tbody>
         </table>
       </div>
+      {showPager && (
+        <div className="sql-result-pager">
+          <span className="sql-result-pager-info">
+            {totalRows === 0
+              ? "0 rows"
+              : `Rows ${start + 1}–${end} of ${totalRows}`}
+          </span>
+          <div className="sql-result-pager-size">
+            <span>Rows per page</span>
+            <Select.Root
+              value={String(pageSize)}
+              onValueChange={(value) => persistPageSize(Number(value))}
+            >
+              <Select.Trigger
+                className="sql-result-pager-size-trigger"
+                aria-label="Rows per page"
+              >
+                <Select.Value>
+                  {PAGE_SIZE_OPTIONS.find((opt) => opt.value === pageSize)
+                    ?.label ?? String(pageSize)}
+                </Select.Value>
+                <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
+                  <polyline
+                    points="2,4 6,8 10,4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Positioner sideOffset={4} alignItemWithTrigger={false}>
+                  <Select.Popup className="bui-select-popup">
+                    {PAGE_SIZE_OPTIONS.map((opt) => (
+                      <Select.Item
+                        key={opt.value}
+                        value={String(opt.value)}
+                        className="bui-select-item"
+                      >
+                        <Select.ItemText>{opt.label}</Select.ItemText>
+                      </Select.Item>
+                    ))}
+                  </Select.Popup>
+                </Select.Positioner>
+              </Select.Portal>
+            </Select.Root>
+          </div>
+          <div className="sql-result-pager-controls">
+            <button
+              type="button"
+              className="sql-result-pager-btn"
+              onClick={() => setPage(0)}
+              disabled={safePage === 0}
+              aria-label="First page"
+              title="First page"
+            >
+              «
+            </button>
+            <button
+              type="button"
+              className="sql-result-pager-btn"
+              onClick={() => setPage(Math.max(0, safePage - 1))}
+              disabled={safePage === 0}
+              aria-label="Previous page"
+              title="Previous page"
+            >
+              ‹
+            </button>
+            <span className="sql-result-pager-page">
+              {safePage + 1} / {totalPages}
+            </span>
+            <button
+              type="button"
+              className="sql-result-pager-btn"
+              onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
+              disabled={safePage >= totalPages - 1}
+              aria-label="Next page"
+              title="Next page"
+            >
+              ›
+            </button>
+            <button
+              type="button"
+              className="sql-result-pager-btn"
+              onClick={() => setPage(totalPages - 1)}
+              disabled={safePage >= totalPages - 1}
+              aria-label="Last page"
+              title="Last page"
+            >
+              »
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Schema sidebar item — a tree-row button wrapped in a Base UI
+// ContextMenu so right-clicking a table or view exposes the typical
+// IDE actions (View Structure, Preview Data, Count Rows, Copy Name,
+// Drop). The primary left-click action stays as "preview" so the
+// existing fast-path behaviour is preserved.
+// ────────────────────────────────────────────────────────────────────────
+
+interface SchemaItemProps {
+  name: string;
+  kind: "table" | "view";
+  onPreview: (name: string, kind: "table" | "view") => void;
+  onStructure: (name: string, kind: "table" | "view") => void;
+  onCount: (name: string, kind: "table" | "view") => void;
+  onCopy: (name: string) => void;
+  onDrop: (name: string, kind: "table" | "view") => void;
+}
+
+function SchemaItem({
+  name,
+  kind,
+  onPreview,
+  onStructure,
+  onCount,
+  onCopy,
+  onDrop,
+}: SchemaItemProps) {
+  const Icon = kind === "view" ? Eye : Table2;
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger
+        render={(props) => (
+          <button
+            type="button"
+            {...props}
+            className="sql-tree-item"
+            onClick={() => onPreview(name, kind)}
+            title={`Preview ${name} (right-click for more)`}
+          >
+            <Icon size={12} aria-hidden="true" />
+            <span>{name}</span>
+          </button>
+        )}
+      />
+      <ContextMenu.Portal>
+        <ContextMenu.Positioner sideOffset={6}>
+          <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onStructure(name, kind)}
+            >
+              <div className="ex-title">View Structure</div>
+              <div className="ex-desc">PRAGMA table_info({name})</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onPreview(name, kind)}
+            >
+              <div className="ex-title">Preview Data</div>
+              <div className="ex-desc">First 200 rows</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onCount(name, kind)}
+            >
+              <div className="ex-title">Count Rows</div>
+              <div className="ex-desc">SELECT COUNT(*)</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onCopy(name)}
+            >
+              <div className="ex-title">Copy Name</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onDrop(name, kind)}
+            >
+              <div className="ex-title">
+                Drop {kind === "view" ? "View" : "Table"}
+              </div>
+              <div className="ex-desc">In-memory only</div>
+            </ContextMenu.Item>
+          </ContextMenu.Popup>
+        </ContextMenu.Positioner>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
   );
 }
