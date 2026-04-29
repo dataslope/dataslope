@@ -22,4 +22,5 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "cpp", label: "C++ Playground", href: "/playground/cpp" },
   { id: "java", label: "Java Playground", href: "/playground/java" },
   { id: "csharp", label: "C# Playground", href: "/playground/csharp" },
+  { id: "sqlite", label: "SQLite Playground", href: "/playground/sqlite" },
 ];

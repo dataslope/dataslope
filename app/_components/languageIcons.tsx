@@ -18,6 +18,7 @@ import {
   SiCplusplus,
   SiOpenjdk,
   SiSharp,
+  SiSqlite,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
@@ -60,6 +61,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   cpp: SiCplusplus,
   java: SiOpenjdk,
   csharp: SiSharp,
+  sqlite: SiSqlite,
 };
 
 /** Per-language relative size multiplier. Some glyphs read "heavier"
@@ -84,4 +86,5 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   cpp: "#00599c",
   java: "#ed8b00",
   csharp: "#9b4f96",
+  sqlite: "#003b57",
 };

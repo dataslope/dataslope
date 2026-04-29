@@ -78,6 +78,12 @@ const CARDS: CardEntry[] = [
     title: "C#",
     desc: "Compile and run C# in the browser via Roslyn on .NET WebAssembly.",
   },
+  {
+    id: "sqlite",
+    href: "/playground/sqlite",
+    title: "SQLite",
+    desc: "Run SQLite queries against in-browser sample databases via sql.js.",
+  },
 ];
 
 // Render the brand icon for a given language adapter id. Falls back to
