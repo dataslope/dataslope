@@ -13,11 +13,13 @@ declare module "codemirror/mode/htmlmixed/htmlmixed";
 declare module "codemirror/mode/xml/xml";
 declare module "codemirror/mode/clike/clike";
 declare module "codemirror/mode/css/css";
+declare module "codemirror/mode/sql/sql";
 declare module "codemirror/addon/edit/closebrackets";
 declare module "codemirror/addon/edit/matchbrackets";
 declare module "codemirror/addon/comment/comment";
 declare module "codemirror/addon/hint/show-hint";
 declare module "codemirror/addon/hint/show-hint.css";
+declare module "codemirror/addon/hint/sql-hint";
 declare module "codemirror/keymap/sublime";
 
 // plotly.js-dist-min has no shipped types either; we only use a tiny slice

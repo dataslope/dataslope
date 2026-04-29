@@ -15,6 +15,18 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 const nextConfig: NextConfig = {
   // Treat MDX files under content/ as page sources via fumadocs-mdx.
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+  // sql.js ships an Emscripten preamble that statically references the
+  // Node-only `fs`/`path` modules. Those branches are dead code in the
+  // browser (gated on `typeof process === "object"`), but Turbopack
+  // can't see through the gate at build time, so we alias them to an
+  // empty stub for the client bundle.
+  turbopack: {
+    resolveAlias: {
+      fs: { browser: "./app/_components/runtime/emptyModule.ts" },
+      path: { browser: "./app/_components/runtime/emptyModule.ts" },
+      crypto: { browser: "./app/_components/runtime/emptyModule.ts" },
+    },
+  },
   redirects: async () => [
     {
       source: "/_dotnet/:path*",

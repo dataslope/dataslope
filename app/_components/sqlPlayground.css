@@ -1,0 +1,411 @@
+/* ─── SQLite playground — layout-specific overrides ───────────────────
+ * Only adds the layout primitives unique to the SQL playground (sidebar
+ * + horizontally-resized panes + result table). Every color is sourced
+ * from the same CSS custom properties (--bg, --bg2, --bg3, --border,
+ * --text, --text-dim, --text-muted) that the editor-theme system
+ * writes via `applyThemePalette`, so picking a different theme retints
+ * this entire UI in lockstep with the rest of the playgrounds.
+ */
+
+.sql-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .sql-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 200px 1fr;
+  }
+}
+
+/* ─── Sidebar ─── */
+.sql-sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .sql-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.sql-db-selector-wrap {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.sql-db-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sql-db-selector:hover {
+  border-color: var(--text-dim);
+}
+
+.sql-db-selector-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sql-db-selector-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-db-popup {
+  min-width: 260px;
+}
+
+.sql-db-item {
+  align-items: flex-start !important;
+  padding: 8px 10px !important;
+}
+
+.sql-db-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sql-db-item-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sql-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.sql-tree-section {
+  padding: 6px 0;
+}
+
+.sql-tree-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  padding: 4px 12px;
+  text-transform: uppercase;
+}
+
+.sql-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sql-tree-item:hover {
+  background: var(--bg3);
+}
+
+.sql-tree-item svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sql-tree-empty {
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 4px 12px;
+  font-style: italic;
+}
+
+.sql-sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding: 6px 12px;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+/* ─── Panes ─── */
+.sql-panes {
+  display: grid;
+  grid-template-rows: 50% 6px 1fr;
+  min-height: 0;
+  background: var(--bg);
+  position: relative;
+}
+
+.sql-results-pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.sql-results-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  background: var(--bg);
+}
+
+.sql-result-source {
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+.sql-result-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  margin-right: 8px;
+}
+
+.sql-result-meta-ok {
+  color: var(--green);
+}
+
+.sql-result-meta-err {
+  color: var(--red);
+}
+
+.sql-result-error {
+  padding: 16px;
+  color: var(--red);
+}
+
+.sql-result-error-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.sql-result-error-body {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: var(--output-font-size);
+  white-space: pre-wrap;
+  margin: 0;
+  color: var(--text);
+}
+
+.sql-result-ok {
+  padding: 16px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.sql-result-sets {
+  display: flex;
+  flex-direction: column;
+}
+
+.sql-result-set + .sql-result-set {
+  border-top: 1px dashed var(--border);
+}
+
+.sql-result-set-label {
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-result-table-wrap {
+  overflow: auto;
+}
+
+.sql-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--output-font-size);
+}
+
+.sql-result-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg2);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sql-result-table tbody td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-result-table tbody tr:nth-child(2n) td {
+  background: var(--bg2);
+}
+
+.sql-result-table tbody tr:hover td {
+  background: var(--bg3);
+}
+
+.sql-cell-null {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ─── Resizer ─── */
+.sql-resizer {
+  background: var(--border);
+  cursor: row-resize;
+  height: 6px;
+  position: relative;
+  transition: background 120ms ease;
+}
+
+.sql-resizer:hover,
+.sql-resizer.dragging {
+  background: var(--accent);
+}
+
+/* ─── Editor pane ─── */
+.sql-editor-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+}
+
+.sql-tabbar {
+  display: flex;
+  align-items: center;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  min-height: 34px;
+  padding-right: 8px;
+}
+
+.sql-tabs {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.sql-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 12px;
+  background: var(--bg2);
+  color: var(--text-dim);
+  border: 0;
+  border-right: 1px solid var(--border);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+}
+
+.sql-tab:hover {
+  color: var(--text);
+}
+
+.sql-tab.active {
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: inset 0 -2px 0 0 var(--accent);
+}
+
+.sql-tab-title {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-tab-close {
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sql-tab-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.sql-tab-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  width: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sql-tab-add:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-left: 8px;
+}
