@@ -1752,7 +1752,7 @@ function SqlTab({
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
-                <button type="submit" className="confirm-btn confirm-btn-danger">
+                <button type="submit" className="confirm-btn confirm-btn-primary">
                   Rename
                 </button>
               </div>

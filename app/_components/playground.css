@@ -1850,6 +1850,13 @@ input[type="range"].fs-slider:disabled {
   background: var(--bg3);
   color: var(--text);
 }
+.confirm-btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.confirm-btn-primary:hover {
+  filter: brightness(1.1);
+}
 .confirm-btn-danger {
   background: var(--red);
   color: white;
