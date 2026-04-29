@@ -83,13 +83,15 @@ body.pg-active {
 
 /* Placeholder text for the DataSlope brand mark. Sits in the slot
    where the per-language logo tile used to live; will be swapped for
-   an actual logo image once available. */
+   an actual logo image once available. Rendered as an anchor linking
+   to the home page. */
 .brand-name {
   font-family: var(--font-ui);
   font-weight: 600;
   font-size: 15px;
   color: var(--text);
   letter-spacing: -0.01em;
+  text-decoration: none;
 }
 
 .header-sep { flex: 1; }

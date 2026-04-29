@@ -27,10 +27,6 @@
   background: var(--border);
   cursor: col-resize;
   transition: background 120ms ease;
-  /* Sit just under floating popups so the sticky thead/popovers stack
-     above it but pointer events still hit the bar. */
-  position: relative;
-  z-index: 1;
 }
 
 .sql-sidebar-resizer:hover,
@@ -275,7 +271,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 1 0 auto;
+  flex: 0 0 auto;
 }
 
 .sql-result-set + .sql-result-set {
@@ -294,10 +290,8 @@
 }
 
 .sql-result-table-wrap {
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 .sql-result-table {
@@ -305,9 +299,6 @@
   border-collapse: collapse;
   font-family: var(--font-mono);
   font-size: var(--output-font-size);
-  /* Allow the table to shrink to its content while still filling the
-     scroll container horizontally. */
-  flex: 1 0 auto;
 }
 
 .sql-result-table thead th {

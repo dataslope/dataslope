@@ -1229,7 +1229,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             {/* Placeholder for the DataSlope brand logo image. The
                 per-language icon previously rendered here was removed
                 so the brand mark can sit in this slot once available. */}
-            <span className="brand-name">DataSlope</span>
+            <a href="/" className="brand-name">Dataslope</a>
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {
