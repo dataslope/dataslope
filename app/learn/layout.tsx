@@ -22,6 +22,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
       <DocsLayout
         tree={source.pageTree}
         nav={{ title: "Dataslope · Learn" }}
+        githubUrl="https://github.com/subwaymatch/dataslope-playground/"
       >
         {children}
       </DocsLayout>
