@@ -10,18 +10,13 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import {
-  SiPython,
-  SiR,
-  SiJavascript,
-  SiTypescript,
-  SiPhp,
-  SiC,
-  SiCplusplus,
-  SiOpenjdk,
-  SiSharp,
-} from "react-icons/si";
+import { Box } from "lucide-react";
 import { Toast } from "@base-ui-components/react/toast";
+import {
+  LANGUAGE_ICONS,
+  LANGUAGE_ICON_COLORS,
+  LANGUAGE_ICON_SIZE_FACTOR,
+} from "./languageIcons";
 // CodeMirror core + the dracula theme — same default the main
 // playground uses, so a code block embedded inside a learning page
 // reads as "the playground, in miniature".
@@ -196,32 +191,26 @@ function PlayIcon() {
   );
 }
 
-// Brand-coloured glyph for the adapter's language. Falls back to a
-// neutral monogram so future adapters render reasonably without
-// having to update this map first.
+// Brand-coloured glyph for the adapter's language. Uses the shared
+// `languageIcons` registry so the playground header, the /playground
+// index, and embedded code blocks all render the same icons + brand
+// colours. Falls back to the adapter's two-character monogram so future
+// adapters render reasonably without having to update the registry first.
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
-  switch (adapter.id) {
-    case "python":
-      return <SiPython style={{ color: "#3776AB" }} aria-hidden />;
-    case "r":
-      return <SiR style={{ color: "#276DC3" }} aria-hidden />;
-    case "javascript":
-      return <SiJavascript style={{ color: "#E0B400" }} aria-hidden />;
-    case "typescript":
-      return <SiTypescript style={{ color: "#3178C6" }} aria-hidden />;
-    case "php":
-      return <SiPhp style={{ color: "#777BB4" }} aria-hidden />;
-    case "c":
-      return <SiC style={{ color: "#A8B9CC" }} aria-hidden />;
-    case "cpp":
-      return <SiCplusplus style={{ color: "#00599C" }} aria-hidden />;
-    case "java":
-      return <SiOpenjdk style={{ color: "#ED8B00" }} aria-hidden />;
-    case "csharp":
-      return <SiSharp style={{ color: "#9B4F96" }} aria-hidden />;
-    default:
-      return <span aria-hidden>{adapter.logoText}</span>;
-  }
+  const Icon = LANGUAGE_ICONS[adapter.id];
+  const color = LANGUAGE_ICON_COLORS[adapter.id];
+  const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
+  if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
+  return (
+    <Icon
+      style={{
+        color,
+        width: `${Math.round(14 * factor)}px`,
+        height: `${Math.round(14 * factor)}px`,
+      }}
+      aria-hidden
+    />
+  );
 }
 
 // Stable short id derived from React's useId so the SSR markup
@@ -585,11 +574,14 @@ function CodeBlockInner({
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
     >
       <div className={styles.header}>
-        <span className={styles.headerId}># {headerLabel}</span>
+        <span className={styles.headerId}>
+          <Box className={styles.headerIdIcon} aria-hidden />
+          {headerLabel}
+        </span>
         <span className={styles.headerLine} aria-hidden />
         <span className={styles.headerLang}>
           <LanguageGlyph adapter={adapter} />
-          <span>
+          <span className={styles.headerLangText}>
             {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
           </span>
         </span>
@@ -728,7 +720,7 @@ function CodeBlockInner({
         </div>
       </div>
 
-      {outputs.length > 0 && (
+      {(outputs.length > 0 || isBusy) && (
         <div className={styles.output} aria-live="polite">
           {outputs.map((cell) => (
             <OutputCellView
