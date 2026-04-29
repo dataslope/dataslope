@@ -1116,6 +1116,21 @@ function SqlPlaygroundInner() {
                 className="playground-switcher"
                 aria-label="Switch playground"
               >
+                {(() => {
+                  const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
+                  const color = PLAYGROUND_ICON_COLORS[PLAYGROUND_ID];
+                  const factor =
+                    PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
+                  return Icon ? (
+                    <span
+                      className="playground-switcher-lang-icon"
+                      style={{ color }}
+                      aria-hidden="true"
+                    >
+                      <Icon size={Math.round(16 * factor)} />
+                    </span>
+                  ) : null;
+                })()}
                 <Select.Value />
                 <Select.Icon className="playground-switcher-icon">
                   <svg viewBox="0 0 12 12" width={10} height={10}>
