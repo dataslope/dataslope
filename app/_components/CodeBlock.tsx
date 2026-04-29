@@ -654,75 +654,76 @@ function CodeBlockInner({
         role="toolbar"
         aria-label="Code block actions"
       >
-        <button
-          type="button"
-          className={`${styles.runBtn}${isBusy ? ` ${styles.runBtnRunning}` : ""}`}
-          onClick={() => run()}
-          disabled={isBusy}
-        >
-          {isBusy ? (
-            <svg
-              viewBox="0 0 12 12"
-              className={styles.runBtnSpinner}
-              aria-hidden
-            >
-              <circle
-                cx="6"
-                cy="6"
-                r="4.5"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray="14 8"
-              />
-            </svg>
-          ) : (
-            <PlayIcon />
-          )}
-          <span>{isBusy ? "Running…" : "Run"}</span>
-        </button>
-        {!isBusy && (
-          <span
-            className={styles.kbdGroup}
-            title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+        <RunOverlay active={isBusy} />
+        <div className={styles.actionBarButtons}>
+          <button
+            type="button"
+            className={`${styles.runBtn}${isBusy ? ` ${styles.runBtnRunning}` : ""}`}
+            onClick={() => run()}
+            disabled={isBusy}
           >
-            <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-            <span className={styles.kbdPlus} aria-hidden="true">
-              +
+            {isBusy ? (
+              <svg
+                viewBox="0 0 12 12"
+                className={styles.runBtnSpinner}
+                aria-hidden
+              >
+                <circle
+                  cx="6"
+                  cy="6"
+                  r="4.5"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="14 8"
+                />
+              </svg>
+            ) : (
+              <PlayIcon />
+            )}
+            <span>{isBusy ? "Running…" : "Run"}</span>
+          </button>
+          {!isBusy && (
+            <span
+              className={styles.kbdGroup}
+              title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+            >
+              <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+              <span className={styles.kbdPlus} aria-hidden="true">
+                +
+              </span>
+              <kbd className={styles.kbd}>Enter</kbd>
             </span>
-            <kbd className={styles.kbd}>Enter</kbd>
-          </span>
-        )}
-        <button
-          type="button"
-          className={styles.resetBtn}
-          onClick={reset}
-          disabled={isBusy}
-        >
-          <span aria-hidden>↻</span>
-          <span>Reset</span>
-        </button>
-        <button
-          type="button"
-          className={styles.iconBtn}
-          title="Copy code to clipboard"
-          aria-label="Copy code to clipboard"
-          onClick={() => {
-            void copyEditor();
-          }}
-        >
-          <CopyIcon />
-        </button>
-        <span className={styles.actionBarSpacer} />
-        {statusMessage && (
-          <span className={styles.statusText} data-status={status}>
-            {statusMessage}
-          </span>
-        )}
+          )}
+          <button
+            type="button"
+            className={styles.resetBtn}
+            onClick={reset}
+            disabled={isBusy}
+          >
+            <span aria-hidden>↻</span>
+            <span>Reset</span>
+          </button>
+          <button
+            type="button"
+            className={styles.iconBtn}
+            title="Copy code to clipboard"
+            aria-label="Copy code to clipboard"
+            onClick={() => {
+              void copyEditor();
+            }}
+          >
+            <CopyIcon />
+          </button>
+          <span className={styles.actionBarSpacer} />
+          {statusMessage && (
+            <span className={styles.statusText} data-status={status}>
+              {statusMessage}
+            </span>
+          )}
+        </div>
       </div>
-
-      <RunOverlay active={status === "running"} />
 
       {outputs.length > 0 && (
         <div className={styles.output} aria-live="polite">

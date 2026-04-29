@@ -1,20 +1,24 @@
-# Playground
+# Dataslope Playground
 
-A [Next.js](https://nextjs.org/) app that hosts browser-based language playgrounds.
+A [Next.js](https://nextjs.org/) app that hosts browser-based language playgrounds and interactive learning content.
 
-| Route         | Status      | Description                                              |
-| ------------- | ----------- | -------------------------------------------------------- |
-| `/`           | ✅ live      | Landing page linking to each playground.                 |
-| `/playground/python`     | ✅ live      | Python playground powered by [Pyodide][pyodide] (WASM).  |
-| `/playground/r`          | ✅ live      | R playground powered by [WebR][webr] 0.5.9 (WASM).       |
-| `/playground/javascript` | ✅ live      | JavaScript playground (runs natively in the browser).    |
-| `/playground/typescript` | ✅ live      | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
-| `/playground/php`        | ✅ live      | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
-| `/playground/c`          | ✅ live      | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
-| `/playground/cpp`        | ✅ live      | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
-| `/playground/java`       | ✅ live      | Java playground powered by [CheerpJ][cheerpj] — OpenJDK + `javac` running in WebAssembly. |
-| `/playground/csharp`     | ✅ live      | C# playground powered by [Roslyn][roslyn] running on the [.NET WebAssembly runtime][dotnetwasm] (Mono). |
-| `/playground/postgres`   | 🔜 planned  | PostgreSQL playground (to be added).                     |
+## Routes
+
+| Route | Status | Description |
+| --- | --- | --- |
+| `/` | ✅ live | Landing page linking to the playground, learn section, and GitHub. |
+| `/playground` | ✅ live | Playground index — links to each language playground. |
+| `/playground/python` | ✅ live | Python playground powered by [Pyodide][pyodide] (WASM). |
+| `/playground/r` | ✅ live | R playground powered by [WebR][webr] 0.5.9 (WASM). |
+| `/playground/javascript` | ✅ live | JavaScript playground (runs natively in the browser). |
+| `/playground/typescript` | ✅ live | TypeScript playground (transpiled in-browser by [`typescript`][ts]). |
+| `/playground/php` | ✅ live | PHP playground powered by [php-wasm](https://github.com/seanmorris/php-wasm) (WASM). |
+| `/playground/c` | ✅ live | C playground (compiled in-browser to WASM by clang via [`@wasmer/sdk`][wasmer]). |
+| `/playground/cpp` | ✅ live | C++ playground (compiled in-browser to WASM by clang in C++ driver mode via [`@wasmer/sdk`][wasmer]). |
+| `/playground/java` | ✅ live | Java playground powered by [CheerpJ][cheerpj] — OpenJDK + `javac` running in WebAssembly. |
+| `/playground/csharp` | ✅ live | C# playground powered by [Roslyn][roslyn] running on the [.NET WebAssembly runtime][dotnetwasm] (Mono). |
+| `/learn` | ✅ live | MDX-based learning section powered by [Fumadocs][fumadocs]. |
+| `/playground/postgres` | 🔜 planned | PostgreSQL playground (to be added). |
 
 [pyodide]: https://pyodide.org/
 [webr]: https://docs.r-wasm.org/webr/latest/
@@ -23,6 +27,7 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 [cheerpj]: https://cheerpj.com/
 [roslyn]: https://github.com/dotnet/roslyn
 [dotnetwasm]: https://learn.microsoft.com/dotnet/core/wasm/
+[fumadocs]: https://fumadocs.vercel.app/
 
 ## Project structure
 
@@ -30,29 +35,48 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 .
 ├── app/                          # Next.js App Router
 │   ├── layout.tsx
-│   ├── page.tsx                  # Landing page (/) — links to /playground
+│   ├── page.tsx                  # Landing page (/) — links to /playground, /learn, GitHub
+│   ├── root.module.css
 │   ├── _components/              # Shared React components
-│   │   ├── Playground.tsx        # The playground UI (editor + output + settings)
+│   │   ├── Playground.tsx        # The full playground UI (editor + output + settings)
 │   │   ├── playground.css
+│   │   ├── CodeBlock.tsx         # Compact executable code block for embedding in /learn pages
+│   │   ├── CodeBlock.module.css
+│   │   ├── MdxCodeBlock.tsx      # MDX wrapper that resolves string adapter IDs for CodeBlock
+│   │   ├── runtimeRegistry.ts    # Shared runtime registry (one runtime per language per page)
+│   │   ├── types.ts              # Shared TypeScript interfaces (LanguageAdapter, OutputCell…)
 │   │   └── runtime/
+│   │       ├── adapters.ts       # Registry mapping adapter IDs to adapter instances
 │   │       ├── python.tsx        # Python language adapter (Pyodide)
 │   │       ├── r.tsx             # R language adapter (WebR)
 │   │       ├── javascript.tsx    # JavaScript language adapter (native)
 │   │       ├── typescript.tsx    # TypeScript language adapter (in-browser tsc)
 │   │       ├── php.tsx           # PHP language adapter (php-wasm)
-│   │       ├── c.tsx             # C language adapter (clang/clang via Wasmer)
-│   │       ├── cpp.tsx           # C++ language adapter (clang/clang via Wasmer)
+│   │       ├── c.tsx             # C language adapter (clang via Wasmer)
+│   │       ├── cpp.tsx           # C++ language adapter (clang via Wasmer)
 │   │       ├── java.tsx          # Java language adapter (CheerpJ)
 │   │       └── csharp.tsx        # C# language adapter (Roslyn on .NET WebAssembly)
-│   ├── playground/python/page.tsx
-│   ├── playground/r/page.tsx
-│   ├── playground/javascript/page.tsx
-│   ├── playground/typescript/page.tsx
-│   ├── playground/php/page.tsx
-│   ├── playground/c/page.tsx
-│   ├── playground/cpp/page.tsx
-│   ├── playground/java/page.tsx
-│   └── playground/csharp/page.tsx
+│   ├── learn/                    # /learn route (Fumadocs-powered)
+│   │   ├── layout.tsx            # Fumadocs DocsLayout + RootProvider
+│   │   ├── learn.css             # Tailwind/Fumadocs CSS (scoped to /learn)
+│   │   └── [[...slug]]/page.tsx  # Catch-all MDX page renderer
+│   └── playground/
+│       ├── page.tsx              # Playground index
+│       ├── python/page.tsx
+│       ├── r/page.tsx
+│       ├── javascript/page.tsx
+│       ├── typescript/page.tsx
+│       ├── php/page.tsx
+│       ├── c/page.tsx
+│       ├── cpp/page.tsx
+│       ├── java/page.tsx
+│       └── csharp/page.tsx
+├── content/learn/                # MDX content for the /learn section
+│   └── **/*.mdx
+├── lib/
+│   └── source.ts                 # Fumadocs loader — maps MDX files to page tree
+├── mdx-components.tsx            # MDX component overrides (registers MdxCodeBlock)
+├── source.config.ts              # Fumadocs collection definition
 ├── __tests__/
 │   ├── javascript.test.ts        # JavaScript runtime execution tests
 │   ├── typescript.test.ts        # TypeScript transpile + execution tests
@@ -63,11 +87,9 @@ A [Next.js](https://nextjs.org/) app that hosts browser-based language playgroun
 └── tsconfig.json
 ```
 
-Each playground is a React client component that renders the shared
-`Playground` UI with a language-specific adapter. The adapter wires up the
-runtime — WebAssembly (Pyodide for Python, WebR for R), the native
-browser engine (JavaScript), or in-browser transpilation (TypeScript) —
-and provides example snippets and the package list.
+Each playground is a React client component that renders the shared `Playground` UI with a language-specific adapter. The adapter wires up the runtime — WebAssembly (Pyodide for Python, WebR for R), the native browser engine (JavaScript), or in-browser transpilation (TypeScript) — and provides example snippets and the package list.
+
+The `/learn` section is powered by [Fumadocs](https://fumadocs.vercel.app/). MDX files under `content/learn/` become pages at `/learn/...`. Authors can embed executable code blocks in MDX using `<CodeBlock>` (via `MdxCodeBlock`), which shares the same language runtimes as the full playground — multiple blocks for the same language on one page share a single runtime instance.
 
 ## Getting started
 
@@ -81,6 +103,7 @@ npm run dev
 Then open:
 
 - http://localhost:3000/ — landing page
+- http://localhost:3000/playground — playground index
 - http://localhost:3000/playground/python — Python playground
 - http://localhost:3000/playground/r — R playground
 - http://localhost:3000/playground/javascript — JavaScript playground
@@ -90,11 +113,11 @@ Then open:
 - http://localhost:3000/playground/cpp — C++ playground
 - http://localhost:3000/playground/java — Java playground
 - http://localhost:3000/playground/csharp — C# playground
+- http://localhost:3000/learn — learning section
 
 ## Editor settings
 
-Each playground persists its settings in `localStorage` (namespaced per
-language). The following settings are available via the ⚙ icon in the header:
+Each playground persists its settings in `localStorage` (namespaced per language). The following settings are available via the ⚙ icon in the header:
 
 | Setting | Default | Description |
 | --- | --- | --- |
@@ -105,13 +128,13 @@ language). The following settings are available via the ⚙ icon in the header:
 
 ## Scripts
 
-| Script          | Description                       |
-| --------------- | --------------------------------- |
-| `npm run dev`   | Start the Next.js dev server.     |
-| `npm run build` | Build the production bundle.      |
-| `npm run start` | Run the production server.        |
-| `npm run lint`  | Run ESLint via `next lint`.       |
-| `npm test`      | Run the Vitest test suite.        |
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Start the Next.js dev server (also runs `fumadocs-mdx` to regenerate `.source/`). |
+| `npm run build` | Build the production bundle (also runs `fumadocs-mdx`). |
+| `npm run start` | Run the production server. |
+| `npm run lint` | Run ESLint via `next lint`. |
+| `npm test` | Run the Vitest test suite. |
 
 ## Testing
 
@@ -127,20 +150,39 @@ npm test
 
 The tests run entirely in Node — no browser or WebAssembly runtime is required. Adapters that use WebAssembly runtimes (Python, R, C, C++, PHP, Java, C#) are covered by configuration tests; their actual execution is best verified by loading the playground in a browser.
 
+## Embedding executable code blocks in MDX (`/learn`)
+
+The `<CodeBlock>` component lets you embed a runnable code snippet anywhere in an MDX learning page. It uses a compact version of the playground UI (editor + Run / Reset / Copy buttons + output panel) with the same language runtimes.
+
+In MDX, use the `<CodeBlock>` shorthand registered by `mdx-components.tsx`:
+
+```mdx
+import { pythonAdapter } from "@/app/_components/runtime/python";
+
+<CodeBlock adapter={pythonAdapter} initialCode={`print("hello")`} />
+```
+
+Or use the string-ID version (`MdxCodeBlock`) that resolves the adapter from the registry:
+
+```mdx
+<CodeBlock adapter="python" initialCode={`print("hello")`} />
+```
+
+Optional props:
+- `label` — human-readable label shown in the block header (defaults to an auto-generated id like `PyBlock-49b7`).
+- `initCode` — read-only initialization code (imports, fixtures) prepended to the user-editable code on every Run, rendered in a collapsed panel.
+
 ## Adding a new playground (e.g. `/playground/postgres`)
 
 Playgrounds are built as native Next.js routes using React and npm packages:
 
-1. Create a language adapter at `app/_components/runtime/<name>.tsx` that
-   implements the `LanguageAdapter` interface from
-   `app/_components/types.ts`. The adapter is responsible for initialising
-   the runtime and turning user code into output cells.
+1. Create a language adapter at `app/_components/runtime/<name>.tsx` that implements the `LanguageAdapter` interface from `app/_components/types.ts`. The adapter is responsible for initialising the runtime and turning user code into output cells.
 2. Add the route at `app/playground/<name>/page.tsx`:
 
    ```tsx
    "use client";
-   import Playground from "../_components/Playground";
-   import { postgresAdapter } from "../_components/runtime/postgres";
+   import Playground from "../../_components/Playground";
+   import { postgresAdapter } from "../../_components/runtime/postgres";
 
    export default function PostgresPage() {
      return <Playground adapter={postgresAdapter} />;
@@ -149,16 +191,11 @@ Playgrounds are built as native Next.js routes using React and npm packages:
 
 3. Link to it from the playground index in `app/playground/page.tsx`.
 
-Prefer installing runtime libraries from npm. Only fall back to a CDN
-`<script>` tag if a library genuinely cannot be installed/bundled (some
-WebAssembly runtimes still require fetching their `.wasm` and stdlib assets
-from a CDN at runtime — that's fine, but the JavaScript loader itself
-should come from an npm package).
+Prefer installing runtime libraries from npm. Only fall back to a CDN `<script>` tag if a library genuinely cannot be installed/bundled (some WebAssembly runtimes still require fetching their `.wasm` and stdlib assets from a CDN at runtime — that's fine, but the JavaScript loader itself should come from an npm package).
 
 ## Deployment
 
-The app is a standard Next.js project and deploys to any Next.js-compatible
-host. The simplest path is [Vercel](https://vercel.com/):
+The app is a standard Next.js project and deploys to any Next.js-compatible host. The simplest path is [Vercel](https://vercel.com/):
 
 1. Push this repo to GitHub.
 2. Import the repo in Vercel — no configuration is required.
@@ -170,3 +207,4 @@ For self-hosting:
 npm run build
 npm run start    # serves on http://localhost:3000
 ```
+

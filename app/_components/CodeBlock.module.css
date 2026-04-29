@@ -176,13 +176,22 @@
 /* ─── Action bar ──────────────────────────────────────────────────── */
 
 .actionBar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   padding: 8px 12px;
   background: var(--cb-bg2);
   border-top: 1px solid var(--cb-border);
   flex-shrink: 0;
+  position: relative;
+}
+
+/* Flex row containing the actual controls (Run, Reset, Copy…). Sits
+   above the RunOverlay (z-index 0) so the sine wave reads as a
+   background animation behind the buttons. */
+.actionBarButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 
 .runBtn {
@@ -606,10 +615,7 @@
 
 .runOverlay {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 28px;
+  inset: 0;
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
@@ -617,7 +623,7 @@
   transition:
     opacity 0.18s ease,
     transform 0.18s ease;
-  z-index: 4;
+  z-index: 0;
   /* Vertical alpha mask: opaque at the bottom, transparent at the top
      so the band blends into the action bar without a hard seam. */
   -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%);
