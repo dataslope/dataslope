@@ -82,7 +82,10 @@
   width: 100%;
   background: var(--bg3);
   color: var(--text);
-  border: 1px solid var(--border);
+  /* Per UI request the selector reads as a plain field rather than a
+     bordered control; drop the border but keep a transparent ring so
+     focus styles still have something to mount on if needed. */
+  border: 1px solid transparent;
   border-radius: 6px;
   padding: 6px 8px;
   font-family: var(--font-mono);
@@ -92,11 +95,13 @@
 }
 
 .sql-db-selector:hover {
-  border-color: var(--text-dim);
+  background: color-mix(in srgb, var(--bg3) 80%, var(--bg) 20%);
 }
 
 .sql-db-selector-icon {
-  color: var(--text-muted);
+  /* Tint the leading database glyph with the playground accent so it
+     reads as the page's primary affordance rather than chrome. */
+  color: var(--accent, #f0b400);
   flex-shrink: 0;
 }
 
@@ -203,7 +208,7 @@
   background: transparent;
   border: 0;
   color: var(--text);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px;
   padding: 4px 12px;
   cursor: pointer;
@@ -244,12 +249,14 @@
 .sql-tree-columns {
   list-style: none;
   margin: 0;
-  /* Reduced left indent (was 28px) and shifted right to keep the
-     guide line aligned roughly under the parent entity's icon. */
-  padding: 2px 0 4px 18px;
+  /* Slightly deeper indent so the column rows sit clearly under their
+     parent table/view, leaving room for the larger PK / FK icons. */
+  padding: 4px 0 6px 26px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  /* Open up the vertical rhythm between rows now that the icons are
+     bigger — keeps the list breathable. */
+  gap: 4px;
   position: relative;
 }
 
@@ -259,9 +266,9 @@
 .sql-tree-columns::before {
   content: "";
   position: absolute;
-  left: 18px;
-  top: 2px;
-  bottom: 4px;
+  left: 26px;
+  top: 4px;
+  bottom: 6px;
   width: 1px;
   background: var(--border);
   pointer-events: none;
@@ -270,13 +277,13 @@
 .sql-tree-column {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
+  gap: 8px;
+  font-family: var(--font-ui);
   font-size: 11px;
   color: var(--text);
   /* Pull the row left so the icon "node" overlaps the guide line. */
-  padding: 2px 8px 2px 0;
-  margin-left: -7px;
+  padding: 3px 8px 3px 0;
+  margin-left: -10px;
   line-height: 1.3;
   cursor: pointer;
 }
@@ -288,9 +295,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-width: 14px;
-  height: 14px;
+  gap: 3px;
+  min-width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -300,15 +307,15 @@
    attached to the line. */
 .sql-tree-column-pk,
 .sql-tree-column-fk {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
   border: 1px solid var(--border);
-  padding: 1px;
+  padding: 2px;
   box-sizing: border-box;
 }
 
@@ -359,7 +366,7 @@
   padding: 6px 12px;
   font-size: 10px;
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
 }
 
 /* ─── Panes ─── */
@@ -881,14 +888,13 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px 6px 12px;
-  /* Inactive tabs sit on a slightly darker background so they read as
-     recessed behind the active one. */
-  background: var(--bg3);
+  /* Inactive tabs render as plain text — no background, no border —
+     so the tab strip reads as a row of labels with the active tab
+     called out as the only "tab-shaped" element. */
+  background: transparent;
   color: var(--text-dim);
-  border: 1px solid var(--border);
-  border-bottom: 0;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
+  border: 0;
+  border-radius: 0;
   font-family: var(--font-ui);
   font-size: 12px;
   cursor: pointer;
@@ -903,12 +909,16 @@
 
 .sql-tab:hover {
   color: var(--text);
-  background: color-mix(in srgb, var(--bg3) 70%, var(--bg) 30%);
+  background: transparent;
 }
 
 .sql-tab.active {
   background: var(--bg);
   color: var(--text);
+  /* Only the active tab takes on a tab shape — rounded top corners
+     joined to the editor pane below. */
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
   /* Accent highlight along the top edge of the active tab to mirror
      common IDE conventions, replacing the previous bottom underline
      (which would clash with the new joined-to-editor look). */
@@ -977,7 +987,6 @@
   background: color-mix(in srgb, var(--bg2) 92%, transparent);
   border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 0 10px 28px #0007;
   backdrop-filter: blur(8px);
 }
 
@@ -997,7 +1006,7 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px;
   line-height: 1;
   backdrop-filter: blur(6px);

@@ -78,7 +78,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { FaInfo } from "react-icons/fa";
+import { FaInfo, FaLink } from "react-icons/fa";
+import { MdOutlineKey } from "react-icons/md";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import type { RuntimeInfo } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
@@ -145,6 +146,12 @@ interface QueryTab {
   id: string;
   title: string;
   code: string;
+  /** Snapshot of `code` at the time the tab was created (e.g. the
+   *  initial template, a sidebar preview's SELECT, or a structure
+   *  query). The tab is considered "dirty" only when `code !==
+   *  pristineCode`, which lets us skip the close-confirmation prompt
+   *  for tabs the user never edited. */
+  pristineCode: string;
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -204,24 +211,40 @@ function newTabId(): string {
 
 function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
   if (typeof window === "undefined") {
-    return defaults.map((seed) => ({ ...seed, id: newTabId() }));
+    return defaults.map((seed) => ({
+      ...seed,
+      id: newTabId(),
+      pristineCode: seed.code,
+    }));
   }
   try {
     const raw = localStorage.getItem(dbScopedKey(dbId, "tabs"));
     if (raw) {
       const parsed = JSON.parse(raw) as QueryTab[];
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((t) => ({
-          id: typeof t.id === "string" ? t.id : newTabId(),
-          title: typeof t.title === "string" ? t.title : "Query",
-          code: typeof t.code === "string" ? t.code : "",
-        }));
+        return parsed.map((t) => {
+          const code = typeof t.code === "string" ? t.code : "";
+          return {
+            id: typeof t.id === "string" ? t.id : newTabId(),
+            title: typeof t.title === "string" ? t.title : "Query",
+            code,
+            // Older saved tabs predate `pristineCode`; assume the
+            // persisted contents are what the user left them at, so
+            // treat them as clean by mirroring `code` here.
+            pristineCode:
+              typeof t.pristineCode === "string" ? t.pristineCode : code,
+          };
+        });
       }
     }
   } catch {
     // Corrupt entry — fall through to defaults.
   }
-  return defaults.map((seed) => ({ ...seed, id: newTabId() }));
+  return defaults.map((seed) => ({
+    ...seed,
+    id: newTabId(),
+    pristineCode: seed.code,
+  }));
 }
 
 function saveTabs(dbId: string, tabs: QueryTab[]): void {
@@ -839,6 +862,7 @@ function SqlPlaygroundInner() {
       const newTabs = sample.defaultTabs.map((seed) => ({
         ...seed,
         id: newTabId(),
+        pristineCode: seed.code,
       }));
       setTabs(newTabs);
       tabsRef.current = newTabs;
@@ -939,7 +963,12 @@ function SqlPlaygroundInner() {
   // distinct tab whose state is preserved when the user switches tabs.
   const openTabAndRun = useCallback(
     (title: string, sql: string, source?: string, sourceTable?: string) => {
-      const tab: QueryTab = { id: newTabId(), title, code: sql };
+      const tab: QueryTab = {
+        id: newTabId(),
+        title,
+        code: sql,
+        pristineCode: sql,
+      };
       const next = [...tabsRef.current, tab];
       tabsRef.current = next;
       activeTabIdRef.current = tab.id;
@@ -1485,10 +1514,12 @@ function SqlPlaygroundInner() {
   // ─── Tab actions ────────────────────────────────────────────────────
   const addTab = useCallback(() => {
     const nextNum = tabs.length + 1;
+    const initialCode = "-- New query\nSELECT 1;";
     const tab: QueryTab = {
       id: newTabId(),
       title: `Query ${nextNum}`,
-      code: "-- New query\nSELECT 1;",
+      code: initialCode,
+      pristineCode: initialCode,
     };
     const next = [...tabs, tab];
     setTabs(next);
@@ -1500,9 +1531,12 @@ function SqlPlaygroundInner() {
     (id: string) => {
       const target = tabs.find((t) => t.id === id);
       if (!target) return;
-      // Prompt before closing a tab with non-trivial contents so the
-      // user can't accidentally lose work.
-      if (target.code.trim().length > 0 && tabs.length > 1) {
+      // Prompt before closing a tab the user has actually edited so
+      // they can't accidentally lose work. Tabs that still match their
+      // pristine seed (e.g. a sidebar preview the user double-clicked
+      // but never modified) close silently.
+      const isDirty = target.code !== target.pristineCode;
+      if (isDirty && tabs.length > 1) {
         setConfirmCloseTabId(id);
         return;
       }
@@ -1513,7 +1547,14 @@ function SqlPlaygroundInner() {
       const finalTabs =
         next.length > 0
           ? next
-          : [{ id: newTabId(), title: "Query 1", code: "" }];
+          : [
+              {
+                id: newTabId(),
+                title: "Query 1",
+                code: "",
+                pristineCode: "",
+              },
+            ];
       setTabs(finalTabs);
       saveTabs(activeDbId, finalTabs);
       if (activeTabId === id) {
@@ -1531,7 +1572,14 @@ function SqlPlaygroundInner() {
     const finalTabs =
       next.length > 0
         ? next
-        : [{ id: newTabId(), title: "Query 1", code: "" }];
+        : [
+            {
+              id: newTabId(),
+              title: "Query 1",
+              code: "",
+              pristineCode: "",
+            },
+          ];
     setTabs(finalTabs);
     saveTabs(activeDbId, finalTabs);
     if (activeTabId === id) {
@@ -1561,6 +1609,10 @@ function SqlPlaygroundInner() {
         ...source,
         id: newTabId(),
         title: `${source.title} Copy`,
+        // Duplicates start out matching their initial contents, so the
+        // user can dismiss them without a confirmation prompt unless
+        // they actually edit the copy.
+        pristineCode: source.code,
       };
       const next = [...tabs.slice(0, idx + 1), copy, ...tabs.slice(idx + 1)];
       setTabs(next);
@@ -1583,7 +1635,9 @@ function SqlPlaygroundInner() {
   );
 
   const closeAllTabs = useCallback(() => {
-    const fresh = [{ id: newTabId(), title: "Query 1", code: "" }];
+    const fresh = [
+      { id: newTabId(), title: "Query 1", code: "", pristineCode: "" },
+    ];
     // Order matters: synchronously update the refs the editor's
     // `change` listener reads from BEFORE we call `editor.setValue`.
     // Otherwise the listener fires with stale `tabsRef`/`activeTabIdRef`
@@ -1607,6 +1661,7 @@ function SqlPlaygroundInner() {
     const fresh = sample.defaultTabs.map((seed) => ({
       ...seed,
       id: newTabId(),
+      pristineCode: seed.code,
     }));
     // Order matters: synchronously update the refs the editor's
     // `change` listener reads from BEFORE we call `editor.setValue`.
@@ -3792,14 +3847,14 @@ function SchemaItem({
                             aria-hidden="true"
                           >
                             {c.pk > 0 && (
-                              <KeyRound
-                                size={10}
+                              <MdOutlineKey
+                                size={14}
                                 className="sql-tree-column-pk"
                               />
                             )}
                             {fk && (
-                              <LinkIcon
-                                size={10}
+                              <FaLink
+                                size={11}
                                 className="sql-tree-column-fk"
                               />
                             )}
