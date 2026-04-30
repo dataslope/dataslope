@@ -684,6 +684,11 @@
   overflow: hidden;
   background: var(--bg);
   position: relative;
+  /* Contain the z-index of absolutely-positioned children (timer pill,
+     toolbar) inside this pane so portaled popovers/modals always render
+     above them. Without this the z-index: 5 elements leak into the root
+     stacking context and appear on top of the info popup. */
+  isolation: isolate;
 }
 
 .sql-tabbar {
