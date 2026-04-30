@@ -51,6 +51,7 @@ import "codemirror/theme/idea.css";
 import "codemirror/theme/base16-light.css";
 import "codemirror/addon/hint/show-hint.css";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -302,8 +303,10 @@ const DEFAULT_PAGE_SIZE = 50;
 /** Delay before treating a sidebar-row click as a single click. The
  *  schema rows distinguish single-click (toggle expand) from
  *  double-click (preview) by deferring the toggle for slightly less
- *  than the OS-typical double-click threshold (≤ 250ms). */
-const SINGLE_CLICK_DELAY_MS = 220;
+ *  than the OS-typical double-click threshold (≤ 250ms). Kept short
+ *  so the expand/collapse interaction still feels snappy — anything
+ *  much higher than this is perceptible as lag. */
+const SINGLE_CLICK_DELAY_MS = 140;
 
 // ────────────────────────────────────────────────────────────────────────
 // Component
@@ -1264,15 +1267,21 @@ function SqlPlaygroundInner() {
   // is the single source of truth for "which expanded rows still need
   // their PRAGMA results fetched", so it correctly recovers when the
   // cache is wiped wholesale by `runSqlForTab` or a database switch.
+  // We also depend on `loaded` so that when the user navigates away
+  // and back (which remounts the component and re-runs engine init),
+  // the expanded rows hydrated from localStorage get their column
+  // lists re-fetched as soon as the engine becomes available — instead
+  // of staying stuck on "Loading…" until the user collapses and
+  // re-expands them.
   useEffect(() => {
     if (expandedEntities.size === 0) return;
-    if (!engineRef.current) return;
+    if (!loaded || !engineRef.current) return;
     for (const name of expandedEntities) {
       if (columnsByEntity[name] === undefined) {
         refreshEntityMetadata(name);
       }
     }
-  }, [expandedEntities, columnsByEntity, refreshEntityMetadata]);
+  }, [expandedEntities, columnsByEntity, refreshEntityMetadata, loaded]);
 
   // Modify Structure: prime the drawer from the current column / FK
   // info for `name` and open it. Each draft column gets a fresh local
@@ -1546,30 +1555,41 @@ function SqlPlaygroundInner() {
   // ─── Resizer (vertical, between results panel and editor) ───────────
   const panesRef = useRef<HTMLDivElement | null>(null);
   const resultsPaneRef = useRef<HTMLDivElement | null>(null);
+  const editorPaneRef = useRef<HTMLDivElement | null>(null);
   const resizerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const resizer = resizerRef.current;
     const panes = panesRef.current;
+    const editorPane = editorPaneRef.current;
     const resultsPane = resultsPaneRef.current;
-    if (!resizer || !panes || !resultsPane) return;
+    if (!resizer || !panes || !editorPane || !resultsPane) return;
     let dragging = false;
     let startY = 0;
-    let startFrac = 0;
+    let startEditorH = 0;
+    let startResultsH = 0;
     const onDown = (e: MouseEvent) => {
       dragging = true;
       startY = e.clientY;
-      startFrac = resultsPane.offsetHeight / panes.offsetHeight;
+      startEditorH = editorPane.offsetHeight;
+      startResultsH = resultsPane.offsetHeight;
       resizer.classList.add("dragging");
       document.body.style.cursor = "row-resize";
       document.body.style.userSelect = "none";
     };
     const onMove = (e: MouseEvent) => {
       if (!dragging) return;
-      const frac = Math.min(
-        0.85,
-        Math.max(0.15, startFrac + (e.clientY - startY) / panes.offsetHeight),
+      // Editor and results share the available track underneath the
+      // tab strip — divide that region by the dragged ratio so the
+      // tabbar's auto-sized row stays untouched.
+      const total = startEditorH + startResultsH;
+      if (total <= 0) return;
+      const dy = e.clientY - startY;
+      const editorH = Math.min(
+        total - Math.round(total * 0.15),
+        Math.max(Math.round(total * 0.15), startEditorH + dy),
       );
-      panes.style.gridTemplateRows = `${frac * 100}% 6px 1fr`;
+      const editorFrac = editorH / total;
+      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
     };
     const onUp = () => {
       if (!dragging) return;
@@ -1719,7 +1739,7 @@ function SqlPlaygroundInner() {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            <a href="/" className="brand-name">Dataslope</a>
+            <Link href="/" className="brand-name">Dataslope</Link>
             <Select.Root
               value={PLAYGROUND_ID}
               onValueChange={(value) => {
@@ -2255,54 +2275,34 @@ function SqlPlaygroundInner() {
           />
 
           <div className="sql-panes" ref={panesRef}>
-            <div className="sql-results-pane" ref={resultsPaneRef}>
-              <div className="sql-tabbar">
-                <div className="sql-tabs" role="tablist">
-                  {tabs.map((t) => (
-                    <SqlTab
-                      key={t.id}
-                      tab={t}
-                      active={t.id === activeTabId}
-                      onActivate={() => setActiveTabId(t.id)}
-                      onClose={() => closeTab(t.id)}
-                      onRename={(name) => renameTab(t.id, name)}
-                      onDuplicate={() => duplicateTab(t.id)}
-                      onCloseOthers={() => closeOtherTabs(t.id)}
-                      onCloseAll={closeAllTabs}
-                    />
-                  ))}
-                  <button
-                    type="button"
-                    className="sql-tab-add"
-                    onClick={addTab}
-                    title="New query tab"
-                    aria-label="New query tab"
-                  >
-                    <Plus size={12} aria-hidden="true" />
-                  </button>
-                </div>
+            <div className="sql-tabbar">
+              <div className="sql-tabs" role="tablist">
+                {tabs.map((t) => (
+                  <SqlTab
+                    key={t.id}
+                    tab={t}
+                    active={t.id === activeTabId}
+                    onActivate={() => setActiveTabId(t.id)}
+                    onClose={() => closeTab(t.id)}
+                    onRename={(name) => renameTab(t.id, name)}
+                    onDuplicate={() => duplicateTab(t.id)}
+                    onCloseOthers={() => closeOtherTabs(t.id)}
+                    onCloseAll={closeAllTabs}
+                  />
+                ))}
+                <button
+                  type="button"
+                  className="sql-tab-add"
+                  onClick={addTab}
+                  title="New query tab"
+                  aria-label="New query tab"
+                >
+                  <Plus size={12} aria-hidden="true" />
+                </button>
               </div>
-              <div className="sql-results-body">
-                <ResultView
-                  result={result}
-                  loading={!loaded}
-                  onClear={clearActiveTabResult}
-                  keyHints={resultKeyHints}
-                />
-              </div>
-              <DataslopeRunOverlay running={statusState === "running"} />
             </div>
 
-            <div
-              className="sql-resizer"
-              ref={resizerRef}
-              role="separator"
-              aria-orientation="horizontal"
-              aria-label="Drag to resize results and editor"
-              title="Drag to resize"
-            />
-
-            <div className="sql-editor-pane">
+            <div className="sql-editor-pane" ref={editorPaneRef}>
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
               </div>
@@ -2352,6 +2352,27 @@ function SqlPlaygroundInner() {
                   {statusState === "running" ? "Running…" : "Run"}
                 </button>
               </div>
+            </div>
+
+            <div
+              className="sql-resizer"
+              ref={resizerRef}
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label="Drag to resize editor and results"
+              title="Drag to resize"
+            />
+
+            <div className="sql-results-pane" ref={resultsPaneRef}>
+              <div className="sql-results-body">
+                <ResultView
+                  result={result}
+                  loading={!loaded}
+                  onClear={clearActiveTabResult}
+                  keyHints={resultKeyHints}
+                />
+              </div>
+              <DataslopeRunOverlay running={statusState === "running"} />
             </div>
           </div>
         </div>
@@ -3340,25 +3361,72 @@ function SchemaItem({
       <ContextMenu.Root>
         <ContextMenu.Trigger
           render={(props) => (
-            <button
-              type="button"
-              {...props}
-              className="sql-tree-item"
-              onClick={handleSingleClick}
-              onDoubleClick={handleDoubleClick}
-              title={`Double-click to preview, click to ${expanded ? "collapse" : "expand"}`}
-              aria-expanded={expanded}
-            >
-              <span className="sql-tree-chevron" aria-hidden="true">
-                {expanded ? (
-                  <ChevronDown size={11} />
-                ) : (
-                  <ChevronRight size={11} />
-                )}
-              </span>
-              <Icon size={12} aria-hidden="true" />
-              <span className="sql-tree-item-name">{name}</span>
-            </button>
+            <div {...props} className="sql-tree-entity-trigger">
+              <button
+                type="button"
+                className="sql-tree-item"
+                onClick={handleSingleClick}
+                onDoubleClick={handleDoubleClick}
+                title={`Double-click to preview, click to ${expanded ? "collapse" : "expand"}`}
+                aria-expanded={expanded}
+              >
+                <span className="sql-tree-chevron" aria-hidden="true">
+                  {expanded ? (
+                    <ChevronDown size={11} />
+                  ) : (
+                    <ChevronRight size={11} />
+                  )}
+                </span>
+                <Icon size={12} aria-hidden="true" />
+                <span className="sql-tree-item-name">{name}</span>
+              </button>
+              {expanded && (
+                <ul className="sql-tree-columns" role="list">
+                  {columns === undefined ? (
+                    <li className="sql-tree-column-loading">Loading…</li>
+                  ) : columns.length === 0 ? (
+                    <li className="sql-tree-column-loading">No columns.</li>
+                  ) : (
+                    columns.map((c) => {
+                      const fk = fkByCol.get(c.name);
+                      return (
+                        <li key={c.cid} className="sql-tree-column">
+                          <span
+                            className="sql-tree-column-icons"
+                            aria-hidden="true"
+                          >
+                            {c.pk > 0 && (
+                              <KeyRound
+                                size={10}
+                                className="sql-tree-column-pk"
+                              />
+                            )}
+                            {fk && (
+                              <LinkIcon
+                                size={10}
+                                className="sql-tree-column-fk"
+                              />
+                            )}
+                          </span>
+                          <span className="sql-tree-column-name">{c.name}</span>
+                          <span className="sql-tree-column-type">
+                            {c.type || "—"}
+                          </span>
+                          {fk && (
+                            <span
+                              className="sql-tree-column-fkref"
+                              title={`Foreign key → ${fk.table}.${fk.to}`}
+                            >
+                              → {fk.table}.{fk.to}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              )}
+            </div>
           )}
         />
         <ContextMenu.Portal>
@@ -3425,49 +3493,6 @@ function SchemaItem({
           </ContextMenu.Positioner>
         </ContextMenu.Portal>
       </ContextMenu.Root>
-      {expanded && (
-        <ul className="sql-tree-columns" role="list">
-          {columns === undefined ? (
-            <li className="sql-tree-column-loading">Loading…</li>
-          ) : columns.length === 0 ? (
-            <li className="sql-tree-column-loading">No columns.</li>
-          ) : (
-            columns.map((c) => {
-              const fk = fkByCol.get(c.name);
-              return (
-                <li key={c.cid} className="sql-tree-column">
-                  <span className="sql-tree-column-icons" aria-hidden="true">
-                    {c.pk > 0 && (
-                      <KeyRound
-                        size={10}
-                        className="sql-tree-column-pk"
-                      />
-                    )}
-                    {fk && (
-                      <LinkIcon
-                        size={10}
-                        className="sql-tree-column-fk"
-                      />
-                    )}
-                  </span>
-                  <span className="sql-tree-column-name">{c.name}</span>
-                  <span className="sql-tree-column-type">
-                    {c.type || "—"}
-                  </span>
-                  {fk && (
-                    <span
-                      className="sql-tree-column-fkref"
-                      title={`Foreign key → ${fk.table}.${fk.to}`}
-                    >
-                      → {fk.table}.{fk.to}
-                    </span>
-                  )}
-                </li>
-              );
-            })
-          )}
-        </ul>
-      )}
     </div>
   );
 }
