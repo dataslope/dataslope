@@ -178,6 +178,10 @@
   display: grid;
   grid-template-rows: 50% 6px 1fr;
   min-height: 0;
+  /* Same rationale as `.sql-editor-pane min-width: 0` below — keep this
+     grid track inside its parent so children become the scroll
+     containers instead of pushing the pane wider than the viewport. */
+  min-width: 0;
   background: var(--bg);
   position: relative;
 }
@@ -444,6 +448,14 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* Without an explicit min-width, this grid item's auto-min-size makes
+     it grow as wide as its widest content. With many open query tabs
+     that pushes the pane past the viewport, defeating the tab strip's
+     own `overflow-x: auto` and dragging the absolutely-positioned Run
+     button (anchored to the pane's right edge) off-screen. Pinning the
+     min-width to 0 lets the pane stay inside its grid track so the tab
+     strip becomes the actual horizontal scroller. */
+  min-width: 0;
   background: var(--bg);
   position: relative;
 }
