@@ -50,6 +50,7 @@ import type {
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 // Base UI primitives — used for menus, popovers, dialogs, and toasts so
 // that the playground gets consistent positioning, focus management,
 // and natural enter/exit animations out of the box.
@@ -1233,7 +1234,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             {/* Placeholder for the DataSlope brand logo image. The
                 per-language icon previously rendered here was removed
                 so the brand mark can sit in this slot once available. */}
-            <a href="/" className="brand-name">Dataslope</a>
+            <Link href="/" className="brand-name">Dataslope</Link>
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {
