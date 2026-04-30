@@ -949,17 +949,28 @@
 }
 
 .sql-modify-col-row {
+  --sql-modify-name-min: 130px;
+  --sql-modify-type-min: 100px;
+  --sql-modify-default-min: 160px;
+  --sql-modify-flags-min: 350px;
+  --sql-modify-fk-min: 260px;
+  --sql-modify-col-gap: 8px;
+
   display: grid;
   grid-template-columns:
-    minmax(130px, 1.2fr)
-    minmax(100px, 0.8fr)
-    minmax(160px, 1.2fr)
-    minmax(350px, auto)
-    minmax(260px, auto)
+    minmax(var(--sql-modify-name-min), 1.2fr)
+    minmax(var(--sql-modify-type-min), 0.8fr)
+    minmax(var(--sql-modify-default-min), 1.2fr)
+    minmax(var(--sql-modify-flags-min), auto)
+    minmax(var(--sql-modify-fk-min), auto)
     auto;
   align-items: center;
-  gap: 8px;
-  min-width: calc(130px + 100px + 160px + 350px + 260px + 5 * 8px);
+  gap: var(--sql-modify-col-gap);
+  min-width: calc(
+    var(--sql-modify-name-min) + var(--sql-modify-type-min) +
+    var(--sql-modify-default-min) + var(--sql-modify-flags-min) +
+    var(--sql-modify-fk-min) + 5 * var(--sql-modify-col-gap)
+  );
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
