@@ -125,6 +125,32 @@
   padding: 6px 0;
 }
 
+.sql-tree-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 8px;
+}
+
+.sql-tree-section-header:hover {
+  background: var(--bg3);
+}
+
+.sql-tree-section-header .sql-tree-label {
+  padding: 0;
+}
+
+.sql-tree-section-body {
+  display: flex;
+  flex-direction: column;
+}
+
 .sql-tree-label {
   font-size: 10px;
   font-weight: 600;
@@ -132,6 +158,20 @@
   color: var(--text-dim);
   padding: 4px 12px;
   text-transform: uppercase;
+}
+
+.sql-tree-entity {
+  display: flex;
+  flex-direction: column;
+}
+
+.sql-tree-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  flex-shrink: 0;
+  color: var(--text-muted);
 }
 
 .sql-tree-item {
@@ -156,6 +196,75 @@
 .sql-tree-item svg {
   color: var(--text-muted);
   flex-shrink: 0;
+}
+
+.sql-tree-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-tree-columns {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 4px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sql-tree-column {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  padding: 2px 8px 2px 0;
+  line-height: 1.3;
+}
+
+.sql-tree-column-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: 22px;
+  flex-shrink: 0;
+}
+
+.sql-tree-column-pk {
+  color: var(--accent, #f0b400);
+}
+
+.sql-tree-column-fk {
+  color: var(--text-muted);
+}
+
+.sql-tree-column-name {
+  flex-shrink: 0;
+}
+
+.sql-tree-column-type {
+  color: var(--text-dim);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sql-tree-column-fkref {
+  color: var(--text-dim);
+  font-size: 10px;
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-tree-column-loading {
+  font-style: italic;
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 2px 8px 2px 0;
 }
 
 .sql-tree-empty {
@@ -658,4 +767,194 @@
 .sql-rename-input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ─── View DDL CodeMirror wrapper ─── */
+.sql-ddl-code-wrap {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 50vh;
+  max-height: 50vh;
+  min-height: 200px;
+  background: var(--bg);
+}
+
+.sql-ddl-code-wrap .CodeMirror {
+  height: 100%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* ─── Result column header key icons ─── */
+.sql-result-th-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sql-result-th-pk {
+  color: var(--accent, #f0b400);
+  flex-shrink: 0;
+}
+
+.sql-result-th-fk {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ─── Modify Structure drawer ─── */
+.sql-modify-popup {
+  width: min(820px, calc(100vw - 64px));
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sql-modify-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sql-modify-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sql-modify-field-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sql-modify-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sql-modify-empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-dim);
+  font-style: italic;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.sql-modify-col-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+}
+
+.sql-modify-col-main {
+  display: grid;
+  grid-template-columns: minmax(140px, 2fr) minmax(110px, 1fr) minmax(140px, 2fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.sql-modify-col-name,
+.sql-modify-col-default {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.sql-modify-col-type {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.sql-modify-col-remove {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.sql-modify-col-remove:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.sql-modify-col-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.sql-modify-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sql-modify-flag.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sql-modify-flag-box {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.sql-modify-flag-box[data-checked] {
+  background: var(--accent, #f0b400);
+  border-color: var(--accent, #f0b400);
+}
+
+.sql-modify-flag-ind {
+  font-size: 10px;
+  color: var(--bg);
+  line-height: 1;
+}
+
+.sql-modify-col-fk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sql-modify-fk-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sql-modify-add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
