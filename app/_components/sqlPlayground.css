@@ -75,32 +75,6 @@
   min-width: 0;
 }
 
-.sql-db-export-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--bg3);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  cursor: pointer;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.sql-db-export-btn:hover:not(:disabled) {
-  border-color: var(--text-dim);
-  color: var(--text);
-}
-
-.sql-db-export-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .sql-db-selector {
   display: flex;
   align-items: center;
