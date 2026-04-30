@@ -2770,6 +2770,11 @@ function ModifyStructureForm({
     });
   };
   const addColumn = () => {
+    // Use a per-call random suffix instead of `state.columns.length`
+    // so users who add → remove → add don't collide with an existing
+    // `column_N`. The engine's `rebuildTable` validates uniqueness on
+    // save anyway, but a unique default is friendlier.
+    const suffix = Math.random().toString(36).slice(2, 6);
     onChange({
       ...state,
       columns: [
@@ -2777,7 +2782,7 @@ function ModifyStructureForm({
         {
           id: newDraftId(),
           originalName: null,
-          name: `column_${state.columns.length + 1}`,
+          name: `column_${suffix}`,
           type: "TEXT",
           notNull: false,
           primaryKey: false,
