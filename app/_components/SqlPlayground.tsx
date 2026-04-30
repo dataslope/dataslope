@@ -26,6 +26,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ReactNode,
 } from "react";
 import "./playground.css";
 import "./sqlPlayground.css";
@@ -55,8 +56,22 @@ import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
+import { Checkbox } from "@base-ui-components/react/checkbox";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Eraser, Play, Plus, X, Database, Table2, Eye } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Eraser,
+  Eye,
+  Database,
+  KeyRound,
+  Link as LinkIcon,
+  Play,
+  Plus,
+  Table2,
+  Trash2,
+  X,
+} from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import type { RuntimeInfo } from "./types";
@@ -86,7 +101,13 @@ import {
   findSampleDatabase,
   type QueryTabSeed,
 } from "./runtime/sqliteSamples";
-import { createSqliteEngine, type SqliteEngine } from "./runtime/sqlite";
+import {
+  createSqliteEngine,
+  type ColumnSpec,
+  type ForeignKeyInfo,
+  type SqliteEngine,
+  type TableColumnInfo,
+} from "./runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 
 const PLAYGROUND_ID = "sqlite";
@@ -118,6 +139,57 @@ interface QueryTab {
   id: string;
   title: string;
   code: string;
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Modify Structure drawer
+// ────────────────────────────────────────────────────────────────────────
+
+/** SQLite type-affinity options exposed by the Modify Structure drawer.
+ *  These cover the five storage classes plus a few common aliases. The
+ *  selected value is passed through to the engine's `rebuildTable`,
+ *  which validates it against an identifier-shaped allowlist before
+ *  inlining. */
+const COLUMN_TYPES = [
+  "INTEGER",
+  "REAL",
+  "TEXT",
+  "BLOB",
+  "NUMERIC",
+  "BOOLEAN",
+  "DATETIME",
+] as const;
+
+/** Editable representation of one column inside the Modify Structure
+ *  drawer. We keep `originalName` separately so the engine knows which
+ *  column to copy from when applying a rename. `id` is a stable, local
+ *  identifier so React's reconciliation matches rows correctly even
+ *  while the user renames or reorders them. */
+interface ModifyColumnDraft {
+  id: string;
+  originalName: string | null;
+  name: string;
+  type: string;
+  notNull: boolean;
+  primaryKey: boolean;
+  autoIncrement: boolean;
+  unique: boolean;
+  defaultValue: string;
+  fkTable: string;
+  fkColumn: string;
+}
+
+function newDraftId(): string {
+  return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/** Hints used by the result-view header to render PK / FK icons next
+ *  to columns sourced from a known table. Computed by the parent
+ *  whenever the current tab's result was produced by a sidebar
+ *  preview, and threaded through `ResultView` → `ResultTableBody`. */
+interface ColumnKeyHints {
+  pk: Set<string>;
+  fk: Map<string, ForeignKeyInfo>;
 }
 
 function newTabId(): string {
@@ -190,6 +262,12 @@ interface QueryRunResult {
   /** Optional source label shown above the result panel — either the
    *  active tab's title or, for sidebar previews, the table name. */
   source: string;
+  /** When the result came from a sidebar preview, the underlying
+   *  table name. The result view uses this to look up PK / FK
+   *  metadata so it can render key icons next to those headers. We
+   *  intentionally only set this for previews — arbitrary user SQL has
+   *  no single "source table" so we don't try to guess. */
+  sourceTable?: string;
 }
 
 function formatCellValue(v: unknown): string {
@@ -297,6 +375,13 @@ function SqlPlaygroundInner() {
   const [ddlDialog, setDdlDialog] = useState<
     { title: string; sql: string } | null
   >(null);
+  // Modify Structure drawer state. `null` = closed; an object holds the
+  // editable form spec for the table currently being modified.
+  const [modifyDialog, setModifyDialog] = useState<{
+    originalName: string;
+    newName: string;
+    columns: ModifyColumnDraft[];
+  } | null>(null);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -336,6 +421,25 @@ function SqlPlaygroundInner() {
   );
   const [tables, setTables] = useState<string[]>([]);
   const [views, setViews] = useState<string[]>([]);
+  // Per-entity column cache, populated lazily when the user expands a
+  // sidebar row. Keyed by entity name. Refreshed any time the engine
+  // performs DDL (covers Modify Structure / Truncate / Drop). Using a
+  // plain object keyed by name keeps render simple and lets us merge
+  // updates incrementally without invalidating unrelated entries.
+  const [columnsByEntity, setColumnsByEntity] = useState<
+    Record<string, TableColumnInfo[]>
+  >({});
+  const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
+    Record<string, ForeignKeyInfo[]>
+  >({});
+  // Sidebar expansion state. Persisted per-database under the same
+  // `pg_sqlite_db_<id>_…` namespace as the editor tabs so it survives
+  // reloads and database switches.
+  const [tablesSectionExpanded, setTablesSectionExpanded] = useState(true);
+  const [viewsSectionExpanded, setViewsSectionExpanded] = useState(true);
+  const [expandedEntities, setExpandedEntities] = useState<Set<string>>(
+    () => new Set<string>(),
+  );
 
   // Active editor tabs for the active database.
   const [tabs, setTabs] = useState<QueryTab[]>([]);
@@ -348,6 +452,10 @@ function SqlPlaygroundInner() {
     Record<string, QueryRunResult>
   >({});
   const result = activeTabId ? resultsByTab[activeTabId] ?? null : null;
+
+  // (PK / FK key-hint computation lives further down — after
+  //  `refreshEntityMetadata` is declared — so we can reference it here.)
+
   const setResultForTab = useCallback(
     (tabId: string, next: QueryRunResult | null) => {
       setResultsByTab((prev) => {
@@ -390,6 +498,20 @@ function SqlPlaygroundInner() {
   // ─── CodeMirror ─────────────────────────────────────────────────────
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const editorRef = useRef<CodeMirrorEditor | null>(null);
+  // CodeMirror module reference, populated alongside the main editor
+  // boot. Kept in a ref so dialogs that mount their own read-only
+  // editors (DDL viewer) can re-use the already-loaded module without
+  // a second async import. Mirrored into state for use during render
+  // (see `cmApi`), since the React rules of hooks forbid reading
+  // `ref.current` during render.
+  const codeMirrorApiRef = useRef<CodeMirrorAPI | null>(null);
+  const [cmApi, setCmApi] = useState<CodeMirrorAPI | null>(null);
+  // Render-time view of `engineRef`. Set once the engine boot effect
+  // resolves so child components (e.g. ModifyStructureForm) can call
+  // engine helpers without breaking the React refs rule.
+  const [engineForRender, setEngineForRender] = useState<SqliteEngine | null>(
+    null,
+  );
   // Latest run handler in a ref so the editor's keymap can call it
   // without being re-bound on every render.
   const runRef = useRef<() => void>(() => undefined);
@@ -485,6 +607,8 @@ function SqlPlaygroundInner() {
 
         const CM = (codeMirrorMod.default ??
           codeMirrorMod) as unknown as CodeMirrorAPI;
+        codeMirrorApiRef.current = CM;
+        setCmApi(CM);
         if (textareaRef.current && !editorRef.current) {
           const initialTheme =
             getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
@@ -532,6 +656,7 @@ function SqlPlaygroundInner() {
         const engine = await createSqliteEngine(initialSampleId);
         if (cancelled) return;
         engineRef.current = engine;
+        setEngineForRender(engine);
 
         // Refresh sidebar tree against whatever sample the engine
         // ended up with (handles the case where `initialSampleId` was
@@ -727,7 +852,7 @@ function SqlPlaygroundInner() {
   // sidebar tables in quick succession) can't clobber one another's
   // results.
   const runSqlForTab = useCallback(
-    (tabId: string, sql: string, source: string) => {
+    (tabId: string, sql: string, source: string, sourceTable?: string) => {
       const engine = engineRef.current;
       if (!engine) return;
       const trimmed = sql.trim();
@@ -741,15 +866,25 @@ function SqlPlaygroundInner() {
       try {
         const sets = engine.exec(trimmed);
         const elapsedMs = performance.now() - t0;
-        setResultForTab(tabId, { sets, elapsedMs, source });
+        setResultForTab(tabId, { sets, elapsedMs, source, sourceTable });
         setStatusState("ready");
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
         setTables(engine.listTables());
         setViews(engine.listViews());
+        // Drop cached column metadata wholesale — the safest assumption
+        // after arbitrary user SQL is that anything could have changed.
+        setColumnsByEntity({});
+        setForeignKeysByEntity({});
       } catch (err) {
         const elapsedMs = performance.now() - t0;
         const msg = err instanceof Error ? err.message : String(err);
-        setResultForTab(tabId, { sets: [], elapsedMs, error: msg, source });
+        setResultForTab(tabId, {
+          sets: [],
+          elapsedMs,
+          error: msg,
+          source,
+          sourceTable,
+        });
         setStatusState("error");
         window.setTimeout(() => setStatusState("ready"), 3000);
       }
@@ -777,7 +912,7 @@ function SqlPlaygroundInner() {
   // context-menu Preview/Structure/Count) so each invocation produces a
   // distinct tab whose state is preserved when the user switches tabs.
   const openTabAndRun = useCallback(
-    (title: string, sql: string, source?: string) => {
+    (title: string, sql: string, source?: string, sourceTable?: string) => {
       const tab: QueryTab = { id: newTabId(), title, code: sql };
       const next = [...tabsRef.current, tab];
       tabsRef.current = next;
@@ -787,7 +922,7 @@ function SqlPlaygroundInner() {
       setActiveTabId(tab.id);
       const editor = editorRef.current;
       if (editor) editor.setValue(sql);
-      runSqlForTab(tab.id, sql, source ?? title);
+      runSqlForTab(tab.id, sql, source ?? title, sourceTable);
     },
     [runSqlForTab],
   );
@@ -799,14 +934,18 @@ function SqlPlaygroundInner() {
 
   const previewTable = useCallback(
     (name: string, kind: "table" | "view") => {
-      // Left-clicking a sidebar entry opens it in a new tab whose title
-      // is the entity's name (Update 3). The default query previews the
+      // Double-clicking a sidebar entry opens it in a new tab whose
+      // title is the entity's name. The default query previews the
       // first 200 rows so the user can see data immediately.
       const sql = `SELECT * FROM ${quoteIdent(name)} LIMIT 200;`;
       openTabAndRun(
         name,
         sql,
         `${kind === "view" ? "View" : "Table"}: ${name}`,
+        // Only tables carry a meaningful "source table" for the
+        // result-view's PK / FK icon lookups. Views can join multiple
+        // tables, so we deliberately omit it.
+        kind === "table" ? name : undefined,
       );
     },
     [openTabAndRun, quoteIdent],
@@ -879,6 +1018,278 @@ function SqlPlaygroundInner() {
     },
     [showToast],
   );
+
+  // Hydrate sidebar collapse state for the active database. Saved
+  // under the same `pg_sqlite_db_<id>_…` namespace as the editor tabs
+  // so it survives reloads and (independently) database switches.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    try {
+      const rawSections = localStorage.getItem(
+        dbScopedKey(activeDbId, "sections_expanded"),
+      );
+      if (rawSections) {
+        const parsed = JSON.parse(rawSections) as {
+          tables?: boolean;
+          views?: boolean;
+        };
+        setTablesSectionExpanded(parsed.tables !== false);
+        setViewsSectionExpanded(parsed.views !== false);
+      } else {
+        setTablesSectionExpanded(true);
+        setViewsSectionExpanded(true);
+      }
+      const rawExpanded = localStorage.getItem(
+        dbScopedKey(activeDbId, "expanded_entities"),
+      );
+      if (rawExpanded) {
+        const parsed = JSON.parse(rawExpanded) as string[];
+        if (Array.isArray(parsed)) {
+          setExpandedEntities(new Set(parsed.filter((s) => typeof s === "string")));
+        } else {
+          setExpandedEntities(new Set());
+        }
+      } else {
+        setExpandedEntities(new Set());
+      }
+    } catch {
+      setExpandedEntities(new Set());
+    }
+    // Cached metadata is per-database, so wipe it when the DB changes.
+    setColumnsByEntity({});
+    setForeignKeysByEntity({});
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [activeDbId]);
+
+  // Persist section collapse state whenever it changes.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(
+        dbScopedKey(activeDbId, "sections_expanded"),
+        JSON.stringify({
+          tables: tablesSectionExpanded,
+          views: viewsSectionExpanded,
+        }),
+      );
+    } catch {
+      // ignore quota errors
+    }
+  }, [activeDbId, tablesSectionExpanded, viewsSectionExpanded]);
+
+  const truncateEntity = useCallback(
+    (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (typeof window !== "undefined") {
+        const ok = window.confirm(
+          `Truncate table "${name}"? This deletes every row but keeps the schema. The change is in-memory only and will be undone next page load.`,
+        );
+        if (!ok) return;
+      }
+      try {
+        engine.truncateTable(name);
+        showToast(`Truncated table "${name}".`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Truncate failed: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  // Refresh cached column / FK info for a single entity. Called when
+  // the sidebar row is expanded for the first time, after DDL changes,
+  // and when the Modify Structure drawer reloads. Failures are
+  // swallowed (and the entry cleared) so a transient PRAGMA error
+  // can't keep stale rows on screen.
+  const refreshEntityMetadata = useCallback((name: string) => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    try {
+      const cols = engine.listColumns(name);
+      const fks = engine.listForeignKeys(name);
+      setColumnsByEntity((prev) => ({ ...prev, [name]: cols }));
+      setForeignKeysByEntity((prev) => ({ ...prev, [name]: fks }));
+    } catch {
+      setColumnsByEntity((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+      setForeignKeysByEntity((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+  }, []);
+
+  // PK / FK lookups for the current result's source table — only set
+  // when the result came from a sidebar preview (`previewTable`
+  // populates `sourceTable`). Computed here so the deeply-nested
+  // `ResultTableBody` doesn't have to know about the engine. We
+  // hydrate `columnsByEntity` / `foreignKeysByEntity` lazily so the
+  // first preview of a not-yet-expanded table still gets icons.
+  useEffect(() => {
+    if (!result?.sourceTable) return;
+    if (
+      columnsByEntity[result.sourceTable] === undefined ||
+      foreignKeysByEntity[result.sourceTable] === undefined
+    ) {
+      refreshEntityMetadata(result.sourceTable);
+    }
+  }, [
+    result,
+    columnsByEntity,
+    foreignKeysByEntity,
+    refreshEntityMetadata,
+  ]);
+
+  const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
+    const tableName = result?.sourceTable;
+    if (!tableName) return undefined;
+    const cols = columnsByEntity[tableName];
+    const fks = foreignKeysByEntity[tableName];
+    if (!cols && !fks) return undefined;
+    const pk = new Set<string>();
+    for (const c of cols ?? []) {
+      if (c.pk > 0) pk.add(c.name);
+    }
+    const fkByName = new Map<string, ForeignKeyInfo>();
+    for (const fk of fks ?? []) fkByName.set(fk.from, fk);
+    return { pk, fk: fkByName };
+  }, [result, columnsByEntity, foreignKeysByEntity]);
+
+  const toggleEntityExpanded = useCallback(
+    (name: string) => {
+      setExpandedEntities((prev) => {
+        const next = new Set(prev);
+        if (next.has(name)) {
+          next.delete(name);
+        } else {
+          next.add(name);
+          // Lazy-load metadata the first time the row is expanded.
+          if (!columnsByEntity[name]) {
+            // Fire & forget — refreshEntityMetadata is synchronous.
+            refreshEntityMetadata(name);
+          }
+        }
+        // Persist the (now-mutated) set so it survives reloads.
+        try {
+          localStorage.setItem(
+            dbScopedKey(activeDbIdRef.current, "expanded_entities"),
+            JSON.stringify(Array.from(next)),
+          );
+        } catch {
+          // ignore quota errors
+        }
+        return next;
+      });
+    },
+    [columnsByEntity, refreshEntityMetadata],
+  );
+
+  // Modify Structure: prime the drawer from the current column / FK
+  // info for `name` and open it. Each draft column gets a fresh local
+  // id so React can track it across edits.
+  const openModifyStructure = useCallback(
+    (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = engine.listColumns(name);
+        const fks = engine.listForeignKeys(name);
+        const fkByCol = new Map<string, ForeignKeyInfo>();
+        for (const fk of fks) fkByCol.set(fk.from, fk);
+        // sql.js exposes `INTEGER PRIMARY KEY AUTOINCREMENT` only via
+        // the original DDL — `PRAGMA table_info` collapses it to
+        // `pk = 1`. We re-parse the DDL to detect the AUTOINCREMENT
+        // marker so the drawer pre-selects the right checkbox.
+        const ddl = engine.getDDL(name);
+        const autoIncMatch =
+          /\bautoincrement\b/i.test(ddl) && cols.some((c) => c.pk === 1);
+        const drafts: ModifyColumnDraft[] = cols.map((c) => {
+          const fk = fkByCol.get(c.name);
+          return {
+            id: newDraftId(),
+            originalName: c.name,
+            name: c.name,
+            type: c.type || "TEXT",
+            notNull: c.notNull,
+            primaryKey: c.pk > 0,
+            autoIncrement:
+              autoIncMatch && c.pk === 1 && /^integer$/i.test(c.type ?? ""),
+            unique: false,
+            defaultValue: c.defaultValue ?? "",
+            fkTable: fk?.table ?? "",
+            fkColumn: fk?.to ?? "",
+          };
+        });
+        setModifyDialog({
+          originalName: name,
+          newName: name,
+          columns: drafts,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't load structure: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const submitModifyStructure = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !modifyDialog) return;
+    const trimmedName = modifyDialog.newName.trim();
+    if (!trimmedName) {
+      showToast("Table name cannot be empty.", "warn");
+      return;
+    }
+    const spec = {
+      originalName: modifyDialog.originalName,
+      newName: trimmedName,
+      columns: modifyDialog.columns.map<ColumnSpec>((c) => ({
+        name: c.name.trim(),
+        type: c.type,
+        notNull: c.notNull,
+        primaryKey: c.primaryKey,
+        autoIncrement: c.autoIncrement,
+        unique: c.unique,
+        defaultValue: c.defaultValue.trim() || undefined,
+        foreignKey: c.fkTable && c.fkColumn
+          ? { table: c.fkTable.trim(), column: c.fkColumn.trim() }
+          : undefined,
+        originalName: c.originalName ?? undefined,
+      })),
+    };
+    try {
+      engine.rebuildTable(spec);
+      setTables(engine.listTables());
+      setViews(engine.listViews());
+      // Refresh cached metadata for the (possibly renamed) table so
+      // expanded rows show the new column list immediately.
+      refreshEntityMetadata(trimmedName);
+      // Update the expanded-set if the table was renamed so the user
+      // doesn't lose their expansion state.
+      if (trimmedName !== modifyDialog.originalName) {
+        setExpandedEntities((prev) => {
+          if (!prev.has(modifyDialog.originalName)) return prev;
+          const next = new Set(prev);
+          next.delete(modifyDialog.originalName);
+          next.add(trimmedName);
+          return next;
+        });
+      }
+      setModifyDialog(null);
+      showToast(`Updated table "${trimmedName}".`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Save failed: ${msg}`, "warn");
+    }
+  }, [modifyDialog, refreshEntityMetadata, showToast]);
 
   const viewDDL = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -1503,9 +1914,11 @@ function SqlPlaygroundInner() {
                 <code>CREATE</code> statement(s) recorded in
                 <code> sqlite_master</code>.
               </Dialog.Description>
-              <pre className="sql-ddl-code" tabIndex={0}>
-                {ddlDialog?.sql ?? ""}
-              </pre>
+              <DdlViewer
+                sql={ddlDialog?.sql ?? ""}
+                cmApi={cmApi}
+                theme={editorTheme}
+              />
               <div className="confirm-actions">
                 <button
                   type="button"
@@ -1533,6 +1946,50 @@ function SqlPlaygroundInner() {
                 <Dialog.Close className="confirm-btn confirm-btn-primary">
                   Close
                 </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        <Dialog.Root
+          open={modifyDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setModifyDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-modify-popup">
+              <Dialog.Title className="confirm-title">
+                Modify structure: {modifyDialog?.originalName ?? ""}
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Rename the table, edit column definitions, or add and
+                remove columns. Click Save to apply via SQLite&rsquo;s
+                rebuild-table pattern (data is copied to a new table,
+                then renamed in place). Reordering columns is not yet
+                supported.
+              </Dialog.Description>
+              {modifyDialog && (
+                <ModifyStructureForm
+                  state={modifyDialog}
+                  onChange={setModifyDialog}
+                  knownTables={tables}
+                  engine={engineForRender}
+                />
+              )}
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={submitModifyStructure}
+                  disabled={!modifyDialog}
+                >
+                  Save
+                </button>
               </div>
             </Dialog.Popup>
           </Dialog.Portal>
@@ -1598,32 +2055,48 @@ function SqlPlaygroundInner() {
             </div>
 
             <div className="sql-tree">
-              <div className="sql-tree-section">
-                <div className="sql-tree-label">TABLES ({tables.length})</div>
+              <SchemaSection
+                label="TABLES"
+                count={tables.length}
+                expanded={tablesSectionExpanded}
+                onToggle={() => setTablesSectionExpanded((v) => !v)}
+                emptyMessage="No tables."
+              >
                 {tables.map((name) => (
                   <SchemaItem
                     key={`t-${name}`}
                     name={name}
                     kind="table"
+                    expanded={expandedEntities.has(name)}
+                    columns={columnsByEntity[name]}
+                    foreignKeys={foreignKeysByEntity[name]}
+                    onToggleExpanded={toggleEntityExpanded}
                     onPreview={previewTable}
-                    onStructure={describeEntity}
+                    onModifyStructure={openModifyStructure}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
+                    onTruncate={truncateEntity}
                     onDrop={dropEntity}
                     onViewDDL={viewDDL}
                   />
                 ))}
-                {tables.length === 0 && (
-                  <div className="sql-tree-empty">No tables.</div>
-                )}
-              </div>
-              <div className="sql-tree-section">
-                <div className="sql-tree-label">VIEWS ({views.length})</div>
+              </SchemaSection>
+              <SchemaSection
+                label="VIEWS"
+                count={views.length}
+                expanded={viewsSectionExpanded}
+                onToggle={() => setViewsSectionExpanded((v) => !v)}
+                emptyMessage="No views."
+              >
                 {views.map((name) => (
                   <SchemaItem
                     key={`v-${name}`}
                     name={name}
                     kind="view"
+                    expanded={expandedEntities.has(name)}
+                    columns={columnsByEntity[name]}
+                    foreignKeys={foreignKeysByEntity[name]}
+                    onToggleExpanded={toggleEntityExpanded}
                     onPreview={previewTable}
                     onStructure={describeEntity}
                     onCount={countEntityRows}
@@ -1632,10 +2105,7 @@ function SqlPlaygroundInner() {
                     onViewDDL={viewDDL}
                   />
                 ))}
-                {views.length === 0 && (
-                  <div className="sql-tree-empty">No views.</div>
-                )}
-              </div>
+              </SchemaSection>
             </div>
 
             <div className="sql-sidebar-footer">
@@ -1685,6 +2155,7 @@ function SqlPlaygroundInner() {
                   result={result}
                   loading={!loaded}
                   onClear={clearActiveTabResult}
+                  keyHints={resultKeyHints}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -1873,10 +2344,12 @@ function ResultView({
   result,
   loading,
   onClear,
+  keyHints,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
   onClear: () => void;
+  keyHints?: ColumnKeyHints;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -1995,6 +2468,7 @@ function ResultView({
               index={idx}
               visible={visible}
               startIndex={start}
+              keyHints={keyHints}
             />
           );
         })}
@@ -2064,11 +2538,13 @@ function ResultTableBody({
   index,
   visible,
   startIndex,
+  keyHints,
 }: {
   set: QueryExecResult;
   index: number;
   visible: QueryExecResult["values"];
   startIndex: number;
+  keyHints?: ColumnKeyHints;
 }) {
   return (
     <div className="sql-result-set">
@@ -2079,9 +2555,31 @@ function ResultTableBody({
         <table className="sql-result-table">
           <thead>
             <tr>
-              {set.columns.map((c) => (
-                <th key={c}>{c}</th>
-              ))}
+              {set.columns.map((c) => {
+                const isPk = keyHints?.pk.has(c) ?? false;
+                const fk = keyHints?.fk.get(c);
+                return (
+                  <th key={c}>
+                    <span className="sql-result-th-label">
+                      {isPk && (
+                        <KeyRound
+                          size={11}
+                          className="sql-result-th-pk"
+                          aria-label="Primary key"
+                        />
+                      )}
+                      {fk && (
+                        <LinkIcon
+                          size={11}
+                          className="sql-result-th-fk"
+                          aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                        />
+                      )}
+                      <span>{c}</span>
+                    </span>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -2234,20 +2732,406 @@ function ResultPager({
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// ModifyStructureForm — body of the "Modify Structure" drawer. Keeps
+// every column field controlled (name, type, default, flags, foreign
+// key) while delegating persistence and the actual rebuild to the
+// parent's `submitModifyStructure`.
+// ────────────────────────────────────────────────────────────────────────
+
+interface ModifyStructureState {
+  originalName: string;
+  newName: string;
+  columns: ModifyColumnDraft[];
+}
+
+function ModifyStructureForm({
+  state,
+  onChange,
+  knownTables,
+  engine,
+}: {
+  state: ModifyStructureState;
+  onChange: (next: ModifyStructureState) => void;
+  knownTables: string[];
+  engine: SqliteEngine | null;
+}) {
+  const updateColumn = (id: string, patch: Partial<ModifyColumnDraft>) => {
+    onChange({
+      ...state,
+      columns: state.columns.map((c) =>
+        c.id === id ? { ...c, ...patch } : c,
+      ),
+    });
+  };
+  const removeColumn = (id: string) => {
+    onChange({
+      ...state,
+      columns: state.columns.filter((c) => c.id !== id),
+    });
+  };
+  const addColumn = () => {
+    // Use a per-call random suffix instead of `state.columns.length`
+    // so users who add → remove → add don't collide with an existing
+    // `column_N`. The engine's `rebuildTable` validates uniqueness on
+    // save anyway, but a unique default is friendlier.
+    const suffix = Math.random().toString(36).slice(2, 6);
+    onChange({
+      ...state,
+      columns: [
+        ...state.columns,
+        {
+          id: newDraftId(),
+          originalName: null,
+          name: `column_${suffix}`,
+          type: "TEXT",
+          notNull: false,
+          primaryKey: false,
+          autoIncrement: false,
+          unique: false,
+          defaultValue: "",
+          fkTable: "",
+          fkColumn: "",
+        },
+      ],
+    });
+  };
+  return (
+    <div className="sql-modify-body">
+      <label className="sql-modify-field">
+        <span className="sql-modify-field-label">Table name</span>
+        <input
+          className="sql-rename-input"
+          value={state.newName}
+          onChange={(e) => onChange({ ...state, newName: e.target.value })}
+        />
+      </label>
+      <div className="sql-modify-columns">
+        {state.columns.map((col) => (
+          <ModifyColumnRow
+            key={col.id}
+            col={col}
+            onChange={(patch) => updateColumn(col.id, patch)}
+            onRemove={() => removeColumn(col.id)}
+            knownTables={knownTables}
+            engine={engine}
+          />
+        ))}
+        {state.columns.length === 0 && (
+          <div className="sql-modify-empty">No columns. Add one below.</div>
+        )}
+      </div>
+      <button
+        type="button"
+        className="confirm-btn confirm-btn-secondary sql-modify-add"
+        onClick={addColumn}
+      >
+        <Plus size={12} aria-hidden="true" /> Add column
+      </button>
+    </div>
+  );
+}
+
+function ModifyColumnRow({
+  col,
+  onChange,
+  onRemove,
+  knownTables,
+  engine,
+}: {
+  col: ModifyColumnDraft;
+  onChange: (patch: Partial<ModifyColumnDraft>) => void;
+  onRemove: () => void;
+  knownTables: string[];
+  engine: SqliteEngine | null;
+}) {
+  // Look up the columns of the FK target table on demand so the
+  // user gets a constrained dropdown rather than a free-text field.
+  const fkTargetColumns = useMemo(() => {
+    if (!engine || !col.fkTable) return [] as TableColumnInfo[];
+    try {
+      return engine.listColumns(col.fkTable);
+    } catch {
+      return [] as TableColumnInfo[];
+    }
+  }, [engine, col.fkTable]);
+  return (
+    <div className="sql-modify-col-row">
+      <div className="sql-modify-col-main">
+        <input
+          className="sql-rename-input sql-modify-col-name"
+          value={col.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          placeholder="column name"
+          aria-label="Column name"
+        />
+        <select
+          className="sql-modify-col-type"
+          value={col.type}
+          onChange={(e) => onChange({ type: e.target.value })}
+          aria-label="Column type"
+        >
+          {COLUMN_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+        <input
+          className="sql-rename-input sql-modify-col-default"
+          value={col.defaultValue}
+          onChange={(e) => onChange({ defaultValue: e.target.value })}
+          placeholder="default (e.g. 'foo' or 0)"
+          aria-label="Default value"
+        />
+        <button
+          type="button"
+          className="sql-modify-col-remove"
+          onClick={onRemove}
+          aria-label="Remove column"
+          title="Remove column"
+        >
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
+      </div>
+      <div className="sql-modify-col-flags">
+        <ColumnFlag
+          checked={col.primaryKey}
+          onChange={(v) =>
+            onChange({
+              primaryKey: v,
+              // Auto-increment is only meaningful with a single PK.
+              autoIncrement: v ? col.autoIncrement : false,
+            })
+          }
+          label="Primary key"
+        />
+        <ColumnFlag
+          checked={!col.notNull}
+          onChange={(v) => onChange({ notNull: !v })}
+          label="Nullable"
+        />
+        <ColumnFlag
+          checked={col.unique}
+          onChange={(v) => onChange({ unique: v })}
+          label="Unique"
+        />
+        <ColumnFlag
+          checked={col.autoIncrement}
+          onChange={(v) => onChange({ autoIncrement: v })}
+          label="Auto-increment"
+          // SQLite allows AUTOINCREMENT only on a single-column INTEGER
+          // PRIMARY KEY. Disable the toggle otherwise so the user can't
+          // craft an invalid spec.
+          disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
+        />
+      </div>
+      <div className="sql-modify-col-fk">
+        <span className="sql-modify-fk-label">Foreign key →</span>
+        <select
+          className="sql-modify-col-type"
+          value={col.fkTable}
+          onChange={(e) =>
+            onChange({ fkTable: e.target.value, fkColumn: "" })
+          }
+          aria-label="Foreign key target table"
+        >
+          <option value="">(none)</option>
+          {knownTables.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+        <select
+          className="sql-modify-col-type"
+          value={col.fkColumn}
+          onChange={(e) => onChange({ fkColumn: e.target.value })}
+          aria-label="Foreign key target column"
+          disabled={!col.fkTable}
+        >
+          <option value="">(column)</option>
+          {fkTargetColumns.map((c) => (
+            <option key={c.cid} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
+function ColumnFlag({
+  checked,
+  onChange,
+  label,
+  disabled,
+}: {
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  return (
+    <label
+      className={`sql-modify-flag${disabled ? " is-disabled" : ""}`}
+    >
+      <Checkbox.Root
+        checked={checked}
+        onCheckedChange={(v) => onChange(v === true)}
+        disabled={disabled}
+        className="sql-modify-flag-box"
+      >
+        <Checkbox.Indicator className="sql-modify-flag-ind">
+          ✓
+        </Checkbox.Indicator>
+      </Checkbox.Root>
+      <span>{label}</span>
+    </label>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// DdlViewer — read-only CodeMirror instance used inside the View DDL
+// dialog so the SQL is syntax-highlighted and the user can scroll /
+// select with their keyboard. Re-uses the already-loaded CodeMirror
+// module (`cmApi`) instead of re-importing it.
+// ────────────────────────────────────────────────────────────────────────
+
+function DdlViewer({
+  sql,
+  cmApi,
+  theme,
+}: {
+  sql: string;
+  cmApi: CodeMirrorAPI | null;
+  theme: string;
+}) {
+  const hostRef = useRef<HTMLTextAreaElement | null>(null);
+  const editorRef = useRef<CodeMirrorEditor | null>(null);
+
+  useEffect(() => {
+    if (!cmApi || !hostRef.current || editorRef.current) return;
+    const cm = cmApi.fromTextArea(hostRef.current, {
+      mode: "text/x-sqlite",
+      theme,
+      lineNumbers: true,
+      indentUnit: 2,
+      tabSize: 2,
+      // `nocursor` disables focus while keeping syntax highlighting —
+      // the standard CodeMirror v5 way to render a read-only listing.
+      readOnly: "nocursor",
+      lineWrapping: false,
+    });
+    cm.setValue(sql);
+    cm.setSize("100%", "100%");
+    editorRef.current = cm;
+    return () => {
+      try {
+        editorRef.current?.toTextArea?.();
+      } catch {
+        // ignore teardown errors
+      }
+      editorRef.current = null;
+    };
+    // We only want this to run once per mount — sql / theme updates
+    // are handled by the effects below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cmApi]);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.getValue() !== sql) {
+      editorRef.current.setValue(sql);
+    }
+  }, [sql]);
+
+  useEffect(() => {
+    editorRef.current?.setOption("theme", theme);
+  }, [theme]);
+
+  return (
+    <div className="sql-ddl-code-wrap">
+      <textarea ref={hostRef} defaultValue={sql} readOnly />
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
 // Schema sidebar item — a tree-row button wrapped in a Base UI
 // ContextMenu so right-clicking a table or view exposes the typical
-// IDE actions (View Structure, Preview Data, Count Rows, Copy Name,
-// Drop). The primary left-click action stays as "preview" so the
-// existing fast-path behaviour is preserved.
+// IDE actions (Modify Structure / View Structure, Preview Data,
+// Count Rows, Copy Name, Truncate, Drop). Single-click toggles the
+// row's expanded state which reveals the column list; double-click
+// opens the entity in a new query tab.
 // ────────────────────────────────────────────────────────────────────────
+
+interface SchemaSectionProps {
+  label: string;
+  count: number;
+  expanded: boolean;
+  onToggle: () => void;
+  emptyMessage: string;
+  children?: ReactNode;
+}
+
+function SchemaSection({
+  label,
+  count,
+  expanded,
+  onToggle,
+  emptyMessage,
+  children,
+}: SchemaSectionProps) {
+  return (
+    <div className="sql-tree-section">
+      <button
+        type="button"
+        className="sql-tree-section-header"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        title={expanded ? `Collapse ${label.toLowerCase()}` : `Expand ${label.toLowerCase()}`}
+      >
+        <span className="sql-tree-chevron" aria-hidden="true">
+          {expanded ? (
+            <ChevronDown size={11} />
+          ) : (
+            <ChevronRight size={11} />
+          )}
+        </span>
+        <span className="sql-tree-label">
+          {label} ({count})
+        </span>
+      </button>
+      {expanded && (
+        <div className="sql-tree-section-body">
+          {count === 0 ? (
+            <div className="sql-tree-empty">{emptyMessage}</div>
+          ) : (
+            children
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface SchemaItemProps {
   name: string;
   kind: "table" | "view";
+  expanded: boolean;
+  columns: TableColumnInfo[] | undefined;
+  foreignKeys: ForeignKeyInfo[] | undefined;
+  onToggleExpanded: (name: string) => void;
   onPreview: (name: string, kind: "table" | "view") => void;
-  onStructure: (name: string, kind: "table" | "view") => void;
+  /** Tables open the Modify Structure drawer; views still use the
+   *  read-only "View Structure" PRAGMA path because their structure
+   *  is derived from their CREATE VIEW statement, not editable. */
+  onModifyStructure?: (name: string) => void;
+  onStructure?: (name: string, kind: "table" | "view") => void;
   onCount: (name: string, kind: "table" | "view") => void;
   onCopy: (name: string) => void;
+  /** Tables only — Truncate is meaningless on a view. */
+  onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
 }
@@ -2255,82 +3139,158 @@ interface SchemaItemProps {
 function SchemaItem({
   name,
   kind,
+  expanded,
+  columns,
+  foreignKeys,
+  onToggleExpanded,
   onPreview,
+  onModifyStructure,
   onStructure,
   onCount,
   onCopy,
+  onTruncate,
   onDrop,
   onViewDDL,
 }: SchemaItemProps) {
   const Icon = kind === "view" ? Eye : Table2;
-  // SQL strings mirrored from the engine so the tab contents exactly
-  // match what is run against the database.
-  const quotedName = `"${name.replace(/"/g, '""')}"`;
+  const fkByCol = useMemo(() => {
+    const m = new Map<string, ForeignKeyInfo>();
+    for (const fk of foreignKeys ?? []) m.set(fk.from, fk);
+    return m;
+  }, [foreignKeys]);
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger
-        render={(props) => (
-          <button
-            type="button"
-            {...props}
-            className="sql-tree-item"
-            onClick={() => onPreview(name, kind)}
-            title={`Open ${name} in a new tab (right-click for more)`}
-          >
-            <Icon size={12} aria-hidden="true" />
-            <span>{name}</span>
-          </button>
-        )}
-      />
-      <ContextMenu.Portal>
-        <ContextMenu.Positioner sideOffset={6}>
-          <ContextMenu.Popup className="bui-popup examples-dropdown">
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onPreview(name, kind)}
+    <div className="sql-tree-entity">
+      <ContextMenu.Root>
+        <ContextMenu.Trigger
+          render={(props) => (
+            <button
+              type="button"
+              {...props}
+              className="sql-tree-item"
+              onClick={() => onToggleExpanded(name)}
+              onDoubleClick={() => onPreview(name, kind)}
+              title={`Double-click to preview, click to ${expanded ? "collapse" : "expand"}`}
+              aria-expanded={expanded}
             >
-              <div className="ex-title">Preview Data</div>
-              <div className="ex-desc">First 200 rows</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onStructure(name, kind)}
-            >
-              <div className="ex-title">View Structure</div>
-              <div className="ex-desc">PRAGMA table_info({quotedName})</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onCount(name, kind)}
-            >
-              <div className="ex-title">Count Rows</div>
-              <div className="ex-desc">SELECT COUNT(*)</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onViewDDL(name, kind)}
-            >
-              <div className="ex-title">View DDL</div>
-              <div className="ex-desc">CREATE statement</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onCopy(name)}
-            >
-              <div className="ex-title">Copy Name</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => onDrop(name, kind)}
-            >
-              <div className="ex-title">
-                Drop {kind === "view" ? "View" : "Table"}
-              </div>
-              <div className="ex-desc">In-memory only</div>
-            </ContextMenu.Item>
-          </ContextMenu.Popup>
-        </ContextMenu.Positioner>
-      </ContextMenu.Portal>
-    </ContextMenu.Root>
+              <span className="sql-tree-chevron" aria-hidden="true">
+                {expanded ? (
+                  <ChevronDown size={11} />
+                ) : (
+                  <ChevronRight size={11} />
+                )}
+              </span>
+              <Icon size={12} aria-hidden="true" />
+              <span className="sql-tree-item-name">{name}</span>
+            </button>
+          )}
+        />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner sideOffset={6}>
+            <ContextMenu.Popup className="bui-popup examples-dropdown">
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onPreview(name, kind)}
+              >
+                <div className="ex-title">Preview Data</div>
+              </ContextMenu.Item>
+              {kind === "table" && onModifyStructure ? (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onModifyStructure(name)}
+                >
+                  <div className="ex-title">Modify Structure</div>
+                </ContextMenu.Item>
+              ) : (
+                onStructure && (
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={() => onStructure(name, kind)}
+                  >
+                    <div className="ex-title">View Structure</div>
+                  </ContextMenu.Item>
+                )
+              )}
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onCount(name, kind)}
+              >
+                <div className="ex-title">Count Rows</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onViewDDL(name, kind)}
+              >
+                <div className="ex-title">View DDL</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onCopy(name)}
+              >
+                <div className="ex-title">Copy Name</div>
+              </ContextMenu.Item>
+              {kind === "table" && onTruncate && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onTruncate(name)}
+                >
+                  <div className="ex-title">Truncate</div>
+                </ContextMenu.Item>
+              )}
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onDrop(name, kind)}
+              >
+                <div className="ex-title">
+                  Drop {kind === "view" ? "View" : "Table"}
+                </div>
+              </ContextMenu.Item>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+      {expanded && (
+        <ul className="sql-tree-columns" role="list">
+          {columns === undefined ? (
+            <li className="sql-tree-column-loading">Loading…</li>
+          ) : columns.length === 0 ? (
+            <li className="sql-tree-column-loading">No columns.</li>
+          ) : (
+            columns.map((c) => {
+              const fk = fkByCol.get(c.name);
+              return (
+                <li key={c.cid} className="sql-tree-column">
+                  <span className="sql-tree-column-icons" aria-hidden="true">
+                    {c.pk > 0 && (
+                      <KeyRound
+                        size={10}
+                        className="sql-tree-column-pk"
+                      />
+                    )}
+                    {fk && (
+                      <LinkIcon
+                        size={10}
+                        className="sql-tree-column-fk"
+                      />
+                    )}
+                  </span>
+                  <span className="sql-tree-column-name">{c.name}</span>
+                  <span className="sql-tree-column-type">
+                    {c.type || "—"}
+                  </span>
+                  {fk && (
+                    <span
+                      className="sql-tree-column-fkref"
+                      title={`Foreign key → ${fk.table}.${fk.to}`}
+                    >
+                      → {fk.table}.{fk.to}
+                    </span>
+                  )}
+                </li>
+              );
+            })
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
