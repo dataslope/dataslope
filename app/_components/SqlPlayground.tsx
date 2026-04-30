@@ -518,8 +518,8 @@ function SqlPlaygroundInner() {
   // boot. Kept in a ref so dialogs that mount their own read-only
   // editors (DDL viewer) can re-use the already-loaded module without
   // a second async import. Mirrored into state for use during render
-  // (see `cmApi`), since the React rules of hooks forbid reading
-  // `ref.current` during render.
+  // (see `cmApi`), since React forbids reading `ref.current` directly
+  // during render.
   const codeMirrorApiRef = useRef<CodeMirrorAPI | null>(null);
   const [cmApi, setCmApi] = useState<CodeMirrorAPI | null>(null);
   // Render-time view of `engineRef`. Set once the engine boot effect
@@ -624,7 +624,9 @@ function SqlPlaygroundInner() {
         const CM = (codeMirrorMod.default ??
           codeMirrorMod) as unknown as CodeMirrorAPI;
         codeMirrorApiRef.current = CM;
-        setCmApi(CM);
+        // CodeMirror's runtime export is function-like; wrap it so React
+        // stores it as a value instead of treating it as a state updater.
+        setCmApi(() => CM);
         if (textareaRef.current && !editorRef.current) {
           const initialTheme =
             getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
@@ -2290,16 +2292,16 @@ function SqlPlaygroundInner() {
                     onCloseAll={closeAllTabs}
                   />
                 ))}
-                <button
-                  type="button"
-                  className="sql-tab-add"
-                  onClick={addTab}
-                  title="New query tab"
-                  aria-label="New query tab"
-                >
-                  <Plus size={12} aria-hidden="true" />
-                </button>
               </div>
+              <button
+                type="button"
+                className="sql-tab-add"
+                onClick={addTab}
+                title="New query tab"
+                aria-label="New query tab"
+              >
+                <Plus size={12} aria-hidden="true" />
+              </button>
             </div>
 
             <div className="sql-editor-pane" ref={editorPaneRef}>
@@ -3030,7 +3032,7 @@ function ModifyColumnRow({
           aria-label="Column name"
         />
         <select
-          className="sql-modify-col-type"
+          className="sql-modify-col-type sql-modify-col-type-select"
           value={col.type}
           onChange={(e) => onChange({ type: e.target.value })}
           aria-label="Column type"
@@ -3093,7 +3095,7 @@ function ModifyColumnRow({
       <div className="sql-modify-col-fk">
         <span className="sql-modify-fk-label">Foreign key →</span>
         <select
-          className="sql-modify-col-type"
+          className="sql-modify-col-type sql-modify-fk-table"
           value={col.fkTable}
           onChange={(e) =>
             onChange({ fkTable: e.target.value, fkColumn: "" })
@@ -3108,7 +3110,7 @@ function ModifyColumnRow({
           ))}
         </select>
         <select
-          className="sql-modify-col-type"
+          className="sql-modify-col-type sql-modify-fk-column"
           value={col.fkColumn}
           onChange={(e) => onChange({ fkColumn: e.target.value })}
           aria-label="Foreign key target column"
