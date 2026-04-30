@@ -18,6 +18,7 @@ import type {
   Database,
   QueryExecResult,
   SqlJsStatic,
+  SqlValue,
 } from "sql.js";
 import { findSampleDatabase, type SqliteSampleDatabase } from "./sqliteSamples";
 
@@ -153,6 +154,21 @@ export interface SqliteEngine {
   getDDL: (name: string) => string;
   /** The sample database currently loaded into memory. */
   activeSample: () => SqliteSampleDatabase;
+  /** Serialise the active database to a SQLite file image. The bytes
+   *  are exactly what would land on disk if SQLite wrote the database
+   *  to a `.sqlite` file, so the result can be downloaded as-is or
+   *  re-opened by any SQLite-compatible tool. */
+  exportDatabase: () => Uint8Array;
+  /** Delete a set of rows from `<tableName>` identified by the values
+   *  of their primary-key columns. Each entry in `pkRows` is the
+   *  ordered list of primary-key values that identifies one row, in
+   *  the same order as `pkColumns`. Bound through prepared statements
+   *  so user-supplied cell values can never be interpreted as SQL. */
+  deleteRows: (
+    tableName: string,
+    pkColumns: string[],
+    pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+  ) => number;
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -502,6 +518,62 @@ export async function createSqliteEngine(
     },
     activeSample() {
       return active;
+    },
+    exportDatabase() {
+      // sql.js's `Database.export()` returns a `Uint8Array` containing
+      // the raw on-disk representation of the database, suitable for
+      // saving as a `.sqlite` file or feeding to `new SQL.Database(...)`
+      // to reopen later.
+      return require().export();
+    },
+    deleteRows(
+      tableName: string,
+      pkColumns: string[],
+      pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    ) {
+      if (pkColumns.length === 0) {
+        throw new Error(
+          "Cannot delete rows without primary-key columns to identify them.",
+        );
+      }
+      if (pkRows.length === 0) return 0;
+      const d = require();
+      // Build one prepared DELETE statement and reuse it across rows
+      // so each cell value is bound through sql.js's parameter API
+      // (immune to SQL injection regardless of cell contents).
+      const where = pkColumns.map((c) => `${quoteIdent(c)} = ?`).join(" AND ");
+      const sql = `DELETE FROM ${quoteIdent(tableName)} WHERE ${where}`;
+      const stmt = d.prepare(sql);
+      let deleted = 0;
+      try {
+        d.run("BEGIN");
+        try {
+          for (const row of pkRows) {
+            if (row.length !== pkColumns.length) {
+              throw new Error(
+                "Primary-key value count does not match primary-key column count.",
+              );
+            }
+            stmt.bind(row as SqlValue[]);
+            // DELETE returns no rows; step() drives the statement to
+            // completion so the change is applied.
+            stmt.step();
+            stmt.reset();
+            deleted += 1;
+          }
+          d.run("COMMIT");
+        } catch (err) {
+          try {
+            d.run("ROLLBACK");
+          } catch {
+            // ignore rollback failure
+          }
+          throw err;
+        }
+      } finally {
+        stmt.free();
+      }
+      return deleted;
     },
   };
 }

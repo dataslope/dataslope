@@ -63,6 +63,7 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
+  Download,
   Eraser,
   Eye,
   Database,
@@ -1171,6 +1172,77 @@ function SqlPlaygroundInner() {
     [showToast],
   );
 
+  // ─── Export ────────────────────────────────────────────────────────
+  // Serialise the in-memory database to a SQLite file image and trigger
+  // a browser download. The filename mirrors the active sample's
+  // canonical filename (e.g. `chinook.sqlite`) so users round-trip the
+  // file naturally.
+  const exportDatabase = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    try {
+      const bytes = engine.exportDatabase();
+      const sample = engine.activeSample();
+      const filename =
+        sample.filename && /\.sqlite$/i.test(sample.filename)
+          ? sample.filename
+          : `${sample.id || "database"}.sqlite`;
+      // Wrap the typed array in a fresh ArrayBuffer slice so the Blob
+      // owns its own copy — sql.js's internal buffer can be reused on
+      // the next exec(), so we mustn't keep a live reference to it.
+      const buf = bytes.slice().buffer;
+      const blob = new Blob([buf], { type: "application/vnd.sqlite3" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Defer revocation so the click navigation always observes a
+      // valid URL — Safari in particular is racy here.
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Export failed: ${msg}`, "warn");
+    }
+  }, [showToast]);
+
+  // ─── Delete selected rows ─────────────────────────────────────────
+  // Called from the result table when the user confirms deletion of one
+  // or more selected rows from a previewed table. We rely on the
+  // table's primary key to safely identify which rows to remove —
+  // callers must pass the ordered PK column names along with the PK
+  // values for each row. Re-runs the original preview afterwards so
+  // the visible result reflects the updated table.
+  const deleteRowsFromTable = useCallback(
+    (
+      tableName: string,
+      pkColumns: string[],
+      pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (pkColumns.length === 0 || pkRows.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        const deleted = engine.deleteRows(tableName, pkColumns, pkRows);
+        showToast(
+          `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
+        );
+        // Re-run the same preview the result was originally produced
+        // from so the table refreshes in place.
+        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Delete failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast],
+  );
+
   // Refresh cached column / FK info for a single entity. Called when
   // the sidebar row is expanded for the first time, after DDL changes,
   // and when the Modify Structure drawer reloads. Failures are
@@ -2116,60 +2188,73 @@ function SqlPlaygroundInner() {
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
-              <Select.Root
-                value={activeDbId}
-                onValueChange={(value) => requestDbSwitch(String(value))}
-              >
-                <Select.Trigger
-                  className="sql-db-selector"
-                  aria-label="Select sample database"
+              <div className="sql-db-selector-row">
+                <Select.Root
+                  value={activeDbId}
+                  onValueChange={(value) => requestDbSwitch(String(value))}
                 >
-                  <Database
-                    size={14}
-                    className="sql-db-selector-icon"
-                    aria-hidden="true"
-                  />
-                  <Select.Value className="sql-db-selector-value">
-                    {activeSample.filename}
-                  </Select.Value>
-                  <Select.Icon className="playground-switcher-icon">
-                    <svg viewBox="0 0 12 12" width={10} height={10}>
-                      <polyline
-                        points="2,4 6,8 10,4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
-                    <Select.Popup className="bui-select-popup sql-db-popup">
-                      {SQLITE_SAMPLE_DATABASES.map((s) => (
-                        <Select.Item
-                          key={s.id}
-                          value={s.id}
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
+                  <Select.Trigger
+                    className="sql-db-selector"
+                    aria-label="Select sample database"
+                  >
+                    <Database
+                      size={14}
+                      className="sql-db-selector-icon"
+                      aria-hidden="true"
+                    />
+                    <Select.Value className="sql-db-selector-value">
+                      {activeSample.filename}
+                    </Select.Value>
+                    <Select.Icon className="playground-switcher-icon">
+                      <svg viewBox="0 0 12 12" width={10} height={10}>
+                        <polyline
+                          points="2,4 6,8 10,4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
+                      <Select.Popup className="bui-select-popup sql-db-popup">
+                        {SQLITE_SAMPLE_DATABASES.map((s) => (
+                          <Select.Item
+                            key={s.id}
+                            value={s.id}
+                            className="bui-select-item sql-db-item"
                           >
-                            <Database size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>{s.filename}</Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              {s.description}
+                            <span
+                              className="bui-select-item-icon"
+                              aria-hidden="true"
+                            >
+                              <Database size={14} />
                             </span>
-                          </span>
-                        </Select.Item>
-                      ))}
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
+                            <span className="sql-db-item-text">
+                              <Select.ItemText>{s.filename}</Select.ItemText>
+                              <span className="sql-db-item-desc">
+                                {s.description}
+                              </span>
+                            </span>
+                          </Select.Item>
+                        ))}
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <button
+                  type="button"
+                  className="sql-db-export-btn"
+                  onClick={exportDatabase}
+                  disabled={!loaded}
+                  title="Export database as .sqlite file"
+                  aria-label="Export database as .sqlite file"
+                >
+                  <Download size={13} aria-hidden="true" />
+                  <span>Export</span>
+                </button>
+              </div>
             </div>
 
             <div className="sql-tree">
@@ -2372,6 +2457,8 @@ function SqlPlaygroundInner() {
                   loading={!loaded}
                   onClear={clearActiveTabResult}
                   keyHints={resultKeyHints}
+                  sourceTable={result?.sourceTable}
+                  onDeleteRows={deleteRowsFromTable}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -2510,11 +2597,19 @@ function ResultView({
   loading,
   onClear,
   keyHints,
+  sourceTable,
+  onDeleteRows,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
   onClear: () => void;
   keyHints?: ColumnKeyHints;
+  sourceTable?: string;
+  onDeleteRows?: (
+    tableName: string,
+    pkColumns: string[],
+    pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+  ) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -2524,6 +2619,16 @@ function ResultView({
   const [pageStates, setPageStates] = useState<
     Record<number, { pageSize: number; page: number }>
   >({});
+  // Selection state — set of *absolute* row indices into `set.values`
+  // (not page-local) so selections survive page navigation. Keyed by
+  // result-set index. Only populated for sets that are deletable.
+  const [selectedByIndex, setSelectedByIndex] = useState<
+    Record<number, Set<number>>
+  >({});
+  // Pending delete confirmation — captures the set index whose
+  // selected rows are about to be deleted. `null` means the dialog is
+  // closed.
+  const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const initialPageSize = useMemo(() => {
     if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
     const saved = Number(
@@ -2534,12 +2639,14 @@ function ResultView({
       : DEFAULT_PAGE_SIZE;
   }, []);
 
-  // Reset pagination whenever a new result lands. Identity-comparing
-  // against the result object is sufficient because `setResult` always
-  // creates a new object.
+  // Reset pagination + selection whenever a new result lands.
+  // Identity-comparing against the result object is sufficient because
+  // `setResult` always creates a new object.
   useEffect(() => {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
+    setSelectedByIndex({});
+    setPendingDelete(null);
   }, [result]);
 
   const getState = useCallback(
@@ -2568,6 +2675,99 @@ function ResultView({
       }
     }
   }, []);
+
+  // Per-set "is this set deletable" decision. A set is deletable when:
+  //   - the result came from a single-table preview (sourceTable set),
+  //   - we have primary-key column metadata for that table, and
+  //   - every PK column appears in the set's column list (so we can
+  //     identify each row by its PK values without guesswork).
+  // Returns the ordered list of PK column names for the set (drawn
+  // from the *set's* column order so the caller can index into rows
+  // directly), or `null` when not deletable.
+  const pkColumnsForSet = useCallback(
+    (set: QueryExecResult): string[] | null => {
+      if (!sourceTable || !onDeleteRows) return null;
+      const pk = keyHints?.pk;
+      if (!pk || pk.size === 0) return null;
+      const ordered: string[] = [];
+      for (const col of set.columns) {
+        if (pk.has(col)) ordered.push(col);
+      }
+      // Need every PK column present in the result.
+      if (ordered.length !== pk.size) return null;
+      return ordered;
+    },
+    [sourceTable, onDeleteRows, keyHints],
+  );
+
+  const toggleRowSelected = useCallback(
+    (setIdx: number, absoluteRow: number) => {
+      setSelectedByIndex((prev) => {
+        const cur = new Set(prev[setIdx] ?? []);
+        if (cur.has(absoluteRow)) cur.delete(absoluteRow);
+        else cur.add(absoluteRow);
+        return { ...prev, [setIdx]: cur };
+      });
+    },
+    [],
+  );
+
+  const setVisibleSelection = useCallback(
+    (setIdx: number, visibleAbsoluteIndices: number[], select: boolean) => {
+      setSelectedByIndex((prev) => {
+        const cur = new Set(prev[setIdx] ?? []);
+        if (select) {
+          for (const i of visibleAbsoluteIndices) cur.add(i);
+        } else {
+          for (const i of visibleAbsoluteIndices) cur.delete(i);
+        }
+        return { ...prev, [setIdx]: cur };
+      });
+    },
+    [],
+  );
+
+  const requestDelete = useCallback((setIdx: number) => {
+    setPendingDelete(setIdx);
+  }, []);
+
+  const performDelete = useCallback(() => {
+    if (pendingDelete === null || !result || !sourceTable || !onDeleteRows) {
+      setPendingDelete(null);
+      return;
+    }
+    const set = result.sets[pendingDelete];
+    if (!set) {
+      setPendingDelete(null);
+      return;
+    }
+    const pkCols = pkColumnsForSet(set);
+    if (!pkCols || pkCols.length === 0) {
+      setPendingDelete(null);
+      return;
+    }
+    const pkColIndexes = pkCols.map((c) => set.columns.indexOf(c));
+    const selected = selectedByIndex[pendingDelete];
+    if (!selected || selected.size === 0) {
+      setPendingDelete(null);
+      return;
+    }
+    const pkRows: unknown[][] = [];
+    for (const rowIdx of selected) {
+      const row = set.values[rowIdx];
+      if (!row) continue;
+      pkRows.push(pkColIndexes.map((ci) => row[ci]));
+    }
+    setPendingDelete(null);
+    onDeleteRows(sourceTable, pkCols, pkRows);
+  }, [
+    pendingDelete,
+    result,
+    sourceTable,
+    onDeleteRows,
+    pkColumnsForSet,
+    selectedByIndex,
+  ]);
 
   if (loading) {
     return (
@@ -2611,6 +2811,12 @@ function ResultView({
       </>
     );
   }
+  const pendingSet =
+    pendingDelete !== null ? result.sets[pendingDelete] : undefined;
+  const pendingCount =
+    pendingDelete !== null
+      ? selectedByIndex[pendingDelete]?.size ?? 0
+      : 0;
   return (
     <>
       <div className="sql-result-sets">
@@ -2626,6 +2832,9 @@ function ResultView({
             st.pageSize > 0
               ? set.values.slice(start, start + effective)
               : set.values;
+          const pkCols = pkColumnsForSet(set);
+          const selected = selectedByIndex[idx];
+          const selectedCount = selected?.size ?? 0;
           return (
             <ResultTableBody
               key={idx}
@@ -2634,6 +2843,16 @@ function ResultView({
               visible={visible}
               startIndex={start}
               keyHints={keyHints}
+              deletable={pkCols !== null}
+              selectedRows={selected}
+              selectedCount={selectedCount}
+              onToggleRow={(absoluteRow) =>
+                toggleRowSelected(idx, absoluteRow)
+              }
+              onToggleVisible={(absoluteIndices, select) =>
+                setVisibleSelection(idx, absoluteIndices, select)
+              }
+              onRequestDelete={() => requestDelete(idx)}
             />
           );
         })}
@@ -2657,6 +2876,41 @@ function ResultView({
           );
         })}
       </div>
+      <AlertDialog.Root
+        open={pendingDelete !== null}
+        onOpenChange={(next) => {
+          if (!next) setPendingDelete(null);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="confirm-backdrop" />
+          <AlertDialog.Popup className="confirm-popup">
+            <AlertDialog.Title className="confirm-title">
+              Delete {pendingCount} row{pendingCount === 1 ? "" : "s"}?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirm-desc">
+              {pendingCount} row{pendingCount === 1 ? "" : "s"} will be
+              permanently deleted from{" "}
+              <strong>
+                {sourceTable ?? pendingSet?.columns[0] ?? "the table"}
+              </strong>
+              . The change is in-memory only and will be undone next page
+              load, but cannot be reversed within this session.
+            </AlertDialog.Description>
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </AlertDialog.Close>
+              <AlertDialog.Close
+                className="confirm-btn confirm-btn-danger"
+                onClick={performDelete}
+              >
+                Delete row{pendingCount === 1 ? "" : "s"}
+              </AlertDialog.Close>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </>
   );
 }
@@ -2686,22 +2940,82 @@ function ResultTableBody({
   visible,
   startIndex,
   keyHints,
+  deletable,
+  selectedRows,
+  selectedCount,
+  onToggleRow,
+  onToggleVisible,
+  onRequestDelete,
 }: {
   set: QueryExecResult;
   index: number;
   visible: QueryExecResult["values"];
   startIndex: number;
   keyHints?: ColumnKeyHints;
+  deletable: boolean;
+  selectedRows?: Set<number>;
+  selectedCount: number;
+  onToggleRow: (absoluteRow: number) => void;
+  onToggleVisible: (absoluteIndices: number[], select: boolean) => void;
+  onRequestDelete: () => void;
 }) {
+  const visibleAbsoluteIndices = useMemo(
+    () => visible.map((_, ri) => startIndex + ri),
+    [visible, startIndex],
+  );
+  const allVisibleSelected =
+    deletable &&
+    visibleAbsoluteIndices.length > 0 &&
+    visibleAbsoluteIndices.every((i) => selectedRows?.has(i));
+  const someVisibleSelected =
+    deletable &&
+    !allVisibleSelected &&
+    visibleAbsoluteIndices.some((i) => selectedRows?.has(i));
   return (
     <div className="sql-result-set">
       {index > 0 && (
         <div className="sql-result-set-label">Result set #{index + 1}</div>
       )}
+      {deletable && selectedCount > 0 && (
+        <div className="sql-result-selection-bar" role="region" aria-label="Selected rows">
+          <span className="sql-result-selection-count">
+            {selectedCount} row{selectedCount === 1 ? "" : "s"} selected
+          </span>
+          <button
+            type="button"
+            className="sql-result-selection-delete"
+            onClick={onRequestDelete}
+          >
+            <Trash2 size={12} aria-hidden="true" />
+            <span>Delete selected</span>
+          </button>
+        </div>
+      )}
       <div className="sql-result-table-wrap">
         <table className="sql-result-table">
           <thead>
             <tr>
+              {deletable && (
+                <th className="sql-result-th-select">
+                  <Checkbox.Root
+                    className="sql-result-row-checkbox"
+                    checked={allVisibleSelected}
+                    indeterminate={someVisibleSelected}
+                    onCheckedChange={(v) =>
+                      onToggleVisible(visibleAbsoluteIndices, v === true)
+                    }
+                    aria-label={
+                      allVisibleSelected
+                        ? "Deselect all visible rows"
+                        : "Select all visible rows"
+                    }
+                  >
+                    <Checkbox.Indicator className="sql-result-row-checkbox-ind">
+                      {allVisibleSelected ? "✓" : "–"}
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                </th>
+              )}
               {set.columns.map((c) => {
                 const isPk = keyHints?.pk.has(c) ?? false;
                 const fk = keyHints?.fk.get(c);
@@ -2730,18 +3044,43 @@ function ResultTableBody({
             </tr>
           </thead>
           <tbody>
-            {visible.map((row, ri) => (
-              <tr key={startIndex + ri}>
-                {row.map((v, ci) => (
-                  <td
-                    key={ci}
-                    className={v === null ? "sql-cell-null" : undefined}
-                  >
-                    {formatCellValue(v)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {visible.map((row, ri) => {
+              const absoluteRow = startIndex + ri;
+              const checked = selectedRows?.has(absoluteRow) ?? false;
+              return (
+                <tr
+                  key={absoluteRow}
+                  className={checked ? "sql-result-row-selected" : undefined}
+                >
+                  {deletable && (
+                    <td className="sql-result-td-select">
+                      <Checkbox.Root
+                        className="sql-result-row-checkbox"
+                        checked={checked}
+                        onCheckedChange={() => onToggleRow(absoluteRow)}
+                        aria-label={
+                          checked
+                            ? `Deselect row ${absoluteRow + 1}`
+                            : `Select row ${absoluteRow + 1}`
+                        }
+                      >
+                        <Checkbox.Indicator className="sql-result-row-checkbox-ind">
+                          ✓
+                        </Checkbox.Indicator>
+                      </Checkbox.Root>
+                    </td>
+                  )}
+                  {row.map((v, ci) => (
+                    <td
+                      key={ci}
+                      className={v === null ? "sql-cell-null" : undefined}
+                    >
+                      {formatCellValue(v)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
