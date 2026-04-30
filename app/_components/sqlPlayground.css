@@ -299,6 +299,8 @@
   min-width: 20px;
   height: 20px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 /* Shared "node on the guide" treatment for the PK / FK glyphs.
@@ -313,8 +315,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--bg2);
   padding: 2px;
   box-sizing: border-box;
 }
