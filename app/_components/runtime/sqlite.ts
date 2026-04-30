@@ -50,6 +50,12 @@ export interface SqliteEngine {
    *  "Drop" action. The kind is restricted to a fixed allowlist so the
    *  resulting statement can never be coerced into something else. */
   dropEntity: (name: string, kind: "table" | "view") => void;
+  /** Returns the original DDL string (`CREATE TABLE …` / `CREATE VIEW
+   *  …`) recorded in `sqlite_master.sql` for the given entity, plus
+   *  the `CREATE INDEX` statements for any indexes defined on it.
+   *  Returns an empty string when the entity has no recorded DDL
+   *  (system tables, certain virtual tables). */
+  getDDL: (name: string) => string;
   /** The sample database currently loaded into memory. */
   activeSample: () => SqliteSampleDatabase;
 }
@@ -173,6 +179,48 @@ export async function createSqliteEngine(
       // looser-typed values from UI events.
       const k = kind === "view" ? "VIEW" : "TABLE";
       require().run(`DROP ${k} IF EXISTS ${quoteIdent(name)}`);
+    },
+    getDDL(name: string) {
+      // `sqlite_master.sql` already stores the original CREATE
+      // statement verbatim (minus a trailing semicolon). We use a
+      // bound parameter for the entity name so this path is safe
+      // against arbitrary identifier strings — sql.js *does* allow
+      // value parameters, only identifier interpolation has to be
+      // done by hand.
+      const stmt = require().prepare(
+        `SELECT sql FROM sqlite_master WHERE name = $name AND sql IS NOT NULL ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'view' THEN 0 ELSE 1 END, name`,
+      );
+      const parts: string[] = [];
+      try {
+        stmt.bind({ $name: name });
+        while (stmt.step()) {
+          const row = stmt.get();
+          if (row.length > 0 && typeof row[0] === "string") {
+            parts.push(row[0].trim());
+          }
+        }
+      } finally {
+        stmt.free();
+      }
+      // Indexes attached to the table also live in sqlite_master, but
+      // their `name` column is the index name rather than the table
+      // name. Pull them in via `tbl_name` so the DDL view matches
+      // what a `.schema <table>` dump would show in the sqlite3 CLI.
+      const idxStmt = require().prepare(
+        `SELECT sql FROM sqlite_master WHERE type = 'index' AND tbl_name = $name AND sql IS NOT NULL ORDER BY name`,
+      );
+      try {
+        idxStmt.bind({ $name: name });
+        while (idxStmt.step()) {
+          const row = idxStmt.get();
+          if (row.length > 0 && typeof row[0] === "string") {
+            parts.push(row[0].trim());
+          }
+        }
+      } finally {
+        idxStmt.free();
+      }
+      return parts.map((p) => (p.endsWith(";") ? p : `${p};`)).join("\n\n");
     },
     activeSample() {
       return active;
