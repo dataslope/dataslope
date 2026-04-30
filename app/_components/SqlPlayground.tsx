@@ -291,6 +291,12 @@ function SqlPlaygroundInner() {
     null,
   );
   const [pendingDbId, setPendingDbId] = useState<string | null>(null);
+  // DDL viewer dialog state. We keep both the title (entity name) and
+  // the DDL string so the dialog can stay open while the underlying
+  // sidebar list mutates from a concurrent DROP.
+  const [ddlDialog, setDdlDialog] = useState<
+    { title: string; sql: string } | null
+  >(null);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -336,8 +342,50 @@ function SqlPlaygroundInner() {
   const [activeTabId, setActiveTabId] = useState<string>("");
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
 
-  // The most recent query result (or sidebar preview).
-  const [result, setResult] = useState<QueryRunResult | null>(null);
+  // The most recent query result, keyed by tab id so each tab keeps
+  // its own result set when the user switches between tabs.
+  const [resultsByTab, setResultsByTab] = useState<
+    Record<string, QueryRunResult>
+  >({});
+  const result = activeTabId ? resultsByTab[activeTabId] ?? null : null;
+  const setResultForTab = useCallback(
+    (tabId: string, next: QueryRunResult | null) => {
+      setResultsByTab((prev) => {
+        if (next === null) {
+          if (!(tabId in prev)) return prev;
+          const copy = { ...prev };
+          delete copy[tabId];
+          return copy;
+        }
+        return { ...prev, [tabId]: next };
+      });
+    },
+    [],
+  );
+  const clearActiveTabResult = useCallback(() => {
+    if (activeTabId) setResultForTab(activeTabId, null);
+  }, [activeTabId, setResultForTab]);
+
+  // When tabs are closed (or replaced wholesale), drop any result
+  // entries whose owning tab no longer exists. Without this the
+  // `resultsByTab` record would grow without bound across long
+  // sessions of opening/closing query tabs.
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setResultsByTab((prev) => {
+      const ids = new Set(tabs.map((t) => t.id));
+      let changed = false;
+      const next: Record<string, QueryRunResult> = {};
+      for (const k of Object.keys(prev)) {
+        if (ids.has(k)) {
+          next[k] = prev[k];
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [tabs]);
 
   // ─── CodeMirror ─────────────────────────────────────────────────────
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -650,7 +698,7 @@ function SqlPlaygroundInner() {
       setActiveTabId(newActive);
       const editor = editorRef.current;
       if (editor) editor.setValue(newTabs[0].code);
-      setResult(null);
+      setResultsByTab({});
       showToast(`Loaded ${sample.filename}.`);
     },
     [showToast],
@@ -673,8 +721,13 @@ function SqlPlaygroundInner() {
   );
 
   // ─── Run / preview ──────────────────────────────────────────────────
-  const runQuery = useCallback(
-    (sql: string, source: string) => {
+  // Runs a SQL string and stores the result against `tabId`. Returns
+  // void; the result is read from `resultsByTab[tabId]`. We capture the
+  // tab id explicitly so concurrent runs (e.g. the user clicks several
+  // sidebar tables in quick succession) can't clobber one another's
+  // results.
+  const runSqlForTab = useCallback(
+    (tabId: string, sql: string, source: string) => {
       const engine = engineRef.current;
       if (!engine) return;
       const trimmed = sql.trim();
@@ -683,12 +736,12 @@ function SqlPlaygroundInner() {
         return;
       }
       setStatusState("running");
-      if (clearBeforeRun) setResult(null);
+      if (clearBeforeRun) setResultForTab(tabId, null);
       const t0 = performance.now();
       try {
         const sets = engine.exec(trimmed);
         const elapsedMs = performance.now() - t0;
-        setResult({ sets, elapsedMs, source });
+        setResultForTab(tabId, { sets, elapsedMs, source });
         setStatusState("ready");
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
         setTables(engine.listTables());
@@ -696,19 +749,21 @@ function SqlPlaygroundInner() {
       } catch (err) {
         const elapsedMs = performance.now() - t0;
         const msg = err instanceof Error ? err.message : String(err);
-        setResult({ sets: [], elapsedMs, error: msg, source });
+        setResultForTab(tabId, { sets: [], elapsedMs, error: msg, source });
         setStatusState("error");
         window.setTimeout(() => setStatusState("ready"), 3000);
       }
     },
-    [clearBeforeRun, showToast],
+    [clearBeforeRun, showToast, setResultForTab],
   );
 
   const runActiveTab = useCallback(() => {
-    if (!activeTab) return;
-    const code = editorRef.current?.getValue() ?? activeTab.code;
-    runQuery(code, activeTab.title);
-  }, [activeTab, runQuery]);
+    const id = activeTabIdRef.current;
+    const tab = tabsRef.current.find((t) => t.id === id);
+    if (!tab) return;
+    const code = editorRef.current?.getValue() ?? tab.code;
+    runSqlForTab(tab.id, code, tab.title);
+  }, [runSqlForTab]);
 
   useEffect(() => {
     runRef.current = () => {
@@ -716,103 +771,73 @@ function SqlPlaygroundInner() {
     };
   }, [runActiveTab]);
 
-  const previewTable = useCallback(
-    (name: string, kind: "table" | "view") => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      setStatusState("running");
-      const t0 = performance.now();
-      try {
-        const sets = engine.previewTable(name);
-        const elapsedMs = performance.now() - t0;
-        setResult({
-          sets,
-          elapsedMs,
-          source: `${kind === "view" ? "View" : "Table"}: ${name}`,
-        });
-        setStatusState("ready");
-      } catch (err) {
-        const elapsedMs = performance.now() - t0;
-        const msg = err instanceof Error ? err.message : String(err);
-        setResult({
-          sets: [],
-          elapsedMs,
-          error: msg,
-          source: `${kind === "view" ? "View" : "Table"}: ${name}`,
-        });
-        setStatusState("error");
-        window.setTimeout(() => setStatusState("ready"), 3000);
-      }
+  // Creates a new tab named `title` with `sql` as its contents, makes it
+  // active, and runs the SQL against the engine so the results land in
+  // the new tab. Used by every sidebar action (left-click preview,
+  // context-menu Preview/Structure/Count) so each invocation produces a
+  // distinct tab whose state is preserved when the user switches tabs.
+  const openTabAndRun = useCallback(
+    (title: string, sql: string, source?: string) => {
+      const tab: QueryTab = { id: newTabId(), title, code: sql };
+      const next = [...tabsRef.current, tab];
+      tabsRef.current = next;
+      activeTabIdRef.current = tab.id;
+      setTabs(next);
+      saveTabs(activeDbIdRef.current, next);
+      setActiveTabId(tab.id);
+      const editor = editorRef.current;
+      if (editor) editor.setValue(sql);
+      runSqlForTab(tab.id, sql, source ?? title);
     },
+    [runSqlForTab],
+  );
+
+  const quoteIdent = useCallback(
+    (name: string) => `"${name.replace(/"/g, '""')}"`,
     [],
   );
 
+  const previewTable = useCallback(
+    (name: string, kind: "table" | "view") => {
+      // Left-clicking a sidebar entry opens it in a new tab whose title
+      // is the entity's name (Update 3). The default query previews the
+      // first 200 rows so the user can see data immediately.
+      const sql = `SELECT * FROM ${quoteIdent(name)} LIMIT 200;`;
+      openTabAndRun(
+        name,
+        sql,
+        `${kind === "view" ? "View" : "Table"}: ${name}`,
+      );
+    },
+    [openTabAndRun, quoteIdent],
+  );
+
   // ─── Sidebar context-menu actions ───────────────────────────────────
-  // Each handler accepts the entity `kind` so SchemaItem can dispatch
-  // any action through one uniform callback signature, and we use it
-  // to label the result-pane source.
+  // Each handler creates a new tab and runs the matching SQL into it
+  // so the action's results stay attached to that tab — switching back
+  // to it later restores both the SQL and the rendered result.
   const describeEntity = useCallback(
     (name: string, kind: "table" | "view") => {
-      const engine = engineRef.current;
-      if (!engine) return;
       const label = kind === "view" ? "View structure" : "Structure";
-      setStatusState("running");
-      const t0 = performance.now();
-      try {
-        const sets = engine.describeTable(name);
-        const elapsedMs = performance.now() - t0;
-        setResult({
-          sets,
-          elapsedMs,
-          source: `${label}: ${name}`,
-        });
-        setStatusState("ready");
-      } catch (err) {
-        const elapsedMs = performance.now() - t0;
-        const msg = err instanceof Error ? err.message : String(err);
-        setResult({
-          sets: [],
-          elapsedMs,
-          error: msg,
-          source: `${label}: ${name}`,
-        });
-        setStatusState("error");
-        window.setTimeout(() => setStatusState("ready"), 3000);
-      }
+      openTabAndRun(
+        `Structure: ${name}`,
+        `PRAGMA table_info(${quoteIdent(name)});`,
+        `${label}: ${name}`,
+      );
     },
-    [],
+    [openTabAndRun, quoteIdent],
   );
 
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
-      const engine = engineRef.current;
-      if (!engine) return;
       const label = kind === "view" ? "View row count" : "Row count";
-      setStatusState("running");
-      const t0 = performance.now();
-      try {
-        const sets = engine.countRows(name);
-        const elapsedMs = performance.now() - t0;
-        setResult({
-          sets,
-          elapsedMs,
-          source: `${label}: ${name}`,
-        });
-        setStatusState("ready");
-      } catch (err) {
-        const elapsedMs = performance.now() - t0;
-        const msg = err instanceof Error ? err.message : String(err);
-        setResult({
-          sets: [],
-          elapsedMs,
-          error: msg,
-          source: `${label}: ${name}`,
-        });
-        setStatusState("error");
-        window.setTimeout(() => setStatusState("ready"), 3000);
-      }
+      openTabAndRun(
+        `Count: ${name}`,
+        `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)};`,
+        `${label}: ${name}`,
+      );
     },
-    [],
+    [openTabAndRun, quoteIdent],
   );
 
   const copyEntityName = useCallback(
@@ -855,6 +880,28 @@ function SqlPlaygroundInner() {
     [showToast],
   );
 
+  const viewDDL = useCallback(
+    (name: string, kind: "table" | "view") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const sql = engine.getDDL(name);
+        if (!sql.trim()) {
+          showToast(
+            `No DDL recorded for ${kind === "view" ? "view" : "table"} "${name}".`,
+            "warn",
+          );
+          return;
+        }
+        setDdlDialog({ title: name, sql });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't read DDL: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
   // ─── Tab actions ────────────────────────────────────────────────────
   const addTab = useCallback(() => {
     const nextNum = tabs.length + 1;
@@ -868,17 +915,6 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, next);
     setActiveTabId(tab.id);
   }, [tabs, activeDbId]);
-
-  const addTabWithCode = useCallback(
-    (title: string, code: string) => {
-      const tab: QueryTab = { id: newTabId(), title, code };
-      const next = [...tabsRef.current, tab];
-      setTabs(next);
-      saveTabs(activeDbIdRef.current, next);
-      setActiveTabId(tab.id);
-    },
-    [],
-  );
 
   const closeTab = useCallback(
     (id: string) => {
@@ -981,9 +1017,20 @@ function SqlPlaygroundInner() {
       ...seed,
       id: newTabId(),
     }));
+    // Order matters: synchronously update the refs the editor's
+    // `change` listener reads from BEFORE we call `editor.setValue`.
+    // Otherwise the listener fires with stale `tabsRef`/`activeTabIdRef`
+    // values, computes a "next" tabs array against the OLD tabs, and
+    // calls setTabs with that — overwriting the fresh tabs we just
+    // committed and leaving the user with the previous tab list (with
+    // only its first entry's code clobbered). This was the exact
+    // symptom reported in Update 4.
+    tabsRef.current = fresh;
+    activeTabIdRef.current = fresh[0].id;
     setTabs(fresh);
     saveTabs(activeDbId, fresh);
     setActiveTabId(fresh[0].id);
+    setResultsByTab({});
     const editor = editorRef.current;
     if (editor) editor.setValue(fresh[0].code);
     showToast("Query tabs reset to defaults.");
@@ -1439,6 +1486,58 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        <Dialog.Root
+          open={ddlDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setDdlDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-ddl-popup">
+              <Dialog.Title className="confirm-title">
+                DDL: {ddlDialog?.title ?? ""}
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Read-only view of the original{" "}
+                <code>CREATE</code> statement(s) recorded in
+                <code> sqlite_master</code>.
+              </Dialog.Description>
+              <pre className="sql-ddl-code" tabIndex={0}>
+                {ddlDialog?.sql ?? ""}
+              </pre>
+              <div className="confirm-actions">
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-secondary"
+                  onClick={() => {
+                    if (
+                      ddlDialog &&
+                      typeof navigator !== "undefined" &&
+                      navigator.clipboard
+                    ) {
+                      navigator.clipboard
+                        .writeText(ddlDialog.sql)
+                        .then(() => showToast("Copied DDL to clipboard."))
+                        .catch(() =>
+                          showToast(
+                            "Couldn't copy to clipboard.",
+                            "warn",
+                          ),
+                        );
+                    }
+                  }}
+                >
+                  Copy
+                </button>
+                <Dialog.Close className="confirm-btn confirm-btn-primary">
+                  Close
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
@@ -1511,7 +1610,7 @@ function SqlPlaygroundInner() {
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
-                    onOpenInTab={addTabWithCode}
+                    onViewDDL={viewDDL}
                   />
                 ))}
                 {tables.length === 0 && (
@@ -1530,7 +1629,7 @@ function SqlPlaygroundInner() {
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
-                    onOpenInTab={addTabWithCode}
+                    onViewDDL={viewDDL}
                   />
                 ))}
                 {views.length === 0 && (
@@ -1555,71 +1654,8 @@ function SqlPlaygroundInner() {
 
           <div className="sql-panes" ref={panesRef}>
             <div className="sql-results-pane" ref={resultsPaneRef}>
-              <div className="pane-bar">
-                <span className="pane-label">
-                  Results
-                  {result && (
-                    <span className="sql-result-source">
-                      {" — "}
-                      {result.source}
-                    </span>
-                  )}
-                </span>
-                <div className="pane-bar-sep" />
-                {result && (
-                  <span className="sql-result-meta">
-                    {result.error ? (
-                      <span className="sql-result-meta-err">Error</span>
-                    ) : (
-                      <span className="sql-result-meta-ok">
-                        {result.sets.length === 0
-                          ? "OK"
-                          : `${result.sets.reduce(
-                              (acc, s) => acc + s.values.length,
-                              0,
-                            )} row${
-                              result.sets.reduce(
-                                (acc, s) => acc + s.values.length,
-                                0,
-                              ) === 1
-                                ? ""
-                                : "s"
-                            }`}
-                      </span>
-                    )}
-                    {" · "}
-                    {(result.elapsedMs / 1000).toFixed(3)}s
-                  </span>
-                )}
-                <button
-                  type="button"
-                  className="clear-btn"
-                  onClick={() => setResult(null)}
-                  title="Clear results"
-                  aria-label="Clear results"
-                >
-                  <Eraser size={13} aria-hidden="true" />
-                  <span>Clear</span>
-                </button>
-              </div>
-              <div className="sql-results-body">
-                <ResultView result={result} loading={!loaded} />
-              </div>
-              <DataslopeRunOverlay running={statusState === "running"} />
-            </div>
-
-            <div
-              className="sql-resizer"
-              ref={resizerRef}
-              role="separator"
-              aria-orientation="horizontal"
-              aria-label="Drag to resize results and editor"
-              title="Drag to resize"
-            />
-
-            <div className="sql-editor-pane">
-              <div className="sql-tabbar">
-                <div className="sql-tabs" role="tablist">
+              <div className="sql-tabbar" role="tablist">
+                <div className="sql-tabs">
                   {tabs.map((t) => (
                     <SqlTab
                       key={t.id}
@@ -1644,6 +1680,26 @@ function SqlPlaygroundInner() {
                   </button>
                 </div>
               </div>
+              <div className="sql-results-body">
+                <ResultView
+                  result={result}
+                  loading={!loaded}
+                  onClear={clearActiveTabResult}
+                />
+              </div>
+              <DataslopeRunOverlay running={statusState === "running"} />
+            </div>
+
+            <div
+              className="sql-resizer"
+              ref={resizerRef}
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label="Drag to resize results and editor"
+              title="Drag to resize"
+            />
+
+            <div className="sql-editor-pane">
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
               </div>
@@ -1816,10 +1872,65 @@ function SqlTab({
 function ResultView({
   result,
   loading,
+  onClear,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
+  onClear: () => void;
 }) {
+  // Pagination state lives at the ResultView level (one record per
+  // result-set index) so the pagers can be rendered in a footer that
+  // sits *outside* the horizontally/vertically scrolling content.
+  // Without this lift the pagination bar would scroll with the table —
+  // the very behaviour Updates 1 and 2 ask us to remove.
+  const [pageStates, setPageStates] = useState<
+    Record<number, { pageSize: number; page: number }>
+  >({});
+  const initialPageSize = useMemo(() => {
+    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
+    const saved = Number(
+      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+    );
+    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
+      ? saved
+      : DEFAULT_PAGE_SIZE;
+  }, []);
+
+  // Reset pagination whenever a new result lands. Identity-comparing
+  // against the result object is sufficient because `setResult` always
+  // creates a new object.
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setPageStates({});
+  }, [result]);
+
+  const getState = useCallback(
+    (idx: number) =>
+      pageStates[idx] ?? { pageSize: initialPageSize, page: 0 },
+    [pageStates, initialPageSize],
+  );
+
+  const setPage = useCallback((idx: number, page: number) => {
+    setPageStates((prev) => {
+      const cur = prev[idx] ?? { pageSize: initialPageSize, page: 0 };
+      return { ...prev, [idx]: { ...cur, page } };
+    });
+  }, [initialPageSize]);
+
+  const setPageSize = useCallback((idx: number, pageSize: number) => {
+    setPageStates((prev) => ({
+      ...prev,
+      [idx]: { pageSize, page: 0 },
+    }));
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(pageSize));
+      } catch {
+        // ignore quota errors
+      }
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="welcome">
@@ -1836,76 +1947,129 @@ function ResultView({
         <p>
           Press <kbd className="kbd">Run</kbd> or use the keyboard shortcut to
           execute the active tab. Click any table or view in the sidebar to
-          preview its rows.
+          open it in a new tab.
         </p>
       </div>
     );
   }
   if (result.error) {
     return (
-      <div className="sql-result-error">
-        <div className="sql-result-error-title">Query failed</div>
-        <pre className="sql-result-error-body">{result.error}</pre>
-      </div>
+      <>
+        <div className="sql-result-error">
+          <div className="sql-result-error-title">Query failed</div>
+          <pre className="sql-result-error-body">{result.error}</pre>
+        </div>
+        <ResultStatusFooter result={result} onClear={onClear} />
+      </>
     );
   }
   if (result.sets.length === 0) {
     return (
-      <div className="sql-result-ok">
-        Statement executed successfully — no rows returned.
-      </div>
+      <>
+        <div className="sql-result-ok">
+          Statement executed successfully — no rows returned.
+        </div>
+        <ResultStatusFooter result={result} onClear={onClear} />
+      </>
     );
   }
   return (
-    <div className="sql-result-sets">
-      {result.sets.map((set, idx) => (
-        <ResultTable key={idx} set={set} index={idx} />
-      ))}
+    <>
+      <div className="sql-result-sets">
+        {result.sets.map((set, idx) => {
+          const st = getState(idx);
+          const totalRows = set.values.length;
+          const effective =
+            st.pageSize > 0 ? st.pageSize : Math.max(totalRows, 1);
+          const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+          const safePage = Math.min(st.page, totalPages - 1);
+          const start = safePage * effective;
+          const visible =
+            st.pageSize > 0
+              ? set.values.slice(start, start + effective)
+              : set.values;
+          return (
+            <ResultTableBody
+              key={idx}
+              set={set}
+              index={idx}
+              visible={visible}
+              startIndex={start}
+            />
+          );
+        })}
+      </div>
+      <div className="sql-result-pagers">
+        {result.sets.map((set, idx) => {
+          const st = getState(idx);
+          return (
+            <ResultPager
+              key={idx}
+              set={set}
+              index={idx}
+              showSetLabel={result.sets.length > 1}
+              pageSize={st.pageSize}
+              page={st.page}
+              onPageChange={(p) => setPage(idx, p)}
+              onPageSizeChange={(s) => setPageSize(idx, s)}
+            />
+          );
+        })}
+        <ResultStatusFooter result={result} onClear={onClear} />
+      </div>
+    </>
+  );
+}
+
+function ResultStatusFooter({
+  result,
+  onClear,
+}: {
+  result: QueryRunResult;
+  onClear: () => void;
+}) {
+  const totalRows = result.sets.reduce((acc, s) => acc + s.values.length, 0);
+  return (
+    <div className="sql-result-status">
+      <span className="sql-result-status-source">{result.source}</span>
+      <span className="sql-result-status-meta">
+        {result.error ? (
+          <span className="sql-result-meta-err">Error</span>
+        ) : (
+          <span className="sql-result-meta-ok">
+            {result.sets.length === 0
+              ? "OK"
+              : `${totalRows} row${totalRows === 1 ? "" : "s"}`}
+          </span>
+        )}
+        {" · "}
+        {(result.elapsedMs / 1000).toFixed(3)}s
+      </span>
+      <button
+        type="button"
+        className="clear-btn"
+        onClick={onClear}
+        title="Clear results"
+        aria-label="Clear results"
+      >
+        <Eraser size={13} aria-hidden="true" />
+        <span>Clear</span>
+      </button>
     </div>
   );
 }
 
-function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
-  const totalRows = set.values.length;
-  const [pageSize, setPageSize] = useState<number>(() => {
-    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
-    const saved = Number(
-      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
-    );
-    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
-      ? saved
-      : DEFAULT_PAGE_SIZE;
-  });
-  const [page, setPage] = useState<number>(0);
-
-  // Reset to the first page whenever the underlying data changes (a
-  // fresh query lands here, or the user shrinks the page size below
-  // the current offset).
-  useEffect(() => {
-    /* eslint-disable-next-line react-hooks/set-state-in-effect */
-    setPage(0);
-  }, [set]);
-
-  const persistPageSize = useCallback((n: number) => {
-    setPageSize(n);
-    setPage(0);
-    if (typeof window === "undefined") return;
-    try {
-      localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(n));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // pageSize === 0 (the "All" option) disables pagination entirely.
-  const effectivePageSize = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
-  const totalPages = Math.max(1, Math.ceil(totalRows / effectivePageSize));
-  const safePage = Math.min(page, totalPages - 1);
-  const start = safePage * effectivePageSize;
-  const end = Math.min(totalRows, start + effectivePageSize);
-  const visible = pageSize > 0 ? set.values.slice(start, end) : set.values;
-  const showPager = totalRows > 0 && (pageSize === 0 || totalRows > pageSize);
-
+function ResultTableBody({
+  set,
+  index,
+  visible,
+  startIndex,
+}: {
+  set: QueryExecResult;
+  index: number;
+  visible: QueryExecResult["values"];
+  startIndex: number;
+}) {
   return (
     <div className="sql-result-set">
       {index > 0 && (
@@ -1922,7 +2086,7 @@ function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
           </thead>
           <tbody>
             {visible.map((row, ri) => (
-              <tr key={start + ri}>
+              <tr key={startIndex + ri}>
                 {row.map((v, ci) => (
                   <td
                     key={ci}
@@ -1936,100 +2100,135 @@ function ResultTable({ set, index }: { set: QueryExecResult; index: number }) {
           </tbody>
         </table>
       </div>
-      {showPager && (
-        <div className="sql-result-pager">
-          <span className="sql-result-pager-info">
-            {totalRows === 0
-              ? "0 rows"
-              : `Rows ${start + 1}–${end} of ${totalRows}`}
-          </span>
-          <div className="sql-result-pager-size">
-            <span>Rows per page</span>
-            <Select.Root
-              value={String(pageSize)}
-              onValueChange={(value) => persistPageSize(Number(value))}
-            >
-              <Select.Trigger
-                className="sql-result-pager-size-trigger"
-                aria-label="Rows per page"
-              >
-                <Select.Value>
-                  {PAGE_SIZE_OPTIONS.find((opt) => opt.value === pageSize)
-                    ?.label ?? String(pageSize)}
-                </Select.Value>
-                <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
-                  <polyline
-                    points="2,4 6,8 10,4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner sideOffset={4} alignItemWithTrigger={false}>
-                  <Select.Popup className="bui-select-popup">
-                    {PAGE_SIZE_OPTIONS.map((opt) => (
-                      <Select.Item
-                        key={opt.value}
-                        value={String(opt.value)}
-                        className="bui-select-item"
-                      >
-                        <Select.ItemText>{opt.label}</Select.ItemText>
-                      </Select.Item>
-                    ))}
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-          <div className="sql-result-pager-controls">
-            <button
-              type="button"
-              className="sql-result-pager-btn"
-              onClick={() => setPage(0)}
-              disabled={safePage === 0}
-              aria-label="First page"
-              title="First page"
-            >
-              «
-            </button>
-            <button
-              type="button"
-              className="sql-result-pager-btn"
-              onClick={() => setPage(Math.max(0, safePage - 1))}
-              disabled={safePage === 0}
-              aria-label="Previous page"
-              title="Previous page"
-            >
-              ‹
-            </button>
-            <span className="sql-result-pager-page">
-              {safePage + 1} / {totalPages}
-            </span>
-            <button
-              type="button"
-              className="sql-result-pager-btn"
-              onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
-              disabled={safePage >= totalPages - 1}
-              aria-label="Next page"
-              title="Next page"
-            >
-              ›
-            </button>
-            <button
-              type="button"
-              className="sql-result-pager-btn"
-              onClick={() => setPage(totalPages - 1)}
-              disabled={safePage >= totalPages - 1}
-              aria-label="Last page"
-              title="Last page"
-            >
-              »
-            </button>
-          </div>
-        </div>
+    </div>
+  );
+}
+
+function ResultPager({
+  set,
+  index,
+  showSetLabel,
+  pageSize,
+  page,
+  onPageChange,
+  onPageSizeChange,
+}: {
+  set: QueryExecResult;
+  index: number;
+  showSetLabel: boolean;
+  pageSize: number;
+  page: number;
+  onPageChange: (p: number) => void;
+  onPageSizeChange: (s: number) => void;
+}) {
+  const totalRows = set.values.length;
+  const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
+  const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+  const safePage = Math.min(page, totalPages - 1);
+  const start = safePage * effective;
+  const end = Math.min(totalRows, start + effective);
+  const showControls = totalRows > 0 && (pageSize === 0 || totalRows > pageSize);
+  if (!showControls && !showSetLabel) return null;
+
+  return (
+    <div className="sql-result-pager">
+      {showSetLabel && (
+        <span className="sql-result-pager-set">
+          Set #{index + 1}
+        </span>
       )}
+      <span className="sql-result-pager-info">
+        {totalRows === 0
+          ? "0 rows"
+          : `Rows ${start + 1}–${end} of ${totalRows}`}
+      </span>
+      <div className="sql-result-pager-size">
+        <span>Rows per page</span>
+        <Select.Root
+          value={String(pageSize)}
+          onValueChange={(value) => onPageSizeChange(Number(value))}
+        >
+          <Select.Trigger
+            className="sql-result-pager-size-trigger"
+            aria-label="Rows per page"
+          >
+            <Select.Value>
+              {PAGE_SIZE_OPTIONS.find((opt) => opt.value === pageSize)?.label ??
+                String(pageSize)}
+            </Select.Value>
+            <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
+              <polyline
+                points="2,4 6,8 10,4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Positioner sideOffset={4} alignItemWithTrigger={false}>
+              <Select.Popup className="bui-select-popup">
+                {PAGE_SIZE_OPTIONS.map((opt) => (
+                  <Select.Item
+                    key={opt.value}
+                    value={String(opt.value)}
+                    className="bui-select-item"
+                  >
+                    <Select.ItemText>{opt.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
+      </div>
+      <div className="sql-result-pager-controls">
+        <button
+          type="button"
+          className="sql-result-pager-btn"
+          onClick={() => onPageChange(0)}
+          disabled={safePage === 0}
+          aria-label="First page"
+          title="First page"
+        >
+          «
+        </button>
+        <button
+          type="button"
+          className="sql-result-pager-btn"
+          onClick={() => onPageChange(Math.max(0, safePage - 1))}
+          disabled={safePage === 0}
+          aria-label="Previous page"
+          title="Previous page"
+        >
+          ‹
+        </button>
+        <span className="sql-result-pager-page">
+          {safePage + 1} / {totalPages}
+        </span>
+        <button
+          type="button"
+          className="sql-result-pager-btn"
+          onClick={() =>
+            onPageChange(Math.min(totalPages - 1, safePage + 1))
+          }
+          disabled={safePage >= totalPages - 1}
+          aria-label="Next page"
+          title="Next page"
+        >
+          ›
+        </button>
+        <button
+          type="button"
+          className="sql-result-pager-btn"
+          onClick={() => onPageChange(totalPages - 1)}
+          disabled={safePage >= totalPages - 1}
+          aria-label="Last page"
+          title="Last page"
+        >
+          »
+        </button>
+      </div>
     </div>
   );
 }
@@ -2050,7 +2249,7 @@ interface SchemaItemProps {
   onCount: (name: string, kind: "table" | "view") => void;
   onCopy: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
-  onOpenInTab: (title: string, sql: string) => void;
+  onViewDDL: (name: string, kind: "table" | "view") => void;
 }
 
 function SchemaItem({
@@ -2061,7 +2260,7 @@ function SchemaItem({
   onCount,
   onCopy,
   onDrop,
-  onOpenInTab,
+  onViewDDL,
 }: SchemaItemProps) {
   const Icon = kind === "view" ? Eye : Table2;
   // SQL strings mirrored from the engine so the tab contents exactly
@@ -2076,7 +2275,7 @@ function SchemaItem({
             {...props}
             className="sql-tree-item"
             onClick={() => onPreview(name, kind)}
-            title={`Preview ${name} (right-click for more)`}
+            title={`Open ${name} in a new tab (right-click for more)`}
           >
             <Icon size={12} aria-hidden="true" />
             <span>{name}</span>
@@ -2088,42 +2287,31 @@ function SchemaItem({
           <ContextMenu.Popup className="bui-popup examples-dropdown">
             <ContextMenu.Item
               className="example-item"
-              onClick={() => {
-                onPreview(name, kind);
-                onOpenInTab(
-                  `Preview: ${name}`,
-                  `SELECT * FROM ${quotedName} LIMIT 200;`,
-                );
-              }}
+              onClick={() => onPreview(name, kind)}
             >
               <div className="ex-title">Preview Data</div>
               <div className="ex-desc">First 200 rows</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => {
-                onStructure(name, kind);
-                onOpenInTab(
-                  `Structure: ${name}`,
-                  `PRAGMA table_info(${quotedName});`,
-                );
-              }}
+              onClick={() => onStructure(name, kind)}
             >
               <div className="ex-title">View Structure</div>
               <div className="ex-desc">PRAGMA table_info({quotedName})</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => {
-                onCount(name, kind);
-                onOpenInTab(
-                  `Count: ${name}`,
-                  `SELECT COUNT(*) AS row_count FROM ${quotedName};`,
-                );
-              }}
+              onClick={() => onCount(name, kind)}
             >
               <div className="ex-title">Count Rows</div>
               <div className="ex-desc">SELECT COUNT(*)</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => onViewDDL(name, kind)}
+            >
+              <div className="ex-title">View DDL</div>
+              <div className="ex-desc">CREATE statement</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
