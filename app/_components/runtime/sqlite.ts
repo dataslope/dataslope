@@ -23,6 +23,75 @@ import { findSampleDatabase, type SqliteSampleDatabase } from "./sqliteSamples";
 
 export type { QueryExecResult } from "sql.js";
 
+/** Description of a single column inside a table, derived from
+ *  `PRAGMA table_info(...)`. Exposed to the UI so the schema sidebar
+ *  doesn't have to re-parse `QueryExecResult`. */
+export interface TableColumnInfo {
+  /** Column ordinal (`cid` from PRAGMA). */
+  cid: number;
+  /** Column name as declared in the CREATE TABLE statement. */
+  name: string;
+  /** Declared type, e.g. `INTEGER`, `TEXT`. May be empty for
+   *  type-less columns. */
+  type: string;
+  /** True when the column has a `NOT NULL` constraint. */
+  notNull: boolean;
+  /** Default value as recorded in `sqlite_master` (string form), or
+   *  `null` when no default was declared. */
+  defaultValue: string | null;
+  /** Position within the primary key (1-indexed). 0 means "not a
+   *  primary key column". */
+  pk: number;
+}
+
+/** Description of one column-level foreign-key relationship, derived
+ *  from `PRAGMA foreign_key_list(...)`. */
+export interface ForeignKeyInfo {
+  /** Source column on this table. */
+  from: string;
+  /** Referenced table. */
+  table: string;
+  /** Referenced column. */
+  to: string;
+}
+
+/** Specification of a single column passed to `rebuildTable`. */
+export interface ColumnSpec {
+  /** New column name. */
+  name: string;
+  /** SQLite type affinity (INTEGER / REAL / TEXT / BLOB / NUMERIC). */
+  type: string;
+  /** When true, render `NOT NULL` in the CREATE TABLE statement. */
+  notNull?: boolean;
+  /** When true, this column is part of the primary key. */
+  primaryKey?: boolean;
+  /** When true (only valid for a single-column INTEGER PRIMARY KEY),
+   *  add `AUTOINCREMENT`. */
+  autoIncrement?: boolean;
+  /** When true, render `UNIQUE` in the column definition. */
+  unique?: boolean;
+  /** Default value (raw SQL literal, e.g. `'foo'` or `42`). When
+   *  empty/undefined no default is rendered. */
+  defaultValue?: string;
+  /** Optional column-level foreign key. */
+  foreignKey?: { table: string; column: string };
+  /** When set, the column existed under this name on the original
+   *  table. Used by `rebuildTable` to copy data from `originalName`
+   *  into `name` even after a rename. */
+  originalName?: string;
+}
+
+/** Spec passed to `rebuildTable` describing the desired post-rebuild
+ *  shape of a table. */
+export interface TableRebuildSpec {
+  /** Current name of the table being modified. */
+  originalName: string;
+  /** Desired name after the rebuild (may equal `originalName`). */
+  newName: string;
+  /** Ordered list of columns the rebuilt table should have. */
+  columns: ColumnSpec[];
+}
+
 export interface SqliteEngine {
   /** Replace the active in-memory database with a fresh build of the
    *  given sample. Returns the active sample for convenience. */
@@ -50,6 +119,21 @@ export interface SqliteEngine {
    *  "Drop" action. The kind is restricted to a fixed allowlist so the
    *  resulting statement can never be coerced into something else. */
   dropEntity: (name: string, kind: "table" | "view") => void;
+  /** `DELETE FROM <name>` — clears every row of a table without
+   *  dropping the schema. SQLite has no `TRUNCATE` keyword; an
+   *  unqualified DELETE is the standard equivalent. */
+  truncateTable: (name: string) => void;
+  /** Structured form of `PRAGMA table_info(<name>)`. */
+  listColumns: (name: string) => TableColumnInfo[];
+  /** Structured form of `PRAGMA foreign_key_list(<name>)`. */
+  listForeignKeys: (name: string) => ForeignKeyInfo[];
+  /** Apply the SQLite "rebuild table" pattern for the given spec:
+   *  create a `<name>__new` with the new shape, copy over rows whose
+   *  source column still exists (matched by `originalName`), drop the
+   *  old table and rename the new one in place. Wrapped in a single
+   *  transaction with foreign-key enforcement disabled so referencing
+   *  tables aren't broken mid-flight. */
+  rebuildTable: (spec: TableRebuildSpec) => void;
   /** Returns the original DDL string (`CREATE TABLE …` / `CREATE VIEW
    *  …`) recorded in `sqlite_master.sql` for the given entity, plus
    *  the `CREATE INDEX` statements for any indexes defined on it.
@@ -92,6 +176,41 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
+const SAFE_TYPE = /^[A-Za-z_][A-Za-z0-9_ ()]*$/;
+
+/** Render one `ColumnSpec` into a column definition for use inside
+ *  `CREATE TABLE (...)`. Inline foreign keys are emitted via
+ *  `REFERENCES`. The output never trusts free-form identifiers — table
+ *  / column names are quoted, and the `type` keyword is checked
+ *  against a conservative allowlist before being inlined. */
+function renderColumnDef(col: ColumnSpec): string {
+  const parts: string[] = [quoteIdent(col.name)];
+  const type = col.type && SAFE_TYPE.test(col.type) ? col.type : "TEXT";
+  parts.push(type);
+  // For multi-column primary keys we emit a table-level constraint
+  // separately; here we only handle the single-column form so we can
+  // attach `AUTOINCREMENT`.
+  if (col.primaryKey && col.autoIncrement) {
+    parts.push("PRIMARY KEY AUTOINCREMENT");
+  }
+  if (col.notNull) parts.push("NOT NULL");
+  if (col.unique) parts.push("UNIQUE");
+  if (col.defaultValue !== undefined && col.defaultValue !== "") {
+    // The default value goes in raw so callers can use SQL literals
+    // (`'foo'`, `42`, `CURRENT_TIMESTAMP`). Surround simple bare
+    // identifiers / literals in single quotes when they don't already
+    // look like a SQL expression to keep the most common case ergonomic.
+    const v = col.defaultValue.trim();
+    parts.push(`DEFAULT ${v}`);
+  }
+  if (col.foreignKey && col.foreignKey.table && col.foreignKey.column) {
+    parts.push(
+      `REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`,
+    );
+  }
+  return parts.join(" ");
+}
+
 export async function createSqliteEngine(
   initialSampleId: string,
 ): Promise<SqliteEngine> {
@@ -108,6 +227,11 @@ export async function createSqliteEngine(
       }
     }
     db = new SQL.Database();
+    // Enforce foreign-key constraints declared in the sample schema.
+    // SQLite ships with this off by default for backwards compatibility,
+    // so we opt in once per database build. The `rebuildTable` flow
+    // toggles it off/on around its own work.
+    db.run("PRAGMA foreign_keys = ON;");
     db.run(sample.schema);
     sample.seed(db);
     active = sample;
@@ -179,6 +303,123 @@ export async function createSqliteEngine(
       // looser-typed values from UI events.
       const k = kind === "view" ? "VIEW" : "TABLE";
       require().run(`DROP ${k} IF EXISTS ${quoteIdent(name)}`);
+    },
+    truncateTable(name: string) {
+      // SQLite has no `TRUNCATE` keyword. An unqualified DELETE is
+      // optimised internally to drop all rows in one go.
+      require().run(`DELETE FROM ${quoteIdent(name)}`);
+    },
+    listColumns(name: string) {
+      const rows = require().exec(
+        `PRAGMA table_info(${quoteIdent(name)})`,
+      );
+      if (rows.length === 0) return [];
+      return rows[0].values.map((row) => ({
+        cid: Number(row[0]),
+        name: String(row[1]),
+        type: String(row[2] ?? ""),
+        notNull: Number(row[3]) !== 0,
+        defaultValue: row[4] === null || row[4] === undefined
+          ? null
+          : String(row[4]),
+        pk: Number(row[5]),
+      }));
+    },
+    listForeignKeys(name: string) {
+      const rows = require().exec(
+        `PRAGMA foreign_key_list(${quoteIdent(name)})`,
+      );
+      if (rows.length === 0) return [];
+      return rows[0].values.map((row) => ({
+        // Columns: id, seq, table, from, to, on_update, on_delete, match
+        from: String(row[3]),
+        table: String(row[2]),
+        to: String(row[4]),
+      }));
+    },
+    rebuildTable(spec: TableRebuildSpec) {
+      const d = require();
+      if (spec.columns.length === 0) {
+        throw new Error("A table must have at least one column.");
+      }
+      // Sanity-check column names: must be non-empty and unique
+      // (case-insensitively, matching SQLite's identifier comparison).
+      const seen = new Set<string>();
+      for (const col of spec.columns) {
+        const trimmed = col.name.trim();
+        if (!trimmed) throw new Error("Column names cannot be empty.");
+        const key = trimmed.toLowerCase();
+        if (seen.has(key)) {
+          throw new Error(`Duplicate column name: ${trimmed}.`);
+        }
+        seen.add(key);
+      }
+
+      const pkCols = spec.columns.filter((c) => c.primaryKey);
+      const useTablePk =
+        pkCols.length > 1 ||
+        (pkCols.length === 1 && !pkCols[0].autoIncrement);
+
+      const defs: string[] = spec.columns.map((c) => {
+        // For multi-column PKs we drop the per-column AUTOINCREMENT
+        // so we can emit a single table-level PRIMARY KEY clause.
+        if (useTablePk) {
+          return renderColumnDef({ ...c, primaryKey: false, autoIncrement: false });
+        }
+        return renderColumnDef(c);
+      });
+      if (useTablePk) {
+        defs.push(
+          `PRIMARY KEY (${pkCols.map((c) => quoteIdent(c.name)).join(", ")})`,
+        );
+      }
+
+      // Build the column copy list: any column whose `originalName`
+      // existed in the prior table maps over directly. New columns are
+      // omitted so SQLite uses their declared default (or NULL).
+      const existing = new Set(
+        require()
+          .exec(`PRAGMA table_info(${quoteIdent(spec.originalName)})`)
+          .flatMap((r) => r.values.map((row) => String(row[1]))),
+      );
+      const sourceCols: string[] = [];
+      const targetCols: string[] = [];
+      for (const c of spec.columns) {
+        const src = c.originalName ?? c.name;
+        if (existing.has(src)) {
+          sourceCols.push(quoteIdent(src));
+          targetCols.push(quoteIdent(c.name));
+        }
+      }
+
+      const tmpName = `${spec.newName}__new`;
+      // Compose the multi-statement script. We toggle foreign keys off
+      // explicitly inside the transaction so referencing tables stay
+      // consistent during the rebuild.
+      d.run("PRAGMA foreign_keys = OFF;");
+      d.run("BEGIN");
+      try {
+        d.run(`CREATE TABLE ${quoteIdent(tmpName)} (${defs.join(", ")})`);
+        if (sourceCols.length > 0) {
+          d.run(
+            `INSERT INTO ${quoteIdent(tmpName)} (${targetCols.join(", ")}) SELECT ${sourceCols.join(", ")} FROM ${quoteIdent(spec.originalName)}`,
+          );
+        }
+        d.run(`DROP TABLE ${quoteIdent(spec.originalName)}`);
+        d.run(
+          `ALTER TABLE ${quoteIdent(tmpName)} RENAME TO ${quoteIdent(spec.newName)}`,
+        );
+        d.run("COMMIT");
+      } catch (err) {
+        try {
+          d.run("ROLLBACK");
+        } catch {
+          // ignore rollback failure
+        }
+        throw err;
+      } finally {
+        d.run("PRAGMA foreign_keys = ON;");
+      }
     },
     getDDL(name: string) {
       // `sqlite_master.sql` already stores the original CREATE

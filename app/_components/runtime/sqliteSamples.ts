@@ -36,8 +36,21 @@ export interface SqliteSampleDatabase {
 
 // ────────────────────────────────────────────────────────────────────────
 // Sample 1: credit_card_transactions.db
-// Ported verbatim from public/SQL Playground.html so existing users see
-// the same data they were drafting against.
+// Ported from public/SQL Playground.html, then extended with foreign
+// keys, indices, and triggers so the playground can showcase the full
+// suite of relational features. The engine enables `PRAGMA
+// foreign_keys = ON` at init, so the FOREIGN KEY clauses below are
+// actually enforced — references must stay consistent on every insert.
+// Notable additions:
+//   - cards.user_id              REFERENCES users(user_id)
+//   - transactions.user_id       REFERENCES users(user_id)
+//   - transactions.card_id       REFERENCES cards(card_id)
+//   - transactions.vendor_id     REFERENCES vendors(vendor_id)
+//   - five indices on the busy join / filter columns
+//   - two AFTER INSERT/DELETE triggers keeping users.num_credit_cards
+//     in sync with the actual count of rows in the cards table
+//   - one BEFORE INSERT trigger that rejects non-fraud transactions
+//     with a negative amount
 // ────────────────────────────────────────────────────────────────────────
 
 const CC_SCHEMA = `
@@ -48,23 +61,55 @@ const CC_SCHEMA = `
     zipcode TEXT, annual_income INTEGER, total_debt INTEGER,
     FICO_score INTEGER, num_credit_cards INTEGER
   );
+  CREATE TABLE vendors (
+    vendor_id INTEGER PRIMARY KEY,
+    name TEXT, category TEXT, city TEXT, state TEXT, country TEXT
+  );
   CREATE TABLE cards (
     card_id INTEGER PRIMARY KEY,
-    user_id INTEGER, card_brand TEXT, card_type TEXT,
+    user_id INTEGER REFERENCES users(user_id),
+    card_brand TEXT, card_type TEXT,
     credit_limit INTEGER, acct_open_date TEXT,
     expires TEXT, has_chip INTEGER
   );
   CREATE TABLE transactions (
     transaction_id INTEGER PRIMARY KEY,
-    user_id INTEGER, card_id INTEGER,
+    user_id INTEGER REFERENCES users(user_id),
+    card_id INTEGER REFERENCES cards(card_id),
+    vendor_id INTEGER REFERENCES vendors(vendor_id),
     amount REAL, transaction_date TEXT,
     merchant_name TEXT, merchant_city TEXT, merchant_state TEXT,
     merchant_country TEXT, category TEXT, is_fraud INTEGER
   );
-  CREATE TABLE vendors (
-    vendor_id INTEGER PRIMARY KEY,
-    name TEXT, category TEXT, city TEXT, state TEXT, country TEXT
-  );
+  CREATE INDEX idx_cards_user_id ON cards(user_id);
+  CREATE INDEX idx_transactions_user_id ON transactions(user_id);
+  CREATE INDEX idx_transactions_card_id ON transactions(card_id);
+  CREATE INDEX idx_transactions_vendor_id ON transactions(vendor_id);
+  CREATE INDEX idx_transactions_date ON transactions(transaction_date);
+  CREATE TRIGGER trg_users_card_count_ai
+    AFTER INSERT ON cards
+    BEGIN
+      UPDATE users
+        SET num_credit_cards = (
+          SELECT COUNT(*) FROM cards WHERE user_id = NEW.user_id
+        )
+        WHERE user_id = NEW.user_id;
+    END;
+  CREATE TRIGGER trg_users_card_count_ad
+    AFTER DELETE ON cards
+    BEGIN
+      UPDATE users
+        SET num_credit_cards = (
+          SELECT COUNT(*) FROM cards WHERE user_id = OLD.user_id
+        )
+        WHERE user_id = OLD.user_id;
+    END;
+  CREATE TRIGGER trg_transactions_block_negative
+    BEFORE INSERT ON transactions
+    WHEN NEW.amount < 0 AND COALESCE(NEW.is_fraud, 0) = 0
+    BEGIN
+      SELECT RAISE(ABORT, 'Non-fraud transactions must have amount >= 0');
+    END;
   CREATE VIEW foreign_transactions AS
     SELECT t.*, u.name as user_name
     FROM transactions t
@@ -121,6 +166,32 @@ function seedCreditCard(db: Database): void {
   ];
   bulkInsert(db, "INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", users);
 
+  const vendors: Row[] = [
+    [1, "Amazon", "E-Commerce", "Seattle", "WA", "US"],
+    [2, "Walmart", "Retail", "Bentonville", "AR", "US"],
+    [3, "Target", "Retail", "Minneapolis", "MN", "US"],
+    [4, "Starbucks", "Food & Beverage", "Seattle", "WA", "US"],
+    [5, "Shell", "Gas Station", "Houston", "TX", "US"],
+    [6, "Netflix", "Entertainment", "Los Gatos", "CA", "US"],
+    [7, "Apple Store", "Electronics", "Cupertino", "CA", "US"],
+    [8, "Airbnb", "Travel", "Paris", "", "FR"],
+    [9, "Uber", "Transportation", "San Francisco", "CA", "US"],
+    [10, "Whole Foods", "Grocery", "Austin", "TX", "US"],
+    [11, "Delta Airlines", "Travel", "Atlanta", "GA", "US"],
+    [12, "Booking.com", "Travel", "Amsterdam", "", "NL"],
+    [13, "Home Depot", "Hardware", "Atlanta", "GA", "US"],
+    [14, "Spotify", "Entertainment", "Stockholm", "", "SE"],
+    [15, "McDonald's", "Food & Beverage", "Chicago", "IL", "US"],
+  ];
+  bulkInsert(db, "INSERT INTO vendors VALUES (?,?,?,?,?,?)", vendors);
+
+  // Vendor lookup keyed by merchant name so the new transactions.vendor_id
+  // FK can be backfilled deterministically from the existing curated and
+  // generated transaction rows. Names without a vendor row are inserted
+  // as NULL so the FK remains satisfied.
+  const vendorByName = new Map<string, number>();
+  for (const v of vendors) vendorByName.set(String(v[1]), Number(v[0]));
+
   const cards: Row[] = [
     [1, 1, "Visa", "Credit", 12000, "2010-03-15", "2026-03", 1],
     [2, 1, "Mastercard", "Debit", 5000, "2015-07-01", "2027-07", 1],
@@ -144,25 +215,6 @@ function seedCreditCard(db: Database): void {
     [20, 17, "Visa", "Credit", 16000, "2013-04-25", "2025-04", 1],
   ];
   bulkInsert(db, "INSERT INTO cards VALUES (?,?,?,?,?,?,?,?)", cards);
-
-  const vendors: Row[] = [
-    [1, "Amazon", "E-Commerce", "Seattle", "WA", "US"],
-    [2, "Walmart", "Retail", "Bentonville", "AR", "US"],
-    [3, "Target", "Retail", "Minneapolis", "MN", "US"],
-    [4, "Starbucks", "Food & Beverage", "Seattle", "WA", "US"],
-    [5, "Shell", "Gas Station", "Houston", "TX", "US"],
-    [6, "Netflix", "Entertainment", "Los Gatos", "CA", "US"],
-    [7, "Apple Store", "Electronics", "Cupertino", "CA", "US"],
-    [8, "Airbnb", "Travel", "Paris", "", "FR"],
-    [9, "Uber", "Transportation", "San Francisco", "CA", "US"],
-    [10, "Whole Foods", "Grocery", "Austin", "TX", "US"],
-    [11, "Delta Airlines", "Travel", "Atlanta", "GA", "US"],
-    [12, "Booking.com", "Travel", "Amsterdam", "", "NL"],
-    [13, "Home Depot", "Hardware", "Atlanta", "GA", "US"],
-    [14, "Spotify", "Entertainment", "Stockholm", "", "SE"],
-    [15, "McDonald's", "Food & Beverage", "Chicago", "IL", "US"],
-  ];
-  bulkInsert(db, "INSERT INTO vendors VALUES (?,?,?,?,?,?)", vendors);
 
   const transactions: Row[] = [
     [1, 1, 1, 127.5, "2024-01-05", "Amazon", "Seattle", "WA", "US", "E-Commerce", 0],
@@ -277,10 +329,20 @@ function seedCreditCard(db: Database): void {
     ]);
   }
 
+  // Append the vendor_id column to every row by looking up
+  // merchant_name in the vendors map. Falls back to NULL when the
+  // merchant has no vendor row, which keeps the FK constraint
+  // satisfied (NULL is always permitted by FOREIGN KEY in SQLite).
+  const transactionsWithVendor: Row[] = transactions.map((row) => {
+    const merchantName = String(row[5] ?? "");
+    const vendorId = vendorByName.get(merchantName) ?? null;
+    return [...row, vendorId];
+  });
+
   bulkInsert(
     db,
-    "INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-    transactions,
+    "INSERT INTO transactions (transaction_id, user_id, card_id, amount, transaction_date, merchant_name, merchant_city, merchant_state, merchant_country, category, is_fraud, vendor_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+    transactionsWithVendor,
   );
 }
 
