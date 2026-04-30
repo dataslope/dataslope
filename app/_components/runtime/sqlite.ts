@@ -103,6 +103,13 @@ export interface SqliteEngine {
   listTables: () => string[];
   /** Names of every view in the active database. */
   listViews: () => string[];
+  /** Names of every user-defined index in the active database. Built-in
+   *  auto-indexes (created implicitly by `PRIMARY KEY` / `UNIQUE`) are
+   *  excluded — they have no `CREATE INDEX` statement and aren't
+   *  meaningful to the user. */
+  listIndexes: () => string[];
+  /** Names of every trigger in the active database. */
+  listTriggers: () => string[];
   /** `SELECT * FROM "<name>" LIMIT <limit>` against the active
    *  database. Identifier is quoted to defend against names that
    *  collide with reserved words; sql.js does not expose a parameter
@@ -115,10 +122,14 @@ export interface SqliteEngine {
   /** `SELECT COUNT(*) FROM <name>` — used by the sidebar context-menu
    *  "Count Rows" action. */
   countRows: (name: string) => QueryExecResult[];
-  /** `DROP TABLE`/`DROP VIEW` — used by the sidebar context-menu
-   *  "Drop" action. The kind is restricted to a fixed allowlist so the
-   *  resulting statement can never be coerced into something else. */
-  dropEntity: (name: string, kind: "table" | "view") => void;
+  /** `DROP TABLE`/`DROP VIEW`/`DROP INDEX`/`DROP TRIGGER` — used by
+   *  the sidebar context-menu "Drop" action. The kind is restricted to
+   *  a fixed allowlist so the resulting statement can never be coerced
+   *  into something else. */
+  dropEntity: (
+    name: string,
+    kind: "table" | "view" | "index" | "trigger",
+  ) => void;
   /** `DELETE FROM <name>` — clears every row of a table without
    *  dropping the schema. SQLite has no `TRUNCATE` keyword; an
    *  unqualified DELETE is the standard equivalent. */
@@ -244,13 +255,26 @@ export async function createSqliteEngine(
     return db;
   }
 
-  function listFromMaster(type: "table" | "view"): string[] {
+  function listFromMaster(
+    type: "table" | "view" | "index" | "trigger",
+  ): string[] {
     // Defensive allowlist even though the TS signature narrows the
     // input — keeps the implementation robust if the function is ever
     // re-exported or called from looser-typed code.
-    const kind = type === "view" ? "view" : "table";
+    const kind =
+      type === "view"
+        ? "view"
+        : type === "index"
+          ? "index"
+          : type === "trigger"
+            ? "trigger"
+            : "table";
+    // Indexes carry an extra filter: skip auto-indexes (those whose
+    // `sql` is NULL — they were created implicitly by PRIMARY KEY /
+    // UNIQUE constraints and have no user-visible DDL).
+    const extra = kind === "index" ? " AND sql IS NOT NULL" : "";
     const res = require().exec(
-      `SELECT name FROM sqlite_master WHERE type = '${kind}' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
+      `SELECT name FROM sqlite_master WHERE type = '${kind}' AND name NOT LIKE 'sqlite_%'${extra} ORDER BY name`,
     );
     if (res.length === 0) return [];
     return res[0].values.map((row) => String(row[0]));
@@ -269,6 +293,12 @@ export async function createSqliteEngine(
     },
     listViews() {
       return listFromMaster("view");
+    },
+    listIndexes() {
+      return listFromMaster("index");
+    },
+    listTriggers() {
+      return listFromMaster("trigger");
     },
     previewTable(name: string, limit = 200) {
       // The table name is a SQLite identifier — sql.js does not allow
@@ -297,11 +327,18 @@ export async function createSqliteEngine(
         `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)}`,
       );
     },
-    dropEntity(name: string, kind: "table" | "view") {
+    dropEntity(name: string, kind: "table" | "view" | "index" | "trigger") {
       // Restrict `kind` to the fixed allowlist defensively even though
       // the TS signature narrows the input — callers may forward
       // looser-typed values from UI events.
-      const k = kind === "view" ? "VIEW" : "TABLE";
+      const k =
+        kind === "view"
+          ? "VIEW"
+          : kind === "index"
+            ? "INDEX"
+            : kind === "trigger"
+              ? "TRIGGER"
+              : "TABLE";
       require().run(`DROP ${k} IF EXISTS ${quoteIdent(name)}`);
     },
     truncateTable(name: string) {
