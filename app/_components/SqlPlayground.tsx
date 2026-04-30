@@ -1187,11 +1187,11 @@ function SqlPlaygroundInner() {
         sample.filename && /\.sqlite$/i.test(sample.filename)
           ? sample.filename
           : `${sample.id || "database"}.sqlite`;
-      // Wrap the typed array in a fresh ArrayBuffer slice so the Blob
-      // owns its own copy — sql.js's internal buffer can be reused on
-      // the next exec(), so we mustn't keep a live reference to it.
-      const buf = bytes.slice().buffer;
-      const blob = new Blob([buf], { type: "application/vnd.sqlite3" });
+      // `Uint8Array.slice()` returns a new typed array backed by a
+      // *fresh* ArrayBuffer, so the Blob owns its own copy of the
+      // bytes. sql.js may reuse its internal buffer on the next
+      // `exec()`, which would otherwise corrupt the in-flight blob.
+      const blob = new Blob([bytes.slice()], { type: "application/vnd.sqlite3" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -2811,8 +2811,6 @@ function ResultView({
       </>
     );
   }
-  const pendingSet =
-    pendingDelete !== null ? result.sets[pendingDelete] : undefined;
   const pendingCount =
     pendingDelete !== null
       ? selectedByIndex[pendingDelete]?.size ?? 0
@@ -2891,9 +2889,7 @@ function ResultView({
             <AlertDialog.Description className="confirm-desc">
               {pendingCount} row{pendingCount === 1 ? "" : "s"} will be
               permanently deleted from{" "}
-              <strong>
-                {sourceTable ?? pendingSet?.columns[0] ?? "the table"}
-              </strong>
+              <strong>{sourceTable ?? "this table"}</strong>
               . The change is in-memory only and will be undone next page
               load, but cannot be reversed within this session.
             </AlertDialog.Description>
