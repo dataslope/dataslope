@@ -58,12 +58,13 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
+import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
+  ArrowDownToLine,
   ChevronDown,
   ChevronRight,
   Clock,
-  Download,
   Eraser,
   Eye,
   Database,
@@ -1885,6 +1886,33 @@ function SqlPlaygroundInner() {
           </div>
           <div className="header-sep" />
           <div className="header-actions desktop-only">
+            <Menu.Root>
+              <Menu.Trigger
+                className="header-btn"
+                title="Export database"
+                aria-label="Export"
+                disabled={!loaded}
+              >
+                <ArrowDownToLine size={14} aria-hidden="true" />
+                <span className="btn-label">Export</span>
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner sideOffset={6} align="start">
+                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={exportDatabase}
+                    >
+                      <span className="ext-badge">.sqlite</span>
+                      <div className="export-item-text">
+                        <div className="ex-title">SQLite Database</div>
+                        <div className="ex-desc">Download as .sqlite</div>
+                      </div>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
@@ -2256,17 +2284,6 @@ function SqlPlaygroundInner() {
                     </Select.Positioner>
                   </Select.Portal>
                 </Select.Root>
-                <button
-                  type="button"
-                  className="sql-db-export-btn"
-                  onClick={exportDatabase}
-                  disabled={!loaded}
-                  title="Export database as .sqlite file"
-                  aria-label="Export database as .sqlite file"
-                >
-                  <Download size={13} aria-hidden="true" />
-                  <span>Export</span>
-                </button>
               </div>
             </div>
 
