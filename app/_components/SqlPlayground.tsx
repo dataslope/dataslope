@@ -518,10 +518,12 @@ function SqlPlaygroundInner() {
   // boot. Kept in a ref so dialogs that mount their own read-only
   // editors (DDL viewer) can re-use the already-loaded module without
   // a second async import. Mirrored into state for use during render
-  // (see `cmApi`), since the React rules of hooks forbid reading
+  // (see `cmApiState`), since the React rules of hooks forbid reading
   // `ref.current` during render.
   const codeMirrorApiRef = useRef<CodeMirrorAPI | null>(null);
-  const [cmApi, setCmApi] = useState<CodeMirrorAPI | null>(null);
+  const [cmApiState, setCmApiState] = useState<{ api: CodeMirrorAPI } | null>(
+    null,
+  );
   // Render-time view of `engineRef`. Set once the engine boot effect
   // resolves so child components (e.g. ModifyStructureForm) can call
   // engine helpers without breaking the React refs rule.
@@ -624,7 +626,7 @@ function SqlPlaygroundInner() {
         const CM = (codeMirrorMod.default ??
           codeMirrorMod) as unknown as CodeMirrorAPI;
         codeMirrorApiRef.current = CM;
-        setCmApi(() => CM);
+        setCmApiState({ api: CM });
         if (textareaRef.current && !editorRef.current) {
           const initialTheme =
             getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
@@ -2032,7 +2034,7 @@ function SqlPlaygroundInner() {
               </Dialog.Description>
               <DdlViewer
                 sql={ddlDialog?.sql ?? ""}
-                cmApi={cmApi}
+                cmApi={cmApiState?.api ?? null}
                 theme={editorTheme}
               />
               <div className="confirm-actions">
