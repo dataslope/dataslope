@@ -299,6 +299,12 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const DEFAULT_PAGE_SIZE = 50;
 
+/** Delay before treating a sidebar-row click as a single click. The
+ *  schema rows distinguish single-click (toggle expand) from
+ *  double-click (preview) by deferring the toggle for slightly less
+ *  than the OS-typical double-click threshold (≤ 250ms). */
+const SINGLE_CLICK_DELAY_MS = 220;
+
 // ────────────────────────────────────────────────────────────────────────
 // Component
 // ────────────────────────────────────────────────────────────────────────
@@ -2758,10 +2764,7 @@ function ResultPager({
       )}
       <span className="sql-result-pager-info">
         {totalRows === 0 ? (
-          <>
-            0 rows of{" "}
-            <strong className="sql-result-pager-total">0</strong>
-          </>
+          "0 rows"
         ) : (
           <>
             Rows {start + 1}–{end} of{" "}
@@ -3304,7 +3307,9 @@ function SchemaItem({
   // delay a double-click would also toggle the row's expanded state
   // (which the user explicitly does not want). We defer the toggle by
   // a short window; if a `dblclick` arrives in that window we cancel
-  // the pending toggle and run `onPreview` instead.
+  // the pending toggle and run `onPreview` instead. The 220ms window
+  // sits a hair under the OS-typical double-click threshold (≤ 250ms)
+  // so the single-click path still feels snappy.
   const clickTimerRef = useRef<number | null>(null);
   useEffect(() => {
     return () => {
@@ -3321,7 +3326,7 @@ function SchemaItem({
     clickTimerRef.current = window.setTimeout(() => {
       clickTimerRef.current = null;
       onToggleExpanded(name);
-    }, 220);
+    }, SINGLE_CLICK_DELAY_MS);
   }, [name, onToggleExpanded]);
   const handleDoubleClick = useCallback(() => {
     if (clickTimerRef.current !== null) {
