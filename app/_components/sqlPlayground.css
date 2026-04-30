@@ -785,7 +785,7 @@
   width: 28px;
   min-height: 30px;
   cursor: pointer;
-  flex: 0 0 28px;
+  flex-shrink: 0;
 }
 
 .sql-tab-add:hover {
