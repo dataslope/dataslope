@@ -61,9 +61,11 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
   ChevronDown,
   ChevronRight,
+  Clock,
   Eraser,
   Eye,
   Database,
+  Hash,
   KeyRound,
   Link as LinkIcon,
   Play,
@@ -71,6 +73,7 @@ import {
   Table2,
   Trash2,
   X,
+  Zap,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
@@ -296,6 +299,12 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const DEFAULT_PAGE_SIZE = 50;
 
+/** Delay before treating a sidebar-row click as a single click. The
+ *  schema rows distinguish single-click (toggle expand) from
+ *  double-click (preview) by deferring the toggle for slightly less
+ *  than the OS-typical double-click threshold (≤ 250ms). */
+const SINGLE_CLICK_DELAY_MS = 220;
+
 // ────────────────────────────────────────────────────────────────────────
 // Component
 // ────────────────────────────────────────────────────────────────────────
@@ -421,6 +430,8 @@ function SqlPlaygroundInner() {
   );
   const [tables, setTables] = useState<string[]>([]);
   const [views, setViews] = useState<string[]>([]);
+  const [indexes, setIndexes] = useState<string[]>([]);
+  const [triggers, setTriggers] = useState<string[]>([]);
   // Per-entity column cache, populated lazily when the user expands a
   // sidebar row. Keyed by entity name. Refreshed any time the engine
   // performs DDL (covers Modify Structure / Truncate / Drop). Using a
@@ -437,6 +448,8 @@ function SqlPlaygroundInner() {
   // reloads and database switches.
   const [tablesSectionExpanded, setTablesSectionExpanded] = useState(true);
   const [viewsSectionExpanded, setViewsSectionExpanded] = useState(true);
+  const [indexesSectionExpanded, setIndexesSectionExpanded] = useState(false);
+  const [triggersSectionExpanded, setTriggersSectionExpanded] = useState(false);
   const [expandedEntities, setExpandedEntities] = useState<Set<string>>(
     () => new Set<string>(),
   );
@@ -665,6 +678,8 @@ function SqlPlaygroundInner() {
         setActiveDbId(sample.id);
         setTables(engine.listTables());
         setViews(engine.listViews());
+        setIndexes(engine.listIndexes());
+        setTriggers(engine.listTriggers());
 
         // Initialise the editor with the active tab's contents.
         const editor = editorRef.current;
@@ -811,6 +826,8 @@ function SqlPlaygroundInner() {
       }
       setTables(engine.listTables());
       setViews(engine.listViews());
+      setIndexes(engine.listIndexes());
+      setTriggers(engine.listTriggers());
 
       const newTabs = sample.defaultTabs.map((seed) => ({
         ...seed,
@@ -871,6 +888,8 @@ function SqlPlaygroundInner() {
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
         setTables(engine.listTables());
         setViews(engine.listViews());
+        setIndexes(engine.listIndexes());
+        setTriggers(engine.listTriggers());
         // Drop cached column metadata wholesale — the safest assumption
         // after arbitrary user SQL is that anything could have changed.
         setColumnsByEntity({});
@@ -1010,10 +1029,58 @@ function SqlPlaygroundInner() {
         engine.dropEntity(name, kind);
         setTables(engine.listTables());
         setViews(engine.listViews());
+        setIndexes(engine.listIndexes());
+        setTriggers(engine.listTriggers());
         showToast(`Dropped ${label} "${name}".`);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Drop failed: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  // Drop / view-DDL helpers for leaf sidebar entries (indexes,
+  // triggers). Kept separate from `dropEntity` / `viewDDL` so the
+  // existing table/view code paths stay strongly typed against
+  // "table" | "view".
+  const dropLeafEntity = useCallback(
+    (name: string, kind: "index" | "trigger") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (typeof window !== "undefined") {
+        const ok = window.confirm(
+          `Drop ${kind} "${name}"? This change is in-memory only and will be undone next page load.`,
+        );
+        if (!ok) return;
+      }
+      try {
+        engine.dropEntity(name, kind);
+        setIndexes(engine.listIndexes());
+        setTriggers(engine.listTriggers());
+        showToast(`Dropped ${kind} "${name}".`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Drop failed: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const viewLeafDDL = useCallback(
+    (name: string, kind: "index" | "trigger") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const sql = engine.getDDL(name);
+        if (!sql.trim()) {
+          showToast(`No DDL recorded for ${kind} "${name}".`, "warn");
+          return;
+        }
+        setDdlDialog({ title: name, sql });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't read DDL: ${msg}`, "warn");
       }
     },
     [showToast],
@@ -1170,11 +1237,6 @@ function SqlPlaygroundInner() {
           next.delete(name);
         } else {
           next.add(name);
-          // Lazy-load metadata the first time the row is expanded.
-          if (!columnsByEntity[name]) {
-            // Fire & forget — refreshEntityMetadata is synchronous.
-            refreshEntityMetadata(name);
-          }
         }
         // Persist the (now-mutated) set so it survives reloads.
         try {
@@ -1187,9 +1249,30 @@ function SqlPlaygroundInner() {
         }
         return next;
       });
+      // Metadata loading is handled by a dedicated effect that watches
+      // `expandedEntities` and `columnsByEntity` — keeping the side
+      // effect outside the state updater is what guarantees the row's
+      // column list reappears after `runSqlForTab` wipes the cache
+      // (e.g. after a sidebar preview), instead of getting stuck on
+      // "Loading…" until the user collapses and re-expands the row.
     },
-    [columnsByEntity, refreshEntityMetadata],
+    [],
   );
+
+  // Lazy-load (and re-load) metadata for every currently-expanded
+  // sidebar entity that has no cached `columnsByEntity` entry. This
+  // is the single source of truth for "which expanded rows still need
+  // their PRAGMA results fetched", so it correctly recovers when the
+  // cache is wiped wholesale by `runSqlForTab` or a database switch.
+  useEffect(() => {
+    if (expandedEntities.size === 0) return;
+    if (!engineRef.current) return;
+    for (const name of expandedEntities) {
+      if (columnsByEntity[name] === undefined) {
+        refreshEntityMetadata(name);
+      }
+    }
+  }, [expandedEntities, columnsByEntity, refreshEntityMetadata]);
 
   // Modify Structure: prime the drawer from the current column / FK
   // info for `name` and open it. Each draft column gets a fresh local
@@ -1269,6 +1352,8 @@ function SqlPlaygroundInner() {
       engine.rebuildTable(spec);
       setTables(engine.listTables());
       setViews(engine.listViews());
+      setIndexes(engine.listIndexes());
+      setTriggers(engine.listTriggers());
       // Refresh cached metadata for the (possibly renamed) table so
       // expanded rows show the new column list immediately.
       refreshEntityMetadata(trimmedName);
@@ -1415,9 +1500,20 @@ function SqlPlaygroundInner() {
 
   const closeAllTabs = useCallback(() => {
     const fresh = [{ id: newTabId(), title: "Query 1", code: "" }];
+    // Order matters: synchronously update the refs the editor's
+    // `change` listener reads from BEFORE we call `editor.setValue`.
+    // Otherwise the listener fires with stale `tabsRef`/`activeTabIdRef`
+    // values, computes a "next" tabs array against the OLD tabs, and
+    // calls setTabs with that — overwriting the fresh single tab we
+    // just committed. The visible symptom is that the first "Close All"
+    // only clears the editor and result set; the user has to invoke it
+    // a second time before the actual tab list collapses.
+    tabsRef.current = fresh;
+    activeTabIdRef.current = fresh[0].id;
     setTabs(fresh);
     saveTabs(activeDbId, fresh);
     setActiveTabId(fresh[0].id);
+    setResultsByTab({});
     const editor = editorRef.current;
     if (editor) editor.setValue("");
   }, [activeDbId]);
@@ -2106,6 +2202,42 @@ function SqlPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
+              <SchemaSection
+                label="INDEXES"
+                count={indexes.length}
+                expanded={indexesSectionExpanded}
+                onToggle={() => setIndexesSectionExpanded((v) => !v)}
+                emptyMessage="No indexes."
+              >
+                {indexes.map((name) => (
+                  <SchemaLeafItem
+                    key={`i-${name}`}
+                    name={name}
+                    kind="index"
+                    onCopy={copyEntityName}
+                    onViewDDL={viewLeafDDL}
+                    onDrop={dropLeafEntity}
+                  />
+                ))}
+              </SchemaSection>
+              <SchemaSection
+                label="TRIGGERS"
+                count={triggers.length}
+                expanded={triggersSectionExpanded}
+                onToggle={() => setTriggersSectionExpanded((v) => !v)}
+                emptyMessage="No triggers."
+              >
+                {triggers.map((name) => (
+                  <SchemaLeafItem
+                    key={`tr-${name}`}
+                    name={name}
+                    kind="trigger"
+                    onCopy={copyEntityName}
+                    onViewDDL={viewLeafDDL}
+                    onDrop={dropLeafEntity}
+                  />
+                ))}
+              </SchemaSection>
             </div>
 
             <div className="sql-sidebar-footer">
@@ -2174,6 +2306,16 @@ function SqlPlaygroundInner() {
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
               </div>
+              {result && statusState !== "running" && (
+                <div
+                  className={`sql-editor-elapsed${result.error ? " sql-editor-elapsed-err" : ""}`}
+                  title="Last execution time"
+                  aria-label="Last execution time"
+                >
+                  <Clock size={11} aria-hidden="true" />
+                  <span>{(result.elapsedMs / 1000).toFixed(3)}s</span>
+                </div>
+              )}
               <div className="sql-toolbar">
                 <span
                   className="kbd-group"
@@ -2432,7 +2574,7 @@ function ResultView({
           <div className="sql-result-error-title">Query failed</div>
           <pre className="sql-result-error-body">{result.error}</pre>
         </div>
-        <ResultStatusFooter result={result} onClear={onClear} />
+        <ResultClearFooter onClear={onClear} />
       </>
     );
   }
@@ -2442,7 +2584,7 @@ function ResultView({
         <div className="sql-result-ok">
           Statement executed successfully — no rows returned.
         </div>
-        <ResultStatusFooter result={result} onClear={onClear} />
+        <ResultClearFooter onClear={onClear} />
       </>
     );
   }
@@ -2476,6 +2618,7 @@ function ResultView({
       <div className="sql-result-pagers">
         {result.sets.map((set, idx) => {
           const st = getState(idx);
+          const isLast = idx === result.sets.length - 1;
           return (
             <ResultPager
               key={idx}
@@ -2486,39 +2629,20 @@ function ResultView({
               page={st.page}
               onPageChange={(p) => setPage(idx, p)}
               onPageSizeChange={(s) => setPageSize(idx, s)}
+              onClear={isLast ? onClear : undefined}
             />
           );
         })}
-        <ResultStatusFooter result={result} onClear={onClear} />
       </div>
     </>
   );
 }
 
-function ResultStatusFooter({
-  result,
-  onClear,
-}: {
-  result: QueryRunResult;
-  onClear: () => void;
-}) {
-  const totalRows = result.sets.reduce((acc, s) => acc + s.values.length, 0);
+// Tiny footer that only renders the Clear button — used for the error
+// and "no rows" branches where there's no pager to attach Clear to.
+function ResultClearFooter({ onClear }: { onClear: () => void }) {
   return (
-    <div className="sql-result-status">
-      <span className="sql-result-status-source">{result.source}</span>
-      <span className="sql-result-status-meta">
-        {result.error ? (
-          <span className="sql-result-meta-err">Error</span>
-        ) : (
-          <span className="sql-result-meta-ok">
-            {result.sets.length === 0
-              ? "OK"
-              : `${totalRows} row${totalRows === 1 ? "" : "s"}`}
-          </span>
-        )}
-        {" · "}
-        {(result.elapsedMs / 1000).toFixed(3)}s
-      </span>
+    <div className="sql-result-status sql-result-status-clear-only">
       <button
         type="button"
         className="clear-btn"
@@ -2610,6 +2734,7 @@ function ResultPager({
   page,
   onPageChange,
   onPageSizeChange,
+  onClear,
 }: {
   set: QueryExecResult;
   index: number;
@@ -2618,6 +2743,10 @@ function ResultPager({
   page: number;
   onPageChange: (p: number) => void;
   onPageSizeChange: (s: number) => void;
+  /** Optional Clear-results action rendered on the right of the pager.
+   *  Only the last pager in a multi-set result wires this up so the
+   *  button doesn't appear for every set. */
+  onClear?: () => void;
 }) {
   const totalRows = set.values.length;
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -2625,8 +2754,6 @@ function ResultPager({
   const safePage = Math.min(page, totalPages - 1);
   const start = safePage * effective;
   const end = Math.min(totalRows, start + effective);
-  const showControls = totalRows > 0 && (pageSize === 0 || totalRows > pageSize);
-  if (!showControls && !showSetLabel) return null;
 
   return (
     <div className="sql-result-pager">
@@ -2636,9 +2763,14 @@ function ResultPager({
         </span>
       )}
       <span className="sql-result-pager-info">
-        {totalRows === 0
-          ? "0 rows"
-          : `Rows ${start + 1}–${end} of ${totalRows}`}
+        {totalRows === 0 ? (
+          "0 rows"
+        ) : (
+          <>
+            Rows {start + 1}–{end} of{" "}
+            <strong className="sql-result-pager-total">{totalRows}</strong>
+          </>
+        )}
       </span>
       <div className="sql-result-pager-size">
         <span>Rows per page</span>
@@ -2727,6 +2859,18 @@ function ResultPager({
           »
         </button>
       </div>
+      {onClear && (
+        <button
+          type="button"
+          className="clear-btn sql-result-pager-clear"
+          onClick={onClear}
+          title="Clear results"
+          aria-label="Clear results"
+        >
+          <Eraser size={13} aria-hidden="true" />
+          <span>Clear</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -3158,6 +3302,39 @@ function SchemaItem({
     for (const fk of foreignKeys ?? []) m.set(fk.from, fk);
     return m;
   }, [foreignKeys]);
+  // Click vs. double-click disambiguation. The native browser fires a
+  // `click` event for each press inside a double-click, so without a
+  // delay a double-click would also toggle the row's expanded state
+  // (which the user explicitly does not want). We defer the toggle by
+  // a short window; if a `dblclick` arrives in that window we cancel
+  // the pending toggle and run `onPreview` instead. The 220ms window
+  // sits a hair under the OS-typical double-click threshold (≤ 250ms)
+  // so the single-click path still feels snappy.
+  const clickTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current !== null) {
+        window.clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+    };
+  }, []);
+  const handleSingleClick = useCallback(() => {
+    if (clickTimerRef.current !== null) {
+      window.clearTimeout(clickTimerRef.current);
+    }
+    clickTimerRef.current = window.setTimeout(() => {
+      clickTimerRef.current = null;
+      onToggleExpanded(name);
+    }, SINGLE_CLICK_DELAY_MS);
+  }, [name, onToggleExpanded]);
+  const handleDoubleClick = useCallback(() => {
+    if (clickTimerRef.current !== null) {
+      window.clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    onPreview(name, kind);
+  }, [name, kind, onPreview]);
   return (
     <div className="sql-tree-entity">
       <ContextMenu.Root>
@@ -3167,8 +3344,8 @@ function SchemaItem({
               type="button"
               {...props}
               className="sql-tree-item"
-              onClick={() => onToggleExpanded(name)}
-              onDoubleClick={() => onPreview(name, kind)}
+              onClick={handleSingleClick}
+              onDoubleClick={handleDoubleClick}
               title={`Double-click to preview, click to ${expanded ? "collapse" : "expand"}`}
               aria-expanded={expanded}
             >
@@ -3291,6 +3468,77 @@ function SchemaItem({
           )}
         </ul>
       )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// SchemaLeafItem — sidebar row for indexes and triggers. These have
+// no per-column metadata so the row is non-expandable; the row is just
+// a name + context menu (View DDL / Copy Name / Drop).
+// ────────────────────────────────────────────────────────────────────────
+
+interface SchemaLeafItemProps {
+  name: string;
+  kind: "index" | "trigger";
+  onCopy: (name: string) => void;
+  onViewDDL: (name: string, kind: "index" | "trigger") => void;
+  onDrop: (name: string, kind: "index" | "trigger") => void;
+}
+
+function SchemaLeafItem({
+  name,
+  kind,
+  onCopy,
+  onViewDDL,
+  onDrop,
+}: SchemaLeafItemProps) {
+  const Icon = kind === "index" ? Hash : Zap;
+  return (
+    <div className="sql-tree-entity">
+      <ContextMenu.Root>
+        <ContextMenu.Trigger
+          render={(props) => (
+            <button
+              type="button"
+              {...props}
+              className="sql-tree-item sql-tree-item-leaf"
+              onClick={() => onViewDDL(name, kind)}
+              title={`View DDL for ${kind} ${name}`}
+            >
+              <span className="sql-tree-chevron" aria-hidden="true" />
+              <Icon size={12} aria-hidden="true" />
+              <span className="sql-tree-item-name">{name}</span>
+            </button>
+          )}
+        />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner sideOffset={6}>
+            <ContextMenu.Popup className="bui-popup examples-dropdown">
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onViewDDL(name, kind)}
+              >
+                <div className="ex-title">View DDL</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onCopy(name)}
+              >
+                <div className="ex-title">Copy Name</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onDrop(name, kind)}
+              >
+                <div className="ex-title">
+                  Drop {kind === "index" ? "Index" : "Trigger"}
+                </div>
+              </ContextMenu.Item>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
     </div>
   );
 }
