@@ -303,10 +303,10 @@ const DEFAULT_PAGE_SIZE = 50;
 /** Delay before treating a sidebar-row click as a single click. The
  *  schema rows distinguish single-click (toggle expand) from
  *  double-click (preview) by deferring the toggle for slightly less
- *  than the OS-typical double-click threshold (≤ 250ms). Kept short
- *  so the expand/collapse interaction still feels snappy — anything
- *  much higher than this is perceptible as lag. */
-const SINGLE_CLICK_DELAY_MS = 140;
+ *  than the OS-typical double-click threshold (≤ 250ms). The 220ms
+ *  window ensures click2 of a double-click always arrives before the
+ *  timer fires, so dblclick can reliably cancel the pending toggle. */
+const SINGLE_CLICK_DELAY_MS = 220;
 
 // ────────────────────────────────────────────────────────────────────────
 // Component
