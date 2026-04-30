@@ -959,7 +959,7 @@
     auto;
   align-items: center;
   gap: 8px;
-  min-width: 1060px;
+  min-width: calc(130px + 100px + 160px + 350px + 260px + 5 * 8px + 20px);
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
