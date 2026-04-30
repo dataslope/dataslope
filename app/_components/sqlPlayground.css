@@ -890,6 +890,14 @@
   flex: 1;
   min-width: 0;
   overflow-x: auto;
+  /* Setting `overflow-x: auto` while leaving `overflow-y` at its
+     default of `visible` causes the spec's "if one axis is not
+     visible, the visible axis becomes auto" rule to kick in, which
+     made Chromium on Windows render a phantom vertical scrollbar in
+     the tab strip even though no content overflowed vertically.
+     Pinning Y to `hidden` removes that scrollbar while keeping the
+     horizontal overflow scroller working. */
+  overflow-y: hidden;
   scrollbar-width: thin;
   gap: 2px;
 }
@@ -966,9 +974,16 @@
   border: 0;
   color: var(--text-dim);
   width: 28px;
-  min-height: 30px;
+  /* Match the visual height of an inactive tab so the button reads
+     as a sibling of the tabs rather than a separate toolbar control.
+     The negative bottom margin mirrors `.sql-tab` so it sits on the
+     same baseline (and stays inside the rounded tab strip). */
+  height: 28px;
+  margin: auto 4px -1px 4px;
+  border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
+  align-self: center;
 }
 
 .sql-tab-add:hover {
@@ -1087,26 +1102,136 @@
   flex-shrink: 0;
 }
 
-/* ─── Modify Structure drawer ─── */
-.sql-modify-popup {
-  width: min(1180px, calc(100vw - 48px));
-  max-height: calc(100vh - 64px);
+/* ─── Modify Structure drawer ───
+   Slides out from the right edge of the viewport (Supabase-style)
+   instead of the previous centered modal so the user can see the
+   underlying table while editing it. The Base UI Dialog primitive
+   still drives focus trapping / overlay; we just swap the popup
+   positioning + animation. */
+.sql-modify-backdrop {
+  /* Lighter scrim than the centered confirm dialogs — the drawer
+     covers a smaller portion of the screen so a heavy backdrop
+     would feel disproportionate. */
+  background: #0008;
+}
+
+.sql-modify-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  /* Cap the drawer width so wide displays don't get a sea of
+     whitespace; on narrower screens it shrinks to leave a small
+     gap on the left so the underlying UI stays peeking through. */
+  width: min(640px, calc(100vw - 48px));
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  box-shadow: -16px 0 48px #000a;
+  z-index: 401;
   display: flex;
   flex-direction: column;
+  outline: none;
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.22s ease;
+}
+
+.sql-modify-drawer[data-starting-style],
+.sql-modify-drawer[data-ending-style] {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.sql-modify-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.sql-modify-drawer-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sql-modify-drawer-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.sql-modify-drawer-subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-modify-drawer-close {
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sql-modify-drawer-close:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.sql-modify-drawer-help {
+  margin: 0;
+  padding: 12px 20px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-modify-drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
 }
 
 .sql-modify-body {
+  /* Body becomes the only scrolling region inside the drawer so the
+     header and footer stay pinned. */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  overflow: auto;
-  padding-right: 4px;
+  gap: 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 20px;
+  min-height: 0;
 }
 
 .sql-modify-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  min-width: 0;
 }
 
 .sql-modify-field-label {
@@ -1114,12 +1239,13 @@
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  font-weight: 500;
 }
 
 .sql-modify-columns {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .sql-modify-empty {
@@ -1132,36 +1258,60 @@
 }
 
 .sql-modify-col-row {
-  --sql-modify-name-min: 130px;
-  --sql-modify-type-min: 100px;
-  --sql-modify-default-min: 160px;
-  --sql-modify-flags-min: 350px;
-  --sql-modify-fk-min: 260px;
-  --sql-modify-col-gap: 8px;
-
-  display: grid;
-  grid-template-columns:
-    minmax(var(--sql-modify-name-min), 1.2fr)
-    minmax(var(--sql-modify-type-min), 0.8fr)
-    minmax(var(--sql-modify-default-min), 1.2fr)
-    minmax(var(--sql-modify-flags-min), auto)
-    minmax(var(--sql-modify-fk-min), auto)
-    auto;
-  align-items: center;
-  gap: var(--sql-modify-col-gap);
-  min-width: calc(
-    var(--sql-modify-name-min) + var(--sql-modify-type-min) +
-    var(--sql-modify-default-min) + var(--sql-modify-flags-min) +
-    var(--sql-modify-fk-min) + 5 * var(--sql-modify-col-gap)
-  );
-  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg2);
+  background: var(--bg);
+  min-width: 0;
 }
 
-.sql-modify-col-main {
-  display: contents;
+.sql-modify-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  /* Visually separate the column card's header strip from its
+     fields without adding a heavy divider. */
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+.sql-modify-col-head-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.sql-modify-col-grid {
+  /* Two-column grid that aligns labels + inputs across rows so
+     "Name / Type" and "Foreign key table / column" line up
+     vertically with each other. Falls back to a single column on
+     very narrow drawers (mobile). */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .sql-modify-col-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sql-modify-field-wide {
+  /* Used to span both columns of `.sql-modify-col-grid` when a
+     field needs the full width (e.g. Default value, Constraints). */
+  grid-column: 1 / -1;
 }
 
 .sql-modify-col-name,
@@ -1170,18 +1320,7 @@
   font-size: 12px;
   padding: 6px 8px;
   min-width: 0;
-}
-
-.sql-modify-col-name {
-  grid-column: 1;
-}
-
-.sql-modify-col-type-select {
-  grid-column: 2;
-}
-
-.sql-modify-col-default {
-  grid-column: 3;
+  width: 100%;
 }
 
 .sql-modify-col-type {
@@ -1192,16 +1331,21 @@
   font-family: var(--font-mono);
   font-size: 12px;
   padding: 6px 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .sql-modify-col-remove {
-  grid-column: 6;
   background: transparent;
   border: 0;
   color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .sql-modify-col-remove:hover {
@@ -1210,12 +1354,9 @@
 }
 
 .sql-modify-col-flags {
-  grid-column: 4;
   display: flex;
-  flex-wrap: nowrap;
-  gap: 10px;
-  padding-top: 0;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  gap: 10px 14px;
 }
 
 .sql-modify-flag {
@@ -1241,6 +1382,7 @@
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .sql-modify-flag-box[data-checked] {
@@ -1252,25 +1394,6 @@
   font-size: 10px;
   color: var(--bg);
   line-height: 1;
-}
-
-.sql-modify-col-fk {
-  grid-column: 5;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: nowrap;
-  min-width: 0;
-}
-
-.sql-modify-fk-table,
-.sql-modify-fk-column {
-  min-width: 92px;
-}
-
-.sql-modify-fk-label {
-  font-size: 11px;
-  color: var(--text-dim);
 }
 
 .sql-modify-add {

@@ -2148,18 +2148,31 @@ function SqlPlaygroundInner() {
           }}
         >
           <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-modify-popup">
-              <Dialog.Title className="confirm-title">
-                Modify structure: {modifyDialog?.originalName ?? ""}
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Modify structure
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    {modifyDialog?.originalName ?? ""}
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              <p className="sql-modify-drawer-help">
                 Rename the table, edit column definitions, or add and
                 remove columns. Click Save to apply via SQLite&rsquo;s
                 rebuild-table pattern (data is copied to a new table,
                 then renamed in place). Reordering columns is not yet
                 supported.
-              </Dialog.Description>
+              </p>
               {modifyDialog && (
                 <ModifyStructureForm
                   state={modifyDialog}
@@ -2168,7 +2181,7 @@ function SqlPlaygroundInner() {
                   engine={engineForRender}
                 />
               )}
-              <div className="confirm-actions">
+              <footer className="sql-modify-drawer-footer">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
@@ -2180,7 +2193,7 @@ function SqlPlaygroundInner() {
                 >
                   Save
                 </button>
-              </div>
+              </footer>
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
@@ -2377,16 +2390,23 @@ function SqlPlaygroundInner() {
                     onCloseAll={closeAllTabs}
                   />
                 ))}
+                {/* The "new tab" (+) button lives inside the same
+                    horizontally-scrolling .sql-tabs container as the
+                    tabs themselves so it sits right next to the
+                    right-most tab when the strip isn't full. Once
+                    the tabs overflow horizontally it scrolls with
+                    them and remains reachable at the end of the
+                    strip via the existing scroller. */}
+                <button
+                  type="button"
+                  className="sql-tab-add"
+                  onClick={addTab}
+                  title="New query tab"
+                  aria-label="New query tab"
+                >
+                  <Plus size={12} aria-hidden="true" />
+                </button>
               </div>
-              <button
-                type="button"
-                className="sql-tab-add"
-                onClick={addTab}
-                title="New query tab"
-                aria-label="New query tab"
-              >
-                <Plus size={12} aria-hidden="true" />
-              </button>
             </div>
 
             <div className="sql-editor-pane" ref={editorPaneRef}>
@@ -3358,33 +3378,10 @@ function ModifyColumnRow({
   }, [engine, col.fkTable]);
   return (
     <div className="sql-modify-col-row">
-      <div className="sql-modify-col-main">
-        <input
-          className="sql-rename-input sql-modify-col-name"
-          value={col.name}
-          onChange={(e) => onChange({ name: e.target.value })}
-          placeholder="column name"
-          aria-label="Column name"
-        />
-        <select
-          className="sql-modify-col-type sql-modify-col-type-select"
-          value={col.type}
-          onChange={(e) => onChange({ type: e.target.value })}
-          aria-label="Column type"
-        >
-          {COLUMN_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <input
-          className="sql-rename-input sql-modify-col-default"
-          value={col.defaultValue}
-          onChange={(e) => onChange({ defaultValue: e.target.value })}
-          placeholder="default (e.g. 'foo' or 0)"
-          aria-label="Default value"
-        />
+      <div className="sql-modify-col-head">
+        <span className="sql-modify-col-head-name" title={col.name}>
+          {col.name || "(unnamed column)"}
+        </span>
         <button
           type="button"
           className="sql-modify-col-remove"
@@ -3395,69 +3392,114 @@ function ModifyColumnRow({
           <Trash2 size={13} aria-hidden="true" />
         </button>
       </div>
-      <div className="sql-modify-col-flags">
-        <ColumnFlag
-          checked={col.primaryKey}
-          onChange={(v) =>
-            onChange({
-              primaryKey: v,
-              // Auto-increment is only meaningful with a single PK.
-              autoIncrement: v ? col.autoIncrement : false,
-            })
-          }
-          label="Primary key"
-        />
-        <ColumnFlag
-          checked={!col.notNull}
-          onChange={(v) => onChange({ notNull: !v })}
-          label="Nullable"
-        />
-        <ColumnFlag
-          checked={col.unique}
-          onChange={(v) => onChange({ unique: v })}
-          label="Unique"
-        />
-        <ColumnFlag
-          checked={col.autoIncrement}
-          onChange={(v) => onChange({ autoIncrement: v })}
-          label="Auto-increment"
-          // SQLite allows AUTOINCREMENT only on a single-column INTEGER
-          // PRIMARY KEY. Disable the toggle otherwise so the user can't
-          // craft an invalid spec.
-          disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
-        />
+      <div className="sql-modify-col-grid">
+        <label className="sql-modify-field">
+          <span className="sql-modify-field-label">Name</span>
+          <input
+            className="sql-rename-input sql-modify-col-name"
+            value={col.name}
+            onChange={(e) => onChange({ name: e.target.value })}
+            placeholder="column name"
+            aria-label="Column name"
+          />
+        </label>
+        <label className="sql-modify-field">
+          <span className="sql-modify-field-label">Type</span>
+          <select
+            className="sql-modify-col-type sql-modify-col-type-select"
+            value={col.type}
+            onChange={(e) => onChange({ type: e.target.value })}
+            aria-label="Column type"
+          >
+            {COLUMN_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="sql-modify-field sql-modify-field-wide">
+          <span className="sql-modify-field-label">Default value</span>
+          <input
+            className="sql-rename-input sql-modify-col-default"
+            value={col.defaultValue}
+            onChange={(e) => onChange({ defaultValue: e.target.value })}
+            placeholder="e.g. 'foo' or 0"
+            aria-label="Default value"
+          />
+        </label>
       </div>
-      <div className="sql-modify-col-fk">
-        <span className="sql-modify-fk-label">Foreign key →</span>
-        <select
-          className="sql-modify-col-type sql-modify-fk-table"
-          value={col.fkTable}
-          onChange={(e) =>
-            onChange({ fkTable: e.target.value, fkColumn: "" })
-          }
-          aria-label="Foreign key target table"
-        >
-          <option value="">(none)</option>
-          {knownTables.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <select
-          className="sql-modify-col-type sql-modify-fk-column"
-          value={col.fkColumn}
-          onChange={(e) => onChange({ fkColumn: e.target.value })}
-          aria-label="Foreign key target column"
-          disabled={!col.fkTable}
-        >
-          <option value="">(column)</option>
-          {fkTargetColumns.map((c) => (
-            <option key={c.cid} value={c.name}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+      <div className="sql-modify-field sql-modify-field-wide">
+        <span className="sql-modify-field-label">Constraints</span>
+        <div className="sql-modify-col-flags">
+          <ColumnFlag
+            checked={col.primaryKey}
+            onChange={(v) =>
+              onChange({
+                primaryKey: v,
+                // Auto-increment is only meaningful with a single PK.
+                autoIncrement: v ? col.autoIncrement : false,
+              })
+            }
+            label="Primary key"
+          />
+          <ColumnFlag
+            checked={!col.notNull}
+            onChange={(v) => onChange({ notNull: !v })}
+            label="Nullable"
+          />
+          <ColumnFlag
+            checked={col.unique}
+            onChange={(v) => onChange({ unique: v })}
+            label="Unique"
+          />
+          <ColumnFlag
+            checked={col.autoIncrement}
+            onChange={(v) => onChange({ autoIncrement: v })}
+            label="Auto-increment"
+            // SQLite allows AUTOINCREMENT only on a single-column INTEGER
+            // PRIMARY KEY. Disable the toggle otherwise so the user can't
+            // craft an invalid spec.
+            disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
+          />
+        </div>
+      </div>
+      <div className="sql-modify-col-grid">
+        <label className="sql-modify-field">
+          <span className="sql-modify-field-label">Foreign key table</span>
+          <select
+            className="sql-modify-col-type sql-modify-fk-table"
+            value={col.fkTable}
+            onChange={(e) =>
+              onChange({ fkTable: e.target.value, fkColumn: "" })
+            }
+            aria-label="Foreign key target table"
+          >
+            <option value="">(none)</option>
+            {knownTables.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="sql-modify-field">
+          <span className="sql-modify-field-label">Foreign key column</span>
+          <select
+            className="sql-modify-col-type sql-modify-fk-column"
+            value={col.fkColumn}
+            onChange={(e) => onChange({ fkColumn: e.target.value })}
+            aria-label="Foreign key target column"
+            disabled={!col.fkTable}
+          >
+            <option value="">(column)</option>
+            {fkTargetColumns.map((c) => (
+              <option key={c.cid} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </div>
   );

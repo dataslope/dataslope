@@ -36,6 +36,54 @@ html[data-theme="light"] .pyodide-loading {
 
 .pg-root *, .pg-root *::before, .pg-root *::after { box-sizing: border-box; }
 
+/* ─── Consistent scrollbar styling ───────────────────────────────────────
+   Apply across every playground (Python, R, SQL, Java, C#, …) so any
+   scrollable surface — output cells, sidebars, dialog/drawer bodies,
+   tab strips, dataframes, etc. — uses the same thin, low-contrast
+   scrollbar that blends with the dark UI chrome instead of the
+   bright OS default.
+
+   Implemented twice for cross-browser support:
+   – `scrollbar-width` / `scrollbar-color` for Firefox & modern Chromium.
+   – `::-webkit-scrollbar*` pseudo-elements for WebKit / Chromium.
+
+   Scoped under `.pg-root` so the marketing pages (and the Fumadocs
+   `/learn` route) keep their own native scrollbars. */
+.pg-root,
+.pg-root * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.pg-root ::-webkit-scrollbar,
+.pg-root::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.pg-root ::-webkit-scrollbar-track,
+.pg-root::-webkit-scrollbar-track {
+  background: transparent;
+}
+.pg-root ::-webkit-scrollbar-thumb,
+.pg-root::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  /* Slightly inset so the thumb doesn't run flush against the gutter
+     edges — gives the same airy look as the bespoke styles already
+     used for the output / package list scrollbars. */
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+.pg-root ::-webkit-scrollbar-thumb:hover,
+.pg-root::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+.pg-root ::-webkit-scrollbar-corner,
+.pg-root::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 body.pg-active {
   min-height: 100%;
   background: var(--bg);
