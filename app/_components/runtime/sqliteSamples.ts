@@ -216,6 +216,67 @@ function seedCreditCard(db: Database): void {
     [49, 3, 4, 6800.0, "2024-04-03", "Booking.com", "Paris", "", "FR", "Travel", 1],
     [50, 7, 10, 62.1, "2024-04-05", "Shell", "Austin", "TX", "US", "Gas Station", 0],
   ];
+
+  // Append a deterministic batch of synthetic transactions so the
+  // `transactions` table has well over 200 rows (currently 50 curated
+  // entries above + 210 generated below = 260). Used for exercising
+  // result pagination in the playground without bloating the source
+  // file with hand-written rows. The generator is intentionally
+  // seeded/deterministic so query results stay stable across reloads
+  // and across users — matching the spirit of the curated rows above.
+  const merchants: Array<[string, string, string, string, string]> = [
+    ["Amazon", "Seattle", "WA", "US", "E-Commerce"],
+    ["Walmart", "Bentonville", "AR", "US", "Retail"],
+    ["Target", "Minneapolis", "MN", "US", "Retail"],
+    ["Starbucks", "Seattle", "WA", "US", "Food & Beverage"],
+    ["Shell", "Houston", "TX", "US", "Gas Station"],
+    ["Netflix", "Los Gatos", "CA", "US", "Entertainment"],
+    ["Apple Store", "Cupertino", "CA", "US", "Electronics"],
+    ["Airbnb", "Paris", "", "FR", "Travel"],
+    ["Uber", "San Francisco", "CA", "US", "Transportation"],
+    ["Whole Foods", "Austin", "TX", "US", "Grocery"],
+    ["Delta Airlines", "Atlanta", "GA", "US", "Travel"],
+    ["Booking.com", "Amsterdam", "", "NL", "Travel"],
+    ["Home Depot", "Atlanta", "GA", "US", "Hardware"],
+    ["Spotify", "Stockholm", "", "SE", "Entertainment"],
+    ["McDonald's", "Chicago", "IL", "US", "Food & Beverage"],
+  ];
+  // Pseudo-random but fully deterministic — small LCG keyed by row id.
+  const rand = (n: number, mod: number) => ((n * 2654435761) >>> 0) % mod;
+  const startId = transactions.length + 1;
+  const targetTotal = 260;
+  for (let id = startId; id <= targetTotal; id += 1) {
+    const userId = (rand(id + 1, 20)) + 1;
+    const cardId = (rand(id + 7, 20)) + 1;
+    const m = merchants[rand(id + 3, merchants.length)];
+    // Spread dates across calendar year 2024.
+    const dayOffset = rand(id + 11, 365);
+    const date = new Date(Date.UTC(2024, 0, 1));
+    date.setUTCDate(date.getUTCDate() + dayOffset);
+    const isoDate = date.toISOString().slice(0, 10);
+    // Amount: a few buckets so the mix of small/medium/large stays
+    // realistic (most transactions are < $200, occasional large ones).
+    const bucket = rand(id + 17, 20);
+    let amount: number;
+    if (bucket < 12) amount = +(5 + rand(id, 19500) / 100).toFixed(2);
+    else if (bucket < 18) amount = +(50 + rand(id + 5, 95000) / 100).toFixed(2);
+    else amount = +(500 + rand(id + 9, 750000) / 100).toFixed(2);
+    const isFraud = rand(id + 23, 25) === 0 ? 1 : 0;
+    transactions.push([
+      id,
+      userId,
+      cardId,
+      amount,
+      isoDate,
+      m[0],
+      m[1],
+      m[2],
+      m[3],
+      m[4],
+      isFraud,
+    ]);
+  }
+
   bulkInsert(
     db,
     "INSERT INTO transactions VALUES (?,?,?,?,?,?,?,?,?,?,?)",

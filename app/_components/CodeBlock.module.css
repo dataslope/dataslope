@@ -417,11 +417,9 @@
 @keyframes cb-fadeSlide {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -656,10 +654,7 @@
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
+  transition: opacity 0.18s ease;
   z-index: 0;
   /* Vertical alpha mask: opaque at the bottom, transparent at the top
      so the band blends into the action bar without a hard seam. */
@@ -668,7 +663,6 @@
 }
 .runOverlay.runOverlayActive {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .runWaves {

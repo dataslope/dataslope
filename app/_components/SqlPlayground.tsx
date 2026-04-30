@@ -1143,10 +1143,10 @@ function SqlPlaygroundInner() {
         >
           <div className="loading-hero" aria-hidden="true">
             <div className="loading-hero-track">
-              <span className="loading-hero-text">SQLite</span>
-              <span className="loading-hero-text">SQLite</span>
-              <span className="loading-hero-text">SQLite</span>
-              <span className="loading-hero-text">SQLite</span>
+              <span className="loading-hero-text">SQLite Playground</span>
+              <span className="loading-hero-text">SQLite Playground</span>
+              <span className="loading-hero-text">SQLite Playground</span>
+              <span className="loading-hero-text">SQLite Playground</span>
             </div>
           </div>
           <div className="loading-bottom">
@@ -2089,19 +2089,6 @@ function SchemaItem({
             <ContextMenu.Item
               className="example-item"
               onClick={() => {
-                onStructure(name, kind);
-                onOpenInTab(
-                  `Structure: ${name}`,
-                  `PRAGMA table_info(${quotedName});`,
-                );
-              }}
-            >
-              <div className="ex-title">View Structure</div>
-              <div className="ex-desc">PRAGMA table_info({quotedName})</div>
-            </ContextMenu.Item>
-            <ContextMenu.Item
-              className="example-item"
-              onClick={() => {
                 onPreview(name, kind);
                 onOpenInTab(
                   `Preview: ${name}`,
@@ -2111,6 +2098,19 @@ function SchemaItem({
             >
               <div className="ex-title">Preview Data</div>
               <div className="ex-desc">First 200 rows</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => {
+                onStructure(name, kind);
+                onOpenInTab(
+                  `Structure: ${name}`,
+                  `PRAGMA table_info(${quotedName});`,
+                );
+              }}
+            >
+              <div className="ex-title">View Structure</div>
+              <div className="ex-desc">PRAGMA table_info({quotedName})</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
