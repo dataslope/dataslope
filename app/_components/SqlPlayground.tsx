@@ -1654,8 +1654,8 @@ function SqlPlaygroundInner() {
 
           <div className="sql-panes" ref={panesRef}>
             <div className="sql-results-pane" ref={resultsPaneRef}>
-              <div className="sql-tabbar" role="tablist">
-                <div className="sql-tabs">
+              <div className="sql-tabbar">
+                <div className="sql-tabs" role="tablist">
                   {tabs.map((t) => (
                     <SqlTab
                       key={t.id}
