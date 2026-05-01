@@ -3163,6 +3163,7 @@ function ResultTableBody({
       visibleAbsoluteIndices,
     ],
   );
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for stable result-table customization.
   const table = useReactTable({
     data,
     columns,
