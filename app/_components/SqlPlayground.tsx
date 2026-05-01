@@ -445,6 +445,8 @@ function SqlPlaygroundInner() {
     newName: string;
     columns: ModifyColumnDraft[];
   } | null>(null);
+  // Truncate confirmation dialog state.
+  const [truncateConfirm, setTruncateConfirm] = useState<string | null>(null);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -1204,26 +1206,24 @@ function SqlPlaygroundInner() {
     }
   }, [activeDbId, tablesSectionExpanded, viewsSectionExpanded]);
 
-  const truncateEntity = useCallback(
-    (name: string) => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      if (typeof window !== "undefined") {
-        const ok = window.confirm(
-          `Truncate table "${name}"? This deletes every row but keeps the schema. The change is in-memory only and will be undone next page load.`,
-        );
-        if (!ok) return;
-      }
-      try {
-        engine.truncateTable(name);
-        showToast(`Truncated table "${name}".`);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Truncate failed: ${msg}`, "warn");
-      }
-    },
-    [showToast],
-  );
+  const truncateEntity = useCallback((name: string) => {
+    setTruncateConfirm(name);
+  }, []);
+
+  const confirmTruncate = useCallback(() => {
+    const engine = engineRef.current;
+    const name = truncateConfirm;
+    if (!engine || !name) return;
+    try {
+      engine.truncateTable(name);
+      showToast(`Truncated table "${name}".`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Truncate failed: ${msg}`, "warn");
+    } finally {
+      setTruncateConfirm(null);
+    }
+  }, [truncateConfirm, showToast]);
 
   // ─── Export ────────────────────────────────────────────────────────
   // Serialise the in-memory database to a SQLite file image and trigger
@@ -2303,6 +2303,38 @@ function SqlPlaygroundInner() {
                   onClick={clearAllLocalStorage}
                 >
                   Clear &amp; reload
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
+        <AlertDialog.Root
+          open={truncateConfirm !== null}
+          onOpenChange={(next) => {
+            if (!next) setTruncateConfirm(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Truncate table?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                Truncate table <strong>{truncateConfirm}</strong>? This deletes
+                every row but keeps the schema. The change is in-memory only and
+                will be undone next page load.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={confirmTruncate}
+                >
+                  Truncate
                 </AlertDialog.Close>
               </div>
             </AlertDialog.Popup>
