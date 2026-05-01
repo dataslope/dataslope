@@ -68,6 +68,7 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowDownToLine,
+  ArrowUpFromLine,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -76,11 +77,16 @@ import {
   Clock,
   Eye,
   Database,
+  FilePlus,
+  FileText,
+  FileJson,
   Hash,
   Play,
   Plus,
   Table2,
   Trash2,
+  TriangleAlert,
+  Upload,
   X,
   Zap,
 } from "lucide-react";
@@ -447,6 +453,40 @@ function SqlPlaygroundInner() {
   } | null>(null);
   // Truncate confirmation dialog state.
   const [truncateConfirm, setTruncateConfirm] = useState<string | null>(null);
+  // Import dialogs state.
+  const [importSqliteOpen, setImportSqliteOpen] = useState(false);
+  const [importSqliteDragging, setImportSqliteDragging] = useState(false);
+  // CSV import: once a file is parsed, we store headers + preview rows
+  // alongside the derived table name so the user can review before committing.
+  type CsvImportState = {
+    tableName: string;
+    headers: string[];
+    rows: string[][];
+    rawText: string;
+  };
+  const [importCsvOpen, setImportCsvOpen] = useState(false);
+  const [importCsvDragging, setImportCsvDragging] = useState(false);
+  const [importCsvState, setImportCsvState] = useState<CsvImportState | null>(
+    null,
+  );
+  // JSON import: same shape — headers are object keys, rows are values.
+  type JsonImportState = {
+    tableName: string;
+    headers: string[];
+    rows: string[][];
+    rawText: string;
+  };
+  const [importJsonOpen, setImportJsonOpen] = useState(false);
+  const [importJsonDragging, setImportJsonDragging] = useState(false);
+  const [importJsonState, setImportJsonState] =
+    useState<JsonImportState | null>(null);
+  // When `activeDbId` doesn't match any entry in SQLITE_SAMPLE_DATABASES
+  // (blank or imported), we store a synthetic descriptor here so the UI
+  // (selector display, `activeSample`, `resetTabsForCurrentDb`) can still
+  // refer to it by id without touching `findSampleDatabase`.
+  const [customDb, setCustomDb] = useState<
+    import("./runtime/sqliteSamples").SqliteSampleDatabase | null
+  >(null);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -863,19 +903,26 @@ function SqlPlaygroundInner() {
   }, []);
 
   // ─── Database switching ─────────────────────────────────────────────
-  const performDbSwitch = useCallback(
-    (nextId: string) => {
+  // Shared helper that performs the actual switch. Handles both sample
+  // databases (via `engine.loadSampleDatabase`) and the two custom paths
+  // (blank + imported, via the overloaded form below).
+  const applyDbLoad = useCallback(
+    (sample: import("./runtime/sqliteSamples").SqliteSampleDatabase) => {
       const engine = engineRef.current;
       if (!engine) return;
-      // Persist whatever was in the editor for the *outgoing* db before
-      // we tear it down, so a switch never silently loses an in-flight
-      // edit.
       saveTabs(activeDbIdRef.current, tabsRef.current);
 
-      const sample = engine.loadSampleDatabase(nextId);
+      // Track custom (blank / imported) databases in state so the UI
+      // can look them up without touching SQLITE_SAMPLE_DATABASES.
+      const isCustom = !SQLITE_SAMPLE_DATABASES.some((s) => s.id === sample.id);
+      setCustomDb(isCustom ? sample : null);
       setActiveDbId(sample.id);
       try {
-        localStorage.setItem(storageKey("db"), sample.id);
+        // Only persist built-in sample IDs to localStorage — blank and
+        // imported databases do not survive a reload anyway.
+        if (!isCustom) {
+          localStorage.setItem(storageKey("db"), sample.id);
+        }
       } catch {
         // ignore
       }
@@ -883,39 +930,87 @@ function SqlPlaygroundInner() {
       setViews(engine.listViews());
       setIndexes(engine.listIndexes());
       setTriggers(engine.listTriggers());
+      // Reset cached column/foreign-key metadata — data from the old
+      // database would be stale for the newly loaded one. The sidebar
+      // will re-fetch these lazily on first expand.
+      setColumnsByEntity({});
+      setForeignKeysByEntity({});
 
       const newTabs = sample.defaultTabs.map((seed) => ({
         ...seed,
         id: newTabId(),
         pristineCode: seed.code,
       }));
-      setTabs(newTabs);
+      // Update the mutable refs synchronously BEFORE calling setState so
+      // that the CodeMirror `change` listener (which reads them via
+      // closures) always sees the new tabs when it fires during
+      // `editor.setValue()` below. Updating state first would let a
+      // stale closure write back incorrect tab data.
       tabsRef.current = newTabs;
+      activeTabIdRef.current = newTabs[0].id;
+      setTabs(newTabs);
       saveTabs(sample.id, newTabs);
-      const newActive = newTabs[0].id;
-      setActiveTabId(newActive);
+      setActiveTabId(newTabs[0].id);
       const editor = editorRef.current;
       if (editor) editor.setValue(newTabs[0].code);
       setResultsByTab({});
+    },
+    [],
+  );
+
+  const performDbSwitch = useCallback(
+    (nextId: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const sample = engine.loadSampleDatabase(nextId);
+      applyDbLoad(sample);
       showToast(`Loaded ${sample.filename}.`);
     },
-    [showToast],
+    [applyDbLoad, showToast],
+  );
+
+  const performBlankLoad = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const sample = engine.loadBlankDatabase();
+    applyDbLoad(sample);
+    showToast("Created blank database.");
+  }, [applyDbLoad, showToast]);
+
+  const performImportSqlite = useCallback(
+    (bytes: Uint8Array, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const sample = engine.loadFromBytes(bytes, filename);
+        applyDbLoad(sample);
+        setImportSqliteOpen(false);
+        showToast(`Imported ${filename}.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Import failed: ${msg}`, "warn");
+      }
+    },
+    [applyDbLoad, showToast],
   );
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
       if (nextId === activeDbId) return;
-      const sample = findSampleDatabase(activeDbId);
+      const curSample =
+        customDb?.id === activeDbId
+          ? customDb
+          : findSampleDatabase(activeDbId);
       // Only prompt when the *current* db has unsaved edits relative to
       // its defaults. Switching to and from clean defaults should be
       // friction-free.
-      if (tabsAreDirty(tabsRef.current, sample.defaultTabs)) {
+      if (tabsAreDirty(tabsRef.current, curSample.defaultTabs)) {
         setPendingDbId(nextId);
         return;
       }
       performDbSwitch(nextId);
     },
-    [activeDbId, performDbSwitch],
+    [activeDbId, customDb, performDbSwitch],
   );
 
   // ─── Run / preview ──────────────────────────────────────────────────
@@ -1261,6 +1356,265 @@ function SqlPlaygroundInner() {
       showToast(`Export failed: ${msg}`, "warn");
     }
   }, [showToast]);
+
+  // ─── CSV import ───────────────────────────────────────────────────
+  // Parses a CSV string into a headers array and an array of value rows.
+  // Handles double-quoted fields and escaped double-quotes (`""`).
+  const parseCsv = useCallback(
+    (text: string): { headers: string[]; rows: string[][] } => {
+      const parseLine = (line: string): string[] => {
+        const fields: string[] = [];
+        let cur = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (inQuotes) {
+            if (ch === '"') {
+              if (i + 1 < line.length && line[i + 1] === '"') {
+                // Two consecutive double-quotes inside a quoted field
+                // represent a literal `"`. Skip the second quote by
+                // manually advancing `i` — the loop's own `i++` then
+                // moves past the escaped pair correctly.
+                cur += '"';
+                i += 1; // intentionally skip second quote of escaped pair
+              } else {
+                inQuotes = false;
+              }
+            } else {
+              cur += ch;
+            }
+          } else if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ",") {
+            fields.push(cur);
+            cur = "";
+          } else {
+            cur += ch;
+          }
+        }
+        fields.push(cur);
+        return fields;
+      };
+
+      const lines = text.split(/\r?\n/);
+      const nonEmpty = lines.filter((l) => l.trim() !== "");
+      if (nonEmpty.length === 0) return { headers: [], rows: [] };
+      const headers = parseLine(nonEmpty[0]);
+      const rows = nonEmpty.slice(1).map((l) => {
+        const vals = parseLine(l);
+        // Pad or truncate each row to match the header count.
+        while (vals.length < headers.length) vals.push("");
+        return vals.slice(0, headers.length);
+      });
+      return { headers, rows };
+    },
+    [],
+  );
+
+  // Derive a safe SQL identifier from a filename (strip extension, replace
+  // non-identifier chars). Falls back to `imported_table` when empty.
+  const tableNameFromFilename = useCallback((filename: string): string => {
+    const base = filename
+      .replace(/\.[^.]+$/, "")
+      .replace(/[^a-zA-Z0-9_]/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .replace(/_+/g, "_");
+    return base || "imported_table";
+  }, []);
+
+  const handleCsvFile = useCallback(
+    (file: File) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result as string;
+          const { headers, rows } = parseCsv(text);
+          if (headers.length === 0) {
+            showToast("CSV file appears to be empty.", "warn");
+            return;
+          }
+          setImportCsvState({
+            tableName: tableNameFromFilename(file.name),
+            headers,
+            rows,
+            rawText: text,
+          });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Could not parse CSV: ${msg}`, "warn");
+        }
+      };
+      reader.readAsText(file);
+    },
+    [parseCsv, tableNameFromFilename, showToast],
+  );
+
+  const submitCsvImport = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !importCsvState) return;
+    const { tableName, headers, rows } = importCsvState;
+    const trimmed = tableName.trim();
+    if (!trimmed) {
+      showToast("Table name cannot be empty.", "warn");
+      return;
+    }
+    try {
+      // Sanitize header names to safe SQL identifiers — each is
+      // double-quote–escaped and used only as a column-name token,
+      // not as a general string value, so the quoting is safe.
+      const safeCols = headers.map((h) => {
+        const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
+        return `"${s.replace(/"/g, '""')}"`;
+      });
+      const tableIdent = `"${trimmed.replace(/"/g, '""')}"`;
+      engine.exec(
+        `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
+      );
+      // Wrap all inserts in a single transaction so the import is
+      // atomic: either all rows land or none do (on error, ROLLBACK
+      // restores the empty table).
+      engine.exec("BEGIN");
+      try {
+        for (const row of rows) {
+          // Values are stored as TEXT. Empty CSV fields become SQL NULL;
+          // non-empty fields are single-quote–escaped string literals
+          // (`''` is the standard SQL escape for a literal single quote).
+          const vals = row
+            .map((v) =>
+              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
+            )
+            .join(", ");
+          engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+        }
+        engine.exec("COMMIT");
+      } catch (insertErr) {
+        try {
+          engine.exec("ROLLBACK");
+        } catch {
+          // Ignore rollback failure.
+        }
+        throw insertErr;
+      }
+      setTables(engine.listTables());
+      setImportCsvOpen(false);
+      setImportCsvState(null);
+      showToast(
+        `Imported ${rows.length} row${rows.length === 1 ? "" : "s"} into "${trimmed}".`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`CSV import failed: ${msg}`, "warn");
+    }
+  }, [importCsvState, showToast]);
+
+  // ─── JSON import ──────────────────────────────────────────────────
+  const handleJsonFile = useCallback(
+    (file: File) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result as string;
+          const parsed = JSON.parse(text) as unknown;
+          if (!Array.isArray(parsed)) {
+            showToast(
+              "JSON must be an array of objects (e.g. [{...}, {...}]).",
+              "warn",
+            );
+            return;
+          }
+          if (parsed.length === 0) {
+            showToast("JSON array is empty.", "warn");
+            return;
+          }
+          // Collect all keys from all objects for robustness.
+          const keySet = new Set<string>();
+          for (const obj of parsed) {
+            if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+              for (const k of Object.keys(obj as Record<string, unknown>)) {
+                keySet.add(k);
+              }
+            }
+          }
+          const headers = Array.from(keySet);
+          if (headers.length === 0) {
+            showToast("JSON objects appear to have no keys.", "warn");
+            return;
+          }
+          const rows = parsed.map((obj) => {
+            const record = obj as Record<string, unknown>;
+            return headers.map((h) => {
+              const v = record[h];
+              if (v === null || v === undefined) return "";
+              if (typeof v === "object") return JSON.stringify(v);
+              return String(v);
+            });
+          });
+          setImportJsonState({
+            tableName: tableNameFromFilename(file.name),
+            headers,
+            rows,
+            rawText: text,
+          });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Could not parse JSON: ${msg}`, "warn");
+        }
+      };
+      reader.readAsText(file);
+    },
+    [tableNameFromFilename, showToast],
+  );
+
+  const submitJsonImport = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !importJsonState) return;
+    const { tableName, headers, rows } = importJsonState;
+    const trimmed = tableName.trim();
+    if (!trimmed) {
+      showToast("Table name cannot be empty.", "warn");
+      return;
+    }
+    try {
+      const safeCols = headers.map((h) => {
+        const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
+        return `"${s.replace(/"/g, '""')}"`;
+      });
+      const tableIdent = `"${trimmed.replace(/"/g, '""')}"`;
+      engine.exec(
+        `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
+      );
+      // Wrap all inserts in a single transaction for atomicity and
+      // performance — a ROLLBACK on error leaves no partial table data.
+      engine.exec("BEGIN");
+      try {
+        for (const row of rows) {
+          const vals = row
+            .map((v) =>
+              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
+            )
+            .join(", ");
+          engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+        }
+        engine.exec("COMMIT");
+      } catch (insertErr) {
+        try {
+          engine.exec("ROLLBACK");
+        } catch {
+          // Ignore rollback failure.
+        }
+        throw insertErr;
+      }
+      setTables(engine.listTables());
+      setImportJsonOpen(false);
+      setImportJsonState(null);
+      showToast(
+        `Imported ${rows.length} row${rows.length === 1 ? "" : "s"} into "${trimmed}".`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`JSON import failed: ${msg}`, "warn");
+    }
+  }, [importJsonState, showToast]);
 
   // ─── Delete selected rows ─────────────────────────────────────────
   // Called from the result table when the user confirms deletion of one
@@ -1792,7 +2146,8 @@ function SqlPlaygroundInner() {
   }, [activeDbId]);
 
   const resetTabsForCurrentDb = useCallback(() => {
-    const sample = findSampleDatabase(activeDbId);
+    const sample =
+      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
     const fresh = sample.defaultTabs.map((seed) => ({
       ...seed,
       id: newTabId(),
@@ -1815,7 +2170,7 @@ function SqlPlaygroundInner() {
     const editor = editorRef.current;
     if (editor) editor.setValue(fresh[0].code);
     showToast("Query tabs reset to defaults.");
-  }, [activeDbId, showToast]);
+  }, [activeDbId, customDb, showToast]);
 
   // ─── Resizer (vertical, between results panel and editor) ───────────
   const panesRef = useRef<HTMLDivElement | null>(null);
@@ -1966,8 +2321,9 @@ function SqlPlaygroundInner() {
   }, [loaded, statusState]);
 
   const activeSample = useMemo(
-    () => findSampleDatabase(activeDbId),
-    [activeDbId],
+    () =>
+      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId),
+    [activeDbId, customDb],
   );
 
   return (
@@ -2080,6 +2436,63 @@ function SqlPlaygroundInner() {
           </div>
           <div className="header-sep" />
           <div className="header-actions desktop-only">
+            <Menu.Root>
+              <Menu.Trigger
+                className="header-btn"
+                title="Import data"
+                aria-label="Import"
+                disabled={!loaded}
+              >
+                <ArrowUpFromLine size={14} aria-hidden="true" />
+                <span className="btn-label">Import</span>
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner sideOffset={6} align="start">
+                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportSqliteOpen(true)}
+                    >
+                      <span className="ext-badge">.sqlite</span>
+                      <div className="export-item-text">
+                        <div className="ex-title">from SQLite</div>
+                        <div className="ex-desc">
+                          Replace database from .sqlite file
+                        </div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => {
+                        setImportCsvState(null);
+                        setImportCsvOpen(true);
+                      }}
+                    >
+                      <span className="ext-badge">.csv</span>
+                      <div className="export-item-text">
+                        <div className="ex-title">from CSV</div>
+                        <div className="ex-desc">Add table from CSV file</div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => {
+                        setImportJsonState(null);
+                        setImportJsonOpen(true);
+                      }}
+                    >
+                      <span className="ext-badge">.json</span>
+                      <div className="export-item-text">
+                        <div className="ex-title">from JSON</div>
+                        <div className="ex-desc">
+                          Add table from JSON array
+                        </div>
+                      </div>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
             <Menu.Root>
               <Menu.Trigger
                 className="header-btn"
@@ -2341,6 +2754,379 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        {/* ── Import SQLite dialog ── */}
+        <Dialog.Root
+          open={importSqliteOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportSqliteOpen(false);
+              setImportSqliteDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import SQLite File
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Open a local <code>.sqlite</code> or <code>.db</code> file as a
+                new in-memory database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This is a playground environment. Your file will{" "}
+                  <strong>not</strong> be uploaded or persisted — it is only
+                  loaded into browser memory and will be gone on reload.
+                </span>
+              </div>
+              <div
+                className={`sql-dropzone${importSqliteDragging ? " dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setImportSqliteDragging(true);
+                }}
+                onDragLeave={() => setImportSqliteDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setImportSqliteDragging(false);
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const buf = ev.target?.result as ArrayBuffer | null;
+                    if (!buf) return;
+                    performImportSqlite(
+                      new Uint8Array(buf),
+                      file.name,
+                    );
+                  };
+                  reader.readAsArrayBuffer(file);
+                }}
+              >
+                <Upload
+                  size={28}
+                  className="sql-dropzone-icon"
+                  aria-hidden="true"
+                />
+                <span>Drop a SQLite file here</span>
+                <span className="sql-dropzone-hint">
+                  or click to browse — .sqlite, .db
+                </span>
+                <input
+                  type="file"
+                  accept=".sqlite,.db,.sqlite3"
+                  aria-label="Choose SQLite file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const buf = ev.target?.result as ArrayBuffer | null;
+                      if (!buf) return;
+                      performImportSqlite(
+                        new Uint8Array(buf),
+                        file.name,
+                      );
+                    };
+                    reader.readAsArrayBuffer(file);
+                    // Reset the input so the same file can be re-selected.
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Import CSV dialog ── */}
+        <Dialog.Root
+          open={importCsvOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportCsvOpen(false);
+              setImportCsvState(null);
+              setImportCsvDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import CSV File
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Parse a CSV file and add it as a new table in the current
+                database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This is a playground — your data is only held in browser
+                  memory and will not be persisted on reload.
+                </span>
+              </div>
+              {!importCsvState ? (
+                <div
+                  className={`sql-dropzone${importCsvDragging ? " dragging" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setImportCsvDragging(true);
+                  }}
+                  onDragLeave={() => setImportCsvDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setImportCsvDragging(false);
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleCsvFile(file);
+                  }}
+                >
+                  <FileText
+                    size={28}
+                    className="sql-dropzone-icon"
+                    aria-hidden="true"
+                  />
+                  <span>Drop a CSV file here</span>
+                  <span className="sql-dropzone-hint">
+                    or click to browse — .csv
+                  </span>
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    aria-label="Choose CSV file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleCsvFile(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="sql-import-table-name-row">
+                    <label htmlFor="csv-table-name">Table name:</label>
+                    <input
+                      id="csv-table-name"
+                      className="sql-rename-input"
+                      value={importCsvState.tableName}
+                      onChange={(e) =>
+                        setImportCsvState((prev) =>
+                          prev ? { ...prev, tableName: e.target.value } : null,
+                        )
+                      }
+                      autoFocus
+                    />
+                  </div>
+                  <div className="sql-import-preview">
+                    <table>
+                      <thead>
+                        <tr>
+                          {importCsvState.headers.map((h) => (
+                            <th key={h}>{h || "(empty)"}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importCsvState.rows.slice(0, 5).map((row, i) => (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <tr key={i}>
+                            {row.map((cell, j) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <td key={j}>{cell || <em>NULL</em>}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-dim)",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {importCsvState.rows.length} row
+                    {importCsvState.rows.length === 1 ? "" : "s"} ·{" "}
+                    {importCsvState.headers.length} column
+                    {importCsvState.headers.length === 1 ? "" : "s"}
+                    {importCsvState.rows.length > 5 &&
+                      ` · showing first 5`}
+                  </div>
+                </>
+              )}
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                {importCsvState && (
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    onClick={submitCsvImport}
+                  >
+                    Import
+                  </button>
+                )}
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Import JSON dialog ── */}
+        <Dialog.Root
+          open={importJsonOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportJsonOpen(false);
+              setImportJsonState(null);
+              setImportJsonDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import JSON File
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Parse a JSON array of objects and add it as a new table in the
+                current database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This is a playground — your data is only held in browser
+                  memory and will not be persisted on reload.
+                </span>
+              </div>
+              {!importJsonState ? (
+                <div
+                  className={`sql-dropzone${importJsonDragging ? " dragging" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setImportJsonDragging(true);
+                  }}
+                  onDragLeave={() => setImportJsonDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setImportJsonDragging(false);
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleJsonFile(file);
+                  }}
+                >
+                  <FileJson
+                    size={28}
+                    className="sql-dropzone-icon"
+                    aria-hidden="true"
+                  />
+                  <span>Drop a JSON file here</span>
+                  <span className="sql-dropzone-hint">
+                    or click to browse — .json (array of objects)
+                  </span>
+                  <input
+                    type="file"
+                    accept=".json,application/json"
+                    aria-label="Choose JSON file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleJsonFile(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="sql-import-table-name-row">
+                    <label htmlFor="json-table-name">Table name:</label>
+                    <input
+                      id="json-table-name"
+                      className="sql-rename-input"
+                      value={importJsonState.tableName}
+                      onChange={(e) =>
+                        setImportJsonState((prev) =>
+                          prev ? { ...prev, tableName: e.target.value } : null,
+                        )
+                      }
+                      autoFocus
+                    />
+                  </div>
+                  <div className="sql-import-preview">
+                    <table>
+                      <thead>
+                        <tr>
+                          {importJsonState.headers.map((h) => (
+                            <th key={h}>{h || "(empty)"}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importJsonState.rows.slice(0, 5).map((row, i) => (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <tr key={i}>
+                            {row.map((cell, j) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <td key={j}>{cell || <em>NULL</em>}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-dim)",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {importJsonState.rows.length} row
+                    {importJsonState.rows.length === 1 ? "" : "s"} ·{" "}
+                    {importJsonState.headers.length} column
+                    {importJsonState.headers.length === 1 ? "" : "s"}
+                    {importJsonState.rows.length > 5 && ` · showing first 5`}
+                  </div>
+                </>
+              )}
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                {importJsonState && (
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    onClick={submitJsonImport}
+                  >
+                    Import
+                  </button>
+                )}
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <Dialog.Root
           open={ddlDialog !== null}
           onOpenChange={(next) => {
@@ -2587,7 +3373,17 @@ function SqlPlaygroundInner() {
               <div className="sql-db-selector-row">
                 <Select.Root
                   value={activeDbId}
-                  onValueChange={(value) => requestDbSwitch(String(value))}
+                  onValueChange={(value) => {
+                    if (value === "__new_db__") {
+                      performBlankLoad();
+                      return;
+                    }
+                    if (value === "__import_sqlite__") {
+                      setImportSqliteOpen(true);
+                      return;
+                    }
+                    requestDbSwitch(String(value));
+                  }}
                 >
                   <Select.Trigger
                     className="sql-db-selector"
@@ -2615,6 +3411,48 @@ function SqlPlaygroundInner() {
                   <Select.Portal>
                     <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
                       <Select.Popup className="bui-select-popup sql-db-popup">
+                        <Select.Item
+                          value="__new_db__"
+                          className="bui-select-item sql-db-item"
+                        >
+                          <span
+                            className="bui-select-item-icon"
+                            aria-hidden="true"
+                          >
+                            <FilePlus size={14} />
+                          </span>
+                          <span className="sql-db-item-text">
+                            <Select.ItemText>New Database</Select.ItemText>
+                            <span className="sql-db-item-desc">
+                              Create a blank database
+                            </span>
+                          </span>
+                        </Select.Item>
+                        <Select.Item
+                          value="__import_sqlite__"
+                          className="bui-select-item sql-db-item"
+                        >
+                          <span
+                            className="bui-select-item-icon"
+                            aria-hidden="true"
+                          >
+                            <Upload size={14} />
+                          </span>
+                          <span className="sql-db-item-text">
+                            <Select.ItemText>Import SQLite File</Select.ItemText>
+                            <span className="sql-db-item-desc">
+                              Open a .sqlite or .db file
+                            </span>
+                          </span>
+                        </Select.Item>
+                        <div
+                          role="separator"
+                          aria-orientation="horizontal"
+                          className="sql-db-popup-sep"
+                        />
+                        <div className="sql-db-popup-group-label">
+                          Sample databases
+                        </div>
                         {SQLITE_SAMPLE_DATABASES.map((s) => (
                           <Select.Item
                             key={s.id}
