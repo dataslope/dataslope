@@ -295,8 +295,8 @@
   content: "";
   position: absolute;
   left: 36px;
-  top: 4px;
-  bottom: 6px;
+  top: 8px;
+  bottom: 12px;
   width: 1px;
   background: var(--border);
   pointer-events: none;
@@ -305,13 +305,13 @@
 .sql-tree-column {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: var(--font-ui);
   font-size: 11px;
   color: var(--text);
   /* Pull the row left so the icon "node" overlaps the guide line. */
   padding: 2px 8px 2px 0;
-  margin-left: -10px;
+  margin-left: -11px;
   line-height: 1.3;
   cursor: pointer;
 }
@@ -691,7 +691,6 @@
   font-weight: 600;
 }
 
-
 .sql-result-pager-controls {
   display: inline-flex;
   align-items: center;
@@ -917,7 +916,9 @@
   /* Sit on top of the tabbar's bottom border so the active tab can
      "punch through" it and visually merge with the editor below. */
   margin-bottom: -1px;
-  transition: background 120ms ease, color 120ms ease;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
 }
 
 .sql-tab:hover {
@@ -1134,7 +1135,8 @@
   display: flex;
   flex-direction: column;
   outline: none;
-  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+  transition:
+    transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
     opacity 0.22s ease;
 }
 
@@ -1529,7 +1531,9 @@
   padding: 32px 24px;
   cursor: pointer;
   text-align: center;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
   position: relative;
   color: var(--text-dim);
   font-size: 13px;

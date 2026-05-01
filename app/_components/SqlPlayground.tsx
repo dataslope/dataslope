@@ -420,8 +420,7 @@ function SqlPlaygroundInner() {
   // ─── UI state ───────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
-  const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
-    useState(false);
+  const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
   const [confirmCloseTabId, setConfirmCloseTabId] = useState<string | null>(
     null,
   );
@@ -429,9 +428,10 @@ function SqlPlaygroundInner() {
   // DDL viewer dialog state. We keep both the title (entity name) and
   // the DDL string so the dialog can stay open while the underlying
   // sidebar list mutates from a concurrent DROP.
-  const [ddlDialog, setDdlDialog] = useState<
-    { title: string; sql: string } | null
-  >(null);
+  const [ddlDialog, setDdlDialog] = useState<{
+    title: string;
+    sql: string;
+  } | null>(null);
   // Modify Structure drawer state. `null` = closed; an object holds the
   // editable form spec for the table currently being modified.
   const [modifyDialog, setModifyDialog] = useState<{
@@ -562,7 +562,7 @@ function SqlPlaygroundInner() {
   const [resultsByTab, setResultsByTab] = useState<
     Record<string, QueryRunResult>
   >({});
-  const result = activeTabId ? resultsByTab[activeTabId] ?? null : null;
+  const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
 
   // (PK / FK key-hint computation lives further down — after
   //  `refreshEntityMetadata` is declared — so we can reference it here.)
@@ -654,9 +654,8 @@ function SqlPlaygroundInner() {
     const savedOutputEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
-      Number(
-        localStorage.getItem(storageKey("outputfontsize")) ?? savedSize,
-      ) || savedSize;
+      Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
+      savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
     const savedClearBeforeRun =
@@ -1000,9 +999,7 @@ function SqlPlaygroundInner() {
     (nextId: string) => {
       if (nextId === activeDbId) return;
       const curSample =
-        customDb?.id === activeDbId
-          ? customDb
-          : findSampleDatabase(activeDbId);
+        customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
       // Only prompt when the *current* db has unsaved edits relative to
       // its defaults. Switching to and from clean defaults should be
       // friction-free.
@@ -1271,7 +1268,9 @@ function SqlPlaygroundInner() {
       if (rawExpanded) {
         const parsed = JSON.parse(rawExpanded) as string[];
         if (Array.isArray(parsed)) {
-          setExpandedEntities(new Set(parsed.filter((s) => typeof s === "string")));
+          setExpandedEntities(
+            new Set(parsed.filter((s) => typeof s === "string")),
+          );
         } else {
           setExpandedEntities(new Set());
         }
@@ -1341,7 +1340,9 @@ function SqlPlaygroundInner() {
       // *fresh* ArrayBuffer, so the Blob owns its own copy of the
       // bytes. sql.js may reuse its internal buffer on the next
       // `exec()`, which would otherwise corrupt the in-flight blob.
-      const blob = new Blob([bytes.slice()], { type: "application/vnd.sqlite3" });
+      const blob = new Blob([bytes.slice()], {
+        type: "application/vnd.sqlite3",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1482,9 +1483,7 @@ function SqlPlaygroundInner() {
           // non-empty fields are single-quote–escaped string literals
           // (`''` is the standard SQL escape for a literal single quote).
           const vals = row
-            .map((v) =>
-              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
-            )
+            .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
             .join(", ");
           engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
         }
@@ -1591,9 +1590,7 @@ function SqlPlaygroundInner() {
       try {
         for (const row of rows) {
           const vals = row
-            .map((v) =>
-              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
-            )
+            .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
             .join(", ");
           engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
         }
@@ -1693,12 +1690,7 @@ function SqlPlaygroundInner() {
     ) {
       refreshEntityMetadata(result.sourceTable);
     }
-  }, [
-    result,
-    columnsByEntity,
-    foreignKeysByEntity,
-    refreshEntityMetadata,
-  ]);
+  }, [result, columnsByEntity, foreignKeysByEntity, refreshEntityMetadata]);
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -1715,35 +1707,32 @@ function SqlPlaygroundInner() {
     return { pk, fk: fkByName };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
-  const toggleEntityExpanded = useCallback(
-    (name: string) => {
-      setExpandedEntities((prev) => {
-        const next = new Set(prev);
-        if (next.has(name)) {
-          next.delete(name);
-        } else {
-          next.add(name);
-        }
-        // Persist the (now-mutated) set so it survives reloads.
-        try {
-          localStorage.setItem(
-            dbScopedKey(activeDbIdRef.current, "expanded_entities"),
-            JSON.stringify(Array.from(next)),
-          );
-        } catch {
-          // ignore quota errors
-        }
-        return next;
-      });
-      // Metadata loading is handled by a dedicated effect that watches
-      // `expandedEntities` and `columnsByEntity` — keeping the side
-      // effect outside the state updater is what guarantees the row's
-      // column list reappears after `runSqlForTab` wipes the cache
-      // (e.g. after a sidebar preview), instead of getting stuck on
-      // "Loading…" until the user collapses and re-expands the row.
-    },
-    [],
-  );
+  const toggleEntityExpanded = useCallback((name: string) => {
+    setExpandedEntities((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      // Persist the (now-mutated) set so it survives reloads.
+      try {
+        localStorage.setItem(
+          dbScopedKey(activeDbIdRef.current, "expanded_entities"),
+          JSON.stringify(Array.from(next)),
+        );
+      } catch {
+        // ignore quota errors
+      }
+      return next;
+    });
+    // Metadata loading is handled by a dedicated effect that watches
+    // `expandedEntities` and `columnsByEntity` — keeping the side
+    // effect outside the state updater is what guarantees the row's
+    // column list reappears after `runSqlForTab` wipes the cache
+    // (e.g. after a sidebar preview), instead of getting stuck on
+    // "Loading…" until the user collapses and re-expands the row.
+  }, []);
 
   const expandAllEntities = useCallback((names: string[]) => {
     setExpandedEntities((prev) => {
@@ -1850,9 +1839,10 @@ function SqlPlaygroundInner() {
         autoIncrement: c.autoIncrement,
         unique: c.unique,
         defaultValue: c.defaultValue.trim() || undefined,
-        foreignKey: c.fkTable && c.fkColumn
-          ? { table: c.fkTable.trim(), column: c.fkColumn.trim() }
-          : undefined,
+        foreignKey:
+          c.fkTable && c.fkColumn
+            ? { table: c.fkTable.trim(), column: c.fkColumn.trim() }
+            : undefined,
         originalName: c.originalName ?? undefined,
       })),
     };
@@ -1892,7 +1882,12 @@ function SqlPlaygroundInner() {
         const cols = engine.listColumns(name);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
-        setAddRowDialog({ tableName: name, columns: cols, values: initValues, addAnother: false });
+        setAddRowDialog({
+          tableName: name,
+          columns: cols,
+          values: initValues,
+          addAnother: false,
+        });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Couldn't load columns: ${msg}`, "warn");
@@ -1923,7 +1918,9 @@ function SqlPlaygroundInner() {
       if (addAnother) {
         const newValues: Record<string, string> = {};
         for (const c of columns) newValues[c.name] = "";
-        setAddRowDialog((prev) => (prev ? { ...prev, values: newValues } : null));
+        setAddRowDialog((prev) =>
+          prev ? { ...prev, values: newValues } : null,
+        );
       } else {
         setAddRowDialog(null);
       }
@@ -2284,10 +2281,7 @@ function SqlPlaygroundInner() {
       if (!dragging) return;
       const shellWidth = shell.offsetWidth;
       const maxW = Math.max(200, Math.min(600, shellWidth - 320));
-      const next = Math.max(
-        160,
-        Math.min(maxW, startW + (e.clientX - startX)),
-      );
+      const next = Math.max(160, Math.min(maxW, startW + (e.clientX - startX)));
       shell.style.setProperty("--sql-sidebar-width", `${next}px`);
     };
     const onUp = () => {
@@ -2378,7 +2372,9 @@ function SqlPlaygroundInner() {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            <Link href="/" className="brand-name">Dataslope</Link>
+            <Link href="/" className="brand-name">
+              Dataslope
+            </Link>
             <Select.Root
               value={PLAYGROUND_ID}
               onValueChange={(value) => {
@@ -2502,9 +2498,7 @@ function SqlPlaygroundInner() {
                       <span className="ext-badge">.json</span>
                       <div className="export-item-text">
                         <div className="ex-title">from JSON</div>
-                        <div className="ex-desc">
-                          Add table from JSON array
-                        </div>
+                        <div className="ex-desc">Add table from JSON array</div>
                       </div>
                     </Menu.Item>
                   </Menu.Popup>
@@ -2624,9 +2618,9 @@ function SqlPlaygroundInner() {
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
                 You have unsaved edits in the query tabs for{" "}
-                <strong>{activeSample.filename}</strong>. They will be saved
-                and restored when you switch back, but loading another
-                database will replace what&rsquo;s currently in the editor.
+                <strong>{activeSample.filename}</strong>. They will be saved and
+                restored when you switch back, but loading another database will
+                replace what&rsquo;s currently in the editor.
               </AlertDialog.Description>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2820,10 +2814,7 @@ function SqlPlaygroundInner() {
                   reader.onload = (ev) => {
                     const buf = ev.target?.result as ArrayBuffer | null;
                     if (!buf) return;
-                    performImportSqlite(
-                      new Uint8Array(buf),
-                      file.name,
-                    );
+                    performImportSqlite(new Uint8Array(buf), file.name);
                   };
                   reader.readAsArrayBuffer(file);
                 }}
@@ -2848,10 +2839,7 @@ function SqlPlaygroundInner() {
                     reader.onload = (ev) => {
                       const buf = ev.target?.result as ArrayBuffer | null;
                       if (!buf) return;
-                      performImportSqlite(
-                        new Uint8Array(buf),
-                        file.name,
-                      );
+                      performImportSqlite(new Uint8Array(buf), file.name);
                     };
                     reader.readAsArrayBuffer(file);
                     // Reset the input so the same file can be re-selected.
@@ -2984,8 +2972,7 @@ function SqlPlaygroundInner() {
                     {importCsvState.rows.length === 1 ? "" : "s"} ·{" "}
                     {importCsvState.headers.length} column
                     {importCsvState.headers.length === 1 ? "" : "s"}
-                    {importCsvState.rows.length > 5 &&
-                      ` · showing first 5`}
+                    {importCsvState.rows.length > 5 && ` · showing first 5`}
                   </div>
                 </>
               )}
@@ -3158,8 +3145,8 @@ function SqlPlaygroundInner() {
                 DDL: {ddlDialog?.title ?? ""}
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Read-only view of the original{" "}
-                <code>CREATE</code> statement(s) recorded in
+                Read-only view of the original <code>CREATE</code> statement(s)
+                recorded in
                 <code> sqlite_master</code>.
               </Dialog.Description>
               <DdlViewer
@@ -3181,10 +3168,7 @@ function SqlPlaygroundInner() {
                         .writeText(ddlDialog.sql)
                         .then(() => showToast("Copied DDL to clipboard."))
                         .catch(() =>
-                          showToast(
-                            "Couldn't copy to clipboard.",
-                            "warn",
-                          ),
+                          showToast("Couldn't copy to clipboard.", "warn"),
                         );
                     }
                   }}
@@ -3281,8 +3265,12 @@ function SqlPlaygroundInner() {
                     {addRowDialog.columns.map((c) => (
                       <label key={c.name} className="sql-add-row-field">
                         <span className="sql-add-row-field-label">
-                          <span className="sql-add-row-field-name">{c.name}</span>
-                          <span className="sql-add-row-field-type">{c.type || "—"}</span>
+                          <span className="sql-add-row-field-name">
+                            {c.name}
+                          </span>
+                          <span className="sql-add-row-field-type">
+                            {c.type || "—"}
+                          </span>
                         </span>
                         <input
                           className="sql-rename-input"
@@ -3292,7 +3280,10 @@ function SqlPlaygroundInner() {
                               prev
                                 ? {
                                     ...prev,
-                                    values: { ...prev.values, [c.name]: e.target.value },
+                                    values: {
+                                      ...prev.values,
+                                      [c.name]: e.target.value,
+                                    },
                                   }
                                 : null,
                             )
@@ -3309,7 +3300,9 @@ function SqlPlaygroundInner() {
                       checked={addRowDialog.addAnother}
                       onChange={(e) =>
                         setAddRowDialog((prev) =>
-                          prev ? { ...prev, addAnother: e.target.checked } : null,
+                          prev
+                            ? { ...prev, addAnother: e.target.checked }
+                            : null,
                         )
                       }
                     />
@@ -3427,7 +3420,10 @@ function SqlPlaygroundInner() {
                     </Select.Icon>
                   </Select.Trigger>
                   <Select.Portal>
-                    <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
+                    <Select.Positioner
+                      sideOffset={6}
+                      alignItemWithTrigger={false}
+                    >
                       <Select.Popup className="bui-select-popup sql-db-popup">
                         <Select.Item
                           value="__new_db__"
@@ -3457,7 +3453,9 @@ function SqlPlaygroundInner() {
                             <Upload size={14} />
                           </span>
                           <span className="sql-db-item-text">
-                            <Select.ItemText>Import SQLite File</Select.ItemText>
+                            <Select.ItemText>
+                              Import SQLite File
+                            </Select.ItemText>
                             <span className="sql-db-item-desc">
                               Open a .sqlite or .db file
                             </span>
@@ -3602,9 +3600,7 @@ function SqlPlaygroundInner() {
               </SchemaSection>
             </div>
 
-            <div className="sql-sidebar-footer">
-              {RUNTIME_INFO.engine}
-            </div>
+            <div className="sql-sidebar-footer">{RUNTIME_INFO.engine}</div>
           </aside>
 
           <div
@@ -3771,7 +3767,9 @@ function SqlTab({
         <Dialog.Portal>
           <Dialog.Backdrop className="confirm-backdrop" />
           <Dialog.Popup className="confirm-popup sql-rename-popup">
-            <Dialog.Title className="confirm-title">Rename query tab</Dialog.Title>
+            <Dialog.Title className="confirm-title">
+              Rename query tab
+            </Dialog.Title>
             <Dialog.Description className="confirm-desc">
               Choose a short name for this query tab.
             </Dialog.Description>
@@ -3792,7 +3790,10 @@ function SqlTab({
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
-                <button type="submit" className="confirm-btn confirm-btn-primary">
+                <button
+                  type="submit"
+                  className="confirm-btn confirm-btn-primary"
+                >
                   Rename
                 </button>
               </div>
@@ -3839,7 +3840,10 @@ function SqlTab({
               <ContextMenu.Item className="example-item" onClick={onClose}>
                 <div className="ex-title">Close</div>
               </ContextMenu.Item>
-              <ContextMenu.Item className="example-item" onClick={onCloseOthers}>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={onCloseOthers}
+              >
                 <div className="ex-title">Close Others</div>
               </ContextMenu.Item>
               <ContextMenu.Item className="example-item" onClick={onCloseAll}>
@@ -3909,17 +3913,19 @@ function ResultView({
   }, [result]);
 
   const getState = useCallback(
-    (idx: number) =>
-      pageStates[idx] ?? { pageSize: initialPageSize, page: 0 },
+    (idx: number) => pageStates[idx] ?? { pageSize: initialPageSize, page: 0 },
     [pageStates, initialPageSize],
   );
 
-  const setPage = useCallback((idx: number, page: number) => {
-    setPageStates((prev) => {
-      const cur = prev[idx] ?? { pageSize: initialPageSize, page: 0 };
-      return { ...prev, [idx]: { ...cur, page } };
-    });
-  }, [initialPageSize]);
+  const setPage = useCallback(
+    (idx: number, page: number) => {
+      setPageStates((prev) => {
+        const cur = prev[idx] ?? { pageSize: initialPageSize, page: 0 };
+        return { ...prev, [idx]: { ...cur, page } };
+      });
+    },
+    [initialPageSize],
+  );
 
   const setPageSize = useCallback((idx: number, pageSize: number) => {
     setPageStates((prev) => ({
@@ -4043,8 +4049,8 @@ function ResultView({
         <h3>Run a query to see results</h3>
         <p>
           Press <kbd className="kbd">Run</kbd> or use the keyboard shortcut to
-          execute the active tab. Click any table or view in the sidebar to
-          open it in a new tab.
+          execute the active tab. Click any table or view in the sidebar to open
+          it in a new tab.
         </p>
       </div>
     );
@@ -4065,9 +4071,7 @@ function ResultView({
     );
   }
   const pendingCount =
-    pendingDelete !== null
-      ? selectedByIndex[pendingDelete]?.size ?? 0
-      : 0;
+    pendingDelete !== null ? (selectedByIndex[pendingDelete]?.size ?? 0) : 0;
   return (
     <>
       <div className="sql-result-sets">
@@ -4095,9 +4099,7 @@ function ResultView({
               keyHints={keyHints}
               deletable={pkCols !== null}
               selectedRows={selected}
-              onToggleRow={(absoluteRow) =>
-                toggleRowSelected(idx, absoluteRow)
-              }
+              onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
               onToggleVisible={(absoluteIndices, select) =>
                 setVisibleSelection(idx, absoluteIndices, select)
               }
@@ -4143,9 +4145,9 @@ function ResultView({
             <AlertDialog.Description className="confirm-desc">
               {pendingCount} row{pendingCount === 1 ? "" : "s"} will be
               permanently deleted from{" "}
-              <strong>{sourceTable ?? "this table"}</strong>
-              . The change is in-memory only and will be undone next page
-              load, but cannot be reversed within this session.
+              <strong>{sourceTable ?? "this table"}</strong>. The change is
+              in-memory only and will be undone next page load, but cannot be
+              reversed within this session.
             </AlertDialog.Description>
             <div className="confirm-actions">
               <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
@@ -4403,9 +4405,7 @@ function ResultPager({
   return (
     <div className="sql-result-pager">
       {showSetLabel && (
-        <span className="sql-result-pager-set">
-          Set #{index + 1}
-        </span>
+        <span className="sql-result-pager-set">Set #{index + 1}</span>
       )}
       <span className="sql-result-pager-info">
         {deletable && selectedCount > 0 ? (
@@ -4491,9 +4491,7 @@ function ResultPager({
         <button
           type="button"
           className="sql-result-pager-btn"
-          onClick={() =>
-            onPageChange(Math.min(totalPages - 1, safePage + 1))
-          }
+          onClick={() => onPageChange(Math.min(totalPages - 1, safePage + 1))}
           disabled={safePage >= totalPages - 1}
           aria-label="Next page"
           title="Next page"
@@ -4542,9 +4540,7 @@ function ModifyStructureForm({
   const updateColumn = (id: string, patch: Partial<ModifyColumnDraft>) => {
     onChange({
       ...state,
-      columns: state.columns.map((c) =>
-        c.id === id ? { ...c, ...patch } : c,
-      ),
+      columns: state.columns.map((c) => (c.id === id ? { ...c, ...patch } : c)),
     });
   };
   const removeColumn = (id: string) => {
@@ -4600,7 +4596,11 @@ function ModifyStructureForm({
                   <th>Not null</th>
                   <th>Primary</th>
                   <th>Unique</th>
-                  <th>Auto-<br/>increment</th>
+                  <th>
+                    Auto-
+                    <br />
+                    increment
+                  </th>
                   <th>Default value</th>
                   <th>FK table</th>
                   <th>FK column</th>
@@ -4807,9 +4807,7 @@ function ColumnFlag({
   showLabel?: boolean;
 }) {
   return (
-    <label
-      className={`sql-modify-flag${disabled ? " is-disabled" : ""}`}
-    >
+    <label className={`sql-modify-flag${disabled ? " is-disabled" : ""}`}>
       <Checkbox.Root
         checked={checked}
         onCheckedChange={(v) => onChange(v === true)}
@@ -4938,14 +4936,14 @@ function SchemaSection({
           className="sql-tree-section-toggle"
           onClick={onToggle}
           aria-expanded={expanded}
-          title={expanded ? `Collapse ${label.toLowerCase()}` : `Expand ${label.toLowerCase()}`}
+          title={
+            expanded
+              ? `Collapse ${label.toLowerCase()}`
+              : `Expand ${label.toLowerCase()}`
+          }
         >
           <span className="sql-tree-chevron" aria-hidden="true">
-            {expanded ? (
-              <ChevronDown size={11} />
-            ) : (
-              <ChevronRight size={11} />
-            )}
+            {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
           </span>
           <span className="sql-tree-label">
             {label} ({count})
@@ -4956,8 +4954,16 @@ function SchemaSection({
             type="button"
             className="sql-tree-section-add"
             onClick={allExpanded ? onCollapseAll : onExpandAll}
-            title={allExpanded ? `Collapse all ${label.toLowerCase()}` : `Expand all ${label.toLowerCase()}`}
-            aria-label={allExpanded ? `Collapse all ${label.toLowerCase()}` : `Expand all ${label.toLowerCase()}`}
+            title={
+              allExpanded
+                ? `Collapse all ${label.toLowerCase()}`
+                : `Expand all ${label.toLowerCase()}`
+            }
+            aria-label={
+              allExpanded
+                ? `Collapse all ${label.toLowerCase()}`
+                : `Expand all ${label.toLowerCase()}`
+            }
           >
             {allExpanded ? (
               <ChevronsUp size={11} aria-hidden="true" />
@@ -5122,10 +5128,13 @@ function SchemaItem({
                                   className="sql-tree-column-fk"
                                   aria-label={`Foreign key → ${fk.table}.${fk.to}`}
                                 >
-                                  <IoLink size={7} aria-hidden="true" />
+                                  <IoLink size={12} aria-hidden="true" />
                                 </Popover.Trigger>
                                 <Popover.Portal>
-                                  <Popover.Positioner sideOffset={6} side="right">
+                                  <Popover.Positioner
+                                    sideOffset={6}
+                                    side="right"
+                                  >
                                     <Popover.Popup className="bui-popup sql-fk-popover">
                                       → {fk.table}.{fk.to}
                                     </Popover.Popup>
