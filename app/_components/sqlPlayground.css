@@ -1011,9 +1011,14 @@
   z-index: 5;
   padding: 8px;
   background: color-mix(in srgb, var(--bg2) 92%, transparent);
-  border: 1px solid var(--border);
   border-radius: 10px;
   backdrop-filter: blur(8px);
+}
+
+.sql-toolbar .kbd {
+  font-weight: normal;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 1px 0 var(--border);
 }
 
 /* Last-execution-time pill, anchored to the top-right of the editor
@@ -1021,7 +1026,7 @@
    sibling control rather than chrome. */
 .sql-editor-elapsed {
   position: absolute;
-  top: 10px;
+  top: 14px;
   right: 14px;
   z-index: 5;
   display: inline-flex;
@@ -1029,7 +1034,6 @@
   gap: 5px;
   padding: 4px 8px;
   background: color-mix(in srgb, var(--bg2) 92%, transparent);
-  border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-dim);
   font-family: var(--font-ui);
