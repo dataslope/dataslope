@@ -187,7 +187,7 @@ export function clearThemePalette(): void {
   ]) {
     root.style.removeProperty(name);
   }
-  root.removeAttribute("data-theme");
+  root.removeAttribute("data-pg-theme");
 }
 
 export function getStoredEditorTheme(legacyKey?: string): string | null {
@@ -214,9 +214,11 @@ export function setStoredEditorTheme(theme: string): void {
   }
 }
 
-/** Toggle `data-theme` on `<html>` so light-mode-only CSS overrides
- *  apply (e.g. inverting the loading overlay for light themes). */
+/** Toggle `data-pg-theme` on `<html>` so playground-specific light-mode
+ *  CSS overrides apply (e.g. inverting the loading overlay for light
+ *  themes). Uses a playground-namespaced attribute so it never conflicts
+ *  with the docs site's own `data-theme` / class-based dark mode. */
 export function applyMode(theme: string): void {
   const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", resolved);
+  document.documentElement.setAttribute("data-pg-theme", resolved);
 }

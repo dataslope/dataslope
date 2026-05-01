@@ -107,22 +107,25 @@ function detectIsMac(): boolean {
 // with `attribute: "class"`, so light/dark is reflected as the `dark`
 // class (or absence thereof) on the document root. We fall back to the
 // OS-level preference in case the page is rendered outside fumadocs.
+// Note: we intentionally do NOT read `data-theme` here because the
+// playground sets that attribute for its own light/dark switching and
+// it can transiently persist during SPA navigation (between playground
+// unmount cleanup and learn page mount), causing CodeBlocks on /learn
+// to pick up the wrong theme. Playgrounds use `data-pg-theme` instead.
 function detectIsDark(): boolean {
   if (typeof document === "undefined") return true;
   const root = document.documentElement;
   if (root.classList.contains("dark")) return true;
   if (root.classList.contains("light")) return false;
-  if (root.dataset.theme === "dark") return true;
-  if (root.dataset.theme === "light") return false;
   if (typeof window !== "undefined" && window.matchMedia) {
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
   return true;
 }
 
-// Subscribe to <html> class / data-theme mutations so we can re-render
-// when the user toggles the docs theme. Pairs with `useSyncExternalStore`
-// to stay SSR-safe (snapshot defaults to `true` / dark on the server).
+// Subscribe to <html> class mutations so we can re-render when the user
+// toggles the docs theme. Pairs with `useSyncExternalStore` to stay
+// SSR-safe (snapshot defaults to `true` / dark on the server).
 function useIsDark(): boolean {
   return useSyncExternalStore(
     (notify) => {
@@ -130,7 +133,7 @@ function useIsDark(): boolean {
       const observer = new MutationObserver(notify);
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["class", "data-theme"],
+        attributeFilter: ["class"],
       });
       const mql =
         typeof window !== "undefined" && window.matchMedia

@@ -30,7 +30,7 @@
 }
 
 /* ─── Light mode — only non-variable overrides remain ─── */
-html[data-theme="light"] .pyodide-loading {
+html[data-pg-theme="light"] .pyodide-loading {
   background: var(--bg);
 }
 
@@ -195,6 +195,10 @@ body.pg-active {
   z-index: 200;
   transform-origin: var(--transform-origin, top);
   transition: opacity 0.15s, transform 0.15s;
+}
+
+.pg-lang-switcher-popup {
+  z-index: 202;
 }
 .bui-select-popup[data-starting-style],
 .bui-select-popup[data-ending-style] {
@@ -1979,7 +1983,7 @@ input[type="range"].fs-slider:disabled {
     height 0.15s;
 }
 
-html[data-theme="light"] .toast {
+html[data-pg-theme="light"] .toast {
   box-shadow: 0 4px 16px rgb(0 0 0 / 0.10), 0 1px 4px rgb(0 0 0 / 0.06);
 }
 
@@ -2074,8 +2078,8 @@ html[data-theme="light"] .toast {
    the empty-output welcome heading so they remain legible against the
    editor-themed background (which can use a colored "muted" hue that
    doesn't read as a UI label). Light themes keep the existing palette. */
-html[data-theme="dark"] .header-btn { color: #ffffff; }
-html[data-theme="dark"] .header-btn:hover,
-html[data-theme="dark"] .header-btn:focus-visible,
-html[data-theme="dark"] .header-btn[data-popup-open] { color: #ffffff; }
-html[data-theme="dark"] .welcome h3 { color: #ffffff; }
+html[data-pg-theme="dark"] .header-btn { color: #ffffff; }
+html[data-pg-theme="dark"] .header-btn:hover,
+html[data-pg-theme="dark"] .header-btn:focus-visible,
+html[data-pg-theme="dark"] .header-btn[data-popup-open] { color: #ffffff; }
+html[data-pg-theme="dark"] .welcome h3 { color: #ffffff; }
