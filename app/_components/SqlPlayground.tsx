@@ -930,6 +930,9 @@ function SqlPlaygroundInner() {
       setViews(engine.listViews());
       setIndexes(engine.listIndexes());
       setTriggers(engine.listTriggers());
+      // Reset cached column/foreign-key metadata — data from the old
+      // database would be stale for the newly loaded one. The sidebar
+      // will re-fetch these lazily on first expand.
       setColumnsByEntity({});
       setForeignKeysByEntity({});
 
@@ -938,6 +941,11 @@ function SqlPlaygroundInner() {
         id: newTabId(),
         pristineCode: seed.code,
       }));
+      // Update the mutable refs synchronously BEFORE calling setState so
+      // that the CodeMirror `change` listener (which reads them via
+      // closures) always sees the new tabs when it fires during
+      // `editor.setValue()` below. Updating state first would let a
+      // stale closure write back incorrect tab data.
       tabsRef.current = newTabs;
       activeTabIdRef.current = newTabs[0].id;
       setTabs(newTabs);
@@ -1363,8 +1371,12 @@ function SqlPlaygroundInner() {
           if (inQuotes) {
             if (ch === '"') {
               if (i + 1 < line.length && line[i + 1] === '"') {
+                // Two consecutive double-quotes inside a quoted field
+                // represent a literal `"`. Skip the second quote by
+                // manually advancing `i` — the loop's own `i++` then
+                // moves past the escaped pair correctly.
                 cur += '"';
-                i += 1;
+                i += 1; // intentionally skip second quote of escaped pair
               } else {
                 inQuotes = false;
               }
@@ -1447,7 +1459,9 @@ function SqlPlaygroundInner() {
       return;
     }
     try {
-      // Sanitize header names to safe SQL identifiers.
+      // Sanitize header names to safe SQL identifiers — each is
+      // double-quote–escaped and used only as a column-name token,
+      // not as a general string value, so the quoting is safe.
       const safeCols = headers.map((h) => {
         const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
         return `"${s.replace(/"/g, '""')}"`;
@@ -1456,11 +1470,30 @@ function SqlPlaygroundInner() {
       engine.exec(
         `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
       );
-      for (const row of rows) {
-        const vals = row
-          .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
-          .join(", ");
-        engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+      // Wrap all inserts in a single transaction so the import is
+      // atomic: either all rows land or none do (on error, ROLLBACK
+      // restores the empty table).
+      engine.exec("BEGIN");
+      try {
+        for (const row of rows) {
+          // Values are stored as TEXT. Empty CSV fields become SQL NULL;
+          // non-empty fields are single-quote–escaped string literals
+          // (`''` is the standard SQL escape for a literal single quote).
+          const vals = row
+            .map((v) =>
+              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
+            )
+            .join(", ");
+          engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+        }
+        engine.exec("COMMIT");
+      } catch (insertErr) {
+        try {
+          engine.exec("ROLLBACK");
+        } catch {
+          // Ignore rollback failure.
+        }
+        throw insertErr;
       }
       setTables(engine.listTables());
       setImportCsvOpen(false);
@@ -1550,11 +1583,26 @@ function SqlPlaygroundInner() {
       engine.exec(
         `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
       );
-      for (const row of rows) {
-        const vals = row
-          .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
-          .join(", ");
-        engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+      // Wrap all inserts in a single transaction for atomicity and
+      // performance — a ROLLBACK on error leaves no partial table data.
+      engine.exec("BEGIN");
+      try {
+        for (const row of rows) {
+          const vals = row
+            .map((v) =>
+              v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`,
+            )
+            .join(", ");
+          engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+        }
+        engine.exec("COMMIT");
+      } catch (insertErr) {
+        try {
+          engine.exec("ROLLBACK");
+        } catch {
+          // Ignore rollback failure.
+        }
+        throw insertErr;
       }
       setTables(engine.listTables());
       setImportJsonOpen(false);
