@@ -278,7 +278,7 @@
   margin: 0;
   /* Slightly deeper indent so the column rows sit clearly under their
      parent table/view, leaving room for the larger PK / FK icons. */
-  padding: 4px 0 6px 26px;
+  padding: 4px 0 6px 32px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -291,7 +291,7 @@
 .sql-tree-columns::before {
   content: "";
   position: absolute;
-  left: 26px;
+  left: 32px;
   top: 4px;
   bottom: 6px;
   width: 1px;
@@ -382,8 +382,10 @@
 .sql-tree-empty {
   font-size: 11px;
   color: var(--text-dim);
-  padding: 4px 12px;
+  padding: 4px 12px 4px 20px;
   font-style: italic;
+  border-left: 1px solid var(--border);
+  margin-left: 12px;
 }
 
 .sql-sidebar-footer {
