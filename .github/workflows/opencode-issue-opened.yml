@@ -33,21 +33,22 @@ jobs:
             A new GitHub issue has been opened by the repository owner.
 
             Your task:
-            - Read and understand the issue
+            - Read and understand the description.
             - Determine the intent (bug fix, feature, refactor, styling update, documentation, etc.)
-            - Make the appropriate changes to the codebase
-            - Create a pull request with a clear title and description
+            - Implement the requested changes in the codebase
+            - ALWAYS create a pull request, even if the issue is ambiguous or incomplete
 
-            Guidelines:
-            - For styling or UI changes (e.g., CSS), apply clean, consistent, and minimal updates
-            - For features, implement only what is described—avoid scope creep
-            - For refactors, preserve existing behavior unless the issue specifies otherwise
-            - Follow the existing code style, structure, and conventions
-            - Keep changes focused and minimal
+            Execution Rules:
+            - If the issue is clear: implement exactly what is requested
+            - If the issue is vague or incomplete: make a reasonable, minimal interpretation
+            - Avoid scope creep
 
             Pull Request Requirements:
-            - Explain what was changed and why
-            - Reference the original issue
-            - Ensure the code builds and passes existing checks (if applicable)
+            - Always create a PR
+            - Use a clear, descriptive title
+            - In the PR description:
+              - Summarize the changes made
+              - Explain any assumptions or interpretations
+              - Reference the original issue
 
-            If the issue is unclear, incomplete, or cannot be safely implemented, do not create a PR.
+            Never exit without creating a pull request.
