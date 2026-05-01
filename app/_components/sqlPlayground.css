@@ -58,6 +58,8 @@
 }
 
 .sql-db-selector-wrap {
+  position: relative;
+  z-index: 2;
   padding: 8px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
@@ -300,7 +302,6 @@
   height: 20px;
   flex-shrink: 0;
   position: relative;
-  z-index: 1;
 }
 
 /* Shared "node on the guide" treatment for the PK / FK glyphs.
@@ -514,7 +515,7 @@
 .sql-result-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: var(--output-font-size);
 }
 
@@ -522,9 +523,9 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--bg2);
-  color: var(--text-muted);
-  font-weight: 600;
+  background: var(--bg);
+  color: var(--text-dim);
+  font-weight: 500;
   text-align: left;
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
@@ -564,8 +565,8 @@
   width: 14px;
   height: 14px;
   border-radius: 3px;
-  border: 1px solid var(--text-muted);
-  background: var(--bg);
+  border: 1px solid var(--border);
+  background: var(--bg2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -575,19 +576,19 @@
 }
 
 .sql-result-row-checkbox:hover {
-  border-color: var(--text);
+  border-color: var(--text-dim);
 }
 
 .sql-result-row-checkbox[data-checked],
 .sql-result-row-checkbox[data-indeterminate] {
-  background: var(--accent, #f0b400);
-  border-color: var(--accent, #f0b400);
+  background: var(--text-muted);
+  border-color: var(--text-muted);
 }
 
 .sql-result-row-checkbox-ind {
   font-size: 10px;
   line-height: 1;
-  color: var(--bg);
+  color: var(--bg2);
   font-weight: 700;
 }
 
@@ -595,11 +596,11 @@
    Override zebra striping via specificity on the same selectors. */
 .sql-result-table tbody tr.sql-result-row-selected td,
 .sql-result-table tbody tr.sql-result-row-selected:nth-child(2n) td {
-  background: color-mix(in srgb, var(--accent, #f0b400) 14%, transparent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
 .sql-result-table tbody tr.sql-result-row-selected:hover td {
-  background: color-mix(in srgb, var(--accent, #f0b400) 22%, transparent);
+  background: color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 /* Compact action bar that appears above the result table while one
@@ -610,7 +611,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  background: color-mix(in srgb, var(--accent, #f0b400) 10%, var(--bg2));
+  background: var(--bg2);
   border-bottom: 1px solid var(--border);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1107,7 +1108,7 @@
   /* Cap the drawer width so wide displays don't get a sea of
      whitespace; on narrower screens it shrinks to leave a small
      gap on the left so the underlying UI stays peeking through. */
-  width: min(640px, calc(100vw - 48px));
+  width: min(1040px, calc(100vw - 32px));
   background: var(--bg2);
   border-left: 1px solid var(--border);
   box-shadow: -16px 0 48px #000a;
@@ -1179,16 +1180,6 @@
   color: var(--text);
 }
 
-.sql-modify-drawer-help {
-  margin: 0;
-  padding: 12px 20px;
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--text-muted);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-
 .sql-modify-drawer-footer {
   display: flex;
   justify-content: flex-end;
@@ -1205,8 +1196,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
   padding: 18px 20px;
   min-height: 0;
 }
@@ -1230,6 +1220,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
 .sql-modify-empty {
@@ -1241,14 +1232,54 @@
   border-radius: 8px;
 }
 
-.sql-modify-col-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px;
+.sql-modify-table-wrap {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg);
+  overflow: auto;
+}
+
+.sql-modify-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.sql-modify-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+  text-align: center;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sql-modify-table td {
+  padding: 7px 8px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  min-width: 0;
+}
+
+.sql-modify-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sql-modify-table tbody tr:nth-child(2n) td {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.sql-modify-table tbody tr:hover td {
+  background: var(--bg3);
+}
+
+.sql-modify-cell-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
 }
 

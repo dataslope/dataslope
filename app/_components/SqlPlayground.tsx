@@ -61,6 +61,12 @@ import { Checkbox } from "@base-ui-components/react/checkbox";
 import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+} from "@tanstack/react-table";
+import {
   ArrowDownToLine,
   ChevronDown,
   ChevronRight,
@@ -70,7 +76,6 @@ import {
   Database,
   Hash,
   KeyRound,
-  Link as LinkIcon,
   Play,
   Plus,
   Table2,
@@ -78,7 +83,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { FaInfo, FaLink } from "react-icons/fa";
+import { FaInfo } from "react-icons/fa";
+import { FiLink } from "react-icons/fi";
 import { MdOutlineKey } from "react-icons/md";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import type { RuntimeInfo } from "./types";
@@ -203,6 +209,11 @@ function newDraftId(): string {
 interface ColumnKeyHints {
   pk: Set<string>;
   fk: Map<string, ForeignKeyInfo>;
+}
+
+interface ResultTableRow {
+  absoluteRow: number;
+  values: QueryExecResult["values"][number];
 }
 
 function newTabId(): string {
@@ -2249,13 +2260,6 @@ function SqlPlaygroundInner() {
                   <X size={16} aria-hidden="true" />
                 </Dialog.Close>
               </header>
-              <p className="sql-modify-drawer-help">
-                Rename the table, edit column definitions, or add and
-                remove columns. Click Save to apply via SQLite&rsquo;s
-                rebuild-table pattern (data is copied to a new table,
-                then renamed in place). Reordering columns is not yet
-                supported.
-              </p>
               {modifyDialog && (
                 <ModifyStructureForm
                   state={modifyDialog}
@@ -3059,6 +3063,112 @@ function ResultTableBody({
     deletable &&
     !allVisibleSelected &&
     visibleAbsoluteIndices.some((i) => selectedRows?.has(i));
+  const data = useMemo<ResultTableRow[]>(
+    () =>
+      visible.map((values, ri) => ({
+        absoluteRow: startIndex + ri,
+        values,
+      })),
+    [visible, startIndex],
+  );
+  const columns = useMemo<ColumnDef<ResultTableRow>[]>(
+    () => [
+      ...(deletable
+        ? [
+            {
+              id: "select",
+              header: () => (
+                <Checkbox.Root
+                  className="sql-result-row-checkbox"
+                  checked={allVisibleSelected}
+                  indeterminate={someVisibleSelected}
+                  onCheckedChange={(v) =>
+                    onToggleVisible(visibleAbsoluteIndices, v === true)
+                  }
+                  aria-label={
+                    allVisibleSelected
+                      ? "Deselect all visible rows"
+                      : "Select all visible rows"
+                  }
+                >
+                  <Checkbox.Indicator className="sql-result-row-checkbox-ind">
+                    {allVisibleSelected ? "✓" : "–"}
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+              ),
+              cell: ({ row }) => {
+                const absoluteRow = row.original.absoluteRow;
+                const checked = selectedRows?.has(absoluteRow) ?? false;
+                return (
+                  <Checkbox.Root
+                    className="sql-result-row-checkbox"
+                    checked={checked}
+                    onCheckedChange={() => onToggleRow(absoluteRow)}
+                    aria-label={
+                      checked
+                        ? `Deselect row ${absoluteRow + 1}`
+                        : `Select row ${absoluteRow + 1}`
+                    }
+                  >
+                    <Checkbox.Indicator className="sql-result-row-checkbox-ind">
+                      ✓
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                );
+              },
+            } satisfies ColumnDef<ResultTableRow>,
+          ]
+        : []),
+      ...set.columns.map(
+        (c, ci) =>
+          ({
+            id: `col-${ci}-${c}`,
+            accessorFn: (row) => row.values[ci],
+            header: () => {
+              const isPk = keyHints?.pk.has(c) ?? false;
+              const fk = keyHints?.fk.get(c);
+              return (
+                <span className="sql-result-th-label">
+                  {isPk && (
+                    <KeyRound
+                      size={11}
+                      className="sql-result-th-pk"
+                      aria-label="Primary key"
+                    />
+                  )}
+                  {fk && (
+                    <FiLink
+                      size={11}
+                      className="sql-result-th-fk"
+                      aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                    />
+                  )}
+                  <span>{c}</span>
+                </span>
+              );
+            },
+            cell: (info) => formatCellValue(info.getValue()),
+          }) satisfies ColumnDef<ResultTableRow>,
+      ),
+    ],
+    [
+      allVisibleSelected,
+      deletable,
+      keyHints,
+      onToggleRow,
+      onToggleVisible,
+      selectedRows,
+      set.columns,
+      someVisibleSelected,
+      visibleAbsoluteIndices,
+    ],
+  );
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for stable result-table customization.
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
   return (
     <div className="sql-result-set">
       {index > 0 && (
@@ -3082,88 +3192,52 @@ function ResultTableBody({
       <div className="sql-result-table-wrap">
         <table className="sql-result-table">
           <thead>
-            <tr>
-              {deletable && (
-                <th className="sql-result-th-select">
-                  <Checkbox.Root
-                    className="sql-result-row-checkbox"
-                    checked={allVisibleSelected}
-                    indeterminate={someVisibleSelected}
-                    onCheckedChange={(v) =>
-                      onToggleVisible(visibleAbsoluteIndices, v === true)
-                    }
-                    aria-label={
-                      allVisibleSelected
-                        ? "Deselect all visible rows"
-                        : "Select all visible rows"
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className={
+                      header.column.id === "select"
+                        ? "sql-result-th-select"
+                        : undefined
                     }
                   >
-                    <Checkbox.Indicator className="sql-result-row-checkbox-ind">
-                      {allVisibleSelected ? "✓" : "–"}
-                    </Checkbox.Indicator>
-                  </Checkbox.Root>
-                </th>
-              )}
-              {set.columns.map((c) => {
-                const isPk = keyHints?.pk.has(c) ?? false;
-                const fk = keyHints?.fk.get(c);
-                return (
-                  <th key={c}>
-                    <span className="sql-result-th-label">
-                      {isPk && (
-                        <KeyRound
-                          size={11}
-                          className="sql-result-th-pk"
-                          aria-label="Primary key"
-                        />
-                      )}
-                      {fk && (
-                        <LinkIcon
-                          size={11}
-                          className="sql-result-th-fk"
-                          aria-label={`Foreign key → ${fk.table}.${fk.to}`}
-                        />
-                      )}
-                      <span>{c}</span>
-                    </span>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </th>
-                );
-              })}
-            </tr>
+                ))}
+              </tr>
+            ))}
           </thead>
           <tbody>
-            {visible.map((row, ri) => {
-              const absoluteRow = startIndex + ri;
+            {table.getRowModel().rows.map((row) => {
+              const absoluteRow = row.original.absoluteRow;
               const checked = selectedRows?.has(absoluteRow) ?? false;
               return (
                 <tr
                   key={absoluteRow}
                   className={checked ? "sql-result-row-selected" : undefined}
                 >
-                  {deletable && (
-                    <td className="sql-result-td-select">
-                      <Checkbox.Root
-                        className="sql-result-row-checkbox"
-                        checked={checked}
-                        onCheckedChange={() => onToggleRow(absoluteRow)}
-                        aria-label={
-                          checked
-                            ? `Deselect row ${absoluteRow + 1}`
-                            : `Select row ${absoluteRow + 1}`
-                        }
-                      >
-                        <Checkbox.Indicator className="sql-result-row-checkbox-ind">
-                          ✓
-                        </Checkbox.Indicator>
-                      </Checkbox.Root>
-                    </td>
-                  )}
-                  {row.map((v, ci) => (
+                  {row.getVisibleCells().map((cell) => (
                     <td
-                      key={ci}
-                      className={v === null ? "sql-cell-null" : undefined}
+                      key={cell.id}
+                      className={
+                        cell.column.id === "select"
+                          ? "sql-result-td-select"
+                          : cell.getValue() === null
+                            ? "sql-cell-null"
+                            : undefined
+                      }
                     >
-                      {formatCellValue(v)}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -3400,17 +3474,38 @@ function ModifyStructureForm({
         />
       </label>
       <div className="sql-modify-columns">
-        {state.columns.map((col) => (
-          <ModifyColumnRow
-            key={col.id}
-            col={col}
-            onChange={(patch) => updateColumn(col.id, patch)}
-            onRemove={() => removeColumn(col.id)}
-            knownTables={knownTables}
-            engine={engine}
-          />
-        ))}
-        {state.columns.length === 0 && (
+        {state.columns.length > 0 ? (
+          <div className="sql-modify-table-wrap">
+            <table className="sql-modify-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Primary</th>
+                  <th>Unique</th>
+                  <th>Auto-increment</th>
+                  <th>Default value</th>
+                  <th>FK table</th>
+                  <th>FK column</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.columns.map((col) => (
+                  <ModifyColumnRow
+                    key={col.id}
+                    col={col}
+                    onChange={(patch) => updateColumn(col.id, patch)}
+                    onRemove={() => removeColumn(col.id)}
+                    knownTables={knownTables}
+                    engine={engine}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
           <div className="sql-modify-empty">No columns. Add one below.</div>
         )}
       </div>
@@ -3449,24 +3544,9 @@ function ModifyColumnRow({
     }
   }, [engine, col.fkTable]);
   return (
-    <div className="sql-modify-col-row">
-      <div className="sql-modify-col-head">
-        <span className="sql-modify-col-head-name" title={col.name}>
-          {col.name || "(unnamed column)"}
-        </span>
-        <button
-          type="button"
-          className="sql-modify-col-remove"
-          onClick={onRemove}
-          aria-label="Remove column"
-          title="Remove column"
-        >
-          <Trash2 size={13} aria-hidden="true" />
-        </button>
-      </div>
-      <div className="sql-modify-col-grid">
-        <label className="sql-modify-field">
-          <span className="sql-modify-field-label">Name</span>
+    <tr className="sql-modify-col-row">
+      <td>
+        <label className="sql-modify-cell-field">
           <input
             className="sql-rename-input sql-modify-col-name"
             value={col.name}
@@ -3475,8 +3555,9 @@ function ModifyColumnRow({
             aria-label="Column name"
           />
         </label>
-        <label className="sql-modify-field">
-          <span className="sql-modify-field-label">Type</span>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
           <select
             className="sql-modify-col-type sql-modify-col-type-select"
             value={col.type}
@@ -3490,8 +3571,51 @@ function ModifyColumnRow({
             ))}
           </select>
         </label>
-        <label className="sql-modify-field sql-modify-field-wide">
-          <span className="sql-modify-field-label">Default value</span>
+      </td>
+      <td>
+        <ColumnFlag
+          checked={!col.notNull}
+          onChange={(v) => onChange({ notNull: !v })}
+          label="Nullable"
+          showLabel={false}
+        />
+      </td>
+      <td>
+        <ColumnFlag
+          checked={col.primaryKey}
+          onChange={(v) =>
+            onChange({
+              primaryKey: v,
+              // Auto-increment is only meaningful with a single PK.
+              autoIncrement: v ? col.autoIncrement : false,
+            })
+          }
+          label="Primary key"
+          showLabel={false}
+        />
+      </td>
+      <td>
+        <ColumnFlag
+          checked={col.unique}
+          onChange={(v) => onChange({ unique: v })}
+          label="Unique"
+          showLabel={false}
+        />
+      </td>
+      <td>
+        <ColumnFlag
+          checked={col.autoIncrement}
+          onChange={(v) => onChange({ autoIncrement: v })}
+          label="Auto-increment"
+          showLabel={false}
+          // SQLite allows AUTOINCREMENT only on a single-column INTEGER
+          // PRIMARY KEY. Disable the toggle otherwise so the user can't
+          // craft an invalid spec.
+          disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
+        />
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
           <input
             className="sql-rename-input sql-modify-col-default"
             value={col.defaultValue}
@@ -3500,45 +3624,9 @@ function ModifyColumnRow({
             aria-label="Default value"
           />
         </label>
-      </div>
-      <div className="sql-modify-field sql-modify-field-wide">
-        <span className="sql-modify-field-label">Constraints</span>
-        <div className="sql-modify-col-flags">
-          <ColumnFlag
-            checked={col.primaryKey}
-            onChange={(v) =>
-              onChange({
-                primaryKey: v,
-                // Auto-increment is only meaningful with a single PK.
-                autoIncrement: v ? col.autoIncrement : false,
-              })
-            }
-            label="Primary key"
-          />
-          <ColumnFlag
-            checked={!col.notNull}
-            onChange={(v) => onChange({ notNull: !v })}
-            label="Nullable"
-          />
-          <ColumnFlag
-            checked={col.unique}
-            onChange={(v) => onChange({ unique: v })}
-            label="Unique"
-          />
-          <ColumnFlag
-            checked={col.autoIncrement}
-            onChange={(v) => onChange({ autoIncrement: v })}
-            label="Auto-increment"
-            // SQLite allows AUTOINCREMENT only on a single-column INTEGER
-            // PRIMARY KEY. Disable the toggle otherwise so the user can't
-            // craft an invalid spec.
-            disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
-          />
-        </div>
-      </div>
-      <div className="sql-modify-col-grid">
-        <label className="sql-modify-field">
-          <span className="sql-modify-field-label">Foreign key table</span>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
           <select
             className="sql-modify-col-type sql-modify-fk-table"
             value={col.fkTable}
@@ -3555,8 +3643,9 @@ function ModifyColumnRow({
             ))}
           </select>
         </label>
-        <label className="sql-modify-field">
-          <span className="sql-modify-field-label">Foreign key column</span>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
           <select
             className="sql-modify-col-type sql-modify-fk-column"
             value={col.fkColumn}
@@ -3572,8 +3661,19 @@ function ModifyColumnRow({
             ))}
           </select>
         </label>
-      </div>
-    </div>
+      </td>
+      <td>
+        <button
+          type="button"
+          className="sql-modify-col-remove"
+          onClick={onRemove}
+          aria-label={`Remove column ${col.name || "unnamed column"}`}
+          title="Remove column"
+        >
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
+      </td>
+    </tr>
   );
 }
 
@@ -3582,11 +3682,13 @@ function ColumnFlag({
   onChange,
   label,
   disabled,
+  showLabel = true,
 }: {
   checked: boolean;
   onChange: (next: boolean) => void;
   label: string;
   disabled?: boolean;
+  showLabel?: boolean;
 }) {
   return (
     <label
@@ -3597,12 +3699,14 @@ function ColumnFlag({
         onCheckedChange={(v) => onChange(v === true)}
         disabled={disabled}
         className="sql-modify-flag-box"
+        aria-label={label}
+        title={label}
       >
         <Checkbox.Indicator className="sql-modify-flag-ind">
           ✓
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <span>{label}</span>
+      {showLabel && <span>{label}</span>}
     </label>
   );
 }
@@ -3853,7 +3957,7 @@ function SchemaItem({
                               />
                             )}
                             {fk && (
-                              <FaLink
+                              <FiLink
                                 size={11}
                                 className="sql-tree-column-fk"
                               />
