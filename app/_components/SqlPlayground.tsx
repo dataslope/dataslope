@@ -85,6 +85,7 @@ import {
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import { FiLink } from "react-icons/fi";
+import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import type { RuntimeInfo } from "./types";
@@ -426,6 +427,20 @@ function SqlPlaygroundInner() {
   // Modify Structure drawer state. `null` = closed; an object holds the
   // editable form spec for the table currently being modified.
   const [modifyDialog, setModifyDialog] = useState<{
+    originalName: string;
+    newName: string;
+    columns: ModifyColumnDraft[];
+  } | null>(null);
+  // Add Row drawer state.
+  const [addRowDialog, setAddRowDialog] = useState<{
+    tableName: string;
+    columns: TableColumnInfo[];
+    values: Record<string, string>;
+    addAnother: boolean;
+  } | null>(null);
+  // Add Table drawer state — shares the ModifyStructureState shape so
+  // the same ModifyStructureForm can be reused.
+  const [addTableDialog, setAddTableDialog] = useState<{
     originalName: string;
     newName: string;
     columns: ModifyColumnDraft[];
@@ -1500,6 +1515,118 @@ function SqlPlaygroundInner() {
     }
   }, [modifyDialog, refreshEntityMetadata, showToast]);
 
+  const openAddRow = useCallback(
+    (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = engine.listColumns(name);
+        const initValues: Record<string, string> = {};
+        for (const c of cols) initValues[c.name] = "";
+        setAddRowDialog({ tableName: name, columns: cols, values: initValues, addAnother: false });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't load columns: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const submitAddRow = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !addRowDialog) return;
+    const { tableName, columns, values, addAnother } = addRowDialog;
+    const colNames = columns
+      .map((c) => `"${c.name.replace(/"/g, '""')}"`)
+      .join(", ");
+    const colValues = columns
+      .map((c) => {
+        const v = values[c.name] ?? "";
+        if (v === "") return "NULL";
+        return `'${v.replace(/'/g, "''")}'`;
+      })
+      .join(", ");
+    try {
+      engine.exec(
+        `INSERT INTO "${tableName.replace(/"/g, '""')}" (${colNames}) VALUES (${colValues})`,
+      );
+      showToast(`Row added to "${tableName}".`);
+      if (addAnother) {
+        const newValues: Record<string, string> = {};
+        for (const c of columns) newValues[c.name] = "";
+        setAddRowDialog((prev) => (prev ? { ...prev, values: newValues } : null));
+      } else {
+        setAddRowDialog(null);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Insert failed: ${msg}`, "warn");
+    }
+  }, [addRowDialog, showToast]);
+
+  const openAddTable = useCallback(() => {
+    setAddTableDialog({
+      originalName: "",
+      newName: "new_table",
+      columns: [
+        {
+          id: newDraftId(),
+          originalName: null,
+          name: "id",
+          type: "INTEGER",
+          notNull: false,
+          primaryKey: true,
+          autoIncrement: true,
+          unique: false,
+          defaultValue: "",
+          fkTable: "",
+          fkColumn: "",
+        },
+      ],
+    });
+  }, []);
+
+  const submitAddTable = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !addTableDialog) return;
+    const trimmedName = addTableDialog.newName.trim();
+    if (!trimmedName) {
+      showToast("Table name cannot be empty.", "warn");
+      return;
+    }
+    const cols = addTableDialog.columns;
+    const colDefs = cols.map((c) => {
+      const parts: string[] = [
+        `"${c.name.trim().replace(/"/g, '""')}" ${c.type}`,
+      ];
+      if (c.notNull) parts.push("NOT NULL");
+      if (c.primaryKey) {
+        parts.push("PRIMARY KEY");
+        if (c.autoIncrement) parts.push("AUTOINCREMENT");
+      }
+      if (c.unique && !c.primaryKey) parts.push("UNIQUE");
+      if (c.defaultValue.trim()) parts.push(`DEFAULT ${c.defaultValue.trim()}`);
+      return parts.join(" ");
+    });
+    const fkConstraints = cols
+      .filter((c) => c.fkTable && c.fkColumn)
+      .map(
+        (c) =>
+          `FOREIGN KEY ("${c.name.trim().replace(/"/g, '""')}") REFERENCES "${c.fkTable}"("${c.fkColumn}")`,
+      );
+    const allDefs = [...colDefs, ...fkConstraints].join(", ");
+    const sql = `CREATE TABLE "${trimmedName.replace(/"/g, '""')}" (${allDefs})`;
+    try {
+      engine.exec(sql);
+      setTables(engine.listTables());
+      setAddTableDialog(null);
+      showToast(`Created table "${trimmedName}".`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Create failed: ${msg}`, "warn");
+    }
+  }, [addTableDialog, showToast]);
+
   const viewDDL = useCallback(
     (name: string, kind: "table" | "view") => {
       const engine = engineRef.current;
@@ -1921,7 +2048,7 @@ function SqlPlaygroundInner() {
               </Select.Trigger>
               <Select.Portal>
                 <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
-                  <Select.Popup className="bui-select-popup">
+                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
                       const color = PLAYGROUND_ICON_COLORS[p.id];
@@ -2285,6 +2412,142 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Add Row drawer ── */}
+        <Dialog.Root
+          open={addRowDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setAddRowDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Add Row
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    {addRowDialog?.tableName ?? ""}
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {addRowDialog && (
+                <div className="sql-modify-body">
+                  <div className="sql-add-row-fields">
+                    {addRowDialog.columns.map((c) => (
+                      <label key={c.name} className="sql-add-row-field">
+                        <span className="sql-add-row-field-label">
+                          <span className="sql-add-row-field-name">{c.name}</span>
+                          <span className="sql-add-row-field-type">{c.type || "—"}</span>
+                        </span>
+                        <input
+                          className="sql-rename-input"
+                          value={addRowDialog.values[c.name] ?? ""}
+                          onChange={(e) =>
+                            setAddRowDialog((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    values: { ...prev.values, [c.name]: e.target.value },
+                                  }
+                                : null,
+                            )
+                          }
+                          placeholder={c.notNull ? "required" : "NULL if empty"}
+                          aria-label={c.name}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  <label className="sql-add-row-another">
+                    <input
+                      type="checkbox"
+                      checked={addRowDialog.addAnother}
+                      onChange={(e) =>
+                        setAddRowDialog((prev) =>
+                          prev ? { ...prev, addAnother: e.target.checked } : null,
+                        )
+                      }
+                    />
+                    Keep open to add another row
+                  </label>
+                </div>
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={submitAddRow}
+                  disabled={!addRowDialog}
+                >
+                  Add Row
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Add Table drawer ── */}
+        <Dialog.Root
+          open={addTableDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setAddTableDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Add Table
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    Create a new table
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {addTableDialog && (
+                <ModifyStructureForm
+                  state={addTableDialog}
+                  onChange={setAddTableDialog}
+                  knownTables={tables}
+                  engine={engineForRender}
+                />
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={submitAddTable}
+                  disabled={!addTableDialog}
+                >
+                  Create Table
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
@@ -2353,6 +2616,7 @@ function SqlPlaygroundInner() {
                 expanded={tablesSectionExpanded}
                 onToggle={() => setTablesSectionExpanded((v) => !v)}
                 emptyMessage="No tables."
+                onAdd={openAddTable}
               >
                 {tables.map((name) => (
                   <SchemaItem
@@ -2365,6 +2629,7 @@ function SqlPlaygroundInner() {
                     onToggleExpanded={toggleEntityExpanded}
                     onPreview={previewTable}
                     onModifyStructure={openModifyStructure}
+                    onAddRow={openAddRow}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onTruncate={truncateEntity}
@@ -3480,11 +3745,11 @@ function ModifyStructureForm({
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
+                  <th style={{ minWidth: "90px" }}>Type</th>
+                  <th>Not null</th>
                   <th>Primary</th>
                   <th>Unique</th>
-                  <th>Auto-increment</th>
+                  <th>Auto-<br/>increment</th>
                   <th>Default value</th>
                   <th>FK table</th>
                   <th>FK column</th>
@@ -3574,9 +3839,9 @@ function ModifyColumnRow({
       </td>
       <td>
         <ColumnFlag
-          checked={!col.notNull}
-          onChange={(v) => onChange({ notNull: !v })}
-          label="Nullable"
+          checked={col.notNull}
+          onChange={(v) => onChange({ notNull: v })}
+          label="Not null"
           showLabel={false}
         />
       </td>
@@ -3792,6 +4057,7 @@ interface SchemaSectionProps {
   onToggle: () => void;
   emptyMessage: string;
   children?: ReactNode;
+  onAdd?: () => void;
 }
 
 function SchemaSection({
@@ -3801,27 +4067,41 @@ function SchemaSection({
   onToggle,
   emptyMessage,
   children,
+  onAdd,
 }: SchemaSectionProps) {
   return (
     <div className="sql-tree-section">
-      <button
-        type="button"
-        className="sql-tree-section-header"
-        onClick={onToggle}
-        aria-expanded={expanded}
-        title={expanded ? `Collapse ${label.toLowerCase()}` : `Expand ${label.toLowerCase()}`}
-      >
-        <span className="sql-tree-chevron" aria-hidden="true">
-          {expanded ? (
-            <ChevronDown size={11} />
-          ) : (
-            <ChevronRight size={11} />
-          )}
-        </span>
-        <span className="sql-tree-label">
-          {label} ({count})
-        </span>
-      </button>
+      <div className="sql-tree-section-header">
+        <button
+          type="button"
+          className="sql-tree-section-toggle"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          title={expanded ? `Collapse ${label.toLowerCase()}` : `Expand ${label.toLowerCase()}`}
+        >
+          <span className="sql-tree-chevron" aria-hidden="true">
+            {expanded ? (
+              <ChevronDown size={11} />
+            ) : (
+              <ChevronRight size={11} />
+            )}
+          </span>
+          <span className="sql-tree-label">
+            {label} ({count})
+          </span>
+        </button>
+        {onAdd && (
+          <button
+            type="button"
+            className="sql-tree-section-add"
+            onClick={onAdd}
+            title={`Add ${label.toLowerCase().replace(/s$/, "")}`}
+            aria-label={`Add ${label.toLowerCase().replace(/s$/, "")}`}
+          >
+            <Plus size={11} aria-hidden="true" />
+          </button>
+        )}
+      </div>
       {expanded && (
         <div className="sql-tree-section-body">
           {count === 0 ? (
@@ -3848,6 +4128,8 @@ interface SchemaItemProps {
    *  is derived from their CREATE VIEW statement, not editable. */
   onModifyStructure?: (name: string) => void;
   onStructure?: (name: string, kind: "table" | "view") => void;
+  /** Tables only — opens the Add Row drawer. */
+  onAddRow?: (name: string) => void;
   onCount: (name: string, kind: "table" | "view") => void;
   onCopy: (name: string) => void;
   /** Tables only — Truncate is meaningless on a view. */
@@ -3866,6 +4148,7 @@ function SchemaItem({
   onPreview,
   onModifyStructure,
   onStructure,
+  onAddRow,
   onCount,
   onCopy,
   onTruncate,
@@ -3957,7 +4240,7 @@ function SchemaItem({
                               />
                             )}
                             {fk && (
-                              <FiLink
+                              <IoLink
                                 size={11}
                                 className="sql-tree-column-fk"
                               />
@@ -3993,6 +4276,14 @@ function SchemaItem({
               >
                 <div className="ex-title">Preview Data</div>
               </ContextMenu.Item>
+              {kind === "table" && onAddRow && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onAddRow(name)}
+                >
+                  <div className="ex-title">Add Row</div>
+                </ContextMenu.Item>
+              )}
               {kind === "table" && onModifyStructure ? (
                 <ContextMenu.Item
                   className="example-item"

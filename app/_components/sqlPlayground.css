@@ -147,8 +147,19 @@
 .sql-tree-section-header {
   display: flex;
   align-items: center;
-  gap: 6px;
   width: 100%;
+}
+
+.sql-tree-section-header:hover {
+  background: var(--bg3);
+}
+
+.sql-tree-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
   background: transparent;
   border: 0;
   color: var(--text-dim);
@@ -157,12 +168,26 @@
   padding: 4px 8px;
 }
 
-.sql-tree-section-header:hover {
-  background: var(--bg3);
+.sql-tree-section-toggle .sql-tree-label {
+  padding: 0;
 }
 
-.sql-tree-section-header .sql-tree-label {
-  padding: 0;
+.sql-tree-section-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px 4px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sql-tree-section-add:hover {
+  color: var(--text);
 }
 
 .sql-tree-section-body {
@@ -256,9 +281,7 @@
   padding: 4px 0 6px 26px;
   display: flex;
   flex-direction: column;
-  /* Open up the vertical rhythm between rows now that the icons are
-     bigger — keeps the list breathable. */
-  gap: 4px;
+  gap: 2px;
   position: relative;
 }
 
@@ -1416,4 +1439,60 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.sql-modify-fk-column:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Add Row drawer ─── */
+.sql-add-row-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sql-add-row-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sql-add-row-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.sql-add-row-field-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-add-row-field-type {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sql-add-row-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.sql-add-row-another {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
 }
