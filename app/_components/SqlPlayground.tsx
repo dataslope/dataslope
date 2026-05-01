@@ -4245,7 +4245,7 @@ function SchemaItem({
                             )}
                             {fk && (
                               <IoLink
-                                size={11}
+                                size={9}
                                 className="sql-tree-column-fk"
                               />
                             )}
