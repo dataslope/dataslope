@@ -2047,7 +2047,11 @@ function SqlPlaygroundInner() {
                 </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
+                <Select.Positioner
+                  className="pg-lang-switcher-positioner"
+                  sideOffset={6}
+                  alignItemWithTrigger={false}
+                >
                   <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
