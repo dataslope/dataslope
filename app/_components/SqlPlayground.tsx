@@ -3488,7 +3488,7 @@ function ModifyStructureForm({
                   <th>Default value</th>
                   <th>FK table</th>
                   <th>FK column</th>
-                  <th aria-label="Remove column" />
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
