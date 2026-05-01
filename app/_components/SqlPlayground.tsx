@@ -3373,7 +3373,7 @@ function ResultTableBody({
                   )}
                   {fk && (
                     <IoLink
-                      size={10}
+                      size={12}
                       className="sql-result-th-fk"
                       aria-label={`Foreign key → ${fk.table}.${fk.to}`}
                     />
