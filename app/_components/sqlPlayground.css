@@ -568,7 +568,7 @@
    `color-mix` is supported in every browser we ship to and lets the
    stripe pick up whichever theme palette is active. */
 .sql-result-table tbody tr:nth-child(2n) td {
-  background: color-mix(in srgb, var(--text) 4%, transparent);
+  background: color-mix(in srgb, var(--text) 2%, transparent);
 }
 
 .sql-result-table tbody tr:hover td {
