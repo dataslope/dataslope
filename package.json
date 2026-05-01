@@ -15,6 +15,7 @@
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-rc.0",
     "@base-ui/react": "^1.4.1",
+    "@tanstack/react-table": "^8.21.3",
     "@types/sql.js": "^1.4.9",
     "codemirror": "^5.65.16",
     "fumadocs-core": "^16.8.5",
