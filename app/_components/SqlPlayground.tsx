@@ -72,8 +72,10 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsDown,
   ChevronsLeft,
   ChevronsRight,
+  ChevronsUp,
   Clock,
   Eye,
   Database,
@@ -1742,6 +1744,22 @@ function SqlPlaygroundInner() {
     },
     [],
   );
+
+  const expandAllEntities = useCallback((names: string[]) => {
+    setExpandedEntities((prev) => {
+      const next = new Set(prev);
+      for (const n of names) next.add(n);
+      return next;
+    });
+  }, []);
+
+  const collapseAllEntities = useCallback((names: string[]) => {
+    setExpandedEntities((prev) => {
+      const next = new Set(prev);
+      for (const n of names) next.delete(n);
+      return next;
+    });
+  }, []);
 
   // Lazy-load (and re-load) metadata for every currently-expanded
   // sidebar entity that has no cached `columnsByEntity` entry. This
@@ -3488,6 +3506,12 @@ function SqlPlaygroundInner() {
                 onToggle={() => setTablesSectionExpanded((v) => !v)}
                 emptyMessage="No tables."
                 onAdd={openAddTable}
+                allExpanded={
+                  tables.length > 0 &&
+                  tables.every((n) => expandedEntities.has(n))
+                }
+                onExpandAll={() => expandAllEntities(tables)}
+                onCollapseAll={() => collapseAllEntities(tables)}
               >
                 {tables.map((name) => (
                   <SchemaItem
@@ -3515,6 +3539,12 @@ function SqlPlaygroundInner() {
                 expanded={viewsSectionExpanded}
                 onToggle={() => setViewsSectionExpanded((v) => !v)}
                 emptyMessage="No views."
+                allExpanded={
+                  views.length > 0 &&
+                  views.every((n) => expandedEntities.has(n))
+                }
+                onExpandAll={() => expandAllEntities(views)}
+                onCollapseAll={() => collapseAllEntities(views)}
               >
                 {views.map((name) => (
                   <SchemaItem
@@ -4879,6 +4909,12 @@ interface SchemaSectionProps {
   emptyMessage: string;
   children?: ReactNode;
   onAdd?: () => void;
+  /** When provided, shows an Expand All / Collapse All icon button.
+   *  `allExpanded` drives which icon is shown; the button calls
+   *  `onCollapseAll` when true, `onExpandAll` when false. */
+  allExpanded?: boolean;
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
 }
 
 function SchemaSection({
@@ -4889,7 +4925,11 @@ function SchemaSection({
   emptyMessage,
   children,
   onAdd,
+  allExpanded,
+  onExpandAll,
+  onCollapseAll,
 }: SchemaSectionProps) {
+  const showExpandCollapse = count > 0 && (onExpandAll || onCollapseAll);
   return (
     <div className="sql-tree-section">
       <div className="sql-tree-section-header">
@@ -4911,6 +4951,21 @@ function SchemaSection({
             {label} ({count})
           </span>
         </button>
+        {showExpandCollapse && (
+          <button
+            type="button"
+            className="sql-tree-section-add"
+            onClick={allExpanded ? onCollapseAll : onExpandAll}
+            title={allExpanded ? `Collapse all ${label.toLowerCase()}` : `Expand all ${label.toLowerCase()}`}
+            aria-label={allExpanded ? `Collapse all ${label.toLowerCase()}` : `Expand all ${label.toLowerCase()}`}
+          >
+            {allExpanded ? (
+              <ChevronsUp size={11} aria-hidden="true" />
+            ) : (
+              <ChevronsDown size={11} aria-hidden="true" />
+            )}
+          </button>
+        )}
         {onAdd && (
           <button
             type="button"
@@ -5050,35 +5105,39 @@ function SchemaItem({
                       const fk = fkByCol.get(c.name);
                       return (
                         <li key={c.cid} className="sql-tree-column">
-                          <span
-                            className="sql-tree-column-icons"
-                            aria-hidden="true"
-                          >
+                          <span className="sql-tree-column-icons">
                             {c.pk > 0 && (
                               <MdOutlineKey
-                                size={14}
+                                size={11}
                                 className="sql-tree-column-pk"
+                                aria-hidden="true"
                               />
                             )}
                             {fk && (
-                              <IoLink
-                                size={9}
-                                className="sql-tree-column-fk"
-                              />
+                              <Popover.Root>
+                                <Popover.Trigger
+                                  openOnHover
+                                  delay={150}
+                                  closeDelay={100}
+                                  className="sql-tree-column-fk"
+                                  aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                                >
+                                  <IoLink size={7} aria-hidden="true" />
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Positioner sideOffset={6} side="right">
+                                    <Popover.Popup className="bui-popup sql-fk-popover">
+                                      → {fk.table}.{fk.to}
+                                    </Popover.Popup>
+                                  </Popover.Positioner>
+                                </Popover.Portal>
+                              </Popover.Root>
                             )}
                           </span>
                           <span className="sql-tree-column-name">{c.name}</span>
                           <span className="sql-tree-column-type">
                             {c.type || "—"}
                           </span>
-                          {fk && (
-                            <span
-                              className="sql-tree-column-fkref"
-                              title={`Foreign key → ${fk.table}.${fk.to}`}
-                            >
-                              → {fk.table}.{fk.to}
-                            </span>
-                          )}
                         </li>
                       );
                     })
