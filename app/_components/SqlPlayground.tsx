@@ -72,8 +72,10 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsDown,
   ChevronsLeft,
   ChevronsRight,
+  ChevronsUp,
   Clock,
   Eye,
   Database,
@@ -1742,6 +1744,27 @@ function SqlPlaygroundInner() {
     },
     [],
   );
+
+  const toggleSectionExpanded = useCallback((names: string[]) => {
+    setExpandedEntities((prev) => {
+      const allExpanded = names.length > 0 && names.every((n) => prev.has(n));
+      const next = new Set(prev);
+      if (allExpanded) {
+        for (const n of names) next.delete(n);
+      } else {
+        for (const n of names) next.add(n);
+      }
+      try {
+        localStorage.setItem(
+          dbScopedKey(activeDbIdRef.current, "expanded_entities"),
+          JSON.stringify(Array.from(next)),
+        );
+      } catch {
+        // ignore quota errors
+      }
+      return next;
+    });
+  }, []);
 
   // Lazy-load (and re-load) metadata for every currently-expanded
   // sidebar entity that has no cached `columnsByEntity` entry. This
@@ -3488,6 +3511,11 @@ function SqlPlaygroundInner() {
                 onToggle={() => setTablesSectionExpanded((v) => !v)}
                 emptyMessage="No tables."
                 onAdd={openAddTable}
+                hasExpandableChildren={tables.length > 0}
+                allExpanded={
+                  tables.length > 0 && tables.every((name) => expandedEntities.has(name))
+                }
+                onToggleAll={() => toggleSectionExpanded(tables)}
               >
                 {tables.map((name) => (
                   <SchemaItem
@@ -3515,6 +3543,11 @@ function SqlPlaygroundInner() {
                 expanded={viewsSectionExpanded}
                 onToggle={() => setViewsSectionExpanded((v) => !v)}
                 emptyMessage="No views."
+                hasExpandableChildren={views.length > 0}
+                allExpanded={
+                  views.length > 0 && views.every((name) => expandedEntities.has(name))
+                }
+                onToggleAll={() => toggleSectionExpanded(views)}
               >
                 {views.map((name) => (
                   <SchemaItem
@@ -4863,6 +4896,53 @@ function DdlViewer({
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// ForeignKeyPopover — hover popover that reveals the FK target so the
+// sidebar column row stays compact.
+// ────────────────────────────────────────────────────────────────────────
+
+function ForeignKeyPopover({ fk }: { fk: ForeignKeyInfo }) {
+  const [open, setOpen] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const show = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => setOpen(true), 150);
+  }, []);
+  const hide = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setOpen(false);
+  }, []);
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger
+        render={(props) => (
+          <span
+            {...props}
+            onMouseEnter={show}
+            onMouseLeave={hide}
+            title={`Foreign key → ${fk.table}.${fk.to}`}
+            aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+          >
+            <IoLink size={7} className="sql-tree-column-fk" />
+          </span>
+        )}
+      />
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={4} align="center">
+          <Popover.Popup className="sql-tree-column-fk-popup">
+            Foreign key → {fk.table}.{fk.to}
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
 // Schema sidebar item — a tree-row button wrapped in a Base UI
 // ContextMenu so right-clicking a table or view exposes the typical
 // IDE actions (Modify Structure / View Structure, Preview Data,
@@ -4879,6 +4959,9 @@ interface SchemaSectionProps {
   emptyMessage: string;
   children?: ReactNode;
   onAdd?: () => void;
+  hasExpandableChildren?: boolean;
+  allExpanded?: boolean;
+  onToggleAll?: () => void;
 }
 
 function SchemaSection({
@@ -4889,6 +4972,9 @@ function SchemaSection({
   emptyMessage,
   children,
   onAdd,
+  hasExpandableChildren,
+  allExpanded,
+  onToggleAll,
 }: SchemaSectionProps) {
   return (
     <div className="sql-tree-section">
@@ -4911,6 +4997,21 @@ function SchemaSection({
             {label} ({count})
           </span>
         </button>
+        {hasExpandableChildren && onToggleAll && (
+          <button
+            type="button"
+            className="sql-tree-section-add"
+            onClick={onToggleAll}
+            title={allExpanded ? "Collapse all" : "Expand all"}
+            aria-label={allExpanded ? "Collapse all" : "Expand all"}
+          >
+            {allExpanded ? (
+              <ChevronsUp size={11} aria-hidden="true" />
+            ) : (
+              <ChevronsDown size={11} aria-hidden="true" />
+            )}
+          </button>
+        )}
         {onAdd && (
           <button
             type="button"
@@ -5050,22 +5151,15 @@ function SchemaItem({
                       const fk = fkByCol.get(c.name);
                       return (
                         <li key={c.cid} className="sql-tree-column">
-                          <span
-                            className="sql-tree-column-icons"
-                            aria-hidden="true"
-                          >
+                          <span className="sql-tree-column-icons">
                             {c.pk > 0 && (
                               <MdOutlineKey
-                                size={14}
+                                size={10}
                                 className="sql-tree-column-pk"
+                                aria-hidden="true"
                               />
                             )}
-                            {fk && (
-                              <IoLink
-                                size={9}
-                                className="sql-tree-column-fk"
-                              />
-                            )}
+                            {fk && <ForeignKeyPopover fk={fk} />}
                           </span>
                           <span className="sql-tree-column-name">{c.name}</span>
                           <span className="sql-tree-column-type">
