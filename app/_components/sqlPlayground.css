@@ -734,6 +734,7 @@
   gap: 4px;
   background: var(--bg3);
   color: var(--text);
+  border: none;
   border-radius: 4px;
   padding: 2px 6px;
   font-family: var(--font-ui);
@@ -784,7 +785,7 @@
 /* ─── View DDL dialog ─── */
 .sql-ddl-popup {
   width: min(720px, calc(100vw - 64px));
-  max-height: calc(100vh - 64px);
+  max-height: min(520px, calc(100vh - 64px));
   display: flex;
   flex-direction: column;
 }
@@ -799,7 +800,7 @@
   color: var(--text);
   white-space: pre;
   overflow: auto;
-  max-height: 50vh;
+  max-height: 320px;
   margin: 0;
 }
 
@@ -1242,7 +1243,6 @@
 }
 
 .sql-modify-table-wrap {
-  border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg);
   overflow: auto;
@@ -1261,7 +1261,6 @@
   font-weight: 600;
   text-align: center;
   padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
@@ -1269,12 +1268,7 @@
   padding: 7px 8px;
   text-align: center;
   vertical-align: middle;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   min-width: 0;
-}
-
-.sql-modify-table tbody tr:last-child td {
-  border-bottom: 0;
 }
 
 .sql-modify-table tbody tr:nth-child(2n) td {

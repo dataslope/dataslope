@@ -3508,8 +3508,14 @@ function SqlPlaygroundInner() {
                   tables.length > 0 &&
                   tables.every((n) => expandedEntities.has(n))
                 }
-                onExpandAll={() => expandAllEntities(tables)}
-                onCollapseAll={() => collapseAllEntities(tables)}
+                onExpandAll={() => {
+                  setTablesSectionExpanded(true);
+                  expandAllEntities(tables);
+                }}
+                onCollapseAll={() => {
+                  setTablesSectionExpanded(false);
+                  collapseAllEntities(tables);
+                }}
               >
                 {tables.map((name) => (
                   <SchemaItem
@@ -3541,8 +3547,14 @@ function SqlPlaygroundInner() {
                   views.length > 0 &&
                   views.every((n) => expandedEntities.has(n))
                 }
-                onExpandAll={() => expandAllEntities(views)}
-                onCollapseAll={() => collapseAllEntities(views)}
+                onExpandAll={() => {
+                  setViewsSectionExpanded(true);
+                  expandAllEntities(views);
+                }}
+                onCollapseAll={() => {
+                  setViewsSectionExpanded(false);
+                  collapseAllEntities(views);
+                }}
               >
                 {views.map((name) => (
                   <SchemaItem
