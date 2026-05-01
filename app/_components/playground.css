@@ -684,7 +684,7 @@ body.pg-active {
    Dialog portals the popup, so positioning is `fixed` (not absolute
    relative to a now-discarded settings-overlay container). */
 .settings-panel {
-  position: fixed; top: 52px; right: 16px; z-index: 201;
+  position: fixed; top: 40px; right: 16px; z-index: 201;
   width: 540px; max-width: calc(100vw - 32px);
   max-height: calc(100vh - 80px);
   background: var(--bg2);
