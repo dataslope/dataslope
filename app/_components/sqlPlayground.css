@@ -402,7 +402,7 @@
      are wrapped with `minmax(0, …)` so each pane can shrink below its
      content's intrinsic size and lets its inner scroll containers
      handle overflow correctly. */
-  grid-template-rows: auto minmax(0, 1fr) 6px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 0.55fr) 6px minmax(0, 1.45fr);
   min-height: 0;
   /* Same rationale as `.sql-editor-pane min-width: 0` below — keep this
      grid track inside its parent so children become the scroll
@@ -548,7 +548,7 @@
   z-index: 1;
   background: var(--bg);
   color: var(--text-dim);
-  font-weight: 500;
+  font-weight: 600;
   text-align: left;
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
