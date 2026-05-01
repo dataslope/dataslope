@@ -76,7 +76,6 @@ import {
   Database,
   Hash,
   KeyRound,
-  Link as LinkIcon,
   Play,
   Plus,
   Table2,
@@ -3138,7 +3137,7 @@ function ResultTableBody({
                     />
                   )}
                   {fk && (
-                    <LinkIcon
+                    <FiLink
                       size={11}
                       className="sql-result-th-fk"
                       aria-label={`Foreign key → ${fk.table}.${fk.to}`}
@@ -3957,7 +3956,7 @@ function SchemaItem({
                               />
                             )}
                             {fk && (
-                              <FaLink
+                              <FiLink
                                 size={11}
                                 className="sql-tree-column-fk"
                               />
