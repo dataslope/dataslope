@@ -954,6 +954,7 @@
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 .sql-tab-close {
