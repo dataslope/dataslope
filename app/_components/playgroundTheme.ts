@@ -172,6 +172,7 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--text", p.text);
   root.style.setProperty("--text-dim", p.dim);
   root.style.setProperty("--text-muted", p.muted);
+  root.style.setProperty("--theme-primary", p.kw);
 }
 
 export function clearThemePalette(): void {
@@ -184,6 +185,7 @@ export function clearThemePalette(): void {
     "--text",
     "--text-dim",
     "--text-muted",
+    "--theme-primary",
   ]) {
     root.style.removeProperty(name);
   }
