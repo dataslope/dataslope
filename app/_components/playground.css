@@ -1371,7 +1371,7 @@ input[type="range"].fs-slider:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 38px;
+  min-width: 52px;
   padding: 3px 8px;
   border-radius: 6px;
   background: linear-gradient(135deg, oklch(68% 0.18 250), oklch(68% 0.18 145));
