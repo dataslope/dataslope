@@ -69,13 +69,14 @@ import {
 import {
   ArrowDownToLine,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Clock,
-  Eraser,
   Eye,
   Database,
   Hash,
-  KeyRound,
   Play,
   Plus,
   Table2,
@@ -84,7 +85,6 @@ import {
   Zap,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
-import { FiLink } from "react-icons/fi";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
@@ -537,9 +537,6 @@ function SqlPlaygroundInner() {
     },
     [],
   );
-  const clearActiveTabResult = useCallback(() => {
-    if (activeTabId) setResultForTab(activeTabId, null);
-  }, [activeTabId, setResultForTab]);
 
   // When tabs are closed (or replaced wholesale), drop any result
   // entries whose owning tab no longer exists. Without this the
@@ -2820,7 +2817,6 @@ function SqlPlaygroundInner() {
                 <ResultView
                   result={result}
                   loading={!loaded}
-                  onClear={clearActiveTabResult}
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
                   onDeleteRows={deleteRowsFromTable}
@@ -2960,14 +2956,12 @@ function SqlTab({
 function ResultView({
   result,
   loading,
-  onClear,
   keyHints,
   sourceTable,
   onDeleteRows,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
-  onClear: () => void;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   onDeleteRows?: (
@@ -3157,23 +3151,17 @@ function ResultView({
   }
   if (result.error) {
     return (
-      <>
-        <div className="sql-result-error">
-          <div className="sql-result-error-title">Query failed</div>
-          <pre className="sql-result-error-body">{result.error}</pre>
-        </div>
-        <ResultClearFooter onClear={onClear} />
-      </>
+      <div className="sql-result-error">
+        <div className="sql-result-error-title">Query failed</div>
+        <pre className="sql-result-error-body">{result.error}</pre>
+      </div>
     );
   }
   if (result.sets.length === 0) {
     return (
-      <>
-        <div className="sql-result-ok">
-          Statement executed successfully — no rows returned.
-        </div>
-        <ResultClearFooter onClear={onClear} />
-      </>
+      <div className="sql-result-ok">
+        Statement executed successfully — no rows returned.
+      </div>
     );
   }
   const pendingCount =
@@ -3197,7 +3185,6 @@ function ResultView({
               : set.values;
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
-          const selectedCount = selected?.size ?? 0;
           return (
             <ResultTableBody
               key={idx}
@@ -3208,14 +3195,12 @@ function ResultView({
               keyHints={keyHints}
               deletable={pkCols !== null}
               selectedRows={selected}
-              selectedCount={selectedCount}
               onToggleRow={(absoluteRow) =>
                 toggleRowSelected(idx, absoluteRow)
               }
               onToggleVisible={(absoluteIndices, select) =>
                 setVisibleSelection(idx, absoluteIndices, select)
               }
-              onRequestDelete={() => requestDelete(idx)}
             />
           );
         })}
@@ -3223,7 +3208,9 @@ function ResultView({
       <div className="sql-result-pagers">
         {result.sets.map((set, idx) => {
           const st = getState(idx);
-          const isLast = idx === result.sets.length - 1;
+          const pkCols = pkColumnsForSet(set);
+          const selected = selectedByIndex[idx];
+          const selectedCount = selected?.size ?? 0;
           return (
             <ResultPager
               key={idx}
@@ -3234,7 +3221,9 @@ function ResultView({
               page={st.page}
               onPageChange={(p) => setPage(idx, p)}
               onPageSizeChange={(s) => setPageSize(idx, s)}
-              onClear={isLast ? onClear : undefined}
+              deletable={pkCols !== null}
+              selectedCount={selectedCount}
+              onRequestDelete={() => requestDelete(idx)}
             />
           );
         })}
@@ -3276,25 +3265,6 @@ function ResultView({
   );
 }
 
-// Tiny footer that only renders the Clear button — used for the error
-// and "no rows" branches where there's no pager to attach Clear to.
-function ResultClearFooter({ onClear }: { onClear: () => void }) {
-  return (
-    <div className="sql-result-status sql-result-status-clear-only">
-      <button
-        type="button"
-        className="clear-btn"
-        onClick={onClear}
-        title="Clear results"
-        aria-label="Clear results"
-      >
-        <Eraser size={13} aria-hidden="true" />
-        <span>Clear</span>
-      </button>
-    </div>
-  );
-}
-
 function ResultTableBody({
   set,
   index,
@@ -3303,10 +3273,8 @@ function ResultTableBody({
   keyHints,
   deletable,
   selectedRows,
-  selectedCount,
   onToggleRow,
   onToggleVisible,
-  onRequestDelete,
 }: {
   set: QueryExecResult;
   index: number;
@@ -3315,10 +3283,8 @@ function ResultTableBody({
   keyHints?: ColumnKeyHints;
   deletable: boolean;
   selectedRows?: Set<number>;
-  selectedCount: number;
   onToggleRow: (absoluteRow: number) => void;
   onToggleVisible: (absoluteIndices: number[], select: boolean) => void;
-  onRequestDelete: () => void;
 }) {
   const visibleAbsoluteIndices = useMemo(
     () => visible.map((_, ri) => startIndex + ri),
@@ -3399,15 +3365,15 @@ function ResultTableBody({
               return (
                 <span className="sql-result-th-label">
                   {isPk && (
-                    <KeyRound
-                      size={11}
+                    <MdOutlineKey
+                      size={12}
                       className="sql-result-th-pk"
                       aria-label="Primary key"
                     />
                   )}
                   {fk && (
-                    <FiLink
-                      size={11}
+                    <IoLink
+                      size={12}
                       className="sql-result-th-fk"
                       aria-label={`Foreign key → ${fk.table}.${fk.to}`}
                     />
@@ -3442,21 +3408,6 @@ function ResultTableBody({
     <div className="sql-result-set">
       {index > 0 && (
         <div className="sql-result-set-label">Result set #{index + 1}</div>
-      )}
-      {deletable && selectedCount > 0 && (
-        <div className="sql-result-selection-bar" role="region" aria-label="Selected rows">
-          <span className="sql-result-selection-count">
-            {selectedCount} row{selectedCount === 1 ? "" : "s"} selected
-          </span>
-          <button
-            type="button"
-            className="sql-result-selection-delete"
-            onClick={onRequestDelete}
-          >
-            <Trash2 size={12} aria-hidden="true" />
-            <span>Delete selected</span>
-          </button>
-        </div>
       )}
       <div className="sql-result-table-wrap">
         <table className="sql-result-table">
@@ -3527,7 +3478,9 @@ function ResultPager({
   page,
   onPageChange,
   onPageSizeChange,
-  onClear,
+  deletable,
+  selectedCount,
+  onRequestDelete,
 }: {
   set: QueryExecResult;
   index: number;
@@ -3536,10 +3489,9 @@ function ResultPager({
   page: number;
   onPageChange: (p: number) => void;
   onPageSizeChange: (s: number) => void;
-  /** Optional Clear-results action rendered on the right of the pager.
-   *  Only the last pager in a multi-set result wires this up so the
-   *  button doesn't appear for every set. */
-  onClear?: () => void;
+  deletable: boolean;
+  selectedCount: number;
+  onRequestDelete: () => void;
 }) {
   const totalRows = set.values.length;
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -3556,7 +3508,11 @@ function ResultPager({
         </span>
       )}
       <span className="sql-result-pager-info">
-        {totalRows === 0 ? (
+        {deletable && selectedCount > 0 ? (
+          <>
+            {selectedCount} row{selectedCount === 1 ? "" : "s"} selected
+          </>
+        ) : totalRows === 0 ? (
           "0 rows"
         ) : (
           <>
@@ -3565,6 +3521,16 @@ function ResultPager({
           </>
         )}
       </span>
+      {deletable && selectedCount > 0 && (
+        <button
+          type="button"
+          className="sql-result-selection-delete"
+          onClick={onRequestDelete}
+        >
+          <Trash2 size={12} aria-hidden="true" />
+          <span>Delete selected</span>
+        </button>
+      )}
       <div className="sql-result-pager-size">
         <span>Rows per page</span>
         <Select.Root
@@ -3579,14 +3545,7 @@ function ResultPager({
               {PAGE_SIZE_OPTIONS.find((opt) => opt.value === pageSize)?.label ??
                 String(pageSize)}
             </Select.Value>
-            <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
-              <polyline
-                points="2,4 6,8 10,4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
+            <ChevronDown size={10} aria-hidden="true" />
           </Select.Trigger>
           <Select.Portal>
             <Select.Positioner sideOffset={4} alignItemWithTrigger={false}>
@@ -3614,7 +3573,7 @@ function ResultPager({
           aria-label="First page"
           title="First page"
         >
-          «
+          <ChevronsLeft size={13} aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -3624,7 +3583,7 @@ function ResultPager({
           aria-label="Previous page"
           title="Previous page"
         >
-          ‹
+          <ChevronLeft size={13} aria-hidden="true" />
         </button>
         <span className="sql-result-pager-page">
           {safePage + 1} / {totalPages}
@@ -3639,7 +3598,7 @@ function ResultPager({
           aria-label="Next page"
           title="Next page"
         >
-          ›
+          <ChevronRight size={13} aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -3649,21 +3608,9 @@ function ResultPager({
           aria-label="Last page"
           title="Last page"
         >
-          »
+          <ChevronsRight size={13} aria-hidden="true" />
         </button>
       </div>
-      {onClear && (
-        <button
-          type="button"
-          className="clear-btn sql-result-pager-clear"
-          onClick={onClear}
-          title="Clear results"
-          aria-label="Clear results"
-        >
-          <Eraser size={13} aria-hidden="true" />
-          <span>Clear</span>
-        </button>
-      )}
     </div>
   );
 }
