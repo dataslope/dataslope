@@ -1476,3 +1476,152 @@
   color: var(--text-dim);
   cursor: pointer;
 }
+
+/* ─── Import dialogs ─── */
+.sql-import-popup {
+  width: min(480px, calc(100vw - 48px));
+}
+
+.sql-import-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: color-mix(in srgb, var(--yellow) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 4px 0 12px;
+}
+
+.sql-import-warning-icon {
+  color: var(--yellow);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Drag-and-drop drop zone */
+.sql-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 32px 24px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 150ms ease, background 150ms ease;
+  position: relative;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.sql-dropzone:hover,
+.sql-dropzone.dragging {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--text);
+}
+
+.sql-dropzone-icon {
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sql-dropzone.dragging .sql-dropzone-icon {
+  color: var(--accent);
+}
+
+.sql-dropzone-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sql-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+/* Import CSV/JSON preview table */
+.sql-import-preview {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 160px;
+  margin: 4px 0 8px;
+}
+
+.sql-import-preview table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  min-width: 100%;
+}
+
+.sql-import-preview thead th {
+  background: var(--bg3);
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.sql-import-preview tbody td {
+  padding: 3px 8px;
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-import-preview tbody tr:nth-child(2n) td {
+  background: color-mix(in srgb, var(--text) 2%, transparent);
+}
+
+/* Table-name row inside the import dialog */
+.sql-import-table-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sql-import-table-name-row label {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sql-import-table-name-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Separator between special selector items and sample databases */
+.sql-db-popup-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 8px;
+}
+
+/* Label above the sample databases group in the dropdown */
+.sql-db-popup-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding: 4px 10px 2px;
+}

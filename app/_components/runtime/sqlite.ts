@@ -169,6 +169,14 @@ export interface SqliteEngine {
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
   ) => number;
+  /** Replace the active in-memory database with a fresh empty database.
+   *  Returns a synthetic SqliteSampleDatabase descriptor for the blank DB. */
+  loadBlankDatabase: () => SqliteSampleDatabase;
+  /** Replace the active in-memory database with a database loaded from
+   *  the given bytes (e.g., a user-uploaded .sqlite file). The filename
+   *  parameter is used only for display purposes. Returns a synthetic
+   *  SqliteSampleDatabase descriptor. */
+  loadFromBytes: (bytes: Uint8Array, filename: string) => SqliteSampleDatabase;
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -574,6 +582,57 @@ export async function createSqliteEngine(
         stmt.free();
       }
       return deleted;
+    },
+    loadBlankDatabase() {
+      if (db) {
+        try {
+          db.close();
+        } catch {
+          // Ignore close errors.
+        }
+      }
+      db = new SQL.Database();
+      db.run("PRAGMA foreign_keys = ON;");
+      const blank: SqliteSampleDatabase = {
+        id: "__blank__",
+        label: "Blank Database",
+        filename: "blank.sqlite",
+        description: "Empty database",
+        schema: "",
+        seed: () => {},
+        defaultTabs: [{ title: "Query 1", code: "" }],
+      };
+      active = blank;
+      return active;
+    },
+    loadFromBytes(bytes: Uint8Array, filename: string) {
+      if (db) {
+        try {
+          db.close();
+        } catch {
+          // Ignore close errors.
+        }
+      }
+      db = new SQL.Database(bytes);
+      db.run("PRAGMA foreign_keys = ON;");
+      // Derive a stable-ish id from the filename so the UI can
+      // distinguish this from the blank placeholder.
+      const basename = filename
+        .replace(/\.[^.]+$/, "")
+        .replace(/[^a-zA-Z0-9_-]/g, "_")
+        .slice(0, 40);
+      const id = `__imported_${basename}__`;
+      const imported: SqliteSampleDatabase = {
+        id,
+        label: filename,
+        filename,
+        description: "Imported database",
+        schema: "",
+        seed: () => {},
+        defaultTabs: [{ title: "Query 1", code: "" }],
+      };
+      active = imported;
+      return imported;
     },
   };
 }
