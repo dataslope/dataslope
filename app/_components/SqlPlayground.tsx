@@ -335,6 +335,12 @@ interface QueryRunResult {
   /** When lazy SQL pagination is active: 0-based index of the page
    *  whose rows are stored in `sets`. */
   lazyPage?: number;
+  /** When lazy SQL pagination is active: the page size (rows per page)
+   *  that was used to fetch this result. Stored separately from the
+   *  global setting so that delete/edit row-index calculations remain
+   *  correct even if the user changes the page size between the query
+   *  run and the action. */
+  lazyPageSize?: number;
 }
 
 type SelectedRowsByResult = Record<number, Set<number>>;
@@ -410,21 +416,24 @@ function stripSqlComments(sql: string): string {
 
 /** Returns true when `sql` appears to be a single SELECT or CTE statement
  *  (no multi-statement semicolons, starts with SELECT or WITH). Used to
- *  decide whether lazy LIMIT/OFFSET pagination is applicable. */
-function isSingleSelectSql(sql: string): boolean {
-  const noComments = stripSqlComments(sql).trim().replace(/;+\s*$/, "");
-  if (noComments.includes(";")) return false;
-  return /^(select|with)\s/i.test(noComments);
+ *  decide whether lazy LIMIT/OFFSET pagination is applicable.
+ *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
+ *  already stripped comments to avoid redundant work. */
+function isSingleSelectSql(sql: string, noComments?: string): boolean {
+  const stripped = (noComments ?? stripSqlComments(sql)).trim().replace(/;+\s*$/, "");
+  if (stripped.includes(";")) return false;
+  return /^(select|with)\s/i.test(stripped);
 }
 
 /** Returns true when `sql` already contains a LIMIT keyword (after
  *  stripping comments and single-quoted string literals). When true, lazy
  *  pagination is skipped: appending another LIMIT would produce invalid SQL.
  *  Single-quoted strings are stripped first so a value like `'No limit'`
- *  does not trigger a false positive. */
-function hasLimitClause(sql: string): boolean {
-  const noComments = stripSqlComments(sql);
-  const noStrings = noComments.replace(/'(?:''|[^'])*'/g, "''");
+ *  does not trigger a false positive.
+ *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
+ *  already stripped comments to avoid redundant work. */
+function hasLimitClause(sqlOrNoComments: string): boolean {
+  const noStrings = sqlOrNoComments.replace(/'(?:''|[^'])*'/g, "''");
   return /\blimit\b/i.test(noStrings);
 }
 
@@ -1223,15 +1232,18 @@ function SqlPlaygroundInner() {
       // Apply lazy pagination only for single SELECT/CTE statements that
       // don't already contain a LIMIT clause, and only when "All" is not
       // selected (pageSize === 0 means load everything).
+      // Strip comments once and reuse for both checks.
+      const noComments = stripSqlComments(trimmed);
       const useLazy =
         currentPageSize > 0 &&
-        isSingleSelectSql(trimmed) &&
-        !hasLimitClause(trimmed);
+        isSingleSelectSql(trimmed, noComments) &&
+        !hasLimitClause(noComments);
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
         let lazyTotalCount: number | undefined;
         let lazyPage: number | undefined;
+        let lazyPageSize: number | undefined;
         if (useLazy) {
           const { result: lazySets, totalCount } = engine.execPaged(
             trimmed,
@@ -1242,6 +1254,7 @@ function SqlPlaygroundInner() {
           lazySql = trimmed;
           lazyTotalCount = totalCount;
           lazyPage = page;
+          lazyPageSize = currentPageSize;
         } else {
           sets = engine.exec(trimmed);
         }
@@ -1254,6 +1267,7 @@ function SqlPlaygroundInner() {
           lazySql,
           lazyTotalCount,
           lazyPage,
+          lazyPageSize,
         });
         setStatusState("ready");
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
@@ -4474,9 +4488,12 @@ function ResultView({
     }
     // In lazy mode, set.values holds only the current page, so absolute
     // row indices must be adjusted by the page offset before indexing.
+    // Use the page size stored on the result (not the current global setting)
+    // so the calculation is correct even if the user changed the page size
+    // between loading the result and triggering the delete.
     const lazyOffset =
       result.lazySql !== undefined && result.lazyPage !== undefined
-        ? result.lazyPage * globalPageSize
+        ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
         : 0;
     const pkRows: unknown[][] = [];
     for (const rowIdx of selected) {
@@ -4543,9 +4560,12 @@ function ResultView({
     }
     // In lazy mode, set.values holds only the current page's rows; adjust
     // the absolute row index by the page offset before indexing into it.
+    // Use the page size stored on the result (not the current global setting)
+    // to remain correct even if the user changed the page size setting after
+    // loading this result.
     const lazyOffset =
       result.lazySql !== undefined && result.lazyPage !== undefined
-        ? result.lazyPage * globalPageSize
+        ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
         : 0;
     const row = set.values[absoluteRow - lazyOffset];
     if (!row) {

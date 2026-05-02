@@ -229,7 +229,8 @@ export interface SqliteEngine {
    *  row count so the UI can render "Rows 1–50 of 12,345" without ever
    *  materialising the full result set in JavaScript memory.
    *
-   *  - `sql`      The trimmed SQL string.  Must not end with a semicolon.
+   *  - `sql`      The trimmed SQL string.  Any trailing semicolons are
+   *               stripped automatically before the query is wrapped.
    *  - `pageSize` Number of rows to return (≥ 1).
    *  - `offset`   0-based index of the first row to return.
    *
