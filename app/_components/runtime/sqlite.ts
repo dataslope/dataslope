@@ -224,6 +224,24 @@ export interface SqliteEngine {
     columnNames: string[],
     values: unknown[],
   ) => void;
+  /** Execute a single SELECT (or WITH…SELECT) statement with server-side
+   *  pagination. Returns the rows for one page together with the total
+   *  row count so the UI can render "Rows 1–50 of 12,345" without ever
+   *  materialising the full result set in JavaScript memory.
+   *
+   *  - `sql`      The trimmed SQL string.  Must not end with a semicolon.
+   *  - `pageSize` Number of rows to return (≥ 1).
+   *  - `offset`   0-based index of the first row to return.
+   *
+   *  The count is obtained via `SELECT COUNT(*) FROM (<sql>)` and the
+   *  page via `<sql> LIMIT <pageSize> OFFSET <offset>`.  If the count
+   *  query fails (e.g. due to an unusual expression list) `totalCount`
+   *  falls back to the number of rows returned by the page query. */
+  execPaged: (
+    sql: string,
+    pageSize: number,
+    offset: number,
+  ) => { result: QueryExecResult[]; totalCount: number };
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -827,6 +845,42 @@ export async function createSqliteEngine(
       } finally {
         stmt.free();
       }
+    },
+    execPaged(sql: string, pageSize: number, offset: number) {
+      const d = require();
+      // Strip trailing semicolons so we can safely append LIMIT/OFFSET
+      // and wrap the query in a COUNT(*) subquery.
+      const stripped = sql.replace(/\s*;+\s*$/, "");
+      const safeSize = Math.max(1, Math.floor(pageSize));
+      const safeOffset = Math.max(0, Math.floor(offset));
+      // Determine total row count via a COUNT(*) wrapper.  If this
+      // fails for any reason (e.g. an unsupported expression list in
+      // the query), fall back to the length of the page result.
+      let totalCount: number | null = null;
+      try {
+        const countResult = d.exec(
+          `SELECT COUNT(*) FROM (${stripped})`,
+        );
+        if (countResult.length > 0 && countResult[0].values.length > 0) {
+          totalCount = Number(countResult[0].values[0][0]) || 0;
+        }
+      } catch {
+        // Count query failed; totalCount stays null and will be
+        // derived from the page result length below.
+      }
+      // Fetch only the requested page by appending LIMIT/OFFSET.  This
+      // preserves any top-level ORDER BY because the LIMIT clause
+      // applies after ORDER BY in SQLite's evaluation order.
+      const result = d.exec(
+        `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
+      );
+      const rowCount =
+        totalCount !== null
+          ? totalCount
+          : result.length > 0
+            ? result[0].values.length + safeOffset
+            : 0;
+      return { result, totalCount: rowCount };
     },
   };
 }
