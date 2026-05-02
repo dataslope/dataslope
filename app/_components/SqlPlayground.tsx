@@ -321,6 +321,26 @@ interface QueryRunResult {
    *  intentionally only set this for previews — arbitrary user SQL has
    *  no single "source table" so we don't try to guess. */
   sourceTable?: string;
+  /** When lazy SQL pagination is active: the original trimmed SQL that
+   *  produced this result. Stored so page-navigation can re-run it
+   *  with a different LIMIT/OFFSET without requiring the caller to pass
+   *  it again. Undefined when the result was produced with all rows
+   *  loaded into memory (non-lazy mode). */
+  lazySql?: string;
+  /** When lazy SQL pagination is active: total row count across all
+   *  pages, from a COUNT(*) wrapper executed at query time. Used by
+   *  the pagination footer to display accurate totals without loading
+   *  all rows into memory. */
+  lazyTotalCount?: number;
+  /** When lazy SQL pagination is active: 0-based index of the page
+   *  whose rows are stored in `sets`. */
+  lazyPage?: number;
+  /** When lazy SQL pagination is active: the page size (rows per page)
+   *  that was used to fetch this result. Stored separately from the
+   *  global setting so that delete/edit row-index calculations remain
+   *  correct even if the user changes the page size between the query
+   *  run and the action. */
+  lazyPageSize?: number;
 }
 
 type SelectedRowsByResult = Record<number, Set<number>>;
@@ -381,6 +401,40 @@ function parseCellKey(cellKey: string): { row: number; col: string } | null {
   const [rowStr, col] = cellKey.split(":");
   const row = Number(rowStr);
   return Number.isInteger(row) ? { row, col } : null;
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// SQL analysis helpers used for lazy (server-side) pagination decisions.
+// ────────────────────────────────────────────────────────────────────────
+
+/** Strip block (`/* … *\/`) and line (`-- …`) comments from a SQL string. */
+function stripSqlComments(sql: string): string {
+  return sql
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/--[^\r\n]*/g, "");
+}
+
+/** Returns true when `sql` appears to be a single SELECT or CTE statement
+ *  (no multi-statement semicolons, starts with SELECT or WITH). Used to
+ *  decide whether lazy LIMIT/OFFSET pagination is applicable.
+ *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
+ *  already stripped comments to avoid redundant work. */
+function isSingleSelectSql(sql: string, noComments?: string): boolean {
+  const stripped = (noComments ?? stripSqlComments(sql)).trim().replace(/;+\s*$/, "");
+  if (stripped.includes(";")) return false;
+  return /^(select|with)\s/i.test(stripped);
+}
+
+/** Returns true when `sql` already contains a LIMIT keyword (after
+ *  stripping comments and single-quoted string literals). When true, lazy
+ *  pagination is skipped: appending another LIMIT would produce invalid SQL.
+ *  Single-quoted strings are stripped first so a value like `'No limit'`
+ *  does not trigger a false positive.
+ *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
+ *  already stripped comments to avoid redundant work. */
+function hasLimitClause(sqlOrNoComments: string): boolean {
+  const noStrings = sqlOrNoComments.replace(/'(?:''|[^'])*'/g, "''");
+  return /\blimit\b/i.test(noStrings);
 }
 
 /** Count deleted rows before a row index to calculate its post-delete shift. */
@@ -507,6 +561,38 @@ function SqlPlaygroundInner() {
   const [editorTheme, setEditorThemeState] = useState<string>("dracula");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+
+  // ─── Global page size ────────────────────────────────────────────────
+  // Lifted from ResultView so that runSqlForTab can read the current
+  // value synchronously (via a ref) when deciding whether to apply lazy
+  // LIMIT/OFFSET pagination. A matching ref is kept in sync so the
+  // callback closure always sees the latest value even if the state
+  // update hasn't flushed yet.
+  const [globalPageSize, setGlobalPageSizeState] = useState<number>(() => {
+    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
+    const saved = Number(
+      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+    );
+    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
+      ? saved
+      : DEFAULT_PAGE_SIZE;
+  });
+  const globalPageSizeRef = useRef(globalPageSize);
+  useEffect(() => {
+    globalPageSizeRef.current = globalPageSize;
+  }, [globalPageSize]);
+  const setGlobalPageSize = useCallback((n: number) => {
+    // Update the ref synchronously so any callback that reads it in the
+    // same event loop tick (e.g. onLoadPage right after onSetGlobalPageSize)
+    // sees the new value before the React state flush.
+    globalPageSizeRef.current = n;
+    setGlobalPageSizeState(n);
+    try {
+      localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(n));
+    } catch {
+      // ignore quota errors
+    }
+  }, []);
 
   // ─── UI state ───────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -657,6 +743,12 @@ function SqlPlaygroundInner() {
     Record<string, QueryRunResult>
   >({});
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
+  // Keep a ref so handleLoadPage (a stable callback) can read the
+  // latest results without needing to close over the state directly.
+  const resultsByTabRef = useRef(resultsByTab);
+  useEffect(() => {
+    resultsByTabRef.current = resultsByTab;
+  }, [resultsByTab]);
 
   // (PK / FK key-hint computation lives further down — after
   //  `refreshEntityMetadata` is declared — so we can reference it here.)
@@ -1112,8 +1204,20 @@ function SqlPlaygroundInner() {
   // tab id explicitly so concurrent runs (e.g. the user clicks several
   // sidebar tables in quick succession) can't clobber one another's
   // results.
+  //
+  // When `page` is provided and the SQL is an eligible single SELECT
+  // without a LIMIT clause, the query is executed with LIMIT/OFFSET so
+  // only the requested page's rows are loaded into memory. The total
+  // row count is obtained via a separate COUNT(*) wrapper query and
+  // stored on the result for the pagination footer.
   const runSqlForTab = useCallback(
-    (tabId: string, sql: string, source: string, sourceTable?: string) => {
+    (
+      tabId: string,
+      sql: string,
+      source: string,
+      sourceTable?: string,
+      page = 0,
+    ) => {
       const engine = engineRef.current;
       if (!engine) return;
       const trimmed = sql.trim();
@@ -1124,10 +1228,47 @@ function SqlPlaygroundInner() {
       setStatusState("running");
       if (clearBeforeRun) setResultForTab(tabId, null);
       const t0 = performance.now();
+      const currentPageSize = globalPageSizeRef.current;
+      // Apply lazy pagination only for single SELECT/CTE statements that
+      // don't already contain a LIMIT clause, and only when "All" is not
+      // selected (pageSize === 0 means load everything).
+      // Strip comments once and reuse for both checks.
+      const noComments = stripSqlComments(trimmed);
+      const useLazy =
+        currentPageSize > 0 &&
+        isSingleSelectSql(trimmed, noComments) &&
+        !hasLimitClause(noComments);
       try {
-        const sets = engine.exec(trimmed);
+        let sets: QueryExecResult[];
+        let lazySql: string | undefined;
+        let lazyTotalCount: number | undefined;
+        let lazyPage: number | undefined;
+        let lazyPageSize: number | undefined;
+        if (useLazy) {
+          const { result: lazySets, totalCount } = engine.execPaged(
+            trimmed,
+            currentPageSize,
+            page * currentPageSize,
+          );
+          sets = lazySets;
+          lazySql = trimmed;
+          lazyTotalCount = totalCount;
+          lazyPage = page;
+          lazyPageSize = currentPageSize;
+        } else {
+          sets = engine.exec(trimmed);
+        }
         const elapsedMs = performance.now() - t0;
-        setResultForTab(tabId, { sets, elapsedMs, source, sourceTable });
+        setResultForTab(tabId, {
+          sets,
+          elapsedMs,
+          source,
+          sourceTable,
+          lazySql,
+          lazyTotalCount,
+          lazyPage,
+          lazyPageSize,
+        });
         setStatusState("ready");
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
         setTables(engine.listTables());
@@ -1153,6 +1294,24 @@ function SqlPlaygroundInner() {
       }
     },
     [clearBeforeRun, showToast, setResultForTab],
+  );
+
+  // Re-run a lazy-paginated result for a different page or page size.
+  // Reads the current result's source / sourceTable from the ref so
+  // the callback itself stays stable across renders.
+  const handleLoadPage = useCallback(
+    (sql: string, page: number) => {
+      const tabId = activeTabIdRef.current;
+      const curResult = resultsByTabRef.current[tabId];
+      runSqlForTab(
+        tabId,
+        sql,
+        curResult?.source ?? sql,
+        curResult?.sourceTable,
+        page,
+      );
+    },
+    [runSqlForTab],
   );
 
   const runActiveTab = useCallback(() => {
@@ -1203,9 +1362,10 @@ function SqlPlaygroundInner() {
   const previewTable = useCallback(
     (name: string, kind: "table" | "view") => {
       // Double-clicking a sidebar entry opens it in a new tab whose
-      // title is the entity's name. The default query previews the
-      // first 200 rows so the user can see data immediately.
-      const sql = `SELECT * FROM ${quoteIdent(name)} LIMIT 200;`;
+      // title is the entity's name. Lazy LIMIT/OFFSET pagination in
+      // runSqlForTab will automatically limit the initial fetch to the
+      // current page size, so we don't hard-code a row cap here.
+      const sql = `SELECT * FROM ${quoteIdent(name)};`;
       openTabAndRun(
         name,
         sql,
@@ -1733,7 +1893,7 @@ function SqlPlaygroundInner() {
         );
         // Re-run the same preview the result was originally produced
         // from so the table refreshes in place.
-        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -1765,7 +1925,7 @@ function SqlPlaygroundInner() {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
-        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -1790,7 +1950,7 @@ function SqlPlaygroundInner() {
       try {
         engine.insertRow(tableName, columnNames, values);
         showToast(`Duplicated row in "${tableName}".`);
-        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -3914,6 +4074,9 @@ function SqlPlaygroundInner() {
                   onDeleteRows={deleteRowsFromTable}
                   onUpdateRows={updateRowsInTable}
                   onDuplicateRow={duplicateRowInTable}
+                  globalPageSize={globalPageSize}
+                  onSetGlobalPageSize={setGlobalPageSize}
+                  onLoadPage={handleLoadPage}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -4064,6 +4227,9 @@ function ResultView({
   onDeleteRows,
   onUpdateRows,
   onDuplicateRow,
+  globalPageSize,
+  onSetGlobalPageSize,
+  onLoadPage,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -4088,6 +4254,12 @@ function ResultView({
     columnNames: string[],
     values: unknown[],
   ) => void;
+  /** Current page size (shared globally, lifted from this component). */
+  globalPageSize: number;
+  /** Setter for globalPageSize — persists to localStorage and updates the ref. */
+  onSetGlobalPageSize: (n: number) => void;
+  /** Called when the user navigates to a different page in lazy mode. */
+  onLoadPage: (sql: string, page: number) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -4096,17 +4268,9 @@ function ResultView({
   // the very behaviour Updates 1 and 2 ask us to remove.
   //
   // The page *size* is global (shared across all result sets, tabs and
-  // databases) and persisted to localStorage. Only the current *page*
-  // number is tracked per result-set index.
-  const [globalPageSize, setGlobalPageSize] = useState(() => {
-    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
-    const saved = Number(
-      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
-    );
-    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
-      ? saved
-      : DEFAULT_PAGE_SIZE;
-  });
+  // databases), lifted to SqlPlaygroundInner and persisted to localStorage
+  // there. Only the current *page* number is tracked per result-set index
+  // for non-lazy results; lazy results store the page on the result object.
   const [pageStates, setPageStates] = useState<Record<number, { page: number }>>(
     {},
   );
@@ -4173,21 +4337,6 @@ function ResultView({
       const cur = prev[idx] ?? { page: 0 };
       return { ...prev, [idx]: { ...cur, page } };
     });
-  }, []);
-
-  const setPageSize = useCallback((idx: number, pageSize: number) => {
-    setGlobalPageSize(pageSize);
-    setPageStates((prev) => ({
-      ...prev,
-      [idx]: { page: 0 },
-    }));
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(pageSize));
-      } catch {
-        // ignore quota errors
-      }
-    }
   }, []);
 
   // Per-set deletability check. Requires a single-table preview with
@@ -4337,9 +4486,18 @@ function ResultView({
       setPendingDelete(null);
       return;
     }
+    // In lazy mode, set.values holds only the current page, so absolute
+    // row indices must be adjusted by the page offset before indexing.
+    // Use the page size stored on the result (not the current global setting)
+    // so the calculation is correct even if the user changed the page size
+    // between loading the result and triggering the delete.
+    const lazyOffset =
+      result.lazySql !== undefined && result.lazyPage !== undefined
+        ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
+        : 0;
     const pkRows: unknown[][] = [];
     for (const rowIdx of selected) {
-      const row = set.values[rowIdx];
+      const row = set.values[rowIdx - lazyOffset];
       if (!row) continue;
       pkRows.push(pkColIndexes.map((ci) => row[ci]));
     }
@@ -4400,7 +4558,16 @@ function ResultView({
       setPendingDeleteSingleRow(null);
       return;
     }
-    const row = set.values[absoluteRow];
+    // In lazy mode, set.values holds only the current page's rows; adjust
+    // the absolute row index by the page offset before indexing into it.
+    // Use the page size stored on the result (not the current global setting)
+    // to remain correct even if the user changed the page size setting after
+    // loading this result.
+    const lazyOffset =
+      result.lazySql !== undefined && result.lazyPage !== undefined
+        ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
+        : 0;
+    const row = set.values[absoluteRow - lazyOffset];
     if (!row) {
       setPendingDeleteSingleRow(null);
       return;
@@ -4472,17 +4639,53 @@ function ResultView({
     <>
       <div className="sql-result-sets">
         {result.sets.map((set, idx) => {
-          const st = getState(idx);
-          const totalRows = set.values.length;
-          const effective =
-            globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
-          const totalPages = Math.max(1, Math.ceil(totalRows / effective));
-          const safePage = Math.min(st.page, totalPages - 1);
-          const start = safePage * effective;
-          const visible =
-            globalPageSize > 0
-              ? set.values.slice(start, start + effective)
-              : set.values;
+          // ── Lazy vs. non-lazy page computation ────────────────────────
+          // For lazy results (single SELECT wrapped with execPaged), the
+          // set already contains only the current page's rows.  For
+          // non-lazy results (multi-statement, LIMIT clause, or "All"
+          // mode), we slice client-side as before.
+          const isLazy = result.lazySql !== undefined && idx === 0;
+          let totalRows: number;
+          let currentPage: number;
+          let startIdx: number;
+          let visibleRows: QueryExecResult["values"];
+          let handlePageChange: (p: number) => void;
+          let handlePageSizeChange: (s: number) => void;
+          if (isLazy) {
+            const effective =
+              globalPageSize > 0
+                ? globalPageSize
+                : Math.max(result.lazyTotalCount ?? 0, 1);
+            totalRows = result.lazyTotalCount ?? set.values.length;
+            currentPage = result.lazyPage ?? 0;
+            startIdx = currentPage * effective;
+            visibleRows = set.values;
+            const lazySql = result.lazySql!;
+            handlePageChange = (p: number) => onLoadPage(lazySql, p);
+            handlePageSizeChange = (s: number) => {
+              // Update globalPageSize first (also updates the ref synchronously)
+              // so the subsequent onLoadPage call sees the new page size.
+              onSetGlobalPageSize(s);
+              onLoadPage(lazySql, 0);
+            };
+          } else {
+            const st = getState(idx);
+            totalRows = set.values.length;
+            const effective =
+              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+            const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+            currentPage = Math.min(st.page, totalPages - 1);
+            startIdx = currentPage * effective;
+            visibleRows =
+              globalPageSize > 0
+                ? set.values.slice(startIdx, startIdx + effective)
+                : set.values;
+            handlePageChange = (p: number) => setPage(idx, p);
+            handlePageSizeChange = (s: number) => {
+              onSetGlobalPageSize(s);
+              setPage(idx, 0);
+            };
+          }
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
           const pendingEdits = pendingEditsByIndex[idx];
@@ -4491,8 +4694,8 @@ function ResultView({
               key={idx}
               set={set}
               index={idx}
-              visible={visible}
-              startIndex={start}
+              visible={visibleRows}
+              startIndex={startIdx}
               keyHints={keyHints}
               deletable={pkCols !== null}
               editable={isEditable}
@@ -4532,7 +4735,31 @@ function ResultView({
       </div>
       <div className="sql-result-pagers">
         {result.sets.map((set, idx) => {
-          const st = getState(idx);
+          const isLazy = result.lazySql !== undefined && idx === 0;
+          let totalRows: number;
+          let currentPage: number;
+          let handlePageChange: (p: number) => void;
+          let handlePageSizeChange: (s: number) => void;
+          if (isLazy) {
+            totalRows = result.lazyTotalCount ?? set.values.length;
+            currentPage = result.lazyPage ?? 0;
+            const lazySql = result.lazySql!;
+            handlePageChange = (p: number) => onLoadPage(lazySql, p);
+            handlePageSizeChange = (s: number) => {
+              onSetGlobalPageSize(s);
+              // For "All" (s === 0), onLoadPage triggers a non-lazy full load.
+              onLoadPage(lazySql, 0);
+            };
+          } else {
+            const st = getState(idx);
+            totalRows = set.values.length;
+            currentPage = st.page;
+            handlePageChange = (p: number) => setPage(idx, p);
+            handlePageSizeChange = (s: number) => {
+              onSetGlobalPageSize(s);
+              setPage(idx, 0);
+            };
+          }
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
           const selectedCount = selected?.size ?? 0;
@@ -4541,13 +4768,13 @@ function ResultView({
           return (
             <ResultPager
               key={idx}
-              set={set}
+              totalRows={totalRows}
               index={idx}
               showSetLabel={result.sets.length > 1}
               pageSize={globalPageSize}
-              page={st.page}
-              onPageChange={(p) => setPage(idx, p)}
-              onPageSizeChange={(s) => setPageSize(idx, s)}
+              page={currentPage}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
               deletable={pkCols !== null}
               editable={isEditable}
               editCount={editCount}
@@ -5153,7 +5380,7 @@ function ResultTableBody({
 }
 
 function ResultPager({
-  set,
+  totalRows,
   index,
   showSetLabel,
   pageSize,
@@ -5167,7 +5394,9 @@ function ResultPager({
   onRequestDelete,
   onCommitEdits,
 }: {
-  set: QueryExecResult;
+  /** Total number of rows across all pages. For lazy results this is the
+   *  COUNT(*) from the engine; for non-lazy results it is set.values.length. */
+  totalRows: number;
   index: number;
   showSetLabel: boolean;
   pageSize: number;
@@ -5181,7 +5410,6 @@ function ResultPager({
   onRequestDelete: () => void;
   onCommitEdits: () => void;
 }) {
-  const totalRows = set.values.length;
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
   const totalPages = Math.max(1, Math.ceil(totalRows / effective));
   const safePage = Math.min(page, totalPages - 1);
