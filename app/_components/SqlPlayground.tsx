@@ -3967,17 +3967,96 @@ function ResultView({
       : DEFAULT_PAGE_SIZE;
   }, []);
 
+  // Flags consumed by the result-reset effect below. Set right before
+  // we trigger our own update / delete which re-runs the preview query
+  // and produces a fresh `result` object. They let us keep the user's
+  // *other* in-progress work intact across the refresh — selections
+  // survive an Update, and pending cell edits survive a Delete.
+  const preserveSelectionsRef = useRef(false);
+  const preserveEditsRef = useRef(false);
+
+  // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
+  // value is the new (string) value the user typed. Keyed by result-set
+  // index so each set tracks its edits independently. Declared up here
+  // (alongside the other reset-target state) so the result-reset effect
+  // can see the setter without TDZ.
+  const [pendingEditsByIndex, setPendingEditsByIndexState] = useState<
+    Record<number, Map<string, unknown>>
+  >({});
+  // Mirror of `pendingEditsByIndex` kept in sync by every setter so
+  // `commitEdits` can read the latest value when invoked in the same
+  // event batch as a blur-driven `setPendingEdit` (the closure-captured
+  // state is still stale at that point — clicking the "Update N cells"
+  // button blurs the active input first, then fires the click).
+  const pendingEditsByIndexRef = useRef<
+    Record<number, Map<string, unknown>>
+  >({});
+  // Single setter that updates both the ref (synchronously, so other
+  // handlers in the same event batch see the latest value) and the
+  // React state.
+  const setPendingEditsByIndex = useCallback(
+    (
+      updater:
+        | Record<number, Map<string, unknown>>
+        | ((
+            prev: Record<number, Map<string, unknown>>,
+          ) => Record<number, Map<string, unknown>>),
+    ) => {
+      const next =
+        typeof updater === "function"
+          ? updater(pendingEditsByIndexRef.current)
+          : updater;
+      pendingEditsByIndexRef.current = next;
+      setPendingEditsByIndexState(next);
+    },
+    [],
+  );
+  // Whether a cell within a given result set is currently being actively
+  // edited (i.e. the user has double-clicked it). We track the "active
+  // editing cell" key per set so we can blur it on commit.
+  const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
+    Record<number, string | null>
+  >({});
+
   // Reset pagination + selection + edits whenever a new result lands.
   // Identity-comparing against the result object is sufficient because
   // `setResult` always creates a new object.
   useEffect(() => {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
-    setSelectedByIndex({});
+    if (preserveSelectionsRef.current) {
+      preserveSelectionsRef.current = false;
+    } else {
+      setSelectedByIndex({});
+    }
     setPendingDelete(null);
-    setPendingEditsByIndex({});
+    if (preserveEditsRef.current) {
+      preserveEditsRef.current = false;
+      // Drop edits whose absolute row index no longer exists in the
+      // refreshed result (defensive — performDelete already remaps).
+      setPendingEditsByIndex((prev) => {
+        const next: Record<number, Map<string, unknown>> = {};
+        result?.sets.forEach((s, idx) => {
+          const prevMap = prev[idx];
+          if (!prevMap || prevMap.size === 0) return;
+          const total = s.values.length;
+          const nextMap = new Map<string, unknown>();
+          for (const [key, value] of prevMap) {
+            const [rowStr] = key.split(":");
+            const row = Number(rowStr);
+            if (Number.isInteger(row) && row >= 0 && row < total) {
+              nextMap.set(key, value);
+            }
+          }
+          if (nextMap.size > 0) next[idx] = nextMap;
+        });
+        return next;
+      });
+    } else {
+      setPendingEditsByIndex({});
+    }
     setActiveEditCellByIndex({});
-  }, [result]);
+  }, [result, setPendingEditsByIndex]);
 
   const getState = useCallback(
     (idx: number) => pageStates[idx] ?? { pageSize: initialPageSize, page: 0 },
@@ -4057,20 +4136,6 @@ function ResultView({
     [],
   );
 
-  // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
-  // value is the new (string) value the user typed. Keyed by result-set
-  // index so each set tracks its edits independently.
-  const [pendingEditsByIndex, setPendingEditsByIndex] = useState<
-    Record<number, Map<string, unknown>>
-  >({});
-
-  // Whether a cell within a given result set is currently being actively
-  // edited (i.e. the user has double-clicked it). We track the "active
-  // editing cell" key per set so we can blur it on commit.
-  const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
-    Record<number, string | null>
-  >({});
-
   const setPendingEdit = useCallback(
     (setIdx: number, cellKey: string, value: unknown) => {
       setPendingEditsByIndex((prev) => {
@@ -4079,7 +4144,7 @@ function ResultView({
         return { ...prev, [setIdx]: cur };
       });
     },
-    [],
+    [setPendingEditsByIndex],
   );
 
   const clearPendingEdit = useCallback(
@@ -4095,7 +4160,7 @@ function ResultView({
         return { ...prev, [setIdx]: cur };
       });
     },
-    [],
+    [setPendingEditsByIndex],
   );
 
   const setActiveEditCell = useCallback(
@@ -4108,7 +4173,10 @@ function ResultView({
   const commitEdits = useCallback(
     (setIdx: number, set: QueryExecResult) => {
       if (!sourceTable || !onUpdateRows) return;
-      const edits = pendingEditsByIndex[setIdx];
+      // Read from the ref so we see edits committed by the input's
+      // `onBlur` that fires in the same event batch as this click —
+      // closure-captured state is still stale at this point.
+      const edits = pendingEditsByIndexRef.current[setIdx];
       if (!edits || edits.size === 0) return;
       const updates: Array<{
         rowIndex: number;
@@ -4132,9 +4200,12 @@ function ResultView({
         return next;
       });
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+      // Selections aren't affected by an Update — keep them across the
+      // upcoming result refresh.
+      preserveSelectionsRef.current = true;
       onUpdateRows(sourceTable, updates);
     },
-    [sourceTable, onUpdateRows, pendingEditsByIndex],
+    [sourceTable, onUpdateRows, setPendingEditsByIndex],
   );
 
   const requestDelete = useCallback((setIdx: number) => {
@@ -4168,7 +4239,34 @@ function ResultView({
       if (!row) continue;
       pkRows.push(pkColIndexes.map((ci) => row[ci]));
     }
+    const setIdx = pendingDelete;
+    const sortedDeletedRows = Array.from(selected).sort((a, b) => a - b);
     setPendingDelete(null);
+    // Pending cell edits are independent of the delete — preserve them
+    // across the upcoming result refresh, but shift their absolute row
+    // indices to account for rows removed above them. Edits on a row
+    // that is itself being deleted are dropped.
+    setPendingEditsByIndex((prev) => {
+      const prevMap = prev[setIdx];
+      if (!prevMap || prevMap.size === 0) return prev;
+      const nextMap = new Map<string, unknown>();
+      for (const [key, value] of prevMap) {
+        const [rowStr, colStr] = key.split(":");
+        const row = Number(rowStr);
+        if (!Number.isInteger(row) || selected.has(row)) continue;
+        let shift = 0;
+        for (const d of sortedDeletedRows) {
+          if (d < row) shift++;
+          else break;
+        }
+        nextMap.set(`${row - shift}:${colStr}`, value);
+      }
+      const next = { ...prev };
+      if (nextMap.size > 0) next[setIdx] = nextMap;
+      else delete next[setIdx];
+      return next;
+    });
+    preserveEditsRef.current = true;
     onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
@@ -4177,6 +4275,7 @@ function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
+    setPendingEditsByIndex,
   ]);
 
   if (loading) {
