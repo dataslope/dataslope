@@ -802,7 +802,7 @@ body.pg-active {
 .settings-action-btn {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 12px;
-  background: transparent;
+  background: color-mix(in srgb, var(--bg3) 40%, transparent);
   border: none;
   color: var(--text-dim);
   font-family: var(--font-ui); font-size: 13px; font-weight: 500;
@@ -811,10 +811,13 @@ body.pg-active {
   transition: background-color 0.15s, color 0.15s;
 }
 .settings-action-btn:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--bg3) 70%, transparent);
   color: var(--text);
 }
 .settings-action-btn svg { flex-shrink: 0; color: currentColor; }
+.settings-action-danger {
+  color: var(--red);
+}
 .settings-action-danger:hover {
   color: var(--red);
 }
@@ -1009,7 +1012,7 @@ input[type="range"].fs-slider:disabled {
   height: 14px;
   border-radius: 50%;
   background: var(--text);
-  transform: translateX(2px);
+  transform: translateX(4px);
   transition: transform 0.15s, background-color 0.15s;
 }
 .bui-switch[data-checked] .bui-switch-thumb {

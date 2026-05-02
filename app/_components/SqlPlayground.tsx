@@ -88,6 +88,7 @@ import {
   Hash,
   Play,
   Plus,
+  RotateCcw,
   Table2,
   Trash2,
   TriangleAlert,
@@ -2938,6 +2939,7 @@ function SqlPlaygroundInner() {
                 className="settings-action-btn"
                 onClick={resetTabsForCurrentDb}
               >
+                <RotateCcw size={14} aria-hidden="true" />
                 <span>Reset query tabs for {activeSample.label}</span>
               </button>
             </div>
