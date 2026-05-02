@@ -792,8 +792,14 @@ export async function createSqliteEngine(
       return cols.map((c) => ({
         name: c.name,
         isPrimaryKey: c.pk > 0,
-        // AUTOINCREMENT only applies to a single-column INTEGER PK.
-        isAutoIncrement: hasAutoIncrement && c.pk === 1,
+        // AUTOINCREMENT can only apply when there is exactly one PK
+        // column (SQLite forbids AUTOINCREMENT on composite PKs). Guard
+        // with pkCount so a composite-PK table whose first member
+        // happens to have pk=1 isn't mistakenly marked auto-increment.
+        isAutoIncrement:
+          hasAutoIncrement &&
+          c.pk === 1 &&
+          cols.filter((col) => col.pk > 0).length === 1,
         isUnique: uniqueColNames.has(c.name),
       }));
     },
