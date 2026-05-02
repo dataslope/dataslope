@@ -3967,15 +3967,29 @@ function ResultView({
       : DEFAULT_PAGE_SIZE;
   }, []);
 
+  // Ref set synchronously before calling onUpdateRows / onDeleteRows so
+  // the useEffect below can skip resetting state that should survive an
+  // internal result refresh (e.g. row selections after an edit commit,
+  // pending edits after a delete). Cleared by the effect after each use.
+  const preserveOnNextResultRef = useRef<{
+    preserveSelections?: boolean;
+    preserveEdits?: boolean;
+  } | null>(null);
+
   // Reset pagination + selection + edits whenever a new result lands.
   // Identity-comparing against the result object is sufficient because
   // `setResult` always creates a new object.
+  // Internal refreshes (edit commit, row delete) set preserveOnNextResultRef
+  // before triggering the result change so we only reset the subset of
+  // state that no longer makes sense for the new result.
   useEffect(() => {
+    const preserve = preserveOnNextResultRef.current;
+    preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
-    setSelectedByIndex({});
+    if (!preserve?.preserveSelections) setSelectedByIndex({});
     setPendingDelete(null);
-    setPendingEditsByIndex({});
+    if (!preserve?.preserveEdits) setPendingEditsByIndex({});
     setActiveEditCellByIndex({});
   }, [result]);
 
@@ -4124,14 +4138,14 @@ function ResultView({
         updates.push({ rowIndex: absoluteRow, column: colName, value });
       }
       if (updates.length === 0) return;
-      // Clear edits before calling the callback so the result refresh
-      // starts with a clean slate regardless of success/failure.
-      setPendingEditsByIndex((prev) => {
-        const next = { ...prev };
-        delete next[setIdx];
-        return next;
-      });
+      // Keep pending edits visible until the result refreshes so the
+      // updated value stays on screen. The useEffect([result]) will clear
+      // them once the re-queried result lands.  Only the active-edit input
+      // is dismissed immediately so the cell reverts to the pending-value
+      // span while the refresh is in flight.
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+      // Preserve checkbox selections across this internal result refresh.
+      preserveOnNextResultRef.current = { preserveSelections: true };
       onUpdateRows(sourceTable, updates);
     },
     [sourceTable, onUpdateRows, pendingEditsByIndex],
@@ -4169,6 +4183,9 @@ function ResultView({
       pkRows.push(pkColIndexes.map((ci) => row[ci]));
     }
     setPendingDelete(null);
+    // Preserve pending cell edits across this internal result refresh so
+    // unsaved edits on other rows survive the delete.
+    preserveOnNextResultRef.current = { preserveEdits: true };
     onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
