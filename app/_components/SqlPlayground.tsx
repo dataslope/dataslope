@@ -397,10 +397,10 @@ function pendingEditsAfterDeletedRows(
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// Pagination defaults — applied per result set. The "All" option
-// (value = 0) renders every row at once and hides the page navigator.
-// The chosen size is persisted across reloads so the user's preference
-// survives navigation between databases and tabs.
+// Pagination defaults — shared globally across all result sets, tabs
+// and databases. The "All" option (value = 0) renders every row at
+// once and hides the page navigator. The chosen size is persisted to
+// localStorage so the user's preference survives reloads.
 // ────────────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
@@ -4010,9 +4010,22 @@ function ResultView({
   // sits *outside* the horizontally/vertically scrolling content.
   // Without this lift the pagination bar would scroll with the table —
   // the very behaviour Updates 1 and 2 ask us to remove.
-  const [pageStates, setPageStates] = useState<
-    Record<number, { pageSize: number; page: number }>
-  >({});
+  //
+  // The page *size* is global (shared across all result sets, tabs and
+  // databases) and persisted to localStorage. Only the current *page*
+  // number is tracked per result-set index.
+  const [globalPageSize, setGlobalPageSize] = useState(() => {
+    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
+    const saved = Number(
+      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+    );
+    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
+      ? saved
+      : DEFAULT_PAGE_SIZE;
+  });
+  const [pageStates, setPageStates] = useState<Record<number, { page: number }>>(
+    {},
+  );
   // Selection state — set of *absolute* row indices into `set.values`
   // (not page-local) so selections survive page navigation. Keyed by
   // result-set index. Only populated for sets that are deletable.
@@ -4041,15 +4054,6 @@ function ResultView({
     selectedByIndex: SelectedRowsByResult;
     pendingEditsByIndex: PendingEditsByResult;
   } | null>(null);
-  const initialPageSize = useMemo(() => {
-    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
-    const saved = Number(
-      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
-    );
-    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
-      ? saved
-      : DEFAULT_PAGE_SIZE;
-  }, []);
 
   // Reset pagination + transient actions whenever a new result lands.
   // Table-edit actions refresh the result in place, so they can opt into
@@ -4068,24 +4072,22 @@ function ResultView({
   }, [result]);
 
   const getState = useCallback(
-    (idx: number) => pageStates[idx] ?? { pageSize: initialPageSize, page: 0 },
-    [pageStates, initialPageSize],
+    (idx: number) => pageStates[idx] ?? { page: 0 },
+    [pageStates],
   );
 
-  const setPage = useCallback(
-    (idx: number, page: number) => {
-      setPageStates((prev) => {
-        const cur = prev[idx] ?? { pageSize: initialPageSize, page: 0 };
-        return { ...prev, [idx]: { ...cur, page } };
-      });
-    },
-    [initialPageSize],
-  );
+  const setPage = useCallback((idx: number, page: number) => {
+    setPageStates((prev) => {
+      const cur = prev[idx] ?? { page: 0 };
+      return { ...prev, [idx]: { ...cur, page } };
+    });
+  }, []);
 
   const setPageSize = useCallback((idx: number, pageSize: number) => {
+    setGlobalPageSize(pageSize);
     setPageStates((prev) => ({
       ...prev,
-      [idx]: { pageSize, page: 0 },
+      [idx]: { page: 0 },
     }));
     if (typeof window !== "undefined") {
       try {
@@ -4320,12 +4322,12 @@ function ResultView({
           const st = getState(idx);
           const totalRows = set.values.length;
           const effective =
-            st.pageSize > 0 ? st.pageSize : Math.max(totalRows, 1);
+            globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
           const totalPages = Math.max(1, Math.ceil(totalRows / effective));
           const safePage = Math.min(st.page, totalPages - 1);
           const start = safePage * effective;
           const visible =
-            st.pageSize > 0
+            globalPageSize > 0
               ? set.values.slice(start, start + effective)
               : set.values;
           const pkCols = pkColumnsForSet(set);
@@ -4375,7 +4377,7 @@ function ResultView({
               set={set}
               index={idx}
               showSetLabel={result.sets.length > 1}
-              pageSize={st.pageSize}
+              pageSize={globalPageSize}
               page={st.page}
               onPageChange={(p) => setPage(idx, p)}
               onPageSizeChange={(s) => setPageSize(idx, s)}
