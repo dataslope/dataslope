@@ -322,6 +322,9 @@ interface QueryRunResult {
   sourceTable?: string;
 }
 
+type SelectedRowsByResult = Record<number, Set<number>>;
+type PendingEditsByResult = Record<number, Map<string, unknown>>;
+
 function formatCellValue(v: unknown): string {
   if (v === null || v === undefined) return "NULL";
   if (typeof v === "string") return v;
@@ -337,6 +340,51 @@ function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
   // Keep as string if it doesn't parse cleanly so the user can see what
   // they typed rather than silently coercing to NaN or 0.
   return Number.isFinite(n) ? n : raw;
+}
+
+function cloneSelections(src: SelectedRowsByResult): SelectedRowsByResult {
+  return Object.fromEntries(
+    Object.entries(src).map(([idx, rows]) => [idx, new Set(rows)]),
+  ) as SelectedRowsByResult;
+}
+
+function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
+  return Object.fromEntries(
+    Object.entries(src).map(([idx, edits]) => [idx, new Map(edits)]),
+  ) as PendingEditsByResult;
+}
+
+function countSortedValuesLessThan(values: number[], target: number): number {
+  let lo = 0;
+  let hi = values.length;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (values[mid] < target) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+function pendingEditsAfterDeletedRows(
+  src: PendingEditsByResult,
+  setIdx: number,
+  deletedRows: Set<number>,
+): PendingEditsByResult {
+  const next = clonePendingEdits(src);
+  const edits = next[setIdx];
+  if (!edits) return next;
+  const sortedDeleted = [...deletedRows].sort((a, b) => a - b);
+  const shifted = new Map<string, unknown>();
+  for (const [cellKey, value] of edits) {
+    const [rowStr, colStr] = cellKey.split(":");
+    const row = Number(rowStr);
+    if (!Number.isInteger(row) || deletedRows.has(row)) continue;
+    const shift = countSortedValuesLessThan(sortedDeleted, row);
+    shifted.set(`${row - shift}:${colStr}`, value);
+  }
+  if (shifted.size > 0) next[setIdx] = shifted;
+  else delete next[setIdx];
+  return next;
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -3959,15 +4007,13 @@ function ResultView({
   // Selection state — set of *absolute* row indices into `set.values`
   // (not page-local) so selections survive page navigation. Keyed by
   // result-set index. Only populated for sets that are deletable.
-  const [selectedByIndex, setSelectedByIndex] = useState<
-    Record<number, Set<number>>
-  >({});
+  const [selectedByIndex, setSelectedByIndex] =
+    useState<SelectedRowsByResult>({});
   // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
   // value is the new value the user typed. Keyed by result-set index so
   // each set tracks its edits independently.
-  const [pendingEditsByIndex, setPendingEditsByIndex] = useState<
-    Record<number, Map<string, unknown>>
-  >({});
+  const [pendingEditsByIndex, setPendingEditsByIndex] =
+    useState<PendingEditsByResult>({});
   // Whether a cell within a given result set is currently being actively
   // edited (i.e. the user has double-clicked it). We track the "active
   // editing cell" key per set so we can blur it on commit.
@@ -3983,8 +4029,8 @@ function ResultView({
   // result-reset effect can carry over unrelated unsaved UI state once,
   // then clear it for ordinary query runs.
   const preserveOnNextResultRef = useRef<{
-    selectedByIndex: Record<number, Set<number>>;
-    pendingEditsByIndex: Record<number, Map<string, unknown>>;
+    selectedByIndex: SelectedRowsByResult;
+    pendingEditsByIndex: PendingEditsByResult;
   } | null>(null);
   const initialPageSize = useMemo(() => {
     if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
@@ -4124,47 +4170,6 @@ function ResultView({
     [],
   );
 
-  const cloneSelections = useCallback(
-    (src: Record<number, Set<number>>) =>
-      Object.fromEntries(
-        Object.entries(src).map(([idx, rows]) => [idx, new Set(rows)]),
-      ) as Record<number, Set<number>>,
-    [],
-  );
-
-  const clonePendingEdits = useCallback(
-    (src: Record<number, Map<string, unknown>>) =>
-      Object.fromEntries(
-        Object.entries(src).map(([idx, edits]) => [idx, new Map(edits)]),
-      ) as Record<number, Map<string, unknown>>,
-    [],
-  );
-
-  const pendingEditsAfterDeletedRows = useCallback(
-    (
-      src: Record<number, Map<string, unknown>>,
-      setIdx: number,
-      deletedRows: Set<number>,
-    ) => {
-      const next = clonePendingEdits(src);
-      const edits = next[setIdx];
-      if (!edits) return next;
-      const sortedDeleted = [...deletedRows].sort((a, b) => a - b);
-      const shifted = new Map<string, unknown>();
-      for (const [cellKey, value] of edits) {
-        const [rowStr, colStr] = cellKey.split(":");
-        const row = Number(rowStr);
-        if (!Number.isInteger(row) || deletedRows.has(row)) continue;
-        const shift = sortedDeleted.filter((deleted) => deleted < row).length;
-        shifted.set(`${row - shift}:${colStr}`, value);
-      }
-      if (shifted.size > 0) next[setIdx] = shifted;
-      else delete next[setIdx];
-      return next;
-    },
-    [clonePendingEdits],
-  );
-
   const commitEdits = useCallback(
     (setIdx: number, set: QueryExecResult) => {
       if (!sourceTable || !onUpdateRows) return;
@@ -4197,8 +4202,6 @@ function ResultView({
       onUpdateRows(sourceTable, updates);
     },
     [
-      clonePendingEdits,
-      cloneSelections,
       sourceTable,
       onUpdateRows,
       pendingEditsByIndex,
@@ -4254,9 +4257,7 @@ function ResultView({
     setPendingEditsByIndex(nextPendingEdits);
     onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
-    cloneSelections,
     pendingDelete,
-    pendingEditsAfterDeletedRows,
     pendingEditsByIndex,
     result,
     sourceTable,
