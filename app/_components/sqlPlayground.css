@@ -1737,3 +1737,42 @@
 .sql-edit-commit-btn:hover {
   filter: brightness(1.1);
 }
+
+/* ─── Row context menu ─── */
+.sql-row-context-menu {
+  min-width: 180px;
+}
+
+/* Disabled-looking context-menu pseudo-item (used for the Duplicate row
+   button when a unique constraint prevents duplication). */
+.sql-ctx-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto; /* keep hover events for the popover */
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 13px;
+}
+.sql-ctx-disabled:last-child { border-bottom: none; }
+
+/* Danger-styled context-menu item (Delete row). */
+.sql-ctx-danger .ex-title {
+  color: var(--red);
+}
+.sql-ctx-danger:hover .ex-title,
+.sql-ctx-danger[data-highlighted] .ex-title {
+  color: var(--red);
+}
+
+/* Small popover explaining the unique constraint. */
+.sql-unique-popover {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: 1.5;
+}

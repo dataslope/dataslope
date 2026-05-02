@@ -45,6 +45,22 @@ export interface TableColumnInfo {
   pk: number;
 }
 
+/** Unique / primary-key constraint info for a single column, used to
+ *  determine whether a row can be safely duplicated. */
+export interface ColumnConstraintInfo {
+  /** Column name as declared in the CREATE TABLE statement. */
+  name: string;
+  /** True when this column is part of the primary key. */
+  isPrimaryKey: boolean;
+  /** True when this column is an INTEGER PRIMARY KEY AUTOINCREMENT —
+   *  its value is assigned automatically by SQLite so it can be
+   *  omitted from an INSERT when duplicating a row. */
+  isAutoIncrement: boolean;
+  /** True when this column has an explicit UNIQUE constraint (separate
+   *  from the primary key). */
+  isUnique: boolean;
+}
+
 /** Description of one column-level foreign-key relationship, derived
  *  from `PRAGMA foreign_key_list(...)`. */
 export interface ForeignKeyInfo {
@@ -192,6 +208,22 @@ export interface SqliteEngine {
    *  parameter is used only for display purposes. Returns a synthetic
    *  SqliteSampleDatabase descriptor. */
   loadFromBytes: (bytes: Uint8Array, filename: string) => SqliteSampleDatabase;
+  /** Returns per-column constraint info for `<tableName>`, combining
+   *  `PRAGMA table_info` (for primary key membership) with
+   *  `PRAGMA index_list` / `PRAGMA index_info` (for UNIQUE constraints)
+   *  and a DDL scan (for AUTOINCREMENT). Used by the result-table
+   *  context menu to decide whether a row can be safely duplicated. */
+  getColumnConstraintInfo: (tableName: string) => ColumnConstraintInfo[];
+  /** Insert a single row into `<tableName>`. Column names and values
+   *  are paired positionally and bound through sql.js's parameter API
+   *  so no user-supplied value can be interpreted as SQL. Skipping
+   *  auto-increment columns in `columnNames` lets SQLite assign the
+   *  next value automatically (the usual behaviour when duplicating). */
+  insertRow: (
+    tableName: string,
+    columnNames: string[],
+    values: unknown[],
+  ) => void;
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -700,6 +732,101 @@ export async function createSqliteEngine(
       };
       active = imported;
       return imported;
+    },
+    getColumnConstraintInfo(tableName: string): ColumnConstraintInfo[] {
+      const d = require();
+      // Primary key membership comes from PRAGMA table_info.
+      const tableInfoResult = d.exec(
+        `PRAGMA table_info(${quoteIdent(tableName)})`,
+      );
+      const cols: Array<{ name: string; pk: number }> =
+        tableInfoResult.length > 0
+          ? tableInfoResult[0].values.map((row) => ({
+              name: String(row[1]),
+              pk: Number(row[5]),
+            }))
+          : [];
+      // AUTOINCREMENT is only detectable from the original DDL.
+      const ddlStmt = d.prepare(
+        `SELECT sql FROM sqlite_master WHERE name = $name AND sql IS NOT NULL ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'view' THEN 0 ELSE 1 END, name`,
+      );
+      let ddlText = "";
+      try {
+        ddlStmt.bind({ $name: tableName });
+        while (ddlStmt.step()) {
+          const row = ddlStmt.get();
+          if (row.length > 0 && typeof row[0] === "string") {
+            ddlText += row[0];
+          }
+        }
+      } finally {
+        ddlStmt.free();
+      }
+      const hasAutoIncrement = /\bautoincrement\b/i.test(ddlText);
+      // Collect column names that have an explicit UNIQUE constraint
+      // (origin = 'u' in index_list means it came from a UNIQUE clause,
+      //  not from a PRIMARY KEY or a user-created index).
+      const uniqueColNames = new Set<string>();
+      const idxListResult = d.exec(
+        `PRAGMA index_list(${quoteIdent(tableName)})`,
+      );
+      if (idxListResult.length > 0) {
+        for (const row of idxListResult[0].values) {
+          // index_list columns: seq, name, unique, origin, partial
+          const isUnique = Number(row[2]) === 1;
+          const origin = String(row[3]);
+          if (isUnique && origin === "u") {
+            const idxName = String(row[1]);
+            const idxInfoResult = d.exec(
+              `PRAGMA index_info(${quoteIdent(idxName)})`,
+            );
+            if (idxInfoResult.length > 0) {
+              for (const iRow of idxInfoResult[0].values) {
+                // index_info columns: seqno, cid, name
+                uniqueColNames.add(String(iRow[2]));
+              }
+            }
+          }
+        }
+      }
+      return cols.map((c) => ({
+        name: c.name,
+        isPrimaryKey: c.pk > 0,
+        // AUTOINCREMENT can only apply when there is exactly one PK
+        // column (SQLite forbids AUTOINCREMENT on composite PKs). Guard
+        // with pkCount so a composite-PK table whose first member
+        // happens to have pk=1 isn't mistakenly marked auto-increment.
+        isAutoIncrement:
+          hasAutoIncrement &&
+          c.pk === 1 &&
+          cols.filter((col) => col.pk > 0).length === 1,
+        isUnique: uniqueColNames.has(c.name),
+      }));
+    },
+    insertRow(
+      tableName: string,
+      columnNames: string[],
+      values: unknown[],
+    ): void {
+      if (columnNames.length !== values.length) {
+        throw new Error("Column count must match value count.");
+      }
+      if (columnNames.length === 0) {
+        throw new Error("Cannot insert a row with no columns.");
+      }
+      const d = require();
+      const cols = columnNames.map(quoteIdent).join(", ");
+      const placeholders = columnNames
+        .map((_, i) => `?${i + 1}`)
+        .join(", ");
+      const sql = `INSERT INTO ${quoteIdent(tableName)} (${cols}) VALUES (${placeholders})`;
+      const stmt = d.prepare(sql);
+      try {
+        stmt.bind(values as SqlValue[]);
+        stmt.step();
+      } finally {
+        stmt.free();
+      }
     },
   };
 }
