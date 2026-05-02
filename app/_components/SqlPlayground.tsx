@@ -4094,7 +4094,7 @@ function ResultView({
         return { ...prev, [setIdx]: cur };
       });
     },
-    [setPendingEditsByIndex],
+    [],
   );
 
   const clearPendingEdit = useCallback(
@@ -4110,14 +4110,14 @@ function ResultView({
         return { ...prev, [setIdx]: cur };
       });
     },
-    [setPendingEditsByIndex],
+    [],
   );
 
   const setActiveEditCell = useCallback(
     (setIdx: number, cellKey: string | null) => {
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: cellKey }));
     },
-    [setActiveEditCellByIndex],
+    [],
   );
 
   const cloneSelections = useCallback(
@@ -4199,8 +4199,6 @@ function ResultView({
       onUpdateRows,
       pendingEditsByIndex,
       selectedByIndex,
-      setPendingEditsByIndex,
-      setActiveEditCellByIndex,
     ],
   );
 
@@ -4261,7 +4259,6 @@ function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
-    setPendingEditsByIndex,
   ]);
 
   if (loading) {
