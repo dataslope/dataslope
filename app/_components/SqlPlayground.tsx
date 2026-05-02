@@ -22,6 +22,7 @@ import {
   startTransition,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -4428,6 +4429,43 @@ function ResultView({
   );
 }
 
+function CellInput({
+  defaultValue,
+  isNumeric,
+  onChange,
+  onBlur,
+  onKeyDown,
+  onClick,
+}: {
+  defaultValue: string;
+  isNumeric: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: () => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLInputElement>) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.focus();
+    input.select();
+  }, []);
+  return (
+    <input
+      ref={inputRef}
+      className="sql-cell-input"
+      defaultValue={defaultValue}
+      type="text"
+      inputMode={isNumeric ? "decimal" : undefined}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+    />
+  );
+}
+
 function ResultTableBody({
   set,
   index,
@@ -4611,12 +4649,9 @@ function ResultTableBody({
                     ? String(pendingValue ?? "")
                     : formatCellValue(rawValue);
                 return (
-                  <input
-                    className="sql-cell-input"
+                  <CellInput
                     defaultValue={editVal}
-                    autoFocus
-                    type="text"
-                    inputMode={isNumeric ? "decimal" : undefined}
+                    isNumeric={isNumeric}
                     onChange={(e) => {
                       const raw = e.target.value;
                       const newVal = parseCellEditValue(raw, isNumeric);
@@ -4757,7 +4792,10 @@ function ResultTableBody({
                         }
                         onDoubleClick={
                           editable && !isSelect && ci >= 0
-                            ? () => onSetActiveEditCell(cellKey)
+                            ? (e) => {
+                                e.preventDefault();
+                                onSetActiveEditCell(cellKey);
+                              }
                             : undefined
                         }
                       >

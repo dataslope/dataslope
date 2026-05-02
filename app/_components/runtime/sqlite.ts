@@ -625,7 +625,7 @@ export async function createSqliteEngine(
               // Subquery resolves the rowid for the Nth row (0-based).
               const sql =
                 `UPDATE ${quoteIdent(tableName)} SET ${quoteIdent(upd.column)} = ?1 ` +
-                `WHERE rowid = (SELECT rowid FROM ${quoteIdent(tableName)} LIMIT 1 OFFSET ?2)`;
+                `WHERE rowid = (SELECT rowid FROM ${quoteIdent(tableName)} ORDER BY rowid LIMIT 1 OFFSET ?2)`;
               stmt = d.prepare(sql);
               stmtCache.set(colKey, stmt);
             }
