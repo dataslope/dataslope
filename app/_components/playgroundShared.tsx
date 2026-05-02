@@ -33,7 +33,7 @@ export const DEFAULT_PLAYGROUND_SETTINGS = {
   fontSize: 13,
   outputFontSize: 13,
   outputFontSizeEnabled: false,
-  editorTheme: "dracula",
+  editorTheme: "lucario",
   wordWrap: true,
   clearBeforeRun: false,
 } as const;
@@ -478,7 +478,14 @@ export function SettingsPanel({
                           />
                         </div>
                         <div className="theme-card-label">
-                          <span className="theme-card-name">{t.label}</span>
+                          <span className="theme-card-name">
+                            {t.label}
+                            {t.value === "lucario" && (
+                              <span className="theme-card-default-badge">
+                                Default
+                              </span>
+                            )}
+                          </span>
                           {selected && (
                             <span
                               className="theme-card-check"

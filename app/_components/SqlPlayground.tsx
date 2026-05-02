@@ -558,7 +558,7 @@ function SqlPlaygroundInner() {
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
-  const [editorTheme, setEditorThemeState] = useState<string>("dracula");
+  const [editorTheme, setEditorThemeState] = useState<string>("lucario");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
 
@@ -906,7 +906,7 @@ function SqlPlaygroundInner() {
         setCmApi(() => CM);
         if (textareaRef.current && !editorRef.current) {
           const initialTheme =
-            getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
+            getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
           const initialWordWrap =
             localStorage.getItem(storageKey("wordwrap")) !== "false";
           const editor = CM.fromTextArea(textareaRef.current, {

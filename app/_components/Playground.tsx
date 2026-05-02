@@ -431,7 +431,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
-  const [editorTheme, setEditorThemeState] = useState<string>("dracula");
+  const [editorTheme, setEditorThemeState] = useState<string>("lucario");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
 
@@ -621,10 +621,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           // Read the persisted theme directly so the editor is created with
           // the same theme that the rest of the UI was hydrated with.
           // Otherwise CodeMirror would briefly render with the default
-          // `editorTheme` state ("dracula") while the surrounding UI uses
+          // `editorTheme` state ("lucario") while the surrounding UI uses
           // the saved theme, producing a visible mismatch on load.
           const initialTheme =
-            getStoredEditorTheme(storageKey("editortheme")) ?? "dracula";
+            getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
           const initialWordWrap =
             localStorage.getItem(storageKey("wordwrap")) !== "false";
           const triggerAutocomplete = () => {
