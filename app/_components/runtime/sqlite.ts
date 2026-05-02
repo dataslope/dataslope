@@ -169,6 +169,21 @@ export interface SqliteEngine {
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
   ) => number;
+  /** Update individual cells in `<tableName>`. Each entry in `updates`
+   *  identifies a row by its 0-based index in the table's natural scan
+   *  order (via `rowid OFFSET rowIndex`) and sets one column to a new
+   *  value. Because this is a single-user in-memory playground, using
+   *  the row position is safe and avoids requiring a primary key.
+   *  All updates run inside a single transaction; any failure rolls back
+   *  the entire batch. Returns the number of UPDATE statements executed. */
+  updateRows: (
+    tableName: string,
+    updates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+    }>,
+  ) => number;
   /** Replace the active in-memory database with a fresh empty database.
    *  Returns a synthetic SqliteSampleDatabase descriptor for the blank DB. */
   loadBlankDatabase: () => SqliteSampleDatabase;
@@ -582,6 +597,58 @@ export async function createSqliteEngine(
         stmt.free();
       }
       return deleted;
+    },
+    updateRows(
+      tableName: string,
+      updates: ReadonlyArray<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }>,
+    ) {
+      if (updates.length === 0) return 0;
+      const d = require();
+      // Each row is identified by its rowid, fetched via OFFSET on the
+      // table's natural scan order. This is safe for a single-user
+      // in-memory playground and removes any requirement for a PK.
+      // We build one prepared statement per distinct target column so
+      // repeated edits to the same column can reuse the same stmt.
+      const stmtCache = new Map<string, ReturnType<Database["prepare"]>>();
+      let count = 0;
+      try {
+        d.run("BEGIN");
+        try {
+          for (const upd of updates) {
+            const colKey = upd.column;
+            let stmt = stmtCache.get(colKey);
+            if (!stmt) {
+              // Subquery resolves the rowid for the Nth row (0-based).
+              const sql =
+                `UPDATE ${quoteIdent(tableName)} SET ${quoteIdent(upd.column)} = ?1 ` +
+                `WHERE rowid = (SELECT rowid FROM ${quoteIdent(tableName)} LIMIT 1 OFFSET ?2)`;
+              stmt = d.prepare(sql);
+              stmtCache.set(colKey, stmt);
+            }
+            stmt.bind([upd.value as SqlValue, upd.rowIndex]);
+            stmt.step();
+            stmt.reset();
+            count += 1;
+          }
+          d.run("COMMIT");
+        } catch (err) {
+          try {
+            d.run("ROLLBACK");
+          } catch {
+            // ignore rollback failure
+          }
+          throw err;
+        }
+      } finally {
+        for (const stmt of stmtCache.values()) {
+          stmt.free();
+        }
+      }
+      return count;
     },
     loadBlankDatabase() {
       if (db) {
