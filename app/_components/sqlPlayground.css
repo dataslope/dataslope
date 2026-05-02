@@ -1656,7 +1656,7 @@
 
 /* Highlight the <th> of the currently sorted column */
 .sql-result-th-sorted {
-  background: color-mix(in srgb, var(--text) 4%, transparent) !important;
+  background: color-mix(in srgb, var(--text) 4%, var(--bg)) !important;
 }
 
 /* ─── Inline cell editor ─── */
