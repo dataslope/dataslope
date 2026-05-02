@@ -815,6 +815,14 @@
   font-style: italic;
 }
 
+/* Wrapper inside each <td> that acts as the context-menu trigger.
+   We make it a block so it fills the cell's content box and right-
+   clicks anywhere inside the cell reliably open the menu. */
+.sql-cell-trigger {
+  display: block;
+  width: 100%;
+}
+
 /* ─── Resizer ─── */
 .sql-resizer {
   background: var(--border);

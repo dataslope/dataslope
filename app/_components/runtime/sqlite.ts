@@ -192,6 +192,11 @@ export interface SqliteEngine {
    *  parameter is used only for display purposes. Returns a synthetic
    *  SqliteSampleDatabase descriptor. */
   loadFromBytes: (bytes: Uint8Array, filename: string) => SqliteSampleDatabase;
+  /** Return the names of every column in `<name>` that participates in
+   *  a UNIQUE or PRIMARY KEY constraint. Derived from
+   *  `PRAGMA table_info` (for PKs) and `PRAGMA index_list` /
+   *  `PRAGMA index_info` (for explicit UNIQUE indexes). */
+  listUniqueColumns: (name: string) => string[];
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -700,6 +705,35 @@ export async function createSqliteEngine(
       };
       active = imported;
       return imported;
+    },
+    listUniqueColumns(name: string) {
+      const d = require();
+      const uniqueCols = new Set<string>();
+      // Primary key columns from table_info
+      const info = d.exec(`PRAGMA table_info(${quoteIdent(name)})`);
+      if (info.length > 0) {
+        for (const row of info[0].values) {
+          if (Number(row[5]) > 0) {
+            uniqueCols.add(String(row[1]));
+          }
+        }
+      }
+      // Unique indexes from index_list
+      const indexes = d.exec(`PRAGMA index_list(${quoteIdent(name)})`);
+      if (indexes.length > 0) {
+        for (const row of indexes[0].values) {
+          if (Number(row[2]) === 1) {
+            const idxName = String(row[1]);
+            const idxInfo = d.exec(`PRAGMA index_info(${quoteIdent(idxName)})`);
+            if (idxInfo.length > 0) {
+              for (const col of idxInfo[0].values) {
+                uniqueCols.add(String(col[2]));
+              }
+            }
+          }
+        }
+      }
+      return Array.from(uniqueCols);
     },
   };
 }

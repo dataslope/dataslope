@@ -610,6 +610,9 @@ function SqlPlaygroundInner() {
   const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
     Record<string, ForeignKeyInfo[]>
   >({});
+  const [uniqueColumnsByEntity, setUniqueColumnsByEntity] = useState<
+    Record<string, string[]>
+  >({});
   // Sidebar expansion state. Persisted per-database under the same
   // `pg_sqlite_db_<id>_…` namespace as the editor tabs so it survives
   // reloads and database switches.
@@ -1718,6 +1721,67 @@ function SqlPlaygroundInner() {
     [quoteIdent, runSqlForTab, showToast],
   );
 
+  // Duplicate a single row in a previewed table. INTEGER PRIMARY KEY
+  // columns are omitted so SQLite auto-assigns a new rowid. If the
+  // table has any other unique constraints the operation is blocked.
+  const duplicateRow = useCallback(
+    (tableName: string, columns: string[], rowValues: unknown[]) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = engine.listColumns(tableName);
+        const uniqueCols = engine.listUniqueColumns(tableName);
+        const pkCols = cols.filter((c) => c.pk > 0);
+        const canOmitPk =
+          pkCols.length === 1 && /^integer$/i.test(pkCols[0].type);
+        const hasOtherUnique = uniqueCols.some(
+          (uc) => !pkCols.some((pk) => pk.name === uc),
+        );
+        if (hasOtherUnique || (pkCols.length > 0 && !canOmitPk)) {
+          showToast(
+            "Cannot duplicate row: table has unique constraints.",
+            "warn",
+          );
+          return;
+        }
+        const colNames: string[] = [];
+        const values: string[] = [];
+        for (let i = 0; i < cols.length; i++) {
+          const c = cols[i];
+          if (canOmitPk && c.pk > 0 && /^integer$/i.test(c.type)) {
+            continue;
+          }
+          colNames.push(`"${c.name.replace(/"/g, '""')}"`);
+          const v = rowValues[i];
+          if (v === null || v === undefined) {
+            values.push("NULL");
+          } else if (typeof v === "number") {
+            values.push(String(v));
+          } else if (v instanceof Uint8Array) {
+            values.push(
+              `x'${Array.from(v)
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("")}'`,
+            );
+          } else {
+            values.push(`'${String(v).replace(/'/g, "''")}'`);
+          }
+        }
+        engine.exec(
+          `INSERT INTO "${tableName.replace(/"/g, '""')}" (${colNames.join(", ")}) VALUES (${values.join(", ")})`,
+        );
+        const tabId = activeTabIdRef.current;
+        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+        showToast(`Duplicated row in "${tableName}".`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Duplicate failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast],
+  );
+
   // Persist a batch of single-cell edits. Called when the user clicks
   // "Update N cells" from an editable table preview. Uses row index
   // (not PK) to identify rows, so works for any table. Re-runs the
@@ -1761,8 +1825,10 @@ function SqlPlaygroundInner() {
     try {
       const cols = engine.listColumns(name);
       const fks = engine.listForeignKeys(name);
+      const uniqueCols = engine.listUniqueColumns(name);
       setColumnsByEntity((prev) => ({ ...prev, [name]: cols }));
       setForeignKeysByEntity((prev) => ({ ...prev, [name]: fks }));
+      setUniqueColumnsByEntity((prev) => ({ ...prev, [name]: uniqueCols }));
     } catch {
       setColumnsByEntity((prev) => {
         const next = { ...prev };
@@ -1770,6 +1836,11 @@ function SqlPlaygroundInner() {
         return next;
       });
       setForeignKeysByEntity((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+      setUniqueColumnsByEntity((prev) => {
         const next = { ...prev };
         delete next[name];
         return next;
@@ -3836,8 +3907,20 @@ function SqlPlaygroundInner() {
                   loading={!loaded}
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
+                  columnsInfo={
+                    result?.sourceTable
+                      ? columnsByEntity[result.sourceTable]
+                      : undefined
+                  }
+                  uniqueColumns={
+                    result?.sourceTable
+                      ? uniqueColumnsByEntity[result.sourceTable]
+                      : undefined
+                  }
+                  showToast={showToast}
                   onDeleteRows={deleteRowsFromTable}
                   onUpdateRows={updateRowsInTable}
+                  onDuplicateRow={duplicateRow}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -3984,13 +4067,20 @@ function ResultView({
   loading,
   keyHints,
   sourceTable,
+  columnsInfo,
+  uniqueColumns,
+  showToast,
   onDeleteRows,
   onUpdateRows,
+  onDuplicateRow,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
+  columnsInfo?: TableColumnInfo[];
+  uniqueColumns?: string[];
+  showToast?: (msg: string, kind?: "info" | "warn") => void;
   onDeleteRows?: (
     tableName: string,
     pkColumns: string[],
@@ -4003,6 +4093,11 @@ function ResultView({
       column: string;
       value: unknown;
     }>,
+  ) => void;
+  onDuplicateRow?: (
+    tableName: string,
+    columns: string[],
+    rowValues: unknown[],
   ) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
@@ -4046,6 +4141,11 @@ function ResultView({
   // selected rows are about to be deleted. `null` means the dialog is
   // closed.
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  // Single-row delete triggered from a cell's context menu.
+  const [cellDeleteRow, setCellDeleteRow] = useState<{
+    setIdx: number;
+    absoluteRow: number;
+  } | null>(null);
   // Update/delete actions re-run the preview and produce a fresh result
   // object. Populate this ref immediately before those callbacks so the
   // result-reset effect can carry over unrelated unsaved UI state once,
@@ -4277,6 +4377,53 @@ function ResultView({
     selectedByIndex,
   ]);
 
+  const performCellDelete = useCallback(() => {
+    if (!cellDeleteRow || !result || !sourceTable || !onDeleteRows) {
+      setCellDeleteRow(null);
+      return;
+    }
+    const set = result.sets[cellDeleteRow.setIdx];
+    if (!set) {
+      setCellDeleteRow(null);
+      return;
+    }
+    const pkCols = pkColumnsForSet(set);
+    if (!pkCols || pkCols.length === 0) {
+      setCellDeleteRow(null);
+      return;
+    }
+    const pkColIndexes = pkCols.map((c) => set.columns.indexOf(c));
+    const row = set.values[cellDeleteRow.absoluteRow];
+    if (!row) {
+      setCellDeleteRow(null);
+      return;
+    }
+    const pkRow = pkColIndexes.map((ci) => row[ci]);
+    const nextSelectedByIndex = cloneSelections(selectedByIndex);
+    delete nextSelectedByIndex[cellDeleteRow.setIdx];
+    const nextPendingEdits = pendingEditsAfterDeletedRows(
+      pendingEditsByIndex,
+      cellDeleteRow.setIdx,
+      new Set([cellDeleteRow.absoluteRow]),
+    );
+    preserveOnNextResultRef.current = {
+      selectedByIndex: nextSelectedByIndex,
+      pendingEditsByIndex: nextPendingEdits,
+    };
+    setCellDeleteRow(null);
+    setSelectedByIndex(nextSelectedByIndex);
+    setPendingEditsByIndex(nextPendingEdits);
+    onDeleteRows(sourceTable, pkCols, [pkRow]);
+  }, [
+    cellDeleteRow,
+    pendingEditsByIndex,
+    result,
+    sourceTable,
+    onDeleteRows,
+    pkColumnsForSet,
+    selectedByIndex,
+  ]);
+
   if (loading) {
     return (
       <div className="welcome">
@@ -4346,6 +4493,10 @@ function ResultView({
               selectedRows={selected}
               pendingEdits={pendingEdits}
               activeEditCell={activeEditCellByIndex[idx] ?? null}
+              sourceTable={sourceTable}
+              columnsInfo={columnsInfo}
+              uniqueColumns={uniqueColumns}
+              showToast={showToast}
               onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
               onToggleVisible={(absoluteIndices, select) =>
                 setVisibleSelection(idx, absoluteIndices, select)
@@ -4359,6 +4510,10 @@ function ResultView({
               onSetActiveEditCell={(cellKey) =>
                 setActiveEditCell(idx, cellKey)
               }
+              onRequestCellDelete={(absoluteRow) =>
+                setCellDeleteRow({ setIdx: idx, absoluteRow })
+              }
+              onDuplicateRow={onDuplicateRow}
             />
           );
         })}
@@ -4424,7 +4579,217 @@ function ResultView({
           </AlertDialog.Popup>
         </AlertDialog.Portal>
       </AlertDialog.Root>
+
+      <AlertDialog.Root
+        open={cellDeleteRow !== null}
+        onOpenChange={(next) => {
+          if (!next) setCellDeleteRow(null);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="confirm-backdrop" />
+          <AlertDialog.Popup className="confirm-popup">
+            <AlertDialog.Title className="confirm-title">
+              Delete this row?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirm-desc">
+              This row will be permanently deleted from{" "}
+              <strong>{sourceTable ?? "this table"}</strong>. The change is
+              in-memory only and will be undone next page load, but cannot be
+              reversed within this session.
+            </AlertDialog.Description>
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </AlertDialog.Close>
+              <AlertDialog.Close
+                className="confirm-btn confirm-btn-danger"
+                onClick={performCellDelete}
+              >
+                Delete row
+              </AlertDialog.Close>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </>
+  );
+}
+
+function CellContextMenu({
+  children,
+  cellValue,
+  rowValues,
+  columns,
+  sourceTable,
+  columnsInfo,
+  uniqueColumns,
+  showToast,
+  onDuplicateRow,
+  onRequestCellDelete,
+}: {
+  children: ReactNode;
+  cellValue: unknown;
+  rowValues: unknown[];
+  columns: string[];
+  sourceTable?: string;
+  columnsInfo?: TableColumnInfo[];
+  uniqueColumns?: string[];
+  showToast?: (msg: string, kind?: "info" | "warn") => void;
+  onDuplicateRow?: (
+    tableName: string,
+    columns: string[],
+    rowValues: unknown[],
+  ) => void;
+  onRequestCellDelete?: () => void;
+}) {
+  const handleCopyCell = () => {
+    const text = formatCellValue(cellValue);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => showToast?.("Copied cell value to clipboard."))
+        .catch(() =>
+          showToast?.("Couldn't copy to clipboard.", "warn"),
+        );
+    } else {
+      showToast?.("Clipboard not available in this browser.", "warn");
+    }
+  };
+
+  const handleCopyRowJson = () => {
+    const obj: Record<string, unknown> = {};
+    for (let i = 0; i < columns.length; i++) {
+      obj[columns[i]] = rowValues[i] ?? null;
+    }
+    const text = JSON.stringify(obj, null, 2);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => showToast?.("Copied row as JSON."))
+        .catch(() =>
+          showToast?.("Couldn't copy to clipboard.", "warn"),
+        );
+    } else {
+      showToast?.("Clipboard not available in this browser.", "warn");
+    }
+  };
+
+  const handleCopyRowSql = () => {
+    if (!sourceTable) return;
+    const colNames = columns.map(
+      (c) => `"${c.replace(/"/g, '""')}"`,
+    );
+    const values = rowValues.map((v) => {
+      if (v === null || v === undefined) return "NULL";
+      if (typeof v === "number") return String(v);
+      if (v instanceof Uint8Array)
+        return `x'${Array.from(v)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("")}'`;
+      return `'${String(v).replace(/'/g, "''")}'`;
+    });
+    const text = `INSERT INTO "${sourceTable.replace(/"/g, '""')}" (${colNames.join(", ")}) VALUES (${values.join(", ")});`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => showToast?.("Copied row as SQL."))
+        .catch(() =>
+          showToast?.("Couldn't copy to clipboard.", "warn"),
+        );
+    } else {
+      showToast?.("Clipboard not available in this browser.", "warn");
+    }
+  };
+
+  const pkCols = columnsInfo?.filter((c) => c.pk > 0) ?? [];
+  const canOmitPk =
+    pkCols.length === 1 && /^integer$/i.test(pkCols[0].type);
+  const hasOtherUnique = (uniqueColumns ?? []).some(
+    (uc) => !pkCols.some((pk) => pk.name === uc),
+  );
+  const canDuplicate =
+    sourceTable && !hasOtherUnique && (pkCols.length === 0 || canOmitPk);
+
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger
+        render={(props) => (
+          <span {...props} className="sql-cell-trigger">
+            {children}
+          </span>
+        )}
+      />
+      <ContextMenu.Portal>
+        <ContextMenu.Positioner sideOffset={6}>
+          <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <ContextMenu.Item
+              className="example-item"
+              onClick={handleCopyCell}
+            >
+              <div className="ex-title">Copy cell value</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={handleCopyRowJson}
+            >
+              <div className="ex-title">Copy row as JSON</div>
+            </ContextMenu.Item>
+            {sourceTable && (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={handleCopyRowSql}
+              >
+                <div className="ex-title">Copy row as SQL</div>
+              </ContextMenu.Item>
+            )}
+            {canDuplicate ? (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() =>
+                  onDuplicateRow?.(sourceTable, columns, rowValues)
+                }
+              >
+                <div className="ex-title">Duplicate row</div>
+              </ContextMenu.Item>
+            ) : sourceTable ? (
+              <div
+                className="example-item"
+                style={{ opacity: 0.5, cursor: "not-allowed" }}
+              >
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={100}
+                    closeDelay={100}
+                    render={(props) => (
+                      <div {...props} className="ex-title">
+                        Duplicate row
+                      </div>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6}>
+                      <Popover.Popup className="bui-popup sql-fk-popover">
+                        This table has a unique constraint.
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              </div>
+            ) : null}
+            {sourceTable && onRequestCellDelete && (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={onRequestCellDelete}
+              >
+                <div className="ex-title">Delete row</div>
+              </ContextMenu.Item>
+            )}
+          </ContextMenu.Popup>
+        </ContextMenu.Positioner>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
   );
 }
 
@@ -4439,11 +4804,17 @@ function ResultTableBody({
   selectedRows,
   pendingEdits,
   activeEditCell,
+  sourceTable,
+  columnsInfo,
+  uniqueColumns,
+  showToast,
   onToggleRow,
   onToggleVisible,
   onSetPendingEdit,
   onClearPendingEdit,
   onSetActiveEditCell,
+  onRequestCellDelete,
+  onDuplicateRow,
 }: {
   set: QueryExecResult;
   index: number;
@@ -4455,11 +4826,21 @@ function ResultTableBody({
   selectedRows?: Set<number>;
   pendingEdits?: Map<string, unknown>;
   activeEditCell: string | null;
+  sourceTable?: string;
+  columnsInfo?: TableColumnInfo[];
+  uniqueColumns?: string[];
+  showToast?: (msg: string, kind?: "info" | "warn") => void;
   onToggleRow: (absoluteRow: number) => void;
   onToggleVisible: (absoluteIndices: number[], select: boolean) => void;
   onSetPendingEdit: (cellKey: string, value: unknown) => void;
   onClearPendingEdit: (cellKey: string) => void;
   onSetActiveEditCell: (cellKey: string | null) => void;
+  onRequestCellDelete?: (absoluteRow: number) => void;
+  onDuplicateRow?: (
+    tableName: string,
+    columns: string[],
+    rowValues: unknown[],
+  ) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -4481,7 +4862,7 @@ function ResultTableBody({
         absoluteRow: startIndex + ri,
         values,
       })),
-    [visible, startIndex, set],
+    [visible, startIndex],
   );
 
   const columns = useMemo<ColumnDef<ResultTableRow>[]>(
@@ -4762,9 +5143,30 @@ function ResultTableBody({
                             : undefined
                         }
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+                        {isSelect ? (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )
+                        ) : (
+                          <CellContextMenu
+                            cellValue={cell.getValue()}
+                            rowValues={row.original.values}
+                            columns={set.columns}
+                            sourceTable={sourceTable}
+                            columnsInfo={columnsInfo}
+                            uniqueColumns={uniqueColumns}
+                            showToast={showToast}
+                            onDuplicateRow={onDuplicateRow}
+                            onRequestCellDelete={() =>
+                              onRequestCellDelete?.(absoluteRow)
+                            }
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </CellContextMenu>
                         )}
                       </td>
                     );
