@@ -16,24 +16,24 @@ export interface ThemeEntry {
 }
 
 export const ALL_THEMES: ThemeEntry[] = [
+  { value: "lucario", label: "Lucario" },
   { value: "dracula", label: "Dracula" },
   { value: "monokai", label: "Monokai" },
-  { value: "material-darker", label: "Material Darker" },
-  { value: "material-palenight", label: "Material Palenight" },
   { value: "nord", label: "Nord" },
+  { value: "material-darker", label: "Material Darker" },
   { value: "tomorrow-night-eighties", label: "Tomorrow Night" },
-  { value: "ayu-mirage", label: "Ayu Mirage" },
+  { value: "solarized dark", label: "Solarized Dark" },
+  { value: "eclipse", label: "Eclipse" },
   { value: "gruvbox-dark", label: "Gruvbox Dark" },
   { value: "oceanic-next", label: "Oceanic Next" },
-  { value: "panda-syntax", label: "Panda" },
-  { value: "darcula", label: "Darcula" },
-  { value: "zenburn", label: "Zenburn" },
-  { value: "lucario", label: "Lucario" },
-  { value: "solarized dark", label: "Solarized Dark" },
+  { value: "material-palenight", label: "Material Palenight" },
   { value: "solarized light", label: "Solarized Light" },
-  { value: "eclipse", label: "Eclipse" },
-  { value: "mdn-like", label: "MDN-like" },
+  { value: "darcula", label: "Darcula" },
+  { value: "ayu-mirage", label: "Ayu Mirage" },
   { value: "idea", label: "IntelliJ IDEA" },
+  { value: "panda-syntax", label: "Panda" },
+  { value: "zenburn", label: "Zenburn" },
+  { value: "mdn-like", label: "MDN-like" },
   { value: "base16-light", label: "Base16 Light" },
 ];
 
@@ -163,7 +163,7 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
  *  so every surface that consumes `--bg`/`--bg2`/`--text`/etc. retints
  *  in lockstep with the editor. */
 export function applyThemePalette(theme: string): void {
-  const p = THEME_PREVIEWS[theme] ?? THEME_PREVIEWS.dracula;
+  const p = THEME_PREVIEWS[theme] ?? THEME_PREVIEWS.lucario;
   const root = document.documentElement;
   root.style.setProperty("--bg", p.bg);
   root.style.setProperty("--bg2", p.bg2);
