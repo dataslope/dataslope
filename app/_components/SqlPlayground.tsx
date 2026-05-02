@@ -354,6 +354,14 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
   ) as PendingEditsByResult;
 }
 
+/** Parse a pending-edit key of the form `${absoluteRow}:${columnIndex}`. */
+function parseCellKey(cellKey: string): { row: number; col: string } | null {
+  const [rowStr, col] = cellKey.split(":");
+  const row = Number(rowStr);
+  return Number.isInteger(row) ? { row, col } : null;
+}
+
+/** Count deleted rows before a row index to calculate its post-delete shift. */
 function countSortedValuesLessThan(values: number[], target: number): number {
   let lo = 0;
   let hi = values.length;
@@ -365,6 +373,7 @@ function countSortedValuesLessThan(values: number[], target: number): number {
   return lo;
 }
 
+/** Shift pending edit row indices after deletions and remove edits on deleted rows. */
 function pendingEditsAfterDeletedRows(
   src: PendingEditsByResult,
   setIdx: number,
@@ -376,11 +385,11 @@ function pendingEditsAfterDeletedRows(
   const sortedDeleted = [...deletedRows].sort((a, b) => a - b);
   const shifted = new Map<string, unknown>();
   for (const [cellKey, value] of edits) {
-    const [rowStr, colStr] = cellKey.split(":");
-    const row = Number(rowStr);
-    if (!Number.isInteger(row) || deletedRows.has(row)) continue;
+    const parsed = parseCellKey(cellKey);
+    if (!parsed || deletedRows.has(parsed.row)) continue;
+    const { row, col } = parsed;
     const shift = countSortedValuesLessThan(sortedDeleted, row);
-    shifted.set(`${row - shift}:${colStr}`, value);
+    shifted.set(`${row - shift}:${col}`, value);
   }
   if (shifted.size > 0) next[setIdx] = shifted;
   else delete next[setIdx];
