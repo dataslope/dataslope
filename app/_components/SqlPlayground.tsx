@@ -4640,6 +4640,7 @@ function ResultTableBody({
                       }
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    onDoubleClick={(e) => e.stopPropagation()}
                   />
                 );
               }
