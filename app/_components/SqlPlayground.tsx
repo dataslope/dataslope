@@ -3978,6 +3978,10 @@ function ResultView({
   // selected rows are about to be deleted. `null` means the dialog is
   // closed.
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  // Update/delete actions re-run the preview and produce a fresh result
+  // object. Populate this ref immediately before those callbacks so the
+  // result-reset effect can carry over unrelated unsaved UI state once,
+  // then clear it for ordinary query runs.
   const preserveOnNextResultRef = useRef<{
     selectedByIndex: Record<number, Set<number>>;
     pendingEditsByIndex: Record<number, Map<string, unknown>>;
