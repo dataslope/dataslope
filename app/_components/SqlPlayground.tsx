@@ -128,6 +128,7 @@ import {
 } from "./runtime/sqliteSamples";
 import {
   createSqliteEngine,
+  type ColumnConstraintInfo,
   type ColumnSpec,
   type ForeignKeyInfo,
   type SqliteEngine,
@@ -331,6 +332,20 @@ function formatCellValue(v: unknown): string {
   if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NaN";
   if (v instanceof Uint8Array) return `BLOB (${v.length} bytes)`;
   return String(v);
+}
+
+/** Format a cell value as a SQL literal suitable for INSERT / SELECT. */
+function formatCellAsSql(v: unknown): string {
+  if (v === null || v === undefined) return "NULL";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
+  if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
+  if (v instanceof Uint8Array) {
+    const hex = Array.from(v)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return `x'${hex}'`;
+  }
+  return `'${String(v).replace(/'/g, "''")}'`;
 }
 
 function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
@@ -609,6 +624,9 @@ function SqlPlaygroundInner() {
   >({});
   const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
     Record<string, ForeignKeyInfo[]>
+  >({});
+  const [constraintsByEntity, setConstraintsByEntity] = useState<
+    Record<string, ColumnConstraintInfo[]>
   >({});
   // Sidebar expansion state. Persisted per-database under the same
   // `pg_sqlite_db_<id>_…` namespace as the editor tabs so it survives
@@ -1750,6 +1768,31 @@ function SqlPlaygroundInner() {
     [quoteIdent, runSqlForTab, showToast],
   );
 
+  // Duplicate a row by inserting a copy of it. Columns that are
+  // auto-increment PKs are omitted so SQLite assigns a new value
+  // automatically. Re-runs the preview afterwards.
+  const duplicateRowInTable = useCallback(
+    (
+      tableName: string,
+      columnNames: string[],
+      values: unknown[],
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        engine.insertRow(tableName, columnNames, values);
+        showToast(`Duplicated row in "${tableName}".`);
+        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Duplicate failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast],
+  );
+
   // Refresh cached column / FK info for a single entity. Called when
   // the sidebar row is expanded for the first time, after DDL changes,
   // and when the Modify Structure drawer reloads. Failures are
@@ -1763,6 +1806,19 @@ function SqlPlaygroundInner() {
       const fks = engine.listForeignKeys(name);
       setColumnsByEntity((prev) => ({ ...prev, [name]: cols }));
       setForeignKeysByEntity((prev) => ({ ...prev, [name]: fks }));
+      // Constraint info is only meaningful for tables (not views), but
+      // we call it unconditionally and let the engine return an empty
+      // array for views — that keeps the call site simple.
+      try {
+        const constraints = engine.getColumnConstraintInfo(name);
+        setConstraintsByEntity((prev) => ({ ...prev, [name]: constraints }));
+      } catch {
+        setConstraintsByEntity((prev) => {
+          const next = { ...prev };
+          delete next[name];
+          return next;
+        });
+      }
     } catch {
       setColumnsByEntity((prev) => {
         const next = { ...prev };
@@ -1770,6 +1826,11 @@ function SqlPlaygroundInner() {
         return next;
       });
       setForeignKeysByEntity((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+      setConstraintsByEntity((prev) => {
         const next = { ...prev };
         delete next[name];
         return next;
@@ -1807,6 +1868,12 @@ function SqlPlaygroundInner() {
     for (const fk of fks ?? []) fkByName.set(fk.from, fk);
     return { pk, fk: fkByName };
   }, [result, columnsByEntity, foreignKeysByEntity]);
+
+  const resultConstraintInfo = useMemo<ColumnConstraintInfo[] | undefined>(() => {
+    const tableName = result?.sourceTable;
+    if (!tableName) return undefined;
+    return constraintsByEntity[tableName];
+  }, [result, constraintsByEntity]);
 
   const toggleEntityExpanded = useCallback((name: string) => {
     setExpandedEntities((prev) => {
@@ -3836,8 +3903,10 @@ function SqlPlaygroundInner() {
                   loading={!loaded}
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
+                  constraintInfo={resultConstraintInfo}
                   onDeleteRows={deleteRowsFromTable}
                   onUpdateRows={updateRowsInTable}
+                  onDuplicateRow={duplicateRowInTable}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -3984,13 +4053,16 @@ function ResultView({
   loading,
   keyHints,
   sourceTable,
+  constraintInfo,
   onDeleteRows,
   onUpdateRows,
+  onDuplicateRow,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
+  constraintInfo?: ColumnConstraintInfo[];
   onDeleteRows?: (
     tableName: string,
     pkColumns: string[],
@@ -4003,6 +4075,11 @@ function ResultView({
       column: string;
       value: unknown;
     }>,
+  ) => void;
+  onDuplicateRow?: (
+    tableName: string,
+    columnNames: string[],
+    values: unknown[],
   ) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
@@ -4046,6 +4123,13 @@ function ResultView({
   // selected rows are about to be deleted. `null` means the dialog is
   // closed.
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  // Single-row delete from context menu — tracks which row is pending
+  // confirmation. Separate from `pendingDelete` (multi-row) so the two
+  // flows don't interfere.
+  const [pendingDeleteSingleRow, setPendingDeleteSingleRow] = useState<{
+    setIdx: number;
+    absoluteRow: number;
+  } | null>(null);
   // Update/delete actions re-run the preview and produce a fresh result
   // object. Populate this ref immediately before those callbacks so the
   // result-reset effect can carry over unrelated unsaved UI state once,
@@ -4067,6 +4151,7 @@ function ResultView({
     setPageStates({});
     setSelectedByIndex(preserved?.selectedByIndex ?? {});
     setPendingDelete(null);
+    setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     setActiveEditCellByIndex({});
   }, [result]);
@@ -4277,6 +4362,67 @@ function ResultView({
     selectedByIndex,
   ]);
 
+  // Single-row delete from the context menu. Shows a confirmation
+  // dialog; on confirm, extracts PK values for that row and calls
+  // `onDeleteRows` with a single-element `pkRows` array.
+  const requestDeleteSingleRow = useCallback(
+    (setIdx: number, absoluteRow: number) => {
+      setPendingDeleteSingleRow({ setIdx, absoluteRow });
+    },
+    [],
+  );
+
+  const performDeleteSingleRow = useCallback(() => {
+    if (
+      pendingDeleteSingleRow === null ||
+      !result ||
+      !sourceTable ||
+      !onDeleteRows
+    ) {
+      setPendingDeleteSingleRow(null);
+      return;
+    }
+    const { setIdx, absoluteRow } = pendingDeleteSingleRow;
+    const set = result.sets[setIdx];
+    if (!set) {
+      setPendingDeleteSingleRow(null);
+      return;
+    }
+    const pkCols = pkColumnsForSet(set);
+    if (!pkCols || pkCols.length === 0) {
+      setPendingDeleteSingleRow(null);
+      return;
+    }
+    const row = set.values[absoluteRow];
+    if (!row) {
+      setPendingDeleteSingleRow(null);
+      return;
+    }
+    const pkColIndexes = pkCols.map((c) => set.columns.indexOf(c));
+    const pkValues = pkColIndexes.map((ci) => row[ci]);
+    const deletedRows = new Set([absoluteRow]);
+    const nextPendingEdits = pendingEditsAfterDeletedRows(
+      pendingEditsByIndex,
+      setIdx,
+      deletedRows,
+    );
+    preserveOnNextResultRef.current = {
+      selectedByIndex: cloneSelections(selectedByIndex),
+      pendingEditsByIndex: nextPendingEdits,
+    };
+    setPendingDeleteSingleRow(null);
+    setPendingEditsByIndex(nextPendingEdits);
+    onDeleteRows(sourceTable, pkCols, [pkValues]);
+  }, [
+    pendingDeleteSingleRow,
+    pendingEditsByIndex,
+    result,
+    sourceTable,
+    onDeleteRows,
+    pkColumnsForSet,
+    selectedByIndex,
+  ]);
+
   if (loading) {
     return (
       <div className="welcome">
@@ -4343,6 +4489,8 @@ function ResultView({
               keyHints={keyHints}
               deletable={pkCols !== null}
               editable={isEditable}
+              sourceTable={sourceTable}
+              constraintInfo={constraintInfo}
               selectedRows={selected}
               pendingEdits={pendingEdits}
               activeEditCell={activeEditCellByIndex[idx] ?? null}
@@ -4358,6 +4506,18 @@ function ResultView({
               }
               onSetActiveEditCell={(cellKey) =>
                 setActiveEditCell(idx, cellKey)
+              }
+              onDeleteSingleRow={
+                pkCols !== null
+                  ? (absoluteRow) =>
+                      requestDeleteSingleRow(idx, absoluteRow)
+                  : undefined
+              }
+              onDuplicateRow={
+                sourceTable && onDuplicateRow
+                  ? (columnNames, values) =>
+                      onDuplicateRow(sourceTable, columnNames, values)
+                  : undefined
               }
             />
           );
@@ -4424,6 +4584,38 @@ function ResultView({
           </AlertDialog.Popup>
         </AlertDialog.Portal>
       </AlertDialog.Root>
+      <AlertDialog.Root
+        open={pendingDeleteSingleRow !== null}
+        onOpenChange={(next) => {
+          if (!next) setPendingDeleteSingleRow(null);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="confirm-backdrop" />
+          <AlertDialog.Popup className="confirm-popup">
+            <AlertDialog.Title className="confirm-title">
+              Delete this row?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirm-desc">
+              This row will be permanently deleted from{" "}
+              <strong>{sourceTable ?? "this table"}</strong>. The change is
+              in-memory only and will be undone next page load, but cannot be
+              reversed within this session.
+            </AlertDialog.Description>
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </AlertDialog.Close>
+              <AlertDialog.Close
+                className="confirm-btn confirm-btn-danger"
+                onClick={performDeleteSingleRow}
+              >
+                Delete row
+              </AlertDialog.Close>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </>
   );
 }
@@ -4436,6 +4628,8 @@ function ResultTableBody({
   keyHints,
   deletable,
   editable,
+  sourceTable,
+  constraintInfo,
   selectedRows,
   pendingEdits,
   activeEditCell,
@@ -4444,6 +4638,8 @@ function ResultTableBody({
   onSetPendingEdit,
   onClearPendingEdit,
   onSetActiveEditCell,
+  onDeleteSingleRow,
+  onDuplicateRow,
 }: {
   set: QueryExecResult;
   index: number;
@@ -4452,6 +4648,8 @@ function ResultTableBody({
   keyHints?: ColumnKeyHints;
   deletable: boolean;
   editable: boolean;
+  sourceTable?: string;
+  constraintInfo?: ColumnConstraintInfo[];
   selectedRows?: Set<number>;
   pendingEdits?: Map<string, unknown>;
   activeEditCell: string | null;
@@ -4460,8 +4658,44 @@ function ResultTableBody({
   onSetPendingEdit: (cellKey: string, value: unknown) => void;
   onClearPendingEdit: (cellKey: string) => void;
   onSetActiveEditCell: (cellKey: string | null) => void;
+  onDeleteSingleRow?: (absoluteRow: number) => void;
+  onDuplicateRow?: (columnNames: string[], values: unknown[]) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  // Tracks which cell was right-clicked so that `Copy cell value` in
+  // the context menu knows which column to read. Updated via
+  // onContextMenu on each <td> before the popup opens.
+  const rightClickedCellRef = useRef<{
+    colIdx: number;
+    value: unknown;
+  } | null>(null);
+
+  // Determine whether rows in this result set can be duplicated.
+  // Duplication is possible when the only unique/PK constraints are
+  // auto-increment (their value is auto-assigned by SQLite so the
+  // column can be omitted from the INSERT). Any non-auto-increment PK
+  // or explicit UNIQUE column prevents duplication because inserting a
+  // copy would produce a duplicate value and violate the constraint.
+  const { canDuplicate, uniqueConstraintReason } = useMemo(() => {
+    if (!onDuplicateRow) {
+      return { canDuplicate: false, uniqueConstraintReason: "" };
+    }
+    if (!constraintInfo || constraintInfo.length === 0) {
+      // No constraint info yet (lazy-loaded) — optimistically allow.
+      return { canDuplicate: true, uniqueConstraintReason: "" };
+    }
+    const blocking = constraintInfo.filter(
+      (c) => (c.isPrimaryKey && !c.isAutoIncrement) || c.isUnique,
+    );
+    if (blocking.length > 0) {
+      const names = blocking.map((c) => c.name).join(", ");
+      return {
+        canDuplicate: false,
+        uniqueConstraintReason: `Column${blocking.length > 1 ? "s" : ""} with unique constraint${blocking.length > 1 ? "s" : ""}: ${names}`,
+      };
+    }
+    return { canDuplicate: true, uniqueConstraintReason: "" };
+  }, [onDuplicateRow, constraintInfo]);
 
   const visibleAbsoluteIndices = useMemo(
     () => visible.map((_, ri) => startIndex + ri),
@@ -4726,50 +4960,182 @@ function ResultTableBody({
           <tbody>
             {table.getRowModel().rows.map((row) => {
               const absoluteRow = row.original.absoluteRow;
+              const rowValues = row.original.values;
               const checked = selectedRows?.has(absoluteRow) ?? false;
-              return (
-                <tr
-                  key={absoluteRow}
-                  className={checked ? "sql-result-row-selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const isSelect = cell.column.id === "select";
-                    const rawVal = isSelect ? undefined : cell.getValue();
-                    // Retrieve the column index from the column's meta,
-                    // which is stored there at column-definition time to
-                    // avoid fragile string-splitting on the column id.
-                    const ci = isSelect
-                      ? -1
-                      : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
-                    const cellKey = `${absoluteRow}:${ci}`;
-                    const hasPendingEdit =
-                      !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
-                    return (
-                      <td
-                        key={cell.id}
-                        className={
-                          isSelect
-                            ? "sql-result-td-select"
-                            : hasPendingEdit
-                              ? "sql-cell-edited-td"
-                              : rawVal === null
-                                ? "sql-cell-null"
-                                : undefined
-                        }
-                        onDoubleClick={
-                          editable && !isSelect && ci >= 0
-                            ? () => onSetActiveEditCell(cellKey)
+              const cells = row.getVisibleCells().map((cell) => {
+                const isSelect = cell.column.id === "select";
+                const rawVal = isSelect ? undefined : cell.getValue();
+                // Retrieve the column index from the column's meta,
+                // which is stored there at column-definition time to
+                // avoid fragile string-splitting on the column id.
+                const ci = isSelect
+                  ? -1
+                  : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
+                const cellKey = `${absoluteRow}:${ci}`;
+                const hasPendingEdit =
+                  !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
+                return (
+                  <td
+                    key={cell.id}
+                    className={
+                      isSelect
+                        ? "sql-result-td-select"
+                        : hasPendingEdit
+                          ? "sql-cell-edited-td"
+                          : rawVal === null
+                            ? "sql-cell-null"
                             : undefined
+                    }
+                    onContextMenu={
+                      !isSelect && ci >= 0
+                        ? () => {
+                            rightClickedCellRef.current = {
+                              colIdx: ci,
+                              value: rawVal,
+                            };
+                          }
+                        : undefined
+                    }
+                    onDoubleClick={
+                      editable && !isSelect && ci >= 0
+                        ? () => onSetActiveEditCell(cellKey)
+                        : undefined
+                    }
+                  >
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext(),
+                    )}
+                  </td>
+                );
+              });
+              return (
+                <ContextMenu.Root key={absoluteRow}>
+                  <ContextMenu.Trigger
+                    render={(props) => (
+                      <tr
+                        {...props}
+                        className={
+                          checked ? "sql-result-row-selected" : undefined
                         }
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+                        {cells}
+                      </tr>
+                    )}
+                  />
+                  <ContextMenu.Portal>
+                    <ContextMenu.Positioner sideOffset={4}>
+                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
+                            const cell = rightClickedCellRef.current;
+                            const text =
+                              cell !== null
+                                ? formatCellValue(cell.value)
+                                : "";
+                            navigator.clipboard
+                              .writeText(text)
+                              .catch(() => undefined);
+                          }}
+                        >
+                          <div className="ex-title">Copy cell value</div>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
+                            const obj = Object.fromEntries(
+                              set.columns.map((c, i) => [c, rowValues[i]]),
+                            );
+                            navigator.clipboard
+                              .writeText(JSON.stringify(obj, null, 2))
+                              .catch(() => undefined);
+                          }}
+                        >
+                          <div className="ex-title">Copy row as JSON</div>
+                        </ContextMenu.Item>
+                        {sourceTable && (
+                          <ContextMenu.Item
+                            className="example-item"
+                            onClick={() => {
+                              const cols = set.columns
+                                .map((c) => `"${c.replace(/"/g, '""')}"`)
+                                .join(", ");
+                              const vals = rowValues
+                                .map((v) => formatCellAsSql(v))
+                                .join(", ");
+                              const sql = `INSERT INTO "${sourceTable.replace(/"/g, '""')}" (${cols}) VALUES (${vals});`;
+                              navigator.clipboard
+                                .writeText(sql)
+                                .catch(() => undefined);
+                            }}
+                          >
+                            <div className="ex-title">Copy row as SQL</div>
+                          </ContextMenu.Item>
                         )}
-                      </td>
-                    );
-                  })}
-                </tr>
+                        {onDuplicateRow &&
+                          (canDuplicate ? (
+                            <ContextMenu.Item
+                              className="example-item"
+                              onClick={() => {
+                                // Build the column/value list excluding
+                                // auto-increment PK columns so SQLite
+                                // assigns the next sequence value.
+                                const autoIncCols = new Set(
+                                  (constraintInfo ?? [])
+                                    .filter((c) => c.isAutoIncrement)
+                                    .map((c) => c.name),
+                                );
+                                const cols: string[] = [];
+                                const vals: unknown[] = [];
+                                set.columns.forEach((c, i) => {
+                                  if (!autoIncCols.has(c)) {
+                                    cols.push(c);
+                                    vals.push(rowValues[i]);
+                                  }
+                                });
+                                onDuplicateRow(cols, vals);
+                              }}
+                            >
+                              <div className="ex-title">Duplicate row</div>
+                            </ContextMenu.Item>
+                          ) : (
+                            <Popover.Root>
+                              <Popover.Trigger
+                                openOnHover
+                                delay={200}
+                                closeDelay={100}
+                                className="example-item sql-ctx-disabled"
+                                render={<div />}
+                                aria-disabled="true"
+                              >
+                                <div className="ex-title">Duplicate row</div>
+                              </Popover.Trigger>
+                              <Popover.Portal>
+                                <Popover.Positioner
+                                  side="right"
+                                  sideOffset={8}
+                                >
+                                  <Popover.Popup className="bui-popup sql-unique-popover">
+                                    {uniqueConstraintReason ||
+                                      "Cannot duplicate: unique constraint"}
+                                  </Popover.Popup>
+                                </Popover.Positioner>
+                              </Popover.Portal>
+                            </Popover.Root>
+                          ))}
+                        {onDeleteSingleRow && (
+                          <ContextMenu.Item
+                            className="example-item sql-ctx-danger"
+                            onClick={() => onDeleteSingleRow(absoluteRow)}
+                          >
+                            <div className="ex-title">Delete row</div>
+                          </ContextMenu.Item>
+                        )}
+                      </ContextMenu.Popup>
+                    </ContextMenu.Positioner>
+                  </ContextMenu.Portal>
+                </ContextMenu.Root>
               );
             })}
           </tbody>
