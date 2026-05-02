@@ -1618,6 +1618,15 @@
   margin: 4px 8px;
 }
 
+.sql-db-popup-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 6px 10px 4px;
+  margin: 0;
+}
 
 /* ─── Sortable column header button ─── */
 .sql-result-th-btn {
