@@ -63,8 +63,10 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type SortingState,
 } from "@tanstack/react-table";
 import {
   ArrowDownToLine,
@@ -76,6 +78,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ChevronsUp,
+  ChevronUp,
   Clock,
   Eye,
   Database,
@@ -1644,6 +1647,38 @@ function SqlPlaygroundInner() {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Delete failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast],
+  );
+
+  // Persist a batch of single-cell edits. Called when the user clicks
+  // "Update N cells" from an editable table preview. Uses row index
+  // (not PK) to identify rows, so works for any table. Re-runs the
+  // original preview afterwards so the result reflects the changes.
+  const updateRowsInTable = useCallback(
+    (
+      tableName: string,
+      updates: ReadonlyArray<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (updates.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        const count = engine.updateRows(tableName, updates);
+        showToast(
+          `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)} LIMIT 200;`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Update failed: ${msg}`, "warn");
       }
     },
     [quoteIdent, runSqlForTab, showToast],
@@ -3728,6 +3763,7 @@ function SqlPlaygroundInner() {
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
                   onDeleteRows={deleteRowsFromTable}
+                  onUpdateRows={updateRowsInTable}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -3875,6 +3911,7 @@ function ResultView({
   keyHints,
   sourceTable,
   onDeleteRows,
+  onUpdateRows,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -3884,6 +3921,14 @@ function ResultView({
     tableName: string,
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+  ) => void;
+  onUpdateRows?: (
+    tableName: string,
+    updates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+    }>,
   ) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
@@ -3914,7 +3959,7 @@ function ResultView({
       : DEFAULT_PAGE_SIZE;
   }, []);
 
-  // Reset pagination + selection whenever a new result lands.
+  // Reset pagination + selection + edits whenever a new result lands.
   // Identity-comparing against the result object is sufficient because
   // `setResult` always creates a new object.
   useEffect(() => {
@@ -3922,6 +3967,8 @@ function ResultView({
     setPageStates({});
     setSelectedByIndex({});
     setPendingDelete(null);
+    setPendingEditsByIndex({});
+    setActiveEditCellByIndex({});
   }, [result]);
 
   const getState = useCallback(
@@ -3953,14 +4000,8 @@ function ResultView({
     }
   }, []);
 
-  // Per-set "is this set deletable" decision. A set is deletable when:
-  //   - the result came from a single-table preview (sourceTable set),
-  //   - we have primary-key column metadata for that table, and
-  //   - every PK column appears in the set's column list (so we can
-  //     identify each row by its PK values without guesswork).
-  // Returns the ordered list of PK column names for the set (drawn
-  // from the *set's* column order so the caller can index into rows
-  // directly), or `null` when not deletable.
+  // Per-set deletability check. Requires a single-table preview with
+  // all PK columns present (needed to identify which rows to DELETE).
   const pkColumnsForSet = useCallback(
     (set: QueryExecResult): string[] | null => {
       if (!sourceTable || !onDeleteRows) return null;
@@ -3976,6 +4017,10 @@ function ResultView({
     },
     [sourceTable, onDeleteRows, keyHints],
   );
+
+  // A set is editable whenever we have a source table and an update
+  // handler. No PK is required — rows are identified by row index.
+  const isEditable = !!(sourceTable && onUpdateRows);
 
   const toggleRowSelected = useCallback(
     (setIdx: number, absoluteRow: number) => {
@@ -4002,6 +4047,70 @@ function ResultView({
       });
     },
     [],
+  );
+
+  // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
+  // value is the new (string) value the user typed. Keyed by result-set
+  // index so each set tracks its edits independently.
+  const [pendingEditsByIndex, setPendingEditsByIndex] = useState<
+    Record<number, Map<string, unknown>>
+  >({});
+
+  // Whether a cell within a given result set is currently being actively
+  // edited (i.e. the user has double-clicked it). We track the "active
+  // editing cell" key per set so we can blur it on commit.
+  const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
+    Record<number, string | null>
+  >({});
+
+  const setPendingEdit = useCallback(
+    (setIdx: number, cellKey: string, value: unknown) => {
+      setPendingEditsByIndex((prev) => {
+        const cur = new Map(prev[setIdx] ?? []);
+        cur.set(cellKey, value);
+        return { ...prev, [setIdx]: cur };
+      });
+    },
+    [],
+  );
+
+  const setActiveEditCell = useCallback(
+    (setIdx: number, cellKey: string | null) => {
+      setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: cellKey }));
+    },
+    [],
+  );
+
+  const commitEdits = useCallback(
+    (setIdx: number, set: QueryExecResult) => {
+      if (!sourceTable || !onUpdateRows) return;
+      const edits = pendingEditsByIndex[setIdx];
+      if (!edits || edits.size === 0) return;
+      const updates: Array<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }> = [];
+      for (const [cellKey, value] of edits) {
+        const [rowStr, colStr] = cellKey.split(":");
+        const absoluteRow = Number(rowStr);
+        const colIdx = Number(colStr);
+        const colName = set.columns[colIdx];
+        if (!colName) continue;
+        updates.push({ rowIndex: absoluteRow, column: colName, value });
+      }
+      if (updates.length === 0) return;
+      // Clear edits before calling the callback so the result refresh
+      // starts with a clean slate regardless of success/failure.
+      setPendingEditsByIndex((prev) => {
+        const next = { ...prev };
+        delete next[setIdx];
+        return next;
+      });
+      setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+      onUpdateRows(sourceTable, updates);
+    },
+    [sourceTable, onUpdateRows, pendingEditsByIndex],
   );
 
   const requestDelete = useCallback((setIdx: number) => {
@@ -4101,6 +4210,8 @@ function ResultView({
               : set.values;
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
+          const pendingEdits = pendingEditsByIndex[idx];
+          const editCount = pendingEdits?.size ?? 0;
           return (
             <ResultTableBody
               key={idx}
@@ -4110,11 +4221,22 @@ function ResultView({
               startIndex={start}
               keyHints={keyHints}
               deletable={pkCols !== null}
+              editable={isEditable}
               selectedRows={selected}
+              pendingEdits={pendingEdits}
+              activeEditCell={activeEditCellByIndex[idx] ?? null}
+              editCount={editCount}
               onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
               onToggleVisible={(absoluteIndices, select) =>
                 setVisibleSelection(idx, absoluteIndices, select)
               }
+              onSetPendingEdit={(cellKey, value) =>
+                setPendingEdit(idx, cellKey, value)
+              }
+              onSetActiveEditCell={(cellKey) =>
+                setActiveEditCell(idx, cellKey)
+              }
+              onCommitEdits={() => commitEdits(idx, set)}
             />
           );
         })}
@@ -4186,9 +4308,16 @@ function ResultTableBody({
   startIndex,
   keyHints,
   deletable,
+  editable,
   selectedRows,
+  pendingEdits,
+  activeEditCell,
+  editCount,
   onToggleRow,
   onToggleVisible,
+  onSetPendingEdit,
+  onSetActiveEditCell,
+  onCommitEdits,
 }: {
   set: QueryExecResult;
   index: number;
@@ -4196,10 +4325,19 @@ function ResultTableBody({
   startIndex: number;
   keyHints?: ColumnKeyHints;
   deletable: boolean;
+  editable: boolean;
   selectedRows?: Set<number>;
+  pendingEdits?: Map<string, unknown>;
+  activeEditCell: string | null;
+  editCount: number;
   onToggleRow: (absoluteRow: number) => void;
   onToggleVisible: (absoluteIndices: number[], select: boolean) => void;
+  onSetPendingEdit: (cellKey: string, value: unknown) => void;
+  onSetActiveEditCell: (cellKey: string | null) => void;
+  onCommitEdits: () => void;
 }) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const visibleAbsoluteIndices = useMemo(
     () => visible.map((_, ri) => startIndex + ri),
     [visible, startIndex],
@@ -4220,12 +4358,14 @@ function ResultTableBody({
       })),
     [visible, startIndex],
   );
+
   const columns = useMemo<ColumnDef<ResultTableRow>[]>(
     () => [
       ...(deletable
         ? [
             {
               id: "select",
+              enableSorting: false,
               header: () => (
                 <Checkbox.Root
                   className="sql-result-row-checkbox"
@@ -4245,7 +4385,7 @@ function ResultTableBody({
                   </Checkbox.Indicator>
                 </Checkbox.Root>
               ),
-              cell: ({ row }) => {
+              cell: ({ row }: { row: { original: ResultTableRow } }) => {
                 const absoluteRow = row.original.absoluteRow;
                 const checked = selectedRows?.has(absoluteRow) ?? false;
                 return (
@@ -4273,39 +4413,145 @@ function ResultTableBody({
           ({
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
-            header: () => {
+            // Store ci in meta so the td renderer can look it up without
+            // fragile string-splitting on the column id.
+            meta: { ci },
+            header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
+              const sorted = column.getIsSorted();
               return (
-                <span className="sql-result-th-label">
-                  {isPk && (
-                    <MdOutlineKey
-                      size={12}
-                      className="sql-result-th-pk"
-                      aria-label="Primary key"
-                    />
-                  )}
-                  {fk && (
-                    <IoLink
-                      size={12}
-                      className="sql-result-th-fk"
-                      aria-label={`Foreign key → ${fk.table}.${fk.to}`}
-                    />
-                  )}
-                  <span>{c}</span>
+                <button
+                  type="button"
+                  className="sql-result-th-btn"
+                  onClick={column.getToggleSortingHandler()}
+                  title={
+                    sorted === "asc"
+                      ? "Sorted ascending — click to sort descending"
+                      : sorted === "desc"
+                        ? "Sorted descending — click to clear sort"
+                        : "Click to sort ascending"
+                  }
+                >
+                  <span className="sql-result-th-label">
+                    {isPk && (
+                      <MdOutlineKey
+                        size={12}
+                        className="sql-result-th-pk"
+                        aria-label="Primary key"
+                      />
+                    )}
+                    {fk && (
+                      <IoLink
+                        size={12}
+                        className="sql-result-th-fk"
+                        aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                      />
+                    )}
+                    <span>{c}</span>
+                  </span>
+                  <span
+                    className={
+                      sorted
+                        ? "sql-result-th-chevron sql-result-th-chevron-active"
+                        : "sql-result-th-chevron"
+                    }
+                    aria-hidden="true"
+                  >
+                    {sorted === "asc" ? (
+                      <ChevronUp size={11} />
+                    ) : (
+                      <ChevronDown size={11} />
+                    )}
+                  </span>
+                </button>
+              );
+            },
+            cell: (info) => {
+              if (!editable) {
+                return formatCellValue(info.getValue());
+              }
+              const absoluteRow = info.row.original.absoluteRow;
+              const cellKey = `${absoluteRow}:${ci}`;
+              const isActiveEdit = activeEditCell === cellKey;
+              const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
+              const pendingValue = pendingEdits?.get(cellKey);
+              const rawValue = info.getValue();
+              // Detect numeric affinity from the current cell value.
+              const isNumeric =
+                rawValue !== null && typeof rawValue === "number";
+              if (isActiveEdit) {
+                const editVal =
+                  hasPendingEdit
+                    ? String(pendingValue ?? "")
+                    : formatCellValue(rawValue);
+                return (
+                  <input
+                    className="sql-cell-input"
+                    defaultValue={editVal}
+                    autoFocus
+                    type="text"
+                    inputMode={isNumeric ? "decimal" : undefined}
+                    onBlur={(e) => {
+                      const raw = e.target.value;
+                      let newVal: unknown;
+                      if (raw === "" || raw === "NULL") {
+                        newVal = null;
+                      } else if (isNumeric) {
+                        const n = Number(raw);
+                        // Keep as string if it doesn't parse cleanly so
+                        // the user can see what they typed rather than
+                        // silently coercing to NaN or 0.
+                        newVal = Number.isFinite(n) ? n : raw;
+                      } else {
+                        newVal = raw;
+                      }
+                      onSetPendingEdit(cellKey, newVal);
+                      onSetActiveEditCell(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        (e.currentTarget as HTMLInputElement).blur();
+                      } else if (e.key === "Escape") {
+                        onSetActiveEditCell(null);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                );
+              }
+              return (
+                <span
+                  className={
+                    hasPendingEdit
+                      ? "sql-cell-edited"
+                      : rawValue === null
+                        ? "sql-cell-null"
+                        : undefined
+                  }
+                  onDoubleClick={() => onSetActiveEditCell(cellKey)}
+                  title={editable ? "Double-click to edit" : undefined}
+                >
+                  {hasPendingEdit
+                    ? formatCellValue(pendingValue)
+                    : formatCellValue(rawValue)}
                 </span>
               );
             },
-            cell: (info) => formatCellValue(info.getValue()),
           }) satisfies ColumnDef<ResultTableRow>,
       ),
     ],
     [
+      activeEditCell,
       allVisibleSelected,
       deletable,
+      editable,
       keyHints,
+      onSetActiveEditCell,
+      onSetPendingEdit,
       onToggleRow,
       onToggleVisible,
+      pendingEdits,
       selectedRows,
       set.columns,
       someVisibleSelected,
@@ -4316,7 +4562,10 @@ function ResultTableBody({
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
   return (
     <div className="sql-result-set">
@@ -4334,7 +4583,9 @@ function ResultTableBody({
                     className={
                       header.column.id === "select"
                         ? "sql-result-th-select"
-                        : undefined
+                        : header.column.getIsSorted()
+                          ? "sql-result-th-sorted"
+                          : undefined
                     }
                   >
                     {header.isPlaceholder
@@ -4357,29 +4608,58 @@ function ResultTableBody({
                   key={absoluteRow}
                   className={checked ? "sql-result-row-selected" : undefined}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className={
-                        cell.column.id === "select"
-                          ? "sql-result-td-select"
-                          : cell.getValue() === null
-                            ? "sql-cell-null"
-                            : undefined
-                      }
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isSelect = cell.column.id === "select";
+                    const rawVal = isSelect ? undefined : cell.getValue();
+                    // Retrieve the column index from the column's meta,
+                    // which is stored there at column-definition time to
+                    // avoid fragile string-splitting on the column id.
+                    const ci = isSelect
+                      ? -1
+                      : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
+                    const cellKey = `${absoluteRow}:${ci}`;
+                    const hasPendingEdit =
+                      !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
+                    return (
+                      <td
+                        key={cell.id}
+                        className={
+                          isSelect
+                            ? "sql-result-td-select"
+                            : hasPendingEdit
+                              ? "sql-cell-edited-td"
+                              : rawVal === null
+                                ? "sql-cell-null"
+                                : undefined
+                        }
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+      {editable && editCount > 0 && (
+        <div className="sql-edit-commit-bar">
+          <span className="sql-edit-count">
+            {editCount} cell{editCount === 1 ? "" : "s"} edited
+          </span>
+          <button
+            type="button"
+            className="sql-edit-commit-btn"
+            onClick={onCommitEdits}
+          >
+            Update {editCount} cell{editCount === 1 ? "" : "s"}…
+          </button>
+        </div>
+      )}
     </div>
   );
 }
