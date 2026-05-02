@@ -1668,7 +1668,7 @@
   border: 1px solid var(--accent, #f0b400);
   border-radius: 3px;
   padding: 2px 5px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: inherit;
   outline: none;
   box-shadow: 0 0 0 2px var(--accent-glow, rgba(240, 180, 0, 0.25));

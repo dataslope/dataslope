@@ -2063,6 +2063,7 @@ function SqlPlaygroundInner() {
     const next = [...tabs, tab];
     setTabs(next);
     saveTabs(activeDbId, next);
+    activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
   }, [tabs, activeDbId]);
 
@@ -2097,6 +2098,7 @@ function SqlPlaygroundInner() {
       setTabs(finalTabs);
       saveTabs(activeDbId, finalTabs);
       if (activeTabId === id) {
+        activeTabIdRef.current = finalTabs[0].id;
         setActiveTabId(finalTabs[0].id);
       }
     },
@@ -2122,6 +2124,7 @@ function SqlPlaygroundInner() {
     setTabs(finalTabs);
     saveTabs(activeDbId, finalTabs);
     if (activeTabId === id) {
+      activeTabIdRef.current = finalTabs[0].id;
       setActiveTabId(finalTabs[0].id);
     }
   }, [confirmCloseTabId, tabs, activeTabId, activeDbId]);
@@ -2156,6 +2159,7 @@ function SqlPlaygroundInner() {
       const next = [...tabs.slice(0, idx + 1), copy, ...tabs.slice(idx + 1)];
       setTabs(next);
       saveTabs(activeDbId, next);
+      activeTabIdRef.current = copy.id;
       setActiveTabId(copy.id);
     },
     [tabs, activeDbId],
@@ -2168,6 +2172,7 @@ function SqlPlaygroundInner() {
       const next = [target];
       setTabs(next);
       saveTabs(activeDbId, next);
+      activeTabIdRef.current = target.id;
       setActiveTabId(target.id);
     },
     [tabs, activeDbId],
@@ -3667,7 +3672,10 @@ function SqlPlaygroundInner() {
                     key={t.id}
                     tab={t}
                     active={t.id === activeTabId}
-                    onActivate={() => setActiveTabId(t.id)}
+                    onActivate={() => {
+                      activeTabIdRef.current = t.id;
+                      setActiveTabId(t.id);
+                    }}
                     onClose={() => closeTab(t.id)}
                     onRename={(name) => renameTab(t.id, name)}
                     onDuplicate={() => duplicateTab(t.id)}
@@ -4375,7 +4383,7 @@ function ResultTableBody({
         absoluteRow: startIndex + ri,
         values,
       })),
-    [visible, startIndex],
+    [visible, startIndex, set],
   );
 
   const columns = useMemo<ColumnDef<ResultTableRow>[]>(
