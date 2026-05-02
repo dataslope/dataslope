@@ -322,12 +322,78 @@ interface QueryRunResult {
   sourceTable?: string;
 }
 
+type SelectedRowsByResult = Record<number, Set<number>>;
+type PendingEditsByResult = Record<number, Map<string, unknown>>;
+
 function formatCellValue(v: unknown): string {
   if (v === null || v === undefined) return "NULL";
   if (typeof v === "string") return v;
   if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NaN";
   if (v instanceof Uint8Array) return `BLOB (${v.length} bytes)`;
   return String(v);
+}
+
+function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
+  if (raw === "" || raw === "NULL") return null;
+  if (!isNumeric) return raw;
+  const n = Number(raw);
+  // Keep as string if it doesn't parse cleanly so the user can see what
+  // they typed rather than silently coercing to NaN or 0.
+  return Number.isFinite(n) ? n : raw;
+}
+
+function cloneSelections(src: SelectedRowsByResult): SelectedRowsByResult {
+  return Object.fromEntries(
+    Object.entries(src).map(([idx, rows]) => [idx, new Set(rows)]),
+  ) as SelectedRowsByResult;
+}
+
+function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
+  return Object.fromEntries(
+    Object.entries(src).map(([idx, edits]) => [idx, new Map(edits)]),
+  ) as PendingEditsByResult;
+}
+
+/** Parse a pending-edit key of the form `${absoluteRow}:${columnIndex}`. */
+function parseCellKey(cellKey: string): { row: number; col: string } | null {
+  const [rowStr, col] = cellKey.split(":");
+  const row = Number(rowStr);
+  return Number.isInteger(row) ? { row, col } : null;
+}
+
+/** Count deleted rows before a row index to calculate its post-delete shift. */
+function countSortedValuesLessThan(values: number[], target: number): number {
+  let lo = 0;
+  let hi = values.length;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (values[mid] < target) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+/** Shift pending edit row indices after deletions and remove edits on deleted rows. */
+function pendingEditsAfterDeletedRows(
+  src: PendingEditsByResult,
+  setIdx: number,
+  deletedRows: Set<number>,
+): PendingEditsByResult {
+  const next = clonePendingEdits(src);
+  const edits = next[setIdx];
+  if (!edits) return next;
+  const sortedDeleted = [...deletedRows].sort((a, b) => a - b);
+  const shifted = new Map<string, unknown>();
+  for (const [cellKey, value] of edits) {
+    const parsed = parseCellKey(cellKey);
+    if (!parsed || deletedRows.has(parsed.row)) continue;
+    const { row, col } = parsed;
+    const shift = countSortedValuesLessThan(sortedDeleted, row);
+    shifted.set(`${row - shift}:${col}`, value);
+  }
+  if (shifted.size > 0) next[setIdx] = shifted;
+  else delete next[setIdx];
+  return next;
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -3950,13 +4016,31 @@ function ResultView({
   // Selection state — set of *absolute* row indices into `set.values`
   // (not page-local) so selections survive page navigation. Keyed by
   // result-set index. Only populated for sets that are deletable.
-  const [selectedByIndex, setSelectedByIndex] = useState<
-    Record<number, Set<number>>
+  const [selectedByIndex, setSelectedByIndex] =
+    useState<SelectedRowsByResult>({});
+  // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
+  // value is the new value the user typed. Keyed by result-set index so
+  // each set tracks its edits independently.
+  const [pendingEditsByIndex, setPendingEditsByIndex] =
+    useState<PendingEditsByResult>({});
+  // Whether a cell within a given result set is currently being actively
+  // edited (i.e. the user has double-clicked it). We track the "active
+  // editing cell" key per set so we can blur it on commit.
+  const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
+    Record<number, string | null>
   >({});
   // Pending delete confirmation — captures the set index whose
   // selected rows are about to be deleted. `null` means the dialog is
   // closed.
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  // Update/delete actions re-run the preview and produce a fresh result
+  // object. Populate this ref immediately before those callbacks so the
+  // result-reset effect can carry over unrelated unsaved UI state once,
+  // then clear it for ordinary query runs.
+  const preserveOnNextResultRef = useRef<{
+    selectedByIndex: SelectedRowsByResult;
+    pendingEditsByIndex: PendingEditsByResult;
+  } | null>(null);
   const initialPageSize = useMemo(() => {
     if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
     const saved = Number(
@@ -3967,15 +4051,19 @@ function ResultView({
       : DEFAULT_PAGE_SIZE;
   }, []);
 
-  // Reset pagination + selection + edits whenever a new result lands.
+  // Reset pagination + transient actions whenever a new result lands.
+  // Table-edit actions refresh the result in place, so they can opt into
+  // preserving the unsaved state that belongs to the other action.
   // Identity-comparing against the result object is sufficient because
   // `setResult` always creates a new object.
   useEffect(() => {
+    const preserved = preserveOnNextResultRef.current;
+    preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
-    setSelectedByIndex({});
+    setSelectedByIndex(preserved?.selectedByIndex ?? {});
     setPendingDelete(null);
-    setPendingEditsByIndex({});
+    setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     setActiveEditCellByIndex({});
   }, [result]);
 
@@ -4057,20 +4145,6 @@ function ResultView({
     [],
   );
 
-  // Per-result-set pending cell edits. Key is `${absoluteRow}:${colIdx}`,
-  // value is the new (string) value the user typed. Keyed by result-set
-  // index so each set tracks its edits independently.
-  const [pendingEditsByIndex, setPendingEditsByIndex] = useState<
-    Record<number, Map<string, unknown>>
-  >({});
-
-  // Whether a cell within a given result set is currently being actively
-  // edited (i.e. the user has double-clicked it). We track the "active
-  // editing cell" key per set so we can blur it on commit.
-  const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
-    Record<number, string | null>
-  >({});
-
   const setPendingEdit = useCallback(
     (setIdx: number, cellKey: string, value: unknown) => {
       setPendingEditsByIndex((prev) => {
@@ -4124,17 +4198,24 @@ function ResultView({
         updates.push({ rowIndex: absoluteRow, column: colName, value });
       }
       if (updates.length === 0) return;
-      // Clear edits before calling the callback so the result refresh
-      // starts with a clean slate regardless of success/failure.
-      setPendingEditsByIndex((prev) => {
-        const next = { ...prev };
-        delete next[setIdx];
-        return next;
-      });
+      const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
+      delete nextPendingEdits[setIdx];
+      preserveOnNextResultRef.current = {
+        selectedByIndex: cloneSelections(selectedByIndex),
+        pendingEditsByIndex: nextPendingEdits,
+      };
+      // Clear committed edits before calling the callback so the result
+      // refresh starts with a clean slate for only the committed cells.
+      setPendingEditsByIndex(nextPendingEdits);
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
       onUpdateRows(sourceTable, updates);
     },
-    [sourceTable, onUpdateRows, pendingEditsByIndex],
+    [
+      sourceTable,
+      onUpdateRows,
+      pendingEditsByIndex,
+      selectedByIndex,
+    ],
   );
 
   const requestDelete = useCallback((setIdx: number) => {
@@ -4168,10 +4249,25 @@ function ResultView({
       if (!row) continue;
       pkRows.push(pkColIndexes.map((ci) => row[ci]));
     }
+    const selectedRows = new Set(selected);
+    const nextSelectedByIndex = cloneSelections(selectedByIndex);
+    delete nextSelectedByIndex[pendingDelete];
+    const nextPendingEdits = pendingEditsAfterDeletedRows(
+      pendingEditsByIndex,
+      pendingDelete,
+      selectedRows,
+    );
+    preserveOnNextResultRef.current = {
+      selectedByIndex: nextSelectedByIndex,
+      pendingEditsByIndex: nextPendingEdits,
+    };
     setPendingDelete(null);
+    setSelectedByIndex(nextSelectedByIndex);
+    setPendingEditsByIndex(nextPendingEdits);
     onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
+    pendingEditsByIndex,
     result,
     sourceTable,
     onDeleteRows,
@@ -4519,20 +4615,9 @@ function ResultTableBody({
                     autoFocus
                     type="text"
                     inputMode={isNumeric ? "decimal" : undefined}
-                    onBlur={(e) => {
+                    onChange={(e) => {
                       const raw = e.target.value;
-                      let newVal: unknown;
-                      if (raw === "" || raw === "NULL") {
-                        newVal = null;
-                      } else if (isNumeric) {
-                        const n = Number(raw);
-                        // Keep as string if it doesn't parse cleanly so
-                        // the user can see what they typed rather than
-                        // silently coercing to NaN or 0.
-                        newVal = Number.isFinite(n) ? n : raw;
-                      } else {
-                        newVal = raw;
-                      }
+                      const newVal = parseCellEditValue(raw, isNumeric);
                       // Only record a pending edit when the value actually
                       // differs from the original DB value. If the user
                       // reverted a previous edit back to the original, clear it.
@@ -4541,6 +4626,8 @@ function ResultTableBody({
                       } else if (hasPendingEdit) {
                         onClearPendingEdit(cellKey);
                       }
+                    }}
+                    onBlur={() => {
                       onSetActiveEditCell(null);
                     }}
                     onKeyDown={(e) => {
