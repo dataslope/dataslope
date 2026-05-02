@@ -4074,6 +4074,22 @@ function ResultView({
     [],
   );
 
+  const clearPendingEdit = useCallback(
+    (setIdx: number, cellKey: string) => {
+      setPendingEditsByIndex((prev) => {
+        const cur = new Map(prev[setIdx] ?? []);
+        cur.delete(cellKey);
+        if (cur.size === 0) {
+          const next = { ...prev };
+          delete next[setIdx];
+          return next;
+        }
+        return { ...prev, [setIdx]: cur };
+      });
+    },
+    [],
+  );
+
   const setActiveEditCell = useCallback(
     (setIdx: number, cellKey: string | null) => {
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: cellKey }));
@@ -4211,7 +4227,6 @@ function ResultView({
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
           const pendingEdits = pendingEditsByIndex[idx];
-          const editCount = pendingEdits?.size ?? 0;
           return (
             <ResultTableBody
               key={idx}
@@ -4225,7 +4240,6 @@ function ResultView({
               selectedRows={selected}
               pendingEdits={pendingEdits}
               activeEditCell={activeEditCellByIndex[idx] ?? null}
-              editCount={editCount}
               onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
               onToggleVisible={(absoluteIndices, select) =>
                 setVisibleSelection(idx, absoluteIndices, select)
@@ -4233,10 +4247,12 @@ function ResultView({
               onSetPendingEdit={(cellKey, value) =>
                 setPendingEdit(idx, cellKey, value)
               }
+              onClearPendingEdit={(cellKey) =>
+                clearPendingEdit(idx, cellKey)
+              }
               onSetActiveEditCell={(cellKey) =>
                 setActiveEditCell(idx, cellKey)
               }
-              onCommitEdits={() => commitEdits(idx, set)}
             />
           );
         })}
@@ -4247,6 +4263,8 @@ function ResultView({
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
           const selectedCount = selected?.size ?? 0;
+          const pendingEdits = pendingEditsByIndex[idx];
+          const editCount = pendingEdits?.size ?? 0;
           return (
             <ResultPager
               key={idx}
@@ -4258,8 +4276,11 @@ function ResultView({
               onPageChange={(p) => setPage(idx, p)}
               onPageSizeChange={(s) => setPageSize(idx, s)}
               deletable={pkCols !== null}
+              editable={isEditable}
+              editCount={editCount}
               selectedCount={selectedCount}
               onRequestDelete={() => requestDelete(idx)}
+              onCommitEdits={() => commitEdits(idx, set)}
             />
           );
         })}
@@ -4312,12 +4333,11 @@ function ResultTableBody({
   selectedRows,
   pendingEdits,
   activeEditCell,
-  editCount,
   onToggleRow,
   onToggleVisible,
   onSetPendingEdit,
+  onClearPendingEdit,
   onSetActiveEditCell,
-  onCommitEdits,
 }: {
   set: QueryExecResult;
   index: number;
@@ -4329,12 +4349,11 @@ function ResultTableBody({
   selectedRows?: Set<number>;
   pendingEdits?: Map<string, unknown>;
   activeEditCell: string | null;
-  editCount: number;
   onToggleRow: (absoluteRow: number) => void;
   onToggleVisible: (absoluteIndices: number[], select: boolean) => void;
   onSetPendingEdit: (cellKey: string, value: unknown) => void;
+  onClearPendingEdit: (cellKey: string) => void;
   onSetActiveEditCell: (cellKey: string | null) => void;
-  onCommitEdits: () => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -4506,7 +4525,14 @@ function ResultTableBody({
                       } else {
                         newVal = raw;
                       }
-                      onSetPendingEdit(cellKey, newVal);
+                      // Only record a pending edit when the value actually
+                      // differs from the original DB value. If the user
+                      // reverted a previous edit back to the original, clear it.
+                      if (newVal !== rawValue) {
+                        onSetPendingEdit(cellKey, newVal);
+                      } else if (hasPendingEdit) {
+                        onClearPendingEdit(cellKey);
+                      }
                       onSetActiveEditCell(null);
                     }}
                     onKeyDown={(e) => {
@@ -4529,7 +4555,6 @@ function ResultTableBody({
                         ? "sql-cell-null"
                         : undefined
                   }
-                  onDoubleClick={() => onSetActiveEditCell(cellKey)}
                   title={editable ? "Double-click to edit" : undefined}
                 >
                   {hasPendingEdit
@@ -4547,6 +4572,7 @@ function ResultTableBody({
       deletable,
       editable,
       keyHints,
+      onClearPendingEdit,
       onSetActiveEditCell,
       onSetPendingEdit,
       onToggleRow,
@@ -4632,6 +4658,11 @@ function ResultTableBody({
                                 ? "sql-cell-null"
                                 : undefined
                         }
+                        onDoubleClick={
+                          editable && !isSelect && ci >= 0
+                            ? () => onSetActiveEditCell(cellKey)
+                            : undefined
+                        }
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -4646,20 +4677,6 @@ function ResultTableBody({
           </tbody>
         </table>
       </div>
-      {editable && editCount > 0 && (
-        <div className="sql-edit-commit-bar">
-          <span className="sql-edit-count">
-            {editCount} cell{editCount === 1 ? "" : "s"} edited
-          </span>
-          <button
-            type="button"
-            className="sql-edit-commit-btn"
-            onClick={onCommitEdits}
-          >
-            Update {editCount} cell{editCount === 1 ? "" : "s"}…
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -4673,8 +4690,11 @@ function ResultPager({
   onPageChange,
   onPageSizeChange,
   deletable,
+  editable,
+  editCount,
   selectedCount,
   onRequestDelete,
+  onCommitEdits,
 }: {
   set: QueryExecResult;
   index: number;
@@ -4684,8 +4704,11 @@ function ResultPager({
   onPageChange: (p: number) => void;
   onPageSizeChange: (s: number) => void;
   deletable: boolean;
+  editable: boolean;
+  editCount: number;
   selectedCount: number;
   onRequestDelete: () => void;
+  onCommitEdits: () => void;
 }) {
   const totalRows = set.values.length;
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -4700,7 +4723,11 @@ function ResultPager({
         <span className="sql-result-pager-set">Set #{index + 1}</span>
       )}
       <span className="sql-result-pager-info">
-        {deletable && selectedCount > 0 ? (
+        {editable && editCount > 0 ? (
+          <>
+            {editCount} cell{editCount === 1 ? "" : "s"} edited
+          </>
+        ) : deletable && selectedCount > 0 ? (
           <>
             {selectedCount} row{selectedCount === 1 ? "" : "s"} selected
           </>
@@ -4713,6 +4740,15 @@ function ResultPager({
           </>
         )}
       </span>
+      {editable && editCount > 0 && (
+        <button
+          type="button"
+          className="sql-edit-commit-btn"
+          onClick={onCommitEdits}
+        >
+          Update {editCount} cell{editCount === 1 ? "" : "s"}…
+        </button>
+      )}
       {deletable && selectedCount > 0 && (
         <button
           type="button"
