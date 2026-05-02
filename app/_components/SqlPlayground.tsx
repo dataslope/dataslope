@@ -4413,6 +4413,9 @@ function ResultTableBody({
           ({
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
+            // Store ci in meta so the td renderer can look it up without
+            // fragile string-splitting on the column id.
+            meta: { ci },
             header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
@@ -4487,15 +4490,22 @@ function ResultTableBody({
                     className="sql-cell-input"
                     defaultValue={editVal}
                     autoFocus
-                    type={isNumeric ? "number" : "text"}
+                    type="text"
+                    inputMode={isNumeric ? "decimal" : undefined}
                     onBlur={(e) => {
-                      const newVal = isNumeric
-                        ? e.target.value === "" || e.target.value === "NULL"
-                          ? null
-                          : Number(e.target.value)
-                        : e.target.value === "NULL"
-                          ? null
-                          : e.target.value;
+                      const raw = e.target.value;
+                      let newVal: unknown;
+                      if (raw === "" || raw === "NULL") {
+                        newVal = null;
+                      } else if (isNumeric) {
+                        const n = Number(raw);
+                        // Keep as string if it doesn't parse cleanly so
+                        // the user can see what they typed rather than
+                        // silently coercing to NaN or 0.
+                        newVal = Number.isFinite(n) ? n : raw;
+                      } else {
+                        newVal = raw;
+                      }
                       onSetPendingEdit(cellKey, newVal);
                       onSetActiveEditCell(null);
                     }}
@@ -4601,14 +4611,15 @@ function ResultTableBody({
                   {row.getVisibleCells().map((cell) => {
                     const isSelect = cell.column.id === "select";
                     const rawVal = isSelect ? undefined : cell.getValue();
-                    // Extract colIdx from column id `col-{ci}-{name}`
-                    const colIdParts = cell.column.id.split("-");
+                    // Retrieve the column index from the column's meta,
+                    // which is stored there at column-definition time to
+                    // avoid fragile string-splitting on the column id.
                     const ci = isSelect
                       ? -1
-                      : Number(colIdParts[1]);
+                      : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
                     const cellKey = `${absoluteRow}:${ci}`;
                     const hasPendingEdit =
-                      !isSelect && (pendingEdits?.has(cellKey) ?? false);
+                      !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
                     return (
                       <td
                         key={cell.id}
