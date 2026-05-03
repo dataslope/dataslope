@@ -598,17 +598,24 @@ export async function createSqliteEngine(
         }
       }
 
-      // Collect trigger DDLs attached to the original table.
+      // Collect ALL trigger DDLs so we can drop them before the table
+      // rebuild and recreate them afterward. SQLite validates trigger
+      // bodies at schema-change time, so any trigger that references the
+      // table being rebuilt (even if it is ON a different table) will
+      // fail validation the moment that table is temporarily absent
+      // between DROP TABLE and ALTER TABLE … RENAME TO. Dropping all
+      // triggers up front — just like we do with views — avoids this.
       const triggerSqls: string[] = [];
+      const triggerNames: string[] = [];
       {
         const stmt = d.prepare(
-          `SELECT sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = $n AND sql IS NOT NULL ORDER BY name`,
+          `SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND sql IS NOT NULL ORDER BY name`,
         );
         try {
-          stmt.bind({ $n: spec.originalName });
           while (stmt.step()) {
             const row = stmt.get();
-            if (typeof row[0] === "string") triggerSqls.push(row[0]);
+            triggerNames.push(String(row[0]));
+            if (typeof row[1] === "string") triggerSqls.push(row[1]);
           }
         } finally {
           stmt.free();
@@ -673,11 +680,18 @@ export async function createSqliteEngine(
       d.run("PRAGMA foreign_keys = OFF;");
       d.run("BEGIN");
       try {
-        // Drop all views before touching the table so SQLite doesn't
-        // attempt to validate their SQL during the interim state where
-        // the original table has been dropped but not yet renamed back.
+        // Drop all views and all triggers before touching the table so
+        // SQLite doesn't attempt to validate their SQL during the interim
+        // state where the original table has been dropped but not yet
+        // renamed back. This mirrors the same issue found for views:
+        // triggers that reference the table (even if ON a different
+        // table) are validated at schema-change time and will fail with
+        // "no such table" if the target is temporarily absent.
         for (const name of viewNames) {
           d.run(`DROP VIEW IF EXISTS ${quoteIdent(name)}`);
+        }
+        for (const name of triggerNames) {
+          d.run(`DROP TRIGGER IF EXISTS ${quoteIdent(name)}`);
         }
         d.run(`CREATE TABLE ${quoteIdent(tmpName)} (${defs.join(", ")})`);
         if (sourceCols.length > 0) {
@@ -693,7 +707,8 @@ export async function createSqliteEngine(
         for (const sql of indexSqls) {
           d.run(patchDdl(sql));
         }
-        // Recreate triggers with potentially patched DDL.
+        // Recreate all triggers with potentially patched DDL (handles
+        // table/column renames when the rebuilt table is also renamed).
         for (const sql of triggerSqls) {
           d.run(patchDdl(sql));
         }
