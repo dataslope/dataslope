@@ -37,13 +37,13 @@ function ErTableNode({ data }: NodeProps) {
         {(columns as TableColumnInfo[]).map((col) => (
           <div key={col.name} className="er-table-col-row">
             <Handle
-              id={columnHandleId(col.name, "left")}
+              id={columnHandleId(col.name, "left", "source")}
               type="source"
               position={Position.Left}
               className="er-table-col-handle er-table-col-handle-left"
             />
             <Handle
-              id={columnHandleId(col.name, "left")}
+              id={columnHandleId(col.name, "left", "target")}
               type="target"
               position={Position.Left}
               className="er-table-col-handle er-table-col-handle-left"
@@ -65,13 +65,13 @@ function ErTableNode({ data }: NodeProps) {
             <span className="er-table-col-name">{col.name}</span>
             <span className="er-table-col-type">{col.type || "—"}</span>
             <Handle
-              id={columnHandleId(col.name, "right")}
+              id={columnHandleId(col.name, "right", "source")}
               type="source"
               position={Position.Right}
               className="er-table-col-handle er-table-col-handle-right"
             />
             <Handle
-              id={columnHandleId(col.name, "right")}
+              id={columnHandleId(col.name, "right", "target")}
               type="target"
               position={Position.Right}
               className="er-table-col-handle er-table-col-handle-right"
@@ -105,8 +105,12 @@ function calcNodeHeight(colCount: number): number {
   return COL_HEADER_H + Math.max(colCount, 1) * COL_ROW_H + COL_FOOTER_PAD;
 }
 
-function columnHandleId(columnName: string, side: "left" | "right"): string {
-  return `${columnName}::${side}`;
+function columnHandleId(
+  columnName: string,
+  side: "left" | "right",
+  type: "source" | "target",
+): string {
+  return `${columnName}::${side}::${type}`;
 }
 
 function layoutTables(
@@ -227,9 +231,9 @@ export function ErDiagramPane({
         edges.push({
           id,
           source: srcTable,
-          sourceHandle: columnHandleId(fk.from, sourceSide),
+          sourceHandle: columnHandleId(fk.from, sourceSide, "source"),
           target: fk.table,
-          targetHandle: columnHandleId(fk.to, targetSide),
+          targetHandle: columnHandleId(fk.to, targetSide, "target"),
           label: `${fk.from} → ${fk.to}`,
           type: "smoothstep",
           style: { stroke: "var(--accent)", strokeWidth: 1.5 },
