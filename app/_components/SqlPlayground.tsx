@@ -175,6 +175,55 @@ interface QueryTab {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// SQLite error hint helper — maps common engine error strings to short
+// plain-English suggestions that appear beneath the raw error message.
+// ────────────────────────────────────────────────────────────────────────
+
+function getSqliteErrorHint(error: string): string | null {
+  const nearMatch = error.match(/^near "(.+)": syntax error$/i);
+  if (nearMatch) {
+    return `Unexpected token "${nearMatch[1]}". Check for typos in SQL keywords or extra characters.`;
+  }
+  const noTableMatch = error.match(/^no such table: (.+)$/i);
+  if (noTableMatch) {
+    return `Table "${noTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
+  }
+  const noColumnMatch = error.match(/^no such column: (.+)$/i);
+  if (noColumnMatch) {
+    return `Column "${noColumnMatch[1]}" was not found. Verify column names with View Structure.`;
+  }
+  const uniqueMatch = error.match(/^UNIQUE constraint failed: (.+)$/i);
+  if (uniqueMatch) {
+    return `Duplicate value violates the UNIQUE constraint on "${uniqueMatch[1]}".`;
+  }
+  const notNullMatch = error.match(/^NOT NULL constraint failed: (.+)$/i);
+  if (notNullMatch) {
+    return `"${notNullMatch[1]}" requires a non-NULL value.`;
+  }
+  if (/^FOREIGN KEY constraint failed$/i.test(error)) {
+    return "The value does not exist in the referenced table.";
+  }
+  const ambiguousMatch = error.match(/^ambiguous column name: (.+)$/i);
+  if (ambiguousMatch) {
+    return `Column "${ambiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
+  }
+  return null;
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// CSV export helper
+// ────────────────────────────────────────────────────────────────────────
+
+function escapeCsvCell(val: unknown): string {
+  if (val === null || val === undefined) return "";
+  const s = String(val);
+  if (s.includes(",") || s.includes("\n") || s.includes("\r") || s.includes('"')) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+// ────────────────────────────────────────────────────────────────────────
 // Modify Structure drawer
 // ────────────────────────────────────────────────────────────────────────
 
@@ -2381,6 +2430,41 @@ function SqlPlaygroundInner() {
     [showToast],
   );
 
+  // ─── Export table / view to CSV ──────────────────────────────────
+  const exportEntityToCsv = useCallback(
+    (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const sets = engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
+        if (!sets || sets.length === 0 || sets[0].values.length === 0) {
+          showToast(`"${name}" is empty — no data to export.`, "warn");
+          return;
+        }
+        const { columns, values } = sets[0];
+        const csvRows = [
+          columns.map(escapeCsvCell).join(","),
+          ...values.map((row) => row.map(escapeCsvCell).join(",")),
+        ];
+        const csv = csvRows.join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${name}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`Exported ${name}.csv.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Export failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, showToast],
+  );
+
   // ─── Tab actions ────────────────────────────────────────────────────
   const addTab = useCallback(() => {
     const nextNum = tabs.length + 1;
@@ -3567,7 +3651,7 @@ function SqlPlaygroundInner() {
               <header className="sql-modify-drawer-header">
                 <div className="sql-modify-drawer-heading">
                   <Dialog.Title className="sql-modify-drawer-title">
-                    Modify structure
+                    View structure
                   </Dialog.Title>
                   <Dialog.Description className="sql-modify-drawer-subtitle">
                     {modifyDialog?.originalName ?? ""}
@@ -3906,6 +3990,7 @@ function SqlPlaygroundInner() {
                     onTruncate={truncateEntity}
                     onDrop={dropEntity}
                     onViewDDL={viewDDL}
+                    onExportCsv={exportEntityToCsv}
                   />
                 ))}
               </SchemaSection>
@@ -3943,6 +4028,7 @@ function SqlPlaygroundInner() {
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
                     onViewDDL={viewDDL}
+                    onExportCsv={exportEntityToCsv}
                   />
                 ))}
               </SchemaSection>
@@ -4657,10 +4743,12 @@ function ResultView({
     );
   }
   if (result.error) {
+    const hint = getSqliteErrorHint(result.error);
     return (
       <div className="sql-result-error">
         <div className="sql-result-error-title">Query failed</div>
         <pre className="sql-result-error-body">{result.error}</pre>
+        {hint && <div className="sql-result-error-hint">{hint}</div>}
       </div>
     );
   }
@@ -5533,6 +5621,22 @@ function ResultPager({
   const start = safePage * effective;
   const end = Math.min(totalRows, start + effective);
 
+  // Controlled input for direct page navigation.
+  const [pageInput, setPageInput] = useState(String(safePage + 1));
+  // Keep the input in sync when the page changes from outside (e.g. prev/next).
+  useEffect(() => {
+    setPageInput(String(safePage + 1));
+  }, [safePage]);
+
+  const commitPageInput = () => {
+    const n = parseInt(pageInput, 10);
+    if (!Number.isNaN(n) && n >= 1 && n <= totalPages) {
+      onPageChange(n - 1);
+    } else {
+      setPageInput(String(safePage + 1));
+    }
+  };
+
   return (
     <div className="sql-result-pager">
       {showSetLabel && (
@@ -5609,49 +5713,66 @@ function ResultPager({
         </Select.Root>
       </div>
       <div className="sql-result-pager-controls">
-        <button
-          type="button"
-          className="sql-result-pager-btn"
-          onClick={() => onPageChange(0)}
-          disabled={safePage === 0}
-          aria-label="First page"
-          title="First page"
-        >
-          <ChevronsLeft size={13} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          className="sql-result-pager-btn"
-          onClick={() => onPageChange(Math.max(0, safePage - 1))}
-          disabled={safePage === 0}
-          aria-label="Previous page"
-          title="Previous page"
-        >
-          <ChevronLeft size={13} aria-hidden="true" />
-        </button>
+        {safePage > 0 && (
+          <button
+            type="button"
+            className="sql-result-pager-btn"
+            onClick={() => onPageChange(0)}
+            aria-label="First page"
+            title="First page"
+          >
+            <ChevronsLeft size={13} aria-hidden="true" />
+          </button>
+        )}
+        {safePage > 0 && (
+          <button
+            type="button"
+            className="sql-result-pager-btn"
+            onClick={() => onPageChange(Math.max(0, safePage - 1))}
+            aria-label="Previous page"
+            title="Previous page"
+          >
+            <ChevronLeft size={13} aria-hidden="true" />
+          </button>
+        )}
         <span className="sql-result-pager-page">
-          {safePage + 1} / {totalPages}
+          <input
+            className="sql-result-pager-page-input"
+            type="text"
+            inputMode="numeric"
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            onBlur={commitPageInput}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitPageInput();
+              else if (e.key === "Escape") setPageInput(String(safePage + 1));
+            }}
+            aria-label="Page number"
+          />
+          {" / "}{totalPages}
         </span>
-        <button
-          type="button"
-          className="sql-result-pager-btn"
-          onClick={() => onPageChange(Math.min(totalPages - 1, safePage + 1))}
-          disabled={safePage >= totalPages - 1}
-          aria-label="Next page"
-          title="Next page"
-        >
-          <ChevronRight size={13} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          className="sql-result-pager-btn"
-          onClick={() => onPageChange(totalPages - 1)}
-          disabled={safePage >= totalPages - 1}
-          aria-label="Last page"
-          title="Last page"
-        >
-          <ChevronsRight size={13} aria-hidden="true" />
-        </button>
+        {safePage < totalPages - 1 && (
+          <button
+            type="button"
+            className="sql-result-pager-btn"
+            onClick={() => onPageChange(Math.min(totalPages - 1, safePage + 1))}
+            aria-label="Next page"
+            title="Next page"
+          >
+            <ChevronRight size={13} aria-hidden="true" />
+          </button>
+        )}
+        {safePage < totalPages - 1 && (
+          <button
+            type="button"
+            className="sql-result-pager-btn"
+            onClick={() => onPageChange(totalPages - 1)}
+            aria-label="Last page"
+            title="Last page"
+          >
+            <ChevronsRight size={13} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -5996,9 +6117,10 @@ function DdlViewer({
       lineNumbers: true,
       indentUnit: 2,
       tabSize: 2,
-      // `nocursor` disables focus while keeping syntax highlighting —
-      // the standard CodeMirror v5 way to render a read-only listing.
-      readOnly: "nocursor",
+      // `readOnly: true` keeps the cursor active (unlike "nocursor") so
+      // Ctrl-A / Cmd-A selects all text within the editor rather than
+      // falling through to the browser's page-level select-all.
+      readOnly: true,
       lineWrapping: false,
     });
     cm.setValue(sql);
@@ -6162,6 +6284,7 @@ interface SchemaItemProps {
   onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
+  onExportCsv: (name: string) => void;
 }
 
 function SchemaItem({
@@ -6180,6 +6303,7 @@ function SchemaItem({
   onTruncate,
   onDrop,
   onViewDDL,
+  onExportCsv,
 }: SchemaItemProps) {
   const Icon = kind === "view" ? Eye : Table2;
   const fkByCol = useMemo(() => {
@@ -6322,7 +6446,7 @@ function SchemaItem({
                   className="example-item"
                   onClick={() => onModifyStructure(name)}
                 >
-                  <div className="ex-title">Modify Structure</div>
+                  <div className="ex-title">View Structure</div>
                 </ContextMenu.Item>
               ) : (
                 onStructure && (
@@ -6351,6 +6475,12 @@ function SchemaItem({
                 onClick={() => onCopy(name)}
               >
                 <div className="ex-title">Copy Name</div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => onExportCsv(name)}
+              >
+                <div className="ex-title">Export to CSV</div>
               </ContextMenu.Item>
               {kind === "table" && onTruncate && (
                 <ContextMenu.Item
