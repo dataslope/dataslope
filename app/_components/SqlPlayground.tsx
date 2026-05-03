@@ -2893,7 +2893,11 @@ function SqlPlaygroundInner() {
         <header className="pg-header">
           <div className="logo">
             <Link href="/" className="brand-name">
-              Dataslope
+              <img
+                src="/dataslope-blue@4x.png"
+                alt="Dataslope"
+                height={28}
+              />
             </Link>
             <Select.Root
               value={PLAYGROUND_ID}
@@ -4408,9 +4412,11 @@ function SqlTab({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup">
-              <ContextMenu.Item className="example-item" onClick={openRename}>
-                <div className="ex-title">Rename</div>
-              </ContextMenu.Item>
+              {tab.kind !== "view-data" && (
+                <ContextMenu.Item className="example-item" onClick={openRename}>
+                  <div className="ex-title">Rename</div>
+                </ContextMenu.Item>
+              )}
               <ContextMenu.Item className="example-item" onClick={onDuplicate}>
                 <div className="ex-title">Duplicate</div>
               </ContextMenu.Item>
@@ -5579,7 +5585,7 @@ function ResultTableBody({
                               setModalEditCell({ cellKey, colName, value: current });
                             }}
                           >
-                            <div className="ex-title">Edit in modal</div>
+                            <div className="ex-title">Edit cell in modal</div>
                           </ContextMenu.Item>
                         )}
                         <ContextMenu.Item

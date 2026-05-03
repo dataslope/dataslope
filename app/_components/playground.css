@@ -142,6 +142,12 @@ body.pg-active {
   text-decoration: none;
 }
 
+.logo img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
 .header-sep { flex: 1; }
 
 /* Dropdown that lets the user switch between playgrounds (sits where the
