@@ -4398,29 +4398,43 @@ function SqlTab({
                   openOnHover
                   delay={100}
                   closeDelay={100}
+                  nativeButton={false}
                   render={<span className="sql-tab-title" />}
                 >
                   {tab.title}
                 </Popover.Trigger>
                 <Popover.Portal>
-                  <Popover.Positioner side="top" sideOffset={6} align="center">
+                  <Popover.Positioner
+                    side="top"
+                    sideOffset={6}
+                    align="center"
+                    className="sql-tab-name-positioner"
+                  >
                     <Popover.Popup className="bui-popup sql-tab-name-popover">
                       {tab.title}
                     </Popover.Popup>
                   </Popover.Positioner>
                 </Popover.Portal>
               </Popover.Root>
-              <button
-                type="button"
+              <span
+                role="button"
+                tabIndex={-1}
                 className="sql-tab-close"
                 aria-label={`Close ${tab.title}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onClose();
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onClose();
+                  }
+                }}
               >
                 <X size={10} aria-hidden="true" />
-              </button>
+              </span>
             </button>
           )}
         />
