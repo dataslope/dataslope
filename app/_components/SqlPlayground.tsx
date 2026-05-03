@@ -2137,6 +2137,12 @@ function SqlPlaygroundInner() {
     }
   }, []);
 
+  const refreshTableMetadata = useCallback(() => {
+    for (const tableName of tables) {
+      refreshEntityMetadata(tableName);
+    }
+  }, [tables, refreshEntityMetadata]);
+
   // PK / FK lookups for the current result's source table — only set
   // when the result came from a sidebar preview (`previewTable`
   // populates `sourceTable`). Computed here so the deeply-nested
@@ -2152,6 +2158,11 @@ function SqlPlaygroundInner() {
       refreshEntityMetadata(result.sourceTable);
     }
   }, [result, columnsByEntity, foreignKeysByEntity, refreshEntityMetadata]);
+
+  useEffect(() => {
+    if (activeTab?.kind !== "er-diagram") return;
+    refreshTableMetadata();
+  }, [activeTab?.kind, tables, refreshTableMetadata]);
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -2545,19 +2556,17 @@ function SqlPlaygroundInner() {
   }, [tabs, activeDbId]);
 
   const openErDiagramTab = useCallback(() => {
+    // Always refresh all table metadata before showing the ERD. The
+    // result table hydrates metadata lazily for the viewed table, and
+    // this keeps revisiting the ERD from rendering with stale partial
+    // column caches.
+    refreshTableMetadata();
     // If an ER diagram tab is already open, just switch to it.
     const existing = tabs.find((t) => t.kind === "er-diagram");
     if (existing) {
       activeTabIdRef.current = existing.id;
       setActiveTabId(existing.id);
       return;
-    }
-    // Eagerly load metadata for any table not yet cached so the diagram
-    // renders complete column lists on first open.
-    for (const tableName of tables) {
-      if (!columnsByEntity[tableName]) {
-        refreshEntityMetadata(tableName);
-      }
     }
     const tab: QueryTab = {
       id: newTabId(),
@@ -2571,7 +2580,7 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, next);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [tabs, activeDbId, tables, columnsByEntity, refreshEntityMetadata]);
+  }, [tabs, activeDbId, refreshTableMetadata]);
 
   const closeTab = useCallback(
     (id: string) => {
