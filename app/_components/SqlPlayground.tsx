@@ -3504,10 +3504,8 @@ function SqlPlaygroundInner() {
                       </thead>
                       <tbody>
                         {importCsvState.rows.slice(0, 5).map((row, i) => (
-                          // eslint-disable-next-line react/no-array-index-key
                           <tr key={i}>
                             {row.map((cell, j) => (
-                              // eslint-disable-next-line react/no-array-index-key
                               <td key={j}>{cell || <em>NULL</em>}</td>
                             ))}
                           </tr>
@@ -3642,10 +3640,8 @@ function SqlPlaygroundInner() {
                       </thead>
                       <tbody>
                         {importJsonState.rows.slice(0, 5).map((row, i) => (
-                          // eslint-disable-next-line react/no-array-index-key
                           <tr key={i}>
                             {row.map((cell, j) => (
-                              // eslint-disable-next-line react/no-array-index-key
                               <td key={j}>{cell || <em>NULL</em>}</td>
                             ))}
                           </tr>
@@ -4745,6 +4741,7 @@ function ResultView({
     onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
+    globalPageSize,
     pendingEditsByIndex,
     result,
     sourceTable,
@@ -4815,6 +4812,7 @@ function ResultView({
     onDeleteRows(sourceTable, pkCols, [pkValues]);
   }, [
     pendingDeleteSingleRow,
+    globalPageSize,
     pendingEditsByIndex,
     result,
     sourceTable,
@@ -4879,8 +4877,6 @@ function ResultView({
           let startIdx: number;
           let visibleRows: QueryExecResult["values"];
           let originalIndices: number[];
-          let handlePageChange: (p: number) => void;
-          let handlePageSizeChange: (s: number) => void;
           if (isLazy) {
             const effective =
               globalPageSize > 0
@@ -4891,22 +4887,6 @@ function ResultView({
             startIdx = currentPage * effective;
             visibleRows = set.values;
             originalIndices = set.values.map((_, ri) => startIdx + ri);
-            const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-            let effectiveLazySql = baseSql;
-            if (sorting.length > 0) {
-              const parsed = parseColumnId(sorting[0].id);
-              if (parsed) {
-                effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
-              }
-            }
-            handlePageChange = (p: number) =>
-              onLoadPage(effectiveLazySql, p);
-            handlePageSizeChange = (s: number) => {
-              // Update globalPageSize first (also updates the ref synchronously)
-              // so the subsequent onLoadPage call sees the new page size.
-              onSetGlobalPageSize(s);
-              onLoadPage(effectiveLazySql, 0);
-            };
           } else {
             const st = getState(idx);
             totalRows = set.values.length;
@@ -4941,11 +4921,6 @@ function ResultView({
                 : sortedIndexed;
             visibleRows = visibleIndexed.map((item) => item.values);
             originalIndices = visibleIndexed.map((item) => item.originalIndex);
-            handlePageChange = (p: number) => setPage(idx, p);
-            handlePageSizeChange = (s: number) => {
-              onSetGlobalPageSize(s);
-              setPage(idx, 0);
-            };
           }
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
@@ -5792,10 +5767,13 @@ function ResultPager({
 
   // Controlled input for direct page navigation.
   const [pageInput, setPageInput] = useState(String(safePage + 1));
-  // Keep the input in sync when the page changes from outside (e.g. prev/next).
-  useEffect(() => {
+  // Keep the input in sync when the page changes from outside (e.g. prev/next)
+  // using the "derive state during render" pattern (avoids a cascading effect).
+  const [prevSafePage, setPrevSafePage] = useState(safePage);
+  if (prevSafePage !== safePage) {
+    setPrevSafePage(safePage);
     setPageInput(String(safePage + 1));
-  }, [safePage]);
+  }
 
   const commitPageInput = () => {
     const n = parseInt(pageInput, 10);
