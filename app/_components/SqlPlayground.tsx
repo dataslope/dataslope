@@ -2455,6 +2455,7 @@ function SqlPlaygroundInner() {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        // Revoke after the browser has had a chance to start the download.
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         showToast(`Exported ${name}.csv.`);
       } catch (err) {
@@ -5738,8 +5739,9 @@ function ResultPager({
         <span className="sql-result-pager-page">
           <input
             className="sql-result-pager-page-input"
-            type="text"
-            inputMode="numeric"
+            type="number"
+            min={1}
+            max={totalPages}
             value={pageInput}
             onChange={(e) => setPageInput(e.target.value)}
             onBlur={commitPageInput}
