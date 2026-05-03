@@ -2892,6 +2892,10 @@ function SqlPlaygroundInner() {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
+            <Link href="/" aria-label="Dataslope home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/dataslope-blue@4x.png" alt="Dataslope logo" className="brand-logo" />
+            </Link>
             <Link href="/" className="brand-name">
               Dataslope
             </Link>
@@ -4389,7 +4393,23 @@ function SqlTab({
               {tab.kind === "view-data" && (
                 <Table2 size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
-              <span className="sql-tab-title">{tab.title}</span>
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={600}
+                  closeDelay={100}
+                  render={<span className="sql-tab-title" />}
+                >
+                  {tab.title}
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Positioner side="top" sideOffset={6} align="center">
+                    <Popover.Popup className="bui-popup sql-tab-name-popover">
+                      {tab.title}
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
               <button
                 type="button"
                 className="sql-tab-close"
@@ -4407,9 +4427,11 @@ function SqlTab({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup">
-              <ContextMenu.Item className="example-item" onClick={openRename}>
-                <div className="ex-title">Rename</div>
-              </ContextMenu.Item>
+              {tab.kind !== "view-data" && (
+                <ContextMenu.Item className="example-item" onClick={openRename}>
+                  <div className="ex-title">Rename</div>
+                </ContextMenu.Item>
+              )}
               <ContextMenu.Item className="example-item" onClick={onDuplicate}>
                 <div className="ex-title">Duplicate</div>
               </ContextMenu.Item>
@@ -5578,7 +5600,7 @@ function ResultTableBody({
                               setModalEditCell({ cellKey, colName, value: current });
                             }}
                           >
-                            <div className="ex-title">Edit in modal</div>
+                            <div className="ex-title">Edit cell in modal</div>
                           </ContextMenu.Item>
                         )}
                         <ContextMenu.Item

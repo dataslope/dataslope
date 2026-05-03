@@ -15,13 +15,30 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { source } from "@/lib/source";
+import Link from "next/link";
+import Image from "next/image";
+import dataslopeLogoSrc from "@/public/dataslope-blue@4x.png";
 
 export default function LearnLayout({ children }: { children: ReactNode }) {
   return (
     <RootProvider>
       <DocsLayout
         tree={source.pageTree}
-        nav={{ title: "Dataslope · Learn" }}
+        nav={{
+          title: (
+            <Link
+              href="/"
+              style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", color: "inherit" }}
+            >
+              <Image
+                src={dataslopeLogoSrc}
+                alt="Dataslope logo"
+                style={{ height: "20px", width: "auto" }}
+              />
+              Dataslope · Learn
+            </Link>
+          ),
+        }}
         githubUrl="https://github.com/subwaymatch/dataslope-playground/"
       >
         {children}

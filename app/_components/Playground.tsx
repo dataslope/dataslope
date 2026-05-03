@@ -1231,9 +1231,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       <div className="pg-app">
         <header className="pg-header">
           <div className="logo">
-            {/* Placeholder for the DataSlope brand logo image. The
-                per-language icon previously rendered here was removed
-                so the brand mark can sit in this slot once available. */}
+            <Link href="/" aria-label="Dataslope home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/dataslope-blue@4x.png" alt="Dataslope logo" className="brand-logo" />
+            </Link>
             <Link href="/" className="brand-name">Dataslope</Link>
             <Select.Root
               value={adapter.id}

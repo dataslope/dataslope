@@ -895,16 +895,7 @@
   align-items: stretch;
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
-  /* Setting `overflow-x: auto` while leaving `overflow-y` at its
-     default of `visible` causes the spec's "if one axis is not
-     visible, the visible axis becomes auto" rule to kick in, which
-     made Chromium on Windows render a phantom vertical scrollbar in
-     the tab strip even though no content overflowed vertically.
-     Pinning Y to `hidden` removes that scrollbar while keeping the
-     horizontal overflow scroller working. */
-  overflow-y: hidden;
-  scrollbar-width: thin;
+  overflow: hidden;
   gap: 2px;
 }
 
@@ -923,9 +914,10 @@
   font-family: var(--font-ui);
   font-size: 12px;
   cursor: pointer;
-  white-space: nowrap;
   position: relative;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 60px;
+  overflow: hidden;
   /* Sit on top of the tabbar's bottom border so the active tab can
      "punch through" it and visually merge with the editor below. */
   margin-bottom: -1px;
@@ -953,9 +945,11 @@
 }
 
 .sql-tab-title {
-  max-width: 160px;
+  flex: 1 1 0;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 500;
 }
 
@@ -976,6 +970,13 @@
 .sql-tab-close:hover {
   background: var(--border);
   color: var(--text);
+}
+
+.sql-tab-name-popover {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  padding: 4px 8px;
+  white-space: nowrap;
 }
 
 .sql-tab-add {
