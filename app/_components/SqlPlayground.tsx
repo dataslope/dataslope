@@ -19,6 +19,23 @@
 // user picks a different editor theme.
 
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS as DndCSS } from "@dnd-kit/utilities";
+import {
   startTransition,
   useCallback,
   useEffect,
@@ -147,6 +164,9 @@ const STORAGE_PREFIX = `pg_${PLAYGROUND_ID}_`;
 const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
 const dbScopedKey = (dbId: string, k: string) =>
   `${STORAGE_PREFIX}db_${dbId}_${k}`;
+
+const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
+  { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
@@ -723,6 +743,11 @@ function SqlPlaygroundInner() {
   } | null>(null);
   // Truncate confirmation dialog state.
   const [truncateConfirm, setTruncateConfirm] = useState<string | null>(null);
+  // Drop entity confirmation dialog state.
+  const [pendingDropEntity, setPendingDropEntity] = useState<{
+    name: string;
+    kind: "table" | "view" | "index" | "trigger";
+  } | null>(null);
   // Import dialogs state.
   const [importSqliteOpen, setImportSqliteOpen] = useState(false);
   const [importSqliteDragging, setImportSqliteDragging] = useState(false);
@@ -1538,28 +1563,9 @@ function SqlPlaygroundInner() {
 
   const dropEntity = useCallback(
     (name: string, kind: "table" | "view") => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      const label = kind === "view" ? "view" : "table";
-      if (typeof window !== "undefined") {
-        const ok = window.confirm(
-          `Drop ${label} "${name}"? This change is in-memory only and will be undone next page load.`,
-        );
-        if (!ok) return;
-      }
-      try {
-        engine.dropEntity(name, kind);
-        setTables(engine.listTables());
-        setViews(engine.listViews());
-        setIndexes(engine.listIndexes());
-        setTriggers(engine.listTriggers());
-        showToast(`Dropped ${label} "${name}".`);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Drop failed: ${msg}`, "warn");
-      }
+      setPendingDropEntity({ name, kind });
     },
-    [showToast],
+    [],
   );
 
   // Drop / view-DDL helpers for leaf sidebar entries (indexes,
@@ -1568,26 +1574,31 @@ function SqlPlaygroundInner() {
   // "table" | "view".
   const dropLeafEntity = useCallback(
     (name: string, kind: "index" | "trigger") => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      if (typeof window !== "undefined") {
-        const ok = window.confirm(
-          `Drop ${kind} "${name}"? This change is in-memory only and will be undone next page load.`,
-        );
-        if (!ok) return;
-      }
-      try {
-        engine.dropEntity(name, kind);
-        setIndexes(engine.listIndexes());
-        setTriggers(engine.listTriggers());
-        showToast(`Dropped ${kind} "${name}".`);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Drop failed: ${msg}`, "warn");
-      }
+      setPendingDropEntity({ name, kind });
     },
-    [showToast],
+    [],
   );
+
+  const confirmDrop = useCallback(() => {
+    const pending = pendingDropEntity;
+    if (!pending) return;
+    const engine = engineRef.current;
+    if (!engine) return;
+    const { name, kind } = pending;
+    try {
+      engine.dropEntity(name, kind);
+      setTables(engine.listTables());
+      setViews(engine.listViews());
+      setIndexes(engine.listIndexes());
+      setTriggers(engine.listTriggers());
+      const label = DROP_KIND_LABELS[kind].toLowerCase();
+      showToast(`Dropped ${label} "${name}".`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Drop failed: ${msg}`, "warn");
+    }
+    setPendingDropEntity(null);
+  }, [pendingDropEntity, showToast]);
 
   const viewLeafDDL = useCallback(
     (name: string, kind: "index" | "trigger") => {
@@ -3265,6 +3276,39 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        {/* ── Drop entity confirmation dialog ── */}
+        <AlertDialog.Root
+          open={pendingDropEntity !== null}
+          onOpenChange={(next) => {
+            if (!next) setPendingDropEntity(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind] : ""}?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase() : ""}{" "}
+                <strong>{pendingDropEntity?.name}</strong>? This change is
+                in-memory only and will be undone next page load.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={confirmDrop}
+                >
+                  Drop
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
         {/* ── Import SQLite dialog ── */}
         <Dialog.Root
           open={importSqliteOpen}
@@ -4125,7 +4169,7 @@ function SqlPlaygroundInner() {
             title="Drag to resize"
           />
 
-          <div className="sql-panes" ref={panesRef}>
+          <div className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}`} ref={panesRef}>
             <div className="sql-tabbar">
               <div className="sql-tabs" role="tablist">
                 {tabs.map((t) => (
@@ -5918,7 +5962,13 @@ function ModifyStructureForm({
   engine: SqliteEngine | null;
 }) {
   const [activeTab, setActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
-  const dragIndexRef = useRef<number | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const updateColumn = (id: string, patch: Partial<ModifyColumnDraft>) => {
     onChange({
@@ -5957,32 +6007,13 @@ function ModifyStructureForm({
     });
   };
 
-  // Drag-and-drop handlers for column reordering.
-  const handleDragStart = (index: number) => {
-    dragIndexRef.current = index;
-  };
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    const from = dragIndexRef.current;
-    if (from === null || from === index) return;
-    const cols = [...state.columns];
-    const [moved] = cols.splice(from, 1);
-    cols.splice(index, 0, moved);
-    dragIndexRef.current = index;
-    onChange({ ...state, columns: cols });
-  };
-  const handleDragEnd = () => {
-    dragIndexRef.current = null;
-  };
-
-  // Keyboard accessibility: move a column up or down by one position.
-  const moveColumn = (index: number, direction: -1 | 1) => {
-    const target = index + direction;
-    if (target < 0 || target >= state.columns.length) return;
-    const cols = [...state.columns];
-    const [moved] = cols.splice(index, 1);
-    cols.splice(target, 0, moved);
-    onChange({ ...state, columns: cols });
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = state.columns.findIndex((c) => c.id === active.id);
+    const newIndex = state.columns.findIndex((c) => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    onChange({ ...state, columns: arrayMove(state.columns, oldIndex, newIndex) });
   };
 
   // Lazy-load indexes and triggers for the Indexes/Triggers tabs.
@@ -6070,25 +6101,29 @@ function ModifyStructureForm({
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {state.columns.map((col, index) => (
-                      <ModifyColumnRow
-                        key={col.id}
-                        col={col}
-                        onChange={(patch) => updateColumn(col.id, patch)}
-                        onRemove={() => removeColumn(col.id)}
-                        knownTables={knownTables}
-                        engine={engine}
-                        onDragStart={() => handleDragStart(index)}
-                        onDragOver={(e) => handleDragOver(e, index)}
-                        onDragEnd={handleDragEnd}
-                        canMoveUp={index > 0}
-                        canMoveDown={index < state.columns.length - 1}
-                        onMoveUp={() => moveColumn(index, -1)}
-                        onMoveDown={() => moveColumn(index, 1)}
-                      />
-                    ))}
-                  </tbody>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={state.columns.map((c) => c.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody>
+                        {state.columns.map((col) => (
+                          <ModifyColumnRow
+                            key={col.id}
+                            col={col}
+                            onChange={(patch) => updateColumn(col.id, patch)}
+                            onRemove={() => removeColumn(col.id)}
+                            knownTables={knownTables}
+                            engine={engine}
+                          />
+                        ))}
+                      </tbody>
+                    </SortableContext>
+                  </DndContext>
                 </table>
               </div>
             ) : (
@@ -6144,27 +6179,30 @@ function ModifyColumnRow({
   onRemove,
   knownTables,
   engine,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  canMoveUp,
-  canMoveDown,
-  onMoveUp,
-  onMoveDown,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
   onRemove: () => void;
   knownTables: string[];
   engine: SqliteEngine | null;
-  onDragStart: () => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDragEnd: () => void;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
 }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: col.id });
+
+  const style: React.CSSProperties = {
+    transform: DndCSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+    position: isDragging ? "relative" : undefined,
+    zIndex: isDragging ? 1 : undefined,
+  };
+
   // Look up the columns of the FK target table on demand so the
   // user gets a constrained dropdown rather than a free-text field.
   const fkTargetColumns = useMemo(() => {
@@ -6177,37 +6215,18 @@ function ModifyColumnRow({
   }, [engine, col.fkTable]);
   return (
     <tr
+      ref={setNodeRef}
+      style={style}
       className="sql-modify-col-row"
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragEnd={onDragEnd}
+      {...attributes}
     >
       <td className="sql-modify-drag-cell">
-        <span className="sql-modify-drag-handle" title="Drag to reorder">
+        <span
+          className="sql-modify-drag-handle"
+          title="Drag to reorder"
+          {...listeners}
+        >
           <GripVertical size={14} aria-hidden="true" />
-        </span>
-        <span className="sql-modify-move-btns">
-          <button
-            type="button"
-            className="sql-modify-move-btn"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            aria-label="Move column up"
-            title="Move up"
-          >
-            <ChevronUp size={10} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="sql-modify-move-btn"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            aria-label="Move column down"
-            title="Move down"
-          >
-            <ChevronDown size={10} aria-hidden="true" />
-          </button>
         </span>
       </td>
       <td>

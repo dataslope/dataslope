@@ -2075,8 +2075,8 @@ html[data-pg-theme="light"] .toast {
   margin-top: 2px;
 }
 
-/* "warn" toasts get an accent stripe but otherwise inherit theme colors. */
-.toast-warn { border-left: 3px solid var(--yellow); }
+/* "warn" toasts get a red stripe to signal failed operations. */
+.toast-warn { border-left: 3px solid var(--red); }
 
 .toast-close {
   position: absolute;
