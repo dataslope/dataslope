@@ -1292,7 +1292,7 @@
 }
 
 .sql-modify-table td {
-  padding: 3px 6px;
+  padding: 6px 6px;
   text-align: center;
   vertical-align: middle;
   min-width: 0;
@@ -1363,7 +1363,7 @@
 .sql-modify-col-default {
   font-family: var(--font-ui);
   font-size: 12px;
-  padding: 3px 6px;
+  padding: 6px 6px 6px 8px;
   min-width: 0;
   width: 100%;
 }
@@ -1375,7 +1375,7 @@
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 12px;
-  padding: 3px 6px;
+  padding: 6px 6px;
   width: 100%;
   min-width: 0;
   box-shadow: none;
@@ -1736,11 +1736,19 @@
 
 /* <td> background highlight for edited cells */
 .sql-cell-edited-td {
-  background: color-mix(in srgb, var(--accent, #f0b400) 12%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--accent, #f0b400) 12%,
+    transparent
+  ) !important;
 }
 
 .sql-result-table tbody tr:hover .sql-cell-edited-td {
-  background: color-mix(in srgb, var(--accent, #f0b400) 18%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--accent, #f0b400) 18%,
+    transparent
+  ) !important;
 }
 
 /* ─── Edit commit bar (bottom of the result table, above the pager) ─── */
@@ -1798,7 +1806,9 @@
   font-family: inherit;
   font-size: 13px;
 }
-.sql-ctx-disabled:last-child { border-bottom: none; }
+.sql-ctx-disabled:last-child {
+  border-bottom: none;
+}
 
 /* Danger-styled context-menu item (Delete row). */
 .sql-ctx-danger .ex-title {
@@ -1921,7 +1931,9 @@
   cursor: pointer;
   white-space: nowrap;
   margin-bottom: -1px;
-  transition: color 120ms ease, border-color 120ms ease;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
   border-radius: 0;
 }
 .sql-struct-tab:hover {
@@ -2025,5 +2037,3 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
-
-
