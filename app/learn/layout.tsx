@@ -33,7 +33,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
               <Image
                 src={dataslopeLogoSrc}
                 alt="Dataslope logo"
-                style={{ height: "20px", width: "auto" }}
+                style={{ height: "10px", width: "auto" }}
               />
               Dataslope · Learn
             </Link>

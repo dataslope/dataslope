@@ -4396,7 +4396,7 @@ function SqlTab({
               <Popover.Root>
                 <Popover.Trigger
                   openOnHover
-                  delay={600}
+                  delay={100}
                   closeDelay={100}
                   render={<span className="sql-tab-title" />}
                 >
