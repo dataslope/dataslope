@@ -893,7 +893,7 @@
 .sql-tabs {
   display: flex;
   align-items: stretch;
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   gap: 2px;
@@ -1145,7 +1145,7 @@
   /* Cap the drawer width so wide displays don't get a sea of
      whitespace; on narrower screens it shrinks to leave a small
      gap on the left so the underlying UI stays peeking through. */
-  width: min(1040px, calc(100vw - 32px));
+  width: min(1280px, calc(100vw - 32px));
   background: var(--bg2);
   border-left: 1px solid var(--border);
   box-shadow: -16px 0 48px #000a;
@@ -1287,12 +1287,12 @@
   color: var(--text-dim);
   font-weight: 600;
   text-align: center;
-  padding: 10px 8px;
+  padding: 6px 6px;
   white-space: nowrap;
 }
 
 .sql-modify-table td {
-  padding: 7px 8px;
+  padding: 3px 6px;
   text-align: center;
   vertical-align: middle;
   min-width: 0;
@@ -1363,7 +1363,7 @@
 .sql-modify-col-default {
   font-family: var(--font-ui);
   font-size: 12px;
-  padding: 6px 8px;
+  padding: 3px 6px;
   min-width: 0;
   width: 100%;
 }
@@ -1375,7 +1375,7 @@
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 12px;
-  padding: 6px 8px;
+  padding: 3px 6px;
   width: 100%;
   min-width: 0;
   box-shadow: none;

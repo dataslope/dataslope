@@ -130,7 +130,7 @@ body.pg-active {
 }
 
 .brand-logo {
-  height: 22px;
+  height: 11px;
   width: auto;
   display: block;
 }
@@ -1497,7 +1497,7 @@ input[type="range"].fs-slider:disabled {
   border-radius: var(--radius);
   box-shadow: 0 8px 32px #0008;
   overflow: hidden;
-  z-index: 200;
+  z-index: 9999;
   transform-origin: var(--transform-origin, top center);
   transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.32, 0.72, 0, 1);
 }
