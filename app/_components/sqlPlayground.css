@@ -885,6 +885,7 @@
      tops sit nicely instead of being clipped by the sidebar/header. */
   padding-top: 4px;
   padding-left: 6px;
+  padding-right: 6px;
   min-width: 0;
   overflow: hidden;
 }
@@ -994,7 +995,6 @@
   border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
-  align-self: center;
 }
 
 .sql-tab-add:hover {

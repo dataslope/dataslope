@@ -4195,23 +4195,22 @@ function SqlPlaygroundInner() {
                     onCloseAll={closeAllTabs}
                   />
                 ))}
-                {/* The "new tab" (+) button lives inside the same
-                    horizontally-scrolling .sql-tabs container as the
-                    tabs themselves so it sits right next to the
-                    right-most tab when the strip isn't full. Once
-                    the tabs overflow horizontally it scrolls with
-                    them and remains reachable at the end of the
-                    strip via the existing scroller. */}
-                <button
-                  type="button"
-                  className="sql-tab-add"
-                  onClick={addTab}
-                  title="New query tab"
-                  aria-label="New query tab"
-                >
-                  <Plus size={12} aria-hidden="true" />
-                </button>
               </div>
+              {/* The "new tab" (+) button sits outside the scrollable
+                  .sql-tabs container so it remains pinned at the right
+                  edge of the tab bar when tabs overflow horizontally.
+                  When the strip isn't full it naturally appears next
+                  to the last tab because both are flex children of
+                  .sql-tabbar. */}
+              <button
+                type="button"
+                className="sql-tab-add"
+                onClick={addTab}
+                title="New query tab"
+                aria-label="New query tab"
+              >
+                <Plus size={12} aria-hidden="true" />
+              </button>
             </div>
 
             <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" ? { display: "none" } : undefined}>
