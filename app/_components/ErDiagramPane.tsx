@@ -32,11 +32,22 @@ function ErTableNode({ data }: NodeProps) {
   const { tableName, columns, fkColumns } = data as ErTableNodeData;
   return (
     <div className="er-table-node">
-      <Handle type="target" position={Position.Left} />
       <div className="er-table-header">{tableName}</div>
       <div className="er-table-columns">
         {(columns as TableColumnInfo[]).map((col) => (
           <div key={col.name} className="er-table-col-row">
+            <Handle
+              id={columnHandleId(col.name, "left")}
+              type="source"
+              position={Position.Left}
+              className="er-table-col-handle er-table-col-handle-left"
+            />
+            <Handle
+              id={columnHandleId(col.name, "left")}
+              type="target"
+              position={Position.Left}
+              className="er-table-col-handle er-table-col-handle-left"
+            />
             <span className="er-table-col-icons">
               {col.pk > 0 && (
                 <MdOutlineKey
@@ -53,6 +64,18 @@ function ErTableNode({ data }: NodeProps) {
             </span>
             <span className="er-table-col-name">{col.name}</span>
             <span className="er-table-col-type">{col.type || "—"}</span>
+            <Handle
+              id={columnHandleId(col.name, "right")}
+              type="source"
+              position={Position.Right}
+              className="er-table-col-handle er-table-col-handle-right"
+            />
+            <Handle
+              id={columnHandleId(col.name, "right")}
+              type="target"
+              position={Position.Right}
+              className="er-table-col-handle er-table-col-handle-right"
+            />
           </div>
         ))}
         {(columns as TableColumnInfo[]).length === 0 && (
@@ -61,7 +84,6 @@ function ErTableNode({ data }: NodeProps) {
           </div>
         )}
       </div>
-      <Handle type="source" position={Position.Right} />
     </div>
   );
 }
@@ -73,14 +95,80 @@ const nodeTypes: NodeTypes = { erTable: ErTableNode };
 // ────────────────────────────────────────────────────────────────────────────
 
 const NODE_W = 230;
-const H_GAP = 100;
+const H_GAP = 140;
 const COL_HEADER_H = 36;
 const COL_ROW_H = 25;
 const COL_FOOTER_PAD = 8;
-const ROW_V_GAP = 50;
+const ROW_V_GAP = 60;
 
 function calcNodeHeight(colCount: number): number {
   return COL_HEADER_H + Math.max(colCount, 1) * COL_ROW_H + COL_FOOTER_PAD;
+}
+
+function columnHandleId(columnName: string, side: "left" | "right"): string {
+  return `${columnName}::${side}`;
+}
+
+function layoutTables(
+  tables: string[],
+  columnsByEntity: Record<string, TableColumnInfo[]>,
+  foreignKeysByEntity: Record<string, ForeignKeyInfo[]>,
+): Map<string, { x: number; y: number }> {
+  const tableSet = new Set(tables);
+  const rankByTable = new Map<string, number>();
+  tables.forEach((table) => rankByTable.set(table, 0));
+
+  for (let i = 0; i < tables.length; i += 1) {
+    let changed = false;
+    for (const table of tables) {
+      const parentRanks = (foreignKeysByEntity[table] ?? [])
+        .filter((fk) => tableSet.has(fk.table) && fk.table !== table)
+        .map((fk) => rankByTable.get(fk.table) ?? 0);
+      if (parentRanks.length === 0) continue;
+      const nextRank = Math.max(...parentRanks) + 1;
+      if (nextRank > (rankByTable.get(table) ?? 0)) {
+        rankByTable.set(table, nextRank);
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+
+  const groups = new Map<number, string[]>();
+  for (const table of tables) {
+    const rank = rankByTable.get(table) ?? 0;
+    groups.set(rank, [...(groups.get(rank) ?? []), table]);
+  }
+
+  const positions = new Map<string, { x: number; y: number }>();
+  for (const [rank, group] of [...groups.entries()].sort((a, b) => a[0] - b[0])) {
+    const ordered = [...group].sort((a, b) => {
+      const aConnections = connectionCount(a, foreignKeysByEntity);
+      const bConnections = connectionCount(b, foreignKeysByEntity);
+      if (aConnections !== bConnections) return bConnections - aConnections;
+      return tables.indexOf(a) - tables.indexOf(b);
+    });
+    let y = 0;
+    for (const table of ordered) {
+      positions.set(table, {
+        x: rank * (NODE_W + H_GAP),
+        y,
+      });
+      y += calcNodeHeight(columnsByEntity[table]?.length ?? 0) + ROW_V_GAP;
+    }
+  }
+  return positions;
+}
+
+function connectionCount(
+  table: string,
+  foreignKeysByEntity: Record<string, ForeignKeyInfo[]>,
+): number {
+  let count = foreignKeysByEntity[table]?.length ?? 0;
+  for (const fks of Object.values(foreignKeysByEntity)) {
+    count += fks.filter((fk) => fk.table === table).length;
+  }
+  return count;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -103,40 +191,21 @@ export function ErDiagramPane({
   const { nodes, edges } = useMemo(() => {
     if (tables.length === 0) return { nodes: [], edges: [] };
 
-    // Arrange tables in a grid: ~3 columns for small schemas,
-    // sqrt-based for larger ones.
-    const numCols = tables.length <= 3 ? tables.length : Math.ceil(Math.sqrt(tables.length));
-    const numRows = Math.ceil(tables.length / numCols);
-
-    // Compute per-row max heights so tall tables don't overlap with the
-    // row below them.
-    const rowMaxH: number[] = Array.from({ length: numRows }, () => 0);
-    tables.forEach((name, i) => {
-      const row = Math.floor(i / numCols);
-      const h = calcNodeHeight(columnsByEntity[name]?.length ?? 0);
-      if (h > rowMaxH[row]) rowMaxH[row] = h;
-    });
-
-    // Cumulative row Y starting positions.
-    const rowY: number[] = [0];
-    for (let r = 0; r < numRows - 1; r++) {
-      rowY.push(rowY[r] + rowMaxH[r] + ROW_V_GAP);
-    }
+    const positions = layoutTables(tables, columnsByEntity, foreignKeysByEntity);
 
     const nodes: Node[] = tables.map((tableName, i) => {
-      const col = i % numCols;
-      const row = Math.floor(i / numCols);
       const cols = columnsByEntity[tableName] ?? [];
       const fkColumns = new Set(
         (foreignKeysByEntity[tableName] ?? []).map((fk) => fk.from),
       );
+      const position = positions.get(tableName) ?? {
+        x: i * (NODE_W + H_GAP),
+        y: 0,
+      };
       return {
         id: tableName,
         type: "erTable",
-        position: {
-          x: col * (NODE_W + H_GAP),
-          y: rowY[row],
-        },
+        position,
         data: { tableName, columns: cols, fkColumns },
       };
     });
@@ -151,10 +220,16 @@ export function ErDiagramPane({
         // produce the same source→target pair more than once.
         const id = `${srcTable}::${fk.from}→${fk.table}::${fk.to}`;
         if (edges.some((e) => e.id === id)) continue;
+        const srcX = positions.get(srcTable)?.x ?? 0;
+        const targetX = positions.get(fk.table)?.x ?? 0;
+        const sourceSide = srcX > targetX ? "left" : "right";
+        const targetSide = srcX > targetX ? "right" : "left";
         edges.push({
           id,
           source: srcTable,
+          sourceHandle: columnHandleId(fk.from, sourceSide),
           target: fk.table,
+          targetHandle: columnHandleId(fk.to, targetSide),
           label: `${fk.from} → ${fk.to}`,
           type: "smoothstep",
           style: { stroke: "var(--accent)", strokeWidth: 1.5 },
