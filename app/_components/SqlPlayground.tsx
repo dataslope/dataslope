@@ -145,7 +145,6 @@ import {
 import {
   SQLITE_SAMPLE_DATABASES,
   findSampleDatabase,
-  type QueryTabSeed,
 } from "./runtime/sqliteSamples";
 import {
   createSqliteEngine,
@@ -157,16 +156,18 @@ import {
 } from "./runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import { ErDiagramPane } from "./ErDiagramPane";
+import {
+  dbScopedKey,
+  loadActiveTabId,
+  loadTabs,
+  newTabId,
+  saveTabs,
+  storageKey,
+  tabsAreDirty,
+  type QueryTab,
+} from "./sqlitePlaygroundTabs";
 
 const PLAYGROUND_ID = "sqlite";
-const STORAGE_PREFIX = `pg_${PLAYGROUND_ID}_`;
-
-// localStorage keys are namespaced under `pg_sqlite_` so they collide
-// neither with the language playgrounds nor with the upcoming Postgres
-// playground.
-const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
-const dbScopedKey = (dbId: string, k: string) =>
-  `${STORAGE_PREFIX}db_${dbId}_${k}`;
 
 const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
   { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
@@ -179,30 +180,6 @@ const RUNTIME_INFO: RuntimeInfo = {
   notes:
     "Pure-JS build of SQLite compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
 };
-
-// ────────────────────────────────────────────────────────────────────────
-// Tab persistence
-// ────────────────────────────────────────────────────────────────────────
-
-interface QueryTab {
-  /** Stable id used as the React key — generated client-side because
-   *  tabs can be created at any time. */
-  id: string;
-  title: string;
-  code: string;
-  /** Snapshot of `code` at the time the tab was created (e.g. the
-   *  initial template, a sidebar preview's SELECT, or a structure
-   *  query). The tab is considered "dirty" only when `code !==
-   *  pristineCode`, which lets us skip the close-confirmation prompt
-   *  for tabs the user never edited. */
-  pristineCode: string;
-  /** When "view-data", this tab was opened via the "View Data" sidebar
-   *  action for a table. These tabs display the table icon, hide the
-   *  SQL editor pane, and auto-run the preview query.
-   *  When "er-diagram", this tab shows an Entity-Relationship Diagram
-   *  of the current database schema. */
-  kind?: "view-data" | "er-diagram";
-}
 
 // ────────────────────────────────────────────────────────────────────────
 // SQLite error hint helper — maps common engine error strings to short
@@ -318,81 +295,6 @@ interface ColumnKeyHints {
 interface ResultTableRow {
   absoluteRow: number;
   values: QueryExecResult["values"][number];
-}
-
-function newTabId(): string {
-  return `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
-  if (typeof window === "undefined") {
-    return defaults.map((seed) => ({
-      ...seed,
-      id: newTabId(),
-      pristineCode: seed.code,
-    }));
-  }
-  try {
-    const raw = localStorage.getItem(dbScopedKey(dbId, "tabs"));
-    if (raw) {
-      const parsed = JSON.parse(raw) as QueryTab[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((t) => {
-          const code = typeof t.code === "string" ? t.code : "";
-          return {
-            id: typeof t.id === "string" ? t.id : newTabId(),
-            title: typeof t.title === "string" ? t.title : "Query",
-            code,
-            // Older saved tabs predate `pristineCode`; assume the
-            // persisted contents are what the user left them at, so
-            // treat them as clean by mirroring `code` here.
-            pristineCode:
-              typeof t.pristineCode === "string" ? t.pristineCode : code,
-          };
-        });
-      }
-    }
-  } catch {
-    // Corrupt entry — fall through to defaults.
-  }
-  return defaults.map((seed) => ({
-    ...seed,
-    id: newTabId(),
-    pristineCode: seed.code,
-  }));
-}
-
-function saveTabs(dbId: string, tabs: QueryTab[]): void {
-  try {
-    // ER diagram tabs are transient — never persist them so they don't
-    // reappear after a page reload or database switch.
-    const persistable = tabs.filter((t) => t.kind !== "er-diagram");
-    localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(persistable));
-  } catch {
-    // Quota exceeded / private mode — silently ignore.
-  }
-}
-
-function loadActiveTabId(dbId: string, tabs: QueryTab[]): string {
-  if (tabs.length === 0) return "";
-  if (typeof window === "undefined") return tabs[0].id;
-  const saved = localStorage.getItem(dbScopedKey(dbId, "active_tab"));
-  if (saved && tabs.some((t) => t.id === saved)) return saved;
-  return tabs[0].id;
-}
-
-function tabsAreDirty(tabs: QueryTab[], defaults: QueryTabSeed[]): boolean {
-  // Dirty = the user added/removed tabs or edited any tab's contents.
-  if (tabs.length !== defaults.length) return true;
-  for (let i = 0; i < tabs.length; i += 1) {
-    if (
-      tabs[i].title !== defaults[i].title ||
-      tabs[i].code !== defaults[i].code
-    ) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -690,7 +592,7 @@ function SqlPlaygroundInner() {
   const [globalPageSize, setGlobalPageSizeState] = useState<number>(() => {
     if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
     const saved = Number(
-      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+      localStorage.getItem(storageKey("page_size")) ?? DEFAULT_PAGE_SIZE,
     );
     return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
       ? saved
@@ -707,7 +609,7 @@ function SqlPlaygroundInner() {
     globalPageSizeRef.current = n;
     setGlobalPageSizeState(n);
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(n));
+      localStorage.setItem(storageKey("page_size"), String(n));
     } catch {
       // ignore quota errors
     }
@@ -2137,6 +2039,12 @@ function SqlPlaygroundInner() {
     }
   }, []);
 
+  const refreshTableMetadata = useCallback(() => {
+    for (const tableName of tables) {
+      refreshEntityMetadata(tableName);
+    }
+  }, [tables, refreshEntityMetadata]);
+
   // PK / FK lookups for the current result's source table — only set
   // when the result came from a sidebar preview (`previewTable`
   // populates `sourceTable`). Computed here so the deeply-nested
@@ -2152,6 +2060,11 @@ function SqlPlaygroundInner() {
       refreshEntityMetadata(result.sourceTable);
     }
   }, [result, columnsByEntity, foreignKeysByEntity, refreshEntityMetadata]);
+
+  useEffect(() => {
+    if (activeTab?.kind !== "er-diagram") return;
+    refreshTableMetadata();
+  }, [activeTab?.kind, tables, refreshTableMetadata]);
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -2545,19 +2458,17 @@ function SqlPlaygroundInner() {
   }, [tabs, activeDbId]);
 
   const openErDiagramTab = useCallback(() => {
+    // Always refresh all table metadata before showing the ERD. The
+    // result table hydrates metadata lazily for the viewed table, and
+    // this keeps revisiting the ERD from rendering with stale partial
+    // column caches.
+    refreshTableMetadata();
     // If an ER diagram tab is already open, just switch to it.
     const existing = tabs.find((t) => t.kind === "er-diagram");
     if (existing) {
       activeTabIdRef.current = existing.id;
       setActiveTabId(existing.id);
       return;
-    }
-    // Eagerly load metadata for any table not yet cached so the diagram
-    // renders complete column lists on first open.
-    for (const tableName of tables) {
-      if (!columnsByEntity[tableName]) {
-        refreshEntityMetadata(tableName);
-      }
     }
     const tab: QueryTab = {
       id: newTabId(),
@@ -2571,7 +2482,7 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, next);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [tabs, activeDbId, tables, columnsByEntity, refreshEntityMetadata]);
+  }, [tabs, activeDbId, refreshTableMetadata]);
 
   const closeTab = useCallback(
     (id: string) => {

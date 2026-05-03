@@ -2138,6 +2138,7 @@
 }
 
 .er-table-col-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -2150,6 +2151,22 @@
 .er-table-col-row.er-table-col-empty {
   color: var(--text-dim);
   font-style: italic;
+}
+
+.er-table-col-row .er-table-col-handle {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border: 1px solid var(--bg2);
+  opacity: 0.9;
+}
+
+.er-table-col-row .er-table-col-handle-left {
+  left: -4px;
+}
+
+.er-table-col-row .er-table-col-handle-right {
+  right: -4px;
 }
 
 .er-table-col-icons {
