@@ -165,6 +165,9 @@ const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
 const dbScopedKey = (dbId: string, k: string) =>
   `${STORAGE_PREFIX}db_${dbId}_${k}`;
 
+const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
+  { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
+
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
   version: "3.49",
@@ -1588,7 +1591,7 @@ function SqlPlaygroundInner() {
       setViews(engine.listViews());
       setIndexes(engine.listIndexes());
       setTriggers(engine.listTriggers());
-      const label = kind === "view" ? "view" : kind;
+      const label = DROP_KIND_LABELS[kind].toLowerCase();
       showToast(`Dropped ${label} "${name}".`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -3284,16 +3287,10 @@ function SqlPlaygroundInner() {
             <AlertDialog.Backdrop className="confirm-backdrop" />
             <AlertDialog.Popup className="confirm-popup">
               <AlertDialog.Title className="confirm-title">
-                Drop {pendingDropEntity?.kind === "table"
-                  ? "Table"
-                  : pendingDropEntity?.kind === "view"
-                  ? "View"
-                  : pendingDropEntity?.kind === "index"
-                  ? "Index"
-                  : "Trigger"}?
+                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind] : ""}?
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
-                Drop {pendingDropEntity?.kind}{" "}
+                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase() : ""}{" "}
                 <strong>{pendingDropEntity?.name}</strong>? This change is
                 in-memory only and will be undone next page load.
               </AlertDialog.Description>
