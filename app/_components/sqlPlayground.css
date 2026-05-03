@@ -412,6 +412,11 @@
 }
 
 .sql-results-pane {
+  /* Explicitly anchor to track 4 so that when .sql-editor-pane and
+     .sql-resizer are display:none in view-data mode, CSS Grid
+     auto-placement doesn't shift the results pane into the collapsed
+     track 2 (height 0). */
+  grid-row: 4;
   position: relative;
   display: flex;
   flex-direction: column;
