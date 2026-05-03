@@ -2035,3 +2035,41 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ─── Column reorder: keyboard move buttons ─── */
+/* Shown inside the drag-handle cell alongside the grip icon. Hidden
+   until the row is hovered so they don't clutter the default view. */
+.sql-modify-move-btns {
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 2px;
+}
+.sql-modify-col-row:hover .sql-modify-move-btns,
+.sql-modify-col-row:focus-within .sql-modify-move-btns {
+  display: flex;
+}
+.sql-modify-drag-cell {
+  display: flex;
+  align-items: center;
+}
+.sql-modify-move-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 1px 2px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.sql-modify-move-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text-dim) 20%, transparent);
+  color: var(--text);
+}
+.sql-modify-move-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}

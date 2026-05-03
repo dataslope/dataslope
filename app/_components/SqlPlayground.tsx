@@ -5975,6 +5975,16 @@ function ModifyStructureForm({
     dragIndexRef.current = null;
   };
 
+  // Keyboard accessibility: move a column up or down by one position.
+  const moveColumn = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= state.columns.length) return;
+    const cols = [...state.columns];
+    const [moved] = cols.splice(index, 1);
+    cols.splice(target, 0, moved);
+    onChange({ ...state, columns: cols });
+  };
+
   // Lazy-load indexes and triggers for the Indexes/Triggers tabs.
   const tableIndexes = useMemo(() => {
     if (!engine || !state.originalName) return [] as string[];
@@ -6072,6 +6082,10 @@ function ModifyStructureForm({
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={(e) => handleDragOver(e, index)}
                         onDragEnd={handleDragEnd}
+                        canMoveUp={index > 0}
+                        canMoveDown={index < state.columns.length - 1}
+                        onMoveUp={() => moveColumn(index, -1)}
+                        onMoveDown={() => moveColumn(index, 1)}
                       />
                     ))}
                   </tbody>
@@ -6133,6 +6147,10 @@ function ModifyColumnRow({
   onDragStart,
   onDragOver,
   onDragEnd,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
@@ -6142,6 +6160,10 @@ function ModifyColumnRow({
   onDragStart: () => void;
   onDragOver: (e: React.DragEvent) => void;
   onDragEnd: () => void;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }) {
   // Look up the columns of the FK target table on demand so the
   // user gets a constrained dropdown rather than a free-text field.
@@ -6164,6 +6186,28 @@ function ModifyColumnRow({
       <td className="sql-modify-drag-cell">
         <span className="sql-modify-drag-handle" title="Drag to reorder">
           <GripVertical size={14} aria-hidden="true" />
+        </span>
+        <span className="sql-modify-move-btns">
+          <button
+            type="button"
+            className="sql-modify-move-btn"
+            onClick={onMoveUp}
+            disabled={!canMoveUp}
+            aria-label="Move column up"
+            title="Move up"
+          >
+            <ChevronUp size={10} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="sql-modify-move-btn"
+            onClick={onMoveDown}
+            disabled={!canMoveDown}
+            aria-label="Move column down"
+            title="Move down"
+          >
+            <ChevronDown size={10} aria-hidden="true" />
+          </button>
         </span>
       </td>
       <td>

@@ -583,40 +583,52 @@ export async function createSqliteEngine(
       // recreate them after the rename.  We exclude auto-indexes (sql IS NULL)
       // because they are recreated automatically by PRIMARY KEY / UNIQUE.
       const indexSqls: string[] = [];
-      const idxRows = d.exec(
-        `SELECT sql FROM sqlite_master WHERE type = 'index' AND tbl_name = '${spec.originalName.replace(/'/g, "''")}' AND sql IS NOT NULL ORDER BY name`,
-      );
-      if (idxRows.length > 0) {
-        for (const row of idxRows[0].values) {
-          if (typeof row[0] === "string") {
-            indexSqls.push(row[0]);
+      {
+        const stmt = d.prepare(
+          `SELECT sql FROM sqlite_master WHERE type = 'index' AND tbl_name = $n AND sql IS NOT NULL ORDER BY name`,
+        );
+        try {
+          stmt.bind({ $n: spec.originalName });
+          while (stmt.step()) {
+            const row = stmt.get();
+            if (typeof row[0] === "string") indexSqls.push(row[0]);
           }
+        } finally {
+          stmt.free();
         }
       }
 
       // Collect trigger DDLs attached to the original table.
       const triggerSqls: string[] = [];
-      const trRows = d.exec(
-        `SELECT sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = '${spec.originalName.replace(/'/g, "''")}' AND sql IS NOT NULL ORDER BY name`,
-      );
-      if (trRows.length > 0) {
-        for (const row of trRows[0].values) {
-          if (typeof row[0] === "string") {
-            triggerSqls.push(row[0]);
+      {
+        const stmt = d.prepare(
+          `SELECT sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = $n AND sql IS NOT NULL ORDER BY name`,
+        );
+        try {
+          stmt.bind({ $n: spec.originalName });
+          while (stmt.step()) {
+            const row = stmt.get();
+            if (typeof row[0] === "string") triggerSqls.push(row[0]);
           }
+        } finally {
+          stmt.free();
         }
       }
 
       // If the table is being renamed (or if columns are renamed), patch
       // the collected DDL strings to use the new names.
+      // NOTE: This is a best-effort word-boundary replacement. It handles
+      // the common case of unquoted identifiers but may not cover all edge
+      // cases (e.g. identifiers inside string literals or comments).
       function patchDdl(sql: string): string {
         let patched = sql;
         // Replace old table name with new one when the table is renamed.
         if (spec.originalName !== spec.newName) {
-          // Replace occurrences of the quoted old table name.
+          // Use case-sensitive replacement (SQLite identifiers are
+          // case-sensitive when quoted).
           const escaped = spec.originalName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           patched = patched.replace(
-            new RegExp(`\\b${escaped}\\b`, "gi"),
+            new RegExp(`\\b${escaped}\\b`, "g"),
             spec.newName,
           );
         }
