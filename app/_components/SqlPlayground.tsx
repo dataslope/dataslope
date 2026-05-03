@@ -592,7 +592,7 @@ function SqlPlaygroundInner() {
   const [globalPageSize, setGlobalPageSizeState] = useState<number>(() => {
     if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
     const saved = Number(
-      localStorage.getItem(`${STORAGE_PREFIX}page_size`) ?? DEFAULT_PAGE_SIZE,
+      localStorage.getItem(storageKey("page_size")) ?? DEFAULT_PAGE_SIZE,
     );
     return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
       ? saved
@@ -609,7 +609,7 @@ function SqlPlaygroundInner() {
     globalPageSizeRef.current = n;
     setGlobalPageSizeState(n);
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}page_size`, String(n));
+      localStorage.setItem(storageKey("page_size"), String(n));
     } catch {
       // ignore quota errors
     }
