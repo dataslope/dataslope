@@ -4327,6 +4327,8 @@ function SqlTab({
 }: SqlTabProps) {
   const [renameOpen, setRenameOpen] = useState(false);
   const [draftTitle, setDraftTitle] = useState(tab.title);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const titleRef = useRef<HTMLSpanElement>(null);
 
   const openRename = useCallback(() => {
     setDraftTitle(tab.title);
@@ -4389,17 +4391,21 @@ function SqlTab({
               onClick={onActivate}
               aria-selected={active}
               role="tab"
+              onMouseEnter={() => {
+                const el = titleRef.current;
+                if (el && el.scrollWidth > el.clientWidth) {
+                  setPopoverOpen(true);
+                }
+              }}
+              onMouseLeave={() => setPopoverOpen(false)}
             >
               {tab.kind === "view-data" && (
                 <Table2 size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
-              <Popover.Root>
+              <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
                 <Popover.Trigger
-                  openOnHover
-                  delay={100}
-                  closeDelay={100}
                   nativeButton={false}
-                  render={<span className="sql-tab-title" />}
+                  render={<span ref={titleRef} className="sql-tab-title" />}
                 >
                   {tab.title}
                 </Popover.Trigger>

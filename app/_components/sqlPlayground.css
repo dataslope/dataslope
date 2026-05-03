@@ -680,7 +680,7 @@
 /* The total row count is highlighted so the user can see at a glance
    how many rows the query returned, even when paginated. */
 .sql-result-pager-total {
-  color: var(--theme-primary, var(--accent, #f0b400));
+  color: var(--text-dim);
   font-weight: 600;
 }
 
