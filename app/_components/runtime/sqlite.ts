@@ -643,6 +643,29 @@ export async function createSqliteEngine(
         return patched;
       }
 
+      // Collect all view DDLs so we can drop them before the table
+      // rebuild and recreate them after. SQLite validates view
+      // references at schema-change time, so leaving views in place
+      // while the table is temporarily absent (between DROP TABLE and
+      // ALTER TABLE ... RENAME TO) causes a spurious "no such table"
+      // error on COMMIT.
+      const viewSqls: string[] = [];
+      const viewNames: string[] = [];
+      {
+        const stmt = d.prepare(
+          `SELECT name, sql FROM sqlite_master WHERE type = 'view' AND sql IS NOT NULL ORDER BY name`,
+        );
+        try {
+          while (stmt.step()) {
+            const row = stmt.get();
+            viewNames.push(String(row[0]));
+            viewSqls.push(String(row[1]));
+          }
+        } finally {
+          stmt.free();
+        }
+      }
+
       const tmpName = `${spec.newName}__new`;
       // Compose the multi-statement script. We toggle foreign keys off
       // explicitly inside the transaction so referencing tables stay
@@ -650,6 +673,12 @@ export async function createSqliteEngine(
       d.run("PRAGMA foreign_keys = OFF;");
       d.run("BEGIN");
       try {
+        // Drop all views before touching the table so SQLite doesn't
+        // attempt to validate their SQL during the interim state where
+        // the original table has been dropped but not yet renamed back.
+        for (const name of viewNames) {
+          d.run(`DROP VIEW IF EXISTS ${quoteIdent(name)}`);
+        }
         d.run(`CREATE TABLE ${quoteIdent(tmpName)} (${defs.join(", ")})`);
         if (sourceCols.length > 0) {
           d.run(
@@ -666,6 +695,10 @@ export async function createSqliteEngine(
         }
         // Recreate triggers with potentially patched DDL.
         for (const sql of triggerSqls) {
+          d.run(patchDdl(sql));
+        }
+        // Recreate all views with patched DDL (handles table/column renames).
+        for (const sql of viewSqls) {
           d.run(patchDdl(sql));
         }
         d.run("COMMIT");

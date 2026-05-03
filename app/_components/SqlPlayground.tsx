@@ -2752,6 +2752,17 @@ function SqlPlaygroundInner() {
     };
   }, []);
 
+  // Clear any inline gridTemplateRows set by the resizer when entering
+  // view-data mode, so the CSS class `.sql-panes--view-data` can take
+  // effect (inline styles otherwise win over class rules).
+  useEffect(() => {
+    const panes = panesRef.current;
+    if (!panes) return;
+    if (activeTab?.kind === "view-data") {
+      panes.style.gridTemplateRows = "";
+    }
+  }, [activeTab?.kind]);
+
   // ─── Sidebar resizer (horizontal, between sidebar and panes) ────────
   // The sidebar width is persisted as a CSS custom property on the
   // `.sql-shell` element and mirrored to localStorage so it survives
@@ -5962,6 +5973,7 @@ function ModifyStructureForm({
   engine: SqliteEngine | null;
 }) {
   const [activeTab, setActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
+  const [isDragging, setIsDragging] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -6008,6 +6020,7 @@ function ModifyStructureForm({
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    setIsDragging(false);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIndex = state.columns.findIndex((c) => c.id === active.id);
@@ -6078,7 +6091,10 @@ function ModifyStructureForm({
         <>
           <div className="sql-modify-columns">
             {state.columns.length > 0 ? (
-              <div className="sql-modify-table-wrap">
+              <div
+                className="sql-modify-table-wrap"
+                style={isDragging ? { overflowX: "hidden" } : undefined}
+              >
                 <table className="sql-modify-table">
                   <thead>
                     <tr>
@@ -6104,6 +6120,7 @@ function ModifyStructureForm({
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
+                    onDragStart={() => setIsDragging(true)}
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
