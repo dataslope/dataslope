@@ -1279,8 +1279,8 @@ function SqlPlaygroundInner() {
             page * currentPageSize,
           );
           sets = lazySets;
-          lazySql = trimmed;
-          lazyBaseSql = baseSql ?? trimmed;
+          lazySql = trimmed.replace(/\s*;+\s*$/, "");
+          lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
           lazyTotalCount = totalCount;
           lazyPage = page;
           lazyPageSize = currentPageSize;
