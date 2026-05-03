@@ -129,6 +129,12 @@ body.pg-active {
   letter-spacing: -0.01em;
 }
 
+.brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
 /* Placeholder text for the DataSlope brand mark. Sits in the slot
    where the per-language logo tile used to live; will be swapped for
    an actual logo image once available. Rendered as an anchor linking
