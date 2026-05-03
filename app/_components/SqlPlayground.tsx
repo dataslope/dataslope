@@ -104,6 +104,7 @@ import {
   FileJson,
   GripVertical,
   Hash,
+  Network,
   Play,
   Plus,
   RotateCcw,
@@ -154,6 +155,7 @@ import {
   type TableColumnInfo,
 } from "./runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
+import { ErDiagramPane } from "./ErDiagramPane";
 
 const PLAYGROUND_ID = "sqlite";
 const STORAGE_PREFIX = `pg_${PLAYGROUND_ID}_`;
@@ -195,8 +197,10 @@ interface QueryTab {
   pristineCode: string;
   /** When "view-data", this tab was opened via the "View Data" sidebar
    *  action for a table. These tabs display the table icon, hide the
-   *  SQL editor pane, and auto-run the preview query. */
-  kind?: "view-data";
+   *  SQL editor pane, and auto-run the preview query.
+   *  When "er-diagram", this tab shows an Entity-Relationship Diagram
+   *  of the current database schema. */
+  kind?: "view-data" | "er-diagram";
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -359,7 +363,10 @@ function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
 
 function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
-    localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(tabs));
+    // ER diagram tabs are transient — never persist them so they don't
+    // reappear after a page reload or database switch.
+    const persistable = tabs.filter((t) => t.kind !== "er-diagram");
+    localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(persistable));
   } catch {
     // Quota exceeded / private mode — silently ignore.
   }
@@ -2536,6 +2543,35 @@ function SqlPlaygroundInner() {
     setActiveTabId(tab.id);
   }, [tabs, activeDbId]);
 
+  const openErDiagramTab = useCallback(() => {
+    // If an ER diagram tab is already open, just switch to it.
+    const existing = tabs.find((t) => t.kind === "er-diagram");
+    if (existing) {
+      activeTabIdRef.current = existing.id;
+      setActiveTabId(existing.id);
+      return;
+    }
+    // Eagerly load metadata for any table not yet cached so the diagram
+    // renders complete column lists on first open.
+    for (const tableName of tables) {
+      if (!columnsByEntity[tableName]) {
+        refreshEntityMetadata(tableName);
+      }
+    }
+    const tab: QueryTab = {
+      id: newTabId(),
+      title: "ER Diagram",
+      code: "",
+      pristineCode: "",
+      kind: "er-diagram",
+    };
+    const next = [...tabs, tab];
+    setTabs(next);
+    saveTabs(activeDbId, next);
+    activeTabIdRef.current = tab.id;
+    setActiveTabId(tab.id);
+  }, [tabs, activeDbId, tables, columnsByEntity, refreshEntityMetadata]);
+
   const closeTab = useCallback(
     (id: string) => {
       const target = tabs.find((t) => t.id === id);
@@ -2753,12 +2789,12 @@ function SqlPlaygroundInner() {
   }, []);
 
   // Clear any inline gridTemplateRows set by the resizer when entering
-  // view-data mode, so the CSS class `.sql-panes--view-data` can take
-  // effect (inline styles otherwise win over class rules).
+  // view-data or er-diagram mode, so the CSS class can take effect
+  // (inline styles otherwise win over class rules).
   useEffect(() => {
     const panes = panesRef.current;
     if (!panes) return;
-    if (activeTab?.kind === "view-data") {
+    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
       panes.style.gridTemplateRows = "";
     }
   }, [activeTab?.kind]);
@@ -4168,7 +4204,18 @@ function SqlPlaygroundInner() {
               </SchemaSection>
             </div>
 
-            <div className="sql-sidebar-footer">{RUNTIME_INFO.engine}</div>
+            <div className="sql-sidebar-footer">
+              <button
+                type="button"
+                className="sql-er-btn"
+                onClick={openErDiagramTab}
+                title="View ER Diagram"
+                aria-label="View ER Diagram"
+              >
+                <Network size={13} aria-hidden="true" />
+                <span>ER Diagram</span>
+              </button>
+            </div>
           </aside>
 
           <div
@@ -4180,7 +4227,10 @@ function SqlPlaygroundInner() {
             title="Drag to resize"
           />
 
-          <div className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}`} ref={panesRef}>
+          <div
+            className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}`}
+            ref={panesRef}
+          >
             <div className="sql-tabbar">
               <div className="sql-tabs" role="tablist">
                 {tabs.map((t) => (
@@ -4217,7 +4267,7 @@ function SqlPlaygroundInner() {
               </button>
             </div>
 
-            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" ? { display: "none" } : undefined}>
+            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}>
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
               </div>
@@ -4276,10 +4326,10 @@ function SqlPlaygroundInner() {
               aria-orientation="horizontal"
               aria-label="Drag to resize editor and results"
               title="Drag to resize"
-              style={activeTab?.kind === "view-data" ? { display: "none" } : undefined}
+              style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}
             />
 
-            <div className="sql-results-pane" ref={resultsPaneRef}>
+            <div className="sql-results-pane" ref={resultsPaneRef} style={activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}>
               <div className="sql-results-body">
                 <ResultView
                   result={result}
@@ -4297,6 +4347,16 @@ function SqlPlaygroundInner() {
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
             </div>
+
+            {activeTab?.kind === "er-diagram" && (
+              <div className="sql-er-pane">
+                <ErDiagramPane
+                  tables={tables}
+                  columnsByEntity={columnsByEntity}
+                  foreignKeysByEntity={foreignKeysByEntity}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -4387,7 +4447,7 @@ function SqlTab({
             <button
               type="button"
               {...props}
-              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}`}
+              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}`}
               onClick={onActivate}
               aria-selected={active}
               role="tab"
@@ -4401,6 +4461,9 @@ function SqlTab({
             >
               {tab.kind === "view-data" && (
                 <Table2 size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+              )}
+              {tab.kind === "er-diagram" && (
+                <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
               <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
                 <Popover.Trigger
@@ -4447,14 +4510,16 @@ function SqlTab({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup">
-              {tab.kind !== "view-data" && (
+              {tab.kind !== "view-data" && tab.kind !== "er-diagram" && (
                 <ContextMenu.Item className="example-item" onClick={openRename}>
                   <div className="ex-title">Rename</div>
                 </ContextMenu.Item>
               )}
-              <ContextMenu.Item className="example-item" onClick={onDuplicate}>
-                <div className="ex-title">Duplicate</div>
-              </ContextMenu.Item>
+              {tab.kind !== "er-diagram" && (
+                <ContextMenu.Item className="example-item" onClick={onDuplicate}>
+                  <div className="ex-title">Duplicate</div>
+                </ContextMenu.Item>
+              )}
               <ContextMenu.Item className="example-item" onClick={onClose}>
                 <div className="ex-title">Close</div>
               </ContextMenu.Item>

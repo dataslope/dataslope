@@ -383,6 +383,30 @@
   font-size: 10px;
   color: var(--text-dim);
   font-family: var(--font-ui);
+  display: flex;
+  align-items: center;
+}
+
+/* ─── ER Diagram button in sidebar footer ─── */
+.sql-er-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.sql-er-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 /* ─── Panes ─── */
@@ -409,6 +433,21 @@
    available height. */
 .sql-panes--view-data {
   grid-template-rows: auto 0 0 1fr;
+}
+
+/* When an "ER Diagram" tab is active the editor, resizer and results
+   pane are hidden; the er-pane spans all content rows. */
+.sql-panes--er-diagram {
+  grid-template-rows: auto 1fr 0 0;
+}
+
+.sql-er-pane {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
 }
 
 .sql-results-pane {
@@ -2040,4 +2079,111 @@
 .sql-modify-fk-cascade:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ─── ER Diagram tab icon ─── */
+.sql-tab-er-diagram .sql-tab-kind-icon {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-dim));
+}
+
+/* ─── ER Diagram pane ─── */
+.er-diagram-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.er-diagram-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+}
+
+/* ─── ER Table node ─── */
+.er-table-node {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-width: 180px;
+  max-width: 260px;
+  font-family: var(--font-ui);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.er-table-node .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border: 2px solid var(--bg2);
+}
+
+.er-table-header {
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.er-table-columns {
+  padding: 4px 0;
+}
+
+.er-table-col-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--text);
+  min-height: 22px;
+}
+
+.er-table-col-row.er-table-col-empty {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.er-table-col-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.er-col-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.er-pk-icon {
+  color: color-mix(in srgb, var(--accent) 80%, var(--text-dim));
+}
+
+.er-fk-icon {
+  color: color-mix(in srgb, #a78bfa 80%, var(--text-dim));
+}
+
+.er-table-col-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.er-table-col-type {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
