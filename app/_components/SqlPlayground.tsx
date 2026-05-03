@@ -131,6 +131,7 @@ import {
   applyThemePalette,
   clearThemePalette,
   getStoredEditorTheme,
+  LIGHT_THEMES,
   setStoredEditorTheme,
 } from "./playgroundTheme";
 import {
@@ -4354,6 +4355,7 @@ function SqlPlaygroundInner() {
                   tables={tables}
                   columnsByEntity={columnsByEntity}
                   foreignKeysByEntity={foreignKeysByEntity}
+                  isDark={!LIGHT_THEMES.has(editorTheme)}
                 />
               </div>
             )}

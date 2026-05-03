@@ -91,12 +91,14 @@ export interface ErDiagramPaneProps {
   tables: string[];
   columnsByEntity: Record<string, TableColumnInfo[]>;
   foreignKeysByEntity: Record<string, ForeignKeyInfo[]>;
+  isDark?: boolean;
 }
 
 export function ErDiagramPane({
   tables,
   columnsByEntity,
   foreignKeysByEntity,
+  isDark = true,
 }: ErDiagramPaneProps) {
   const { nodes, edges } = useMemo(() => {
     if (tables.length === 0) return { nodes: [], edges: [] };
@@ -182,12 +184,12 @@ export function ErDiagramPane({
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.05}
+        minZoom={0.2}
         maxZoom={2}
         nodesDraggable
         nodesConnectable={false}
         elementsSelectable
-        colorMode="dark"
+        colorMode={isDark ? "dark" : "light"}
       >
         <Background />
         <Controls />
