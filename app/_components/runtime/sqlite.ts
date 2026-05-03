@@ -70,6 +70,10 @@ export interface ForeignKeyInfo {
   table: string;
   /** Referenced column. */
   to: string;
+  /** ON DELETE action (e.g. "CASCADE", "SET NULL", "NO ACTION"). */
+  onDelete: string;
+  /** ON UPDATE action (e.g. "CASCADE", "SET NULL", "NO ACTION"). */
+  onUpdate: string;
 }
 
 /** Specification of a single column passed to `rebuildTable`. */
@@ -91,7 +95,7 @@ export interface ColumnSpec {
    *  empty/undefined no default is rendered. */
   defaultValue?: string;
   /** Optional column-level foreign key. */
-  foreignKey?: { table: string; column: string };
+  foreignKey?: { table: string; column: string; onDelete?: string; onUpdate?: string };
   /** When set, the column existed under this name on the original
    *  table. Used by `rebuildTable` to copy data from `originalName`
    *  into `name` even after a rename. */
@@ -224,6 +228,11 @@ export interface SqliteEngine {
     columnNames: string[],
     values: unknown[],
   ) => void;
+  /** Names of user-defined indexes on a specific table (excludes
+   *  auto-indexes created by PRIMARY KEY / UNIQUE constraints). */
+  listTableIndexes: (tableName: string) => string[];
+  /** Names of triggers defined on a specific table. */
+  listTableTriggers: (tableName: string) => string[];
   /** Execute a single SELECT (or WITH…SELECT) statement with server-side
    *  pagination. Returns the rows for one page together with the total
    *  row count so the UI can render "Rows 1–50 of 12,345" without ever
@@ -305,9 +314,17 @@ function renderColumnDef(col: ColumnSpec): string {
     parts.push(`DEFAULT ${v}`);
   }
   if (col.foreignKey && col.foreignKey.table && col.foreignKey.column) {
-    parts.push(
-      `REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`,
-    );
+    let fkClause = `REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`;
+    const onDelete = col.foreignKey.onDelete?.trim().toUpperCase();
+    const onUpdate = col.foreignKey.onUpdate?.trim().toUpperCase();
+    const validActions = new Set(["NO ACTION", "RESTRICT", "SET NULL", "SET DEFAULT", "CASCADE"]);
+    if (onDelete && validActions.has(onDelete) && onDelete !== "NO ACTION") {
+      fkClause += ` ON DELETE ${onDelete}`;
+    }
+    if (onUpdate && validActions.has(onUpdate) && onUpdate !== "NO ACTION") {
+      fkClause += ` ON UPDATE ${onUpdate}`;
+    }
+    parts.push(fkClause);
   }
   return parts.join(" ");
 }
@@ -390,6 +407,38 @@ export async function createSqliteEngine(
     listTriggers() {
       return listFromMaster("trigger");
     },
+    listTableIndexes(tableName: string) {
+      const stmt = require().prepare(
+        `SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = $n AND sql IS NOT NULL ORDER BY name`,
+      );
+      const names: string[] = [];
+      try {
+        stmt.bind({ $n: tableName });
+        while (stmt.step()) {
+          const row = stmt.get();
+          if (typeof row[0] === "string") names.push(row[0]);
+        }
+      } finally {
+        stmt.free();
+      }
+      return names;
+    },
+    listTableTriggers(tableName: string) {
+      const stmt = require().prepare(
+        `SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = $n ORDER BY name`,
+      );
+      const names: string[] = [];
+      try {
+        stmt.bind({ $n: tableName });
+        while (stmt.step()) {
+          const row = stmt.get();
+          if (typeof row[0] === "string") names.push(row[0]);
+        }
+      } finally {
+        stmt.free();
+      }
+      return names;
+    },
     previewTable(name: string, limit = 200) {
       // The table name is a SQLite identifier — sql.js does not allow
       // parameter binding for identifiers, so we quote it instead. The
@@ -462,6 +511,8 @@ export async function createSqliteEngine(
         from: String(row[3]),
         table: String(row[2]),
         to: String(row[4]),
+        onUpdate: String(row[5] ?? "NO ACTION"),
+        onDelete: String(row[6] ?? "NO ACTION"),
       }));
     },
     rebuildTable(spec: TableRebuildSpec) {
@@ -519,6 +570,67 @@ export async function createSqliteEngine(
         }
       }
 
+      // Build a rename map (originalName → newName) so we can patch
+      // index/trigger DDL after the rename if a column was renamed.
+      const renameMap = new Map<string, string>();
+      for (const c of spec.columns) {
+        if (c.originalName && c.originalName !== c.name) {
+          renameMap.set(c.originalName, c.name);
+        }
+      }
+
+      // Collect index DDLs attached to the original table so we can
+      // recreate them after the rename.  We exclude auto-indexes (sql IS NULL)
+      // because they are recreated automatically by PRIMARY KEY / UNIQUE.
+      const indexSqls: string[] = [];
+      const idxRows = d.exec(
+        `SELECT sql FROM sqlite_master WHERE type = 'index' AND tbl_name = '${spec.originalName.replace(/'/g, "''")}' AND sql IS NOT NULL ORDER BY name`,
+      );
+      if (idxRows.length > 0) {
+        for (const row of idxRows[0].values) {
+          if (typeof row[0] === "string") {
+            indexSqls.push(row[0]);
+          }
+        }
+      }
+
+      // Collect trigger DDLs attached to the original table.
+      const triggerSqls: string[] = [];
+      const trRows = d.exec(
+        `SELECT sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = '${spec.originalName.replace(/'/g, "''")}' AND sql IS NOT NULL ORDER BY name`,
+      );
+      if (trRows.length > 0) {
+        for (const row of trRows[0].values) {
+          if (typeof row[0] === "string") {
+            triggerSqls.push(row[0]);
+          }
+        }
+      }
+
+      // If the table is being renamed (or if columns are renamed), patch
+      // the collected DDL strings to use the new names.
+      function patchDdl(sql: string): string {
+        let patched = sql;
+        // Replace old table name with new one when the table is renamed.
+        if (spec.originalName !== spec.newName) {
+          // Replace occurrences of the quoted old table name.
+          const escaped = spec.originalName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          patched = patched.replace(
+            new RegExp(`\\b${escaped}\\b`, "gi"),
+            spec.newName,
+          );
+        }
+        // Patch renamed columns (best-effort — simple word-boundary replacement).
+        for (const [oldCol, newCol] of renameMap) {
+          const escaped = oldCol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          patched = patched.replace(
+            new RegExp(`\\b${escaped}\\b`, "g"),
+            newCol,
+          );
+        }
+        return patched;
+      }
+
       const tmpName = `${spec.newName}__new`;
       // Compose the multi-statement script. We toggle foreign keys off
       // explicitly inside the transaction so referencing tables stay
@@ -536,6 +648,14 @@ export async function createSqliteEngine(
         d.run(
           `ALTER TABLE ${quoteIdent(tmpName)} RENAME TO ${quoteIdent(spec.newName)}`,
         );
+        // Recreate indexes with potentially patched DDL.
+        for (const sql of indexSqls) {
+          d.run(patchDdl(sql));
+        }
+        // Recreate triggers with potentially patched DDL.
+        for (const sql of triggerSqls) {
+          d.run(patchDdl(sql));
+        }
         d.run("COMMIT");
       } catch (err) {
         try {

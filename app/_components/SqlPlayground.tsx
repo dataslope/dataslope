@@ -85,6 +85,7 @@ import {
   FilePlus,
   FileText,
   FileJson,
+  GripVertical,
   Hash,
   Play,
   Plus,
@@ -172,6 +173,10 @@ interface QueryTab {
    *  pristineCode`, which lets us skip the close-confirmation prompt
    *  for tabs the user never edited. */
   pristineCode: string;
+  /** When "view-data", this tab was opened via the "View Data" sidebar
+   *  action for a table. These tabs display the table icon, hide the
+   *  SQL editor pane, and auto-run the preview query. */
+  kind?: "view-data";
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -242,6 +247,15 @@ const COLUMN_TYPES = [
   "DATETIME",
 ] as const;
 
+/** Allowed ON DELETE / ON UPDATE actions for foreign-key columns. */
+const FK_ACTIONS = [
+  "NO ACTION",
+  "RESTRICT",
+  "CASCADE",
+  "SET NULL",
+  "SET DEFAULT",
+] as const;
+
 /** Editable representation of one column inside the Modify Structure
  *  drawer. We keep `originalName` separately so the engine knows which
  *  column to copy from when applying a rename. `id` is a stable, local
@@ -259,6 +273,8 @@ interface ModifyColumnDraft {
   defaultValue: string;
   fkTable: string;
   fkColumn: string;
+  fkOnDelete: string;
+  fkOnUpdate: string;
 }
 
 function newDraftId(): string {
@@ -1446,17 +1462,34 @@ function SqlPlaygroundInner() {
       // runSqlForTab will automatically limit the initial fetch to the
       // current page size, so we don't hard-code a row cap here.
       const sql = `SELECT * FROM ${quoteIdent(name)};`;
-      openTabAndRun(
-        name,
-        sql,
-        `${kind === "view" ? "View" : "Table"}: ${name}`,
-        // Only tables carry a meaningful "source table" for the
-        // result-view's PK / FK icon lookups. Views can join multiple
-        // tables, so we deliberately omit it.
-        kind === "table" ? name : undefined,
-      );
+      if (kind === "table") {
+        // For tables, open a "view-data" tab that hides the editor pane.
+        const tab: QueryTab = {
+          id: newTabId(),
+          title: name,
+          code: sql,
+          pristineCode: sql,
+          kind: "view-data",
+        };
+        const next = [...tabsRef.current, tab];
+        tabsRef.current = next;
+        activeTabIdRef.current = tab.id;
+        setTabs(next);
+        saveTabs(activeDbIdRef.current, next);
+        setActiveTabId(tab.id);
+        const editor = editorRef.current;
+        if (editor) editor.setValue(sql);
+        runSqlForTab(tab.id, sql, `Table: ${name}`, name);
+      } else {
+        openTabAndRun(
+          name,
+          sql,
+          `View: ${name}`,
+          undefined,
+        );
+      }
     },
-    [openTabAndRun, quoteIdent],
+    [openTabAndRun, quoteIdent, runSqlForTab],
   );
 
   // ─── Sidebar context-menu actions ───────────────────────────────────
@@ -2220,6 +2253,8 @@ function SqlPlaygroundInner() {
             defaultValue: c.defaultValue ?? "",
             fkTable: fk?.table ?? "",
             fkColumn: fk?.to ?? "",
+            fkOnDelete: fk?.onDelete ?? "NO ACTION",
+            fkOnUpdate: fk?.onUpdate ?? "NO ACTION",
           };
         });
         setModifyDialog({
@@ -2256,7 +2291,12 @@ function SqlPlaygroundInner() {
         defaultValue: c.defaultValue.trim() || undefined,
         foreignKey:
           c.fkTable && c.fkColumn
-            ? { table: c.fkTable.trim(), column: c.fkColumn.trim() }
+            ? {
+                table: c.fkTable.trim(),
+                column: c.fkColumn.trim(),
+                onDelete: c.fkOnDelete || "NO ACTION",
+                onUpdate: c.fkOnUpdate || "NO ACTION",
+              }
             : undefined,
         originalName: c.originalName ?? undefined,
       })),
@@ -2362,6 +2402,8 @@ function SqlPlaygroundInner() {
           defaultValue: "",
           fkTable: "",
           fkColumn: "",
+          fkOnDelete: "NO ACTION",
+          fkOnUpdate: "NO ACTION",
         },
       ],
     });
@@ -4121,7 +4163,7 @@ function SqlPlaygroundInner() {
               </div>
             </div>
 
-            <div className="sql-editor-pane" ref={editorPaneRef}>
+            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" ? { display: "none" } : undefined}>
               <div className="editor-wrap">
                 <textarea ref={textareaRef} defaultValue="" />
               </div>
@@ -4180,6 +4222,7 @@ function SqlPlaygroundInner() {
               aria-orientation="horizontal"
               aria-label="Drag to resize editor and results"
               title="Drag to resize"
+              style={activeTab?.kind === "view-data" ? { display: "none" } : undefined}
             />
 
             <div className="sql-results-pane" ref={resultsPaneRef}>
@@ -4288,11 +4331,14 @@ function SqlTab({
             <button
               type="button"
               {...props}
-              className={`sql-tab${active ? " active" : ""}`}
+              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}`}
               onClick={onActivate}
               aria-selected={active}
               role="tab"
             >
+              {tab.kind === "view-data" && (
+                <Table2 size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+              )}
               <span className="sql-tab-title">{tab.title}</span>
               <button
                 type="button"
@@ -5101,6 +5147,14 @@ function ResultTableBody({
     value: unknown;
   } | null>(null);
 
+  // State for the "Edit in modal" dialog — tracks which cell is being
+  // edited in the larger text-area modal.
+  const [modalEditCell, setModalEditCell] = useState<{
+    cellKey: string;
+    colName: string;
+    value: string;
+  } | null>(null);
+
   // React Table may pass an updater function to onSortingChange (e.g.
   // from the toggle handler). We resolve it to the next state before
   // forwarding to the parent so the parent always receives a plain
@@ -5481,6 +5535,23 @@ function ResultTableBody({
                         >
                           <div className="ex-title">Copy cell value</div>
                         </ContextMenu.Item>
+                        {editable && (
+                          <ContextMenu.Item
+                            className="example-item"
+                            onClick={() => {
+                              const cell = rightClickedCellRef.current;
+                              if (cell === null || cell.colIdx < 0) return;
+                              const colName = set.columns[cell.colIdx] ?? "";
+                              const cellKey = `${absoluteRow}:${cell.colIdx}`;
+                              const current = pendingEdits?.has(cellKey)
+                                ? String(pendingEdits.get(cellKey) ?? "")
+                                : formatCellValue(cell.value);
+                              setModalEditCell({ cellKey, colName, value: current });
+                            }}
+                          >
+                            <div className="ex-title">Edit in modal</div>
+                          </ContextMenu.Item>
+                        )}
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
@@ -5581,6 +5652,48 @@ function ResultTableBody({
           </tbody>
         </table>
       </div>
+      {/* Edit-in-modal dialog */}
+      <Dialog.Root open={modalEditCell !== null} onOpenChange={(open) => { if (!open) setModalEditCell(null); }}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup sql-cell-modal-popup">
+            <Dialog.Title className="confirm-title">
+              Edit cell
+            </Dialog.Title>
+            {modalEditCell && (
+              <Dialog.Description className="confirm-desc">
+                Column: <strong>{modalEditCell.colName}</strong>
+              </Dialog.Description>
+            )}
+            {modalEditCell && (
+              <form
+                className="sql-cell-modal-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSetPendingEdit(modalEditCell.cellKey, modalEditCell.value);
+                  setModalEditCell(null);
+                }}
+              >
+                <textarea
+                  className="sql-cell-modal-textarea"
+                  value={modalEditCell.value}
+                  onChange={(e) => setModalEditCell({ ...modalEditCell, value: e.target.value })}
+                  autoFocus
+                  rows={8}
+                />
+                <div className="confirm-actions">
+                  <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                    Cancel
+                  </Dialog.Close>
+                  <button type="submit" className="confirm-btn confirm-btn-primary">
+                    Apply
+                  </button>
+                </div>
+              </form>
+            )}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }
@@ -5804,6 +5917,9 @@ function ModifyStructureForm({
   knownTables: string[];
   engine: SqliteEngine | null;
 }) {
+  const [activeTab, setActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
+  const dragIndexRef = useRef<number | null>(null);
+
   const updateColumn = (id: string, patch: Partial<ModifyColumnDraft>) => {
     onChange({
       ...state,
@@ -5817,10 +5933,6 @@ function ModifyStructureForm({
     });
   };
   const addColumn = () => {
-    // Use a per-call random suffix instead of `state.columns.length`
-    // so users who add → remove → add don't collide with an existing
-    // `column_N`. The engine's `rebuildTable` validates uniqueness on
-    // save anyway, but a unique default is friendlier.
     const suffix = Math.random().toString(36).slice(2, 6);
     onChange({
       ...state,
@@ -5838,10 +5950,50 @@ function ModifyStructureForm({
           defaultValue: "",
           fkTable: "",
           fkColumn: "",
+          fkOnDelete: "NO ACTION",
+          fkOnUpdate: "NO ACTION",
         },
       ],
     });
   };
+
+  // Drag-and-drop handlers for column reordering.
+  const handleDragStart = (index: number) => {
+    dragIndexRef.current = index;
+  };
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    const from = dragIndexRef.current;
+    if (from === null || from === index) return;
+    const cols = [...state.columns];
+    const [moved] = cols.splice(from, 1);
+    cols.splice(index, 0, moved);
+    dragIndexRef.current = index;
+    onChange({ ...state, columns: cols });
+  };
+  const handleDragEnd = () => {
+    dragIndexRef.current = null;
+  };
+
+  // Lazy-load indexes and triggers for the Indexes/Triggers tabs.
+  const tableIndexes = useMemo(() => {
+    if (!engine || !state.originalName) return [] as string[];
+    try {
+      return engine.listTableIndexes(state.originalName);
+    } catch {
+      return [] as string[];
+    }
+  }, [engine, state.originalName]);
+
+  const tableTriggers = useMemo(() => {
+    if (!engine || !state.originalName) return [] as string[];
+    try {
+      return engine.listTableTriggers(state.originalName);
+    } catch {
+      return [] as string[];
+    }
+  }, [engine, state.originalName]);
+
   return (
     <div className="sql-modify-body">
       <label className="sql-modify-field">
@@ -5852,53 +6004,122 @@ function ModifyStructureForm({
           onChange={(e) => onChange({ ...state, newName: e.target.value })}
         />
       </label>
-      <div className="sql-modify-columns">
-        {state.columns.length > 0 ? (
-          <div className="sql-modify-table-wrap">
-            <table className="sql-modify-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th style={{ minWidth: "90px" }}>Type</th>
-                  <th>Not null</th>
-                  <th>Primary</th>
-                  <th>Unique</th>
-                  <th>
-                    Auto-
-                    <br />
-                    increment
-                  </th>
-                  <th>Default value</th>
-                  <th>FK table</th>
-                  <th>FK column</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.columns.map((col) => (
-                  <ModifyColumnRow
-                    key={col.id}
-                    col={col}
-                    onChange={(patch) => updateColumn(col.id, patch)}
-                    onRemove={() => removeColumn(col.id)}
-                    knownTables={knownTables}
-                    engine={engine}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="sql-modify-empty">No columns. Add one below.</div>
-        )}
+
+      {/* Tab strip */}
+      <div className="sql-struct-tabs">
+        <button
+          type="button"
+          className={`sql-struct-tab${activeTab === "columns" ? " active" : ""}`}
+          onClick={() => setActiveTab("columns")}
+        >
+          Columns
+          <span className="sql-struct-tab-count">{state.columns.length}</span>
+        </button>
+        <button
+          type="button"
+          className={`sql-struct-tab${activeTab === "indexes" ? " active" : ""}`}
+          onClick={() => setActiveTab("indexes")}
+        >
+          Indexes
+          <span className="sql-struct-tab-count">{tableIndexes.length}</span>
+        </button>
+        <button
+          type="button"
+          className={`sql-struct-tab${activeTab === "triggers" ? " active" : ""}`}
+          onClick={() => setActiveTab("triggers")}
+        >
+          Triggers
+          <span className="sql-struct-tab-count">{tableTriggers.length}</span>
+        </button>
       </div>
-      <button
-        type="button"
-        className="confirm-btn confirm-btn-secondary sql-modify-add"
-        onClick={addColumn}
-      >
-        <Plus size={12} aria-hidden="true" /> Add column
-      </button>
+
+      {activeTab === "columns" && (
+        <>
+          <div className="sql-modify-columns">
+            {state.columns.length > 0 ? (
+              <div className="sql-modify-table-wrap">
+                <table className="sql-modify-table">
+                  <thead>
+                    <tr>
+                      <th className="sql-modify-th-drag" />
+                      <th>Name</th>
+                      <th style={{ minWidth: "90px" }}>Type</th>
+                      <th>Not null</th>
+                      <th>Primary</th>
+                      <th>Unique</th>
+                      <th>
+                        Auto-
+                        <br />
+                        increment
+                      </th>
+                      <th>Default value</th>
+                      <th>FK table</th>
+                      <th>FK column</th>
+                      <th>On delete</th>
+                      <th>On update</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {state.columns.map((col, index) => (
+                      <ModifyColumnRow
+                        key={col.id}
+                        col={col}
+                        onChange={(patch) => updateColumn(col.id, patch)}
+                        onRemove={() => removeColumn(col.id)}
+                        knownTables={knownTables}
+                        engine={engine}
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragEnd={handleDragEnd}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="sql-modify-empty">No columns. Add one below.</div>
+            )}
+          </div>
+          <button
+            type="button"
+            className="confirm-btn confirm-btn-secondary sql-modify-add"
+            onClick={addColumn}
+          >
+            <Plus size={12} aria-hidden="true" /> Add column
+          </button>
+        </>
+      )}
+
+      {activeTab === "indexes" && (
+        <div className="sql-struct-list">
+          {tableIndexes.length === 0 ? (
+            <div className="sql-modify-empty">No user-defined indexes.</div>
+          ) : (
+            tableIndexes.map((name) => (
+              <div key={name} className="sql-struct-list-item">
+                <Hash size={12} className="sql-struct-list-icon" aria-hidden="true" />
+                <span className="sql-struct-list-name">{name}</span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === "triggers" && (
+        <div className="sql-struct-list">
+          {tableTriggers.length === 0 ? (
+            <div className="sql-modify-empty">No triggers.</div>
+          ) : (
+            tableTriggers.map((name) => (
+              <div key={name} className="sql-struct-list-item">
+                <Zap size={12} className="sql-struct-list-icon" aria-hidden="true" />
+                <span className="sql-struct-list-name">{name}</span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -5909,12 +6130,18 @@ function ModifyColumnRow({
   onRemove,
   knownTables,
   engine,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
   onRemove: () => void;
   knownTables: string[];
   engine: SqliteEngine | null;
+  onDragStart: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
 }) {
   // Look up the columns of the FK target table on demand so the
   // user gets a constrained dropdown rather than a free-text field.
@@ -5927,7 +6154,18 @@ function ModifyColumnRow({
     }
   }, [engine, col.fkTable]);
   return (
-    <tr className="sql-modify-col-row">
+    <tr
+      className="sql-modify-col-row"
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
+    >
+      <td className="sql-modify-drag-cell">
+        <span className="sql-modify-drag-handle" title="Drag to reorder">
+          <GripVertical size={14} aria-hidden="true" />
+        </span>
+      </td>
       <td>
         <label className="sql-modify-cell-field">
           <input
@@ -5969,7 +6207,6 @@ function ModifyColumnRow({
           onChange={(v) =>
             onChange({
               primaryKey: v,
-              // Auto-increment is only meaningful with a single PK.
               autoIncrement: v ? col.autoIncrement : false,
             })
           }
@@ -5991,9 +6228,6 @@ function ModifyColumnRow({
           onChange={(v) => onChange({ autoIncrement: v })}
           label="Auto-increment"
           showLabel={false}
-          // SQLite allows AUTOINCREMENT only on a single-column INTEGER
-          // PRIMARY KEY. Disable the toggle otherwise so the user can't
-          // craft an invalid spec.
           disabled={!col.primaryKey || !/^integer$/i.test(col.type)}
         />
       </td>
@@ -6041,6 +6275,36 @@ function ModifyColumnRow({
               <option key={c.cid} value={c.name}>
                 {c.name}
               </option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-cascade"
+            value={col.fkOnDelete}
+            onChange={(e) => onChange({ fkOnDelete: e.target.value })}
+            aria-label="On delete cascade action"
+            disabled={!col.fkTable}
+          >
+            {FK_ACTIONS.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-cascade"
+            value={col.fkOnUpdate}
+            onChange={(e) => onChange({ fkOnUpdate: e.target.value })}
+            aria-label="On update cascade action"
+            disabled={!col.fkTable}
+          >
+            {FK_ACTIONS.map((a) => (
+              <option key={a} value={a}>{a}</option>
             ))}
           </select>
         </label>
@@ -6433,7 +6697,7 @@ function SchemaItem({
                 className="example-item"
                 onClick={() => onPreview(name, kind)}
               >
-                <div className="ex-title">Preview Data</div>
+                <div className="ex-title">View Data</div>
               </ContextMenu.Item>
               {kind === "table" && onAddRow && (
                 <ContextMenu.Item
