@@ -1079,17 +1079,22 @@
   width: 100%;
   padding: 8px 10px;
   background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: none;
+  border-radius: 6px;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
   outline: none;
+  box-shadow: none;
 }
 
 .sql-rename-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.sql-rename-input::placeholder {
+  color: color-mix(in srgb, var(--text-dim) 60%, transparent);
 }
 
 /* ─── View DDL CodeMirror wrapper ─── */
@@ -1309,7 +1314,7 @@
 }
 
 .sql-modify-table tbody tr:hover td {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
 }
 
 .sql-modify-cell-field {
@@ -1376,14 +1381,20 @@
 
 .sql-modify-col-type {
   background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: none;
+  border-radius: 5px;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 12px;
   padding: 6px 8px;
   width: 100%;
   min-width: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.sql-modify-col-type:focus {
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .sql-modify-col-remove {
@@ -1431,14 +1442,22 @@
   align-items: center;
   justify-content: center;
   background: var(--bg3);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 3px;
   flex-shrink: 0;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+.sql-modify-flag-box:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .sql-modify-flag-box[data-checked] {
   background: var(--accent, #f0b400);
-  border-color: var(--accent, #f0b400);
+  border-color: transparent;
 }
 
 .sql-modify-flag-ind {
@@ -1808,4 +1827,249 @@
   color: var(--text-muted);
   max-width: 240px;
   line-height: 1.5;
+}
+
+/* ─── Placeholder text — theme-matched ─── */
+/* Update 5: Make placeholder text use the current theme's dim color at
+   a reduced opacity so it remains a weak, non-distracting hint while
+   still adapting to light/dark themes. Applies globally in the playground
+   (all inputs share this context). */
+.sql-modify-drawer .sql-rename-input::placeholder,
+.sql-modify-drawer input::placeholder,
+.sql-add-row-field input::placeholder {
+  color: color-mix(in srgb, var(--text-dim) 55%, transparent);
+}
+
+/* ─── Add Row drawer checkbox ─── */
+/* Update 6: Remove browser default checkbox appearance and style it
+   to match the editor theme (same look as .sql-modify-flag-box). */
+.sql-add-row-another input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 3px;
+  background: var(--bg3);
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sql-add-row-another input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.sql-add-row-another input[type="checkbox"]:checked {
+  background: var(--accent, #f0b400);
+}
+.sql-add-row-another input[type="checkbox"]:checked::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 7px;
+  border: 1.5px solid var(--bg);
+  border-top: none;
+  border-left: none;
+  transform: rotate(40deg) translate(-1px, -1px);
+}
+
+/* ─── Drag handle in View Structure table ─── */
+/* Update 1: Drag handle column and cell. */
+.sql-modify-th-drag {
+  width: 24px;
+  padding: 0 !important;
+}
+.sql-modify-drag-cell {
+  width: 24px;
+  padding: 0 4px !important;
+  text-align: center;
+}
+.sql-modify-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  cursor: grab;
+  opacity: 0.4;
+  padding: 2px;
+  border-radius: 3px;
+}
+.sql-modify-col-row:hover .sql-modify-drag-handle {
+  opacity: 0.85;
+}
+.sql-modify-drag-handle:active {
+  cursor: grabbing;
+  opacity: 1;
+}
+
+/* ─── Structure tabs (Columns / Indexes / Triggers) ─── */
+/* Update 4: Tab strip inside the View Structure drawer. */
+.sql-struct-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+  margin-bottom: -2px;
+}
+.sql-struct-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: -1px;
+  transition: color 120ms ease, border-color 120ms ease;
+  border-radius: 0;
+}
+.sql-struct-tab:hover {
+  color: var(--text);
+}
+.sql-struct-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.sql-struct-tab-count {
+  background: color-mix(in srgb, var(--text-dim) 20%, transparent);
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+.sql-struct-tab.active .sql-struct-tab-count {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+/* ─── Index / Trigger list inside View Structure ─── */
+/* Update 4: Flat list rendering for the Indexes / Triggers tabs. */
+.sql-struct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+.sql-struct-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bg3) 60%, transparent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}
+.sql-struct-list-icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.sql-struct-list-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── View Data tab icon ─── */
+/* Update 7: Table2 icon on the left of View Data tabs. */
+.sql-tab-kind-icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.sql-tab-view-data .sql-tab-kind-icon {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-dim));
+}
+
+/* ─── Edit-in-modal dialog ─── */
+/* Update 8: Modal dialog for editing cell values in a larger textarea. */
+.sql-cell-modal-popup {
+  width: min(560px, calc(100vw - 48px));
+}
+.sql-cell-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sql-cell-modal-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  box-shadow: none;
+}
+.sql-cell-modal-textarea:focus {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.sql-cell-modal-textarea::placeholder {
+  color: color-mix(in srgb, var(--text-dim) 55%, transparent);
+}
+
+/* ─── Cascade dropdowns ─── */
+/* Update 2: Slightly narrow FK cascade dropdowns. */
+.sql-modify-fk-cascade {
+  min-width: 80px;
+}
+.sql-modify-fk-cascade:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Column reorder: keyboard move buttons ─── */
+/* Shown inside the drag-handle cell alongside the grip icon. Hidden
+   until the row is hovered so they don't clutter the default view. */
+.sql-modify-move-btns {
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 2px;
+}
+.sql-modify-col-row:hover .sql-modify-move-btns,
+.sql-modify-col-row:focus-within .sql-modify-move-btns {
+  display: flex;
+}
+.sql-modify-drag-cell {
+  display: flex;
+  align-items: center;
+}
+.sql-modify-move-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 1px 2px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.sql-modify-move-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text-dim) 20%, transparent);
+  color: var(--text);
+}
+.sql-modify-move-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
 }
