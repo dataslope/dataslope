@@ -1274,7 +1274,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Positioner sideOffset={6} alignItemWithTrigger={false}>
+                <Select.Positioner sideOffset={0} alignItemWithTrigger={false}>
                   <Select.Popup className="bui-select-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];

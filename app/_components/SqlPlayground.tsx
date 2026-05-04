@@ -4021,6 +4021,7 @@ function SqlPlaygroundInner() {
                   </Select.Trigger>
                   <Select.Portal>
                     <Select.Positioner
+                      className="sql-db-positioner"
                       sideOffset={6}
                       alignItemWithTrigger={false}
                     >
@@ -6177,26 +6178,22 @@ function ResultPager({
                 </div>
               </Menu.Item>
               {canExportCurrentPage && (
-                <>
-                  <div
-                    role="separator"
-                    aria-orientation="horizontal"
-                    className="sql-result-export-sep"
-                  />
-                  <div className="sql-result-export-toggle-row">
-                    <span className="sql-result-export-toggle-label">
-                      Current page only
-                    </span>
-                    <Switch.Root
-                      checked={exportCurrentPageOnly}
-                      onCheckedChange={setExportCurrentPageOnly}
-                      className="bui-switch sql-export-switch"
-                      aria-label="Export current page only"
-                    >
-                      <Switch.Thumb className="bui-switch-thumb" />
-                    </Switch.Root>
-                  </div>
-                </>
+                <div className="sql-result-export-toggle-row">
+                  <span className="sql-result-export-toggle-label">
+                    Only rows in current page
+                  </span>
+                  <Switch.Root
+                    checked={!exportCurrentPageOnly}
+                    onCheckedChange={(v) => setExportCurrentPageOnly(!v)}
+                    className="bui-switch sql-export-switch"
+                    aria-label="Export all rows"
+                  >
+                    <Switch.Thumb className="bui-switch-thumb" />
+                  </Switch.Root>
+                  <span className="sql-result-export-toggle-label">
+                    All rows
+                  </span>
+                </div>
               )}
             </Menu.Popup>
           </Menu.Positioner>

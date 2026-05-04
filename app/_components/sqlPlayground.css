@@ -94,8 +94,13 @@
   white-space: nowrap;
 }
 
+.sql-db-positioner {
+  z-index: 500;
+}
+
 .sql-db-popup {
   min-width: 260px;
+  z-index: 500;
 }
 
 .sql-db-item {
@@ -867,7 +872,6 @@
 
 .sql-result-export-popup {
   width: 220px;
-  border: none !important;
 }
 
 .sql-result-export-popup .sql-result-export-group-label {
@@ -875,8 +879,8 @@
 }
 
 .sql-result-export-popup .export-item {
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 .sql-result-export-group-label {
@@ -899,16 +903,23 @@
 .sql-result-export-toggle-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 5px 10px 6px;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px 7px;
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
 }
 
 .sql-result-export-toggle-label {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
   user-select: none;
+  flex: 1;
+}
+
+.sql-result-export-toggle-label:last-child {
+  text-align: right;
 }
 
 .sql-export-switch {
@@ -2172,14 +2183,14 @@
 }
 
 /* ─── Disabled state diagonal marker ─── */
-/* Draws a subtle 45° line through the center of disabled checkboxes
+/* Draws a subtle line through the center of disabled checkboxes
    and select wrappers to signal the field is not interactive. */
 .sql-modify-flag.is-disabled .sql-modify-flag-box::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    45deg,
+    135deg,
     transparent calc(50% - 0.75px),
     color-mix(in srgb, var(--text) 45%, transparent) calc(50% - 0.75px),
     color-mix(in srgb, var(--text) 45%, transparent) calc(50% + 0.75px),
@@ -2197,7 +2208,7 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    45deg,
+    135deg,
     transparent calc(50% - 0.75px),
     color-mix(in srgb, var(--text) 30%, transparent) calc(50% - 0.75px),
     color-mix(in srgb, var(--text) 30%, transparent) calc(50% + 0.75px),
