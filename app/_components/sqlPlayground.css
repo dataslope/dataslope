@@ -379,34 +379,34 @@
 
 .sql-sidebar-footer {
   border-top: 1px solid var(--border);
-  padding: 6px 12px;
   font-size: 10px;
   color: var(--text-dim);
   font-family: var(--font-ui);
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 
 /* ─── ER Diagram button in sidebar footer ─── */
 .sql-er-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 4px 8px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 0;
   background: transparent;
   color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
   cursor: pointer;
-  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  transition: background 120ms ease, color 120ms ease;
 }
 
 .sql-er-btn:hover {
   background: var(--bg3);
   color: var(--text);
-  border-color: var(--accent);
 }
 
 /* ─── Panes ─── */
@@ -849,25 +849,34 @@
   align-items: center;
   gap: 5px;
   padding: 3px 8px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 5px;
-  background: transparent;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
   color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
 .sql-result-export-btn:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--text) 12%, transparent);
   color: var(--text);
-  border-color: var(--accent);
 }
 
 .sql-result-export-popup {
   width: 220px;
+  border: none !important;
+}
+
+.sql-result-export-popup .sql-result-export-group-label {
+  padding: 4px 8px 2px;
+}
+
+.sql-result-export-popup .export-item {
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 .sql-result-export-group-label {
@@ -1453,6 +1462,10 @@
   padding: 6px 6px 6px 8px;
   min-width: 0;
   width: 100%;
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 4px;
+  color: var(--text);
 }
 
 .sql-modify-col-type {
