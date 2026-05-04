@@ -1093,6 +1093,22 @@ function SqlPlaygroundInner() {
     editorRef.current?.setOption("lineWrapping", wordWrap);
   }, [wordWrap]);
 
+  // Keep autocomplete schema in sync with the current database tables/views.
+  // The CodeMirror 5 sql-hint addon reads `hintOptions.tables` as a map of
+  // entity name → column name array. We rebuild it whenever tables or views
+  // change so that DDL executed in the editor (CREATE TABLE, ALTER TABLE, …)
+  // is immediately reflected in autocomplete suggestions.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const editor = editorRef.current;
+    if (!engine || !editor) return;
+    const schema: Record<string, string[]> = {};
+    for (const name of [...tables, ...views]) {
+      schema[name] = engine.listColumns(name).map((c) => c.name);
+    }
+    editor.setOption("hintOptions", { tables: schema, completeSingle: false });
+  }, [tables, views]);
+
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--cm-font-size",
