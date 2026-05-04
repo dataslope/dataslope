@@ -343,7 +343,7 @@ async function computeElkLayout(
       target: meta.tgtTable,
       type: "elkEdge",
       data: { path, labelX, labelY, label: meta.label },
-      style: { stroke: "var(--accent)", strokeWidth: 1.5 },
+      style: { stroke: "var(--text-muted)", strokeWidth: 1.5 },
     });
     return acc;
   }, []);
@@ -423,8 +423,9 @@ export function ErDiagramPane({
         nodesConnectable={false}
         elementsSelectable
         colorMode={isDark ? "dark" : "light"}
+        style={{ background: "var(--bg)" }}
       >
-        <Background />
+        <Background color="var(--border)" />
         <Controls />
       </ReactFlow>
     </div>

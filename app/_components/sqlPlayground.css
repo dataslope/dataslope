@@ -2107,8 +2107,9 @@
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 6px;
-  min-width: 180px;
-  max-width: 260px;
+  /* Width must stay in sync with NODE_W in ErDiagramPane.tsx so that ELK
+     port positions (placed at x=NODE_W) align with the rendered node edges. */
+  width: 230px;
   font-family: var(--font-ui);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
@@ -2183,11 +2184,11 @@
 }
 
 .er-pk-icon {
-  color: color-mix(in srgb, var(--accent) 80%, var(--text-dim));
+  color: var(--text-dim);
 }
 
 .er-fk-icon {
-  color: color-mix(in srgb, #a78bfa 80%, var(--text-dim));
+  color: var(--text-dim);
 }
 
 .er-table-col-name {
