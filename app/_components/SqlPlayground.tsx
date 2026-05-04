@@ -4435,7 +4435,7 @@ function SqlPlaygroundInner() {
                     <span className="kbd-plus" aria-hidden="true">
                       +
                     </span>
-                    <kbd className="kbd">⇧</kbd>
+                    <kbd className="kbd" aria-label="Shift">⇧</kbd>
                     <span className="kbd-plus" aria-hidden="true">
                       +
                     </span>
@@ -4800,8 +4800,9 @@ function ResultView({
 
   // Active result-set tab index for multi-set results.
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
-  // Incremented on each new result to trigger the fade-in animation.
-  const [flashKey, setFlashKey] = useState<number>(0);
+  // Ref to the flash wrapper div — used to replay the CSS animation on
+  // each new result without unmounting the component tree.
+  const flashWrapperRef = useRef<HTMLDivElement>(null);
 
   // Reset pagination + transient actions whenever a new result lands.
   // Table-edit actions refresh the result in place, so they can opt into
@@ -4819,7 +4820,17 @@ function ResultView({
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
-    setFlashKey((k) => k + 1);
+    // Replay the flash animation: remove the class, access offsetWidth to
+    // force the browser to reflow and reset the CSS animation timeline
+    // (without this, re-adding the class has no effect because the animation
+    // is still in its "finished" state from the previous run), then re-add
+    // the class so the animation plays from the start.
+    const el = flashWrapperRef.current;
+    if (el) {
+      el.classList.remove("sql-result-flash-anim");
+      void el.offsetWidth; // force reflow — resets animation timeline
+      el.classList.add("sql-result-flash-anim");
+    }
   }, [result]);
 
   const getState = useCallback(
@@ -5136,7 +5147,7 @@ function ResultView({
     pendingDelete !== null ? (selectedByIndex[pendingDelete]?.size ?? 0) : 0;
 
   // Clamp activeSetIdx in case a new result has fewer sets.
-  const safeSetIdx = Math.min(activeSetIdx, result.sets.length - 1);
+  const safeSetIdx = Math.max(0, Math.min(activeSetIdx, result.sets.length - 1));
 
   // ── Compute rendering data for the currently-visible result set ──
   const computeSetRenderData = (idx: number) => {
@@ -5199,11 +5210,14 @@ function ResultView({
   return (
     <>
       {result.sets.length > 1 && (
-        <div className="sql-result-set-tabs">
+        <div className="sql-result-set-tabs" role="tablist" aria-label="Result sets">
           {result.sets.map((_, idx) => (
             <button
               key={idx}
               type="button"
+              role="tab"
+              aria-selected={safeSetIdx === idx}
+              aria-label={`Result set ${idx + 1} of ${result.sets.length}`}
               className={`sql-result-set-tab${safeSetIdx === idx ? " active" : ""}`}
               onClick={() => setActiveSetIdx(idx)}
             >
@@ -5212,7 +5226,7 @@ function ResultView({
           ))}
         </div>
       )}
-      <div key={flashKey} className="sql-result-flash-wrapper">
+      <div ref={flashWrapperRef} className="sql-result-flash-wrapper sql-result-flash-anim">
         <div className="sql-result-sets">
           {activeSetData && (() => {
             const idx = safeSetIdx;

@@ -582,14 +582,17 @@
   overflow: auto;
 }
 
-/* Flash-wrapper: plays a quick fade-in whenever it mounts (i.e. on every
-   new query result, since its `key` prop is bumped). The animation is short
-   and subtle so it doesn't distract during normal use. */
+/* Flash-wrapper: plays a quick fade-in whenever the animation class is
+   toggled (remove + reflow + add) on a new query result. The wrapper is
+   a proper flex child so the result table fills available height. */
 .sql-result-flash-wrapper {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.sql-result-flash-anim {
   animation: sql-result-flash 180ms ease-out;
 }
 
