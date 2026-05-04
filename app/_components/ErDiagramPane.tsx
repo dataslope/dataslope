@@ -306,7 +306,11 @@ async function computeElkLayout(
       "elk.algorithm": "layered",
       "elk.direction": "RIGHT",
       "elk.spacing.nodeNode": "80",
-      "elk.layered.spacing.edgeNodeBetweenLayers": "60",
+      // Minimum gap between nodes in adjacent layers (i.e. between two
+      // connected tables laid out left-to-right). The default (20px) is
+      // far too tight for edge labels to render without being clipped.
+      "elk.layered.spacing.nodeNodeBetweenLayers": "160",
+      "elk.layered.spacing.edgeNodeBetweenLayers": "80",
       "elk.edgeRouting": "ORTHOGONAL",
       "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
       "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
