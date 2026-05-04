@@ -11,34 +11,43 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
-// CodeMirror v5 stylesheets — these are pure CSS so importing them at the
-// top of a "use client" component is safe (Next.js extracts them at build
-// time and they don't touch `window`).
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/theme/monokai.css";
-import "codemirror/theme/material-darker.css";
-import "codemirror/theme/material-palenight.css";
-import "codemirror/theme/nord.css";
-import "codemirror/theme/tomorrow-night-eighties.css";
-import "codemirror/theme/solarized.css";
-import "codemirror/theme/eclipse.css";
-import "codemirror/theme/mdn-like.css";
-import "codemirror/theme/ayu-mirage.css";
-import "codemirror/theme/gruvbox-dark.css";
-import "codemirror/theme/oceanic-next.css";
-import "codemirror/theme/panda-syntax.css";
-import "codemirror/theme/darcula.css";
-import "codemirror/theme/zenburn.css";
-import "codemirror/theme/lucario.css";
-import "codemirror/theme/idea.css";
-import "codemirror/theme/base16-light.css";
-// CodeMirror's show-hint addon ships its own popup stylesheet.
-import "codemirror/addon/hint/show-hint.css";
-import type {
-  CodeMirrorAPI,
-  CodeMirrorEditor,
-} from "./runtime/globals";
+import { EditorState, Compartment } from "@codemirror/state";
+import {
+  EditorView,
+  keymap,
+  lineNumbers as lineNumbersExt,
+  highlightActiveLineGutter,
+  highlightActiveLine,
+  drawSelection,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+} from "@codemirror/view";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from "@codemirror/commands";
+import {
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  indentUnit,
+} from "@codemirror/language";
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+  type CompletionContext,
+  type CompletionResult,
+} from "@codemirror/autocomplete";
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { loadLanguage, themeFor } from "./cmExtensions";
+
 import type {
   ExampleSnippet,
   ExportFormat,
@@ -502,8 +511,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const runtimeRef = useRef<LanguageRuntime | null>(null);
 
   // ─── CodeMirror ─────────────────────────────────────────────────────────
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const editorRef = useRef<CodeMirrorEditor | null>(null);
+  const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<EditorView | null>(null);
+  const themeCompRef = useRef<Compartment | null>(null);
+  const wrapCompRef = useRef<Compartment | null>(null);
   const outputBodyRef = useRef<HTMLDivElement | null>(null);
 
   // Latest run handler in a ref so the editor's keymap can call into it
@@ -585,130 +596,143 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);
 
-  // Boot scripts + runtime.
+  // Boot the runtime + mount the editor.
   useEffect(() => {
     let cancelled = false;
+
+    if (editorHostRef.current && !editorRef.current) {
+      // Read persisted settings directly so the editor mounts with the
+      // same values the surrounding UI was hydrated with — otherwise the
+      // editor would briefly render with default theme/wrapping and then
+      // flip to the saved values on the next effect.
+      const initialTheme =
+        getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
+      const initialWordWrap =
+        localStorage.getItem(storageKey("wordwrap")) !== "false";
+
+      const themeComp = new Compartment();
+      const wrapComp = new Compartment();
+      const languageComp = new Compartment();
+
+      // Bridge the runtime adapter's `complete()` into v6 autocompletion.
+      // The runtime returns `{ list, replaceLength }` describing the prefix
+      // under the cursor; we translate that into a v6 `CompletionResult`.
+      const completionSource = async (
+        ctx: CompletionContext,
+      ): Promise<CompletionResult | null> => {
+        const rt = runtimeRef.current;
+        if (!rt || typeof rt.complete !== "function") return null;
+        const line = ctx.state.doc.lineAt(ctx.pos);
+        const col = ctx.pos - line.from;
+        try {
+          const res = await rt.complete(line.text, col);
+          if (!res || res.list.length === 0) return null;
+          return {
+            from: ctx.pos - res.replaceLength,
+            to: ctx.pos,
+            options: res.list.map((label) => ({ label, type: "variable" })),
+            validFor: /^[\w$]*$/,
+          };
+        } catch {
+          return null;
+        }
+      };
+
+      // Listen for doc changes to persist + auto-trigger completion on `.`,
+      // matching the v5 inputRead "type a dot" UX.
+      const persistListener = EditorView.updateListener.of((update) => {
+        if (!update.docChanged) return;
+        try {
+          localStorage.setItem(
+            storageKey("code"),
+            update.state.doc.toString(),
+          );
+        } catch {
+          // Quota exceeded / private mode — ignore.
+        }
+        for (const tr of update.transactions) {
+          if (!tr.isUserEvent("input.type")) continue;
+          let inserted = "";
+          tr.changes.iterChanges((_fA, _tA, _fB, _tB, ins) => {
+            inserted += ins.toString();
+          });
+          if (inserted === ".") {
+            startCompletion(update.view);
+          }
+        }
+      });
+
+      const view = new EditorView({
+        doc:
+          localStorage.getItem(storageKey("code")) ??
+          adapter.examples[0]?.code ??
+          "",
+        parent: editorHostRef.current,
+        extensions: [
+          history(),
+          drawSelection(),
+          dropCursor(),
+          EditorState.allowMultipleSelections.of(true),
+          indentOnInput(),
+          bracketMatching(),
+          closeBrackets(),
+          lineNumbersExt(),
+          highlightActiveLineGutter(),
+          foldGutter(),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          rectangularSelection(),
+          crosshairCursor(),
+          EditorState.tabSize.of(2),
+          indentUnit.of("  "),
+          autocompletion({
+            override: [completionSource],
+            activateOnTyping: false,
+            closeOnBlur: true,
+          }),
+          keymap.of([
+            {
+              key: "Mod-Enter",
+              run: () => {
+                runRef.current();
+                return true;
+              },
+            },
+            {
+              key: "Ctrl-Space",
+              run: (v) => {
+                startCompletion(v);
+                return true;
+              },
+            },
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            indentWithTab,
+          ]),
+          languageComp.of([]),
+          themeComp.of(themeFor(initialTheme)),
+          wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
+          persistListener,
+        ],
+      });
+
+      editorRef.current = view;
+      themeCompRef.current = themeComp;
+      wrapCompRef.current = wrapComp;
+
+      void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+        if (ext && editorRef.current === view) {
+          view.dispatch({ effects: languageComp.reconfigure(ext) });
+        }
+      });
+    }
+
     (async () => {
       try {
-        // Dynamically import CodeMirror v5 and its modes/addons/keymap.
-        // These touch `window` at import time, so we can't import them
-        // statically in a "use client" file (Next.js still SSRs the
-        // module on the server during the initial render pass).
-        const codeMirrorMod = await import("codemirror");
-        await Promise.all([
-          import("codemirror/mode/python/python"),
-          import("codemirror/mode/r/r"),
-          import("codemirror/mode/javascript/javascript"),
-          // The PHP mode depends on htmlmixed, which itself depends on
-          // xml, css, and javascript (already loaded above), and on
-          // clike for inline C-style syntax inside <?php blocks.
-          import("codemirror/mode/xml/xml"),
-          import("codemirror/mode/css/css"),
-          import("codemirror/mode/clike/clike"),
-          import("codemirror/mode/htmlmixed/htmlmixed"),
-          import("codemirror/mode/php/php"),
-          import("codemirror/addon/edit/closebrackets"),
-          import("codemirror/addon/edit/matchbrackets"),
-          import("codemirror/addon/comment/comment"),
-          import("codemirror/addon/hint/show-hint"),
-          import("codemirror/keymap/sublime"),
-        ]);
-        if (cancelled) return;
-
-        // Initialise CodeMirror once the script is on the page.
-        const CM = (codeMirrorMod.default ?? codeMirrorMod) as unknown as CodeMirrorAPI;
-        if (textareaRef.current && !editorRef.current) {
-          // Read the persisted theme directly so the editor is created with
-          // the same theme that the rest of the UI was hydrated with.
-          // Otherwise CodeMirror would briefly render with the default
-          // `editorTheme` state ("lucario") while the surrounding UI uses
-          // the saved theme, producing a visible mismatch on load.
-          const initialTheme =
-            getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
-          const initialWordWrap =
-            localStorage.getItem(storageKey("wordwrap")) !== "false";
-          const triggerAutocomplete = () => {
-            // The runtime might not be ready yet (e.g. immediately after
-            // page load); the registered hint helper just resolves to
-            // null in that case so it's safe to always trigger.
-            editorRef.current?.showHint({ completeSingle: false });
-          };
-          const editor = CM.fromTextArea(textareaRef.current, {
-            mode: adapter.codeMirrorMode,
-            theme: initialTheme,
-            lineNumbers: true,
-            indentUnit: 2,
-            tabSize: 2,
-            indentWithTabs: false,
-            keyMap: "sublime",
-            autoCloseBrackets: true,
-            matchBrackets: true,
-            lineWrapping: initialWordWrap,
-            extraKeys: {
-              "Cmd-Enter": () => runRef.current(),
-              "Ctrl-Enter": () => runRef.current(),
-              "Ctrl-Space": triggerAutocomplete,
-            },
-          });
-          editor.setValue(
-            localStorage.getItem(storageKey("code")) ??
-              adapter.examples[0]?.code ??
-              "",
-          );
-          editor.setSize("100%", "100%");
-          editorRef.current = editor;
-
-          // Persist editor contents to localStorage on every change so a
-          // page refresh (or accidental tab close) doesn't lose work in
-          // progress. Saved per playground via `storageKey("code")`.
-          editor.on("change", ((cm: CodeMirrorEditor) => {
-            try {
-              localStorage.setItem(storageKey("code"), cm.getValue());
-            } catch {
-              // Quota exceeded / private mode — silently ignore so a
-              // failed write doesn't break editing.
-            }
-          }) as (...args: unknown[]) => void);
-
-          // Register a hint helper for the adapter's mode that defers to
-          // the runtime's `complete()` (when implemented). Helpers can
-          // return a promise — show-hint awaits it before showing the
-          // popup, which is exactly what we need for the worker round-trip.
-          CM.registerHelper(
-            "hint",
-            adapter.codeMirrorMode,
-            async (cm: CodeMirrorEditor) => {
-              const rt = runtimeRef.current;
-              if (!rt || typeof rt.complete !== "function") return null;
-              const cur = cm.getCursor();
-              const lineText = cm.getLine(cur.line);
-              try {
-                const res = await rt.complete(lineText, cur.ch);
-                if (!res || res.list.length === 0) return null;
-                return {
-                  list: res.list,
-                  from: CM.Pos(cur.line, cur.ch - res.replaceLength),
-                  to: CM.Pos(cur.line, cur.ch),
-                };
-              } catch {
-                return null;
-              }
-            },
-          );
-
-          // Auto-trigger the popup after the user types `.` so that
-          // `pd.<Tab>` style attribute completion feels natural without
-          // requiring an explicit Ctrl-Space.
-          editor.on("inputRead", ((_cm: unknown, change: unknown) => {
-            const c = change as { text?: string[]; origin?: string };
-            if (c.origin !== "+input") return;
-            const text = c.text?.[0];
-            if (text === ".") {
-              triggerAutocomplete();
-            }
-          }) as (...args: unknown[]) => void);
-        }
-
         const rt = await adapter.init((m) => {
           if (!cancelled) setLoadingMessage(m);
         });
@@ -725,33 +749,45 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     })();
     return () => {
       cancelled = true;
+      editorRef.current?.destroy();
+      editorRef.current = null;
+      themeCompRef.current = null;
+      wrapCompRef.current = null;
     };
     // editorTheme is intentionally only consumed for the *initial* CM theme;
-    // subsequent changes are pushed via setOption in another effect.
+    // subsequent changes are pushed via Compartment reconfigure below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter]);
 
   // Push editor-theme changes into CodeMirror after init.
   useEffect(() => {
-    editorRef.current?.setOption("theme", editorTheme);
+    if (editorRef.current && themeCompRef.current) {
+      editorRef.current.dispatch({
+        effects: themeCompRef.current.reconfigure(themeFor(editorTheme)),
+      });
+    }
     applyThemePalette(editorTheme);
     applyMode(editorTheme);
   }, [editorTheme]);
 
   // Push word-wrap changes into CodeMirror after init.
   useEffect(() => {
-    editorRef.current?.setOption("lineWrapping", wordWrap);
+    if (editorRef.current && wrapCompRef.current) {
+      editorRef.current.dispatch({
+        effects: wrapCompRef.current.reconfigure(
+          wordWrap ? EditorView.lineWrapping : [],
+        ),
+      });
+    }
   }, [wordWrap]);
 
-  // Update the editor font size via CSS variable. This is what makes the
-  // slider actually take effect — previously the inline-style approach was
-  // overridden by `.CodeMirror { font-size: 13.5px !important }`.
+  // Update the editor font size via CSS variable.
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--cm-font-size",
       `${fontSize}px`,
     );
-    editorRef.current?.refresh();
+    editorRef.current?.requestMeasure();
   }, [fontSize]);
 
   // Apply the output font size: when the toggle is off we mirror the editor
@@ -863,7 +899,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
     if (!editor || !rt) return;
-    const code = editor.getValue().trim();
+    const code = editor.state.doc.toString().trim();
     if (!code) return;
 
     setStatusState("running");
@@ -940,9 +976,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // user-initiated picks so we can prompt before discarding work.
   const applyExample = useCallback(
     (ex: ExampleSnippet) => {
-      editorRef.current?.setValue(ex.code);
+      const view = editorRef.current;
+      if (view) {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: ex.code },
+        });
+        view.focus();
+      }
       setMobileTab(MOBILE_EDITOR_TAB);
-      editorRef.current?.focus();
       showToast(`Loaded ${ex.title} in the editor.`);
     },
     [showToast],
@@ -950,7 +991,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const requestExample = useCallback(
     (ex: ExampleSnippet) => {
-      const current = editorRef.current?.getValue().trim() ?? "";
+      const current = editorRef.current?.state.doc.toString().trim() ?? "";
       // Prompt only when the editor has user content that isn't already
       // identical to the chosen example. We always allow the very first
       // example (index 0) load when the buffer matches the default code.
@@ -985,7 +1026,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (pkg: PackageInfo) => {
       const editor = editorRef.current;
       if (!editor) return;
-      const current = editor.getValue();
+      const current = editor.state.doc.toString();
       if (adapter.hasImport(current, pkg.name)) {
         setMobileTab(MOBILE_EDITOR_TAB);
         showToast(`${pkg.name} is already imported.`, "warn");
@@ -993,10 +1034,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
       const snippet = adapter.importSnippet(pkg.name);
       const next = current.length === 0 ? `${snippet}\n` : `${snippet}\n${current}`;
-      editor.setValue(next);
-      // Position the cursor right after the inserted line so the user lands
-      // back where work in progress can continue.
-      editor.setCursor({ line: 1, ch: 0 });
+      // Position the cursor right after the inserted import line so the
+      // user lands back where work in progress can continue. Line 2,
+      // column 0 in v6's 1-indexed line model = start of second line.
+      const secondLineStart =
+        editor.state.doc.lines >= 2
+          ? editor.state.doc.line(2).from
+          : next.length;
+      editor.dispatch({
+        changes: { from: 0, to: editor.state.doc.length, insert: next },
+        selection: { anchor: secondLineStart },
+      });
       setMobileTab(MOBILE_EDITOR_TAB);
       showToast(`Imported ${pkg.name}.`);
     },
@@ -1005,7 +1053,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const exportCode = useCallback(
     (format: ExportFormat) => {
-      const code = editorRef.current?.getValue() ?? "";
+      const code = editorRef.current?.state.doc.toString() ?? "";
       const blob = new Blob([code], { type: format.mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1065,7 +1113,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   const copyEditor = useCallback(() => {
-    const code = editorRef.current?.getValue() ?? "";
+    const code = editorRef.current?.state.doc.toString() ?? "";
     if (!code) {
       showToast("Editor is empty.", "warn");
       return;
@@ -1831,9 +1879,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 {statusState === "running" ? "Running…" : "Run"}
               </button>
             </div>
-            <div className="editor-wrap">
-              <textarea ref={textareaRef} defaultValue="" />
-            </div>
+            <div className="editor-wrap" ref={editorHostRef} />
             <div
               className="resizer"
               ref={resizerRef}

@@ -1258,10 +1258,19 @@
   background: var(--bg);
 }
 
-.sql-ddl-code-wrap .CodeMirror {
+.sql-ddl-code-wrap {
+  display: flex;
+}
+.sql-ddl-code-wrap .cm-editor {
   height: 100%;
+  width: 100%;
   font-family: var(--font-mono);
   font-size: 12px;
+}
+.sql-ddl-code-wrap .cm-editor .cm-scroller,
+.sql-ddl-code-wrap .cm-editor .cm-content {
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* ─── Result column header key icons ─── */

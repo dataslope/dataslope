@@ -17,12 +17,26 @@ import {
   LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
-// CodeMirror core + the dracula theme — same default the main
-// playground uses, so a code block embedded inside a learning page
-// reads as "the playground, in miniature".
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/theme/idea.css";
+import { EditorState, Compartment } from "@codemirror/state";
+import {
+  EditorView,
+  keymap,
+  lineNumbers as lineNumbersExt,
+  highlightActiveLineGutter,
+  highlightActiveLine,
+  drawSelection,
+  dropCursor,
+} from "@codemirror/view";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  indentUnit,
+} from "@codemirror/language";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import { loadLanguage, themeFor } from "./cmExtensions";
 
 import type {
   LanguageAdapter,
@@ -30,7 +44,6 @@ import type {
   OutputCell,
   PlotlyFigure,
 } from "./types";
-import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import { getSharedRuntime } from "./runtimeRegistry";
 import styles from "./CodeBlock.module.css";
 
@@ -63,36 +76,6 @@ interface CodeBlockProps {
    *  responsible for syntactic compatibility; runtime errors caused by
    *  invalid init will surface as ordinary stderr cells. */
   initCode?: string;
-}
-
-// Promise that resolves once CodeMirror v5 + the modes used by the
-// supported language adapters have finished loading. Cached at module
-// scope so a page with many code blocks pays the import cost once.
-let cmLoadPromise: Promise<CodeMirrorAPI> | null = null;
-function loadCodeMirror(): Promise<CodeMirrorAPI> {
-  if (cmLoadPromise) return cmLoadPromise;
-  cmLoadPromise = (async () => {
-    const codeMirrorMod = await import("codemirror");
-    await Promise.all([
-      import("codemirror/mode/python/python"),
-      import("codemirror/mode/r/r"),
-      import("codemirror/mode/javascript/javascript"),
-      import("codemirror/mode/xml/xml"),
-      import("codemirror/mode/css/css"),
-      import("codemirror/mode/clike/clike"),
-      import("codemirror/mode/htmlmixed/htmlmixed"),
-      import("codemirror/mode/php/php"),
-      import("codemirror/addon/edit/closebrackets"),
-      import("codemirror/addon/edit/matchbrackets"),
-    ]);
-    return (codeMirrorMod.default ??
-      (codeMirrorMod as unknown)) as CodeMirrorAPI;
-  })().catch((err) => {
-    // Don't cache failure — a later mount can retry.
-    cmLoadPromise = null;
-    throw err;
-  });
-  return cmLoadPromise;
 }
 
 // Match the convention of the existing playground for shortcut hints.
@@ -152,7 +135,7 @@ function useIsDark(): boolean {
 
 // Map the document's colour scheme to the matching CodeMirror theme name.
 // Light docs → IntelliJ IDEA, dark docs → Dracula.
-function cmThemeFor(isDark: boolean): string {
+function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "dracula" : "idea";
 }
 
@@ -324,10 +307,12 @@ function CodeBlockInner({
 
   const toastManager = Toast.useToastManager();
 
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const editorRef = useRef<CodeMirrorEditor | null>(null);
-  const initTextareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const initEditorRef = useRef<CodeMirrorEditor | null>(null);
+  const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<EditorView | null>(null);
+  const themeCompRef = useRef<Compartment | null>(null);
+  const initEditorHostRef = useRef<HTMLDivElement | null>(null);
+  const initEditorRef = useRef<EditorView | null>(null);
+  const initThemeCompRef = useRef<Compartment | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
   // Sequence number lets us drop output from a previous run if the
   // user clicks Run again while one is in flight.
@@ -358,112 +343,141 @@ function CodeBlockInner({
   // between IntelliJ IDEA (light) and Dracula (dark) when the user
   // toggles the docs theme.
   const isDark = useIsDark();
-  const cmTheme = cmThemeFor(isDark);
+  const cmThemeName = cmThemeNameFor(isDark);
 
   // ─── Editor mount ──────────────────────────────────────────────────────
   useEffect(() => {
-    let cancelled = false;
-    loadCodeMirror()
-      .then((CM) => {
-        if (cancelled || !textareaRef.current || editorRef.current) return;
-        const editor = CM.fromTextArea(textareaRef.current, {
-          mode: adapter.codeMirrorMode,
-          theme: cmThemeFor(detectIsDark()),
-          lineNumbers: true,
-          // When init code is present, the user-editable region's line
-          // numbers continue from where the init block left off so the
-          // combined code reads as a single contiguous program.
-          firstLineNumber: hasInit ? initLineCount + 1 : 1,
-          indentUnit: 2,
-          tabSize: 2,
-          indentWithTabs: false,
-          autoCloseBrackets: true,
-          matchBrackets: true,
-          lineWrapping: true,
-          extraKeys: {
-            "Cmd-Enter": () => runRef.current(),
-            "Ctrl-Enter": () => runRef.current(),
+    if (!editorHostRef.current || editorRef.current) return;
+
+    const themeComp = new Compartment();
+    const languageComp = new Compartment();
+
+    // When init code is present, the user-editable region's line numbers
+    // continue from where the init block left off so the combined code
+    // reads as a single contiguous program.
+    const lineOffset = hasInit ? initLineCount : 0;
+
+    const view = new EditorView({
+      doc: initialCode,
+      parent: editorHostRef.current,
+      extensions: [
+        history(),
+        drawSelection(),
+        dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        indentOnInput(),
+        bracketMatching(),
+        closeBrackets(),
+        lineNumbersExt({
+          formatNumber: lineOffset
+            ? (n) => String(n + lineOffset)
+            : undefined,
+        }),
+        highlightActiveLineGutter(),
+        foldGutter(),
+        highlightActiveLine(),
+        EditorState.tabSize.of(2),
+        indentUnit.of("  "),
+        EditorView.lineWrapping,
+        keymap.of([
+          {
+            key: "Mod-Enter",
+            run: () => {
+              runRef.current();
+              return true;
+            },
           },
-        });
-        editor.setValue(initialCode);
-        editor.setSize("100%", "auto");
-        editorRef.current = editor;
-      })
-      .catch((err) => {
-        // Editor failed to load — fall back to the textarea so the
-        // user can still see / edit the code.
-        if (cancelled) return;
-        setStatus("error");
-        setStatusMessage(
-          err instanceof Error ? err.message : "Failed to load editor",
-        );
-      });
+          ...closeBracketsKeymap,
+          ...defaultKeymap,
+          ...historyKeymap,
+          ...foldKeymap,
+        ]),
+        languageComp.of([]),
+        themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+      ],
+    });
+
+    editorRef.current = view;
+    themeCompRef.current = themeComp;
+
+    // Lazy-load the language extension so the editor mounts immediately
+    // and re-highlights once the language module resolves.
+    void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+      if (ext && editorRef.current === view) {
+        view.dispatch({ effects: languageComp.reconfigure(ext) });
+      }
+    });
+
     return () => {
-      cancelled = true;
+      view.destroy();
+      editorRef.current = null;
+      themeCompRef.current = null;
     };
-    // We intentionally only mount the editor once per CodeBlock instance.
-    // adapter / initialCode are captured by the ref-based callbacks below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync the CodeMirror theme whenever the docs colour scheme flips.
   useEffect(() => {
-    editorRef.current?.setOption("theme", cmTheme);
-    initEditorRef.current?.setOption("theme", cmTheme);
-  }, [cmTheme]);
+    if (editorRef.current && themeCompRef.current) {
+      editorRef.current.dispatch({
+        effects: themeCompRef.current.reconfigure(themeFor(cmThemeName)),
+      });
+    }
+    if (initEditorRef.current && initThemeCompRef.current) {
+      initEditorRef.current.dispatch({
+        effects: initThemeCompRef.current.reconfigure(themeFor(cmThemeName)),
+      });
+    }
+  }, [cmThemeName]);
 
-  // Mount the read-only init editor lazily, the first time the panel
-  // is expanded — keeps the cost zero for collapsed init blocks.
-  // The cleanup tears the editor down whenever the panel collapses (the
-  // host `<div>` is unmounted by the conditional render in JSX, taking
-  // the underlying textarea with it). Without resetting `initEditorRef`
-  // here, a re-expand would keep the stale editor reference alive and
-  // skip mounting a fresh CodeMirror instance, leaving only the bare
-  // textarea fallback visible.
+  // Mount the read-only init editor lazily, the first time the panel is
+  // expanded — keeps the cost zero for collapsed init blocks. The cleanup
+  // destroys the EditorView when the panel collapses so React can safely
+  // unmount the host element.
   useEffect(() => {
     if (!hasInit || !initExpanded) return;
-    let cancelled = false;
-    loadCodeMirror()
-      .then((CM) => {
-        if (cancelled || !initTextareaRef.current || initEditorRef.current) {
-          return;
-        }
-        const editor = CM.fromTextArea(initTextareaRef.current, {
-          mode: adapter.codeMirrorMode,
-          theme: cmThemeFor(detectIsDark()),
-          lineNumbers: true,
-          indentUnit: 2,
-          tabSize: 2,
-          indentWithTabs: false,
-          lineWrapping: true,
-          // "nocursor" disables both editing AND focus, so the read-only
-          // editor reads as a code listing rather than a disabled input.
-          readOnly: "nocursor",
-        });
-        editor.setValue(trimmedInit);
-        editor.setSize("100%", "auto");
-        initEditorRef.current = editor;
-      })
-      .catch(() => {
-        // Non-fatal: the textarea fallback will still display the code.
-      });
+    if (!initEditorHostRef.current || initEditorRef.current) return;
+
+    const themeComp = new Compartment();
+    const languageComp = new Compartment();
+
+    const view = new EditorView({
+      doc: trimmedInit,
+      parent: initEditorHostRef.current,
+      extensions: [
+        EditorState.readOnly.of(true),
+        EditorView.editable.of(false),
+        drawSelection(),
+        lineNumbersExt(),
+        foldGutter(),
+        EditorState.tabSize.of(2),
+        indentUnit.of("  "),
+        EditorView.lineWrapping,
+        languageComp.of([]),
+        themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+      ],
+    });
+
+    initEditorRef.current = view;
+    initThemeCompRef.current = themeComp;
+
+    void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+      if (ext && initEditorRef.current === view) {
+        view.dispatch({ effects: languageComp.reconfigure(ext) });
+      }
+    });
+
     return () => {
-      cancelled = true;
-      // toTextArea restores the original textarea so React can safely
-      // unmount it; clearing the ref ensures the next expand mounts a
-      // fresh editor instead of bailing on the stale reference.
-      initEditorRef.current?.toTextArea?.();
+      view.destroy();
       initEditorRef.current = null;
+      initThemeCompRef.current = null;
     };
-    // adapter.codeMirrorMode is stable per adapter; trimmedInit is stable
-    // per render of this CodeBlock (init code never changes at runtime).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasInit, initExpanded]);
 
   // ─── Run / Reset ───────────────────────────────────────────────────────
   const run = useCallback(async () => {
-    const userCode =
-      editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
+    const userCode = editorRef.current?.state.doc.toString() ?? "";
     // Init code is prepended verbatim — every adapter resets state at the
     // start of run(), so init effectively executes inside the same fresh
     // scope as the user code. Authors are responsible for providing
@@ -531,7 +545,12 @@ function CodeBlockInner({
 
   const reset = useCallback(() => {
     runSeqRef.current++;
-    editorRef.current?.setValue(initialCode);
+    const view = editorRef.current;
+    if (view) {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: initialCode },
+      });
+    }
     setOutputs([]);
     setStatus("idle");
     setStatusMessage("");
@@ -543,8 +562,7 @@ function CodeBlockInner({
   // / contexts where the async Clipboard API is unavailable.
   // On success or failure, fires a toast identical to the playground's.
   const copyEditor = useCallback(async () => {
-    const code =
-      editorRef.current?.getValue() ?? textareaRef.current?.value ?? "";
+    const code = editorRef.current?.state.doc.toString() ?? "";
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(code);
@@ -626,26 +644,17 @@ function CodeBlockInner({
               id={initPanelId}
               className={styles.initEditor}
               aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
-            >
-              <textarea
-                ref={initTextareaRef}
-                defaultValue={trimmedInit}
-                spellCheck={false}
-                readOnly
-              />
-            </div>
+              ref={initEditorHostRef}
+            />
           )}
         </div>
       )}
 
-      <div className={styles.editor}>
-        <textarea
-          ref={textareaRef}
-          defaultValue={initialCode}
-          spellCheck={false}
-          aria-label={`${adapter.runtimeInfo.language} source code`}
-        />
-      </div>
+      <div
+        className={styles.editor}
+        ref={editorHostRef}
+        aria-label={`${adapter.runtimeInfo.language} source code`}
+      />
 
       <div
         className={styles.actionBar}
