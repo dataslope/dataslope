@@ -1233,7 +1233,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           <div className="logo">
             <Link href="/" aria-label="Dataslope home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dataslope-blue@4x.png" alt="Dataslope logo" className="brand-logo" />
+              <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
             </Link>
             <Link href="/" className="brand-name">Dataslope</Link>
             <Select.Root
