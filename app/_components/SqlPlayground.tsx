@@ -230,6 +230,10 @@ function escapeCsvCell(val: unknown): string {
   return s;
 }
 
+function toFileSafeName(title: string): string {
+  return title.replace(/[/\\:*?"<>|\x00-\x1f]/g, "_").trim() || "result_set";
+}
+
 function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -2543,9 +2547,22 @@ function SqlPlaygroundInner() {
     // this keeps revisiting the ERD from rendering with stale partial
     // column caches.
     refreshTableMetadata();
-    // If an ER diagram tab is already open, just switch to it.
     const existing = tabs.find((t) => t.kind === "er-diagram");
     if (existing) {
+      // If the ER Diagram tab is already the active tab, close it (toggle).
+      if (existing.id === activeTabId) {
+        const next = tabs.filter((t) => t.id !== existing.id);
+        const finalTabs =
+          next.length > 0
+            ? next
+            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+        setTabs(finalTabs);
+        saveTabs(activeDbId, finalTabs);
+        activeTabIdRef.current = finalTabs[0].id;
+        setActiveTabId(finalTabs[0].id);
+        return;
+      }
+      // Otherwise switch to it.
       activeTabIdRef.current = existing.id;
       setActiveTabId(existing.id);
       return;
@@ -2562,7 +2579,7 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, next);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [tabs, activeDbId, refreshTableMetadata]);
+  }, [tabs, activeTabId, activeDbId, refreshTableMetadata]);
 
   const closeTab = useCallback(
     (id: string) => {
@@ -4336,6 +4353,7 @@ function SqlPlaygroundInner() {
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
                   onFetchAllRows={handleFetchAllRows}
+                  tabTitle={activeTab?.title ?? "result_set"}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -4547,6 +4565,7 @@ function ResultView({
   onSetGlobalPageSize,
   onLoadPage,
   onFetchAllRows,
+  tabTitle,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -4580,6 +4599,8 @@ function ResultView({
   /** Fetches all rows for the given SQL (used to export lazy results without
    *  loading all pages into React state). */
   onFetchAllRows: (sql: string) => QueryExecResult["values"];
+  /** Title of the active tab, used to generate the export filename. */
+  tabTitle: string;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -4940,7 +4961,7 @@ function ResultView({
         <h3>Run a query to see results</h3>
         <p>
           Press <kbd className="kbd">Run</kbd> or use the keyboard shortcut to
-          execute the active tab. Click any table or view in the sidebar to open
+          execute the active tab. Double-click any table or view in the sidebar to open
           it in a new tab.
         </p>
       </div>
@@ -5200,6 +5221,7 @@ function ResultView({
               isLazy={isLazy}
               effectiveLazySql={effectiveLazySql}
               onFetchAllRows={onFetchAllRows}
+              tabTitle={tabTitle}
             />
           );
         })}
@@ -5897,6 +5919,7 @@ function ResultPager({
   isLazy,
   effectiveLazySql,
   onFetchAllRows,
+  tabTitle,
 }: {
   /** Total number of rows across all pages. For lazy results this is the
    *  COUNT(*) from the engine; for non-lazy results it is set.values.length. */
@@ -5927,6 +5950,8 @@ function ResultPager({
   effectiveLazySql: string;
   /** Fetches all rows by running effectiveLazySql against the engine. */
   onFetchAllRows: (sql: string) => QueryExecResult["values"];
+  /** Title of the active tab, used to generate the export filename. */
+  tabTitle: string;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
   const totalPages = Math.max(1, Math.ceil(totalRows / effective));
@@ -5967,7 +5992,7 @@ function ResultPager({
         : isLazy
           ? onFetchAllRows(effectiveLazySql)
           : allRows;
-    const filename = `result_set.${format}`;
+    const filename = `${toFileSafeName(tabTitle)}.${format}`;
     if (format === "csv") exportResultToCsv(columns, rows, filename);
     else if (format === "json") exportResultToJson(columns, rows, filename);
     else exportResultToSql(columns, rows, filename);
