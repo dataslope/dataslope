@@ -382,6 +382,26 @@
   margin-left: 12px;
 }
 
+.sql-tree-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 12px 4px 20px;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+
+.sql-tree-create-btn:hover {
+  color: var(--text);
+}
+
 .sql-sidebar-footer {
   border-top: 1px solid var(--border);
   font-size: 10px;
@@ -900,42 +920,43 @@
   margin: 4px 0;
 }
 
-.sql-result-export-toggle-row {
+.sql-result-export-scope-options {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 8px 4px;
+  gap: 1px;
+}
+
+.sql-result-export-scope-option {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 6px 10px 7px;
-  border-top: 1px solid var(--border);
-  margin-top: 2px;
-}
-
-.sql-result-export-toggle-label {
+  gap: 6px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-dim);
-  user-select: none;
-  flex: 1;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.1s, color 0.1s;
 }
 
-.sql-result-export-toggle-label:last-child {
-  text-align: right;
+.sql-result-export-scope-option:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text);
 }
 
-.sql-export-switch {
-  width: 28px;
-  height: 16px;
+.sql-result-export-scope-option.is-selected {
+  color: var(--text);
+}
+
+.scope-radio-indicator {
+  font-size: 10px;
   flex-shrink: 0;
-}
-
-.sql-export-switch .bui-switch-thumb {
-  width: 11px;
-  height: 11px;
-  transform: translateX(3px);
-}
-
-.sql-export-switch[data-checked] .bui-switch-thumb {
-  transform: translateX(14px);
+  line-height: 1;
 }
 
 /* ─── View DDL dialog ─── */
