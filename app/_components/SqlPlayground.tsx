@@ -75,7 +75,6 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
-import { Switch } from "@base-ui-components/react/switch";
 import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
@@ -2556,7 +2555,7 @@ function SqlPlaygroundInner() {
         const finalTabs =
           next.length > 0
             ? next
-            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+            : [{ id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" }];
         setTabs(finalTabs);
         saveTabs(activeDbId, finalTabs);
         activeTabIdRef.current = finalTabs[0].id;
@@ -2606,8 +2605,8 @@ function SqlPlaygroundInner() {
               {
                 id: newTabId(),
                 title: "Query 1",
-                code: "",
-                pristineCode: "",
+                code: "-- New query\nSELECT 1;",
+                pristineCode: "-- New query\nSELECT 1;",
               },
             ];
       setTabs(finalTabs);
@@ -2632,8 +2631,8 @@ function SqlPlaygroundInner() {
             {
               id: newTabId(),
               title: "Query 1",
-              code: "",
-              pristineCode: "",
+              code: "-- New query\nSELECT 1;",
+              pristineCode: "-- New query\nSELECT 1;",
             },
           ];
     setTabs(finalTabs);
@@ -2695,7 +2694,7 @@ function SqlPlaygroundInner() {
 
   const closeAllTabs = useCallback(() => {
     const fresh = [
-      { id: newTabId(), title: "Query 1", code: "", pristineCode: "" },
+      { id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" },
     ];
     // Order matters: synchronously update the refs the editor's
     // `change` listener reads from BEFORE we call `editor.setValue`.
@@ -6147,6 +6146,35 @@ function ResultPager({
         <Menu.Portal>
           <Menu.Positioner sideOffset={6} align="end">
             <Menu.Popup className="bui-popup export-dropdown sql-result-export-popup">
+              {canExportCurrentPage && (
+                <>
+                  <div className="sql-result-export-group-label">Scope</div>
+                  <div className="sql-result-export-scope-options">
+                    <button
+                      type="button"
+                      className={`sql-result-export-scope-option${exportCurrentPageOnly ? " is-selected" : ""}`}
+                      onClick={(e) => { e.stopPropagation(); setExportCurrentPageOnly(true); }}
+                    >
+                      <span className="scope-radio-indicator" aria-hidden="true">
+                        {exportCurrentPageOnly ? "●" : "○"}
+                      </span>
+                      <span>Current page ({(end - start).toLocaleString()} rows)</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`sql-result-export-scope-option${!exportCurrentPageOnly ? " is-selected" : ""}`}
+                      onClick={(e) => { e.stopPropagation(); setExportCurrentPageOnly(false); }}
+                    >
+                      <span className="scope-radio-indicator" aria-hidden="true">
+                        {!exportCurrentPageOnly ? "●" : "○"}
+                      </span>
+                      <span>Entire result ({totalRows.toLocaleString()} rows)</span>
+                    </button>
+                  </div>
+                  <div className="sql-result-export-sep" />
+                </>
+              )}
+              <div className="sql-result-export-group-label">Format</div>
               <Menu.Item
                 className="example-item export-item"
                 onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "csv")}
@@ -6177,24 +6205,6 @@ function ResultPager({
                   <div className="ex-desc">INSERT statements</div>
                 </div>
               </Menu.Item>
-              {canExportCurrentPage && (
-                <div className="sql-result-export-toggle-row">
-                  <span className="sql-result-export-toggle-label">
-                    Only rows in current page
-                  </span>
-                  <Switch.Root
-                    checked={!exportCurrentPageOnly}
-                    onCheckedChange={(v) => setExportCurrentPageOnly(!v)}
-                    className="bui-switch sql-export-switch"
-                    aria-label="Export all rows"
-                  >
-                    <Switch.Thumb className="bui-switch-thumb" />
-                  </Switch.Root>
-                  <span className="sql-result-export-toggle-label">
-                    All rows
-                  </span>
-                </div>
-              )}
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>
@@ -6854,7 +6864,18 @@ function SchemaSection({
       {expanded && (
         <div className="sql-tree-section-body">
           {count === 0 ? (
-            <div className="sql-tree-empty">{emptyMessage}</div>
+            onAdd ? (
+              <button
+                type="button"
+                className="sql-tree-create-btn"
+                onClick={onAdd}
+              >
+                <Table2 size={12} aria-hidden="true" />
+                <span>Create a {label.toLowerCase().replace(/s$/, "")}</span>
+              </button>
+            ) : (
+              <div className="sql-tree-empty">{emptyMessage}</div>
+            )
           ) : (
             children
           )}
