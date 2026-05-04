@@ -185,7 +185,7 @@
    the editor to grow with content (we don't have a fixed-height pane
    here). The dracula theme styles syntax colours; we only override
    layout-related properties. */
-.editor :global(.CodeMirror) {
+.editor :global(.cm-editor) {
   height: auto;
   min-height: 60px;
   font-family: var(--cb-font-mono);
@@ -194,8 +194,11 @@
   font-variant-ligatures: none;
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
 }
-.editor :global(.CodeMirror-scroll) {
+.editor :global(.cm-editor .cm-scroller) {
   min-height: 60px;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 /* ─── Action bar ──────────────────────────────────────────────────── */
@@ -609,7 +612,7 @@
   border-top: 1px solid var(--cb-border);
   background: var(--cb-bg);
 }
-.initEditor :global(.CodeMirror) {
+.initEditor :global(.cm-editor) {
   height: auto;
   min-height: 30px;
   font-family: var(--cb-font-mono);
@@ -619,7 +622,12 @@
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
   cursor: not-allowed;
 }
-.initEditor :global(.CodeMirror-cursor) {
+.initEditor :global(.cm-editor .cm-scroller) {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.initEditor :global(.cm-editor .cm-cursor) {
   display: none !important;
 }
 

@@ -20,9 +20,9 @@
   --font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --radius: 8px;
   /* Editor font size — overridable inline by the font-size slider.
-     Defining it as a variable lets the slider take effect even though the
-     `.CodeMirror` rule below uses `!important` (which previously prevented
-     inline font-size styles from applying). */
+     Defining it as a variable lets the slider take effect even though
+     the `.cm-editor` rule below uses `!important` (which would otherwise
+     prevent inline font-size styles from applying). */
   --cm-font-size: 13.5px;
   /* Output cell font size — defaults to the editor font size unless the
      "Use Different Font Size for Outputs" toggle is enabled. */
@@ -448,7 +448,7 @@ body.pg-active {
    stylesheet has been loaded (e.g. after an SPA navigation
    /playground → /learn), making the learn-page editors render with the
    playground's `--bg` / palette tokens instead of their own. */
-.pg-root .CodeMirror {
+.pg-root .cm-editor {
   height: 100% !important;
   font-family: var(--font-mono) !important;
   font-size: var(--cm-font-size, 13.5px) !important;
@@ -461,26 +461,35 @@ body.pg-active {
     "clig" 0,
     "dlig" 0 !important;
 }
-.pg-root .CodeMirror pre,
-.pg-root .CodeMirror span {
+.pg-root .cm-editor .cm-scroller,
+.pg-root .cm-editor .cm-content {
   font-variant-ligatures: inherit !important;
   font-feature-settings: inherit !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
-.pg-root .CodeMirror-scroll { height: 100%; }
-.pg-root .CodeMirror-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; }
-.pg-root .CodeMirror-linenumber { color: var(--text-dim) !important; }
+.pg-root .cm-editor .cm-scroller { height: 100%; }
+.pg-root .cm-gutters {
+  background: var(--bg) !important;
+  border-right: 1px solid var(--border) !important;
+}
+.pg-root .cm-lineNumbers .cm-gutterElement { color: var(--text-dim) !important; }
 
 /* ─── Tomorrow Night Eighties — selection override ─── */
 /* The theme sets selection to #2D2D2D which is identical to the editor
    background after the playground palette override, making selected text
    invisible. Use a lighter shade that is clearly distinguishable. */
-.pg-root .cm-s-tomorrow-night-eighties div.CodeMirror-selected { background: #515151 !important; }
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line::selection,
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line > span::selection,
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line > span > span::selection { background: rgba(81, 81, 81, 0.99) !important; }
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line::-moz-selection,
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line > span::-moz-selection,
-.pg-root .cm-s-tomorrow-night-eighties .CodeMirror-line > span > span::-moz-selection { background: rgba(81, 81, 81, 0.99) !important; }
+.pg-root .cm-s-tomorrow-night-eighties .cm-selectionBackground,
+.pg-root .cm-s-tomorrow-night-eighties.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
+  background: #515151 !important;
+}
+.pg-root .cm-s-tomorrow-night-eighties .cm-line::selection,
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span::selection,
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection { background: rgba(81, 81, 81, 0.99) !important; }
+.pg-root .cm-s-tomorrow-night-eighties .cm-line::-moz-selection,
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span::-moz-selection,
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection { background: rgba(81, 81, 81, 0.99) !important; }
 
 /* ─── Output pane ─── */
 .output-pane {
@@ -1496,22 +1505,13 @@ input[type="range"].fs-slider:disabled {
   /* The drag-to-resize divider doesn't make sense in a tabbed layout. */
   .resizer { display: none; }
 
-  /* Hide the CodeMirror line-number gutter on mobile. CodeMirror v5
-     paints line numbers in two places: the absolutely-positioned
-     `.CodeMirror-gutters` strip on the left, AND a per-line
-     `.CodeMirror-gutter-wrapper` that floats on top of each rendered
-     line. Hiding only the gutters strip leaves the per-line wrappers
-     visible (the line-numbers appear to "float" over the code on the
-     left edge), so we hide both, zero out the sizer's left margin so
-     the code takes the full width, and add a slight horizontal inset
-     on each line so tapping near the edge to position the caret /
-     start a selection is easier (without the inset the very first
-     character sits flush against the screen edge). */
-  .pg-root .CodeMirror-gutters { display: none !important; }
-  .pg-root .CodeMirror-gutter-wrapper { display: none !important; }
-  .pg-root .CodeMirror-sizer { margin-left: 0 !important; }
-  .pg-root .CodeMirror pre.CodeMirror-line,
-  .pg-root .CodeMirror pre.CodeMirror-line-like {
+  /* Hide the CodeMirror line-number gutter on mobile so the code takes
+     the full width, and add a slight horizontal inset on each line so
+     tapping near the edge to position the caret / start a selection is
+     easier (without the inset the very first character sits flush
+     against the screen edge). */
+  .pg-root .cm-gutters { display: none !important; }
+  .pg-root .cm-line {
     padding-left: 10px !important;
     padding-right: 10px !important;
   }

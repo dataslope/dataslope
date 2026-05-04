@@ -47,26 +47,50 @@ import {
 } from "react";
 import "./playground.css";
 import "./sqlPlayground.css";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/theme/monokai.css";
-import "codemirror/theme/material-darker.css";
-import "codemirror/theme/material-palenight.css";
-import "codemirror/theme/nord.css";
-import "codemirror/theme/tomorrow-night-eighties.css";
-import "codemirror/theme/solarized.css";
-import "codemirror/theme/eclipse.css";
-import "codemirror/theme/mdn-like.css";
-import "codemirror/theme/ayu-mirage.css";
-import "codemirror/theme/gruvbox-dark.css";
-import "codemirror/theme/oceanic-next.css";
-import "codemirror/theme/panda-syntax.css";
-import "codemirror/theme/darcula.css";
-import "codemirror/theme/zenburn.css";
-import "codemirror/theme/lucario.css";
-import "codemirror/theme/idea.css";
-import "codemirror/theme/base16-light.css";
-import "codemirror/addon/hint/show-hint.css";
+import { EditorState, Compartment } from "@codemirror/state";
+import {
+  EditorView,
+  keymap,
+  lineNumbers as lineNumbersExt,
+  highlightActiveLineGutter,
+  highlightActiveLine,
+  drawSelection,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+} from "@codemirror/view";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from "@codemirror/commands";
+import {
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  indentUnit,
+} from "@codemirror/language";
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+} from "@codemirror/autocomplete";
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
+import { themeFor } from "./cmExtensions";
+
+// Replace the entire editor document — the v6 idiom for what v5 called
+// `editor.setValue(s)`. Centralised so the call sites that swap tab
+// contents all read the same.
+function replaceDoc(view: EditorView, value: string): void {
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: value },
+  });
+}
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
@@ -118,7 +142,6 @@ import {
 import { FaInfo } from "react-icons/fa";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
-import type { CodeMirrorAPI, CodeMirrorEditor } from "./runtime/globals";
 import type { RuntimeInfo } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import {
@@ -886,16 +909,14 @@ function SqlPlaygroundInner() {
   }, [tabs]);
 
   // ─── CodeMirror ─────────────────────────────────────────────────────
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const editorRef = useRef<CodeMirrorEditor | null>(null);
-  // CodeMirror module reference, populated alongside the main editor
-  // boot. Kept in a ref so dialogs that mount their own read-only
-  // editors (DDL viewer) can re-use the already-loaded module without
-  // a second async import. Mirrored into state for use during render
-  // (see `cmApi`), since React forbids reading `ref.current` directly
-  // during render.
-  const codeMirrorApiRef = useRef<CodeMirrorAPI | null>(null);
-  const [cmApi, setCmApi] = useState<CodeMirrorAPI | null>(null);
+  const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<EditorView | null>(null);
+  const themeCompRef = useRef<Compartment | null>(null);
+  const wrapCompRef = useRef<Compartment | null>(null);
+  // SQL language extension is rebuilt with a fresh schema whenever
+  // tables/views change so the autocomplete popup stays in sync with
+  // DDL the user runs in the editor.
+  const sqlLangCompRef = useRef<Compartment | null>(null);
   // Render-time view of `engineRef`. Set once the engine boot effect
   // resolves so child components (e.g. ModifyStructureForm) can call
   // engine helpers without breaking the React refs rule.
@@ -979,67 +1000,95 @@ function SqlPlaygroundInner() {
   // ─── Boot the engine and CodeMirror ─────────────────────────────────
   useEffect(() => {
     let cancelled = false;
+
+    if (editorHostRef.current && !editorRef.current) {
+      const initialTheme =
+        getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
+      const initialWordWrap =
+        localStorage.getItem(storageKey("wordwrap")) !== "false";
+
+      const themeComp = new Compartment();
+      const wrapComp = new Compartment();
+      const sqlLangComp = new Compartment();
+
+      // Persist whichever tab is currently active. Tab id + tab list are
+      // read from refs so this listener doesn't need to be re-bound when
+      // either changes.
+      const persistListener = EditorView.updateListener.of((update) => {
+        if (!update.docChanged) return;
+        const id = activeTabIdRef.current;
+        if (!id) return;
+        const value = update.state.doc.toString();
+        const next = tabsRef.current.map((t) =>
+          t.id === id ? { ...t, code: value } : t,
+        );
+        tabsRef.current = next;
+        setTabs(next);
+        saveTabs(activeDbIdRef.current, next);
+      });
+
+      const view = new EditorView({
+        doc: "",
+        parent: editorHostRef.current,
+        extensions: [
+          history(),
+          drawSelection(),
+          dropCursor(),
+          EditorState.allowMultipleSelections.of(true),
+          indentOnInput(),
+          bracketMatching(),
+          closeBrackets(),
+          lineNumbersExt(),
+          highlightActiveLineGutter(),
+          foldGutter(),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          rectangularSelection(),
+          crosshairCursor(),
+          EditorState.tabSize.of(2),
+          indentUnit.of("  "),
+          autocompletion({ activateOnTyping: false, closeOnBlur: true }),
+          keymap.of([
+            {
+              key: "Mod-Enter",
+              run: () => {
+                runRef.current();
+                return true;
+              },
+            },
+            {
+              key: "Ctrl-Space",
+              run: (v) => {
+                startCompletion(v);
+                return true;
+              },
+            },
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            indentWithTab,
+          ]),
+          // Initial language config — the schema-aware variant is swapped
+          // in via `sqlLangComp.reconfigure(...)` once the engine reports
+          // its tables.
+          sqlLangComp.of(sqlLang({ dialect: SQLite, upperCaseKeywords: false })),
+          themeComp.of(themeFor(initialTheme)),
+          wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
+          persistListener,
+        ],
+      });
+
+      editorRef.current = view;
+      themeCompRef.current = themeComp;
+      wrapCompRef.current = wrapComp;
+      sqlLangCompRef.current = sqlLangComp;
+    }
+
     (async () => {
       try {
-        setLoadingMessage("Loading CodeMirror…");
-        const codeMirrorMod = await import("codemirror");
-        await Promise.all([
-          import("codemirror/mode/sql/sql"),
-          import("codemirror/addon/edit/closebrackets"),
-          import("codemirror/addon/edit/matchbrackets"),
-          import("codemirror/addon/comment/comment"),
-          import("codemirror/addon/hint/show-hint"),
-          import("codemirror/addon/hint/sql-hint"),
-          import("codemirror/keymap/sublime"),
-        ]);
-        if (cancelled) return;
-
-        const CM = (codeMirrorMod.default ??
-          codeMirrorMod) as unknown as CodeMirrorAPI;
-        codeMirrorApiRef.current = CM;
-        // CodeMirror's runtime export is function-like; wrap it so React
-        // stores it as a value instead of treating it as a state updater.
-        setCmApi(() => CM);
-        if (textareaRef.current && !editorRef.current) {
-          const initialTheme =
-            getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
-          const initialWordWrap =
-            localStorage.getItem(storageKey("wordwrap")) !== "false";
-          const editor = CM.fromTextArea(textareaRef.current, {
-            mode: "text/x-sqlite",
-            theme: initialTheme,
-            lineNumbers: true,
-            indentUnit: 2,
-            tabSize: 2,
-            indentWithTabs: false,
-            keyMap: "sublime",
-            autoCloseBrackets: true,
-            matchBrackets: true,
-            lineWrapping: initialWordWrap,
-            extraKeys: {
-              "Cmd-Enter": () => runRef.current(),
-              "Ctrl-Enter": () => runRef.current(),
-              "Ctrl-Space": "autocomplete",
-            },
-          });
-          editor.setSize("100%", "100%");
-          editorRef.current = editor;
-
-          // Persist whichever tab is currently active. We pull the latest
-          // tab id and tab list out of refs so this listener doesn't need
-          // to be re-bound every time either changes.
-          editor.on("change", ((cm: CodeMirrorEditor) => {
-            const id = activeTabIdRef.current;
-            if (!id) return;
-            const next = tabsRef.current.map((t) =>
-              t.id === id ? { ...t, code: cm.getValue() } : t,
-            );
-            tabsRef.current = next;
-            setTabs(next);
-            saveTabs(activeDbIdRef.current, next);
-          }) as (...args: unknown[]) => void);
-        }
-
         setLoadingMessage("Loading SQLite engine…");
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
@@ -1049,9 +1098,6 @@ function SqlPlaygroundInner() {
         engineRef.current = engine;
         setEngineForRender(engine);
 
-        // Refresh sidebar tree against whatever sample the engine
-        // ended up with (handles the case where `initialSampleId` was
-        // unknown and `findSampleDatabase` fell back).
         const sample = engine.activeSample();
         setActiveDbId(sample.id);
         setTables(engine.listTables());
@@ -1060,12 +1106,18 @@ function SqlPlaygroundInner() {
         setTriggers(engine.listTriggers());
 
         // Initialise the editor with the active tab's contents.
-        const editor = editorRef.current;
-        if (editor) {
+        const view = editorRef.current;
+        if (view) {
           const t = tabsRef.current.find(
             (x) => x.id === activeTabIdRef.current,
           );
-          editor.setValue(t?.code ?? "");
+          view.dispatch({
+            changes: {
+              from: 0,
+              to: view.state.doc.length,
+              insert: t?.code ?? "",
+            },
+          });
         }
 
         setLoaded(true);
@@ -1079,34 +1131,55 @@ function SqlPlaygroundInner() {
     })();
     return () => {
       cancelled = true;
+      editorRef.current?.destroy();
+      editorRef.current = null;
+      themeCompRef.current = null;
+      wrapCompRef.current = null;
+      sqlLangCompRef.current = null;
     };
   }, []);
 
   // Push editor-theme changes into CodeMirror after init.
   useEffect(() => {
-    editorRef.current?.setOption("theme", editorTheme);
+    if (editorRef.current && themeCompRef.current) {
+      editorRef.current.dispatch({
+        effects: themeCompRef.current.reconfigure(themeFor(editorTheme)),
+      });
+    }
     applyThemePalette(editorTheme);
     applyMode(editorTheme);
   }, [editorTheme]);
 
   useEffect(() => {
-    editorRef.current?.setOption("lineWrapping", wordWrap);
+    if (editorRef.current && wrapCompRef.current) {
+      editorRef.current.dispatch({
+        effects: wrapCompRef.current.reconfigure(
+          wordWrap ? EditorView.lineWrapping : [],
+        ),
+      });
+    }
   }, [wordWrap]);
 
   // Keep autocomplete schema in sync with the current database tables/views.
-  // The CodeMirror 5 sql-hint addon reads `hintOptions.tables` as a map of
-  // entity name → column name array. We rebuild it whenever tables or views
-  // change so that DDL executed in the editor (CREATE TABLE, ALTER TABLE, …)
-  // is immediately reflected in autocomplete suggestions.
+  // `@codemirror/lang-sql`'s `schema` option produces context-aware
+  // completion for `<table>.<col>` style references; we rebuild it
+  // whenever tables/views change so DDL executed in the editor
+  // (CREATE TABLE, ALTER TABLE, …) is immediately reflected in
+  // autocomplete suggestions.
   useEffect(() => {
     const engine = engineRef.current;
-    const editor = editorRef.current;
-    if (!engine || !editor) return;
+    const view = editorRef.current;
+    const comp = sqlLangCompRef.current;
+    if (!engine || !view || !comp) return;
     const schema: Record<string, string[]> = {};
     for (const name of [...tables, ...views]) {
       schema[name] = engine.listColumns(name).map((c) => c.name);
     }
-    editor.setOption("hintOptions", { tables: schema, completeSingle: false });
+    view.dispatch({
+      effects: comp.reconfigure(
+        sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
+      ),
+    });
   }, [tables, views]);
 
   useEffect(() => {
@@ -1114,7 +1187,7 @@ function SqlPlaygroundInner() {
       "--cm-font-size",
       `${fontSize}px`,
     );
-    editorRef.current?.refresh();
+    editorRef.current?.requestMeasure();
   }, [fontSize]);
 
   useEffect(() => {
@@ -1128,10 +1201,16 @@ function SqlPlaygroundInner() {
   // Swap the editor's contents whenever the active tab id changes.
   useEffect(() => {
     if (!loaded) return;
-    const editor = editorRef.current;
-    if (!editor || !activeTab) return;
-    if (editor.getValue() !== activeTab.code) {
-      editor.setValue(activeTab.code);
+    const view = editorRef.current;
+    if (!view || !activeTab) return;
+    if (view.state.doc.toString() !== activeTab.code) {
+      view.dispatch({
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: activeTab.code,
+        },
+      });
     }
     if (typeof window !== "undefined") {
       try {
@@ -1250,8 +1329,8 @@ function SqlPlaygroundInner() {
       setTabs(newTabs);
       saveTabs(sample.id, newTabs);
       setActiveTabId(newTabs[0].id);
-      const editor = editorRef.current;
-      if (editor) editor.setValue(newTabs[0].code);
+      const view = editorRef.current;
+      if (view) replaceDoc(view, newTabs[0].code);
       setResultsByTab({});
     },
     [],
@@ -1449,7 +1528,7 @@ function SqlPlaygroundInner() {
     const id = activeTabIdRef.current;
     const tab = tabsRef.current.find((t) => t.id === id);
     if (!tab) return;
-    const code = editorRef.current?.getValue() ?? tab.code;
+    const code = editorRef.current?.state.doc.toString() ?? tab.code;
     runSqlForTab(tab.id, code, tab.title);
   }, [runSqlForTab]);
 
@@ -1478,8 +1557,8 @@ function SqlPlaygroundInner() {
       setTabs(next);
       saveTabs(activeDbIdRef.current, next);
       setActiveTabId(tab.id);
-      const editor = editorRef.current;
-      if (editor) editor.setValue(sql);
+      const view = editorRef.current;
+      if (view) replaceDoc(view, sql);
       runSqlForTab(tab.id, sql, source ?? title, sourceTable);
     },
     [runSqlForTab],
@@ -1512,8 +1591,8 @@ function SqlPlaygroundInner() {
         setTabs(next);
         saveTabs(activeDbIdRef.current, next);
         setActiveTabId(tab.id);
-        const editor = editorRef.current;
-        if (editor) editor.setValue(sql);
+        const view = editorRef.current;
+        if (view) replaceDoc(view, sql);
         runSqlForTab(tab.id, sql, `Table: ${name}`, name);
       } else {
         openTabAndRun(
@@ -2726,8 +2805,8 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, fresh);
     setActiveTabId(fresh[0].id);
     setResultsByTab({});
-    const editor = editorRef.current;
-    if (editor) editor.setValue("");
+    const view = editorRef.current;
+    if (view) replaceDoc(view, "");
   }, [activeDbId]);
 
   const resetTabsForCurrentDb = useCallback(() => {
@@ -2752,8 +2831,8 @@ function SqlPlaygroundInner() {
     saveTabs(activeDbId, fresh);
     setActiveTabId(fresh[0].id);
     setResultsByTab({});
-    const editor = editorRef.current;
-    if (editor) editor.setValue(fresh[0].code);
+    const view = editorRef.current;
+    if (view) replaceDoc(view, fresh[0].code);
     showToast("Query tabs reset to defaults.");
   }, [activeDbId, customDb, showToast]);
 
@@ -3766,7 +3845,6 @@ function SqlPlaygroundInner() {
               </Dialog.Description>
               <DdlViewer
                 sql={ddlDialog?.sql ?? ""}
-                cmApi={cmApi}
                 theme={editorTheme}
               />
               <div className="confirm-actions">
@@ -4294,9 +4372,7 @@ function SqlPlaygroundInner() {
             </div>
 
             <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}>
-              <div className="editor-wrap">
-                <textarea ref={textareaRef} defaultValue="" />
-              </div>
+              <div className="editor-wrap" ref={editorHostRef} />
               {result && statusState !== "running" && (
                 <div
                   className={`sql-editor-elapsed${result.error ? " sql-editor-elapsed-err" : ""}`}
@@ -6718,69 +6794,70 @@ function ColumnFlag({
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// DdlViewer — read-only CodeMirror instance used inside the View DDL
-// dialog so the SQL is syntax-highlighted and the user can scroll /
-// select with their keyboard. Re-uses the already-loaded CodeMirror
-// module (`cmApi`) instead of re-importing it.
+// DdlViewer — read-only EditorView mounted inside the View DDL dialog so
+// the SQL is syntax-highlighted and the user can scroll / select with
+// their keyboard.
 // ────────────────────────────────────────────────────────────────────────
 
 function DdlViewer({
   sql,
-  cmApi,
   theme,
 }: {
   sql: string;
-  cmApi: CodeMirrorAPI | null;
   theme: string;
 }) {
-  const hostRef = useRef<HTMLTextAreaElement | null>(null);
-  const editorRef = useRef<CodeMirrorEditor | null>(null);
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const viewRef = useRef<EditorView | null>(null);
+  const themeCompRef = useRef<Compartment | null>(null);
 
   useEffect(() => {
-    if (!cmApi || !hostRef.current || editorRef.current) return;
-    const cm = cmApi.fromTextArea(hostRef.current, {
-      mode: "text/x-sqlite",
-      theme,
-      lineNumbers: true,
-      indentUnit: 2,
-      tabSize: 2,
-      // `readOnly: true` keeps the cursor active (unlike "nocursor") so
-      // Ctrl-A / Cmd-A selects all text within the editor rather than
-      // falling through to the browser's page-level select-all.
-      readOnly: true,
-      lineWrapping: false,
+    if (!hostRef.current || viewRef.current) return;
+    const themeComp = new Compartment();
+    const view = new EditorView({
+      doc: sql,
+      parent: hostRef.current,
+      extensions: [
+        // `readOnly: true` keeps the cursor active so Ctrl-A / Cmd-A
+        // selects all text within the editor rather than falling through
+        // to the browser's page-level select-all. (`EditorView.editable`
+        // would disable focus entirely, like v5's `"nocursor"`.)
+        EditorState.readOnly.of(true),
+        drawSelection(),
+        lineNumbersExt(),
+        foldGutter(),
+        EditorState.tabSize.of(2),
+        indentUnit.of("  "),
+        sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
+        themeComp.of(themeFor(theme)),
+      ],
     });
-    cm.setValue(sql);
-    cm.setSize("100%", "100%");
-    editorRef.current = cm;
+    viewRef.current = view;
+    themeCompRef.current = themeComp;
     return () => {
-      try {
-        editorRef.current?.toTextArea?.();
-      } catch {
-        // ignore teardown errors
-      }
-      editorRef.current = null;
+      view.destroy();
+      viewRef.current = null;
+      themeCompRef.current = null;
     };
-    // We only want this to run once per mount — sql / theme updates
-    // are handled by the effects below.
+    // sql / theme updates are handled by the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cmApi]);
+  }, []);
 
   useEffect(() => {
-    if (editorRef.current && editorRef.current.getValue() !== sql) {
-      editorRef.current.setValue(sql);
+    const view = viewRef.current;
+    if (view && view.state.doc.toString() !== sql) {
+      replaceDoc(view, sql);
     }
   }, [sql]);
 
   useEffect(() => {
-    editorRef.current?.setOption("theme", theme);
+    if (viewRef.current && themeCompRef.current) {
+      viewRef.current.dispatch({
+        effects: themeCompRef.current.reconfigure(themeFor(theme)),
+      });
+    }
   }, [theme]);
 
-  return (
-    <div className="sql-ddl-code-wrap">
-      <textarea ref={hostRef} defaultValue={sql} readOnly />
-    </div>
-  );
+  return <div className="sql-ddl-code-wrap" ref={hostRef} />;
 }
 
 // ────────────────────────────────────────────────────────────────────────
