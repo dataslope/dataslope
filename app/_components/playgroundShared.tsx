@@ -382,14 +382,14 @@ export function SettingsPanel({
                       min={10}
                       max={22}
                       step={1}
-                      value={outputFontSize}
+                      value={outputFontSizeEnabled ? outputFontSize : fontSize}
                       onChange={(e) =>
                         setOutputFontSize(Number(e.target.value))
                       }
                       disabled={!outputFontSizeEnabled}
                       aria-label="Output font size"
                     />
-                    <span className="font-size-val">{outputFontSize}px</span>
+                    <span className="font-size-val">{outputFontSizeEnabled ? outputFontSize : fontSize}px</span>
                   </div>
                 </div>
 

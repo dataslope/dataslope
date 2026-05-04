@@ -582,6 +582,61 @@
   overflow: auto;
 }
 
+/* Flash-wrapper: plays a quick fade-in whenever it mounts (i.e. on every
+   new query result, since its `key` prop is bumped). The animation is short
+   and subtle so it doesn't distract during normal use. */
+.sql-result-flash-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: sql-result-flash 180ms ease-out;
+}
+
+@keyframes sql-result-flash {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
+}
+
+/* Tab bar shown at the top of the results pane when a query returns
+   more than one result set. */
+.sql-result-set-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 8px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.sql-result-set-tab {
+  padding: 3px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: color 100ms, background 100ms;
+}
+
+.sql-result-set-tab:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-result-set-tab.active {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--border);
+  font-weight: 500;
+}
+
 .sql-result-set {
   display: flex;
   flex-direction: column;
@@ -1174,6 +1229,19 @@
   background: color-mix(in srgb, var(--bg2) 92%, transparent);
   border-radius: 10px;
   backdrop-filter: blur(8px);
+}
+
+.sql-toolbar-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sql-toolbar-shortcut-sep {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1;
+  opacity: 0.6;
 }
 
 .sql-toolbar .kbd {

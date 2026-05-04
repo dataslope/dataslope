@@ -926,6 +926,8 @@ function SqlPlaygroundInner() {
   // Latest run handler in a ref so the editor's keymap can call it
   // without being re-bound on every render.
   const runRef = useRef<() => void>(() => undefined);
+  // Handler to run a specific SQL string (used for "run selection").
+  const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
   // Tab change requests from the editor's onChange need access to the
   // latest active tab id. Keep a ref so we don't re-create the editor
   // every time the user switches tabs.
@@ -1050,7 +1052,22 @@ function SqlPlaygroundInner() {
           autocompletion({ activateOnTyping: false, closeOnBlur: true }),
           keymap.of([
             {
+              // Run selection if text is selected, otherwise run all.
               key: "Mod-Enter",
+              run: (v) => {
+                const sel = v.state.selection.main;
+                if (!sel.empty) {
+                  const selected = v.state.sliceDoc(sel.from, sel.to);
+                  runSelectionRef.current(selected);
+                } else {
+                  runRef.current();
+                }
+                return true;
+              },
+            },
+            {
+              // Always run all queries (ignores any selection).
+              key: "Mod-Shift-Enter",
               run: () => {
                 runRef.current();
                 return true;
@@ -1532,11 +1549,25 @@ function SqlPlaygroundInner() {
     runSqlForTab(tab.id, code, tab.title);
   }, [runSqlForTab]);
 
+  // Run a specific SQL string (used for "run selection").
+  const runSelection = useCallback(
+    (sql: string) => {
+      const id = activeTabIdRef.current;
+      const tab = tabsRef.current.find((t) => t.id === id);
+      if (!tab) return;
+      runSqlForTab(tab.id, sql, tab.title);
+    },
+    [runSqlForTab],
+  );
+
   useEffect(() => {
     runRef.current = () => {
       runActiveTab();
     };
-  }, [runActiveTab]);
+    runSelectionRef.current = (sql: string) => {
+      runSelection(sql);
+    };
+  }, [runActiveTab, runSelection]);
 
   // Creates a new tab named `title` with `sql` as its contents, makes it
   // active, and runs the SQL against the engine so the results land in
@@ -4384,16 +4415,33 @@ function SqlPlaygroundInner() {
                 </div>
               )}
               <div className="sql-toolbar">
-                <span
-                  className="kbd-group"
-                  title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-                >
-                  <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                  <span className="kbd-plus" aria-hidden="true">
-                    +
+                <div className="sql-toolbar-shortcuts">
+                  <span
+                    className="kbd-group"
+                    title={isMac ? "Cmd + Enter — run selection or all" : "Ctrl + Enter — run selection or all"}
+                  >
+                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className="kbd-plus" aria-hidden="true">
+                      +
+                    </span>
+                    <kbd className="kbd">Enter</kbd>
                   </span>
-                  <kbd className="kbd">Enter</kbd>
-                </span>
+                  <span className="sql-toolbar-shortcut-sep" aria-hidden="true">/</span>
+                  <span
+                    className="kbd-group"
+                    title={isMac ? "Cmd + Shift + Enter — run all" : "Ctrl + Shift + Enter — run all"}
+                  >
+                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className="kbd-plus" aria-hidden="true">
+                      +
+                    </span>
+                    <kbd className="kbd">⇧</kbd>
+                    <span className="kbd-plus" aria-hidden="true">
+                      +
+                    </span>
+                    <kbd className="kbd">Enter</kbd>
+                  </span>
+                </div>
                 <button
                   type="button"
                   className={`run-btn${statusState === "running" ? " running" : ""}`}
@@ -4750,6 +4798,11 @@ function ResultView({
     pendingEditsByIndex: PendingEditsByResult;
   } | null>(null);
 
+  // Active result-set tab index for multi-set results.
+  const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
+  // Incremented on each new result to trigger the fade-in animation.
+  const [flashKey, setFlashKey] = useState<number>(0);
+
   // Reset pagination + transient actions whenever a new result lands.
   // Table-edit actions refresh the result in place, so they can opt into
   // preserving the unsaved state that belongs to the other action.
@@ -4765,6 +4818,8 @@ function ResultView({
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     setActiveEditCellByIndex({});
+    setActiveSetIdx(0);
+    setFlashKey((k) => k + 1);
   }, [result]);
 
   const getState = useCallback(
@@ -5079,153 +5134,171 @@ function ResultView({
   }
   const pendingCount =
     pendingDelete !== null ? (selectedByIndex[pendingDelete]?.size ?? 0) : 0;
+
+  // Clamp activeSetIdx in case a new result has fewer sets.
+  const safeSetIdx = Math.min(activeSetIdx, result.sets.length - 1);
+
+  // ── Compute rendering data for the currently-visible result set ──
+  const computeSetRenderData = (idx: number) => {
+    const set = result.sets[idx];
+    if (!set) return null;
+    const isLazy = result.lazySql !== undefined && idx === 0;
+    const sorting = sortingByIndex[idx] ?? [];
+    let totalRows: number;
+    let currentPage: number;
+    let startIdx: number;
+    let visibleRows: QueryExecResult["values"];
+    let originalIndices: number[];
+    if (isLazy) {
+      const effective =
+        globalPageSize > 0
+          ? globalPageSize
+          : Math.max(result.lazyTotalCount ?? 0, 1);
+      totalRows = result.lazyTotalCount ?? set.values.length;
+      currentPage = result.lazyPage ?? 0;
+      startIdx = currentPage * effective;
+      visibleRows = set.values;
+      originalIndices = set.values.map((_, ri) => startIdx + ri);
+    } else {
+      const st = getState(idx);
+      totalRows = set.values.length;
+      const effective =
+        globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+      const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+      currentPage = Math.min(st.page, totalPages - 1);
+      startIdx = currentPage * effective;
+      const indexed = set.values.map((values, i) => ({
+        values,
+        originalIndex: i,
+      }));
+      let sortedIndexed = indexed;
+      if (sorting.length > 0) {
+        const parsed = parseColumnId(sorting[0].id);
+        if (parsed) {
+          sortedIndexed = [...indexed].sort((a, b) => {
+            const cmp = compareCellValues(
+              a.values[parsed.ci],
+              b.values[parsed.ci],
+            );
+            return sorting[0].desc ? -cmp : cmp;
+          });
+        }
+      }
+      const visibleIndexed =
+        globalPageSize > 0
+          ? sortedIndexed.slice(startIdx, startIdx + effective)
+          : sortedIndexed;
+      visibleRows = visibleIndexed.map((item) => item.values);
+      originalIndices = visibleIndexed.map((item) => item.originalIndex);
+    }
+    return { set, isLazy, sorting, totalRows, currentPage, startIdx, visibleRows, originalIndices };
+  };
+
+  const activeSetData = computeSetRenderData(safeSetIdx);
+
   return (
     <>
-      <div className="sql-result-sets">
-        {result.sets.map((set, idx) => {
-          // ── Lazy vs. non-lazy page computation ────────────────────────
-          // For lazy results (single SELECT wrapped with execPaged), the
-          // set already contains only the current page's rows.  For
-          // non-lazy results (multi-statement, LIMIT clause, or "All"
-          // mode), we slice client-side as before.
-          const isLazy = result.lazySql !== undefined && idx === 0;
-          const sorting = sortingByIndex[idx] ?? [];
-          let totalRows: number;
-          let currentPage: number;
-          let startIdx: number;
-          let visibleRows: QueryExecResult["values"];
-          let originalIndices: number[];
-          if (isLazy) {
-            const effective =
-              globalPageSize > 0
-                ? globalPageSize
-                : Math.max(result.lazyTotalCount ?? 0, 1);
-            totalRows = result.lazyTotalCount ?? set.values.length;
-            currentPage = result.lazyPage ?? 0;
-            startIdx = currentPage * effective;
-            visibleRows = set.values;
-            originalIndices = set.values.map((_, ri) => startIdx + ri);
-          } else {
-            const st = getState(idx);
-            totalRows = set.values.length;
-            const effective =
-              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
-            const totalPages = Math.max(1, Math.ceil(totalRows / effective));
-            currentPage = Math.min(st.page, totalPages - 1);
-            startIdx = currentPage * effective;
-            // Apply client-side sorting to the full result set before slicing,
-            // keeping track of each row's original index so selection / edits
-            // still target the correct absolute row.
-            const indexed = set.values.map((values, i) => ({
-              values,
-              originalIndex: i,
-            }));
-            let sortedIndexed = indexed;
-            if (sorting.length > 0) {
-              const parsed = parseColumnId(sorting[0].id);
-              if (parsed) {
-                sortedIndexed = [...indexed].sort((a, b) => {
-                  const cmp = compareCellValues(
-                    a.values[parsed.ci],
-                    b.values[parsed.ci],
-                  );
-                  return sorting[0].desc ? -cmp : cmp;
-                });
-              }
-            }
-            const visibleIndexed =
-              globalPageSize > 0
-                ? sortedIndexed.slice(startIdx, startIdx + effective)
-                : sortedIndexed;
-            visibleRows = visibleIndexed.map((item) => item.values);
-            originalIndices = visibleIndexed.map((item) => item.originalIndex);
-          }
-          const pkCols = pkColumnsForSet(set);
-          const selected = selectedByIndex[idx];
-          const pendingEdits = pendingEditsByIndex[idx];
-          const handleSortingChange = (
-            newSorting: SortingState | ((old: SortingState) => SortingState),
-          ) => {
-            const resolved =
-              typeof newSorting === "function"
-                ? newSorting(sorting)
-                : newSorting;
-            setSortingByIndex((prev) => ({ ...prev, [idx]: resolved }));
-            // Reset to page 0 whenever sort changes.
-            setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
-            if (isLazy) {
-              const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              if (resolved.length > 0) {
-                const parsed = parseColumnId(resolved[0].id);
-                if (parsed) {
-                  const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
-                  onLoadPage(sortedSql, 0);
-                }
-              } else {
-                onLoadPage(baseSql, 0);
-              }
-            }
-          };
-          return (
-            <ResultTableBody
+      {result.sets.length > 1 && (
+        <div className="sql-result-set-tabs">
+          {result.sets.map((_, idx) => (
+            <button
               key={idx}
-              set={set}
-              index={idx}
-              visible={visibleRows}
-              originalIndices={originalIndices}
-              sorting={sorting}
-              onSortingChange={handleSortingChange}
-              keyHints={keyHints}
-              deletable={pkCols !== null}
-              editable={isEditable}
-              sourceTable={sourceTable}
-              constraintInfo={constraintInfo}
-              selectedRows={selected}
-              pendingEdits={pendingEdits}
-              activeEditCell={activeEditCellByIndex[idx] ?? null}
-              onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
-              onToggleVisible={(absoluteIndices, select) =>
-                setVisibleSelection(idx, absoluteIndices, select)
+              type="button"
+              className={`sql-result-set-tab${safeSetIdx === idx ? " active" : ""}`}
+              onClick={() => setActiveSetIdx(idx)}
+            >
+              Set {idx + 1}
+            </button>
+          ))}
+        </div>
+      )}
+      <div key={flashKey} className="sql-result-flash-wrapper">
+        <div className="sql-result-sets">
+          {activeSetData && (() => {
+            const idx = safeSetIdx;
+            const { set, isLazy, sorting, visibleRows, originalIndices } = activeSetData;
+            const pkCols = pkColumnsForSet(set);
+            const selected = selectedByIndex[idx];
+            const pendingEdits = pendingEditsByIndex[idx];
+            const handleSortingChange = (
+              newSorting: SortingState | ((old: SortingState) => SortingState),
+            ) => {
+              const resolved =
+                typeof newSorting === "function"
+                  ? newSorting(sorting)
+                  : newSorting;
+              setSortingByIndex((prev) => ({ ...prev, [idx]: resolved }));
+              setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
+              if (isLazy) {
+                const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+                if (resolved.length > 0) {
+                  const parsed = parseColumnId(resolved[0].id);
+                  if (parsed) {
+                    const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                    onLoadPage(sortedSql, 0);
+                  }
+                } else {
+                  onLoadPage(baseSql, 0);
+                }
               }
-              onSetPendingEdit={(cellKey, value) =>
-                setPendingEdit(idx, cellKey, value)
-              }
-              onClearPendingEdit={(cellKey) =>
-                clearPendingEdit(idx, cellKey)
-              }
-              onSetActiveEditCell={(cellKey) =>
-                setActiveEditCell(idx, cellKey)
-              }
-              onDeleteSingleRow={
-                pkCols !== null
-                  ? (absoluteRow) =>
-                      requestDeleteSingleRow(idx, absoluteRow)
-                  : undefined
-              }
-              onDuplicateRow={
-                sourceTable && onDuplicateRow
-                  ? (columnNames, values) =>
-                      onDuplicateRow(sourceTable, columnNames, values)
-                  : undefined
-              }
-            />
-          );
-        })}
+            };
+            return (
+              <ResultTableBody
+                key={idx}
+                set={set}
+                index={idx}
+                visible={visibleRows}
+                originalIndices={originalIndices}
+                sorting={sorting}
+                onSortingChange={handleSortingChange}
+                keyHints={keyHints}
+                deletable={pkCols !== null}
+                editable={isEditable}
+                sourceTable={sourceTable}
+                constraintInfo={constraintInfo}
+                selectedRows={selected}
+                pendingEdits={pendingEdits}
+                activeEditCell={activeEditCellByIndex[idx] ?? null}
+                onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
+                onToggleVisible={(absoluteIndices, select) =>
+                  setVisibleSelection(idx, absoluteIndices, select)
+                }
+                onSetPendingEdit={(cellKey, value) =>
+                  setPendingEdit(idx, cellKey, value)
+                }
+                onClearPendingEdit={(cellKey) =>
+                  clearPendingEdit(idx, cellKey)
+                }
+                onSetActiveEditCell={(cellKey) =>
+                  setActiveEditCell(idx, cellKey)
+                }
+                onDeleteSingleRow={
+                  pkCols !== null
+                    ? (absoluteRow) =>
+                        requestDeleteSingleRow(idx, absoluteRow)
+                    : undefined
+                }
+                onDuplicateRow={
+                  sourceTable && onDuplicateRow
+                    ? (columnNames, values) =>
+                        onDuplicateRow(sourceTable, columnNames, values)
+                    : undefined
+                }
+              />
+            );
+          })()}
+        </div>
       </div>
       <div className="sql-result-pagers">
-        {result.sets.map((set, idx) => {
-          const isLazy = result.lazySql !== undefined && idx === 0;
-          const sorting = sortingByIndex[idx] ?? [];
-          let totalRows: number;
-          let currentPage: number;
+        {activeSetData && (() => {
+          const idx = safeSetIdx;
+          const { set, isLazy, sorting, totalRows, currentPage } = activeSetData;
           let handlePageChange: (p: number) => void;
           let handlePageSizeChange: (s: number) => void;
           let currentPageRows: QueryExecResult["values"];
           let allRows: QueryExecResult["values"];
           let effectiveLazySql: string;
           if (isLazy) {
-            totalRows = result.lazyTotalCount ?? set.values.length;
-            currentPage = result.lazyPage ?? 0;
             const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
             effectiveLazySql = baseSql;
             if (sorting.length > 0) {
@@ -5234,36 +5307,25 @@ function ResultView({
                 effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
               }
             }
-            handlePageChange = (p: number) =>
-              onLoadPage(effectiveLazySql, p);
+            handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
             handlePageSizeChange = (s: number) => {
               onSetGlobalPageSize(s);
-              // For "All" (s === 0), onLoadPage triggers a non-lazy full load.
               onLoadPage(effectiveLazySql, 0);
             };
-            // For lazy, set.values is already the current page.
             currentPageRows = set.values;
-            allRows = []; // unused for lazy — onFetchAllRows handles export
+            allRows = [];
           } else {
-            const st = getState(idx);
-            totalRows = set.values.length;
-            currentPage = st.page;
+            const effective =
+              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+            const totalPagesLocal = Math.max(1, Math.ceil(totalRows / effective));
+            const safePage = Math.min(currentPage, totalPagesLocal - 1);
+            const startIdx = safePage * effective;
             handlePageChange = (p: number) => setPage(idx, p);
             handlePageSizeChange = (s: number) => {
               onSetGlobalPageSize(s);
               setPage(idx, 0);
             };
             effectiveLazySql = "";
-            const effective =
-              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
-            const totalPagesLocal = Math.max(
-              1,
-              Math.ceil(totalRows / effective),
-            );
-            const safePage = Math.min(currentPage, totalPagesLocal - 1);
-            const startIdx = safePage * effective;
-            // Apply the same sorting used by the table body so exported
-            // rows match what the user sees on screen.
             const indexed = set.values.map((values, i) => ({
               values,
               originalIndex: i,
@@ -5297,7 +5359,7 @@ function ResultView({
               key={idx}
               totalRows={totalRows}
               index={idx}
-              showSetLabel={result.sets.length > 1}
+              showSetLabel={false}
               pageSize={globalPageSize}
               page={currentPage}
               onPageChange={handlePageChange}
@@ -5317,7 +5379,7 @@ function ResultView({
               tabTitle={tabTitle}
             />
           );
-        })}
+        })()}
       </div>
       <AlertDialog.Root
         open={pendingDelete !== null}
