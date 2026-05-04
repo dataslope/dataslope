@@ -75,6 +75,7 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
+import { Switch } from "@base-ui-components/react/switch";
 import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import {
@@ -2939,7 +2940,7 @@ function SqlPlaygroundInner() {
           <div className="logo">
             <Link href="/" aria-label="Dataslope home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dataslope-blue@4x.png" alt="Dataslope logo" className="brand-logo" />
+              <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
             </Link>
             <Link href="/" className="brand-name">
               Dataslope
@@ -5959,9 +5960,10 @@ function ResultPager({
   const start = safePage * effective;
   const end = Math.min(totalRows, start + effective);
 
-  // Show "Current page" export section only when pagination is active
-  // (i.e. there are more rows than the current page holds).
-  const showCurrentPageExport = pageSize > 0 && totalRows > pageSize;
+  // Whether the export toggle is available (pagination is active).
+  const canExportCurrentPage = pageSize > 0 && totalRows > pageSize;
+  // Toggle: false = entire result set (default), true = current page only.
+  const [exportCurrentPageOnly, setExportCurrentPageOnly] = useState(false);
 
   // Controlled input for direct page navigation.
   const [pageInput, setPageInput] = useState(String(safePage + 1));
@@ -6144,54 +6146,9 @@ function ResultPager({
         <Menu.Portal>
           <Menu.Positioner sideOffset={6} align="end">
             <Menu.Popup className="bui-popup export-dropdown sql-result-export-popup">
-              {showCurrentPageExport && (
-                <>
-                  <div className="sql-result-export-group-label">
-                    Current page
-                  </div>
-                  <Menu.Item
-                    className="example-item export-item"
-                    onClick={() => handleExport("page", "csv")}
-                  >
-                    <span className="ext-badge">.csv</span>
-                    <div className="export-item-text">
-                      <div className="ex-title">CSV</div>
-                      <div className="ex-desc">Comma-separated values</div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item
-                    className="example-item export-item"
-                    onClick={() => handleExport("page", "json")}
-                  >
-                    <span className="ext-badge">.json</span>
-                    <div className="export-item-text">
-                      <div className="ex-title">JSON</div>
-                      <div className="ex-desc">Array of objects</div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item
-                    className="example-item export-item"
-                    onClick={() => handleExport("page", "sql")}
-                  >
-                    <span className="ext-badge">.sql</span>
-                    <div className="export-item-text">
-                      <div className="ex-title">SQL</div>
-                      <div className="ex-desc">INSERT statements</div>
-                    </div>
-                  </Menu.Item>
-                  <div
-                    role="separator"
-                    aria-orientation="horizontal"
-                    className="sql-result-export-sep"
-                  />
-                </>
-              )}
-              <div className="sql-result-export-group-label">
-                Entire result set
-              </div>
               <Menu.Item
                 className="example-item export-item"
-                onClick={() => handleExport("all", "csv")}
+                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "csv")}
               >
                 <span className="ext-badge">.csv</span>
                 <div className="export-item-text">
@@ -6201,7 +6158,7 @@ function ResultPager({
               </Menu.Item>
               <Menu.Item
                 className="example-item export-item"
-                onClick={() => handleExport("all", "json")}
+                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "json")}
               >
                 <span className="ext-badge">.json</span>
                 <div className="export-item-text">
@@ -6211,7 +6168,7 @@ function ResultPager({
               </Menu.Item>
               <Menu.Item
                 className="example-item export-item"
-                onClick={() => handleExport("all", "sql")}
+                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "sql")}
               >
                 <span className="ext-badge">.sql</span>
                 <div className="export-item-text">
@@ -6219,6 +6176,28 @@ function ResultPager({
                   <div className="ex-desc">INSERT statements</div>
                 </div>
               </Menu.Item>
+              {canExportCurrentPage && (
+                <>
+                  <div
+                    role="separator"
+                    aria-orientation="horizontal"
+                    className="sql-result-export-sep"
+                  />
+                  <div className="sql-result-export-toggle-row">
+                    <span className="sql-result-export-toggle-label">
+                      Current page only
+                    </span>
+                    <Switch.Root
+                      checked={exportCurrentPageOnly}
+                      onCheckedChange={setExportCurrentPageOnly}
+                      className="bui-switch sql-export-switch"
+                      aria-label="Export current page only"
+                    >
+                      <Switch.Thumb className="bui-switch-thumb" />
+                    </Switch.Root>
+                  </div>
+                </>
+              )}
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>

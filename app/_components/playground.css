@@ -979,7 +979,38 @@ input[type="range"].fs-slider:disabled {
   user-select: none;
 }
 .setting-checkbox-row input[type="checkbox"] {
-  width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent);
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: var(--bg3);
+  box-shadow: none;
+  outline: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.12s;
+}
+.setting-checkbox-row input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.setting-checkbox-row input[type="checkbox"]:checked {
+  background: color-mix(in srgb, var(--accent) 80%, var(--bg3));
+}
+.setting-checkbox-row input[type="checkbox"]:checked::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 7px;
+  border: 1.5px solid var(--bg);
+  border-top: none;
+  border-left: none;
+  transform: rotate(40deg) translate(-1px, -1px);
 }
 
 /* Setting row using a Base UI Switch (e.g. Word Wrap, Clear Output). The
