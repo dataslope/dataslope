@@ -554,7 +554,9 @@ interface QueryRunResult {
 type ResultSetExportScope = "page" | "all";
 
 interface ResultSetExportSnapshot {
+  setIndex: number;
   columns: string[];
+  allRows: QueryExecResult["values"];
   rows: QueryExecResult["values"];
   totalRows: number;
   pageSize: number;
@@ -2395,14 +2397,20 @@ function SqlPlaygroundInner() {
   const handleResultSetExport = useCallback(
     (format: "csv" | "json" | "sql" | "parquet") => {
       if (!result || result.sets.length === 0) return;
-      const set = result.sets[0];
-      const columns = set.columns;
+      const set =
+        result.sets[resultSetExportSnapshot?.setIndex ?? 0] ?? result.sets[0];
+      const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows: QueryExecResult["values"];
       const scope = resultSetExportScope;
       if (scope === "page" && resultSetExportSnapshot) {
         rows = resultSetExportSnapshot.rows;
-      } else if (result.lazySql !== undefined) {
+      } else if (
+        result.lazySql !== undefined &&
+        (resultSetExportSnapshot?.setIndex ?? 0) === 0
+      ) {
         rows = handleFetchAllRows(result.lazySql);
+      } else if (resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.allRows;
       } else {
         rows = set.values;
       }
@@ -6185,12 +6193,13 @@ function ResultView({
       onExportSnapshotChange(null);
       return;
     }
-    const set = result.sets[0];
+    const setIndex = safeSetIdx;
+    const set = result.sets[setIndex];
     if (!set) {
       onExportSnapshotChange(null);
       return;
     }
-    const isLazy = result.lazySql !== undefined;
+    const isLazy = result.lazySql !== undefined && setIndex === 0;
     const effective =
       globalPageSize > 0
         ? globalPageSize
@@ -6200,7 +6209,9 @@ function ResultView({
           );
     if (isLazy) {
       onExportSnapshotChange({
+        setIndex,
         columns: set.columns,
+        allRows: set.values,
         rows: set.values,
         totalRows: result.lazyTotalCount ?? set.values.length,
         pageSize: effective,
@@ -6208,8 +6219,8 @@ function ResultView({
       });
       return;
     }
-    const sorting = sortingByIndex[0] ?? [];
-    const st = getState(0);
+    const sorting = sortingByIndex[setIndex] ?? [];
+    const st = getState(setIndex);
     let rows = set.values;
     if (sorting.length > 0) {
       const parsed = parseColumnId(sorting[0].id);
@@ -6227,7 +6238,9 @@ function ResultView({
     const visibleRows =
       globalPageSize > 0 ? rows.slice(start, start + effective) : rows;
     onExportSnapshotChange({
+      setIndex,
       columns: set.columns,
+      allRows: rows,
       rows: visibleRows,
       totalRows,
       pageSize: effective,
