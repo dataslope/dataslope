@@ -25,6 +25,21 @@ interface SqlCompletionContextInfo {
 
 const identifierPattern = /^[A-Za-z_][\w$]*$/;
 const validIdentifierPrefix = /^[\w$]*$/;
+const sqlIdentifierPattern =
+  String.raw`(?:[A-Za-z_][\w$]*|"(?:""|[^"])+"|` +
+  "`[^`]+`" +
+  String.raw`|\[[^\]]+\])`;
+const qualifiedIdentifierPattern = new RegExp(
+  `(${sqlIdentifierPattern})\\.\\s*([A-Za-z_][\\w$]*)?$`,
+);
+const tableReferencePattern = new RegExp(
+  String.raw`\b(?:FROM|JOIN|UPDATE|INTO)\s+(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?`,
+  "gi",
+);
+const commaTableReferencePattern = new RegExp(
+  String.raw`,\s*(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?`,
+  "g",
+);
 
 const tableSection = { name: "Tables", rank: 10 };
 const viewSection = { name: "Views", rank: 11 };
@@ -243,7 +258,10 @@ function currentStatementBeforeCursor(sql: string, pos: number): string {
 }
 
 function tokenize(sql: string): string[] {
-  return maskCommentsAndStrings(sql).match(/[A-Za-z_][\w$]*|[,().]/g) ?? [];
+  return (
+    maskCommentsAndStrings(sql).match(/[A-Za-z_][\w$]*|[,().;=*<>+\-/]/g) ??
+    []
+  );
 }
 
 function isKeyword(value: string | undefined): boolean {
@@ -258,9 +276,7 @@ function inferCompletionContext(
     context.pos,
   );
   const word = context.matchBefore(/[A-Za-z_][\w$]*/);
-  const qualified = statement.match(
-    /((?:[A-Za-z_][\w$]*)|(?:"(?:""|[^"])+")|(?:`[^`]+`)|(?:\[[^\]]+\]))\.\s*([A-Za-z_][\w$]*)?$/,
-  );
+  const qualified = statement.match(qualifiedIdentifierPattern);
 
   if (qualified) {
     return {
@@ -310,16 +326,14 @@ function extractTableReferences(sql: string): Map<string, string> {
     if (alias && !isKeyword(alias)) references.set(alias.toLowerCase(), tableName);
   };
 
-  const tableRef =
-    /\b(?:FROM|JOIN|UPDATE|INTO)\s+((?:[A-Za-z_][\w$]*)|(?:"(?:""|[^"])+")|(?:`[^`]+`)|(?:\[[^\]]+\]))(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?/gi;
   let match: RegExpExecArray | null;
-  while ((match = tableRef.exec(masked))) {
+  tableReferencePattern.lastIndex = 0;
+  while ((match = tableReferencePattern.exec(masked))) {
     addReference(match[1], match[2]);
   }
 
-  const commaRef =
-    /,\s*((?:[A-Za-z_][\w$]*)|(?:"(?:""|[^"])+")|(?:`[^`]+`)|(?:\[[^\]]+\]))(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?/g;
-  while ((match = commaRef.exec(masked))) {
+  commaTableReferencePattern.lastIndex = 0;
+  while ((match = commaTableReferencePattern.exec(masked))) {
     const beforeComma = masked.slice(0, match.index).toUpperCase();
     const lastBoundary = Math.max(
       beforeComma.lastIndexOf(" FROM "),

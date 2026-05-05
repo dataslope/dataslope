@@ -92,6 +92,15 @@ function replaceDoc(view: EditorView, value: string): void {
     changes: { from: 0, to: view.state.doc.length, insert: value },
   });
 }
+
+function sqlAutocompletion(schema: SqlCompletionSchema) {
+  return autocompletion({
+    activateOnTyping: true,
+    activateOnTypingDelay: 75,
+    closeOnBlur: true,
+    override: [createSqlCompletionSource(schema)],
+  });
+}
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
@@ -1564,12 +1573,7 @@ function SqlPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           completionComp.of(
-            autocompletion({
-              activateOnTyping: true,
-              activateOnTypingDelay: 75,
-              closeOnBlur: true,
-              override: [createSqlCompletionSource({ entities: [] })],
-            }),
+            sqlAutocompletion({ entities: [] }),
           ),
           tooltips({ parent: document.body }),
           keymap.of([
@@ -1742,12 +1746,7 @@ function SqlPlaygroundInner() {
           sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
         ),
         completionComp.reconfigure(
-          autocompletion({
-            activateOnTyping: true,
-            activateOnTypingDelay: 75,
-            closeOnBlur: true,
-            override: [createSqlCompletionSource(completionSchema)],
-          }),
+          sqlAutocompletion(completionSchema),
         ),
       ],
     });
