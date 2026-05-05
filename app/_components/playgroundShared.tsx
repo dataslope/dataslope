@@ -7,7 +7,7 @@
 // playground (the SQL playground) can mount the same components without
 // duplicating them.
 
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
@@ -515,7 +515,9 @@ export function SettingsPanel({
                 </div>
               </div>
             </Tabs.Panel>
-            {extraTabs?.map((t) => t.panel)}
+            {extraTabs?.map((t) => (
+              <Fragment key={t.value}>{t.panel}</Fragment>
+            ))}
           </Tabs.Root>
         </Dialog.Popup>
       </Dialog.Portal>

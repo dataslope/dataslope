@@ -631,6 +631,19 @@ type PragmaSettings = {
   caseSensitiveLike: boolean;
 };
 
+/** Minimum and maximum valid SQLite page sizes. */
+const PRAGMA_PAGE_SIZE_MIN = 512;
+const PRAGMA_PAGE_SIZE_MAX = 65536;
+
+/** Maps the human-readable `synchronous` setting names to their
+ *  PRAGMA integer values. Kept at module level to avoid re-creating
+ *  the object on every `applyPragmasToEngine` call. */
+const PRAGMA_SYNC_MAP: Record<string, string> = {
+  off: "0",
+  normal: "1",
+  full: "2",
+};
+
 /** Apply a set of pragma settings to an already-initialised SQLite engine.
  *  Called once after the engine boots and again whenever the user saves
  *  changes in the Pragmas settings tab. Errors are swallowed so a single
@@ -640,12 +653,11 @@ function applyPragmasToEngine(
   engine: import("./runtime/sqlite").SqliteEngine,
   p: PragmaSettings,
 ): void {
-  const syncMap: Record<string, string> = { off: "0", normal: "1", full: "2" };
   const statements: string[] = [
     `PRAGMA foreign_keys = ${p.foreignKeys ? "ON" : "OFF"}`,
     `PRAGMA journal_mode = ${p.journalMode}`,
-    `PRAGMA synchronous = ${syncMap[p.synchronous] ?? "2"}`,
-    `PRAGMA page_size = ${Math.max(512, Math.min(65536, p.pageSize))}`,
+    `PRAGMA synchronous = ${PRAGMA_SYNC_MAP[p.synchronous] ?? "2"}`,
+    `PRAGMA page_size = ${Math.max(PRAGMA_PAGE_SIZE_MIN, Math.min(PRAGMA_PAGE_SIZE_MAX, p.pageSize))}`,
     `PRAGMA automatic_index = ${p.automaticIndex ? "ON" : "OFF"}`,
     `PRAGMA case_sensitive_like = ${p.caseSensitiveLike ? "ON" : "OFF"}`,
   ];
@@ -1256,9 +1268,12 @@ function SqlPlaygroundInner() {
         localStorage.getItem(storageKey("pragma_journalmode")) ?? DP.journalMode,
       synchronous:
         localStorage.getItem(storageKey("pragma_synchronous")) ?? DP.synchronous,
-      pageSize:
-        Number(localStorage.getItem(storageKey("pragma_pagesize")) ?? DP.pageSize) ||
-        DP.pageSize,
+      pageSize: (() => {
+        const raw = Number(localStorage.getItem(storageKey("pragma_pagesize")));
+        return raw >= PRAGMA_PAGE_SIZE_MIN && raw <= PRAGMA_PAGE_SIZE_MAX
+          ? raw
+          : DP.pageSize;
+      })(),
       automaticIndex:
         localStorage.getItem(storageKey("pragma_automaticindex")) !== "false",
       caseSensitiveLike:
