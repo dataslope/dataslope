@@ -19,6 +19,7 @@ import {
   SiOpenjdk,
   SiSharp,
   SiSqlite,
+  SiPostgresql,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
@@ -62,6 +63,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   java: SiOpenjdk,
   csharp: SiSharp,
   sqlite: SiSqlite,
+  postgres: SiPostgresql,
 };
 
 /** Per-language relative size multiplier. Some glyphs read "heavier"
@@ -87,4 +89,5 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   java: "#ed8b00",
   csharp: "#9b4f96",
   sqlite: "#003b57",
+  postgres: "#4169E1",
 };

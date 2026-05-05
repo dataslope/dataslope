@@ -183,6 +183,11 @@ import {
 } from "../runtime/sqlite";
 import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
+import { ToastList } from "./components/ToastList";
+import { SqlTab } from "./components/SqlTab";
+import { useSettingsStore } from "./stores/useSettingsStore";
+import { usePragmaStore } from "./stores/usePragmaStore";
+import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
 import {
   dbScopedKey,
   loadActiveTabId,
@@ -729,7 +734,6 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
   { value: 0, label: "All" },
 ];
 
-const DEFAULT_PAGE_SIZE = 50;
 
 // ─── Pragma settings ─────────────────────────────────────────────────────
 
@@ -816,41 +820,6 @@ export default function SqlPlayground() {
       </Toast.Portal>
     </Toast.Provider>
   );
-}
-
-function ToastList() {
-  const { toasts } = Toast.useToastManager();
-  return toasts.map((toast) => (
-    <Toast.Root
-      key={toast.id}
-      toast={toast}
-      className={`toast toast-${toast.data?.kind ?? "info"}`}
-    >
-      <Toast.Content className="toast-content">
-        <Toast.Title className="toast-title">{toast.title}</Toast.Title>
-        {toast.description && (
-          <Toast.Description className="toast-desc">
-            {toast.description}
-          </Toast.Description>
-        )}
-        <Toast.Close className="toast-close" aria-label="Dismiss">
-          <svg
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        </Toast.Close>
-      </Toast.Content>
-    </Toast.Root>
-  ));
 }
 
 // ─── Pragma descriptions shown in each row's info popover ────────────────────
@@ -1080,25 +1049,31 @@ function PragmaSettingsTab({
 function SqlPlaygroundInner() {
   const router = useRouter();
 
-  // ─── Settings state (mirrors PlaygroundInner) ───────────────────────
-  const [fontSize, setFontSizeState] = useState<number>(
-    DEFAULT_PLAYGROUND_SETTINGS.fontSize,
+  // ─── Settings state (Zustand-backed) ───────────────────────────────
+  const fontSize = useSettingsStore((s) => s.fontSize);
+  const setFontSizeState = useSettingsStore((s) => s.setFontSize);
+  const outputFontSizeEnabled = useSettingsStore(
+    (s) => s.outputFontSizeEnabled,
   );
-  const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
-    useState<boolean>(false);
-  const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
-  const [editorTheme, setEditorThemeState] = useState<string>("lucario");
-  const [wordWrap, setWordWrapState] = useState<boolean>(true);
-  const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+  const setOutputFontSizeEnabledState = useSettingsStore(
+    (s) => s.setOutputFontSizeEnabled,
+  );
+  const outputFontSize = useSettingsStore((s) => s.outputFontSize);
+  const setOutputFontSizeState = useSettingsStore((s) => s.setOutputFontSize);
+  const editorTheme = useSettingsStore((s) => s.editorTheme);
+  const setEditorThemeState = useSettingsStore((s) => s.setEditorTheme);
+  const wordWrap = useSettingsStore((s) => s.wordWrap);
+  const setWordWrapState = useSettingsStore((s) => s.setWordWrap);
+  const clearBeforeRun = useSettingsStore((s) => s.clearBeforeRun);
+  const setClearBeforeRunState = useSettingsStore((s) => s.setClearBeforeRun);
   const [resultSetExportScope, setResultSetExportScope] =
     useState<ResultSetExportScope>("all");
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
 
   // ─── Pragma settings ────────────────────────────────────────────────
-  const [pragmaSettings, setPragmaSettingsState] = useState<PragmaSettings>(
-    DEFAULT_PRAGMA_SETTINGS,
-  );
+  const pragmaSettings = usePragmaStore((s) => s.pragmaSettings);
+  const setPragmaSettingsState = usePragmaStore((s) => s.setPragmaSettings);
   // Ref kept in sync so applyPragmasToEngine can always read the latest
   // saved values even when called from async engine-init callbacks.
   const pragmaSettingsRef = useRef<PragmaSettings>(DEFAULT_PRAGMA_SETTINGS);
@@ -1109,15 +1084,10 @@ function SqlPlaygroundInner() {
   // LIMIT/OFFSET pagination. A matching ref is kept in sync so the
   // callback closure always sees the latest value even if the state
   // update hasn't flushed yet.
-  const [globalPageSize, setGlobalPageSizeState] = useState<number>(() => {
-    if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
-    const saved = Number(
-      localStorage.getItem(storageKey("page_size")) ?? DEFAULT_PAGE_SIZE,
-    );
-    return PAGE_SIZE_OPTIONS.some((opt) => opt.value === saved)
-      ? saved
-      : DEFAULT_PAGE_SIZE;
-  });
+  const globalPageSize = useSqlPlaygroundStore((s) => s.globalPageSize);
+  const setGlobalPageSizeState = useSqlPlaygroundStore(
+    (s) => s.setGlobalPageSize,
+  );
   const globalPageSizeRef = useRef(globalPageSize);
   useEffect(() => {
     globalPageSizeRef.current = globalPageSize;
@@ -1136,7 +1106,7 @@ function SqlPlaygroundInner() {
     } catch {
       // ignore quota errors
     }
-  }, []);
+  }, [setGlobalPageSizeState]);
 
   // ─── UI state ───────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1469,7 +1439,15 @@ function SqlPlaygroundInner() {
       document.body.classList.remove("pg-active");
       clearThemePalette();
     };
-  }, []);
+  }, [
+    setClearBeforeRunState,
+    setEditorThemeState,
+    setFontSizeState,
+    setOutputFontSizeEnabledState,
+    setOutputFontSizeState,
+    setPragmaSettingsState,
+    setWordWrapState,
+  ]);
 
   // ─── Boot the engine and CodeMirror ─────────────────────────────────
   useEffect(() => {
@@ -1731,27 +1709,27 @@ function SqlPlaygroundInner() {
   const setFontSize = useCallback((n: number) => {
     setFontSizeState(n);
     localStorage.setItem(storageKey("fontsize"), String(n));
-  }, []);
+  }, [setFontSizeState]);
   const setOutputFontSizeEnabled = useCallback((b: boolean) => {
     setOutputFontSizeEnabledState(b);
     localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
-  }, []);
+  }, [setOutputFontSizeEnabledState]);
   const setOutputFontSize = useCallback((n: number) => {
     setOutputFontSizeState(n);
     localStorage.setItem(storageKey("outputfontsize"), String(n));
-  }, []);
+  }, [setOutputFontSizeState]);
   const setEditorTheme = useCallback((t: string) => {
     setEditorThemeState(t);
     setStoredEditorTheme(t);
-  }, []);
+  }, [setEditorThemeState]);
   const setWordWrap = useCallback((b: boolean) => {
     setWordWrapState(b);
     localStorage.setItem(storageKey("wordwrap"), String(b));
-  }, []);
+  }, [setWordWrapState]);
   const setClearBeforeRun = useCallback((b: boolean) => {
     setClearBeforeRunState(b);
     localStorage.setItem(storageKey("clearbeforerun"), String(b));
-  }, []);
+  }, [setClearBeforeRunState]);
 
   const savePragmaSettings = useCallback(
     (p: PragmaSettings) => {
@@ -1784,7 +1762,7 @@ function SqlPlaygroundInner() {
       }
       showToast("Pragma settings saved.");
     },
-    [showToast],
+    [setPragmaSettingsState, showToast],
   );
 
   const restoreDefaultSettings = useCallback(() => {
@@ -5582,202 +5560,6 @@ function SqlPlaygroundInner() {
         </div>
       </div>
     </div>
-  );
-}
-
-interface SqlTabProps {
-  tab: QueryTab;
-  active: boolean;
-  onActivate: () => void;
-  onClose: () => void;
-  onRename: (name: string) => void;
-  onDuplicate: () => void;
-  onCloseOthers: () => void;
-  onCloseAll: () => void;
-}
-
-function SqlTab({
-  tab,
-  active,
-  onActivate,
-  onClose,
-  onRename,
-  onDuplicate,
-  onCloseOthers,
-  onCloseAll,
-}: SqlTabProps) {
-  const [renameOpen, setRenameOpen] = useState(false);
-  const [draftTitle, setDraftTitle] = useState(tab.title);
-  const [popoverOpen, setPopoverOpen] = useState(false);
-  const titleRef = useRef<HTMLSpanElement>(null);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: tab.id });
-
-  const dragStyle: React.CSSProperties = {
-    transform: DndCSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : undefined,
-    zIndex: isDragging ? 10 : undefined,
-  };
-
-  const openRename = useCallback(() => {
-    setDraftTitle(tab.title);
-    setRenameOpen(true);
-  }, [tab.title]);
-
-  const submitRename = useCallback(() => {
-    onRename(draftTitle);
-    setRenameOpen(false);
-  }, [draftTitle, onRename]);
-
-  return (
-    <>
-      <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="confirm-backdrop" />
-          <Dialog.Popup className="confirm-popup sql-rename-popup">
-            <Dialog.Title className="confirm-title">
-              Rename query tab
-            </Dialog.Title>
-            <Dialog.Description className="confirm-desc">
-              Choose a short name for this query tab.
-            </Dialog.Description>
-            <form
-              className="sql-rename-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                submitRename();
-              }}
-            >
-              <input
-                className="sql-rename-input"
-                value={draftTitle}
-                onChange={(e) => setDraftTitle(e.target.value)}
-                autoFocus
-              />
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="submit"
-                  className="confirm-btn confirm-btn-primary"
-                >
-                  Rename
-                </button>
-              </div>
-            </form>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
-
-      <ContextMenu.Root>
-        <ContextMenu.Trigger
-          render={(props) => (
-            <button
-              type="button"
-              {...props}
-              {...attributes}
-              {...listeners}
-              ref={setNodeRef}
-              style={dragStyle}
-              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}`}
-              onClick={onActivate}
-              aria-selected={active}
-              role="tab"
-              onMouseEnter={() => {
-                const el = titleRef.current;
-                if (el && el.scrollWidth > el.clientWidth) {
-                  setPopoverOpen(true);
-                }
-              }}
-              onMouseLeave={() => setPopoverOpen(false)}
-            >
-              {tab.kind === "view-data" && (
-                <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
-              )}
-              {tab.kind === "er-diagram" && (
-                <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
-              )}
-              <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <Popover.Trigger
-                  nativeButton={false}
-                  render={<span ref={titleRef} className="sql-tab-title" />}
-                >
-                  {tab.title}
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Positioner
-                    side="top"
-                    sideOffset={6}
-                    align="center"
-                    className="sql-tab-name-positioner"
-                  >
-                    <Popover.Popup className="bui-popup sql-tab-name-popover">
-                      {tab.title}
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-              <span
-                role="button"
-                tabIndex={-1}
-                className="sql-tab-close"
-                aria-label={`Close ${tab.title}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onClose();
-                  }
-                }}
-              >
-                <X size={10} aria-hidden="true" />
-              </span>
-            </button>
-          )}
-        />
-        <ContextMenu.Portal>
-          <ContextMenu.Positioner sideOffset={6}>
-            <ContextMenu.Popup className="bui-popup">
-              {tab.kind !== "view-data" && tab.kind !== "er-diagram" && (
-                <ContextMenu.Item className="example-item" onClick={openRename}>
-                  <div className="ex-title">Rename</div>
-                </ContextMenu.Item>
-              )}
-              {tab.kind !== "er-diagram" && (
-                <ContextMenu.Item className="example-item" onClick={onDuplicate}>
-                  <div className="ex-title">Duplicate</div>
-                </ContextMenu.Item>
-              )}
-              <ContextMenu.Item className="example-item" onClick={onClose}>
-                <div className="ex-title">Close</div>
-              </ContextMenu.Item>
-              <ContextMenu.Item
-                className="example-item"
-                onClick={onCloseOthers}
-              >
-                <div className="ex-title">Close Others</div>
-              </ContextMenu.Item>
-              <ContextMenu.Item className="example-item" onClick={onCloseAll}>
-                <div className="ex-title">Close All</div>
-              </ContextMenu.Item>
-            </ContextMenu.Popup>
-          </ContextMenu.Positioner>
-        </ContextMenu.Portal>
-      </ContextMenu.Root>
-    </>
   );
 }
 
