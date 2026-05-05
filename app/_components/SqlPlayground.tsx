@@ -2397,8 +2397,7 @@ function SqlPlaygroundInner() {
     [result, activeTab, handleFetchAllRows],
   );
 
-
-  // Parses a CSV string into a headers array and an array of value rows.
+  // ─── CSV import ───────────────────────────────────────────────────
   // Handles double-quoted fields and escaped double-quotes (`""`).
   const parseCsv = useCallback(
     (text: string): { headers: string[]; rows: string[][] } => {
@@ -7712,6 +7711,7 @@ function DdlViewer({
         lineNumbersExt(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
+        // Wrap long lines to prevent horizontal scroll in the View DDL popup.
         EditorView.lineWrapping,
         sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
         themeComp.of(themeFor(theme)),
