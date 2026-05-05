@@ -51,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/dataslope-logo-blue.svg" type="image/svg+xml" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>{children}</body>

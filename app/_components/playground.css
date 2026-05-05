@@ -437,6 +437,59 @@ body.pg-active {
 .run-btn-spinner { animation: pg-spin 0.75s linear infinite; fill: none; }
 @keyframes pg-spin { to { transform: rotate(360deg); } }
 
+/* ─── Split run button (shown when editor has a selection) ─── */
+.run-btn-split {
+  display: flex;
+  align-items: stretch;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--accent);
+  transition: all 0.15s;
+}
+.run-btn-split.running { opacity: 0.75; }
+.run-btn-split-main {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: transparent; border: none;
+  color: white; font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  cursor: pointer;
+}
+.run-btn-split-main:hover { filter: brightness(1.1); }
+.run-btn-split-main:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
+.run-btn-split-main svg { width: 12px; height: 12px; flex-shrink: 0; fill: white; stroke: white; }
+.run-btn-split-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+.run-btn-split-chevron {
+  display: flex; align-items: center; justify-content: center;
+  padding: 5px 8px;
+  background: transparent; border: none;
+  color: white;
+  cursor: pointer;
+}
+.run-btn-split-chevron:hover { filter: brightness(1.1); }
+.run-btn-split-chevron:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
+.run-btn-split-chevron svg { width: 11px; height: 11px; }
+
+/* ─── Run split dropdown menu ─── */
+.run-split-dropdown {
+  min-width: 160px;
+}
+.run-split-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  border-radius: 4px;
+}
+.run-split-item svg { width: 11px; height: 11px; flex-shrink: 0; fill: var(--text); stroke: var(--text); }
+
 .editor-wrap {
   flex: 1; overflow: hidden; position: relative;
 }
@@ -476,20 +529,47 @@ body.pg-active {
 }
 .pg-root .cm-lineNumbers .cm-gutterElement { color: var(--text-dim) !important; }
 
+/* ─── Subtle selection background for all themes ─── */
+/* Overrides each theme's native selection colour with a low-opacity
+   accent tint so the highlight is visible but never distracting.
+   Two selectors are needed: the non-focused layer (.cm-selectionBackground
+   directly on the element) and the focused selection layer rendered by
+   CodeMirror's drawSelection() plugin. */
+.pg-root .cm-selectionBackground {
+  background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+.pg-root .cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
+  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+/* Native ::selection (shown when the editor loses focus or the
+   browser falls back from the CM layer). */
+.pg-root .cm-line::selection,
+.pg-root .cm-line > span::selection,
+.pg-root .cm-line > span > span::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+.pg-root .cm-line::-moz-selection,
+.pg-root .cm-line > span::-moz-selection,
+.pg-root .cm-line > span > span::-moz-selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+
 /* ─── Tomorrow Night Eighties — selection override ─── */
 /* The theme sets selection to #2D2D2D which is identical to the editor
    background after the playground palette override, making selected text
-   invisible. Use a lighter shade that is clearly distinguishable. */
+   invisible. The global subtle rule above already fixes this, but we keep
+   the TN80s entry to ensure the non-focused layer also uses the accent
+   tint rather than the invisible theme default. */
 .pg-root .cm-s-tomorrow-night-eighties .cm-selectionBackground,
 .pg-root .cm-s-tomorrow-night-eighties.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
-  background: #515151 !important;
+  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
 }
 .pg-root .cm-s-tomorrow-night-eighties .cm-line::selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span::selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection { background: rgba(81, 81, 81, 0.99) !important; }
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection { background: color-mix(in srgb, var(--accent) 30%, transparent) !important; }
 .pg-root .cm-s-tomorrow-night-eighties .cm-line::-moz-selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span::-moz-selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection { background: rgba(81, 81, 81, 0.99) !important; }
+.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection { background: color-mix(in srgb, var(--accent) 30%, transparent) !important; }
 
 /* ─── Output pane ─── */
 .output-pane {
