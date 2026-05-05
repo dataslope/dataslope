@@ -1126,7 +1126,7 @@
   border-radius: 0;
   font-family: var(--font-ui);
   font-size: 12px;
-  cursor: pointer;
+  cursor: grab;
   position: relative;
   flex: 0 1 auto;
   min-width: 60px;
@@ -1137,6 +1137,10 @@
   transition:
     background 120ms ease,
     color 120ms ease;
+}
+
+.sql-tab:active {
+  cursor: grabbing;
 }
 
 .sql-tab:hover {
@@ -1895,6 +1899,60 @@
 .sql-import-table-name-row input {
   flex: 1;
   min-width: 0;
+}
+
+/* Table selector row shown after a file is parsed */
+.sql-import-target-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sql-import-target-row input,
+.sql-import-target-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* New / Existing table mode toggle */
+.sql-import-mode-btns {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sql-import-mode-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms, color 120ms;
+}
+
+.sql-import-mode-btn + .sql-import-mode-btn {
+  border-left: 1px solid var(--border);
+}
+
+.sql-import-mode-btn:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-import-mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.sql-import-mode-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Separator between special selector items and sample databases */

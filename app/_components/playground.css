@@ -475,12 +475,13 @@ body.pg-active {
 
 /* ─── Run split dropdown menu ─── */
 .run-split-dropdown {
-  min-width: 160px;
+  min-width: 200px;
 }
 .run-split-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   padding: 8px 12px;
   font-family: var(--font-ui);
   font-size: 13px;
@@ -488,7 +489,12 @@ body.pg-active {
   color: var(--text);
   border-radius: 4px;
 }
-.run-split-item svg { width: 11px; height: 11px; flex-shrink: 0; fill: var(--text); stroke: var(--text); }
+.run-split-item-label { flex: 1 1 auto; }
+.run-split-item-kbd {
+  color: var(--text-dim);
+  font-size: 11px;
+  flex-shrink: 0;
+}
 
 .editor-wrap {
   flex: 1; overflow: hidden; position: relative;
