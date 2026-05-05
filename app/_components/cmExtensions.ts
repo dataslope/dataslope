@@ -127,8 +127,25 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
         border: "none",
         borderRight: `1px solid ${palette.border}`,
       },
-      ".cm-selectionLayer": { zIndex: 1 },
-      ".cm-activeLine": { backgroundColor: palette.bg2 },
+      // Render the active-line highlight as an absolutely-positioned
+      // pseudo-element with `z-index: -1` instead of as a `background-color`
+      // on `.cm-line`. CM6's `.cm-selectionLayer` also sits at `z-index: -1`
+      // but is a later DOM sibling of `.cm-content`, so at equal z-index it
+      // paints *over* the pseudo — which means text selections inside the
+      // active line stay visible. (A plain background on `.cm-line` is
+      // opaque and covers the selection layer entirely.)
+      ".cm-activeLine": {
+        backgroundColor: "transparent",
+        position: "relative",
+      },
+      ".cm-activeLine::before": {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        backgroundColor: palette.bg2,
+        zIndex: "-1",
+        pointerEvents: "none",
+      },
       ".cm-activeLineGutter": {
         backgroundColor: palette.bg2,
         color: palette.text,
