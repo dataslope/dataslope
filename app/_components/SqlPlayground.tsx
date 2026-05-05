@@ -26,6 +26,7 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -102,6 +103,8 @@ import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
 import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
+import { RadioGroup } from "@base-ui-components/react/radio-group";
+import { Radio } from "@base-ui-components/react/radio";
 import {
   flexRender,
   getCoreRowModel,
@@ -338,7 +341,7 @@ async function initParquetWasm(): Promise<typeof import("parquet-wasm/esm")> {
   if (!_parquetWasmInit) {
     _parquetWasmInit = (async () => {
       const mod = await import("parquet-wasm/esm");
-      await mod.default("/_parquet/parquet_wasm_bg.wasm");
+      await mod.default("https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm");
       return mod;
     })();
   }
@@ -3429,6 +3432,15 @@ function SqlPlaygroundInner() {
     if (view) replaceDoc(view, "");
   }, [activeDbId]);
 
+  const handleTabDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const id = String(event.active.id);
+      activeTabIdRef.current = id;
+      setActiveTabId(id);
+    },
+    [],
+  );
+
   const handleTabDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
@@ -5186,6 +5198,7 @@ function SqlPlaygroundInner() {
               <DndContext
                 sensors={tabDragSensors}
                 collisionDetection={closestCenter}
+                onDragStart={handleTabDragStart}
                 onDragEnd={handleTabDragEnd}
               >
                 <SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
@@ -7216,28 +7229,27 @@ function ResultPager({
               {canExportCurrentPage && (
                 <>
                   <div className="sql-result-export-group-label">Scope</div>
-                  <div className="sql-result-export-scope-options">
-                    <button
-                      type="button"
-                      className={`sql-result-export-scope-option${exportCurrentPageOnly ? " is-selected" : ""}`}
-                      onClick={(e) => { e.stopPropagation(); setExportCurrentPageOnly(true); }}
-                    >
-                      <span className="scope-radio-indicator" aria-hidden="true">
-                        {exportCurrentPageOnly ? "●" : "○"}
+                  <RadioGroup
+                    className="sql-result-export-scope-options"
+                    value={exportCurrentPageOnly ? "page" : "all"}
+                    onValueChange={(value) => {
+                      setExportCurrentPageOnly(value === "page");
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Radio.Root value="page" className="sql-result-export-scope-option">
+                      <span className="scope-radio-ring">
+                        <Radio.Indicator className="scope-radio-dot" />
                       </span>
                       <span>Current page ({(end - start).toLocaleString()} rows)</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={`sql-result-export-scope-option${!exportCurrentPageOnly ? " is-selected" : ""}`}
-                      onClick={(e) => { e.stopPropagation(); setExportCurrentPageOnly(false); }}
-                    >
-                      <span className="scope-radio-indicator" aria-hidden="true">
-                        {!exportCurrentPageOnly ? "●" : "○"}
+                    </Radio.Root>
+                    <Radio.Root value="all" className="sql-result-export-scope-option">
+                      <span className="scope-radio-ring">
+                        <Radio.Indicator className="scope-radio-dot" />
                       </span>
                       <span>Entire result ({totalRows.toLocaleString()} rows)</span>
-                    </button>
-                  </div>
+                    </Radio.Root>
+                  </RadioGroup>
                   <div className="sql-result-export-sep" />
                 </>
               )}
