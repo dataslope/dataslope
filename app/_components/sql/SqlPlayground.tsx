@@ -185,6 +185,10 @@ import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
 import { ToastList } from "./components/ToastList";
 import { SqlTab } from "./components/SqlTab";
+import {
+  createSqlCompletionSource,
+  type SqlCompletionSchema,
+} from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -1383,6 +1387,7 @@ function SqlPlaygroundInner() {
   const editorRef = useRef<EditorView | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
+  const completionCompRef = useRef<Compartment | null>(null);
   // SQL language extension is rebuilt with a fresh schema whenever
   // tables/views change so the autocomplete popup stays in sync with
   // DDL the user runs in the editor.
@@ -1512,6 +1517,7 @@ function SqlPlaygroundInner() {
 
       const themeComp = new Compartment();
       const wrapComp = new Compartment();
+      const completionComp = new Compartment();
       const sqlLangComp = new Compartment();
 
       // Persist whichever tab is currently active. Tab id + tab list are
@@ -1557,7 +1563,14 @@ function SqlPlaygroundInner() {
           crosshairCursor(),
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
-          autocompletion({ activateOnTyping: false, closeOnBlur: true }),
+          completionComp.of(
+            autocompletion({
+              activateOnTyping: true,
+              activateOnTypingDelay: 75,
+              closeOnBlur: true,
+              override: [createSqlCompletionSource({ entities: [] })],
+            }),
+          ),
           tooltips({ parent: document.body }),
           keymap.of([
             {
@@ -1610,6 +1623,7 @@ function SqlPlaygroundInner() {
       editorRef.current = view;
       themeCompRef.current = themeComp;
       wrapCompRef.current = wrapComp;
+      completionCompRef.current = completionComp;
       sqlLangCompRef.current = sqlLangComp;
     }
 
@@ -1666,6 +1680,7 @@ function SqlPlaygroundInner() {
       editorRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      completionCompRef.current = null;
       sqlLangCompRef.current = null;
     };
   }, []);
@@ -1700,16 +1715,41 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     const engine = engineRef.current;
     const view = editorRef.current;
-    const comp = sqlLangCompRef.current;
-    if (!engine || !view || !comp) return;
+    const sqlComp = sqlLangCompRef.current;
+    const completionComp = completionCompRef.current;
+    if (!engine || !view || !sqlComp || !completionComp) return;
     const schema: Record<string, string[]> = {};
-    for (const name of [...tables, ...views]) {
+    const completionSchema: SqlCompletionSchema = { entities: [] };
+    for (const name of tables) {
       schema[name] = engine.listColumns(name).map((c) => c.name);
+      completionSchema.entities.push({
+        name,
+        columns: schema[name],
+        kind: "table",
+      });
+    }
+    for (const name of views) {
+      schema[name] = engine.listColumns(name).map((c) => c.name);
+      completionSchema.entities.push({
+        name,
+        columns: schema[name],
+        kind: "view",
+      });
     }
     view.dispatch({
-      effects: comp.reconfigure(
-        sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
-      ),
+      effects: [
+        sqlComp.reconfigure(
+          sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
+        ),
+        completionComp.reconfigure(
+          autocompletion({
+            activateOnTyping: true,
+            activateOnTypingDelay: 75,
+            closeOnBlur: true,
+            override: [createSqlCompletionSource(completionSchema)],
+          }),
+        ),
+      ],
     });
   }, [tables, views]);
 
