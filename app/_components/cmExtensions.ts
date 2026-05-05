@@ -8,7 +8,7 @@
 // extensions / decorations / annotations later is just appending to the
 // extension list at the call site.
 
-import { EditorView } from "@codemirror/view";
+import { EditorView, layer, RectangleMarker } from "@codemirror/view";
 import {
   HighlightStyle,
   StreamLanguage,
@@ -127,25 +127,21 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
         border: "none",
         borderRight: `1px solid ${palette.border}`,
       },
-      // Render the active-line highlight as an absolutely-positioned
-      // pseudo-element with `z-index: -1` instead of as a `background-color`
-      // on `.cm-line`. CM6's `.cm-selectionLayer` also sits at `z-index: -1`
-      // but is a later DOM sibling of `.cm-content`, so at equal z-index it
-      // paints *over* the pseudo — which means text selections inside the
-      // active line stay visible. (A plain background on `.cm-line` is
-      // opaque and covers the selection layer entirely.)
-      ".cm-activeLine": {
-        backgroundColor: "transparent",
-        position: "relative",
-      },
-      ".cm-activeLine::before": {
-        content: '""',
-        position: "absolute",
-        inset: "0",
-        backgroundColor: palette.bg2,
-        zIndex: "-1",
-        pointerEvents: "none",
-      },
+      // The active-line highlight is rendered as a custom `layer` (see
+      // `activeLineLayer` below) instead of as a `background-color` on
+      // `.cm-line`. CM6's selection layer is itself a `layer` registered
+      // by `drawSelection()`, and `LayerView.setOrder` assigns z-indexes
+      // based on each layer's position in the `layerOrder` facet. By
+      // appending our active-line layer *after* `drawSelection()` in the
+      // extension tree, its z-index ends up more negative than the
+      // selection layer's, so the selection paints over it — keeping
+      // partial selections visible inside the active line.
+      // A `!important` here disables the `&dark .cm-activeLine`
+      // background that ships with `highlightActiveLine()` (its
+      // specificity equals ours, but `!important` settles it
+      // unambiguously).
+      ".cm-activeLine": { backgroundColor: "transparent !important" },
+      ".cm-activeLineMarker": { backgroundColor: palette.bg2 },
       ".cm-activeLineGutter": {
         backgroundColor: palette.bg2,
         color: palette.text,
@@ -234,8 +230,57 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
     class: `cm-s-${name.replace(/\s+/g, "-")}`,
   });
 
-  return [view, syntaxHighlighting(highlight), themeNameClass];
+  return [
+    view,
+    syntaxHighlighting(highlight),
+    themeNameClass,
+    activeLineLayer,
+  ];
 }
+
+// Active-line background drawn as a `layer({ above: false })`. This is the
+// CM6-author-recommended fix for the "active line covers the selection"
+// problem (see https://discuss.codemirror.net/t/line-background-color-and-selection-layering/5413/4 ):
+// because LayerView.setOrder assigns each below-layer the z-index
+// `(-1 - posInLayerOrder)`, the layer registered later in the extension
+// tree gets a *more negative* z-index than the selection layer added by
+// `drawSelection()`. The active-line rectangle is therefore painted
+// behind the selection, so partial selections stay visible on the
+// active line. Each consumer adds `themeFor(...)` after `drawSelection()`
+// in its extension list, which keeps the ordering correct.
+const activeLineLayer = layer({
+  above: false,
+  markers(view) {
+    const markers: RectangleMarker[] = [];
+    const seen = new Set<number>();
+    const width = view.scrollDOM.scrollWidth;
+    for (const r of view.state.selection.ranges) {
+      const line = view.state.doc.lineAt(r.head);
+      if (seen.has(line.from)) continue;
+      seen.add(line.from);
+      const block = view.lineBlockAt(line.from);
+      markers.push(
+        new RectangleMarker(
+          "cm-activeLineMarker",
+          0,
+          block.top,
+          width,
+          block.height,
+        ),
+      );
+    }
+    return markers;
+  },
+  update(update) {
+    return (
+      update.docChanged ||
+      update.selectionSet ||
+      update.viewportChanged ||
+      update.geometryChanged
+    );
+  },
+  class: "cm-activeLineLayer",
+});
 
 const themeCache = new Map<string, Extension>();
 
