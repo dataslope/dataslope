@@ -995,12 +995,6 @@
   pointer-events: none;
 }
 
-.sql-result-export-sep {
-  height: 1px;
-  background: var(--border);
-  margin: 4px 0;
-}
-
 .sql-result-export-scope-options {
   display: flex;
   flex-direction: column;
