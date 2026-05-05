@@ -23,21 +23,21 @@ interface SqlCompletionContextInfo {
   qualifier?: string;
 }
 
-const completeIdentifierPattern = /^[A-Za-z_][\w$]*$/;
-const partialIdentifierPattern = /^$|^[A-Za-z_][\w$]*$/;
+const completeIdentifierPattern = /^[A-Za-z_][A-Za-z0-9_$]*$/;
+const partialIdentifierPattern = /^$|^[A-Za-z_][A-Za-z0-9_$]*$/;
 const sqlIdentifierPattern =
-  String.raw`(?:[A-Za-z_][\w$]*|"(?:""|[^"])+"|` +
+  String.raw`(?:[A-Za-z_][A-Za-z0-9_$]*|"(?:""|[^"])+"|` +
   "`[^`]+`" +
   String.raw`|\[[^\]]+\])`;
 const qualifiedIdentifierPattern = new RegExp(
-  `(${sqlIdentifierPattern})\\.\\s*([A-Za-z_][\\w$]*)?$`,
+  `(${sqlIdentifierPattern})\\.\\s*([A-Za-z_][A-Za-z0-9_$]*)?$`,
 );
 const tableReferencePattern = new RegExp(
-  String.raw`\b(?:FROM|JOIN|UPDATE|INTO)\s+(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?`,
+  String.raw`\b(?:FROM|JOIN|UPDATE|INTO)\s+(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][A-Za-z0-9_$]*))?`,
   "gi",
 );
 const commaTableReferencePattern = new RegExp(
-  String.raw`,\s*(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][\w$]*))?`,
+  String.raw`,\s*(${sqlIdentifierPattern})(?:\s+(?:AS\s+)?([A-Za-z_][A-Za-z0-9_$]*))?`,
   "g",
 );
 
@@ -275,7 +275,7 @@ function tokenize(sql: string): string[] {
   // Operators and punctuation are kept as clause boundaries so nearby SQL
   // expressions don't get folded into identifier/keyword context detection.
   return (
-    maskCommentsAndStrings(sql).match(/[A-Za-z_][\w$]*|[,().;=*<>+\-/]/g) ??
+    maskCommentsAndStrings(sql).match(/[A-Za-z_][A-Za-z0-9_$]*|[,().;=*<>+\-/]/g) ??
     []
   );
 }
@@ -291,7 +291,7 @@ function inferCompletionContext(
     context.state.doc.toString(),
     context.pos,
   );
-  const word = context.matchBefore(/[A-Za-z_][\w$]*/);
+  const word = context.matchBefore(/[A-Za-z_][A-Za-z0-9_$]*/);
   const qualified = statement.match(qualifiedIdentifierPattern);
 
   if (qualified) {
