@@ -82,25 +82,6 @@ import {
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
-import { themeFor } from "../cmExtensions";
-
-// Replace the entire editor document — the v6 idiom for what v5 called
-// `editor.setValue(s)`. Centralised so the call sites that swap tab
-// contents all read the same.
-function replaceDoc(view: EditorView, value: string): void {
-  view.dispatch({
-    changes: { from: 0, to: view.state.doc.length, insert: value },
-  });
-}
-
-function sqlAutocompletion(schema: SqlCompletionSchema) {
-  return autocompletion({
-    activateOnTyping: true,
-    activateOnTypingDelay: 75,
-    closeOnBlur: true,
-    override: [createSqlCompletionSource(schema)],
-  });
-}
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
@@ -211,6 +192,25 @@ import {
   tabsAreDirty,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
+import { themeFor } from "../cmExtensions";
+
+// Replace the entire editor document — the v6 idiom for what v5 called
+// `editor.setValue(s)`. Centralised so the call sites that swap tab
+// contents all read the same.
+function replaceDoc(view: EditorView, value: string): void {
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: value },
+  });
+}
+
+function sqlAutocompletion(schema: SqlCompletionSchema) {
+  return autocompletion({
+    activateOnTyping: true,
+    activateOnTypingDelay: 75,
+    closeOnBlur: true,
+    override: [createSqlCompletionSource(schema)],
+  });
+}
 
 const PLAYGROUND_ID = "sqlite";
 

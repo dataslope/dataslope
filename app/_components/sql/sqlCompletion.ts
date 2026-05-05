@@ -24,7 +24,7 @@ interface SqlCompletionContextInfo {
 }
 
 const identifierPattern = /^[A-Za-z_][\w$]*$/;
-const validIdentifierPrefix = /^[\w$]*$/;
+const validIdentifierPrefix = /^$|^[A-Za-z_][\w$]*$/;
 const sqlIdentifierPattern =
   String.raw`(?:[A-Za-z_][\w$]*|"(?:""|[^"])+"|` +
   "`[^`]+`" +
