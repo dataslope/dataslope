@@ -203,10 +203,13 @@ function replaceDoc(view: EditorView, value: string): void {
   });
 }
 
+// Short enough to feel immediate, but still lets rapid typing coalesce.
+const AUTOCOMPLETE_DELAY_MS = 75;
+
 function sqlAutocompletion(schema: SqlCompletionSchema) {
   return autocompletion({
     activateOnTyping: true,
-    activateOnTypingDelay: 75,
+    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
     closeOnBlur: true,
     override: [createSqlCompletionSource(schema)],
   });

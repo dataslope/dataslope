@@ -23,8 +23,8 @@ interface SqlCompletionContextInfo {
   qualifier?: string;
 }
 
-const identifierPattern = /^[A-Za-z_][\w$]*$/;
-const validIdentifierPrefix = /^$|^[A-Za-z_][\w$]*$/;
+const completeIdentifierPattern = /^[A-Za-z_][\w$]*$/;
+const partialIdentifierPattern = /^$|^[A-Za-z_][\w$]*$/;
 const sqlIdentifierPattern =
   String.raw`(?:[A-Za-z_][\w$]*|"(?:""|[^"])+"|` +
   "`[^`]+`" +
@@ -45,6 +45,17 @@ const tableSection = { name: "Tables", rank: 10 };
 const viewSection = { name: "Views", rank: 11 };
 const columnSection = { name: "Columns", rank: 20 };
 const keywordSection = { name: "Keywords", rank: 30 };
+
+const BOOST = {
+  tableInTableContext: 80,
+  keywordInTableContext: 5,
+  columnInColumnContext: 90,
+  keywordInColumnContext: 20,
+  tableInColumnContext: 1,
+  qualifiedColumn: 100,
+  keywordInKeywordContext: 50,
+  tableInKeywordContext: 10,
+} as const;
 
 const SQL_KEYWORDS = [
   "SELECT",
@@ -191,8 +202,31 @@ function normalizeIdentifier(identifier: string | undefined): string {
 }
 
 function quoteIdentifier(identifier: string): string {
-  if (identifierPattern.test(identifier)) return identifier;
+  if (completeIdentifierPattern.test(identifier)) return identifier;
   return `"${identifier.replace(/"/g, '""')}"`;
+}
+
+function maskRangePreservingNewlines(sql: string, start: number, end: number): string {
+  return sql
+    .slice(start, end)
+    .split("")
+    .map((ch) => (ch === "\n" ? "\n" : " "))
+    .join("");
+}
+
+function findSingleQuotedStringEnd(sql: string, start: number): number {
+  let i = start + 1;
+  while (i < sql.length) {
+    if (sql[i] === "'") {
+      if (sql[i + 1] === "'") {
+        i += 2;
+        continue;
+      }
+      return i + 1;
+    }
+    i += 1;
+  }
+  return sql.length;
 }
 
 function maskCommentsAndStrings(sql: string): string {
@@ -202,46 +236,23 @@ function maskCommentsAndStrings(sql: string): string {
     const ch = sql[i];
     const next = sql[i + 1];
     if (ch === "-" && next === "-") {
-      masked += "  ";
-      i += 2;
-      while (i < sql.length && sql[i] !== "\n") {
-        masked += " ";
-        i += 1;
-      }
+      const end = sql.indexOf("\n", i + 2);
+      const nextIndex = end === -1 ? sql.length : end;
+      masked += maskRangePreservingNewlines(sql, i, nextIndex);
+      i = nextIndex;
       continue;
     }
     if (ch === "/" && next === "*") {
-      masked += "  ";
-      i += 2;
-      while (i < sql.length) {
-        const end = sql[i] === "*" && sql[i + 1] === "/";
-        masked += sql[i] === "\n" ? "\n" : " ";
-        i += 1;
-        if (end) {
-          masked += " ";
-          i += 1;
-          break;
-        }
-      }
+      const end = sql.indexOf("*/", i + 2);
+      const nextIndex = end === -1 ? sql.length : end + 2;
+      masked += maskRangePreservingNewlines(sql, i, nextIndex);
+      i = nextIndex;
       continue;
     }
-    if (ch === "'" || ch === '"' || ch === "`") {
-      const quote = ch;
-      masked += " ";
-      i += 1;
-      while (i < sql.length) {
-        const current = sql[i];
-        masked += current === "\n" ? "\n" : " ";
-        i += 1;
-        if (current === quote) {
-          if (sql[i] === quote) {
-            masked += " ";
-            i += 1;
-          } else {
-            break;
-          }
-        }
-      }
+    if (ch === "'") {
+      const nextIndex = findSingleQuotedStringEnd(sql, i);
+      masked += maskRangePreservingNewlines(sql, i, nextIndex);
+      i = nextIndex;
       continue;
     }
     masked += ch;
@@ -465,17 +476,28 @@ export function createSqlCompletionSource(
     const options = (() => {
       switch (info.mode) {
         case "tables":
-          return [...tableOptions(schema, 80), ...keywordOptions(5)];
+          return [
+            ...tableOptions(schema, BOOST.tableInTableContext),
+            ...keywordOptions(BOOST.keywordInTableContext),
+          ];
         case "columns":
           return [
-            ...columnOptions(schema, statement, 90),
-            ...keywordOptions(20),
-            ...tableOptions(schema, 1),
+            ...columnOptions(schema, statement, BOOST.columnInColumnContext),
+            ...keywordOptions(BOOST.keywordInColumnContext),
+            ...tableOptions(schema, BOOST.tableInColumnContext),
           ];
         case "qualified-columns":
-          return qualifiedColumnOptions(schema, statement, info.qualifier, 100);
+          return qualifiedColumnOptions(
+            schema,
+            statement,
+            info.qualifier,
+            BOOST.qualifiedColumn,
+          );
         case "keywords":
-          return [...keywordOptions(50), ...tableOptions(schema, 10)];
+          return [
+            ...keywordOptions(BOOST.keywordInKeywordContext),
+            ...tableOptions(schema, BOOST.tableInKeywordContext),
+          ];
       }
     })();
 
@@ -484,7 +506,7 @@ export function createSqlCompletionSource(
     return {
       from: info.from,
       options: uniqueOptions,
-      validFor: validIdentifierPrefix,
+      validFor: partialIdentifierPattern,
     } satisfies CompletionResult;
   };
 }
