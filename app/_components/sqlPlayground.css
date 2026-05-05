@@ -231,6 +231,27 @@
   background: var(--bg3);
 }
 
+.sql-tree-popover-positioner {
+  z-index: 600;
+}
+
+.sql-tree-popover {
+  z-index: 600;
+  max-width: 260px;
+  padding: 7px 9px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sql-tree-popover strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .sql-tree-item svg {
   color: var(--text-muted);
   flex-shrink: 0;
