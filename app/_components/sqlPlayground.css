@@ -1602,6 +1602,45 @@
   background: color-mix(in srgb, var(--text) 3%, transparent);
 }
 
+/* Small info button beside column headers in the modify-table drawer. */
+.sql-col-header-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin-left: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-dim);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: color 0.12s, background-color 0.12s;
+}
+.sql-col-header-info:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+.sql-col-header-info:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* Popover body for column header descriptions. */
+.sql-col-header-popup {
+  max-width: 260px;
+  padding: 10px 12px;
+  z-index: 600;
+}
+.sql-col-header-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
 .sql-modify-cell-field {
   display: flex;
   align-items: center;
