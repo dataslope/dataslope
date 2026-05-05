@@ -141,9 +141,11 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
       // specificity equals ours, but `!important` settles it
       // unambiguously).
       ".cm-activeLine": { backgroundColor: "transparent !important" },
-      ".cm-activeLineMarker": { backgroundColor: palette.bg2 },
+      ".cm-activeLineMarker": {
+        backgroundColor: isLight ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.05)",
+      },
       ".cm-activeLineGutter": {
-        backgroundColor: palette.bg2,
+        backgroundColor: isLight ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.05)",
         color: palette.text,
       },
       ".cm-lineNumbers .cm-gutterElement": { color: palette.dim },
