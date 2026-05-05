@@ -3926,7 +3926,6 @@ function SqlPlaygroundInner() {
                     </Menu.Item>
                     {result && result.sets.length > 0 && (
                       <>
-                        <div className="sql-result-export-sep" />
                         <div className="sql-result-export-group-label">Result Set</div>
                         {(() => {
                           const totalRows =
@@ -3937,6 +3936,9 @@ function SqlPlaygroundInner() {
                             resultSetExportSnapshot?.pageSize ?? globalPageSize;
                           const hasMultiplePages =
                             pageSize > 0 && totalRows > pageSize;
+                          const currentPageRows =
+                            resultSetExportSnapshot?.rows.length ??
+                            Math.min(pageSize, totalRows);
                           return (
                             <div className="sql-result-export-scope-options">
                               {hasMultiplePages && (
@@ -3959,7 +3961,7 @@ function SqlPlaygroundInner() {
                                       <span className="scope-radio-dot" />
                                     )}
                                   </span>
-                                  <span>Current page</span>
+                                  <span>Current page ({currentPageRows} rows)</span>
                                 </label>
                               )}
                               <label
@@ -3981,7 +3983,7 @@ function SqlPlaygroundInner() {
                                     <span className="scope-radio-dot" />
                                   )}
                                 </span>
-                                <span>Entire result set</span>
+                                <span>Entire result set ({totalRows} rows)</span>
                               </label>
                             </div>
                           );
@@ -7989,7 +7991,6 @@ function SchemaSection({
                 className="sql-tree-section-toggle"
                 onClick={onToggle}
                 aria-expanded={expanded}
-                title={toggleHint}
               >
                 <span className="sql-tree-chevron" aria-hidden="true">
                   {expanded ? (
@@ -8028,7 +8029,6 @@ function SchemaSection({
                   {...props}
                   className="sql-tree-section-add"
                   onClick={allExpanded ? onCollapseAll : onExpandAll}
-                  title={expandCollapseHint}
                   aria-label={expandCollapseHint}
                 >
                   {allExpanded ? (
@@ -8064,7 +8064,6 @@ function SchemaSection({
                   {...props}
                   className="sql-tree-section-add"
                   onClick={onAdd}
-                  title={addHint}
                   aria-label={addHint}
                 >
                   <Plus size={11} aria-hidden="true" />
@@ -8209,7 +8208,6 @@ function SchemaItem({
                       className="sql-tree-item"
                       onClick={handleSingleClick}
                       onDoubleClick={handleDoubleClick}
-                      title={itemHint}
                       aria-expanded={expanded}
                     >
                       <span className="sql-tree-chevron" aria-hidden="true">
@@ -8416,7 +8414,6 @@ function SchemaLeafItem({
                       {...triggerProps}
                       className="sql-tree-item sql-tree-item-leaf"
                       onClick={() => onViewDDL(name, kind)}
-                      title={itemHint}
                     >
                       <span className="sql-tree-chevron" aria-hidden="true" />
                       <Icon size={12} aria-hidden="true" />
