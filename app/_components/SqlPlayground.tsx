@@ -5390,7 +5390,11 @@ function ResultView({
               isLazy={isLazy}
               effectiveLazySql={effectiveLazySql}
               onFetchAllRows={onFetchAllRows}
-              tabTitle={tabTitle}
+              tabTitle={
+                result.sets.length > 1
+                  ? `${tabTitle} - Set ${safeSetIdx + 1}`
+                  : tabTitle
+              }
             />
           );
         })()}
@@ -5791,9 +5795,6 @@ function ResultTableBody({
   });
   return (
     <div className="sql-result-set">
-      {index > 0 && (
-        <div className="sql-result-set-label">Result set #{index + 1}</div>
-      )}
       <div className="sql-result-table-wrap">
         <table className="sql-result-table">
           <thead>
@@ -6162,7 +6163,9 @@ function ResultPager({
         : isLazy
           ? onFetchAllRows(effectiveLazySql)
           : allRows;
-    const filename = `${toFileSafeName(tabTitle)}.${format}`;
+    const rowCount = rows.length;
+    const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
+    const filename = `${toFileSafeName(tabTitle)} (${rowLabel}).${format}`;
     if (format === "csv") exportResultToCsv(columns, rows, filename);
     else if (format === "json") exportResultToJson(columns, rows, filename);
     else exportResultToSql(columns, rows, filename);
