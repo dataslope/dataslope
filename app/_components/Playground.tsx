@@ -434,7 +434,9 @@ function ToastList() {
 function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Initial settings (persisted in localStorage, namespaced per-language) ─
   const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
-  const [fontSize, setFontSizeState] = useState<number>(13);
+  const [fontSize, setFontSizeState] = useState<number>(
+    DEFAULT_PLAYGROUND_SETTINGS.fontSize,
+  );
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
@@ -1398,9 +1400,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         className="example-item export-item"
                         onClick={() => exportCode(fmt)}
                       >
-                        <span className="ext-badge">.{fmt.extension}</span>
                         <div className="export-item-text">
-                          <div className="ex-title">{fmt.label}</div>
+                          <div className="ex-title">
+                            {fmt.label}
+                            <span className="ext-badge">.{fmt.extension}</span>
+                          </div>
                           <div className="ex-desc">
                             Download as .{fmt.extension}
                           </div>
@@ -1590,9 +1594,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                                         exportCode(fmt);
                                       }}
                                     >
-                                      <span className="ext-badge">.{fmt.extension}</span>
                                       <div className="export-item-text">
-                                        <div className="ex-title">{fmt.label}</div>
+                                        <div className="ex-title">
+                                          {fmt.label}
+                                          <span className="ext-badge">.{fmt.extension}</span>
+                                        </div>
                                         <div className="ex-desc">
                                           Download as .{fmt.extension}
                                         </div>

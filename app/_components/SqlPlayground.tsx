@@ -551,6 +551,18 @@ interface QueryRunResult {
   lazyPageSize?: number;
 }
 
+type ResultSetExportScope = "page" | "all";
+
+interface ResultSetExportSnapshot {
+  setIndex: number;
+  columns: string[];
+  allRows: QueryExecResult["values"];
+  rows: QueryExecResult["values"];
+  totalRows: number;
+  pageSize: number;
+  currentPage: number;
+}
+
 type SelectedRowsByResult = Record<number, Set<number>>;
 type PendingEditsByResult = Record<number, Map<string, unknown>>;
 
@@ -861,11 +873,21 @@ const PRAGMA_DESCRIPTIONS: Record<keyof PragmaSettings, string> = {
 function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
   return (
     <Popover.Root>
-      <Popover.Trigger className="pragma-info-btn" aria-label="More info">
+      <Popover.Trigger
+        className="pragma-info-btn"
+        aria-label="More info"
+        openOnHover
+        delay={80}
+        closeDelay={120}
+      >
         <CircleHelp size={13} aria-hidden="true" />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={6} align="start">
+        <Popover.Positioner
+          className="pragma-info-positioner"
+          sideOffset={6}
+          align="start"
+        >
           <Popover.Popup className="bui-popup pragma-info-popup">
             <p className="pragma-info-text">{PRAGMA_DESCRIPTIONS[pragma]}</p>
           </Popover.Popup>
@@ -1059,13 +1081,19 @@ function SqlPlaygroundInner() {
   const router = useRouter();
 
   // ─── Settings state (mirrors PlaygroundInner) ───────────────────────
-  const [fontSize, setFontSizeState] = useState<number>(13);
+  const [fontSize, setFontSizeState] = useState<number>(
+    DEFAULT_PLAYGROUND_SETTINGS.fontSize,
+  );
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("lucario");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+  const [resultSetExportScope, setResultSetExportScope] =
+    useState<ResultSetExportScope>("all");
+  const [resultSetExportSnapshot, setResultSetExportSnapshot] =
+    useState<ResultSetExportSnapshot | null>(null);
 
   // ─── Pragma settings ────────────────────────────────────────────────
   const [pragmaSettings, setPragmaSettingsState] = useState<PragmaSettings>(
@@ -1382,11 +1410,6 @@ function SqlPlaygroundInner() {
       D.fontSize;
     const savedTheme =
       getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
-    const savedOutputEnabled =
-      localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
-    const savedOutputSize =
-      Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
-      savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
     const savedClearBeforeRun =
@@ -1417,8 +1440,8 @@ function SqlPlaygroundInner() {
 
     /* eslint-disable react-hooks/set-state-in-effect */
     setFontSizeState(savedSize);
-    setOutputFontSizeEnabledState(savedOutputEnabled);
-    setOutputFontSizeState(savedOutputSize);
+    setOutputFontSizeEnabledState(false);
+    setOutputFontSizeState(D.outputFontSize);
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
@@ -1439,7 +1462,7 @@ function SqlPlaygroundInner() {
     );
     document.documentElement.style.setProperty(
       "--output-font-size",
-      `${savedOutputEnabled ? savedOutputSize : savedSize}px`,
+      `${D.outputFontSize}px`,
     );
 
     return () => {
@@ -1670,12 +1693,11 @@ function SqlPlaygroundInner() {
   }, [fontSize]);
 
   useEffect(() => {
-    const effective = outputFontSizeEnabled ? outputFontSize : fontSize;
     document.documentElement.style.setProperty(
       "--output-font-size",
-      `${effective}px`,
+      `${DEFAULT_PLAYGROUND_SETTINGS.outputFontSize}px`,
     );
-  }, [outputFontSizeEnabled, outputFontSize, fontSize]);
+  }, []);
 
   // Swap the editor's contents whenever the active tab id changes.
   useEffect(() => {
@@ -2370,31 +2392,45 @@ function SqlPlaygroundInner() {
   }, [showToast]);
 
   // ─── Result set export (from top-level Export button) ────────────────
-  // Exports the first result set's rows in the chosen format. For lazy
-  // (paginated) results, all rows are fetched from the engine. Always
-  // exports every row (no current-page scope) since page state lives
-  // inside ResultView.
+  // Exports the first result set's rows in the chosen format. The scope
+  // selector lets lazy results use the already-loaded page or fetch every row.
   const handleResultSetExport = useCallback(
     (format: "csv" | "json" | "sql" | "parquet") => {
       if (!result || result.sets.length === 0) return;
-      const set = result.sets[0];
-      const columns = set.columns;
+      const set =
+        result.sets[resultSetExportSnapshot?.setIndex ?? 0] ?? result.sets[0];
+      const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows: QueryExecResult["values"];
-      if (result.lazySql !== undefined) {
+      const scope = resultSetExportScope;
+      if (scope === "page" && resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.rows;
+      } else if (
+        result.lazySql !== undefined &&
+        (resultSetExportSnapshot?.setIndex ?? 0) === 0
+      ) {
         rows = handleFetchAllRows(result.lazySql);
+      } else if (resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.allRows;
       } else {
         rows = set.values;
       }
       const title = activeTab?.title ?? "result_set";
       const rowCount = rows.length;
       const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
-      const filename = `${toFileSafeName(title)} (${rowLabel}).${format}`;
+      const scopeLabel = scope === "page" ? "current page" : "all rows";
+      const filename = `${toFileSafeName(title)} (${scopeLabel}, ${rowLabel}).${format}`;
       if (format === "csv") exportResultToCsv(columns, rows, filename);
       else if (format === "json") exportResultToJson(columns, rows, filename);
       else if (format === "parquet") exportResultToParquet(columns, rows, filename);
       else exportResultToSql(columns, rows, filename);
     },
-    [result, activeTab, handleFetchAllRows],
+    [
+      result,
+      activeTab,
+      handleFetchAllRows,
+      resultSetExportScope,
+      resultSetExportSnapshot,
+    ],
   );
 
   // ─── CSV import ───────────────────────────────────────────────────
@@ -3803,9 +3839,11 @@ function SqlPlaygroundInner() {
                       className="example-item export-item"
                       onClick={() => setImportSqliteOpen(true)}
                     >
-                      <span className="ext-badge">.sqlite</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from SQLite</div>
+                        <div className="ex-title">
+                          from SQLite
+                          <span className="ext-badge">.sqlite</span>
+                        </div>
                         <div className="ex-desc">
                           Replace database from .sqlite file
                         </div>
@@ -3818,9 +3856,11 @@ function SqlPlaygroundInner() {
                         setImportCsvOpen(true);
                       }}
                     >
-                      <span className="ext-badge">.csv</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from CSV</div>
+                        <div className="ex-title">
+                          from CSV
+                          <span className="ext-badge">.csv</span>
+                        </div>
                         <div className="ex-desc">Add table from CSV file</div>
                       </div>
                     </Menu.Item>
@@ -3831,9 +3871,11 @@ function SqlPlaygroundInner() {
                         setImportJsonOpen(true);
                       }}
                     >
-                      <span className="ext-badge">.json</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from JSON</div>
+                        <div className="ex-title">
+                          from JSON
+                          <span className="ext-badge">.json</span>
+                        </div>
                         <div className="ex-desc">Add table from JSON array</div>
                       </div>
                     </Menu.Item>
@@ -3844,9 +3886,11 @@ function SqlPlaygroundInner() {
                         setImportParquetDragging(false);
                       }}
                     >
-                      <span className="ext-badge">.parquet</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from Parquet</div>
+                        <div className="ex-title">
+                          from Parquet
+                          <span className="ext-badge">.parquet</span>
+                        </div>
                         <div className="ex-desc">Add table from Parquet file</div>
                       </div>
                     </Menu.Item>
@@ -3872,9 +3916,11 @@ function SqlPlaygroundInner() {
                       className="example-item export-item"
                       onClick={exportDatabase}
                     >
-                      <span className="ext-badge">.sqlite</span>
                       <div className="export-item-text">
-                        <div className="ex-title">SQLite Database</div>
+                        <div className="ex-title">
+                          SQLite Database
+                          <span className="ext-badge">.sqlite</span>
+                        </div>
                         <div className="ex-desc">Download as .sqlite</div>
                       </div>
                     </Menu.Item>
@@ -3882,13 +3928,73 @@ function SqlPlaygroundInner() {
                       <>
                         <div className="sql-result-export-sep" />
                         <div className="sql-result-export-group-label">Result Set</div>
+                        {(() => {
+                          const totalRows =
+                            resultSetExportSnapshot?.totalRows ??
+                            result.sets[0]?.values.length ??
+                            0;
+                          const pageSize =
+                            resultSetExportSnapshot?.pageSize ?? globalPageSize;
+                          const hasMultiplePages =
+                            pageSize > 0 && totalRows > pageSize;
+                          return (
+                            <div className="sql-result-export-scope-options">
+                              {hasMultiplePages && (
+                                <label
+                                  className="sql-result-export-scope-option"
+                                  data-checked={
+                                    resultSetExportScope === "page" ? "" : undefined
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    className="scope-radio-input"
+                                    type="radio"
+                                    name="sql-result-export-scope"
+                                    checked={resultSetExportScope === "page"}
+                                    onChange={() => setResultSetExportScope("page")}
+                                  />
+                                  <span className="scope-radio-ring">
+                                    {resultSetExportScope === "page" && (
+                                      <span className="scope-radio-dot" />
+                                    )}
+                                  </span>
+                                  <span>Current page</span>
+                                </label>
+                              )}
+                              <label
+                                className="sql-result-export-scope-option"
+                                data-checked={
+                                  resultSetExportScope === "all" ? "" : undefined
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  className="scope-radio-input"
+                                  type="radio"
+                                  name="sql-result-export-scope"
+                                  checked={resultSetExportScope === "all"}
+                                  onChange={() => setResultSetExportScope("all")}
+                                />
+                                <span className="scope-radio-ring">
+                                  {resultSetExportScope === "all" && (
+                                    <span className="scope-radio-dot" />
+                                  )}
+                                </span>
+                                <span>Entire result set</span>
+                              </label>
+                            </div>
+                          );
+                        })()}
                         <Menu.Item
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("csv")}
                         >
-                          <span className="ext-badge">.csv</span>
                           <div className="export-item-text">
-                            <div className="ex-title">CSV</div>
+                            <div className="ex-title">
+                              CSV
+                              <span className="ext-badge">.csv</span>
+                            </div>
                             <div className="ex-desc">Comma-separated values</div>
                           </div>
                         </Menu.Item>
@@ -3896,9 +4002,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("json")}
                         >
-                          <span className="ext-badge">.json</span>
                           <div className="export-item-text">
-                            <div className="ex-title">JSON</div>
+                            <div className="ex-title">
+                              JSON
+                              <span className="ext-badge">.json</span>
+                            </div>
                             <div className="ex-desc">Array of objects</div>
                           </div>
                         </Menu.Item>
@@ -3906,9 +4014,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("sql")}
                         >
-                          <span className="ext-badge">.sql</span>
                           <div className="export-item-text">
-                            <div className="ex-title">SQL</div>
+                            <div className="ex-title">
+                              SQL
+                              <span className="ext-badge">.sql</span>
+                            </div>
                             <div className="ex-desc">INSERT statements</div>
                           </div>
                         </Menu.Item>
@@ -3916,9 +4026,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("parquet")}
                         >
-                          <span className="ext-badge">.parquet</span>
                           <div className="export-item-text">
-                            <div className="ex-title">Parquet</div>
+                            <div className="ex-title">
+                              Parquet
+                              <span className="ext-badge">.parquet</span>
+                            </div>
                             <div className="ex-desc">Apache Parquet columnar format</div>
                           </div>
                         </Menu.Item>
@@ -3982,7 +4094,7 @@ function SqlPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          outputFontSizeLabel="Use Different Font Size for Results"
+          showOutputFontSizeControls={false}
           clearBeforeRunLabel="Clear Results Before Running"
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
@@ -5448,6 +5560,7 @@ function SqlPlaygroundInner() {
                   globalPageSize={globalPageSize}
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
+                  onExportSnapshotChange={setResultSetExportSnapshot}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -5678,6 +5791,7 @@ function ResultView({
   globalPageSize,
   onSetGlobalPageSize,
   onLoadPage,
+  onExportSnapshotChange,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -5708,6 +5822,8 @@ function ResultView({
   onSetGlobalPageSize: (n: number) => void;
   /** Called when the user navigates to a different page in lazy mode. */
   onLoadPage: (sql: string, page: number) => void;
+  /** Reports the first result set's currently visible page for export scope. */
+  onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -6071,6 +6187,74 @@ function ResultView({
     selectedByIndex,
   ]);
 
+  useEffect(() => {
+    if (!onExportSnapshotChange) return;
+    if (!result || result.error || result.sets.length === 0) {
+      onExportSnapshotChange(null);
+      return;
+    }
+    const setIndex = Math.max(0, Math.min(activeSetIdx, result.sets.length - 1));
+    const set = result.sets[setIndex];
+    if (!set) {
+      onExportSnapshotChange(null);
+      return;
+    }
+    const isLazy = result.lazySql !== undefined && setIndex === 0;
+    const effective =
+      globalPageSize > 0
+        ? globalPageSize
+        : Math.max(
+            isLazy ? (result.lazyTotalCount ?? set.values.length) : set.values.length,
+            1,
+          );
+    if (isLazy) {
+      onExportSnapshotChange({
+        setIndex,
+        columns: set.columns,
+        allRows: set.values,
+        rows: set.values,
+        totalRows: result.lazyTotalCount ?? set.values.length,
+        pageSize: effective,
+        currentPage: result.lazyPage ?? 0,
+      });
+      return;
+    }
+    const sorting = sortingByIndex[setIndex] ?? [];
+    const st = getState(setIndex);
+    let rows = set.values;
+    if (sorting.length > 0) {
+      const parsed = parseColumnId(sorting[0].id);
+      if (parsed) {
+        rows = [...set.values].sort((a, b) => {
+          const cmp = compareCellValues(a[parsed.ci], b[parsed.ci]);
+          return sorting[0].desc ? -cmp : cmp;
+        });
+      }
+    }
+    const totalRows = rows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+    const currentPage = Math.min(st.page, totalPages - 1);
+    const start = currentPage * effective;
+    const visibleRows =
+      globalPageSize > 0 ? rows.slice(start, start + effective) : rows;
+    onExportSnapshotChange({
+      setIndex,
+      columns: set.columns,
+      allRows: rows,
+      rows: visibleRows,
+      totalRows,
+      pageSize: effective,
+      currentPage,
+    });
+  }, [
+    result,
+    globalPageSize,
+    activeSetIdx,
+    sortingByIndex,
+    getState,
+    onExportSnapshotChange,
+  ]);
+
   if (loading) {
     return (
       <div className="welcome">
@@ -6226,7 +6410,6 @@ function ResultView({
               <ResultTableBody
                 key={idx}
                 set={set}
-                index={idx}
                 visible={visibleRows}
                 originalIndices={originalIndices}
                 sorting={sorting}
@@ -6316,6 +6499,7 @@ function ResultView({
               editCount={editCount}
               selectedCount={selectedCount}
               onRequestDelete={() => requestDelete(idx)}
+              // eslint-disable-next-line react-hooks/refs
               onCommitEdits={() => commitEdits(idx, set)}
             />
           );
@@ -6392,7 +6576,6 @@ function ResultView({
 
 function ResultTableBody({
   set,
-  index,
   visible,
   originalIndices,
   sorting,
@@ -6414,7 +6597,6 @@ function ResultTableBody({
   onDuplicateRow,
 }: {
   set: QueryExecResult;
-  index: number;
   visible: QueryExecResult["values"];
   originalIndices: number[];
   sorting: SortingState;
@@ -7707,6 +7889,7 @@ function DdlViewer({
       parent: hostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
+        EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(2),
@@ -7784,60 +7967,122 @@ function SchemaSection({
   onCollapseAll,
 }: SchemaSectionProps) {
   const showExpandCollapse = count > 0 && (onExpandAll || onCollapseAll);
+  const toggleHint = expanded
+    ? `Collapse ${label.toLowerCase()}`
+    : `Expand ${label.toLowerCase()}`;
+  const expandCollapseHint = allExpanded
+    ? `Collapse all ${label.toLowerCase()}`
+    : `Expand all ${label.toLowerCase()}`;
+  const addHint = `Add ${label.toLowerCase().replace(/s$/, "")}`;
   return (
     <div className="sql-tree-section">
       <div className="sql-tree-section-header">
-        <button
-          type="button"
-          className="sql-tree-section-toggle"
-          onClick={onToggle}
-          aria-expanded={expanded}
-          title={
-            expanded
-              ? `Collapse ${label.toLowerCase()}`
-              : `Expand ${label.toLowerCase()}`
-          }
-        >
-          <span className="sql-tree-chevron" aria-hidden="true">
-            {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-          </span>
-          <span className="sql-tree-label">
-            {label} ({count})
-          </span>
-        </button>
-        {showExpandCollapse && (
-          <button
-            type="button"
-            className="sql-tree-section-add"
-            onClick={allExpanded ? onCollapseAll : onExpandAll}
-            title={
-              allExpanded
-                ? `Collapse all ${label.toLowerCase()}`
-                : `Expand all ${label.toLowerCase()}`
-            }
-            aria-label={
-              allExpanded
-                ? `Collapse all ${label.toLowerCase()}`
-                : `Expand all ${label.toLowerCase()}`
-            }
-          >
-            {allExpanded ? (
-              <ChevronsUp size={11} aria-hidden="true" />
-            ) : (
-              <ChevronsDown size={11} aria-hidden="true" />
+        <Popover.Root>
+          <Popover.Trigger
+            openOnHover
+            delay={120}
+            closeDelay={80}
+            render={(props) => (
+              <button
+                type="button"
+                {...props}
+                className="sql-tree-section-toggle"
+                onClick={onToggle}
+                aria-expanded={expanded}
+                title={toggleHint}
+              >
+                <span className="sql-tree-chevron" aria-hidden="true">
+                  {expanded ? (
+                    <ChevronDown size={11} />
+                  ) : (
+                    <ChevronRight size={11} />
+                  )}
+                </span>
+                <span className="sql-tree-label">
+                  {label} ({count})
+                </span>
+              </button>
             )}
-          </button>
+          />
+          <Popover.Portal>
+            <Popover.Positioner
+              className="sql-tree-popover-positioner"
+              sideOffset={6}
+              align="start"
+            >
+              <Popover.Popup className="bui-popup sql-tree-popover">
+                {toggleHint}
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
+        {showExpandCollapse && (
+          <Popover.Root>
+            <Popover.Trigger
+              openOnHover
+              delay={120}
+              closeDelay={80}
+              render={(props) => (
+                <button
+                  type="button"
+                  {...props}
+                  className="sql-tree-section-add"
+                  onClick={allExpanded ? onCollapseAll : onExpandAll}
+                  title={expandCollapseHint}
+                  aria-label={expandCollapseHint}
+                >
+                  {allExpanded ? (
+                    <ChevronsUp size={11} aria-hidden="true" />
+                  ) : (
+                    <ChevronsDown size={11} aria-hidden="true" />
+                  )}
+                </button>
+              )}
+            />
+            <Popover.Portal>
+              <Popover.Positioner
+                className="sql-tree-popover-positioner"
+                sideOffset={6}
+                align="start"
+              >
+                <Popover.Popup className="bui-popup sql-tree-popover">
+                  {expandCollapseHint}
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
         )}
         {onAdd && (
-          <button
-            type="button"
-            className="sql-tree-section-add"
-            onClick={onAdd}
-            title={`Add ${label.toLowerCase().replace(/s$/, "")}`}
-            aria-label={`Add ${label.toLowerCase().replace(/s$/, "")}`}
-          >
-            <Plus size={11} aria-hidden="true" />
-          </button>
+          <Popover.Root>
+            <Popover.Trigger
+              openOnHover
+              delay={120}
+              closeDelay={80}
+              render={(props) => (
+                <button
+                  type="button"
+                  {...props}
+                  className="sql-tree-section-add"
+                  onClick={onAdd}
+                  title={addHint}
+                  aria-label={addHint}
+                >
+                  <Plus size={11} aria-hidden="true" />
+                </button>
+              )}
+            />
+            <Popover.Portal>
+              <Popover.Positioner
+                className="sql-tree-popover-positioner"
+                sideOffset={6}
+                align="start"
+              >
+                <Popover.Popup className="bui-popup sql-tree-popover">
+                  {addHint}
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
         )}
       </div>
       {expanded && (
@@ -7945,30 +8190,54 @@ function SchemaItem({
     }
     onPreview(name, kind);
   }, [name, kind, onPreview]);
+  const itemHint = `Double-click to preview, click to ${expanded ? "collapse" : "expand"}`;
   return (
     <div className="sql-tree-entity">
       <ContextMenu.Root>
         <ContextMenu.Trigger
           render={(props) => (
             <div {...props} className="sql-tree-entity-trigger">
-              <button
-                type="button"
-                className="sql-tree-item"
-                onClick={handleSingleClick}
-                onDoubleClick={handleDoubleClick}
-                title={`Double-click to preview, click to ${expanded ? "collapse" : "expand"}`}
-                aria-expanded={expanded}
-              >
-                <span className="sql-tree-chevron" aria-hidden="true">
-                  {expanded ? (
-                    <ChevronDown size={11} />
-                  ) : (
-                    <ChevronRight size={11} />
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={180}
+                  closeDelay={80}
+                  render={(triggerProps) => (
+                    <button
+                      type="button"
+                      {...triggerProps}
+                      className="sql-tree-item"
+                      onClick={handleSingleClick}
+                      onDoubleClick={handleDoubleClick}
+                      title={itemHint}
+                      aria-expanded={expanded}
+                    >
+                      <span className="sql-tree-chevron" aria-hidden="true">
+                        {expanded ? (
+                          <ChevronDown size={11} />
+                        ) : (
+                          <ChevronRight size={11} />
+                        )}
+                      </span>
+                      <Icon size={12} aria-hidden="true" />
+                      <span className="sql-tree-item-name">{name}</span>
+                    </button>
                   )}
-                </span>
-                <Icon size={12} aria-hidden="true" />
-                <span className="sql-tree-item-name">{name}</span>
-              </button>
+                />
+                <Popover.Portal>
+                  <Popover.Positioner
+                    className="sql-tree-popover-positioner"
+                    sideOffset={6}
+                    side="right"
+                    align="start"
+                  >
+                    <Popover.Popup className="bui-popup sql-tree-popover">
+                      <strong>{name}</strong>
+                      <span>{itemHint}</span>
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
               {expanded && (
                 <ul className="sql-tree-columns" role="list">
                   {columns === undefined ? (
@@ -8129,22 +8398,47 @@ function SchemaLeafItem({
   onDrop,
 }: SchemaLeafItemProps) {
   const Icon = kind === "index" ? Hash : Zap;
+  const itemHint = `View DDL for ${kind} ${name}`;
   return (
     <div className="sql-tree-entity">
       <ContextMenu.Root>
         <ContextMenu.Trigger
           render={(props) => (
-            <button
-              type="button"
-              {...props}
-              className="sql-tree-item sql-tree-item-leaf"
-              onClick={() => onViewDDL(name, kind)}
-              title={`View DDL for ${kind} ${name}`}
-            >
-              <span className="sql-tree-chevron" aria-hidden="true" />
-              <Icon size={12} aria-hidden="true" />
-              <span className="sql-tree-item-name">{name}</span>
-            </button>
+            <div {...props} className="sql-tree-entity-trigger">
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={180}
+                  closeDelay={80}
+                  render={(triggerProps) => (
+                    <button
+                      type="button"
+                      {...triggerProps}
+                      className="sql-tree-item sql-tree-item-leaf"
+                      onClick={() => onViewDDL(name, kind)}
+                      title={itemHint}
+                    >
+                      <span className="sql-tree-chevron" aria-hidden="true" />
+                      <Icon size={12} aria-hidden="true" />
+                      <span className="sql-tree-item-name">{name}</span>
+                    </button>
+                  )}
+                />
+                <Popover.Portal>
+                  <Popover.Positioner
+                    className="sql-tree-popover-positioner"
+                    sideOffset={6}
+                    side="right"
+                    align="start"
+                  >
+                    <Popover.Popup className="bui-popup sql-tree-popover">
+                      <strong>{name}</strong>
+                      <span>{itemHint}</span>
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
           )}
         />
         <ContextMenu.Portal>
