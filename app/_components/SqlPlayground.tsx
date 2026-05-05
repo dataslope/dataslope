@@ -350,7 +350,7 @@ async function exportResultToParquet(
   rows: QueryExecResult["values"],
   filename: string,
 ): Promise<void> {
-  const [{ tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray }, { Table: WasmTable, writeParquet }] = await Promise.all([
+  const [{ tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray }, { Table: WasmParquetTable, writeParquet }] = await Promise.all([
     import("apache-arrow"),
     initParquetWasm(),
   ]);
@@ -384,7 +384,7 @@ async function exportResultToParquet(
 
   const arrowTable = tableFromArrays(fields as Parameters<typeof tableFromArrays>[0]);
   const ipcBytes = tableToIPC(arrowTable, "stream");
-  const wasmTable = WasmTable.fromIPCStream(ipcBytes);
+  const wasmTable = WasmParquetTable.fromIPCStream(ipcBytes);
   const parquetBytes = writeParquet(wasmTable);
   triggerDownload(
     new Blob([parquetBytes], { type: "application/octet-stream" }),
@@ -404,12 +404,14 @@ async function importParquetFile(
   const arrowTable = tableFromIPC(wasmTable.intoIPCStream());
 
   const columns = arrowTable.schema.fields.map((f) => f.name);
+  // Pre-build column index map to avoid O(n) findIndex inside the row loop.
+  const colIndexMap = new Map(columns.map((name, i) => [name, i]));
+  const colVectors = columns.map((_, i) => arrowTable.getChildAt(i));
   const rows: QueryExecResult["values"] = [];
   for (let r = 0; r < arrowTable.numRows; r++) {
     const row: QueryExecResult["values"][number] = [];
-    for (const col of columns) {
-      const colVec = arrowTable.getChildAt(arrowTable.schema.fields.findIndex((f) => f.name === col));
-      const val = colVec?.get(r);
+    for (let c = 0; c < columns.length; c++) {
+      const val = colVectors[colIndexMap.get(columns[c])!]?.get(r);
       row.push((val === undefined ? null : val) as SqlValue);
     }
     rows.push(row);
@@ -1270,6 +1272,9 @@ function SqlPlaygroundInner() {
   const tabDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
+  // Memoize tab id list so SortableContext doesn't receive a new array
+  // on every render unrelated to tab reordering.
+  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
 
   // The most recent query result, keyed by tab id so each tab keeps
   // its own result set when the user switches between tabs.
@@ -2461,8 +2466,11 @@ function SqlPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !importCsvState) return;
     const { headers, rows, targetMode, targetTable, tableName } = importCsvState;
-    const isExisting = targetMode === "existing" && targetTable;
-    const effectiveTable = isExisting ? targetTable : tableName.trim();
+    // Use the snapshot targetTable if set; fall back to the first live table
+    // in case the table list changed while the dialog was open.
+    const resolvedTarget = targetTable || tables[0] || "";
+    const isExisting = targetMode === "existing" && resolvedTarget;
+    const effectiveTable = isExisting ? resolvedTarget : tableName.trim();
     if (!effectiveTable) {
       showToast("Table name cannot be empty.", "warn");
       return;
@@ -2520,7 +2528,7 @@ function SqlPlaygroundInner() {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`CSV import failed: ${msg}`, "warn");
     }
-  }, [importCsvState, showToast]);
+  }, [importCsvState, tables, showToast]);
 
   // ─── JSON import ──────────────────────────────────────────────────
   const handleJsonFile = useCallback(
@@ -2586,8 +2594,9 @@ function SqlPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !importJsonState) return;
     const { headers, rows, targetMode, targetTable, tableName } = importJsonState;
-    const isExisting = targetMode === "existing" && targetTable;
-    const effectiveTable = isExisting ? targetTable : tableName.trim();
+    const resolvedTarget = targetTable || tables[0] || "";
+    const isExisting = targetMode === "existing" && resolvedTarget;
+    const effectiveTable = isExisting ? resolvedTarget : tableName.trim();
     if (!effectiveTable) {
       showToast("Table name cannot be empty.", "warn");
       return;
@@ -2638,7 +2647,7 @@ function SqlPlaygroundInner() {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`JSON import failed: ${msg}`, "warn");
     }
-  }, [importJsonState, showToast]);
+  }, [importJsonState, tables, showToast]);
 
   // ─── Parquet import ───────────────────────────────────────────────
   const handleParquetFile = useCallback(
@@ -5179,7 +5188,7 @@ function SqlPlaygroundInner() {
                 collisionDetection={closestCenter}
                 onDragEnd={handleTabDragEnd}
               >
-                <SortableContext items={tabs.map((t) => t.id)} strategy={horizontalListSortingStrategy}>
+                <SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
                   <div className="sql-tabs" role="tablist">
                     {tabs.map((t) => (
                       <SqlTab
