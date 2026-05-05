@@ -901,7 +901,11 @@ function ColumnHeaderPopover({ pragma }: { pragma: string }) {
         <CircleHelp size={11} aria-hidden="true" />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={6} align="center">
+        <Popover.Positioner
+          className="sql-col-header-positioner"
+          sideOffset={6}
+          align="center"
+        >
           <Popover.Popup className="bui-popup sql-col-header-popup">
             <p className="sql-col-header-text">
               {COLUMN_HEADER_DESCRIPTIONS[pragma]}

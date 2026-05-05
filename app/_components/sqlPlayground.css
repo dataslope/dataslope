@@ -1628,6 +1628,11 @@
   box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
+/* Popover positioner for column header descriptions. */
+.sql-col-header-positioner {
+  z-index: 600;
+}
+
 /* Popover body for column header descriptions. */
 .sql-col-header-popup {
   max-width: 260px;
