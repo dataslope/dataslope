@@ -127,6 +127,7 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
         border: "none",
         borderRight: `1px solid ${palette.border}`,
       },
+      ".cm-selectionLayer": { zIndex: 1 },
       ".cm-activeLine": { backgroundColor: palette.bg2 },
       ".cm-activeLineGutter": {
         backgroundColor: palette.bg2,
