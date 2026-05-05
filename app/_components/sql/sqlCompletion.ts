@@ -55,6 +55,7 @@ const BOOST = {
   qualifiedColumn: 100,
   keywordInKeywordContext: 50,
   tableInKeywordContext: 10,
+  functionPenalty: 1,
 } as const;
 
 const SQL_KEYWORDS = [
@@ -203,6 +204,8 @@ function normalizeIdentifier(identifier: string | undefined): string {
 
 function quoteIdentifier(identifier: string): string {
   if (completeIdentifierPattern.test(identifier)) return identifier;
+  // SQLite accepts several identifier quote styles; double quotes are the
+  // SQL-standard form and match the rest of the playground's generated SQL.
   return `"${identifier.replace(/"/g, '""')}"`;
 }
 
@@ -269,6 +272,8 @@ function currentStatementBeforeCursor(sql: string, pos: number): string {
 }
 
 function tokenize(sql: string): string[] {
+  // Operators and punctuation are kept as clause boundaries so nearby SQL
+  // expressions don't get folded into identifier/keyword context detection.
   return (
     maskCommentsAndStrings(sql).match(/[A-Za-z_][\w$]*|[,().;=*<>+\-/]/g) ??
     []
@@ -385,7 +390,7 @@ function keywordOptions(boost: number): Completion[] {
       apply: `${fn}()`,
       type: "function",
       section: keywordSection,
-      boost: boost - 1,
+      boost: boost - BOOST.functionPenalty,
     })),
   ];
 }

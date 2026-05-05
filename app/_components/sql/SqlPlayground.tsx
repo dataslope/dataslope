@@ -203,7 +203,8 @@ function replaceDoc(view: EditorView, value: string): void {
   });
 }
 
-// Short enough to feel immediate, but still lets rapid typing coalesce.
+// CodeMirror's default is 100ms; 75ms keeps local schema suggestions feeling
+// immediate while still coalescing rapid typing before recomputing completions.
 const AUTOCOMPLETE_DELAY_MS = 75;
 
 function sqlAutocompletion(schema: SqlCompletionSchema) {
