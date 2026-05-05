@@ -551,6 +551,16 @@ interface QueryRunResult {
   lazyPageSize?: number;
 }
 
+type ResultSetExportScope = "page" | "all";
+
+interface ResultSetExportSnapshot {
+  columns: string[];
+  rows: QueryExecResult["values"];
+  totalRows: number;
+  pageSize: number;
+  currentPage: number;
+}
+
 type SelectedRowsByResult = Record<number, Set<number>>;
 type PendingEditsByResult = Record<number, Map<string, unknown>>;
 
@@ -861,11 +871,21 @@ const PRAGMA_DESCRIPTIONS: Record<keyof PragmaSettings, string> = {
 function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
   return (
     <Popover.Root>
-      <Popover.Trigger className="pragma-info-btn" aria-label="More info">
+      <Popover.Trigger
+        className="pragma-info-btn"
+        aria-label="More info"
+        openOnHover
+        delay={80}
+        closeDelay={120}
+      >
         <CircleHelp size={13} aria-hidden="true" />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={6} align="start">
+        <Popover.Positioner
+          className="pragma-info-positioner"
+          sideOffset={6}
+          align="start"
+        >
           <Popover.Popup className="bui-popup pragma-info-popup">
             <p className="pragma-info-text">{PRAGMA_DESCRIPTIONS[pragma]}</p>
           </Popover.Popup>
@@ -1059,13 +1079,19 @@ function SqlPlaygroundInner() {
   const router = useRouter();
 
   // ─── Settings state (mirrors PlaygroundInner) ───────────────────────
-  const [fontSize, setFontSizeState] = useState<number>(13);
+  const [fontSize, setFontSizeState] = useState<number>(
+    DEFAULT_PLAYGROUND_SETTINGS.fontSize,
+  );
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
   const [editorTheme, setEditorThemeState] = useState<string>("lucario");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+  const [resultSetExportScope, setResultSetExportScope] =
+    useState<ResultSetExportScope>("all");
+  const [resultSetExportSnapshot, setResultSetExportSnapshot] =
+    useState<ResultSetExportSnapshot | null>(null);
 
   // ─── Pragma settings ────────────────────────────────────────────────
   const [pragmaSettings, setPragmaSettingsState] = useState<PragmaSettings>(
@@ -1382,11 +1408,6 @@ function SqlPlaygroundInner() {
       D.fontSize;
     const savedTheme =
       getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
-    const savedOutputEnabled =
-      localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
-    const savedOutputSize =
-      Number(localStorage.getItem(storageKey("outputfontsize")) ?? savedSize) ||
-      savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
     const savedClearBeforeRun =
@@ -1417,8 +1438,8 @@ function SqlPlaygroundInner() {
 
     /* eslint-disable react-hooks/set-state-in-effect */
     setFontSizeState(savedSize);
-    setOutputFontSizeEnabledState(savedOutputEnabled);
-    setOutputFontSizeState(savedOutputSize);
+    setOutputFontSizeEnabledState(false);
+    setOutputFontSizeState(D.outputFontSize);
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
@@ -1439,7 +1460,7 @@ function SqlPlaygroundInner() {
     );
     document.documentElement.style.setProperty(
       "--output-font-size",
-      `${savedOutputEnabled ? savedOutputSize : savedSize}px`,
+      `${D.outputFontSize}px`,
     );
 
     return () => {
@@ -1670,12 +1691,11 @@ function SqlPlaygroundInner() {
   }, [fontSize]);
 
   useEffect(() => {
-    const effective = outputFontSizeEnabled ? outputFontSize : fontSize;
     document.documentElement.style.setProperty(
       "--output-font-size",
-      `${effective}px`,
+      `${DEFAULT_PLAYGROUND_SETTINGS.outputFontSize}px`,
     );
-  }, [outputFontSizeEnabled, outputFontSize, fontSize]);
+  }, []);
 
   // Swap the editor's contents whenever the active tab id changes.
   useEffect(() => {
@@ -2370,17 +2390,18 @@ function SqlPlaygroundInner() {
   }, [showToast]);
 
   // ─── Result set export (from top-level Export button) ────────────────
-  // Exports the first result set's rows in the chosen format. For lazy
-  // (paginated) results, all rows are fetched from the engine. Always
-  // exports every row (no current-page scope) since page state lives
-  // inside ResultView.
+  // Exports the first result set's rows in the chosen format. The scope
+  // selector lets lazy results use the already-loaded page or fetch every row.
   const handleResultSetExport = useCallback(
     (format: "csv" | "json" | "sql" | "parquet") => {
       if (!result || result.sets.length === 0) return;
       const set = result.sets[0];
       const columns = set.columns;
       let rows: QueryExecResult["values"];
-      if (result.lazySql !== undefined) {
+      const scope = resultSetExportScope;
+      if (scope === "page" && resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.rows;
+      } else if (result.lazySql !== undefined) {
         rows = handleFetchAllRows(result.lazySql);
       } else {
         rows = set.values;
@@ -2388,13 +2409,20 @@ function SqlPlaygroundInner() {
       const title = activeTab?.title ?? "result_set";
       const rowCount = rows.length;
       const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
-      const filename = `${toFileSafeName(title)} (${rowLabel}).${format}`;
+      const scopeLabel = scope === "page" ? "current page" : "all rows";
+      const filename = `${toFileSafeName(title)} (${scopeLabel}, ${rowLabel}).${format}`;
       if (format === "csv") exportResultToCsv(columns, rows, filename);
       else if (format === "json") exportResultToJson(columns, rows, filename);
       else if (format === "parquet") exportResultToParquet(columns, rows, filename);
       else exportResultToSql(columns, rows, filename);
     },
-    [result, activeTab, handleFetchAllRows],
+    [
+      result,
+      activeTab,
+      handleFetchAllRows,
+      resultSetExportScope,
+      resultSetExportSnapshot,
+    ],
   );
 
   // ─── CSV import ───────────────────────────────────────────────────
@@ -3803,9 +3831,11 @@ function SqlPlaygroundInner() {
                       className="example-item export-item"
                       onClick={() => setImportSqliteOpen(true)}
                     >
-                      <span className="ext-badge">.sqlite</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from SQLite</div>
+                        <div className="ex-title">
+                          from SQLite
+                          <span className="ext-badge">.sqlite</span>
+                        </div>
                         <div className="ex-desc">
                           Replace database from .sqlite file
                         </div>
@@ -3818,9 +3848,11 @@ function SqlPlaygroundInner() {
                         setImportCsvOpen(true);
                       }}
                     >
-                      <span className="ext-badge">.csv</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from CSV</div>
+                        <div className="ex-title">
+                          from CSV
+                          <span className="ext-badge">.csv</span>
+                        </div>
                         <div className="ex-desc">Add table from CSV file</div>
                       </div>
                     </Menu.Item>
@@ -3831,9 +3863,11 @@ function SqlPlaygroundInner() {
                         setImportJsonOpen(true);
                       }}
                     >
-                      <span className="ext-badge">.json</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from JSON</div>
+                        <div className="ex-title">
+                          from JSON
+                          <span className="ext-badge">.json</span>
+                        </div>
                         <div className="ex-desc">Add table from JSON array</div>
                       </div>
                     </Menu.Item>
@@ -3844,9 +3878,11 @@ function SqlPlaygroundInner() {
                         setImportParquetDragging(false);
                       }}
                     >
-                      <span className="ext-badge">.parquet</span>
                       <div className="export-item-text">
-                        <div className="ex-title">from Parquet</div>
+                        <div className="ex-title">
+                          from Parquet
+                          <span className="ext-badge">.parquet</span>
+                        </div>
                         <div className="ex-desc">Add table from Parquet file</div>
                       </div>
                     </Menu.Item>
@@ -3872,9 +3908,11 @@ function SqlPlaygroundInner() {
                       className="example-item export-item"
                       onClick={exportDatabase}
                     >
-                      <span className="ext-badge">.sqlite</span>
                       <div className="export-item-text">
-                        <div className="ex-title">SQLite Database</div>
+                        <div className="ex-title">
+                          SQLite Database
+                          <span className="ext-badge">.sqlite</span>
+                        </div>
                         <div className="ex-desc">Download as .sqlite</div>
                       </div>
                     </Menu.Item>
@@ -3882,13 +3920,73 @@ function SqlPlaygroundInner() {
                       <>
                         <div className="sql-result-export-sep" />
                         <div className="sql-result-export-group-label">Result Set</div>
+                        {(() => {
+                          const totalRows =
+                            resultSetExportSnapshot?.totalRows ??
+                            result.sets[0]?.values.length ??
+                            0;
+                          const pageSize =
+                            resultSetExportSnapshot?.pageSize ?? globalPageSize;
+                          const hasMultiplePages =
+                            pageSize > 0 && totalRows > pageSize;
+                          return (
+                            <div className="sql-result-export-scope-options">
+                              {hasMultiplePages && (
+                                <label
+                                  className="sql-result-export-scope-option"
+                                  data-checked={
+                                    resultSetExportScope === "page" ? "" : undefined
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    className="scope-radio-input"
+                                    type="radio"
+                                    name="sql-result-export-scope"
+                                    checked={resultSetExportScope === "page"}
+                                    onChange={() => setResultSetExportScope("page")}
+                                  />
+                                  <span className="scope-radio-ring">
+                                    {resultSetExportScope === "page" && (
+                                      <span className="scope-radio-dot" />
+                                    )}
+                                  </span>
+                                  <span>Current page</span>
+                                </label>
+                              )}
+                              <label
+                                className="sql-result-export-scope-option"
+                                data-checked={
+                                  resultSetExportScope === "all" ? "" : undefined
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  className="scope-radio-input"
+                                  type="radio"
+                                  name="sql-result-export-scope"
+                                  checked={resultSetExportScope === "all"}
+                                  onChange={() => setResultSetExportScope("all")}
+                                />
+                                <span className="scope-radio-ring">
+                                  {resultSetExportScope === "all" && (
+                                    <span className="scope-radio-dot" />
+                                  )}
+                                </span>
+                                <span>Entire result set</span>
+                              </label>
+                            </div>
+                          );
+                        })()}
                         <Menu.Item
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("csv")}
                         >
-                          <span className="ext-badge">.csv</span>
                           <div className="export-item-text">
-                            <div className="ex-title">CSV</div>
+                            <div className="ex-title">
+                              CSV
+                              <span className="ext-badge">.csv</span>
+                            </div>
                             <div className="ex-desc">Comma-separated values</div>
                           </div>
                         </Menu.Item>
@@ -3896,9 +3994,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("json")}
                         >
-                          <span className="ext-badge">.json</span>
                           <div className="export-item-text">
-                            <div className="ex-title">JSON</div>
+                            <div className="ex-title">
+                              JSON
+                              <span className="ext-badge">.json</span>
+                            </div>
                             <div className="ex-desc">Array of objects</div>
                           </div>
                         </Menu.Item>
@@ -3906,9 +4006,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("sql")}
                         >
-                          <span className="ext-badge">.sql</span>
                           <div className="export-item-text">
-                            <div className="ex-title">SQL</div>
+                            <div className="ex-title">
+                              SQL
+                              <span className="ext-badge">.sql</span>
+                            </div>
                             <div className="ex-desc">INSERT statements</div>
                           </div>
                         </Menu.Item>
@@ -3916,9 +4018,11 @@ function SqlPlaygroundInner() {
                           className="example-item export-item"
                           onClick={() => handleResultSetExport("parquet")}
                         >
-                          <span className="ext-badge">.parquet</span>
                           <div className="export-item-text">
-                            <div className="ex-title">Parquet</div>
+                            <div className="ex-title">
+                              Parquet
+                              <span className="ext-badge">.parquet</span>
+                            </div>
                             <div className="ex-desc">Apache Parquet columnar format</div>
                           </div>
                         </Menu.Item>
@@ -3982,7 +4086,7 @@ function SqlPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          outputFontSizeLabel="Use Different Font Size for Results"
+          showOutputFontSizeControls={false}
           clearBeforeRunLabel="Clear Results Before Running"
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
@@ -5448,6 +5552,7 @@ function SqlPlaygroundInner() {
                   globalPageSize={globalPageSize}
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
+                  onExportSnapshotChange={setResultSetExportSnapshot}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -5678,6 +5783,7 @@ function ResultView({
   globalPageSize,
   onSetGlobalPageSize,
   onLoadPage,
+  onExportSnapshotChange,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -5708,6 +5814,8 @@ function ResultView({
   onSetGlobalPageSize: (n: number) => void;
   /** Called when the user navigates to a different page in lazy mode. */
   onLoadPage: (sql: string, page: number) => void;
+  /** Reports the first result set's currently visible page for export scope. */
+  onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -6071,6 +6179,68 @@ function ResultView({
     selectedByIndex,
   ]);
 
+  useEffect(() => {
+    if (!onExportSnapshotChange) return;
+    if (!result || result.error || result.sets.length === 0) {
+      onExportSnapshotChange(null);
+      return;
+    }
+    const set = result.sets[0];
+    if (!set) {
+      onExportSnapshotChange(null);
+      return;
+    }
+    const isLazy = result.lazySql !== undefined;
+    const effective =
+      globalPageSize > 0
+        ? globalPageSize
+        : Math.max(
+            isLazy ? (result.lazyTotalCount ?? set.values.length) : set.values.length,
+            1,
+          );
+    if (isLazy) {
+      onExportSnapshotChange({
+        columns: set.columns,
+        rows: set.values,
+        totalRows: result.lazyTotalCount ?? set.values.length,
+        pageSize: effective,
+        currentPage: result.lazyPage ?? 0,
+      });
+      return;
+    }
+    const sorting = sortingByIndex[0] ?? [];
+    const st = getState(0);
+    let rows = set.values;
+    if (sorting.length > 0) {
+      const parsed = parseColumnId(sorting[0].id);
+      if (parsed) {
+        rows = [...set.values].sort((a, b) => {
+          const cmp = compareCellValues(a[parsed.ci], b[parsed.ci]);
+          return sorting[0].desc ? -cmp : cmp;
+        });
+      }
+    }
+    const totalRows = rows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / effective));
+    const currentPage = Math.min(st.page, totalPages - 1);
+    const start = currentPage * effective;
+    const visibleRows =
+      globalPageSize > 0 ? rows.slice(start, start + effective) : rows;
+    onExportSnapshotChange({
+      columns: set.columns,
+      rows: visibleRows,
+      totalRows,
+      pageSize: effective,
+      currentPage,
+    });
+  }, [
+    result,
+    globalPageSize,
+    sortingByIndex,
+    getState,
+    onExportSnapshotChange,
+  ]);
+
   if (loading) {
     return (
       <div className="welcome">
@@ -6226,7 +6396,6 @@ function ResultView({
               <ResultTableBody
                 key={idx}
                 set={set}
-                index={idx}
                 visible={visibleRows}
                 originalIndices={originalIndices}
                 sorting={sorting}
@@ -6316,6 +6485,7 @@ function ResultView({
               editCount={editCount}
               selectedCount={selectedCount}
               onRequestDelete={() => requestDelete(idx)}
+              // eslint-disable-next-line react-hooks/refs
               onCommitEdits={() => commitEdits(idx, set)}
             />
           );
@@ -6392,7 +6562,6 @@ function ResultView({
 
 function ResultTableBody({
   set,
-  index,
   visible,
   originalIndices,
   sorting,
@@ -6414,7 +6583,6 @@ function ResultTableBody({
   onDuplicateRow,
 }: {
   set: QueryExecResult;
-  index: number;
   visible: QueryExecResult["values"];
   originalIndices: number[];
   sorting: SortingState;
@@ -7707,6 +7875,7 @@ function DdlViewer({
       parent: hostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
+        EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(2),

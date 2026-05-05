@@ -35,6 +35,7 @@
   --cb-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --cb-font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+  --cb-cm-font-size: 14px;
   --cb-radius: 8px;
 
   display: flex;
@@ -189,7 +190,7 @@
   height: auto;
   min-height: 60px;
   font-family: var(--cb-font-mono);
-  font-size: 13.5px;
+  font-size: var(--cb-cm-font-size, 14px);
   line-height: 1.7;
   font-variant-ligatures: none;
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;

@@ -554,7 +554,7 @@
   border-radius: 6px;
   padding: 10px 12px;
   font-family: var(--font-mono);
-  font-size: var(--output-font-size);
+  font-size: 13px;
   white-space: pre-wrap;
   margin: 0;
   margin-top: 8px;
@@ -673,7 +673,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-ui);
-  font-size: var(--output-font-size);
+  font-size: 13px;
 }
 
 .sql-result-table thead th {
@@ -1002,6 +1002,12 @@
   width: 100%;
   transition: background 0.1s, color 0.1s;
   user-select: none;
+}
+
+.scope-radio-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sql-result-export-scope-option:hover {
@@ -1365,6 +1371,19 @@
 .sql-ddl-code-wrap .cm-editor .cm-content {
   font-family: inherit;
   font-size: inherit;
+}
+
+.sql-ddl-code-wrap .cm-editor .cm-scroller {
+  overflow-x: hidden !important;
+}
+
+.sql-ddl-code-wrap .cm-editor .cm-content {
+  min-width: 0;
+}
+
+.sql-ddl-code-wrap .cm-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* ─── Result column header key icons ─── */

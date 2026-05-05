@@ -30,7 +30,7 @@ import type { RuntimeInfo } from "./types";
  *  when the user clicks "Restore default settings", so the two paths
  *  can never drift out of sync. */
 export const DEFAULT_PLAYGROUND_SETTINGS = {
-  fontSize: 13,
+  fontSize: 14,
   outputFontSize: 13,
   outputFontSizeEnabled: false,
   editorTheme: "lucario",
@@ -262,6 +262,8 @@ export interface SettingsPanelProps {
   /** Optional override for the "Use Different Font Size for Outputs"
    *  row label — the SQL playground uses "Results" instead. */
   outputFontSizeLabel?: string;
+  /** Whether to render the output/result font-size controls. */
+  showOutputFontSizeControls?: boolean;
   /** Optional override for the "Clear Output Before Running" row label
    *  — the SQL playground says "Clear Results Before Running". */
   clearBeforeRunLabel?: string;
@@ -299,6 +301,7 @@ export function SettingsPanel({
   setClearBeforeRun,
   language,
   outputFontSizeLabel,
+  showOutputFontSizeControls = true,
   clearBeforeRunLabel,
   onClose,
   onRestoreDefaults,
@@ -371,41 +374,43 @@ export function SettingsPanel({
                   </div>
                 </div>
 
-                <div className="setting-row">
-                  <label className="setting-checkbox-row">
-                    <input
-                      type="checkbox"
-                      checked={outputFontSizeEnabled}
-                      onChange={(e) =>
-                        setOutputFontSizeEnabled(e.target.checked)
-                      }
-                    />
-                    <span>
-                      {outputFontSizeLabel ??
-                        "Use Different Font Size for Outputs"}
-                    </span>
-                  </label>
-                  <div
-                    className={`font-size-row${
-                      outputFontSizeEnabled ? "" : " disabled"
-                    }`}
-                  >
-                    <input
-                      type="range"
-                      className="fs-slider"
-                      min={10}
-                      max={22}
-                      step={1}
-                      value={outputFontSizeEnabled ? outputFontSize : fontSize}
-                      onChange={(e) =>
-                        setOutputFontSize(Number(e.target.value))
-                      }
-                      disabled={!outputFontSizeEnabled}
-                      aria-label="Output font size"
-                    />
-                    <span className="font-size-val">{outputFontSizeEnabled ? outputFontSize : fontSize}px</span>
+                {showOutputFontSizeControls && (
+                  <div className="setting-row">
+                    <label className="setting-checkbox-row">
+                      <input
+                        type="checkbox"
+                        checked={outputFontSizeEnabled}
+                        onChange={(e) =>
+                          setOutputFontSizeEnabled(e.target.checked)
+                        }
+                      />
+                      <span>
+                        {outputFontSizeLabel ??
+                          "Use Different Font Size for Outputs"}
+                      </span>
+                    </label>
+                    <div
+                      className={`font-size-row${
+                        outputFontSizeEnabled ? "" : " disabled"
+                      }`}
+                    >
+                      <input
+                        type="range"
+                        className="fs-slider"
+                        min={10}
+                        max={22}
+                        step={1}
+                        value={outputFontSizeEnabled ? outputFontSize : fontSize}
+                        onChange={(e) =>
+                          setOutputFontSize(Number(e.target.value))
+                        }
+                        disabled={!outputFontSizeEnabled}
+                        aria-label="Output font size"
+                      />
+                      <span className="font-size-val">{outputFontSizeEnabled ? outputFontSize : fontSize}px</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="setting-row">
                   <label className="setting-switch-row">
