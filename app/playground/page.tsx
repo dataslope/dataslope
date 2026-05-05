@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SiPostgresql } from "react-icons/si";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
@@ -84,6 +83,12 @@ const CARDS: CardEntry[] = [
     title: "SQLite",
     desc: "Run SQLite queries against in-browser sample databases via sql.js.",
   },
+  {
+    id: "postgres",
+    href: "/playground/postgres",
+    title: "PostgreSQL",
+    desc: "Preview the mocked Postgres playground shell.",
+  },
 ];
 
 // Render the brand icon for a given language adapter id. Falls back to
@@ -127,23 +132,6 @@ export default function Home() {
               </Link>
             </li>
           ))}
-          <li>
-            <span className={`${styles.card} ${styles.cardDisabled}`}>
-              <span className={styles.logo}>
-                <SiPostgresql
-                  className={styles.logoSvg}
-                  style={{ color: "#4169E1" }}
-                  aria-hidden="true"
-                />
-              </span>
-              <span className={styles.cardText}>
-                <strong>PostgreSQL</strong>
-                <span className={styles.cardDesc}>
-                  Coming soon at /playground/postgres.
-                </span>
-              </span>
-            </span>
-          </li>
         </ul>
       </div>
     </main>
