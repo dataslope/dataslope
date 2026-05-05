@@ -866,6 +866,57 @@ function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
   );
 }
 
+// ─── Column header popovers in the modify-table drawer ───────────────────────
+
+const COLUMN_HEADER_DESCRIPTIONS: Record<string, string> = {
+  type: "The SQLite data type for this column, such as INTEGER, TEXT, REAL, or BLOB.",
+  notNull:
+    "When checked, every row must have a value in this column. NULL values are not allowed.",
+  primary:
+    "When checked, this column is the primary key used to uniquely identify each row.",
+  unique: "When checked, no two rows can have the same value in this column.",
+  autoIncrement:
+    "When checked, SQLite automatically assigns an incrementing integer value for each new row.",
+  defaultValue:
+    "The value automatically used for this column when no value is provided during insertion.",
+  fkTable: "The table that this column references as a foreign key.",
+  fkColumn:
+    "The column in the referenced table that this foreign key column maps to.",
+  onDelete:
+    "The action to perform when the referenced row in the foreign table is deleted.",
+  onUpdate:
+    "The action to perform when the referenced value in the foreign table is updated.",
+};
+
+function ColumnHeaderPopover({ pragma }: { pragma: string }) {
+  return (
+    <Popover.Root>
+      <Popover.Trigger
+        className="sql-col-header-info"
+        aria-label="More info"
+        openOnHover
+        delay={80}
+        closeDelay={120}
+      >
+        <CircleHelp size={11} aria-hidden="true" />
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner
+          className="sql-col-header-positioner"
+          sideOffset={6}
+          align="center"
+        >
+          <Popover.Popup className="bui-popup sql-col-header-popup">
+            <p className="sql-col-header-text">
+              {COLUMN_HEADER_DESCRIPTIONS[pragma]}
+            </p>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
 // ─── Pragma settings tab ─────────────────────────────────────────────────────
 
 function PragmaSettingsTab({
@@ -7312,20 +7363,40 @@ function ModifyStructureForm({
                     <tr>
                       <th className="sql-modify-th-drag" />
                       <th>Name</th>
-                      <th style={{ minWidth: "90px" }}>Type</th>
-                      <th>Not null</th>
-                      <th>Primary</th>
-                      <th>Unique</th>
+                      <th style={{ minWidth: "90px" }}>
+                        Type <ColumnHeaderPopover pragma="type" />
+                      </th>
+                      <th>
+                        Not null <ColumnHeaderPopover pragma="notNull" />
+                      </th>
+                      <th>
+                        Primary <ColumnHeaderPopover pragma="primary" />
+                      </th>
+                      <th>
+                        Unique <ColumnHeaderPopover pragma="unique" />
+                      </th>
                       <th>
                         Auto-
                         <br />
-                        increment
+                        increment{" "}
+                        <ColumnHeaderPopover pragma="autoIncrement" />
                       </th>
-                      <th>Default value</th>
-                      <th>FK table</th>
-                      <th>FK column</th>
-                      <th>On delete</th>
-                      <th>On update</th>
+                      <th>
+                        Default value{" "}
+                        <ColumnHeaderPopover pragma="defaultValue" />
+                      </th>
+                      <th>
+                        FK table <ColumnHeaderPopover pragma="fkTable" />
+                      </th>
+                      <th>
+                        FK column <ColumnHeaderPopover pragma="fkColumn" />
+                      </th>
+                      <th>
+                        On delete <ColumnHeaderPopover pragma="onDelete" />
+                      </th>
+                      <th>
+                        On update <ColumnHeaderPopover pragma="onUpdate" />
+                      </th>
                       <th>Actions</th>
                     </tr>
                   </thead>
