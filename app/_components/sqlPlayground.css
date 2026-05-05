@@ -988,9 +988,8 @@
 .sql-result-export-scope-option {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  border: none;
+  gap: 8px;
+  padding: 5px 6px;
   border-radius: 4px;
   background: transparent;
   color: var(--text-dim);
@@ -1000,6 +999,7 @@
   text-align: left;
   width: 100%;
   transition: background 0.1s, color 0.1s;
+  user-select: none;
 }
 
 .sql-result-export-scope-option:hover {
@@ -1007,14 +1007,31 @@
   color: var(--text);
 }
 
-.sql-result-export-scope-option.is-selected {
+.sql-result-export-scope-option[data-checked] {
   color: var(--text);
 }
 
-.scope-radio-indicator {
-  font-size: 10px;
+.scope-radio-ring {
   flex-shrink: 0;
-  line-height: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.1s;
+}
+
+.sql-result-export-scope-option[data-checked] .scope-radio-ring {
+  border-color: var(--accent);
+}
+
+.scope-radio-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 /* ─── View DDL dialog ─── */

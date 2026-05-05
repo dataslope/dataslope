@@ -270,7 +270,7 @@ function loadSqlJs(): Promise<SqlJsStatic> {
         // and the Java runtime (`/app/tools.jar`): static wasm assets
         // live under public/_sqljs/ so they're served from the same
         // origin (no CORS surprises) and shipped with the deploy.
-        locateFile: (file: string) => `/_sqljs/${file}`,
+        locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/sql.js@1.14.1/dist/${file}`,
       });
     });
   }
