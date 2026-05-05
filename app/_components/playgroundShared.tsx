@@ -7,7 +7,7 @@
 // playground (the SQL playground) can mount the same components without
 // duplicating them.
 
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
@@ -271,6 +271,14 @@ export interface SettingsPanelProps {
   /** Optional extra rows appended inside the General tab — used by the
    *  SQL playground to surface a per-DB "Reset query tabs" action. */
   extraGeneralRows?: ReactNode;
+  /** Optional extra settings tabs rendered after "Editor Themes". Each
+   *  entry provides the tab trigger and its panel content. Used by the
+   *  SQL playground to surface the Pragmas tab. */
+  extraTabs?: Array<{
+    value: string;
+    trigger: ReactNode;
+    panel: ReactNode;
+  }>;
 }
 
 /** Tabbed settings dialog (General + Editor Themes) shared across all
@@ -296,6 +304,7 @@ export function SettingsPanel({
   onRestoreDefaults,
   onClearLocalStorage,
   extraGeneralRows,
+  extraTabs,
 }: SettingsPanelProps) {
   const [tab, setTab] = useState<string>("general");
 
@@ -334,6 +343,11 @@ export function SettingsPanel({
                 <Palette size={14} aria-hidden="true" />
                 <span className="settings-tab-label">Editor Themes</span>
               </Tabs.Tab>
+              {extraTabs?.map((t) => (
+                <Tabs.Tab key={t.value} value={t.value} className="settings-tab">
+                  {t.trigger}
+                </Tabs.Tab>
+              ))}
             </Tabs.List>
 
             <Tabs.Panel value="general" className="settings-panel-pane">
@@ -501,6 +515,9 @@ export function SettingsPanel({
                 </div>
               </div>
             </Tabs.Panel>
+            {extraTabs?.map((t) => (
+              <Fragment key={t.value}>{t.panel}</Fragment>
+            ))}
           </Tabs.Root>
         </Dialog.Popup>
       </Dialog.Portal>
