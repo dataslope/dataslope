@@ -7161,6 +7161,49 @@ function ResultPager({
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// ColumnHeader — a <th> with a help popover explaining the column setting
+// ────────────────────────────────────────────────────────────────────────
+function ColumnHeader({
+  label,
+  description,
+  style,
+}: {
+  label: React.ReactNode;
+  description: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <th style={style}>
+      <span className="sql-modify-th-content">
+        {label}
+        <Popover.Root>
+          <Popover.Trigger
+            className="sql-modify-th-info"
+            aria-label="Column info"
+            openOnHover
+            delay={200}
+            closeDelay={150}
+          >
+            <CircleHelp size={11} aria-hidden="true" />
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner
+              className="sql-modify-th-positioner"
+              sideOffset={4}
+              align="center"
+            >
+              <Popover.Popup className="bui-popup sql-modify-th-popup">
+                {description}
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
+      </span>
+    </th>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
 // ModifyStructureForm — body of the "Modify Structure" drawer. Keeps
 // every column field controlled (name, type, default, flags, foreign
 // key) while delegating persistence and the actual rebuild to the
@@ -7312,20 +7355,47 @@ function ModifyStructureForm({
                     <tr>
                       <th className="sql-modify-th-drag" />
                       <th>Name</th>
-                      <th style={{ minWidth: "90px" }}>Type</th>
-                      <th>Not null</th>
-                      <th>Primary</th>
-                      <th>Unique</th>
-                      <th>
-                        Auto-
-                        <br />
-                        increment
-                      </th>
-                      <th>Default value</th>
-                      <th>FK table</th>
-                      <th>FK column</th>
-                      <th>On delete</th>
-                      <th>On update</th>
+                      <ColumnHeader
+                        label="Type"
+                        description="Storage class or type affinity for the column (TEXT, INTEGER, REAL, BLOB, or NUMERIC)."
+                        style={{ minWidth: "90px" }}
+                      />
+                      <ColumnHeader
+                        label="Not null"
+                        description="When enabled, the column cannot contain NULL values."
+                      />
+                      <ColumnHeader
+                        label="Primary"
+                        description="When enabled, this column is part of the PRIMARY KEY that uniquely identifies each row."
+                      />
+                      <ColumnHeader
+                        label="Unique"
+                        description="When enabled, all values in this column must be distinct across all rows."
+                      />
+                      <ColumnHeader
+                        label={<>Auto-<br />increment</>}
+                        description="When enabled, new rows automatically get a sequential integer value. Requires INTEGER PRIMARY KEY."
+                      />
+                      <ColumnHeader
+                        label="Default value"
+                        description="A value automatically used when no value is provided for new rows."
+                      />
+                      <ColumnHeader
+                        label="FK table"
+                        description="The referenced table for a foreign key constraint."
+                      />
+                      <ColumnHeader
+                        label="FK column"
+                        description="The referenced column in the foreign key table."
+                      />
+                      <ColumnHeader
+                        label="On delete"
+                        description="Action when a referenced row is deleted (e.g., CASCADE, SET NULL, RESTRICT)."
+                      />
+                      <ColumnHeader
+                        label="On update"
+                        description="Action when a referenced row's key is updated (e.g., CASCADE, SET NULL, RESTRICT)."
+                      />
                       <th>Actions</th>
                     </tr>
                   </thead>

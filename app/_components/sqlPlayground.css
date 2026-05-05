@@ -2282,6 +2282,46 @@
   opacity: 1;
 }
 
+/* ─── Modify table column header popovers ─── */
+.sql-modify-th-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sql-modify-th-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: help;
+  opacity: 0.5;
+  border-radius: 3px;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.sql-modify-th-info:hover,
+.sql-modify-th-info:focus-visible {
+  opacity: 1;
+  color: var(--text);
+}
+
+.sql-modify-th-positioner {
+  z-index: 600;
+}
+
+.sql-modify-th-popup {
+  z-index: 600;
+  max-width: 220px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
 /* ─── Structure tabs (Columns / Indexes / Triggers) ─── */
 /* Update 4: Tab strip inside the View Structure drawer. */
 .sql-struct-tabs {
