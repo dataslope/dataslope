@@ -2143,3 +2143,137 @@ html[data-pg-theme="dark"] .header-btn:hover,
 html[data-pg-theme="dark"] .header-btn:focus-visible,
 html[data-pg-theme="dark"] .header-btn[data-popup-open] { color: #ffffff; }
 html[data-pg-theme="dark"] .welcome h3 { color: #ffffff; }
+
+/* ─── Pragma settings tab ─────────────────────────────────────────────────
+   Styles for each pragma row (label + info button + control) and the
+   bottom save / reset actions. Scoped to `.pragma-*` classes so there is
+   no risk of colliding with the General or Themes tab styles. */
+
+/* The Pragmas tab body gets a bit less top gap than `.settings-body` so
+   it doesn't feel sparse with only six rows. */
+.pragma-settings-body { gap: 14px !important; }
+
+/* One row: label-wrap on the left, control on the right. */
+.pragma-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Label + info-popover-trigger side. */
+.pragma-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pragma-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Small circular info button that opens a Popover explaining the pragma. */
+.pragma-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.12s, background-color 0.12s;
+}
+.pragma-info-btn:hover { color: var(--text); background: var(--bg3); }
+.pragma-info-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* Popover body for pragma descriptions. */
+.pragma-info-popup {
+  position: static;
+  top: auto;
+  right: auto;
+  max-width: 280px;
+  padding: 10px 12px;
+}
+.pragma-info-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* Native <select> for journal_mode / synchronous / page_size. Inherits
+   the same visual language as the General tab's theme selector. */
+.pragma-select-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.pragma-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 28px 6px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  min-width: 110px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.12s;
+}
+.pragma-select:hover { border-color: var(--text-dim); }
+.pragma-select:focus { border-color: var(--accent); }
+
+/* Checkbox rows inside the pragma tab use the same base class but also
+   need the "Enabled / Disabled" text label to the right. */
+.pragma-checkbox-row { gap: 8px; }
+.pragma-checkbox-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 54px;
+}
+
+/* Bottom action bar: "Reset to defaults" (left) + "Save" (right). */
+.pragma-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* Primary save button. Disabled state makes it muted and non-interactive. */
+.pragma-save-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, filter 0.15s;
+}
+.pragma-save-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.pragma-save-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

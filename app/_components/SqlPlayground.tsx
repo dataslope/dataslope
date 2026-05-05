@@ -58,6 +58,7 @@ import {
   dropCursor,
   rectangularSelection,
   crosshairCursor,
+  tooltips,
 } from "@codemirror/view";
 import {
   defaultKeymap,
@@ -96,6 +97,7 @@ import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
+import { Tabs } from "@base-ui-components/react/tabs";
 import { Toast } from "@base-ui-components/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
@@ -120,6 +122,7 @@ import {
   ChevronsRight,
   ChevronsUp,
   ChevronUp,
+  CircleHelp,
   Clock,
   Eye,
   Database,
@@ -132,6 +135,7 @@ import {
   Play,
   Plus,
   RotateCcw,
+  Settings2,
   Table2,
   Trash2,
   TriangleAlert,
@@ -604,6 +608,56 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const DEFAULT_PAGE_SIZE = 50;
 
+// ─── Pragma settings ─────────────────────────────────────────────────────
+
+/** SQLite pragma defaults that the playground starts with when no saved
+ *  preferences are found. `foreignKeys` is ON here because the engine
+ *  already enables it via `PRAGMA foreign_keys = ON` in `build()`. */
+const DEFAULT_PRAGMA_SETTINGS = {
+  foreignKeys: true,
+  journalMode: "delete",
+  synchronous: "full",
+  pageSize: 4096,
+  automaticIndex: true,
+  caseSensitiveLike: false,
+} as const;
+
+type PragmaSettings = {
+  foreignKeys: boolean;
+  journalMode: string;
+  synchronous: string;
+  pageSize: number;
+  automaticIndex: boolean;
+  caseSensitiveLike: boolean;
+};
+
+/** Apply a set of pragma settings to an already-initialised SQLite engine.
+ *  Called once after the engine boots and again whenever the user saves
+ *  changes in the Pragmas settings tab. Errors are swallowed so a single
+ *  unsupported pragma (e.g. page_size on an existing database) does not
+ *  prevent the other pragmas from being applied. */
+function applyPragmasToEngine(
+  engine: import("./runtime/sqlite").SqliteEngine,
+  p: PragmaSettings,
+): void {
+  const syncMap: Record<string, string> = { off: "0", normal: "1", full: "2" };
+  const statements: string[] = [
+    `PRAGMA foreign_keys = ${p.foreignKeys ? "ON" : "OFF"}`,
+    `PRAGMA journal_mode = ${p.journalMode}`,
+    `PRAGMA synchronous = ${syncMap[p.synchronous] ?? "2"}`,
+    `PRAGMA page_size = ${Math.max(512, Math.min(65536, p.pageSize))}`,
+    `PRAGMA automatic_index = ${p.automaticIndex ? "ON" : "OFF"}`,
+    `PRAGMA case_sensitive_like = ${p.caseSensitiveLike ? "ON" : "OFF"}`,
+  ];
+  for (const sql of statements) {
+    try {
+      engine.exec(sql);
+    } catch {
+      // Silently ignore unsupported pragmas (e.g. page_size on a non-empty db).
+    }
+  }
+}
+
 /** Delay before treating a sidebar-row click as a single click. The
  *  schema rows distinguish single-click (toggle expand) from
  *  double-click (preview) by deferring the toggle for slightly less
@@ -664,6 +718,220 @@ function ToastList() {
   ));
 }
 
+// ─── Pragma descriptions shown in each row's info popover ────────────────────
+
+const PRAGMA_DESCRIPTIONS: Record<keyof PragmaSettings, string> = {
+  foreignKeys:
+    "Enforces referential integrity for foreign key constraints. When ON, SQLite raises an error on inserts or updates that would violate a declared FOREIGN KEY relationship.",
+  journalMode:
+    "Controls how the rollback journal file is managed after a commit. DELETE (default) removes the journal each time. WAL (Write-Ahead Log) allows concurrent reads while a write is in progress.",
+  synchronous:
+    "Controls how aggressively SQLite syncs data to disk. FULL (default) is safest; NORMAL reduces sync calls; OFF skips syncing entirely and is fastest but risks corruption on an OS crash.",
+  pageSize:
+    "Size in bytes of each page in the database file. Must be a power of 2 between 512 and 65536. Can only be changed before the first table is created in a new database.",
+  automaticIndex:
+    "When ON (default), SQLite may automatically create temporary indexes during query planning to speed up full-table scans. Disabling reduces memory overhead at the cost of potentially slower queries.",
+  caseSensitiveLike:
+    "When ON, the LIKE operator distinguishes uppercase and lowercase ASCII letters. By default (OFF), LIKE is case-insensitive for ASCII characters.",
+};
+
+function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
+  return (
+    <Popover.Root>
+      <Popover.Trigger className="pragma-info-btn" aria-label="More info">
+        <CircleHelp size={13} aria-hidden="true" />
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={6} align="start">
+          <Popover.Popup className="bui-popup pragma-info-popup">
+            <p className="pragma-info-text">{PRAGMA_DESCRIPTIONS[pragma]}</p>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ─── Pragma settings tab ─────────────────────────────────────────────────────
+
+function PragmaSettingsTab({
+  savedPragmas,
+  onSave,
+}: {
+  savedPragmas: PragmaSettings;
+  onSave: (p: PragmaSettings) => void;
+}) {
+  const [draft, setDraft] = useState<PragmaSettings>({ ...savedPragmas });
+
+  const hasChanges =
+    draft.foreignKeys !== savedPragmas.foreignKeys ||
+    draft.journalMode !== savedPragmas.journalMode ||
+    draft.synchronous !== savedPragmas.synchronous ||
+    draft.pageSize !== savedPragmas.pageSize ||
+    draft.automaticIndex !== savedPragmas.automaticIndex ||
+    draft.caseSensitiveLike !== savedPragmas.caseSensitiveLike;
+
+  return (
+    <Tabs.Panel value="pragmas" className="settings-panel-pane">
+      <div className="settings-body pragma-settings-body">
+        {/* Foreign keys */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Foreign Keys</span>
+            <PragmaInfoButton pragma="foreignKeys" />
+          </div>
+          <label className="setting-checkbox-row pragma-checkbox-row">
+            <input
+              type="checkbox"
+              checked={draft.foreignKeys}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, foreignKeys: e.target.checked }))
+              }
+            />
+            <span className="pragma-checkbox-label">
+              {draft.foreignKeys ? "Enabled" : "Disabled"}
+            </span>
+          </label>
+        </div>
+
+        {/* Journal mode */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Journal Mode</span>
+            <PragmaInfoButton pragma="journalMode" />
+          </div>
+          <div className="pragma-select-wrap">
+            <select
+              className="pragma-select"
+              value={draft.journalMode}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, journalMode: e.target.value }))
+              }
+            >
+              <option value="delete">Delete</option>
+              <option value="truncate">Truncate</option>
+              <option value="persist">Persist</option>
+              <option value="memory">Memory</option>
+              <option value="wal">WAL</option>
+              <option value="off">Off</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Synchronous */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Synchronous</span>
+            <PragmaInfoButton pragma="synchronous" />
+          </div>
+          <div className="pragma-select-wrap">
+            <select
+              className="pragma-select"
+              value={draft.synchronous}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, synchronous: e.target.value }))
+              }
+            >
+              <option value="off">Off</option>
+              <option value="normal">Normal</option>
+              <option value="full">Full</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Page size */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Page Size (bytes)</span>
+            <PragmaInfoButton pragma="pageSize" />
+          </div>
+          <div className="pragma-select-wrap">
+            <select
+              className="pragma-select"
+              value={draft.pageSize}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, pageSize: Number(e.target.value) }))
+              }
+            >
+              <option value={512}>512</option>
+              <option value={1024}>1024</option>
+              <option value={2048}>2048</option>
+              <option value={4096}>4096</option>
+              <option value={8192}>8192</option>
+              <option value={16384}>16384</option>
+              <option value={32768}>32768</option>
+              <option value={65536}>65536</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Automatic index */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Automatic Index</span>
+            <PragmaInfoButton pragma="automaticIndex" />
+          </div>
+          <label className="setting-checkbox-row pragma-checkbox-row">
+            <input
+              type="checkbox"
+              checked={draft.automaticIndex}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, automaticIndex: e.target.checked }))
+              }
+            />
+            <span className="pragma-checkbox-label">
+              {draft.automaticIndex ? "Enabled" : "Disabled"}
+            </span>
+          </label>
+        </div>
+
+        {/* Case sensitive LIKE */}
+        <div className="pragma-row">
+          <div className="pragma-label-wrap">
+            <span className="pragma-label">Case Sensitive LIKE</span>
+            <PragmaInfoButton pragma="caseSensitiveLike" />
+          </div>
+          <label className="setting-checkbox-row pragma-checkbox-row">
+            <input
+              type="checkbox"
+              checked={draft.caseSensitiveLike}
+              onChange={(e) =>
+                setDraft((d) => ({
+                  ...d,
+                  caseSensitiveLike: e.target.checked,
+                }))
+              }
+            />
+            <span className="pragma-checkbox-label">
+              {draft.caseSensitiveLike ? "Enabled" : "Disabled"}
+            </span>
+          </label>
+        </div>
+
+        {/* Bottom actions */}
+        <div className="pragma-actions">
+          <button
+            type="button"
+            className="settings-action-btn"
+            onClick={() => setDraft({ ...DEFAULT_PRAGMA_SETTINGS })}
+          >
+            <RotateCcw size={14} aria-hidden="true" />
+            <span>Reset to defaults</span>
+          </button>
+          <button
+            type="button"
+            className="pragma-save-btn"
+            disabled={!hasChanges}
+            onClick={() => onSave(draft)}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </Tabs.Panel>
+  );
+}
+
 function SqlPlaygroundInner() {
   const router = useRouter();
 
@@ -675,6 +943,14 @@ function SqlPlaygroundInner() {
   const [editorTheme, setEditorThemeState] = useState<string>("lucario");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+
+  // ─── Pragma settings ────────────────────────────────────────────────
+  const [pragmaSettings, setPragmaSettingsState] = useState<PragmaSettings>(
+    DEFAULT_PRAGMA_SETTINGS,
+  );
+  // Ref kept in sync so applyPragmasToEngine can always read the latest
+  // saved values even when called from async engine-init callbacks.
+  const pragmaSettingsRef = useRef<PragmaSettings>(DEFAULT_PRAGMA_SETTINGS);
 
   // ─── Global page size ────────────────────────────────────────────────
   // Lifted from ResultView so that runSqlForTab can read the current
@@ -695,6 +971,9 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     globalPageSizeRef.current = globalPageSize;
   }, [globalPageSize]);
+  useEffect(() => {
+    pragmaSettingsRef.current = pragmaSettings;
+  }, [pragmaSettings]);
   const setGlobalPageSize = useCallback((n: number) => {
     // Update the ref synchronously so any callback that reads it in the
     // same event loop tick (e.g. onLoadPage right after onSetGlobalPageSize)
@@ -968,6 +1247,24 @@ function SqlPlaygroundInner() {
     const savedDb =
       localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
 
+    // ─── Hydrate pragma settings ─────────────────────────────────────
+    const DP = DEFAULT_PRAGMA_SETTINGS;
+    const savedPragmas: PragmaSettings = {
+      foreignKeys:
+        localStorage.getItem(storageKey("pragma_foreignkeys")) !== "false",
+      journalMode:
+        localStorage.getItem(storageKey("pragma_journalmode")) ?? DP.journalMode,
+      synchronous:
+        localStorage.getItem(storageKey("pragma_synchronous")) ?? DP.synchronous,
+      pageSize:
+        Number(localStorage.getItem(storageKey("pragma_pagesize")) ?? DP.pageSize) ||
+        DP.pageSize,
+      automaticIndex:
+        localStorage.getItem(storageKey("pragma_automaticindex")) !== "false",
+      caseSensitiveLike:
+        localStorage.getItem(storageKey("pragma_casesensitivelike")) === "true",
+    };
+
     /* eslint-disable react-hooks/set-state-in-effect */
     setFontSizeState(savedSize);
     setOutputFontSizeEnabledState(savedOutputEnabled);
@@ -975,6 +1272,8 @@ function SqlPlaygroundInner() {
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
+    setPragmaSettingsState(savedPragmas);
+    pragmaSettingsRef.current = savedPragmas;
     const initialSample = findSampleDatabase(savedDb);
     setActiveDbId(initialSample.id);
     const initialTabs = loadTabs(initialSample.id, initialSample.defaultTabs);
@@ -1050,6 +1349,7 @@ function SqlPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           autocompletion({ activateOnTyping: false, closeOnBlur: true }),
+          tooltips({ parent: document.body }),
           keymap.of([
             {
               // Run selection if text is selected, otherwise run all.
@@ -1114,6 +1414,11 @@ function SqlPlaygroundInner() {
         if (cancelled) return;
         engineRef.current = engine;
         setEngineForRender(engine);
+
+        // Apply any user-saved pragma settings to the freshly-initialised
+        // database. pragmaSettingsRef is already populated from the
+        // localStorage hydration effect that runs synchronously on mount.
+        applyPragmasToEngine(engine, pragmaSettingsRef.current);
 
         const sample = engine.activeSample();
         setActiveDbId(sample.id);
@@ -1269,6 +1574,40 @@ function SqlPlaygroundInner() {
     localStorage.setItem(storageKey("clearbeforerun"), String(b));
   }, []);
 
+  const savePragmaSettings = useCallback(
+    (p: PragmaSettings) => {
+      setPragmaSettingsState(p);
+      pragmaSettingsRef.current = p;
+      try {
+        localStorage.setItem(
+          storageKey("pragma_foreignkeys"),
+          String(p.foreignKeys),
+        );
+        localStorage.setItem(storageKey("pragma_journalmode"), p.journalMode);
+        localStorage.setItem(storageKey("pragma_synchronous"), p.synchronous);
+        localStorage.setItem(
+          storageKey("pragma_pagesize"),
+          String(p.pageSize),
+        );
+        localStorage.setItem(
+          storageKey("pragma_automaticindex"),
+          String(p.automaticIndex),
+        );
+        localStorage.setItem(
+          storageKey("pragma_casesensitivelike"),
+          String(p.caseSensitiveLike),
+        );
+      } catch {
+        // ignore quota errors
+      }
+      if (engineRef.current) {
+        applyPragmasToEngine(engineRef.current, p);
+      }
+      showToast("Pragma settings saved.");
+    },
+    [showToast],
+  );
+
   const restoreDefaultSettings = useCallback(() => {
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     setFontSize(D.fontSize);
@@ -1321,6 +1660,10 @@ function SqlPlaygroundInner() {
       } catch {
         // ignore
       }
+      // Re-apply pragma settings after the new database is loaded because
+      // `loadSampleDatabase` / `loadBlankDatabase` rebuild the db from
+      // scratch (clearing any previously applied pragmas).
+      applyPragmasToEngine(engine, pragmaSettingsRef.current);
       setTables(engine.listTables());
       setViews(engine.listViews());
       setIndexes(engine.listIndexes());
@@ -3298,6 +3641,24 @@ function SqlPlaygroundInner() {
               </button>
             </div>
           }
+          extraTabs={[
+            {
+              value: "pragmas",
+              trigger: (
+                <>
+                  <Settings2 size={14} aria-hidden="true" />
+                  <span className="settings-tab-label">Pragmas</span>
+                </>
+              ),
+              panel: (
+                <PragmaSettingsTab
+                  key={settingsOpen ? "open" : "closed"}
+                  savedPragmas={pragmaSettings}
+                  onSave={savePragmaSettings}
+                />
+              ),
+            },
+          ]}
         />
 
         <AlertDialog.Root
