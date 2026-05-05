@@ -68,8 +68,6 @@ import {
 } from "@codemirror/commands";
 import {
   bracketMatching,
-  foldGutter,
-  foldKeymap,
   indentOnInput,
   indentUnit,
 } from "@codemirror/language";
@@ -397,6 +395,24 @@ interface ResultTableRow {
 // ────────────────────────────────────────────────────────────────────────
 // Result formatting
 // ────────────────────────────────────────────────────────────────────────
+
+/** Infer a SQLite-style type label from the runtime JavaScript value.
+ *  Scans the column's values to find the first non-null entry so that
+ *  all-null columns fall back to "NULL" rather than silently showing
+ *  nothing. Returns "INTEGER", "REAL", "TEXT", "BLOB", or "NULL". */
+function inferColumnType(
+  rows: QueryExecResult["values"],
+  colIdx: number,
+): string {
+  for (const row of rows) {
+    const v = row[colIdx];
+    if (v === null) continue;
+    if (v instanceof Uint8Array) return "BLOB";
+    if (typeof v === "number") return Number.isInteger(v) ? "INTEGER" : "REAL";
+    if (typeof v === "string") return "TEXT";
+  }
+  return "NULL";
+}
 
 interface QueryRunResult {
   /** The result sets returned by sql.js (one per SELECT-like statement). */
@@ -1219,6 +1235,11 @@ function SqlPlaygroundInner() {
   const runRef = useRef<() => void>(() => undefined);
   // Handler to run a specific SQL string (used for "run selection").
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
+  // Whether the editor currently has a non-empty text selection. Used
+  // to swap the Run button between "Run" (no selection) and a split
+  // "Run Selection | ▾" (selection active) affordance.
+  const [hasEditorSelection, setHasEditorSelection] = useState(false);
+  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   // Tab change requests from the editor's onChange need access to the
   // latest active tab id. Keep a ref so we don't re-create the editor
   // every time the user switches tabs.
@@ -1343,6 +1364,14 @@ function SqlPlaygroundInner() {
         saveTabs(activeDbIdRef.current, next);
       });
 
+      // Track whether the editor has an active text selection so the
+      // Run button can switch between "Run" and "Run Selection" modes.
+      const selectionListener = EditorView.updateListener.of((update) => {
+        if (!update.selectionSet && !update.docChanged) return;
+        const sel = update.state.selection.main;
+        setHasEditorSelectionRef.current(!sel.empty);
+      });
+
       const view = new EditorView({
         doc: "",
         parent: editorHostRef.current,
@@ -1356,7 +1385,6 @@ function SqlPlaygroundInner() {
           closeBrackets(),
           lineNumbersExt(),
           highlightActiveLineGutter(),
-          foldGutter(),
           highlightActiveLine(),
           highlightSelectionMatches(),
           rectangularSelection(),
@@ -1399,7 +1427,6 @@ function SqlPlaygroundInner() {
             ...defaultKeymap,
             ...searchKeymap,
             ...historyKeymap,
-            ...foldKeymap,
             ...completionKeymap,
             indentWithTab,
           ]),
@@ -1410,6 +1437,7 @@ function SqlPlaygroundInner() {
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
           persistListener,
+          selectionListener,
         ],
       });
 
@@ -1917,6 +1945,17 @@ function SqlPlaygroundInner() {
     },
     [runSqlForTab],
   );
+
+  // Read the current editor selection and run it. Called by the "Run
+  // Selection" split-button and its dropdown menu item.
+  const runCurrentSelection = useCallback(() => {
+    const view = editorRef.current;
+    if (!view) return;
+    const sel = view.state.selection.main;
+    if (sel.empty) return;
+    const selected = view.state.sliceDoc(sel.from, sel.to);
+    runSelection(selected);
+  }, [runSelection]);
 
   useEffect(() => {
     runRef.current = () => {
@@ -4802,46 +4841,92 @@ function SqlPlaygroundInner() {
                     </span>
                     <kbd className="kbd">Enter</kbd>
                   </span>
-                  <span className="sql-toolbar-shortcut-sep" aria-hidden="true">/</span>
-                  <span
-                    className="kbd-group"
-                    title={isMac ? "Cmd + Shift + Enter — run all" : "Ctrl + Shift + Enter — run all"}
-                  >
-                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                    <span className="kbd-plus" aria-hidden="true">
-                      +
-                    </span>
-                    <kbd className="kbd" aria-label="Shift">⇧</kbd>
-                    <span className="kbd-plus" aria-hidden="true">
-                      +
-                    </span>
-                    <kbd className="kbd">Enter</kbd>
-                  </span>
                 </div>
-                <button
-                  type="button"
-                  className={`run-btn${statusState === "running" ? " running" : ""}`}
-                  disabled={!loaded || statusState === "running"}
-                  onClick={runActiveTab}
-                >
-                  {statusState === "running" ? (
-                    <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                      <circle
-                        cx="6"
-                        cy="6"
-                        r="4.5"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeDasharray="14 8"
-                      />
-                    </svg>
-                  ) : (
-                    <Play size={10} aria-hidden="true" />
-                  )}
-                  {statusState === "running" ? "Running…" : "Run"}
-                </button>
+                {hasEditorSelection ? (
+                  <div className={`run-btn-split${statusState === "running" ? " running" : ""}`}>
+                    <button
+                      type="button"
+                      className="run-btn-split-main"
+                      disabled={!loaded || statusState === "running"}
+                      onClick={runCurrentSelection}
+                    >
+                      {statusState === "running" ? (
+                        <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                          <circle
+                            cx="6"
+                            cy="6"
+                            r="4.5"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeDasharray="14 8"
+                          />
+                        </svg>
+                      ) : (
+                        <Play size={10} aria-hidden="true" />
+                      )}
+                      {statusState === "running" ? "Running…" : "Run Selection"}
+                    </button>
+                    <span className="run-btn-split-divider" aria-hidden="true" />
+                    <Menu.Root>
+                      <Menu.Trigger
+                        className="run-btn-split-chevron"
+                        disabled={!loaded || statusState === "running"}
+                        aria-label="Run options"
+                      >
+                        <ChevronDown size={11} aria-hidden="true" />
+                      </Menu.Trigger>
+                      <Menu.Portal>
+                        <Menu.Positioner sideOffset={6} align="end">
+                          <Menu.Popup className="bui-popup run-split-dropdown">
+                            <Menu.Item
+                              className="run-split-item"
+                              onClick={runCurrentSelection}
+                              disabled={!loaded || statusState === "running"}
+                            >
+                              <Play size={10} aria-hidden="true" />
+                              Run Selection
+                            </Menu.Item>
+                            <Menu.Item
+                              className="run-split-item"
+                              onClick={runActiveTab}
+                              disabled={!loaded || statusState === "running"}
+                            >
+                              <Play size={10} aria-hidden="true" />
+                              Run All
+                            </Menu.Item>
+                          </Menu.Popup>
+                        </Menu.Positioner>
+                      </Menu.Portal>
+                    </Menu.Root>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`run-btn${statusState === "running" ? " running" : ""}`}
+                    disabled={!loaded || statusState === "running"}
+                    onClick={runActiveTab}
+                  >
+                    {statusState === "running" ? (
+                      <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                        <circle
+                          cx="6"
+                          cy="6"
+                          r="4.5"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeDasharray="14 8"
+                        />
+                      </svg>
+                    ) : (
+                      <Play size={10} aria-hidden="true" />
+                    )}
+                    {statusState === "running" ? "Running…" : "Run"}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -6022,6 +6107,7 @@ function ResultTableBody({
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
               const sorted = column.getIsSorted();
+              const colType = inferColumnType(set.values, ci);
               return (
                 <button
                   type="button"
@@ -6035,37 +6121,40 @@ function ResultTableBody({
                         : "Click to sort ascending"
                   }
                 >
-                  <span className="sql-result-th-label">
-                    {isPk && (
-                      <MdOutlineKey
-                        size={12}
-                        className="sql-result-th-pk"
-                        aria-label="Primary key"
-                      />
-                    )}
-                    {fk && (
-                      <IoLink
-                        size={12}
-                        className="sql-result-th-fk"
-                        aria-label={`Foreign key → ${fk.table}.${fk.to}`}
-                      />
-                    )}
-                    <span>{c}</span>
+                  <span className="sql-result-th-top">
+                    <span className="sql-result-th-label">
+                      {isPk && (
+                        <MdOutlineKey
+                          size={12}
+                          className="sql-result-th-pk"
+                          aria-label="Primary key"
+                        />
+                      )}
+                      {fk && (
+                        <IoLink
+                          size={12}
+                          className="sql-result-th-fk"
+                          aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                        />
+                      )}
+                      <span>{c}</span>
+                    </span>
+                    <span
+                      className={
+                        sorted
+                          ? "sql-result-th-chevron sql-result-th-chevron-active"
+                          : "sql-result-th-chevron"
+                      }
+                      aria-hidden="true"
+                    >
+                      {sorted === "asc" ? (
+                        <ChevronUp size={11} />
+                      ) : (
+                        <ChevronDown size={11} />
+                      )}
+                    </span>
                   </span>
-                  <span
-                    className={
-                      sorted
-                        ? "sql-result-th-chevron sql-result-th-chevron-active"
-                        : "sql-result-th-chevron"
-                    }
-                    aria-hidden="true"
-                  >
-                    {sorted === "asc" ? (
-                      <ChevronUp size={11} />
-                    ) : (
-                      <ChevronDown size={11} />
-                    )}
-                  </span>
+                  <span className="sql-result-th-type">{colType}</span>
                 </button>
               );
             },
@@ -6155,6 +6244,7 @@ function ResultTableBody({
       pendingEdits,
       selectedRows,
       set.columns,
+      set.values,
       someVisibleSelected,
       originalIndices,
     ],
@@ -7279,7 +7369,6 @@ function DdlViewer({
         EditorState.readOnly.of(true),
         drawSelection(),
         lineNumbersExt(),
-        foldGutter(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         sqlLang({ dialect: SQLite, upperCaseKeywords: false }),

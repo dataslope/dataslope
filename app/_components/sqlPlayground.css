@@ -1917,8 +1917,9 @@
 /* ─── Sortable column header button ─── */
 .sql-result-th-btn {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   background: transparent;
   border: none;
   padding: 0;
@@ -1929,6 +1930,14 @@
   width: 100%;
   text-align: left;
   white-space: nowrap;
+}
+
+/* Top row: column name + sort chevron */
+.sql-result-th-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
 }
 
 .sql-result-th-btn:hover .sql-result-th-chevron {
@@ -1952,6 +1961,17 @@
 /* Highlight the <th> of the currently sorted column */
 .sql-result-th-sorted {
   background: color-mix(in srgb, var(--text) 4%, var(--bg)) !important;
+}
+
+/* Column data-type label rendered below the column name */
+.sql-result-th-type {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-dim);
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
 }
 
 /* ─── Inline cell editor ─── */
