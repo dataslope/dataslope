@@ -113,6 +113,7 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
         height: "100%",
       },
       ".cm-scroller": {
+        fontSize: "14px",
         fontFamily:
           "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
       },

@@ -30,8 +30,6 @@ import {
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import {
   bracketMatching,
-  foldGutter,
-  foldKeymap,
   indentOnInput,
   indentUnit,
 } from "@codemirror/language";
@@ -374,7 +372,6 @@ function CodeBlockInner({
             : undefined,
         }),
         highlightActiveLineGutter(),
-        foldGutter(),
         highlightActiveLine(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
@@ -390,7 +387,6 @@ function CodeBlockInner({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
-          ...foldKeymap,
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
@@ -449,7 +445,6 @@ function CodeBlockInner({
         EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
-        foldGutter(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,

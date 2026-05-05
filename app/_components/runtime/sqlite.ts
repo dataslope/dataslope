@@ -266,10 +266,6 @@ function loadSqlJs(): Promise<SqlJsStatic> {
         cfg?: { locateFile?: (file: string) => string },
       ) => Promise<SqlJsStatic>;
       return init({
-        // Mirrors the pattern used by the C# runtime (`/_dotnet/...`)
-        // and the Java runtime (`/app/tools.jar`): static wasm assets
-        // live under public/_sqljs/ so they're served from the same
-        // origin (no CORS surprises) and shipped with the deploy.
         locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/sql.js@1.14.1/dist/${file}`,
       });
     });
