@@ -31,8 +31,6 @@ import {
 } from "@codemirror/commands";
 import {
   bracketMatching,
-  foldGutter,
-  foldKeymap,
   indentOnInput,
   indentUnit,
 } from "@codemirror/language";
@@ -678,7 +676,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           closeBrackets(),
           lineNumbersExt(),
           highlightActiveLineGutter(),
-          foldGutter(),
           highlightActiveLine(),
           highlightSelectionMatches(),
           rectangularSelection(),
@@ -709,7 +706,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             ...defaultKeymap,
             ...searchKeymap,
             ...historyKeymap,
-            ...foldKeymap,
             ...completionKeymap,
             indentWithTab,
           ]),

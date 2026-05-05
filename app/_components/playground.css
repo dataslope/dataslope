@@ -2284,9 +2284,6 @@ html[data-pg-theme="dark"] .welcome h3 { color: #ffffff; }
 
 /* Popover body for pragma descriptions. */
 .pragma-info-popup {
-  position: static;
-  top: auto;
-  right: auto;
   max-width: 280px;
   padding: 10px 12px;
 }

@@ -103,8 +103,6 @@ import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
 import { Menu } from "@base-ui-components/react/menu";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { RadioGroup } from "@base-ui-components/react/radio-group";
-import { Radio } from "@base-ui-components/react/radio";
 import {
   flexRender,
   getCoreRowModel,
@@ -138,7 +136,7 @@ import {
   Plus,
   RotateCcw,
   Settings2,
-  Table2,
+  Table,
   Trash2,
   TriangleAlert,
   Upload,
@@ -332,8 +330,8 @@ function exportResultToSql(
 // ─── Parquet helpers ─────────────────────────────────────────────────────
 //
 // Loaded lazily on first use via dynamic imports so the WASM binary is
-// not bundled into the initial page chunk. The WASM is served from
-// public/_parquet/ (like sql.js), loaded once, and cached thereafter.
+// not bundled into the initial page chunk. The WASM is fetched from the
+// jsDelivr CDN, loaded once, and cached thereafter.
 
 let _parquetWasmInit: Promise<typeof import("parquet-wasm/esm")> | null = null;
 
@@ -2371,8 +2369,35 @@ function SqlPlaygroundInner() {
     }
   }, [showToast]);
 
+  // ─── Result set export (from top-level Export button) ────────────────
+  // Exports the first result set's rows in the chosen format. For lazy
+  // (paginated) results, all rows are fetched from the engine. Always
+  // exports every row (no current-page scope) since page state lives
+  // inside ResultView.
+  const handleResultSetExport = useCallback(
+    (format: "csv" | "json" | "sql" | "parquet") => {
+      if (!result || result.sets.length === 0) return;
+      const set = result.sets[0];
+      const columns = set.columns;
+      let rows: QueryExecResult["values"];
+      if (result.lazySql !== undefined) {
+        rows = handleFetchAllRows(result.lazySql);
+      } else {
+        rows = set.values;
+      }
+      const title = activeTab?.title ?? "result_set";
+      const rowCount = rows.length;
+      const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
+      const filename = `${toFileSafeName(title)} (${rowLabel}).${format}`;
+      if (format === "csv") exportResultToCsv(columns, rows, filename);
+      else if (format === "json") exportResultToJson(columns, rows, filename);
+      else if (format === "parquet") exportResultToParquet(columns, rows, filename);
+      else exportResultToSql(columns, rows, filename);
+    },
+    [result, activeTab, handleFetchAllRows],
+  );
+
   // ─── CSV import ───────────────────────────────────────────────────
-  // Parses a CSV string into a headers array and an array of value rows.
   // Handles double-quoted fields and escaped double-quotes (`""`).
   const parseCsv = useCallback(
     (text: string): { headers: string[]; rows: string[][] } => {
@@ -3842,6 +3867,7 @@ function SqlPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="sql-result-export-group-label">Database</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={exportDatabase}
@@ -3852,6 +3878,52 @@ function SqlPlaygroundInner() {
                         <div className="ex-desc">Download as .sqlite</div>
                       </div>
                     </Menu.Item>
+                    {result && result.sets.length > 0 && (
+                      <>
+                        <div className="sql-result-export-sep" />
+                        <div className="sql-result-export-group-label">Result Set</div>
+                        <Menu.Item
+                          className="example-item export-item"
+                          onClick={() => handleResultSetExport("csv")}
+                        >
+                          <span className="ext-badge">.csv</span>
+                          <div className="export-item-text">
+                            <div className="ex-title">CSV</div>
+                            <div className="ex-desc">Comma-separated values</div>
+                          </div>
+                        </Menu.Item>
+                        <Menu.Item
+                          className="example-item export-item"
+                          onClick={() => handleResultSetExport("json")}
+                        >
+                          <span className="ext-badge">.json</span>
+                          <div className="export-item-text">
+                            <div className="ex-title">JSON</div>
+                            <div className="ex-desc">Array of objects</div>
+                          </div>
+                        </Menu.Item>
+                        <Menu.Item
+                          className="example-item export-item"
+                          onClick={() => handleResultSetExport("sql")}
+                        >
+                          <span className="ext-badge">.sql</span>
+                          <div className="export-item-text">
+                            <div className="ex-title">SQL</div>
+                            <div className="ex-desc">INSERT statements</div>
+                          </div>
+                        </Menu.Item>
+                        <Menu.Item
+                          className="example-item export-item"
+                          onClick={() => handleResultSetExport("parquet")}
+                        >
+                          <span className="ext-badge">.parquet</span>
+                          <div className="export-item-text">
+                            <div className="ex-title">Parquet</div>
+                            <div className="ex-desc">Apache Parquet columnar format</div>
+                          </div>
+                        </Menu.Item>
+                      </>
+                    )}
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>
@@ -5376,8 +5448,6 @@ function SqlPlaygroundInner() {
                   globalPageSize={globalPageSize}
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
-                  onFetchAllRows={handleFetchAllRows}
-                  tabTitle={activeTab?.title ?? "result_set"}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -5516,7 +5586,7 @@ function SqlTab({
               onMouseLeave={() => setPopoverOpen(false)}
             >
               {tab.kind === "view-data" && (
-                <Table2 size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+                <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
               {tab.kind === "er-diagram" && (
                 <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
@@ -5608,8 +5678,6 @@ function ResultView({
   globalPageSize,
   onSetGlobalPageSize,
   onLoadPage,
-  onFetchAllRows,
-  tabTitle,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -5640,11 +5708,6 @@ function ResultView({
   onSetGlobalPageSize: (n: number) => void;
   /** Called when the user navigates to a different page in lazy mode. */
   onLoadPage: (sql: string, page: number) => void;
-  /** Fetches all rows for the given SQL (used to export lazy results without
-   *  loading all pages into React state). */
-  onFetchAllRows: (sql: string) => QueryExecResult["values"];
-  /** Title of the active tab, used to generate the export filename. */
-  tabTitle: string;
 }) {
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
@@ -6212,12 +6275,9 @@ function ResultView({
           const { set, isLazy, sorting, totalRows, currentPage } = activeSetData;
           let handlePageChange: (p: number) => void;
           let handlePageSizeChange: (s: number) => void;
-          let currentPageRows: QueryExecResult["values"];
-          let allRows: QueryExecResult["values"];
-          let effectiveLazySql: string;
           if (isLazy) {
             const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-            effectiveLazySql = baseSql;
+            let effectiveLazySql = baseSql;
             if (sorting.length > 0) {
               const parsed = parseColumnId(sorting[0].id);
               if (parsed) {
@@ -6229,42 +6289,12 @@ function ResultView({
               onSetGlobalPageSize(s);
               onLoadPage(effectiveLazySql, 0);
             };
-            currentPageRows = set.values;
-            allRows = [];
           } else {
-            const effective =
-              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
-            const totalPagesLocal = Math.max(1, Math.ceil(totalRows / effective));
-            const safePage = Math.min(currentPage, totalPagesLocal - 1);
-            const startIdx = safePage * effective;
             handlePageChange = (p: number) => setPage(idx, p);
             handlePageSizeChange = (s: number) => {
               onSetGlobalPageSize(s);
               setPage(idx, 0);
             };
-            effectiveLazySql = "";
-            const indexed = set.values.map((values, i) => ({
-              values,
-              originalIndex: i,
-            }));
-            let sortedIndexed = indexed;
-            if (sorting.length > 0) {
-              const parsed = parseColumnId(sorting[0].id);
-              if (parsed) {
-                sortedIndexed = [...indexed].sort((a, b) => {
-                  const cmp = compareCellValues(
-                    a.values[parsed.ci],
-                    b.values[parsed.ci],
-                  );
-                  return sorting[0].desc ? -cmp : cmp;
-                });
-              }
-            }
-            allRows = sortedIndexed.map((item) => item.values);
-            currentPageRows =
-              globalPageSize > 0
-                ? allRows.slice(startIdx, startIdx + effective)
-                : allRows;
           }
           const pkCols = pkColumnsForSet(set);
           const selected = selectedByIndex[idx];
@@ -6287,17 +6317,6 @@ function ResultView({
               selectedCount={selectedCount}
               onRequestDelete={() => requestDelete(idx)}
               onCommitEdits={() => commitEdits(idx, set)}
-              columns={set.columns}
-              currentPageRows={currentPageRows}
-              allRows={allRows}
-              isLazy={isLazy}
-              effectiveLazySql={effectiveLazySql}
-              onFetchAllRows={onFetchAllRows}
-              tabTitle={
-                result.sets.length > 1
-                  ? `${tabTitle} - Set ${safeSetIdx + 1}`
-                  : tabTitle
-              }
             />
           );
         })()}
@@ -6991,13 +7010,6 @@ function ResultPager({
   selectedCount,
   onRequestDelete,
   onCommitEdits,
-  columns,
-  currentPageRows,
-  allRows,
-  isLazy,
-  effectiveLazySql,
-  onFetchAllRows,
-  tabTitle,
 }: {
   /** Total number of rows across all pages. For lazy results this is the
    *  COUNT(*) from the engine; for non-lazy results it is set.values.length. */
@@ -7014,33 +7026,12 @@ function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
-  /** Column names for the result set, used for export. */
-  columns: string[];
-  /** Rows visible on the current page (already sorted and sliced). */
-  currentPageRows: QueryExecResult["values"];
-  /** All rows in the result set (sorted but not sliced). For lazy results
-   *  this is unused — rows are fetched on demand via onFetchAllRows. */
-  allRows: QueryExecResult["values"];
-  /** Whether this result uses server-side (lazy) pagination. */
-  isLazy: boolean;
-  /** For lazy results: the SQL (possibly with ORDER BY) to use when
-   *  fetching the entire result set for export. */
-  effectiveLazySql: string;
-  /** Fetches all rows by running effectiveLazySql against the engine. */
-  onFetchAllRows: (sql: string) => QueryExecResult["values"];
-  /** Title of the active tab, used to generate the export filename. */
-  tabTitle: string;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
   const totalPages = Math.max(1, Math.ceil(totalRows / effective));
   const safePage = Math.min(page, totalPages - 1);
   const start = safePage * effective;
   const end = Math.min(totalRows, start + effective);
-
-  // Whether the export toggle is available (pagination is active).
-  const canExportCurrentPage = pageSize > 0 && totalRows > pageSize;
-  // Toggle: false = entire result set (default), true = current page only.
-  const [exportCurrentPageOnly, setExportCurrentPageOnly] = useState(false);
 
   // Controlled input for direct page navigation.
   const [pageInput, setPageInput] = useState(String(safePage + 1));
@@ -7059,25 +7050,6 @@ function ResultPager({
     } else {
       setPageInput(String(safePage + 1));
     }
-  };
-
-  const handleExport = (
-    scope: "page" | "all",
-    format: "csv" | "json" | "sql" | "parquet",
-  ) => {
-    const rows =
-      scope === "page"
-        ? currentPageRows
-        : isLazy
-          ? onFetchAllRows(effectiveLazySql)
-          : allRows;
-    const rowCount = rows.length;
-    const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
-    const filename = `${toFileSafeName(tabTitle)} (${rowLabel}).${format}`;
-    if (format === "csv") exportResultToCsv(columns, rows, filename);
-    else if (format === "json") exportResultToJson(columns, rows, filename);
-    else if (format === "parquet") exportResultToParquet(columns, rows, filename);
-    else exportResultToSql(columns, rows, filename);
   };
 
   return (
@@ -7218,86 +7190,6 @@ function ResultPager({
           </button>
         )}
       </div>
-      <Menu.Root>
-        <Menu.Trigger className="sql-result-export-btn" aria-label="Export result set">
-          <ArrowDownToLine size={12} aria-hidden="true" />
-          <span>Export</span>
-        </Menu.Trigger>
-        <Menu.Portal>
-          <Menu.Positioner sideOffset={6} align="end">
-            <Menu.Popup className="bui-popup export-dropdown sql-result-export-popup">
-              {canExportCurrentPage && (
-                <>
-                  <div className="sql-result-export-group-label">Scope</div>
-                  <RadioGroup
-                    className="sql-result-export-scope-options"
-                    value={exportCurrentPageOnly ? "page" : "all"}
-                    onValueChange={(value) => {
-                      setExportCurrentPageOnly(value === "page");
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Radio.Root value="page" className="sql-result-export-scope-option">
-                      <span className="scope-radio-ring">
-                        <Radio.Indicator className="scope-radio-dot" />
-                      </span>
-                      <span>Current page ({(end - start).toLocaleString()} rows)</span>
-                    </Radio.Root>
-                    <Radio.Root value="all" className="sql-result-export-scope-option">
-                      <span className="scope-radio-ring">
-                        <Radio.Indicator className="scope-radio-dot" />
-                      </span>
-                      <span>Entire result ({totalRows.toLocaleString()} rows)</span>
-                    </Radio.Root>
-                  </RadioGroup>
-                  <div className="sql-result-export-sep" />
-                </>
-              )}
-              <div className="sql-result-export-group-label">Format</div>
-              <Menu.Item
-                className="example-item export-item"
-                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "csv")}
-              >
-                <span className="ext-badge">.csv</span>
-                <div className="export-item-text">
-                  <div className="ex-title">CSV</div>
-                  <div className="ex-desc">Comma-separated values</div>
-                </div>
-              </Menu.Item>
-              <Menu.Item
-                className="example-item export-item"
-                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "json")}
-              >
-                <span className="ext-badge">.json</span>
-                <div className="export-item-text">
-                  <div className="ex-title">JSON</div>
-                  <div className="ex-desc">Array of objects</div>
-                </div>
-              </Menu.Item>
-              <Menu.Item
-                className="example-item export-item"
-                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "sql")}
-              >
-                <span className="ext-badge">.sql</span>
-                <div className="export-item-text">
-                  <div className="ex-title">SQL</div>
-                  <div className="ex-desc">INSERT statements</div>
-                </div>
-              </Menu.Item>
-              <Menu.Item
-                className="example-item export-item"
-                onClick={() => handleExport(exportCurrentPageOnly ? "page" : "all", "parquet")}
-              >
-                <span className="ext-badge">.parquet</span>
-                <div className="export-item-text">
-                  <div className="ex-title">Parquet</div>
-                  <div className="ex-desc">Apache Parquet columnar format</div>
-                </div>
-              </Menu.Item>
-            </Menu.Popup>
-          </Menu.Positioner>
-        </Menu.Portal>
-      </Menu.Root>
     </div>
   );
 }
@@ -7814,15 +7706,13 @@ function DdlViewer({
       doc: sql,
       parent: hostRef.current,
       extensions: [
-        // `readOnly: true` keeps the cursor active so Ctrl-A / Cmd-A
-        // selects all text within the editor rather than falling through
-        // to the browser's page-level select-all. (`EditorView.editable`
-        // would disable focus entirely, like v5's `"nocursor"`.)
         EditorState.readOnly.of(true),
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
+        // Wrap long lines to prevent horizontal scroll in the View DDL popup.
+        EditorView.lineWrapping,
         sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
         themeComp.of(themeFor(theme)),
       ],
@@ -7959,7 +7849,7 @@ function SchemaSection({
                 className="sql-tree-create-btn"
                 onClick={onAdd}
               >
-                <Table2 size={12} aria-hidden="true" />
+                <Table size={12} aria-hidden="true" />
                 <span>Create a {label.toLowerCase().replace(/s$/, "")}</span>
               </button>
             ) : (
@@ -8016,7 +7906,7 @@ function SchemaItem({
   onViewDDL,
   onExportCsv,
 }: SchemaItemProps) {
-  const Icon = kind === "view" ? Eye : Table2;
+  const Icon = kind === "view" ? Eye : Table;
   const fkByCol = useMemo(() => {
     const m = new Map<string, ForeignKeyInfo>();
     for (const fk of foreignKeys ?? []) m.set(fk.from, fk);
