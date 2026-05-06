@@ -10,12 +10,14 @@ interface SqlSettingsState {
   editorTheme: string;
   wordWrap: boolean;
   clearBeforeRun: boolean;
+  aiAutocompleteEnabled: boolean;
   setFontSize: (fontSize: number) => void;
   setOutputFontSizeEnabled: (enabled: boolean) => void;
   setOutputFontSize: (fontSize: number) => void;
   setEditorTheme: (theme: string) => void;
   setWordWrap: (wordWrap: boolean) => void;
   setClearBeforeRun: (clearBeforeRun: boolean) => void;
+  setAiAutocompleteEnabled: (enabled: boolean) => void;
 }
 
 export const useSettingsStore = create<SqlSettingsState>((set) => ({
@@ -25,6 +27,7 @@ export const useSettingsStore = create<SqlSettingsState>((set) => ({
   editorTheme: "lucario",
   wordWrap: true,
   clearBeforeRun: false,
+  aiAutocompleteEnabled: false,
   setFontSize: (fontSize) => set({ fontSize }),
   setOutputFontSizeEnabled: (outputFontSizeEnabled) =>
     set({ outputFontSizeEnabled }),
@@ -32,4 +35,6 @@ export const useSettingsStore = create<SqlSettingsState>((set) => ({
   setEditorTheme: (editorTheme) => set({ editorTheme }),
   setWordWrap: (wordWrap) => set({ wordWrap }),
   setClearBeforeRun: (clearBeforeRun) => set({ clearBeforeRun }),
+  setAiAutocompleteEnabled: (aiAutocompleteEnabled) =>
+    set({ aiAutocompleteEnabled }),
 }));

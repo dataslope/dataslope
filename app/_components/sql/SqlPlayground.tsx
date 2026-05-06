@@ -179,6 +179,7 @@ import {
   createSqlCompletionSource,
   type SqlCompletionSchema,
 } from "./sqlCompletion";
+import { createSqlAiCompletionSource } from "./sqlAiCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -193,6 +194,7 @@ import {
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
 import { themeFor } from "../cmExtensions";
+import { Switch } from "@base-ui-components/react/switch";
 
 // Replace the entire editor document — the v6 idiom for what v5 called
 // `editor.setValue(s)`. Centralised so the call sites that swap tab
@@ -206,15 +208,69 @@ function replaceDoc(view: EditorView, value: string): void {
 // CodeMirror's default is 100ms; 75ms keeps local schema suggestions feeling
 // immediate while still coalescing rapid typing before recomputing completions.
 const AUTOCOMPLETE_DELAY_MS = 75;
+// Longer delay for AI-backed completions to avoid saturating the API on every
+// keystroke.  The extra latency is acceptable because each suggestion is
+// context-rich rather than a simple keyword match.
+const AI_AUTOCOMPLETE_DELAY_MS = 300;
 
-function sqlAutocompletion(schema: SqlCompletionSchema) {
+function sqlAutocompletion(
+  schema: SqlCompletionSchema,
+  aiEnabled: boolean,
+  aiApiBaseUrl: string,
+  aiApiKey: string,
+) {
+  const sqlSource = createSqlCompletionSource(schema);
+  const source =
+    aiEnabled && aiApiBaseUrl && aiApiKey
+      ? createSqlAiCompletionSource(
+          {
+            apiBaseUrl: aiApiBaseUrl,
+            apiKey: aiApiKey,
+            schema,
+            debounceMs: AI_AUTOCOMPLETE_DELAY_MS,
+          },
+          sqlSource,
+        )
+      : sqlSource;
   return autocompletion({
     activateOnTyping: true,
-    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
+    activateOnTypingDelay: aiEnabled ? AI_AUTOCOMPLETE_DELAY_MS : AUTOCOMPLETE_DELAY_MS,
     closeOnBlur: true,
-    override: [createSqlCompletionSource(schema)],
+    override: [source],
   });
 }
+
+// ─── AI autocomplete environment-variable configuration ──────────────────────
+// These are read once at module load time. NEXT_PUBLIC_ vars are inlined by
+// the Next.js build, so they are always strings (empty when unset).
+const AI_API_BASE_URL = process.env.NEXT_PUBLIC_AI_API_BASE_URL ?? "";
+const AI_API_KEY = process.env.NEXT_PUBLIC_AI_API_KEY ?? "";
+
+interface AiConfigStatus {
+  available: boolean;
+  /** Human-readable description of what is missing (when !available). */
+  missingMessage?: string;
+}
+
+function getAiConfigStatus(): AiConfigStatus {
+  const missingBase = !AI_API_BASE_URL;
+  const missingKey = !AI_API_KEY;
+  if (missingBase && missingKey) {
+    return {
+      available: false,
+      missingMessage: "missing API base URL and API key",
+    };
+  }
+  if (missingBase) {
+    return { available: false, missingMessage: "missing API base URL" };
+  }
+  if (missingKey) {
+    return { available: false, missingMessage: "missing API key" };
+  }
+  return { available: true };
+}
+
+const AI_CONFIG = getAiConfigStatus();
 
 const PLAYGROUND_ID = "sqlite";
 
@@ -1189,6 +1245,12 @@ function SqlPlaygroundInner() {
   const setWordWrapState = useSettingsStore((s) => s.setWordWrap);
   const clearBeforeRun = useSettingsStore((s) => s.clearBeforeRun);
   const setClearBeforeRunState = useSettingsStore((s) => s.setClearBeforeRun);
+  const aiAutocompleteEnabled = useSettingsStore(
+    (s) => s.aiAutocompleteEnabled,
+  );
+  const setAiAutocompleteEnabledState = useSettingsStore(
+    (s) => s.setAiAutocompleteEnabled,
+  );
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
 
@@ -1508,6 +1570,10 @@ function SqlPlaygroundInner() {
       localStorage.getItem(storageKey("clearbeforerun")) === "true";
     const savedDb =
       localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
+    // Only restore AI autocomplete if the required env vars are configured.
+    const savedAiAutocomplete =
+      AI_CONFIG.available &&
+      localStorage.getItem(storageKey("ai_autocomplete")) === "true";
 
     // ─── Hydrate pragma settings ─────────────────────────────────────
     const DP = DEFAULT_PRAGMA_SETTINGS;
@@ -1537,6 +1603,7 @@ function SqlPlaygroundInner() {
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
+    setAiAutocompleteEnabledState(savedAiAutocomplete);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
     const initialSample = findSampleDatabase(savedDb);
@@ -1563,6 +1630,7 @@ function SqlPlaygroundInner() {
     };
   }, [
     setClearBeforeRunState,
+    setAiAutocompleteEnabledState,
     setEditorThemeState,
     setFontSizeState,
     setOutputFontSizeEnabledState,
@@ -1630,7 +1698,7 @@ function SqlPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           completionComp.of(
-            sqlAutocompletion({ entities: [] }),
+            sqlAutocompletion({ entities: [] }, false, "", ""),
           ),
           tooltips({ parent: document.body }),
           keymap.of([
@@ -1772,7 +1840,8 @@ function SqlPlaygroundInner() {
   // completion for `<table>.<col>` style references; we rebuild it
   // whenever tables/views change so DDL executed in the editor
   // (CREATE TABLE, ALTER TABLE, …) is immediately reflected in
-  // autocomplete suggestions.
+  // autocomplete suggestions. Also rebuild when aiAutocompleteEnabled
+  // toggles so the source swaps in/out without a page reload.
   useEffect(() => {
     const engine = engineRef.current;
     const view = editorRef.current;
@@ -1803,11 +1872,16 @@ function SqlPlaygroundInner() {
           sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
         ),
         completionComp.reconfigure(
-          sqlAutocompletion(completionSchema),
+          sqlAutocompletion(
+            completionSchema,
+            aiAutocompleteEnabled,
+            AI_API_BASE_URL,
+            AI_API_KEY,
+          ),
         ),
       ],
     });
-  }, [tables, views]);
+  }, [tables, views, aiAutocompleteEnabled]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -1877,6 +1951,19 @@ function SqlPlaygroundInner() {
     setClearBeforeRunState(b);
     localStorage.setItem(storageKey("clearbeforerun"), String(b));
   }, [setClearBeforeRunState]);
+  const setAiAutocompleteEnabled = useCallback(
+    (b: boolean) => {
+      // Guard: silently ignore enable requests when the feature is unavailable.
+      const next = b && AI_CONFIG.available ? true : false;
+      setAiAutocompleteEnabledState(next);
+      try {
+        localStorage.setItem(storageKey("ai_autocomplete"), String(next));
+      } catch {
+        // ignore quota errors
+      }
+    },
+    [setAiAutocompleteEnabledState],
+  );
 
   const savePragmaSettings = useCallback(
     (p: PragmaSettings) => {
@@ -1920,6 +2007,7 @@ function SqlPlaygroundInner() {
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
     setClearBeforeRun(D.clearBeforeRun);
+    setAiAutocompleteEnabled(false);
     showToast("Default settings restored.");
   }, [
     setFontSize,
@@ -1928,6 +2016,7 @@ function SqlPlaygroundInner() {
     setEditorTheme,
     setWordWrap,
     setClearBeforeRun,
+    setAiAutocompleteEnabled,
     showToast,
   ]);
 
@@ -4205,16 +4294,42 @@ function SqlPlaygroundInner() {
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
           extraGeneralRows={
-            <div className="setting-row">
-              <button
-                type="button"
-                className="settings-action-btn"
-                onClick={resetTabsForCurrentDb}
-              >
-                <RotateCcw size={14} aria-hidden="true" />
-                <span>Reset query tabs for {activeSample.label}</span>
-              </button>
-            </div>
+            <>
+              <div className="setting-row">
+                <label
+                  className={`setting-switch-row${!AI_CONFIG.available ? " ai-autocomplete-unavailable" : ""}`}
+                >
+                  <span className="ai-autocomplete-label-wrap">
+                    <span>AI-based Autocomplete</span>
+                    {!AI_CONFIG.available && (
+                      <span className="ai-autocomplete-unavail-msg">
+                        AI autocomplete unavailable:{" "}
+                        {AI_CONFIG.missingMessage}
+                      </span>
+                    )}
+                  </span>
+                  <Switch.Root
+                    checked={aiAutocompleteEnabled}
+                    onCheckedChange={setAiAutocompleteEnabled}
+                    disabled={!AI_CONFIG.available}
+                    className="bui-switch"
+                    aria-label="AI-based Autocomplete"
+                  >
+                    <Switch.Thumb className="bui-switch-thumb" />
+                  </Switch.Root>
+                </label>
+              </div>
+              <div className="setting-row">
+                <button
+                  type="button"
+                  className="settings-action-btn"
+                  onClick={resetTabsForCurrentDb}
+                >
+                  <RotateCcw size={14} aria-hidden="true" />
+                  <span>Reset query tabs for {activeSample.label}</span>
+                </button>
+              </div>
+            </>
           }
           extraTabs={[
             {

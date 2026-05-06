@@ -1559,6 +1559,25 @@ input[type="range"].fs-slider:disabled {
   transform: translateX(16px);
   background: white;
 }
+.bui-switch[data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* AI autocomplete toggle — unavailable state */
+.ai-autocomplete-unavailable {
+  cursor: default;
+}
+.ai-autocomplete-label-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ai-autocomplete-unavail-msg {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
 
 /* Theme select */
 .theme-select-wrap {
