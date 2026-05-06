@@ -4227,6 +4227,7 @@ function SqlPlaygroundInner() {
                     <Menu.Item
                       className="example-item export-item"
                       onClick={exportDatabase}
+                      disabled={tables.length === 0}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -4239,6 +4240,7 @@ function SqlPlaygroundInner() {
                     <Menu.Item
                       className="example-item export-item"
                       onClick={exportDatabaseToXlsx}
+                      disabled={tables.length === 0}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -4248,6 +4250,11 @@ function SqlPlaygroundInner() {
                         <div className="ex-desc">One sheet per table</div>
                       </div>
                     </Menu.Item>
+                    {tables.length === 0 && (
+                      <div className="sql-export-info-msg">
+                        Create a table to export the database
+                      </div>
+                    )}
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>

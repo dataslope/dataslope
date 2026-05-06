@@ -2144,6 +2144,16 @@ input[type="range"].fs-slider:disabled {
   margin-top: 4px;
 }
 
+.sql-export-info-msg {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  user-select: none;
+}
+
 /* File-extension badge — compact inline badge rendered beside the item title. */
 .ext-badge {
   flex-shrink: 0;
