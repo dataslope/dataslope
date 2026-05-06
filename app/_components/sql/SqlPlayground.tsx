@@ -1954,7 +1954,7 @@ function SqlPlaygroundInner() {
   const setAiAutocompleteEnabled = useCallback(
     (b: boolean) => {
       // Guard: silently ignore enable requests when the feature is unavailable.
-      const next = b && AI_CONFIG.available ? true : false;
+      const next = b && AI_CONFIG.available;
       setAiAutocompleteEnabledState(next);
       try {
         localStorage.setItem(storageKey("ai_autocomplete"), String(next));
