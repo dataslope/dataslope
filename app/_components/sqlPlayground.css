@@ -2243,6 +2243,25 @@
   color: var(--red);
 }
 
+/* ─── Export submenu trigger inside sidebar / ERD context menus ─── */
+.ctx-export-trigger {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: default;
+}
+.ctx-export-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.ctx-export-arrow {
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
 /* Small popover explaining the unique constraint. */
 .sql-unique-popover {
   padding: 8px 10px;

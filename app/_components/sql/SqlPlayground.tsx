@@ -3375,6 +3375,48 @@ function SqlPlaygroundInner() {
     [quoteIdent, showToast],
   );
 
+  // ─── Export table / view to any format ───────────────────────────
+  const exportEntityToFormat = useCallback(
+    (name: string, format: "csv" | "json" | "sql" | "parquet") => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const sets = engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
+        if (!sets || sets.length === 0) {
+          showToast(`"${name}" is empty — no data to export.`, "warn");
+          return;
+        }
+        const { columns, values: rows } = sets[0];
+        const filename = `${name}.${format}`;
+        if (format === "csv") exportResultToCsv(columns, rows, filename);
+        else if (format === "json") exportResultToJson(columns, rows, filename);
+        else if (format === "parquet") exportResultToParquet(columns, rows, filename);
+        else exportResultToSql(columns, rows, filename);
+        showToast(`Exported ${filename}.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Export failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, showToast],
+  );
+
+  // ─── Get row count for a table / view ────────────────────────────
+  const getEntityRowCount = useCallback(
+    (name: string): number => {
+      const engine = engineRef.current;
+      if (!engine) return 0;
+      try {
+        const sets = engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`);
+        if (!sets || sets.length === 0 || sets[0].values.length === 0) return 0;
+        return Number(sets[0].values[0][0]) || 0;
+      } catch {
+        return 0;
+      }
+    },
+    [quoteIdent],
+  );
+
   // ─── Tab actions ────────────────────────────────────────────────────
   const addTab = useCallback(() => {
     const nextNum = tabs.length + 1;
@@ -5345,7 +5387,8 @@ function SqlPlaygroundInner() {
                     onTruncate={truncateEntity}
                     onDrop={dropEntity}
                     onViewDDL={viewDDL}
-                    onExportCsv={exportEntityToCsv}
+                    onExport={exportEntityToFormat}
+                    onGetRowCount={getEntityRowCount}
                   />
                 ))}
               </SchemaSection>
@@ -5383,7 +5426,8 @@ function SqlPlaygroundInner() {
                     onCopy={copyEntityName}
                     onDrop={dropEntity}
                     onViewDDL={viewDDL}
-                    onExportCsv={exportEntityToCsv}
+                    onExport={exportEntityToFormat}
+                    onGetRowCount={getEntityRowCount}
                   />
                 ))}
               </SchemaSection>
@@ -5655,7 +5699,8 @@ function SqlPlaygroundInner() {
                   onTruncate={truncateEntity}
                   onDrop={dropEntity}
                   onViewDDL={viewDDL}
-                  onExportCsv={exportEntityToCsv}
+                  onExport={exportEntityToFormat}
+                  onGetRowCount={getEntityRowCount}
                 />
               </div>
             )}
@@ -8088,7 +8133,8 @@ interface SchemaItemProps {
   onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
-  onExportCsv: (name: string) => void;
+  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onGetRowCount: (name: string) => number;
 }
 
 function SchemaItem({
@@ -8107,8 +8153,15 @@ function SchemaItem({
   onTruncate,
   onDrop,
   onViewDDL,
-  onExportCsv,
+  onExport,
+  onGetRowCount,
 }: SchemaItemProps) {
+  const [exportRowCount, setExportRowCount] = useState<number | null>(null);
+  const ensureRowCount = useCallback(() => {
+    if (exportRowCount === null) {
+      setExportRowCount(onGetRowCount(name));
+    }
+  }, [exportRowCount, onGetRowCount, name]);
   const Icon = kind === "view" ? Eye : Table;
   const fkByCol = useMemo(() => {
     const m = new Map<string, ForeignKeyInfo>();
@@ -8303,12 +8356,64 @@ function SchemaItem({
               >
                 <div className="ex-title">Copy Name</div>
               </ContextMenu.Item>
-              <ContextMenu.Item
-                className="example-item"
-                onClick={() => onExportCsv(name)}
-              >
-                <div className="ex-title">Export to CSV</div>
-              </ContextMenu.Item>
+              <Menu.Root>
+                <Menu.Trigger
+                  className="example-item ctx-export-trigger"
+                  onPointerDown={ensureRowCount}
+                >
+                  <div className="ex-title ctx-export-title">
+                    Export
+                    <ChevronRight size={10} className="ctx-export-arrow" />
+                  </div>
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner side="right" align="start" sideOffset={4}>
+                    <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                      {exportRowCount !== null && (
+                        <div className="sql-result-export-group-label">
+                          {exportRowCount.toLocaleString()} rows
+                        </div>
+                      )}
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => onExport(name, "csv")}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
+                          <div className="ex-desc">Comma-separated values</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => onExport(name, "json")}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
+                          <div className="ex-desc">Array of row objects</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => onExport(name, "sql")}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
+                          <div className="ex-desc">INSERT statements</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => onExport(name, "parquet")}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
+                          <div className="ex-desc">Apache Parquet binary</div>
+                        </div>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
               {kind === "table" && onTruncate && (
                 <ContextMenu.Item
                   className="example-item"
