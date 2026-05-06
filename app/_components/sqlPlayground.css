@@ -449,7 +449,9 @@
   font-family: var(--font-ui);
   font-size: 11px;
   cursor: pointer;
-  transition: background 120ms ease, color 120ms ease;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
 }
 
 .sql-er-btn:hover {
@@ -620,8 +622,12 @@
 }
 
 @keyframes sql-result-flash {
-  from { opacity: 0.3; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Tab bar shown at the top of the results pane when a query returns
@@ -648,7 +654,9 @@
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.4;
-  transition: color 100ms, background 100ms;
+  transition:
+    color 100ms,
+    background 100ms;
 }
 
 .sql-result-set-tab:hover {
@@ -964,27 +972,17 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 .sql-result-export-btn:hover {
   background: color-mix(in srgb, var(--text) 12%, transparent);
   color: var(--text);
 }
 
-.sql-result-export-popup {
-  width: 220px;
-}
-
-.sql-result-export-popup .sql-result-export-group-label {
-  padding: 4px 8px 2px;
-}
-
-.sql-result-export-popup .export-item {
-  padding-top: 6px;
-  padding-bottom: 6px;
-}
-
 .sql-result-export-group-label {
+  margin-top: 6px;
   padding: 6px 10px 3px;
   font-family: var(--font-ui);
   font-size: 10px;
@@ -1015,7 +1013,9 @@
   cursor: pointer;
   text-align: left;
   width: 100%;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
   user-select: none;
 }
 
@@ -1617,7 +1617,9 @@
   color: var(--text-dim);
   cursor: pointer;
   vertical-align: middle;
-  transition: color 0.12s, background-color 0.12s;
+  transition:
+    color 0.12s,
+    background-color 0.12s;
 }
 .sql-col-header-info:hover {
   color: var(--text);
@@ -2030,7 +2032,9 @@
   color: var(--text-dim);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 120ms, color 120ms;
+  transition:
+    background 120ms,
+    color 120ms;
 }
 
 .sql-import-mode-btn + .sql-import-mode-btn {
@@ -2462,7 +2466,7 @@
 /* Draws a subtle line through the center of disabled checkboxes
    and select wrappers to signal the field is not interactive. */
 .sql-modify-flag.is-disabled .sql-modify-flag-box::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -2480,7 +2484,7 @@
   position: relative;
 }
 .sql-modify-cell-field:has(select:disabled)::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -2618,7 +2622,6 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
-
 
 /* ─── PostgreSQL playground mock shell ─────────────────────────────── */
 .postgres-shell {
