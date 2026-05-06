@@ -5647,6 +5647,15 @@ function SqlPlaygroundInner() {
                   columnsByEntity={columnsByEntity}
                   foreignKeysByEntity={foreignKeysByEntity}
                   isDark={!LIGHT_THEMES.has(editorTheme)}
+                  onPreview={previewTable}
+                  onModifyStructure={openModifyStructure}
+                  onAddRow={openAddRow}
+                  onCount={countEntityRows}
+                  onCopy={copyEntityName}
+                  onTruncate={truncateEntity}
+                  onDrop={dropEntity}
+                  onViewDDL={viewDDL}
+                  onExportCsv={exportEntityToCsv}
                 />
               </div>
             )}
@@ -5655,6 +5664,52 @@ function SqlPlaygroundInner() {
       </div>
     </div>
   );
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Result comparison — used to decide whether the fade animation should play.
+// The animation is only shown when the new result is identical to the previous
+// one (same columns, same rows, same values in the same order), so a rerun
+// of a query that returns the same data provides visual feedback that the
+// query actually ran without the table appearing to "jump".
+// ────────────────────────────────────────────────────────────────────────────
+
+function sqlValueEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  // Uint8Array BLOBs: compare byte by byte
+  if (a instanceof Uint8Array && b instanceof Uint8Array) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function queryResultsIdentical(
+  a: QueryRunResult | null,
+  b: QueryRunResult | null,
+): boolean {
+  if (a === null && b === null) return true;
+  if (a === null || b === null) return false;
+  if (a.sets.length !== b.sets.length) return false;
+  for (let i = 0; i < a.sets.length; i++) {
+    const sa = a.sets[i];
+    const sb = b.sets[i];
+    if (sa.columns.length !== sb.columns.length) return false;
+    if (!sa.columns.every((col, j) => col === sb.columns[j])) return false;
+    if (sa.values.length !== sb.values.length) return false;
+    for (let r = 0; r < sa.values.length; r++) {
+      const ra = sa.values[r];
+      const rb = sb.values[r];
+      if (ra.length !== rb.length) return false;
+      for (let c = 0; c < ra.length; c++) {
+        if (!sqlValueEqual(ra[c], rb[c])) return false;
+      }
+    }
+  }
+  return true;
 }
 
 function ResultView({
@@ -5763,6 +5818,9 @@ function ResultView({
   // Ref to the flash wrapper div — used to replay the CSS animation on
   // each new result without unmounting the component tree.
   const flashWrapperRef = useRef<HTMLDivElement>(null);
+  // Tracks the previous result so we can compare data identity before
+  // deciding whether to play the fade animation.
+  const prevResultRef = useRef<QueryRunResult | null>(null);
 
   // Reset pagination + transient actions whenever a new result lands.
   // Table-edit actions refresh the result in place, so they can opt into
@@ -5780,16 +5838,21 @@ function ResultView({
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
-    // Replay the flash animation: remove the class, access offsetWidth to
-    // force the browser to reflow and reset the CSS animation timeline
-    // (without this, re-adding the class has no effect because the animation
-    // is still in its "finished" state from the previous run), then re-add
-    // the class so the animation plays from the start.
+    // Only replay the fade animation when the new result data is identical to
+    // the previous one (same columns, rows, and values in the same order).
+    // For a genuinely different result the table content changes visibly, so
+    // the animation would be distracting rather than informative.
     const el = flashWrapperRef.current;
     if (el) {
+      const identical = queryResultsIdentical(result, prevResultRef.current);
+      prevResultRef.current = result;
       el.classList.remove("sql-result-flash-anim");
-      void el.offsetWidth; // force reflow — resets animation timeline
-      el.classList.add("sql-result-flash-anim");
+      if (identical && result !== null) {
+        void el.offsetWidth; // force reflow — resets animation timeline
+        el.classList.add("sql-result-flash-anim");
+      }
+    } else {
+      prevResultRef.current = result;
     }
   }, [result]);
 
