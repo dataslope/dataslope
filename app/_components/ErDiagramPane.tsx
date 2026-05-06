@@ -40,7 +40,7 @@ interface ErTableActions {
   onTruncate?: (name: string) => void;
   onDrop: (name: string) => void;
   onViewDDL: (name: string) => void;
-  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
   onGetRowCount: (name: string) => number;
 }
 
@@ -90,6 +90,21 @@ function ErTableNode({ data }: NodeProps) {
       setExportRowCount(actions.onGetRowCount(tableName));
     }
   }, [exportRowCount, actions, tableName]);
+
+  // Hover-to-open state for the Export submenu.
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleExportPointerEnter = useCallback(() => {
+    if (exportCloseTimer.current) {
+      clearTimeout(exportCloseTimer.current);
+      exportCloseTimer.current = null;
+    }
+    ensureRowCount();
+    setExportOpen(true);
+  }, [ensureRowCount]);
+  const handleExportPointerLeave = useCallback(() => {
+    exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
+  }, []);
 
   const nodeContent = (
     <div className="er-table-node">
@@ -199,10 +214,11 @@ function ErTableNode({ data }: NodeProps) {
               <div className="ex-title">Copy Name</div>
             </ContextMenu.Item>
             {/* Export submenu — opens to the side showing all 4 formats */}
-            <Menu.Root>
+            <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
               <Menu.Trigger
                 className="example-item ctx-export-trigger"
-                onPointerDown={ensureRowCount}
+                onPointerEnter={handleExportPointerEnter}
+                onPointerLeave={handleExportPointerLeave}
               >
                 <div className="ex-title ctx-export-title">
                   Export
@@ -211,7 +227,11 @@ function ErTableNode({ data }: NodeProps) {
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner side="right" align="start" sideOffset={4}>
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                  <Menu.Popup
+                    className="bui-popup examples-dropdown export-dropdown"
+                    onPointerEnter={handleExportPointerEnter}
+                    onPointerLeave={handleExportPointerLeave}
+                  >
                     {exportRowCount !== null && (
                       <div className="sql-result-export-group-label">
                         {exportRowCount.toLocaleString()} rows
@@ -263,6 +283,17 @@ function ErTableNode({ data }: NodeProps) {
                         </div>
                       </div>
                     </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => actions.onExport(tableName, "xlsx")}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          Excel <span className="ext-badge">.xlsx</span>
+                        </div>
+                        <div className="ex-desc">Excel workbook (single sheet)</div>
+                      </div>
+                    </Menu.Item>
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>
@@ -306,9 +337,9 @@ interface ElkEdgeData {
 /**
  * Render crow's-foot cardinality markers directly into the edge SVG.
  *
- * The source (FK / "many") end gets a crow's foot: three lines radiating
- * outward from the entity boundary in the direction the edge travels.
- * The target (PK / "one") end gets a single perpendicular tick.
+ * The source (FK / "many") end gets a crow's foot: a perpendicular bar at
+ * the entity boundary plus two diverging tines that fan outward along the
+ * edge. The target (PK / "one") end gets a single perpendicular tick.
  *
  * Angles are derived from the first and last edge segments so the symbols
  * always align with the actual line direction.
@@ -327,41 +358,23 @@ function renderCardinalityMarkers(
     Math.atan2(pts[n - 1].y - pts[n - 2].y, pts[n - 1].x - pts[n - 2].x) *
     (180 / Math.PI);
 
+  const lineProps = { stroke, strokeWidth: sw, strokeLinecap: "round" as const };
+
   return (
     <>
       {/* ── Crow's foot (N / many) at the source / FK end ──
-          rotate(startAngle): the +x direction aligns with the edge direction,
-          so the fork lines radiate *away* from the source entity. */}
+          rotate(startAngle): +x aligns with the edge direction (away from entity).
+          The perpendicular bar sits right at the entity boundary; the two tines
+          fan outward from the same origin point. */}
       <g
         transform={`translate(${pts[0].x},${pts[0].y}) rotate(${startAngle})`}
       >
-        {/* Centre line — reinforces the main edge path */}
-        <line
-          x1="0"
-          y1="0"
-          x2="12"
-          y2="0"
-          stroke={stroke}
-          strokeWidth={sw}
-        />
-        {/* Upper fork */}
-        <line
-          x1="0"
-          y1="0"
-          x2="12"
-          y2="-6"
-          stroke={stroke}
-          strokeWidth={sw}
-        />
-        {/* Lower fork */}
-        <line
-          x1="0"
-          y1="0"
-          x2="12"
-          y2="6"
-          stroke={stroke}
-          strokeWidth={sw}
-        />
+        {/* Perpendicular bar at the entity boundary */}
+        <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
+        {/* Upper tine — fans up-and-out */}
+        <line x1="0" y1="0" x2="10" y2="-7" {...lineProps} />
+        {/* Lower tine — fans down-and-out */}
+        <line x1="0" y1="0" x2="10" y2="7" {...lineProps} />
       </g>
 
       {/* ── Single tick (1 / one) at the target / PK end ──
@@ -371,14 +384,7 @@ function renderCardinalityMarkers(
         transform={`translate(${pts[n - 1].x},${pts[n - 1].y}) rotate(${endAngle + 180})`}
       >
         {/* Perpendicular tick right at the entity boundary */}
-        <line
-          x1="0"
-          y1="-6"
-          x2="0"
-          y2="6"
-          stroke={stroke}
-          strokeWidth={sw}
-        />
+        <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
       </g>
     </>
   );
@@ -387,20 +393,22 @@ function renderCardinalityMarkers(
 function ElkEdgeComponent({ data, style, markerEnd }: EdgeProps) {
   const showCardinality = useContext(CardinalityContext);
   const { path, label, labelX, labelY } = data as ElkEdgeData;
-  if (!path) return null;
 
   const stroke = (style?.stroke as string) ?? "var(--text-muted)";
   const sw = (style?.strokeWidth as number) ?? 1.5;
 
   // Parse the polyline path into discrete points so we can compute the
   // direction at each end (for rotating the cardinality markers).
+  // useMemo must be called unconditionally (before any early return).
   const pts = useMemo(() => {
-    if (!showCardinality) return null;
+    if (!showCardinality || !path) return null;
     const arr = [
       ...path.matchAll(/[ML]\s*([\d.eE+-]+)\s+([\d.eE+-]+)/g),
     ].map((m) => ({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
     return arr.length >= 2 ? arr : null;
   }, [path, showCardinality]);
+
+  if (!path) return null;
 
   return (
     <>
@@ -645,7 +653,7 @@ export interface ErDiagramPaneProps {
   onTruncate?: (name: string) => void;
   onDrop?: (name: string, kind: "table" | "view") => void;
   onViewDDL?: (name: string, kind: "table" | "view") => void;
-  onExport?: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onExport?: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
   onGetRowCount?: (name: string) => number;
 }
 

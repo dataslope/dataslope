@@ -442,6 +442,61 @@ async function importParquetFile(
   return { columns, rows };
 }
 
+// ─── XLSX helpers (wasm-xlsxwriter) ─────────────────────────────────────────
+//
+// Loaded lazily on first use via dynamic imports so the WASM binary is
+// not bundled into the initial page chunk. The WASM is fetched from the
+// jsDelivr CDN, loaded once, and cached thereafter.
+
+let _xlsxWasmInit: Promise<typeof import("wasm-xlsxwriter/web")> | null = null;
+
+async function initXlsxWasm(): Promise<typeof import("wasm-xlsxwriter/web")> {
+  if (!_xlsxWasmInit) {
+    _xlsxWasmInit = (async () => {
+      const mod = await import("wasm-xlsxwriter/web");
+      await mod.default("https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@0.13.0/web/wasm_xlsxwriter_bg.wasm");
+      return mod;
+    })();
+  }
+  return _xlsxWasmInit;
+}
+
+/** Convert a SQLite cell value to an ExcelData-compatible type. */
+function toExcelData(v: unknown): string | number | boolean | undefined {
+  if (v === null || v === undefined) return undefined;
+  if (typeof v === "number") return v;
+  if (typeof v === "boolean") return v;
+  if (v instanceof Uint8Array) return `[BLOB ${v.length} bytes]`;
+  return String(v);
+}
+
+/**
+ * Export columns + rows to a single-sheet Excel (.xlsx) file.
+ * The first row is the header row.
+ */
+async function exportResultToXlsx(
+  columns: string[],
+  rows: QueryExecResult["values"],
+  filename: string,
+): Promise<void> {
+  const mod = await initXlsxWasm();
+  const workbook = new mod.Workbook();
+  const worksheet = workbook.addWorksheet();
+  // Header row
+  worksheet.writeRow(0, 0, columns);
+  // Data rows
+  for (let ri = 0; ri < rows.length; ri++) {
+    worksheet.writeRow(ri + 1, 0, rows[ri].map(toExcelData));
+  }
+  const bytes = workbook.saveToBufferSync();
+  triggerDownload(
+    new Blob([bytes], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }),
+    filename,
+  );
+}
+
 // ────────────────────────────────────────────────────────────────────────
 // Modify Structure drawer
 // ────────────────────────────────────────────────────────────────────────
@@ -1134,8 +1189,6 @@ function SqlPlaygroundInner() {
   const setWordWrapState = useSettingsStore((s) => s.setWordWrap);
   const clearBeforeRun = useSettingsStore((s) => s.clearBeforeRun);
   const setClearBeforeRunState = useSettingsStore((s) => s.setClearBeforeRun);
-  const [resultSetExportScope, setResultSetExportScope] =
-    useState<ResultSetExportScope>("all");
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
 
@@ -2463,17 +2516,65 @@ function SqlPlaygroundInner() {
     }
   }, [showToast]);
 
-  // ─── Result set export (from top-level Export button) ────────────────
-  // Exports the first result set's rows in the chosen format. The scope
-  // selector lets lazy results use the already-loaded page or fetch every row.
+  // ─── Export entire database to Excel ─────────────────────────────
+  // Creates a multi-sheet .xlsx workbook with one sheet per table.
+  const exportDatabaseToXlsx = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const sample = engine.activeSample();
+    const baseName = sample.id || "database";
+    const filename = `${baseName}.xlsx`;
+    // Collect table list at call time (synchronously), then kick off async work.
+    const tableList = [...tables];
+    (async () => {
+      try {
+        const mod = await initXlsxWasm();
+        const workbook = new mod.Workbook();
+        let sheetCount = 0;
+        for (const tableName of tableList) {
+          const sets = engine.exec(`SELECT * FROM ${quoteIdent(tableName)}`);
+          if (!sets || sets.length === 0) continue;
+          const { columns, values: rows } = sets[0];
+          // Excel sheet names are limited to 31 characters.
+          const sheetName = tableName.length > 31 ? tableName.slice(0, 31) : tableName;
+          const worksheet = workbook.addWorksheet();
+          worksheet.setName(sheetName);
+          worksheet.writeRow(0, 0, columns);
+          for (let ri = 0; ri < rows.length; ri++) {
+            worksheet.writeRow(ri + 1, 0, rows[ri].map(toExcelData));
+          }
+          sheetCount++;
+        }
+        if (sheetCount === 0) {
+          showToast("No tables to export.", "warn");
+          return;
+        }
+        const bytes = workbook.saveToBufferSync();
+        triggerDownload(
+          new Blob([bytes], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          }),
+          filename,
+        );
+        showToast(`Exported ${filename}.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Export failed: ${msg}`, "warn");
+      }
+    })();
+  }, [tables, quoteIdent, showToast]);
+
+  // ─── Result set export ────────────────────────────────────────────────────
+  // Exports the first result set's rows in the chosen format and scope.
+  // Called from the export button in the result pager (inside ResultView).
+  // `scope` is passed in from the pager's local state.
   const handleResultSetExport = useCallback(
-    (format: "csv" | "json" | "sql" | "parquet") => {
+    (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => {
       if (!result || result.sets.length === 0) return;
       const set =
         result.sets[resultSetExportSnapshot?.setIndex ?? 0] ?? result.sets[0];
       const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows: QueryExecResult["values"];
-      const scope = resultSetExportScope;
       if (scope === "page" && resultSetExportSnapshot) {
         rows = resultSetExportSnapshot.rows;
       } else if (
@@ -2491,17 +2592,28 @@ function SqlPlaygroundInner() {
       const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
       const scopeLabel = scope === "page" ? "current page" : "all rows";
       const filename = `${toFileSafeName(title)} (${scopeLabel}, ${rowLabel}).${format}`;
-      if (format === "csv") exportResultToCsv(columns, rows, filename);
-      else if (format === "json") exportResultToJson(columns, rows, filename);
-      else if (format === "parquet") exportResultToParquet(columns, rows, filename);
-      else exportResultToSql(columns, rows, filename);
+      if (format === "csv") {
+        exportResultToCsv(columns, rows, filename);
+      } else if (format === "json") {
+        exportResultToJson(columns, rows, filename);
+      } else if (format === "parquet") {
+        exportResultToParquet(columns, rows, filename).catch((err) =>
+          showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
+        );
+      } else if (format === "xlsx") {
+        exportResultToXlsx(columns, rows, filename).catch((err) =>
+          showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
+        );
+      } else {
+        exportResultToSql(columns, rows, filename);
+      }
     },
     [
       result,
       activeTab,
       handleFetchAllRows,
-      resultSetExportScope,
       resultSetExportSnapshot,
+      showToast,
     ],
   );
 
@@ -3340,44 +3452,10 @@ function SqlPlaygroundInner() {
   );
 
   // ─── Export table / view to CSV ──────────────────────────────────
-  const exportEntityToCsv = useCallback(
-    (name: string) => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      try {
-        const sets = engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
-        if (!sets || sets.length === 0 || sets[0].values.length === 0) {
-          showToast(`"${name}" is empty — no data to export.`, "warn");
-          return;
-        }
-        const { columns, values } = sets[0];
-        const csvRows = [
-          columns.map(escapeCsvCell).join(","),
-          ...values.map((row) => row.map(escapeCsvCell).join(",")),
-        ];
-        const csv = csvRows.join("\r\n");
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${name}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        // Revoke after the browser has had a chance to start the download.
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-        showToast(`Exported ${name}.csv.`);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Export failed: ${msg}`, "warn");
-      }
-    },
-    [quoteIdent, showToast],
-  );
 
   // ─── Export table / view to any format ───────────────────────────
   const exportEntityToFormat = useCallback(
-    (name: string, format: "csv" | "json" | "sql" | "parquet") => {
+    (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => {
       const engine = engineRef.current;
       if (!engine) return;
       try {
@@ -3388,11 +3466,24 @@ function SqlPlaygroundInner() {
         }
         const { columns, values: rows } = sets[0];
         const filename = `${name}.${format}`;
-        if (format === "csv") exportResultToCsv(columns, rows, filename);
-        else if (format === "json") exportResultToJson(columns, rows, filename);
-        else if (format === "parquet") exportResultToParquet(columns, rows, filename);
-        else exportResultToSql(columns, rows, filename);
-        showToast(`Exported ${filename}.`);
+        if (format === "csv") {
+          exportResultToCsv(columns, rows, filename);
+          showToast(`Exported ${filename}.`);
+        } else if (format === "json") {
+          exportResultToJson(columns, rows, filename);
+          showToast(`Exported ${filename}.`);
+        } else if (format === "parquet") {
+          exportResultToParquet(columns, rows, filename)
+            .then(() => showToast(`Exported ${filename}.`))
+            .catch((err) => showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"));
+        } else if (format === "xlsx") {
+          exportResultToXlsx(columns, rows, filename)
+            .then(() => showToast(`Exported ${filename}.`))
+            .catch((err) => showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"));
+        } else {
+          exportResultToSql(columns, rows, filename);
+          showToast(`Exported ${filename}.`);
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Export failed: ${msg}`, "warn");
@@ -4025,133 +4116,31 @@ function SqlPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    <div className="sql-result-export-group-label">Database</div>
+                    <div className="sql-result-export-group-label">SQLite Database</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={exportDatabase}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
-                          SQLite Database
+                          SQLite File
                           <span className="ext-badge">.sqlite</span>
                         </div>
                         <div className="ex-desc">Download as .sqlite</div>
                       </div>
                     </Menu.Item>
-                    {result && result.sets.length > 0 && (
-                      <>
-                        <div className="sql-result-export-group-label">Result Set</div>
-                        {(() => {
-                          const totalRows =
-                            resultSetExportSnapshot?.totalRows ??
-                            result.sets[0]?.values.length ??
-                            0;
-                          const pageSize =
-                            resultSetExportSnapshot?.pageSize ?? globalPageSize;
-                          const hasMultiplePages =
-                            pageSize > 0 && totalRows > pageSize;
-                          const currentPageRows =
-                            resultSetExportSnapshot?.rows.length ??
-                            Math.min(pageSize, totalRows);
-                          return (
-                            <div className="sql-result-export-scope-options">
-                              {hasMultiplePages && (
-                                <label
-                                  className="sql-result-export-scope-option"
-                                  data-checked={
-                                    resultSetExportScope === "page" ? "" : undefined
-                                  }
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <input
-                                    className="scope-radio-input"
-                                    type="radio"
-                                    name="sql-result-export-scope"
-                                    checked={resultSetExportScope === "page"}
-                                    onChange={() => setResultSetExportScope("page")}
-                                  />
-                                  <span className="scope-radio-ring">
-                                    {resultSetExportScope === "page" && (
-                                      <span className="scope-radio-dot" />
-                                    )}
-                                  </span>
-                                  <span>Current page ({currentPageRows} rows)</span>
-                                </label>
-                              )}
-                              <label
-                                className="sql-result-export-scope-option"
-                                data-checked={
-                                  resultSetExportScope === "all" ? "" : undefined
-                                }
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <input
-                                  className="scope-radio-input"
-                                  type="radio"
-                                  name="sql-result-export-scope"
-                                  checked={resultSetExportScope === "all"}
-                                  onChange={() => setResultSetExportScope("all")}
-                                />
-                                <span className="scope-radio-ring">
-                                  {resultSetExportScope === "all" && (
-                                    <span className="scope-radio-dot" />
-                                  )}
-                                </span>
-                                <span>Entire result set ({totalRows} rows)</span>
-                              </label>
-                            </div>
-                          );
-                        })()}
-                        <Menu.Item
-                          className="example-item export-item"
-                          onClick={() => handleResultSetExport("csv")}
-                        >
-                          <div className="export-item-text">
-                            <div className="ex-title">
-                              CSV
-                              <span className="ext-badge">.csv</span>
-                            </div>
-                            <div className="ex-desc">Comma-separated values</div>
-                          </div>
-                        </Menu.Item>
-                        <Menu.Item
-                          className="example-item export-item"
-                          onClick={() => handleResultSetExport("json")}
-                        >
-                          <div className="export-item-text">
-                            <div className="ex-title">
-                              JSON
-                              <span className="ext-badge">.json</span>
-                            </div>
-                            <div className="ex-desc">Array of objects</div>
-                          </div>
-                        </Menu.Item>
-                        <Menu.Item
-                          className="example-item export-item"
-                          onClick={() => handleResultSetExport("sql")}
-                        >
-                          <div className="export-item-text">
-                            <div className="ex-title">
-                              SQL
-                              <span className="ext-badge">.sql</span>
-                            </div>
-                            <div className="ex-desc">INSERT statements</div>
-                          </div>
-                        </Menu.Item>
-                        <Menu.Item
-                          className="example-item export-item"
-                          onClick={() => handleResultSetExport("parquet")}
-                        >
-                          <div className="export-item-text">
-                            <div className="ex-title">
-                              Parquet
-                              <span className="ext-badge">.parquet</span>
-                            </div>
-                            <div className="ex-desc">Apache Parquet columnar format</div>
-                          </div>
-                        </Menu.Item>
-                      </>
-                    )}
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={exportDatabaseToXlsx}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          Excel Workbook
+                          <span className="ext-badge">.xlsx</span>
+                        </div>
+                        <div className="ex-desc">One sheet per table</div>
+                      </div>
+                    </Menu.Item>
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>
@@ -5679,6 +5668,7 @@ function SqlPlaygroundInner() {
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
                   onExportSnapshotChange={setResultSetExportSnapshot}
+                  onExportResultSet={handleResultSetExport}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />
@@ -5770,6 +5760,7 @@ function ResultView({
   onSetGlobalPageSize,
   onLoadPage,
   onExportSnapshotChange,
+  onExportResultSet,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -5802,7 +5793,13 @@ function ResultView({
   onLoadPage: (sql: string, page: number) => void;
   /** Reports the first result set's currently visible page for export scope. */
   onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
+  /** Called when the user triggers a result-set export from the pager. */
+  onExportResultSet?: (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => void;
 }) {
+  // Export scope — page vs all rows. Local to ResultView, surfaced by the
+  // export button in the pager. Defaults to "all".
+  const [resultSetExportScope, setResultSetExportScope] =
+    useState<ResultSetExportScope>("all");
   // Pagination state lives at the ResultView level (one record per
   // result-set index) so the pagers can be rendered in a footer that
   // sits *outside* the horizontally/vertically scrolling content.
@@ -6470,24 +6467,137 @@ function ResultView({
           const selectedCount = selected?.size ?? 0;
           const pendingEdits = pendingEditsByIndex[idx];
           const editCount = pendingEdits?.size ?? 0;
+          // Compute paging info needed for the scope selector in the export menu.
+          const effectivePageSize = globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+          const hasMultiplePages = globalPageSize > 0 && totalRows > effectivePageSize;
+          const safePage = Math.min(currentPage, Math.max(0, Math.ceil(totalRows / effectivePageSize) - 1));
+          const pageStart = safePage * effectivePageSize;
+          const currentPageRows = Math.min(totalRows - pageStart, effectivePageSize);
           return (
-            <ResultPager
-              key={idx}
-              totalRows={totalRows}
-              index={idx}
-              showSetLabel={false}
-              pageSize={globalPageSize}
-              page={currentPage}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              deletable={pkCols !== null}
-              editable={isEditable}
-              editCount={editCount}
-              selectedCount={selectedCount}
-              onRequestDelete={() => requestDelete(idx)}
-              // eslint-disable-next-line react-hooks/refs
-              onCommitEdits={() => commitEdits(idx, set)}
-            />
+            <>
+              <ResultPager
+                key={idx}
+                totalRows={totalRows}
+                index={idx}
+                showSetLabel={false}
+                pageSize={globalPageSize}
+                page={currentPage}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                deletable={pkCols !== null}
+                editable={isEditable}
+                editCount={editCount}
+                selectedCount={selectedCount}
+                onRequestDelete={() => requestDelete(idx)}
+                // eslint-disable-next-line react-hooks/refs
+                onCommitEdits={() => commitEdits(idx, set)}
+              >
+                {onExportResultSet && (
+                  <Menu.Root>
+                    <Menu.Trigger
+                      className="sql-result-export-btn"
+                      title="Export result set"
+                      aria-label="Export result set"
+                    >
+                      <ArrowDownToLine size={13} aria-hidden="true" />
+                    </Menu.Trigger>
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={6} align="end" side="top">
+                        <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                          {hasMultiplePages && (
+                            <div className="sql-result-export-scope-options">
+                              <label
+                                className="sql-result-export-scope-option"
+                                data-checked={resultSetExportScope === "page" ? "" : undefined}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  className="scope-radio-input"
+                                  type="radio"
+                                  name="sql-result-export-scope-pager"
+                                  checked={resultSetExportScope === "page"}
+                                  onChange={() => setResultSetExportScope("page")}
+                                />
+                                <span className="scope-radio-ring">
+                                  {resultSetExportScope === "page" && (
+                                    <span className="scope-radio-dot" />
+                                  )}
+                                </span>
+                                <span>Current page ({currentPageRows} rows)</span>
+                              </label>
+                              <label
+                                className="sql-result-export-scope-option"
+                                data-checked={resultSetExportScope === "all" ? "" : undefined}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  className="scope-radio-input"
+                                  type="radio"
+                                  name="sql-result-export-scope-pager"
+                                  checked={resultSetExportScope === "all"}
+                                  onChange={() => setResultSetExportScope("all")}
+                                />
+                                <span className="scope-radio-ring">
+                                  {resultSetExportScope === "all" && (
+                                    <span className="scope-radio-dot" />
+                                  )}
+                                </span>
+                                <span>All rows ({totalRows.toLocaleString()})</span>
+                              </label>
+                            </div>
+                          )}
+                          <Menu.Item
+                            className="example-item export-item"
+                            onClick={() => onExportResultSet("csv", resultSetExportScope)}
+                          >
+                            <div className="export-item-text">
+                              <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
+                              <div className="ex-desc">Comma-separated values</div>
+                            </div>
+                          </Menu.Item>
+                          <Menu.Item
+                            className="example-item export-item"
+                            onClick={() => onExportResultSet("json", resultSetExportScope)}
+                          >
+                            <div className="export-item-text">
+                              <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
+                              <div className="ex-desc">Array of row objects</div>
+                            </div>
+                          </Menu.Item>
+                          <Menu.Item
+                            className="example-item export-item"
+                            onClick={() => onExportResultSet("sql", resultSetExportScope)}
+                          >
+                            <div className="export-item-text">
+                              <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
+                              <div className="ex-desc">INSERT statements</div>
+                            </div>
+                          </Menu.Item>
+                          <Menu.Item
+                            className="example-item export-item"
+                            onClick={() => onExportResultSet("parquet", resultSetExportScope)}
+                          >
+                            <div className="export-item-text">
+                              <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
+                              <div className="ex-desc">Apache Parquet binary</div>
+                            </div>
+                          </Menu.Item>
+                          <Menu.Item
+                            className="example-item export-item"
+                            onClick={() => onExportResultSet("xlsx", resultSetExportScope)}
+                          >
+                            <div className="export-item-text">
+                              <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
+                              <div className="ex-desc">Excel workbook (single sheet)</div>
+                            </div>
+                          </Menu.Item>
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.Root>
+                )}
+              </ResultPager>
+            </>
           );
         })()}
       </div>
@@ -7178,6 +7288,7 @@ function ResultPager({
   selectedCount,
   onRequestDelete,
   onCommitEdits,
+  children,
 }: {
   /** Total number of rows across all pages. For lazy results this is the
    *  COUNT(*) from the engine; for non-lazy results it is set.values.length. */
@@ -7194,6 +7305,7 @@ function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
+  children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
   const totalPages = Math.max(1, Math.ceil(totalRows / effective));
@@ -7358,6 +7470,7 @@ function ResultPager({
           </button>
         )}
       </div>
+      {children}
     </div>
   );
 }
@@ -8133,7 +8246,7 @@ interface SchemaItemProps {
   onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
-  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
   onGetRowCount: (name: string) => number;
 }
 
@@ -8162,6 +8275,21 @@ function SchemaItem({
       setExportRowCount(onGetRowCount(name));
     }
   }, [exportRowCount, onGetRowCount, name]);
+
+  // Hover-to-open state for the Export submenu.
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleExportPointerEnter = useCallback(() => {
+    if (exportCloseTimer.current) {
+      clearTimeout(exportCloseTimer.current);
+      exportCloseTimer.current = null;
+    }
+    ensureRowCount();
+    setExportOpen(true);
+  }, [ensureRowCount]);
+  const handleExportPointerLeave = useCallback(() => {
+    exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
+  }, []);
   const Icon = kind === "view" ? Eye : Table;
   const fkByCol = useMemo(() => {
     const m = new Map<string, ForeignKeyInfo>();
@@ -8356,10 +8484,11 @@ function SchemaItem({
               >
                 <div className="ex-title">Copy Name</div>
               </ContextMenu.Item>
-              <Menu.Root>
+              <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
                 <Menu.Trigger
                   className="example-item ctx-export-trigger"
-                  onPointerDown={ensureRowCount}
+                  onPointerEnter={handleExportPointerEnter}
+                  onPointerLeave={handleExportPointerLeave}
                 >
                   <div className="ex-title ctx-export-title">
                     Export
@@ -8368,7 +8497,11 @@ function SchemaItem({
                 </Menu.Trigger>
                 <Menu.Portal>
                   <Menu.Positioner side="right" align="start" sideOffset={4}>
-                    <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <Menu.Popup
+                      className="bui-popup examples-dropdown export-dropdown"
+                      onPointerEnter={handleExportPointerEnter}
+                      onPointerLeave={handleExportPointerLeave}
+                    >
                       {exportRowCount !== null && (
                         <div className="sql-result-export-group-label">
                           {exportRowCount.toLocaleString()} rows
@@ -8408,6 +8541,15 @@ function SchemaItem({
                         <div className="export-item-text">
                           <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
                           <div className="ex-desc">Apache Parquet binary</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => onExport(name, "xlsx")}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
+                          <div className="ex-desc">Excel workbook (single sheet)</div>
                         </div>
                       </Menu.Item>
                     </Menu.Popup>
