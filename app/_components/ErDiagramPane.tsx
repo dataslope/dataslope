@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext, createContext, useMemo, useCallback } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
   Handle,
+  Panel,
   Position,
   BaseEdge,
   EdgeLabelRenderer,
@@ -22,6 +23,29 @@ import type { ElkExtendedEdge, ElkEdgeSection, ElkPoint } from "elkjs";
 import type { TableColumnInfo, ForeignKeyInfo } from "./runtime/sqlite";
 import { MdOutlineKey } from "react-icons/md";
 import { IoLink } from "react-icons/io5";
+import { ChevronRight } from "lucide-react";
+import { ContextMenu } from "@base-ui-components/react/context-menu";
+import { Menu } from "@base-ui-components/react/menu";
+
+// ────────────────────────────────────────────────────────────────────────────
+// Contexts — cardinality visibility + table action callbacks
+// ────────────────────────────────────────────────────────────────────────────
+
+interface ErTableActions {
+  onPreview: (name: string) => void;
+  onModifyStructure?: (name: string) => void;
+  onAddRow?: (name: string) => void;
+  onCount: (name: string) => void;
+  onCopy: (name: string) => void;
+  onTruncate?: (name: string) => void;
+  onDrop: (name: string) => void;
+  onViewDDL: (name: string) => void;
+  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onGetRowCount: (name: string) => number;
+}
+
+const CardinalityContext = createContext<boolean>(true);
+const TableActionsContext = createContext<ErTableActions | null>(null);
 
 // ────────────────────────────────────────────────────────────────────────────
 // Node dimensions (must match CSS for correct port positions)
@@ -57,7 +81,17 @@ function columnHandleId(
 
 function ErTableNode({ data }: NodeProps) {
   const { tableName, columns, fkColumns } = data as ErTableNodeData;
-  return (
+  const actions = useContext(TableActionsContext);
+
+  // Row count is fetched lazily the first time the Export submenu opens.
+  const [exportRowCount, setExportRowCount] = useState<number | null>(null);
+  const ensureRowCount = useCallback(() => {
+    if (exportRowCount === null && actions?.onGetRowCount) {
+      setExportRowCount(actions.onGetRowCount(tableName));
+    }
+  }, [exportRowCount, actions, tableName]);
+
+  const nodeContent = (
     <div className="er-table-node">
       <div className="er-table-header">{tableName}</div>
       <div className="er-table-columns">
@@ -113,12 +147,152 @@ function ErTableNode({ data }: NodeProps) {
       </div>
     </div>
   );
+
+  if (!actions) return nodeContent;
+
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger
+        render={(props) => <div {...props}>{nodeContent}</div>}
+      />
+      <ContextMenu.Portal>
+        <ContextMenu.Positioner sideOffset={6}>
+          <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => actions.onPreview(tableName)}
+            >
+              <div className="ex-title">View Data</div>
+            </ContextMenu.Item>
+            {actions.onAddRow && (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => actions.onAddRow!(tableName)}
+              >
+                <div className="ex-title">Add Row</div>
+              </ContextMenu.Item>
+            )}
+            {actions.onModifyStructure && (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => actions.onModifyStructure!(tableName)}
+              >
+                <div className="ex-title">View Structure</div>
+              </ContextMenu.Item>
+            )}
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => actions.onCount(tableName)}
+            >
+              <div className="ex-title">Count Rows</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => actions.onViewDDL(tableName)}
+            >
+              <div className="ex-title">View DDL</div>
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => actions.onCopy(tableName)}
+            >
+              <div className="ex-title">Copy Name</div>
+            </ContextMenu.Item>
+            {/* Export submenu — opens to the side showing all 4 formats */}
+            <Menu.Root>
+              <Menu.Trigger
+                className="example-item ctx-export-trigger"
+                onPointerDown={ensureRowCount}
+              >
+                <div className="ex-title ctx-export-title">
+                  Export
+                  <ChevronRight size={10} className="ctx-export-arrow" />
+                </div>
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner side="right" align="start" sideOffset={4}>
+                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    {exportRowCount !== null && (
+                      <div className="sql-result-export-group-label">
+                        {exportRowCount.toLocaleString()} rows
+                      </div>
+                    )}
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => actions.onExport(tableName, "csv")}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          CSV <span className="ext-badge">.csv</span>
+                        </div>
+                        <div className="ex-desc">Comma-separated values</div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => actions.onExport(tableName, "json")}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          JSON <span className="ext-badge">.json</span>
+                        </div>
+                        <div className="ex-desc">Array of objects</div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => actions.onExport(tableName, "sql")}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          SQL <span className="ext-badge">.sql</span>
+                        </div>
+                        <div className="ex-desc">INSERT statements</div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => actions.onExport(tableName, "parquet")}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          Parquet <span className="ext-badge">.parquet</span>
+                        </div>
+                        <div className="ex-desc">
+                          Apache Parquet columnar format
+                        </div>
+                      </div>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+            {actions.onTruncate && (
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => actions.onTruncate!(tableName)}
+              >
+                <div className="ex-title">Truncate</div>
+              </ContextMenu.Item>
+            )}
+            <ContextMenu.Item
+              className="example-item"
+              onClick={() => actions.onDrop(tableName)}
+            >
+              <div className="ex-title">Drop Table</div>
+            </ContextMenu.Item>
+          </ContextMenu.Popup>
+        </ContextMenu.Positioner>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
+  );
 }
 
 const nodeTypes: NodeTypes = { erTable: ErTableNode };
 
 // ────────────────────────────────────────────────────────────────────────────
-// Custom ELK edge — renders bend-point paths produced by the ELK router
+// Custom ELK edge — renders bend-point paths produced by the ELK router,
+// with optional crow's-foot cardinality markers
 // ────────────────────────────────────────────────────────────────────────────
 
 interface ElkEdgeData {
@@ -129,12 +303,109 @@ interface ElkEdgeData {
   [key: string]: unknown;
 }
 
+/**
+ * Render crow's-foot cardinality markers directly into the edge SVG.
+ *
+ * The source (FK / "many") end gets a crow's foot: three lines radiating
+ * outward from the entity boundary in the direction the edge travels.
+ * The target (PK / "one") end gets a single perpendicular tick.
+ *
+ * Angles are derived from the first and last edge segments so the symbols
+ * always align with the actual line direction.
+ */
+function renderCardinalityMarkers(
+  pts: { x: number; y: number }[],
+  stroke: string,
+  sw: number,
+): React.ReactElement {
+  const n = pts.length;
+  // Direction the edge leaves the source point.
+  const startAngle =
+    Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) * (180 / Math.PI);
+  // Direction the edge arrives at the target point.
+  const endAngle =
+    Math.atan2(pts[n - 1].y - pts[n - 2].y, pts[n - 1].x - pts[n - 2].x) *
+    (180 / Math.PI);
+
+  return (
+    <>
+      {/* ── Crow's foot (N / many) at the source / FK end ──
+          rotate(startAngle): the +x direction aligns with the edge direction,
+          so the fork lines radiate *away* from the source entity. */}
+      <g
+        transform={`translate(${pts[0].x},${pts[0].y}) rotate(${startAngle})`}
+      >
+        {/* Centre line — reinforces the main edge path */}
+        <line
+          x1="0"
+          y1="0"
+          x2="12"
+          y2="0"
+          stroke={stroke}
+          strokeWidth={sw}
+        />
+        {/* Upper fork */}
+        <line
+          x1="0"
+          y1="0"
+          x2="12"
+          y2="-6"
+          stroke={stroke}
+          strokeWidth={sw}
+        />
+        {/* Lower fork */}
+        <line
+          x1="0"
+          y1="0"
+          x2="12"
+          y2="6"
+          stroke={stroke}
+          strokeWidth={sw}
+        />
+      </g>
+
+      {/* ── Single tick (1 / one) at the target / PK end ──
+          rotate(endAngle + 180): flips so the +x axis points *away* from the
+          target entity, making the bar perpendicular to the incoming edge. */}
+      <g
+        transform={`translate(${pts[n - 1].x},${pts[n - 1].y}) rotate(${endAngle + 180})`}
+      >
+        {/* Perpendicular tick right at the entity boundary */}
+        <line
+          x1="0"
+          y1="-6"
+          x2="0"
+          y2="6"
+          stroke={stroke}
+          strokeWidth={sw}
+        />
+      </g>
+    </>
+  );
+}
+
 function ElkEdgeComponent({ data, style, markerEnd }: EdgeProps) {
+  const showCardinality = useContext(CardinalityContext);
   const { path, label, labelX, labelY } = data as ElkEdgeData;
   if (!path) return null;
+
+  const stroke = (style?.stroke as string) ?? "var(--text-muted)";
+  const sw = (style?.strokeWidth as number) ?? 1.5;
+
+  // Parse the polyline path into discrete points so we can compute the
+  // direction at each end (for rotating the cardinality markers).
+  const pts = useMemo(() => {
+    if (!showCardinality) return null;
+    const arr = [
+      ...path.matchAll(/[ML]\s*([\d.eE+-]+)\s+([\d.eE+-]+)/g),
+    ].map((m) => ({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
+    return arr.length >= 2 ? arr : null;
+  }, [path, showCardinality]);
+
   return (
     <>
       <BaseEdge path={path} style={style} markerEnd={markerEnd} />
+      {pts && renderCardinalityMarkers(pts, stroke, sw)}
       {label && (
         <EdgeLabelRenderer>
           <div
@@ -364,6 +635,18 @@ export interface ErDiagramPaneProps {
   columnsByEntity: Record<string, TableColumnInfo[]>;
   foreignKeysByEntity: Record<string, ForeignKeyInfo[]>;
   isDark?: boolean;
+  // Context-menu callbacks — same actions as the .sql-tree sidebar.
+  // All are optional; if none are provided the context menu is omitted.
+  onPreview?: (name: string, kind: "table" | "view") => void;
+  onModifyStructure?: (name: string) => void;
+  onAddRow?: (name: string) => void;
+  onCount?: (name: string, kind: "table" | "view") => void;
+  onCopy?: (name: string) => void;
+  onTruncate?: (name: string) => void;
+  onDrop?: (name: string, kind: "table" | "view") => void;
+  onViewDDL?: (name: string, kind: "table" | "view") => void;
+  onExport?: (name: string, format: "csv" | "json" | "sql" | "parquet") => void;
+  onGetRowCount?: (name: string) => number;
 }
 
 export function ErDiagramPane({
@@ -371,10 +654,51 @@ export function ErDiagramPane({
   columnsByEntity,
   foreignKeysByEntity,
   isDark = true,
+  onPreview,
+  onModifyStructure,
+  onAddRow,
+  onCount,
+  onCopy,
+  onTruncate,
+  onDrop,
+  onViewDDL,
+  onExport,
+  onGetRowCount,
 }: ErDiagramPaneProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [showCardinality, setShowCardinality] = useState(true);
   const layoutGen = useRef(0);
+
+  // Build stable action object for the context menu context. All ERD nodes
+  // are tables, so we lock `kind` to "table" when forwarding to the parent.
+  const tableActions = useMemo<ErTableActions | null>(() => {
+    if (!onPreview || !onCount || !onCopy || !onDrop || !onViewDDL || !onExport || !onGetRowCount)
+      return null;
+    return {
+      onPreview: (name) => onPreview(name, "table"),
+      onModifyStructure,
+      onAddRow,
+      onCount: (name) => onCount(name, "table"),
+      onCopy,
+      onTruncate,
+      onDrop: (name) => onDrop(name, "table"),
+      onViewDDL: (name) => onViewDDL(name, "table"),
+      onExport,
+      onGetRowCount,
+    };
+  }, [
+    onPreview,
+    onModifyStructure,
+    onAddRow,
+    onCount,
+    onCopy,
+    onTruncate,
+    onDrop,
+    onViewDDL,
+    onExport,
+    onGetRowCount,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -411,27 +735,48 @@ export function ErDiagramPane({
   }
 
   return (
-    <div className="er-diagram-wrap">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.2}
-        maxZoom={2}
-        // Nodes are not draggable: ELK edge paths are absolute coordinates
-        // and would not follow node movements.
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable
-        colorMode={isDark ? "dark" : "light"}
-        style={{ background: "var(--bg)" }}
-      >
-        <Background color="var(--border)" />
-        <Controls />
-      </ReactFlow>
-    </div>
+    <CardinalityContext.Provider value={showCardinality}>
+      <TableActionsContext.Provider value={tableActions}>
+        <div className="er-diagram-wrap">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            fitView
+            fitViewOptions={{ padding: 0.15 }}
+            minZoom={0.2}
+            maxZoom={2}
+            // Nodes are not draggable: ELK edge paths are absolute coordinates
+            // and would not follow node movements.
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable
+            colorMode={isDark ? "dark" : "light"}
+            style={{ background: "var(--bg)" }}
+            proOptions={{ hideAttribution: true }}
+          >
+            <Background color="var(--border)" />
+            <Controls />
+            <Panel position="top-left" className="er-cardinality-panel">
+              <label className="er-cardinality-toggle-label">
+                <input
+                  type="checkbox"
+                  className="er-cardinality-checkbox"
+                  checked={showCardinality}
+                  onChange={(e) => setShowCardinality(e.target.checked)}
+                />
+                <span>Cardinality</span>
+              </label>
+              {showCardinality && (
+                <div className="er-cardinality-note">
+                  Inferred from FK constraints
+                </div>
+              )}
+            </Panel>
+          </ReactFlow>
+        </div>
+      </TableActionsContext.Provider>
+    </CardinalityContext.Provider>
   );
 }
