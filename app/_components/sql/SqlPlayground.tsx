@@ -82,16 +82,6 @@ import {
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
-import { themeFor } from "../cmExtensions";
-
-// Replace the entire editor document — the v6 idiom for what v5 called
-// `editor.setValue(s)`. Centralised so the call sites that swap tab
-// contents all read the same.
-function replaceDoc(view: EditorView, value: string): void {
-  view.dispatch({
-    changes: { from: 0, to: view.state.doc.length, insert: value },
-  });
-}
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
@@ -185,6 +175,10 @@ import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
 import { ToastList } from "./components/ToastList";
 import { SqlTab } from "./components/SqlTab";
+import {
+  createSqlCompletionSource,
+  type SqlCompletionSchema,
+} from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -198,6 +192,29 @@ import {
   tabsAreDirty,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
+import { themeFor } from "../cmExtensions";
+
+// Replace the entire editor document — the v6 idiom for what v5 called
+// `editor.setValue(s)`. Centralised so the call sites that swap tab
+// contents all read the same.
+function replaceDoc(view: EditorView, value: string): void {
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: value },
+  });
+}
+
+// CodeMirror's default is 100ms; 75ms keeps local schema suggestions feeling
+// immediate while still coalescing rapid typing before recomputing completions.
+const AUTOCOMPLETE_DELAY_MS = 75;
+
+function sqlAutocompletion(schema: SqlCompletionSchema) {
+  return autocompletion({
+    activateOnTyping: true,
+    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
+    closeOnBlur: true,
+    override: [createSqlCompletionSource(schema)],
+  });
+}
 
 const PLAYGROUND_ID = "sqlite";
 
@@ -1383,6 +1400,7 @@ function SqlPlaygroundInner() {
   const editorRef = useRef<EditorView | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
+  const completionCompRef = useRef<Compartment | null>(null);
   // SQL language extension is rebuilt with a fresh schema whenever
   // tables/views change so the autocomplete popup stays in sync with
   // DDL the user runs in the editor.
@@ -1512,6 +1530,7 @@ function SqlPlaygroundInner() {
 
       const themeComp = new Compartment();
       const wrapComp = new Compartment();
+      const completionComp = new Compartment();
       const sqlLangComp = new Compartment();
 
       // Persist whichever tab is currently active. Tab id + tab list are
@@ -1557,7 +1576,9 @@ function SqlPlaygroundInner() {
           crosshairCursor(),
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
-          autocompletion({ activateOnTyping: false, closeOnBlur: true }),
+          completionComp.of(
+            sqlAutocompletion({ entities: [] }),
+          ),
           tooltips({ parent: document.body }),
           keymap.of([
             {
@@ -1610,6 +1631,7 @@ function SqlPlaygroundInner() {
       editorRef.current = view;
       themeCompRef.current = themeComp;
       wrapCompRef.current = wrapComp;
+      completionCompRef.current = completionComp;
       sqlLangCompRef.current = sqlLangComp;
     }
 
@@ -1666,6 +1688,7 @@ function SqlPlaygroundInner() {
       editorRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      completionCompRef.current = null;
       sqlLangCompRef.current = null;
     };
   }, []);
@@ -1700,16 +1723,36 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     const engine = engineRef.current;
     const view = editorRef.current;
-    const comp = sqlLangCompRef.current;
-    if (!engine || !view || !comp) return;
+    const sqlComp = sqlLangCompRef.current;
+    const completionComp = completionCompRef.current;
+    if (!engine || !view || !sqlComp || !completionComp) return;
     const schema: Record<string, string[]> = {};
-    for (const name of [...tables, ...views]) {
+    const completionSchema: SqlCompletionSchema = { entities: [] };
+    for (const name of tables) {
       schema[name] = engine.listColumns(name).map((c) => c.name);
+      completionSchema.entities.push({
+        name,
+        columns: schema[name],
+        kind: "table",
+      });
+    }
+    for (const name of views) {
+      schema[name] = engine.listColumns(name).map((c) => c.name);
+      completionSchema.entities.push({
+        name,
+        columns: schema[name],
+        kind: "view",
+      });
     }
     view.dispatch({
-      effects: comp.reconfigure(
-        sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
-      ),
+      effects: [
+        sqlComp.reconfigure(
+          sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
+        ),
+        completionComp.reconfigure(
+          sqlAutocompletion(completionSchema),
+        ),
+      ],
     });
   }, [tables, views]);
 
