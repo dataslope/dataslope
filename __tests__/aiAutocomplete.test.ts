@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCachedResponse, setCachedResponse, pruneCache } from "../app/_components/ai/aiAutocompleteCache";
 import { AUTOCOMPLETE_SCHEMA_VERSION } from "../app/_components/ai/aiAutocompleteSchema";
+import { fetchAiCompletions } from "../app/_components/ai/aiCompletionProvider";
 
 // ─── Cache tests ─────────────────────────────────────────────────────────────
 describe("aiAutocompleteCache", () => {
@@ -106,5 +107,79 @@ describe("isAutocompleteResponse", () => {
         suggestions: [{ label: "users", type: "type", apply: "users", detail: "table" }],
       }),
     ).toBe(true);
+  });
+
+  it("accepts null optional fields required by strict structured outputs", () => {
+    expect(
+      isAutocompleteResponse({
+        suggestions: [
+          { label: "users", apply: null, detail: null, type: "type" },
+        ],
+      }),
+    ).toBe(true);
+  });
+});
+
+// ─── Provider request tests ──────────────────────────────────────────────────
+
+describe("fetchAiCompletions", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("uses GPT-5-compatible chat completion parameters", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  suggestions: [
+                    { label: "SELECT", apply: null, detail: null, type: "keyword" },
+                  ],
+                }),
+              },
+            },
+          ],
+        }),
+        { status: 200, statusText: "OK" },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchAiCompletions("prompt", "provider-gpt5", {
+      apiBaseUrl: "https://api.openai.com/v1",
+      apiKey: "test-key",
+      model: "gpt-5.4-nano",
+      systemPrompt: "system",
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body.max_completion_tokens).toBe(512);
+    expect(body.max_tokens).toBeUndefined();
+    expect(body.temperature).toBeUndefined();
+  });
+
+  it("includes response body details for API errors", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response("bad request details", {
+          status: 400,
+          statusText: "Bad Request",
+        }),
+      ),
+    );
+
+    await expect(
+      fetchAiCompletions("prompt", "provider-error", {
+        apiBaseUrl: "https://api.openai.com/v1",
+        apiKey: "test-key",
+        model: "gpt-5.4-nano",
+        systemPrompt: "system",
+      }),
+    ).rejects.toThrow("bad request details");
   });
 });

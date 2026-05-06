@@ -25,9 +25,9 @@ export interface AutocompleteSuggestion {
    * Text inserted when the user accepts this suggestion.
    * Defaults to `label` when omitted.
    */
-  apply?: string;
+  apply?: string | null;
   /** Short description shown to the right of the label. */
-  detail?: string;
+  detail?: string | null;
   /** CodeMirror completion type — controls the icon in the popup. */
   type: CompletionItemType;
 }
@@ -54,8 +54,11 @@ export const AUTOCOMPLETE_RESPONSE_FORMAT = {
             type: "object",
             properties: {
               label: { type: "string" },
-              apply: { type: "string" },
-              detail: { type: "string" },
+              // Semantically optional. Strict OpenAI structured outputs require
+              // every object property to be listed in `required`, so the model
+              // must send null when these values are not needed.
+              apply: { type: ["string", "null"] },
+              detail: { type: ["string", "null"] },
               type: {
                 type: "string",
                 enum: [
@@ -69,7 +72,7 @@ export const AUTOCOMPLETE_RESPONSE_FORMAT = {
                 ] as CompletionItemType[],
               },
             },
-            required: ["label", "type"],
+            required: ["label", "apply", "detail", "type"],
             additionalProperties: false,
           },
         },
@@ -92,6 +95,12 @@ export function isAutocompleteResponse(
       typeof s === "object" &&
       s !== null &&
       typeof (s as Record<string, unknown>).label === "string" &&
-      typeof (s as Record<string, unknown>).type === "string",
+      typeof (s as Record<string, unknown>).type === "string" &&
+      (!("apply" in (s as Record<string, unknown>)) ||
+        typeof (s as Record<string, unknown>).apply === "string" ||
+        (s as Record<string, unknown>).apply === null) &&
+      (!("detail" in (s as Record<string, unknown>)) ||
+        typeof (s as Record<string, unknown>).detail === "string" ||
+        (s as Record<string, unknown>).detail === null),
   );
 }

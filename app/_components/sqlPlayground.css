@@ -2247,6 +2247,9 @@
   border: none;
   cursor: default;
 }
+.ctx-export-trigger-bordered {
+  border-bottom: 1px solid var(--border);
+}
 .ctx-export-title {
   display: flex;
   align-items: center;
@@ -2582,6 +2585,7 @@
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 6px;
+  box-sizing: border-box;
   /* Width must stay in sync with NODE_W in ErDiagramPane.tsx so that ELK
      port positions (placed at x=NODE_W) align with the rendered node edges. */
   width: 230px;
@@ -2598,7 +2602,11 @@
 }
 
 .er-table-header {
-  padding: 7px 10px;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
   font-size: 12px;
   font-weight: 600;
   color: var(--text);
@@ -2618,10 +2626,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  box-sizing: border-box;
+  height: 25px;
+  padding: 0 10px;
   font-size: 11px;
   color: var(--text);
-  min-height: 22px;
 }
 
 .er-table-col-row.er-table-col-empty {

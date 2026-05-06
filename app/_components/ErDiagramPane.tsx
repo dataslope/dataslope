@@ -216,7 +216,7 @@ function ErTableNode({ data }: NodeProps) {
             {/* Export submenu — opens to the side showing all 4 formats */}
             <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
               <Menu.Trigger
-                className="example-item ctx-export-trigger"
+                className="example-item ctx-export-trigger ctx-export-trigger-bordered"
                 onPointerEnter={handleExportPointerEnter}
                 onPointerLeave={handleExportPointerLeave}
               >
@@ -350,13 +350,20 @@ function renderCardinalityMarkers(
   sw: number,
 ): React.ReactElement {
   const n = pts.length;
+  const startDx = pts[1].x - pts[0].x;
+  const startDy = pts[1].y - pts[0].y;
+  const startLen = Math.hypot(startDx, startDy) || 1;
+  const endDx = pts[n - 2].x - pts[n - 1].x;
+  const endDy = pts[n - 2].y - pts[n - 1].y;
+  const endLen = Math.hypot(endDx, endDy) || 1;
+  const sourceX = pts[0].x + (startDx / startLen) * 2;
+  const sourceY = pts[0].y + (startDy / startLen) * 2;
+  const targetX = pts[n - 1].x + (endDx / endLen) * 7;
+  const targetY = pts[n - 1].y + (endDy / endLen) * 7;
   // Direction the edge leaves the source point.
-  const startAngle =
-    Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) * (180 / Math.PI);
+  const startAngle = Math.atan2(startDy, startDx) * (180 / Math.PI);
   // Direction the edge arrives at the target point.
-  const endAngle =
-    Math.atan2(pts[n - 1].y - pts[n - 2].y, pts[n - 1].x - pts[n - 2].x) *
-    (180 / Math.PI);
+  const endAngle = Math.atan2(-endDy, -endDx) * (180 / Math.PI);
 
   const lineProps = { stroke, strokeWidth: sw, strokeLinecap: "round" as const };
 
@@ -367,7 +374,7 @@ function renderCardinalityMarkers(
           The perpendicular bar sits right at the entity boundary; the two tines
           fan outward from the same origin point. */}
       <g
-        transform={`translate(${pts[0].x},${pts[0].y}) rotate(${startAngle})`}
+        transform={`translate(${sourceX},${sourceY}) rotate(${startAngle})`}
       >
         {/* Perpendicular bar at the entity boundary */}
         <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
@@ -381,7 +388,7 @@ function renderCardinalityMarkers(
           rotate(endAngle + 180): flips so the +x axis points *away* from the
           target entity, making the bar perpendicular to the incoming edge. */}
       <g
-        transform={`translate(${pts[n - 1].x},${pts[n - 1].y}) rotate(${endAngle + 180})`}
+        transform={`translate(${targetX},${targetY}) rotate(${endAngle + 180})`}
       >
         {/* Perpendicular tick right at the entity boundary */}
         <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
@@ -498,6 +505,10 @@ function sectionsToPath(sections: ElkEdgeSection[]): {
 interface EdgeMeta {
   srcTable: string;
   tgtTable: string;
+  srcColumn: string;
+  tgtColumn: string;
+  hasSrcPort: boolean;
+  hasTgtPort: boolean;
   label: string;
 }
 
@@ -555,16 +566,20 @@ async function computeElkLayout(
       if (edgeSet.has(id)) continue;
       edgeSet.add(id);
 
-      edgeMetadata.set(id, {
-        srcTable,
-        tgtTable: fk.table,
-        label: `${fk.from} → ${fk.to}`,
-      });
-
       const srcCols = columnsByEntity[srcTable] ?? [];
       const tgtCols = columnsByEntity[fk.table] ?? [];
       const hasSrcPort = srcCols.some((c) => c.name === fk.from);
       const hasTgtPort = tgtCols.some((c) => c.name === fk.to);
+
+      edgeMetadata.set(id, {
+        srcTable,
+        tgtTable: fk.table,
+        srcColumn: fk.from,
+        tgtColumn: fk.to,
+        hasSrcPort,
+        hasTgtPort,
+        label: `${fk.from} → ${fk.to}`,
+      });
 
       elkEdges.push({
         id,
@@ -624,6 +639,12 @@ async function computeElkLayout(
       id: elkEdge.id,
       source: meta.srcTable,
       target: meta.tgtTable,
+      sourceHandle: meta.hasSrcPort
+        ? columnHandleId(meta.srcColumn, "right", "source")
+        : undefined,
+      targetHandle: meta.hasTgtPort
+        ? columnHandleId(meta.tgtColumn, "left", "target")
+        : undefined,
       type: "elkEdge",
       data: { path, labelX, labelY, label: meta.label },
       style: { stroke: "var(--text-muted)", strokeWidth: 1.5 },
