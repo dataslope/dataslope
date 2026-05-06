@@ -54,6 +54,9 @@ export const AUTOCOMPLETE_RESPONSE_FORMAT = {
             type: "object",
             properties: {
               label: { type: "string" },
+              // Semantically optional. Strict OpenAI structured outputs require
+              // every object property to be listed in `required`, so the model
+              // must send null when these values are not needed.
               apply: { type: ["string", "null"] },
               detail: { type: ["string", "null"] },
               type: {

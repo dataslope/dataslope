@@ -1555,8 +1555,6 @@ function SqlPlaygroundInner() {
       localStorage.getItem(storageKey("ai_autocomplete")) === "true";
     const savedAiBaseUrl =
       localStorage.getItem(storageKey("ai_base_url")) ?? "";
-    const savedAiApiKey =
-      localStorage.getItem(storageKey("ai_api_key")) ?? "";
     const savedAiModel =
       localStorage.getItem(storageKey("ai_model")) ?? "";
 
@@ -1590,7 +1588,7 @@ function SqlPlaygroundInner() {
     setClearBeforeRunState(savedClearBeforeRun);
     setAiAutocompleteEnabledState(savedAiAutocomplete);
     setAiBaseUrlState(savedAiBaseUrl);
-    setAiApiKeyState(savedAiApiKey);
+    setAiApiKeyState("");
     setAiModelState(savedAiModel);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
@@ -1972,8 +1970,8 @@ function SqlPlaygroundInner() {
     const nextModel = aiByokDraft.model.trim();
     try {
       localStorage.setItem(storageKey("ai_base_url"), nextBaseUrl);
-      localStorage.setItem(storageKey("ai_api_key"), aiByokDraft.apiKey);
       localStorage.setItem(storageKey("ai_model"), nextModel);
+      localStorage.removeItem(storageKey("ai_api_key"));
       setAiBaseUrlState(nextBaseUrl);
       setAiApiKeyState(aiByokDraft.apiKey);
       setAiModelState(nextModel);
@@ -4433,8 +4431,8 @@ function SqlPlaygroundInner() {
                     </button>
                   </div>
                   <p className="ai-byok-privacy-note">
-                    Your API key is stored locally in your browser and never
-                    sent to our servers.
+                    Your API key is kept in memory for this browser session and
+                    never sent to our servers.
                   </p>
                 </div>
               )}

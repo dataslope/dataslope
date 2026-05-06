@@ -31,7 +31,7 @@ export interface AiCompletionProviderOptions {
   systemPrompt: string;
 }
 
-function usesModernTokenParameter(model: string): boolean {
+function usesMaxCompletionTokens(model: string): boolean {
   return /^(gpt-5|o\d|o[.-])/i.test(model);
 }
 
@@ -49,7 +49,7 @@ function buildChatCompletionBody(
     response_format: AUTOCOMPLETE_RESPONSE_FORMAT,
   };
 
-  if (usesModernTokenParameter(model)) {
+  if (usesMaxCompletionTokens(model)) {
     body.max_completion_tokens = 512;
   } else {
     body.max_tokens = 512;
