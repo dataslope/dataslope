@@ -80,8 +80,8 @@ function suggestionsToCompletions(
 ): Completion[] {
   return suggestions.map((s) => ({
     label: s.label,
-    ...(s.apply !== undefined ? { apply: s.apply } : {}),
-    ...(s.detail !== undefined ? { detail: s.detail } : {}),
+    ...(typeof s.apply === "string" ? { apply: s.apply } : {}),
+    ...(typeof s.detail === "string" ? { detail: s.detail } : {}),
     type: s.type,
     boost: 100,
   }));

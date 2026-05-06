@@ -31,6 +31,34 @@ export interface AiCompletionProviderOptions {
   systemPrompt: string;
 }
 
+function usesModernTokenParameter(model: string): boolean {
+  return /^(gpt-5|o\d|o[.-])/i.test(model);
+}
+
+function buildChatCompletionBody(
+  model: string,
+  systemPrompt: string,
+  userPrompt: string,
+): Record<string, unknown> {
+  const body: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    response_format: AUTOCOMPLETE_RESPONSE_FORMAT,
+  };
+
+  if (usesModernTokenParameter(model)) {
+    body.max_completion_tokens = 512;
+  } else {
+    body.max_tokens = 512;
+    body.temperature = 0;
+  }
+
+  return body;
+}
+
 /**
  * Fetch autocomplete suggestions from an OpenAI-compatible endpoint.
  *
@@ -63,21 +91,23 @@ export async function fetchAiCompletions(
       "Content-Type": "application/json",
       Authorization: `Bearer ${options.apiKey}`,
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: options.systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: AUTOCOMPLETE_RESPONSE_FORMAT,
-      max_tokens: 512,
-      temperature: 0,
-    }),
+    body: JSON.stringify(
+      buildChatCompletionBody(model, options.systemPrompt, userPrompt),
+    ),
     signal,
   });
 
   if (!response.ok) {
-    throw new Error(`AI API error: ${response.status} ${response.statusText}`);
+    let detail = "";
+    try {
+      const text = await response.text();
+      detail = text ? `: ${text.slice(0, 500)}` : "";
+    } catch {
+      // ignore body read errors
+    }
+    throw new Error(
+      `AI API error: ${response.status} ${response.statusText}${detail}`,
+    );
   }
 
   const data = (await response.json()) as {

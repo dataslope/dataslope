@@ -1604,6 +1604,16 @@ input[type="range"].fs-slider:disabled {
 .ai-byok-input:focus {
   border-color: var(--accent);
 }
+.ai-byok-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.ai-byok-actions .settings-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 .ai-byok-privacy-note {
   color: var(--text-dim);
   font-size: 11px;

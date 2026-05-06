@@ -1353,6 +1353,11 @@ function SqlPlaygroundInner() {
   const [customDb, setCustomDb] = useState<
     import("../runtime/sqliteSamples").SqliteSampleDatabase | null
   >(null);
+  const [aiByokDraft, setAiByokDraft] = useState({
+    baseUrl: "",
+    apiKey: "",
+    model: "",
+  });
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -1949,39 +1954,48 @@ function SqlPlaygroundInner() {
     },
     [setAiAutocompleteEnabledState],
   );
-  const setAiBaseUrl = useCallback(
-    (url: string) => {
-      setAiBaseUrlState(url);
-      try {
-        localStorage.setItem(storageKey("ai_base_url"), url);
-      } catch {
-        // ignore quota errors
-      }
-    },
-    [setAiBaseUrlState],
-  );
-  const setAiApiKey = useCallback(
-    (key: string) => {
-      setAiApiKeyState(key);
-      try {
-        localStorage.setItem(storageKey("ai_api_key"), key);
-      } catch {
-        // ignore quota errors
-      }
-    },
-    [setAiApiKeyState],
-  );
-  const setAiModel = useCallback(
-    (model: string) => {
-      setAiModelState(model);
-      try {
-        localStorage.setItem(storageKey("ai_model"), model);
-      } catch {
-        // ignore quota errors
-      }
-    },
-    [setAiModelState],
-  );
+  const aiByokHasChanges =
+    aiByokDraft.baseUrl !== aiBaseUrl ||
+    aiByokDraft.apiKey !== aiApiKey ||
+    aiByokDraft.model !== aiModel;
+
+  const cancelAiByokChanges = useCallback(() => {
+    setAiByokDraft({
+      baseUrl: aiBaseUrl,
+      apiKey: aiApiKey,
+      model: aiModel,
+    });
+  }, [aiBaseUrl, aiApiKey, aiModel]);
+
+  const saveAiByokSettings = useCallback(() => {
+    const nextBaseUrl = aiByokDraft.baseUrl.trim();
+    const nextModel = aiByokDraft.model.trim();
+    try {
+      localStorage.setItem(storageKey("ai_base_url"), nextBaseUrl);
+      localStorage.setItem(storageKey("ai_api_key"), aiByokDraft.apiKey);
+      localStorage.setItem(storageKey("ai_model"), nextModel);
+      setAiBaseUrlState(nextBaseUrl);
+      setAiApiKeyState(aiByokDraft.apiKey);
+      setAiModelState(nextModel);
+      setAiByokDraft({
+        baseUrl: nextBaseUrl,
+        apiKey: aiByokDraft.apiKey,
+        model: nextModel,
+      });
+      showToast("AI autocomplete settings saved.");
+    } catch {
+      setAiBaseUrlState(nextBaseUrl);
+      setAiApiKeyState(aiByokDraft.apiKey);
+      setAiModelState(nextModel);
+      showToast("AI settings saved for this session, but not persisted.", "warn");
+    }
+  }, [
+    aiByokDraft,
+    setAiBaseUrlState,
+    setAiApiKeyState,
+    setAiModelState,
+    showToast,
+  ]);
 
   const savePragmaSettings = useCallback(
     (p: PragmaSettings) => {
@@ -4278,7 +4292,14 @@ function SqlPlaygroundInner() {
             <button
               type="button"
               className="header-btn icon-only"
-              onClick={() => setSettingsOpen(true)}
+              onClick={() => {
+                setAiByokDraft({
+                  baseUrl: aiBaseUrl,
+                  apiKey: aiApiKey,
+                  model: aiModel,
+                });
+                setSettingsOpen(true);
+              }}
               title="Settings"
               aria-label="Settings"
             >
@@ -4344,8 +4365,13 @@ function SqlPlaygroundInner() {
                       type="text"
                       className="ai-byok-input"
                       placeholder="https://api.openai.com/v1"
-                      value={aiBaseUrl}
-                      onChange={(e) => setAiBaseUrl(e.target.value)}
+                      value={aiByokDraft.baseUrl}
+                      onChange={(e) =>
+                        setAiByokDraft((draft) => ({
+                          ...draft,
+                          baseUrl: e.target.value,
+                        }))
+                      }
                       spellCheck={false}
                     />
                   </div>
@@ -4358,8 +4384,13 @@ function SqlPlaygroundInner() {
                       type="password"
                       className="ai-byok-input"
                       placeholder="sk-…"
-                      value={aiApiKey}
-                      onChange={(e) => setAiApiKey(e.target.value)}
+                      value={aiByokDraft.apiKey}
+                      onChange={(e) =>
+                        setAiByokDraft((draft) => ({
+                          ...draft,
+                          apiKey: e.target.value,
+                        }))
+                      }
                       autoComplete="off"
                     />
                   </div>
@@ -4372,10 +4403,34 @@ function SqlPlaygroundInner() {
                       type="text"
                       className="ai-byok-input"
                       placeholder="gpt-5.4-nano"
-                      value={aiModel}
-                      onChange={(e) => setAiModel(e.target.value)}
+                      value={aiByokDraft.model}
+                      onChange={(e) =>
+                        setAiByokDraft((draft) => ({
+                          ...draft,
+                          model: e.target.value,
+                        }))
+                      }
                       spellCheck={false}
                     />
+                  </div>
+                  <div className="ai-byok-actions">
+                    <button
+                      type="button"
+                      className="settings-action-btn"
+                      disabled={!aiByokHasChanges}
+                      onClick={cancelAiByokChanges}
+                    >
+                      <X size={14} aria-hidden="true" />
+                      <span>Cancel</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="pragma-save-btn"
+                      disabled={!aiByokHasChanges}
+                      onClick={saveAiByokSettings}
+                    >
+                      Save
+                    </button>
                   </div>
                   <p className="ai-byok-privacy-note">
                     Your API key is stored locally in your browser and never
@@ -8665,7 +8720,7 @@ function SchemaItem({
               </ContextMenu.Item>
               <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
                 <Menu.Trigger
-                  className="example-item ctx-export-trigger"
+                  className="example-item ctx-export-trigger ctx-export-trigger-bordered"
                   onPointerEnter={handleExportPointerEnter}
                   onPointerLeave={handleExportPointerLeave}
                 >
