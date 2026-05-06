@@ -218,6 +218,7 @@ function sqlAutocompletion(
   aiEnabled: boolean,
   aiApiBaseUrl: string,
   aiApiKey: string,
+  aiModel: string,
 ) {
   const sqlSource = createSqlCompletionSource(schema);
   const source =
@@ -226,6 +227,7 @@ function sqlAutocompletion(
           {
             apiBaseUrl: aiApiBaseUrl,
             apiKey: aiApiKey,
+            model: aiModel || undefined,
             schema,
             debounceMs: AI_AUTOCOMPLETE_DELAY_MS,
           },
@@ -239,38 +241,6 @@ function sqlAutocompletion(
     override: [source],
   });
 }
-
-// ─── AI autocomplete environment-variable configuration ──────────────────────
-// These are read once at module load time. NEXT_PUBLIC_ vars are inlined by
-// the Next.js build, so they are always strings (empty when unset).
-const AI_API_BASE_URL = process.env.NEXT_PUBLIC_AI_API_BASE_URL ?? "";
-const AI_API_KEY = process.env.NEXT_PUBLIC_AI_API_KEY ?? "";
-
-interface AiConfigStatus {
-  available: boolean;
-  /** Human-readable description of what is missing (when !available). */
-  missingMessage?: string;
-}
-
-function getAiConfigStatus(): AiConfigStatus {
-  const missingBase = !AI_API_BASE_URL;
-  const missingKey = !AI_API_KEY;
-  if (missingBase && missingKey) {
-    return {
-      available: false,
-      missingMessage: "missing API base URL and API key",
-    };
-  }
-  if (missingBase) {
-    return { available: false, missingMessage: "missing API base URL" };
-  }
-  if (missingKey) {
-    return { available: false, missingMessage: "missing API key" };
-  }
-  return { available: true };
-}
-
-const AI_CONFIG = getAiConfigStatus();
 
 const PLAYGROUND_ID = "sqlite";
 
@@ -1251,6 +1221,12 @@ function SqlPlaygroundInner() {
   const setAiAutocompleteEnabledState = useSettingsStore(
     (s) => s.setAiAutocompleteEnabled,
   );
+  const aiBaseUrl = useSettingsStore((s) => s.aiBaseUrl);
+  const setAiBaseUrlState = useSettingsStore((s) => s.setAiBaseUrl);
+  const aiApiKey = useSettingsStore((s) => s.aiApiKey);
+  const setAiApiKeyState = useSettingsStore((s) => s.setAiApiKey);
+  const aiModel = useSettingsStore((s) => s.aiModel);
+  const setAiModelState = useSettingsStore((s) => s.setAiModel);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
 
@@ -1570,10 +1546,14 @@ function SqlPlaygroundInner() {
       localStorage.getItem(storageKey("clearbeforerun")) === "true";
     const savedDb =
       localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
-    // Only restore AI autocomplete if the required env vars are configured.
     const savedAiAutocomplete =
-      AI_CONFIG.available &&
       localStorage.getItem(storageKey("ai_autocomplete")) === "true";
+    const savedAiBaseUrl =
+      localStorage.getItem(storageKey("ai_base_url")) ?? "";
+    const savedAiApiKey =
+      localStorage.getItem(storageKey("ai_api_key")) ?? "";
+    const savedAiModel =
+      localStorage.getItem(storageKey("ai_model")) ?? "";
 
     // ─── Hydrate pragma settings ─────────────────────────────────────
     const DP = DEFAULT_PRAGMA_SETTINGS;
@@ -1604,6 +1584,9 @@ function SqlPlaygroundInner() {
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
     setAiAutocompleteEnabledState(savedAiAutocomplete);
+    setAiBaseUrlState(savedAiBaseUrl);
+    setAiApiKeyState(savedAiApiKey);
+    setAiModelState(savedAiModel);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
     const initialSample = findSampleDatabase(savedDb);
@@ -1631,6 +1614,9 @@ function SqlPlaygroundInner() {
   }, [
     setClearBeforeRunState,
     setAiAutocompleteEnabledState,
+    setAiBaseUrlState,
+    setAiApiKeyState,
+    setAiModelState,
     setEditorThemeState,
     setFontSizeState,
     setOutputFontSizeEnabledState,
@@ -1698,7 +1684,7 @@ function SqlPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           completionComp.of(
-            sqlAutocompletion({ entities: [] }, false, "", ""),
+            sqlAutocompletion({ entities: [] }, false, "", "", ""),
           ),
           tooltips({ parent: document.body }),
           keymap.of([
@@ -1875,13 +1861,14 @@ function SqlPlaygroundInner() {
           sqlAutocompletion(
             completionSchema,
             aiAutocompleteEnabled,
-            AI_API_BASE_URL,
-            AI_API_KEY,
+            aiBaseUrl,
+            aiApiKey,
+            aiModel,
           ),
         ),
       ],
     });
-  }, [tables, views, aiAutocompleteEnabled]);
+  }, [tables, views, aiAutocompleteEnabled, aiBaseUrl, aiApiKey, aiModel]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -1953,16 +1940,47 @@ function SqlPlaygroundInner() {
   }, [setClearBeforeRunState]);
   const setAiAutocompleteEnabled = useCallback(
     (b: boolean) => {
-      // Guard: silently ignore enable requests when the feature is unavailable.
-      const next = b && AI_CONFIG.available;
-      setAiAutocompleteEnabledState(next);
+      setAiAutocompleteEnabledState(b);
       try {
-        localStorage.setItem(storageKey("ai_autocomplete"), String(next));
+        localStorage.setItem(storageKey("ai_autocomplete"), String(b));
       } catch {
         // ignore quota errors
       }
     },
     [setAiAutocompleteEnabledState],
+  );
+  const setAiBaseUrl = useCallback(
+    (url: string) => {
+      setAiBaseUrlState(url);
+      try {
+        localStorage.setItem(storageKey("ai_base_url"), url);
+      } catch {
+        // ignore quota errors
+      }
+    },
+    [setAiBaseUrlState],
+  );
+  const setAiApiKey = useCallback(
+    (key: string) => {
+      setAiApiKeyState(key);
+      try {
+        localStorage.setItem(storageKey("ai_api_key"), key);
+      } catch {
+        // ignore quota errors
+      }
+    },
+    [setAiApiKeyState],
+  );
+  const setAiModel = useCallback(
+    (model: string) => {
+      setAiModelState(model);
+      try {
+        localStorage.setItem(storageKey("ai_model"), model);
+      } catch {
+        // ignore quota errors
+      }
+    },
+    [setAiModelState],
   );
 
   const savePragmaSettings = useCallback(
@@ -4296,22 +4314,11 @@ function SqlPlaygroundInner() {
           extraGeneralRows={
             <>
               <div className="setting-row">
-                <label
-                  className={`setting-switch-row${!AI_CONFIG.available ? " ai-autocomplete-unavailable" : ""}`}
-                >
-                  <span className="ai-autocomplete-label-wrap">
-                    <span>AI-based Autocomplete</span>
-                    {!AI_CONFIG.available && (
-                      <span className="ai-autocomplete-unavail-msg">
-                        AI autocomplete unavailable:{" "}
-                        {AI_CONFIG.missingMessage}
-                      </span>
-                    )}
-                  </span>
+                <label className="setting-switch-row">
+                  <span>AI-based Autocomplete</span>
                   <Switch.Root
                     checked={aiAutocompleteEnabled}
                     onCheckedChange={setAiAutocompleteEnabled}
-                    disabled={!AI_CONFIG.available}
                     className="bui-switch"
                     aria-label="AI-based Autocomplete"
                   >
@@ -4319,6 +4326,56 @@ function SqlPlaygroundInner() {
                   </Switch.Root>
                 </label>
               </div>
+              {aiAutocompleteEnabled && (
+                <div className="setting-row ai-byok-fields">
+                  <div className="ai-byok-field">
+                    <label className="ai-byok-label" htmlFor="ai-base-url">
+                      OpenAI-compatible Base URL
+                    </label>
+                    <input
+                      id="ai-base-url"
+                      type="text"
+                      className="ai-byok-input"
+                      placeholder="https://api.openai.com/v1"
+                      value={aiBaseUrl}
+                      onChange={(e) => setAiBaseUrl(e.target.value)}
+                      spellCheck={false}
+                    />
+                  </div>
+                  <div className="ai-byok-field">
+                    <label className="ai-byok-label" htmlFor="ai-api-key">
+                      API Key
+                    </label>
+                    <input
+                      id="ai-api-key"
+                      type="password"
+                      className="ai-byok-input"
+                      placeholder="sk-…"
+                      value={aiApiKey}
+                      onChange={(e) => setAiApiKey(e.target.value)}
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="ai-byok-field">
+                    <label className="ai-byok-label" htmlFor="ai-model">
+                      Model
+                    </label>
+                    <input
+                      id="ai-model"
+                      type="text"
+                      className="ai-byok-input"
+                      placeholder="gpt-5.4-nano"
+                      value={aiModel}
+                      onChange={(e) => setAiModel(e.target.value)}
+                      spellCheck={false}
+                    />
+                  </div>
+                  <p className="ai-byok-privacy-note">
+                    Your API key is stored locally in your browser and never
+                    sent to our servers.
+                  </p>
+                </div>
+              )}
               <div className="setting-row">
                 <button
                   type="button"

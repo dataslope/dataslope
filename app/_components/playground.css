@@ -1564,19 +1564,52 @@ input[type="range"].fs-slider:disabled {
   cursor: not-allowed;
 }
 
-/* AI autocomplete toggle — unavailable state */
-.ai-autocomplete-unavailable {
-  cursor: default;
-}
-.ai-autocomplete-label-wrap {
+/* AI autocomplete BYOK settings */
+.ai-byok-fields {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border-radius: 6px;
+  border: 1px solid var(--border);
 }
-.ai-autocomplete-unavail-msg {
+.ai-byok-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ai-byok-label {
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-dim);
+}
+.ai-byok-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  padding: 6px 8px;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.ai-byok-input::placeholder {
+  color: var(--text-dim);
+}
+.ai-byok-input:focus {
+  border-color: var(--accent);
+}
+.ai-byok-privacy-note {
+  color: var(--text-dim);
+  font-size: 11px;
   font-style: italic;
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* Theme select */
