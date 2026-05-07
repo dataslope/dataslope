@@ -2614,6 +2614,9 @@ function SqlPlaygroundInner() {
       const bytes = engine.exportDatabase();
       const sample = engine.activeSample();
       const overriddenFilename = customFilenames[activeDbId];
+      // Derive the base name by stripping the last file extension (e.g.
+      // ".db", ".sqlite3") so the download always has a ".sqlite" suffix
+      // regardless of which extension the user chose when renaming.
       const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
       const baseName = effectiveFilename
         ? effectiveFilename.replace(/\.[^.]+$/, "")
@@ -4260,6 +4263,12 @@ function SqlPlaygroundInner() {
                   style={{ cursor: "not-allowed" }}
                   onMouseEnter={() => setExportNoTabsHover(true)}
                   onMouseLeave={() => setExportNoTabsHover(false)}
+                  onFocus={() => setExportNoTabsHover(true)}
+                  onBlur={() => setExportNoTabsHover(false)}
+                  tabIndex={0}
+                  role="button"
+                  aria-disabled="true"
+                  aria-label="Export (create a table to enable)"
                 >
                   <Popover.Trigger
                     className="header-btn"
