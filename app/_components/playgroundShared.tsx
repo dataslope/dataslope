@@ -344,7 +344,7 @@ export function SettingsPanel({
               </Tabs.Tab>
               <Tabs.Tab value="themes" className="settings-tab">
                 <Palette size={14} aria-hidden="true" />
-                <span className="settings-tab-label">Editor Themes</span>
+                <span className="settings-tab-label">Themes</span>
               </Tabs.Tab>
               {extraTabs?.map((t) => (
                 <Tabs.Tab key={t.value} value={t.value} className="settings-tab">

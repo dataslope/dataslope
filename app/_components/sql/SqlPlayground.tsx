@@ -123,6 +123,7 @@ import {
   GripVertical,
   Hash,
   Network,
+  Pencil,
   Play,
   Plus,
   RotateCcw,
@@ -1318,6 +1319,15 @@ function SqlPlaygroundInner() {
   const [customDb, setCustomDb] = useState<
     import("../runtime/sqliteSamples").SqliteSampleDatabase | null
   >(null);
+  // Rename-database dialog state. Stores the user's in-progress input
+  // separately from the committed name so the dialog can be cancelled
+  // cleanly.
+  const [renameDbOpen, setRenameDbOpen] = useState(false);
+  const [renameDbBaseName, setRenameDbBaseName] = useState("");
+  const [renameDbExt, setRenameDbExt] = useState(".sqlite");
+  // Per-database filename overrides.  Keyed by db id; takes precedence
+  // over the built-in `SqliteSampleDatabase.filename` for display.
+  const [customFilenames, setCustomFilenames] = useState<Record<string, string>>({});
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -1790,7 +1800,11 @@ function SqlPlaygroundInner() {
     const schema: Record<string, string[]> = {};
     const completionSchema: SqlCompletionSchema = { entities: [] };
     for (const name of tables) {
-      schema[name] = engine.listColumns(name).map((c) => c.name);
+      try {
+        schema[name] = engine.listColumns(name).map((c) => c.name);
+      } catch {
+        schema[name] = [];
+      }
       completionSchema.entities.push({
         name,
         columns: schema[name],
@@ -1798,7 +1812,11 @@ function SqlPlaygroundInner() {
       });
     }
     for (const name of views) {
-      schema[name] = engine.listColumns(name).map((c) => c.name);
+      try {
+        schema[name] = engine.listColumns(name).map((c) => c.name);
+      } catch {
+        schema[name] = [];
+      }
       completionSchema.entities.push({
         name,
         columns: schema[name],
@@ -1855,6 +1873,13 @@ function SqlPlaygroundInner() {
       } catch {
         // Ignore quota errors.
       }
+    }
+    // Focus the editor so the user can type immediately after any tab
+    // operation (activate, create, reorder, close, close-all).
+    // Skip "er-diagram" / "view-data" tabs whose editor pane is hidden.
+    const tab = tabsRef.current.find((t) => t.id === activeTabId);
+    if (tab?.kind !== "er-diagram" && tab?.kind !== "view-data") {
+      view?.focus();
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2138,14 +2163,42 @@ function SqlPlaygroundInner() {
         });
         setStatusState("ready");
         // Refresh sidebar in case the query was DDL (CREATE/DROP).
-        setTables(engine.listTables());
-        setViews(engine.listViews());
+        const newTables = engine.listTables();
+        const newViews = engine.listViews();
+        setTables(newTables);
+        setViews(newViews);
         setIndexes(engine.listIndexes());
         setTriggers(engine.listTriggers());
         // Drop cached column metadata wholesale — the safest assumption
         // after arbitrary user SQL is that anything could have changed.
         setColumnsByEntity({});
         setForeignKeysByEntity({});
+        // Remove any expanded sidebar entities or result tabs that
+        // reference tables / views that no longer exist (e.g. after a
+        // manual DROP TABLE query). This prevents the metadata-reload
+        // effect from calling listColumns() on dropped entities.
+        const newEntitySet = new Set([...newTables, ...newViews]);
+        setExpandedEntities((prev) => {
+          const dropped = [...prev].filter((n) => !newEntitySet.has(n));
+          if (dropped.length === 0) return prev;
+          const next = new Set(prev);
+          for (const d of dropped) next.delete(d);
+          return next;
+        });
+        setResultsByTab((prev) => {
+          const entries = Object.entries(prev);
+          const hasDropped = entries.some(
+            ([, r]) => r?.sourceTable && !newEntitySet.has(r.sourceTable),
+          );
+          if (!hasDropped) return prev;
+          const next = { ...prev };
+          for (const [tId, r] of entries) {
+            if (r?.sourceTable && !newEntitySet.has(r.sourceTable)) {
+              delete next[tId];
+            }
+          }
+          return next;
+        });
       } catch (err) {
         const elapsedMs = performance.now() - t0;
         const msg = err instanceof Error ? err.message : String(err);
@@ -2377,6 +2430,42 @@ function SqlPlaygroundInner() {
       setViews(engine.listViews());
       setIndexes(engine.listIndexes());
       setTriggers(engine.listTriggers());
+      // For tables and views, clear any stale result tabs and sidebar
+      // metadata that reference the dropped entity — this prevents the
+      // autocomplete / metadata-reload effects from trying to call
+      // listColumns() on a table that no longer exists.
+      if (kind === "table" || kind === "view") {
+        setResultsByTab((prev) => {
+          const next = { ...prev };
+          for (const tabId of Object.keys(next)) {
+            if (next[tabId]?.sourceTable === name) {
+              delete next[tabId];
+            }
+          }
+          return next;
+        });
+        setExpandedEntities((prev) => {
+          if (!prev.has(name)) return prev;
+          const next = new Set(prev);
+          next.delete(name);
+          return next;
+        });
+        setColumnsByEntity((prev) => {
+          if (!(name in prev)) return prev;
+          const { [name]: _, ...rest } = prev;
+          return rest;
+        });
+        setForeignKeysByEntity((prev) => {
+          if (!(name in prev)) return prev;
+          const { [name]: _, ...rest } = prev;
+          return rest;
+        });
+        setConstraintsByEntity((prev) => {
+          if (!(name in prev)) return prev;
+          const { [name]: _, ...rest } = prev;
+          return rest;
+        });
+      }
       const label = DROP_KIND_LABELS[kind].toLowerCase();
       showToast(`Dropped ${label} "${name}".`);
     } catch (err) {
@@ -3927,11 +4016,13 @@ function SqlPlaygroundInner() {
     return () => window.clearInterval(id);
   }, [loaded, statusState]);
 
-  const activeSample = useMemo(
-    () =>
-      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId),
-    [activeDbId, customDb],
-  );
+  const activeSample = useMemo(() => {
+    const base =
+      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
+    const overrideName = customFilenames[activeDbId];
+    if (overrideName) return { ...base, filename: overrideName };
+    return base;
+  }, [activeDbId, customDb, customFilenames]);
 
   return (
     <div className="pg-root">
@@ -4554,6 +4645,75 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Rename Database dialog ── */}
+        <Dialog.Root
+          open={renameDbOpen}
+          onOpenChange={(next) => {
+            if (!next) setRenameDbOpen(false);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
+              <Dialog.Title className="confirm-title">
+                Rename Database
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Choose a new filename for the current database.
+              </Dialog.Description>
+              <div className="sql-rename-db-form">
+                <div className="sql-rename-db-name-row">
+                  <input
+                    className="sql-rename-input sql-rename-db-name-input"
+                    value={renameDbBaseName}
+                    onChange={(e) => setRenameDbBaseName(e.target.value)}
+                    placeholder="database name"
+                    aria-label="Database name"
+                    autoFocus
+                  />
+                  <select
+                    className="sql-rename-db-ext-select"
+                    value={renameDbExt}
+                    onChange={(e) => setRenameDbExt(e.target.value)}
+                    aria-label="File extension"
+                  >
+                    <option value=".sqlite">.sqlite (most common)</option>
+                    <option value=".db">.db</option>
+                    <option value=".sqlite3">.sqlite3</option>
+                    <option value=".db3">.db3</option>
+                  </select>
+                </div>
+              </div>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  disabled={!renameDbBaseName.trim()}
+                  onClick={() => {
+                    const newFilename = `${renameDbBaseName.trim()}${renameDbExt}`;
+                    setCustomFilenames((prev) => ({
+                      ...prev,
+                      [activeDbId]: newFilename,
+                    }));
+                    if (customDb?.id === activeDbId) {
+                      setCustomDb((prev) =>
+                        prev ? { ...prev, filename: newFilename } : prev,
+                      );
+                    }
+                    showToast(`Renamed to "${newFilename}".`);
+                    setRenameDbOpen(false);
+                  }}
+                >
+                  Rename
+                </button>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         {/* ── Import CSV dialog ── */}
         <Dialog.Root
           open={importCsvOpen}
@@ -5103,6 +5263,8 @@ function SqlPlaygroundInner() {
                   invalidColumnIds={modifyInvalidColIds}
                   knownTables={tables}
                   engine={engineForRender}
+                  onDropLeaf={dropLeafEntity}
+                  theme={editorTheme}
                 />
               )}
               <footer className="sql-modify-drawer-footer">
@@ -5297,6 +5459,22 @@ function SqlPlaygroundInner() {
                       setImportSqliteOpen(true);
                       return;
                     }
+                    if (value === "__rename_db__") {
+                      // Pre-populate with current filename (strip extension).
+                      const cur = activeSample.filename;
+                      const dotIdx = cur.lastIndexOf(".");
+                      if (dotIdx > 0) {
+                        setRenameDbBaseName(cur.slice(0, dotIdx));
+                        const ext = cur.slice(dotIdx);
+                        const knownExts = [".sqlite", ".db", ".sqlite3", ".db3"];
+                        setRenameDbExt(knownExts.includes(ext) ? ext : ".sqlite");
+                      } else {
+                        setRenameDbBaseName(cur);
+                        setRenameDbExt(".sqlite");
+                      }
+                      setRenameDbOpen(true);
+                      return;
+                    }
                     requestDbSwitch(String(value));
                   }}
                 >
@@ -5363,6 +5541,25 @@ function SqlPlaygroundInner() {
                             </Select.ItemText>
                             <span className="sql-db-item-desc">
                               Open a .sqlite or .db file
+                            </span>
+                          </span>
+                        </Select.Item>
+                        <Select.Item
+                          value="__rename_db__"
+                          className="bui-select-item sql-db-item"
+                        >
+                          <span
+                            className="bui-select-item-icon"
+                            aria-hidden="true"
+                          >
+                            <Pencil size={14} />
+                          </span>
+                          <span className="sql-db-item-text">
+                            <Select.ItemText>
+                              Rename Current Database
+                            </Select.ItemText>
+                            <span className="sql-db-item-desc">
+                              Change filename and extension
                             </span>
                           </span>
                         </Select.Item>
@@ -7603,15 +7800,25 @@ function ModifyStructureForm({
   invalidColumnIds,
   knownTables,
   engine,
+  onDropLeaf,
+  theme,
 }: {
   state: ModifyStructureState;
   onChange: (next: ModifyStructureState) => void;
   invalidColumnIds?: Set<string>;
   knownTables: string[];
   engine: SqliteEngine | null;
+  /** Called when the user clicks the drop button on an index/trigger item. */
+  onDropLeaf?: (name: string, kind: "index" | "trigger") => void;
+  /** Editor theme forwarded to inline DdlViewer blocks. */
+  theme?: string;
 }) {
   const [activeTab, setActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
   const [isDragging, setIsDragging] = useState(false);
+  // Tracks which index/trigger items are expanded to show DDL inline.
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  // Caches DDL strings fetched from the engine keyed by entity name.
+  const [itemDdls, setItemDdls] = useState<Record<string, string>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -7619,6 +7826,29 @@ function ModifyStructureForm({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  // Toggle inline DDL visibility for an index/trigger item. On first
+  // expansion the DDL is fetched from the engine and cached.
+  const toggleStructItem = (name: string, kind: "index" | "trigger") => {
+    const isExpanded = expandedItems.has(name);
+    if (!isExpanded && !(name in itemDdls) && engine) {
+      try {
+        const sql = engine.getDDL(name);
+        setItemDdls((prev) => ({ ...prev, [name]: sql }));
+      } catch {
+        setItemDdls((prev) => ({ ...prev, [name]: "" }));
+      }
+    }
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (isExpanded) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  };
 
   const updateColumn = (id: string, patch: Partial<ModifyColumnDraft>) => {
     onChange({
@@ -7820,12 +8050,48 @@ function ModifyStructureForm({
           {tableIndexes.length === 0 ? (
             <div className="sql-modify-empty">No user-defined indexes.</div>
           ) : (
-            tableIndexes.map((name) => (
-              <div key={name} className="sql-struct-list-item">
-                <Hash size={12} className="sql-struct-list-icon" aria-hidden="true" />
-                <span className="sql-struct-list-name">{name}</span>
-              </div>
-            ))
+            tableIndexes.map((name) => {
+              const isOpen = expandedItems.has(name);
+              const ddl = itemDdls[name] ?? "";
+              return (
+                <div key={name} className={`sql-struct-list-item sql-struct-list-item-toggle${isOpen ? " is-open" : ""}`}>
+                  <div className="sql-struct-list-header">
+                    <button
+                      type="button"
+                      className="sql-struct-list-row"
+                      onClick={() => toggleStructItem(name, "index")}
+                      aria-expanded={isOpen}
+                    >
+                      <Hash size={12} className="sql-struct-list-icon" aria-hidden="true" />
+                      <span className="sql-struct-list-name">{name}</span>
+                      <span className="sql-struct-list-chevron" aria-hidden="true">
+                        {isOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                      </span>
+                    </button>
+                    {onDropLeaf && (
+                      <button
+                        type="button"
+                        className="sql-struct-list-drop"
+                        onClick={() => onDropLeaf(name, "index")}
+                        title={`Drop index ${name}`}
+                        aria-label={`Drop index ${name}`}
+                      >
+                        <Trash2 size={11} aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
+                  {isOpen && (
+                    <div className="sql-struct-list-ddl">
+                      {ddl.trim() ? (
+                        <DdlViewer sql={ddl} theme={theme ?? "default"} />
+                      ) : (
+                        <div className="sql-modify-empty">No DDL recorded for this index.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       )}
@@ -7835,12 +8101,48 @@ function ModifyStructureForm({
           {tableTriggers.length === 0 ? (
             <div className="sql-modify-empty">No triggers.</div>
           ) : (
-            tableTriggers.map((name) => (
-              <div key={name} className="sql-struct-list-item">
-                <Zap size={12} className="sql-struct-list-icon" aria-hidden="true" />
-                <span className="sql-struct-list-name">{name}</span>
-              </div>
-            ))
+            tableTriggers.map((name) => {
+              const isOpen = expandedItems.has(name);
+              const ddl = itemDdls[name] ?? "";
+              return (
+                <div key={name} className={`sql-struct-list-item sql-struct-list-item-toggle${isOpen ? " is-open" : ""}`}>
+                  <div className="sql-struct-list-header">
+                    <button
+                      type="button"
+                      className="sql-struct-list-row"
+                      onClick={() => toggleStructItem(name, "trigger")}
+                      aria-expanded={isOpen}
+                    >
+                      <Zap size={12} className="sql-struct-list-icon" aria-hidden="true" />
+                      <span className="sql-struct-list-name">{name}</span>
+                      <span className="sql-struct-list-chevron" aria-hidden="true">
+                        {isOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                      </span>
+                    </button>
+                    {onDropLeaf && (
+                      <button
+                        type="button"
+                        className="sql-struct-list-drop"
+                        onClick={() => onDropLeaf(name, "trigger")}
+                        title={`Drop trigger ${name}`}
+                        aria-label={`Drop trigger ${name}`}
+                      >
+                        <Trash2 size={11} aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
+                  {isOpen && (
+                    <div className="sql-struct-list-ddl">
+                      {ddl.trim() ? (
+                        <DdlViewer sql={ddl} theme={theme ?? "default"} />
+                      ) : (
+                        <div className="sql-modify-empty">No DDL recorded for this trigger.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       )}

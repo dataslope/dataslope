@@ -1925,6 +1925,40 @@
   width: min(480px, calc(100vw - 48px));
 }
 
+.sql-rename-db-popup {
+  width: min(420px, calc(100vw - 48px));
+}
+.sql-rename-db-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.sql-rename-db-name-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.sql-rename-db-name-input {
+  flex: 1;
+  min-width: 0;
+}
+.sql-rename-db-ext-select {
+  background: var(--bg3);
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sql-rename-db-ext-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+
 .sql-import-warning {
   display: flex;
   align-items: flex-start;
@@ -2477,6 +2511,75 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text);
+}
+/* Clickable index/trigger items — togglable layout */
+.sql-struct-list-item.sql-struct-list-item-toggle {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+/* Header row: expand button + drop button side by side */
+.sql-struct-list-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 6px;
+}
+.sql-struct-list-item.sql-struct-list-item-toggle.is-open .sql-struct-list-header {
+  border-radius: 6px 6px 0 0;
+}
+.sql-struct-list-row {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+  padding: 7px 8px 7px 10px;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px 0 0 6px;
+}
+.sql-struct-list-item.sql-struct-list-item-toggle:not(.is-open) .sql-struct-list-row {
+  border-radius: 6px 0 0 6px;
+}
+.sql-struct-list-row:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.sql-struct-list-chevron {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  display: flex;
+  margin-left: auto;
+}
+.sql-struct-list-drop {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 7px 8px;
+  border-radius: 0 6px 6px 0;
+  transition: color 0.15s, background 0.15s;
+}
+.sql-struct-list-drop:hover {
+  color: var(--danger, #e53e3e);
+  background: color-mix(in srgb, var(--danger, #e53e3e) 10%, transparent);
+}
+.sql-struct-list-ddl {
+  padding: 0 6px 6px;
+}
+.sql-struct-list-ddl .sql-ddl-code-wrap {
+  height: 160px;
+  min-height: 100px;
+  max-height: 260px;
+  border-radius: 4px;
 }
 .sql-struct-list-icon {
   color: var(--text-dim);
