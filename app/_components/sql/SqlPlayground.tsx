@@ -879,6 +879,74 @@ function applyPragmasToEngine(
  *  timer fires, so dblclick can reliably cancel the pending toggle. */
 const SINGLE_CLICK_DELAY_MS = 220;
 
+// ── Import column-comparison helper ─────────────────────────────────────
+// Compares the file headers that will be inserted against the column list
+// of an existing target table, returning a row-per-column summary used by
+// the import dialogs to flag matched / extra / missing columns.
+// Sanitizes a raw header/column name to the SQL identifier that the import
+// handlers use when building INSERT statements (same regex as the callers).
+// Case is preserved so the created column names match the original file.
+function sanitizeImportColName(header: string): string {
+  return header.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
+}
+
+// Case-insensitive variant used only for column-matching comparisons.
+// SQLite column lookups are case-insensitive, so we normalise both sides
+// before comparing.
+function normalizeImportColName(header: string): string {
+  return sanitizeImportColName(header).toLowerCase();
+}
+
+function computeImportColComparison(
+  fileHeaders: string[],
+  tableCols: TableColumnInfo[],
+): Array<{
+  status: "matched" | "extra" | "optional" | "required";
+  fileCol: string | null;
+  tableCol: string | null;
+}> {
+  const tableMap = new Map(tableCols.map((c) => [c.name.toLowerCase(), c]));
+  const matched = new Set<string>();
+  const rows: ReturnType<typeof computeImportColComparison> = [];
+
+  for (const h of fileHeaders) {
+    const key = normalizeImportColName(h);
+    const col = tableMap.get(key);
+    if (col) {
+      rows.push({ status: "matched", fileCol: h, tableCol: col.name });
+      matched.add(key);
+    } else {
+      rows.push({ status: "extra", fileCol: h, tableCol: null });
+    }
+  }
+
+  for (const col of tableCols) {
+    if (!matched.has(col.name.toLowerCase())) {
+      // A column can safely be omitted from the import file when it
+      // allows NULL, carries a DEFAULT, or is (part of) the primary key
+      // (INTEGER PRIMARY KEY columns auto-assign the rowid).
+      const isOptional =
+        !col.notNull || col.defaultValue !== null || col.pk > 0;
+      rows.push({
+        status: isOptional ? "optional" : "required",
+        fileCol: null,
+        tableCol: col.name,
+      });
+    }
+  }
+
+  return rows;
+}
+
+// Labels shown in the status column of the column-comparison table inside
+// the import dialogs.
+const IMPORT_COL_STATUS_LABEL = {
+  matched: "✓ Matched",
+  extra: "⚠ Not in table",
+  optional: "○ Optional",
+  required: "✗ Required",
+} as const;
+
 // ────────────────────────────────────────────────────────────────────────
 // Component
 // ────────────────────────────────────────────────────────────────────────
@@ -1287,6 +1355,9 @@ function SqlPlaygroundInner() {
   // alongside the derived table name so the user can review before committing.
   // `targetMode` controls whether to create a new table or append to an
   // existing one; `targetTable` holds the selected existing table name.
+  // `colCompare` is populated when `targetMode === "existing"` and holds the
+  // pre-computed column comparison (computed via engine in the event handler,
+  // not during render, to satisfy the react-hooks/refs lint rule).
   type CsvImportState = {
     tableName: string;
     headers: string[];
@@ -1294,6 +1365,7 @@ function SqlPlaygroundInner() {
     rawText: string;
     targetMode: "new" | "existing";
     targetTable: string;
+    colCompare: ReturnType<typeof computeImportColComparison> | null;
   };
   const [importCsvOpen, setImportCsvOpen] = useState(false);
   const [importCsvDragging, setImportCsvDragging] = useState(false);
@@ -1308,14 +1380,27 @@ function SqlPlaygroundInner() {
     rawText: string;
     targetMode: "new" | "existing";
     targetTable: string;
+    colCompare: ReturnType<typeof computeImportColComparison> | null;
   };
   const [importJsonOpen, setImportJsonOpen] = useState(false);
   const [importJsonDragging, setImportJsonDragging] = useState(false);
   const [importJsonState, setImportJsonState] =
     useState<JsonImportState | null>(null);
-  // Parquet import state.
+  // Parquet import state. When a file is parsed we hold the columns and rows
+  // so the user can pick a target table before the actual insert (mirroring
+  // the CSV/JSON two-step flow).
+  type ParquetImportState = {
+    tableName: string;
+    columns: string[];
+    rows: QueryExecResult["values"];
+    targetMode: "new" | "existing";
+    targetTable: string;
+    colCompare: ReturnType<typeof computeImportColComparison> | null;
+  };
   const [importParquetOpen, setImportParquetOpen] = useState(false);
   const [importParquetDragging, setImportParquetDragging] = useState(false);
+  const [importParquetState, setImportParquetState] =
+    useState<ParquetImportState | null>(null);
   // When `activeDbId` doesn't match any entry in SQLITE_SAMPLE_DATABASES
   // (blank or imported), we store a synthetic descriptor here so the UI
   // (selector display, `activeSample`, `resetTabsForCurrentDb`) can still
@@ -2833,6 +2918,7 @@ function SqlPlaygroundInner() {
             rawText: text,
             targetMode: "new",
             targetTable: tables[0] ?? "",
+            colCompare: null,
           });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -2862,8 +2948,8 @@ function SqlPlaygroundInner() {
       // double-quote–escaped and used only as a column-name token,
       // not as a general string value, so the quoting is safe.
       const safeCols = headers.map((h) => {
-        const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
-        return `"${s.replace(/"/g, '""')}"`;
+        const s = sanitizeImportColName(h).replace(/"/g, '""');
+        return `"${s}"`;
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
@@ -2961,6 +3047,7 @@ function SqlPlaygroundInner() {
             rawText: text,
             targetMode: "new",
             targetTable: tables[0] ?? "",
+            colCompare: null,
           });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -2985,8 +3072,8 @@ function SqlPlaygroundInner() {
     }
     try {
       const safeCols = headers.map((h) => {
-        const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
-        return `"${s.replace(/"/g, '""')}"`;
+        const s = sanitizeImportColName(h).replace(/"/g, '""');
+        return `"${s}"`;
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
@@ -3034,8 +3121,6 @@ function SqlPlaygroundInner() {
   // ─── Parquet import ───────────────────────────────────────────────
   const handleParquetFile = useCallback(
     async (file: File) => {
-      const engine = engineRef.current;
-      if (!engine) return;
       try {
         showToast("Reading parquet file…");
         const { columns, rows } = await importParquetFile(file);
@@ -3043,48 +3128,83 @@ function SqlPlaygroundInner() {
           showToast("Parquet file appears to have no columns.", "warn");
           return;
         }
-        const tableName = tableNameFromFilename(file.name);
-        const safeCols = columns.map((h) => {
-          const s = h.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
-          return `"${s.replace(/"/g, '""')}"`;
+        setImportParquetState({
+          tableName: tableNameFromFilename(file.name),
+          columns,
+          rows,
+          targetMode: "new",
+          targetTable: tables[0] ?? "",
+          colCompare: null,
         });
-        const tableIdent = `"${tableName.replace(/"/g, '""')}"`;
-        engine.exec(
-          `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
-        );
-        engine.exec("BEGIN");
-        try {
-          for (const row of rows) {
-            const vals = row
-              .map((v) =>
-                v === null || v === undefined
-                  ? "NULL"
-                  : `'${String(v).replace(/'/g, "''")}'`,
-              )
-              .join(", ");
-            engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
-          }
-          engine.exec("COMMIT");
-        } catch (insertErr) {
-          try {
-            engine.exec("ROLLBACK");
-          } catch {
-            // Ignore rollback failure.
-          }
-          throw insertErr;
-        }
-        setTables(engine.listTables());
-        setImportParquetOpen(false);
-        showToast(
-          `Imported ${rows.length} row${rows.length === 1 ? "" : "s"} into "${tableName}".`,
-        );
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Parquet import failed: ${msg}`, "warn");
       }
     },
-    [tableNameFromFilename, showToast],
+    [tableNameFromFilename, showToast, tables],
   );
+
+  const submitParquetImport = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || !importParquetState) return;
+    const { columns, rows, targetMode, targetTable, tableName } =
+      importParquetState;
+    const resolvedTarget = targetTable || tables[0] || "";
+    const isExisting = targetMode === "existing" && resolvedTarget;
+    const effectiveTable = isExisting ? resolvedTarget : tableName.trim();
+    if (!effectiveTable) {
+      showToast("Table name cannot be empty.", "warn");
+      return;
+    }
+    try {
+      const safeCols = columns.map((h) => {
+        const s = sanitizeImportColName(h).replace(/"/g, '""');
+        return `"${s}"`;
+      });
+      const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
+      if (!isExisting) {
+        engine.exec(
+          `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
+        );
+      }
+      engine.exec("BEGIN");
+      try {
+        for (const row of rows) {
+          const vals = row
+            .map((v) =>
+              v === null || v === undefined
+                ? "NULL"
+                : `'${String(v).replace(/'/g, "''")}'`,
+            )
+            .join(", ");
+          if (isExisting) {
+            engine.exec(
+              `INSERT INTO ${tableIdent} (${safeCols.join(", ")}) VALUES (${vals})`,
+            );
+          } else {
+            engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+          }
+        }
+        engine.exec("COMMIT");
+      } catch (insertErr) {
+        try {
+          engine.exec("ROLLBACK");
+        } catch {
+          // Ignore rollback failure.
+        }
+        throw insertErr;
+      }
+      setTables(engine.listTables());
+      setImportParquetOpen(false);
+      setImportParquetState(null);
+      showToast(
+        `Imported ${rows.length} row${rows.length === 1 ? "" : "s"} into "${effectiveTable}".`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Parquet import failed: ${msg}`, "warn");
+    }
+  }, [importParquetState, tables, showToast]);
   // Called from the result table when the user confirms deletion of one
   // or more selected rows from a previewed table. We rely on the
   // table's primary key to safely identify which rows to remove —
@@ -4283,7 +4403,7 @@ function SqlPlaygroundInner() {
                 </div>
                 <Popover.Portal>
                   <Popover.Positioner sideOffset={6} align="start" className="sql-export-disabled-positioner">
-                    <Popover.Popup className="bui-popup">
+                    <Popover.Popup className="bui-popup sql-export-disabled-popup">
                       Create a table to export the database
                     </Popover.Popup>
                   </Popover.Positioner>
@@ -4858,7 +4978,9 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importCsvState.targetMode === "new" ? " active" : ""}`}
                         onClick={() =>
                           setImportCsvState((prev) =>
-                            prev ? { ...prev, targetMode: "new" } : null,
+                            prev
+                              ? { ...prev, targetMode: "new", colCompare: null }
+                              : null,
                           )
                         }
                       >
@@ -4868,17 +4990,25 @@ function SqlPlaygroundInner() {
                         type="button"
                         className={`sql-import-mode-btn${importCsvState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
-                        onClick={() =>
+                        onClick={() => {
+                          const targetTable =
+                            importCsvState.targetTable || tables[0] || "";
+                          const tableCols =
+                            engineRef.current?.listColumns(targetTable) ?? [];
                           setImportCsvState((prev) =>
                             prev
                               ? {
                                   ...prev,
                                   targetMode: "existing",
-                                  targetTable: prev.targetTable || tables[0] || "",
+                                  targetTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.headers,
+                                    tableCols,
+                                  ),
                                 }
                               : null,
-                          )
-                        }
+                          );
+                        }}
                       >
                         Existing table
                       </button>
@@ -4898,15 +5028,25 @@ function SqlPlaygroundInner() {
                       />
                     ) : (
                       <select
-                        className="pragma-select"
+                        className="sql-import-target-select"
                         value={importCsvState.targetTable}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newTable = e.target.value;
+                          const tableCols =
+                            engineRef.current?.listColumns(newTable) ?? [];
                           setImportCsvState((prev) =>
                             prev
-                              ? { ...prev, targetTable: e.target.value }
+                              ? {
+                                  ...prev,
+                                  targetTable: newTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.headers,
+                                    tableCols,
+                                  ),
+                                }
                               : null,
-                          )
-                        }
+                          );
+                        }}
                         autoFocus
                       >
                         {tables.map((t) => (
@@ -4917,26 +5057,52 @@ function SqlPlaygroundInner() {
                       </select>
                     )}
                   </div>
-                  <div className="sql-import-preview">
-                    <table>
-                      <thead>
-                        <tr>
-                          {importCsvState.headers.map((h) => (
-                            <th key={h}>{h || "(empty)"}</th>
+                  {importCsvState.targetMode === "existing" &&
+                  importCsvState.colCompare ? (
+                    <div className="sql-import-col-compare">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>File column</th>
+                            <th>Table column</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importCsvState.colCompare.map((r, i) => (
+                            <tr key={i}>
+                              <td>{r.fileCol ?? <em>—</em>}</td>
+                              <td>{r.tableCol ?? <em>—</em>}</td>
+                              <td className={`cmp-${r.status}`}>
+                                {IMPORT_COL_STATUS_LABEL[r.status]}
+                              </td>
+                            </tr>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {importCsvState.rows.slice(0, 5).map((row, i) => (
-                          <tr key={i}>
-                            {row.map((cell, j) => (
-                              <td key={j}>{cell || <em>NULL</em>}</td>
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="sql-import-preview">
+                      <table>
+                        <thead>
+                          <tr>
+                            {importCsvState.headers.map((h) => (
+                              <th key={h}>{h || "(empty)"}</th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {importCsvState.rows.slice(0, 5).map((row, i) => (
+                            <tr key={i}>
+                              {row.map((cell, j) => (
+                                <td key={j}>{cell || <em>NULL</em>}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                   <div
                     style={{
                       fontSize: 11,
@@ -4948,7 +5114,9 @@ function SqlPlaygroundInner() {
                     {importCsvState.rows.length === 1 ? "" : "s"} ·{" "}
                     {importCsvState.headers.length} column
                     {importCsvState.headers.length === 1 ? "" : "s"}
-                    {importCsvState.rows.length > 5 && ` · showing first 5`}
+                    {importCsvState.rows.length > 5 &&
+                      importCsvState.targetMode === "new" &&
+                      ` · showing first 5`}
                   </div>
                 </>
               )}
@@ -5046,7 +5214,9 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importJsonState.targetMode === "new" ? " active" : ""}`}
                         onClick={() =>
                           setImportJsonState((prev) =>
-                            prev ? { ...prev, targetMode: "new" } : null,
+                            prev
+                              ? { ...prev, targetMode: "new", colCompare: null }
+                              : null,
                           )
                         }
                       >
@@ -5056,17 +5226,25 @@ function SqlPlaygroundInner() {
                         type="button"
                         className={`sql-import-mode-btn${importJsonState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
-                        onClick={() =>
+                        onClick={() => {
+                          const targetTable =
+                            importJsonState.targetTable || tables[0] || "";
+                          const tableCols =
+                            engineRef.current?.listColumns(targetTable) ?? [];
                           setImportJsonState((prev) =>
                             prev
                               ? {
                                   ...prev,
                                   targetMode: "existing",
-                                  targetTable: prev.targetTable || tables[0] || "",
+                                  targetTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.headers,
+                                    tableCols,
+                                  ),
                                 }
                               : null,
-                          )
-                        }
+                          );
+                        }}
                       >
                         Existing table
                       </button>
@@ -5086,15 +5264,25 @@ function SqlPlaygroundInner() {
                       />
                     ) : (
                       <select
-                        className="pragma-select"
+                        className="sql-import-target-select"
                         value={importJsonState.targetTable}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newTable = e.target.value;
+                          const tableCols =
+                            engineRef.current?.listColumns(newTable) ?? [];
                           setImportJsonState((prev) =>
                             prev
-                              ? { ...prev, targetTable: e.target.value }
+                              ? {
+                                  ...prev,
+                                  targetTable: newTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.headers,
+                                    tableCols,
+                                  ),
+                                }
                               : null,
-                          )
-                        }
+                          );
+                        }}
                         autoFocus
                       >
                         {tables.map((t) => (
@@ -5105,26 +5293,52 @@ function SqlPlaygroundInner() {
                       </select>
                     )}
                   </div>
-                  <div className="sql-import-preview">
-                    <table>
-                      <thead>
-                        <tr>
-                          {importJsonState.headers.map((h) => (
-                            <th key={h}>{h || "(empty)"}</th>
+                  {importJsonState.targetMode === "existing" &&
+                  importJsonState.colCompare ? (
+                    <div className="sql-import-col-compare">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>File column</th>
+                            <th>Table column</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importJsonState.colCompare.map((r, i) => (
+                            <tr key={i}>
+                              <td>{r.fileCol ?? <em>—</em>}</td>
+                              <td>{r.tableCol ?? <em>—</em>}</td>
+                              <td className={`cmp-${r.status}`}>
+                                {IMPORT_COL_STATUS_LABEL[r.status]}
+                              </td>
+                            </tr>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {importJsonState.rows.slice(0, 5).map((row, i) => (
-                          <tr key={i}>
-                            {row.map((cell, j) => (
-                              <td key={j}>{cell || <em>NULL</em>}</td>
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="sql-import-preview">
+                      <table>
+                        <thead>
+                          <tr>
+                            {importJsonState.headers.map((h) => (
+                              <th key={h}>{h || "(empty)"}</th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {importJsonState.rows.slice(0, 5).map((row, i) => (
+                            <tr key={i}>
+                              {row.map((cell, j) => (
+                                <td key={j}>{cell || <em>NULL</em>}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                   <div
                     style={{
                       fontSize: 11,
@@ -5136,7 +5350,9 @@ function SqlPlaygroundInner() {
                     {importJsonState.rows.length === 1 ? "" : "s"} ·{" "}
                     {importJsonState.headers.length} column
                     {importJsonState.headers.length === 1 ? "" : "s"}
-                    {importJsonState.rows.length > 5 && ` · showing first 5`}
+                    {importJsonState.rows.length > 5 &&
+                      importJsonState.targetMode === "new" &&
+                      ` · showing first 5`}
                   </div>
                 </>
               )}
@@ -5164,6 +5380,7 @@ function SqlPlaygroundInner() {
           onOpenChange={(next) => {
             if (!next) {
               setImportParquetOpen(false);
+              setImportParquetState(null);
               setImportParquetDragging(false);
             }
           }}
@@ -5175,8 +5392,8 @@ function SqlPlaygroundInner() {
                 Import Parquet File
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Read a Parquet file and add its rows as a new table. Column
-                types are inferred from the file schema.
+                Read a Parquet file and add its rows into a new or existing
+                table.
               </Dialog.Description>
               <div className="sql-import-warning">
                 <TriangleAlert
@@ -5189,47 +5406,209 @@ function SqlPlaygroundInner() {
                   memory and will not be persisted on reload.
                 </span>
               </div>
-              <div
-                className={`sql-dropzone${importParquetDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportParquetDragging(true);
-                }}
-                onDragLeave={() => setImportParquetDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportParquetDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (file) handleParquetFile(file);
-                }}
-              >
-                <Database
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a Parquet file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .parquet
-                </span>
-                <input
-                  type="file"
-                  accept=".parquet,application/octet-stream"
-                  aria-label="Choose Parquet file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleParquetFile(file);
-                      setImportParquetOpen(false);
-                    }
-                    e.target.value = "";
+              {!importParquetState ? (
+                <div
+                  className={`sql-dropzone${importParquetDragging ? " dragging" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setImportParquetDragging(true);
                   }}
-                />
-              </div>
+                  onDragLeave={() => setImportParquetDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setImportParquetDragging(false);
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleParquetFile(file);
+                  }}
+                >
+                  <Database
+                    size={28}
+                    className="sql-dropzone-icon"
+                    aria-hidden="true"
+                  />
+                  <span>Drop a Parquet file here</span>
+                  <span className="sql-dropzone-hint">
+                    or click to browse — .parquet
+                  </span>
+                  <input
+                    type="file"
+                    accept=".parquet,application/octet-stream"
+                    aria-label="Choose Parquet file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleParquetFile(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="sql-import-target-row">
+                    <div className="sql-import-mode-btns">
+                      <button
+                        type="button"
+                        className={`sql-import-mode-btn${importParquetState.targetMode === "new" ? " active" : ""}`}
+                        onClick={() =>
+                          setImportParquetState((prev) =>
+                            prev
+                              ? { ...prev, targetMode: "new", colCompare: null }
+                              : null,
+                          )
+                        }
+                      >
+                        New table
+                      </button>
+                      <button
+                        type="button"
+                        className={`sql-import-mode-btn${importParquetState.targetMode === "existing" ? " active" : ""}`}
+                        disabled={tables.length === 0}
+                        onClick={() => {
+                          const targetTable =
+                            importParquetState.targetTable || tables[0] || "";
+                          const tableCols =
+                            engineRef.current?.listColumns(targetTable) ?? [];
+                          setImportParquetState((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  targetMode: "existing",
+                                  targetTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.columns,
+                                    tableCols,
+                                  ),
+                                }
+                              : null,
+                          );
+                        }}
+                      >
+                        Existing table
+                      </button>
+                    </div>
+                    {importParquetState.targetMode === "new" ? (
+                      <input
+                        id="parquet-table-name"
+                        className="sql-rename-input"
+                        value={importParquetState.tableName}
+                        onChange={(e) =>
+                          setImportParquetState((prev) =>
+                            prev
+                              ? { ...prev, tableName: e.target.value }
+                              : null,
+                          )
+                        }
+                        placeholder="Table name"
+                        autoFocus
+                      />
+                    ) : (
+                      <select
+                        className="sql-import-target-select"
+                        value={importParquetState.targetTable}
+                        onChange={(e) => {
+                          const newTable = e.target.value;
+                          const tableCols =
+                            engineRef.current?.listColumns(newTable) ?? [];
+                          setImportParquetState((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  targetTable: newTable,
+                                  colCompare: computeImportColComparison(
+                                    prev.columns,
+                                    tableCols,
+                                  ),
+                                }
+                              : null,
+                          );
+                        }}
+                        autoFocus
+                      >
+                        {tables.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  {importParquetState.targetMode === "existing" &&
+                  importParquetState.colCompare ? (
+                    <div className="sql-import-col-compare">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>File column</th>
+                            <th>Table column</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importParquetState.colCompare.map((r, i) => (
+                            <tr key={i}>
+                              <td>{r.fileCol ?? <em>—</em>}</td>
+                              <td>{r.tableCol ?? <em>—</em>}</td>
+                              <td className={`cmp-${r.status}`}>
+                                {IMPORT_COL_STATUS_LABEL[r.status]}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="sql-import-preview">
+                      <table>
+                        <thead>
+                          <tr>
+                            {importParquetState.columns.map((h) => (
+                              <th key={h}>{h || "(empty)"}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importParquetState.rows.slice(0, 5).map((row, i) => (
+                            <tr key={i}>
+                              {row.map((cell, j) => (
+                                <td key={j}>
+                                  {cell === null ? <em>NULL</em> : String(cell)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-dim)",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {importParquetState.rows.length} row
+                    {importParquetState.rows.length === 1 ? "" : "s"} ·{" "}
+                    {importParquetState.columns.length} column
+                    {importParquetState.columns.length === 1 ? "" : "s"}
+                    {importParquetState.rows.length > 5 &&
+                      importParquetState.targetMode === "new" &&
+                      ` · showing first 5`}
+                  </div>
+                </>
+              )}
               <div className="confirm-actions" style={{ marginTop: 16 }}>
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
+                {importParquetState && (
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    onClick={submitParquetImport}
+                  >
+                    Import
+                  </button>
+                )}
               </div>
             </Dialog.Popup>
           </Dialog.Portal>

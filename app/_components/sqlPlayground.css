@@ -2154,6 +2154,91 @@
   cursor: not-allowed;
 }
 
+/* Disabled-Export "create a table" popover — add comfortable padding. */
+.sql-export-disabled-popup {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Column-comparison table shown in the import dialog when targeting an
+   existing table. Reuses the preview table's container style but adds
+   status-cell coloring and a slightly taller max-height so the full
+   comparison is visible without excessive scrolling. */
+.sql-import-col-compare {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 220px;
+  margin: 4px 0 8px;
+}
+
+.sql-import-col-compare table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  min-width: 100%;
+  width: 100%;
+}
+
+.sql-import-col-compare thead th {
+  background: var(--bg3);
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.sql-import-col-compare tbody td {
+  padding: 3px 8px;
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-import-col-compare tbody tr:nth-child(2n) td {
+  background: color-mix(in srgb, var(--text) 2%, transparent);
+}
+
+.sql-import-col-compare .cmp-matched {
+  color: var(--green);
+}
+
+.sql-import-col-compare .cmp-extra {
+  color: var(--yellow);
+}
+
+.sql-import-col-compare .cmp-optional {
+  color: var(--text-dim);
+}
+
+.sql-import-col-compare .cmp-required {
+  color: var(--red);
+}
+
+/* Target-table select inside the import dialogs */
+.sql-import-target-select {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.sql-import-target-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* Separator between special selector items and sample databases */
 .sql-db-popup-sep {
   border: none;

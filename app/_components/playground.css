@@ -308,9 +308,24 @@ body.pg-active {
     background 0.15s,
     color 0.15s;
 }
-.header-btn:hover {
+/* Re-assert border-left after the .header-btn { border:none } reset. Using
+   a two-class selector gives specificity (0,2,0), which beats .header-btn's
+   (0,1,0) and therefore survives the border:none override. The universal `*`
+   before `+` means this fires regardless of what the preceding sibling is —
+   including the visually-hidden FocusGuard <span>s that Base UI injects next
+   to Menu/Popover triggers when a popup is open, which previously broke the
+   more specific `.header-btn + .header-btn` sibling selector. */
+.header-actions > * + .header-btn {
+  border-left: 1px solid var(--border);
+}
+.header-btn:hover:not(:disabled) {
   background: var(--bg3);
   color: var(--text);
+}
+/* Wash out disabled header buttons and suppress interaction cues. */
+.header-btn:disabled {
+  color: var(--text-dim);
+  cursor: not-allowed;
 }
 .header-btn:focus-visible {
   outline: none;
@@ -2981,7 +2996,10 @@ html[data-pg-theme="light"] .toast {
 html[data-pg-theme="dark"] .header-btn {
   color: #ffffff;
 }
-html[data-pg-theme="dark"] .header-btn:hover,
+html[data-pg-theme="dark"] .header-btn:disabled {
+  color: color-mix(in srgb, #ffffff 45%, transparent);
+}
+html[data-pg-theme="dark"] .header-btn:hover:not(:disabled),
 html[data-pg-theme="dark"] .header-btn:focus-visible,
 html[data-pg-theme="dark"] .header-btn[data-popup-open] {
   color: #ffffff;
