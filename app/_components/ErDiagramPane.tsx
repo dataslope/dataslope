@@ -6,7 +6,6 @@ import {
   Background,
   Controls,
   Handle,
-  Panel,
   Position,
   BaseEdge,
   EdgeLabelRenderer,
@@ -26,9 +25,10 @@ import { IoLink } from "react-icons/io5";
 import { ChevronRight } from "lucide-react";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
+import { Popover } from "@base-ui-components/react/popover";
 
 // ────────────────────────────────────────────────────────────────────────────
-// Contexts — cardinality visibility + table action callbacks
+// Contexts — table action callbacks + node selection state
 // ────────────────────────────────────────────────────────────────────────────
 
 interface ErTableActions {
@@ -44,8 +44,18 @@ interface ErTableActions {
   onGetRowCount: (name: string) => number;
 }
 
-const CardinalityContext = createContext<boolean>(true);
+interface ErSelectionState {
+  selectedTable: string | null;
+  connectedTables: Set<string>;
+  connectedEdgeIds: Set<string>;
+}
+
 const TableActionsContext = createContext<ErTableActions | null>(null);
+const SelectionContext = createContext<ErSelectionState>({
+  selectedTable: null,
+  connectedTables: new Set(),
+  connectedEdgeIds: new Set(),
+});
 
 // ────────────────────────────────────────────────────────────────────────────
 // Node dimensions (must match CSS for correct port positions)
@@ -55,6 +65,9 @@ const NODE_W = 230;
 const COL_HEADER_H = 36;
 const COL_ROW_H = 25;
 const COL_FOOTER_PAD = 8;
+// Top padding of the .er-table-columns section (must match the CSS).
+// Used to vertically center port positions on each column row.
+const COL_TOP_PAD = 4;
 
 function calcNodeHeight(colCount: number): number {
   return COL_HEADER_H + Math.max(colCount, 1) * COL_ROW_H + COL_FOOTER_PAD;
@@ -82,12 +95,18 @@ function columnHandleId(
 function ErTableNode({ data }: NodeProps) {
   const { tableName, columns, fkColumns } = data as ErTableNodeData;
   const actions = useContext(TableActionsContext);
+  const selection = useContext(SelectionContext);
+
+  // Determine whether this node should be visually dimmed.
+  const isActive =
+    !selection.selectedTable ||
+    selection.connectedTables.has(tableName as string);
 
   // Row count is fetched lazily the first time the Export submenu opens.
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
     if (exportRowCount === null && actions?.onGetRowCount) {
-      setExportRowCount(actions.onGetRowCount(tableName));
+      setExportRowCount(actions.onGetRowCount(tableName as string));
     }
   }, [exportRowCount, actions, tableName]);
 
@@ -107,7 +126,7 @@ function ErTableNode({ data }: NodeProps) {
   }, []);
 
   const nodeContent = (
-    <div className="er-table-node">
+    <div className="er-table-node" style={isActive ? undefined : { opacity: 0.2 }}>
       <div className="er-table-header">{tableName}</div>
       <div className="er-table-columns">
         {(columns as TableColumnInfo[]).map((col) => (
@@ -126,16 +145,54 @@ function ErTableNode({ data }: NodeProps) {
             />
             <span className="er-table-col-icons">
               {col.pk > 0 && (
-                <MdOutlineKey
-                  className="er-col-icon er-pk-icon"
-                  aria-label="Primary key"
-                />
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={120}
+                    closeDelay={80}
+                    render={(triggerProps) => (
+                      <span {...triggerProps} className="er-col-icon-trigger">
+                        <MdOutlineKey
+                          className="er-col-icon er-pk-icon"
+                          aria-label="Primary key"
+                        />
+                      </span>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6} side="top" className="er-icon-popover-positioner">
+                      <Popover.Popup className="bui-popup er-icon-popover">
+                        <MdOutlineKey className="er-icon-popover-icon er-pk-icon" />
+                        <span>Primary key</span>
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
               )}
               {(fkColumns as Set<string>).has(col.name) && (
-                <IoLink
-                  className="er-col-icon er-fk-icon"
-                  aria-label="Foreign key"
-                />
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={120}
+                    closeDelay={80}
+                    render={(triggerProps) => (
+                      <span {...triggerProps} className="er-col-icon-trigger">
+                        <IoLink
+                          className="er-col-icon er-fk-icon"
+                          aria-label="Foreign key"
+                        />
+                      </span>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6} side="top" className="er-icon-popover-positioner">
+                      <Popover.Popup className="bui-popup er-icon-popover">
+                        <IoLink className="er-icon-popover-icon er-fk-icon" />
+                        <span>Foreign key</span>
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
               )}
             </span>
             <span className="er-table-col-name">{col.name}</span>
@@ -173,16 +230,17 @@ function ErTableNode({ data }: NodeProps) {
       <ContextMenu.Portal>
         <ContextMenu.Positioner sideOffset={6}>
           <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <div className="ctx-table-name">{tableName}</div>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onPreview(tableName)}
+              onClick={() => actions.onPreview(tableName as string)}
             >
               <div className="ex-title">View Data</div>
             </ContextMenu.Item>
             {actions.onAddRow && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onAddRow!(tableName)}
+                onClick={() => actions.onAddRow!(tableName as string)}
               >
                 <div className="ex-title">Add Row</div>
               </ContextMenu.Item>
@@ -190,26 +248,26 @@ function ErTableNode({ data }: NodeProps) {
             {actions.onModifyStructure && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onModifyStructure!(tableName)}
+                onClick={() => actions.onModifyStructure!(tableName as string)}
               >
                 <div className="ex-title">View Structure</div>
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onCount(tableName)}
+              onClick={() => actions.onCount(tableName as string)}
             >
               <div className="ex-title">Count Rows</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onViewDDL(tableName)}
+              onClick={() => actions.onViewDDL(tableName as string)}
             >
               <div className="ex-title">View DDL</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onCopy(tableName)}
+              onClick={() => actions.onCopy(tableName as string)}
             >
               <div className="ex-title">Copy Name</div>
             </ContextMenu.Item>
@@ -239,7 +297,7 @@ function ErTableNode({ data }: NodeProps) {
                     )}
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName, "csv")}
+                      onClick={() => actions.onExport(tableName as string, "csv")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -250,7 +308,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName, "json")}
+                      onClick={() => actions.onExport(tableName as string, "json")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -261,7 +319,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName, "sql")}
+                      onClick={() => actions.onExport(tableName as string, "sql")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -272,7 +330,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName, "parquet")}
+                      onClick={() => actions.onExport(tableName as string, "parquet")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -285,7 +343,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName, "xlsx")}
+                      onClick={() => actions.onExport(tableName as string, "xlsx")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -301,14 +359,14 @@ function ErTableNode({ data }: NodeProps) {
             {actions.onTruncate && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onTruncate!(tableName)}
+                onClick={() => actions.onTruncate!(tableName as string)}
               >
                 <div className="ex-title">Truncate</div>
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onDrop(tableName)}
+              onClick={() => actions.onDrop(tableName as string)}
             >
               <div className="ex-title">Drop Table</div>
             </ContextMenu.Item>
@@ -322,8 +380,9 @@ function ErTableNode({ data }: NodeProps) {
 const nodeTypes: NodeTypes = { erTable: ErTableNode };
 
 // ────────────────────────────────────────────────────────────────────────────
-// Custom ELK edge — renders bend-point paths produced by the ELK router,
-// with optional crow's-foot cardinality markers
+// Custom ELK edge — renders bend-point paths produced by the ELK router.
+// When a table is selected, connected edges are highlighted and animated;
+// unconnected edges are shown in a low-saturation subtle color.
 // ────────────────────────────────────────────────────────────────────────────
 
 interface ElkEdgeData {
@@ -334,93 +393,38 @@ interface ElkEdgeData {
   [key: string]: unknown;
 }
 
-/**
- * Render crow's-foot cardinality markers directly into the edge SVG.
- *
- * The source (FK / "many") end gets a crow's foot: a perpendicular bar at
- * the entity boundary plus two diverging tines that fan outward along the
- * edge. The target (PK / "one") end gets a single perpendicular tick.
- *
- * Angles are derived from the first and last edge segments so the symbols
- * always align with the actual line direction.
- */
-function renderCardinalityMarkers(
-  pts: { x: number; y: number }[],
-  stroke: string,
-  sw: number,
-): React.ReactElement {
-  const n = pts.length;
-  const startDx = pts[1].x - pts[0].x;
-  const startDy = pts[1].y - pts[0].y;
-  const startLen = Math.hypot(startDx, startDy) || 1;
-  const endDx = pts[n - 2].x - pts[n - 1].x;
-  const endDy = pts[n - 2].y - pts[n - 1].y;
-  const endLen = Math.hypot(endDx, endDy) || 1;
-  const sourceX = pts[0].x + (startDx / startLen) * 2;
-  const sourceY = pts[0].y + (startDy / startLen) * 2;
-  const targetX = pts[n - 1].x + (endDx / endLen) * 7;
-  const targetY = pts[n - 1].y + (endDy / endLen) * 7;
-  // Direction the edge leaves the source point.
-  const startAngle = Math.atan2(startDy, startDx) * (180 / Math.PI);
-  // Direction the edge arrives at the target point.
-  const endAngle = Math.atan2(-endDy, -endDx) * (180 / Math.PI);
-
-  const lineProps = { stroke, strokeWidth: sw, strokeLinecap: "round" as const };
-
-  return (
-    <>
-      {/* ── Crow's foot (N / many) at the source / FK end ──
-          rotate(startAngle): +x aligns with the edge direction (away from entity).
-          The perpendicular bar sits right at the entity boundary; the two tines
-          fan outward from the same origin point. */}
-      <g
-        transform={`translate(${sourceX},${sourceY}) rotate(${startAngle})`}
-      >
-        {/* Perpendicular bar at the entity boundary */}
-        <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
-        {/* Upper tine — fans up-and-out */}
-        <line x1="0" y1="0" x2="10" y2="-7" {...lineProps} />
-        {/* Lower tine — fans down-and-out */}
-        <line x1="0" y1="0" x2="10" y2="7" {...lineProps} />
-      </g>
-
-      {/* ── Single tick (1 / one) at the target / PK end ──
-          rotate(endAngle + 180): flips so the +x axis points *away* from the
-          target entity, making the bar perpendicular to the incoming edge. */}
-      <g
-        transform={`translate(${targetX},${targetY}) rotate(${endAngle + 180})`}
-      >
-        {/* Perpendicular tick right at the entity boundary */}
-        <line x1="0" y1="-7" x2="0" y2="7" {...lineProps} />
-      </g>
-    </>
-  );
-}
-
-function ElkEdgeComponent({ data, style, markerEnd }: EdgeProps) {
-  const showCardinality = useContext(CardinalityContext);
+function ElkEdgeComponent({ id, data, style }: EdgeProps) {
+  const selection = useContext(SelectionContext);
   const { path, label, labelX, labelY } = data as ElkEdgeData;
 
-  const stroke = (style?.stroke as string) ?? "var(--text-muted)";
-  const sw = (style?.strokeWidth as number) ?? 1.5;
+  const isAnySelected = !!selection.selectedTable;
+  const isConnected = !isAnySelected || selection.connectedEdgeIds.has(id);
 
-  // Parse the polyline path into discrete points so we can compute the
-  // direction at each end (for rotating the cardinality markers).
-  // useMemo must be called unconditionally (before any early return).
-  const pts = useMemo(() => {
-    if (!showCardinality || !path) return null;
-    const arr = [
-      ...path.matchAll(/[ML]\s*([\d.eE+-]+)\s+([\d.eE+-]+)/g),
-    ].map((m) => ({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
-    return arr.length >= 2 ? arr : null;
-  }, [path, showCardinality]);
+  let stroke = (style?.stroke as string) ?? "var(--text-muted)";
+  let strokeWidth = (style?.strokeWidth as number) ?? 1.5;
+  if (isAnySelected && isConnected) {
+    stroke = "var(--accent)";
+    strokeWidth = 2;
+  } else if (isAnySelected && !isConnected) {
+    stroke = "var(--border)";
+    strokeWidth = 1;
+  }
 
   if (!path) return null;
 
   return (
     <>
-      <BaseEdge path={path} style={style} markerEnd={markerEnd} />
-      {pts && renderCardinalityMarkers(pts, stroke, sw)}
+      <BaseEdge path={path} style={{ ...style, stroke, strokeWidth }} />
+      {isAnySelected && isConnected && (
+        <path
+          d={path}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray="8 4"
+          className="er-edge-flowing"
+        />
+      )}
       {label && (
         <EdgeLabelRenderer>
           <div
@@ -525,7 +529,7 @@ async function computeElkLayout(
     const h = calcNodeHeight(cols.length);
 
     const ports = cols.flatMap((col, i) => {
-      const portY = COL_HEADER_H + i * COL_ROW_H + COL_ROW_H / 2;
+      const portY = COL_HEADER_H + COL_TOP_PAD + i * COL_ROW_H + COL_ROW_H / 2;
       return [
         {
           id: elkPortId(tableName, col.name, "west"),
@@ -696,7 +700,7 @@ export function ErDiagramPane({
 }: ErDiagramPaneProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [showCardinality, setShowCardinality] = useState(true);
+  const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const layoutGen = useRef(0);
 
   // Build stable action object for the context menu context. All ERD nodes
@@ -729,6 +733,23 @@ export function ErDiagramPane({
     onGetRowCount,
   ]);
 
+  // Derive which tables + edges are connected to the selected node.
+  const selectionInfo = useMemo<ErSelectionState>(() => {
+    if (!selectedTable) {
+      return { selectedTable: null, connectedTables: new Set(), connectedEdgeIds: new Set() };
+    }
+    const connectedTables = new Set<string>([selectedTable]);
+    const connectedEdgeIds = new Set<string>();
+    for (const edge of edges) {
+      if (edge.source === selectedTable || edge.target === selectedTable) {
+        connectedEdgeIds.add(edge.id);
+        connectedTables.add(edge.source);
+        connectedTables.add(edge.target);
+      }
+    }
+    return { selectedTable, connectedTables, connectedEdgeIds };
+  }, [selectedTable, edges]);
+
   useEffect(() => {
     let cancelled = false;
     const gen = ++layoutGen.current;
@@ -755,6 +776,11 @@ export function ErDiagramPane({
     };
   }, [tables, columnsByEntity, foreignKeysByEntity]);
 
+  // Reset selection when the schema changes (tables added/removed).
+  useEffect(() => {
+    setSelectedTable(null);
+  }, [tables]);
+
   if (tables.length === 0) {
     return (
       <div className="er-diagram-empty">
@@ -764,7 +790,7 @@ export function ErDiagramPane({
   }
 
   return (
-    <CardinalityContext.Provider value={showCardinality}>
+    <SelectionContext.Provider value={selectionInfo}>
       <TableActionsContext.Provider value={tableActions}>
         <div className="er-diagram-wrap">
           <ReactFlow
@@ -784,28 +810,16 @@ export function ErDiagramPane({
             colorMode={isDark ? "dark" : "light"}
             style={{ background: "var(--bg)" }}
             proOptions={{ hideAttribution: true }}
+            onNodeClick={(_event, node) => {
+              setSelectedTable((prev) => (prev === node.id ? null : node.id));
+            }}
+            onPaneClick={() => setSelectedTable(null)}
           >
             <Background color="var(--border)" />
             <Controls />
-            <Panel position="top-left" className="er-cardinality-panel">
-              <label className="er-cardinality-toggle-label">
-                <input
-                  type="checkbox"
-                  className="er-cardinality-checkbox"
-                  checked={showCardinality}
-                  onChange={(e) => setShowCardinality(e.target.checked)}
-                />
-                <span>Cardinality</span>
-              </label>
-              {showCardinality && (
-                <div className="er-cardinality-note">
-                  Inferred from FK constraints
-                </div>
-              )}
-            </Panel>
           </ReactFlow>
         </div>
       </TableActionsContext.Provider>
-    </CardinalityContext.Provider>
+    </SelectionContext.Provider>
   );
 }
