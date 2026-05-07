@@ -340,7 +340,7 @@
 /* Shared "node on the guide" treatment for the PK / FK glyphs.
    Renders each icon centered inside a small circle that sits on top
    of the vertical guide line, so the marker reads as a discrete node
-   attached to the line. */
+   attached to the line. Both are now Popover.Trigger buttons. */
 .sql-tree-column-pk,
 .sql-tree-column-fk {
   width: 16px;
@@ -352,14 +352,7 @@
   background: var(--bg2);
   padding: 1px;
   box-sizing: border-box;
-}
-
-.sql-tree-column-pk {
-  color: var(--text-dim);
-}
-
-.sql-tree-column-fk {
-  /* Reset button defaults when Popover.Trigger renders a <button>. */
+  /* Reset button defaults */
   border: none;
   cursor: default;
   color: var(--text-dim);
@@ -380,7 +373,48 @@
   margin-left: auto;
 }
 
-/* FK hover popover — minimal size, mono font, no decoration. */
+/* Shared popover for PK / FK key icons (SQL tree + result table header) */
+.sql-key-icon-popover-positioner {
+  z-index: 600;
+}
+
+.sql-key-icon-popover {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sql-key-icon-popover-icon {
+  flex-shrink: 0;
+}
+
+/* Trigger wrapper for result-table PK/FK icons — no button styling */
+.sql-result-th-key-trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
+/* Context menu table name header */
+.ctx-table-name {
+  padding: 6px 12px 6px 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
 .sql-fk-popover {
   padding: 4px 8px;
   font-family: var(--font-mono);
@@ -2532,43 +2566,7 @@
   display: none;
 }
 
-/* ── Cardinality toggle panel (rendered via React Flow <Panel>) ── */
-.er-cardinality-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 7px 10px;
-  font-family: var(--font-ui);
-  font-size: 11px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.er-cardinality-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: var(--text);
-  font-weight: 500;
-  user-select: none;
-}
-
-.er-cardinality-checkbox {
-  accent-color: var(--accent);
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-}
-
-.er-cardinality-note {
-  color: var(--text-dim);
-  font-size: 10px;
-  line-height: 1.3;
-  max-width: 140px;
-}
+/* ── Removed: cardinality toggle panel ── */
 
 .er-diagram-empty {
   display: flex;
@@ -2633,6 +2631,10 @@
   color: var(--text);
 }
 
+.er-table-col-row:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
 .er-table-col-row.er-table-col-empty {
   color: var(--text-dim);
   font-style: italic;
@@ -2673,6 +2675,48 @@
 
 .er-fk-icon {
   color: var(--text-dim);
+}
+
+/* Inline trigger wrapper for PK/FK icon popovers inside ER nodes */
+.er-col-icon-trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
+/* Popover for PK/FK icons inside ER nodes */
+.er-icon-popover-positioner {
+  z-index: 10000;
+}
+
+.er-icon-popover {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.er-icon-popover-icon {
+  flex-shrink: 0;
+}
+
+/* Flowing edge animation for selected-table connected edges */
+@keyframes erEdgeFlow {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.er-edge-flowing {
+  animation: erEdgeFlow 0.8s linear infinite;
+  pointer-events: none;
 }
 
 .er-table-col-name {

@@ -7095,18 +7095,64 @@ function ResultTableBody({
                   <span className="sql-result-th-top">
                     <span className="sql-result-th-label">
                       {isPk && (
-                        <MdOutlineKey
-                          size={12}
-                          className="sql-result-th-pk"
-                          aria-label="Primary key"
-                        />
+                        <Popover.Root>
+                          <Popover.Trigger
+                            openOnHover
+                            delay={150}
+                            closeDelay={100}
+                            render={(triggerProps) => (
+                              <span {...triggerProps} className="sql-result-th-key-trigger">
+                                <MdOutlineKey
+                                  size={12}
+                                  className="sql-result-th-pk"
+                                  aria-label="Primary key"
+                                />
+                              </span>
+                            )}
+                          />
+                          <Popover.Portal>
+                            <Popover.Positioner
+                              sideOffset={6}
+                              side="top"
+                              className="sql-key-icon-popover-positioner"
+                            >
+                              <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                <span>Primary key</span>
+                              </Popover.Popup>
+                            </Popover.Positioner>
+                          </Popover.Portal>
+                        </Popover.Root>
                       )}
                       {fk && (
-                        <IoLink
-                          size={12}
-                          className="sql-result-th-fk"
-                          aria-label={`Foreign key → ${fk.table}.${fk.to}`}
-                        />
+                        <Popover.Root>
+                          <Popover.Trigger
+                            openOnHover
+                            delay={150}
+                            closeDelay={100}
+                            render={(triggerProps) => (
+                              <span {...triggerProps} className="sql-result-th-key-trigger">
+                                <IoLink
+                                  size={12}
+                                  className="sql-result-th-fk"
+                                  aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                                />
+                              </span>
+                            )}
+                          />
+                          <Popover.Portal>
+                            <Popover.Positioner
+                              sideOffset={6}
+                              side="top"
+                              className="sql-key-icon-popover-positioner"
+                            >
+                              <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                <span>Foreign key</span>
+                              </Popover.Popup>
+                            </Popover.Positioner>
+                          </Popover.Portal>
+                        </Popover.Root>
                       )}
                       <span>{c}</span>
                     </span>
@@ -8621,11 +8667,29 @@ function SchemaItem({
                         <li key={c.cid} className="sql-tree-column">
                           <span className="sql-tree-column-icons">
                             {c.pk > 0 && (
-                              <MdOutlineKey
-                                size={11}
-                                className="sql-tree-column-pk"
-                                aria-hidden="true"
-                              />
+                              <Popover.Root>
+                                <Popover.Trigger
+                                  openOnHover
+                                  delay={150}
+                                  closeDelay={100}
+                                  className="sql-tree-column-pk"
+                                  aria-label="Primary key"
+                                >
+                                  <MdOutlineKey size={11} aria-hidden="true" />
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Positioner
+                                    sideOffset={6}
+                                    side="right"
+                                    className="sql-key-icon-popover-positioner"
+                                  >
+                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                      <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <span>Primary key</span>
+                                    </Popover.Popup>
+                                  </Popover.Positioner>
+                                </Popover.Portal>
+                              </Popover.Root>
                             )}
                             {fk && (
                               <Popover.Root>
@@ -8642,9 +8706,11 @@ function SchemaItem({
                                   <Popover.Positioner
                                     sideOffset={6}
                                     side="right"
+                                    className="sql-key-icon-popover-positioner"
                                   >
-                                    <Popover.Popup className="bui-popup sql-fk-popover">
-                                      → {fk.table}.{fk.to}
+                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                      <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <span>Foreign key</span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
                                 </Popover.Portal>
@@ -8667,6 +8733,7 @@ function SchemaItem({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup examples-dropdown">
+              <div className="ctx-table-name">{name}</div>
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => onPreview(name, kind)}
