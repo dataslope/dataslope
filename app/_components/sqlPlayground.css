@@ -400,8 +400,11 @@
   cursor: default;
 }
 
-/* Context menu table name header */
+/* Context menu table/view name header */
 .ctx-table-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   padding: 6px 12px 6px 10px;
   font-family: var(--font-ui);
   font-size: 11px;
@@ -413,6 +416,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
+}
+
+.ctx-name-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
 }
 
 .sql-fk-popover {
@@ -2559,6 +2567,25 @@
 .er-diagram-wrap {
   width: 100%;
   height: 100%;
+  position: relative;
+}
+
+/* Selection hint overlay shown in the bottom-left corner */
+.er-selection-hint {
+  position: absolute;
+  bottom: 52px;
+  left: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-family: var(--font-ui);
+  color: var(--text-dim);
+  pointer-events: none;
+  z-index: 10;
+  max-width: 300px;
+  line-height: 1.4;
 }
 
 /* Hide the React Flow attribution badge */
@@ -2707,7 +2734,7 @@
 /* Flowing edge animation for selected-table connected edges */
 @keyframes erEdgeFlow {
   from {
-    stroke-dashoffset: 24;
+    stroke-dashoffset: 36;
   }
   to {
     stroke-dashoffset: 0;
@@ -2715,7 +2742,7 @@
 }
 
 .er-edge-flowing {
-  animation: erEdgeFlow 0.8s linear infinite;
+  animation: erEdgeFlow 0.9s linear infinite;
   pointer-events: none;
 }
 

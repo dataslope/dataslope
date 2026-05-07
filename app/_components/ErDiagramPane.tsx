@@ -22,7 +22,7 @@ import type { ElkExtendedEdge, ElkEdgeSection, ElkPoint } from "elkjs";
 import type { TableColumnInfo, ForeignKeyInfo } from "./runtime/sqlite";
 import { MdOutlineKey } from "react-icons/md";
 import { IoLink } from "react-icons/io5";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Table } from "lucide-react";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
@@ -230,7 +230,10 @@ function ErTableNode({ data }: NodeProps) {
       <ContextMenu.Portal>
         <ContextMenu.Positioner sideOffset={6}>
           <ContextMenu.Popup className="bui-popup examples-dropdown">
-            <div className="ctx-table-name">{tableName}</div>
+            <div className="ctx-table-name">
+              <Table size={12} className="ctx-name-icon" aria-hidden="true" />
+              {tableName}
+            </div>
             <ContextMenu.Item
               className="example-item"
               onClick={() => actions.onPreview(tableName)}
@@ -402,26 +405,30 @@ function ElkEdgeComponent({ id, data, style }: EdgeProps) {
 
   let stroke = (style?.stroke as string) ?? "var(--text-muted)";
   let strokeWidth = (style?.strokeWidth as number) ?? 1.5;
+  let trackStroke = stroke;
   if (isAnySelected && isConnected) {
+    // Render the BaseEdge as a dim track so the animated dashes stand out.
+    trackStroke = "var(--border)";
     stroke = "var(--accent)";
-    strokeWidth = 2;
+    strokeWidth = 2.5;
   } else if (isAnySelected && !isConnected) {
     stroke = "var(--border)";
     strokeWidth = 1;
+    trackStroke = stroke;
   }
 
   if (!path) return null;
 
   return (
     <>
-      <BaseEdge path={path} style={{ ...style, stroke, strokeWidth }} />
+      <BaseEdge path={path} style={{ ...style, stroke: trackStroke, strokeWidth }} />
       {isAnySelected && isConnected && (
         <path
           d={path}
           stroke={stroke}
           strokeWidth={strokeWidth}
           fill="none"
-          strokeDasharray="8 4"
+          strokeDasharray="12 6"
           className="er-edge-flowing"
         />
       )}
@@ -820,6 +827,12 @@ export function ErDiagramPane({
             <Background color="var(--border)" />
             <Controls />
           </ReactFlow>
+          {selectedTable && (
+            <div className="er-selection-hint">
+              <strong>{selectedTable}</strong> and its foreign key relationships
+              are highlighted. Unrelated tables are faded out.
+            </div>
+          )}
         </div>
       </TableActionsContext.Provider>
     </SelectionContext.Provider>
