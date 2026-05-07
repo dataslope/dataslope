@@ -2601,11 +2601,10 @@ function SqlPlaygroundInner() {
     if (!engine) return;
     try {
       const bytes = engine.exportDatabase();
-      const sample = engine.activeSample();
       const filename =
-        sample.filename && /\.sqlite$/i.test(sample.filename)
-          ? sample.filename
-          : `${sample.id || "database"}.sqlite`;
+        activeSample.filename && /\.sqlite$/i.test(activeSample.filename)
+          ? activeSample.filename
+          : `${activeSample.id || "database"}.sqlite`;
       // `Uint8Array.slice()` returns a new typed array backed by a
       // *fresh* ArrayBuffer, so the Blob owns its own copy of the
       // bytes. sql.js may reuse its internal buffer on the next
@@ -2628,15 +2627,14 @@ function SqlPlaygroundInner() {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Export failed: ${msg}`, "warn");
     }
-  }, [showToast]);
+  }, [activeSample, showToast]);
 
   // ─── Export entire database to Excel ─────────────────────────────
   // Creates a multi-sheet .xlsx workbook with one sheet per table.
   const exportDatabaseToXlsx = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    const sample = engine.activeSample();
-    const baseName = sample.id || "database";
+    const baseName = activeSample.id || "database";
     const filename = `${baseName}.xlsx`;
     // Collect table list at call time (synchronously), then kick off async work.
     const tableList = [...tables];
@@ -2676,7 +2674,7 @@ function SqlPlaygroundInner() {
         showToast(`Export failed: ${msg}`, "warn");
       }
     })();
-  }, [tables, quoteIdent, showToast]);
+  }, [tables, quoteIdent, showToast, activeSample]);
 
   // ─── Result set export ────────────────────────────────────────────────────
   // Exports the first result set's rows in the chosen format and scope.
