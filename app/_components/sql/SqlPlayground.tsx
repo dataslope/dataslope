@@ -7975,7 +7975,6 @@ function ModifyStructureForm({
     } catch {
       return [] as string[];
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, state.originalName, refreshKey]);
 
   const tableTriggers = useMemo(() => {
@@ -7985,7 +7984,6 @@ function ModifyStructureForm({
     } catch {
       return [] as string[];
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, state.originalName, refreshKey]);
 
   return (
