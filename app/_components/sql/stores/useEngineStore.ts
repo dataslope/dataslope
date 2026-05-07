@@ -56,10 +56,19 @@ interface EngineState {
   setExpandedEntities: (
     updater: ((prev: Set<string>) => Set<string>) | Set<string>,
   ) => void;
-  setTablesSectionExpanded: (expanded: boolean) => void;
-  setViewsSectionExpanded: (expanded: boolean) => void;
+  setTablesSectionExpanded: (
+    expanded: boolean | ((prev: boolean) => boolean),
+  ) => void;
+  setViewsSectionExpanded: (
+    expanded: boolean | ((prev: boolean) => boolean),
+  ) => void;
   setActiveDbId: (id: string) => void;
-  setCustomDb: (db: SqliteSampleDatabase | null) => void;
+  setCustomDb: (
+    db:
+      | SqliteSampleDatabase
+      | null
+      | ((prev: SqliteSampleDatabase | null) => SqliteSampleDatabase | null),
+  ) => void;
   setCustomFilenames: (
     updater:
       | ((prev: Record<string, string>) => Record<string, string>)
@@ -111,12 +120,26 @@ export const useEngineStore = create<EngineState>((set) => ({
       expandedEntities:
         typeof updater === "function" ? updater(state.expandedEntities) : updater,
     })),
-  setTablesSectionExpanded: (tablesSectionExpanded) =>
-    set({ tablesSectionExpanded }),
-  setViewsSectionExpanded: (viewsSectionExpanded) =>
-    set({ viewsSectionExpanded }),
+  setTablesSectionExpanded: (expanded) =>
+    set((state) => ({
+      tablesSectionExpanded:
+        typeof expanded === "function"
+          ? expanded(state.tablesSectionExpanded)
+          : expanded,
+    })),
+  setViewsSectionExpanded: (expanded) =>
+    set((state) => ({
+      viewsSectionExpanded:
+        typeof expanded === "function"
+          ? expanded(state.viewsSectionExpanded)
+          : expanded,
+    })),
   setActiveDbId: (activeDbId) => set({ activeDbId }),
-  setCustomDb: (customDb) => set({ customDb }),
+  setCustomDb: (updater) =>
+    set((state) => ({
+      customDb:
+        typeof updater === "function" ? updater(state.customDb) : updater,
+    })),
   setCustomFilenames: (updater) =>
     set((state) => ({
       customFilenames:

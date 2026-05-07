@@ -54,7 +54,12 @@ interface DialogState {
   setModifyStructureRefreshKey: (
     updater: ((prev: number) => number) | number,
   ) => void;
-  setAddRowDialog: (dialog: AddRowDialogState | null) => void;
+  setAddRowDialog: (
+    dialog:
+      | AddRowDialogState
+      | null
+      | ((prev: AddRowDialogState | null) => AddRowDialogState | null),
+  ) => void;
   setAddTableDialog: (dialog: ModifyDialogState | null) => void;
   setAddTableInvalidColIds: (
     updater: ((prev: Set<string>) => Set<string>) | Set<string>,
@@ -69,13 +74,28 @@ interface DialogState {
   setImportSqliteOpen: (open: boolean) => void;
   setImportSqliteDragging: (dragging: boolean) => void;
   setImportCsvOpen: (open: boolean) => void;
-  setImportCsvState: (state: CsvImportState | null) => void;
+  setImportCsvState: (
+    state:
+      | CsvImportState
+      | null
+      | ((prev: CsvImportState | null) => CsvImportState | null),
+  ) => void;
   setImportCsvDragging: (dragging: boolean) => void;
   setImportJsonOpen: (open: boolean) => void;
-  setImportJsonState: (state: JsonImportState | null) => void;
+  setImportJsonState: (
+    state:
+      | JsonImportState
+      | null
+      | ((prev: JsonImportState | null) => JsonImportState | null),
+  ) => void;
   setImportJsonDragging: (dragging: boolean) => void;
   setImportParquetOpen: (open: boolean) => void;
-  setImportParquetState: (state: ParquetImportState | null) => void;
+  setImportParquetState: (
+    state:
+      | ParquetImportState
+      | null
+      | ((prev: ParquetImportState | null) => ParquetImportState | null),
+  ) => void;
   setImportParquetDragging: (dragging: boolean) => void;
   setRenameDbOpen: (open: boolean) => void;
   setRenameDbBaseName: (name: string) => void;
@@ -136,7 +156,11 @@ export const useDialogStore = create<DialogState>((set) => ({
           ? updater(state.modifyStructureRefreshKey)
           : updater,
     })),
-  setAddRowDialog: (addRowDialog) => set({ addRowDialog }),
+  setAddRowDialog: (updater) =>
+    set((state) => ({
+      addRowDialog:
+        typeof updater === "function" ? updater(state.addRowDialog) : updater,
+    })),
   setAddTableDialog: (addTableDialog) => set({ addTableDialog }),
   setAddTableInvalidColIds: (updater) =>
     set((state) => ({
@@ -151,13 +175,27 @@ export const useDialogStore = create<DialogState>((set) => ({
   setImportSqliteDragging: (importSqliteDragging) =>
     set({ importSqliteDragging }),
   setImportCsvOpen: (importCsvOpen) => set({ importCsvOpen }),
-  setImportCsvState: (importCsvState) => set({ importCsvState }),
+  setImportCsvState: (updater) =>
+    set((state) => ({
+      importCsvState:
+        typeof updater === "function" ? updater(state.importCsvState) : updater,
+    })),
   setImportCsvDragging: (importCsvDragging) => set({ importCsvDragging }),
   setImportJsonOpen: (importJsonOpen) => set({ importJsonOpen }),
-  setImportJsonState: (importJsonState) => set({ importJsonState }),
+  setImportJsonState: (updater) =>
+    set((state) => ({
+      importJsonState:
+        typeof updater === "function" ? updater(state.importJsonState) : updater,
+    })),
   setImportJsonDragging: (importJsonDragging) => set({ importJsonDragging }),
   setImportParquetOpen: (importParquetOpen) => set({ importParquetOpen }),
-  setImportParquetState: (importParquetState) => set({ importParquetState }),
+  setImportParquetState: (updater) =>
+    set((state) => ({
+      importParquetState:
+        typeof updater === "function"
+          ? updater(state.importParquetState)
+          : updater,
+    })),
   setImportParquetDragging: (importParquetDragging) =>
     set({ importParquetDragging }),
   setRenameDbOpen: (renameDbOpen) => set({ renameDbOpen }),
