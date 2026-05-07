@@ -1269,6 +1269,10 @@ function SqlPlaygroundInner() {
     columns: ModifyColumnDraft[];
   } | null>(null);
   const [addTableInvalidColIds, setAddTableInvalidColIds] = useState<Set<string>>(new Set());
+  // View Structure drawer: active tab state and refresh key (incremented
+  // after each index/trigger drop so the form re-queries the engine).
+  const [modifyStructureTab, setModifyStructureTab] = useState<"columns" | "indexes" | "triggers">("columns");
+  const [modifyStructureRefreshKey, setModifyStructureRefreshKey] = useState(0);
   // Truncate confirmation dialog state.
   const [truncateConfirm, setTruncateConfirm] = useState<string | null>(null);
   // Drop entity confirmation dialog state.
@@ -2485,6 +2489,11 @@ function SqlPlaygroundInner() {
       }
       const label = DROP_KIND_LABELS[kind].toLowerCase();
       showToast(`Dropped ${label} "${name}".`);
+      // Bump the refresh key so ModifyStructureForm re-queries
+      // indexes/triggers from the engine while the drawer is open.
+      if (kind === "index" || kind === "trigger") {
+        setModifyStructureRefreshKey((v) => v + 1);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Drop failed: ${msg}`, "warn");
@@ -2602,9 +2611,11 @@ function SqlPlaygroundInner() {
     try {
       const bytes = engine.exportDatabase();
       const sample = engine.activeSample();
+      const overriddenFilename = customFilenames[activeDbId];
+      const effectiveFilename = overriddenFilename ?? sample.filename;
       const filename =
-        sample.filename && /\.sqlite$/i.test(sample.filename)
-          ? sample.filename
+        effectiveFilename && /\.sqlite$/i.test(effectiveFilename)
+          ? effectiveFilename
           : `${sample.id || "database"}.sqlite`;
       // `Uint8Array.slice()` returns a new typed array backed by a
       // *fresh* ArrayBuffer, so the Blob owns its own copy of the
@@ -2628,7 +2639,7 @@ function SqlPlaygroundInner() {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Export failed: ${msg}`, "warn");
     }
-  }, [showToast]);
+  }, [activeDbId, customFilenames, showToast]);
 
   // ─── Export entire database to Excel ─────────────────────────────
   // Creates a multi-sheet .xlsx workbook with one sheet per table.
@@ -2636,7 +2647,11 @@ function SqlPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine) return;
     const sample = engine.activeSample();
-    const baseName = sample.id || "database";
+    const overriddenFilename = customFilenames[activeDbId];
+    const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
+    const baseName = effectiveFilename
+      ? effectiveFilename.replace(/\.[^.]+$/, "")
+      : sample.id || "database";
     const filename = `${baseName}.xlsx`;
     // Collect table list at call time (synchronously), then kick off async work.
     const tableList = [...tables];
@@ -2676,7 +2691,7 @@ function SqlPlaygroundInner() {
         showToast(`Export failed: ${msg}`, "warn");
       }
     })();
-  }, [tables, quoteIdent, showToast]);
+  }, [activeDbId, customFilenames, tables, quoteIdent, showToast]);
 
   // ─── Result set export ────────────────────────────────────────────────────
   // Exports the first result set's rows in the chosen format and scope.
@@ -5240,6 +5255,7 @@ function SqlPlaygroundInner() {
             if (!next) {
               setModifyDialog(null);
               setModifyInvalidColIds(new Set());
+              setModifyStructureTab("columns");
             }
           }}
         >
@@ -5282,21 +5298,26 @@ function SqlPlaygroundInner() {
                   engine={engineForRender}
                   onDropLeaf={dropLeafEntity}
                   theme={editorTheme}
+                  activeTab={modifyStructureTab}
+                  onTabChange={setModifyStructureTab}
+                  refreshKey={modifyStructureRefreshKey}
                 />
               )}
-              <footer className="sql-modify-drawer-footer">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  onClick={submitModifyStructure}
-                  disabled={!modifyDialog}
-                >
-                  Save
-                </button>
-              </footer>
+              {modifyStructureTab === "columns" && (
+                <footer className="sql-modify-drawer-footer">
+                  <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                    Cancel
+                  </Dialog.Close>
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    onClick={submitModifyStructure}
+                    disabled={!modifyDialog}
+                  >
+                    Save
+                  </button>
+                </footer>
+              )}
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
@@ -7831,6 +7852,9 @@ function ModifyStructureForm({
   engine,
   onDropLeaf,
   theme,
+  activeTab: activeTabProp,
+  onTabChange,
+  refreshKey,
 }: {
   state: ModifyStructureState;
   onChange: (next: ModifyStructureState) => void;
@@ -7841,8 +7865,22 @@ function ModifyStructureForm({
   onDropLeaf?: (name: string, kind: "index" | "trigger") => void;
   /** Editor theme forwarded to inline DdlViewer blocks. */
   theme?: string;
+  /** Controlled active tab; if provided the tab state is lifted to the parent. */
+  activeTab?: "columns" | "indexes" | "triggers";
+  /** Called when the user switches tabs. */
+  onTabChange?: (tab: "columns" | "indexes" | "triggers") => void;
+  /** Incrementing key that forces re-computation of indexes/triggers. */
+  refreshKey?: number;
 }) {
-  const [activeTab, setActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
+  const [internalActiveTab, setInternalActiveTab] = useState<"columns" | "indexes" | "triggers">("columns");
+  const activeTab = activeTabProp ?? internalActiveTab;
+  const setActiveTab = (tab: "columns" | "indexes" | "triggers") => {
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setInternalActiveTab(tab);
+    }
+  };
   const [isDragging, setIsDragging] = useState(false);
   // Tracks which index/trigger items are expanded to show DDL inline.
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -7928,6 +7966,8 @@ function ModifyStructureForm({
   };
 
   // Lazy-load indexes and triggers for the Indexes/Triggers tabs.
+  // `refreshKey` is incremented by the parent after a drop so this
+  // memo re-runs even though `engine` and `state.originalName` haven't changed.
   const tableIndexes = useMemo(() => {
     if (!engine || !state.originalName) return [] as string[];
     try {
@@ -7935,7 +7975,7 @@ function ModifyStructureForm({
     } catch {
       return [] as string[];
     }
-  }, [engine, state.originalName]);
+  }, [engine, state.originalName, refreshKey]);
 
   const tableTriggers = useMemo(() => {
     if (!engine || !state.originalName) return [] as string[];
@@ -7944,7 +7984,7 @@ function ModifyStructureForm({
     } catch {
       return [] as string[];
     }
-  }, [engine, state.originalName]);
+  }, [engine, state.originalName, refreshKey]);
 
   return (
     <div className="sql-modify-body">
