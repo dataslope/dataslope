@@ -252,6 +252,18 @@
   font-weight: 600;
 }
 
+.sql-tree-popover-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+}
+
+.sql-tree-popover-name svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
 .sql-tree-item svg {
   color: var(--text-muted);
   flex-shrink: 0;
@@ -405,7 +417,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 12px 6px 10px;
+  padding: 9px 12px 9px 10px;
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 600;
@@ -2288,6 +2300,7 @@
   background: none;
   border: none;
   cursor: default;
+  font-family: var(--font-ui);
 }
 .ctx-export-trigger-bordered {
   border-bottom: 1px solid var(--border);
@@ -2570,10 +2583,10 @@
   position: relative;
 }
 
-/* Selection hint overlay shown in the bottom-left corner */
+/* Selection hint overlay shown in the top-left corner */
 .er-selection-hint {
   position: absolute;
-  bottom: 52px;
+  top: 12px;
   left: 12px;
   background: var(--bg2);
   border: 1px solid var(--border);
