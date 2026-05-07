@@ -1,0 +1,449 @@
+"use client";
+
+import { useCallback, useRef } from "react";
+import { startTransition } from "react";
+import { Toast } from "@base-ui-components/react/toast";
+import type { EditorView } from "@codemirror/view";
+import type { QueryExecResult } from "sql.js";
+import type { SqliteEngine } from "../../runtime/sqlite";
+import type { QueryTab } from "../../sqlitePlaygroundTabs";
+import {
+  newTabId,
+  saveTabs,
+} from "../../sqlitePlaygroundTabs";
+import { replaceDoc } from "../utils/editorUtils";
+import {
+  stripSqlComments,
+  isSingleSelectSql,
+  hasLimitClause,
+} from "../utils/sqlAnalysis";
+import {
+  exportResultToCsv,
+  exportResultToJson,
+  exportResultToSql,
+  exportResultToParquet,
+  exportResultToXlsx,
+  toFileSafeName,
+} from "../utils/exportUtils";
+import { useEngineStore } from "../stores/useEngineStore";
+import { useTabStore } from "../stores/useTabStore";
+import { useSettingsStore } from "../stores/useSettingsStore";
+import { useSqlPlaygroundStore } from "../stores/useSqlPlaygroundStore";
+import type { QueryRunResult, ResultSetExportScope } from "../types";
+
+export interface SqlPlaygroundRefs {
+  engineRef: React.MutableRefObject<SqliteEngine | null>;
+  editorRef: React.MutableRefObject<EditorView | null>;
+  tabsRef: React.MutableRefObject<QueryTab[]>;
+  activeTabIdRef: React.MutableRefObject<string>;
+  activeDbIdRef: React.MutableRefObject<string>;
+}
+
+export function useQueryRunner(refs: SqlPlaygroundRefs) {
+  const { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef } = refs;
+
+  const toastManager = Toast.useToastManager();
+  const showToast = useCallback(
+    (msg: string, kind: "info" | "warn" = "info") => {
+      startTransition(() => {
+        toastManager.add({ title: msg, data: { kind } });
+      });
+    },
+    [toastManager],
+  );
+
+  const clearBeforeRun = useSettingsStore((s) => s.clearBeforeRun);
+  const globalPageSize = useSqlPlaygroundStore((s) => s.globalPageSize);
+  // Ref kept in sync so runSqlForTab can read synchronously without stale closures.
+  const globalPageSizeRef = useRef(globalPageSize);
+  // Keep ref in sync
+  const globalPageSizeValue = useSqlPlaygroundStore((s) => s.globalPageSize);
+  if (globalPageSizeRef.current !== globalPageSizeValue) {
+    globalPageSizeRef.current = globalPageSizeValue;
+  }
+
+  const setStatusState = useEngineStore((s) => s.setStatusState);
+  const setTables = useEngineStore((s) => s.setTables);
+  const setViews = useEngineStore((s) => s.setViews);
+  const setIndexes = useEngineStore((s) => s.setIndexes);
+  const setTriggers = useEngineStore((s) => s.setTriggers);
+  const setColumnsByEntity = useEngineStore((s) => s.setColumnsByEntity);
+  const setForeignKeysByEntity = useEngineStore((s) => s.setForeignKeysByEntity);
+  const setExpandedEntities = useEngineStore((s) => s.setExpandedEntities);
+
+  const setResultForTab = useTabStore((s) => s.setResultForTab);
+  const setResultsByTab = useTabStore((s) => s.setResultsByTab);
+  const setTabs = useTabStore((s) => s.setTabs);
+  const setActiveTabId = useTabStore((s) => s.setActiveTabId);
+
+  const resultsByTabRef = useRef<Record<string, QueryRunResult | null>>({});
+
+  const quoteIdent = useCallback(
+    (name: string) => `"${name.replace(/"/g, '""')}"`,
+    [],
+  );
+
+  const runSqlForTab = useCallback(
+    (
+      tabId: string,
+      sql: string,
+      source: string,
+      sourceTable?: string,
+      page = 0,
+      baseSql?: string,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const trimmed = sql.trim();
+      if (!trimmed) {
+        showToast("Nothing to run — the query is empty.", "warn");
+        return;
+      }
+      setStatusState("running");
+      if (clearBeforeRun) setResultForTab(tabId, null);
+      const t0 = performance.now();
+      const currentPageSize = globalPageSizeRef.current;
+      const noComments = stripSqlComments(trimmed);
+      const useLazy =
+        currentPageSize > 0 &&
+        isSingleSelectSql(trimmed, noComments) &&
+        !hasLimitClause(noComments);
+      try {
+        let sets: QueryExecResult[];
+        let lazySql: string | undefined;
+        let lazyBaseSql: string | undefined;
+        let lazyTotalCount: number | undefined;
+        let lazyPage: number | undefined;
+        let lazyPageSize: number | undefined;
+        if (useLazy) {
+          const { result: lazySets, totalCount } = engine.execPaged(
+            trimmed,
+            currentPageSize,
+            page * currentPageSize,
+          );
+          sets = lazySets;
+          lazySql = trimmed.replace(/\s*;+\s*$/, "");
+          lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
+          lazyTotalCount = totalCount;
+          lazyPage = page;
+          lazyPageSize = currentPageSize;
+        } else {
+          sets = engine.exec(trimmed);
+        }
+        const elapsedMs = performance.now() - t0;
+        setResultForTab(tabId, {
+          sets,
+          elapsedMs,
+          source,
+          sourceTable,
+          lazySql,
+          lazyBaseSql,
+          lazyTotalCount,
+          lazyPage,
+          lazyPageSize,
+        });
+        setStatusState("ready");
+        const newTables = engine.listTables();
+        const newViews = engine.listViews();
+        setTables(newTables);
+        setViews(newViews);
+        setIndexes(engine.listIndexes());
+        setTriggers(engine.listTriggers());
+        setColumnsByEntity({});
+        setForeignKeysByEntity({});
+        const newEntitySet = new Set([...newTables, ...newViews]);
+        setExpandedEntities((prev) => {
+          const dropped = [...prev].filter((n) => !newEntitySet.has(n));
+          if (dropped.length === 0) return prev;
+          const next = new Set(prev);
+          for (const d of dropped) next.delete(d);
+          return next;
+        });
+        setResultsByTab((prev) => {
+          const entries = Object.entries(prev);
+          const hasDropped = entries.some(
+            ([, r]) => r?.sourceTable && !newEntitySet.has(r.sourceTable),
+          );
+          if (!hasDropped) return prev;
+          const next = { ...prev };
+          for (const [tId, r] of entries) {
+            if (r?.sourceTable && !newEntitySet.has(r.sourceTable)) {
+              delete next[tId];
+            }
+          }
+          return next;
+        });
+      } catch (err) {
+        const elapsedMs = performance.now() - t0;
+        const msg = err instanceof Error ? err.message : String(err);
+        setResultForTab(tabId, {
+          sets: [],
+          elapsedMs,
+          error: msg,
+          source,
+          sourceTable,
+        });
+        setStatusState("error");
+        window.setTimeout(() => setStatusState("ready"), 3000);
+      }
+    },
+    [
+      clearBeforeRun,
+      showToast,
+      setResultForTab,
+      setStatusState,
+      setTables,
+      setViews,
+      setIndexes,
+      setTriggers,
+      setColumnsByEntity,
+      setForeignKeysByEntity,
+      setExpandedEntities,
+      setResultsByTab,
+      engineRef,
+    ],
+  );
+
+  const handleLoadPage = useCallback(
+    (sql: string, page: number) => {
+      const tabId = activeTabIdRef.current;
+      const curResult = resultsByTabRef.current[tabId];
+      runSqlForTab(
+        tabId,
+        sql,
+        curResult?.source ?? sql,
+        curResult?.sourceTable,
+        page,
+        curResult?.lazyBaseSql ?? curResult?.lazySql,
+      );
+    },
+    [runSqlForTab, activeTabIdRef],
+  );
+
+  const handleFetchAllRows = useCallback(
+    (sql: string): QueryExecResult["values"] => {
+      const engine = engineRef.current;
+      if (!engine) return [];
+      try {
+        const results = engine.exec(sql);
+        return results[0]?.values ?? [];
+      } catch {
+        return [];
+      }
+    },
+    [engineRef],
+  );
+
+  const runActiveTab = useCallback(() => {
+    const id = activeTabIdRef.current;
+    const tab = tabsRef.current.find((t) => t.id === id);
+    if (!tab) return;
+    const code = editorRef.current?.state.doc.toString() ?? tab.code;
+    runSqlForTab(tab.id, code, tab.title);
+  }, [runSqlForTab, activeTabIdRef, tabsRef, editorRef]);
+
+  const runSelection = useCallback(
+    (sql: string) => {
+      const id = activeTabIdRef.current;
+      const tab = tabsRef.current.find((t) => t.id === id);
+      if (!tab) return;
+      runSqlForTab(tab.id, sql, tab.title);
+    },
+    [runSqlForTab, activeTabIdRef, tabsRef],
+  );
+
+  const runCurrentSelection = useCallback(() => {
+    const view = editorRef.current;
+    if (!view) return;
+    const sel = view.state.selection.main;
+    if (sel.empty) return;
+    const selected = view.state.sliceDoc(sel.from, sel.to);
+    runSelection(selected);
+  }, [runSelection, editorRef]);
+
+  const openTabAndRun = useCallback(
+    (title: string, sql: string, source?: string, sourceTable?: string) => {
+      const tab: QueryTab = {
+        id: newTabId(),
+        title,
+        code: sql,
+        pristineCode: sql,
+      };
+      const next = [...tabsRef.current, tab];
+      tabsRef.current = next;
+      activeTabIdRef.current = tab.id;
+      setTabs(next);
+      saveTabs(activeDbIdRef.current, next);
+      setActiveTabId(tab.id);
+      const view = editorRef.current;
+      if (view) replaceDoc(view, sql);
+      runSqlForTab(tab.id, sql, source ?? title, sourceTable);
+    },
+    [runSqlForTab, tabsRef, activeTabIdRef, activeDbIdRef, editorRef, setTabs, setActiveTabId],
+  );
+
+  const previewTable = useCallback(
+    (name: string, kind: "table" | "view") => {
+      const sql = `SELECT * FROM ${quoteIdent(name)};`;
+      if (kind === "table") {
+        const tab: QueryTab = {
+          id: newTabId(),
+          title: name,
+          code: sql,
+          pristineCode: sql,
+          kind: "view-data",
+        };
+        const next = [...tabsRef.current, tab];
+        tabsRef.current = next;
+        activeTabIdRef.current = tab.id;
+        setTabs(next);
+        saveTabs(activeDbIdRef.current, next);
+        setActiveTabId(tab.id);
+        const view = editorRef.current;
+        if (view) replaceDoc(view, sql);
+        runSqlForTab(tab.id, sql, `Table: ${name}`, name);
+      } else {
+        openTabAndRun(name, sql, `View: ${name}`, undefined);
+      }
+    },
+    [openTabAndRun, quoteIdent, runSqlForTab, tabsRef, activeTabIdRef, activeDbIdRef, editorRef, setTabs, setActiveTabId],
+  );
+
+  const handleResultSetExport = useCallback(
+    (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => {
+      const { resultsByTab, resultSetExportSnapshot, tabs, activeTabId } = useTabStore.getState();
+      const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
+      if (!result || result.sets.length === 0) return;
+      const set =
+        resultSetExportSnapshot
+          ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0])
+          : result.sets[0];
+      const columns = resultSetExportSnapshot?.columns ?? set.columns;
+      let rows: QueryExecResult["values"];
+      if (scope === "page" && resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.rows;
+      } else if (
+        result.lazySql !== undefined &&
+        (resultSetExportSnapshot?.setIndex ?? 0) === 0
+      ) {
+        rows = handleFetchAllRows(result.lazySql);
+      } else if (resultSetExportSnapshot) {
+        rows = resultSetExportSnapshot.allRows;
+      } else {
+        rows = set.values;
+      }
+      const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
+      const title = activeTab?.title ?? "result_set";
+      const rowCount = rows.length;
+      const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
+      const scopeLabel = scope === "page" ? "current page" : "all rows";
+      const filename = `${toFileSafeName(title)} (${scopeLabel}, ${rowLabel}).${format}`;
+      if (format === "csv") {
+        exportResultToCsv(columns, rows, filename);
+      } else if (format === "json") {
+        exportResultToJson(columns, rows, filename);
+      } else if (format === "parquet") {
+        exportResultToParquet(columns, rows, filename).catch((err) =>
+          showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
+        );
+      } else if (format === "xlsx") {
+        exportResultToXlsx(columns, rows, filename).catch((err) =>
+          showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
+        );
+      } else {
+        exportResultToSql(columns, rows, filename);
+      }
+    },
+    [handleFetchAllRows, showToast],
+  );
+
+  const deleteRowsFromTable = useCallback(
+    (
+      tableName: string,
+      pkColumns: string[],
+      pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (pkColumns.length === 0 || pkRows.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        const deleted = engine.deleteRows(tableName, pkColumns, pkRows);
+        showToast(
+          `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Delete failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
+  );
+
+  const updateRowsInTable = useCallback(
+    (
+      tableName: string,
+      updates: ReadonlyArray<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (updates.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        const count = engine.updateRows(tableName, updates);
+        showToast(
+          `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Update failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
+  );
+
+  const duplicateRowInTable = useCallback(
+    (tableName: string, columnNames: string[], values: unknown[]) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const tabId = activeTabIdRef.current;
+      try {
+        engine.insertRow(tableName, columnNames, values);
+        showToast(`Duplicated row in "${tableName}".`);
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Duplicate failed: ${msg}`, "warn");
+      }
+    },
+    [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
+  );
+
+  // Expose resultsByTabRef so the component can keep it in sync.
+  return {
+    runSqlForTab,
+    handleLoadPage,
+    handleFetchAllRows,
+    runActiveTab,
+    runSelection,
+    runCurrentSelection,
+    openTabAndRun,
+    previewTable,
+    handleResultSetExport,
+    deleteRowsFromTable,
+    updateRowsInTable,
+    duplicateRowInTable,
+    resultsByTabRef,
+    showToast,
+    quoteIdent,
+  };
+}
