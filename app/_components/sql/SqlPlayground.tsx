@@ -3263,6 +3263,11 @@ function SqlPlaygroundInner() {
       showToast("Table name cannot be empty.", "warn");
       return;
     }
+    const blankCol = modifyDialog.columns.find((c) => !c.name.trim());
+    if (blankCol) {
+      showToast("Column names cannot be empty.", "warn");
+      return;
+    }
     const spec = {
       originalName: modifyDialog.originalName,
       newName: trimmedName,
@@ -3403,6 +3408,11 @@ function SqlPlaygroundInner() {
       return;
     }
     const cols = addTableDialog.columns;
+    const blankCol = cols.find((c) => !c.name.trim());
+    if (blankCol) {
+      showToast("Column names cannot be empty.", "warn");
+      return;
+    }
     const colDefs = cols.map((c) => {
       const parts: string[] = [
         `"${c.name.trim().replace(/"/g, '""')}" ${c.type}`,
@@ -7585,7 +7595,6 @@ function ModifyStructureForm({
     });
   };
   const addColumn = () => {
-    const suffix = Math.random().toString(36).slice(2, 6);
     onChange({
       ...state,
       columns: [
@@ -7593,7 +7602,7 @@ function ModifyStructureForm({
         {
           id: newDraftId(),
           originalName: null,
-          name: `column_${suffix}`,
+          name: "",
           type: "TEXT",
           notNull: false,
           primaryKey: false,
@@ -8354,6 +8363,10 @@ function SchemaItem({
     exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
   }, []);
   const Icon = kind === "view" ? Eye : Table;
+  const pkCount = useMemo(
+    () => (columns ?? []).filter((c) => c.pk > 0).length,
+    [columns],
+  );
   const fkByCol = useMemo(() => {
     const m = new Map<string, ForeignKeyInfo>();
     for (const fk of foreignKeys ?? []) m.set(fk.from, fk);
@@ -8433,7 +8446,10 @@ function SchemaItem({
                     align="start"
                   >
                     <Popover.Popup className="bui-popup sql-tree-popover">
-                      <strong>{name}</strong>
+                      <span className="sql-tree-popover-name">
+                        <Icon size={12} aria-hidden="true" />
+                        <strong>{name}</strong>
+                      </span>
                       <span>{itemHint}</span>
                     </Popover.Popup>
                   </Popover.Positioner>
@@ -8458,7 +8474,7 @@ function SchemaItem({
                                   delay={150}
                                   closeDelay={100}
                                   className="sql-tree-column-pk"
-                                  aria-label="Primary key"
+                                  aria-label={pkCount > 1 ? "Composite primary key" : "Primary key"}
                                 >
                                   <MdOutlineKey size={11} aria-hidden="true" />
                                 </Popover.Trigger>
@@ -8470,7 +8486,7 @@ function SchemaItem({
                                   >
                                     <Popover.Popup className="bui-popup sql-key-icon-popover">
                                       <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
-                                      <span>Primary key</span>
+                                      <span>{pkCount > 1 ? "Composite primary key" : "Primary key"}</span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
                                 </Popover.Portal>

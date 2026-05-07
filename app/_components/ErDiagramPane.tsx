@@ -712,6 +712,13 @@ export function ErDiagramPane({
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const layoutGen = useRef(0);
 
+  // Reset selection synchronously when tables change (avoids useEffect state update).
+  const [prevTables, setPrevTables] = useState(tables);
+  if (prevTables !== tables) {
+    setPrevTables(tables);
+    if (selectedTable !== null) setSelectedTable(null);
+  }
+
   // Build stable action object for the context menu context. All ERD nodes
   // are tables, so we lock `kind` to "table" when forwarding to the parent.
   const tableActions = useMemo<ErTableActions | null>(() => {
@@ -785,11 +792,6 @@ export function ErDiagramPane({
     };
   }, [tables, columnsByEntity, foreignKeysByEntity]);
 
-  // Reset selection when the schema changes (tables added/removed).
-  useEffect(() => {
-    setSelectedTable(null);
-  }, [tables]);
-
   if (tables.length === 0) {
     return (
       <div className="er-diagram-empty">
@@ -825,12 +827,21 @@ export function ErDiagramPane({
             onPaneClick={() => setSelectedTable(null)}
           >
             <Background color="var(--border)" />
-            <Controls />
+            <Controls showInteractive={false} />
           </ReactFlow>
           {selectedTable && (
             <div className="er-selection-hint">
-              <strong>{selectedTable}</strong> and its foreign key relationships
-              are highlighted. Unrelated tables are faded out.
+              {selectionInfo.connectedEdgeIds.size > 0 ? (
+                <>
+                  <strong>{selectedTable}</strong> and its foreign key
+                  relationships are highlighted. Unrelated tables are faded out.
+                </>
+              ) : (
+                <>
+                  <strong>{selectedTable}</strong> is highlighted. It is not
+                  linked to any other tables through foreign keys.
+                </>
+              )}
             </div>
           )}
         </div>
