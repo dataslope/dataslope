@@ -1764,6 +1764,10 @@
   color: var(--text);
 }
 
+.sql-modify-col-name-error {
+  border-color: var(--red) !important;
+}
+
 .sql-modify-col-type {
   background: var(--bg3);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);

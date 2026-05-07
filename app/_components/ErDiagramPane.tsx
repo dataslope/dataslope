@@ -102,6 +102,9 @@ function ErTableNode({ data }: NodeProps) {
     !selection.selectedTable ||
     selection.connectedTables.has(tableName);
 
+  // Count primary key columns to detect composite PKs.
+  const pkCount = (columns as TableColumnInfo[]).filter((c) => c.pk > 0).length;
+
   // Row count is fetched lazily the first time the Export submenu opens.
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
@@ -126,7 +129,7 @@ function ErTableNode({ data }: NodeProps) {
   }, []);
 
   const nodeContent = (
-    <div className="er-table-node" style={isActive ? undefined : { opacity: 0.2 }}>
+    <div className="er-table-node" style={isActive ? undefined : { opacity: 0.4 }}>
       <div className="er-table-header">{tableName}</div>
       <div className="er-table-columns">
         {(columns as TableColumnInfo[]).map((col) => (
@@ -154,7 +157,7 @@ function ErTableNode({ data }: NodeProps) {
                       <span {...triggerProps} className="er-col-icon-trigger">
                         <MdOutlineKey
                           className="er-col-icon er-pk-icon"
-                          aria-label="Primary key"
+                          aria-label={pkCount > 1 ? "Composite primary key" : "Primary key"}
                         />
                       </span>
                     )}
@@ -163,7 +166,7 @@ function ErTableNode({ data }: NodeProps) {
                     <Popover.Positioner sideOffset={6} side="top" className="er-icon-popover-positioner">
                       <Popover.Popup className="bui-popup er-icon-popover">
                         <MdOutlineKey className="er-icon-popover-icon er-pk-icon" />
-                        <span>Primary key</span>
+                        <span>{pkCount > 1 ? "Composite primary key" : "Primary key"}</span>
                       </Popover.Popup>
                     </Popover.Positioner>
                   </Popover.Portal>
