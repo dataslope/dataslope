@@ -1803,6 +1803,11 @@ function SqlPlaygroundInner() {
       try {
         schema[name] = engine.listColumns(name).map((c) => c.name);
       } catch {
+        // A table might have been dropped right before this effect runs
+        // (e.g. a view that depended on the dropped table remains in the
+        // views list but PRAGMA table_info on it now throws). Fall back
+        // to an empty column list so autocomplete degrades gracefully
+        // rather than crashing the page.
         schema[name] = [];
       }
       completionSchema.entities.push({
@@ -1815,6 +1820,8 @@ function SqlPlaygroundInner() {
       try {
         schema[name] = engine.listColumns(name).map((c) => c.name);
       } catch {
+        // Same rationale as above — a view referencing a dropped table
+        // causes PRAGMA table_info to throw; treat it as empty columns.
         schema[name] = [];
       }
       completionSchema.entities.push({
@@ -7836,6 +7843,8 @@ function ModifyStructureForm({
         const sql = engine.getDDL(name);
         setItemDdls((prev) => ({ ...prev, [name]: sql }));
       } catch {
+        // getDDL can throw if the entity was just dropped; store an
+        // empty string so the UI shows the "no DDL" fallback message.
         setItemDdls((prev) => ({ ...prev, [name]: "" }));
       }
     }
