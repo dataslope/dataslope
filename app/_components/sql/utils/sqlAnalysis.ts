@@ -1,4 +1,4 @@
-/** Strip block (`/* … *\/`) and line (`-- …`) comments from a SQL string. */
+/** Strip block (`/* … */`) and line (`-- …`) comments from a SQL string. */
 export function stripSqlComments(sql: string): string {
   return sql
     .replace(/\/\*[\s\S]*?\*\//g, " ")

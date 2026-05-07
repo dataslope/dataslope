@@ -9,7 +9,7 @@ export function sanitizeImportColName(header: string): string {
 }
 
 /** Case-insensitive variant used only for column-matching comparisons.
- *  SQLite column lookups are case-insensitive, so we normalise both sides
+ *  SQLite column lookups are case-insensitive, so we normalize both sides
  *  before comparing. */
 export function normalizeImportColName(header: string): string {
   return sanitizeImportColName(header).toLowerCase();
