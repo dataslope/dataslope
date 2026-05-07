@@ -3859,7 +3859,7 @@ function SqlPlaygroundInner() {
                   engine={engineForRender}
                   onDropLeaf={dropLeafEntity}
                   theme={editorTheme}
-                  activeTab={modifyStructureTab}
+                  activeTab={modifyStructureTab as "columns" | "indexes" | "triggers" | undefined}
                   onTabChange={setModifyStructureTab}
                   refreshKey={modifyStructureRefreshKey}
                 />
