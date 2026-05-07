@@ -1252,6 +1252,7 @@ function SqlPlaygroundInner() {
     newName: string;
     columns: ModifyColumnDraft[];
   } | null>(null);
+  const [modifyInvalidColIds, setModifyInvalidColIds] = useState<Set<string>>(new Set());
   // Add Row drawer state.
   const [addRowDialog, setAddRowDialog] = useState<{
     tableName: string;
@@ -1266,6 +1267,7 @@ function SqlPlaygroundInner() {
     newName: string;
     columns: ModifyColumnDraft[];
   } | null>(null);
+  const [addTableInvalidColIds, setAddTableInvalidColIds] = useState<Set<string>>(new Set());
   // Truncate confirmation dialog state.
   const [truncateConfirm, setTruncateConfirm] = useState<string | null>(null);
   // Drop entity confirmation dialog state.
@@ -3263,9 +3265,10 @@ function SqlPlaygroundInner() {
       showToast("Table name cannot be empty.", "warn");
       return;
     }
-    const blankCol = modifyDialog.columns.find((c) => !c.name.trim());
-    if (blankCol) {
+    const blankCols = modifyDialog.columns.filter((c) => !c.name.trim());
+    if (blankCols.length > 0) {
       showToast("Column names cannot be empty.", "warn");
+      setModifyInvalidColIds(new Set(blankCols.map((c) => c.id)));
       return;
     }
     const spec = {
@@ -3312,6 +3315,7 @@ function SqlPlaygroundInner() {
         });
       }
       setModifyDialog(null);
+      setModifyInvalidColIds(new Set());
       showToast(`Updated table "${trimmedName}".`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -3408,9 +3412,10 @@ function SqlPlaygroundInner() {
       return;
     }
     const cols = addTableDialog.columns;
-    const blankCol = cols.find((c) => !c.name.trim());
-    if (blankCol) {
+    const blankCols = cols.filter((c) => !c.name.trim());
+    if (blankCols.length > 0) {
       showToast("Column names cannot be empty.", "warn");
+      setAddTableInvalidColIds(new Set(blankCols.map((c) => c.id)));
       return;
     }
     const colDefs = cols.map((c) => {
@@ -3438,6 +3443,7 @@ function SqlPlaygroundInner() {
       engine.exec(sql);
       setTables(engine.listTables());
       setAddTableDialog(null);
+      setAddTableInvalidColIds(new Set());
       showToast(`Created table "${trimmedName}".`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -5054,7 +5060,10 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={modifyDialog !== null}
           onOpenChange={(next) => {
-            if (!next) setModifyDialog(null);
+            if (!next) {
+              setModifyDialog(null);
+              setModifyInvalidColIds(new Set());
+            }
           }}
         >
           <Dialog.Portal>
@@ -5079,7 +5088,19 @@ function SqlPlaygroundInner() {
               {modifyDialog && (
                 <ModifyStructureForm
                   state={modifyDialog}
-                  onChange={setModifyDialog}
+                  onChange={(next) => {
+                    setModifyDialog(next);
+                    if (modifyInvalidColIds.size > 0) {
+                      setModifyInvalidColIds((prev) => {
+                        const updated = new Set(prev);
+                        for (const col of next.columns) {
+                          if (col.name.trim()) updated.delete(col.id);
+                        }
+                        return updated;
+                      });
+                    }
+                  }}
+                  invalidColumnIds={modifyInvalidColIds}
                   knownTables={tables}
                   engine={engineForRender}
                 />
@@ -5199,7 +5220,10 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={addTableDialog !== null}
           onOpenChange={(next) => {
-            if (!next) setAddTableDialog(null);
+            if (!next) {
+              setAddTableDialog(null);
+              setAddTableInvalidColIds(new Set());
+            }
           }}
         >
           <Dialog.Portal>
@@ -5224,7 +5248,19 @@ function SqlPlaygroundInner() {
               {addTableDialog && (
                 <ModifyStructureForm
                   state={addTableDialog}
-                  onChange={setAddTableDialog}
+                  onChange={(next) => {
+                    setAddTableDialog(next);
+                    if (addTableInvalidColIds.size > 0) {
+                      setAddTableInvalidColIds((prev) => {
+                        const updated = new Set(prev);
+                        for (const col of next.columns) {
+                          if (col.name.trim()) updated.delete(col.id);
+                        }
+                        return updated;
+                      });
+                    }
+                  }}
+                  invalidColumnIds={addTableInvalidColIds}
                   knownTables={tables}
                   engine={engineForRender}
                 />
@@ -7564,11 +7600,13 @@ interface ModifyStructureState {
 function ModifyStructureForm({
   state,
   onChange,
+  invalidColumnIds,
   knownTables,
   engine,
 }: {
   state: ModifyStructureState;
   onChange: (next: ModifyStructureState) => void;
+  invalidColumnIds?: Set<string>;
   knownTables: string[];
   engine: SqliteEngine | null;
 }) {
@@ -7753,6 +7791,7 @@ function ModifyStructureForm({
                             col={col}
                             onChange={(patch) => updateColumn(col.id, patch)}
                             onRemove={() => removeColumn(col.id)}
+                            hasNameError={invalidColumnIds?.has(col.id) ?? false}
                             knownTables={knownTables}
                             engine={engine}
                           />
@@ -7813,12 +7852,14 @@ function ModifyColumnRow({
   col,
   onChange,
   onRemove,
+  hasNameError,
   knownTables,
   engine,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
   onRemove: () => void;
+  hasNameError?: boolean;
   knownTables: string[];
   engine: SqliteEngine | null;
 }) {
@@ -7868,7 +7909,7 @@ function ModifyColumnRow({
       <td>
         <label className="sql-modify-cell-field">
           <input
-            className="sql-rename-input sql-modify-col-name"
+            className={`sql-rename-input sql-modify-col-name${hasNameError ? " sql-modify-col-name-error" : ""}`}
             value={col.name}
             onChange={(e) => onChange({ name: e.target.value })}
             placeholder="column name"
