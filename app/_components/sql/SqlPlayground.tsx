@@ -79,6 +79,7 @@ import {
   closeBracketsKeymap,
   completionKeymap,
   startCompletion,
+  acceptCompletion,
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
@@ -179,7 +180,6 @@ import {
   createSqlCompletionSource,
   type SqlCompletionSchema,
 } from "./sqlCompletion";
-import { createSqlAiCompletionSource } from "./sqlAiCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -194,8 +194,6 @@ import {
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
 import { themeFor } from "../cmExtensions";
-import { Switch } from "@base-ui-components/react/switch";
-
 // Replace the entire editor document — the v6 idiom for what v5 called
 // `editor.setValue(s)`. Centralised so the call sites that swap tab
 // contents all read the same.
@@ -208,35 +206,12 @@ function replaceDoc(view: EditorView, value: string): void {
 // CodeMirror's default is 100ms; 75ms keeps local schema suggestions feeling
 // immediate while still coalescing rapid typing before recomputing completions.
 const AUTOCOMPLETE_DELAY_MS = 75;
-// Longer delay for AI-backed completions to avoid saturating the API on every
-// keystroke.  The extra latency is acceptable because each suggestion is
-// context-rich rather than a simple keyword match.
-const AI_AUTOCOMPLETE_DELAY_MS = 300;
 
-function sqlAutocompletion(
-  schema: SqlCompletionSchema,
-  aiEnabled: boolean,
-  aiApiBaseUrl: string,
-  aiApiKey: string,
-  aiModel: string,
-) {
-  const sqlSource = createSqlCompletionSource(schema);
-  const source =
-    aiEnabled && aiApiBaseUrl && aiApiKey
-      ? createSqlAiCompletionSource(
-          {
-            apiBaseUrl: aiApiBaseUrl,
-            apiKey: aiApiKey,
-            model: aiModel || undefined,
-            schema,
-            debounceMs: AI_AUTOCOMPLETE_DELAY_MS,
-          },
-          sqlSource,
-        )
-      : sqlSource;
+function sqlAutocompletion(schema: SqlCompletionSchema) {
+  const source = createSqlCompletionSource(schema);
   return autocompletion({
     activateOnTyping: true,
-    activateOnTypingDelay: aiEnabled ? AI_AUTOCOMPLETE_DELAY_MS : AUTOCOMPLETE_DELAY_MS,
+    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
     closeOnBlur: true,
     override: [source],
   });
@@ -1215,18 +1190,6 @@ function SqlPlaygroundInner() {
   const setWordWrapState = useSettingsStore((s) => s.setWordWrap);
   const clearBeforeRun = useSettingsStore((s) => s.clearBeforeRun);
   const setClearBeforeRunState = useSettingsStore((s) => s.setClearBeforeRun);
-  const aiAutocompleteEnabled = useSettingsStore(
-    (s) => s.aiAutocompleteEnabled,
-  );
-  const setAiAutocompleteEnabledState = useSettingsStore(
-    (s) => s.setAiAutocompleteEnabled,
-  );
-  const aiBaseUrl = useSettingsStore((s) => s.aiBaseUrl);
-  const setAiBaseUrlState = useSettingsStore((s) => s.setAiBaseUrl);
-  const aiApiKey = useSettingsStore((s) => s.aiApiKey);
-  const setAiApiKeyState = useSettingsStore((s) => s.setAiApiKey);
-  const aiModel = useSettingsStore((s) => s.aiModel);
-  const setAiModelState = useSettingsStore((s) => s.setAiModel);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
 
@@ -1353,11 +1316,6 @@ function SqlPlaygroundInner() {
   const [customDb, setCustomDb] = useState<
     import("../runtime/sqliteSamples").SqliteSampleDatabase | null
   >(null);
-  const [aiByokDraft, setAiByokDraft] = useState({
-    baseUrl: "",
-    apiKey: "",
-    model: "",
-  });
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -1551,12 +1509,6 @@ function SqlPlaygroundInner() {
       localStorage.getItem(storageKey("clearbeforerun")) === "true";
     const savedDb =
       localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
-    const savedAiAutocomplete =
-      localStorage.getItem(storageKey("ai_autocomplete")) === "true";
-    const savedAiBaseUrl =
-      localStorage.getItem(storageKey("ai_base_url")) ?? "";
-    const savedAiModel =
-      localStorage.getItem(storageKey("ai_model")) ?? "";
 
     // ─── Hydrate pragma settings ─────────────────────────────────────
     const DP = DEFAULT_PRAGMA_SETTINGS;
@@ -1586,10 +1538,6 @@ function SqlPlaygroundInner() {
     setEditorThemeState(savedTheme);
     setWordWrapState(savedWordWrap);
     setClearBeforeRunState(savedClearBeforeRun);
-    setAiAutocompleteEnabledState(savedAiAutocomplete);
-    setAiBaseUrlState(savedAiBaseUrl);
-    setAiApiKeyState("");
-    setAiModelState(savedAiModel);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
     const initialSample = findSampleDatabase(savedDb);
@@ -1616,10 +1564,6 @@ function SqlPlaygroundInner() {
     };
   }, [
     setClearBeforeRunState,
-    setAiAutocompleteEnabledState,
-    setAiBaseUrlState,
-    setAiApiKeyState,
-    setAiModelState,
     setEditorThemeState,
     setFontSizeState,
     setOutputFontSizeEnabledState,
@@ -1687,7 +1631,7 @@ function SqlPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           completionComp.of(
-            sqlAutocompletion({ entities: [] }, false, "", "", ""),
+            sqlAutocompletion({ entities: [] }),
           ),
           tooltips({ parent: document.body }),
           keymap.of([
@@ -1724,7 +1668,12 @@ function SqlPlaygroundInner() {
             ...defaultKeymap,
             ...searchKeymap,
             ...historyKeymap,
-            ...completionKeymap,
+            // Remove Enter from the default completion keymap so that Enter
+            // always inserts a newline. Tab accepts the active completion
+            // instead, falling through to indentWithTab when no completion
+            // is shown.
+            ...completionKeymap.filter((b) => b.key !== "Enter"),
+            { key: "Tab", run: acceptCompletion },
             indentWithTab,
           ]),
           // Initial language config — the schema-aware variant is swapped
@@ -1829,8 +1778,7 @@ function SqlPlaygroundInner() {
   // completion for `<table>.<col>` style references; we rebuild it
   // whenever tables/views change so DDL executed in the editor
   // (CREATE TABLE, ALTER TABLE, …) is immediately reflected in
-  // autocomplete suggestions. Also rebuild when aiAutocompleteEnabled
-  // toggles so the source swaps in/out without a page reload.
+  // autocomplete suggestions.
   useEffect(() => {
     const engine = engineRef.current;
     const view = editorRef.current;
@@ -1861,17 +1809,11 @@ function SqlPlaygroundInner() {
           sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
         ),
         completionComp.reconfigure(
-          sqlAutocompletion(
-            completionSchema,
-            aiAutocompleteEnabled,
-            aiBaseUrl,
-            aiApiKey,
-            aiModel,
-          ),
+          sqlAutocompletion(completionSchema),
         ),
       ],
     });
-  }, [tables, views, aiAutocompleteEnabled, aiBaseUrl, aiApiKey, aiModel]);
+  }, [tables, views]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -1941,59 +1883,6 @@ function SqlPlaygroundInner() {
     setClearBeforeRunState(b);
     localStorage.setItem(storageKey("clearbeforerun"), String(b));
   }, [setClearBeforeRunState]);
-  const setAiAutocompleteEnabled = useCallback(
-    (b: boolean) => {
-      setAiAutocompleteEnabledState(b);
-      try {
-        localStorage.setItem(storageKey("ai_autocomplete"), String(b));
-      } catch {
-        // ignore quota errors
-      }
-    },
-    [setAiAutocompleteEnabledState],
-  );
-  const aiByokHasChanges =
-    aiByokDraft.baseUrl !== aiBaseUrl ||
-    aiByokDraft.apiKey !== aiApiKey ||
-    aiByokDraft.model !== aiModel;
-
-  const cancelAiByokChanges = useCallback(() => {
-    setAiByokDraft({
-      baseUrl: aiBaseUrl,
-      apiKey: aiApiKey,
-      model: aiModel,
-    });
-  }, [aiBaseUrl, aiApiKey, aiModel]);
-
-  const saveAiByokSettings = useCallback(() => {
-    const nextBaseUrl = aiByokDraft.baseUrl.trim();
-    const nextModel = aiByokDraft.model.trim();
-    try {
-      localStorage.setItem(storageKey("ai_base_url"), nextBaseUrl);
-      localStorage.setItem(storageKey("ai_model"), nextModel);
-      localStorage.removeItem(storageKey("ai_api_key"));
-      setAiBaseUrlState(nextBaseUrl);
-      setAiApiKeyState(aiByokDraft.apiKey);
-      setAiModelState(nextModel);
-      setAiByokDraft({
-        baseUrl: nextBaseUrl,
-        apiKey: aiByokDraft.apiKey,
-        model: nextModel,
-      });
-      showToast("AI autocomplete settings saved.");
-    } catch {
-      setAiBaseUrlState(nextBaseUrl);
-      setAiApiKeyState(aiByokDraft.apiKey);
-      setAiModelState(nextModel);
-      showToast("AI settings saved for this session, but not persisted.", "warn");
-    }
-  }, [
-    aiByokDraft,
-    setAiBaseUrlState,
-    setAiApiKeyState,
-    setAiModelState,
-    showToast,
-  ]);
 
   const savePragmaSettings = useCallback(
     (p: PragmaSettings) => {
@@ -2037,7 +1926,6 @@ function SqlPlaygroundInner() {
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
     setClearBeforeRun(D.clearBeforeRun);
-    setAiAutocompleteEnabled(false);
     showToast("Default settings restored.");
   }, [
     setFontSize,
@@ -2046,7 +1934,6 @@ function SqlPlaygroundInner() {
     setEditorTheme,
     setWordWrap,
     setClearBeforeRun,
-    setAiAutocompleteEnabled,
     showToast,
   ]);
 
@@ -4291,11 +4178,6 @@ function SqlPlaygroundInner() {
               type="button"
               className="header-btn icon-only"
               onClick={() => {
-                setAiByokDraft({
-                  baseUrl: aiBaseUrl,
-                  apiKey: aiApiKey,
-                  model: aiModel,
-                });
                 setSettingsOpen(true);
               }}
               title="Settings"
@@ -4339,103 +4221,6 @@ function SqlPlaygroundInner() {
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
           extraGeneralRows={
             <>
-              <div className="setting-row">
-                <label className="setting-switch-row">
-                  <span>AI-based Autocomplete</span>
-                  <Switch.Root
-                    checked={aiAutocompleteEnabled}
-                    onCheckedChange={setAiAutocompleteEnabled}
-                    className="bui-switch"
-                    aria-label="AI-based Autocomplete"
-                  >
-                    <Switch.Thumb className="bui-switch-thumb" />
-                  </Switch.Root>
-                </label>
-              </div>
-              {aiAutocompleteEnabled && (
-                <div className="setting-row ai-byok-fields">
-                  <div className="ai-byok-field">
-                    <label className="ai-byok-label" htmlFor="ai-base-url">
-                      OpenAI-compatible Base URL
-                    </label>
-                    <input
-                      id="ai-base-url"
-                      type="text"
-                      className="ai-byok-input"
-                      placeholder="https://api.openai.com/v1"
-                      value={aiByokDraft.baseUrl}
-                      onChange={(e) =>
-                        setAiByokDraft((draft) => ({
-                          ...draft,
-                          baseUrl: e.target.value,
-                        }))
-                      }
-                      spellCheck={false}
-                    />
-                  </div>
-                  <div className="ai-byok-field">
-                    <label className="ai-byok-label" htmlFor="ai-api-key">
-                      API Key
-                    </label>
-                    <input
-                      id="ai-api-key"
-                      type="password"
-                      className="ai-byok-input"
-                      placeholder="sk-…"
-                      value={aiByokDraft.apiKey}
-                      onChange={(e) =>
-                        setAiByokDraft((draft) => ({
-                          ...draft,
-                          apiKey: e.target.value,
-                        }))
-                      }
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="ai-byok-field">
-                    <label className="ai-byok-label" htmlFor="ai-model">
-                      Model
-                    </label>
-                    <input
-                      id="ai-model"
-                      type="text"
-                      className="ai-byok-input"
-                      placeholder="gpt-5.4-nano"
-                      value={aiByokDraft.model}
-                      onChange={(e) =>
-                        setAiByokDraft((draft) => ({
-                          ...draft,
-                          model: e.target.value,
-                        }))
-                      }
-                      spellCheck={false}
-                    />
-                  </div>
-                  <div className="ai-byok-actions">
-                    <button
-                      type="button"
-                      className="settings-action-btn"
-                      disabled={!aiByokHasChanges}
-                      onClick={cancelAiByokChanges}
-                    >
-                      <X size={14} aria-hidden="true" />
-                      <span>Cancel</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="pragma-save-btn"
-                      disabled={!aiByokHasChanges}
-                      onClick={saveAiByokSettings}
-                    >
-                      Save
-                    </button>
-                  </div>
-                  <p className="ai-byok-privacy-note">
-                    Your API key is kept in memory for this browser session and
-                    never sent to our servers.
-                  </p>
-                </div>
-              )}
               <div className="setting-row">
                 <button
                   type="button"
@@ -8733,7 +8518,10 @@ function SchemaItem({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup examples-dropdown">
-              <div className="ctx-table-name">{name}</div>
+              <div className="ctx-table-name">
+                <Icon size={12} className="ctx-name-icon" aria-hidden="true" />
+                {name}
+              </div>
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => onPreview(name, kind)}
