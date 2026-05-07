@@ -100,13 +100,13 @@ function ErTableNode({ data }: NodeProps) {
   // Determine whether this node should be visually dimmed.
   const isActive =
     !selection.selectedTable ||
-    selection.connectedTables.has(tableName as string);
+    selection.connectedTables.has(tableName);
 
   // Row count is fetched lazily the first time the Export submenu opens.
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
     if (exportRowCount === null && actions?.onGetRowCount) {
-      setExportRowCount(actions.onGetRowCount(tableName as string));
+      setExportRowCount(actions.onGetRowCount(tableName));
     }
   }, [exportRowCount, actions, tableName]);
 
@@ -233,14 +233,14 @@ function ErTableNode({ data }: NodeProps) {
             <div className="ctx-table-name">{tableName}</div>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onPreview(tableName as string)}
+              onClick={() => actions.onPreview(tableName)}
             >
               <div className="ex-title">View Data</div>
             </ContextMenu.Item>
             {actions.onAddRow && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onAddRow!(tableName as string)}
+                onClick={() => actions.onAddRow!(tableName)}
               >
                 <div className="ex-title">Add Row</div>
               </ContextMenu.Item>
@@ -248,26 +248,26 @@ function ErTableNode({ data }: NodeProps) {
             {actions.onModifyStructure && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onModifyStructure!(tableName as string)}
+                onClick={() => actions.onModifyStructure!(tableName)}
               >
                 <div className="ex-title">View Structure</div>
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onCount(tableName as string)}
+              onClick={() => actions.onCount(tableName)}
             >
               <div className="ex-title">Count Rows</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onViewDDL(tableName as string)}
+              onClick={() => actions.onViewDDL(tableName)}
             >
               <div className="ex-title">View DDL</div>
             </ContextMenu.Item>
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onCopy(tableName as string)}
+              onClick={() => actions.onCopy(tableName)}
             >
               <div className="ex-title">Copy Name</div>
             </ContextMenu.Item>
@@ -297,7 +297,7 @@ function ErTableNode({ data }: NodeProps) {
                     )}
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName as string, "csv")}
+                      onClick={() => actions.onExport(tableName, "csv")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -308,7 +308,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName as string, "json")}
+                      onClick={() => actions.onExport(tableName, "json")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -319,7 +319,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName as string, "sql")}
+                      onClick={() => actions.onExport(tableName, "sql")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -330,7 +330,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName as string, "parquet")}
+                      onClick={() => actions.onExport(tableName, "parquet")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -343,7 +343,7 @@ function ErTableNode({ data }: NodeProps) {
                     </Menu.Item>
                     <Menu.Item
                       className="example-item export-item"
-                      onClick={() => actions.onExport(tableName as string, "xlsx")}
+                      onClick={() => actions.onExport(tableName, "xlsx")}
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
@@ -359,14 +359,14 @@ function ErTableNode({ data }: NodeProps) {
             {actions.onTruncate && (
               <ContextMenu.Item
                 className="example-item"
-                onClick={() => actions.onTruncate!(tableName as string)}
+                onClick={() => actions.onTruncate!(tableName)}
               >
                 <div className="ex-title">Truncate</div>
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
               className="example-item"
-              onClick={() => actions.onDrop(tableName as string)}
+              onClick={() => actions.onDrop(tableName)}
             >
               <div className="ex-title">Drop Table</div>
             </ContextMenu.Item>
@@ -529,6 +529,8 @@ async function computeElkLayout(
     const h = calcNodeHeight(cols.length);
 
     const ports = cols.flatMap((col, i) => {
+      // COL_TOP_PAD accounts for the 4px top padding of .er-table-columns
+      // so the port is vertically centered on the column row in the DOM.
       const portY = COL_HEADER_H + COL_TOP_PAD + i * COL_ROW_H + COL_ROW_H / 2;
       return [
         {
