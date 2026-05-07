@@ -1258,6 +1258,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 500;
+  /* Prevent this span (rendered by Popover.Trigger) from intercepting
+     pointer events and stealing focus away from the CodeMirror editor.
+     Mouse-enter/leave on the parent .sql-tab button handle the overflow
+     popover, so no pointer events are needed on the title span itself. */
+  pointer-events: none;
 }
 
 .sql-tab-close {
@@ -1948,6 +1953,7 @@
   border: none;
   border-radius: 6px;
   color: var(--text);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
   font-size: 13px;
   padding: 8px 10px;
   cursor: pointer;

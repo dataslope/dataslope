@@ -86,6 +86,11 @@ const CC_SCHEMA = `
   CREATE INDEX idx_transactions_card_id ON transactions(card_id);
   CREATE INDEX idx_transactions_vendor_id ON transactions(vendor_id);
   CREATE INDEX idx_transactions_date ON transactions(transaction_date);
+  CREATE INDEX idx_transactions_category ON transactions(category);
+  CREATE INDEX idx_transactions_is_fraud ON transactions(is_fraud);
+  CREATE INDEX idx_users_state ON users(state);
+  CREATE INDEX idx_users_fico ON users(FICO_score);
+  CREATE INDEX idx_vendors_category ON vendors(category);
   CREATE TRIGGER trg_users_card_count_ai
     AFTER INSERT ON cards
     BEGIN
@@ -110,6 +115,12 @@ const CC_SCHEMA = `
     BEGIN
       SELECT RAISE(ABORT, 'Non-fraud transactions must have amount >= 0');
     END;
+  CREATE TRIGGER trg_transactions_block_negative_update
+    BEFORE UPDATE OF amount ON transactions
+    WHEN NEW.amount < 0 AND COALESCE(NEW.is_fraud, 0) = 0
+    BEGIN
+      SELECT RAISE(ABORT, 'Non-fraud transactions must have amount >= 0');
+    END;
   CREATE VIEW foreign_transactions AS
     SELECT t.*, u.name as user_name
     FROM transactions t
@@ -126,6 +137,55 @@ const CC_SCHEMA = `
       SUM(is_fraud) as fraud_count
     FROM transactions
     GROUP BY merchant_name, merchant_city, category;
+  CREATE VIEW fraud_summary AS
+    SELECT
+      u.name AS user_name,
+      u.state,
+      COUNT(*) AS fraud_count,
+      ROUND(SUM(t.amount), 2) AS total_fraud_amount
+    FROM transactions t
+    JOIN users u ON t.user_id = u.user_id
+    WHERE t.is_fraud = 1
+    GROUP BY t.user_id
+    ORDER BY fraud_count DESC;
+  CREATE VIEW high_value_customers AS
+    SELECT
+      u.user_id,
+      u.name,
+      u.city,
+      u.state,
+      u.annual_income,
+      u.FICO_score,
+      COUNT(t.transaction_id) AS total_transactions,
+      ROUND(SUM(t.amount), 2) AS total_spent
+    FROM users u
+    LEFT JOIN transactions t ON u.user_id = t.user_id
+    GROUP BY u.user_id
+    HAVING total_spent > 500
+    ORDER BY total_spent DESC;
+  CREATE VIEW monthly_spending AS
+    SELECT
+      SUBSTR(transaction_date, 1, 7) AS month,
+      category,
+      COUNT(*) AS num_transactions,
+      ROUND(SUM(amount), 2) AS total_amount
+    FROM transactions
+    GROUP BY month, category
+    ORDER BY month DESC, total_amount DESC;
+  CREATE VIEW card_utilization AS
+    SELECT
+      c.card_id,
+      c.card_brand,
+      c.card_type,
+      c.credit_limit,
+      u.name AS owner,
+      COUNT(t.transaction_id) AS num_transactions,
+      ROUND(SUM(t.amount), 2) AS total_charged,
+      ROUND(100.0 * SUM(t.amount) / NULLIF(c.credit_limit, 0), 1) AS utilization_pct
+    FROM cards c
+    JOIN users u ON c.user_id = u.user_id
+    LEFT JOIN transactions t ON t.card_id = c.card_id
+    GROUP BY c.card_id;
 `;
 
 type Row = Array<string | number | null>;
@@ -398,6 +458,29 @@ const CHINOOK_SCHEMA = `
     invoice_date TEXT,
     total REAL
   );
+  CREATE INDEX idx_albums_artist_id ON albums(artist_id);
+  CREATE INDEX idx_tracks_album_id ON tracks(album_id);
+  CREATE INDEX idx_tracks_genre ON tracks(genre);
+  CREATE INDEX idx_invoices_customer_id ON invoices(customer_id);
+  CREATE INDEX idx_invoices_date ON invoices(invoice_date);
+  CREATE TRIGGER trg_block_negative_invoice
+    BEFORE INSERT ON invoices
+    WHEN NEW.total < 0
+    BEGIN
+      SELECT RAISE(ABORT, 'Invoice total cannot be negative');
+    END;
+  CREATE TRIGGER trg_block_negative_invoice_update
+    BEFORE UPDATE OF total ON invoices
+    WHEN NEW.total < 0
+    BEGIN
+      SELECT RAISE(ABORT, 'Invoice total cannot be negative');
+    END;
+  CREATE TRIGGER trg_prevent_duplicate_email
+    BEFORE INSERT ON customers
+    WHEN (SELECT COUNT(*) FROM customers WHERE email = NEW.email) > 0
+    BEGIN
+      SELECT RAISE(ABORT, 'A customer with this email already exists');
+    END;
   CREATE VIEW top_genres AS
     SELECT
       genre,
@@ -406,6 +489,37 @@ const CHINOOK_SCHEMA = `
       ROUND(SUM(unit_price), 2) AS catalog_value
     FROM tracks
     GROUP BY genre;
+  CREATE VIEW artist_catalog AS
+    SELECT
+      ar.name AS artist,
+      COUNT(DISTINCT al.album_id) AS album_count,
+      COUNT(t.track_id) AS track_count,
+      ROUND(SUM(t.unit_price), 2) AS catalog_value
+    FROM artists ar
+    LEFT JOIN albums al ON al.artist_id = ar.artist_id
+    LEFT JOIN tracks t ON t.album_id = al.album_id
+    GROUP BY ar.artist_id
+    ORDER BY catalog_value DESC;
+  CREATE VIEW customer_invoice_summary AS
+    SELECT
+      c.customer_id,
+      c.first_name || ' ' || c.last_name AS full_name,
+      c.country,
+      COUNT(i.invoice_id) AS invoice_count,
+      ROUND(SUM(i.total), 2) AS total_spent,
+      ROUND(AVG(i.total), 2) AS avg_invoice
+    FROM customers c
+    LEFT JOIN invoices i ON i.customer_id = c.customer_id
+    GROUP BY c.customer_id
+    ORDER BY total_spent DESC;
+  CREATE VIEW genre_revenue AS
+    SELECT
+      t.genre,
+      COUNT(t.track_id) AS track_count,
+      ROUND(SUM(t.unit_price), 2) AS potential_revenue
+    FROM tracks t
+    GROUP BY t.genre
+    ORDER BY potential_revenue DESC;
 `;
 
 function seedChinook(db: Database): void {
@@ -553,6 +667,31 @@ const NORTHWIND_SCHEMA = `
     unit_price REAL,
     PRIMARY KEY (order_id, product_id)
   );
+  CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+  CREATE INDEX idx_orders_employee_id ON orders(employee_id);
+  CREATE INDEX idx_orders_date ON orders(order_date);
+  CREATE INDEX idx_order_details_product_id ON order_details(product_id);
+  CREATE INDEX idx_products_category ON products(category);
+  CREATE TRIGGER trg_block_out_of_stock
+    BEFORE INSERT ON order_details
+    WHEN (SELECT units_in_stock FROM products WHERE product_id = NEW.product_id) < NEW.quantity
+    BEGIN
+      SELECT RAISE(ABORT, 'Insufficient stock for this product');
+    END;
+  CREATE TRIGGER trg_reduce_stock
+    AFTER INSERT ON order_details
+    BEGIN
+      UPDATE products
+        SET units_in_stock = units_in_stock - NEW.quantity
+        WHERE product_id = NEW.product_id;
+    END;
+  CREATE TRIGGER trg_restore_stock
+    AFTER DELETE ON order_details
+    BEGIN
+      UPDATE products
+        SET units_in_stock = units_in_stock + OLD.quantity
+        WHERE product_id = OLD.product_id;
+    END;
   CREATE VIEW order_totals AS
     SELECT
       o.order_id,
@@ -563,6 +702,43 @@ const NORTHWIND_SCHEMA = `
     JOIN customers c ON o.customer_id = c.customer_id
     JOIN order_details od ON od.order_id = o.order_id
     GROUP BY o.order_id;
+  CREATE VIEW sales_by_employee AS
+    SELECT
+      e.employee_id,
+      e.first_name || ' ' || e.last_name AS employee,
+      e.title,
+      COUNT(DISTINCT o.order_id) AS order_count,
+      ROUND(SUM(od.quantity * od.unit_price), 2) AS total_sales
+    FROM employees e
+    LEFT JOIN orders o ON o.employee_id = e.employee_id
+    LEFT JOIN order_details od ON od.order_id = o.order_id
+    GROUP BY e.employee_id
+    ORDER BY total_sales DESC;
+  CREATE VIEW product_revenue AS
+    SELECT
+      p.product_id,
+      p.product_name,
+      p.category,
+      p.unit_price AS list_price,
+      p.units_in_stock,
+      COALESCE(SUM(od.quantity), 0) AS units_sold,
+      ROUND(COALESCE(SUM(od.quantity * od.unit_price), 0), 2) AS revenue
+    FROM products p
+    LEFT JOIN order_details od ON od.product_id = p.product_id
+    GROUP BY p.product_id
+    ORDER BY revenue DESC;
+  CREATE VIEW customer_order_stats AS
+    SELECT
+      c.customer_id,
+      c.company_name,
+      c.country,
+      COUNT(DISTINCT o.order_id) AS order_count,
+      ROUND(SUM(od.quantity * od.unit_price), 2) AS total_spent
+    FROM customers c
+    LEFT JOIN orders o ON o.customer_id = c.customer_id
+    LEFT JOIN order_details od ON od.order_id = o.order_id
+    GROUP BY c.customer_id
+    ORDER BY total_spent DESC;
 `;
 
 function seedNorthwind(db: Database): void {
@@ -596,10 +772,10 @@ function seedNorthwind(db: Database): void {
     [4, "Chef Anton's Cajun Seasoning", "Condiments", 22.0, 53],
     [5, "Grandma's Boysenberry Spread", "Condiments", 25.0, 120],
     [6, "Uncle Bob's Organic Dried Pears", "Produce", 30.0, 15],
-    [7, "Northwoods Cranberry Sauce", "Condiments", 40.0, 6],
+    [7, "Northwoods Cranberry Sauce", "Condiments", 40.0, 50],
     [8, "Mishi Kobe Niku", "Meat/Poultry", 97.0, 29],
     [9, "Ikura", "Seafood", 31.0, 31],
-    [10, "Queso Cabrales", "Dairy Products", 21.0, 22],
+    [10, "Queso Cabrales", "Dairy Products", 21.0, 30],
   ];
   bulkInsert(
     db,

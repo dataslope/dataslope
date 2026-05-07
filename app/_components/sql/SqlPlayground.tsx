@@ -2055,6 +2055,16 @@ function SqlPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine) return;
     const sample = engine.loadBlankDatabase();
+    // Clear any filename override that was set for the blank db id by a
+    // previous "Rename Database" action.  Without this, a subsequent blank
+    // database would inherit the old custom name (e.g. "test.sqlite")
+    // instead of resetting to "blank.sqlite".
+    setCustomFilenames((prev) => {
+      if (!(sample.id in prev)) return prev;
+      const next = { ...prev };
+      delete next[sample.id];
+      return next;
+    });
     applyDbLoad(sample);
     showToast("Created blank database.");
   }, [applyDbLoad, showToast]);
@@ -5767,8 +5777,20 @@ function SqlPlaygroundInner() {
                         tab={t}
                         active={t.id === activeTabId}
                         onActivate={() => {
+                          const prevId = activeTabIdRef.current;
                           activeTabIdRef.current = t.id;
                           setActiveTabId(t.id);
+                          // When the user re-clicks the already-active tab the
+                          // useEffect that focuses the editor won't re-run
+                          // (activeTabId hasn't changed).  Focus it explicitly
+                          // so typing works immediately without a second click.
+                          if (
+                            prevId === t.id &&
+                            t.kind !== "er-diagram" &&
+                            t.kind !== "view-data"
+                          ) {
+                            editorRef.current?.focus();
+                          }
                         }}
                         onClose={() => closeTab(t.id)}
                         onRename={(name) => renameTab(t.id, name)}
