@@ -1329,6 +1329,8 @@ function SqlPlaygroundInner() {
   const [renameDbOpen, setRenameDbOpen] = useState(false);
   const [renameDbBaseName, setRenameDbBaseName] = useState("");
   const [renameDbExt, setRenameDbExt] = useState(".sqlite");
+  // Controls the "no tables" hover popover shown over the disabled Export button.
+  const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   // Per-database filename overrides.  Keyed by db id; takes precedence
   // over the built-in `SqliteSampleDatabase.filename` for display.
   const [customFilenames, setCustomFilenames] = useState<Record<string, string>>({});
@@ -2612,11 +2614,14 @@ function SqlPlaygroundInner() {
       const bytes = engine.exportDatabase();
       const sample = engine.activeSample();
       const overriddenFilename = customFilenames[activeDbId];
-      const effectiveFilename = overriddenFilename ?? sample.filename;
-      const filename =
-        effectiveFilename && /\.sqlite$/i.test(effectiveFilename)
-          ? effectiveFilename
-          : `${sample.id || "database"}.sqlite`;
+      // Derive the base name by stripping the last file extension (e.g.
+      // ".db", ".sqlite3") so the download always has a ".sqlite" suffix
+      // regardless of which extension the user chose when renaming.
+      const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
+      const baseName = effectiveFilename
+        ? effectiveFilename.replace(/\.[^.]+$/, "")
+        : sample.id || "database";
+      const filename = `${baseName}.sqlite`;
       // `Uint8Array.slice()` returns a new typed array backed by a
       // *fresh* ArrayBuffer, so the Blob owns its own copy of the
       // bytes. sql.js may reuse its internal buffer on the next
@@ -3839,6 +3844,10 @@ function SqlPlaygroundInner() {
     setResultsByTab({});
     const view = editorRef.current;
     if (view) replaceDoc(view, "");
+    // Defer focus so it fires after the context menu has fully closed and
+    // returned focus to its trigger.  Without the timeout the context
+    // menu's blur/close sequence can steal focus back from the editor.
+    window.setTimeout(() => editorRef.current?.focus(), 0);
   }, [activeDbId]);
 
   const handleTabDragStart = useCallback(
@@ -4248,55 +4257,82 @@ function SqlPlaygroundInner() {
                 </Menu.Positioner>
               </Menu.Portal>
             </Menu.Root>
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Export database"
-                aria-label="Export"
-                disabled={!loaded}
-              >
-                <ArrowDownToLine size={14} aria-hidden="true" />
-                <span className="btn-label">Export</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    <div className="sql-result-export-group-label">SQLite Database</div>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={exportDatabase}
-                      disabled={tables.length === 0}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          SQLite File
-                          <span className="ext-badge">.sqlite</span>
+            {tables.length === 0 && loaded ? (
+              <Popover.Root open={exportNoTabsHover} onOpenChange={setExportNoTabsHover}>
+                <div
+                  style={{ cursor: "not-allowed" }}
+                  onMouseEnter={() => setExportNoTabsHover(true)}
+                  onMouseLeave={() => setExportNoTabsHover(false)}
+                  onFocus={() => setExportNoTabsHover(true)}
+                  onBlur={() => setExportNoTabsHover(false)}
+                  tabIndex={0}
+                  role="button"
+                  aria-disabled="true"
+                  aria-label="Export (create a table to enable)"
+                >
+                  <Popover.Trigger
+                    className="header-btn"
+                    disabled
+                    style={{ pointerEvents: "none" }}
+                    title="Export database"
+                    aria-label="Export"
+                  >
+                    <ArrowDownToLine size={14} aria-hidden="true" />
+                    <span className="btn-label">Export</span>
+                  </Popover.Trigger>
+                </div>
+                <Popover.Portal>
+                  <Popover.Positioner sideOffset={6} align="start" className="sql-export-disabled-positioner">
+                    <Popover.Popup className="bui-popup">
+                      Create a table to export the database
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            ) : (
+              <Menu.Root>
+                <Menu.Trigger
+                  className="header-btn"
+                  title="Export database"
+                  aria-label="Export"
+                  disabled={!loaded}
+                >
+                  <ArrowDownToLine size={14} aria-hidden="true" />
+                  <span className="btn-label">Export</span>
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner sideOffset={6} align="start">
+                    <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                      <div className="sql-result-export-group-label">SQLite Database</div>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={exportDatabase}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            SQLite File
+                            <span className="ext-badge">.sqlite</span>
+                          </div>
+                          <div className="ex-desc">Download as .sqlite</div>
                         </div>
-                        <div className="ex-desc">Download as .sqlite</div>
-                      </div>
-                    </Menu.Item>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={exportDatabaseToXlsx}
-                      disabled={tables.length === 0}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          Excel Workbook
-                          <span className="ext-badge">.xlsx</span>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={exportDatabaseToXlsx}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            Excel Workbook
+                            <span className="ext-badge">.xlsx</span>
+                          </div>
+                          <div className="ex-desc">One sheet per table</div>
                         </div>
-                        <div className="ex-desc">One sheet per table</div>
-                      </div>
-                    </Menu.Item>
-                    {tables.length === 0 && (
-                      <div className="sql-export-info-msg">
-                        Create a table to export the database
-                      </div>
-                    )}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            )}
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
