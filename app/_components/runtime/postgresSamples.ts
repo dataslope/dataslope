@@ -308,7 +308,17 @@ export const POSTGRES_SAMPLE_DATABASES: PostgresSampleDatabase[] = [
   },
 ];
 
+export const POSTGRES_BLANK_DATABASE: PostgresSampleDatabase = {
+  id: "blank",
+  label: "New Database",
+  filename: "untitled.pg",
+  description: "Empty database — start from scratch.",
+  sql: "",
+  defaultTabs: [{ title: "Query 1", code: "" }],
+};
+
 export function findPostgresSampleDatabase(id: string): PostgresSampleDatabase {
+  if (id === POSTGRES_BLANK_DATABASE.id) return POSTGRES_BLANK_DATABASE;
   return (
     POSTGRES_SAMPLE_DATABASES.find((sample) => sample.id === id) ??
     POSTGRES_SAMPLE_DATABASES[0]

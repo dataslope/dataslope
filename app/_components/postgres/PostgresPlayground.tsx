@@ -37,6 +37,7 @@ import {
   ArrowUpFromLine,
   ChevronDown,
   Database,
+  FilePlus,
   FileJson,
   FileText,
   Network,
@@ -79,6 +80,7 @@ import {
 } from "../playgroundShared";
 import {
   POSTGRES_SAMPLE_DATABASES,
+  POSTGRES_BLANK_DATABASE,
   findPostgresSampleDatabase,
 } from "../runtime/postgresSamples";
 import {
@@ -790,7 +792,10 @@ function PostgresPlaygroundInner() {
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
       try {
-        const sample = await engine.loadSampleDatabase(nextId);
+        const sample =
+          nextId === POSTGRES_BLANK_DATABASE.id
+            ? await engine.loadBlankDatabase()
+            : await engine.loadSampleDatabase(nextId);
         setActiveDbId(sample.id);
         try {
           localStorage.setItem(storageKey("db"), sample.id);
@@ -1023,6 +1028,43 @@ function PostgresPlaygroundInner() {
       const tab: QueryTab = { id: newTabId(), title: `DDL: ${name}`, code: ddl, pristineCode: ddl };
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
+    },
+    [persistTabs],
+  );
+
+  const openEntityStructure = useCallback(
+    async (name: string) => {
+      const engine = engineRef.current;
+      // Display SQL is for the editor tab only — actual execution uses
+      // parameterized execParams below to prevent injection.
+      const displaySql =
+        `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
+      const tab: QueryTab = {
+        id: newTabId(),
+        title: `Structure: ${name}`,
+        code: displaySql,
+        pristineCode: displaySql,
+      };
+      persistTabs([...tabsRef.current, tab]);
+      setActiveTabId(tab.id);
+      if (!engine) return;
+      // Run via parameterized query to avoid any injection risk.
+      const paramSql =
+        `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`;
+      try {
+        const sets = await engine.execParams(paramSql, [name]);
+        setResultsByTab((prev) => ({
+          ...prev,
+          [tab.id]: {
+            sets,
+            elapsedMs: 0,
+            source: `Structure: ${name}`,
+          },
+        }));
+      } catch (err) {
+        // Non-fatal: the user can always run the query manually from the tab.
+        console.error("[Postgres] openEntityStructure failed:", err);
+      }
     },
     [persistTabs],
   );
@@ -1722,6 +1764,16 @@ function PostgresPlaygroundInner() {
                           </span>
                         </Select.Item>
                       ))}
+                      <Select.Item
+                        value={POSTGRES_BLANK_DATABASE.id}
+                        className="bui-select-item sql-db-item"
+                      >
+                        <span className="bui-select-item-icon" aria-hidden="true"><FilePlus size={14} /></span>
+                        <span className="sql-db-item-text">
+                          <Select.ItemText>{POSTGRES_BLANK_DATABASE.label}</Select.ItemText>
+                          <span className="sql-db-item-desc">{POSTGRES_BLANK_DATABASE.description}</span>
+                        </span>
+                      </Select.Item>
                     </Select.Popup>
                   </Select.Positioner>
                 </Select.Portal>
@@ -1755,6 +1807,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onModifyStructure={openEntityStructure}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={requestDropEntity}
@@ -1788,6 +1841,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onStructure={(n) => openEntityStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={requestDropEntity}
@@ -1910,6 +1964,7 @@ function PostgresPlaygroundInner() {
                 columnsByEntity={columnsByEntity}
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
+                onModifyStructure={openEntityStructure}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
                 onDrop={requestDropEntity}

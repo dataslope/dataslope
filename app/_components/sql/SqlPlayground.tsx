@@ -2146,15 +2146,18 @@ function SqlPlaygroundInner() {
 
   // Lazy-load (and re-load) metadata for every currently-expanded
   // sidebar entity that has no cached `columnsByEntity` entry.
+  // Use `engineForRender` (local state, null on every mount) as the
+  // trigger so that returning from another playground re-fetches columns
+  // even when the Zustand `loaded` flag was already true.
   useEffect(() => {
     if (expandedEntities.size === 0) return;
-    if (!loaded || !engineRef.current) return;
+    if (!engineForRender) return;
     for (const name of expandedEntities) {
       if (columnsByEntity[name] === undefined) {
         refreshEntityMetadata(name);
       }
     }
-  }, [expandedEntities, columnsByEntity, refreshEntityMetadata, loaded]);
+  }, [expandedEntities, columnsByEntity, refreshEntityMetadata, engineForRender]);
 
   // ─── Resizer (vertical, between results panel and editor) ────────────
   useEffect(() => {
@@ -3826,7 +3829,7 @@ function SqlPlaygroundInner() {
               <header className="sql-modify-drawer-header">
                 <div className="sql-modify-drawer-heading">
                   <Dialog.Title className="sql-modify-drawer-title">
-                    View structure
+                    View/Edit Structure
                   </Dialog.Title>
                   <Dialog.Description className="sql-modify-drawer-subtitle">
                     {modifyDialog?.originalName ?? ""}
