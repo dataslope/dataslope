@@ -38,6 +38,9 @@ export default function Home() {
           <Link href="/playground" className={styles.ctaSecondary}>
             Open the Playground
           </Link>
+          <Link href="/color-test" className={styles.ctaSecondary}>
+            Color Theme Test
+          </Link>
           <a
             href="https://github.com/subwaymatch/dataslope-playground/"
             target="_blank"
