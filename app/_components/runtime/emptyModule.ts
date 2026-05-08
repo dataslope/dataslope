@@ -10,3 +10,9 @@ export default emptyStub;
 export const readFileSync = () => {
   throw new Error("fs.readFileSync is not available in the browser");
 };
+export const existsSync = () => false;
+export const mkdirSync = () => {
+  throw new Error("fs.mkdirSync is not available in the browser");
+};
+export const join = (...parts: string[]) => parts.filter(Boolean).join("/");
+export const resolve = (...parts: string[]) => join(...parts);
