@@ -25,6 +25,12 @@
      before a theme has been applied. */
   --text-soft: oklch(68% 0.12 240);
   --text-accent: oklch(68% 0.16 145);
+  /* Theme-driven complementary accent — populated per-theme from the
+     editor palette's `str` (string-literal) color, which is a calm,
+     distinct accent that complements the primary text. The default
+     below kicks in outside the playground or before a theme has
+     been applied. */
+  --text-complementary: oklch(78% 0.14 85);
   --primary: oklch(68% 0.18 250);
   --primary-glow: oklch(68% 0.18 250 / 0.15);
   --blue: oklch(68% 0.18 250);
