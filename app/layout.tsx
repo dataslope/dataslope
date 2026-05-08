@@ -27,15 +27,15 @@ const themeBootstrapScript = `
     // editor's comments and atoms) and DO need to be set inline so the
     // first paint matches the persisted theme.
     var palettes = {
-      "dracula":         {bg:"#282a36",bg2:"#21222c",bg3:"#343746",border:"#44475a",text:"#f8f8f2",soft:"#6272a4",accent:"#bd93f9"},
-      "monokai":         {bg:"#272822",bg2:"#1e1f1c",bg3:"#3e3d32",border:"#49483e",text:"#f8f8f2",soft:"#75715e",accent:"#ae81ff"},
-      "material-darker": {bg:"#212121",bg2:"#1a1a1a",bg3:"#2d2d2d",border:"#3d3d3d",text:"#eeffff",soft:"#546e7a",accent:"#82aaff"},
-      "nord":            {bg:"#2e3440",bg2:"#272c36",bg3:"#3b4252",border:"#434c5e",text:"#d8dee9",soft:"#4c566a",accent:"#88c0d0"},
-      "tomorrow-night-eighties":{bg:"#2d2d2d",bg2:"#252525",bg3:"#393939",border:"#515151",text:"#cccccc",soft:"#777777",accent:"#cc99cc"},
-      "solarized dark":  {bg:"#002b36",bg2:"#00212b",bg3:"#073642",border:"#094b5a",text:"#839496",soft:"#586e75",accent:"#657b83"},
-      "solarized light": {bg:"#fdf6e3",bg2:"#eee8d5",bg3:"#f5efdc",border:"#ddd6c0",text:"#657b83",soft:"#93a1a1",accent:"#586e75"},
-      "eclipse":         {bg:"#ffffff",bg2:"#f5f5f5",bg3:"#ebebeb",border:"#d8d8d8",text:"#1a1a1a",soft:"#aaaaaa",accent:"#555555"},
-      "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",soft:"#aaaaaa",accent:"#666666"}
+      "dracula":         {bg:"#282a36",bg2:"#21222c",bg3:"#343746",border:"#44475a",text:"#f8f8f2",soft:"#6272a4",accent:"#bd93f9",complementary:"#50fa7b"},
+      "monokai":         {bg:"#272822",bg2:"#1e1f1c",bg3:"#3e3d32",border:"#49483e",text:"#f8f8f2",soft:"#75715e",accent:"#ae81ff",complementary:"#a6e22e"},
+      "material-darker": {bg:"#212121",bg2:"#1a1a1a",bg3:"#2d2d2d",border:"#3d3d3d",text:"#eeffff",soft:"#546e7a",accent:"#82aaff",complementary:"#82aaff"},
+      "nord":            {bg:"#2e3440",bg2:"#272c36",bg3:"#3b4252",border:"#434c5e",text:"#d8dee9",soft:"#4c566a",accent:"#88c0d0",complementary:"#88c0d0"},
+      "tomorrow-night-eighties":{bg:"#2d2d2d",bg2:"#252525",bg3:"#393939",border:"#515151",text:"#cccccc",soft:"#777777",accent:"#cc99cc",complementary:"#6699cc"},
+      "solarized dark":  {bg:"#002b36",bg2:"#00212b",bg3:"#073642",border:"#094b5a",text:"#839496",soft:"#586e75",accent:"#657b83",complementary:"#268bd2"},
+      "solarized light": {bg:"#fdf6e3",bg2:"#eee8d5",bg3:"#f5efdc",border:"#ddd6c0",text:"#657b83",soft:"#93a1a1",accent:"#586e75",complementary:"#268bd2"},
+      "eclipse":         {bg:"#ffffff",bg2:"#f5f5f5",bg3:"#ebebeb",border:"#d8d8d8",text:"#1a1a1a",soft:"#aaaaaa",accent:"#555555",complementary:"#0000c0"},
+      "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",soft:"#aaaaaa",accent:"#666666",complementary:"#005cc5"}
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
     if (!/^\/playground(?:\/|$)/.test(location.pathname)) return;
@@ -50,6 +50,7 @@ const themeBootstrapScript = `
     r.style.setProperty("--text", p.text);
     r.style.setProperty("--text-soft", p.soft);
     r.style.setProperty("--text-accent", p.accent);
+    r.style.setProperty("--text-complementary", p.complementary);
     r.setAttribute("data-theme", lightThemes[theme] ? "light" : "dark");
   } catch (e) { /* localStorage unavailable — fall back to default theme */ }
 })();

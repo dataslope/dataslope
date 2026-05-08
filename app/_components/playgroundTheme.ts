@@ -183,6 +183,7 @@ export function applyThemePalette(theme: string): void {
   // tree icons, and ER table headers.
   root.style.setProperty("--text-soft", p.dim);
   root.style.setProperty("--text-accent", p.muted);
+  root.style.setProperty("--text-complementary", p.fn);
   root.style.setProperty("--theme-primary", p.kw);
 }
 
@@ -198,6 +199,7 @@ export function clearThemePalette(): void {
     "--text-muted",
     "--text-soft",
     "--text-accent",
+    "--text-complementary",
     "--theme-primary",
   ]) {
     root.style.removeProperty(name);

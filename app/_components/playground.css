@@ -25,6 +25,10 @@
      before a theme has been applied. */
   --text-soft: oklch(68% 0.12 240);
   --text-accent: oklch(68% 0.16 145);
+  /* Complementary accent drawn from the theme's function-highlight color —
+     a vibrant hue that pairs well against `--text-soft` and `--text-accent`
+     and is populated per-theme by `applyThemePalette`. */
+  --text-complementary: oklch(75% 0.20 85);
   --primary: oklch(68% 0.18 250);
   --primary-glow: oklch(68% 0.18 250 / 0.15);
   --blue: oklch(68% 0.18 250);
