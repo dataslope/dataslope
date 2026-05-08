@@ -388,7 +388,7 @@
 }
 
 .sql-tree-column-type {
-  color: var(--text-dim);
+  color: var(--text-soft);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
