@@ -55,6 +55,7 @@ function rowsToQueryExecResult(
 export interface PostgresEngine {
   loadSampleDatabase: (id: string) => Promise<PostgresSampleDatabase>;
   exec: (sql: string) => Promise<QueryExecResult[]>;
+  execParams: (sql: string, params: unknown[]) => Promise<QueryExecResult[]>;
   execPaged: (
     sql: string,
     pageSize: number,
@@ -125,6 +126,16 @@ export async function createPostgresEngine(
       return results
         .map(resultToQueryExecResult)
         .filter((result): result is QueryExecResult => result !== null);
+    },
+
+    async execParams(sql, params) {
+      const result = await db.query<Record<string, unknown>>(sql, params);
+      const exec = resultToQueryExecResult({
+        fields: result.fields,
+        rows: result.rows,
+        affectedRows: result.affectedRows,
+      } as PgliteResult);
+      return exec ? [exec] : [];
     },
 
     async execPaged(sql, pageSize, offset) {
