@@ -9,6 +9,7 @@ import type {
 } from "./sqlite";
 import {
   findPostgresSampleDatabase,
+  POSTGRES_BLANK_DATABASE,
   type PostgresSampleDatabase,
 } from "./postgresSamples";
 
@@ -54,6 +55,7 @@ function rowsToQueryExecResult(
 
 export interface PostgresEngine {
   loadSampleDatabase: (id: string) => Promise<PostgresSampleDatabase>;
+  loadBlankDatabase: () => Promise<PostgresSampleDatabase>;
   exec: (sql: string) => Promise<QueryExecResult[]>;
   execParams: (sql: string, params: unknown[]) => Promise<QueryExecResult[]>;
   execPaged: (
@@ -116,6 +118,15 @@ export async function createPostgresEngine(
     async loadSampleDatabase(id) {
       sample = findPostgresSampleDatabase(id);
       const next = await createFreshDatabase(sample);
+      await db.close();
+      db = next;
+      return sample;
+    },
+
+    async loadBlankDatabase() {
+      sample = POSTGRES_BLANK_DATABASE;
+      const next = new PGlite();
+      await next.waitReady;
       await db.close();
       db = next;
       return sample;
@@ -333,7 +344,7 @@ export async function createPostgresEngine(
 
     async getDDL(name) {
       const tableRows = await queryRows<{ table_name: string }>(
-        `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1`,
+        `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1 AND table_type = 'BASE TABLE'`,
         [name],
       );
       if (tableRows.length > 0) {

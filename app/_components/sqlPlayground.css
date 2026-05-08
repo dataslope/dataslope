@@ -3005,3 +3005,10 @@
 .postgres-panes {
   grid-template-rows: auto minmax(0, 1fr) 6px minmax(0, 0.85fr);
 }
+
+/* In view-data mode the editor and resizer are hidden; collapse their
+   grid tracks so the result fills all available height. This rule must
+   come after .postgres-panes to win the specificity tie. */
+.postgres-panes.sql-panes--view-data {
+  grid-template-rows: auto 0 0 1fr;
+}

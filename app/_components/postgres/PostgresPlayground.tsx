@@ -37,6 +37,7 @@ import {
   ArrowUpFromLine,
   ChevronDown,
   Database,
+  FilePlus,
   FileJson,
   FileText,
   Network,
@@ -79,6 +80,7 @@ import {
 } from "../playgroundShared";
 import {
   POSTGRES_SAMPLE_DATABASES,
+  POSTGRES_BLANK_DATABASE,
   findPostgresSampleDatabase,
 } from "../runtime/postgresSamples";
 import {
@@ -790,7 +792,10 @@ function PostgresPlaygroundInner() {
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
       try {
-        const sample = await engine.loadSampleDatabase(nextId);
+        const sample =
+          nextId === POSTGRES_BLANK_DATABASE.id
+            ? await engine.loadBlankDatabase()
+            : await engine.loadSampleDatabase(nextId);
         setActiveDbId(sample.id);
         try {
           localStorage.setItem(storageKey("db"), sample.id);
@@ -1025,6 +1030,24 @@ function PostgresPlaygroundInner() {
       setActiveTabId(tab.id);
     },
     [persistTabs],
+  );
+
+  const openEntityStructure = useCallback(
+    (name: string) => {
+      const escapedName = name.replace(/'/g, "''");
+      const sql =
+        `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${escapedName}'\nORDER BY ordinal_position;`;
+      const tab: QueryTab = {
+        id: newTabId(),
+        title: `Structure: ${name}`,
+        code: sql,
+        pristineCode: sql,
+      };
+      persistTabs([...tabsRef.current, tab]);
+      setActiveTabId(tab.id);
+      void runSqlForTab(tab.id, sql, `Structure: ${name}`);
+    },
+    [persistTabs, runSqlForTab],
   );
 
   const requestDropEntity = useCallback(
@@ -1722,6 +1745,16 @@ function PostgresPlaygroundInner() {
                           </span>
                         </Select.Item>
                       ))}
+                      <Select.Item
+                        value={POSTGRES_BLANK_DATABASE.id}
+                        className="bui-select-item sql-db-item"
+                      >
+                        <span className="bui-select-item-icon" aria-hidden="true"><FilePlus size={14} /></span>
+                        <span className="sql-db-item-text">
+                          <Select.ItemText>{POSTGRES_BLANK_DATABASE.label}</Select.ItemText>
+                          <span className="sql-db-item-desc">{POSTGRES_BLANK_DATABASE.description}</span>
+                        </span>
+                      </Select.Item>
                     </Select.Popup>
                   </Select.Positioner>
                 </Select.Portal>
@@ -1755,6 +1788,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onModifyStructure={openEntityStructure}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={requestDropEntity}
@@ -1788,6 +1822,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onStructure={(n) => openEntityStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={requestDropEntity}
@@ -1910,6 +1945,7 @@ function PostgresPlaygroundInner() {
                 columnsByEntity={columnsByEntity}
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
+                onModifyStructure={openEntityStructure}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
                 onDrop={requestDropEntity}

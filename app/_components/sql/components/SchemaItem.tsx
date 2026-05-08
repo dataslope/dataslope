@@ -276,7 +276,7 @@ export function SchemaItem({
                   className="example-item"
                   onClick={() => onModifyStructure(name)}
                 >
-                  <div className="ex-title">View Structure</div>
+                  <div className="ex-title">View/Edit Structure</div>
                 </ContextMenu.Item>
               ) : (
                 onStructure && (
@@ -284,7 +284,7 @@ export function SchemaItem({
                     className="example-item"
                     onClick={() => onStructure(name, kind)}
                   >
-                    <div className="ex-title">View Structure</div>
+                    <div className="ex-title">View/Edit Structure</div>
                   </ContextMenu.Item>
                 )
               )}

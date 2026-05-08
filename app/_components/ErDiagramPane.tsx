@@ -259,7 +259,7 @@ function ErTableNode({ data }: NodeProps) {
                 className="example-item"
                 onClick={() => actions.onModifyStructure!(tableName)}
               >
-                <div className="ex-title">View Structure</div>
+                <div className="ex-title">View/Edit Structure</div>
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
