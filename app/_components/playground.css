@@ -9,10 +9,25 @@
   --bg3: #1e2535;
   --border: #2a3347;
   --text: #e2e8f0;
-  --text-dim: #64748b;
-  --text-muted: #94a3b8;
-  --accent: oklch(68% 0.18 250);
-  --accent-glow: oklch(68% 0.18 250 / 0.15);
+  /* `--text-muted` and `--text-dim` are derived neutrally by blending the
+     primary text color with the background. This keeps secondary UI text
+     legible and palette-cohesive across every theme — the editor syntax
+     palette (`palette.dim` / `palette.muted` in `playgroundTheme.ts`)
+     stays decoupled and is only used for CodeMirror highlighting. */
+  --text-muted: color-mix(in srgb, var(--text) 78%, var(--bg) 22%);
+  --text-dim: color-mix(in srgb, var(--text) 55%, var(--bg) 45%);
+  /* Theme-driven accents. `--text-soft` is a more saturated secondary
+     color (e.g. Lucario's blue #5c98cd), and `--text-accent` is the
+     theme's accent color used for table/view icons and ER headers
+     (e.g. Lucario's green #72c05d). Both are populated per-theme by
+     `applyThemePalette` from the same fields the editor highlighter
+     consumes. The defaults below kick in outside the playground or
+     before a theme has been applied. */
+  --text-soft: oklch(68% 0.12 240);
+  --text-accent: oklch(68% 0.16 145);
+  --primary: oklch(68% 0.18 250);
+  --primary-glow: oklch(68% 0.18 250 / 0.15);
+  --blue: oklch(68% 0.18 250);
   --green: oklch(68% 0.18 145);
   --red: oklch(62% 0.18 15);
   --yellow: oklch(78% 0.16 85);
@@ -186,7 +201,7 @@ body.pg-active {
 }
 .playground-switcher:focus-visible {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .playground-switcher-icon {
   color: var(--text-dim);
@@ -248,7 +263,7 @@ body.pg-active {
   background: var(--bg3);
 }
 .bui-select-item[data-selected] {
-  color: var(--accent);
+  color: var(--primary);
 }
 .bui-select-item-icon {
   display: inline-flex;
@@ -383,7 +398,7 @@ body.pg-active {
   transition: all 0.15s;
 }
 .examples-btn:hover {
-  border-color: var(--accent);
+  border-color: var(--primary);
   color: var(--text);
 }
 
@@ -512,7 +527,7 @@ body.pg-active {
      button is the primary action and reads as more "button-like" with
      a small-but-deliberate corner. */
   border-radius: 4px;
-  background: var(--accent);
+  background: var(--primary);
   border: none;
   color: white;
   font-family: var(--font-ui);
@@ -559,7 +574,7 @@ body.pg-active {
   align-items: stretch;
   border-radius: 4px;
   overflow: hidden;
-  background: var(--accent);
+  background: var(--primary);
   transition: all 0.15s;
 }
 .run-btn-split.running {
@@ -702,26 +717,26 @@ body.pg-active {
    directly on the element) and the focused selection layer rendered by
    CodeMirror's drawSelection() plugin. */
 .pg-root .cm-selectionBackground {
-  background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 22%, transparent) !important;
 }
 .pg-root
   .cm-focused
   > .cm-scroller
   > .cm-selectionLayer
   .cm-selectionBackground {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 /* Native ::selection (shown when the editor loses focus or the
    browser falls back from the CM layer). */
 .pg-root .cm-line::selection,
 .pg-root .cm-line > span::selection,
 .pg-root .cm-line > span > span::selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 .pg-root .cm-line::-moz-selection,
 .pg-root .cm-line > span::-moz-selection,
 .pg-root .cm-line > span > span::-moz-selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
 /* ─── Tomorrow Night Eighties — selection override ─── */
@@ -736,17 +751,17 @@ body.pg-active {
   > .cm-scroller
   > .cm-selectionLayer
   .cm-selectionBackground {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 .pg-root .cm-s-tomorrow-night-eighties .cm-line::selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span::selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 .pg-root .cm-s-tomorrow-night-eighties .cm-line::-moz-selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span::-moz-selection,
 .pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
 /* ─── Output pane ─── */
@@ -867,7 +882,7 @@ body.pg-active {
   border-left: 3px solid var(--red);
 }
 .out-cell.html {
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 .out-cell.plot {
   border-left: 3px solid var(--yellow);
@@ -922,7 +937,7 @@ body.pg-active {
   border-right: 1px solid var(--border);
   text-align: left;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary);
   white-space: nowrap;
 }
 .out-cell.html td {
@@ -1011,7 +1026,7 @@ body.pg-active {
   background: var(--bg3);
 }
 .icon-btn:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
 .icon-btn svg {
@@ -1061,7 +1076,7 @@ body.pg-active {
   font-family: var(--font-mono);
 }
 .info-popover-val a {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
 }
 .info-popover-val a:hover {
@@ -1215,9 +1230,9 @@ body.pg-active {
   background: var(--bg3);
 }
 .settings-tab[data-active] {
-  color: var(--accent);
+  color: var(--primary);
   background: var(--bg3);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--primary);
   font-weight: 600;
 }
 .settings-tab:focus-visible {
@@ -1312,12 +1327,12 @@ body.pg-active {
 }
 .theme-card:focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 .theme-card.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
 }
 .theme-card-preview {
   border-bottom: 1px solid;
@@ -1355,7 +1370,7 @@ body.pg-active {
   padding: 1px 5px;
 }
 .theme-card-check {
-  color: var(--accent);
+  color: var(--primary);
   font-weight: 700;
 }
 
@@ -1395,9 +1410,9 @@ body.pg-active {
     height: 18px;
   }
   .settings-tab[data-active] {
-    border-color: var(--accent);
+    border-color: var(--primary);
     background: var(--bg3);
-    color: var(--accent);
+    color: var(--primary);
   }
   .settings-tab-label {
     /* Visually hidden — keep available to assistive tech via aria. */
@@ -1446,7 +1461,7 @@ body.pg-active {
 .font-size-val {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--accent);
+  color: var(--primary);
   min-width: 30px;
   text-align: right;
 }
@@ -1468,13 +1483,13 @@ input[type="range"].fs-slider::-webkit-slider-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--primary);
   margin-top: -6px;
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--primary-glow);
   transition: box-shadow 0.15s;
 }
 input[type="range"].fs-slider:hover::-webkit-slider-thumb {
-  box-shadow: 0 0 0 5px var(--accent-glow);
+  box-shadow: 0 0 0 5px var(--primary-glow);
 }
 input[type="range"].fs-slider:disabled {
   cursor: not-allowed;
@@ -1513,10 +1528,10 @@ input[type="range"].fs-slider:disabled {
   transition: background-color 0.12s;
 }
 .setting-checkbox-row input[type="checkbox"]:focus-visible {
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 .setting-checkbox-row input[type="checkbox"]:checked {
-  background: color-mix(in srgb, var(--accent) 80%, var(--bg3));
+  background: color-mix(in srgb, var(--primary) 80%, var(--bg3));
 }
 .setting-checkbox-row input[type="checkbox"]:checked::after {
   content: "";
@@ -1558,10 +1573,10 @@ input[type="range"].fs-slider:disabled {
   transition: background-color 0.15s;
 }
 .bui-switch[data-checked] {
-  background: var(--accent);
+  background: var(--primary);
 }
 .bui-switch:focus-visible {
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 .bui-switch-thumb {
   display: block;
@@ -1621,7 +1636,7 @@ input[type="range"].fs-slider:disabled {
   color: var(--text-dim);
 }
 .ai-byok-input:focus {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .ai-byok-actions {
   display: flex;
@@ -1661,7 +1676,7 @@ input[type="range"].fs-slider:disabled {
 }
 .theme-select:hover,
 .theme-select:focus {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .theme-select-arrow {
   position: absolute;
@@ -1768,10 +1783,10 @@ input[type="range"].fs-slider:disabled {
   font-size: 10px;
   font-weight: 600;
   padding: 2px 7px;
-  background: var(--accent-glow);
-  color: var(--accent);
+  background: var(--primary-glow);
+  color: var(--primary);
   border-radius: 10px;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--primary);
 }
 
 .pkg-search-wrap {
@@ -1793,7 +1808,7 @@ input[type="range"].fs-slider:disabled {
   transition: border-color 0.15s;
 }
 .pkg-search:focus {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .pkg-search-icon {
   position: absolute;
@@ -1857,7 +1872,7 @@ input[type="range"].fs-slider:disabled {
 .pkg-item:focus-visible {
   outline: none;
   background: var(--bg3);
-  box-shadow: inset 2px 0 0 var(--accent);
+  box-shadow: inset 2px 0 0 var(--primary);
 }
 
 /* Wraps the import-on-click button and the optional Example button
@@ -1902,8 +1917,8 @@ input[type="range"].fs-slider:disabled {
     border-color 0.12s;
 }
 .pkg-example-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--primary);
+  color: var(--primary);
   background: var(--bg2);
 }
 .pkg-example-btn svg {
@@ -1956,7 +1971,7 @@ input[type="range"].fs-slider:disabled {
   line-height: 1.5;
 }
 .pkg-footer a {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
 }
 .pkg-footer a:hover {
@@ -2140,14 +2155,14 @@ input[type="range"].fs-slider:disabled {
 }
 .resizer:hover::before,
 .resizer.dragging::before {
-  background: var(--accent);
+  background: var(--primary);
   opacity: 1;
   height: 64px;
   width: 3px;
 }
 .resizer:hover,
 .resizer.dragging {
-  background: var(--accent-glow);
+  background: var(--primary-glow);
 }
 
 /* Export dropdown reuses the examples-dropdown layout but anchors below
@@ -2230,7 +2245,7 @@ input[type="range"].fs-slider:disabled {
 }
 .mobile-tab.active {
   color: var(--text);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--primary);
 }
 
 @media (max-width: 768px) {
@@ -2587,16 +2602,16 @@ input[type="range"].fs-slider:disabled {
   overflow: visible;
 }
 .dataslope-wave {
-  fill: color-mix(in oklab, var(--accent) 40%, transparent);
+  fill: color-mix(in oklab, var(--primary) 40%, transparent);
   transform: translateX(0);
   will-change: transform;
 }
 .dataslope-wave--back {
-  fill: color-mix(in oklab, var(--accent) 22%, transparent);
+  fill: color-mix(in oklab, var(--primary) 22%, transparent);
   animation: dataslopeWaveBack 2.4s linear infinite;
 }
 .dataslope-wave--front {
-  fill: color-mix(in oklab, var(--accent) 45%, transparent);
+  fill: color-mix(in oklab, var(--primary) 45%, transparent);
   animation: dataslopeWaveFront 1.4s linear infinite;
 }
 
@@ -2607,7 +2622,7 @@ input[type="range"].fs-slider:disabled {
   inset: 0;
   background: radial-gradient(
     120% 80% at 50% 110%,
-    color-mix(in oklab, var(--accent) 40%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 40%, transparent) 0%,
     transparent 70%
   );
   animation: dataslopePulse 0.9s ease-in-out infinite alternate;
@@ -2624,7 +2639,7 @@ input[type="range"].fs-slider:disabled {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in oklab, var(--accent) 80%, white 20%) 50%,
+    color-mix(in oklab, var(--primary) 80%, white 20%) 50%,
     transparent 100%
   );
   filter: blur(0.5px);
@@ -2805,7 +2820,7 @@ input[type="range"].fs-slider:disabled {
   color: var(--text);
 }
 .confirm-btn-primary {
-  background: var(--accent);
+  background: var(--primary);
   color: white;
 }
 .confirm-btn-primary:hover {
@@ -3068,7 +3083,7 @@ html[data-pg-theme="dark"] .welcome h3 {
 }
 .pragma-info-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
 /* Popover body for pragma descriptions. */
@@ -3115,7 +3130,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   border-color: var(--text-dim);
 }
 .pragma-select:focus {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 
 /* Checkbox rows inside the pragma tab use the same base class but also
@@ -3144,7 +3159,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   display: inline-flex;
   align-items: center;
   padding: 8px 18px;
-  background: var(--accent);
+  background: var(--primary);
   border: none;
   border-radius: var(--radius);
   color: #fff;

@@ -170,8 +170,19 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--bg3", p.bg3);
   root.style.setProperty("--border", p.border);
   root.style.setProperty("--text", p.text);
-  root.style.setProperty("--text-dim", p.dim);
-  root.style.setProperty("--text-muted", p.muted);
+  // `--text-dim` and `--text-muted` are intentionally NOT written here.
+  // They are derived in CSS via `color-mix(--text, --bg)` so secondary UI
+  // text always blends with the active theme's background and stays
+  // neutral instead of inheriting the editor palette's accent hues
+  // (e.g. Lucario's blue/green or IntelliJ's dark purple).
+  //
+  // `--text-soft` and `--text-accent` are the *opposite* — places where we
+  // explicitly want the theme's personality to come through. They reuse
+  // the editor palette's `dim` / `muted` slots (e.g. Lucario blue for
+  // soft, Lucario green for accent), used for tab labels, table/view
+  // tree icons, and ER table headers.
+  root.style.setProperty("--text-soft", p.dim);
+  root.style.setProperty("--text-accent", p.muted);
   root.style.setProperty("--theme-primary", p.kw);
 }
 
@@ -185,6 +196,8 @@ export function clearThemePalette(): void {
     "--text",
     "--text-dim",
     "--text-muted",
+    "--text-soft",
+    "--text-accent",
     "--theme-primary",
   ]) {
     root.style.removeProperty(name);
