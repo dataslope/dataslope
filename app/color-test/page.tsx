@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Circle,
   Code2,
+  Copy,
   Database,
   Info,
   Play,
@@ -33,8 +34,52 @@ import {
 import "../_components/playground.css";
 import styles from "./color-test.module.css";
 
+const SWATCH_DEFS = [
+  { name: "--bg", label: "Background" },
+  { name: "--bg2", label: "Background 2" },
+  { name: "--bg3", label: "Background 3" },
+  { name: "--border", label: "Border" },
+  { name: "--text", label: "Text", isTextColor: true },
+  { name: "--text-muted", label: "Text Muted", isTextColor: true },
+  { name: "--text-dim", label: "Text Dim", isTextColor: true },
+  { name: "--text-soft", label: "Text Soft", isTextColor: true },
+  { name: "--text-accent", label: "Text Accent", isTextColor: true },
+  {
+    name: "--text-complementary",
+    label: "Text Complementary",
+    isTextColor: true,
+    highlight: true,
+  },
+  { name: "--theme-primary", label: "Theme Primary", isTextColor: true },
+  { name: "--primary", label: "Primary" },
+  { name: "--blue", label: "Blue" },
+  { name: "--green", label: "Green" },
+  { name: "--red", label: "Red" },
+  { name: "--yellow", label: "Yellow" },
+] as const;
+
+function resolveCssVarToHex(varName: string): string {
+  const el = document.createElement("div");
+  el.style.cssText = `position:fixed;left:-9999px;top:0;width:1px;height:1px;background:var(${varName})`;
+  document.body.appendChild(el);
+  const rgb = getComputedStyle(el).backgroundColor;
+  document.body.removeChild(el);
+  const m = rgb.match(/\d+/g);
+  if (!m || m.length < 3) return "";
+  return (
+    "#" +
+    (m as string[])
+      .slice(0, 3)
+      .map((n: string) => parseInt(n).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+
 export default function ColorTestPage() {
   const [activeTheme, setActiveTheme] = useState("lucario");
+  const [resolvedHex, setResolvedHex] = useState<Record<string, string>>({});
+  const [copiedVar, setCopiedVar] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = getStoredEditorTheme();
@@ -44,6 +89,15 @@ export default function ColorTestPage() {
     applyMode(theme);
   }, []);
 
+  // Re-resolve hex values whenever the theme changes (after CSS vars update).
+  useEffect(() => {
+    const map: Record<string, string> = {};
+    for (const { name } of SWATCH_DEFS) {
+      map[name] = resolveCssVarToHex(name);
+    }
+    setResolvedHex(map);
+  }, [activeTheme]);
+
   function handleThemeChange(theme: string) {
     setActiveTheme(theme);
     applyThemePalette(theme);
@@ -51,20 +105,18 @@ export default function ColorTestPage() {
     setStoredEditorTheme(theme);
   }
 
+  function handleCopy(varName: string) {
+    const hex = resolvedHex[varName];
+    if (!hex) return;
+    navigator.clipboard.writeText(hex.slice(1)); // strip leading #
+    setCopiedVar(varName);
+    setTimeout(() => setCopiedVar((v) => (v === varName ? null : v)), 1500);
+  }
+
   return (
     <div className={`pg-root ${styles.root}`}>
       {/* ── Theme switcher ── */}
       <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <h1 className={styles.pageTitle}>
-            <Zap size={20} />
-            Color Theme Test
-          </h1>
-          <p className={styles.pageSubtitle}>
-            Select a theme to preview all UI colors and elements.
-          </p>
-        </div>
-
         <div className={styles.themeGrid}>
           {ALL_THEMES.map(({ value, label }) => {
             const p = THEME_PREVIEWS[value];
@@ -80,18 +132,9 @@ export default function ColorTestPage() {
                   className={styles.themePreview}
                   style={{ background: p.bg, borderColor: p.border }}
                 >
-                  <span
-                    className={styles.dot}
-                    style={{ background: p.kw }}
-                  />
-                  <span
-                    className={styles.dot}
-                    style={{ background: p.fn }}
-                  />
-                  <span
-                    className={styles.dot}
-                    style={{ background: p.str }}
-                  />
+                  <span className={styles.dot} style={{ background: p.kw }} />
+                  <span className={styles.dot} style={{ background: p.fn }} />
+                  <span className={styles.dot} style={{ background: p.str }} />
                   {activeTheme === value && (
                     <Check
                       size={10}
@@ -112,62 +155,84 @@ export default function ColorTestPage() {
         {/* Color swatches */}
         <Section title="Color Variables">
           <div className={styles.swatchGrid}>
-            {[
-              { name: "--bg", label: "Background" },
-              { name: "--bg2", label: "Background 2" },
-              { name: "--bg3", label: "Background 3" },
-              { name: "--border", label: "Border", text: true },
-              { name: "--text", label: "Text", onBg: true },
-              { name: "--text-muted", label: "Text Muted", onBg: true },
-              { name: "--text-dim", label: "Text Dim", onBg: true },
-              { name: "--text-soft", label: "Text Soft", onBg: true },
-              { name: "--text-accent", label: "Text Accent", onBg: true },
-              {
-                name: "--text-complementary",
-                label: "Text Complementary",
-                onBg: true,
-                highlight: true,
-              },
-              { name: "--theme-primary", label: "Theme Primary", onBg: true },
-              { name: "--primary", label: "Primary" },
-              { name: "--blue", label: "Blue" },
-              { name: "--green", label: "Green" },
-              { name: "--red", label: "Red" },
-              { name: "--yellow", label: "Yellow" },
-            ].map(({ name, label, onBg, highlight }) => (
-              <div
-                key={name}
-                className={`${styles.swatch} ${highlight ? styles.swatchHighlight : ""}`}
-              >
+            {SWATCH_DEFS.map(({ name, label, isTextColor, highlight }) => {
+              const hex = resolvedHex[name] ?? "";
+              return (
                 <div
-                  className={styles.swatchColor}
-                  style={{
-                    background: onBg ? "var(--bg)" : `var(${name})`,
-                    borderColor: "var(--border)",
-                  }}
+                  key={name}
+                  className={[
+                    styles.swatch,
+                    isTextColor ? styles.swatchDual : "",
+                    highlight ? styles.swatchHighlight : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
-                  {onBg ? (
-                    <span
-                      className={styles.swatchSample}
-                      style={{ color: `var(${name})` }}
+                  <div className={styles.swatchColors}>
+                    <div
+                      className={styles.swatchColor}
+                      style={{
+                        background: isTextColor
+                          ? "var(--bg)"
+                          : `var(${name})`,
+                        borderColor: "var(--border)",
+                      }}
                     >
-                      Aa
+                      {isTextColor && (
+                        <span
+                          className={styles.swatchSample}
+                          style={{ color: `var(${name})` }}
+                        >
+                          Aa
+                        </span>
+                      )}
+                    </div>
+                    {isTextColor && (
+                      <div
+                        className={styles.swatchColorSolid}
+                        style={{
+                          background: `var(${name})`,
+                          borderColor: "var(--border)",
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div className={styles.swatchMeta}>
+                    <span className={styles.swatchHex}>
+                      {hex || "—"}
                     </span>
-                  ) : null}
+                    <button
+                      className={styles.copyBtn}
+                      onClick={() => handleCopy(name)}
+                      title="Copy hex (without #)"
+                      disabled={!hex}
+                    >
+                      {copiedVar === name ? (
+                        <Check size={9} />
+                      ) : (
+                        <Copy size={9} />
+                      )}
+                    </button>
+                  </div>
+
+                  <span className={styles.swatchName}>{name}</span>
+                  <span className={styles.swatchLabel}>{label}</span>
                 </div>
-                <span className={styles.swatchName}>{name}</span>
-                <span className={styles.swatchLabel}>{label}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Section>
 
         {/* Typography */}
         <Section title="Typography">
-          <div className={styles.typoGrid}>
+          <div className={styles.typoStack}>
             <div className={styles.typoCard}>
               <h3 className={styles.typoCardTitle}>Sans-serif — UI Font</h3>
-              <div className={styles.typoSamples} style={{ fontFamily: "var(--font-ui)" }}>
+              <div
+                className={styles.typoSamples}
+                style={{ fontFamily: "var(--font-ui)" }}
+              >
                 <p className={styles.typoH1} style={{ color: "var(--text)" }}>
                   Heading One
                 </p>
@@ -177,58 +242,80 @@ export default function ColorTestPage() {
                 <p className={styles.typoH3} style={{ color: "var(--text)" }}>
                   Heading Three
                 </p>
-                <p style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.6 }}>
+                <p
+                  style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.6 }}
+                >
                   Body text — The quick brown fox jumps over the lazy dog. Pack
                   my box with five dozen liquor jugs.
                 </p>
-                <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>
+                <p
+                  style={{
+                    color: "var(--text-muted)",
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                  }}
+                >
                   Muted body — Secondary descriptions and helper text appear
                   here, blended toward the background.
                 </p>
-                <p style={{ color: "var(--text-dim)", fontSize: 13, lineHeight: 1.6 }}>
+                <p
+                  style={{
+                    color: "var(--text-dim)",
+                    fontSize: 13,
+                    lineHeight: 1.6,
+                  }}
+                >
                   Dimmed caption — Timestamps, metadata, and low-priority labels
                   rendered at reduced opacity.
                 </p>
               </div>
             </div>
 
-            <div className={styles.typoCard}>
+            <div className={styles.cmCard}>
               <h3 className={styles.typoCardTitle}>Monospace — Code Font</h3>
-              <div className={styles.typoSamples} style={{ fontFamily: "var(--font-mono)" }}>
-                <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.8 }}>
+              <pre className={styles.codeBlock}>
+                <code>
                   <span style={{ color: "var(--theme-primary)" }}>def </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
                   <span style={{ color: "var(--text)" }}>(</span>
                   <span style={{ color: "var(--text-soft)" }}>n: int</span>
-                  <span style={{ color: "var(--text)" }}>) -&gt; int:</span>
-                </p>
-                <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.8 }}>
-                  &nbsp;&nbsp;<span style={{ color: "var(--text-dim)" }}># base cases</span>
-                </p>
-                <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.8 }}>
-                  &nbsp;&nbsp;<span style={{ color: "var(--theme-primary)" }}>if </span>
-                  <span style={{ color: "var(--text)" }}>n &lt;= 1: </span>
-                  <span style={{ color: "var(--theme-primary)" }}>return </span>
-                  <span style={{ color: "var(--text-accent)" }}>n</span>
-                </p>
-                <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.8 }}>
-                  &nbsp;&nbsp;<span style={{ color: "var(--theme-primary)" }}>return </span>
+                  <span style={{ color: "var(--text)" }}>) -&gt; int:{"\n"}</span>
+                  <span style={{ color: "var(--text-dim)" }}>{"    "}"""Return the nth Fibonacci number."""{"\n"}</span>
+                  {"    "}<span style={{ color: "var(--theme-primary)" }}>if </span>
+                  <span style={{ color: "var(--text)" }}>n &lt;= </span>
+                  <span style={{ color: "var(--text-accent)" }}>1</span>
+                  <span style={{ color: "var(--text)" }}>:{"\n"}</span>
+                  {"        "}<span style={{ color: "var(--theme-primary)" }}>return </span>
+                  <span style={{ color: "var(--text-accent)" }}>n{"\n"}</span>
+                  {"    "}<span style={{ color: "var(--theme-primary)" }}>return </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(n-</span>
+                  <span style={{ color: "var(--text)" }}>(n - </span>
                   <span style={{ color: "var(--text-accent)" }}>1</span>
                   <span style={{ color: "var(--text)" }}>) + </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(n-</span>
+                  <span style={{ color: "var(--text)" }}>(n - </span>
                   <span style={{ color: "var(--text-accent)" }}>2</span>
+                  <span style={{ color: "var(--text)" }}>){"\n\n"}</span>
+                  <span style={{ color: "var(--text-dim)" }}># Compute first 10 values{"\n"}</span>
+                  <span style={{ color: "var(--text-complementary)" }}>results</span>
+                  <span style={{ color: "var(--text)" }}> = [</span>
+                  <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
+                  <span style={{ color: "var(--text)" }}>(i) </span>
+                  <span style={{ color: "var(--theme-primary)" }}>for </span>
+                  <span style={{ color: "var(--text)" }}>i </span>
+                  <span style={{ color: "var(--theme-primary)" }}>in </span>
+                  <span style={{ color: "var(--text-complementary)" }}>range</span>
+                  <span style={{ color: "var(--text)" }}>(</span>
+                  <span style={{ color: "var(--text-accent)" }}>10</span>
+                  <span style={{ color: "var(--text)" }}>)]{"\n"}</span>
+                  <span style={{ color: "var(--text-complementary)" }}>print</span>
+                  <span style={{ color: "var(--text)" }}>(</span>
+                  <span style={{ color: "var(--text-soft)" }}>f"Sequence: {"{"}</span>
+                  <span style={{ color: "var(--text-complementary)" }}>results</span>
+                  <span style={{ color: "var(--text-soft)" }}>{"}"}"</span>
                   <span style={{ color: "var(--text)" }}>)</span>
-                </p>
-                <p style={{ color: "var(--text-soft)", fontSize: 13, marginTop: 8 }}>
-                  &gt; fibonacci(10)
-                </p>
-                <p style={{ color: "var(--text-accent)", fontSize: 13 }}>
-                  55
-                </p>
-              </div>
+                </code>
+              </pre>
             </div>
           </div>
         </Section>
@@ -257,13 +344,17 @@ export default function ColorTestPage() {
             </button>
           </div>
           <div className={styles.row} style={{ marginTop: 8 }}>
-            <button className={`${styles.btn} ${styles.btnSm} ${styles.btnPrimary}`}>
+            <button
+              className={`${styles.btn} ${styles.btnSm} ${styles.btnPrimary}`}
+            >
               Small
             </button>
             <button className={`${styles.btn} ${styles.btnPrimary}`}>
               Medium
             </button>
-            <button className={`${styles.btn} ${styles.btnLg} ${styles.btnPrimary}`}>
+            <button
+              className={`${styles.btn} ${styles.btnLg} ${styles.btnPrimary}`}
+            >
               Large
             </button>
           </div>
@@ -272,9 +363,13 @@ export default function ColorTestPage() {
         {/* Badges & Tags */}
         <Section title="Badges & Tags">
           <div className={styles.row}>
-            <span className={`${styles.badge} ${styles.badgeDefault}`}>Default</span>
+            <span className={`${styles.badge} ${styles.badgeDefault}`}>
+              Default
+            </span>
             <span className={`${styles.badge} ${styles.badgeSoft}`}>Soft</span>
-            <span className={`${styles.badge} ${styles.badgeAccent}`}>Accent</span>
+            <span className={`${styles.badge} ${styles.badgeAccent}`}>
+              Accent
+            </span>
             <span className={`${styles.badge} ${styles.badgeComplementary}`}>
               Complementary
             </span>
@@ -421,7 +516,7 @@ export default function ColorTestPage() {
               <div>
                 <strong>Complementary</strong> — Highlighted state using{" "}
                 <code className={styles.inlineCode}>--text-complementary</code>{" "}
-                — the new function-color variable.
+                — the function-color variable.
               </div>
             </div>
             <div className={`${styles.alert} ${styles.alertWarning}`}>
@@ -446,7 +541,11 @@ export default function ColorTestPage() {
           <div className={styles.listGrid}>
             <nav className={styles.navList}>
               {[
-                { icon: <Terminal size={15} />, label: "Python Playground", active: true },
+                {
+                  icon: <Terminal size={15} />,
+                  label: "Python Playground",
+                  active: true,
+                },
                 { icon: <Code2 size={15} />, label: "JavaScript" },
                 { icon: <Database size={15} />, label: "SQLite" },
                 { icon: <Code2 size={15} />, label: "TypeScript" },
@@ -465,67 +564,46 @@ export default function ColorTestPage() {
                     {icon}
                   </span>
                   <span>{label}</span>
-                  <ChevronRight size={13} style={{ marginLeft: "auto", color: "var(--text-dim)" }} />
+                  <ChevronRight
+                    size={13}
+                    style={{ marginLeft: "auto", color: "var(--text-dim)" }}
+                  />
                 </div>
               ))}
             </nav>
 
             <ul className={styles.bulletList}>
               {[
-                { color: "var(--text-soft)", text: "--text-soft — muted secondary (dim slot)" },
-                { color: "var(--text-accent)", text: "--text-accent — accent (muted slot)" },
-                { color: "var(--text-complementary)", text: "--text-complementary — fn slot (new)" },
-                { color: "var(--theme-primary)", text: "--theme-primary — keyword highlight" },
+                {
+                  color: "var(--text-soft)",
+                  text: "--text-soft — muted secondary (dim slot)",
+                },
+                {
+                  color: "var(--text-accent)",
+                  text: "--text-accent — accent (muted slot)",
+                },
+                {
+                  color: "var(--text-complementary)",
+                  text: "--text-complementary — fn slot (new)",
+                },
+                {
+                  color: "var(--theme-primary)",
+                  text: "--theme-primary — keyword highlight",
+                },
               ].map(({ color, text }) => (
                 <li key={text} className={styles.bulletItem}>
-                  <Circle size={8} style={{ color, flexShrink: 0 }} fill={color} />
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>{text}</span>
+                  <Circle
+                    size={8}
+                    style={{ color, flexShrink: 0 }}
+                    fill={color}
+                  />
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>
+                    {text}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
-        </Section>
-
-        {/* Code block */}
-        <Section title="Inline & Block Code">
-          <p className={styles.prose}>
-            Use <code className={styles.inlineCode}>--text-complementary</code>{" "}
-            alongside{" "}
-            <code className={styles.inlineCode}>--text-soft</code> and{" "}
-            <code className={styles.inlineCode}>--text-accent</code> to add a
-            third distinct accent drawn straight from the active editor theme's{" "}
-            <code className={styles.inlineCode}>fn</code> color slot.
-          </p>
-          <pre className={styles.codeBlock}>
-            <code>
-              <span style={{ color: "var(--theme-primary)" }}>SELECT</span>
-              {`\n  `}
-              <span style={{ color: "var(--text-complementary)" }}>id</span>
-              {`, `}
-              <span style={{ color: "var(--text-complementary)" }}>name</span>
-              {`, `}
-              <span style={{ color: "var(--text-complementary)" }}>created_at</span>
-              {`\n`}
-              <span style={{ color: "var(--theme-primary)" }}>FROM</span>
-              {`  `}
-              <span style={{ color: "var(--text-soft)" }}>users</span>
-              {`\n`}
-              <span style={{ color: "var(--theme-primary)" }}>WHERE</span>
-              {` active = `}
-              <span style={{ color: "var(--text-accent)" }}>true</span>
-              {`\n`}
-              <span style={{ color: "var(--theme-primary)" }}>ORDER BY</span>
-              {` `}
-              <span style={{ color: "var(--text-complementary)" }}>created_at</span>
-              {` `}
-              <span style={{ color: "var(--theme-primary)" }}>DESC</span>
-              {`\n`}
-              <span style={{ color: "var(--theme-primary)" }}>LIMIT</span>
-              {`  `}
-              <span style={{ color: "var(--text-accent)" }}>100</span>
-              {`;`}
-            </code>
-          </pre>
         </Section>
       </main>
     </div>

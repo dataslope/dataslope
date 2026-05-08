@@ -14,30 +14,7 @@
   z-index: 100;
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  padding: 16px 24px 12px;
-}
-
-.headerInner {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.pageTitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.pageSubtitle {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 0;
+  padding: 10px 16px;
 }
 
 .themeGrid {
@@ -137,35 +114,103 @@
 .swatchGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  align-items: flex-start;
 }
 
+/* Single-color swatch item */
 .swatch {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  width: 80px;
+  width: 76px;
 }
 
-.swatchHighlight .swatchColor {
+/* Dual-color swatch item (text colors showing both "Aa on bg" and solid fill) */
+.swatchDual {
+  width: 114px;
+}
+
+/* Highlight the --text-complementary swatch */
+.swatchHighlight .swatchColors {
   outline: 2px solid var(--text-complementary);
   outline-offset: 2px;
+  border-radius: 7px;
 }
 
+/* Flex row holding one or two color boxes */
+.swatchColors {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+/* Main color box: for non-text colors it is the solid fill;
+   for text colors it shows "Aa" text on --bg */
 .swatchColor {
-  width: 64px;
+  flex: 1;
   height: 40px;
   border-radius: 6px;
   border: 1px solid;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+}
+
+/* Secondary box: solid fill of the text color */
+.swatchColorSolid {
+  width: 48px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid;
+  flex-shrink: 0;
 }
 
 .swatchSample {
   font-size: 17px;
   font-weight: 700;
+}
+
+/* Hex value + copy button row */
+.swatchMeta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  justify-content: center;
+}
+
+.swatchHex {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 1px 3px;
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+}
+
+.copyBtn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.copyBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .swatchName {
@@ -183,17 +228,20 @@
 }
 
 /* ── Typography ── */
-.typoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 640px) {
-  .typoGrid { grid-template-columns: 1fr; }
+.typoStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .typoCard {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.cmCard {
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -218,6 +266,21 @@
 .typoH1 { font-size: 24px; font-weight: 700; margin: 0; }
 .typoH2 { font-size: 20px; font-weight: 600; margin: 0; }
 .typoH3 { font-size: 16px; font-weight: 500; margin: 0; }
+
+/* ── Code block (pre) ── */
+.codeBlock {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+  overflow-x: auto;
+  padding: 14px 18px;
+  color: var(--text);
+  white-space: pre;
+}
 
 /* ── Buttons ── */
 .row {
@@ -515,6 +578,17 @@
 
 .alertError svg { color: var(--red); flex-shrink: 0; margin-top: 1px; }
 
+/* ── Inline code (used in alerts) ── */
+.inlineCode {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-complementary);
+  padding: 1px 5px;
+}
+
 /* ── Lists / Navigation ── */
 .listGrid {
   display: grid;
@@ -570,35 +644,4 @@
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.5;
-}
-
-/* ── Code ── */
-.prose {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin: 0 0 12px;
-}
-
-.inlineCode {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-complementary);
-  padding: 1px 5px;
-}
-
-.codeBlock {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.8;
-  margin: 0;
-  overflow-x: auto;
-  padding: 14px 18px;
-  color: var(--text);
 }
