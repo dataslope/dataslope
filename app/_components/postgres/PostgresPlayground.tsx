@@ -393,15 +393,18 @@ function PostgresPlaygroundInner() {
     ]);
     const entries = await Promise.all(
       [...nextTables, ...nextViews].map(async (name) => {
-        try {
-          const [cols, fks] = await Promise.all([
-            engine.listColumns(name),
-            engine.listForeignKeys(name),
-          ]);
-          return [name, cols, fks] as const;
-        } catch {
-          return [name, [] as TableColumnInfo[], [] as ForeignKeyInfo[]] as const;
-        }
+        const [colsResult, fksResult, countResult] = await Promise.allSettled([
+          engine.listColumns(name),
+          engine.listForeignKeys(name),
+          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`),
+        ]);
+        const cols = colsResult.status === "fulfilled" ? colsResult.value : [];
+        const fks = fksResult.status === "fulfilled" ? fksResult.value : [];
+        const count =
+          countResult.status === "fulfilled"
+            ? Number(countResult.value[0]?.values?.[0]?.[0] ?? 0)
+            : 0;
+        return [name, cols, fks, count] as const;
       }),
     );
     setTables(nextTables);
@@ -410,7 +413,7 @@ function PostgresPlaygroundInner() {
     setTriggers(nextTriggers);
     setColumnsByEntity(Object.fromEntries(entries.map(([name, cols]) => [name, cols])));
     setForeignKeysByEntity(Object.fromEntries(entries.map(([name, , fks]) => [name, fks])));
-    setRowCountByTable({});
+    setRowCountByTable(Object.fromEntries(entries.map(([name, , , count]) => [name, count])));
   }, []);
 
   const runSqlForTab = useCallback(
@@ -1062,25 +1065,11 @@ function PostgresPlaygroundInner() {
     [],
   );
 
+  // Row counts are precomputed by `refreshSchema` so this is a synchronous
+  // lookup. SchemaItem caches the first non-null result it sees, so we
+  // can't hand back a stale 0 while a real count is in flight.
   const fetchEntityRowCount = useCallback(
-    (name: string): number => {
-      const cached = rowCountByTable[name];
-      if (cached !== undefined) return cached;
-      const engine = engineRef.current;
-      if (!engine) return 0;
-      // Fire-and-forget — by the time the user opens the export submenu
-      // again the count will be cached.
-      void (async () => {
-        try {
-          const sets = await engine.exec(`SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)}`);
-          const value = Number(sets[0]?.values?.[0]?.[0] ?? 0);
-          setRowCountByTable((prev) => ({ ...prev, [name]: value }));
-        } catch {
-          setRowCountByTable((prev) => ({ ...prev, [name]: 0 }));
-        }
-      })();
-      return 0;
-    },
+    (name: string): number => rowCountByTable[name] ?? 0,
     [rowCountByTable],
   );
 
@@ -1665,6 +1654,7 @@ function PostgresPlaygroundInner() {
           engine={engineRef.current}
           onPickFile={handleCsvFile}
           onSubmit={() => void submitImport("csv")}
+          onError={(msg) => showToast(msg, "warn")}
         />
 
         {/* ── Import JSON dialog ── */}
@@ -1684,6 +1674,7 @@ function PostgresPlaygroundInner() {
           engine={engineRef.current}
           onPickFile={handleJsonFile}
           onSubmit={() => void submitImport("json")}
+          onError={(msg) => showToast(msg, "warn")}
         />
 
         {/* ── Import Parquet dialog ── */}
@@ -1703,6 +1694,7 @@ function PostgresPlaygroundInner() {
           engine={engineRef.current}
           onPickFile={(f) => void handleParquetFile(f)}
           onSubmit={() => void submitImport("parquet")}
+          onError={(msg) => showToast(msg, "warn")}
         />
 
         <div className="sql-shell postgres-shell">
@@ -1964,6 +1956,7 @@ interface ImportDialogProps<S extends CsvImportState | JsonImportState | Parquet
   engine: PostgresEngine | null;
   onPickFile: (file: File) => void;
   onSubmit: () => void;
+  onError: (message: string) => void;
 }
 
 function ImportDialog<
@@ -1980,6 +1973,7 @@ function ImportDialog<
   engine,
   onPickFile,
   onSubmit,
+  onError,
 }: ImportDialogProps<S>) {
   const flavorConfig = useMemo(() => {
     if (flavor === "csv") {
@@ -2036,16 +2030,25 @@ function ImportDialog<
       const target = state?.targetTable || tables[0] || "";
       if (target) {
         void (async () => {
-          const cols = await engine.listColumns(target);
-          onStateChange((prev) => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              targetMode: "existing",
-              targetTable: target,
-              colCompare: computeImportColComparison(fileColumns, cols),
-            } as S;
-          });
+          try {
+            const cols = await engine.listColumns(target);
+            onStateChange((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                targetMode: "existing",
+                targetTable: target,
+                colCompare: computeImportColComparison(fileColumns, cols),
+              } as S;
+            });
+          } catch (err) {
+            onStateChange((prev) => (prev ? ({ ...prev, colCompare: null } as S) : prev));
+            onError(
+              `Could not load columns for "${target}": ${
+                err instanceof Error ? err.message : String(err)
+              }`,
+            );
+          }
         })();
       }
     }
@@ -2053,16 +2056,26 @@ function ImportDialog<
 
   const setTargetTable = (newTable: string) => {
     if (!engine) return;
+    onStateChange((prev) => (prev ? ({ ...prev, targetTable: newTable } as S) : prev));
     void (async () => {
-      const cols = await engine.listColumns(newTable);
-      onStateChange((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          targetTable: newTable,
-          colCompare: computeImportColComparison(fileColumns, cols),
-        } as S;
-      });
+      try {
+        const cols = await engine.listColumns(newTable);
+        onStateChange((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            targetTable: newTable,
+            colCompare: computeImportColComparison(fileColumns, cols),
+          } as S;
+        });
+      } catch (err) {
+        onStateChange((prev) => (prev ? ({ ...prev, colCompare: null } as S) : prev));
+        onError(
+          `Could not load columns for "${newTable}": ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
     })();
   };
 
