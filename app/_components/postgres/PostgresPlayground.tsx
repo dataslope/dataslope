@@ -321,11 +321,6 @@ function PostgresPlaygroundInner() {
   }, [tabs]);
   useEffect(() => {
     activeTabIdRef.current = activeTabId;
-    try {
-      localStorage.setItem(dbScopedKey(activeDbIdRef.current, "active_tab"), activeTabId);
-    } catch {
-      // ignore
-    }
   }, [activeTabId]);
   useEffect(() => {
     activeDbIdRef.current = activeDbId;

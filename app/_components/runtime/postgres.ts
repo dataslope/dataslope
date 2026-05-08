@@ -269,10 +269,7 @@ export async function createPostgresEngine(
     },
 
     async getColumnConstraintInfo(tableName) {
-      const [cols, fks] = await Promise.all([
-        engine.listColumns(tableName),
-        engine.listForeignKeys(tableName),
-      ]);
+      const cols = await engine.listColumns(tableName);
       const uniqueRows = await queryRows<{ column_name: string }>(
         `
         SELECT kcu.column_name
@@ -287,12 +284,13 @@ export async function createPostgresEngine(
         [tableName],
       );
       const unique = new Set(uniqueRows.map((row) => row.column_name));
-      const fkCols = new Set(fks.map((fk) => fk.from));
       return cols.map((col) => ({
         name: col.name,
         isPrimaryKey: col.pk > 0,
-        isAutoIncrement: Boolean(col.defaultValue?.includes("nextval(")),
-        isUnique: unique.has(col.name) || fkCols.has(col.name),
+        isAutoIncrement: /^nextval\('([^']+)'::regclass\)$/i.test(
+          col.defaultValue ?? "",
+        ),
+        isUnique: unique.has(col.name),
       }));
     },
 
