@@ -72,11 +72,11 @@
 }
 
 .themeLabel {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   text-align: center;
   white-space: nowrap;
-  max-width: 56px;
+  max-width: 64px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -124,12 +124,12 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  width: 76px;
+  width: 90px;
 }
 
 /* Dual-color swatch item (text colors showing both "Aa on bg" and solid fill) */
 .swatchDual {
-  width: 114px;
+  width: 132px;
 }
 
 /* Highlight the --text-complementary swatch */
@@ -183,7 +183,7 @@
 }
 
 .swatchHex {
-  font-size: 9px;
+  font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-dim);
   letter-spacing: 0.02em;
@@ -214,7 +214,7 @@
 }
 
 .swatchName {
-  font-size: 9px;
+  font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-dim);
   text-align: center;
@@ -222,7 +222,7 @@
 }
 
 .swatchLabel {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-muted);
   text-align: center;
 }
@@ -249,7 +249,7 @@
 }
 
 .typoCardTitle {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-soft);
   text-transform: uppercase;
@@ -336,7 +336,7 @@
   border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
 }
 
-.btnSm { font-size: 11px; padding: 4px 8px; }
+.btnSm { font-size: 12px; padding: 4px 8px; }
 .btnLg { font-size: 15px; padding: 9px 18px; }
 
 /* ── Badges ── */
@@ -345,7 +345,7 @@
   align-items: center;
   gap: 4px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 2px 8px;
 }
@@ -432,7 +432,7 @@
 }
 
 .iconLabel {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   text-align: center;
 }
@@ -455,7 +455,7 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-muted);
 }
