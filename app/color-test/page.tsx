@@ -34,7 +34,14 @@ import {
 import "../_components/playground.css";
 import styles from "./color-test.module.css";
 
-const SWATCH_DEFS = [
+interface SwatchDef {
+  name: string;
+  label: string;
+  isTextColor?: boolean;
+  highlight?: boolean;
+}
+
+const SWATCH_DEFS: SwatchDef[] = [
   { name: "--bg", label: "Background" },
   { name: "--bg2", label: "Background 2" },
   { name: "--bg3", label: "Background 3" },
@@ -56,7 +63,7 @@ const SWATCH_DEFS = [
   { name: "--green", label: "Green" },
   { name: "--red", label: "Red" },
   { name: "--yellow", label: "Yellow" },
-] as const;
+];
 
 function resolveCssVarToHex(varName: string): string {
   const el = document.createElement("div");
