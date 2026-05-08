@@ -2992,7 +2992,7 @@
 
 .er-table-col-type {
   font-size: 10px;
-  color: var(--text-dim);
+  color: var(--text-soft);
   white-space: nowrap;
   flex-shrink: 0;
 }
