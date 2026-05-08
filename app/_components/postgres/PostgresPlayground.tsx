@@ -145,6 +145,7 @@ import {
 
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
+const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 
 // ─── Postgres structure drawer types ────────────────────────────────────
 
@@ -158,8 +159,9 @@ interface PgStructureColumn {
   isPk: boolean;
 }
 
+let _pgStructureIdCounter = 0;
 function newPgStructureId(): string {
-  return `pgc_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+  return `pgc_${++_pgStructureIdCounter}`;
 }
 
 function PgStructureColumnRow({
@@ -1307,9 +1309,7 @@ function PostgresPlaygroundInner() {
         const set = sets?.[0];
         if (!set) continue;
         const { columns, values: rows } = set;
-        const quotedCols = columns
-          .map((c) => `"${c.replace(/"/g, '""')}"`)
-          .join(", ");
+        const quotedCols = columns.map((c) => quoteIdent(c)).join(", ");
         for (const row of rows) {
           const vals = row
             .map((v) => {
@@ -1359,7 +1359,9 @@ function PostgresPlaygroundInner() {
         if (!set) continue;
         const { columns, values: rows } = set;
         const sheetName =
-          tableName.length > 31 ? tableName.slice(0, 31) : tableName;
+          tableName.length > MAX_EXCEL_SHEET_NAME_LENGTH
+            ? tableName.slice(0, MAX_EXCEL_SHEET_NAME_LENGTH)
+            : tableName;
         const worksheet = workbook.addWorksheet();
         worksheet.setName(sheetName);
         worksheet.writeRow(0, 0, columns);
