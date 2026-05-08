@@ -379,7 +379,7 @@
   /* Reset button defaults */
   border: none;
   cursor: default;
-  color: var(--text-dim);
+  color: var(--text-soft);
 }
 
 .sql-tree-column-name {
@@ -2933,11 +2933,11 @@
 }
 
 .er-pk-icon {
-  color: var(--text-dim);
+  color: var(--text-soft);
 }
 
 .er-fk-icon {
-  color: var(--text-dim);
+  color: var(--text-soft);
 }
 
 /* Inline trigger wrapper for PK/FK icon popovers inside ER nodes */
