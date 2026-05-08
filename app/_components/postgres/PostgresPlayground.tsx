@@ -33,12 +33,10 @@ import {
   ArrowDownToLine,
   ChevronDown,
   Database,
-  FileJson,
   FileText,
   Network,
   Play,
   Plus,
-  RotateCcw,
   Table,
 } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useRef, useState, startTransition } from "react";
@@ -148,7 +146,9 @@ function PostgresPlaygroundInner() {
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
-      startTransition(() => toastManager.add({ title, data: { kind } }));
+      startTransition(() => {
+        toastManager.add({ title, data: { kind } });
+      });
     },
     [toastManager],
   );
@@ -218,7 +218,7 @@ function PostgresPlaygroundInner() {
           ]);
           return [name, cols, fks] as const;
         } catch {
-          return [name, [], []] as const;
+          return [name, [] as TableColumnInfo[], [] as ForeignKeyInfo[]] as const;
         }
       }),
     );
@@ -431,10 +431,15 @@ function PostgresPlaygroundInner() {
     if (!view || !langComp || !completionComp) return;
     const schema: Record<string, string[]> = {};
     const completionSchema: SqlCompletionSchema = { entities: [] };
-    for (const name of [...tables, ...views]) {
+    for (const name of tables) {
       const cols = columnsByEntity[name]?.map((column) => column.name) ?? [];
       schema[name] = cols;
-      completionSchema.entities.push({ name, columns: cols });
+      completionSchema.entities.push({ name, columns: cols, kind: "table" });
+    }
+    for (const name of views) {
+      const cols = columnsByEntity[name]?.map((column) => column.name) ?? [];
+      schema[name] = cols;
+      completionSchema.entities.push({ name, columns: cols, kind: "view" });
     }
     view.dispatch({
       effects: [
@@ -493,7 +498,8 @@ function PostgresPlaygroundInner() {
     persistTabs(finalTabs);
     if (activeTabIdRef.current === id) setActiveTabId(fallback.id);
     setResultsByTab((prev) => {
-      const { [id]: _deleted, ...rest } = prev;
+      const { [id]: deletedResult, ...rest } = prev;
+      void deletedResult;
       return rest;
     });
   }, [persistTabs]);
