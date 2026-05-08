@@ -646,8 +646,10 @@ function PostgresPlaygroundInner() {
             <Select.Root
               value={PLAYGROUND_ID}
               onValueChange={(value) => {
-                const next = PLAYGROUNDS.find((playground) => playground.id === value);
-                if (next && next.id !== PLAYGROUND_ID) router.push(next.href);
+                const selectedPlayground = PLAYGROUNDS.find((playground) => playground.id === value);
+                if (selectedPlayground && selectedPlayground.id !== PLAYGROUND_ID) {
+                  router.push(selectedPlayground.href);
+                }
               }}
             >
               <Select.Trigger className="playground-switcher" aria-label="Switch playground">
@@ -663,11 +665,21 @@ function PostgresPlaygroundInner() {
               <Select.Portal>
                 <Select.Positioner className="pg-lang-switcher-positioner" sideOffset={6} alignItemWithTrigger={false}>
                   <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
-                    {PLAYGROUNDS.map((playground) => (
-                      <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
-                        <Select.ItemText>{playground.label}</Select.ItemText>
-                      </Select.Item>
-                    ))}
+                    {PLAYGROUNDS.map((playground) => {
+                      const Icon = PLAYGROUND_ICONS[playground.id];
+                      const color = PLAYGROUND_ICON_COLORS[playground.id];
+                      const factor = PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
+                      return (
+                        <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
+                          {Icon && (
+                            <span className="bui-select-item-icon" style={{ color }} aria-hidden="true">
+                              <Icon size={Math.round(16 * factor)} />
+                            </span>
+                          )}
+                          <Select.ItemText>{playground.label}</Select.ItemText>
+                        </Select.Item>
+                      );
+                    })}
                   </Select.Popup>
                 </Select.Positioner>
               </Select.Portal>
