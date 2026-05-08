@@ -130,7 +130,10 @@ function ErTableNode({ data }: NodeProps) {
 
   const nodeContent = (
     <div className="er-table-node" style={isActive ? undefined : { opacity: 0.4 }}>
-      <div className="er-table-header">{tableName}</div>
+      <div className="er-table-header">
+        <Table size={12} className="er-table-header-icon" aria-hidden="true" />
+        <span className="er-table-header-name">{tableName}</span>
+      </div>
       <div className="er-table-columns">
         {(columns as TableColumnInfo[]).map((col) => (
           <div key={col.name} className="er-table-col-row">
@@ -408,24 +411,25 @@ function ElkEdgeComponent({ id, data, style }: EdgeProps) {
 
   let stroke = (style?.stroke as string) ?? "var(--text-muted)";
   let strokeWidth = (style?.strokeWidth as number) ?? 1.5;
-  let trackStroke = stroke;
-  if (isAnySelected && isConnected) {
-    // Render the BaseEdge as a dim track so the animated dashes stand out.
-    trackStroke = "var(--border)";
-    stroke = "var(--accent)";
+  // Connected-and-selected edges render the flowing animation alone,
+  // without a backdrop track underneath. Unconnected edges stay dim.
+  const showConnectedFlow = isAnySelected && isConnected;
+  if (showConnectedFlow) {
+    stroke = "var(--primary)";
     strokeWidth = 2.5;
   } else if (isAnySelected && !isConnected) {
     stroke = "var(--border)";
     strokeWidth = 1;
-    trackStroke = stroke;
   }
 
   if (!path) return null;
 
   return (
     <>
-      <BaseEdge path={path} style={{ ...style, stroke: trackStroke, strokeWidth }} />
-      {isAnySelected && isConnected && (
+      {!showConnectedFlow && (
+        <BaseEdge path={path} style={{ ...style, stroke, strokeWidth }} />
+      )}
+      {showConnectedFlow && (
         <path
           d={path}
           stroke={stroke}
