@@ -169,6 +169,7 @@ function PostgresPlaygroundInner() {
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
+  const [triggersExpanded, setTriggersExpanded] = useState(true);
   const [indexes, setIndexes] = useState<string[]>([]);
   const [triggers, setTriggers] = useState<string[]>([]);
   const [columnsByEntity, setColumnsByEntity] = useState<Record<string, TableColumnInfo[]>>({});
@@ -764,7 +765,7 @@ function PostgresPlaygroundInner() {
               <SchemaSection label="INDEXES" count={indexes.length} expanded={indexesExpanded} onToggle={() => setIndexesExpanded((v) => !v)} emptyMessage="No indexes.">
                 {indexes.map((name) => <div key={name} className="schema-leaf"><Table size={12} />{name}</div>)}
               </SchemaSection>
-              <SchemaSection label="TRIGGERS" count={triggers.length} expanded={true} onToggle={() => undefined} emptyMessage="No triggers.">
+              <SchemaSection label="TRIGGERS" count={triggers.length} expanded={triggersExpanded} onToggle={() => setTriggersExpanded((v) => !v)} emptyMessage="No triggers.">
                 {triggers.map((name) => <div key={name} className="schema-leaf"><FileText size={12} />{name}</div>)}
               </SchemaSection>
             </div>
