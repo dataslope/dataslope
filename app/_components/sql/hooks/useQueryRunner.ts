@@ -76,8 +76,6 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   const setTabs = useTabStore((s) => s.setTabs);
   const setActiveTabId = useTabStore((s) => s.setActiveTabId);
 
-  const resultsByTabRef = useRef<Record<string, QueryRunResult | null>>({});
-
   const quoteIdent = useCallback(
     (name: string) => `"${name.replace(/"/g, '""')}"`,
     [],
@@ -207,7 +205,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   const handleLoadPage = useCallback(
     (sql: string, page: number) => {
       const tabId = activeTabIdRef.current;
-      const curResult = resultsByTabRef.current[tabId];
+      const curResult = useTabStore.getState().resultsByTab[tabId];
       runSqlForTab(
         tabId,
         sql,
@@ -428,7 +426,6 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
     [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
   );
 
-  // Expose resultsByTabRef so the component can keep it in sync.
   return {
     runSqlForTab,
     handleLoadPage,
@@ -442,7 +439,6 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
     deleteRowsFromTable,
     updateRowsInTable,
     duplicateRowInTable,
-    resultsByTabRef,
     showToast,
     quoteIdent,
   };
