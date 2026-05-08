@@ -1035,6 +1035,8 @@ function PostgresPlaygroundInner() {
   const openEntityStructure = useCallback(
     async (name: string) => {
       const engine = engineRef.current;
+      // Display SQL is for the editor tab only — actual execution uses
+      // parameterized execParams below to prevent injection.
       const displaySql =
         `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
@@ -1059,8 +1061,9 @@ function PostgresPlaygroundInner() {
             source: `Structure: ${name}`,
           },
         }));
-      } catch {
-        // Silently ignore; the user can always run the query manually.
+      } catch (err) {
+        // Non-fatal: the user can always run the query manually from the tab.
+        console.error("[Postgres] openEntityStructure failed:", err);
       }
     },
     [persistTabs],
