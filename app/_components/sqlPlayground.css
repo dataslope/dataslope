@@ -3012,3 +3012,57 @@
 .postgres-panes.sql-panes--view-data {
   grid-template-rows: auto 0 0 1fr;
 }
+
+/* ─── Postgres View Structure drawer ───────────────────────────────── */
+.sql-modify-col-type-cell {
+  white-space: nowrap;
+}
+
+.sql-modify-col-type-badge {
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  background: var(--bg-badge, rgba(128, 128, 128, 0.12));
+  color: var(--text-soft);
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+.sql-modify-flag-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sql-modify-flag-yes {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent, #3b82f6);
+}
+
+.sql-modify-flag-no {
+  font-size: 11px;
+  color: var(--text-dim, #aaa);
+}
+
+.sql-modify-col-default-cell {
+  max-width: 140px;
+}
+
+.sql-modify-col-default-value {
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.sql-modify-pg-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 8px 16px 0;
+  font-size: 11px;
+  color: var(--text-dim);
+}
