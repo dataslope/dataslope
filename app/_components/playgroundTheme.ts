@@ -170,8 +170,11 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--bg3", p.bg3);
   root.style.setProperty("--border", p.border);
   root.style.setProperty("--text", p.text);
-  root.style.setProperty("--text-dim", p.dim);
-  root.style.setProperty("--text-muted", p.muted);
+  // `--text-dim` and `--text-muted` are intentionally NOT written here.
+  // They are derived in CSS via `color-mix(--text, --bg)` so secondary UI
+  // text always blends with the active theme's background and stays
+  // neutral instead of inheriting the editor palette's accent hues
+  // (e.g. Lucario's blue/green or IntelliJ's dark purple).
   root.style.setProperty("--theme-primary", p.kw);
 }
 
