@@ -2,12 +2,22 @@
 
 import {
   DndContext,
+  KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
+  type DragEndEvent,
 } from "@dnd-kit/core";
-import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { autocompletion, closeBracketsKeymap, completionKeymap, startCompletion, acceptCompletion } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
@@ -40,11 +50,14 @@ import {
   FilePlus,
   FileJson,
   FileText,
+  GripVertical,
   Network,
+  Pencil,
   Play,
   Plus,
   RotateCcw,
   TriangleAlert,
+  X,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import React, {
@@ -103,7 +116,10 @@ import {
   exportResultToParquet,
   exportResultToSql,
   exportResultToXlsx,
+  initXlsxWasm,
+  toExcelData,
   toFileSafeName,
+  triggerDownload,
 } from "../sql/utils/exportUtils";
 import { isSingleSelectSql, hasLimitClause, stripSqlComments } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
@@ -129,6 +145,98 @@ import {
 
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
+const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
+
+// ─── Postgres structure drawer types ────────────────────────────────────
+
+interface PgStructureColumn {
+  id: string;
+  originalName: string;
+  name: string;
+  type: string;
+  nullable: boolean;
+  defaultValue: string | null;
+  isPk: boolean;
+}
+
+let _pgStructureIdCounter = 0;
+function newPgStructureId(): string {
+  return `pgc_${++_pgStructureIdCounter}`;
+}
+
+function PgStructureColumnRow({
+  col,
+  onNameChange,
+}: {
+  col: PgStructureColumn;
+  onNameChange: (id: string, name: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: col.id });
+
+  const style: React.CSSProperties = {
+    transform: DndCSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+    position: isDragging ? "relative" : undefined,
+    zIndex: isDragging ? 1 : undefined,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} className="sql-modify-col-row" {...attributes}>
+      <td className="sql-modify-drag-cell">
+        <span
+          className="sql-modify-drag-handle"
+          title="Drag to reorder"
+          {...listeners}
+        >
+          <GripVertical size={14} aria-hidden="true" />
+        </span>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <input
+            className="sql-rename-input sql-modify-col-name"
+            value={col.name}
+            onChange={(e) => onNameChange(col.id, e.target.value)}
+            placeholder="column name"
+            aria-label="Column name"
+          />
+        </label>
+      </td>
+      <td className="sql-modify-col-type-cell">
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      </td>
+      <td className="sql-modify-flag-cell">
+        {col.isPk ? (
+          <span className="sql-modify-flag-yes" title="Primary key">PK</span>
+        ) : (
+          <span className="sql-modify-flag-no" aria-hidden="true">—</span>
+        )}
+      </td>
+      <td className="sql-modify-flag-cell">
+        {col.nullable ? (
+          <span className="sql-modify-flag-yes" title="Nullable">✓</span>
+        ) : (
+          <span className="sql-modify-flag-no" title="Not null">✗</span>
+        )}
+      </td>
+      <td className="sql-modify-col-default-cell">
+        <span className="sql-modify-col-default-value" title={col.defaultValue ?? ""}>
+          {col.defaultValue ?? <em>—</em>}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+
 const storageKey = (key: string) => `${STORAGE_PREFIX}${key}`;
 const dbScopedKey = (dbId: string, key: string) =>
   `${STORAGE_PREFIX}db_${dbId}_${key}`;
@@ -358,6 +466,17 @@ function PostgresPlaygroundInner() {
   const [importParquetDragging, setImportParquetDragging] = useState(false);
   const [importParquetState, setImportParquetState] =
     useState<ParquetImportState | null>(null);
+
+  // ─── View Structure drawer state ──────────────────────────────────────
+  const [viewStructureDialog, setViewStructureDialog] = useState<{
+    tableName: string;
+    columns: PgStructureColumn[];
+  } | null>(null);
+  const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
+  const pgStructureSensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
@@ -1115,6 +1234,162 @@ function PostgresPlaygroundInner() {
     [rowCountByTable],
   );
 
+  // ─── View Structure drawer ────────────────────────────────────────────
+
+  const openViewStructure = useCallback(
+    async (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = await engine.listColumns(name);
+        setViewStructureDialog({
+          tableName: name,
+          columns: cols.map((c) => ({
+            id: newPgStructureId(),
+            originalName: c.name,
+            name: c.name,
+            type: c.type || "—",
+            nullable: !c.notNull,
+            defaultValue: c.defaultValue ?? null,
+            isPk: c.pk > 0,
+          })),
+        });
+      } catch (err) {
+        showToast(
+          `Couldn't load structure: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+      }
+    },
+    [showToast],
+  );
+
+  const submitViewStructure = useCallback(async () => {
+    const dialog = viewStructureDialog;
+    const engine = engineRef.current;
+    if (!dialog || !engine) return;
+    const renames = dialog.columns.filter(
+      (c) => c.name.trim() !== c.originalName && c.name.trim(),
+    );
+    try {
+      for (const col of renames) {
+        await engine.exec(
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} RENAME COLUMN ${quoteIdent(col.originalName)} TO ${quoteIdent(col.name.trim())}`,
+        );
+      }
+      if (renames.length > 0) {
+        await refreshSchema();
+        showToast(`Updated structure of "${dialog.tableName}".`);
+      }
+    } catch (err) {
+      showToast(
+        `Update failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+    setViewStructureDialog(null);
+  }, [viewStructureDialog, refreshSchema, showToast]);
+
+  // ─── Export database helpers ──────────────────────────────────────────
+
+  const exportPostgresDatabase = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || tables.length === 0) return;
+    try {
+      const lines: string[] = [
+        `-- PostgreSQL dump`,
+        `-- Generated by Dataslope\n`,
+      ];
+      for (const tableName of tables) {
+        const ddl = await engine.getDDL(tableName);
+        if (ddl) {
+          lines.push(`${ddl};\n`);
+        }
+        const sets = await engine.exec(`SELECT * FROM ${quoteIdent(tableName)}`);
+        const set = sets?.[0];
+        if (!set) continue;
+        const { columns, values: rows } = set;
+        const quotedCols = columns.map((c) => quoteIdent(c)).join(", ");
+        for (const row of rows) {
+          const vals = row
+            .map((v) => {
+              if (v === null || v === undefined) return "NULL";
+              if (typeof v === "number") return String(v);
+              return `'${String(v).replace(/'/g, "''")}'`;
+            })
+            .join(", ");
+          lines.push(
+            `INSERT INTO ${quoteIdent(tableName)} (${quotedCols}) VALUES (${vals});`,
+          );
+        }
+        lines.push("");
+      }
+      const sql = lines.join("\n");
+      const baseName =
+        activeSample.filename.replace(/\.[^.]+$/, "") || "database";
+      const filename = `${baseName}.sql`;
+      triggerDownload(
+        new Blob([sql], { type: "text/plain;charset=utf-8" }),
+        filename,
+      );
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      showToast(
+        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [tables, activeSample, showToast]);
+
+  const exportPostgresDatabaseToXlsx = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || tables.length === 0) return;
+    const baseName =
+      activeSample.filename.replace(/\.[^.]+$/, "") || "database";
+    const filename = `${baseName}.xlsx`;
+    try {
+      const mod = await initXlsxWasm();
+      const workbook = new mod.Workbook();
+      let sheetCount = 0;
+      for (const tableName of tables) {
+        const sets = await engine.exec(
+          `SELECT * FROM ${quoteIdent(tableName)}`,
+        );
+        const set = sets?.[0];
+        if (!set) continue;
+        const { columns, values: rows } = set;
+        const sheetName =
+          tableName.length > MAX_EXCEL_SHEET_NAME_LENGTH
+            ? tableName.slice(0, MAX_EXCEL_SHEET_NAME_LENGTH)
+            : tableName;
+        const worksheet = workbook.addWorksheet();
+        worksheet.setName(sheetName);
+        worksheet.writeRow(0, 0, columns);
+        for (let ri = 0; ri < rows.length; ri++) {
+          worksheet.writeRow(ri + 1, 0, rows[ri].map(toExcelData));
+        }
+        sheetCount++;
+      }
+      if (sheetCount === 0) {
+        showToast("No tables to export.", "warn");
+        return;
+      }
+      const bytes = workbook.saveToBufferSync();
+      triggerDownload(
+        new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }),
+        filename,
+      );
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      showToast(
+        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [tables, activeSample, showToast]);
+
   // ─── Import handlers ─────────────────────────────────────────────────
   const handleCsvFile = useCallback(
     (file: File) => {
@@ -1466,6 +1741,82 @@ function PostgresPlaygroundInner() {
                 </Menu.Positioner>
               </Menu.Portal>
             </Menu.Root>
+            {tables.length === 0 && loaded ? (
+              <Popover.Root open={exportNoTabsHover} onOpenChange={setExportNoTabsHover}>
+                <div
+                  style={{ cursor: "not-allowed" }}
+                  onMouseEnter={() => setExportNoTabsHover(true)}
+                  onMouseLeave={() => setExportNoTabsHover(false)}
+                  onFocus={() => setExportNoTabsHover(true)}
+                  onBlur={() => setExportNoTabsHover(false)}
+                  tabIndex={0}
+                  role="button"
+                  aria-disabled="true"
+                  aria-label="Export (create a table to enable)"
+                >
+                  <Popover.Trigger
+                    className="header-btn"
+                    disabled
+                    style={{ pointerEvents: "none" }}
+                    title="Export database"
+                    aria-label="Export"
+                  >
+                    <ArrowDownToLine size={14} aria-hidden="true" />
+                    <span className="btn-label">Export DB</span>
+                  </Popover.Trigger>
+                </div>
+                <Popover.Portal>
+                  <Popover.Positioner sideOffset={6} align="start" className="sql-export-disabled-positioner">
+                    <Popover.Popup className="bui-popup sql-export-disabled-popup">
+                      Create a table to export the database
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            ) : (
+              <Menu.Root>
+                <Menu.Trigger
+                  className="header-btn"
+                  title="Export database"
+                  aria-label="Export"
+                  disabled={!loaded}
+                >
+                  <ArrowDownToLine size={14} aria-hidden="true" />
+                  <span className="btn-label">Export DB</span>
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner sideOffset={6} align="start">
+                    <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                      <div className="sql-result-export-group-label">PostgreSQL Database</div>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => void exportPostgresDatabase()}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            SQL Dump
+                            <span className="ext-badge">.sql</span>
+                          </div>
+                          <div className="ex-desc">CREATE + INSERT statements</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => void exportPostgresDatabaseToXlsx()}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            Excel Workbook
+                            <span className="ext-badge">.xlsx</span>
+                          </div>
+                          <div className="ex-desc">One sheet per table</div>
+                        </div>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            )}
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
@@ -1501,15 +1852,6 @@ function PostgresPlaygroundInner() {
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-            </button>
-            <button
-              type="button"
-              className="run-btn"
-              disabled={!loaded || statusState === "running"}
-              onClick={runActiveTab}
-            >
-              <Play size={15} aria-hidden="true" />
-              <span>{statusState === "running" ? "Running…" : "Run"}</span>
             </button>
           </div>
         </header>
@@ -1679,6 +2021,113 @@ function PostgresPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        {/* ── View/Edit Structure drawer ── */}
+        <Dialog.Root
+          open={viewStructureDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setViewStructureDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    View/Edit Structure
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    {viewStructureDialog?.tableName ?? ""}
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {viewStructureDialog && (
+                <div className="sql-modify-body">
+                  <DndContext
+                    sensors={pgStructureSensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={(event: DragEndEvent) => {
+                      const { active, over } = event;
+                      if (!over || active.id === over.id) return;
+                      const cols = viewStructureDialog.columns;
+                      const oldIndex = cols.findIndex((c) => c.id === active.id);
+                      const newIndex = cols.findIndex((c) => c.id === over.id);
+                      if (oldIndex === -1 || newIndex === -1) return;
+                      setViewStructureDialog({
+                        ...viewStructureDialog,
+                        columns: arrayMove(cols, oldIndex, newIndex),
+                      });
+                    }}
+                  >
+                    <SortableContext
+                      items={viewStructureDialog.columns.map((c) => c.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="sql-modify-table-wrap">
+                        <table className="sql-modify-table">
+                          <thead>
+                            <tr>
+                              <th className="sql-modify-drag-cell" aria-label="Drag handle" />
+                              <th>Name</th>
+                              <th>Type</th>
+                              <th>PK</th>
+                              <th>Nullable</th>
+                              <th>Default</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {viewStructureDialog.columns.map((col) => (
+                              <PgStructureColumnRow
+                                key={col.id}
+                                col={col}
+                                onNameChange={(id, name) =>
+                                  setViewStructureDialog((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          columns: prev.columns.map((c) =>
+                                            c.id === id ? { ...c, name } : c,
+                                          ),
+                                        }
+                                      : null,
+                                  )
+                                }
+                              />
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                  <p className="sql-modify-pg-note">
+                    <Pencil size={12} aria-hidden="true" />
+                    Rename columns above and click Save. Column order changes are visual only.
+                  </p>
+                </div>
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={() => void submitViewStructure()}
+                  disabled={!viewStructureDialog}
+                >
+                  Save
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         {/* ── Import CSV dialog ── */}
         <ImportDialog
           flavor="csv"
@@ -1807,7 +2256,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
-                    onModifyStructure={openEntityStructure}
+                    onModifyStructure={(n) => void openViewStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
                     onDrop={requestDropEntity}
@@ -1964,7 +2413,7 @@ function PostgresPlaygroundInner() {
                 columnsByEntity={columnsByEntity}
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
-                onModifyStructure={openEntityStructure}
+                onModifyStructure={(n) => void openViewStructure(n)}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
                 onDrop={requestDropEntity}
