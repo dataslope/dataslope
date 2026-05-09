@@ -51,6 +51,7 @@ import {
   FileJson,
   FileText,
   GripVertical,
+  History,
   Network,
   Pencil,
   Play,
@@ -113,6 +114,8 @@ import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
 import { ToastList } from "../sql/components/ToastList";
 import { DdlViewer } from "../sql/components/DdlViewer";
+import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
+import { useQueryHistory } from "../sql/hooks/useQueryHistory";
 import {
   exportResultToCsv,
   exportResultToJson,
@@ -305,7 +308,7 @@ function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
     localStorage.setItem(
       dbScopedKey(dbId, "tabs"),
-      JSON.stringify(tabs.filter((tab) => tab.kind !== "er-diagram")),
+      JSON.stringify(tabs.filter((tab) => tab.kind !== "er-diagram" && tab.kind !== "query-history")),
     );
   } catch {
     // Ignore storage quota / private-mode errors.
@@ -448,6 +451,9 @@ function PostgresPlaygroundInner() {
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
   const [rowCountByTable, setRowCountByTable] = useState<Record<string, number>>({});
+
+  // ─── Query history ────────────────────────────────────────────────────
+  const { history: queryHistory, addHistoryEntry, clearHistory } = useQueryHistory();
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -597,11 +603,12 @@ function PostgresPlaygroundInner() {
         } else {
           sets = await engine.exec(trimmed);
         }
+        const elapsedMs = performance.now() - t0;
         setResultsByTab((prev) => ({
           ...prev,
           [tabId]: {
             sets,
-            elapsedMs: performance.now() - t0,
+            elapsedMs,
             source,
             sourceTable,
             lazySql,
@@ -611,32 +618,48 @@ function PostgresPlaygroundInner() {
             lazyPageSize,
           },
         }));
+        addHistoryEntry({
+          sql: trimmed,
+          source,
+          executedAt: Date.now(),
+          elapsedMs,
+          success: true,
+        });
         await refreshSchema();
         setStatusState("ready");
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
+        const elapsedMs = performance.now() - t0;
         setResultsByTab((prev) => ({
           ...prev,
           [tabId]: {
             sets: [],
-            elapsedMs: performance.now() - t0,
+            elapsedMs,
             source,
             sourceTable,
             error: message,
           },
         }));
+        addHistoryEntry({
+          sql: trimmed,
+          source,
+          executedAt: Date.now(),
+          elapsedMs,
+          success: false,
+          error: message,
+        });
         setStatusState("error");
         window.setTimeout(() => setStatusState("ready"), 3000);
       } finally {
         runningRef.current = false;
       }
     },
-    [clearBeforeRun, globalPageSize, refreshSchema, showToast],
+    [clearBeforeRun, globalPageSize, refreshSchema, showToast, addHistoryEntry],
   );
 
   const runActiveTab = useCallback(() => {
     const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
-    if (!tab || tab.kind === "er-diagram") return;
+    if (!tab || tab.kind === "er-diagram" || tab.kind === "query-history") return;
     const sql = editorRef.current?.state.doc.toString() ?? tab.code;
     void runSqlForTab(tab.id, sql, tab.title, tab.kind === "view-data" ? tab.title : undefined);
   }, [runSqlForTab]);
@@ -862,7 +885,7 @@ function PostgresPlaygroundInner() {
 
   useEffect(() => {
     const view = editorRef.current;
-    if (!view || !activeTab || activeTab.kind === "er-diagram" || activeTab.kind === "view-data")
+    if (!view || !activeTab || activeTab.kind === "er-diagram" || activeTab.kind === "view-data" || activeTab.kind === "query-history")
       return;
     const current = view.state.doc.toString();
     if (current !== activeTab.code) {
@@ -1085,6 +1108,23 @@ function PostgresPlaygroundInner() {
       code: "",
       pristineCode: "",
       kind: "er-diagram",
+    };
+    persistTabs([...tabsRef.current, tab]);
+    setActiveTabId(tab.id);
+  }, [persistTabs]);
+
+  const openQueryHistoryTab = useCallback(() => {
+    const existing = tabsRef.current.find((tab) => tab.kind === "query-history");
+    if (existing) {
+      setActiveTabId(existing.id);
+      return;
+    }
+    const tab: QueryTab = {
+      id: newTabId(),
+      title: "Query History",
+      code: "",
+      pristineCode: "",
+      kind: "query-history",
     };
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
@@ -2416,15 +2456,19 @@ function PostgresPlaygroundInner() {
               </SchemaSection>
             </div>
             <div className="sql-sidebar-footer">
-              <button type="button" className="sql-er-btn" onClick={openErDiagramTab}>
+              <button type="button" className="sql-er-btn" onClick={openErDiagramTab} title="View ER Diagram" aria-label="View ER Diagram">
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
+              </button>
+              <button type="button" className="sql-er-btn" onClick={openQueryHistoryTab} title="View Query History" aria-label="View Query History">
+                <History size={13} aria-hidden="true" />
+                <span>History</span>
               </button>
             </div>
           </aside>
           <div className="sql-sidebar-resizer" role="separator" aria-orientation="vertical" />
           <main
-            className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}`}
+            className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
             <div className="sql-tabbar">
               <DndContext sensors={tabDragSensors} collisionDetection={closestCenter}>
@@ -2468,7 +2512,7 @@ function PostgresPlaygroundInner() {
             <div
               className="sql-editor-pane"
               style={
-                activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram"
+                activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history"
                   ? { display: "none" }
                   : undefined
               }
@@ -2588,6 +2632,15 @@ function PostgresPlaygroundInner() {
                 onExport={(name, format) => void exportEntity(name, format)}
                 onGetRowCount={fetchEntityRowCount}
               />
+            ) : activeTab?.kind === "query-history" ? (
+              <div className="sql-er-pane">
+                <QueryHistoryPane
+                  history={queryHistory}
+                  theme={editorTheme}
+                  isPostgres={true}
+                  onClear={clearHistory}
+                />
+              </div>
             ) : (
               <Fragment>
                 <div className="sql-resizer" role="separator" aria-orientation="horizontal" />

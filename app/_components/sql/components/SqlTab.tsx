@@ -6,7 +6,7 @@ import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Network, Table, X } from "lucide-react";
+import { History, Network, Table, X } from "lucide-react";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
 
 export interface SqlTabProps {
@@ -112,7 +112,7 @@ export function SqlTab({
               {...listeners}
               ref={setNodeRef}
               style={dragStyle}
-              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}`}
+              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}`}
               onClick={onActivate}
               aria-selected={active}
               role="tab"
@@ -129,6 +129,9 @@ export function SqlTab({
               )}
               {tab.kind === "er-diagram" && (
                 <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+              )}
+              {tab.kind === "query-history" && (
+                <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
               <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
                 <Popover.Trigger
@@ -175,12 +178,12 @@ export function SqlTab({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup">
-              {tab.kind !== "view-data" && tab.kind !== "er-diagram" && (
+              {tab.kind !== "view-data" && tab.kind !== "er-diagram" && tab.kind !== "query-history" && (
                 <ContextMenu.Item className="example-item" onClick={openRename}>
                   <div className="ex-title">Rename</div>
                 </ContextMenu.Item>
               )}
-              {tab.kind !== "er-diagram" && (
+              {tab.kind !== "er-diagram" && tab.kind !== "query-history" && (
                 <ContextMenu.Item className="example-item" onClick={onDuplicate}>
                   <div className="ex-title">Duplicate</div>
                 </ContextMenu.Item>

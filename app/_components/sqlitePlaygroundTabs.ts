@@ -27,8 +27,9 @@ export interface QueryTab {
    *  action for a table. These tabs display the table icon, hide the
    *  SQL editor pane, and auto-run the preview query.
    *  When "er-diagram", this tab shows an Entity-Relationship Diagram
-   *  of the current database schema. */
-  kind?: "view-data" | "er-diagram";
+   *  of the current database schema.
+   *  When "query-history", this tab shows the full query execution log. */
+  kind?: "view-data" | "er-diagram" | "query-history";
 }
 
 export function newTabId(): string {
@@ -75,9 +76,9 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
 
 export function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
-    // ER diagram tabs are transient — never persist them so they don't
-    // reappear after a page reload or database switch.
-    const persistable = tabs.filter((t) => t.kind !== "er-diagram");
+    // ER diagram and query-history tabs are transient — never persist them
+    // so they don't reappear after a page reload or database switch.
+    const persistable = tabs.filter((t) => t.kind !== "er-diagram" && t.kind !== "query-history");
     localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(persistable));
   } catch {
     // Quota exceeded / private mode — silently ignore.

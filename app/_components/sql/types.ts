@@ -129,3 +129,21 @@ export interface AddRowDialogState {
   values: Record<string, string>;
   addAnother: boolean;
 }
+
+/** A single entry in the query execution history. */
+export interface QueryHistoryEntry {
+  /** Unique identifier for the entry. */
+  id: string;
+  /** The SQL that was executed (trimmed). */
+  sql: string;
+  /** Source label, e.g. tab title or "Table: x". */
+  source: string;
+  /** Unix timestamp (ms) when the query was executed. */
+  executedAt: number;
+  /** Elapsed execution time in milliseconds. */
+  elapsedMs: number;
+  /** True if the query succeeded, false if it threw an error. */
+  success: boolean;
+  /** Error message if the query failed. */
+  error?: string;
+}

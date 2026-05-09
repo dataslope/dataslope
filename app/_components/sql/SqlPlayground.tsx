@@ -115,6 +115,7 @@ import {
   FileJson,
   GripVertical,
   Hash,
+  History,
   Network,
   Pencil,
   Play,
@@ -170,6 +171,7 @@ import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
 import { ToastList } from "./components/ToastList";
 import { SqlTab } from "./components/SqlTab";
+import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import {
   createSqlCompletionSource,
   type SqlCompletionSchema,
@@ -184,6 +186,7 @@ import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
+import { useQueryHistory } from "./hooks/useQueryHistory";
 import { DdlViewer } from "./components/DdlViewer";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
 import { ResultView } from "./components/ResultView";
@@ -1475,7 +1478,8 @@ function SqlPlaygroundInner() {
   );
 
   // ─── Custom hooks ────────────────────────────────────────────────────
-  const queryRunnerRefs = { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef };
+  const { history: queryHistory, addHistoryEntry, clearHistory } = useQueryHistory();
+  const queryRunnerRefs = { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef, addHistoryEntry };
   const {
     runSqlForTab,
     handleLoadPage,
@@ -1525,6 +1529,7 @@ function SqlPlaygroundInner() {
   const {
     addTab,
     openErDiagramTab,
+    openQueryHistoryTab,
     closeTab,
     confirmCloseTab,
     renameTab,
@@ -2043,9 +2048,9 @@ function SqlPlaygroundInner() {
     }
     // Focus the editor so the user can type immediately after any tab
     // operation (activate, create, reorder, close, close-all).
-    // Skip "er-diagram" / "view-data" tabs whose editor pane is hidden.
+    // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
-    if (tab?.kind !== "er-diagram" && tab?.kind !== "view-data") {
+    if (tab?.kind !== "er-diagram" && tab?.kind !== "view-data" && tab?.kind !== "query-history") {
       view?.focus();
     }
     // Only rerun when the active tab id changes, not on every keystroke.
@@ -4331,6 +4336,16 @@ function SqlPlaygroundInner() {
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
               </button>
+              <button
+                type="button"
+                className="sql-er-btn"
+                onClick={openQueryHistoryTab}
+                title="View Query History"
+                aria-label="View Query History"
+              >
+                <History size={13} aria-hidden="true" />
+                <span>History</span>
+              </button>
             </div>
           </aside>
 
@@ -4344,7 +4359,7 @@ function SqlPlaygroundInner() {
           />
 
           <div
-            className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}`}
+            className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
             ref={panesRef}
           >
             <div className="sql-tabbar">
@@ -4372,7 +4387,8 @@ function SqlPlaygroundInner() {
                           if (
                             prevId === t.id &&
                             t.kind !== "er-diagram" &&
-                            t.kind !== "view-data"
+                            t.kind !== "view-data" &&
+                            t.kind !== "query-history"
                           ) {
                             editorRef.current?.focus();
                           }
@@ -4404,7 +4420,7 @@ function SqlPlaygroundInner() {
               </button>
             </div>
 
-            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}>
+            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}>
               <div className="editor-wrap" ref={editorHostRef} />
               {result && statusState !== "running" && (
                 <div
@@ -4524,10 +4540,10 @@ function SqlPlaygroundInner() {
               aria-orientation="horizontal"
               aria-label="Drag to resize editor and results"
               title="Drag to resize"
-              style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}
+              style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}
             />
 
-            <div className="sql-results-pane" ref={resultsPaneRef} style={activeTab?.kind === "er-diagram" ? { display: "none" } : undefined}>
+            <div className="sql-results-pane" ref={resultsPaneRef} style={activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}>
               <div className="sql-results-body">
                 <ResultView
                   result={result}
@@ -4565,6 +4581,17 @@ function SqlPlaygroundInner() {
                   onViewDDL={viewDDL}
                   onExport={exportEntityToFormat}
                   onGetRowCount={getEntityRowCount}
+                />
+              </div>
+            )}
+
+            {activeTab?.kind === "query-history" && (
+              <div className="sql-er-pane">
+                <QueryHistoryPane
+                  history={queryHistory}
+                  theme={editorTheme}
+                  isPostgres={false}
+                  onClear={clearHistory}
                 />
               </div>
             )}

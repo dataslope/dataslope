@@ -29,7 +29,7 @@ import { useEngineStore } from "../stores/useEngineStore";
 import { useTabStore } from "../stores/useTabStore";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { useSqlPlaygroundStore } from "../stores/useSqlPlaygroundStore";
-import type { QueryRunResult, ResultSetExportScope } from "../types";
+import type { QueryRunResult, ResultSetExportScope, QueryHistoryEntry } from "../types";
 
 export interface SqlPlaygroundRefs {
   engineRef: React.MutableRefObject<SqliteEngine | null>;
@@ -37,10 +37,11 @@ export interface SqlPlaygroundRefs {
   tabsRef: React.MutableRefObject<QueryTab[]>;
   activeTabIdRef: React.MutableRefObject<string>;
   activeDbIdRef: React.MutableRefObject<string>;
+  addHistoryEntry: (entry: Omit<QueryHistoryEntry, "id">) => void;
 }
 
 export function useQueryRunner(refs: SqlPlaygroundRefs) {
-  const { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef } = refs;
+  const { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef, addHistoryEntry } = refs;
 
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
@@ -140,6 +141,13 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPage,
           lazyPageSize,
         });
+        addHistoryEntry({
+          sql: trimmed,
+          source,
+          executedAt: Date.now(),
+          elapsedMs,
+          success: true,
+        });
         setStatusState("ready");
         const newTables = engine.listTables();
         const newViews = engine.listViews();
@@ -181,6 +189,14 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           source,
           sourceTable,
         });
+        addHistoryEntry({
+          sql: trimmed,
+          source,
+          executedAt: Date.now(),
+          elapsedMs,
+          success: false,
+          error: msg,
+        });
         setStatusState("error");
         window.setTimeout(() => setStatusState("ready"), 3000);
       }
@@ -188,6 +204,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
     [
       clearBeforeRun,
       showToast,
+      addHistoryEntry,
       setResultForTab,
       setStatusState,
       setTables,
