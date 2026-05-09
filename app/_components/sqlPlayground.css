@@ -3066,3 +3066,207 @@
   font-size: 11px;
   color: var(--text-dim);
 }
+
+/* ─── Query History tab (sidebar footer button) ─── */
+.sql-sidebar-footer .sql-er-btn + .sql-er-btn {
+  border-left: 1px solid var(--border);
+}
+
+/* ─── Query History pane grid override ─── */
+/* When a "Query History" tab is active the editor, resizer and results
+   pane are hidden; the history pane spans all content rows. */
+.sql-panes--query-history {
+  grid-template-rows: auto 1fr 0 0;
+}
+
+/* ─── Query History pane container ─── */
+.sql-query-history-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* ─── Query History toolbar ─── */
+.sql-history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.sql-history-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sql-history-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-dim);
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+
+.sql-history-clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.sql-history-clear-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+  border-color: var(--border-strong, var(--border));
+}
+
+/* ─── Query History list ─── */
+.sql-history-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─── Empty state ─── */
+.sql-history-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+.sql-history-empty p {
+  margin: 0;
+}
+
+.sql-history-empty-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+/* ─── Individual history entry ─── */
+.sql-history-entry {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+.sql-history-entry--ok {
+  border-left: 3px solid var(--ok-accent, #22c55e);
+}
+
+.sql-history-entry--err {
+  border-left: 3px solid var(--err-accent, #ef4444);
+}
+
+.sql-history-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sql-history-entry-status {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sql-history-entry--ok .sql-history-entry-status {
+  color: var(--ok-accent, #22c55e);
+}
+
+.sql-history-entry--err .sql-history-entry-status {
+  color: var(--err-accent, #ef4444);
+}
+
+.sql-history-entry-source {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-history-entry-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sql-history-entry-datetime {
+  font-size: 11px;
+}
+
+.sql-history-entry-elapsed {
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 5px;
+}
+
+.sql-history-entry-error {
+  padding: 6px 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--err-accent, #ef4444);
+  background: color-mix(in srgb, var(--err-accent, #ef4444) 8%, transparent);
+  border-bottom: 1px solid var(--border);
+  word-break: break-word;
+}
+
+.sql-history-entry-editor {
+  /* Let the editor breathe a bit; no extra chrome needed. */
+  padding: 0;
+}
+
+.sql-history-entry-editor .cm-editor {
+  max-height: 200px;
+  overflow-y: auto;
+}

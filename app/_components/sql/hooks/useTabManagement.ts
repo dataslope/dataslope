@@ -101,6 +101,45 @@ export function useTabManagement(
     setActiveTabId(tab.id);
   }, [refreshTableMetadata, tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId]);
 
+  const openQueryHistoryTab = useCallback(() => {
+    const currentTabs = tabsRef.current;
+    const currentActiveTabId = activeTabIdRef.current;
+    const currentActiveDbId = activeDbIdRef.current;
+    const existing = currentTabs.find((t) => t.kind === "query-history");
+    if (existing) {
+      if (existing.id === currentActiveTabId) {
+        // Clicking while already active: close it.
+        const next = currentTabs.filter((t) => t.id !== existing.id);
+        const finalTabs =
+          next.length > 0
+            ? next
+            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+        tabsRef.current = finalTabs;
+        setTabs(finalTabs);
+        saveTabs(currentActiveDbId, finalTabs);
+        activeTabIdRef.current = finalTabs[0].id;
+        setActiveTabId(finalTabs[0].id);
+        return;
+      }
+      activeTabIdRef.current = existing.id;
+      setActiveTabId(existing.id);
+      return;
+    }
+    const tab: QueryTab = {
+      id: newTabId(),
+      title: "Query History",
+      code: "",
+      pristineCode: "",
+      kind: "query-history",
+    };
+    const next = [...currentTabs, tab];
+    tabsRef.current = next;
+    setTabs(next);
+    saveTabs(currentActiveDbId, next);
+    activeTabIdRef.current = tab.id;
+    setActiveTabId(tab.id);
+  }, [tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId]);
+
   const closeTab = useCallback(
     (id: string) => {
       const currentTabs = tabsRef.current;
@@ -268,6 +307,7 @@ export function useTabManagement(
   return {
     addTab,
     openErDiagramTab,
+    openQueryHistoryTab,
     closeTab,
     confirmCloseTab,
     renameTab,
