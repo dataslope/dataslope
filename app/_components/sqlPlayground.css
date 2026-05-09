@@ -3013,6 +3013,14 @@
   grid-template-rows: auto 0 0 1fr;
 }
 
+/* ER-diagram and query-history modes: collapse rows 3 & 4 and give the
+   content row all available space. These must come after .postgres-panes
+   to win the specificity tie (same as --view-data above). */
+.postgres-panes.sql-panes--er-diagram,
+.postgres-panes.sql-panes--query-history {
+  grid-template-rows: auto 1fr 0 0;
+}
+
 /* ─── Postgres View Structure drawer ───────────────────────────────── */
 .sql-modify-col-type-cell {
   white-space: nowrap;
@@ -3179,7 +3187,6 @@
 
 /* ─── Individual history entry ─── */
 .sql-history-entry {
-  border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
   background: var(--bg2);
@@ -3201,7 +3208,6 @@
   font-family: var(--font-ui);
   font-size: 11px;
   background: var(--bg3);
-  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
@@ -3245,10 +3251,7 @@
 .sql-history-entry-elapsed {
   font-size: 11px;
   font-family: var(--font-mono, monospace);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 0 5px;
+  color: var(--text-dim);
 }
 
 .sql-history-entry-error {
@@ -3257,7 +3260,6 @@
   font-size: 11px;
   color: var(--err-accent, #ef4444);
   background: color-mix(in srgb, var(--err-accent, #ef4444) 8%, transparent);
-  border-bottom: 1px solid var(--border);
   word-break: break-word;
 }
 
@@ -3269,4 +3271,14 @@
 .sql-history-entry-editor .cm-editor {
   max-height: 200px;
   overflow-y: auto;
+}
+
+/* Read-only history editors: suppress the active-line highlight that
+   appears when a line is clicked. */
+.sql-history-entry-editor .cm-activeLineMarker {
+  background-color: transparent !important;
+}
+
+.sql-history-entry-editor .cm-activeLineGutter {
+  background-color: transparent !important;
 }
