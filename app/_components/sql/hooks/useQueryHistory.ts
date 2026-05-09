@@ -3,11 +3,11 @@
 import { useCallback, useState } from "react";
 import type { QueryHistoryEntry } from "../types";
 
-let historyEntryCounter = 0;
-
 function newHistoryId(): string {
-  historyEntryCounter += 1;
-  return `h_${Date.now().toString(36)}_${historyEntryCounter}`;
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `h_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
 export interface UseQueryHistoryResult {
