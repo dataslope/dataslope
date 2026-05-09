@@ -373,9 +373,33 @@ export async function createPostgresEngine(
         `SELECT definition FROM pg_views WHERE schemaname = 'public' AND viewname = $1`,
         [name],
       );
-      return viewRows[0]?.definition
-        ? `CREATE VIEW ${quoteIdent(name)} AS\n${viewRows[0].definition}`
-        : "";
+      if (viewRows.length > 0 && viewRows[0].definition) {
+        return `CREATE VIEW ${quoteIdent(name)} AS\n${viewRows[0].definition}`;
+      }
+      const indexRows = await queryRows<{ indexdef: string }>(
+        `SELECT indexdef FROM pg_indexes WHERE schemaname = 'public' AND indexname = $1`,
+        [name],
+      );
+      if (indexRows.length > 0 && indexRows[0].indexdef) {
+        return `${indexRows[0].indexdef};`;
+      }
+      const trigRows = await queryRows<{ triggerdef: string; funcdef: string }>(
+        `SELECT
+           pg_get_triggerdef(t.oid) AS triggerdef,
+           pg_get_functiondef(p.oid) AS funcdef
+         FROM pg_trigger t
+         JOIN pg_class c ON c.oid = t.tgrelid
+         JOIN pg_proc p ON p.oid = t.tgfoid
+         WHERE t.tgname = $1
+           AND NOT t.tgisinternal
+         LIMIT 1`,
+        [name],
+      );
+      if (trigRows.length > 0) {
+        const { funcdef, triggerdef } = trigRows[0];
+        return `${funcdef}\n\n${triggerdef};`;
+      }
+      return "";
     },
 
     async deleteRows(tableName, pkColumns, pkRows) {

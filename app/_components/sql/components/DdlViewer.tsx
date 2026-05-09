@@ -8,7 +8,7 @@ import {
   lineNumbers as lineNumbersExt,
 } from "@codemirror/view";
 import { indentUnit } from "@codemirror/language";
-import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
+import { sql as sqlLang, SQLite, PostgreSQL } from "@codemirror/lang-sql";
 import { themeFor } from "../../cmExtensions";
 
 // Replace the entire editor document — the v6 idiom for what v5 called
@@ -28,9 +28,11 @@ function replaceDoc(view: EditorView, value: string): void {
 export function DdlViewer({
   sql,
   theme,
+  isPostgres = false,
 }: {
   sql: string;
   theme: string;
+  isPostgres?: boolean;
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -51,7 +53,7 @@ export function DdlViewer({
         indentUnit.of("  "),
         // Wrap long lines to prevent horizontal scroll in the View DDL popup.
         EditorView.lineWrapping,
-        sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
+        sqlLang({ dialect: isPostgres ? PostgreSQL : SQLite, upperCaseKeywords: false }),
         themeComp.of(themeFor(theme)),
       ],
     });

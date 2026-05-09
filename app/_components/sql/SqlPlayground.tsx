@@ -2547,7 +2547,7 @@ function SqlPlaygroundInner() {
                     aria-label="Export"
                   >
                     <ArrowDownToLine size={14} aria-hidden="true" />
-                    <span className="btn-label">Export</span>
+                    <span className="btn-label">Export DB</span>
                   </Popover.Trigger>
                 </div>
                 <Popover.Portal>
@@ -2567,7 +2567,7 @@ function SqlPlaygroundInner() {
                   disabled={!loaded}
                 >
                   <ArrowDownToLine size={14} aria-hidden="true" />
-                  <span className="btn-label">Export</span>
+                  <span className="btn-label">Export DB</span>
                 </Menu.Trigger>
                 <Menu.Portal>
                   <Menu.Positioner sideOffset={6} align="start">

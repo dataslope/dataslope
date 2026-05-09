@@ -47,7 +47,7 @@ export function useTabManagement(
 
   const addTab = useCallback(() => {
     const nextNum = tabsRef.current.length + 1;
-    const initialCode = "-- New query\nSELECT 1;";
+    const initialCode = "";
     const tab: QueryTab = {
       id: newTabId(),
       title: `Query ${nextNum}`,
@@ -74,7 +74,7 @@ export function useTabManagement(
         const finalTabs =
           next.length > 0
             ? next
-            : [{ id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" }];
+            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
         tabsRef.current = finalTabs;
         setTabs(finalTabs);
         saveTabs(currentActiveDbId, finalTabs);
@@ -115,7 +115,7 @@ export function useTabManagement(
       const finalTabs =
         next.length > 0
           ? next
-          : [{ id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" }];
+          : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
       tabsRef.current = finalTabs;
       setTabs(finalTabs);
       saveTabs(activeDbIdRef.current, finalTabs);
@@ -136,7 +136,7 @@ export function useTabManagement(
     const finalTabs =
       next.length > 0
         ? next
-        : [{ id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" }];
+        : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
     tabsRef.current = finalTabs;
     setTabs(finalTabs);
     saveTabs(activeDbIdRef.current, finalTabs);
@@ -198,7 +198,7 @@ export function useTabManagement(
 
   const closeAllTabs = useCallback(() => {
     const fresh = [
-      { id: newTabId(), title: "Query 1", code: "-- New query\nSELECT 1;", pristineCode: "-- New query\nSELECT 1;" },
+      { id: newTabId(), title: "Query 1", code: "", pristineCode: "" },
     ];
     tabsRef.current = fresh;
     activeTabIdRef.current = fresh[0].id;

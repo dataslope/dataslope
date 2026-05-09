@@ -68,6 +68,7 @@ import React, {
   useRef,
   useState,
   startTransition,
+  useSyncExternalStore,
 } from "react";
 import "../playground.css";
 import "../sqlPlayground.css";
@@ -90,6 +91,7 @@ import {
   DEFAULT_PLAYGROUND_SETTINGS,
   RuntimeInfoContent,
   SettingsPanel,
+  detectIsMac,
 } from "../playgroundShared";
 import {
   POSTGRES_SAMPLE_DATABASES,
@@ -110,6 +112,7 @@ import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
 import { ToastList } from "../sql/components/ToastList";
+import { DdlViewer } from "../sql/components/DdlViewer";
 import {
   exportResultToCsv,
   exportResultToJson,
@@ -455,6 +458,7 @@ function PostgresPlaygroundInner() {
     name: string;
     kind: "table" | "view" | "index" | "trigger";
   } | null>(null);
+  const [ddlDialog, setDdlDialog] = useState<{ title: string; sql: string } | null>(null);
 
   const [importCsvOpen, setImportCsvOpen] = useState(false);
   const [importCsvDragging, setImportCsvDragging] = useState(false);
@@ -490,6 +494,17 @@ function PostgresPlaygroundInner() {
   const activeTabIdRef = useRef(activeTabId);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
+
+  // ─── Selection tracking ───────────────────────────────────────────────
+  const [hasEditorSelection, setHasEditorSelection] = useState(false);
+  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
+  const isMac = useSyncExternalStore(
+    () => () => {},
+    () => detectIsMac(),
+    () => false,
+  );
+  const runActiveTabRef = useRef<() => void>(() => undefined);
+  const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
   const result = activeTab ? resultsByTab[activeTab.id] ?? null : null;
@@ -625,10 +640,27 @@ function PostgresPlaygroundInner() {
     const sql = editorRef.current?.state.doc.toString() ?? tab.code;
     void runSqlForTab(tab.id, sql, tab.title, tab.kind === "view-data" ? tab.title : undefined);
   }, [runSqlForTab]);
-  const runActiveTabRef = useRef(runActiveTab);
+
+  const runCurrentSelection = useCallback(() => {
+    const view = editorRef.current;
+    if (!view) return;
+    const sel = view.state.selection.main;
+    if (sel.empty) return;
+    const selected = view.state.sliceDoc(sel.from, sel.to);
+    const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
+    if (!tab) return;
+    void runSqlForTab(tab.id, selected, tab.title);
+  }, [runSqlForTab]);
+
+  // Keep runActiveTabRef / runSelectionRef in sync with latest callbacks.
   useEffect(() => {
     runActiveTabRef.current = runActiveTab;
-  }, [runActiveTab]);
+    runSelectionRef.current = (sql: string) => {
+      const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
+      if (!tab) return;
+      void runSqlForTab(tab.id, sql, tab.title);
+    };
+  }, [runActiveTab, runSqlForTab]);
 
   useEffect(() => {
     tabsRef.current = tabs;
@@ -744,6 +776,10 @@ function PostgresPlaygroundInner() {
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
           EditorView.updateListener.of((update) => {
+            if (update.selectionSet) {
+              const sel = update.state.selection.main;
+              setHasEditorSelectionRef.current(!sel.empty);
+            }
             if (!update.docChanged) return;
             const id = activeTabIdRef.current;
             const code = update.state.doc.toString();
@@ -754,7 +790,22 @@ function PostgresPlaygroundInner() {
           }),
           keymap.of([
             {
+              // Run selection if text is selected, otherwise run all.
               key: "Mod-Enter",
+              run: (v) => {
+                const sel = v.state.selection.main;
+                if (!sel.empty) {
+                  const selected = v.state.sliceDoc(sel.from, sel.to);
+                  runSelectionRef.current(selected);
+                } else {
+                  runActiveTabRef.current();
+                }
+                return true;
+              },
+            },
+            {
+              // Always run all queries (ignores any selection).
+              key: "Mod-Shift-Enter",
               run: () => {
                 runActiveTabRef.current();
                 return true;
@@ -1142,13 +1193,19 @@ function PostgresPlaygroundInner() {
 
   const viewDDL = useCallback(
     async (name: string) => {
-      const ddl = await engineRef.current?.getDDL(name);
-      if (!ddl) return;
-      const tab: QueryTab = { id: newTabId(), title: `DDL: ${name}`, code: ddl, pristineCode: ddl };
-      persistTabs([...tabsRef.current, tab]);
-      setActiveTabId(tab.id);
+      try {
+        const ddl = await engineRef.current?.getDDL(name);
+        if (!ddl?.trim()) {
+          showToast(`No DDL found for "${name}".`, "warn");
+          return;
+        }
+        setDdlDialog({ title: name, sql: ddl });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't read DDL: ${msg}`, "warn");
+      }
     },
-    [persistTabs],
+    [showToast],
   );
 
   const openEntityStructure = useCallback(
@@ -1715,32 +1772,6 @@ function PostgresPlaygroundInner() {
                 </Menu.Positioner>
               </Menu.Portal>
             </Menu.Root>
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                disabled={!result || result.sets.length === 0}
-              >
-                <ArrowDownToLine size={14} aria-hidden="true" />
-                <span className="btn-label">Export Result</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="end">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    {(["csv", "json", "sql", "parquet", "xlsx"] as const).map((format) => (
-                      <Menu.Item
-                        key={format}
-                        className="example-item export-item"
-                        onClick={() => void exportResultSet(format, "all")}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">{format.toUpperCase()} <span className="ext-badge">.{format}</span></div>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
             {tables.length === 0 && loaded ? (
               <Popover.Root open={exportNoTabsHover} onOpenChange={setExportNoTabsHover}>
                 <div
@@ -1889,6 +1920,53 @@ function PostgresPlaygroundInner() {
             </div>
           }
         />
+
+        <Dialog.Root
+          open={ddlDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setDdlDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-ddl-popup">
+              <Dialog.Title className="confirm-title">
+                DDL: {ddlDialog?.title ?? ""}
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Read-only view of the reconstructed <code>CREATE</code> statement(s).
+              </Dialog.Description>
+              <DdlViewer
+                sql={ddlDialog?.sql ?? ""}
+                theme={editorTheme}
+                isPostgres
+              />
+              <div className="confirm-actions">
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-secondary"
+                  onClick={() => {
+                    if (
+                      ddlDialog &&
+                      typeof navigator !== "undefined" &&
+                      navigator.clipboard
+                    ) {
+                      navigator.clipboard
+                        .writeText(ddlDialog.sql)
+                        .then(() => showToast("Copied DDL to clipboard."))
+                        .catch(() => showToast("Couldn't copy to clipboard.", "warn"));
+                    }
+                  }}
+                >
+                  Copy
+                </button>
+                <Dialog.Close className="confirm-btn confirm-btn-primary">
+                  Close
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         <AlertDialog.Root
           open={pendingDbId !== null}
@@ -2376,6 +2454,7 @@ function PostgresPlaygroundInner() {
                           const fresh = { id: newTabId(), title: "Query 1", code: "", pristineCode: "" };
                           persistTabs([fresh]);
                           setActiveTabId(fresh.id);
+                          window.setTimeout(() => editorRef.current?.focus(), 0);
                         }}
                       />
                     ))}
@@ -2396,15 +2475,103 @@ function PostgresPlaygroundInner() {
             >
               <div className="editor-wrap" ref={editorHostRef} />
               <div className="sql-toolbar">
-                <button
-                  type="button"
-                  className={`run-btn${statusState === "running" ? " running" : ""}`}
-                  disabled={!loaded || statusState === "running"}
-                  onClick={runActiveTab}
-                >
-                  <Play size={10} aria-hidden="true" />
-                  {statusState === "running" ? "Running…" : "Run"}
-                </button>
+                <div className="sql-toolbar-shortcuts">
+                  <span
+                    className="kbd-group"
+                    title={isMac ? "Cmd + Enter — run selection or all" : "Ctrl + Enter — run selection or all"}
+                  >
+                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className="kbd-plus" aria-hidden="true">
+                      +
+                    </span>
+                    <kbd className="kbd">Enter</kbd>
+                  </span>
+                </div>
+                {hasEditorSelection ? (
+                  <div className={`run-btn-split${statusState === "running" ? " running" : ""}`}>
+                    <button
+                      type="button"
+                      className="run-btn-split-main"
+                      disabled={!loaded || statusState === "running"}
+                      onClick={runCurrentSelection}
+                    >
+                      {statusState === "running" ? (
+                        <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                          <circle
+                            cx="6"
+                            cy="6"
+                            r="4.5"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeDasharray="14 8"
+                          />
+                        </svg>
+                      ) : (
+                        <Play size={10} aria-hidden="true" />
+                      )}
+                      {statusState === "running" ? "Running…" : "Run Selection"}
+                    </button>
+                    <span className="run-btn-split-divider" aria-hidden="true" />
+                    <Menu.Root>
+                      <Menu.Trigger
+                        className="run-btn-split-chevron"
+                        disabled={!loaded || statusState === "running"}
+                        aria-label="Run options"
+                      >
+                        <ChevronDown size={11} aria-hidden="true" />
+                      </Menu.Trigger>
+                      <Menu.Portal>
+                        <Menu.Positioner sideOffset={6} align="end">
+                          <Menu.Popup className="bui-popup run-split-dropdown">
+                            <Menu.Item
+                              className="run-split-item"
+                              onClick={runCurrentSelection}
+                              disabled={!loaded || statusState === "running"}
+                            >
+                              <span className="run-split-item-label">Run Selection</span>
+                              <span className="run-split-item-kbd">{isMac ? "⌘Enter" : "Ctrl+Enter"}</span>
+                            </Menu.Item>
+                            <Menu.Item
+                              className="run-split-item"
+                              onClick={runActiveTab}
+                              disabled={!loaded || statusState === "running"}
+                            >
+                              <span className="run-split-item-label">Run All</span>
+                              <span className="run-split-item-kbd">{isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}</span>
+                            </Menu.Item>
+                          </Menu.Popup>
+                        </Menu.Positioner>
+                      </Menu.Portal>
+                    </Menu.Root>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`run-btn${statusState === "running" ? " running" : ""}`}
+                    disabled={!loaded || statusState === "running"}
+                    onClick={runActiveTab}
+                  >
+                    {statusState === "running" ? (
+                      <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                        <circle
+                          cx="6"
+                          cy="6"
+                          r="4.5"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeDasharray="14 8"
+                        />
+                      </svg>
+                    ) : (
+                      <Play size={10} aria-hidden="true" />
+                    )}
+                    {statusState === "running" ? "Running…" : "Run"}
+                  </button>
+                )}
               </div>
             </div>
             {activeTab?.kind === "er-diagram" ? (

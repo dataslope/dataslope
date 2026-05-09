@@ -3003,7 +3003,7 @@
 }
 
 .postgres-panes {
-  grid-template-rows: auto minmax(0, 1fr) 6px minmax(0, 0.85fr);
+  grid-template-rows: auto minmax(0, 0.55fr) 6px minmax(0, 1.45fr);
 }
 
 /* In view-data mode the editor and resizer are hidden; collapse their
