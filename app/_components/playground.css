@@ -2212,13 +2212,13 @@ input[type="range"].fs-slider:disabled {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--primary);
   pointer-events: none;
   user-select: none;
 }
 
 .import-section-label:first-child {
-  margin-top: 0;
+  margin-top: 8px;
   padding-top: 4px;
 }
 
