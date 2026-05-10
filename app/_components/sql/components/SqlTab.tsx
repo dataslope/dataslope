@@ -33,6 +33,8 @@ export function SqlTab({
   const [renameOpen, setRenameOpen] = useState(false);
   const [draftTitle, setDraftTitle] = useState(tab.title);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
 
   const {
@@ -60,6 +62,25 @@ export function SqlTab({
     onRename(draftTitle);
     setRenameOpen(false);
   }, [draftTitle, onRename]);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    // Safety net: if onAnimationEnd never fires (e.g. the element is hidden
+    // or the animation is skipped), fall back to closing after a short delay.
+    setTimeout(() => {
+      if (!closedRef.current) {
+        closedRef.current = true;
+        onClose();
+      }
+    }, 200);
+  }, [onClose]);
+
+  const handleAnimationEnd = useCallback(() => {
+    if (isClosing && !closedRef.current) {
+      closedRef.current = true;
+      onClose();
+    }
+  }, [isClosing, onClose]);
 
   return (
     <>
@@ -112,10 +133,11 @@ export function SqlTab({
               {...listeners}
               ref={setNodeRef}
               style={dragStyle}
-              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}`}
+              className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}${isClosing ? " sql-tab--closing" : ""}`}
               onClick={onActivate}
               aria-selected={active}
               role="tab"
+              onAnimationEnd={handleAnimationEnd}
               onMouseEnter={() => {
                 const el = titleRef.current;
                 if (el && el.scrollWidth > el.clientWidth) {
@@ -160,13 +182,13 @@ export function SqlTab({
                 aria-label={`Close ${tab.title}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onClose();
+                  handleClose();
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     e.stopPropagation();
-                    onClose();
+                    handleClose();
                   }
                 }}
               >
@@ -188,7 +210,7 @@ export function SqlTab({
                   <div className="ex-title">Duplicate</div>
                 </ContextMenu.Item>
               )}
-              <ContextMenu.Item className="example-item" onClick={onClose}>
+              <ContextMenu.Item className="example-item" onClick={handleClose}>
                 <div className="ex-title">Close</div>
               </ContextMenu.Item>
               <ContextMenu.Item

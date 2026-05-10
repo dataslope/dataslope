@@ -2437,7 +2437,6 @@ function SqlPlaygroundInner() {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color: "var(--primary)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />
@@ -2467,6 +2466,7 @@ function SqlPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="import-section-label">Database</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => setImportSqliteOpen(true)}
@@ -2481,6 +2481,7 @@ function SqlPlaygroundInner() {
                         </div>
                       </div>
                     </Menu.Item>
+                    <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => {
@@ -4330,7 +4331,7 @@ function SqlPlaygroundInner() {
             <div className="sql-sidebar-footer">
               <button
                 type="button"
-                className="sql-er-btn"
+                className="sql-sidebar-btn"
                 onClick={openErDiagramTab}
                 title="View ER Diagram"
                 aria-label="View ER Diagram"
@@ -4340,7 +4341,7 @@ function SqlPlaygroundInner() {
               </button>
               <button
                 type="button"
-                className="sql-er-btn"
+                className="sql-sidebar-btn"
                 onClick={openQueryHistoryTab}
                 title="View Query History"
                 aria-label="View Query History"

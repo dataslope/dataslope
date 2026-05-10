@@ -2240,7 +2240,7 @@ function PostgresPlaygroundInner() {
                       return (
                         <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
                           {Icon && (
-                            <span className="bui-select-item-icon" style={{ color: "var(--primary)" }} aria-hidden="true">
+                            <span className="bui-select-item-icon" aria-hidden="true">
                               <Icon size={Math.round(16 * factor)} />
                             </span>
                           )}
@@ -3081,11 +3081,11 @@ function PostgresPlaygroundInner() {
               </SchemaSection>
             </div>
             <div className="sql-sidebar-footer">
-              <button type="button" className="sql-er-btn" onClick={openErDiagramTab} title="View ER Diagram" aria-label="View ER Diagram">
+              <button type="button" className="sql-sidebar-btn" onClick={openErDiagramTab} title="View ER Diagram" aria-label="View ER Diagram">
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
               </button>
-              <button type="button" className="sql-er-btn" onClick={openQueryHistoryTab} title="View Query History" aria-label="View Query History">
+              <button type="button" className="sql-sidebar-btn" onClick={openQueryHistoryTab} title="View Query History" aria-label="View Query History">
                 <History size={13} aria-hidden="true" />
                 <span>History</span>
               </button>
