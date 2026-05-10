@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-} from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
-import {
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  Table,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, Table } from "lucide-react";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { ForeignKeyInfo, TableColumnInfo } from "../../runtime/sqlite";
@@ -42,7 +31,10 @@ export interface SchemaItemProps {
   onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
-  onExport: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
+  onExport: (
+    name: string,
+    format: "csv" | "json" | "sql" | "parquet" | "xlsx",
+  ) => void;
   onGetRowCount: (name: string) => number;
 }
 
@@ -147,9 +139,9 @@ export function SchemaItem({
                     >
                       <span className="sql-tree-chevron" aria-hidden="true">
                         {expanded ? (
-                          <ChevronDown size={11} />
+                          <ChevronDown size={12} />
                         ) : (
-                          <ChevronRight size={11} />
+                          <ChevronRight size={12} />
                         )}
                       </span>
                       <Icon size={12} aria-hidden="true" />
@@ -193,7 +185,11 @@ export function SchemaItem({
                                   delay={150}
                                   closeDelay={100}
                                   className="sql-tree-column-pk"
-                                  aria-label={pkCount > 1 ? "Composite primary key" : "Primary key"}
+                                  aria-label={
+                                    pkCount > 1
+                                      ? "Composite primary key"
+                                      : "Primary key"
+                                  }
                                 >
                                   <MdOutlineKey size={11} aria-hidden="true" />
                                 </Popover.Trigger>
@@ -204,8 +200,16 @@ export function SchemaItem({
                                     className="sql-key-icon-popover-positioner"
                                   >
                                     <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
-                                      <span>{pkCount > 1 ? "Composite primary key" : "Primary key"}</span>
+                                      <MdOutlineKey
+                                        size={11}
+                                        className="sql-key-icon-popover-icon"
+                                        aria-hidden="true"
+                                      />
+                                      <span>
+                                        {pkCount > 1
+                                          ? "Composite primary key"
+                                          : "Primary key"}
+                                      </span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
                                 </Popover.Portal>
@@ -229,7 +233,11 @@ export function SchemaItem({
                                     className="sql-key-icon-popover-positioner"
                                   >
                                     <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <IoLink
+                                        size={12}
+                                        className="sql-key-icon-popover-icon"
+                                        aria-hidden="true"
+                                      />
                                       <span>Foreign key</span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
@@ -334,7 +342,9 @@ export function SchemaItem({
                         onClick={() => onExport(name, "csv")}
                       >
                         <div className="export-item-text">
-                          <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
+                          <div className="ex-title">
+                            CSV <span className="ext-badge">.csv</span>
+                          </div>
                           <div className="ex-desc">Comma-separated values</div>
                         </div>
                       </Menu.Item>
@@ -343,7 +353,9 @@ export function SchemaItem({
                         onClick={() => onExport(name, "json")}
                       >
                         <div className="export-item-text">
-                          <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
+                          <div className="ex-title">
+                            JSON <span className="ext-badge">.json</span>
+                          </div>
                           <div className="ex-desc">Array of row objects</div>
                         </div>
                       </Menu.Item>
@@ -352,7 +364,9 @@ export function SchemaItem({
                         onClick={() => onExport(name, "sql")}
                       >
                         <div className="export-item-text">
-                          <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
+                          <div className="ex-title">
+                            SQL <span className="ext-badge">.sql</span>
+                          </div>
                           <div className="ex-desc">INSERT statements</div>
                         </div>
                       </Menu.Item>
@@ -361,7 +375,9 @@ export function SchemaItem({
                         onClick={() => onExport(name, "parquet")}
                       >
                         <div className="export-item-text">
-                          <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
+                          <div className="ex-title">
+                            Parquet <span className="ext-badge">.parquet</span>
+                          </div>
                           <div className="ex-desc">Apache Parquet binary</div>
                         </div>
                       </Menu.Item>
@@ -370,8 +386,12 @@ export function SchemaItem({
                         onClick={() => onExport(name, "xlsx")}
                       >
                         <div className="export-item-text">
-                          <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
-                          <div className="ex-desc">Excel workbook (single sheet)</div>
+                          <div className="ex-title">
+                            Excel <span className="ext-badge">.xlsx</span>
+                          </div>
+                          <div className="ex-desc">
+                            Excel workbook (single sheet)
+                          </div>
                         </div>
                       </Menu.Item>
                     </Menu.Popup>
