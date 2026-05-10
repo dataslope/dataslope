@@ -59,7 +59,8 @@ const CC_SCHEMA = `
     name TEXT, current_age INTEGER, birth_year INTEGER,
     gender TEXT, address TEXT, city TEXT, state TEXT,
     zipcode TEXT, annual_income INTEGER, total_debt INTEGER,
-    FICO_score INTEGER, num_credit_cards INTEGER
+    FICO_score INTEGER, num_credit_cards INTEGER,
+    debt_to_income_pct REAL GENERATED ALWAYS AS (ROUND(total_debt * 100.0 / NULLIF(annual_income, 0), 2)) STORED
   );
   CREATE TABLE vendors (
     vendor_id INTEGER PRIMARY KEY,
@@ -79,7 +80,8 @@ const CC_SCHEMA = `
     vendor_id INTEGER REFERENCES vendors(vendor_id),
     amount REAL, transaction_date TEXT,
     merchant_name TEXT, merchant_city TEXT, merchant_state TEXT,
-    merchant_country TEXT, category TEXT, is_fraud INTEGER
+    merchant_country TEXT, category TEXT, is_fraud INTEGER,
+    amount_category TEXT GENERATED ALWAYS AS (CASE WHEN amount < 50 THEN 'small' WHEN amount < 200 THEN 'medium' ELSE 'large' END) STORED
   );
   CREATE INDEX idx_cards_user_id ON cards(user_id);
   CREATE INDEX idx_transactions_user_id ON transactions(user_id);
@@ -445,12 +447,14 @@ const CHINOOK_SCHEMA = `
     album_id INTEGER REFERENCES albums(album_id),
     genre TEXT,
     milliseconds INTEGER,
-    unit_price REAL
+    unit_price REAL,
+    duration_seconds REAL GENERATED ALWAYS AS (ROUND(milliseconds / 1000.0, 1)) STORED
   );
   CREATE TABLE customers (
     customer_id INTEGER PRIMARY KEY,
     first_name TEXT, last_name TEXT,
-    email TEXT, country TEXT
+    email TEXT, country TEXT,
+    full_name TEXT GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED
   );
   CREATE TABLE invoices (
     invoice_id INTEGER PRIMARY KEY,
@@ -575,7 +579,7 @@ function seedChinook(db: Database): void {
   ];
   bulkInsert(
     db,
-    "INSERT INTO tracks VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO tracks (track_id, name, album_id, genre, milliseconds, unit_price) VALUES (?, ?, ?, ?, ?, ?)",
     tracks,
   );
 
@@ -591,7 +595,7 @@ function seedChinook(db: Database): void {
     [9, "Kara", "Nielsen", "kara.nielsen@jubii.dk", "Denmark"],
     [10, "Eduardo", "Martins", "eduardo@woodstock.com.br", "Brazil"],
   ];
-  bulkInsert(db, "INSERT INTO customers VALUES (?, ?, ?, ?, ?)", customers);
+  bulkInsert(db, "INSERT INTO customers (customer_id, first_name, last_name, email, country) VALUES (?, ?, ?, ?, ?)", customers);
 
   const invoices: Row[] = [
     [1, 1, "2023-01-01", 1.98],
@@ -651,7 +655,8 @@ const NORTHWIND_SCHEMA = `
     product_name TEXT,
     category TEXT,
     unit_price REAL,
-    units_in_stock INTEGER
+    units_in_stock INTEGER,
+    inventory_value REAL GENERATED ALWAYS AS (unit_price * units_in_stock) STORED
   );
   CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY,
@@ -665,6 +670,7 @@ const NORTHWIND_SCHEMA = `
     product_id INTEGER REFERENCES products(product_id),
     quantity INTEGER,
     unit_price REAL,
+    line_total REAL GENERATED ALWAYS AS (quantity * unit_price) STORED,
     PRIMARY KEY (order_id, product_id)
   );
   CREATE INDEX idx_orders_customer_id ON orders(customer_id);
@@ -779,7 +785,7 @@ function seedNorthwind(db: Database): void {
   ];
   bulkInsert(
     db,
-    "INSERT INTO products VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO products (product_id, product_name, category, unit_price, units_in_stock) VALUES (?, ?, ?, ?, ?)",
     products,
   );
 
@@ -813,7 +819,7 @@ function seedNorthwind(db: Database): void {
   ];
   bulkInsert(
     db,
-    "INSERT INTO order_details VALUES (?, ?, ?, ?)",
+    "INSERT INTO order_details (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)",
     orderDetails,
   );
 }
