@@ -253,6 +253,8 @@ export async function createPostgresEngine(
         data_type: string;
         is_nullable: string;
         column_default: string | null;
+        is_generated: string;
+        generation_expression: string | null;
         pk_position: number | null;
       }>(
         `
@@ -262,6 +264,8 @@ export async function createPostgresEngine(
           c.data_type,
           c.is_nullable,
           c.column_default,
+          c.is_generated,
+          c.generation_expression,
           kcu.ordinal_position AS pk_position
         FROM information_schema.columns c
         LEFT JOIN information_schema.table_constraints tc
@@ -283,8 +287,16 @@ export async function createPostgresEngine(
         name: row.column_name,
         type: row.data_type,
         notNull: row.is_nullable === "NO",
-        defaultValue: row.column_default,
+        defaultValue: row.is_generated === "ALWAYS" ? null : row.column_default,
         pk: row.pk_position ? Number(row.pk_position) : 0,
+        generated:
+          row.is_generated === "ALWAYS" && row.generation_expression != null
+            ? {
+                expression: row.generation_expression,
+                // PostgreSQL only supports STORED generated columns.
+                storageType: "STORED" as const,
+              }
+            : null,
       }));
     },
 

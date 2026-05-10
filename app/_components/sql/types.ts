@@ -80,6 +80,9 @@ export interface ModifyColumnDraft {
   fkColumn: string;
   fkOnDelete: string;
   fkOnUpdate: string;
+  /** When this column is a generated column, holds the expression and
+   *  storage type. `null` for ordinary columns. */
+  generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
 }
 
 export interface ModifyDialogState {

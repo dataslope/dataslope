@@ -291,6 +291,64 @@ export function ModifyColumnRow({
   );
 }
 
+/** Row for a single generated (computed) column inside the Columns tab.
+ *  Generated columns cannot be reordered or have their name/type changed
+ *  here — only the expression and storage type (Virtual/Stored) are editable. */
+function GeneratedColumnRow({
+  col,
+  onChange,
+}: {
+  col: ModifyColumnDraft;
+  onChange: (patch: Partial<ModifyColumnDraft>) => void;
+}) {
+  const gen = col.generated!; // always truthy when this component is rendered
+  return (
+    <tr className="sql-modify-col-row sql-modify-gen-row">
+      <td className="sql-modify-gen-name">
+        <span className="sql-modify-gen-name-text" title={col.name}>
+          {col.name}
+        </span>
+        <span className="sql-modify-gen-type-badge">{col.type || "—"}</span>
+      </td>
+      <td className="sql-modify-gen-expr-cell">
+        <label className="sql-modify-cell-field">
+          <input
+            className="sql-rename-input sql-modify-gen-expr"
+            value={gen.expression}
+            onChange={(e) =>
+              onChange({
+                generated: { ...gen, expression: e.target.value },
+              })
+            }
+            placeholder="e.g. price * quantity"
+            aria-label={`Generation expression for ${col.name}`}
+          />
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-gen-storage"
+            value={gen.storageType}
+            onChange={(e) =>
+              onChange({
+                generated: {
+                  ...gen,
+                  storageType: e.target.value as "VIRTUAL" | "STORED",
+                },
+              })
+            }
+            aria-label={`Storage type for ${col.name}`}
+          >
+            <option value="VIRTUAL">Virtual</option>
+            <option value="STORED">Stored</option>
+          </select>
+        </label>
+      </td>
+    </tr>
+  );
+}
+
 export function ModifyStructureForm({
   state,
   onChange,
@@ -374,27 +432,29 @@ export function ModifyStructureForm({
     });
   };
   const addColumn = () => {
-    onChange({
-      ...state,
-      columns: [
-        ...state.columns,
-        {
-          id: newDraftId(),
-          originalName: null,
-          name: "",
-          type: "TEXT",
-          notNull: false,
-          primaryKey: false,
-          autoIncrement: false,
-          unique: false,
-          defaultValue: "",
-          fkTable: "",
-          fkColumn: "",
-          fkOnDelete: "NO ACTION",
-          fkOnUpdate: "NO ACTION",
-        },
-      ],
-    });
+    // Insert new regular columns before any generated columns so the
+    // ordering stays sensible (regular columns first, generated last).
+    const firstGenIdx = state.columns.findIndex((c) => c.generated !== null);
+    const insertAt = firstGenIdx === -1 ? state.columns.length : firstGenIdx;
+    const newCol: ModifyColumnDraft = {
+      id: newDraftId(),
+      originalName: null,
+      name: "",
+      type: "TEXT",
+      notNull: false,
+      primaryKey: false,
+      autoIncrement: false,
+      unique: false,
+      defaultValue: "",
+      fkTable: "",
+      fkColumn: "",
+      fkOnDelete: "NO ACTION",
+      fkOnUpdate: "NO ACTION",
+      generated: null,
+    };
+    const next = [...state.columns];
+    next.splice(insertAt, 0, newCol);
+    onChange({ ...state, columns: next });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -406,6 +466,17 @@ export function ModifyStructureForm({
     if (oldIndex === -1 || newIndex === -1) return;
     onChange({ ...state, columns: arrayMove(state.columns, oldIndex, newIndex) });
   };
+
+  // Split columns into regular and generated so they can be rendered
+  // in separate sections inside the Columns tab.
+  const regularColumns = useMemo(
+    () => state.columns.filter((c) => !c.generated),
+    [state.columns],
+  );
+  const generatedColumns = useMemo(
+    () => state.columns.filter((c) => c.generated !== null),
+    [state.columns],
+  );
 
   const tableIndexes = useMemo(() => {
     if (!engine || !state.originalName) return [] as string[];
@@ -469,7 +540,7 @@ export function ModifyStructureForm({
       {activeTab === "columns" && (
         <>
           <div className="sql-modify-columns">
-            {state.columns.length > 0 ? (
+            {regularColumns.length > 0 ? (
               <div
                 className="sql-modify-table-wrap"
                 style={isDragging ? { overflowX: "hidden" } : undefined}
@@ -523,11 +594,11 @@ export function ModifyStructureForm({
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
-                      items={state.columns.map((c) => c.id)}
+                      items={regularColumns.map((c) => c.id)}
                       strategy={verticalListSortingStrategy}
                     >
                       <tbody>
-                        {state.columns.map((col) => (
+                        {regularColumns.map((col) => (
                           <ModifyColumnRow
                             key={col.id}
                             col={col}
@@ -554,6 +625,34 @@ export function ModifyStructureForm({
           >
             <Plus size={12} aria-hidden="true" /> Add column
           </button>
+
+          {generatedColumns.length > 0 && (
+            <div className="sql-modify-gen-section">
+              <div className="sql-modify-gen-section-header">
+                Generated columns
+              </div>
+              <div className="sql-modify-table-wrap">
+                <table className="sql-modify-table">
+                  <thead>
+                    <tr>
+                      <th>Name / Type</th>
+                      <th>Expression</th>
+                      <th>Storage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {generatedColumns.map((col) => (
+                      <GeneratedColumnRow
+                        key={col.id}
+                        col={col}
+                        onChange={(patch) => updateColumn(col.id, patch)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </>
       )}
 

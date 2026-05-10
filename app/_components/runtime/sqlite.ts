@@ -43,6 +43,9 @@ export interface TableColumnInfo {
   /** Position within the primary key (1-indexed). 0 means "not a
    *  primary key column". */
   pk: number;
+  /** For generated (computed) columns: the generation expression and
+   *  storage type. `null` for ordinary columns. */
+  generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
 }
 
 /** Unique / primary-key constraint info for a single column, used to
@@ -96,6 +99,12 @@ export interface ColumnSpec {
   defaultValue?: string;
   /** Optional column-level foreign key. */
   foreignKey?: { table: string; column: string; onDelete?: string; onUpdate?: string };
+  /** When set, this is a generated column. The `expression` is the
+   *  raw SQL expression (without surrounding parens), and `storageType`
+   *  is either `"VIRTUAL"` (default) or `"STORED"`. When present, most
+   *  other column modifiers (NOT NULL, UNIQUE, DEFAULT, FK) are ignored
+   *  by `renderColumnDef`. */
+  generated?: { expression: string; storageType: "VIRTUAL" | "STORED" };
   /** When set, the column existed under this name on the original
    *  table. Used by `rebuildTable` to copy data from `originalName`
    *  into `name` even after a rename. */
@@ -293,6 +302,15 @@ function renderColumnDef(col: ColumnSpec): string {
   const parts: string[] = [quoteIdent(col.name)];
   const type = col.type && SAFE_TYPE.test(col.type) ? col.type : "TEXT";
   parts.push(type);
+
+  // Generated columns use a completely different clause; all other
+  // modifiers (NOT NULL, UNIQUE, DEFAULT, FK) are not applicable.
+  if (col.generated) {
+    const st = col.generated.storageType === "STORED" ? "STORED" : "VIRTUAL";
+    parts.push(`GENERATED ALWAYS AS (${col.generated.expression}) ${st}`);
+    return parts.join(" ");
+  }
+
   // For multi-column primary keys we emit a table-level constraint
   // separately; here we only handle the single-column form so we can
   // attach `AUTOINCREMENT`.
@@ -323,6 +341,58 @@ function renderColumnDef(col: ColumnSpec): string {
     parts.push(fkClause);
   }
   return parts.join(" ");
+}
+
+/**
+ * Parse the `GENERATED ALWAYS AS (expr) [STORED|VIRTUAL]` clause for each
+ * generated column from the table's CREATE TABLE DDL.
+ *
+ * SQLite stores the full DDL in `sqlite_master.sql` but `PRAGMA table_xinfo`
+ * only tells us *which* columns are generated (via the `hidden` flag), not
+ * the expression itself.  This helper bridges that gap by scanning the DDL
+ * for each known generated column name and extracting its expression using a
+ * parenthesis-depth counter (to correctly handle nested function calls).
+ */
+function parseGeneratedFromDDL(
+  ddl: string,
+  generatedColNames: string[],
+): Map<string, { expression: string; storageType: "VIRTUAL" | "STORED" }> {
+  const result = new Map<string, { expression: string; storageType: "VIRTUAL" | "STORED" }>();
+
+  for (const colName of generatedColNames) {
+    // Build a regex that matches the column name (quoted or unquoted) followed
+    // eventually by `GENERATED ALWAYS AS (`.  We use a non-greedy `[\s\S]*?`
+    // so we latch onto the first match for each column name.
+    const escaped = colName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pat = new RegExp(
+      `(?:"${escaped}"|\\b${escaped}\\b)[\\s\\S]*?GENERATED\\s+ALWAYS\\s+AS\\s*\\(`,
+      "i",
+    );
+    const m = pat.exec(ddl);
+    if (!m) continue;
+
+    // Walk forward from the opening paren, counting depth.
+    const start = m.index + m[0].length; // character after the opening "("
+    let depth = 1;
+    let pos = start;
+    while (pos < ddl.length && depth > 0) {
+      if (ddl[pos] === "(") depth += 1;
+      else if (ddl[pos] === ")") depth -= 1;
+      pos += 1;
+    }
+    const expression = ddl.slice(start, pos - 1).trim();
+
+    // Look for STORED or VIRTUAL keyword immediately after the closing paren.
+    const after = ddl.slice(pos).trimStart();
+    const storageMatch = /^(STORED|VIRTUAL)\b/i.exec(after);
+    const storageType: "VIRTUAL" | "STORED" = storageMatch
+      ? (storageMatch[1].toUpperCase() as "VIRTUAL" | "STORED")
+      : "VIRTUAL";
+
+    result.set(colName, { expression, storageType });
+  }
+
+  return result;
 }
 
 export async function createSqliteEngine(
@@ -482,20 +552,66 @@ export async function createSqliteEngine(
       require().run(`DELETE FROM ${quoteIdent(name)}`);
     },
     listColumns(name: string) {
+      // PRAGMA table_xinfo returns one extra column compared to
+      // PRAGMA table_info: `hidden` (0 = normal, 1 = hidden virtual-table
+      // column, 2 = stored generated, 3 = virtual generated).
       const rows = require().exec(
-        `PRAGMA table_info(${quoteIdent(name)})`,
+        `PRAGMA table_xinfo(${quoteIdent(name)})`,
       );
       if (rows.length === 0) return [];
-      return rows[0].values.map((row) => ({
-        cid: Number(row[0]),
-        name: String(row[1]),
-        type: String(row[2] ?? ""),
-        notNull: Number(row[3]) !== 0,
-        defaultValue: row[4] === null || row[4] === undefined
-          ? null
-          : String(row[4]),
-        pk: Number(row[5]),
-      }));
+
+      const generatedColNames: string[] = [];
+      const columns: TableColumnInfo[] = rows[0].values.map((row) => {
+        const hidden = Number(row[6]);
+        const isGenerated = hidden === 2 || hidden === 3;
+        const colName = String(row[1]);
+        if (isGenerated) generatedColNames.push(colName);
+        return {
+          cid: Number(row[0]),
+          name: colName,
+          type: String(row[2] ?? ""),
+          notNull: Number(row[3]) !== 0,
+          // Generated columns never have a user-visible default value.
+          defaultValue: isGenerated
+            ? null
+            : row[4] === null || row[4] === undefined
+              ? null
+              : String(row[4]),
+          pk: Number(row[5]),
+          generated: null,
+        };
+      });
+
+      // If the table has generated columns, parse their expressions from the
+      // DDL stored in sqlite_master.
+      if (generatedColNames.length > 0) {
+        const ddlStmt = require().prepare(
+          `SELECT sql FROM sqlite_master WHERE name = $n AND type = 'table'`,
+        );
+        let ddl = "";
+        try {
+          ddlStmt.bind({ $n: name });
+          if (ddlStmt.step()) {
+            const row = ddlStmt.get();
+            if (typeof row[0] === "string") ddl = row[0];
+          }
+        } finally {
+          ddlStmt.free();
+        }
+        if (ddl) {
+          const info = parseGeneratedFromDDL(ddl, generatedColNames);
+          for (const col of columns) {
+            if (generatedColNames.includes(col.name)) {
+              col.generated = info.get(col.name) ?? {
+                expression: "",
+                storageType: "VIRTUAL",
+              };
+            }
+          }
+        }
+      }
+
+      return columns;
     },
     listForeignKeys(name: string) {
       const rows = require().exec(
@@ -551,6 +667,8 @@ export async function createSqliteEngine(
       // Build the column copy list: any column whose `originalName`
       // existed in the prior table maps over directly. New columns are
       // omitted so SQLite uses their declared default (or NULL).
+      // Generated columns are always excluded from INSERT…SELECT because
+      // SQLite computes their values automatically from the expression.
       const existing = new Set(
         require()
           .exec(`PRAGMA table_info(${quoteIdent(spec.originalName)})`)
@@ -559,6 +677,7 @@ export async function createSqliteEngine(
       const sourceCols: string[] = [];
       const targetCols: string[] = [];
       for (const c of spec.columns) {
+        if (c.generated) continue; // generated columns cannot be copied
         const src = c.originalName ?? c.name;
         if (existing.has(src)) {
           sourceCols.push(quoteIdent(src));
