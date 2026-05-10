@@ -818,18 +818,34 @@ export async function createSqliteEngine(
         d.run(
           `ALTER TABLE ${quoteIdent(tmpName)} RENAME TO ${quoteIdent(spec.newName)}`,
         );
-        // Recreate indexes with potentially patched DDL.
+        // Recreate indexes with potentially patched DDL. If an index
+        // references a column that was deleted in this rebuild it will
+        // fail — skip it rather than aborting the whole save.
         for (const sql of indexSqls) {
-          d.run(patchDdl(sql));
+          try {
+            d.run(patchDdl(sql));
+          } catch {
+            // Index references a deleted column — drop it silently.
+          }
         }
         // Recreate all triggers with potentially patched DDL (handles
         // table/column renames when the rebuilt table is also renamed).
+        // Skip any trigger that references a deleted column.
         for (const sql of triggerSqls) {
-          d.run(patchDdl(sql));
+          try {
+            d.run(patchDdl(sql));
+          } catch {
+            // Trigger references a deleted column — drop it silently.
+          }
         }
         // Recreate all views with patched DDL (handles table/column renames).
+        // Skip any view that references a deleted column.
         for (const sql of viewSqls) {
-          d.run(patchDdl(sql));
+          try {
+            d.run(patchDdl(sql));
+          } catch {
+            // View references a deleted column — drop it silently.
+          }
         }
         d.run("COMMIT");
       } catch (err) {

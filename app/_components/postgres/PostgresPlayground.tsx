@@ -58,6 +58,7 @@ import {
   Play,
   Plus,
   RotateCcw,
+  Trash2,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -657,10 +658,12 @@ function PgStructureColumnRow({
 function PgGeneratedColumnRow({
   col,
   onExpressionChange,
+  onRemove,
   theme,
 }: {
   col: PgStructureColumn;
   onExpressionChange: (id: string, expression: string) => void;
+  onRemove: (id: string) => void;
   theme: string;
 }) {
   const gen = col.generated!;
@@ -686,6 +689,17 @@ function PgGeneratedColumnRow({
       </td>
       <td className="sql-modify-gen-storage-cell">
         <span className="sql-modify-col-type-badge">Stored</span>
+      </td>
+      <td>
+        <button
+          type="button"
+          className="sql-modify-col-remove"
+          onClick={() => onRemove(col.id)}
+          aria-label={`Remove generated column ${col.originalName ?? col.name}`}
+          title="Remove column"
+        >
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
       </td>
     </tr>
   );
@@ -2830,6 +2844,7 @@ function PostgresPlaygroundInner() {
                                     <th>Name / Type</th>
                                     <th>Expression</th>
                                     <th>Storage</th>
+                                    <th>Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -2854,6 +2869,16 @@ function PostgresPlaygroundInner() {
                                                       }
                                                     : c,
                                                 ),
+                                              }
+                                            : null,
+                                        )
+                                      }
+                                      onRemove={(id) =>
+                                        setViewStructureDialog((prev) =>
+                                          prev
+                                            ? {
+                                                ...prev,
+                                                columns: prev.columns.filter((c) => c.id !== id),
                                               }
                                             : null,
                                         )

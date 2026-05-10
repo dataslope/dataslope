@@ -298,10 +298,12 @@ export function ModifyColumnRow({
 function GeneratedColumnRow({
   col,
   onChange,
+  onRemove,
   theme,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
+  onRemove: () => void;
   theme: string;
 }) {
   const gen = col.generated!; // always truthy when this component is rendered
@@ -347,6 +349,17 @@ function GeneratedColumnRow({
             <option value="STORED">Stored</option>
           </select>
         </label>
+      </td>
+      <td>
+        <button
+          type="button"
+          className="sql-modify-col-remove"
+          onClick={onRemove}
+          aria-label={`Remove generated column ${col.name || "unnamed column"}`}
+          title="Remove column"
+        >
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
       </td>
     </tr>
   );
@@ -641,6 +654,7 @@ export function ModifyStructureForm({
                       <th>Name / Type</th>
                       <th>Expression</th>
                       <th>Storage</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -649,6 +663,7 @@ export function ModifyStructureForm({
                         key={col.id}
                         col={col}
                         onChange={(patch) => updateColumn(col.id, patch)}
+                        onRemove={() => removeColumn(col.id)}
                         theme={theme ?? "default"}
                       />
                     ))}
