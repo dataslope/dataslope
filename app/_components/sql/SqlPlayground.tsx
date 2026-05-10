@@ -284,7 +284,12 @@ function getSqliteErrorHint(error: string): string | null {
 function escapeCsvCell(val: unknown): string {
   if (val === null || val === undefined) return "";
   const s = String(val);
-  if (s.includes(",") || s.includes("\n") || s.includes("\r") || s.includes('"')) {
+  if (
+    s.includes(",") ||
+    s.includes("\n") ||
+    s.includes("\r") ||
+    s.includes('"')
+  ) {
     return `"${s.replace(/"/g, '""')}"`;
   }
   return s;
@@ -372,7 +377,9 @@ async function initParquetWasm(): Promise<typeof import("parquet-wasm/esm")> {
   if (!_parquetWasmInit) {
     _parquetWasmInit = (async () => {
       const mod = await import("parquet-wasm/esm");
-      await mod.default("https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm");
+      await mod.default(
+        "https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm",
+      );
       return mod;
     })();
   }
@@ -384,10 +391,10 @@ async function exportResultToParquet(
   rows: QueryExecResult["values"],
   filename: string,
 ): Promise<void> {
-  const [{ tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray }, { Table: WasmParquetTable, writeParquet }] = await Promise.all([
-    import("apache-arrow"),
-    initParquetWasm(),
-  ]);
+  const [
+    { tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray },
+    { Table: WasmParquetTable, writeParquet },
+  ] = await Promise.all([import("apache-arrow"), initParquetWasm()]);
 
   // Build per-column value arrays, preserving nulls.
   const colArrays: Record<string, unknown[]> = {};
@@ -416,7 +423,9 @@ async function exportResultToParquet(
     }
   }
 
-  const arrowTable = tableFromArrays(fields as Parameters<typeof tableFromArrays>[0]);
+  const arrowTable = tableFromArrays(
+    fields as Parameters<typeof tableFromArrays>[0],
+  );
   const ipcBytes = tableToIPC(arrowTable, "stream");
   const wasmTable = WasmParquetTable.fromIPCStream(ipcBytes);
   const parquetBytes = writeParquet(wasmTable);
@@ -465,7 +474,9 @@ async function initXlsxWasm(): Promise<typeof import("wasm-xlsxwriter/web")> {
   if (!_xlsxWasmInit) {
     _xlsxWasmInit = (async () => {
       const mod = await import("wasm-xlsxwriter/web");
-      await mod.default("https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@0.13.0/web/wasm_xlsxwriter_bg.wasm");
+      await mod.default(
+        "https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@0.13.0/web/wasm_xlsxwriter_bg.wasm",
+      );
       return mod;
     })();
   }
@@ -739,9 +750,7 @@ function parseCellKey(cellKey: string): { row: number; col: string } | null {
 
 /** Strip block (`/* … *\/`) and line (`-- …`) comments from a SQL string. */
 function stripSqlComments(sql: string): string {
-  return sql
-    .replace(/\/\*[\s\S]*?\*\//g, " ")
-    .replace(/--[^\r\n]*/g, "");
+  return sql.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/--[^\r\n]*/g, "");
 }
 
 /** Returns true when `sql` appears to be a single SELECT or CTE statement
@@ -750,7 +759,9 @@ function stripSqlComments(sql: string): string {
  *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
  *  already stripped comments to avoid redundant work. */
 function isSingleSelectSql(sql: string, noComments?: string): boolean {
-  const stripped = (noComments ?? stripSqlComments(sql)).trim().replace(/;+\s*$/, "");
+  const stripped = (noComments ?? stripSqlComments(sql))
+    .trim()
+    .replace(/;+\s*$/, "");
   if (stripped.includes(";")) return false;
   return /^(select|with)\s/i.test(stripped);
 }
@@ -817,7 +828,6 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
   { value: 500, label: "500" },
   { value: 0, label: "All" },
 ];
-
 
 // ─── Pragma settings ─────────────────────────────────────────────────────
 
@@ -1255,7 +1265,9 @@ function SqlPlaygroundInner() {
   // ─── Settings store ──────────────────────────────────────────────────
   const fontSize = useSettingsStore((s) => s.fontSize);
   const setFontSizeState = useSettingsStore((s) => s.setFontSize);
-  const outputFontSizeEnabled = useSettingsStore((s) => s.outputFontSizeEnabled);
+  const outputFontSizeEnabled = useSettingsStore(
+    (s) => s.outputFontSizeEnabled,
+  );
   const setOutputFontSizeEnabledState = useSettingsStore(
     (s) => s.setOutputFontSizeEnabled,
   );
@@ -1285,15 +1297,18 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     pragmaSettingsRef.current = pragmaSettings;
   }, [pragmaSettings]);
-  const setGlobalPageSize = useCallback((n: number) => {
-    globalPageSizeRef.current = n;
-    setGlobalPageSizeState(n);
-    try {
-      localStorage.setItem(storageKey("page_size"), String(n));
-    } catch {
-      // ignore quota errors
-    }
-  }, [setGlobalPageSizeState]);
+  const setGlobalPageSize = useCallback(
+    (n: number) => {
+      globalPageSizeRef.current = n;
+      setGlobalPageSizeState(n);
+      try {
+        localStorage.setItem(storageKey("page_size"), String(n));
+      } catch {
+        // ignore quota errors
+      }
+    },
+    [setGlobalPageSizeState],
+  );
 
   // ─── Engine store ────────────────────────────────────────────────────
   const loaded = useEngineStore((s) => s.loaded);
@@ -1311,9 +1326,13 @@ function SqlPlaygroundInner() {
   const columnsByEntity = useEngineStore((s) => s.columnsByEntity);
   const setColumnsByEntity = useEngineStore((s) => s.setColumnsByEntity);
   const foreignKeysByEntity = useEngineStore((s) => s.foreignKeysByEntity);
-  const setForeignKeysByEntity = useEngineStore((s) => s.setForeignKeysByEntity);
+  const setForeignKeysByEntity = useEngineStore(
+    (s) => s.setForeignKeysByEntity,
+  );
   const constraintsByEntity = useEngineStore((s) => s.constraintsByEntity);
-  const setConstraintsByEntity = useEngineStore((s) => s.setConstraintsByEntity);
+  const setConstraintsByEntity = useEngineStore(
+    (s) => s.setConstraintsByEntity,
+  );
   const expandedEntities = useEngineStore((s) => s.expandedEntities);
   const setExpandedEntities = useEngineStore((s) => s.setExpandedEntities);
   const tablesSectionExpanded = useEngineStore((s) => s.tablesSectionExpanded);
@@ -1422,7 +1441,9 @@ function SqlPlaygroundInner() {
   const setExportNoTabsHover = useDialogStore((s) => s.setExportNoTabsHover);
 
   // ─── Local state (only items not in any store) ───────────────────────
-  const [loadingMessage, setLoadingMessage] = useState("Loading SQLite engine…");
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Loading SQLite engine…",
+  );
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
   const [indexesSectionExpanded, setIndexesSectionExpanded] = useState(false);
   const [triggersSectionExpanded, setTriggersSectionExpanded] = useState(false);
@@ -1479,8 +1500,19 @@ function SqlPlaygroundInner() {
   );
 
   // ─── Custom hooks ────────────────────────────────────────────────────
-  const { history: queryHistory, addHistoryEntry, clearHistory } = useQueryHistory();
-  const queryRunnerRefs = { engineRef, editorRef, tabsRef, activeTabIdRef, activeDbIdRef, addHistoryEntry };
+  const {
+    history: queryHistory,
+    addHistoryEntry,
+    clearHistory,
+  } = useQueryHistory();
+  const queryRunnerRefs = {
+    engineRef,
+    editorRef,
+    tabsRef,
+    activeTabIdRef,
+    activeDbIdRef,
+    addHistoryEntry,
+  };
   const {
     runSqlForTab,
     handleLoadPage,
@@ -1562,30 +1594,48 @@ function SqlPlaygroundInner() {
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
 
   // ─── Settings setters (persist to localStorage) ──────────────────────
-  const setFontSize = useCallback((n: number) => {
-    setFontSizeState(n);
-    localStorage.setItem(storageKey("fontsize"), String(n));
-  }, [setFontSizeState]);
-  const setOutputFontSizeEnabled = useCallback((b: boolean) => {
-    setOutputFontSizeEnabledState(b);
-    localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
-  }, [setOutputFontSizeEnabledState]);
-  const setOutputFontSize = useCallback((n: number) => {
-    setOutputFontSizeState(n);
-    localStorage.setItem(storageKey("outputfontsize"), String(n));
-  }, [setOutputFontSizeState]);
-  const setEditorTheme = useCallback((t: string) => {
-    setEditorThemeState(t);
-    setStoredEditorTheme(t);
-  }, [setEditorThemeState]);
-  const setWordWrap = useCallback((b: boolean) => {
-    setWordWrapState(b);
-    localStorage.setItem(storageKey("wordwrap"), String(b));
-  }, [setWordWrapState]);
-  const setClearBeforeRun = useCallback((b: boolean) => {
-    setClearBeforeRunState(b);
-    localStorage.setItem(storageKey("clearbeforerun"), String(b));
-  }, [setClearBeforeRunState]);
+  const setFontSize = useCallback(
+    (n: number) => {
+      setFontSizeState(n);
+      localStorage.setItem(storageKey("fontsize"), String(n));
+    },
+    [setFontSizeState],
+  );
+  const setOutputFontSizeEnabled = useCallback(
+    (b: boolean) => {
+      setOutputFontSizeEnabledState(b);
+      localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
+    },
+    [setOutputFontSizeEnabledState],
+  );
+  const setOutputFontSize = useCallback(
+    (n: number) => {
+      setOutputFontSizeState(n);
+      localStorage.setItem(storageKey("outputfontsize"), String(n));
+    },
+    [setOutputFontSizeState],
+  );
+  const setEditorTheme = useCallback(
+    (t: string) => {
+      setEditorThemeState(t);
+      setStoredEditorTheme(t);
+    },
+    [setEditorThemeState],
+  );
+  const setWordWrap = useCallback(
+    (b: boolean) => {
+      setWordWrapState(b);
+      localStorage.setItem(storageKey("wordwrap"), String(b));
+    },
+    [setWordWrapState],
+  );
+  const setClearBeforeRun = useCallback(
+    (b: boolean) => {
+      setClearBeforeRunState(b);
+      localStorage.setItem(storageKey("clearbeforerun"), String(b));
+    },
+    [setClearBeforeRunState],
+  );
 
   const savePragmaSettings = useCallback(
     (p: PragmaSettings) => {
@@ -1598,10 +1648,7 @@ function SqlPlaygroundInner() {
         );
         localStorage.setItem(storageKey("pragma_journalmode"), p.journalMode);
         localStorage.setItem(storageKey("pragma_synchronous"), p.synchronous);
-        localStorage.setItem(
-          storageKey("pragma_pagesize"),
-          String(p.pageSize),
-        );
+        localStorage.setItem(storageKey("pragma_pagesize"), String(p.pageSize));
         localStorage.setItem(
           storageKey("pragma_automaticindex"),
           String(p.automaticIndex),
@@ -1706,9 +1753,7 @@ function SqlPlaygroundInner() {
         localStorage.getItem(storageKey("pragma_synchronous")) ??
         DP.synchronous,
       pageSize: (() => {
-        const raw = Number(
-          localStorage.getItem(storageKey("pragma_pagesize")),
-        );
+        const raw = Number(localStorage.getItem(storageKey("pragma_pagesize")));
         return raw >= PRAGMA_PAGE_SIZE_MIN && raw <= PRAGMA_PAGE_SIZE_MAX
           ? raw
           : DP.pageSize;
@@ -1820,9 +1865,7 @@ function SqlPlaygroundInner() {
           crosshairCursor(),
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
-          completionComp.of(
-            sqlAutocompletion({ entities: [] }),
-          ),
+          completionComp.of(sqlAutocompletion({ entities: [] })),
           tooltips({ parent: document.body }),
           keymap.of([
             {
@@ -1869,7 +1912,9 @@ function SqlPlaygroundInner() {
           // Initial language config — the schema-aware variant is swapped
           // in via `sqlLangComp.reconfigure(...)` once the engine reports
           // its tables.
-          sqlLangComp.of(sqlLang({ dialect: SQLite, upperCaseKeywords: false })),
+          sqlLangComp.of(
+            sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
+          ),
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
           persistListener,
@@ -2001,9 +2046,7 @@ function SqlPlaygroundInner() {
         sqlComp.reconfigure(
           sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
         ),
-        completionComp.reconfigure(
-          sqlAutocompletion(completionSchema),
-        ),
+        completionComp.reconfigure(sqlAutocompletion(completionSchema)),
       ],
     });
   }, [tables, views]);
@@ -2051,7 +2094,11 @@ function SqlPlaygroundInner() {
     // operation (activate, create, reorder, close, close-all).
     // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
-    if (tab?.kind !== "er-diagram" && tab?.kind !== "view-data" && tab?.kind !== "query-history") {
+    if (
+      tab?.kind !== "er-diagram" &&
+      tab?.kind !== "view-data" &&
+      tab?.kind !== "query-history"
+    ) {
       view?.focus();
     }
     // Only rerun when the active tab id changes, not on every keystroke.
@@ -2163,7 +2210,12 @@ function SqlPlaygroundInner() {
         refreshEntityMetadata(name);
       }
     }
-  }, [expandedEntities, columnsByEntity, refreshEntityMetadata, engineForRender]);
+  }, [
+    expandedEntities,
+    columnsByEntity,
+    refreshEntityMetadata,
+    engineForRender,
+  ]);
 
   // ─── Resizer (vertical, between results panel and editor) ────────────
   useEffect(() => {
@@ -2254,10 +2306,7 @@ function SqlPlaygroundInner() {
       if (!dragging) return;
       const shellWidth = shell.offsetWidth;
       const maxW = Math.max(200, Math.min(600, shellWidth - 320));
-      const next = Math.max(
-        160,
-        Math.min(maxW, startW + (e.clientX - startX)),
-      );
+      const next = Math.max(160, Math.min(maxW, startW + (e.clientX - startX)));
       shell.style.setProperty("--sql-sidebar-width", `${next}px`);
     };
     const onUp = () => {
@@ -2334,7 +2383,9 @@ function SqlPlaygroundInner() {
     return { pk, fk: fkByName };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
-  const resultConstraintInfo = useMemo<ColumnConstraintInfo[] | undefined>(() => {
+  const resultConstraintInfo = useMemo<
+    ColumnConstraintInfo[] | undefined
+  >(() => {
     const tableName = result?.sourceTable;
     if (!tableName) return undefined;
     return constraintsByEntity[tableName];
@@ -2376,7 +2427,11 @@ function SqlPlaygroundInner() {
           <div className="logo">
             <Link href="/" aria-label="Dataslope home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
+              <img
+                src="/dataslope-logo-blue.svg"
+                alt="Dataslope logo"
+                className="brand-logo"
+              />
             </Link>
             <Link href="/" className="brand-name">
               Dataslope
@@ -2524,7 +2579,9 @@ function SqlPlaygroundInner() {
                           from Parquet
                           <span className="ext-badge">.parquet</span>
                         </div>
-                        <div className="ex-desc">Add table from Parquet file</div>
+                        <div className="ex-desc">
+                          Add table from Parquet file
+                        </div>
                       </div>
                     </Menu.Item>
                   </Menu.Popup>
@@ -2532,7 +2589,10 @@ function SqlPlaygroundInner() {
               </Menu.Portal>
             </Menu.Root>
             {tables.length === 0 && loaded ? (
-              <Popover.Root open={exportNoTabsHover} onOpenChange={setExportNoTabsHover}>
+              <Popover.Root
+                open={exportNoTabsHover}
+                onOpenChange={setExportNoTabsHover}
+              >
                 <div
                   style={{ cursor: "not-allowed" }}
                   onMouseEnter={() => setExportNoTabsHover(true)}
@@ -2556,7 +2616,11 @@ function SqlPlaygroundInner() {
                   </Popover.Trigger>
                 </div>
                 <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} align="start" className="sql-export-disabled-positioner">
+                  <Popover.Positioner
+                    sideOffset={6}
+                    align="start"
+                    className="sql-export-disabled-positioner"
+                  >
                     <Popover.Popup className="bui-popup sql-export-disabled-popup">
                       Create a table to export the database
                     </Popover.Popup>
@@ -2577,7 +2641,9 @@ function SqlPlaygroundInner() {
                 <Menu.Portal>
                   <Menu.Positioner sideOffset={6} align="start">
                     <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                      <div className="sql-result-export-group-label">SQLite Database</div>
+                      <div className="sql-result-export-group-label">
+                        SQLite Database
+                      </div>
                       <Menu.Item
                         className="example-item export-item"
                         onClick={exportDatabase}
@@ -2875,10 +2941,17 @@ function SqlPlaygroundInner() {
             <AlertDialog.Backdrop className="confirm-backdrop" />
             <AlertDialog.Popup className="confirm-popup">
               <AlertDialog.Title className="confirm-title">
-                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind] : ""}?
+                Drop{" "}
+                {pendingDropEntity
+                  ? DROP_KIND_LABELS[pendingDropEntity.kind]
+                  : ""}
+                ?
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
-                Drop {pendingDropEntity ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase() : ""}{" "}
+                Drop{" "}
+                {pendingDropEntity
+                  ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase()
+                  : ""}{" "}
                 <strong>{pendingDropEntity?.name}</strong>? This change is
                 in-memory only and will be undone next page load.
               </AlertDialog.Description>
@@ -3174,7 +3247,9 @@ function SqlPlaygroundInner() {
                         value={importCsvState.tableName}
                         onChange={(e) =>
                           setImportCsvState((prev) =>
-                            prev ? { ...prev, tableName: e.target.value } : null,
+                            prev
+                              ? { ...prev, tableName: e.target.value }
+                              : null,
                           )
                         }
                         placeholder="Table name"
@@ -3310,8 +3385,8 @@ function SqlPlaygroundInner() {
                 Import JSON File
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Parse a JSON array of objects and import its rows into a new
-                or existing table.
+                Parse a JSON array of objects and import its rows into a new or
+                existing table.
               </Dialog.Description>
               <div className="sql-import-warning">
                 <TriangleAlert
@@ -3410,7 +3485,9 @@ function SqlPlaygroundInner() {
                         value={importJsonState.tableName}
                         onChange={(e) =>
                           setImportJsonState((prev) =>
-                            prev ? { ...prev, tableName: e.target.value } : null,
+                            prev
+                              ? { ...prev, tableName: e.target.value }
+                              : null,
                           )
                         }
                         placeholder="Table name"
@@ -3785,10 +3862,7 @@ function SqlPlaygroundInner() {
                 recorded in
                 <code> sqlite_master</code>.
               </Dialog.Description>
-              <DdlViewer
-                sql={ddlDialog?.sql ?? ""}
-                theme={editorTheme}
-              />
+              <DdlViewer sql={ddlDialog?.sql ?? ""} theme={editorTheme} />
               <div className="confirm-actions">
                 <button
                   type="button"
@@ -3851,7 +3925,10 @@ function SqlPlaygroundInner() {
                 <ModifyStructureForm
                   state={modifyDialog}
                   onChange={(next) => {
-                    setModifyDialog({ ...next, originalSignature: modifyDialog!.originalSignature });
+                    setModifyDialog({
+                      ...next,
+                      originalSignature: modifyDialog!.originalSignature,
+                    });
                     if (modifyInvalidColIds.size > 0) {
                       setModifyInvalidColIds((prev) => {
                         const updated = new Set(prev);
@@ -3867,7 +3944,13 @@ function SqlPlaygroundInner() {
                   engine={engineForRender}
                   onDropLeaf={dropLeafEntity}
                   theme={editorTheme}
-                  activeTab={modifyStructureTab as "columns" | "indexes" | "triggers" | undefined}
+                  activeTab={
+                    modifyStructureTab as
+                      | "columns"
+                      | "indexes"
+                      | "triggers"
+                      | undefined
+                  }
                   onTabChange={setModifyStructureTab}
                   refreshKey={modifyStructureRefreshKey}
                 />
@@ -3883,7 +3966,8 @@ function SqlPlaygroundInner() {
                     onClick={submitModifyStructure}
                     disabled={
                       !modifyDialog ||
-                      modifyDialogSignature(modifyDialog) === modifyDialog.originalSignature
+                      modifyDialogSignature(modifyDialog) ===
+                        modifyDialog.originalSignature
                     }
                   >
                     Save
@@ -4021,7 +4105,10 @@ function SqlPlaygroundInner() {
                 <ModifyStructureForm
                   state={addTableDialog}
                   onChange={(next) => {
-                    setAddTableDialog({ ...next, originalSignature: addTableDialog!.originalSignature });
+                    setAddTableDialog({
+                      ...next,
+                      originalSignature: addTableDialog!.originalSignature,
+                    });
                     if (addTableInvalidColIds.size > 0) {
                       setAddTableInvalidColIds((prev) => {
                         const updated = new Set(prev);
@@ -4076,8 +4163,15 @@ function SqlPlaygroundInner() {
                       if (dotIdx > 0) {
                         setRenameDbBaseName(cur.slice(0, dotIdx));
                         const ext = cur.slice(dotIdx);
-                        const knownExts = [".sqlite", ".db", ".sqlite3", ".db3"];
-                        setRenameDbExt(knownExts.includes(ext) ? ext : ".sqlite");
+                        const knownExts = [
+                          ".sqlite",
+                          ".db",
+                          ".sqlite3",
+                          ".db3",
+                        ];
+                        setRenameDbExt(
+                          knownExts.includes(ext) ? ext : ".sqlite",
+                        );
                       } else {
                         setRenameDbBaseName(cur);
                         setRenameDbExt(".sqlite");
@@ -4210,7 +4304,7 @@ function SqlPlaygroundInner() {
 
             <div className="sql-tree">
               <SchemaSection
-                label="TABLES"
+                label="Tables"
                 count={tables.length}
                 expanded={tablesSectionExpanded}
                 onToggle={() => setTablesSectionExpanded((v) => !v)}
@@ -4252,7 +4346,7 @@ function SqlPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="VIEWS"
+                label="Views"
                 count={views.length}
                 expanded={viewsSectionExpanded}
                 onToggle={() => setViewsSectionExpanded((v) => !v)}
@@ -4291,7 +4385,7 @@ function SqlPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="INDEXES"
+                label="Indexes"
                 count={indexes.length}
                 expanded={indexesSectionExpanded}
                 onToggle={() => setIndexesSectionExpanded((v) => !v)}
@@ -4309,7 +4403,7 @@ function SqlPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="TRIGGERS"
+                label="Triggers"
                 count={triggers.length}
                 expanded={triggersSectionExpanded}
                 onToggle={() => setTriggersSectionExpanded((v) => !v)}
@@ -4372,7 +4466,10 @@ function SqlPlaygroundInner() {
                 onDragStart={handleTabDragStart}
                 onDragEnd={handleTabDragEnd}
               >
-                <SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
+                <SortableContext
+                  items={tabIds}
+                  strategy={horizontalListSortingStrategy}
+                >
                   <div className="sql-tabs" role="tablist">
                     {tabs.map((t) => (
                       <SqlTab
@@ -4423,7 +4520,17 @@ function SqlPlaygroundInner() {
               </button>
             </div>
 
-            <div className="sql-editor-pane" ref={editorPaneRef} style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}>
+            <div
+              className="sql-editor-pane"
+              ref={editorPaneRef}
+              style={
+                activeTab?.kind === "view-data" ||
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
+                  ? { display: "none" }
+                  : undefined
+              }
+            >
               <div className="editor-wrap" ref={editorHostRef} />
               {result && statusState !== "running" && (
                 <div
@@ -4439,7 +4546,11 @@ function SqlPlaygroundInner() {
                 <div className="sql-toolbar-shortcuts">
                   <span
                     className="kbd-group"
-                    title={isMac ? "Cmd + Enter — run selection or all" : "Ctrl + Enter — run selection or all"}
+                    title={
+                      isMac
+                        ? "Cmd + Enter — run selection or all"
+                        : "Ctrl + Enter — run selection or all"
+                    }
                   >
                     <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
                     <span className="kbd-plus" aria-hidden="true">
@@ -4449,7 +4560,9 @@ function SqlPlaygroundInner() {
                   </span>
                 </div>
                 {hasEditorSelection ? (
-                  <div className={`run-btn-split${statusState === "running" ? " running" : ""}`}>
+                  <div
+                    className={`run-btn-split${statusState === "running" ? " running" : ""}`}
+                  >
                     <button
                       type="button"
                       className="run-btn-split-main"
@@ -4474,7 +4587,10 @@ function SqlPlaygroundInner() {
                       )}
                       {statusState === "running" ? "Running…" : "Run Selection"}
                     </button>
-                    <span className="run-btn-split-divider" aria-hidden="true" />
+                    <span
+                      className="run-btn-split-divider"
+                      aria-hidden="true"
+                    />
                     <Menu.Root>
                       <Menu.Trigger
                         className="run-btn-split-chevron"
@@ -4491,16 +4607,24 @@ function SqlPlaygroundInner() {
                               onClick={runCurrentSelection}
                               disabled={!loaded || statusState === "running"}
                             >
-                              <span className="run-split-item-label">Run Selection</span>
-                              <span className="run-split-item-kbd">{isMac ? "⌘Enter" : "Ctrl+Enter"}</span>
+                              <span className="run-split-item-label">
+                                Run Selection
+                              </span>
+                              <span className="run-split-item-kbd">
+                                {isMac ? "⌘Enter" : "Ctrl+Enter"}
+                              </span>
                             </Menu.Item>
                             <Menu.Item
                               className="run-split-item"
                               onClick={runActiveTab}
                               disabled={!loaded || statusState === "running"}
                             >
-                              <span className="run-split-item-label">Run All</span>
-                              <span className="run-split-item-kbd">{isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}</span>
+                              <span className="run-split-item-label">
+                                Run All
+                              </span>
+                              <span className="run-split-item-kbd">
+                                {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
+                              </span>
                             </Menu.Item>
                           </Menu.Popup>
                         </Menu.Positioner>
@@ -4543,10 +4667,25 @@ function SqlPlaygroundInner() {
               aria-orientation="horizontal"
               aria-label="Drag to resize editor and results"
               title="Drag to resize"
-              style={activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}
+              style={
+                activeTab?.kind === "view-data" ||
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
+                  ? { display: "none" }
+                  : undefined
+              }
             />
 
-            <div className="sql-results-pane" ref={resultsPaneRef} style={activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history" ? { display: "none" } : undefined}>
+            <div
+              className="sql-results-pane"
+              ref={resultsPaneRef}
+              style={
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
+                  ? { display: "none" }
+                  : undefined
+              }
+            >
               <div className="sql-results-body">
                 <ResultView
                   result={result}
@@ -4604,4 +4743,3 @@ function SqlPlaygroundInner() {
     </div>
   );
 }
-

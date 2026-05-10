@@ -65,9 +65,9 @@ export function SchemaSection({
               >
                 <span className="sql-tree-chevron" aria-hidden="true">
                   {expanded ? (
-                    <ChevronDown size={11} />
+                    <ChevronDown size={12} />
                   ) : (
-                    <ChevronRight size={11} />
+                    <ChevronRight size={12} />
                   )}
                 </span>
                 <span className="sql-tree-label">
@@ -103,9 +103,9 @@ export function SchemaSection({
                   aria-label={expandCollapseHint}
                 >
                   {allExpanded ? (
-                    <ChevronsUp size={11} aria-hidden="true" />
+                    <ChevronsUp size={12} aria-hidden="true" />
                   ) : (
-                    <ChevronsDown size={11} aria-hidden="true" />
+                    <ChevronsDown size={12} aria-hidden="true" />
                   )}
                 </button>
               )}
@@ -137,7 +137,7 @@ export function SchemaSection({
                   onClick={onAdd}
                   aria-label={addHint}
                 >
-                  <Plus size={11} aria-hidden="true" />
+                  <Plus size={12} aria-hidden="true" />
                 </button>
               )}
             />

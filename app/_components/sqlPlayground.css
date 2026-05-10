@@ -185,7 +185,7 @@
 }
 
 .sql-tree-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--text-soft);
@@ -512,7 +512,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 500;
@@ -2014,7 +2014,6 @@
   outline-offset: 1px;
 }
 
-
 .sql-import-warning {
   display: flex;
   align-items: flex-start;
@@ -2667,7 +2666,8 @@
   gap: 2px;
   border-radius: 6px;
 }
-.sql-struct-list-item.sql-struct-list-item-toggle.is-open .sql-struct-list-header {
+.sql-struct-list-item.sql-struct-list-item-toggle.is-open
+  .sql-struct-list-header {
   border-radius: 6px 6px 0 0;
 }
 .sql-struct-list-row {
@@ -2685,7 +2685,8 @@
   cursor: pointer;
   border-radius: 6px 0 0 6px;
 }
-.sql-struct-list-item.sql-struct-list-item-toggle:not(.is-open) .sql-struct-list-row {
+.sql-struct-list-item.sql-struct-list-item-toggle:not(.is-open)
+  .sql-struct-list-row {
   border-radius: 6px 0 0 6px;
 }
 .sql-struct-list-row:hover {
@@ -2707,7 +2708,9 @@
   align-items: center;
   padding: 7px 8px;
   border-radius: 0 6px 6px 0;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 .sql-struct-list-drop:hover {
   color: var(--danger, #e53e3e);
@@ -3362,7 +3365,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 24px;
 }
 
 /* ─── Empty state ─── */
@@ -3391,8 +3394,6 @@
 /* ─── Individual history entry ─── */
 .sql-history-entry {
   overflow: hidden;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
 }
 
 .sql-history-entry:last-child {
