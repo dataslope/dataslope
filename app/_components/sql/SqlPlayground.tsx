@@ -2467,6 +2467,7 @@ function SqlPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="import-section-label">Database</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => setImportSqliteOpen(true)}
@@ -2481,6 +2482,7 @@ function SqlPlaygroundInner() {
                         </div>
                       </div>
                     </Menu.Item>
+                    <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => {

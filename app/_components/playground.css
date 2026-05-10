@@ -196,6 +196,7 @@ body.pg-active {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  margin-left: 8px;
   transition:
     background-color 0.15s,
     border-color 0.15s;
@@ -277,6 +278,15 @@ body.pg-active {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+}
+
+/* Icons inside the language-switcher dropdown default to --text; only
+   the currently-selected (active) item's icon uses --primary. */
+.pg-lang-switcher-popup .bui-select-item-icon {
+  color: var(--text);
+}
+.pg-lang-switcher-popup .bui-select-item[data-selected] .bui-select-item-icon {
+  color: var(--primary);
 }
 
 /* Status pill removed — runtime state is now communicated by the Run
@@ -2190,6 +2200,24 @@ input[type="range"].fs-slider:disabled {
 
 .export-item .ex-desc {
   margin-top: 4px;
+}
+
+/* Section heading inside the Import dropdown — separates "Database" from
+   "Tables" import options. Non-interactive; pointer-events disabled. */
+.import-section-label {
+  padding: 6px 10px 3px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  pointer-events: none;
+  user-select: none;
+}
+
+.import-section-label:first-child {
+  padding-top: 4px;
 }
 
 .sql-export-info-msg {
