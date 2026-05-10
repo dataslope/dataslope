@@ -1548,8 +1548,20 @@ function PostgresPlaygroundInner() {
   );
 
   const openErDiagramTab = useCallback(() => {
-    const existing = tabsRef.current.find((tab) => tab.kind === "er-diagram");
+    const currentTabs = tabsRef.current;
+    const currentActiveTabId = activeTabIdRef.current;
+    const existing = currentTabs.find((tab) => tab.kind === "er-diagram");
     if (existing) {
+      if (existing.id === currentActiveTabId) {
+        const next = currentTabs.filter((t) => t.id !== existing.id);
+        const finalTabs =
+          next.length > 0
+            ? next
+            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+        persistTabs(finalTabs);
+        setActiveTabId(finalTabs[0].id);
+        return;
+      }
       setActiveTabId(existing.id);
       return;
     }
@@ -1560,13 +1572,25 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "er-diagram",
     };
-    persistTabs([...tabsRef.current, tab]);
+    persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
 
   const openQueryHistoryTab = useCallback(() => {
-    const existing = tabsRef.current.find((tab) => tab.kind === "query-history");
+    const currentTabs = tabsRef.current;
+    const currentActiveTabId = activeTabIdRef.current;
+    const existing = currentTabs.find((tab) => tab.kind === "query-history");
     if (existing) {
+      if (existing.id === currentActiveTabId) {
+        const next = currentTabs.filter((t) => t.id !== existing.id);
+        const finalTabs =
+          next.length > 0
+            ? next
+            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+        persistTabs(finalTabs);
+        setActiveTabId(finalTabs[0].id);
+        return;
+      }
       setActiveTabId(existing.id);
       return;
     }
@@ -1577,7 +1601,7 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "query-history",
     };
-    persistTabs([...tabsRef.current, tab]);
+    persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
 
