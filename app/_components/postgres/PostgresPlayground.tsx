@@ -35,6 +35,7 @@ import {
 } from "@codemirror/view";
 import { sql as sqlLang, PostgreSQL } from "@codemirror/lang-sql";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
@@ -362,72 +363,51 @@ function PgTypeSelector({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const [filter, setFilter] = useState("");
-  const query = filter.trim().toLowerCase();
+  const query = value.trim().toLowerCase();
   const visibleGroups = PG_TYPE_GROUPS.map((group) => ({
     ...group,
-    types: group.types.filter(
-      (type) =>
-        type.toLowerCase().includes(query),
-    ),
+    types: group.types.filter((type) => type.toLowerCase().includes(query)),
   })).filter((group) => group.types.length > 0);
+
   return (
-    <div className="pg-type-selector">
-      <input
+    <Combobox.Root
+      value={PG_TYPE_OPTIONS.includes(value) ? value : null}
+      onValueChange={(newValue) => {
+        if (newValue) onChange(newValue as string);
+      }}
+      inputValue={value}
+      onInputValueChange={(v) => onChange(v)}
+      autoHighlight
+    >
+      <Combobox.Input
         className="sql-rename-input sql-modify-col-type pg-type-input"
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        onFocus={() => setFilter(value)}
         placeholder="e.g. varchar(255)"
         aria-label="Column type"
-        list="pg-type-suggestions"
       />
-      <datalist id="pg-type-suggestions">
-        {PG_TYPE_OPTIONS.map((type) => (
-          <option key={type} value={type} />
-        ))}
-      </datalist>
-      <Select.Root
-        value={PG_TYPE_OPTIONS.includes(value) ? value : ""}
-        onValueChange={(next) => {
-          if (next) onChange(next);
-        }}
-      >
-        <Select.Trigger className="pg-type-trigger" aria-label="Show PostgreSQL types">
-          <ChevronDown size={12} aria-hidden="true" />
-        </Select.Trigger>
-        <Select.Portal>
-          <Select.Positioner sideOffset={4} align="start" className="pg-type-positioner">
-            <Select.Popup className="bui-select-popup pg-type-popup">
-              <div className="pg-type-search-wrap">
-                <input
-                  className="sql-rename-input pg-type-search"
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  placeholder="Search PostgreSQL types…"
-                  aria-label="Search PostgreSQL types"
-                />
+      <Combobox.Portal>
+        <Combobox.Positioner sideOffset={4} align="start" className="pg-type-positioner">
+          <Combobox.Popup className="bui-select-popup pg-type-popup">
+            {visibleGroups.map((group) => (
+              <Combobox.Group key={group.label} className="pg-type-group">
+                <Combobox.GroupLabel className="pg-type-group-label">
+                  {group.label}
+                </Combobox.GroupLabel>
+                {group.types.map((type) => (
+                  <Combobox.Item key={type} value={type} className="bui-select-item">
+                    {type}
+                  </Combobox.Item>
+                ))}
+              </Combobox.Group>
+            ))}
+            {visibleGroups.length === 0 && (
+              <div className="pg-type-empty">
+                No matching built-in types. You can keep the typed value.
               </div>
-              {visibleGroups.map((group) => (
-                <div key={group.label} className="pg-type-group">
-                  <div className="pg-type-group-label">{group.label}</div>
-                  {group.types.map((type) => (
-                    <Select.Item key={type} value={type} className="bui-select-item">
-                      <Select.ItemText>{type}</Select.ItemText>
-                    </Select.Item>
-                  ))}
-                </div>
-              ))}
-              {visibleGroups.length === 0 && (
-                <div className="pg-type-empty">No matching built-in types. You can keep the typed value.</div>
-              )}
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Portal>
-      </Select.Root>
-    </div>
+            )}
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Portal>
+    </Combobox.Root>
   );
 }
 

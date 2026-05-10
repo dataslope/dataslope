@@ -2819,7 +2819,7 @@ input[type="range"].fs-slider:disabled {
   border-color: var(--border);
   color: var(--text);
 }
-.confirm-btn-secondary:hover {
+.confirm-btn-secondary:hover:not(:disabled) {
   background: var(--bg3);
   color: var(--text);
 }
@@ -2827,15 +2827,19 @@ input[type="range"].fs-slider:disabled {
   background: var(--primary);
   color: white;
 }
-.confirm-btn-primary:hover {
+.confirm-btn-primary:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 .confirm-btn-danger {
   background: var(--red);
   color: white;
 }
-.confirm-btn-danger:hover {
+.confirm-btn-danger:hover:not(:disabled) {
   filter: brightness(1.1);
+}
+.confirm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 .confirm-btn:focus-visible {
   outline: none;
