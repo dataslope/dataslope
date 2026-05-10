@@ -160,10 +160,12 @@ const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 
 interface PgStructureColumn {
   id: string;
+  /** Existing columns keep their pre-edit name; new unsaved columns use null. */
   originalName: string | null;
   name: string;
   type: string;
   nullable: boolean;
+  /** Raw SQL default expression; an empty string means no DEFAULT clause. */
   defaultValue: string;
   isPk: boolean;
   unique: boolean;
@@ -297,10 +299,6 @@ function validatePgStructure(
     const type = col.type.trim();
     if (!type || !PG_TYPE_VALIDATION_REGEX.test(type)) {
       errors.push(`"${name || "Unnamed column"}" has an invalid type.`);
-      invalidColumnIds.add(col.id);
-    }
-    if (col.autoIncrement && !col.isPk) {
-      errors.push(`"${name || "Unnamed column"}" must be primary key to use identity/serial.`);
       invalidColumnIds.add(col.id);
     }
     if (col.autoIncrement && !/^(smallint|integer|bigint|smallserial|serial|bigserial)$/i.test(type)) {
@@ -493,7 +491,7 @@ function PgStructureColumnRow({
       <td>
         <ColumnFlag
           checked={col.isPk}
-          onChange={(isPk) => onChange({ isPk, autoIncrement: isPk ? col.autoIncrement : false })}
+          onChange={(isPk) => onChange({ isPk })}
           label="Primary key"
           showLabel={false}
         />
@@ -512,7 +510,6 @@ function PgStructureColumnRow({
           onChange={(autoIncrement) => onChange({ autoIncrement })}
           label="Identity / serial"
           showLabel={false}
-          disabled={!col.isPk}
         />
       </td>
       <td>
@@ -2793,7 +2790,7 @@ function PostgresPlaygroundInner() {
                             </div>
                             <p className="sql-modify-pg-note">
                               <Pencil size={12} aria-hidden="true" />
-                              PostgreSQL generated columns are stored. Editing the expression rebuilds the in-memory table.
+                              PostgreSQL generated columns are stored. Editing the expression rebuilds the table structure.
                             </p>
                           </div>
                         )}

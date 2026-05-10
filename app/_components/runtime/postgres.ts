@@ -314,7 +314,7 @@ export async function createPostgresEngine(
         SELECT
           c.ordinal_position,
           c.column_name,
-          pg_catalog.format_type(a.atttypid, a.atttypmod) AS formatted_type,
+          COALESCE(pg_catalog.format_type(a.atttypid, a.atttypmod), c.data_type) AS formatted_type,
           c.data_type,
           c.is_nullable,
           c.column_default,
