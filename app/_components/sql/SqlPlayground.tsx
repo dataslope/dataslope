@@ -2399,7 +2399,7 @@ function SqlPlaygroundInner() {
                   return Icon ? (
                     <span
                       className="playground-switcher-lang-icon"
-                      style={{ color: "var(--primary)" }}
+                      style={{ color: "var(--text)" }}
                       aria-hidden="true"
                     >
                       <Icon size={Math.round(16 * factor)} />
