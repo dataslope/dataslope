@@ -1025,7 +1025,7 @@ export function ResultTableBody({
   onDeleteSingleRow,
   onDuplicateRow,
 }: {
-  set: QueryExecResult;
+  set: QueryExecResult & { columnTypes?: string[] };
   visible: QueryExecResult["values"];
   originalIndices: number[];
   sorting: SortingState;
@@ -1161,7 +1161,7 @@ export function ResultTableBody({
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
               const sorted = column.getIsSorted();
-              const colType = inferColumnType(set.values, ci);
+              const colType = set.columnTypes?.[ci] || inferColumnType(set.values, ci);
               return (
                 <button
                   type="button"
