@@ -16,6 +16,7 @@ import { useDialogStore } from "../stores/useDialogStore";
 import { useTabStore } from "../stores/useTabStore";
 import { DROP_KIND_LABELS } from "../constants";
 import type { ModifyColumnDraft } from "../types";
+import { modifyDialogSignature } from "../types";
 import { dbScopedKey } from "../../sqlitePlaygroundTabs";
 
 function newDraftId(): string {
@@ -315,6 +316,7 @@ export function useSidebarActions(
           originalName: name,
           newName: name,
           columns: drafts,
+          originalSignature: modifyDialogSignature({ newName: name, columns: drafts }),
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -478,6 +480,8 @@ export function useSidebarActions(
           generated: null,
         },
       ],
+      // New tables are always dirty (there's no previous state to compare).
+      originalSignature: "",
     });
   }, [setAddTableDialog]);
 

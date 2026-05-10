@@ -89,6 +89,40 @@ export interface ModifyDialogState {
   originalName: string;
   newName: string;
   columns: ModifyColumnDraft[];
+  /** Serialised snapshot of the dialog at open-time; compare with
+   *  `modifyDialogSignature` to decide whether anything has changed.
+   *  An empty string means the dialog is for a brand-new table and is
+   *  always considered dirty. */
+  originalSignature: string;
+}
+
+/** Produces a stable JSON string that captures every user-editable field
+ *  of a ModifyDialogState (table name + column definitions).  Two calls
+ *  with logically identical states produce the same string, so comparing
+ *  the result against `originalSignature` reliably detects changes. */
+export function modifyDialogSignature(
+  state: Pick<ModifyDialogState, "newName" | "columns">,
+): string {
+  return JSON.stringify({
+    name: state.newName.trim(),
+    columns: state.columns.map((c) => ({
+      originalName: c.originalName,
+      name: c.name.trim(),
+      type: c.type,
+      notNull: c.notNull,
+      primaryKey: c.primaryKey,
+      autoIncrement: c.autoIncrement,
+      unique: c.unique,
+      defaultValue: c.defaultValue.trim(),
+      fkTable: c.fkTable,
+      fkColumn: c.fkColumn,
+      fkOnDelete: c.fkOnDelete || "NO ACTION",
+      fkOnUpdate: c.fkOnUpdate || "NO ACTION",
+      generated: c.generated
+        ? { expression: c.generated.expression.trim(), storageType: c.generated.storageType }
+        : null,
+    })),
+  });
 }
 
 export interface ImportColComparison {

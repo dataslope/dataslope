@@ -80,7 +80,6 @@ import { FaInfo } from "react-icons/fa";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
-  LANGUAGE_ICON_COLORS as PLAYGROUND_ICON_COLORS,
 } from "./languageIcons";
 import {
   applyMode,
@@ -1295,12 +1294,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               >
                 {(() => {
                   const Icon = PLAYGROUND_ICONS[adapter.id];
-                  const color = PLAYGROUND_ICON_COLORS[adapter.id];
                   const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
                   return Icon ? (
                     <span
                       className="playground-switcher-lang-icon"
-                      style={{ color }}
+                      style={{ color: "var(--text-accent)" }}
                       aria-hidden="true"
                     >
                       <Icon size={Math.round(16 * factor)} />
@@ -1324,7 +1322,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   <Select.Popup className="bui-select-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
-                      const color = PLAYGROUND_ICON_COLORS[p.id];
                       const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
                       return (
                         <Select.Item
@@ -1335,7 +1332,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color }}
+                              style={{ color: "var(--text-accent)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />
