@@ -222,7 +222,7 @@ const PG_TYPE_GROUPS = [
   },
 ] as const;
 
-const PG_TYPE_OPTIONS = PG_TYPE_GROUPS.flatMap((group) => group.types);
+const PG_TYPE_OPTIONS: readonly string[] = PG_TYPE_GROUPS.flatMap((group) => group.types);
 const PG_SERIAL_TYPES = new Set(["serial", "bigserial", "smallserial"]);
 
 function normalizePgFkAction(action: string | undefined): string {
@@ -380,7 +380,12 @@ function PgTypeSelector({
           <option key={type} value={type} />
         ))}
       </datalist>
-      <Select.Root value={PG_TYPE_OPTIONS.includes(value) ? value : ""} onValueChange={onChange}>
+      <Select.Root
+        value={PG_TYPE_OPTIONS.includes(value) ? value : ""}
+        onValueChange={(next) => {
+          if (next) onChange(next);
+        }}
+      >
         <Select.Trigger className="pg-type-trigger" aria-label="Show PostgreSQL types">
           <ChevronDown size={12} aria-hidden="true" />
         </Select.Trigger>
