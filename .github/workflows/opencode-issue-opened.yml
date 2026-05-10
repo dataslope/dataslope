@@ -23,12 +23,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Select model
+        id: model
+        run: |
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'simple') }}" == "true" ]]; then
+            echo "model=opencode-go/deepseek-v4-flash" >> $GITHUB_OUTPUT
+          else
+            echo "model=opencode-go/kimi-k2.6" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run OpenCode
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
-          model: opencode-go/kimi-k2.6
+          model: ${{ steps.model.outputs.model }}
           prompt: |
             A new GitHub issue has been opened by the repository owner.
 
