@@ -3129,7 +3129,9 @@
 }
 
 .pg-type-positioner {
-  z-index: 80;
+  /* Must sit above .sql-modify-drawer (z-index: 401) since the popup is
+     portaled to the body and would otherwise render behind the drawer. */
+  z-index: 500;
 }
 
 .pg-type-popup {
