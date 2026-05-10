@@ -238,6 +238,10 @@ function normalizePgFkAction(action: string | undefined): string {
     : "NO ACTION";
 }
 
+function isPgSerialType(type: string): boolean {
+  return PG_SERIAL_TYPES.has(type.trim().toLowerCase());
+}
+
 function pgStructureSignature(state: Pick<PgStructureDialogState, "newTableName" | "columns">): string {
   return JSON.stringify({
     table: state.newTableName.trim(),
@@ -366,7 +370,6 @@ function PgTypeSelector({
         className="sql-rename-input sql-modify-col-type pg-type-input"
         value={value}
         onChange={(e) => {
-          setFilter(e.target.value);
           onChange(e.target.value);
         }}
         onFocus={() => setFilter(value)}
@@ -453,7 +456,7 @@ function PgStructureColumnRow({
     zIndex: isDragging ? 1 : undefined,
   };
   const fkTargetColumns = col.fkTable ? columnsByTable[col.fkTable] ?? [] : [];
-  const serialType = PG_SERIAL_TYPES.has(col.type.trim().toLowerCase());
+  const serialType = isPgSerialType(col.type);
 
   return (
     <tr ref={setNodeRef} style={style} className="sql-modify-col-row" {...attributes}>
@@ -1812,7 +1815,7 @@ function PostgresPlaygroundInner() {
           notNull: !col.nullable,
           primaryKey: col.isPk,
           unique: col.unique,
-          autoIncrement: col.autoIncrement || PG_SERIAL_TYPES.has(col.type.trim().toLowerCase()),
+          autoIncrement: col.autoIncrement || isPgSerialType(col.type),
           defaultValue: col.defaultValue.trim() || undefined,
           foreignKey:
             col.fkTable && col.fkColumn

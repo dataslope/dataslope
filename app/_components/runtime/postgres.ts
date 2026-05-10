@@ -65,6 +65,8 @@ const PG_TYPE_NAMES: Record<number, string> = {
   3802: "jsonb",
 };
 
+let pgRebuildCounter = 0;
+
 function pgTypeName(dataTypeID: number): string {
   return PG_TYPE_NAMES[dataTypeID] ?? "";
 }
@@ -439,7 +441,7 @@ export async function createPostgresEngine(
         type: (col.type || "text").trim(),
       }));
       if (columns.length === 0) throw new Error("A table must have at least one column.");
-      const tmpName = `${spec.originalName}__tmp_rebuild_${Date.now().toString(36)}`;
+      const tmpName = `${spec.originalName}__tmp_rebuild_${++pgRebuildCounter}`;
       const createSql = renderPgCreateTable(tmpName, columns);
       const copyable = columns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
