@@ -114,6 +114,7 @@ import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
 import { ToastList } from "../sql/components/ToastList";
 import { DdlViewer } from "../sql/components/DdlViewer";
+import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
 import {
@@ -255,29 +256,32 @@ function PgStructureColumnRow({
 function PgGeneratedColumnRow({
   col,
   onExpressionChange,
+  theme,
 }: {
   col: PgStructureColumn;
   onExpressionChange: (id: string, expression: string) => void;
+  theme: string;
 }) {
   const gen = col.generated!;
   return (
     <tr className="sql-modify-col-row sql-modify-gen-row">
-      <td className="sql-modify-gen-name">
-        <span className="sql-modify-gen-name-text" title={col.originalName}>
-          {col.originalName}
-        </span>
-        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      <td>
+        <div className="sql-modify-gen-name">
+          <span className="sql-modify-gen-name-text" title={col.originalName}>
+            {col.originalName}
+          </span>
+          <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+        </div>
       </td>
       <td className="sql-modify-gen-expr-cell">
-        <label className="sql-modify-cell-field">
-          <input
-            className="sql-rename-input sql-modify-gen-expr"
-            value={gen.expression}
-            onChange={(e) => onExpressionChange(col.id, e.target.value)}
-            placeholder="e.g. price * quantity"
-            aria-label={`Generation expression for ${col.originalName}`}
-          />
-        </label>
+        <GenExprEditor
+          value={gen.expression}
+          onChange={(expression) => onExpressionChange(col.id, expression)}
+          placeholder="e.g. price * quantity"
+          ariaLabel={`Generation expression for ${col.originalName}`}
+          isPostgres
+          theme={theme}
+        />
       </td>
       <td className="sql-modify-gen-storage-cell">
         <span className="sql-modify-col-type-badge">Stored</span>
@@ -1435,6 +1439,56 @@ function PostgresPlaygroundInner() {
       for (const col of genChanges) {
         const newExpr = col.generated!.expression.trim();
         if (!newExpr) continue;
+
+        // Find all views (direct and transitive) that depend on this column,
+        // ordered deepest-first so they can be dropped in dependency order.
+        const depResult = await engine.execParams(
+          `WITH RECURSIVE view_deps AS (
+             SELECT vc.oid AS view_oid, vc.relname AS viewname, 1 AS depth
+             FROM pg_depend d
+             JOIN pg_rewrite r ON r.oid = d.objid AND d.classid = 'pg_rewrite'::regclass
+             JOIN pg_class vc ON vc.oid = r.ev_class AND vc.relkind = 'v'
+             JOIN pg_namespace vn ON vn.oid = vc.relnamespace AND vn.nspname = 'public'
+             WHERE d.refobjid = (
+               SELECT c.oid FROM pg_class c
+               JOIN pg_namespace n ON n.oid = c.relnamespace
+               WHERE c.relname = $1 AND n.nspname = 'public' AND c.relkind = 'r'
+               LIMIT 1
+             )
+             AND d.refobjsubid = (
+               SELECT a.attnum FROM pg_attribute a
+               JOIN pg_class c ON c.oid = a.attrelid
+               JOIN pg_namespace n ON n.oid = c.relnamespace
+               WHERE c.relname = $1 AND n.nspname = 'public' AND a.attname = $2
+               LIMIT 1
+             )
+             UNION
+             SELECT vc.oid, vc.relname, vd.depth + 1
+             FROM view_deps vd
+             JOIN pg_depend d ON d.refobjid = vd.view_oid AND d.classid = 'pg_rewrite'::regclass
+             JOIN pg_rewrite r ON r.oid = d.objid
+             JOIN pg_class vc ON vc.oid = r.ev_class AND vc.relkind = 'v'
+             JOIN pg_namespace vn ON vn.oid = vc.relnamespace AND vn.nspname = 'public'
+           )
+           SELECT v.viewname, v.definition
+           FROM (
+             SELECT viewname, MAX(depth) AS max_depth FROM view_deps GROUP BY viewname
+           ) ranked
+           JOIN pg_views v ON v.viewname = ranked.viewname AND v.schemaname = 'public'
+           ORDER BY max_depth DESC`,
+          [dialog.tableName, col.originalName],
+        );
+
+        // depViews is ordered deepest-first (outermost views first).
+        const depViews: { name: string; def: string }[] = (
+          depResult[0]?.values ?? []
+        ).map((row) => ({ name: row[0] as string, def: row[1] as string }));
+
+        // Drop dependent views in dependency order (outermost first).
+        for (const { name } of depViews) {
+          await engine.exec(`DROP VIEW IF EXISTS ${quoteIdent(name)}`);
+        }
+
         // Drop the existing generated column and add it back with the
         // updated expression. This is the safe approach that works across
         // all PostgreSQL versions.
@@ -1444,6 +1498,11 @@ function PostgresPlaygroundInner() {
         await engine.exec(
           `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,
         );
+
+        // Recreate dependent views in reverse order (innermost first).
+        for (const { name, def } of [...depViews].reverse()) {
+          await engine.exec(`CREATE VIEW ${quoteIdent(name)} AS ${def}`);
+        }
       }
       if (renames.length > 0 || genChanges.length > 0) {
         await refreshSchema();
@@ -2327,6 +2386,7 @@ function PostgresPlaygroundInner() {
                                     <PgGeneratedColumnRow
                                       key={col.id}
                                       col={col}
+                                      theme={editorTheme}
                                       onExpressionChange={(id, expression) =>
                                         setViewStructureDialog((prev) =>
                                           prev

@@ -3132,6 +3132,35 @@
   text-align: center;
 }
 
+/* ─── Generated-column expression CodeMirror editor ─── */
+.sql-gen-expr-editor .cm-editor {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.sql-gen-expr-editor .cm-editor.cm-focused {
+  outline: none;
+  border-color: var(--accent, #3b82f6);
+}
+
+/* Auto-expand: the scroller scrolls only after a set maximum height,
+   letting the editor grow and shrink naturally with the number of lines. */
+.sql-gen-expr-editor .cm-scroller {
+  max-height: 160px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sql-gen-expr-editor .cm-content {
+  padding: 4px 6px;
+  min-height: 28px;
+}
+
+.sql-gen-expr-editor .cm-line {
+  padding: 0;
+}
+
 /* ─── Query History tab (sidebar footer button) ─── */
 .sql-sidebar-footer .sql-er-btn + .sql-er-btn {
   border-left: 1px solid var(--border);
