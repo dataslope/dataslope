@@ -266,7 +266,7 @@ function PgGeneratedColumnRow({
         <span className="sql-modify-gen-name-text" title={col.originalName}>
           {col.originalName}
         </span>
-        <span className="sql-modify-gen-type-badge">{col.type || "—"}</span>
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
       </td>
       <td className="sql-modify-gen-expr-cell">
         <label className="sql-modify-cell-field">
@@ -280,7 +280,7 @@ function PgGeneratedColumnRow({
         </label>
       </td>
       <td className="sql-modify-gen-storage-cell">
-        <span className="sql-modify-gen-type-badge">Stored</span>
+        <span className="sql-modify-col-type-badge">Stored</span>
       </td>
     </tr>
   );
@@ -1439,7 +1439,7 @@ function PostgresPlaygroundInner() {
         // updated expression. This is the safe approach that works across
         // all PostgreSQL versions.
         await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} DROP COLUMN ${quoteIdent(col.originalName)} CASCADE`,
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} DROP COLUMN ${quoteIdent(col.originalName)}`,
         );
         await engine.exec(
           `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,

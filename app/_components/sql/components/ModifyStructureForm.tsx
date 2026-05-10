@@ -308,7 +308,7 @@ function GeneratedColumnRow({
         <span className="sql-modify-gen-name-text" title={col.name}>
           {col.name}
         </span>
-        <span className="sql-modify-gen-type-badge">{col.type || "—"}</span>
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
       </td>
       <td className="sql-modify-gen-expr-cell">
         <label className="sql-modify-cell-field">
