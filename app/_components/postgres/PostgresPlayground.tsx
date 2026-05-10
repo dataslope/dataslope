@@ -115,6 +115,7 @@ import { SchemaSection } from "../sql/components/SchemaSection";
 import { ToastList } from "../sql/components/ToastList";
 import { DdlViewer } from "../sql/components/DdlViewer";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
+import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
 import {
@@ -149,6 +150,7 @@ import {
   readParquetFile,
   tableNameFromFilename,
 } from "./postgresImport";
+import { FK_ACTIONS } from "../sql/constants";
 
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
@@ -158,12 +160,18 @@ const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 
 interface PgStructureColumn {
   id: string;
-  originalName: string;
+  originalName: string | null;
   name: string;
   type: string;
   nullable: boolean;
-  defaultValue: string | null;
+  defaultValue: string;
   isPk: boolean;
+  unique: boolean;
+  autoIncrement: boolean;
+  fkTable: string;
+  fkColumn: string;
+  fkOnDelete: string;
+  fkOnUpdate: string;
   /** Non-null when this is a generated column. `expression` may be edited;
    *  `originalExpression` records the pre-edit value for change detection.
    *  PostgreSQL only supports STORED generated columns. */
@@ -173,17 +181,256 @@ interface PgStructureColumn {
   } | null;
 }
 
+interface PgStructureDialogState {
+  tableName: string;
+  newTableName: string;
+  columns: PgStructureColumn[];
+  originalSignature: string;
+}
+
 let _pgStructureIdCounter = 0;
 function newPgStructureId(): string {
   return `pgc_${++_pgStructureIdCounter}`;
 }
 
+const PG_TYPE_GROUPS = [
+  {
+    label: "Numbers",
+    types: [
+      "smallint",
+      "integer",
+      "bigint",
+      "serial",
+      "bigserial",
+      "numeric",
+      "decimal",
+      "real",
+      "double precision",
+    ],
+  },
+  { label: "Text", types: ["text", "varchar", "varchar(255)", "char", "char(1)"] },
+  { label: "Boolean / identifiers", types: ["boolean", "uuid"] },
+  { label: "JSON", types: ["json", "jsonb"] },
+  {
+    label: "Date / time",
+    types: ["date", "time", "timestamp", "timestamptz", "interval"],
+  },
+  { label: "Binary", types: ["bytea"] },
+  {
+    label: "Arrays / extensions",
+    types: ["text[]", "integer[]", "uuid[]", "geometry", "geography"],
+  },
+] as const;
+
+const PG_TYPE_OPTIONS = PG_TYPE_GROUPS.flatMap((group) => group.types);
+const PG_SERIAL_TYPES = new Set(["serial", "bigserial", "smallserial"]);
+
+function normalizePgFkAction(action: string | undefined): string {
+  const normalized = (action || "NO ACTION").trim().toUpperCase();
+  return FK_ACTIONS.includes(normalized as (typeof FK_ACTIONS)[number])
+    ? normalized
+    : "NO ACTION";
+}
+
+function pgStructureSignature(state: Pick<PgStructureDialogState, "newTableName" | "columns">): string {
+  return JSON.stringify({
+    table: state.newTableName.trim(),
+    columns: state.columns.map((c) => ({
+      originalName: c.originalName,
+      name: c.name.trim(),
+      type: c.type.trim(),
+      nullable: c.nullable,
+      defaultValue: c.defaultValue.trim(),
+      isPk: c.isPk,
+      unique: c.unique,
+      autoIncrement: c.autoIncrement,
+      fkTable: c.fkTable,
+      fkColumn: c.fkColumn,
+      fkOnDelete: normalizePgFkAction(c.fkOnDelete),
+      fkOnUpdate: normalizePgFkAction(c.fkOnUpdate),
+      generated: c.generated
+        ? { expression: c.generated.expression.trim() }
+        : null,
+    })),
+  });
+}
+
+function validatePgStructure(
+  state: PgStructureDialogState | null,
+  tableColumns: Record<string, TableColumnInfo[]>,
+) {
+  const invalidColumnIds = new Set<string>();
+  const errors: string[] = [];
+  if (!state) return { invalidColumnIds, errors, isValid: false, isDirty: false };
+  const tableName = state.newTableName.trim();
+  const identifierRe = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  const typeRe =
+    /^[A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*(?:\s*\([^()]*\))?(?:\s*\[\s*\])*$/;
+  if (!tableName) errors.push("Table name cannot be empty.");
+  else if (!identifierRe.test(tableName)) errors.push("Table name must be a valid unquoted PostgreSQL identifier.");
+  const seen = new Map<string, string>();
+  for (const col of state.columns) {
+    if (col.generated) {
+      if (!col.generated.expression.trim()) {
+        errors.push(`Generated column "${col.name || col.originalName || "unnamed"}" needs an expression.`);
+        invalidColumnIds.add(col.id);
+      }
+      continue;
+    }
+    const name = col.name.trim();
+    const lower = name.toLowerCase();
+    if (!name) {
+      errors.push("Column names cannot be empty.");
+      invalidColumnIds.add(col.id);
+    } else if (!identifierRe.test(name)) {
+      errors.push(`"${name}" is not a valid unquoted PostgreSQL identifier.`);
+      invalidColumnIds.add(col.id);
+    } else if (seen.has(lower)) {
+      errors.push(`Duplicate column name "${name}".`);
+      invalidColumnIds.add(col.id);
+      invalidColumnIds.add(seen.get(lower)!);
+    } else {
+      seen.set(lower, col.id);
+    }
+    const type = col.type.trim();
+    if (!type || !typeRe.test(type)) {
+      errors.push(`"${name || "Unnamed column"}" has an invalid type.`);
+      invalidColumnIds.add(col.id);
+    }
+    if (col.autoIncrement && !col.isPk) {
+      errors.push(`"${name || "Unnamed column"}" must be primary key to use identity/serial.`);
+      invalidColumnIds.add(col.id);
+    }
+    if (col.autoIncrement && !/^(smallint|integer|bigint|smallserial|serial|bigserial)$/i.test(type)) {
+      errors.push(`"${name || "Unnamed column"}" must use an integer/serial type for identity/serial.`);
+      invalidColumnIds.add(col.id);
+    }
+    if ((col.fkTable && !col.fkColumn) || (!col.fkTable && col.fkColumn)) {
+      errors.push(`"${name || "Unnamed column"}" has an incomplete foreign key.`);
+      invalidColumnIds.add(col.id);
+    }
+    if (col.fkTable && col.fkColumn) {
+      const targetColumns = tableColumns[col.fkTable] ?? [];
+      if (!targetColumns.some((target) => target.name === col.fkColumn)) {
+        errors.push(`"${name || "Unnamed column"}" references a missing foreign key column.`);
+        invalidColumnIds.add(col.id);
+      }
+    }
+  }
+  return {
+    invalidColumnIds,
+    errors: Array.from(new Set(errors)),
+    isValid: errors.length === 0,
+    isDirty: pgStructureSignature(state) !== state.originalSignature,
+  };
+}
+
+function makeNewPgColumn(): PgStructureColumn {
+  return {
+    id: newPgStructureId(),
+    originalName: null,
+    name: "",
+    type: "text",
+    nullable: true,
+    defaultValue: "",
+    isPk: false,
+    unique: false,
+    autoIncrement: false,
+    fkTable: "",
+    fkColumn: "",
+    fkOnDelete: "NO ACTION",
+    fkOnUpdate: "NO ACTION",
+    generated: null,
+  };
+}
+
+function PgTypeSelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [filter, setFilter] = useState("");
+  const query = filter.trim().toLowerCase();
+  const visibleGroups = PG_TYPE_GROUPS.map((group) => ({
+    ...group,
+    types: group.types.filter(
+      (type) =>
+        type.toLowerCase().includes(query) ||
+        query.includes(type.toLowerCase()),
+    ),
+  })).filter((group) => group.types.length > 0);
+  return (
+    <div className="pg-type-selector">
+      <input
+        className="sql-rename-input sql-modify-col-type pg-type-input"
+        value={value}
+        onChange={(e) => {
+          setFilter(e.target.value);
+          onChange(e.target.value);
+        }}
+        onFocus={() => setFilter(value)}
+        placeholder="e.g. varchar(255)"
+        aria-label="Column type"
+        list="pg-type-suggestions"
+      />
+      <datalist id="pg-type-suggestions">
+        {PG_TYPE_OPTIONS.map((type) => (
+          <option key={type} value={type} />
+        ))}
+      </datalist>
+      <Select.Root value={PG_TYPE_OPTIONS.includes(value) ? value : ""} onValueChange={onChange}>
+        <Select.Trigger className="pg-type-trigger" aria-label="Show PostgreSQL types">
+          <ChevronDown size={12} aria-hidden="true" />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner sideOffset={4} align="start" className="pg-type-positioner">
+            <Select.Popup className="bui-select-popup pg-type-popup">
+              <div className="pg-type-search-wrap">
+                <input
+                  className="sql-rename-input pg-type-search"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  placeholder="Search PostgreSQL types…"
+                  aria-label="Search PostgreSQL types"
+                />
+              </div>
+              {visibleGroups.map((group) => (
+                <div key={group.label} className="pg-type-group">
+                  <div className="pg-type-group-label">{group.label}</div>
+                  {group.types.map((type) => (
+                    <Select.Item key={type} value={type} className="bui-select-item">
+                      <Select.ItemText>{type}</Select.ItemText>
+                    </Select.Item>
+                  ))}
+                </div>
+              ))}
+              {visibleGroups.length === 0 && (
+                <div className="pg-type-empty">No matching built-in types. You can keep the typed value.</div>
+              )}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
+    </div>
+  );
+}
+
 function PgStructureColumnRow({
   col,
-  onNameChange,
+  onChange,
+  onRemove,
+  hasError,
+  knownTables,
+  columnsByTable,
 }: {
   col: PgStructureColumn;
-  onNameChange: (id: string, name: string) => void;
+  onChange: (patch: Partial<PgStructureColumn>) => void;
+  onRemove: () => void;
+  hasError?: boolean;
+  knownTables: string[];
+  columnsByTable: Record<string, TableColumnInfo[]>;
 }) {
   const {
     attributes,
@@ -201,6 +448,8 @@ function PgStructureColumnRow({
     position: isDragging ? "relative" : undefined,
     zIndex: isDragging ? 1 : undefined,
   };
+  const fkTargetColumns = col.fkTable ? columnsByTable[col.fkTable] ?? [] : [];
+  const serialType = PG_SERIAL_TYPES.has(col.type.trim().toLowerCase());
 
   return (
     <tr ref={setNodeRef} style={style} className="sql-modify-col-row" {...attributes}>
@@ -216,35 +465,133 @@ function PgStructureColumnRow({
       <td>
         <label className="sql-modify-cell-field">
           <input
-            className="sql-rename-input sql-modify-col-name"
+            className={`sql-rename-input sql-modify-col-name${hasError ? " sql-modify-col-name-error" : ""}`}
             value={col.name}
-            onChange={(e) => onNameChange(col.id, e.target.value)}
+            onChange={(e) => onChange({ name: e.target.value })}
             placeholder="column name"
             aria-label="Column name"
           />
         </label>
       </td>
-      <td className="sql-modify-col-type-cell">
-        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      <td>
+        <PgTypeSelector value={col.type} onChange={(type) => onChange({ type })} />
       </td>
-      <td className="sql-modify-flag-cell">
-        {col.isPk ? (
-          <span className="sql-modify-flag-yes" title="Primary key">PK</span>
-        ) : (
-          <span className="sql-modify-flag-no" aria-hidden="true">—</span>
-        )}
+      <td>
+        <ColumnFlag
+          checked={!col.nullable}
+          onChange={(notNull) => onChange({ nullable: !notNull })}
+          label="Not null"
+          showLabel={false}
+        />
       </td>
-      <td className="sql-modify-flag-cell">
-        {col.nullable ? (
-          <span className="sql-modify-flag-yes" title="Nullable">✓</span>
-        ) : (
-          <span className="sql-modify-flag-no" title="Not null">✗</span>
-        )}
+      <td>
+        <ColumnFlag
+          checked={col.isPk}
+          onChange={(isPk) => onChange({ isPk, autoIncrement: isPk ? col.autoIncrement : false })}
+          label="Primary key"
+          showLabel={false}
+        />
       </td>
-      <td className="sql-modify-col-default-cell">
-        <span className="sql-modify-col-default-value" title={col.defaultValue ?? ""}>
-          {col.defaultValue ?? <em>—</em>}
-        </span>
+      <td>
+        <ColumnFlag
+          checked={col.unique}
+          onChange={(unique) => onChange({ unique })}
+          label="Unique"
+          showLabel={false}
+        />
+      </td>
+      <td>
+        <ColumnFlag
+          checked={col.autoIncrement || serialType}
+          onChange={(autoIncrement) => onChange({ autoIncrement })}
+          label="Identity / serial"
+          showLabel={false}
+          disabled={!col.isPk}
+        />
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <input
+            className="sql-rename-input sql-modify-col-default"
+            value={col.defaultValue}
+            onChange={(e) => onChange({ defaultValue: e.target.value })}
+            placeholder="e.g. now() or 0"
+            aria-label="Default value"
+            disabled={col.autoIncrement || serialType}
+          />
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-table"
+            value={col.fkTable}
+            onChange={(e) => onChange({ fkTable: e.target.value, fkColumn: "" })}
+            aria-label="Foreign key target table"
+          >
+            <option value="">(none)</option>
+            {knownTables.map((table) => (
+              <option key={table} value={table}>{table}</option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-column"
+            value={col.fkColumn}
+            onChange={(e) => onChange({ fkColumn: e.target.value })}
+            aria-label="Foreign key target column"
+            disabled={!col.fkTable}
+          >
+            <option value="">(column)</option>
+            {fkTargetColumns.map((target) => (
+              <option key={target.name} value={target.name}>{target.name}</option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-cascade"
+            value={col.fkOnDelete}
+            onChange={(e) => onChange({ fkOnDelete: e.target.value })}
+            aria-label="On delete action"
+            disabled={!col.fkTable}
+          >
+            {FK_ACTIONS.map((action) => (
+              <option key={action} value={action}>{action}</option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <label className="sql-modify-cell-field">
+          <select
+            className="sql-modify-col-type sql-modify-fk-cascade"
+            value={col.fkOnUpdate}
+            onChange={(e) => onChange({ fkOnUpdate: e.target.value })}
+            aria-label="On update action"
+            disabled={!col.fkTable}
+          >
+            {FK_ACTIONS.map((action) => (
+              <option key={action} value={action}>{action}</option>
+            ))}
+          </select>
+        </label>
+      </td>
+      <td>
+        <button
+          type="button"
+          className="sql-modify-col-remove"
+          onClick={onRemove}
+          aria-label={`Remove column ${col.name || "unnamed column"}`}
+          title="Remove column"
+        >
+          <X size={13} aria-hidden="true" />
+        </button>
       </td>
     </tr>
   );
@@ -267,8 +614,8 @@ function PgGeneratedColumnRow({
     <tr className="sql-modify-col-row sql-modify-gen-row">
       <td>
         <div className="sql-modify-gen-name">
-          <span className="sql-modify-gen-name-text" title={col.originalName}>
-            {col.originalName}
+          <span className="sql-modify-gen-name-text" title={col.originalName ?? col.name}>
+            {col.originalName ?? col.name}
           </span>
           <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
         </div>
@@ -526,14 +873,16 @@ function PostgresPlaygroundInner() {
     useState<ParquetImportState | null>(null);
 
   // ─── View Structure drawer state ──────────────────────────────────────
-  const [viewStructureDialog, setViewStructureDialog] = useState<{
-    tableName: string;
-    columns: PgStructureColumn[];
-  } | null>(null);
+  const [viewStructureDialog, setViewStructureDialog] =
+    useState<PgStructureDialogState | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const pgStructureValidation = useMemo(
+    () => validatePgStructure(viewStructureDialog, columnsByEntity),
+    [viewStructureDialog, columnsByEntity],
   );
 
   // ─── Refs ─────────────────────────────────────────────────────────────
@@ -1386,24 +1735,49 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name);
-        setViewStructureDialog({
-          tableName: name,
-          columns: cols.map((c) => ({
+        const [cols, fks, constraints] = await Promise.all([
+          engine.listColumns(name),
+          engine.listForeignKeys(name),
+          engine.getColumnConstraintInfo(name),
+        ]);
+        const fkByCol = new Map<string, ForeignKeyInfo>();
+        for (const fk of fks) fkByCol.set(fk.from, fk);
+        const constraintsByCol = new Map(constraints.map((c) => [c.name, c]));
+        const columns = cols.map<PgStructureColumn>((c) => {
+          const fk = fkByCol.get(c.name);
+          const constraint = constraintsByCol.get(c.name);
+          const isAutoIncrement = constraint?.isAutoIncrement ?? /^nextval\(/i.test(c.defaultValue ?? "");
+          return {
             id: newPgStructureId(),
             originalName: c.name,
             name: c.name,
-            type: c.type || "—",
+            type: c.type || "text",
             nullable: !c.notNull,
-            defaultValue: c.defaultValue ?? null,
+            defaultValue: isAutoIncrement ? "" : c.defaultValue ?? "",
             isPk: c.pk > 0,
+            unique: constraint?.isUnique ?? false,
+            autoIncrement: isAutoIncrement,
+            fkTable: fk?.table ?? "",
+            fkColumn: fk?.to ?? "",
+            fkOnDelete: normalizePgFkAction(fk?.onDelete),
+            fkOnUpdate: normalizePgFkAction(fk?.onUpdate),
             generated: c.generated
               ? {
                   expression: c.generated.expression,
                   originalExpression: c.generated.expression,
                 }
               : null,
-          })),
+          };
+        });
+        const nextDialog = {
+          tableName: name,
+          newTableName: name,
+          columns,
+          originalSignature: "",
+        };
+        setViewStructureDialog({
+          ...nextDialog,
+          originalSignature: pgStructureSignature(nextDialog),
         });
       } catch (err) {
         showToast(
@@ -1419,45 +1793,52 @@ function PostgresPlaygroundInner() {
     const dialog = viewStructureDialog;
     const engine = engineRef.current;
     if (!dialog || !engine) return;
-    const renames = dialog.columns.filter(
-      (c) => !c.generated && c.name.trim() !== c.originalName && c.name.trim(),
-    );
-    // Generated columns whose expression changed need to be dropped and
-    // re-added with the new expression. PostgreSQL doesn't support
-    // ALTER COLUMN ... SET EXPRESSION directly in older versions.
-    const genChanges = dialog.columns.filter(
-      (c) =>
-        c.generated &&
-        c.generated.expression.trim() !== c.generated.originalExpression.trim(),
-    );
+    const validation = validatePgStructure(dialog, columnsByEntity);
+    if (!validation.isValid) {
+      showToast(validation.errors[0] ?? "Fix validation errors before saving.", "warn");
+      return;
+    }
+    if (!validation.isDirty) return;
     try {
-      for (const col of renames) {
-        await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} RENAME COLUMN ${quoteIdent(col.originalName)} TO ${quoteIdent(col.name.trim())}`,
-        );
-      }
-      for (const col of genChanges) {
-        const newExpr = col.generated!.expression.trim();
-        if (!newExpr) continue;
-        // PGlite is based on PostgreSQL 17, which supports ALTER COLUMN SET
-        // EXPRESSION (added in PG 16). This modifies the generated expression
-        // in place without dropping the column, so dependent views are unaffected.
-        await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} ALTER COLUMN ${quoteIdent(col.originalName)} SET EXPRESSION AS (${newExpr})`,
-        );
-      }
-      if (renames.length > 0 || genChanges.length > 0) {
-        await refreshSchema();
-        showToast(`Updated structure of "${dialog.tableName}".`);
-      }
+      await engine.rebuildTable({
+        originalName: dialog.tableName,
+        newName: dialog.newTableName.trim(),
+        columns: dialog.columns.map((col) => ({
+          name: col.name.trim(),
+          type: col.type.trim(),
+          notNull: !col.nullable,
+          primaryKey: col.isPk,
+          unique: col.unique,
+          autoIncrement: col.autoIncrement || PG_SERIAL_TYPES.has(col.type.trim().toLowerCase()),
+          defaultValue: col.defaultValue.trim() || undefined,
+          foreignKey:
+            col.fkTable && col.fkColumn
+              ? {
+                  table: col.fkTable,
+                  column: col.fkColumn,
+                  onDelete: normalizePgFkAction(col.fkOnDelete),
+                  onUpdate: normalizePgFkAction(col.fkOnUpdate),
+                }
+              : undefined,
+          originalName: col.originalName ?? undefined,
+          generated: col.generated
+            ? {
+                expression: col.generated.expression.trim(),
+                storageType: "STORED" as const,
+              }
+            : undefined,
+        })),
+      });
+      await refreshSchema();
+      showToast(`Updated structure of "${dialog.newTableName.trim()}".`);
+      setViewStructureDialog(null);
     } catch (err) {
       showToast(
         `Update failed: ${err instanceof Error ? err.message : String(err)}`,
         "warn",
       );
     }
-    setViewStructureDialog(null);
-  }, [viewStructureDialog, refreshSchema, showToast]);
+  }, [viewStructureDialog, columnsByEntity, refreshSchema, showToast]);
 
   // ─── Export database helpers ──────────────────────────────────────────
 
@@ -2239,7 +2620,18 @@ function PostgresPlaygroundInner() {
               </header>
               {viewStructureDialog && (
                 <div className="sql-modify-body">
-                  {/* Regular (non-generated) columns — draggable, renameable */}
+                  <label className="sql-modify-field">
+                    <span className="sql-modify-field-label">Table name</span>
+                    <input
+                      className={`sql-rename-input${pgStructureValidation.errors.some((err) => err.startsWith("Table name")) ? " sql-modify-col-name-error" : ""}`}
+                      value={viewStructureDialog.newTableName}
+                      onChange={(e) =>
+                        setViewStructureDialog((prev) =>
+                          prev ? { ...prev, newTableName: e.target.value } : null,
+                        )
+                      }
+                    />
+                  </label>
                   {(() => {
                     const regularCols = viewStructureDialog.columns.filter(
                       (c) => !c.generated,
@@ -2276,9 +2668,16 @@ function PostgresPlaygroundInner() {
                                     <th className="sql-modify-drag-cell" aria-label="Drag handle" />
                                     <th>Name</th>
                                     <th>Type</th>
-                                    <th>PK</th>
-                                    <th>Nullable</th>
+                                    <th>Not null</th>
+                                    <th>Primary</th>
+                                    <th>Unique</th>
+                                    <th>Identity/<br />serial</th>
                                     <th>Default</th>
+                                    <th>FK table</th>
+                                    <th>FK column</th>
+                                    <th>On delete</th>
+                                    <th>On update</th>
+                                    <th>Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -2286,18 +2685,31 @@ function PostgresPlaygroundInner() {
                                     <PgStructureColumnRow
                                       key={col.id}
                                       col={col}
-                                      onNameChange={(id, name) =>
+                                      onChange={(patch) =>
                                         setViewStructureDialog((prev) =>
                                           prev
                                             ? {
                                                 ...prev,
                                                 columns: prev.columns.map((c) =>
-                                                  c.id === id ? { ...c, name } : c,
+                                                  c.id === col.id ? { ...c, ...patch } : c,
                                                 ),
                                               }
                                             : null,
                                         )
                                       }
+                                      onRemove={() =>
+                                        setViewStructureDialog((prev) =>
+                                          prev
+                                            ? {
+                                                ...prev,
+                                                columns: prev.columns.filter((c) => c.id !== col.id),
+                                              }
+                                            : null,
+                                        )
+                                      }
+                                      hasError={pgStructureValidation.invalidColumnIds.has(col.id)}
+                                      knownTables={tables}
+                                      columnsByTable={columnsByEntity}
                                     />
                                   ))}
                                 </tbody>
@@ -2305,10 +2717,29 @@ function PostgresPlaygroundInner() {
                             </div>
                           </SortableContext>
                         </DndContext>
-                        <p className="sql-modify-pg-note">
-                          <Pencil size={12} aria-hidden="true" />
-                          Rename columns above and click Save. Column order changes are visual only.
-                        </p>
+                        <button
+                          type="button"
+                          className="confirm-btn confirm-btn-secondary sql-modify-add"
+                          onClick={() =>
+                            setViewStructureDialog((prev) => {
+                              if (!prev) return null;
+                              const firstGenIdx = prev.columns.findIndex((col) => col.generated);
+                              const insertAt = firstGenIdx === -1 ? prev.columns.length : firstGenIdx;
+                              const nextColumns = [...prev.columns];
+                              nextColumns.splice(insertAt, 0, makeNewPgColumn());
+                              return { ...prev, columns: nextColumns };
+                            })
+                          }
+                        >
+                          <Plus size={12} aria-hidden="true" /> Add column
+                        </button>
+                        {pgStructureValidation.errors.length > 0 && (
+                          <div className="sql-modify-validation" role="alert">
+                            {pgStructureValidation.errors.map((error) => (
+                              <div key={error}>{error}</div>
+                            ))}
+                          </div>
+                        )}
                         {generatedCols.length > 0 && (
                           <div className="sql-modify-gen-section">
                             <div className="sql-modify-gen-section-header">
@@ -2356,7 +2787,7 @@ function PostgresPlaygroundInner() {
                             </div>
                             <p className="sql-modify-pg-note">
                               <Pencil size={12} aria-hidden="true" />
-                              Editing an expression drops and recreates the column (PostgreSQL only supports STORED).
+                              PostgreSQL generated columns are stored. Editing the expression rebuilds the in-memory table.
                             </p>
                           </div>
                         )}
@@ -2373,7 +2804,11 @@ function PostgresPlaygroundInner() {
                   type="button"
                   className="confirm-btn confirm-btn-primary"
                   onClick={() => void submitViewStructure()}
-                  disabled={!viewStructureDialog}
+                  disabled={
+                    !viewStructureDialog ||
+                    !pgStructureValidation.isDirty ||
+                    !pgStructureValidation.isValid
+                  }
                 >
                   Save
                 </button>

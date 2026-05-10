@@ -3,8 +3,10 @@
 import { PGlite } from "@electric-sql/pglite";
 import type { QueryExecResult, SqlValue } from "sql.js";
 import type {
+  ColumnSpec,
   ColumnConstraintInfo,
   ForeignKeyInfo,
+  TableRebuildSpec,
   TableColumnInfo,
 } from "./sqlite";
 import {
@@ -67,6 +69,55 @@ function pgTypeName(dataTypeID: number): string {
   return PG_TYPE_NAMES[dataTypeID] ?? "";
 }
 
+const FK_ACTIONS = new Set(["NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]);
+
+function normalizeFkAction(action: string | undefined): string {
+  const normalized = (action || "NO ACTION").trim().toUpperCase();
+  return FK_ACTIONS.has(normalized) ? normalized : "NO ACTION";
+}
+
+function renderPgType(col: ColumnSpec): string {
+  const type = (col.type || "text").trim();
+  if (col.autoIncrement) {
+    if (/^big(serial|int)$/i.test(type)) return "bigserial";
+    if (/^small(serial|int)$/i.test(type)) return "smallserial";
+    return "serial";
+  }
+  return type;
+}
+
+function renderPgColumnDef(col: ColumnSpec): string {
+  const name = quoteIdent(col.name);
+  const type = renderPgType(col);
+  if (col.generated) {
+    return `${name} ${type} GENERATED ALWAYS AS (${col.generated.expression}) STORED`;
+  }
+  const parts = [name, type];
+  if (col.notNull) parts.push("NOT NULL");
+  if (col.unique && !col.primaryKey) parts.push("UNIQUE");
+  if (col.defaultValue && !col.autoIncrement) parts.push(`DEFAULT ${col.defaultValue}`);
+  return parts.join(" ");
+}
+
+function renderPgCreateTable(name: string, columns: ColumnSpec[]): string {
+  const defs = columns.map((col) => `  ${renderPgColumnDef(col)}`);
+  const pk = columns.filter((col) => col.primaryKey);
+  if (pk.length > 0) {
+    defs.push(`  PRIMARY KEY (${pk.map((col) => quoteIdent(col.name)).join(", ")})`);
+  }
+  for (const col of columns) {
+    if (!col.foreignKey?.table || !col.foreignKey.column) continue;
+    defs.push(
+      [
+        `  FOREIGN KEY (${quoteIdent(col.name)}) REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`,
+        `ON DELETE ${normalizeFkAction(col.foreignKey.onDelete)}`,
+        `ON UPDATE ${normalizeFkAction(col.foreignKey.onUpdate)}`,
+      ].join(" "),
+    );
+  }
+  return `CREATE TABLE ${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
+}
+
 function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { columnTypes?: string[] } | null {
   if (result.fields.length === 0) return null;
   const columns = result.fields.map((field) => field.name);
@@ -109,6 +160,7 @@ export interface PostgresEngine {
   listColumns: (name: string) => Promise<TableColumnInfo[]>;
   listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
   getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
+  rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
   dropEntity: (
     name: string,
     kind: "table" | "view" | "index" | "trigger",
@@ -250,6 +302,7 @@ export async function createPostgresEngine(
       const rows = await queryRows<{
         ordinal_position: number;
         column_name: string;
+        formatted_type: string | null;
         data_type: string;
         is_nullable: string;
         column_default: string | null;
@@ -261,6 +314,7 @@ export async function createPostgresEngine(
         SELECT
           c.ordinal_position,
           c.column_name,
+          pg_catalog.format_type(a.atttypid, a.atttypmod) AS formatted_type,
           c.data_type,
           c.is_nullable,
           c.column_default,
@@ -268,6 +322,15 @@ export async function createPostgresEngine(
           c.generation_expression,
           kcu.ordinal_position AS pk_position
         FROM information_schema.columns c
+        JOIN pg_catalog.pg_namespace n
+          ON n.nspname = c.table_schema
+        JOIN pg_catalog.pg_class cls
+          ON cls.relnamespace = n.oid
+         AND cls.relname = c.table_name
+        JOIN pg_catalog.pg_attribute a
+          ON a.attrelid = cls.oid
+         AND a.attname = c.column_name
+         AND a.attnum > 0
         LEFT JOIN information_schema.table_constraints tc
           ON tc.table_schema = c.table_schema
          AND tc.table_name = c.table_name
@@ -285,7 +348,7 @@ export async function createPostgresEngine(
       return rows.map((row) => ({
         cid: Number(row.ordinal_position) - 1,
         name: row.column_name,
-        type: row.data_type,
+        type: row.formatted_type || row.data_type,
         notNull: row.is_nullable === "NO",
         defaultValue: row.is_generated === "ALWAYS" ? null : row.column_default,
         pk: row.pk_position ? Number(row.pk_position) : 0,
@@ -367,6 +430,41 @@ export async function createPostgresEngine(
       }));
     },
 
+    async rebuildTable(spec) {
+      const finalName = spec.newName.trim();
+      if (!finalName) throw new Error("Table name cannot be empty.");
+      const columns = spec.columns.filter((col) => col.name.trim()).map((col) => ({
+        ...col,
+        name: col.name.trim(),
+        type: (col.type || "text").trim(),
+      }));
+      if (columns.length === 0) throw new Error("A table must have at least one column.");
+      const tmpName = `${spec.originalName}__dataslope_${Date.now().toString(36)}`;
+      const createSql = renderPgCreateTable(tmpName, columns);
+      const copyable = columns.filter((col) => col.originalName && !col.generated);
+      const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
+      const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
+      try {
+        await db.exec("BEGIN");
+        await db.exec(createSql);
+        if (copyable.length > 0) {
+          await db.exec(
+            `INSERT INTO ${quoteIdent(tmpName)} (${targetCols}) SELECT ${sourceCols} FROM ${quoteIdent(spec.originalName)}`,
+          );
+        }
+        await db.exec(`DROP TABLE ${quoteIdent(spec.originalName)} CASCADE`);
+        await db.exec(`ALTER TABLE ${quoteIdent(tmpName)} RENAME TO ${quoteIdent(finalName)}`);
+        await db.exec("COMMIT");
+      } catch (err) {
+        try {
+          await db.exec("ROLLBACK");
+        } catch {
+          // ignore rollback failures
+        }
+        throw err;
+      }
+    },
+
     async dropEntity(name, kind) {
       const keyword =
         kind === "table"
@@ -404,7 +502,10 @@ export async function createPostgresEngine(
           engine.listForeignKeys(name),
         ]);
         const colSql = cols.map((col) => {
-          const parts = [quoteIdent(col.name), col.type.toUpperCase()];
+          if (col.generated) {
+            return `  ${quoteIdent(col.name)} ${col.type} GENERATED ALWAYS AS (${col.generated.expression}) STORED`;
+          }
+          const parts = [quoteIdent(col.name), col.type];
           if (col.notNull) parts.push("NOT NULL");
           if (col.defaultValue) parts.push(`DEFAULT ${col.defaultValue}`);
           return `  ${parts.join(" ")}`;
@@ -415,7 +516,7 @@ export async function createPostgresEngine(
         }
         for (const fk of fks) {
           colSql.push(
-            `  FOREIGN KEY (${quoteIdent(fk.from)}) REFERENCES ${quoteIdent(fk.table)}(${quoteIdent(fk.to)})`,
+            `  FOREIGN KEY (${quoteIdent(fk.from)}) REFERENCES ${quoteIdent(fk.table)}(${quoteIdent(fk.to)}) ON DELETE ${normalizeFkAction(fk.onDelete)} ON UPDATE ${normalizeFkAction(fk.onUpdate)}`,
           );
         }
         return `CREATE TABLE ${quoteIdent(name)} (\n${colSql.join(",\n")}\n);`;
