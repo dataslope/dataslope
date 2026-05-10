@@ -133,6 +133,7 @@ import { FaInfo } from "react-icons/fa";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { RuntimeInfo } from "../types";
+import { modifyDialogSignature } from "./types";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
@@ -3852,7 +3853,7 @@ function SqlPlaygroundInner() {
                 <ModifyStructureForm
                   state={modifyDialog}
                   onChange={(next) => {
-                    setModifyDialog(next);
+                    setModifyDialog({ ...next, originalSignature: modifyDialog!.originalSignature });
                     if (modifyInvalidColIds.size > 0) {
                       setModifyInvalidColIds((prev) => {
                         const updated = new Set(prev);
@@ -3882,7 +3883,10 @@ function SqlPlaygroundInner() {
                     type="button"
                     className="confirm-btn confirm-btn-primary"
                     onClick={submitModifyStructure}
-                    disabled={!modifyDialog}
+                    disabled={
+                      !modifyDialog ||
+                      modifyDialogSignature(modifyDialog) === modifyDialog.originalSignature
+                    }
                   >
                     Save
                   </button>
@@ -4019,7 +4023,7 @@ function SqlPlaygroundInner() {
                 <ModifyStructureForm
                   state={addTableDialog}
                   onChange={(next) => {
-                    setAddTableDialog(next);
+                    setAddTableDialog({ ...next, originalSignature: addTableDialog!.originalSignature });
                     if (addTableInvalidColIds.size > 0) {
                       setAddTableInvalidColIds((prev) => {
                         const updated = new Set(prev);

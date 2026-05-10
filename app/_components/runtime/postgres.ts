@@ -441,9 +441,41 @@ export async function createPostgresEngine(
         type: (col.type || "text").trim(),
       }));
       if (columns.length === 0) throw new Error("A table must have at least one column.");
+
+      // Build rename map: originalName → new name for all renamed columns.
+      const renameMap = new Map<string, string>();
+      for (const col of columns) {
+        if (col.originalName && col.originalName !== col.name) {
+          renameMap.set(col.originalName, col.name);
+        }
+      }
+
+      // Patch generated column expressions that reference a renamed column.
+      // This prevents CREATE TABLE from failing with "column X does not exist"
+      // when a column referenced inside a GENERATED ALWAYS AS expression is renamed.
+      const patchedColumns =
+        renameMap.size > 0
+          ? columns.map((col) => {
+              if (!col.generated) return col;
+              let expr = col.generated.expression;
+              for (const [oldName, newName] of renameMap) {
+                expr = expr.replace(
+                  new RegExp(
+                    `\\b${oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+                    "g",
+                  ),
+                  newName,
+                );
+              }
+              return expr === col.generated.expression
+                ? col
+                : { ...col, generated: { ...col.generated, expression: expr } };
+            })
+          : columns;
+
       const tmpName = `${spec.originalName}__tmp_rebuild_${++pgRebuildCounter}`;
-      const createSql = renderPgCreateTable(tmpName, columns);
-      const copyable = columns.filter((col) => col.originalName && !col.generated);
+      const createSql = renderPgCreateTable(tmpName, patchedColumns);
+      const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
       try {

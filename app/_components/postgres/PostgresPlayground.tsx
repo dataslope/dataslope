@@ -2654,6 +2654,7 @@ function PostgresPlaygroundInner() {
                     );
                     return (
                       <>
+                        <div className="sql-modify-columns">
                         <DndContext
                           sensors={pgStructureSensors}
                           collisionDetection={closestCenter}
@@ -2730,6 +2731,7 @@ function PostgresPlaygroundInner() {
                             </div>
                           </SortableContext>
                         </DndContext>
+                        </div>
                         <button
                           type="button"
                           className="confirm-btn confirm-btn-secondary sql-modify-add"
