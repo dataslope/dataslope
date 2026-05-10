@@ -25,7 +25,7 @@ import {
 import {
   ALL_THEMES,
   LIGHT_THEMES,
-  THEME_PREVIEWS,
+  THEME_PALETTES,
   applyMode,
   applyThemePalette,
   getStoredEditorTheme,
@@ -56,6 +56,8 @@ const SWATCH_DEFS: SwatchDef[] = [
     highlight: true,
   },
   { name: "--theme-primary", label: "Theme Primary", isTextColor: true },
+  { name: "--accent1", label: "Accent 1", isTextColor: true },
+  { name: "--accent2", label: "Accent 2", isTextColor: true },
   { name: "--primary", label: "Primary" },
   { name: "--blue", label: "Blue" },
   { name: "--green", label: "Green" },
@@ -124,7 +126,7 @@ export default function ColorTestPage() {
       <header className={styles.header}>
         <div className={styles.themeGrid}>
           {ALL_THEMES.map(({ value, label }) => {
-            const p = THEME_PREVIEWS[value];
+            const p = THEME_PALETTES[value];
             const isLight = LIGHT_THEMES.has(value);
             return (
               <button

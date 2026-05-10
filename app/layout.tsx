@@ -21,18 +21,17 @@ export const metadata: Metadata = {
 const themeBootstrapScript = `
 (function () {
   try {
-    // --text-dim and --text-muted are derived from --text and --bg via
-    // color-mix in playground.css and retint automatically.
+    // --text-dim and --text-muted are hardcoded in playground.css and stay constant.
     var palettes = {
-      "dracula":         {bg:"#282a36",bg2:"#21222c",bg3:"#343746",border:"#44475a",text:"#f8f8f2",complementary:"#50fa7b"},
-      "monokai":         {bg:"#272822",bg2:"#1e1f1c",bg3:"#3e3d32",border:"#49483e",text:"#f8f8f2",complementary:"#a6e22e"},
-      "material-darker": {bg:"#212121",bg2:"#1a1a1a",bg3:"#2d2d2d",border:"#3d3d3d",text:"#eeffff",complementary:"#82aaff"},
-      "nord":            {bg:"#2e3440",bg2:"#272c36",bg3:"#3b4252",border:"#434c5e",text:"#d8dee9",complementary:"#88c0d0"},
-      "tomorrow-night-eighties":{bg:"#2d2d2d",bg2:"#252525",bg3:"#393939",border:"#515151",text:"#cccccc",complementary:"#6699cc"},
-      "solarized dark":  {bg:"#002b36",bg2:"#00212b",bg3:"#073642",border:"#094b5a",text:"#839496",complementary:"#268bd2"},
-      "solarized light": {bg:"#fdf6e3",bg2:"#eee8d5",bg3:"#f5efdc",border:"#ddd6c0",text:"#657b83",complementary:"#268bd2"},
-      "eclipse":         {bg:"#ffffff",bg2:"#f5f5f5",bg3:"#ebebeb",border:"#d8d8d8",text:"#1a1a1a",complementary:"#0000c0"},
-      "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",complementary:"#005cc5"}
+      "dracula":         {bg:"#282a36",bg2:"#21222c",bg3:"#343746",border:"#44475a",text:"#f8f8f2",accent1:"#ff79c6",accent2:"#50fa7b"},
+      "monokai":         {bg:"#272822",bg2:"#1e1f1c",bg3:"#3e3d32",border:"#49483e",text:"#f8f8f2",accent1:"#f92672",accent2:"#a6e22e"},
+      "material-darker": {bg:"#212121",bg2:"#1a1a1a",bg3:"#2d2d2d",border:"#3d3d3d",text:"#eeffff",accent1:"#c792ea",accent2:"#82aaff"},
+      "nord":            {bg:"#2e3440",bg2:"#272c36",bg3:"#3b4252",border:"#434c5e",text:"#d8dee9",accent1:"#81a1c1",accent2:"#88c0d0"},
+      "tomorrow-night-eighties":{bg:"#2d2d2d",bg2:"#252525",bg3:"#393939",border:"#515151",text:"#cccccc",accent1:"#cc99cc",accent2:"#6699cc"},
+      "solarized dark":  {bg:"#002b36",bg2:"#00212b",bg3:"#073642",border:"#094b5a",text:"#839496",accent1:"#859900",accent2:"#268bd2"},
+      "solarized light": {bg:"#fdf6e3",bg2:"#eee8d5",bg3:"#f5efdc",border:"#ddd6c0",text:"#657b83",accent1:"#859900",accent2:"#268bd2"},
+      "eclipse":         {bg:"#ffffff",bg2:"#f5f5f5",bg3:"#ebebeb",border:"#d8d8d8",text:"#1a1a1a",accent1:"#7f0055",accent2:"#0000c0"},
+      "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",accent1:"#a71d5d",accent2:"#005cc5"}
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
     if (!/^\/playground(?:\/|$)/.test(location.pathname)) return;
@@ -45,7 +44,9 @@ const themeBootstrapScript = `
     r.style.setProperty("--bg3", p.bg3);
     r.style.setProperty("--border", p.border);
     r.style.setProperty("--text", p.text);
-    r.style.setProperty("--text-complementary", p.complementary);
+    r.style.setProperty("--text-complementary", p.accent2);
+    r.style.setProperty("--accent1", p.accent1);
+    r.style.setProperty("--accent2", p.accent2);
     r.setAttribute("data-theme", lightThemes[theme] ? "light" : "dark");
   } catch (e) { /* localStorage unavailable — fall back to default theme */ }
 })();

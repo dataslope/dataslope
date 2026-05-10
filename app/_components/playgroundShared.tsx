@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import {
   ALL_THEMES,
-  THEME_PREVIEWS,
+  THEME_PALETTES,
   type ThemePalette,
 } from "./playgroundTheme";
 import type { RuntimeInfo } from "./types";
@@ -472,7 +472,7 @@ export function SettingsPanel({
                 >
                   {ALL_THEMES.map((t) => {
                     const palette =
-                      THEME_PREVIEWS[t.value] ?? THEME_PREVIEWS.dracula;
+                      THEME_PALETTES[t.value] ?? THEME_PALETTES.dracula;
                     const selected = editorTheme === t.value;
                     return (
                       <button

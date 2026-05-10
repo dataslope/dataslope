@@ -9,16 +9,22 @@
   --bg3: #1e2535;
   --border: #2a3347;
   --text: #e2e8f0;
-  /* `--text-muted` and `--text-dim` are derived neutrally by blending the
-     primary text color with the background. This keeps secondary UI text
-     legible and palette-cohesive across every theme — the editor syntax
-     palette (`palette.dim` / `palette.muted` in `playgroundTheme.ts`)
-     stays decoupled and is only used for CodeMirror highlighting. */
-  --text-muted: color-mix(in srgb, var(--text) 78%, var(--bg) 22%);
-  --text-dim: color-mix(in srgb, var(--text) 55%, var(--bg) 45%);
+  /* Fixed neutral secondary-text tones computed from the default dark palette.
+     These stay constant across themes so secondary UI text remains legible
+     without inheriting editor syntax-highlight hues. The editor palette
+     (`palette.dim` / `palette.muted` in `playgroundTheme.ts`) is separate
+     and is only used for CodeMirror token coloring. */
+  --text-muted: #b4b9c0;
+  --text-dim: #83878e;
   /* Complementary accent drawn from the theme's function-highlight color —
      a vibrant hue populated per-theme by `applyThemePalette`. */
   --text-complementary: oklch(75% 0.2 85);
+  /* Semantic aliases for the active theme's primary/complementary colors.
+     Populated per-theme by `applyThemePalette`; these defaults match the
+     palette-neutral fallbacks already used by `--primary` and
+     `--text-complementary`. */
+  --accent1: oklch(68% 0.18 250);
+  --accent2: oklch(75% 0.2 85);
   --primary: oklch(68% 0.18 250);
   --primary-glow: oklch(68% 0.18 250 / 0.15);
   --blue: oklch(68% 0.18 250);
