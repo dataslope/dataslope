@@ -284,7 +284,7 @@ export function SchemaItem({
                     className="example-item"
                     onClick={() => onStructure(name, kind)}
                   >
-                    <div className="ex-title">View/Edit Structure</div>
+                    <div className="ex-title">View Structure</div>
                   </ContextMenu.Item>
                 )
               )}

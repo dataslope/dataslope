@@ -33,6 +33,7 @@ import type { ModifyColumnDraft } from "../types";
 import type { TableColumnInfo, SqliteEngine } from "../../runtime/sqlite";
 import { COLUMN_TYPES, FK_ACTIONS } from "../constants";
 import { DdlViewer } from "./DdlViewer";
+import { GenExprEditor } from "./GenExprEditor";
 import { ColumnHeaderPopover } from "./PragmaSettingsTab";
 
 function newDraftId(): string {
@@ -297,33 +298,35 @@ export function ModifyColumnRow({
 function GeneratedColumnRow({
   col,
   onChange,
+  theme,
 }: {
   col: ModifyColumnDraft;
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
+  theme: string;
 }) {
   const gen = col.generated!; // always truthy when this component is rendered
   return (
     <tr className="sql-modify-col-row sql-modify-gen-row">
-      <td className="sql-modify-gen-name">
-        <span className="sql-modify-gen-name-text" title={col.name}>
-          {col.name}
-        </span>
-        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      <td>
+        <div className="sql-modify-gen-name">
+          <span className="sql-modify-gen-name-text" title={col.name}>
+            {col.name}
+          </span>
+          <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+        </div>
       </td>
       <td className="sql-modify-gen-expr-cell">
-        <label className="sql-modify-cell-field">
-          <input
-            className="sql-rename-input sql-modify-gen-expr"
-            value={gen.expression}
-            onChange={(e) =>
-              onChange({
-                generated: { ...gen, expression: e.target.value },
-              })
-            }
-            placeholder="e.g. price * quantity"
-            aria-label={`Generation expression for ${col.name}`}
-          />
-        </label>
+        <GenExprEditor
+          value={gen.expression}
+          onChange={(expression) =>
+            onChange({
+              generated: { ...gen, expression },
+            })
+          }
+          placeholder="e.g. price * quantity"
+          ariaLabel={`Generation expression for ${col.name}`}
+          theme={theme}
+        />
       </td>
       <td>
         <label className="sql-modify-cell-field">
@@ -646,6 +649,7 @@ export function ModifyStructureForm({
                         key={col.id}
                         col={col}
                         onChange={(patch) => updateColumn(col.id, patch)}
+                        theme={theme ?? "default"}
                       />
                     ))}
                   </tbody>

@@ -114,6 +114,7 @@ import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
 import { ToastList } from "../sql/components/ToastList";
 import { DdlViewer } from "../sql/components/DdlViewer";
+import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
 import {
@@ -255,29 +256,32 @@ function PgStructureColumnRow({
 function PgGeneratedColumnRow({
   col,
   onExpressionChange,
+  theme,
 }: {
   col: PgStructureColumn;
   onExpressionChange: (id: string, expression: string) => void;
+  theme: string;
 }) {
   const gen = col.generated!;
   return (
     <tr className="sql-modify-col-row sql-modify-gen-row">
-      <td className="sql-modify-gen-name">
-        <span className="sql-modify-gen-name-text" title={col.originalName}>
-          {col.originalName}
-        </span>
-        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      <td>
+        <div className="sql-modify-gen-name">
+          <span className="sql-modify-gen-name-text" title={col.originalName}>
+            {col.originalName}
+          </span>
+          <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+        </div>
       </td>
       <td className="sql-modify-gen-expr-cell">
-        <label className="sql-modify-cell-field">
-          <input
-            className="sql-rename-input sql-modify-gen-expr"
-            value={gen.expression}
-            onChange={(e) => onExpressionChange(col.id, e.target.value)}
-            placeholder="e.g. price * quantity"
-            aria-label={`Generation expression for ${col.originalName}`}
-          />
-        </label>
+        <GenExprEditor
+          value={gen.expression}
+          onChange={(expression) => onExpressionChange(col.id, expression)}
+          placeholder="e.g. price * quantity"
+          ariaLabel={`Generation expression for ${col.originalName}`}
+          isPostgres
+          theme={theme}
+        />
       </td>
       <td className="sql-modify-gen-storage-cell">
         <span className="sql-modify-col-type-badge">Stored</span>
@@ -1435,14 +1439,11 @@ function PostgresPlaygroundInner() {
       for (const col of genChanges) {
         const newExpr = col.generated!.expression.trim();
         if (!newExpr) continue;
-        // Drop the existing generated column and add it back with the
-        // updated expression. This is the safe approach that works across
-        // all PostgreSQL versions.
+        // PGlite is based on PostgreSQL 17, which supports ALTER COLUMN SET
+        // EXPRESSION (added in PG 16). This modifies the generated expression
+        // in place without dropping the column, so dependent views are unaffected.
         await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} DROP COLUMN ${quoteIdent(col.originalName)}`,
-        );
-        await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} ALTER COLUMN ${quoteIdent(col.originalName)} SET EXPRESSION AS (${newExpr})`,
         );
       }
       if (renames.length > 0 || genChanges.length > 0) {
@@ -2327,6 +2328,7 @@ function PostgresPlaygroundInner() {
                                     <PgGeneratedColumnRow
                                       key={col.id}
                                       col={col}
+                                      theme={editorTheme}
                                       onExpressionChange={(id, expression) =>
                                         setViewStructureDialog((prev) =>
                                           prev
