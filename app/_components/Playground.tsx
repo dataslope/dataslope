@@ -1332,7 +1332,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color: "var(--primary)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />

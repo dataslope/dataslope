@@ -2437,7 +2437,6 @@ function SqlPlaygroundInner() {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color: "var(--primary)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />
@@ -4332,7 +4331,7 @@ function SqlPlaygroundInner() {
             <div className="sql-sidebar-footer">
               <button
                 type="button"
-                className="sql-er-btn"
+                className="sql-sidebar-btn"
                 onClick={openErDiagramTab}
                 title="View ER Diagram"
                 aria-label="View ER Diagram"
@@ -4342,7 +4341,7 @@ function SqlPlaygroundInner() {
               </button>
               <button
                 type="button"
-                className="sql-er-btn"
+                className="sql-sidebar-btn"
                 onClick={openQueryHistoryTab}
                 title="View Query History"
                 aria-label="View Query History"

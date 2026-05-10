@@ -132,6 +132,7 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
       // it transparent so the current line has no background highlight.
       ".cm-activeLine": { backgroundColor: "transparent !important" },
       ".cm-activeLineGutter": {
+        backgroundColor: "transparent !important",
         color: palette.text,
       },
       ".cm-lineNumbers .cm-gutterElement": { color: palette.dim },

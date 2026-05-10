@@ -2203,20 +2203,22 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* Section heading inside the Import dropdown — separates "Database" from
-   "Tables" import options. Non-interactive; pointer-events disabled. */
+   "Tables" import options. Matches .sql-result-export-group-label style. */
 .import-section-label {
+  margin-top: 6px;
   padding: 6px 10px 3px;
   font-family: var(--font-ui);
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-muted);
   pointer-events: none;
   user-select: none;
 }
 
 .import-section-label:first-child {
+  margin-top: 0;
   padding-top: 4px;
 }
 
