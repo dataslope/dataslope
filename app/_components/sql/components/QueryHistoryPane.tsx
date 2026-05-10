@@ -125,6 +125,7 @@ function HistoryEntryRow({
       className={`sql-history-entry${entry.success ? " sql-history-entry--ok" : " sql-history-entry--err"}`}
     >
       <div className="sql-history-entry-header">
+        <span className="sql-history-entry-donut" aria-hidden="true" />
         <span className="sql-history-entry-status">
           {entry.success ? (
             <CheckCircle size={13} aria-label="Success" />
