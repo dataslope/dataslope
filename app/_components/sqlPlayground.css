@@ -3080,13 +3080,58 @@
   color: var(--text-dim);
 }
 
-.pg-type-input {
-  min-width: 160px;
+.pg-type-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
+  min-width: 160px;
+}
+
+.pg-type-input {
+  min-width: 0;
+  width: 100%;
+  padding-right: 26px;
+}
+
+.pg-type-trigger {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  outline: none;
+}
+
+.pg-type-trigger:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.pg-type-trigger:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+.pg-type-trigger[data-popup-open] svg {
+  transform: rotate(180deg);
+}
+
+.pg-type-trigger svg {
+  transition: transform 0.15s ease;
 }
 
 .pg-type-positioner {
-  z-index: 80;
+  /* Must sit above .sql-modify-drawer (z-index: 401) since the popup is
+     portaled to the body and would otherwise render behind the drawer. */
+  z-index: 500;
 }
 
 .pg-type-popup {

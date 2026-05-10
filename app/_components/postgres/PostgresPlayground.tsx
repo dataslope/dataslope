@@ -412,32 +412,37 @@ function PgTypeSelector({
       openOnInputClick
       autoHighlight
     >
-      <Combobox.Input
-        className="sql-rename-input sql-modify-col-type pg-type-input"
-        placeholder="e.g. varchar(255)"
-        aria-label="Column type"
-        onBlur={() => {
-          const typed = inputVal.trim();
-          let finalVal: string;
-          if (
-            PG_TYPE_OPTIONS.includes(value) &&
-            !PG_TYPE_OPTIONS.includes(typed) &&
-            !PG_TYPE_VALIDATION_REGEX.test(typed)
-          ) {
-            // Original was a known type; typed value is neither a known type
-            // nor a valid custom type (e.g. varchar(255)) → revert.
-            finalVal = value;
-          } else {
-            finalVal = typed || value;
-            if (finalVal !== value) onChange(finalVal);
-          }
-          blurLockRef.current = finalVal;
-          setInputVal(finalVal);
-          setTimeout(() => {
-            blurLockRef.current = null;
-          }, 100);
-        }}
-      />
+      <div className="pg-type-input-group">
+        <Combobox.Input
+          className="sql-rename-input sql-modify-col-type pg-type-input"
+          placeholder="e.g. varchar(255)"
+          aria-label="Column type"
+          onBlur={() => {
+            const typed = inputVal.trim();
+            let finalVal: string;
+            if (
+              PG_TYPE_OPTIONS.includes(value) &&
+              !PG_TYPE_OPTIONS.includes(typed) &&
+              !PG_TYPE_VALIDATION_REGEX.test(typed)
+            ) {
+              // Original was a known type; typed value is neither a known type
+              // nor a valid custom type (e.g. varchar(255)) → revert.
+              finalVal = value;
+            } else {
+              finalVal = typed || value;
+              if (finalVal !== value) onChange(finalVal);
+            }
+            blurLockRef.current = finalVal;
+            setInputVal(finalVal);
+            setTimeout(() => {
+              blurLockRef.current = null;
+            }, 100);
+          }}
+        />
+        <Combobox.Trigger className="pg-type-trigger" aria-label="Open type list">
+          <ChevronDown size={14} />
+        </Combobox.Trigger>
+      </div>
       <Combobox.Portal>
         <Combobox.Positioner sideOffset={4} align="start" className="pg-type-positioner">
           <Combobox.Popup className="bui-select-popup pg-type-popup">
