@@ -2223,7 +2223,7 @@ function PostgresPlaygroundInner() {
                   const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
                   const factor = PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
                   return Icon ? (
-                    <span className="playground-switcher-lang-icon" style={{ color: "var(--text-accent)" }} aria-hidden="true">
+                    <span className="playground-switcher-lang-icon" style={{ color: "var(--primary)" }} aria-hidden="true">
                       <Icon size={Math.round(16 * factor)} />
                     </span>
                   ) : null;
@@ -2240,7 +2240,7 @@ function PostgresPlaygroundInner() {
                       return (
                         <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
                           {Icon && (
-                            <span className="bui-select-item-icon" style={{ color: "var(--text-accent)" }} aria-hidden="true">
+                            <span className="bui-select-item-icon" style={{ color: "var(--primary)" }} aria-hidden="true">
                               <Icon size={Math.round(16 * factor)} />
                             </span>
                           )}
