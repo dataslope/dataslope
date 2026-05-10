@@ -31,6 +31,9 @@ export function GenExprEditor({
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   const themeCompRef = useRef<Compartment | null>(null);
+  // Prevents the updateListener from forwarding changes that were dispatched
+  // programmatically by the value-sync effect (not by the user).
+  const isProgrammaticUpdate = useRef(false);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -52,7 +55,7 @@ export function GenExprEditor({
         history(),
         EditorView.lineWrapping,
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
+          if (update.docChanged && !isProgrammaticUpdate.current) {
             onChangeRef.current(update.state.doc.toString());
           }
         }),
@@ -77,9 +80,13 @@ export function GenExprEditor({
   useEffect(() => {
     const view = viewRef.current;
     if (view && view.state.doc.toString() !== value) {
+      // Flag the dispatch as programmatic so the updateListener doesn't fire
+      // onChange back to the parent and cause a spurious re-render.
+      isProgrammaticUpdate.current = true;
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: value },
       });
+      isProgrammaticUpdate.current = false;
     }
   }, [value]);
 

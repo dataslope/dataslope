@@ -3137,6 +3137,7 @@
   border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 12px;
+  text-align: left;
 }
 
 .sql-gen-expr-editor .cm-editor.cm-focused {

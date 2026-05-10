@@ -1439,74 +1439,12 @@ function PostgresPlaygroundInner() {
       for (const col of genChanges) {
         const newExpr = col.generated!.expression.trim();
         if (!newExpr) continue;
-
-        // Find all views (direct and transitive) that depend on this column,
-        // ordered deepest-first so they can be dropped in dependency order.
-        const depResult = await engine.execParams(
-          `WITH RECURSIVE view_deps AS (
-             SELECT vc.oid AS view_oid, vc.relname AS viewname, 1 AS depth
-             FROM pg_depend d
-             JOIN pg_rewrite r ON r.oid = d.objid AND d.classid = 'pg_rewrite'::regclass
-             JOIN pg_class vc ON vc.oid = r.ev_class AND vc.relkind = 'v'
-             JOIN pg_namespace vn ON vn.oid = vc.relnamespace AND vn.nspname = 'public'
-             WHERE d.refobjid = (
-               SELECT c.oid FROM pg_class c
-               JOIN pg_namespace n ON n.oid = c.relnamespace
-               WHERE c.relname = $1 AND n.nspname = 'public' AND c.relkind = 'r'
-               LIMIT 1
-             )
-             AND d.refobjsubid = (
-               SELECT a.attnum FROM pg_attribute a
-               JOIN pg_class c ON c.oid = a.attrelid
-               JOIN pg_namespace n ON n.oid = c.relnamespace
-               WHERE c.relname = $1 AND n.nspname = 'public' AND a.attname = $2
-               LIMIT 1
-             )
-             UNION
-             SELECT vc.oid, vc.relname, vd.depth + 1
-             FROM view_deps vd
-             JOIN pg_depend d ON d.refobjid = vd.view_oid AND d.classid = 'pg_rewrite'::regclass
-             JOIN pg_rewrite r ON r.oid = d.objid
-             JOIN pg_class vc ON vc.oid = r.ev_class AND vc.relkind = 'v'
-             JOIN pg_namespace vn ON vn.oid = vc.relnamespace AND vn.nspname = 'public'
-           )
-           SELECT v.viewname, v.definition
-           FROM (
-             SELECT viewname, MAX(depth) AS max_depth FROM view_deps GROUP BY viewname
-           ) ranked
-           JOIN pg_views v ON v.viewname = ranked.viewname AND v.schemaname = 'public'
-           ORDER BY max_depth DESC`,
-          [dialog.tableName, col.originalName],
-        );
-
-        // depViews is ordered by depth descending: views with higher depth
-        // numbers (those that depend on other intermediate views) come first.
-        // These must be dropped before the views they depend on.
-        const depViews: { name: string; def: string }[] = (
-          depResult[0]?.values ?? []
-        ).map((row) => ({ name: row[0] as string, def: row[1] as string }));
-
-        // Drop dependent views in dependency order (highest-depth first,
-        // i.e., drop views that depend on other views before their dependencies).
-        for (const { name } of depViews) {
-          await engine.exec(`DROP VIEW IF EXISTS ${quoteIdent(name)}`);
-        }
-
-        // Drop the existing generated column and add it back with the
-        // updated expression. This is the safe approach that works across
-        // all PostgreSQL versions.
+        // PGlite is based on PostgreSQL 17, which supports ALTER COLUMN SET
+        // EXPRESSION (added in PG 16). This modifies the generated expression
+        // in place without dropping the column, so dependent views are unaffected.
         await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} DROP COLUMN ${quoteIdent(col.originalName)}`,
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} ALTER COLUMN ${quoteIdent(col.originalName)} SET EXPRESSION AS (${newExpr})`,
         );
-        await engine.exec(
-          `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,
-        );
-
-        // Recreate dependent views in reverse order (lowest depth first,
-        // i.e., recreate base views before views that reference them).
-        for (const { name, def } of [...depViews].reverse()) {
-          await engine.exec(`CREATE VIEW ${quoteIdent(name)} AS ${def}`);
-        }
       }
       if (renames.length > 0 || genChanges.length > 0) {
         await refreshSchema();
