@@ -59,9 +59,11 @@ export interface ThemePalette {
   fn: string;
   arg: string;
   str: string;
+  accent1: string;
+  accent2: string;
 }
 
-export const THEME_PREVIEWS: Record<string, ThemePalette> = {
+export const THEME_PALETTES: Record<string, ThemePalette> = {
   dracula: {
     bg: "#282a36",
     bg2: "#21222c",
@@ -74,6 +76,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#50fa7b",
     arg: "#ffb86c",
     str: "#f1fa8c",
+    accent1: "#ff79c6",
+    accent2: "#50fa7b",
   },
   monokai: {
     bg: "#272822",
@@ -87,6 +91,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#a6e22e",
     arg: "#fd971f",
     str: "#e6db74",
+    accent1: "#f92672",
+    accent2: "#a6e22e",
   },
   "material-darker": {
     bg: "#212121",
@@ -100,6 +106,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#82aaff",
     arg: "#ffcb6b",
     str: "#c3e88d",
+    accent1: "#c792ea",
+    accent2: "#82aaff",
   },
   nord: {
     bg: "#2e3440",
@@ -113,6 +121,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#88c0d0",
     arg: "#d08770",
     str: "#a3be8c",
+    accent1: "#81a1c1",
+    accent2: "#88c0d0",
   },
   "tomorrow-night-eighties": {
     bg: "#2d2d2d",
@@ -126,6 +136,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#6699cc",
     arg: "#f99157",
     str: "#99cc99",
+    accent1: "#cc99cc",
+    accent2: "#6699cc",
   },
   "solarized dark": {
     bg: "#002b36",
@@ -139,6 +151,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#268bd2",
     arg: "#cb4b16",
     str: "#2aa198",
+    accent1: "#859900",
+    accent2: "#268bd2",
   },
   "solarized light": {
     bg: "#fdf6e3",
@@ -152,6 +166,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#268bd2",
     arg: "#cb4b16",
     str: "#2aa198",
+    accent1: "#859900",
+    accent2: "#268bd2",
   },
   eclipse: {
     bg: "#ffffff",
@@ -165,6 +181,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#0000c0",
     arg: "#6a3e3e",
     str: "#2a00ff",
+    accent1: "#7f0055",
+    accent2: "#0000c0",
   },
   "mdn-like": {
     bg: "#ffffff",
@@ -178,6 +196,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#005cc5",
     arg: "#e36209",
     str: "#032f62",
+    accent1: "#a71d5d",
+    accent2: "#005cc5",
   },
   "material-palenight": {
     bg: "#292d3e",
@@ -191,6 +211,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#82aaff",
     arg: "#ffcb6b",
     str: "#c3e88d",
+    accent1: "#c792ea",
+    accent2: "#82aaff",
   },
   "ayu-mirage": {
     bg: "#1f2430",
@@ -204,6 +226,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#ffd580",
     arg: "#ffcc66",
     str: "#bae67e",
+    accent1: "#ffa759",
+    accent2: "#ffd580",
   },
   "gruvbox-dark": {
     bg: "#282828",
@@ -217,6 +241,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#b8bb26",
     arg: "#fabd2f",
     str: "#b8bb26",
+    accent1: "#fb4934",
+    accent2: "#b8bb26",
   },
   "oceanic-next": {
     bg: "#1b2b34",
@@ -230,6 +256,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#6699cc",
     arg: "#f99157",
     str: "#99c794",
+    accent1: "#c594c5",
+    accent2: "#6699cc",
   },
   "panda-syntax": {
     bg: "#292a2b",
@@ -243,6 +271,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#19f9d8",
     arg: "#ffb86c",
     str: "#19f9d8",
+    accent1: "#ff75b5",
+    accent2: "#19f9d8",
   },
   darcula: {
     bg: "#2b2b2b",
@@ -256,6 +286,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#ffc66d",
     arg: "#9876aa",
     str: "#6a8759",
+    accent1: "#cc7832",
+    accent2: "#ffc66d",
   },
   zenburn: {
     bg: "#3f3f3f",
@@ -269,6 +301,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#dfaf8f",
     arg: "#dcdccc",
     str: "#cc9393",
+    accent1: "#f0dfaf",
+    accent2: "#dfaf8f",
   },
   lucario: {
     bg: "#2b3e50",
@@ -282,6 +316,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#a6e22e",
     arg: "#e7c547",
     str: "#e7db74",
+    accent1: "#ff6541",
+    accent2: "#a6e22e",
   },
   idea: {
     bg: "#ffffff",
@@ -295,6 +331,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#0000ff",
     arg: "#660e7a",
     str: "#008000",
+    accent1: "#000080",
+    accent2: "#0000ff",
   },
   "base16-light": {
     bg: "#f5f5f5",
@@ -308,6 +346,8 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
     fn: "#6a9fb5",
     arg: "#aa759f",
     str: "#a06e3b",
+    accent1: "#90a959",
+    accent2: "#6a9fb5",
   },
 };
 
@@ -315,7 +355,7 @@ export const THEME_PREVIEWS: Record<string, ThemePalette> = {
  *  so every surface that consumes `--bg`/`--bg2`/`--text`/etc. retints
  *  in lockstep with the editor. */
 export function applyThemePalette(theme: string): void {
-  const p = THEME_PREVIEWS[theme] ?? THEME_PREVIEWS.lucario;
+  const p = THEME_PALETTES[theme] ?? THEME_PALETTES.lucario;
   const root = document.documentElement;
   root.style.setProperty("--bg", p.bg);
   root.style.setProperty("--bg2", p.bg2);
@@ -323,12 +363,12 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--border", p.border);
   root.style.setProperty("--text", p.text);
   // `--text-dim` and `--text-muted` are intentionally NOT written here.
-  // They are derived in CSS via `color-mix(--text, --bg)` so secondary UI
-  // text always blends with the active theme's background and stays
-  // neutral instead of inheriting the editor palette's accent hues
-  // (e.g. Lucario's blue/green or IntelliJ's dark purple).
+  // They are hardcoded in playground.css `:root` as fixed neutral tones so
+  // secondary UI text remains legible without inheriting editor accent hues.
   root.style.setProperty("--text-complementary", p.fn);
   root.style.setProperty("--theme-primary", p.kw);
+  root.style.setProperty("--accent1", p.accent1);
+  root.style.setProperty("--accent2", p.accent2);
 }
 
 export function clearThemePalette(): void {
@@ -343,6 +383,8 @@ export function clearThemePalette(): void {
     "--text-muted",
     "--text-complementary",
     "--theme-primary",
+    "--accent1",
+    "--accent2",
   ]) {
     root.style.removeProperty(name);
   }

@@ -19,7 +19,7 @@ import type { Extension } from "@codemirror/state";
 
 import {
   LIGHT_THEMES,
-  THEME_PREVIEWS,
+  THEME_PALETTES,
   type ThemePalette,
 } from "./playgroundTheme";
 
@@ -93,7 +93,7 @@ export async function loadLanguage(mode: string): Promise<Extension | null> {
 //
 // v6 themes are JS objects. Rather than ship 19 hand-written themes (or
 // pull in a fat third-party theme bundle), we synthesise the editor
-// theme + token highlight style from the same `THEME_PREVIEWS` palette
+// theme + token highlight style from the same `THEME_PALETTES` catalog
 // already used by the surrounding UI chrome. The editor then stays in
 // lockstep with the chrome whenever the user picks a different theme.
 
@@ -231,7 +231,7 @@ const themeCache = new Map<string, Extension>();
 export function themeFor(name: string): Extension {
   const cached = themeCache.get(name);
   if (cached) return cached;
-  const palette = THEME_PREVIEWS[name] ?? THEME_PREVIEWS.lucario;
+  const palette = THEME_PALETTES[name] ?? THEME_PALETTES.lucario;
   const ext = buildTheme(name, palette, LIGHT_THEMES.has(name));
   themeCache.set(name, ext);
   return ext;
