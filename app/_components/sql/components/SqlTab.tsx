@@ -34,6 +34,7 @@ export function SqlTab({
   const [draftTitle, setDraftTitle] = useState(tab.title);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
 
   const {
@@ -64,10 +65,19 @@ export function SqlTab({
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
-  }, []);
+    // Safety net: if onAnimationEnd never fires (e.g. the element is hidden
+    // or the animation is skipped), fall back to closing after a short delay.
+    setTimeout(() => {
+      if (!closedRef.current) {
+        closedRef.current = true;
+        onClose();
+      }
+    }, 200);
+  }, [onClose]);
 
   const handleAnimationEnd = useCallback(() => {
-    if (isClosing) {
+    if (isClosing && !closedRef.current) {
+      closedRef.current = true;
       onClose();
     }
   }, [isClosing, onClose]);
