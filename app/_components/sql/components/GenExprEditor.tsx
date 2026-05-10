@@ -66,6 +66,10 @@ export function GenExprEditor({
       viewRef.current = null;
       themeCompRef.current = null;
     };
+    // The editor is created exactly once. `value` and `theme` changes are
+    // handled by the dedicated effects below; `onChange` uses an always-current
+    // ref so stale-closure is not a concern; `isPostgres` and `placeholder` are
+    // stable across the component lifetime (only set from constant props).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -1479,12 +1479,15 @@ function PostgresPlaygroundInner() {
           [dialog.tableName, col.originalName],
         );
 
-        // depViews is ordered deepest-first (outermost views first).
+        // depViews is ordered by depth descending: views with higher depth
+        // numbers (those that depend on other intermediate views) come first.
+        // These must be dropped before the views they depend on.
         const depViews: { name: string; def: string }[] = (
           depResult[0]?.values ?? []
         ).map((row) => ({ name: row[0] as string, def: row[1] as string }));
 
-        // Drop dependent views in dependency order (outermost first).
+        // Drop dependent views in dependency order (highest-depth first,
+        // i.e., drop views that depend on other views before their dependencies).
         for (const { name } of depViews) {
           await engine.exec(`DROP VIEW IF EXISTS ${quoteIdent(name)}`);
         }
@@ -1499,7 +1502,8 @@ function PostgresPlaygroundInner() {
           `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,
         );
 
-        // Recreate dependent views in reverse order (innermost first).
+        // Recreate dependent views in reverse order (lowest depth first,
+        // i.e., recreate base views before views that reference them).
         for (const { name, def } of [...depViews].reverse()) {
           await engine.exec(`CREATE VIEW ${quoteIdent(name)} AS ${def}`);
         }
