@@ -49,8 +49,6 @@ const SWATCH_DEFS: SwatchDef[] = [
   { name: "--text", label: "Text", isTextColor: true },
   { name: "--text-muted", label: "Text Muted", isTextColor: true },
   { name: "--text-dim", label: "Text Dim", isTextColor: true },
-  { name: "--text-soft", label: "Text Soft", isTextColor: true },
-  { name: "--text-accent", label: "Text Accent", isTextColor: true },
   {
     name: "--text-complementary",
     label: "Text Complementary",
@@ -285,23 +283,23 @@ export default function ColorTestPage() {
                   <span style={{ color: "var(--theme-primary)" }}>def </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
                   <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-soft)" }}>n: int</span>
+                  <span style={{ color: "var(--text-dim)" }}>n: int</span>
                   <span style={{ color: "var(--text)" }}>) -&gt; int:{"\n"}</span>
                   <span style={{ color: "var(--text-dim)" }}>{"    "}"""Return the nth Fibonacci number."""{"\n"}</span>
                   {"    "}<span style={{ color: "var(--theme-primary)" }}>if </span>
                   <span style={{ color: "var(--text)" }}>n &lt;= </span>
-                  <span style={{ color: "var(--text-accent)" }}>1</span>
+                  <span style={{ color: "var(--text-muted)" }}>1</span>
                   <span style={{ color: "var(--text)" }}>:{"\n"}</span>
                   {"        "}<span style={{ color: "var(--theme-primary)" }}>return </span>
-                  <span style={{ color: "var(--text-accent)" }}>n{"\n"}</span>
+                  <span style={{ color: "var(--text-muted)" }}>n{"\n"}</span>
                   {"    "}<span style={{ color: "var(--theme-primary)" }}>return </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
                   <span style={{ color: "var(--text)" }}>(n - </span>
-                  <span style={{ color: "var(--text-accent)" }}>1</span>
+                  <span style={{ color: "var(--text-muted)" }}>1</span>
                   <span style={{ color: "var(--text)" }}>) + </span>
                   <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
                   <span style={{ color: "var(--text)" }}>(n - </span>
-                  <span style={{ color: "var(--text-accent)" }}>2</span>
+                  <span style={{ color: "var(--text-muted)" }}>2</span>
                   <span style={{ color: "var(--text)" }}>){"\n\n"}</span>
                   <span style={{ color: "var(--text-dim)" }}># Compute first 10 values{"\n"}</span>
                   <span style={{ color: "var(--text-complementary)" }}>results</span>
@@ -313,13 +311,13 @@ export default function ColorTestPage() {
                   <span style={{ color: "var(--theme-primary)" }}>in </span>
                   <span style={{ color: "var(--text-complementary)" }}>range</span>
                   <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-accent)" }}>10</span>
+                  <span style={{ color: "var(--text-muted)" }}>10</span>
                   <span style={{ color: "var(--text)" }}>)]{"\n"}</span>
                   <span style={{ color: "var(--text-complementary)" }}>print</span>
                   <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-soft)" }}>f"Sequence: {"{"}</span>
+                  <span style={{ color: "var(--text-dim)" }}>f"Sequence: {"{"}</span>
                   <span style={{ color: "var(--text-complementary)" }}>results</span>
-                  <span style={{ color: "var(--text-soft)" }}>{"}"}"</span>
+                  <span style={{ color: "var(--text-dim)" }}>{"}"}"</span>
                   <span style={{ color: "var(--text)" }}>)</span>
                 </code>
               </pre>
@@ -437,8 +435,8 @@ export default function ColorTestPage() {
                     color: [
                       "var(--text)",
                       "var(--text-muted)",
-                      "var(--text-soft)",
-                      "var(--text-accent)",
+                      "var(--text-dim)",
+                      "var(--text-muted)",
                       "var(--text-complementary)",
                       "var(--theme-primary)",
                       "var(--text-dim)",
@@ -507,7 +505,7 @@ export default function ColorTestPage() {
               <Info size={16} />
               <div>
                 <strong>Info</strong> — This is an informational message using{" "}
-                <code className={styles.inlineCode}>--text-soft</code> for the
+                <code className={styles.inlineCode}>--text-dim</code> for the
                 icon and border accent.
               </div>
             </div>
@@ -515,7 +513,7 @@ export default function ColorTestPage() {
               <CheckCircle2 size={16} />
               <div>
                 <strong>Success</strong> — Operation completed using{" "}
-                <code className={styles.inlineCode}>--text-accent</code> tones.
+                <code className={styles.inlineCode}>--text-muted</code> tones.
               </div>
             </div>
             <div className={`${styles.alert} ${styles.alertComplementary}`}>
@@ -565,7 +563,7 @@ export default function ColorTestPage() {
                     style={{
                       color: active
                         ? "var(--text-complementary)"
-                        : "var(--text-soft)",
+                        : "var(--text-dim)",
                     }}
                   >
                     {icon}
@@ -582,12 +580,12 @@ export default function ColorTestPage() {
             <ul className={styles.bulletList}>
               {[
                 {
-                  color: "var(--text-soft)",
-                  text: "--text-soft — muted secondary (dim slot)",
+                  color: "var(--text-dim)",
+                  text: "--text-dim — muted secondary (dim slot)",
                 },
                 {
-                  color: "var(--text-accent)",
-                  text: "--text-accent — accent (muted slot)",
+                  color: "var(--text-muted)",
+                  text: "--text-muted — accent (muted slot)",
                 },
                 {
                   color: "var(--text-complementary)",
