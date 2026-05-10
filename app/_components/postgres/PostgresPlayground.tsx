@@ -419,8 +419,13 @@ function PgTypeSelector({
         onBlur={() => {
           const typed = inputVal.trim();
           let finalVal: string;
-          if (PG_TYPE_OPTIONS.includes(value) && !PG_TYPE_OPTIONS.includes(typed)) {
-            // Original was a known type; typed value is not → revert.
+          if (
+            PG_TYPE_OPTIONS.includes(value) &&
+            !PG_TYPE_OPTIONS.includes(typed) &&
+            !PG_TYPE_VALIDATION_REGEX.test(typed)
+          ) {
+            // Original was a known type; typed value is neither a known type
+            // nor a valid custom type (e.g. varchar(255)) → revert.
             finalVal = value;
           } else {
             finalVal = typed || value;
