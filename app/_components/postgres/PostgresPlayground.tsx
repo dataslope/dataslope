@@ -271,11 +271,17 @@ function validatePgStructure(
 ) {
   const invalidColumnIds = new Set<string>();
   const errors: string[] = [];
-  if (!state) return { invalidColumnIds, errors, isValid: false, isDirty: false };
+  let hasTableNameError = false;
+  if (!state) return { invalidColumnIds, errors, hasTableNameError, isValid: false, isDirty: false };
   const tableName = state.newTableName.trim();
   const identifierRe = /^[A-Za-z_][A-Za-z0-9_]*$/;
-  if (!tableName) errors.push("Table name cannot be empty.");
-  else if (!identifierRe.test(tableName)) errors.push("Table name must be a valid unquoted PostgreSQL identifier.");
+  if (!tableName) {
+    errors.push("Table name cannot be empty.");
+    hasTableNameError = true;
+  } else if (!identifierRe.test(tableName)) {
+    errors.push("Table name must be a valid unquoted PostgreSQL identifier.");
+    hasTableNameError = true;
+  }
   const seen = new Map<string, string>();
   for (const col of state.columns) {
     if (col.generated) {
@@ -324,6 +330,7 @@ function validatePgStructure(
   return {
     invalidColumnIds,
     errors: Array.from(new Set(errors)),
+    hasTableNameError,
     isValid: errors.length === 0,
     isDirty: pgStructureSignature(state) !== state.originalSignature,
   };
@@ -1752,7 +1759,7 @@ function PostgresPlaygroundInner() {
         const columns = cols.map<PgStructureColumn>((c) => {
           const fk = fkByCol.get(c.name);
           const constraint = constraintsByCol.get(c.name);
-          const isAutoIncrement = constraint?.isAutoIncrement ?? /^nextval\(/i.test(c.defaultValue ?? "");
+          const isAutoIncrement = constraint?.isAutoIncrement ?? /^nextval\s*\(/i.test(c.defaultValue ?? "");
           return {
             id: newPgStructureId(),
             originalName: c.name,
@@ -2629,7 +2636,7 @@ function PostgresPlaygroundInner() {
                   <label className="sql-modify-field">
                     <span className="sql-modify-field-label">Table name</span>
                     <input
-                      className={`sql-rename-input${pgStructureValidation.errors.some((err) => err.startsWith("Table name")) ? " sql-modify-col-name-error" : ""}`}
+                      className={`sql-rename-input${pgStructureValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
                       value={viewStructureDialog.newTableName}
                       onChange={(e) =>
                         setViewStructureDialog((prev) =>
