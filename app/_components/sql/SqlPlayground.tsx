@@ -138,7 +138,6 @@ import { PLAYGROUNDS } from "../playgrounds";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
-  LANGUAGE_ICON_COLORS as PLAYGROUND_ICON_COLORS,
 } from "../languageIcons";
 import {
   applyMode,
@@ -2395,13 +2394,12 @@ function SqlPlaygroundInner() {
               >
                 {(() => {
                   const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const color = PLAYGROUND_ICON_COLORS[PLAYGROUND_ID];
                   const factor =
                     PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
                   return Icon ? (
                     <span
                       className="playground-switcher-lang-icon"
-                      style={{ color }}
+                      style={{ color: "var(--text-accent)" }}
                       aria-hidden="true"
                     >
                       <Icon size={Math.round(16 * factor)} />
@@ -2429,7 +2427,6 @@ function SqlPlaygroundInner() {
                   <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
-                      const color = PLAYGROUND_ICON_COLORS[p.id];
                       const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
                       return (
                         <Select.Item
@@ -2440,7 +2437,7 @@ function SqlPlaygroundInner() {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color }}
+                              style={{ color: "var(--text-accent)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />

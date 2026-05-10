@@ -77,7 +77,6 @@ import "../sqlPlayground.css";
 import { ErDiagramPane } from "../ErDiagramPane";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
-  LANGUAGE_ICON_COLORS as PLAYGROUND_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 import { PLAYGROUNDS } from "../playgrounds";
@@ -363,47 +362,99 @@ function PgTypeSelector({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const query = value.trim().toLowerCase();
-  const visibleGroups = PG_TYPE_GROUPS.map((group) => ({
-    ...group,
-    types: group.types.filter((type) => type.toLowerCase().includes(query)),
-  })).filter((group) => group.types.length > 0);
+  const [inputVal, setInputVal] = useState(value);
+  // Prevents the Combobox's internal blur-reset from overriding our state.
+  const blurLockRef = useRef<string | null>(null);
+
+  // Sync inputVal when the committed value changes externally (e.g. a
+  // different column row is selected) but not while we own the blur lock.
+  useEffect(() => {
+    if (blurLockRef.current === null) {
+      setInputVal(value);
+    }
+  }, [value]);
+
+  const query = inputVal.trim().toLowerCase();
+  const visibleGroups = useMemo(
+    () =>
+      PG_TYPE_GROUPS.map((group) => ({
+        ...group,
+        types: group.types.filter((type) => type.toLowerCase().includes(query)),
+      })).filter((group) => group.types.length > 0),
+    [query],
+  );
 
   return (
     <Combobox.Root
-      value={PG_TYPE_OPTIONS.includes(value) ? value : null}
+      value={PG_TYPE_OPTIONS.includes(inputVal) ? inputVal : null}
       onValueChange={(newValue) => {
-        if (newValue) onChange(newValue as string);
+        if (newValue) {
+          const v = newValue as string;
+          blurLockRef.current = v;
+          setInputVal(v);
+          onChange(v);
+          setTimeout(() => {
+            blurLockRef.current = null;
+          }, 0);
+        }
       }}
-      inputValue={value}
-      onInputValueChange={(v) => onChange(v)}
+      inputValue={inputVal}
+      onInputValueChange={(v) => {
+        // Ignore any reset the Combobox tries to apply while the blur lock
+        // is held (it resets to "" when no item is selected on close).
+        if (blurLockRef.current !== null) {
+          setInputVal(blurLockRef.current);
+          return;
+        }
+        setInputVal(v);
+      }}
+      filter={null}
+      openOnInputClick
       autoHighlight
     >
       <Combobox.Input
         className="sql-rename-input sql-modify-col-type pg-type-input"
         placeholder="e.g. varchar(255)"
         aria-label="Column type"
+        onBlur={() => {
+          const typed = inputVal.trim();
+          let finalVal: string;
+          if (PG_TYPE_OPTIONS.includes(value) && !PG_TYPE_OPTIONS.includes(typed)) {
+            // Original was a known type; typed value is not → revert.
+            finalVal = value;
+          } else {
+            finalVal = typed || value;
+            if (finalVal !== value) onChange(finalVal);
+          }
+          blurLockRef.current = finalVal;
+          setInputVal(finalVal);
+          setTimeout(() => {
+            blurLockRef.current = null;
+          }, 100);
+        }}
       />
       <Combobox.Portal>
         <Combobox.Positioner sideOffset={4} align="start" className="pg-type-positioner">
           <Combobox.Popup className="bui-select-popup pg-type-popup">
-            {visibleGroups.map((group) => (
-              <Combobox.Group key={group.label} className="pg-type-group">
-                <Combobox.GroupLabel className="pg-type-group-label">
-                  {group.label}
-                </Combobox.GroupLabel>
-                {group.types.map((type) => (
-                  <Combobox.Item key={type} value={type} className="bui-select-item">
-                    {type}
-                  </Combobox.Item>
-                ))}
-              </Combobox.Group>
-            ))}
-            {visibleGroups.length === 0 && (
-              <div className="pg-type-empty">
-                No matching built-in types. You can keep the typed value.
-              </div>
-            )}
+            <Combobox.List>
+              {visibleGroups.map((group) => (
+                <Combobox.Group key={group.label} className="pg-type-group">
+                  <Combobox.GroupLabel className="pg-type-group-label">
+                    {group.label}
+                  </Combobox.GroupLabel>
+                  {group.types.map((type) => (
+                    <Combobox.Item key={type} value={type} className="bui-select-item">
+                      {type}
+                    </Combobox.Item>
+                  ))}
+                </Combobox.Group>
+              ))}
+              {visibleGroups.length === 0 && (
+                <div className="pg-type-empty">
+                  No matching built-in types. You can keep the typed value.
+                </div>
+              )}
+            </Combobox.List>
           </Combobox.Popup>
         </Combobox.Positioner>
       </Combobox.Portal>
@@ -2160,10 +2211,9 @@ function PostgresPlaygroundInner() {
               <Select.Trigger className="playground-switcher" aria-label="Switch playground">
                 {(() => {
                   const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const color = PLAYGROUND_ICON_COLORS[PLAYGROUND_ID];
                   const factor = PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
                   return Icon ? (
-                    <span className="playground-switcher-lang-icon" style={{ color }} aria-hidden="true">
+                    <span className="playground-switcher-lang-icon" style={{ color: "var(--text-accent)" }} aria-hidden="true">
                       <Icon size={Math.round(16 * factor)} />
                     </span>
                   ) : null;
@@ -2176,12 +2226,11 @@ function PostgresPlaygroundInner() {
                   <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((playground) => {
                       const Icon = PLAYGROUND_ICONS[playground.id];
-                      const color = PLAYGROUND_ICON_COLORS[playground.id];
                       const factor = PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
                       return (
                         <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
                           {Icon && (
-                            <span className="bui-select-item-icon" style={{ color }} aria-hidden="true">
+                            <span className="bui-select-item-icon" style={{ color: "var(--text-accent)" }} aria-hidden="true">
                               <Icon size={Math.round(16 * factor)} />
                             </span>
                           )}
