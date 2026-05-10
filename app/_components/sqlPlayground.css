@@ -278,7 +278,7 @@
    the entity icon with the palette's accent without affecting the
    chevron or any other nested SVGs. */
 .sql-tree-item > svg {
-  color: var(--text-muted);
+  color: var(--accent1);
 }
 
 .sql-tree-item-name {
