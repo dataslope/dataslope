@@ -439,7 +439,7 @@ export async function createPostgresEngine(
         type: (col.type || "text").trim(),
       }));
       if (columns.length === 0) throw new Error("A table must have at least one column.");
-      const tmpName = `${spec.originalName}__dataslope_${Date.now().toString(36)}`;
+      const tmpName = `${spec.originalName}__tmp_rebuild_${Date.now().toString(36)}`;
       const createSql = renderPgCreateTable(tmpName, columns);
       const copyable = columns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");

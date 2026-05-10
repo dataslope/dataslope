@@ -224,6 +224,10 @@ const PG_TYPE_GROUPS = [
 
 const PG_TYPE_OPTIONS: readonly string[] = PG_TYPE_GROUPS.flatMap((group) => group.types);
 const PG_SERIAL_TYPES = new Set(["serial", "bigserial", "smallserial"]);
+// Accepts common PostgreSQL type text, including multi-word types,
+// parameterized types such as varchar(255), and array suffixes.
+const PG_TYPE_VALIDATION_REGEX =
+  /^[A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*(?:\s*\([^()]*\))?(?:\s*\[\s*\])*$/;
 
 function normalizePgFkAction(action: string | undefined): string {
   const normalized = (action || "NO ACTION").trim().toUpperCase();
@@ -264,8 +268,6 @@ function validatePgStructure(
   if (!state) return { invalidColumnIds, errors, isValid: false, isDirty: false };
   const tableName = state.newTableName.trim();
   const identifierRe = /^[A-Za-z_][A-Za-z0-9_]*$/;
-  const typeRe =
-    /^[A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*(?:\s*\([^()]*\))?(?:\s*\[\s*\])*$/;
   if (!tableName) errors.push("Table name cannot be empty.");
   else if (!identifierRe.test(tableName)) errors.push("Table name must be a valid unquoted PostgreSQL identifier.");
   const seen = new Map<string, string>();
@@ -293,7 +295,7 @@ function validatePgStructure(
       seen.set(lower, col.id);
     }
     const type = col.type.trim();
-    if (!type || !typeRe.test(type)) {
+    if (!type || !PG_TYPE_VALIDATION_REGEX.test(type)) {
       errors.push(`"${name || "Unnamed column"}" has an invalid type.`);
       invalidColumnIds.add(col.id);
     }
@@ -357,8 +359,7 @@ function PgTypeSelector({
     ...group,
     types: group.types.filter(
       (type) =>
-        type.toLowerCase().includes(query) ||
-        query.includes(type.toLowerCase()),
+        type.toLowerCase().includes(query),
     ),
   })).filter((group) => group.types.length > 0);
   return (
