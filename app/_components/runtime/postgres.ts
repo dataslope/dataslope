@@ -453,6 +453,8 @@ export async function createPostgresEngine(
       // Patch generated column expressions that reference a renamed column.
       // This prevents CREATE TABLE from failing with "column X does not exist"
       // when a column referenced inside a GENERATED ALWAYS AS expression is renamed.
+      // `validatePgStructure` ensures all column names are valid unquoted identifiers
+      // (/^[A-Za-z_][A-Za-z0-9_]*$/), so newName is always safe to use unquoted.
       const patchedColumns =
         renameMap.size > 0
           ? columns.map((col) => {
