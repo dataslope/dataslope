@@ -1298,7 +1298,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   return Icon ? (
                     <span
                       className="playground-switcher-lang-icon"
-                      style={{ color: "var(--text-accent)" }}
+                      style={{ color: "var(--primary)" }}
                       aria-hidden="true"
                     >
                       <Icon size={Math.round(16 * factor)} />
@@ -1332,7 +1332,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           {Icon && (
                             <span
                               className="bui-select-item-icon"
-                              style={{ color: "var(--text-accent)" }}
+                              style={{ color: "var(--primary)" }}
                               aria-hidden="true"
                             >
                               <Icon size={Math.round(16 * factor)} />
