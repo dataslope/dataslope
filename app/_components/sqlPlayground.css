@@ -151,7 +151,7 @@
   min-width: 0;
   background: transparent;
   border: 0;
-  color: var(--text-soft);
+  color: var(--text-dim);
   cursor: pointer;
   text-align: left;
   padding: 4px 8px;
@@ -167,7 +167,7 @@
   justify-content: center;
   background: transparent;
   border: 0;
-  color: var(--text-soft);
+  color: var(--text-dim);
   cursor: pointer;
   padding: 4px 8px 4px 4px;
   border-radius: 4px;
@@ -188,7 +188,7 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--text-soft);
+  color: var(--text-dim);
   padding: 4px 12px;
   text-transform: uppercase;
 }
@@ -265,7 +265,7 @@
 
 .sql-tree-popover-name svg {
   flex-shrink: 0;
-  color: var(--text-accent);
+  color: var(--text-muted);
 }
 
 .sql-tree-item svg {
@@ -278,7 +278,7 @@
    the entity icon with the palette's accent without affecting the
    chevron or any other nested SVGs. */
 .sql-tree-item > svg {
-  color: var(--text-accent);
+  color: var(--text-muted);
 }
 
 .sql-tree-item-name {
@@ -379,7 +379,7 @@
   /* Reset button defaults */
   border: none;
   cursor: default;
-  color: var(--text-soft);
+  color: var(--text-dim);
 }
 
 .sql-tree-column-name {
@@ -388,7 +388,7 @@
 }
 
 .sql-tree-column-type {
-  color: var(--text-soft);
+  color: var(--text-dim);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -444,7 +444,7 @@
 
 .ctx-name-icon {
   flex-shrink: 0;
-  color: var(--text-accent);
+  color: var(--text-muted);
 }
 
 .sql-fk-popover {
@@ -1224,11 +1224,10 @@
   padding: 6px 10px 6px 12px;
   /* Inactive tabs render as plain text — no background, no border —
      so the tab strip reads as a row of labels with the active tab
-     called out as the only "tab-shaped" element. `--text-soft` carries
-     the theme's secondary hue (e.g. Lucario blue) so the tab strip
-     feels palette-cohesive without competing with primary text. */
+     called out as the only "tab-shaped" element. `--text-dim` keeps
+     the tab strip legible without competing with primary text. */
   background: transparent;
-  color: var(--text-soft);
+  color: var(--text-dim);
   border: 0;
   border-radius: 0;
   font-family: var(--font-ui);
@@ -1317,7 +1316,7 @@
 .sql-tab-close {
   background: transparent;
   border: 0;
-  color: var(--text-soft);
+  color: var(--text-dim);
   width: 16px;
   height: 16px;
   display: inline-flex;
@@ -1350,7 +1349,7 @@
   justify-content: center;
   background: transparent;
   border: 0;
-  color: var(--text-soft);
+  color: var(--text-dim);
   width: 28px;
   /* Match the visual height of an inactive tab so the button reads
      as a sibling of the tabs rather than a separate toolbar control.
@@ -2910,7 +2909,7 @@
 
 .er-table-header-icon {
   flex-shrink: 0;
-  color: var(--text-accent);
+  color: var(--text-muted);
 }
 
 .er-table-header-name {
@@ -2974,11 +2973,11 @@
 }
 
 .er-pk-icon {
-  color: var(--text-soft);
+  color: var(--text-dim);
 }
 
 .er-fk-icon {
-  color: var(--text-soft);
+  color: var(--text-dim);
 }
 
 /* Inline trigger wrapper for PK/FK icon popovers inside ER nodes */
@@ -3033,7 +3032,7 @@
 
 .er-table-col-type {
   font-size: 10px;
-  color: var(--text-soft);
+  color: var(--text-dim);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -3071,7 +3070,7 @@
   font-size: 11px;
   font-family: var(--font-mono, monospace);
   background: var(--bg-badge, rgba(128, 128, 128, 0.12));
-  color: var(--text-soft);
+  color: var(--text-dim);
   border-radius: 3px;
   padding: 1px 5px;
   white-space: nowrap;
@@ -3100,7 +3099,7 @@
 .sql-modify-col-default-value {
   font-size: 11px;
   font-family: var(--font-mono, monospace);
-  color: var(--text-soft);
+  color: var(--text-dim);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

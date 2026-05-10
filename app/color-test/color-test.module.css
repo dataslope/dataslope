@@ -252,7 +252,7 @@
 .typoCardTitle {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-soft);
+  color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0 0 12px;
@@ -327,7 +327,7 @@
 
 .btnGhost {
   background: transparent;
-  color: var(--text-soft);
+  color: var(--text-dim);
   border: 1px solid var(--border);
 }
 
@@ -358,13 +358,13 @@
 }
 
 .badgeSoft {
-  background: color-mix(in srgb, var(--text-soft) 16%, var(--bg3));
-  color: var(--text-soft);
+  background: color-mix(in srgb, var(--text-dim) 16%, var(--bg3));
+  color: var(--text-dim);
 }
 
 .badgeAccent {
-  background: color-mix(in srgb, var(--text-accent) 16%, var(--bg3));
-  color: var(--text-accent);
+  background: color-mix(in srgb, var(--text-muted) 16%, var(--bg3));
+  color: var(--text-muted);
 }
 
 .badgeComplementary {
@@ -401,9 +401,9 @@
 }
 
 .tagAccent {
-  border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
-  color: var(--text-accent);
-  background: color-mix(in srgb, var(--text-accent) 10%, var(--bg3));
+  border-color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text-muted) 10%, var(--bg3));
 }
 
 /* ── Icons ── */
@@ -535,22 +535,22 @@
 }
 
 .alertInfo {
-  background: color-mix(in srgb, var(--text-soft) 10%, var(--bg3));
-  border-color: color-mix(in srgb, var(--text-soft) 30%, transparent);
-  border-left-color: var(--text-soft);
+  background: color-mix(in srgb, var(--text-dim) 10%, var(--bg3));
+  border-color: color-mix(in srgb, var(--text-dim) 30%, transparent);
+  border-left-color: var(--text-dim);
   color: var(--text);
 }
 
-.alertInfo svg { color: var(--text-soft); flex-shrink: 0; margin-top: 1px; }
+.alertInfo svg { color: var(--text-dim); flex-shrink: 0; margin-top: 1px; }
 
 .alertSuccess {
-  background: color-mix(in srgb, var(--text-accent) 10%, var(--bg3));
-  border-color: color-mix(in srgb, var(--text-accent) 30%, transparent);
-  border-left-color: var(--text-accent);
+  background: color-mix(in srgb, var(--text-muted) 10%, var(--bg3));
+  border-color: color-mix(in srgb, var(--text-muted) 30%, transparent);
+  border-left-color: var(--text-muted);
   color: var(--text);
 }
 
-.alertSuccess svg { color: var(--text-accent); flex-shrink: 0; margin-top: 1px; }
+.alertSuccess svg { color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
 
 .alertComplementary {
   background: color-mix(in srgb, var(--text-complementary) 10%, var(--bg3));

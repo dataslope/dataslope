@@ -16,18 +16,8 @@
      stays decoupled and is only used for CodeMirror highlighting. */
   --text-muted: color-mix(in srgb, var(--text) 78%, var(--bg) 22%);
   --text-dim: color-mix(in srgb, var(--text) 55%, var(--bg) 45%);
-  /* Theme-driven accents. `--text-soft` is a more saturated secondary
-     color (e.g. Lucario's blue #5c98cd), and `--text-accent` is the
-     theme's accent color used for table/view icons and ER headers
-     (e.g. Lucario's green #72c05d). Both are populated per-theme by
-     `applyThemePalette` from the same fields the editor highlighter
-     consumes. The defaults below kick in outside the playground or
-     before a theme has been applied. */
-  --text-soft: oklch(68% 0.12 240);
-  --text-accent: oklch(68% 0.16 145);
   /* Complementary accent drawn from the theme's function-highlight color —
-     a vibrant hue that pairs well against `--text-soft` and `--text-accent`
-     and is populated per-theme by `applyThemePalette`. */
+     a vibrant hue populated per-theme by `applyThemePalette`. */
   --text-complementary: oklch(75% 0.2 85);
   --primary: oklch(68% 0.18 250);
   --primary-glow: oklch(68% 0.18 250 / 0.15);
