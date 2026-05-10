@@ -163,6 +163,13 @@ interface PgStructureColumn {
   nullable: boolean;
   defaultValue: string | null;
   isPk: boolean;
+  /** Non-null when this is a generated column. `expression` may be edited;
+   *  `originalExpression` records the pre-edit value for change detection.
+   *  PostgreSQL only supports STORED generated columns. */
+  generated: {
+    expression: string;
+    originalExpression: string;
+  } | null;
 }
 
 let _pgStructureIdCounter = 0;
@@ -237,6 +244,43 @@ function PgStructureColumnRow({
         <span className="sql-modify-col-default-value" title={col.defaultValue ?? ""}>
           {col.defaultValue ?? <em>—</em>}
         </span>
+      </td>
+    </tr>
+  );
+}
+
+/** Row for a generated column inside the Postgres structure drawer.
+ *  PostgreSQL only supports STORED generated columns, so there is no
+ *  storage-type selector — only the expression is editable. */
+function PgGeneratedColumnRow({
+  col,
+  onExpressionChange,
+}: {
+  col: PgStructureColumn;
+  onExpressionChange: (id: string, expression: string) => void;
+}) {
+  const gen = col.generated!;
+  return (
+    <tr className="sql-modify-col-row sql-modify-gen-row">
+      <td className="sql-modify-gen-name">
+        <span className="sql-modify-gen-name-text" title={col.originalName}>
+          {col.originalName}
+        </span>
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
+      </td>
+      <td className="sql-modify-gen-expr-cell">
+        <label className="sql-modify-cell-field">
+          <input
+            className="sql-rename-input sql-modify-gen-expr"
+            value={gen.expression}
+            onChange={(e) => onExpressionChange(col.id, e.target.value)}
+            placeholder="e.g. price * quantity"
+            aria-label={`Generation expression for ${col.originalName}`}
+          />
+        </label>
+      </td>
+      <td className="sql-modify-gen-storage-cell">
+        <span className="sql-modify-col-type-badge">Stored</span>
       </td>
     </tr>
   );
@@ -1349,6 +1393,12 @@ function PostgresPlaygroundInner() {
             nullable: !c.notNull,
             defaultValue: c.defaultValue ?? null,
             isPk: c.pk > 0,
+            generated: c.generated
+              ? {
+                  expression: c.generated.expression,
+                  originalExpression: c.generated.expression,
+                }
+              : null,
           })),
         });
       } catch (err) {
@@ -1366,7 +1416,15 @@ function PostgresPlaygroundInner() {
     const engine = engineRef.current;
     if (!dialog || !engine) return;
     const renames = dialog.columns.filter(
-      (c) => c.name.trim() !== c.originalName && c.name.trim(),
+      (c) => !c.generated && c.name.trim() !== c.originalName && c.name.trim(),
+    );
+    // Generated columns whose expression changed need to be dropped and
+    // re-added with the new expression. PostgreSQL doesn't support
+    // ALTER COLUMN ... SET EXPRESSION directly in older versions.
+    const genChanges = dialog.columns.filter(
+      (c) =>
+        c.generated &&
+        c.generated.expression.trim() !== c.generated.originalExpression.trim(),
     );
     try {
       for (const col of renames) {
@@ -1374,7 +1432,20 @@ function PostgresPlaygroundInner() {
           `ALTER TABLE ${quoteIdent(dialog.tableName)} RENAME COLUMN ${quoteIdent(col.originalName)} TO ${quoteIdent(col.name.trim())}`,
         );
       }
-      if (renames.length > 0) {
+      for (const col of genChanges) {
+        const newExpr = col.generated!.expression.trim();
+        if (!newExpr) continue;
+        // Drop the existing generated column and add it back with the
+        // updated expression. This is the safe approach that works across
+        // all PostgreSQL versions.
+        await engine.exec(
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} DROP COLUMN ${quoteIdent(col.originalName)}`,
+        );
+        await engine.exec(
+          `ALTER TABLE ${quoteIdent(dialog.tableName)} ADD COLUMN ${quoteIdent(col.originalName)} ${col.type} GENERATED ALWAYS AS (${newExpr}) STORED`,
+        );
+      }
+      if (renames.length > 0 || genChanges.length > 0) {
         await refreshSchema();
         showToast(`Updated structure of "${dialog.tableName}".`);
       }
@@ -2167,66 +2238,129 @@ function PostgresPlaygroundInner() {
               </header>
               {viewStructureDialog && (
                 <div className="sql-modify-body">
-                  <DndContext
-                    sensors={pgStructureSensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event: DragEndEvent) => {
-                      const { active, over } = event;
-                      if (!over || active.id === over.id) return;
-                      const cols = viewStructureDialog.columns;
-                      const oldIndex = cols.findIndex((c) => c.id === active.id);
-                      const newIndex = cols.findIndex((c) => c.id === over.id);
-                      if (oldIndex === -1 || newIndex === -1) return;
-                      setViewStructureDialog({
-                        ...viewStructureDialog,
-                        columns: arrayMove(cols, oldIndex, newIndex),
-                      });
-                    }}
-                  >
-                    <SortableContext
-                      items={viewStructureDialog.columns.map((c) => c.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div className="sql-modify-table-wrap">
-                        <table className="sql-modify-table">
-                          <thead>
-                            <tr>
-                              <th className="sql-modify-drag-cell" aria-label="Drag handle" />
-                              <th>Name</th>
-                              <th>Type</th>
-                              <th>PK</th>
-                              <th>Nullable</th>
-                              <th>Default</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {viewStructureDialog.columns.map((col) => (
-                              <PgStructureColumnRow
-                                key={col.id}
-                                col={col}
-                                onNameChange={(id, name) =>
-                                  setViewStructureDialog((prev) =>
-                                    prev
-                                      ? {
-                                          ...prev,
-                                          columns: prev.columns.map((c) =>
-                                            c.id === id ? { ...c, name } : c,
-                                          ),
-                                        }
-                                      : null,
-                                  )
-                                }
-                              />
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </SortableContext>
-                  </DndContext>
-                  <p className="sql-modify-pg-note">
-                    <Pencil size={12} aria-hidden="true" />
-                    Rename columns above and click Save. Column order changes are visual only.
-                  </p>
+                  {/* Regular (non-generated) columns — draggable, renameable */}
+                  {(() => {
+                    const regularCols = viewStructureDialog.columns.filter(
+                      (c) => !c.generated,
+                    );
+                    const generatedCols = viewStructureDialog.columns.filter(
+                      (c) => c.generated !== null,
+                    );
+                    return (
+                      <>
+                        <DndContext
+                          sensors={pgStructureSensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={(event: DragEndEvent) => {
+                            const { active, over } = event;
+                            if (!over || active.id === over.id) return;
+                            const cols = viewStructureDialog.columns;
+                            const oldIndex = cols.findIndex((c) => c.id === active.id);
+                            const newIndex = cols.findIndex((c) => c.id === over.id);
+                            if (oldIndex === -1 || newIndex === -1) return;
+                            setViewStructureDialog({
+                              ...viewStructureDialog,
+                              columns: arrayMove(cols, oldIndex, newIndex),
+                            });
+                          }}
+                        >
+                          <SortableContext
+                            items={regularCols.map((c) => c.id)}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            <div className="sql-modify-table-wrap">
+                              <table className="sql-modify-table">
+                                <thead>
+                                  <tr>
+                                    <th className="sql-modify-drag-cell" aria-label="Drag handle" />
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>PK</th>
+                                    <th>Nullable</th>
+                                    <th>Default</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {regularCols.map((col) => (
+                                    <PgStructureColumnRow
+                                      key={col.id}
+                                      col={col}
+                                      onNameChange={(id, name) =>
+                                        setViewStructureDialog((prev) =>
+                                          prev
+                                            ? {
+                                                ...prev,
+                                                columns: prev.columns.map((c) =>
+                                                  c.id === id ? { ...c, name } : c,
+                                                ),
+                                              }
+                                            : null,
+                                        )
+                                      }
+                                    />
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </SortableContext>
+                        </DndContext>
+                        <p className="sql-modify-pg-note">
+                          <Pencil size={12} aria-hidden="true" />
+                          Rename columns above and click Save. Column order changes are visual only.
+                        </p>
+                        {generatedCols.length > 0 && (
+                          <div className="sql-modify-gen-section">
+                            <div className="sql-modify-gen-section-header">
+                              Generated columns
+                            </div>
+                            <div className="sql-modify-table-wrap">
+                              <table className="sql-modify-table">
+                                <thead>
+                                  <tr>
+                                    <th>Name / Type</th>
+                                    <th>Expression</th>
+                                    <th>Storage</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {generatedCols.map((col) => (
+                                    <PgGeneratedColumnRow
+                                      key={col.id}
+                                      col={col}
+                                      onExpressionChange={(id, expression) =>
+                                        setViewStructureDialog((prev) =>
+                                          prev
+                                            ? {
+                                                ...prev,
+                                                columns: prev.columns.map((c) =>
+                                                  c.id === id && c.generated
+                                                    ? {
+                                                        ...c,
+                                                        generated: {
+                                                          ...c.generated,
+                                                          expression,
+                                                        },
+                                                      }
+                                                    : c,
+                                                ),
+                                              }
+                                            : null,
+                                        )
+                                      }
+                                    />
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                            <p className="sql-modify-pg-note">
+                              <Pencil size={12} aria-hidden="true" />
+                              Editing an expression drops and recreates the column (PostgreSQL only supports STORED).
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
               <footer className="sql-modify-drawer-footer">

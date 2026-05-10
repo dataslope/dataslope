@@ -308,6 +308,7 @@ export function useSidebarActions(
             fkColumn: fk?.to ?? "",
             fkOnDelete: fk?.onDelete ?? "NO ACTION",
             fkOnUpdate: fk?.onUpdate ?? "NO ACTION",
+            generated: c.generated ?? null,
           };
         });
         setModifyDialog({
@@ -332,7 +333,9 @@ export function useSidebarActions(
       showToast("Table name cannot be empty.", "warn");
       return;
     }
-    const blankCols = dialog.columns.filter((c) => !c.name.trim());
+    // Only validate names for non-generated columns; generated column
+    // names cannot be changed through the UI.
+    const blankCols = dialog.columns.filter((c) => !c.generated && !c.name.trim());
     if (blankCols.length > 0) {
       showToast("Column names cannot be empty.", "warn");
       setModifyInvalidColIds(new Set(blankCols.map((c) => c.id)));
@@ -359,6 +362,7 @@ export function useSidebarActions(
               }
             : undefined,
         originalName: c.originalName ?? undefined,
+        generated: c.generated ?? undefined,
       })),
     };
     try {
@@ -471,6 +475,7 @@ export function useSidebarActions(
           fkColumn: "",
           fkOnDelete: "NO ACTION",
           fkOnUpdate: "NO ACTION",
+          generated: null,
         },
       ],
     });

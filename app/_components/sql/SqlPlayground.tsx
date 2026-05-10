@@ -555,6 +555,7 @@ interface ModifyColumnDraft {
   fkColumn: string;
   fkOnDelete: string;
   fkOnUpdate: string;
+  generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
 }
 
 function newDraftId(): string {
