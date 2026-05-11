@@ -2146,8 +2146,12 @@ function PostgresPlaygroundInner() {
           .map((col) => quoteIdent(col.name));
         const orderBy =
           pkCols.length > 0 ? ` ORDER BY ${pkCols.join(", ")}` : "";
-        const sql = `SELECT * FROM ${quoteIdent(tableName)}${orderBy};`;
-        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+        // Pass the bare SELECT (without ORDER BY) as baseSql so that
+        // subsequent column-header sorting doesn't produce a double-ORDER-BY
+        // syntax error ("... ORDER BY pk ORDER BY col ASC").
+        const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
+        const sql = `${baseSql}${orderBy};`;
+        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Failed to update cells in "${tableName}": ${msg}`, "warn");
