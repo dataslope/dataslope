@@ -1377,13 +1377,19 @@
   backdrop-filter: blur(8px);
 }
 
-/* Run button and split-run button: flush left edge connects to the
-   shortcuts area, so the whole toolbar reads as one compound element.
-   Use border-radius: 0 to let the toolbar's own border-radius + overflow:hidden
-   clip the corners instead. */
+.sql-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--bg2) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-radius: 0 10px 10px 0;
+}
+
 .sql-toolbar .run-btn,
 .sql-toolbar .run-btn-split {
-  border-radius: 0;
+  border-radius: 6px;
 }
 
 .sql-toolbar-shortcut-sep {
