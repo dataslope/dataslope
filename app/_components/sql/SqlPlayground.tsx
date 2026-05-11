@@ -2734,19 +2734,16 @@ function SqlPlaygroundInner() {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          extraGeneralRows={
-            <>
-              <div className="setting-row">
-                <button
-                  type="button"
-                  className="settings-action-btn"
-                  onClick={resetTabsForCurrentDb}
-                >
-                  <RotateCcw size={14} aria-hidden="true" />
-                  <span>Reset query tabs for {activeSample.label}</span>
-                </button>
-              </div>
-            </>
+          extraGeneralRows={null}
+          extraActionRows={
+            <button
+              type="button"
+              className="settings-action-btn"
+              onClick={resetTabsForCurrentDb}
+            >
+              <RotateCcw size={14} aria-hidden="true" />
+              <span>Reset query tabs for {activeSample.label}</span>
+            </button>
           }
           extraTabs={[
             {

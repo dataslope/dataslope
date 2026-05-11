@@ -13,10 +13,12 @@ import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
 import {
   ALargeSmall,
+  Eraser,
   Palette,
   RotateCcw,
   Sliders,
   Trash2,
+  WrapText,
 } from "lucide-react";
 import {
   ALL_THEMES,
@@ -273,6 +275,10 @@ export interface SettingsPanelProps {
   /** Optional extra rows appended inside the General tab — used by the
    *  SQL playground to surface a per-DB "Reset query tabs" action. */
   extraGeneralRows?: ReactNode;
+  /** Optional extra action buttons prepended inside the `.settings-actions`
+   *  group — used by the SQL playground to surface "Reset query tabs" next
+   *  to the other destructive actions so all three form one grouped button. */
+  extraActionRows?: ReactNode;
   /** Optional extra settings tabs rendered after "Editor Themes". Each
    *  entry provides the tab trigger and its panel content. Used by the
    *  SQL playground to surface the Pragmas tab. */
@@ -307,6 +313,7 @@ export function SettingsPanel({
   onRestoreDefaults,
   onClearLocalStorage,
   extraGeneralRows,
+  extraActionRows,
   extraTabs,
 }: SettingsPanelProps) {
   const [tab, setTab] = useState<string>("general");
@@ -414,7 +421,10 @@ export function SettingsPanel({
 
                 <div className="setting-row">
                   <label className="setting-switch-row">
-                    <span>Word Wrap</span>
+                    <span className="setting-switch-label">
+                      <WrapText size={14} aria-hidden="true" />
+                      <span>Word Wrap</span>
+                    </span>
                     <Switch.Root
                       checked={wordWrap}
                       onCheckedChange={setWordWrap}
@@ -427,8 +437,11 @@ export function SettingsPanel({
 
                 <div className="setting-row">
                   <label className="setting-switch-row">
-                    <span>
-                      {clearBeforeRunLabel ?? "Clear Output Before Running"}
+                    <span className="setting-switch-label">
+                      <Eraser size={14} aria-hidden="true" />
+                      <span>
+                        {clearBeforeRunLabel ?? "Clear Output Before Running"}
+                      </span>
                     </span>
                     <Switch.Root
                       checked={clearBeforeRun}
@@ -443,6 +456,7 @@ export function SettingsPanel({
                 {extraGeneralRows}
 
                 <div className="settings-actions">
+                  {extraActionRows}
                   <button
                     type="button"
                     className="settings-action-btn"
