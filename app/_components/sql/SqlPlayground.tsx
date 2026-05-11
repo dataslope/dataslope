@@ -20,10 +20,12 @@
 
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -170,7 +172,7 @@ import {
 import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
 import { ToastList } from "./components/ToastList";
-import { SqlTab } from "./components/SqlTab";
+import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import {
   createSqlCompletionSource,
@@ -2368,6 +2370,26 @@ function SqlPlaygroundInner() {
   const tabDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
+  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
+  const draggingTab = draggingTabId
+    ? tabs.find((t) => t.id === draggingTabId) ?? null
+    : null;
+
+  const onTabDragStart = useCallback(
+    (event: DragStartEvent) => {
+      setDraggingTabId(String(event.active.id));
+      handleTabDragStart(event);
+    },
+    [handleTabDragStart],
+  );
+
+  const onTabDragEnd = useCallback(
+    (event: Parameters<typeof handleTabDragEnd>[0]) => {
+      setDraggingTabId(null);
+      handleTabDragEnd(event);
+    },
+    [handleTabDragEnd],
+  );
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -4475,8 +4497,8 @@ function SqlPlaygroundInner() {
               <DndContext
                 sensors={tabDragSensors}
                 collisionDetection={closestCenter}
-                onDragStart={handleTabDragStart}
-                onDragEnd={handleTabDragEnd}
+                onDragStart={onTabDragStart}
+                onDragEnd={onTabDragEnd}
               >
                 <SortableContext
                   items={tabIds}
@@ -4514,6 +4536,11 @@ function SqlPlaygroundInner() {
                     ))}
                   </div>
                 </SortableContext>
+                <DragOverlay dropAnimation={null}>
+                  {draggingTab ? (
+                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
+                  ) : null}
+                </DragOverlay>
               </DndContext>
               {/* The "new tab" (+) button sits outside the scrollable
                   .sql-tabs container so it remains pinned at the right
