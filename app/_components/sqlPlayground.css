@@ -1234,15 +1234,18 @@
   animation: sql-tab-appear 0.15s ease both;
 }
 
+/* Note: do NOT animate `transform` here. With `animation-fill-mode: both`,
+   a `transform` keyframe value (even the identity `scaleX(1)`) persists
+   after the animation ends and overrides the inline `transform` set by
+   @dnd-kit/sortable — which silently breaks the live tab reordering as
+   you drag. Use opacity + max-width for the entry effect instead. */
 @keyframes sql-tab-appear {
   from {
     opacity: 0;
-    transform: scaleX(0.7);
     max-width: 0;
   }
   to {
     opacity: 1;
-    transform: scaleX(1);
     max-width: 300px;
   }
 }
