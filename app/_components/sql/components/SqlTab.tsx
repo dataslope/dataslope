@@ -49,7 +49,7 @@ export function SqlTab({
   const dragStyle: React.CSSProperties = {
     transform: DndCSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : undefined,
+    opacity: isDragging ? 0 : undefined,
     zIndex: isDragging ? 10 : undefined,
   };
 
@@ -227,5 +227,36 @@ export function SqlTab({
         </ContextMenu.Portal>
       </ContextMenu.Root>
     </>
+  );
+}
+
+/** Lightweight clone of a tab rendered inside DragOverlay (no DnD or context menu). */
+export function SqlTabDragOverlay({
+  tab,
+  active,
+}: {
+  tab: QueryTab;
+  active: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}`}
+      style={{ opacity: 0.85, cursor: "grabbing" }}
+    >
+      {tab.kind === "view-data" && (
+        <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+      )}
+      {tab.kind === "er-diagram" && (
+        <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+      )}
+      {tab.kind === "query-history" && (
+        <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
+      )}
+      <span className="sql-tab-title">{tab.title}</span>
+      <span className="sql-tab-close">
+        <X size={10} aria-hidden="true" />
+      </span>
+    </button>
   );
 }

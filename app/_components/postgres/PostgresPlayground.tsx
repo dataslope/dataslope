@@ -2,12 +2,14 @@
 
 import {
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -122,7 +124,7 @@ import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
-import { SqlTab } from "../sql/components/SqlTab";
+import { SqlTab, SqlTabDragOverlay } from "../sql/components/SqlTab";
 import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
@@ -1175,6 +1177,10 @@ function PostgresPlaygroundInner() {
   const tabDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
+  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
+  const draggingTab = draggingTabId
+    ? tabs.find((t) => t.id === draggingTabId) ?? null
+    : null;
 
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
@@ -1184,6 +1190,30 @@ function PostgresPlaygroundInner() {
     },
     [],
   );
+
+  const handleTabDragStart = useCallback((event: DragStartEvent) => {
+    const id = String(event.active.id);
+    setDraggingTabId(id);
+    setActiveTabId(id);
+  }, []);
+
+  const handleTabDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setDraggingTabId(null);
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const current = tabsRef.current;
+      const oldIndex = current.findIndex((t) => t.id === active.id);
+      const newIndex = current.findIndex((t) => t.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
+      persistTabs(arrayMove(current, oldIndex, newIndex));
+    },
+    [persistTabs],
+  );
+
+  const handleTabDragCancel = useCallback(() => {
+    setDraggingTabId(null);
+  }, []);
 
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
@@ -3993,6 +4023,9 @@ function PostgresPlaygroundInner() {
               <DndContext
                 sensors={tabDragSensors}
                 collisionDetection={closestCenter}
+                onDragStart={handleTabDragStart}
+                onDragEnd={handleTabDragEnd}
+                onDragCancel={handleTabDragCancel}
               >
                 <SortableContext
                   items={tabIds}
@@ -4043,6 +4076,11 @@ function PostgresPlaygroundInner() {
                     ))}
                   </div>
                 </SortableContext>
+                <DragOverlay dropAnimation={null}>
+                  {draggingTab ? (
+                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
+                  ) : null}
+                </DragOverlay>
               </DndContext>
               <button
                 type="button"
