@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -83,6 +83,7 @@ export function ModifyColumnRow({
   onChange,
   onRemove,
   hasNameError,
+  onBlurName,
   knownTables,
   engine,
 }: {
@@ -90,6 +91,7 @@ export function ModifyColumnRow({
   onChange: (patch: Partial<ModifyColumnDraft>) => void;
   onRemove: () => void;
   hasNameError?: boolean;
+  onBlurName?: () => void;
   knownTables: string[];
   engine: SqliteEngine | null;
 }) {
@@ -140,8 +142,10 @@ export function ModifyColumnRow({
             className={`sql-rename-input sql-modify-col-name${hasNameError ? " sql-modify-col-name-error" : ""}`}
             value={col.name}
             onChange={(e) => onChange({ name: e.target.value })}
+            onBlur={onBlurName}
             placeholder="column name"
             aria-label="Column name"
+            data-col-id={col.id}
           />
         </label>
       </td>
@@ -314,8 +318,10 @@ function GeneratedColumnRow({
           <span className="sql-modify-gen-name-text" title={col.name}>
             {col.name}
           </span>
-          <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
         </div>
+      </td>
+      <td className="sql-modify-gen-storage-cell">
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
       </td>
       <td className="sql-modify-gen-expr-cell">
         <GenExprEditor
@@ -405,6 +411,9 @@ export function ModifyStructureForm({
   const [isDragging, setIsDragging] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [itemDdls, setItemDdls] = useState<Record<string, string>>({});
+  const [touchedColIds, setTouchedColIds] = useState<Set<string>>(new Set());
+  const [pendingFocusId, setPendingFocusId] = useState<string | null>(null);
+  const formBodyRef = useRef<HTMLDivElement | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -452,8 +461,9 @@ export function ModifyStructureForm({
     // ordering stays sensible (regular columns first, generated last).
     const firstGenIdx = state.columns.findIndex((c) => c.generated !== null);
     const insertAt = firstGenIdx === -1 ? state.columns.length : firstGenIdx;
+    const newId = newDraftId();
     const newCol: ModifyColumnDraft = {
-      id: newDraftId(),
+      id: newId,
       originalName: null,
       name: "",
       type: "TEXT",
@@ -471,6 +481,7 @@ export function ModifyStructureForm({
     const next = [...state.columns];
     next.splice(insertAt, 0, newCol);
     onChange({ ...state, columns: next });
+    setPendingFocusId(newId);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -482,6 +493,17 @@ export function ModifyStructureForm({
     if (oldIndex === -1 || newIndex === -1) return;
     onChange({ ...state, columns: arrayMove(state.columns, oldIndex, newIndex) });
   };
+
+  useEffect(() => {
+    if (!pendingFocusId) return;
+    const input = formBodyRef.current?.querySelector<HTMLElement>(
+      `[data-col-id="${pendingFocusId}"]`,
+    );
+    if (input) {
+      input.focus();
+      setPendingFocusId(null);
+    }
+  }, [pendingFocusId]);
 
   // Split columns into regular and generated so they can be rendered
   // in separate sections inside the Columns tab.
@@ -515,7 +537,7 @@ export function ModifyStructureForm({
   }, [engine, state.originalName, refreshKey]);
 
   return (
-    <div className="sql-modify-body">
+    <div className="sql-modify-body" ref={formBodyRef}>
       <label className="sql-modify-field">
         <span className="sql-modify-field-label">Table name</span>
         <input
@@ -620,7 +642,13 @@ export function ModifyStructureForm({
                             col={col}
                             onChange={(patch) => updateColumn(col.id, patch)}
                             onRemove={() => removeColumn(col.id)}
-                            hasNameError={invalidColumnIds?.has(col.id) ?? false}
+                            hasNameError={
+                              (invalidColumnIds?.has(col.id) ?? false) ||
+                              (touchedColIds.has(col.id) && !col.name.trim())
+                            }
+                            onBlurName={() =>
+                              setTouchedColIds((prev) => new Set([...prev, col.id]))
+                            }
                             knownTables={knownTables}
                             engine={engine}
                           />
@@ -642,6 +670,16 @@ export function ModifyStructureForm({
             <Plus size={12} aria-hidden="true" /> Add column
           </button>
 
+          {regularColumns.some(
+            (col) =>
+              !col.name.trim() &&
+              (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
+          ) && (
+            <div className="sql-modify-validation" role="alert">
+              Column names cannot be empty.
+            </div>
+          )}
+
           {generatedColumns.length > 0 && (
             <div className="sql-modify-gen-section">
               <div className="sql-modify-gen-section-header">
@@ -651,7 +689,8 @@ export function ModifyStructureForm({
                 <table className="sql-modify-table">
                   <thead>
                     <tr>
-                      <th>Name / Type</th>
+                      <th>Name</th>
+                      <th>Type</th>
                       <th>Expression</th>
                       <th>Storage</th>
                       <th>Actions</th>

@@ -162,6 +162,7 @@ export interface PostgresEngine {
   listColumns: (name: string) => Promise<TableColumnInfo[]>;
   listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
   getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
+  createTable: (name: string, columns: ColumnSpec[]) => Promise<void>;
   rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
   dropEntity: (
     name: string,
@@ -430,6 +431,19 @@ export async function createPostgresEngine(
         ),
         isUnique: unique.has(col.name),
       }));
+    },
+
+    async createTable(name, columns) {
+      const finalName = name.trim();
+      if (!finalName) throw new Error("Table name cannot be empty.");
+      const filteredCols = columns.filter((col) => col.name.trim()).map((col) => ({
+        ...col,
+        name: col.name.trim(),
+        type: (col.type || "text").trim(),
+      }));
+      if (filteredCols.length === 0) throw new Error("A table must have at least one column.");
+      const createSql = renderPgCreateTable(finalName, filteredCols);
+      await db.exec(createSql);
     },
 
     async rebuildTable(spec) {
