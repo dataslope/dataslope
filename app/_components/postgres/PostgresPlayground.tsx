@@ -73,6 +73,7 @@ import {
   Play,
   Plus,
   RotateCcw,
+  Table,
   Trash2,
   TriangleAlert,
   X,
@@ -1061,6 +1062,13 @@ function PostgresPlaygroundInner() {
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
     useState<PgStructureDialogState | null>(null);
+  const [viewStructureTouchedColIds, setViewStructureTouchedColIds] = useState<
+    Set<string>
+  >(new Set());
+  const [viewStructurePendingFocusId, setViewStructurePendingFocusId] = useState<
+    string | null
+  >(null);
+  const viewStructureBodyRef = useRef<HTMLDivElement | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<PgStructureDialogState | null>(null);
   const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<
@@ -1081,6 +1089,32 @@ function PostgresPlaygroundInner() {
     () => validatePgStructure(viewStructureDialog, columnsByEntity),
     [viewStructureDialog, columnsByEntity],
   );
+  // Only include NEW columns (originalName === null) that have been touched
+  // (blurred) or already have a non-empty name so that empty-name errors
+  // don't appear until the user has had a chance to type something.
+  // Existing columns always show validation errors immediately.
+  const viewStructureDisplayValidation = useMemo(() => {
+    if (!viewStructureDialog) {
+      return {
+        invalidColumnIds: new Set<string>(),
+        errors: [] as string[],
+        hasTableNameError: false,
+        isValid: false,
+        isDirty: false,
+      };
+    }
+    const displayCols = viewStructureDialog.columns.filter(
+      (c) =>
+        c.generated ||
+        c.originalName !== null ||
+        c.name.trim() ||
+        viewStructureTouchedColIds.has(c.id),
+    );
+    return validatePgStructure(
+      { ...viewStructureDialog, columns: displayCols },
+      columnsByEntity,
+    );
+  }, [viewStructureDialog, viewStructureTouchedColIds, columnsByEntity]);
   const addTableValidation = useMemo(
     () => validatePgStructure(addTableDialog, columnsByEntity),
     [addTableDialog, columnsByEntity],
@@ -1332,6 +1366,18 @@ function PostgresPlaygroundInner() {
       void runSqlForTab(tab.id, sql, tab.title);
     };
   }, [runActiveTab, runSqlForTab]);
+
+  // Focus the newly added column's name input in the View/Edit Structure drawer.
+  useEffect(() => {
+    if (!viewStructurePendingFocusId) return;
+    const input = viewStructureBodyRef.current?.querySelector<HTMLElement>(
+      `[data-col-id="${viewStructurePendingFocusId}"]`,
+    );
+    if (input) {
+      input.focus();
+      setViewStructurePendingFocusId(null);
+    }
+  }, [viewStructurePendingFocusId]);
 
   // Focus the newly added column's name input in the Add Table drawer.
   useEffect(() => {
@@ -3112,7 +3158,10 @@ function PostgresPlaygroundInner() {
         <Dialog.Root
           open={viewStructureDialog !== null}
           onOpenChange={(next) => {
-            if (!next) setViewStructureDialog(null);
+            if (!next) {
+              setViewStructureDialog(null);
+              setViewStructureTouchedColIds(new Set());
+            }
           }}
         >
           <Dialog.Portal>
@@ -3124,6 +3173,7 @@ function PostgresPlaygroundInner() {
                     View/Edit Structure
                   </Dialog.Title>
                   <Dialog.Description className="sql-modify-drawer-subtitle">
+                    <Table size={12} className="sql-modify-drawer-entity-icon" aria-hidden="true" />
                     {viewStructureDialog?.tableName ?? ""}
                   </Dialog.Description>
                 </div>
@@ -3135,7 +3185,7 @@ function PostgresPlaygroundInner() {
                 </Dialog.Close>
               </header>
               {viewStructureDialog && (
-                <div className="sql-modify-body">
+                <div className="sql-modify-body" ref={viewStructureBodyRef}>
                   <label className="sql-modify-field">
                     <span className="sql-modify-field-label">Table name</span>
                     <input
@@ -3242,9 +3292,15 @@ function PostgresPlaygroundInner() {
                                               : null,
                                           )
                                         }
-                                        hasError={pgStructureValidation.invalidColumnIds.has(
+                                        hasError={viewStructureDisplayValidation.invalidColumnIds.has(
                                           col.id,
                                         )}
+                                        onBlurName={() =>
+                                          setViewStructureTouchedColIds(
+                                            (prev) =>
+                                              new Set([...prev, col.id]),
+                                          )
+                                        }
                                         knownTables={tables}
                                         columnsByTable={columnsByEntity}
                                       />
@@ -3258,7 +3314,9 @@ function PostgresPlaygroundInner() {
                         <button
                           type="button"
                           className="confirm-btn confirm-btn-secondary sql-modify-add"
-                          onClick={() =>
+                          onClick={() => {
+                            const newCol = makeNewPgColumn();
+                            setViewStructurePendingFocusId(newCol.id);
                             setViewStructureDialog((prev) => {
                               if (!prev) return null;
                               const firstGenIdx = prev.columns.findIndex(
@@ -3269,20 +3327,16 @@ function PostgresPlaygroundInner() {
                                   ? prev.columns.length
                                   : firstGenIdx;
                               const nextColumns = [...prev.columns];
-                              nextColumns.splice(
-                                insertAt,
-                                0,
-                                makeNewPgColumn(),
-                              );
+                              nextColumns.splice(insertAt, 0, newCol);
                               return { ...prev, columns: nextColumns };
-                            })
-                          }
+                            });
+                          }}
                         >
                           <Plus size={12} aria-hidden="true" /> Add column
                         </button>
-                        {pgStructureValidation.errors.length > 0 && (
+                        {viewStructureDisplayValidation.errors.length > 0 && (
                           <div className="sql-modify-validation" role="alert">
-                            {pgStructureValidation.errors.map((error) => (
+                            {viewStructureDisplayValidation.errors.map((error) => (
                               <div key={error}>{error}</div>
                             ))}
                           </div>
@@ -3360,6 +3414,17 @@ function PostgresPlaygroundInner() {
                 </div>
               )}
               <footer className="sql-modify-drawer-footer">
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-danger sql-modify-drawer-drop"
+                  onClick={() => {
+                    const name = viewStructureDialog?.tableName;
+                    setViewStructureDialog(null);
+                    if (name) requestDropEntity(name, "table");
+                  }}
+                >
+                  Drop Table
+                </button>
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
