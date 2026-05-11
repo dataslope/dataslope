@@ -243,12 +243,12 @@
   z-index: 600;
   max-width: 260px;
   padding: 7px 9px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--text);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .sql-tree-popover strong {
@@ -265,6 +265,10 @@
 .sql-tree-popover-name svg {
   flex-shrink: 0;
   color: var(--accent1);
+}
+
+.sql-tree-popover-hint {
+  color: var(--text-dim);
 }
 
 .sql-tree-item svg {
@@ -884,7 +888,7 @@
   padding: 6px 12px;
   border-top: 1px solid var(--border);
   background: var(--bg2);
-  color: var(--text-dim);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 12px;
   flex-wrap: wrap;
@@ -901,7 +905,7 @@
 /* The total row count is highlighted so the user can see at a glance
    how many rows the query returned, even when paginated. */
 .sql-result-pager-total {
-  color: var(--text-dim);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -915,10 +919,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
+  width: 20px;
   height: 22px;
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -1033,8 +1037,8 @@
   width: 22px;
   height: 22px;
   background: transparent;
-  color: var(--text-dim);
-  border: none;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
   border-radius: 4px;
   cursor: pointer;
   padding: 0;
@@ -1042,7 +1046,6 @@
 }
 .sql-result-export-btn:hover {
   background: var(--bg3);
-  color: var(--text);
 }
 
 .sql-result-export-group-label {
@@ -2352,7 +2355,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
-  color: var(--text-dim);
+  color: var(--accent1);
   text-transform: lowercase;
 }
 
@@ -2908,7 +2911,7 @@
 
 .er-table-header-icon {
   flex-shrink: 0;
-  color: var(--text-muted);
+  color: var(--accent1);
 }
 
 .er-table-header-name {

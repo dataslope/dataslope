@@ -161,7 +161,7 @@ export function SchemaItem({
                         <Icon size={12} aria-hidden="true" />
                         <strong>{name}</strong>
                       </span>
-                      <span>{itemHint}</span>
+                      <span className="sql-tree-popover-hint">{itemHint}</span>
                     </Popover.Popup>
                   </Popover.Positioner>
                 </Popover.Portal>

@@ -325,7 +325,7 @@ body.pg-active {
   background: transparent;
   border: none;
   border-radius: 0;
-  color: var(--text-muted);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
   cursor: pointer;
@@ -344,8 +344,7 @@ body.pg-active {
   border-left: 1px solid var(--border);
 }
 .header-btn:hover:not(:disabled) {
-  background: var(--bg3);
-  color: var(--text);
+  background: color-mix(in srgb, var(--bg3) 50%, var(--bg2));
 }
 /* Wash out disabled header buttons and suppress interaction cues. */
 .header-btn:disabled {
@@ -1282,11 +1281,11 @@ body.pg-active {
 .settings-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: color-mix(in srgb, var(--bg3) 40%, transparent);
-  border: none;
-  color: var(--text-dim);
+  gap: 10px;
+  padding: 13px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
@@ -1297,8 +1296,7 @@ body.pg-active {
     color 0.15s;
 }
 .settings-action-btn:hover {
-  background: color-mix(in srgb, var(--bg3) 70%, transparent);
-  color: var(--text);
+  border-color: color-mix(in srgb, var(--text) 40%, var(--border) 60%);
 }
 .settings-action-btn svg {
   flex-shrink: 0;
@@ -1306,9 +1304,13 @@ body.pg-active {
 }
 .settings-action-danger {
   color: var(--red);
+  border-color: var(--red);
+  /* border: none; */
 }
 .settings-action-danger:hover {
   color: var(--red);
+  border-color: oklch(from var(--red) calc(l - 0.3) c h);
+  /* background-color: oklch(from var(--red) calc(l - 0.05) c h); */
 }
 
 /* Editor-themes tab — grid of preview cards. */
@@ -1452,7 +1454,7 @@ body.pg-active {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -3047,18 +3049,18 @@ html[data-pg-theme="light"] .toast {
    editor-themed background (which can use a colored "muted" hue that
    doesn't read as a UI label). Light themes keep the existing palette. */
 html[data-pg-theme="dark"] .header-btn {
-  color: #ffffff;
+  color: var(--text);
 }
 html[data-pg-theme="dark"] .header-btn:disabled {
-  color: color-mix(in srgb, #ffffff 45%, transparent);
+  color: color-mix(in srgb, var(--text) 45%, transparent);
 }
 html[data-pg-theme="dark"] .header-btn:hover:not(:disabled),
 html[data-pg-theme="dark"] .header-btn:focus-visible,
 html[data-pg-theme="dark"] .header-btn[data-popup-open] {
-  color: #ffffff;
+  color: var(--text);
 }
 html[data-pg-theme="dark"] .welcome h3 {
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* ─── Pragma settings tab ─────────────────────────────────────────────────
@@ -3131,9 +3133,9 @@ html[data-pg-theme="dark"] .welcome h3 {
 }
 .pragma-info-text {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
 }
 
 /* Native <select> for journal_mode / synchronous / page_size. Inherits
@@ -3174,7 +3176,7 @@ html[data-pg-theme="dark"] .welcome h3 {
 }
 .pragma-checkbox-label {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text);
   min-width: 54px;
 }
 

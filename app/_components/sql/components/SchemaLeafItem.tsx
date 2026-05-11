@@ -59,8 +59,8 @@ export function SchemaLeafItem({
                     align="start"
                   >
                     <Popover.Popup className="bui-popup sql-tree-popover">
-                      <strong>{name}</strong>
-                      <span>{itemHint}</span>
+                      <strong className="sql-tree-popover-name">{name}</strong>
+                      <span className="sql-tree-popover-hint">{itemHint}</span>
                     </Popover.Popup>
                   </Popover.Positioner>
                 </Popover.Portal>
