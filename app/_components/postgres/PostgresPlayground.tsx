@@ -1045,6 +1045,7 @@ function PostgresPlaygroundInner() {
     name: string;
     kind: "table" | "view" | "index" | "trigger";
   } | null>(null);
+  const [pendingTruncate, setPendingTruncate] = useState<string | null>(null);
   const [ddlDialog, setDdlDialog] = useState<{
     title: string;
     sql: string;
@@ -2218,6 +2219,12 @@ function PostgresPlaygroundInner() {
   }, [addRowDialog, showToast]);
 
   const copyEntityName = useCallback(
+    (name: string) => {
+      void navigator.clipboard?.writeText(name);
+      showToast(`Copied "${name}".`);
+    },
+    [showToast],
+  );
 
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -2313,6 +2320,25 @@ function PostgresPlaygroundInner() {
       );
     }
   }, [pendingDropEntity, refreshSchema, showToast]);
+
+  const truncateEntity = useCallback((name: string) => {
+    setPendingTruncate(name);
+  }, []);
+
+  const confirmTruncate = useCallback(async () => {
+    const name = pendingTruncate;
+    if (!name) return;
+    setPendingTruncate(null);
+    try {
+      await engineRef.current?.truncateTable(name);
+      showToast(`Truncated table "${name}".`);
+    } catch (err) {
+      showToast(
+        `Truncate failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [pendingTruncate, showToast]);
 
   const exportEntity = useCallback(
     async (
@@ -3417,6 +3443,38 @@ function PostgresPlaygroundInner() {
         </AlertDialog.Root>
 
         <AlertDialog.Root
+          open={pendingTruncate !== null}
+          onOpenChange={(next) => {
+            if (!next) setPendingTruncate(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Truncate table?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                Truncate table <strong>{pendingTruncate}</strong>? This deletes
+                every row but keeps the schema. The change is in-memory only and
+                will be undone next page load.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => void confirmTruncate()}
+                >
+                  Truncate
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
+        <AlertDialog.Root
           open={confirmRestoreOpen}
           onOpenChange={setConfirmRestoreOpen}
         >
@@ -4240,6 +4298,7 @@ function PostgresPlaygroundInner() {
                     }
                     onPreview={previewEntity}
                     onAddRow={(n) => void openAddRow(n)}
+                    onTruncate={truncateEntity}
                     onModifyStructure={(n) => void openViewStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
@@ -4566,6 +4625,7 @@ function PostgresPlaygroundInner() {
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
                 onAddRow={(n) => void openAddRow(n)}
+                onTruncate={truncateEntity}
                 onModifyStructure={(n) => void openViewStructure(n)}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
