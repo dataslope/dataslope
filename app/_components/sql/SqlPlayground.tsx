@@ -1516,6 +1516,7 @@ function SqlPlaygroundInner() {
   const {
     runSqlForTab,
     handleLoadPage,
+    handleLoadMorePage,
     handleFetchAllRows,
     runActiveTab,
     runSelection,
@@ -4712,6 +4713,7 @@ function SqlPlaygroundInner() {
                   globalPageSize={globalPageSize}
                   onSetGlobalPageSize={setGlobalPageSize}
                   onLoadPage={handleLoadPage}
+                  onLoadMorePage={handleLoadMorePage}
                   onExportSnapshotChange={setResultSetExportSnapshot}
                   onExportResultSet={handleResultSetExport}
                 />

@@ -123,6 +123,8 @@ import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import { SqlTab } from "../sql/components/SqlTab";
 import { ResultView } from "../sql/components/ResultView";
+
+const LAZY_ALL_PAGE_SIZE = 500;
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
@@ -1248,9 +1250,9 @@ function PostgresPlaygroundInner() {
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
       const useLazy =
-        globalPageSize > 0 &&
-        isSingleSelectSql(trimmed, noComments) &&
-        !hasLimitClause(noComments);
+        isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
+      const lazyPageSizeForRun =
+        globalPageSize > 0 ? globalPageSize : LAZY_ALL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -1261,15 +1263,15 @@ function PostgresPlaygroundInner() {
         if (useLazy) {
           const lazy = await engine.execPaged(
             trimmed,
-            globalPageSize,
-            page * globalPageSize,
+            lazyPageSizeForRun,
+            page * lazyPageSizeForRun,
           );
           sets = lazy.result;
           lazySql = trimmed.replace(/\s*;+\s*$/, "");
           lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
           lazyTotalCount = lazy.totalCount;
           lazyPage = page;
-          lazyPageSize = globalPageSize;
+          lazyPageSize = lazyPageSizeForRun;
         } else {
           sets = await engine.exec(trimmed);
         }
@@ -1286,6 +1288,7 @@ function PostgresPlaygroundInner() {
             lazyTotalCount,
             lazyPage,
             lazyPageSize,
+            lazyInfinite: globalPageSize === 0 && useLazy,
           },
         }));
         addHistoryEntry({
@@ -2001,6 +2004,56 @@ function PostgresPlaygroundInner() {
       );
     },
     [resultsByTab, runSqlForTab],
+  );
+
+  const handleLoadMorePage = useCallback(
+    async (sql: string, page: number) => {
+      const engine = engineRef.current;
+      if (!engine || runningRef.current) return;
+      const tabId = activeTabIdRef.current;
+      const curResult = resultsByTab[tabId];
+      if (!curResult?.lazySql || !curResult.lazyInfinite) return;
+      const pageSize = curResult.lazyPageSize ?? LAZY_ALL_PAGE_SIZE;
+      const offset = page * pageSize;
+      const currentSet = curResult.sets[0];
+      if (!currentSet || currentSet.values.length !== offset) return;
+      runningRef.current = true;
+      try {
+        const lazy = await engine.execPaged(sql, pageSize, offset);
+        const nextSet = lazy.result[0];
+        if (!nextSet || nextSet.values.length === 0) return;
+        setResultsByTab((prev) => {
+          const latest = prev[tabId];
+          const latestSet = latest?.sets[0];
+          if (
+            !latest?.lazyInfinite ||
+            !latestSet ||
+            latestSet.values.length !== offset
+          ) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [tabId]: {
+              ...latest,
+              sets: [
+                {
+                  ...latestSet,
+                  values: [...latestSet.values, ...nextSet.values],
+                },
+                ...latest.sets.slice(1),
+              ],
+              lazyTotalCount: lazy.totalCount,
+            },
+          };
+        });
+      } catch {
+        // Keep the already-loaded rows visible if the next chunk fails.
+      } finally {
+        runningRef.current = false;
+      }
+    },
+    [resultsByTab],
   );
 
   const copyEntityName = useCallback(
@@ -4167,6 +4220,9 @@ function PostgresPlaygroundInner() {
                     globalPageSize={globalPageSize}
                     onSetGlobalPageSize={setGlobalPageSize}
                     onLoadPage={handleLoadPage}
+                    onLoadMorePage={(sql, page) =>
+                      void handleLoadMorePage(sql, page)
+                    }
                     onExportSnapshotChange={setResultSetExportSnapshot}
                     onExportResultSet={(format, scope) =>
                       void exportResultSet(format, scope)
