@@ -535,8 +535,8 @@ body.pg-active {
 }
 
 .run-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   flex-shrink: 0;
   /* The lucide `Play` icon is stroke-based, so colour both the stroke
      and the fill so the triangle reads as a solid white glyph. */
@@ -591,8 +591,8 @@ body.pg-active {
   filter: none;
 }
 .run-btn-split-main svg {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   flex-shrink: 0;
   fill: white;
   stroke: white;

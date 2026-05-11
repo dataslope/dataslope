@@ -4556,6 +4556,7 @@ function SqlPlaygroundInner() {
                     <kbd className="kbd">Enter</kbd>
                   </span>
                 </div>
+                <div className="sql-toolbar-actions">
                 {hasEditorSelection ? (
                   <div
                     className={`run-btn-split${statusState === "running" ? " running" : ""}`}
@@ -4654,6 +4655,7 @@ function SqlPlaygroundInner() {
                     {statusState === "running" ? "Running…" : "Run"}
                   </button>
                 )}
+                </div>
               </div>
             </div>
 
