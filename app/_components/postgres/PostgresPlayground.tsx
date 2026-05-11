@@ -106,6 +106,7 @@ import {
   setStoredEditorTheme,
 } from "../playgroundTheme";
 import {
+  DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
   RuntimeInfoContent,
   SettingsPanel,
@@ -4217,7 +4218,7 @@ function PostgresPlaygroundInner() {
                 <section className="sql-results-pane">
                   <ResultView
                     result={result}
-                    loading={statusState === "running"}
+                    loading={statusState === "loading"}
                     keyHints={resultKeyHints}
                     sourceTable={result?.sourceTable}
                     globalPageSize={globalPageSize}
@@ -4231,6 +4232,7 @@ function PostgresPlaygroundInner() {
                       void exportResultSet(format, scope)
                     }
                   />
+                  <DataslopeRunOverlay running={statusState === "running"} />
                 </section>
               </Fragment>
             )}
