@@ -1233,6 +1233,7 @@ function PostgresPlaygroundInner() {
       sourceTable?: string,
       page = 0,
       baseSql?: string,
+      explicitPageSize?: number,
     ) => {
       const engine = engineRef.current;
       if (!engine || runningRef.current) return;
@@ -1250,8 +1251,10 @@ function PostgresPlaygroundInner() {
       const noComments = stripSqlComments(trimmed);
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
+      const effectivePageSize =
+        explicitPageSize !== undefined ? explicitPageSize : globalPageSize;
       const lazyPageSizeForRun =
-        globalPageSize > 0 ? globalPageSize : INFINITE_SCROLL_PAGE_SIZE;
+        effectivePageSize > 0 ? effectivePageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -1287,7 +1290,7 @@ function PostgresPlaygroundInner() {
             lazyTotalCount,
             lazyPage,
             lazyPageSize,
-            lazyInfinite: globalPageSize === 0 && useLazy,
+            lazyInfinite: effectivePageSize === 0 && useLazy,
           },
         }));
         addHistoryEntry({
@@ -1987,7 +1990,7 @@ function PostgresPlaygroundInner() {
   );
 
   const handleLoadPage = useCallback(
-    (sql: string, page: number) => {
+    (sql: string, page: number, explicitPageSize?: number) => {
       const tab = tabsRef.current.find(
         (candidate) => candidate.id === activeTabIdRef.current,
       );
@@ -2000,6 +2003,7 @@ function PostgresPlaygroundInner() {
         curResult?.sourceTable,
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
+        explicitPageSize,
       );
     },
     [resultsByTab, runSqlForTab],

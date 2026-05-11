@@ -90,6 +90,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       sourceTable?: string,
       page = 0,
       baseSql?: string,
+      explicitPageSize?: number,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -101,7 +102,8 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       setStatusState("running");
       if (clearBeforeRun) setResultForTab(tabId, null);
       const t0 = performance.now();
-      const currentPageSize = globalPageSizeRef.current;
+      const currentPageSize =
+        explicitPageSize !== undefined ? explicitPageSize : globalPageSizeRef.current;
       const noComments = stripSqlComments(trimmed);
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
@@ -221,7 +223,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   );
 
   const handleLoadPage = useCallback(
-    (sql: string, page: number) => {
+    (sql: string, page: number, explicitPageSize?: number) => {
       const tabId = activeTabIdRef.current;
       const curResult = useTabStore.getState().resultsByTab[tabId];
       runSqlForTab(
@@ -231,6 +233,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         curResult?.sourceTable,
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
+        explicitPageSize,
       );
     },
     [runSqlForTab, activeTabIdRef],

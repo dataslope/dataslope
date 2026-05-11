@@ -240,7 +240,7 @@ export function ResultView({
   ) => void;
   globalPageSize: number;
   onSetGlobalPageSize: (n: number) => void;
-  onLoadPage: (sql: string, page: number) => void;
+  onLoadPage: (sql: string, page: number, explicitPageSize?: number) => void;
   onLoadMorePage?: (sql: string, page: number) => void;
   onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
   onExportResultSet?: (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => void;
@@ -859,7 +859,7 @@ export function ResultView({
             handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
             handlePageSizeChange = (s: number) => {
               onSetGlobalPageSize(s);
-              onLoadPage(effectiveLazySql, 0);
+              onLoadPage(effectiveLazySql, 0, s);
             };
           } else {
             handlePageChange = (p: number) => setPage(idx, p);
