@@ -26,9 +26,11 @@ import {
   useSensor,
   useSensors,
   type DragStartEvent,
+  type DragOverEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
+  arrayMove,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
@@ -2374,22 +2376,43 @@ function SqlPlaygroundInner() {
   const draggingTab = draggingTabId
     ? tabs.find((t) => t.id === draggingTabId) ?? null
     : null;
+  // Live-sorted ids used by SortableContext so tabs visually shift during drag.
+  const [liveTabIds, setLiveTabIds] = useState<string[] | null>(null);
 
   const onTabDragStart = useCallback(
     (event: DragStartEvent) => {
       setDraggingTabId(String(event.active.id));
+      setLiveTabIds(tabsRef.current.map((t) => t.id));
       handleTabDragStart(event);
     },
-    [handleTabDragStart],
+    [handleTabDragStart, tabsRef],
   );
+
+  const onTabDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setLiveTabIds((prev) => {
+      const ids = prev ?? tabsRef.current.map((t) => t.id);
+      const oldIndex = ids.indexOf(String(active.id));
+      const newIndex = ids.indexOf(String(over.id));
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(ids, oldIndex, newIndex);
+    });
+  }, [tabsRef]);
 
   const onTabDragEnd = useCallback(
     (event: Parameters<typeof handleTabDragEnd>[0]) => {
       setDraggingTabId(null);
+      setLiveTabIds(null);
       handleTabDragEnd(event);
     },
     [handleTabDragEnd],
   );
+
+  const onTabDragCancel = useCallback(() => {
+    setDraggingTabId(null);
+    setLiveTabIds(null);
+  }, []);
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -4498,10 +4521,12 @@ function SqlPlaygroundInner() {
                 sensors={tabDragSensors}
                 collisionDetection={closestCenter}
                 onDragStart={onTabDragStart}
+                onDragOver={onTabDragOver}
                 onDragEnd={onTabDragEnd}
+                onDragCancel={onTabDragCancel}
               >
                 <SortableContext
-                  items={tabIds}
+                  items={liveTabIds ?? tabIds}
                   strategy={horizontalListSortingStrategy}
                 >
                   <div className="sql-tabs" role="tablist">

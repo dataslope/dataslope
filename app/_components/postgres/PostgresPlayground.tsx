@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
 import {
@@ -1181,6 +1182,8 @@ function PostgresPlaygroundInner() {
   const draggingTab = draggingTabId
     ? tabs.find((t) => t.id === draggingTabId) ?? null
     : null;
+  // Live-sorted ids used by SortableContext so tabs visually shift during drag.
+  const [liveTabIds, setLiveTabIds] = useState<string[] | null>(null);
 
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
@@ -1194,12 +1197,26 @@ function PostgresPlaygroundInner() {
   const handleTabDragStart = useCallback((event: DragStartEvent) => {
     const id = String(event.active.id);
     setDraggingTabId(id);
+    setLiveTabIds(tabsRef.current.map((t) => t.id));
     setActiveTabId(id);
+  }, []);
+
+  const handleTabDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setLiveTabIds((prev) => {
+      const ids = prev ?? tabsRef.current.map((t) => t.id);
+      const oldIndex = ids.indexOf(String(active.id));
+      const newIndex = ids.indexOf(String(over.id));
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(ids, oldIndex, newIndex);
+    });
   }, []);
 
   const handleTabDragEnd = useCallback(
     (event: DragEndEvent) => {
       setDraggingTabId(null);
+      setLiveTabIds(null);
       const { active, over } = event;
       if (!over || active.id === over.id) return;
       const current = tabsRef.current;
@@ -1210,6 +1227,11 @@ function PostgresPlaygroundInner() {
     },
     [persistTabs],
   );
+
+  const handleTabDragCancel = useCallback(() => {
+    setDraggingTabId(null);
+    setLiveTabIds(null);
+  }, []);
 
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
@@ -4020,10 +4042,12 @@ function PostgresPlaygroundInner() {
                 sensors={tabDragSensors}
                 collisionDetection={closestCenter}
                 onDragStart={handleTabDragStart}
+                onDragOver={handleTabDragOver}
                 onDragEnd={handleTabDragEnd}
+                onDragCancel={handleTabDragCancel}
               >
                 <SortableContext
-                  items={tabIds}
+                  items={liveTabIds ?? tabIds}
                   strategy={horizontalListSortingStrategy}
                 >
                   <div className="sql-tabs" role="tablist">
