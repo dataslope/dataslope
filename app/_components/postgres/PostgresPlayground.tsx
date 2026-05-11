@@ -3420,6 +3420,7 @@ function PostgresPlaygroundInner() {
                   onClick={() => {
                     const name = viewStructureDialog?.tableName;
                     setViewStructureDialog(null);
+                    setViewStructureTouchedColIds(new Set());
                     if (name) requestDropEntity(name, "table");
                   }}
                 >
