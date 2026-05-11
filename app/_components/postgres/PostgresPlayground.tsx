@@ -2128,6 +2128,8 @@ function PostgresPlaygroundInner() {
         column: string;
         value: unknown;
       }>,
+      refetchSql?: string,
+      refetchBaseSql?: string,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -2137,27 +2139,33 @@ function PostgresPlaygroundInner() {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
-        // Re-fetch with PK ordering so the updated row does not move to the
-        // end of the result set (PostgreSQL changes a row's ctid on UPDATE,
-        // which would otherwise cause it to appear last in heap order).
-        const pkCols = (columnsByEntity[tableName] ?? [])
-          .filter((col) => col.pk > 0)
-          .sort((a, b) => a.pk - b.pk)
-          .map((col) => quoteIdent(col.name));
-        const orderBy =
-          pkCols.length > 0 ? ` ORDER BY ${pkCols.join(", ")}` : "";
-        // Pass the bare SELECT (without ORDER BY) as baseSql so that
-        // subsequent column-header sorting doesn't produce a double-ORDER-BY
-        // syntax error ("... ORDER BY pk ORDER BY col ASC").
-        const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
-        const sql = `${baseSql}${orderBy};`;
-        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
+        if (refetchSql) {
+          // Caller supplied a sort-preserving SQL; use it as-is and keep the
+          // base SQL (without ORDER BY) for subsequent column-header sorting.
+          void runSqlForTab(tabId, `${refetchSql};`, `Table: ${tableName}`, tableName, 0, refetchBaseSql ?? refetchSql);
+        } else {
+          // Re-fetch with PK ordering so the updated row does not move to the
+          // end of the result set (PostgreSQL changes a row's ctid on UPDATE,
+          // which would otherwise cause it to appear last in heap order).
+          const pkCols = (columnsByEntity[tableName] ?? [])
+            .filter((col) => col.pk > 0)
+            .sort((a, b) => a.pk - b.pk)
+            .map((col) => quoteIdent(col.name));
+          const orderBy =
+            pkCols.length > 0 ? ` ORDER BY ${pkCols.join(", ")}` : "";
+          // Pass the bare SELECT (without ORDER BY) as baseSql so that
+          // subsequent column-header sorting doesn't produce a double-ORDER-BY
+          // syntax error ("... ORDER BY pk ORDER BY col ASC").
+          const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
+          const sql = `${baseSql}${orderBy};`;
+          void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
+        }
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Failed to update cells in "${tableName}": ${msg}`, "warn");
       });
     },
-    [runSqlForTab, showToast, columnsByEntity],
+    [runSqlForTab, showToast, columnsByEntity, quoteIdent],
   );
 
   const copyEntityName = useCallback(
