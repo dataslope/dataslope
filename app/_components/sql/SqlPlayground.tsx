@@ -3908,6 +3908,7 @@ function SqlPlaygroundInner() {
                     View/Edit Structure
                   </Dialog.Title>
                   <Dialog.Description className="sql-modify-drawer-subtitle">
+                    <Table size={12} className="sql-modify-drawer-entity-icon" aria-hidden="true" />
                     {modifyDialog?.originalName ?? ""}
                   </Dialog.Description>
                 </div>
@@ -3954,6 +3955,19 @@ function SqlPlaygroundInner() {
               )}
               {modifyStructureTab === "columns" && (
                 <footer className="sql-modify-drawer-footer">
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-danger sql-modify-drawer-drop"
+                    onClick={() => {
+                      const name = modifyDialog?.originalName;
+                      setModifyDialog(null);
+                      setModifyInvalidColIds(new Set());
+                      setModifyStructureTab("columns");
+                      if (name) dropEntity(name, "table");
+                    }}
+                  >
+                    Drop Table
+                  </button>
                   <Dialog.Close className="confirm-btn confirm-btn-secondary">
                     Cancel
                   </Dialog.Close>

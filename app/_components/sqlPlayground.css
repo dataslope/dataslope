@@ -1622,6 +1622,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .sql-modify-drawer-close {
@@ -1650,6 +1653,15 @@
   padding: 14px 20px;
   border-top: 1px solid var(--border);
   background: var(--bg2);
+}
+
+.sql-modify-drawer-drop {
+  margin-right: auto;
+}
+
+.sql-modify-drawer-entity-icon {
+  color: var(--accent1);
+  flex-shrink: 0;
 }
 
 .sql-modify-body {
