@@ -2799,7 +2799,7 @@ input[type="range"].fs-slider:disabled {
 .toast-viewport {
   position: fixed;
   z-index: 500;
-  top: 16px;
+  bottom: 16px;
   right: 16px;
   width: 320px;
   max-width: calc(100vw - 32px);
@@ -2813,13 +2813,13 @@ input[type="range"].fs-slider:disabled {
   --shrink: calc(1 - var(--scale));
   --height: var(--toast-frontmost-height, var(--toast-height));
   --offset-y: calc(
-    var(--toast-offset-y) + (var(--toast-index) * var(--gap)) +
+    var(--toast-offset-y) * -1 + (var(--toast-index) * var(--gap) * -1) +
       var(--toast-swipe-movement-y)
   );
 
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   left: auto;
   margin: 0;
   width: 100%;
@@ -2837,7 +2837,7 @@ input[type="range"].fs-slider:disabled {
   font-family: var(--font-ui);
   font-size: 12.5px;
   line-height: 1.4;
-  transform-origin: top center;
+  transform-origin: bottom center;
   cursor: default;
   user-select: none;
   -webkit-user-select: none;
@@ -2845,7 +2845,7 @@ input[type="range"].fs-slider:disabled {
   transform: translateX(var(--toast-swipe-movement-x))
     translateY(
       calc(
-        var(--toast-swipe-movement-y) + (var(--toast-index) * var(--peek)) +
+        var(--toast-swipe-movement-y) - (var(--toast-index) * var(--peek)) -
           (var(--shrink) * var(--height))
       )
     )
