@@ -272,6 +272,7 @@ export function ResultView({
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
+  const noResultsRef = useRef<HTMLDivElement>(null);
   const resultSetsScrollRef = useRef<HTMLDivElement>(null);
   const prevResultRef = useRef<QueryRunResult | null>(null);
 
@@ -287,6 +288,7 @@ export function ResultView({
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
     const el = flashWrapperRef.current;
+    const noEl = noResultsRef.current;
     if (el) {
       const identical = queryResultsIdentical(result, prevResultRef.current);
       prevResultRef.current = result;
@@ -295,6 +297,11 @@ export function ResultView({
         void el.offsetWidth;
         el.classList.add("sql-result-flash-anim");
       }
+    } else if (noEl) {
+      prevResultRef.current = result;
+      noEl.classList.remove("sql-result-flash-anim");
+      void noEl.offsetWidth;
+      noEl.classList.add("sql-result-flash-anim");
     } else {
       prevResultRef.current = result;
     }
@@ -653,8 +660,8 @@ export function ResultView({
   }
   if (result.sets.length === 0) {
     return (
-      <div className="sql-result-ok">
-        Statement executed successfully — no rows returned.
+      <div ref={noResultsRef} className="sql-result-ok">
+        Statement executed successfully — no result set returned.
       </div>
     );
   }

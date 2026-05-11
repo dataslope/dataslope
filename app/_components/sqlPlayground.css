@@ -1918,7 +1918,7 @@
 .sql-modify-col-remove {
   background: transparent;
   border: 0;
-  color: var(--text-muted);
+  color: var(--red);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -1930,7 +1930,7 @@
 
 .sql-modify-col-remove:hover {
   background: var(--bg3);
-  color: var(--text);
+  color: var(--red);
 }
 
 .sql-modify-col-flags {

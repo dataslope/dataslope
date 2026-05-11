@@ -91,6 +91,7 @@ export default function ColorTestPage() {
   useEffect(() => {
     const stored = getStoredEditorTheme();
     const theme = stored ?? "lucario";
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setActiveTheme(theme);
     applyThemePalette(theme);
     applyMode(theme);
@@ -102,6 +103,7 @@ export default function ColorTestPage() {
     for (const { name } of SWATCH_DEFS) {
       map[name] = resolveCssVarToHex(name);
     }
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setResolvedHex(map);
   }, [activeTheme]);
 
@@ -287,7 +289,7 @@ export default function ColorTestPage() {
                   <span style={{ color: "var(--text)" }}>(</span>
                   <span style={{ color: "var(--text-dim)" }}>n: int</span>
                   <span style={{ color: "var(--text)" }}>) -&gt; int:{"\n"}</span>
-                  <span style={{ color: "var(--text-dim)" }}>{"    "}"""Return the nth Fibonacci number."""{"\n"}</span>
+                  <span style={{ color: "var(--text-dim)" }}>{"    "}{'"""Return the nth Fibonacci number."""'}{"\n"}</span>
                   {"    "}<span style={{ color: "var(--theme-primary)" }}>if </span>
                   <span style={{ color: "var(--text)" }}>n &lt;= </span>
                   <span style={{ color: "var(--text-muted)" }}>1</span>
@@ -317,9 +319,9 @@ export default function ColorTestPage() {
                   <span style={{ color: "var(--text)" }}>)]{"\n"}</span>
                   <span style={{ color: "var(--text-complementary)" }}>print</span>
                   <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-dim)" }}>f"Sequence: {"{"}</span>
+                  <span style={{ color: "var(--text-dim)" }}>{'f"'}Sequence: {"{"}</span>
                   <span style={{ color: "var(--text-complementary)" }}>results</span>
-                  <span style={{ color: "var(--text-dim)" }}>{"}"}"</span>
+                  <span style={{ color: "var(--text-dim)" }}>{'}"'}</span>
                   <span style={{ color: "var(--text)" }}>)</span>
                 </code>
               </pre>
