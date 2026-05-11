@@ -1157,6 +1157,12 @@ function PostgresPlaygroundInner() {
   const activeTabIdRef = useRef(activeTabId);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
+  const panesRef = useRef<HTMLElement | null>(null);
+  const editorPaneRef = useRef<HTMLDivElement | null>(null);
+  const resultsPaneRef = useRef<HTMLElement | null>(null);
+  const resizerRef = useRef<HTMLDivElement | null>(null);
 
   // ─── Selection tracking ───────────────────────────────────────────────
   const [hasEditorSelection, setHasEditorSelection] = useState(false);
@@ -2131,14 +2137,23 @@ function PostgresPlaygroundInner() {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
-        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        // Re-fetch with PK ordering so the updated row does not move to the
+        // end of the result set (PostgreSQL changes a row's ctid on UPDATE,
+        // which would otherwise cause it to appear last in heap order).
+        const pkCols = (columnsByEntity[tableName] ?? [])
+          .filter((col) => col.pk > 0)
+          .sort((a, b) => a.pk - b.pk)
+          .map((col) => quoteIdent(col.name));
+        const orderBy =
+          pkCols.length > 0 ? ` ORDER BY ${pkCols.join(", ")}` : "";
+        const sql = `SELECT * FROM ${quoteIdent(tableName)}${orderBy};`;
         void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Failed to update cells in "${tableName}": ${msg}`, "warn");
       });
     },
-    [runSqlForTab, showToast],
+    [runSqlForTab, showToast, columnsByEntity],
   );
 
   const copyEntityName = useCallback(
@@ -2275,6 +2290,123 @@ function PostgresPlaygroundInner() {
     (name: string): number => rowCountByTable[name] ?? 0,
     [rowCountByTable],
   );
+
+  // ─── Resizer (vertical, between results panel and editor) ────────────
+  useEffect(() => {
+    const resizer = resizerRef.current;
+    const panes = panesRef.current;
+    const editorPane = editorPaneRef.current;
+    const resultsPane = resultsPaneRef.current;
+    if (!resizer || !panes || !editorPane || !resultsPane) return;
+    let dragging = false;
+    let startY = 0;
+    let startEditorH = 0;
+    let startResultsH = 0;
+    const onDown = (e: MouseEvent) => {
+      dragging = true;
+      startY = e.clientY;
+      startEditorH = editorPane.offsetHeight;
+      startResultsH = resultsPane.offsetHeight;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const total = startEditorH + startResultsH;
+      if (total <= 0) return;
+      const dy = e.clientY - startY;
+      const editorH = Math.min(
+        total - Math.round(total * 0.15),
+        Math.max(Math.round(total * 0.15), startEditorH + dy),
+      );
+      const editorFrac = editorH / total;
+      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      resizer.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    resizer.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      resizer.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+
+  // Clear any inline gridTemplateRows set by the resizer when entering
+  // view-data or er-diagram mode.
+  useEffect(() => {
+    const panes = panesRef.current;
+    if (!panes) return;
+    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
+      panes.style.gridTemplateRows = "";
+    }
+  }, [activeTab?.kind]);
+
+  // ─── Sidebar resizer (horizontal, between sidebar and panes) ─────────
+  useEffect(() => {
+    const shell = shellRef.current;
+    const resizer = sidebarResizerRef.current;
+    if (!shell || !resizer) return;
+    try {
+      const saved = Number(localStorage.getItem(storageKey("sidebar_w")));
+      if (Number.isFinite(saved) && saved >= 160 && saved <= 600) {
+        shell.style.setProperty("--sql-sidebar-width", `${saved}px`);
+      }
+    } catch {
+      // ignore
+    }
+    let dragging = false;
+    let startX = 0;
+    let startW = 0;
+    const onDown = (e: MouseEvent) => {
+      dragging = true;
+      startX = e.clientX;
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      startW = sidebar?.offsetWidth ?? 240;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const shellWidth = shell.offsetWidth;
+      const maxW = Math.max(200, Math.min(600, shellWidth - 320));
+      const next = Math.max(160, Math.min(maxW, startW + (e.clientX - startX)));
+      shell.style.setProperty("--sql-sidebar-width", `${next}px`);
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      resizer.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      const w = sidebar?.offsetWidth;
+      if (w) {
+        try {
+          localStorage.setItem(storageKey("sidebar_w"), String(w));
+        } catch {
+          // ignore
+        }
+      }
+    };
+    resizer.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      resizer.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   // ─── View Structure drawer ────────────────────────────────────────────
 
@@ -3849,7 +3981,7 @@ function PostgresPlaygroundInner() {
           onError={(msg) => showToast(msg, "warn")}
         />
 
-        <div className="sql-shell postgres-shell">
+        <div className="sql-shell postgres-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
               <Select.Root
@@ -4064,10 +4196,12 @@ function PostgresPlaygroundInner() {
           </aside>
           <div
             className="sql-sidebar-resizer"
+            ref={sidebarResizerRef}
             role="separator"
             aria-orientation="vertical"
           />
           <main
+            ref={panesRef}
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
             <div className="sql-tabbar">
@@ -4144,6 +4278,7 @@ function PostgresPlaygroundInner() {
             </div>
             <div
               className="sql-editor-pane"
+              ref={editorPaneRef}
               style={
                 activeTab?.kind === "view-data" ||
                 activeTab?.kind === "er-diagram" ||
@@ -4301,10 +4436,11 @@ function PostgresPlaygroundInner() {
               <Fragment>
                 <div
                   className="sql-resizer"
+                  ref={resizerRef}
                   role="separator"
                   aria-orientation="horizontal"
                 />
-                <section className="sql-results-pane">
+                <section className="sql-results-pane" ref={resultsPaneRef}>
                   <ResultView
                     result={result}
                     loading={statusState === "loading"}
