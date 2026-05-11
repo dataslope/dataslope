@@ -2446,6 +2446,18 @@
   color: var(--text-dim);
 }
 
+/* ─── Sort instruction popover ─── */
+.sql-result-th-btn-positioner {
+  z-index: 600;
+}
+.sql-result-th-btn-popover {
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 /* Subtle chevron for unsorted columns */
 .sql-result-th-chevron {
   flex-shrink: 0;
