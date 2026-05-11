@@ -1192,103 +1192,123 @@ export function ResultTableBody({
               const fk = keyHints?.fk.get(c);
               const sorted = column.getIsSorted();
               const colType = set.columnTypes?.[ci] || inferColumnType(set.values, ci);
+              const sortTitle = sorted === "asc"
+                ? "Sorted ascending — click to sort descending"
+                : sorted === "desc"
+                  ? "Sorted descending — click to clear sort"
+                  : "Click to sort ascending";
               return (
-                <button
-                  type="button"
-                  className="sql-result-th-btn"
-                  onClick={column.getToggleSortingHandler()}
-                  title={
-                    sorted === "asc"
-                      ? "Sorted ascending — click to sort descending"
-                      : sorted === "desc"
-                        ? "Sorted descending — click to clear sort"
-                        : "Click to sort ascending"
-                  }
-                >
-                  <span className="sql-result-th-top">
-                    <span className="sql-result-th-label">
-                      {isPk && (
-                        <Popover.Root>
-                          <Popover.Trigger
-                            openOnHover
-                            delay={150}
-                            closeDelay={100}
-                            render={(triggerProps) => (
-                              <span {...triggerProps} className="sql-result-th-key-trigger">
-                                <MdOutlineKey
-                                  size={12}
-                                  className="sql-result-th-pk"
-                                  aria-label="Primary key"
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={150}
+                    closeDelay={100}
+                    render={(triggerProps) => (
+                      <button
+                        {...triggerProps}
+                        type="button"
+                        className="sql-result-th-btn"
+                        onClick={column.getToggleSortingHandler()}
+                        aria-label={sortTitle}
+                      >
+                        <span className="sql-result-th-top">
+                          <span className="sql-result-th-label">
+                            {isPk && (
+                              <Popover.Root>
+                                <Popover.Trigger
+                                  openOnHover
+                                  delay={150}
+                                  closeDelay={100}
+                                  render={(triggerProps) => (
+                                    <span {...triggerProps} className="sql-result-th-key-trigger">
+                                      <MdOutlineKey
+                                        size={12}
+                                        className="sql-result-th-pk"
+                                        aria-label="Primary key"
+                                      />
+                                    </span>
+                                  )}
                                 />
-                              </span>
+                                <Popover.Portal>
+                                  <Popover.Positioner
+                                    sideOffset={6}
+                                    side="top"
+                                    className="sql-key-icon-popover-positioner"
+                                  >
+                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                      <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <span>Primary key</span>
+                                    </Popover.Popup>
+                                  </Popover.Positioner>
+                                </Popover.Portal>
+                              </Popover.Root>
                             )}
-                          />
-                          <Popover.Portal>
-                            <Popover.Positioner
-                              sideOffset={6}
-                              side="top"
-                              className="sql-key-icon-popover-positioner"
-                            >
-                              <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
-                                <span>Primary key</span>
-                              </Popover.Popup>
-                            </Popover.Positioner>
-                          </Popover.Portal>
-                        </Popover.Root>
-                      )}
-                      {fk && (
-                        <Popover.Root>
-                          <Popover.Trigger
-                            openOnHover
-                            delay={150}
-                            closeDelay={100}
-                            render={(triggerProps) => (
-                              <span {...triggerProps} className="sql-result-th-key-trigger">
-                                <IoLink
-                                  size={12}
-                                  className="sql-result-th-fk"
-                                  aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                            {fk && (
+                              <Popover.Root>
+                                <Popover.Trigger
+                                  openOnHover
+                                  delay={150}
+                                  closeDelay={100}
+                                  render={(triggerProps) => (
+                                    <span {...triggerProps} className="sql-result-th-key-trigger">
+                                      <IoLink
+                                        size={12}
+                                        className="sql-result-th-fk"
+                                        aria-label={`Foreign key → ${fk.table}.${fk.to}`}
+                                      />
+                                    </span>
+                                  )}
                                 />
-                              </span>
+                                <Popover.Portal>
+                                  <Popover.Positioner
+                                    sideOffset={6}
+                                    side="top"
+                                    className="sql-key-icon-popover-positioner"
+                                  >
+                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
+                                      <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <span>Foreign key</span>
+                                    </Popover.Popup>
+                                  </Popover.Positioner>
+                                </Popover.Portal>
+                              </Popover.Root>
                             )}
-                          />
-                          <Popover.Portal>
-                            <Popover.Positioner
-                              sideOffset={6}
-                              side="top"
-                              className="sql-key-icon-popover-positioner"
-                            >
-                              <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
-                                <span>Foreign key</span>
-                              </Popover.Popup>
-                            </Popover.Positioner>
-                          </Popover.Portal>
-                        </Popover.Root>
-                      )}
-                      <span>{c}</span>
-                    </span>
-                    <span
-                      className={
-                        sorted
-                          ? "sql-result-th-chevron sql-result-th-chevron-active"
-                          : "sql-result-th-chevron"
-                      }
-                      aria-hidden="true"
+                            <span>{c}</span>
+                          </span>
+                          <span
+                            className={
+                              sorted
+                                ? "sql-result-th-chevron sql-result-th-chevron-active"
+                                : "sql-result-th-chevron"
+                            }
+                            aria-hidden="true"
+                          >
+                            {sorted === "asc" ? (
+                              <ChevronUp size={11} />
+                            ) : (
+                              <ChevronDown size={11} />
+                            )}
+                          </span>
+                        </span>
+                        <span className="sql-result-th-type">
+                          <DataTypeIcon type={colType} />
+                          {colType}
+                        </span>
+                      </button>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      sideOffset={6}
+                      side="top"
+                      className="sql-result-th-btn-positioner"
                     >
-                      {sorted === "asc" ? (
-                        <ChevronUp size={11} />
-                      ) : (
-                        <ChevronDown size={11} />
-                      )}
-                    </span>
-                  </span>
-                  <span className="sql-result-th-type">
-                    <DataTypeIcon type={colType} />
-                    {colType}
-                  </span>
-                </button>
+                      <Popover.Popup className="bui-popup sql-result-th-btn-popover">
+                        {sortTitle}
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
               );
             },
             cell: (info) => {
