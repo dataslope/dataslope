@@ -478,6 +478,7 @@ function PgStructureColumnRow({
   onChange,
   onRemove,
   hasError,
+  onBlurName,
   knownTables,
   columnsByTable,
 }: {
@@ -485,6 +486,7 @@ function PgStructureColumnRow({
   onChange: (patch: Partial<PgStructureColumn>) => void;
   onRemove: () => void;
   hasError?: boolean;
+  onBlurName?: () => void;
   knownTables: string[];
   columnsByTable: Record<string, TableColumnInfo[]>;
 }) {
@@ -524,8 +526,10 @@ function PgStructureColumnRow({
             className={`sql-rename-input sql-modify-col-name${hasError ? " sql-modify-col-name-error" : ""}`}
             value={col.name}
             onChange={(e) => onChange({ name: e.target.value })}
+            onBlur={onBlurName}
             placeholder="column name"
             aria-label="Column name"
+            data-col-id={col.id}
           />
         </label>
       </td>
@@ -674,8 +678,10 @@ function PgGeneratedColumnRow({
           <span className="sql-modify-gen-name-text" title={col.originalName ?? col.name}>
             {col.originalName ?? col.name}
           </span>
-          <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
         </div>
+      </td>
+      <td className="sql-modify-gen-storage-cell">
+        <span className="sql-modify-col-type-badge">{col.type || "—"}</span>
       </td>
       <td className="sql-modify-gen-expr-cell">
         <GenExprEditor
@@ -945,6 +951,9 @@ function PostgresPlaygroundInner() {
     useState<PgStructureDialogState | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<PgStructureDialogState | null>(null);
+  const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<Set<string>>(new Set());
+  const [addTablePendingFocusId, setAddTablePendingFocusId] = useState<string | null>(null);
+  const addTableBodyRef = useRef<HTMLDivElement | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
@@ -958,6 +967,18 @@ function PostgresPlaygroundInner() {
     () => validatePgStructure(addTableDialog, columnsByEntity),
     [addTableDialog, columnsByEntity],
   );
+  // Only include columns that have been touched (blurred) or already have a
+  // non-empty name so that empty-name errors don't appear until the user
+  // has had a chance to type something.
+  const addTableDisplayValidation = useMemo(() => {
+    if (!addTableDialog) {
+      return { invalidColumnIds: new Set<string>(), errors: [] as string[], hasTableNameError: false, isValid: false, isDirty: false };
+    }
+    const displayCols = addTableDialog.columns.filter(
+      (c) => c.generated || c.name.trim() || addTableTouchedColIds.has(c.id),
+    );
+    return validatePgStructure({ ...addTableDialog, columns: displayCols }, columnsByEntity);
+  }, [addTableDialog, addTableTouchedColIds, columnsByEntity]);
 
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
@@ -973,8 +994,7 @@ function PostgresPlaygroundInner() {
   const runningRef = useRef(false);
 
   // ─── Selection tracking ───────────────────────────────────────────────
-  const [hasEditorSelection, setHasEditorSelection] = useState(false);
-  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
+  const [hasEditorSelection, setHasEditorSelection] = useState(false);  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   const isMac = useSyncExternalStore(
     () => () => {},
     () => detectIsMac(),
@@ -1155,6 +1175,18 @@ function PostgresPlaygroundInner() {
       void runSqlForTab(tab.id, sql, tab.title);
     };
   }, [runActiveTab, runSqlForTab]);
+
+  // Focus the newly added column's name input in the Add Table drawer.
+  useEffect(() => {
+    if (!addTablePendingFocusId) return;
+    const input = addTableBodyRef.current?.querySelector<HTMLElement>(
+      `[data-col-id="${addTablePendingFocusId}"]`,
+    );
+    if (input) {
+      input.focus();
+      setAddTablePendingFocusId(null);
+    }
+  }, [addTablePendingFocusId]);
 
   useEffect(() => {
     tabsRef.current = tabs;
@@ -1939,6 +1971,7 @@ function PostgresPlaygroundInner() {
   }, [viewStructureDialog, columnsByEntity, refreshSchema, showToast]);
 
   const openAddTable = useCallback(() => {
+    setAddTableTouchedColIds(new Set());
     setAddTableDialog({
       tableName: "",
       newTableName: "new_table",
@@ -1970,6 +2003,8 @@ function PostgresPlaygroundInner() {
     if (!dialog || !engine) return;
     const validation = validatePgStructure(dialog, columnsByEntity);
     if (!validation.isValid) {
+      // Mark all columns as touched so errors are shown in the form.
+      setAddTableTouchedColIds(new Set(dialog.columns.map((c) => c.id)));
       showToast(validation.errors[0] ?? "Fix validation errors before saving.", "warn");
       return;
     }
@@ -2921,7 +2956,8 @@ function PostgresPlaygroundInner() {
                               <table className="sql-modify-table">
                                 <thead>
                                   <tr>
-                                    <th>Name / Type</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
                                     <th>Expression</th>
                                     <th>Storage</th>
                                     <th>Actions</th>
@@ -3004,7 +3040,10 @@ function PostgresPlaygroundInner() {
         <Dialog.Root
           open={addTableDialog !== null}
           onOpenChange={(next) => {
-            if (!next) setAddTableDialog(null);
+            if (!next) {
+              setAddTableDialog(null);
+              setAddTableTouchedColIds(new Set());
+            }
           }}
         >
           <Dialog.Portal>
@@ -3027,11 +3066,11 @@ function PostgresPlaygroundInner() {
                 </Dialog.Close>
               </header>
               {addTableDialog && (
-                <div className="sql-modify-body">
+                <div className="sql-modify-body" ref={addTableBodyRef}>
                   <label className="sql-modify-field">
                     <span className="sql-modify-field-label">Table name</span>
                     <input
-                      className={`sql-rename-input${addTableValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
+                      className={`sql-rename-input${addTableDisplayValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
                       value={addTableDialog.newTableName}
                       onChange={(e) =>
                         setAddTableDialog((prev) =>
@@ -3113,7 +3152,10 @@ function PostgresPlaygroundInner() {
                                               : null,
                                           )
                                         }
-                                        hasError={addTableValidation.invalidColumnIds.has(col.id)}
+                                        hasError={addTableDisplayValidation.invalidColumnIds.has(col.id)}
+                                        onBlurName={() =>
+                                          setAddTableTouchedColIds((prev) => new Set([...prev, col.id]))
+                                        }
                                         knownTables={tables}
                                         columnsByTable={columnsByEntity}
                                       />
@@ -3127,18 +3169,20 @@ function PostgresPlaygroundInner() {
                         <button
                           type="button"
                           className="confirm-btn confirm-btn-secondary sql-modify-add"
-                          onClick={() =>
+                          onClick={() => {
+                            const newCol = makeNewPgColumn();
+                            setAddTablePendingFocusId(newCol.id);
                             setAddTableDialog((prev) => {
                               if (!prev) return null;
-                              return { ...prev, columns: [...prev.columns, makeNewPgColumn()] };
-                            })
-                          }
+                              return { ...prev, columns: [...prev.columns, newCol] };
+                            });
+                          }}
                         >
                           <Plus size={12} aria-hidden="true" /> Add column
                         </button>
-                        {addTableValidation.errors.length > 0 && (
+                        {addTableDisplayValidation.errors.length > 0 && (
                           <div className="sql-modify-validation" role="alert">
-                            {addTableValidation.errors.map((error) => (
+                            {addTableDisplayValidation.errors.map((error) => (
                               <div key={error}>{error}</div>
                             ))}
                           </div>
