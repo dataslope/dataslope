@@ -1285,7 +1285,9 @@
 
 .sql-tab:hover {
   color: var(--text);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
 }
 
 .sql-tab.active {
@@ -1318,7 +1320,6 @@
 .sql-tab-close {
   background: transparent;
   border: 0;
-  color: var(--text-dim);
   width: 16px;
   height: 16px;
   display: inline-flex;
