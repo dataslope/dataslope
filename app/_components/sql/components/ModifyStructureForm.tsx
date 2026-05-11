@@ -670,6 +670,16 @@ export function ModifyStructureForm({
             <Plus size={12} aria-hidden="true" /> Add column
           </button>
 
+          {regularColumns.some(
+            (col) =>
+              !col.name.trim() &&
+              (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
+          ) && (
+            <div className="sql-modify-validation" role="alert">
+              Column names cannot be empty.
+            </div>
+          )}
+
           {generatedColumns.length > 0 && (
             <div className="sql-modify-gen-section">
               <div className="sql-modify-gen-section-header">
