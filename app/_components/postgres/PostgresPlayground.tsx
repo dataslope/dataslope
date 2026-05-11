@@ -994,7 +994,8 @@ function PostgresPlaygroundInner() {
   const runningRef = useRef(false);
 
   // ─── Selection tracking ───────────────────────────────────────────────
-  const [hasEditorSelection, setHasEditorSelection] = useState(false);  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
+  const [hasEditorSelection, setHasEditorSelection] = useState(false);
+  const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   const isMac = useSyncExternalStore(
     () => () => {},
     () => detectIsMac(),
