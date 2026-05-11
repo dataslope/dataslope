@@ -2108,7 +2108,7 @@ function PostgresPlaygroundInner() {
         void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Delete failed: ${msg}`, "warn");
+        showToast(`Failed to delete rows from "${tableName}": ${msg}`, "warn");
       });
     },
     [runSqlForTab, showToast],
@@ -2135,7 +2135,7 @@ function PostgresPlaygroundInner() {
         void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
-        showToast(`Update failed: ${msg}`, "warn");
+        showToast(`Failed to update cells in "${tableName}": ${msg}`, "warn");
       });
     },
     [runSqlForTab, showToast],
