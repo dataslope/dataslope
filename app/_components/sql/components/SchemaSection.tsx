@@ -169,24 +169,16 @@ export function SchemaSection({
             <ContextMenu.Positioner sideOffset={6}>
               <ContextMenu.Popup className="bui-popup examples-dropdown">
                 {(onExpandAll || onCollapseAll) && count > 0 && (
-                  <>
-                    <ContextMenu.Item
-                      className="example-item"
-                      onClick={onExpandAll}
-                    >
-                      <div className="ex-title">
-                        Expand all {labelLower}
-                      </div>
-                    </ContextMenu.Item>
-                    <ContextMenu.Item
-                      className="example-item"
-                      onClick={onCollapseAll}
-                    >
-                      <div className="ex-title">
-                        Collapse all {labelLower}
-                      </div>
-                    </ContextMenu.Item>
-                  </>
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={allExpanded ? onCollapseAll : onExpandAll}
+                  >
+                    <div className="ex-title">
+                      {allExpanded
+                        ? `Collapse all ${labelLower}`
+                        : `Expand all ${labelLower}`}
+                    </div>
+                  </ContextMenu.Item>
                 )}
                 {onAdd && (
                   <ContextMenu.Item
