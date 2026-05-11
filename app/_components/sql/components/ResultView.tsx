@@ -1714,7 +1714,9 @@ export function ResultTableBody({
                 <td colSpan={colSpan} style={{ height: paddingTop, padding: 0 }} />
               </tr>
             )}
-            {renderedRows.map(({ row }) => renderRow(row))}
+            {renderedRows.map(({ row }) => (
+              <React.Fragment key={row.id}>{renderRow(row)}</React.Fragment>
+            ))}
             {paddingBottom > 0 && (
               <tr aria-hidden="true">
                 <td colSpan={colSpan} style={{ height: paddingBottom, padding: 0 }} />

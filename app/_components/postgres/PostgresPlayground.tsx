@@ -123,8 +123,6 @@ import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import { SqlTab } from "../sql/components/SqlTab";
 import { ResultView } from "../sql/components/ResultView";
-
-const LAZY_ALL_PAGE_SIZE = 500;
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
@@ -178,6 +176,7 @@ import { FK_ACTIONS } from "../sql/constants";
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
+const LAZY_ALL_PAGE_SIZE = 500;
 
 // ─── Postgres structure drawer types ────────────────────────────────────
 
