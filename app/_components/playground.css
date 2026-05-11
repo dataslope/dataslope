@@ -1256,6 +1256,24 @@ body.pg-active {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* The settings panel renders in a Dialog portal at body level, so it
+     falls outside .pg-root and doesn't inherit the global scrollbar
+     theme. Re-apply it explicitly here. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.settings-panel-pane::-webkit-scrollbar {
+  width: 6px;
+}
+.settings-panel-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+.settings-panel-pane::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.settings-panel-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
 }
 
 .settings-body {
@@ -1270,11 +1288,13 @@ body.pg-active {
 
 /* Restore-defaults / clear-localStorage actions. Sit at the bottom of
    the General tab, separated from the rest by a divider so they don't
-   read as just-another-toggle. */
+   read as just-another-toggle. The buttons are styled as a vertical
+   grouped control — shared borders, corner-radius only on the outermost
+   buttons — so they read as one cohesive section. */
 .settings-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   padding-top: 14px;
   border-top: 1px solid var(--border);
 }
@@ -1289,14 +1309,31 @@ body.pg-active {
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
-  border-radius: var(--radius);
+  border-radius: 0;
   cursor: pointer;
+  position: relative;
   transition:
     background-color 0.15s,
     color 0.15s;
 }
+/* Collapse adjacent borders so each shared edge is 1 px, not 2. */
+.settings-action-btn:not(:first-child) {
+  margin-top: -1px;
+}
+/* Hover needs z-index so its border renders on top of siblings. */
 .settings-action-btn:hover {
+  z-index: 1;
   border-color: color-mix(in srgb, var(--text) 40%, var(--border) 60%);
+}
+/* Corner radius: top on first, bottom on last, all four on an only-child. */
+.settings-action-btn:first-child {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.settings-action-btn:last-child {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.settings-action-btn:only-child {
+  border-radius: var(--radius);
 }
 .settings-action-btn svg {
   flex-shrink: 0;
@@ -1305,12 +1342,10 @@ body.pg-active {
 .settings-action-danger {
   color: var(--red);
   border-color: var(--red);
-  /* border: none; */
 }
 .settings-action-danger:hover {
   color: var(--red);
   border-color: oklch(from var(--red) calc(l - 0.3) c h);
-  /* background-color: oklch(from var(--red) calc(l - 0.05) c h); */
 }
 
 /* Editor-themes tab — grid of preview cards. */
@@ -1568,6 +1603,17 @@ input[type="range"].fs-slider:disabled {
   color: var(--text);
   cursor: pointer;
   user-select: none;
+}
+/* Icon + text label inside a switch row. Mirrors the flex+gap of
+   `.setting-label` so icons align with those on slider rows. */
+.setting-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.setting-switch-label svg {
+  color: var(--text-dim);
+  flex-shrink: 0;
 }
 .bui-switch {
   position: relative;

@@ -17,15 +17,23 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
+import { ToggleGroup } from "@base-ui/react/toggle-group";
 import {
   ArrowDownToLine,
+  Binary,
+  Calendar,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
   ChevronUp,
+  Clock,
+  Hash,
+  Minus,
+  ToggleLeft,
   Trash2,
+  Type,
 } from "lucide-react";
 import { MdOutlineKey } from "react-icons/md";
 import { IoLink } from "react-icons/io5";
@@ -104,6 +112,36 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
   return Object.fromEntries(
     Object.entries(src).map(([idx, edits]) => [idx, new Map(edits)]),
   ) as PendingEditsByResult;
+}
+
+/** Returns a small icon component that visually represents a SQL/inferred
+ *  column type. Matches by prefix so "VARCHAR", "NVARCHAR", "CHAR" all
+ *  resolve to the text icon, and "DATETIME"/"TIMESTAMP" to the clock icon. */
+function DataTypeIcon({ type }: { type: string }) {
+  const t = type.toUpperCase();
+  if (t === "NULL") return <Minus size={10} aria-hidden="true" />;
+  if (t.includes("INT")) return <Hash size={10} aria-hidden="true" />;
+  if (
+    t.includes("REAL") ||
+    t.includes("FLOAT") ||
+    t.includes("DOUBLE") ||
+    t.includes("NUMERIC") ||
+    t.includes("DECIMAL")
+  )
+    return <Hash size={10} aria-hidden="true" />;
+  if (
+    t.includes("CHAR") ||
+    t.includes("TEXT") ||
+    t.includes("CLOB") ||
+    t.includes("STRING")
+  )
+    return <Type size={10} aria-hidden="true" />;
+  if (t.includes("BOOL")) return <ToggleLeft size={10} aria-hidden="true" />;
+  if (t.includes("BLOB") || t.includes("BINARY") || t.includes("BYTE"))
+    return <Binary size={10} aria-hidden="true" />;
+  if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
+  if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
+  return null;
 }
 
 const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
@@ -838,45 +876,36 @@ export function ResultView({
                       <Menu.Positioner sideOffset={6} align="end" side="top">
                         <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
                           {hasMultiplePages && (
-                            <div className="sql-result-export-scope-options">
-                              <label
-                                className="sql-result-export-scope-option"
-                                data-checked={resultSetExportScope === "page" ? "" : undefined}
-                                onClick={(e) => e.stopPropagation()}
+                            <div
+                              className="sql-result-export-scope-options"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ToggleGroup.Root
+                                value={[resultSetExportScope]}
+                                onValueChange={(newVals) => {
+                                  const next = newVals.find(
+                                    (v) => v !== resultSetExportScope,
+                                  );
+                                  if (next)
+                                    setResultSetExportScope(
+                                      next as ResultSetExportScope,
+                                    );
+                                }}
+                                className="sql-scope-toggle-group"
                               >
-                                <input
-                                  className="scope-radio-input"
-                                  type="radio"
-                                  name="sql-result-export-scope-pager"
-                                  checked={resultSetExportScope === "page"}
-                                  onChange={() => setResultSetExportScope("page")}
-                                />
-                                <span className="scope-radio-ring">
-                                  {resultSetExportScope === "page" && (
-                                    <span className="scope-radio-dot" />
-                                  )}
-                                </span>
-                                <span>Current page ({currentPageRows} rows)</span>
-                              </label>
-                              <label
-                                className="sql-result-export-scope-option"
-                                data-checked={resultSetExportScope === "all" ? "" : undefined}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <input
-                                  className="scope-radio-input"
-                                  type="radio"
-                                  name="sql-result-export-scope-pager"
-                                  checked={resultSetExportScope === "all"}
-                                  onChange={() => setResultSetExportScope("all")}
-                                />
-                                <span className="scope-radio-ring">
-                                  {resultSetExportScope === "all" && (
-                                    <span className="scope-radio-dot" />
-                                  )}
-                                </span>
-                                <span>All rows ({totalRows.toLocaleString()})</span>
-                              </label>
+                                <ToggleGroup.Item
+                                  value="page"
+                                  className="sql-scope-toggle-item"
+                                >
+                                  Page ({currentPageRows})
+                                </ToggleGroup.Item>
+                                <ToggleGroup.Item
+                                  value="all"
+                                  className="sql-scope-toggle-item"
+                                >
+                                  All ({totalRows.toLocaleString()})
+                                </ToggleGroup.Item>
+                              </ToggleGroup.Root>
                             </div>
                           )}
                           <Menu.Item
@@ -1254,7 +1283,10 @@ export function ResultTableBody({
                       )}
                     </span>
                   </span>
-                  <span className="sql-result-th-type">{colType}</span>
+                  <span className="sql-result-th-type">
+                    <DataTypeIcon type={colType} />
+                    {colType}
+                  </span>
                 </button>
               );
             },
