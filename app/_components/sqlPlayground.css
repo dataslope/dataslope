@@ -112,10 +112,14 @@
   padding: 8px 10px !important;
 }
 
+.sql-db-item.bui-select-item[data-selected] {
+  color: var(--accent1);
+}
+
 .sql-db-item-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .sql-db-item-desc {
@@ -2326,9 +2330,9 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--primary);
   padding: 6px 10px 4px;
-  margin: 0;
+  margin: 4px 0;
 }
 
 /* ─── Sortable column header button ─── */

@@ -18,9 +18,24 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
-import { autocompletion, closeBracketsKeymap, completionKeymap, startCompletion, acceptCompletion } from "@codemirror/autocomplete";
-import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
-import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
+import {
+  autocompletion,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+  acceptCompletion,
+} from "@codemirror/autocomplete";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from "@codemirror/commands";
+import {
+  bracketMatching,
+  indentOnInput,
+  indentUnit,
+} from "@codemirror/language";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -100,10 +115,7 @@ import {
   POSTGRES_BLANK_DATABASE,
   findPostgresSampleDatabase,
 } from "../runtime/postgresSamples";
-import {
-  createPostgresEngine,
-  type PostgresEngine,
-} from "../runtime/postgres";
+import { createPostgresEngine, type PostgresEngine } from "../runtime/postgres";
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
@@ -130,7 +142,11 @@ import {
   toFileSafeName,
   triggerDownload,
 } from "../sql/utils/exportUtils";
-import { isSingleSelectSql, hasLimitClause, stripSqlComments } from "../sql/utils/sqlAnalysis";
+import {
+  isSingleSelectSql,
+  hasLimitClause,
+  stripSqlComments,
+} from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import type {
   ColumnKeyHints,
@@ -143,7 +159,10 @@ import type {
   ResultSetExportSnapshot,
 } from "../sql/types";
 import type { RuntimeInfo } from "../types";
-import { createSqlCompletionSource, type SqlCompletionSchema } from "../sql/sqlCompletion";
+import {
+  createSqlCompletionSource,
+  type SqlCompletionSchema,
+} from "../sql/sqlCompletion";
 import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
 import {
   importRowsIntoPostgres,
@@ -211,7 +230,10 @@ const PG_TYPE_GROUPS = [
       "double precision",
     ],
   },
-  { label: "Text", types: ["text", "varchar", "varchar(255)", "char", "char(1)"] },
+  {
+    label: "Text",
+    types: ["text", "varchar", "varchar(255)", "char", "char(1)"],
+  },
   { label: "Boolean / identifiers", types: ["boolean", "uuid"] },
   { label: "JSON", types: ["json", "jsonb"] },
   {
@@ -225,7 +247,9 @@ const PG_TYPE_GROUPS = [
   },
 ] as const;
 
-const PG_TYPE_OPTIONS: readonly string[] = PG_TYPE_GROUPS.flatMap((group) => group.types);
+const PG_TYPE_OPTIONS: readonly string[] = PG_TYPE_GROUPS.flatMap(
+  (group) => group.types,
+);
 const PG_SERIAL_TYPES = new Set(["serial", "bigserial", "smallserial"]);
 // Accepts common PostgreSQL type text, including multi-word types,
 // parameterized types such as varchar(255), and array suffixes.
@@ -243,7 +267,9 @@ function isPgSerialType(type: string): boolean {
   return PG_SERIAL_TYPES.has(type.trim().toLowerCase());
 }
 
-function pgStructureSignature(state: Pick<PgStructureDialogState, "newTableName" | "columns">): string {
+function pgStructureSignature(
+  state: Pick<PgStructureDialogState, "newTableName" | "columns">,
+): string {
   return JSON.stringify({
     table: state.newTableName.trim(),
     columns: state.columns.map((c) => ({
@@ -273,7 +299,14 @@ function validatePgStructure(
   const invalidColumnIds = new Set<string>();
   const errors: string[] = [];
   let hasTableNameError = false;
-  if (!state) return { invalidColumnIds, errors, hasTableNameError, isValid: false, isDirty: false };
+  if (!state)
+    return {
+      invalidColumnIds,
+      errors,
+      hasTableNameError,
+      isValid: false,
+      isDirty: false,
+    };
   const tableName = state.newTableName.trim();
   const identifierRe = /^[A-Za-z_][A-Za-z0-9_]*$/;
   if (!tableName) {
@@ -287,7 +320,9 @@ function validatePgStructure(
   for (const col of state.columns) {
     if (col.generated) {
       if (!col.generated.expression.trim()) {
-        errors.push(`Generated column "${col.name || col.originalName || "unnamed"}" needs an expression.`);
+        errors.push(
+          `Generated column "${col.name || col.originalName || "unnamed"}" needs an expression.`,
+        );
         invalidColumnIds.add(col.id);
       }
       continue;
@@ -312,18 +347,27 @@ function validatePgStructure(
       errors.push(`"${name || "Unnamed column"}" has an invalid type.`);
       invalidColumnIds.add(col.id);
     }
-    if (col.autoIncrement && !/^(smallint|integer|bigint|smallserial|serial|bigserial)$/i.test(type)) {
-      errors.push(`"${name || "Unnamed column"}" must use an integer/serial type for identity/serial.`);
+    if (
+      col.autoIncrement &&
+      !/^(smallint|integer|bigint|smallserial|serial|bigserial)$/i.test(type)
+    ) {
+      errors.push(
+        `"${name || "Unnamed column"}" must use an integer/serial type for identity/serial.`,
+      );
       invalidColumnIds.add(col.id);
     }
     if ((col.fkTable && !col.fkColumn) || (!col.fkTable && col.fkColumn)) {
-      errors.push(`"${name || "Unnamed column"}" has an incomplete foreign key.`);
+      errors.push(
+        `"${name || "Unnamed column"}" has an incomplete foreign key.`,
+      );
       invalidColumnIds.add(col.id);
     }
     if (col.fkTable && col.fkColumn) {
       const targetColumns = tableColumns[col.fkTable] ?? [];
       if (!targetColumns.some((target) => target.name === col.fkColumn)) {
-        errors.push(`"${name || "Unnamed column"}" references a missing foreign key column.`);
+        errors.push(
+          `"${name || "Unnamed column"}" references a missing foreign key column.`,
+        );
         invalidColumnIds.add(col.id);
       }
     }
@@ -440,12 +484,19 @@ function PgTypeSelector({
             }, 100);
           }}
         />
-        <Combobox.Trigger className="pg-type-trigger" aria-label="Open type list">
+        <Combobox.Trigger
+          className="pg-type-trigger"
+          aria-label="Open type list"
+        >
           <ChevronDown size={14} />
         </Combobox.Trigger>
       </div>
       <Combobox.Portal>
-        <Combobox.Positioner sideOffset={4} align="start" className="pg-type-positioner">
+        <Combobox.Positioner
+          sideOffset={4}
+          align="start"
+          className="pg-type-positioner"
+        >
           <Combobox.Popup className="bui-select-popup pg-type-popup">
             <Combobox.List>
               {visibleGroups.map((group) => (
@@ -454,7 +505,11 @@ function PgTypeSelector({
                     {group.label}
                   </Combobox.GroupLabel>
                   {group.types.map((type) => (
-                    <Combobox.Item key={type} value={type} className="bui-select-item">
+                    <Combobox.Item
+                      key={type}
+                      value={type}
+                      className="bui-select-item"
+                    >
                       {type}
                     </Combobox.Item>
                   ))}
@@ -506,11 +561,18 @@ function PgStructureColumnRow({
     position: isDragging ? "relative" : undefined,
     zIndex: isDragging ? 1 : undefined,
   };
-  const fkTargetColumns = col.fkTable ? columnsByTable[col.fkTable] ?? [] : [];
+  const fkTargetColumns = col.fkTable
+    ? (columnsByTable[col.fkTable] ?? [])
+    : [];
   const serialType = isPgSerialType(col.type);
 
   return (
-    <tr ref={setNodeRef} style={style} className="sql-modify-col-row" {...attributes}>
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className="sql-modify-col-row"
+      {...attributes}
+    >
       <td className="sql-modify-drag-cell">
         <span
           className="sql-modify-drag-handle"
@@ -534,7 +596,10 @@ function PgStructureColumnRow({
         </label>
       </td>
       <td>
-        <PgTypeSelector value={col.type} onChange={(type) => onChange({ type })} />
+        <PgTypeSelector
+          value={col.type}
+          onChange={(type) => onChange({ type })}
+        />
       </td>
       <td>
         <ColumnFlag
@@ -585,12 +650,16 @@ function PgStructureColumnRow({
           <select
             className="sql-modify-col-type sql-modify-fk-table"
             value={col.fkTable}
-            onChange={(e) => onChange({ fkTable: e.target.value, fkColumn: "" })}
+            onChange={(e) =>
+              onChange({ fkTable: e.target.value, fkColumn: "" })
+            }
             aria-label="Foreign key target table"
           >
             <option value="">(none)</option>
             {knownTables.map((table) => (
-              <option key={table} value={table}>{table}</option>
+              <option key={table} value={table}>
+                {table}
+              </option>
             ))}
           </select>
         </label>
@@ -606,7 +675,9 @@ function PgStructureColumnRow({
           >
             <option value="">(column)</option>
             {fkTargetColumns.map((target) => (
-              <option key={target.name} value={target.name}>{target.name}</option>
+              <option key={target.name} value={target.name}>
+                {target.name}
+              </option>
             ))}
           </select>
         </label>
@@ -621,7 +692,9 @@ function PgStructureColumnRow({
             disabled={!col.fkTable}
           >
             {FK_ACTIONS.map((action) => (
-              <option key={action} value={action}>{action}</option>
+              <option key={action} value={action}>
+                {action}
+              </option>
             ))}
           </select>
         </label>
@@ -636,7 +709,9 @@ function PgStructureColumnRow({
             disabled={!col.fkTable}
           >
             {FK_ACTIONS.map((action) => (
-              <option key={action} value={action}>{action}</option>
+              <option key={action} value={action}>
+                {action}
+              </option>
             ))}
           </select>
         </label>
@@ -675,7 +750,10 @@ function PgGeneratedColumnRow({
     <tr className="sql-modify-col-row sql-modify-gen-row">
       <td>
         <div className="sql-modify-gen-name">
-          <span className="sql-modify-gen-name-text" title={col.originalName ?? col.name}>
+          <span
+            className="sql-modify-gen-name-text"
+            title={col.originalName ?? col.name}
+          >
             {col.originalName ?? col.name}
           </span>
         </div>
@@ -710,7 +788,6 @@ function PgGeneratedColumnRow({
     </tr>
   );
 }
-
 
 const storageKey = (key: string) => `${STORAGE_PREFIX}${key}`;
 const dbScopedKey = (dbId: string, key: string) =>
@@ -777,17 +854,27 @@ function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
     localStorage.setItem(
       dbScopedKey(dbId, "tabs"),
-      JSON.stringify(tabs.filter((tab) => tab.kind !== "er-diagram" && tab.kind !== "query-history")),
+      JSON.stringify(
+        tabs.filter(
+          (tab) => tab.kind !== "er-diagram" && tab.kind !== "query-history",
+        ),
+      ),
     );
   } catch {
     // Ignore storage quota / private-mode errors.
   }
 }
 
-function tabsAreDirty(tabs: QueryTab[], defaults: { title: string; code: string }[]): boolean {
+function tabsAreDirty(
+  tabs: QueryTab[],
+  defaults: { title: string; code: string }[],
+): boolean {
   if (tabs.length !== defaults.length) return true;
   for (let i = 0; i < tabs.length; i += 1) {
-    if (tabs[i].title !== defaults[i].title || tabs[i].code !== defaults[i].code) {
+    if (
+      tabs[i].title !== defaults[i].title ||
+      tabs[i].code !== defaults[i].code
+    ) {
       return true;
     }
   }
@@ -897,14 +984,21 @@ function PostgresPlaygroundInner() {
   const initialDbId =
     typeof window === "undefined"
       ? POSTGRES_SAMPLE_DATABASES[0].id
-      : localStorage.getItem(storageKey("db")) ?? POSTGRES_SAMPLE_DATABASES[0].id;
+      : (localStorage.getItem(storageKey("db")) ??
+        POSTGRES_SAMPLE_DATABASES[0].id);
   const [activeDbId, setActiveDbId] = useState(initialDbId);
   const [tabs, setTabs] = useState<QueryTab[]>(() => loadTabs(initialDbId));
   const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? "");
-  const [resultsByTab, setResultsByTab] = useState<Record<string, QueryRunResult | null>>({});
+  const [resultsByTab, setResultsByTab] = useState<
+    Record<string, QueryRunResult | null>
+  >({});
   const [loaded, setLoaded] = useState(false);
-  const [statusState, setStatusState] = useState<"loading" | "ready" | "running" | "error">("loading");
-  const [loadingMessage, setLoadingMessage] = useState("Loading PostgreSQL engine…");
+  const [statusState, setStatusState] = useState<
+    "loading" | "ready" | "running" | "error"
+  >("loading");
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Loading PostgreSQL engine…",
+  );
   const [tables, setTables] = useState<string[]>([]);
   const [views, setViews] = useState<string[]>([]);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
@@ -913,16 +1007,28 @@ function PostgresPlaygroundInner() {
   const [triggersExpanded, setTriggersExpanded] = useState(true);
   const [indexes, setIndexes] = useState<string[]>([]);
   const [triggers, setTriggers] = useState<string[]>([]);
-  const [columnsByEntity, setColumnsByEntity] = useState<Record<string, TableColumnInfo[]>>({});
-  const [foreignKeysByEntity, setForeignKeysByEntity] = useState<Record<string, ForeignKeyInfo[]>>({});
-  const [expandedEntities, setExpandedEntities] = useState<Set<string>>(new Set());
+  const [columnsByEntity, setColumnsByEntity] = useState<
+    Record<string, TableColumnInfo[]>
+  >({});
+  const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
+    Record<string, ForeignKeyInfo[]>
+  >({});
+  const [expandedEntities, setExpandedEntities] = useState<Set<string>>(
+    new Set(),
+  );
   const [globalPageSize, setGlobalPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
-  const [rowCountByTable, setRowCountByTable] = useState<Record<string, number>>({});
+  const [rowCountByTable, setRowCountByTable] = useState<
+    Record<string, number>
+  >({});
 
   // ─── Query history ────────────────────────────────────────────────────
-  const { history: queryHistory, addHistoryEntry, clearHistory } = useQueryHistory();
+  const {
+    history: queryHistory,
+    addHistoryEntry,
+    clearHistory,
+  } = useQueryHistory();
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -933,14 +1039,20 @@ function PostgresPlaygroundInner() {
     name: string;
     kind: "table" | "view" | "index" | "trigger";
   } | null>(null);
-  const [ddlDialog, setDdlDialog] = useState<{ title: string; sql: string } | null>(null);
+  const [ddlDialog, setDdlDialog] = useState<{
+    title: string;
+    sql: string;
+  } | null>(null);
 
   const [importCsvOpen, setImportCsvOpen] = useState(false);
   const [importCsvDragging, setImportCsvDragging] = useState(false);
-  const [importCsvState, setImportCsvState] = useState<CsvImportState | null>(null);
+  const [importCsvState, setImportCsvState] = useState<CsvImportState | null>(
+    null,
+  );
   const [importJsonOpen, setImportJsonOpen] = useState(false);
   const [importJsonDragging, setImportJsonDragging] = useState(false);
-  const [importJsonState, setImportJsonState] = useState<JsonImportState | null>(null);
+  const [importJsonState, setImportJsonState] =
+    useState<JsonImportState | null>(null);
   const [importParquetOpen, setImportParquetOpen] = useState(false);
   const [importParquetDragging, setImportParquetDragging] = useState(false);
   const [importParquetState, setImportParquetState] =
@@ -951,13 +1063,19 @@ function PostgresPlaygroundInner() {
     useState<PgStructureDialogState | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<PgStructureDialogState | null>(null);
-  const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<Set<string>>(new Set());
-  const [addTablePendingFocusId, setAddTablePendingFocusId] = useState<string | null>(null);
+  const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<
+    Set<string>
+  >(new Set());
+  const [addTablePendingFocusId, setAddTablePendingFocusId] = useState<
+    string | null
+  >(null);
   const addTableBodyRef = useRef<HTMLDivElement | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
   const pgStructureValidation = useMemo(
     () => validatePgStructure(viewStructureDialog, columnsByEntity),
@@ -972,12 +1090,21 @@ function PostgresPlaygroundInner() {
   // has had a chance to type something.
   const addTableDisplayValidation = useMemo(() => {
     if (!addTableDialog) {
-      return { invalidColumnIds: new Set<string>(), errors: [] as string[], hasTableNameError: false, isValid: false, isDirty: false };
+      return {
+        invalidColumnIds: new Set<string>(),
+        errors: [] as string[],
+        hasTableNameError: false,
+        isValid: false,
+        isDirty: false,
+      };
     }
     const displayCols = addTableDialog.columns.filter(
       (c) => c.generated || c.name.trim() || addTableTouchedColIds.has(c.id),
     );
-    return validatePgStructure({ ...addTableDialog, columns: displayCols }, columnsByEntity);
+    return validatePgStructure(
+      { ...addTableDialog, columns: displayCols },
+      columnsByEntity,
+    );
   }, [addTableDialog, addTableTouchedColIds, columnsByEntity]);
 
   // ─── Refs ─────────────────────────────────────────────────────────────
@@ -1004,27 +1131,34 @@ function PostgresPlaygroundInner() {
   const runActiveTabRef = useRef<() => void>(() => undefined);
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
 
-  const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
-  const result = activeTab ? resultsByTab[activeTab.id] ?? null : null;
+  const activeTab =
+    tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
+  const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findPostgresSampleDatabase(activeDbId);
   const tabIds = useMemo(() => tabs.map((tab) => tab.id), [tabs]);
-  const tabDragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const tabDragSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
 
-  const persistTabs = useCallback((nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
-    tabsRef.current = nextTabs;
-    setTabs(nextTabs);
-    saveTabs(dbId, nextTabs);
-  }, []);
+  const persistTabs = useCallback(
+    (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
+      tabsRef.current = nextTabs;
+      setTabs(nextTabs);
+      saveTabs(dbId, nextTabs);
+    },
+    [],
+  );
 
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine) return;
-    const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
-      engine.listTables(),
-      engine.listViews(),
-      engine.listIndexes(),
-      engine.listTriggers(),
-    ]);
+    const [nextTables, nextViews, nextIndexes, nextTriggers] =
+      await Promise.all([
+        engine.listTables(),
+        engine.listViews(),
+        engine.listIndexes(),
+        engine.listTriggers(),
+      ]);
     const entries = await Promise.all(
       [...nextTables, ...nextViews].map(async (name) => {
         const [colsResult, fksResult, countResult] = await Promise.allSettled([
@@ -1045,9 +1179,15 @@ function PostgresPlaygroundInner() {
     setViews(nextViews);
     setIndexes(nextIndexes);
     setTriggers(nextTriggers);
-    setColumnsByEntity(Object.fromEntries(entries.map(([name, cols]) => [name, cols])));
-    setForeignKeysByEntity(Object.fromEntries(entries.map(([name, , fks]) => [name, fks])));
-    setRowCountByTable(Object.fromEntries(entries.map(([name, , , count]) => [name, count])));
+    setColumnsByEntity(
+      Object.fromEntries(entries.map(([name, cols]) => [name, cols])),
+    );
+    setForeignKeysByEntity(
+      Object.fromEntries(entries.map(([name, , fks]) => [name, fks])),
+    );
+    setRowCountByTable(
+      Object.fromEntries(entries.map(([name, , , count]) => [name, count])),
+    );
   }, []);
 
   const runSqlForTab = useCallback(
@@ -1085,7 +1225,11 @@ function PostgresPlaygroundInner() {
         let lazyPage: number | undefined;
         let lazyPageSize: number | undefined;
         if (useLazy) {
-          const lazy = await engine.execPaged(trimmed, globalPageSize, page * globalPageSize);
+          const lazy = await engine.execPaged(
+            trimmed,
+            globalPageSize,
+            page * globalPageSize,
+          );
           sets = lazy.result;
           lazySql = trimmed.replace(/\s*;+\s*$/, "");
           lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
@@ -1150,10 +1294,18 @@ function PostgresPlaygroundInner() {
   );
 
   const runActiveTab = useCallback(() => {
-    const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
-    if (!tab || tab.kind === "er-diagram" || tab.kind === "query-history") return;
+    const tab = tabsRef.current.find(
+      (candidate) => candidate.id === activeTabIdRef.current,
+    );
+    if (!tab || tab.kind === "er-diagram" || tab.kind === "query-history")
+      return;
     const sql = editorRef.current?.state.doc.toString() ?? tab.code;
-    void runSqlForTab(tab.id, sql, tab.title, tab.kind === "view-data" ? tab.title : undefined);
+    void runSqlForTab(
+      tab.id,
+      sql,
+      tab.title,
+      tab.kind === "view-data" ? tab.title : undefined,
+    );
   }, [runSqlForTab]);
 
   const runCurrentSelection = useCallback(() => {
@@ -1162,7 +1314,9 @@ function PostgresPlaygroundInner() {
     const sel = view.state.selection.main;
     if (sel.empty) return;
     const selected = view.state.sliceDoc(sel.from, sel.to);
-    const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
+    const tab = tabsRef.current.find(
+      (candidate) => candidate.id === activeTabIdRef.current,
+    );
     if (!tab) return;
     void runSqlForTab(tab.id, selected, tab.title);
   }, [runSqlForTab]);
@@ -1171,7 +1325,9 @@ function PostgresPlaygroundInner() {
   useEffect(() => {
     runActiveTabRef.current = runActiveTab;
     runSelectionRef.current = (sql: string) => {
-      const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
+      const tab = tabsRef.current.find(
+        (candidate) => candidate.id === activeTabIdRef.current,
+      );
       if (!tab) return;
       void runSqlForTab(tab.id, sql, tab.title);
     };
@@ -1195,7 +1351,10 @@ function PostgresPlaygroundInner() {
   useEffect(() => {
     activeTabIdRef.current = activeTabId;
     try {
-      localStorage.setItem(dbScopedKey(activeDbIdRef.current, "active_tab"), activeTabId);
+      localStorage.setItem(
+        dbScopedKey(activeDbIdRef.current, "active_tab"),
+        activeTabId,
+      );
     } catch {
       /* ignore */
     }
@@ -1216,8 +1375,9 @@ function PostgresPlaygroundInner() {
     const savedOutputFontEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
-      Number(localStorage.getItem(storageKey("outputfontsize")) ?? D.outputFontSize) ||
-      D.outputFontSize;
+      Number(
+        localStorage.getItem(storageKey("outputfontsize")) ?? D.outputFontSize,
+      ) || D.outputFontSize;
     const savedTheme =
       getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
     const savedWordWrap =
@@ -1234,7 +1394,10 @@ function PostgresPlaygroundInner() {
 
     applyMode(savedTheme);
     applyThemePalette(savedTheme);
-    document.documentElement.style.setProperty("--cm-font-size", `${savedSize}px`);
+    document.documentElement.style.setProperty(
+      "--cm-font-size",
+      `${savedSize}px`,
+    );
     document.documentElement.style.setProperty(
       "--output-font-size",
       `${savedOutputFontEnabled ? savedOutputSize : savedSize}px`,
@@ -1245,7 +1408,10 @@ function PostgresPlaygroundInner() {
       const savedActiveTab = localStorage.getItem(
         dbScopedKey(initialDbId, "active_tab"),
       );
-      if (savedActiveTab && tabsRef.current.some((tab) => tab.id === savedActiveTab)) {
+      if (
+        savedActiveTab &&
+        tabsRef.current.some((tab) => tab.id === savedActiveTab)
+      ) {
         setActiveTabId(savedActiveTab);
       }
     } catch {
@@ -1298,8 +1464,14 @@ function PostgresPlaygroundInner() {
           crosshairCursor(),
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
-          langComp.of(sqlLang({ dialect: PostgreSQL, upperCaseKeywords: false })),
-          completionComp.of(autocompletion({ override: [createSqlCompletionSource({ entities: [] })] })),
+          langComp.of(
+            sqlLang({ dialect: PostgreSQL, upperCaseKeywords: false }),
+          ),
+          completionComp.of(
+            autocompletion({
+              override: [createSqlCompletionSource({ entities: [] })],
+            }),
+          ),
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
           EditorView.updateListener.of((update) => {
@@ -1372,7 +1544,9 @@ function PostgresPlaygroundInner() {
         setStatusState("ready");
       } catch (err) {
         if (cancelled) return;
-        setLoadingMessage(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
+        setLoadingMessage(
+          `Failed to load: ${err instanceof Error ? err.message : String(err)}`,
+        );
         setStatusState("error");
       }
     })();
@@ -1389,11 +1563,19 @@ function PostgresPlaygroundInner() {
 
   useEffect(() => {
     const view = editorRef.current;
-    if (!view || !activeTab || activeTab.kind === "er-diagram" || activeTab.kind === "view-data" || activeTab.kind === "query-history")
+    if (
+      !view ||
+      !activeTab ||
+      activeTab.kind === "er-diagram" ||
+      activeTab.kind === "view-data" ||
+      activeTab.kind === "query-history"
+    )
       return;
     const current = view.state.doc.toString();
     if (current !== activeTab.code) {
-      view.dispatch({ changes: { from: 0, to: current.length, insert: activeTab.code } });
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: activeTab.code },
+      });
     }
     view.focus();
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1424,7 +1606,10 @@ function PostgresPlaygroundInner() {
 
   // Apply font size.
   useEffect(() => {
-    document.documentElement.style.setProperty("--cm-font-size", `${fontSize}px`);
+    document.documentElement.style.setProperty(
+      "--cm-font-size",
+      `${fontSize}px`,
+    );
     editorRef.current?.requestMeasure();
   }, [fontSize]);
 
@@ -1457,9 +1642,13 @@ function PostgresPlaygroundInner() {
     }
     view.dispatch({
       effects: [
-        langComp.reconfigure(sqlLang({ dialect: PostgreSQL, schema, upperCaseKeywords: false })),
+        langComp.reconfigure(
+          sqlLang({ dialect: PostgreSQL, schema, upperCaseKeywords: false }),
+        ),
         completionComp.reconfigure(
-          autocompletion({ override: [createSqlCompletionSource(completionSchema)] }),
+          autocompletion({
+            override: [createSqlCompletionSource(completionSchema)],
+          }),
         ),
       ],
     });
@@ -1519,7 +1708,10 @@ function PostgresPlaygroundInner() {
         setStatusState("ready");
         showToast(`Loaded ${sample.filename}.`);
       } catch (err) {
-        showToast(`Load failed: ${err instanceof Error ? err.message : String(err)}`, "warn");
+        showToast(
+          `Load failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
         setStatusState("ready");
       }
     },
@@ -1551,23 +1743,26 @@ function PostgresPlaygroundInner() {
     setActiveTabId(tab.id);
   }, [persistTabs]);
 
-  const closeTab = useCallback((id: string) => {
-    const next = tabsRef.current.filter((tab) => tab.id !== id);
-    const fallback = next[0] ?? {
-      id: newTabId(),
-      title: "Query 1",
-      code: "",
-      pristineCode: "",
-    };
-    const finalTabs = next.length > 0 ? next : [fallback];
-    persistTabs(finalTabs);
-    if (activeTabIdRef.current === id) setActiveTabId(fallback.id);
-    setResultsByTab((prev) => {
-      const { [id]: _deleted, ...rest } = prev;
-      void _deleted;
-      return rest;
-    });
-  }, [persistTabs]);
+  const closeTab = useCallback(
+    (id: string) => {
+      const next = tabsRef.current.filter((tab) => tab.id !== id);
+      const fallback = next[0] ?? {
+        id: newTabId(),
+        title: "Query 1",
+        code: "",
+        pristineCode: "",
+      };
+      const finalTabs = next.length > 0 ? next : [fallback];
+      persistTabs(finalTabs);
+      if (activeTabIdRef.current === id) setActiveTabId(fallback.id);
+      setResultsByTab((prev) => {
+        const { [id]: _deleted, ...rest } = prev;
+        void _deleted;
+        return rest;
+      });
+    },
+    [persistTabs],
+  );
 
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findPostgresSampleDatabase(activeDbIdRef.current);
@@ -1610,7 +1805,14 @@ function PostgresPlaygroundInner() {
         const finalTabs =
           next.length > 0
             ? next
-            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+            : [
+                {
+                  id: newTabId(),
+                  title: "Query 1",
+                  code: "",
+                  pristineCode: "",
+                },
+              ];
         persistTabs(finalTabs);
         setActiveTabId(finalTabs[0].id);
         return;
@@ -1639,7 +1841,14 @@ function PostgresPlaygroundInner() {
         const finalTabs =
           next.length > 0
             ? next
-            : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
+            : [
+                {
+                  id: newTabId(),
+                  title: "Query 1",
+                  code: "",
+                  pristineCode: "",
+                },
+              ];
         persistTabs(finalTabs);
         setActiveTabId(finalTabs[0].id);
         return;
@@ -1700,24 +1909,30 @@ function PostgresPlaygroundInner() {
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
   const exportResultSet = useCallback(
-    async (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => {
+    async (
+      format: "csv" | "json" | "sql" | "parquet" | "xlsx",
+      scope: ResultSetExportScope,
+    ) => {
       if (!result || result.sets.length === 0) return;
       const set = resultSetExportSnapshot
-        ? result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0]
+        ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0])
         : result.sets[0];
       const columns = resultSetExportSnapshot?.columns ?? set.columns;
-      let rows = scope === "page" && resultSetExportSnapshot
-        ? resultSetExportSnapshot.rows
-        : resultSetExportSnapshot?.allRows ?? set.values;
+      let rows =
+        scope === "page" && resultSetExportSnapshot
+          ? resultSetExportSnapshot.rows
+          : (resultSetExportSnapshot?.allRows ?? set.values);
       if (scope === "all" && result.lazySql && engineRef.current) {
-        rows = (await engineRef.current.exec(result.lazySql))[0]?.values ?? rows;
+        rows =
+          (await engineRef.current.exec(result.lazySql))[0]?.values ?? rows;
       }
       const title = activeTab?.title ?? "result_set";
       const filename = `${toFileSafeName(title)}.${format}`;
       if (format === "csv") exportResultToCsv(columns, rows, filename);
       else if (format === "json") exportResultToJson(columns, rows, filename);
       else if (format === "sql") exportResultToSql(columns, rows, filename);
-      else if (format === "parquet") await exportResultToParquet(columns, rows, filename);
+      else if (format === "parquet")
+        await exportResultToParquet(columns, rows, filename);
       else await exportResultToXlsx(columns, rows, filename);
     },
     [activeTab, result, resultSetExportSnapshot],
@@ -1725,7 +1940,9 @@ function PostgresPlaygroundInner() {
 
   const handleLoadPage = useCallback(
     (sql: string, page: number) => {
-      const tab = tabsRef.current.find((candidate) => candidate.id === activeTabIdRef.current);
+      const tab = tabsRef.current.find(
+        (candidate) => candidate.id === activeTabIdRef.current,
+      );
       const curResult = tab ? resultsByTab[tab.id] : null;
       if (!tab) return;
       void runSqlForTab(
@@ -1751,10 +1968,19 @@ function PostgresPlaygroundInner() {
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
       const sql = `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)};`;
-      const tab: QueryTab = { id: newTabId(), title: `Count: ${name}`, code: sql, pristineCode: sql };
+      const tab: QueryTab = {
+        id: newTabId(),
+        title: `Count: ${name}`,
+        code: sql,
+        pristineCode: sql,
+      };
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
-      void runSqlForTab(tab.id, sql, `${kind === "view" ? "View row count" : "Row count"}: ${name}`);
+      void runSqlForTab(
+        tab.id,
+        sql,
+        `${kind === "view" ? "View row count" : "Row count"}: ${name}`,
+      );
     },
     [persistTabs, runSqlForTab],
   );
@@ -1781,8 +2007,7 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       // Display SQL is for the editor tab only — actual execution uses
       // parameterized execParams below to prevent injection.
-      const displaySql =
-        `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
+      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Structure: ${name}`,
@@ -1793,8 +2018,7 @@ function PostgresPlaygroundInner() {
       setActiveTabId(tab.id);
       if (!engine) return;
       // Run via parameterized query to avoid any injection risk.
-      const paramSql =
-        `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`;
+      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`;
       try {
         const sets = await engine.execParams(paramSql, [name]);
         setResultsByTab((prev) => ({
@@ -1837,15 +2061,24 @@ function PostgresPlaygroundInner() {
   }, [pendingDropEntity, refreshSchema, showToast]);
 
   const exportEntity = useCallback(
-    async (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => {
-      const sets = await engineRef.current?.exec(`SELECT * FROM ${quoteIdent(name)}`);
+    async (
+      name: string,
+      format: "csv" | "json" | "sql" | "parquet" | "xlsx",
+    ) => {
+      const sets = await engineRef.current?.exec(
+        `SELECT * FROM ${quoteIdent(name)}`,
+      );
       const set = sets?.[0];
       if (!set) return;
       const filename = `${toFileSafeName(name)}.${format}`;
-      if (format === "csv") exportResultToCsv(set.columns, set.values, filename);
-      else if (format === "json") exportResultToJson(set.columns, set.values, filename);
-      else if (format === "sql") exportResultToSql(set.columns, set.values, filename);
-      else if (format === "parquet") await exportResultToParquet(set.columns, set.values, filename);
+      if (format === "csv")
+        exportResultToCsv(set.columns, set.values, filename);
+      else if (format === "json")
+        exportResultToJson(set.columns, set.values, filename);
+      else if (format === "sql")
+        exportResultToSql(set.columns, set.values, filename);
+      else if (format === "parquet")
+        await exportResultToParquet(set.columns, set.values, filename);
       else await exportResultToXlsx(set.columns, set.values, filename);
     },
     [],
@@ -1877,14 +2110,16 @@ function PostgresPlaygroundInner() {
         const columns = cols.map<PgStructureColumn>((c) => {
           const fk = fkByCol.get(c.name);
           const constraint = constraintsByCol.get(c.name);
-          const isAutoIncrement = constraint?.isAutoIncrement ?? /^nextval\s*\(/i.test(c.defaultValue ?? "");
+          const isAutoIncrement =
+            constraint?.isAutoIncrement ??
+            /^nextval\s*\(/i.test(c.defaultValue ?? "");
           return {
             id: newPgStructureId(),
             originalName: c.name,
             name: c.name,
             type: c.type || "text",
             nullable: !c.notNull,
-            defaultValue: isAutoIncrement ? "" : c.defaultValue ?? "",
+            defaultValue: isAutoIncrement ? "" : (c.defaultValue ?? ""),
             isPk: c.pk > 0,
             unique: constraint?.isUnique ?? false,
             autoIncrement: isAutoIncrement,
@@ -1926,7 +2161,10 @@ function PostgresPlaygroundInner() {
     if (!dialog || !engine) return;
     const validation = validatePgStructure(dialog, columnsByEntity);
     if (!validation.isValid) {
-      showToast(validation.errors[0] ?? "Fix validation errors before saving.", "warn");
+      showToast(
+        validation.errors[0] ?? "Fix validation errors before saving.",
+        "warn",
+      );
       return;
     }
     if (!validation.isDirty) return;
@@ -2006,7 +2244,10 @@ function PostgresPlaygroundInner() {
     if (!validation.isValid) {
       // Mark all columns as touched so errors are shown in the form.
       setAddTableTouchedColIds(new Set(dialog.columns.map((c) => c.id)));
-      showToast(validation.errors[0] ?? "Fix validation errors before saving.", "warn");
+      showToast(
+        validation.errors[0] ?? "Fix validation errors before saving.",
+        "warn",
+      );
       return;
     }
     const trimmedName = dialog.newTableName.trim();
@@ -2064,7 +2305,9 @@ function PostgresPlaygroundInner() {
         if (ddl) {
           lines.push(`${ddl};\n`);
         }
-        const sets = await engine.exec(`SELECT * FROM ${quoteIdent(tableName)}`);
+        const sets = await engine.exec(
+          `SELECT * FROM ${quoteIdent(tableName)}`,
+        );
         const set = sets?.[0];
         if (!set) continue;
         const { columns, values: rows } = set;
@@ -2312,9 +2555,15 @@ function PostgresPlaygroundInner() {
         return;
       }
       try {
-        await importRowsIntoPostgres(engine, effectiveTable, fileColumns, rows, {
-          createTable: !isExisting,
-        });
+        await importRowsIntoPostgres(
+          engine,
+          effectiveTable,
+          fileColumns,
+          rows,
+          {
+            createTable: !isExisting,
+          },
+        );
         await refreshSchema();
         if (flavor === "csv") {
           setImportCsvOpen(false);
@@ -2336,13 +2585,23 @@ function PostgresPlaygroundInner() {
         );
       }
     },
-    [importCsvState, importJsonState, importParquetState, refreshSchema, showToast],
+    [
+      importCsvState,
+      importJsonState,
+      importParquetState,
+      refreshSchema,
+      showToast,
+    ],
   );
 
   return (
     <div className="pg-root">
       {!loaded && (
-        <div className={`pyodide-loading${statusState === "error" ? " has-error" : ""}`} role="status" aria-live="polite">
+        <div
+          className={`pyodide-loading${statusState === "error" ? " has-error" : ""}`}
+          role="status"
+          aria-live="polite"
+        >
           <div className="loading-hero" aria-hidden="true">
             <div className="loading-hero-track">
               <span className="loading-hero-text">PostgreSQL Playground</span>
@@ -2352,7 +2611,9 @@ function PostgresPlaygroundInner() {
           </div>
           <div className="loading-bottom">
             <div className="loading-quip">{loadingMessage}</div>
-            <div className="loading-bar-wrap"><div className="loading-bar" /></div>
+            <div className="loading-bar-wrap">
+              <div className="loading-bar" />
+            </div>
           </div>
         </div>
       )}
@@ -2361,41 +2622,74 @@ function PostgresPlaygroundInner() {
           <div className="logo">
             <Link href="/" aria-label="Dataslope home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
+              <img
+                src="/dataslope-logo-blue.svg"
+                alt="Dataslope logo"
+                className="brand-logo"
+              />
             </Link>
-            <Link href="/" className="brand-name">Dataslope</Link>
+            <Link href="/" className="brand-name">
+              Dataslope
+            </Link>
             <Select.Root
               value={PLAYGROUND_ID}
               onValueChange={(value) => {
-                const selectedPlayground = PLAYGROUNDS.find((playground) => playground.id === value);
-                if (selectedPlayground && selectedPlayground.id !== PLAYGROUND_ID) {
+                const selectedPlayground = PLAYGROUNDS.find(
+                  (playground) => playground.id === value,
+                );
+                if (
+                  selectedPlayground &&
+                  selectedPlayground.id !== PLAYGROUND_ID
+                ) {
                   router.push(selectedPlayground.href);
                 }
               }}
             >
-              <Select.Trigger className="playground-switcher" aria-label="Switch playground">
+              <Select.Trigger
+                className="playground-switcher"
+                aria-label="Switch playground"
+              >
                 {(() => {
                   const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const factor = PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
+                  const factor =
+                    PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
                   return Icon ? (
-                    <span className="playground-switcher-lang-icon" style={{ color: "var(--text)" }} aria-hidden="true">
+                    <span
+                      className="playground-switcher-lang-icon"
+                      style={{ color: "var(--text)" }}
+                      aria-hidden="true"
+                    >
                       <Icon size={Math.round(16 * factor)} />
                     </span>
                   ) : null;
                 })()}
                 <Select.Value />
-                <Select.Icon className="playground-switcher-icon"><ChevronDown size={12} /></Select.Icon>
+                <Select.Icon className="playground-switcher-icon">
+                  <ChevronDown size={12} />
+                </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Positioner className="pg-lang-switcher-positioner" sideOffset={6} alignItemWithTrigger={false}>
+                <Select.Positioner
+                  className="pg-lang-switcher-positioner"
+                  sideOffset={6}
+                  alignItemWithTrigger={false}
+                >
                   <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((playground) => {
                       const Icon = PLAYGROUND_ICONS[playground.id];
-                      const factor = PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
+                      const factor =
+                        PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
                       return (
-                        <Select.Item key={playground.id} value={playground.id} className="bui-select-item">
+                        <Select.Item
+                          key={playground.id}
+                          value={playground.id}
+                          className="bui-select-item"
+                        >
                           {Icon && (
-                            <span className="bui-select-item-icon" aria-hidden="true">
+                            <span
+                              className="bui-select-item-icon"
+                              aria-hidden="true"
+                            >
                               <Icon size={Math.round(16 * factor)} />
                             </span>
                           )}
@@ -2465,7 +2759,9 @@ function PostgresPlaygroundInner() {
                           from Parquet
                           <span className="ext-badge">.parquet</span>
                         </div>
-                        <div className="ex-desc">Add table from Parquet file</div>
+                        <div className="ex-desc">
+                          Add table from Parquet file
+                        </div>
                       </div>
                     </Menu.Item>
                   </Menu.Popup>
@@ -2473,7 +2769,10 @@ function PostgresPlaygroundInner() {
               </Menu.Portal>
             </Menu.Root>
             {tables.length === 0 && loaded ? (
-              <Popover.Root open={exportNoTabsHover} onOpenChange={setExportNoTabsHover}>
+              <Popover.Root
+                open={exportNoTabsHover}
+                onOpenChange={setExportNoTabsHover}
+              >
                 <div
                   style={{ cursor: "not-allowed" }}
                   onMouseEnter={() => setExportNoTabsHover(true)}
@@ -2497,7 +2796,11 @@ function PostgresPlaygroundInner() {
                   </Popover.Trigger>
                 </div>
                 <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} align="start" className="sql-export-disabled-positioner">
+                  <Popover.Positioner
+                    sideOffset={6}
+                    align="start"
+                    className="sql-export-disabled-positioner"
+                  >
                     <Popover.Popup className="bui-popup sql-export-disabled-popup">
                       Create a table to export the database
                     </Popover.Popup>
@@ -2518,7 +2821,9 @@ function PostgresPlaygroundInner() {
                 <Menu.Portal>
                   <Menu.Positioner sideOffset={6} align="start">
                     <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                      <div className="sql-result-export-group-label">PostgreSQL Database</div>
+                      <div className="sql-result-export-group-label">
+                        PostgreSQL Database
+                      </div>
                       <Menu.Item
                         className="example-item export-item"
                         onClick={() => void exportPostgresDatabase()}
@@ -2528,7 +2833,9 @@ function PostgresPlaygroundInner() {
                             SQL Dump
                             <span className="ext-badge">.sql</span>
                           </div>
-                          <div className="ex-desc">CREATE + INSERT statements</div>
+                          <div className="ex-desc">
+                            CREATE + INSERT statements
+                          </div>
                         </div>
                       </Menu.Item>
                       <Menu.Item
@@ -2633,7 +2940,8 @@ function PostgresPlaygroundInner() {
                 DDL: {ddlDialog?.title ?? ""}
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Read-only view of the reconstructed <code>CREATE</code> statement(s).
+                Read-only view of the reconstructed <code>CREATE</code>{" "}
+                statement(s).
               </Dialog.Description>
               <DdlViewer
                 sql={ddlDialog?.sql ?? ""}
@@ -2653,7 +2961,9 @@ function PostgresPlaygroundInner() {
                       navigator.clipboard
                         .writeText(ddlDialog.sql)
                         .then(() => showToast("Copied DDL to clipboard."))
-                        .catch(() => showToast("Couldn't copy to clipboard.", "warn"));
+                        .catch(() =>
+                          showToast("Couldn't copy to clipboard.", "warn"),
+                        );
                     }
                   }}
                 >
@@ -2717,8 +3027,8 @@ function PostgresPlaygroundInner() {
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
                 This will permanently drop{" "}
-                <strong>{pendingDropEntity?.name ?? ""}</strong> from the in-memory
-                database. Reload the page to restore the sample.
+                <strong>{pendingDropEntity?.name ?? ""}</strong> from the
+                in-memory database. Reload the page to restore the sample.
               </AlertDialog.Description>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2833,7 +3143,9 @@ function PostgresPlaygroundInner() {
                       value={viewStructureDialog.newTableName}
                       onChange={(e) =>
                         setViewStructureDialog((prev) =>
-                          prev ? { ...prev, newTableName: e.target.value } : null,
+                          prev
+                            ? { ...prev, newTableName: e.target.value }
+                            : null,
                         )
                       }
                     />
@@ -2848,82 +3160,100 @@ function PostgresPlaygroundInner() {
                     return (
                       <>
                         <div className="sql-modify-columns">
-                        <DndContext
-                          sensors={pgStructureSensors}
-                          collisionDetection={closestCenter}
-                          onDragEnd={(event: DragEndEvent) => {
-                            const { active, over } = event;
-                            if (!over || active.id === over.id) return;
-                            const cols = viewStructureDialog.columns;
-                            const oldIndex = cols.findIndex((c) => c.id === active.id);
-                            const newIndex = cols.findIndex((c) => c.id === over.id);
-                            if (oldIndex === -1 || newIndex === -1) return;
-                            setViewStructureDialog({
-                              ...viewStructureDialog,
-                              columns: arrayMove(cols, oldIndex, newIndex),
-                            });
-                          }}
-                        >
-                          <SortableContext
-                            items={regularCols.map((c) => c.id)}
-                            strategy={verticalListSortingStrategy}
+                          <DndContext
+                            sensors={pgStructureSensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={(event: DragEndEvent) => {
+                              const { active, over } = event;
+                              if (!over || active.id === over.id) return;
+                              const cols = viewStructureDialog.columns;
+                              const oldIndex = cols.findIndex(
+                                (c) => c.id === active.id,
+                              );
+                              const newIndex = cols.findIndex(
+                                (c) => c.id === over.id,
+                              );
+                              if (oldIndex === -1 || newIndex === -1) return;
+                              setViewStructureDialog({
+                                ...viewStructureDialog,
+                                columns: arrayMove(cols, oldIndex, newIndex),
+                              });
+                            }}
                           >
-                            <div className="sql-modify-table-wrap">
-                              <table className="sql-modify-table">
-                                <thead>
-                                  <tr>
-                                    <th className="sql-modify-drag-cell" aria-label="Drag handle" />
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Not null</th>
-                                    <th>Primary</th>
-                                    <th>Unique</th>
-                                    <th>Identity/<br />serial</th>
-                                    <th>Default</th>
-                                    <th>FK table</th>
-                                    <th>FK column</th>
-                                    <th>On delete</th>
-                                    <th>On update</th>
-                                    <th>Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {regularCols.map((col) => (
-                                    <PgStructureColumnRow
-                                      key={col.id}
-                                      col={col}
-                                      onChange={(patch) =>
-                                        setViewStructureDialog((prev) =>
-                                          prev
-                                            ? {
-                                                ...prev,
-                                                columns: prev.columns.map((c) =>
-                                                  c.id === col.id ? { ...c, ...patch } : c,
-                                                ),
-                                              }
-                                            : null,
-                                        )
-                                      }
-                                      onRemove={() =>
-                                        setViewStructureDialog((prev) =>
-                                          prev
-                                            ? {
-                                                ...prev,
-                                                columns: prev.columns.filter((c) => c.id !== col.id),
-                                              }
-                                            : null,
-                                        )
-                                      }
-                                      hasError={pgStructureValidation.invalidColumnIds.has(col.id)}
-                                      knownTables={tables}
-                                      columnsByTable={columnsByEntity}
-                                    />
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </SortableContext>
-                        </DndContext>
+                            <SortableContext
+                              items={regularCols.map((c) => c.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="sql-modify-table-wrap">
+                                <table className="sql-modify-table">
+                                  <thead>
+                                    <tr>
+                                      <th
+                                        className="sql-modify-drag-cell"
+                                        aria-label="Drag handle"
+                                      />
+                                      <th>Name</th>
+                                      <th>Type</th>
+                                      <th>Not null</th>
+                                      <th>Primary</th>
+                                      <th>Unique</th>
+                                      <th>
+                                        Identity/
+                                        <br />
+                                        serial
+                                      </th>
+                                      <th>Default</th>
+                                      <th>FK table</th>
+                                      <th>FK column</th>
+                                      <th>On delete</th>
+                                      <th>On update</th>
+                                      <th>Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {regularCols.map((col) => (
+                                      <PgStructureColumnRow
+                                        key={col.id}
+                                        col={col}
+                                        onChange={(patch) =>
+                                          setViewStructureDialog((prev) =>
+                                            prev
+                                              ? {
+                                                  ...prev,
+                                                  columns: prev.columns.map(
+                                                    (c) =>
+                                                      c.id === col.id
+                                                        ? { ...c, ...patch }
+                                                        : c,
+                                                  ),
+                                                }
+                                              : null,
+                                          )
+                                        }
+                                        onRemove={() =>
+                                          setViewStructureDialog((prev) =>
+                                            prev
+                                              ? {
+                                                  ...prev,
+                                                  columns: prev.columns.filter(
+                                                    (c) => c.id !== col.id,
+                                                  ),
+                                                }
+                                              : null,
+                                          )
+                                        }
+                                        hasError={pgStructureValidation.invalidColumnIds.has(
+                                          col.id,
+                                        )}
+                                        knownTables={tables}
+                                        columnsByTable={columnsByEntity}
+                                      />
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </SortableContext>
+                          </DndContext>
                         </div>
                         <button
                           type="button"
@@ -2931,10 +3261,19 @@ function PostgresPlaygroundInner() {
                           onClick={() =>
                             setViewStructureDialog((prev) => {
                               if (!prev) return null;
-                              const firstGenIdx = prev.columns.findIndex((col) => col.generated);
-                              const insertAt = firstGenIdx === -1 ? prev.columns.length : firstGenIdx;
+                              const firstGenIdx = prev.columns.findIndex(
+                                (col) => col.generated,
+                              );
+                              const insertAt =
+                                firstGenIdx === -1
+                                  ? prev.columns.length
+                                  : firstGenIdx;
                               const nextColumns = [...prev.columns];
-                              nextColumns.splice(insertAt, 0, makeNewPgColumn());
+                              nextColumns.splice(
+                                insertAt,
+                                0,
+                                makeNewPgColumn(),
+                              );
                               return { ...prev, columns: nextColumns };
                             })
                           }
@@ -2975,16 +3314,17 @@ function PostgresPlaygroundInner() {
                                           prev
                                             ? {
                                                 ...prev,
-                                                columns: prev.columns.map((c) =>
-                                                  c.id === id && c.generated
-                                                    ? {
-                                                        ...c,
-                                                        generated: {
-                                                          ...c.generated,
-                                                          expression,
-                                                        },
-                                                      }
-                                                    : c,
+                                                columns: prev.columns.map(
+                                                  (c) =>
+                                                    c.id === id && c.generated
+                                                      ? {
+                                                          ...c,
+                                                          generated: {
+                                                            ...c.generated,
+                                                            expression,
+                                                          },
+                                                        }
+                                                      : c,
                                                 ),
                                               }
                                             : null,
@@ -2995,7 +3335,9 @@ function PostgresPlaygroundInner() {
                                           prev
                                             ? {
                                                 ...prev,
-                                                columns: prev.columns.filter((c) => c.id !== id),
+                                                columns: prev.columns.filter(
+                                                  (c) => c.id !== id,
+                                                ),
                                               }
                                             : null,
                                         )
@@ -3007,7 +3349,8 @@ function PostgresPlaygroundInner() {
                             </div>
                             <p className="sql-modify-pg-note">
                               <Pencil size={12} aria-hidden="true" />
-                              PostgreSQL generated columns are stored. Editing the expression rebuilds the table structure.
+                              PostgreSQL generated columns are stored. Editing
+                              the expression rebuilds the table structure.
                             </p>
                           </div>
                         )}
@@ -3075,7 +3418,9 @@ function PostgresPlaygroundInner() {
                       value={addTableDialog.newTableName}
                       onChange={(e) =>
                         setAddTableDialog((prev) =>
-                          prev ? { ...prev, newTableName: e.target.value } : null,
+                          prev
+                            ? { ...prev, newTableName: e.target.value }
+                            : null,
                         )
                       }
                     />
@@ -3094,8 +3439,12 @@ function PostgresPlaygroundInner() {
                               const { active, over } = event;
                               if (!over || active.id === over.id) return;
                               const cols = addTableDialog.columns;
-                              const oldIndex = cols.findIndex((c) => c.id === active.id);
-                              const newIndex = cols.findIndex((c) => c.id === over.id);
+                              const oldIndex = cols.findIndex(
+                                (c) => c.id === active.id,
+                              );
+                              const newIndex = cols.findIndex(
+                                (c) => c.id === over.id,
+                              );
                               if (oldIndex === -1 || newIndex === -1) return;
                               setAddTableDialog({
                                 ...addTableDialog,
@@ -3111,13 +3460,20 @@ function PostgresPlaygroundInner() {
                                 <table className="sql-modify-table">
                                   <thead>
                                     <tr>
-                                      <th className="sql-modify-drag-cell" aria-label="Drag handle" />
+                                      <th
+                                        className="sql-modify-drag-cell"
+                                        aria-label="Drag handle"
+                                      />
                                       <th>Name</th>
                                       <th>Type</th>
                                       <th>Not null</th>
                                       <th>Primary</th>
                                       <th>Unique</th>
-                                      <th>Identity/<br />serial</th>
+                                      <th>
+                                        Identity/
+                                        <br />
+                                        serial
+                                      </th>
                                       <th>Default</th>
                                       <th>FK table</th>
                                       <th>FK column</th>
@@ -3136,8 +3492,11 @@ function PostgresPlaygroundInner() {
                                             prev
                                               ? {
                                                   ...prev,
-                                                  columns: prev.columns.map((c) =>
-                                                    c.id === col.id ? { ...c, ...patch } : c,
+                                                  columns: prev.columns.map(
+                                                    (c) =>
+                                                      c.id === col.id
+                                                        ? { ...c, ...patch }
+                                                        : c,
                                                   ),
                                                 }
                                               : null,
@@ -3148,14 +3507,21 @@ function PostgresPlaygroundInner() {
                                             prev
                                               ? {
                                                   ...prev,
-                                                  columns: prev.columns.filter((c) => c.id !== col.id),
+                                                  columns: prev.columns.filter(
+                                                    (c) => c.id !== col.id,
+                                                  ),
                                                 }
                                               : null,
                                           )
                                         }
-                                        hasError={addTableDisplayValidation.invalidColumnIds.has(col.id)}
+                                        hasError={addTableDisplayValidation.invalidColumnIds.has(
+                                          col.id,
+                                        )}
                                         onBlurName={() =>
-                                          setAddTableTouchedColIds((prev) => new Set([...prev, col.id]))
+                                          setAddTableTouchedColIds(
+                                            (prev) =>
+                                              new Set([...prev, col.id]),
+                                          )
                                         }
                                         knownTables={tables}
                                         columnsByTable={columnsByEntity}
@@ -3175,7 +3541,10 @@ function PostgresPlaygroundInner() {
                             setAddTablePendingFocusId(newCol.id);
                             setAddTableDialog((prev) => {
                               if (!prev) return null;
-                              return { ...prev, columns: [...prev.columns, newCol] };
+                              return {
+                                ...prev,
+                                columns: [...prev.columns, newCol],
+                              };
                             });
                           }}
                         >
@@ -3222,7 +3591,9 @@ function PostgresPlaygroundInner() {
             setImportCsvDragging(false);
           }}
           state={importCsvState}
-          onStateChange={(updater) => setImportCsvState((prev) => updater(prev))}
+          onStateChange={(updater) =>
+            setImportCsvState((prev) => updater(prev))
+          }
           tables={tables}
           engine={engineRef.current}
           onPickFile={handleCsvFile}
@@ -3242,7 +3613,9 @@ function PostgresPlaygroundInner() {
             setImportJsonDragging(false);
           }}
           state={importJsonState}
-          onStateChange={(updater) => setImportJsonState((prev) => updater(prev))}
+          onStateChange={(updater) =>
+            setImportJsonState((prev) => updater(prev))
+          }
           tables={tables}
           engine={engineRef.current}
           onPickFile={handleJsonFile}
@@ -3262,7 +3635,9 @@ function PostgresPlaygroundInner() {
             setImportParquetDragging(false);
           }}
           state={importParquetState}
-          onStateChange={(updater) => setImportParquetState((prev) => updater(prev))}
+          onStateChange={(updater) =>
+            setImportParquetState((prev) => updater(prev))
+          }
           tables={tables}
           engine={engineRef.current}
           onPickFile={(f) => void handleParquetFile(f)}
@@ -3277,21 +3652,49 @@ function PostgresPlaygroundInner() {
                 value={activeDbId}
                 onValueChange={(value) => requestDbSwitch(String(value))}
               >
-                <Select.Trigger className="sql-db-selector" aria-label="Select sample database">
-                  <Database size={14} className="sql-db-selector-icon" aria-hidden="true" />
-                  <Select.Value className="sql-db-selector-value">{activeSample.filename}</Select.Value>
-                  <Select.Icon className="playground-switcher-icon"><ChevronDown size={12} /></Select.Icon>
+                <Select.Trigger
+                  className="sql-db-selector"
+                  aria-label="Select sample database"
+                >
+                  <Database
+                    size={14}
+                    className="sql-db-selector-icon"
+                    aria-hidden="true"
+                  />
+                  <Select.Value className="sql-db-selector-value">
+                    {activeSample.filename}
+                  </Select.Value>
+                  <Select.Icon className="playground-switcher-icon">
+                    <ChevronDown size={12} />
+                  </Select.Icon>
                 </Select.Trigger>
                 <Select.Portal>
-                  <Select.Positioner className="sql-db-positioner" sideOffset={6} alignItemWithTrigger={false}>
+                  <Select.Positioner
+                    className="sql-db-positioner"
+                    sideOffset={6}
+                    alignItemWithTrigger={false}
+                  >
                     <Select.Popup className="bui-select-popup sql-db-popup">
-                      <div className="sql-db-popup-group-label">Sample databases</div>
+                      <div className="sql-db-popup-group-label">
+                        Sample databases
+                      </div>
                       {POSTGRES_SAMPLE_DATABASES.map((sample) => (
-                        <Select.Item key={sample.id} value={sample.id} className="bui-select-item sql-db-item">
-                          <span className="bui-select-item-icon" aria-hidden="true"><Database size={14} /></span>
+                        <Select.Item
+                          key={sample.id}
+                          value={sample.id}
+                          className="bui-select-item sql-db-item"
+                        >
+                          <span
+                            className="bui-select-item-icon"
+                            aria-hidden="true"
+                          >
+                            <Database size={14} />
+                          </span>
                           <span className="sql-db-item-text">
                             <Select.ItemText>{sample.filename}</Select.ItemText>
-                            <span className="sql-db-item-desc">{sample.description}</span>
+                            <span className="sql-db-item-desc">
+                              {sample.description}
+                            </span>
                           </span>
                         </Select.Item>
                       ))}
@@ -3299,10 +3702,19 @@ function PostgresPlaygroundInner() {
                         value={POSTGRES_BLANK_DATABASE.id}
                         className="bui-select-item sql-db-item"
                       >
-                        <span className="bui-select-item-icon" aria-hidden="true"><FilePlus size={14} /></span>
+                        <span
+                          className="bui-select-item-icon"
+                          aria-hidden="true"
+                        >
+                          <FilePlus size={14} />
+                        </span>
                         <span className="sql-db-item-text">
-                          <Select.ItemText>{POSTGRES_BLANK_DATABASE.label}</Select.ItemText>
-                          <span className="sql-db-item-desc">{POSTGRES_BLANK_DATABASE.description}</span>
+                          <Select.ItemText>
+                            {POSTGRES_BLANK_DATABASE.label}
+                          </Select.ItemText>
+                          <span className="sql-db-item-desc">
+                            {POSTGRES_BLANK_DATABASE.description}
+                          </span>
                         </span>
                       </Select.Item>
                     </Select.Popup>
@@ -3318,7 +3730,10 @@ function PostgresPlaygroundInner() {
                 onToggle={() => setTablesExpanded((v) => !v)}
                 emptyMessage="No tables."
                 onAdd={openAddTable}
-                allExpanded={tables.length > 0 && tables.every((name) => expandedEntities.has(name))}
+                allExpanded={
+                  tables.length > 0 &&
+                  tables.every((name) => expandedEntities.has(name))
+                }
                 onExpandAll={() => setExpandedEntities(new Set(tables))}
                 onCollapseAll={() => setExpandedEntities(new Set())}
               >
@@ -3421,23 +3836,45 @@ function PostgresPlaygroundInner() {
               </SchemaSection>
             </div>
             <div className="sql-sidebar-footer">
-              <button type="button" className="sql-sidebar-btn" onClick={openErDiagramTab} title="View ER Diagram" aria-label="View ER Diagram">
+              <button
+                type="button"
+                className="sql-sidebar-btn"
+                onClick={openErDiagramTab}
+                title="View ER Diagram"
+                aria-label="View ER Diagram"
+              >
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
               </button>
-              <button type="button" className="sql-sidebar-btn" onClick={openQueryHistoryTab} title="View Query History" aria-label="View Query History">
+              <button
+                type="button"
+                className="sql-sidebar-btn"
+                onClick={openQueryHistoryTab}
+                title="View Query History"
+                aria-label="View Query History"
+              >
                 <History size={13} aria-hidden="true" />
                 <span>History</span>
               </button>
             </div>
           </aside>
-          <div className="sql-sidebar-resizer" role="separator" aria-orientation="vertical" />
+          <div
+            className="sql-sidebar-resizer"
+            role="separator"
+            aria-orientation="vertical"
+          />
           <main
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
             <div className="sql-tabbar">
-              <DndContext sensors={tabDragSensors} collisionDetection={closestCenter}>
-                <SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
+              <DndContext
+                sensors={tabDragSensors}
+                collisionDetection={closestCenter}
+              >
+                <SortableContext
+                  items={tabIds}
+                  strategy={horizontalListSortingStrategy}
+                >
                   <div className="sql-tabs" role="tablist">
                     {tabs.map((tab) => (
                       <SqlTab
@@ -3449,35 +3886,56 @@ function PostgresPlaygroundInner() {
                         onRename={(title) =>
                           persistTabs(
                             tabsRef.current.map((candidate) =>
-                              candidate.id === tab.id ? { ...candidate, title } : candidate,
+                              candidate.id === tab.id
+                                ? { ...candidate, title }
+                                : candidate,
                             ),
                           )
                         }
                         onDuplicate={() => {
-                          const dup = { ...tab, id: newTabId(), title: `${tab.title} copy` };
+                          const dup = {
+                            ...tab,
+                            id: newTabId(),
+                            title: `${tab.title} copy`,
+                          };
                           persistTabs([...tabsRef.current, dup]);
                           setActiveTabId(dup.id);
                         }}
                         onCloseOthers={() => persistTabs([tab])}
                         onCloseAll={() => {
-                          const fresh = { id: newTabId(), title: "Query 1", code: "", pristineCode: "" };
+                          const fresh = {
+                            id: newTabId(),
+                            title: "Query 1",
+                            code: "",
+                            pristineCode: "",
+                          };
                           persistTabs([fresh]);
                           setActiveTabId(fresh.id);
-                          window.setTimeout(() => editorRef.current?.focus(), 0);
+                          window.setTimeout(
+                            () => editorRef.current?.focus(),
+                            0,
+                          );
                         }}
                       />
                     ))}
                   </div>
                 </SortableContext>
               </DndContext>
-              <button type="button" className="sql-tab-add" onClick={addTab} aria-label="New query tab">
+              <button
+                type="button"
+                className="sql-tab-add"
+                onClick={addTab}
+                aria-label="New query tab"
+              >
                 <Plus size={12} aria-hidden="true" />
               </button>
             </div>
             <div
               className="sql-editor-pane"
               style={
-                activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram" || activeTab?.kind === "query-history"
+                activeTab?.kind === "view-data" ||
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
                   ? { display: "none" }
                   : undefined
               }
@@ -3487,7 +3945,11 @@ function PostgresPlaygroundInner() {
                 <div className="sql-toolbar-shortcuts">
                   <span
                     className="kbd-group"
-                    title={isMac ? "Cmd + Enter — run selection or all" : "Ctrl + Enter — run selection or all"}
+                    title={
+                      isMac
+                        ? "Cmd + Enter — run selection or all"
+                        : "Ctrl + Enter — run selection or all"
+                    }
                   >
                     <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
                     <span className="kbd-plus" aria-hidden="true">
@@ -3496,13 +3958,87 @@ function PostgresPlaygroundInner() {
                     <kbd className="kbd">Enter</kbd>
                   </span>
                 </div>
-                {hasEditorSelection ? (
-                  <div className={`run-btn-split${statusState === "running" ? " running" : ""}`}>
+                <div className="sql-toolbar-actions">
+                  {hasEditorSelection ? (
+                    <div
+                      className={`run-btn-split${statusState === "running" ? " running" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        className="run-btn-split-main"
+                        disabled={!loaded || statusState === "running"}
+                        onClick={runCurrentSelection}
+                      >
+                        {statusState === "running" ? (
+                          <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                            <circle
+                              cx="6"
+                              cy="6"
+                              r="4.5"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeDasharray="14 8"
+                            />
+                          </svg>
+                        ) : (
+                          <Play size={10} aria-hidden="true" />
+                        )}
+                        {statusState === "running"
+                          ? "Running…"
+                          : "Run Selection"}
+                      </button>
+                      <span
+                        className="run-btn-split-divider"
+                        aria-hidden="true"
+                      />
+                      <Menu.Root>
+                        <Menu.Trigger
+                          className="run-btn-split-chevron"
+                          disabled={!loaded || statusState === "running"}
+                          aria-label="Run options"
+                        >
+                          <ChevronDown size={11} aria-hidden="true" />
+                        </Menu.Trigger>
+                        <Menu.Portal>
+                          <Menu.Positioner sideOffset={6} align="end">
+                            <Menu.Popup className="bui-popup run-split-dropdown">
+                              <Menu.Item
+                                className="run-split-item"
+                                onClick={runCurrentSelection}
+                                disabled={!loaded || statusState === "running"}
+                              >
+                                <span className="run-split-item-label">
+                                  Run Selection
+                                </span>
+                                <span className="run-split-item-kbd">
+                                  {isMac ? "⌘Enter" : "Ctrl+Enter"}
+                                </span>
+                              </Menu.Item>
+                              <Menu.Item
+                                className="run-split-item"
+                                onClick={runActiveTab}
+                                disabled={!loaded || statusState === "running"}
+                              >
+                                <span className="run-split-item-label">
+                                  Run All
+                                </span>
+                                <span className="run-split-item-kbd">
+                                  {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
+                                </span>
+                              </Menu.Item>
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.Root>
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      className="run-btn-split-main"
+                      className={`run-btn${statusState === "running" ? " running" : ""}`}
                       disabled={!loaded || statusState === "running"}
-                      onClick={runCurrentSelection}
+                      onClick={runActiveTab}
                     >
                       {statusState === "running" ? (
                         <svg viewBox="0 0 12 12" className="run-btn-spinner">
@@ -3520,67 +4056,10 @@ function PostgresPlaygroundInner() {
                       ) : (
                         <Play size={10} aria-hidden="true" />
                       )}
-                      {statusState === "running" ? "Running…" : "Run Selection"}
+                      {statusState === "running" ? "Running…" : "Run"}
                     </button>
-                    <span className="run-btn-split-divider" aria-hidden="true" />
-                    <Menu.Root>
-                      <Menu.Trigger
-                        className="run-btn-split-chevron"
-                        disabled={!loaded || statusState === "running"}
-                        aria-label="Run options"
-                      >
-                        <ChevronDown size={11} aria-hidden="true" />
-                      </Menu.Trigger>
-                      <Menu.Portal>
-                        <Menu.Positioner sideOffset={6} align="end">
-                          <Menu.Popup className="bui-popup run-split-dropdown">
-                            <Menu.Item
-                              className="run-split-item"
-                              onClick={runCurrentSelection}
-                              disabled={!loaded || statusState === "running"}
-                            >
-                              <span className="run-split-item-label">Run Selection</span>
-                              <span className="run-split-item-kbd">{isMac ? "⌘Enter" : "Ctrl+Enter"}</span>
-                            </Menu.Item>
-                            <Menu.Item
-                              className="run-split-item"
-                              onClick={runActiveTab}
-                              disabled={!loaded || statusState === "running"}
-                            >
-                              <span className="run-split-item-label">Run All</span>
-                              <span className="run-split-item-kbd">{isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}</span>
-                            </Menu.Item>
-                          </Menu.Popup>
-                        </Menu.Positioner>
-                      </Menu.Portal>
-                    </Menu.Root>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className={`run-btn${statusState === "running" ? " running" : ""}`}
-                    disabled={!loaded || statusState === "running"}
-                    onClick={runActiveTab}
-                  >
-                    {statusState === "running" ? (
-                      <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                        <circle
-                          cx="6"
-                          cy="6"
-                          r="4.5"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeDasharray="14 8"
-                        />
-                      </svg>
-                    ) : (
-                      <Play size={10} aria-hidden="true" />
-                    )}
-                    {statusState === "running" ? "Running…" : "Run"}
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
             </div>
             {activeTab?.kind === "er-diagram" ? (
@@ -3608,7 +4087,11 @@ function PostgresPlaygroundInner() {
               </div>
             ) : (
               <Fragment>
-                <div className="sql-resizer" role="separator" aria-orientation="horizontal" />
+                <div
+                  className="sql-resizer"
+                  role="separator"
+                  aria-orientation="horizontal"
+                />
                 <section className="sql-results-pane">
                   <ResultView
                     result={result}
@@ -3619,7 +4102,9 @@ function PostgresPlaygroundInner() {
                     onSetGlobalPageSize={setGlobalPageSize}
                     onLoadPage={handleLoadPage}
                     onExportSnapshotChange={setResultSetExportSnapshot}
-                    onExportResultSet={(format, scope) => void exportResultSet(format, scope)}
+                    onExportResultSet={(format, scope) =>
+                      void exportResultSet(format, scope)
+                    }
                   />
                 </section>
               </Fragment>
@@ -3633,7 +4118,9 @@ function PostgresPlaygroundInner() {
 
 // ─── Import dialog component (CSV / JSON / Parquet) ─────────────────────
 
-interface ImportDialogProps<S extends CsvImportState | JsonImportState | ParquetImportState> {
+interface ImportDialogProps<
+  S extends CsvImportState | JsonImportState | ParquetImportState,
+> {
   flavor: ImportFlavor;
   open: boolean;
   dragging: boolean;
@@ -3668,7 +4155,8 @@ function ImportDialog<
     if (flavor === "csv") {
       return {
         title: "Import CSV File",
-        description: "Parse a CSV file and import its rows into a new or existing table.",
+        description:
+          "Parse a CSV file and import its rows into a new or existing table.",
         accept: ".csv,text/csv",
         dropLabel: "Drop a CSV file here",
         dropHint: "or click to browse — .csv",
@@ -3678,7 +4166,8 @@ function ImportDialog<
     if (flavor === "json") {
       return {
         title: "Import JSON File",
-        description: "Parse a JSON array of objects and import its rows into a new or existing table.",
+        description:
+          "Parse a JSON array of objects and import its rows into a new or existing table.",
         accept: ".json,application/json",
         dropLabel: "Drop a JSON file here",
         dropHint: "or click to browse — .json (array of objects)",
@@ -3687,7 +4176,8 @@ function ImportDialog<
     }
     return {
       title: "Import Parquet File",
-      description: "Read a Parquet file and add its rows into a new or existing table.",
+      description:
+        "Read a Parquet file and add its rows into a new or existing table.",
       accept: ".parquet,application/octet-stream",
       dropLabel: "Drop a Parquet file here",
       dropHint: "or click to browse — .parquet",
@@ -3713,7 +4203,12 @@ function ImportDialog<
         return { ...prev, targetMode: "new", colCompare: null } as S;
       }
       const targetTable = prev.targetTable || tables[0] || "";
-      return { ...prev, targetMode: "existing", targetTable, colCompare: null } as S;
+      return {
+        ...prev,
+        targetMode: "existing",
+        targetTable,
+        colCompare: null,
+      } as S;
     });
     if (mode === "existing" && engine) {
       const target = state?.targetTable || tables[0] || "";
@@ -3731,7 +4226,9 @@ function ImportDialog<
               } as S;
             });
           } catch (err) {
-            onStateChange((prev) => (prev ? ({ ...prev, colCompare: null } as S) : prev));
+            onStateChange((prev) =>
+              prev ? ({ ...prev, colCompare: null } as S) : prev,
+            );
             onError(
               `Could not load columns for "${target}": ${
                 err instanceof Error ? err.message : String(err)
@@ -3745,7 +4242,9 @@ function ImportDialog<
 
   const setTargetTable = (newTable: string) => {
     if (!engine) return;
-    onStateChange((prev) => (prev ? ({ ...prev, targetTable: newTable } as S) : prev));
+    onStateChange((prev) =>
+      prev ? ({ ...prev, targetTable: newTable } as S) : prev,
+    );
     void (async () => {
       try {
         const cols = await engine.listColumns(newTable);
@@ -3758,7 +4257,9 @@ function ImportDialog<
           } as S;
         });
       } catch (err) {
-        onStateChange((prev) => (prev ? ({ ...prev, colCompare: null } as S) : prev));
+        onStateChange((prev) =>
+          prev ? ({ ...prev, colCompare: null } as S) : prev,
+        );
         onError(
           `Could not load columns for "${newTable}": ${
             err instanceof Error ? err.message : String(err)
@@ -3769,25 +4270,38 @@ function ImportDialog<
   };
 
   const setNewTableName = (value: string) => {
-    onStateChange((prev) => (prev ? ({ ...prev, tableName: value } as S) : prev));
+    onStateChange((prev) =>
+      prev ? ({ ...prev, tableName: value } as S) : prev,
+    );
   };
 
   const Icon = flavorConfig.Icon;
 
   return (
-    <Dialog.Root open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
       <Dialog.Portal>
         <Dialog.Backdrop className="confirm-backdrop" />
         <Dialog.Popup className="confirm-popup sql-import-popup">
-          <Dialog.Title className="confirm-title">{flavorConfig.title}</Dialog.Title>
+          <Dialog.Title className="confirm-title">
+            {flavorConfig.title}
+          </Dialog.Title>
           <Dialog.Description className="confirm-desc">
             {flavorConfig.description}
           </Dialog.Description>
           <div className="sql-import-warning">
-            <TriangleAlert size={14} className="sql-import-warning-icon" aria-hidden="true" />
+            <TriangleAlert
+              size={14}
+              className="sql-import-warning-icon"
+              aria-hidden="true"
+            />
             <span>
-              This is a playground — your data is only held in browser memory and
-              will not be persisted on reload.
+              This is a playground — your data is only held in browser memory
+              and will not be persisted on reload.
             </span>
           </div>
           {!state ? (
@@ -3805,7 +4319,11 @@ function ImportDialog<
                 if (file) onPickFile(file);
               }}
             >
-              <Icon size={28} className="sql-dropzone-icon" aria-hidden="true" />
+              <Icon
+                size={28}
+                className="sql-dropzone-icon"
+                aria-hidden="true"
+              />
               <span>{flavorConfig.dropLabel}</span>
               <span className="sql-dropzone-hint">{flavorConfig.dropHint}</span>
               <input
@@ -3855,7 +4373,9 @@ function ImportDialog<
                     autoFocus
                   >
                     {tables.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
                     ))}
                   </select>
                 )}
@@ -3875,7 +4395,9 @@ function ImportDialog<
                         <tr key={i}>
                           <td>{r.fileCol ?? <em>—</em>}</td>
                           <td>{r.tableCol ?? <em>—</em>}</td>
-                          <td className={`cmp-${r.status}`}>{IMPORT_COL_STATUS_LABEL[r.status]}</td>
+                          <td className={`cmp-${r.status}`}>
+                            {IMPORT_COL_STATUS_LABEL[r.status]}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -3896,9 +4418,13 @@ function ImportDialog<
                         <tr key={i}>
                           {row.map((cell, j) => (
                             <td key={j}>
-                              {cell === null || cell === undefined || cell === ""
-                                ? <em>NULL</em>
-                                : String(cell)}
+                              {cell === null ||
+                              cell === undefined ||
+                              cell === "" ? (
+                                <em>NULL</em>
+                              ) : (
+                                String(cell)
+                              )}
                             </td>
                           ))}
                         </tr>
@@ -3907,10 +4433,18 @@ function ImportDialog<
                   </table>
                 </div>
               )}
-              <div style={{ fontSize: 11, color: "var(--text-dim)", marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-dim)",
+                  marginBottom: 8,
+                }}
+              >
                 {previewRows.length} row{previewRows.length === 1 ? "" : "s"} ·{" "}
                 {fileColumns.length} column{fileColumns.length === 1 ? "" : "s"}
-                {previewRows.length > 5 && state.targetMode === "new" && " · showing first 5"}
+                {previewRows.length > 5 &&
+                  state.targetMode === "new" &&
+                  " · showing first 5"}
               </div>
             </Fragment>
           )}
