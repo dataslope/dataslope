@@ -156,6 +156,7 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 ];
 
 const VIRTUAL_ROW_ESTIMATE = 30;
+const LOAD_MORE_ROW_THRESHOLD = 25;
 
 // ────────────────────────────────────────────────────────────────────────
 // Exports
@@ -1478,7 +1479,7 @@ export function ResultTableBody({
   const lastVirtualIndex = virtualRows[virtualRows.length - 1]?.index ?? -1;
   useEffect(() => {
     if (!virtualized || !hasMoreRows || !onLoadMoreRows) return;
-    if (lastVirtualIndex < tableRows.length - 25) return;
+    if (lastVirtualIndex < tableRows.length - LOAD_MORE_ROW_THRESHOLD) return;
     if (loadMoreRequestedForCountRef.current === tableRows.length) return;
     loadMoreRequestedForCountRef.current = tableRows.length;
     onLoadMoreRows();
