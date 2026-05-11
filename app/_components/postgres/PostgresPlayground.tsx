@@ -153,6 +153,7 @@ import {
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import type {
+  AddRowDialogState,
   ColumnKeyHints,
   CsvImportState,
   ImportColComparison,
@@ -1082,6 +1083,7 @@ function PostgresPlaygroundInner() {
     string | null
   >(null);
   const addTableBodyRef = useRef<HTMLDivElement | null>(null);
+  const [addRowDialog, setAddRowDialog] = useState<AddRowDialogState | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
@@ -2168,13 +2170,54 @@ function PostgresPlaygroundInner() {
     [runSqlForTab, showToast, columnsByEntity, quoteIdent],
   );
 
-  const copyEntityName = useCallback(
-    (name: string) => {
-      void navigator.clipboard?.writeText(name);
-      showToast(`Copied "${name}".`);
+  const openAddRow = useCallback(
+    async (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = await engine.listColumns(name);
+        const initValues: Record<string, string> = {};
+        for (const c of cols) initValues[c.name] = "";
+        setAddRowDialog({
+          tableName: name,
+          columns: cols,
+          values: initValues,
+          addAnother: false,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't load columns: ${msg}`, "warn");
+      }
     },
     [showToast],
   );
+
+  const submitAddRow = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || !addRowDialog) return;
+    const { tableName, columns, values, addAnother } = addRowDialog;
+    const columnNames = columns.map((c) => c.name);
+    const rowValues = columns.map((c) => {
+      const v = values[c.name] ?? "";
+      return v === "" ? null : v;
+    });
+    try {
+      await engine.insertRow(tableName, columnNames, rowValues);
+      showToast(`Row added to "${tableName}".`);
+      if (addAnother) {
+        const newValues: Record<string, string> = {};
+        for (const c of columns) newValues[c.name] = "";
+        setAddRowDialog({ ...addRowDialog, values: newValues });
+      } else {
+        setAddRowDialog(null);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Insert failed: ${msg}`, "warn");
+    }
+  }, [addRowDialog, showToast]);
+
+  const copyEntityName = useCallback(
 
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -3728,6 +3771,100 @@ function PostgresPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Add Row drawer ── */}
+        <Dialog.Root
+          open={addRowDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setAddRowDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Add Row
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    {addRowDialog?.tableName ?? ""}
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {addRowDialog && (
+                <div className="sql-modify-body">
+                  <div className="sql-add-row-fields">
+                    {addRowDialog.columns.map((c) => (
+                      <label key={c.name} className="sql-add-row-field">
+                        <span className="sql-add-row-field-label">
+                          <span className="sql-add-row-field-name">
+                            {c.name}
+                          </span>
+                          <span className="sql-add-row-field-type">
+                            {c.type || "—"}
+                          </span>
+                        </span>
+                        <input
+                          className="sql-rename-input"
+                          value={addRowDialog.values[c.name] ?? ""}
+                          onChange={(e) =>
+                            setAddRowDialog((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    values: {
+                                      ...prev.values,
+                                      [c.name]: e.target.value,
+                                    },
+                                  }
+                                : null,
+                            )
+                          }
+                          placeholder={c.notNull ? "required" : "NULL if empty"}
+                          aria-label={c.name}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  <label className="sql-add-row-another">
+                    <input
+                      type="checkbox"
+                      checked={addRowDialog.addAnother}
+                      onChange={(e) =>
+                        setAddRowDialog((prev) =>
+                          prev
+                            ? { ...prev, addAnother: e.target.checked }
+                            : null,
+                        )
+                      }
+                    />
+                    Keep open to add another row
+                  </label>
+                </div>
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={() => void submitAddRow()}
+                  disabled={!addRowDialog}
+                >
+                  Add Row
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         {/* ── Add Table drawer ── */}
         <Dialog.Root
           open={addTableDialog !== null}
@@ -4102,6 +4239,7 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onAddRow={(n) => void openAddRow(n)}
                     onModifyStructure={(n) => void openViewStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
@@ -4427,6 +4565,7 @@ function PostgresPlaygroundInner() {
                 columnsByEntity={columnsByEntity}
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
+                onAddRow={(n) => void openAddRow(n)}
                 onModifyStructure={(n) => void openViewStructure(n)}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
