@@ -2090,6 +2090,57 @@ function PostgresPlaygroundInner() {
     [resultsByTab],
   );
 
+  const deleteRowsFromTable = useCallback(
+    (
+      tableName: string,
+      pkColumns: string[],
+      pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (pkColumns.length === 0 || pkRows.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      void engine.deleteRows(tableName, pkColumns, pkRows).then((deleted) => {
+        showToast(
+          `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Delete failed: ${msg}`, "warn");
+      });
+    },
+    [runSqlForTab, showToast],
+  );
+
+  const updateRowsInTable = useCallback(
+    (
+      tableName: string,
+      updates: ReadonlyArray<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (updates.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      void engine.updateRows(tableName, updates).then((count) => {
+        showToast(
+          `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Update failed: ${msg}`, "warn");
+      });
+    },
+    [runSqlForTab, showToast],
+  );
+
   const copyEntityName = useCallback(
     (name: string) => {
       void navigator.clipboard?.writeText(name);
@@ -4259,6 +4310,8 @@ function PostgresPlaygroundInner() {
                     loading={statusState === "loading"}
                     keyHints={resultKeyHints}
                     sourceTable={result?.sourceTable}
+                    onDeleteRows={deleteRowsFromTable}
+                    onUpdateRows={updateRowsInTable}
                     globalPageSize={globalPageSize}
                     onSetGlobalPageSize={setGlobalPageSize}
                     onLoadPage={handleLoadPage}
