@@ -18,6 +18,7 @@ import { Menu } from "@base-ui-components/react/menu";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { Toggle } from "@base-ui/react/toggle";
 import {
   ArrowDownToLine,
   Binary,
@@ -120,8 +121,8 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
 function DataTypeIcon({ type }: { type: string }) {
   const t = type.toUpperCase();
   if (t === "NULL") return <Minus size={10} aria-hidden="true" />;
-  if (t.includes("INT")) return <Hash size={10} aria-hidden="true" />;
   if (
+    t.includes("INT") ||
     t.includes("REAL") ||
     t.includes("FLOAT") ||
     t.includes("DOUBLE") ||
@@ -880,7 +881,7 @@ export function ResultView({
                               className="sql-result-export-scope-options"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <ToggleGroup.Root
+                              <ToggleGroup
                                 value={[resultSetExportScope]}
                                 onValueChange={(newVals) => {
                                   const next = newVals.find(
@@ -893,19 +894,19 @@ export function ResultView({
                                 }}
                                 className="sql-scope-toggle-group"
                               >
-                                <ToggleGroup.Item
+                                <Toggle
                                   value="page"
                                   className="sql-scope-toggle-item"
                                 >
                                   Page ({currentPageRows})
-                                </ToggleGroup.Item>
-                                <ToggleGroup.Item
+                                </Toggle>
+                                <Toggle
                                   value="all"
                                   className="sql-scope-toggle-item"
                                 >
                                   All ({totalRows.toLocaleString()})
-                                </ToggleGroup.Item>
-                              </ToggleGroup.Root>
+                                </Toggle>
+                              </ToggleGroup>
                             </div>
                           )}
                           <Menu.Item

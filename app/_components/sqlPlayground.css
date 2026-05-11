@@ -1101,7 +1101,7 @@
   color: var(--text);
 }
 
-.sql-scope-toggle-item[data-state="on"] {
+.sql-scope-toggle-item[data-pressed] {
   background: color-mix(in srgb, var(--primary) 15%, var(--bg3));
   color: var(--text);
 }
