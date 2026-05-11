@@ -59,10 +59,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   const globalPageSize = useSqlPlaygroundStore((s) => s.globalPageSize);
   // Ref kept in sync so runSqlForTab can read synchronously without stale closures.
   const globalPageSizeRef = useRef(globalPageSize);
-  const globalPageSizeValue = useSqlPlaygroundStore((s) => s.globalPageSize);
   useEffect(() => {
-    globalPageSizeRef.current = globalPageSizeValue;
-  }, [globalPageSizeValue]);
+    globalPageSizeRef.current = globalPageSize;
+  }, [globalPageSize]);
 
   const setStatusState = useEngineStore((s) => s.setStatusState);
   const setTables = useEngineStore((s) => s.setTables);

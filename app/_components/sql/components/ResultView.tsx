@@ -607,7 +607,7 @@ export function ResultView({
       allRows: rows,
       rows: visibleRows,
       totalRows,
-        pageSize: effective,
+      pageSize: effective,
       currentPage,
     });
   }, [
@@ -665,8 +665,8 @@ export function ResultView({
   const computeSetRenderData = (idx: number) => {
     const set = result.sets[idx];
     if (!set) return null;
-      const isLazy = result.lazySql !== undefined && idx === 0;
-      const isInfiniteAll = isLazy && result.lazyInfinite === true;
+    const isLazy = result.lazySql !== undefined && idx === 0;
+    const isInfiniteAll = isLazy && result.lazyInfinite === true;
     const sorting = sortingByIndex[idx] ?? [];
     let totalRows: number;
     let currentPage: number;
@@ -1714,7 +1714,7 @@ export function ResultTableBody({
                 <td colSpan={colSpan} style={{ height: paddingTop, padding: 0 }} />
               </tr>
             )}
-            {renderedRows.map(({ row }) => (row ? renderRow(row) : null))}
+            {renderedRows.map(({ row }) => renderRow(row))}
             {paddingBottom > 0 && (
               <tr aria-hidden="true">
                 <td colSpan={colSpan} style={{ height: paddingBottom, padding: 0 }} />
