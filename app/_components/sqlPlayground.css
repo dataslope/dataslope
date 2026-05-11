@@ -1052,6 +1052,15 @@
   background: var(--bg3);
 }
 
+/* Tooltip popover shown on hover over the export button */
+.sql-export-btn-popover {
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .sql-result-export-group-label {
   margin-top: 6px;
   padding: 6px 10px 3px;
@@ -1922,7 +1931,7 @@
 .sql-modify-col-remove {
   background: transparent;
   border: 0;
-  color: var(--red);
+  color: var(--text);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -1933,8 +1942,8 @@
 }
 
 .sql-modify-col-remove:hover {
-  background: var(--bg3);
-  color: var(--red);
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  color: var(--text);
 }
 
 .sql-modify-col-flags {
@@ -2996,6 +3005,11 @@
 /* Hide the React Flow attribution badge */
 .er-diagram-wrap .react-flow__attribution {
   display: none;
+}
+
+/* ER diagram background matches the theme background */
+.er-diagram-wrap .react-flow__background {
+  background: var(--bg);
 }
 
 /* ── Removed: cardinality toggle panel ── */

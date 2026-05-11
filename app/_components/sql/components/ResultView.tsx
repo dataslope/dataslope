@@ -158,6 +158,140 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 const VIRTUAL_ROW_HEIGHT_ESTIMATE = 30;
 const LOAD_MORE_THRESHOLD_ROWS = 25;
 
+// ─── Result set export button + tooltip ──────────────────────────────────
+// Encapsulated so it can track menu-open state with a hook and suppress
+// the hover popover while the export dropdown is visible.
+
+type ResultSetExportFormat = "csv" | "json" | "sql" | "parquet" | "xlsx";
+
+interface ResultSetExportButtonProps {
+  hasMultiplePages: boolean;
+  currentPageRows: number;
+  totalRows: number;
+  resultSetExportScope: ResultSetExportScope;
+  onExportResultSet: (format: ResultSetExportFormat, scope: ResultSetExportScope) => void;
+  onSetResultSetExportScope: (scope: ResultSetExportScope) => void;
+}
+
+function ResultSetExportButton({
+  hasMultiplePages,
+  currentPageRows,
+  totalRows,
+  resultSetExportScope,
+  onExportResultSet,
+  onSetResultSetExportScope,
+}: ResultSetExportButtonProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  return (
+    <Menu.Root onOpenChange={setMenuOpen}>
+      <Popover.Root
+        open={menuOpen ? false : popoverOpen}
+        onOpenChange={setPopoverOpen}
+      >
+        <Popover.Trigger
+          openOnHover
+          delay={150}
+          closeDelay={100}
+          render={(triggerProps) => (
+            <Menu.Trigger
+              {...triggerProps}
+              className="sql-result-export-btn"
+              aria-label="Export result set"
+            >
+              <ArrowDownToLine size={13} aria-hidden="true" />
+            </Menu.Trigger>
+          )}
+        />
+        <Popover.Portal>
+          <Popover.Positioner sideOffset={6} align="center" side="top">
+            <Popover.Popup className="bui-popup sql-export-btn-popover">
+              Export result set
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+      <Menu.Portal>
+        <Menu.Positioner sideOffset={6} align="end" side="top">
+          <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+            {hasMultiplePages && (
+              <div
+                className="sql-result-export-scope-options"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ToggleGroup
+                  value={[resultSetExportScope]}
+                  onValueChange={(newVals) => {
+                    const next = newVals.find(
+                      (v) => v !== resultSetExportScope,
+                    );
+                    if (next)
+                      onSetResultSetExportScope(next as ResultSetExportScope);
+                  }}
+                  className="sql-scope-toggle-group"
+                >
+                  <Toggle value="page" className="sql-scope-toggle-item">
+                    Page ({currentPageRows})
+                  </Toggle>
+                  <Toggle value="all" className="sql-scope-toggle-item">
+                    All ({totalRows.toLocaleString()})
+                  </Toggle>
+                </ToggleGroup>
+              </div>
+            )}
+            <Menu.Item
+              className="example-item export-item"
+              onClick={() => onExportResultSet("csv", resultSetExportScope)}
+            >
+              <div className="export-item-text">
+                <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
+                <div className="ex-desc">Comma-separated values</div>
+              </div>
+            </Menu.Item>
+            <Menu.Item
+              className="example-item export-item"
+              onClick={() => onExportResultSet("json", resultSetExportScope)}
+            >
+              <div className="export-item-text">
+                <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
+                <div className="ex-desc">Array of row objects</div>
+              </div>
+            </Menu.Item>
+            <Menu.Item
+              className="example-item export-item"
+              onClick={() => onExportResultSet("sql", resultSetExportScope)}
+            >
+              <div className="export-item-text">
+                <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
+                <div className="ex-desc">INSERT statements</div>
+              </div>
+            </Menu.Item>
+            <Menu.Item
+              className="example-item export-item"
+              onClick={() => onExportResultSet("parquet", resultSetExportScope)}
+            >
+              <div className="export-item-text">
+                <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
+                <div className="ex-desc">Apache Parquet binary</div>
+              </div>
+            </Menu.Item>
+            <Menu.Item
+              className="example-item export-item"
+              onClick={() => onExportResultSet("xlsx", resultSetExportScope)}
+            >
+              <div className="export-item-text">
+                <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
+                <div className="ex-desc">Excel workbook (single sheet)</div>
+              </div>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  );
+}
+
 // ────────────────────────────────────────────────────────────────────────
 // Exports
 // ────────────────────────────────────────────────────────────────────────
@@ -906,115 +1040,14 @@ export function ResultView({
                 onCommitEdits={() => commitEdits(idx, set)}
               >
                 {onExportResultSet && (
-                  <Menu.Root>
-                    <Popover.Root>
-                      <Popover.Trigger
-                        openOnHover
-                        delay={150}
-                        closeDelay={100}
-                        render={(triggerProps) => (
-                          <Menu.Trigger
-                            {...triggerProps}
-                            className="sql-result-export-btn"
-                            aria-label="Export result set"
-                          >
-                            <ArrowDownToLine size={13} aria-hidden="true" />
-                          </Menu.Trigger>
-                        )}
-                      />
-                      <Popover.Portal>
-                        <Popover.Positioner sideOffset={6} align="center" side="top">
-                          <Popover.Popup className="bui-popup sql-export-btn-popover">
-                            Export result set
-                          </Popover.Popup>
-                        </Popover.Positioner>
-                      </Popover.Portal>
-                    </Popover.Root>
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={6} align="end" side="top">
-                        <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                          {hasMultiplePages && (
-                            <div
-                              className="sql-result-export-scope-options"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ToggleGroup
-                                value={[resultSetExportScope]}
-                                onValueChange={(newVals) => {
-                                  const next = newVals.find(
-                                    (v) => v !== resultSetExportScope,
-                                  );
-                                  if (next)
-                                    setResultSetExportScope(
-                                      next as ResultSetExportScope,
-                                    );
-                                }}
-                                className="sql-scope-toggle-group"
-                              >
-                                <Toggle
-                                  value="page"
-                                  className="sql-scope-toggle-item"
-                                >
-                                  Page ({currentPageRows})
-                                </Toggle>
-                                <Toggle
-                                  value="all"
-                                  className="sql-scope-toggle-item"
-                                >
-                                  All ({totalRows.toLocaleString()})
-                                </Toggle>
-                              </ToggleGroup>
-                            </div>
-                          )}
-                          <Menu.Item
-                            className="example-item export-item"
-                            onClick={() => onExportResultSet("csv", resultSetExportScope)}
-                          >
-                            <div className="export-item-text">
-                              <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
-                              <div className="ex-desc">Comma-separated values</div>
-                            </div>
-                          </Menu.Item>
-                          <Menu.Item
-                            className="example-item export-item"
-                            onClick={() => onExportResultSet("json", resultSetExportScope)}
-                          >
-                            <div className="export-item-text">
-                              <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
-                              <div className="ex-desc">Array of row objects</div>
-                            </div>
-                          </Menu.Item>
-                          <Menu.Item
-                            className="example-item export-item"
-                            onClick={() => onExportResultSet("sql", resultSetExportScope)}
-                          >
-                            <div className="export-item-text">
-                              <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
-                              <div className="ex-desc">INSERT statements</div>
-                            </div>
-                          </Menu.Item>
-                          <Menu.Item
-                            className="example-item export-item"
-                            onClick={() => onExportResultSet("parquet", resultSetExportScope)}
-                          >
-                            <div className="export-item-text">
-                              <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
-                              <div className="ex-desc">Apache Parquet binary</div>
-                            </div>
-                          </Menu.Item>
-                          <Menu.Item
-                            className="example-item export-item"
-                            onClick={() => onExportResultSet("xlsx", resultSetExportScope)}
-                          >
-                            <div className="export-item-text">
-                              <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
-                              <div className="ex-desc">Excel workbook (single sheet)</div>
-                            </div>
-                          </Menu.Item>
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.Root>
+                  <ResultSetExportButton
+                    hasMultiplePages={hasMultiplePages}
+                    currentPageRows={currentPageRows}
+                    totalRows={totalRows}
+                    resultSetExportScope={resultSetExportScope}
+                    onExportResultSet={onExportResultSet}
+                    onSetResultSetExportScope={setResultSetExportScope}
+                  />
                 )}
               </ResultPager>
             </>
