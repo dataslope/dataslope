@@ -366,6 +366,8 @@ export function ResultView({
       column: string;
       value: unknown;
     }>,
+    refetchSql?: string,
+    refetchBaseSql?: string,
   ) => void;
   onDuplicateRow?: (
     tableName: string,
@@ -558,13 +560,31 @@ export function ResultView({
       };
       setPendingEditsByIndex(nextPendingEdits);
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
-      onUpdateRows(sourceTable, updates);
+      // Preserve the current sort order so the re-fetch after the update
+      // uses the same ORDER BY the user has applied, not the default order.
+      const baseSql = result?.lazyBaseSql ?? result?.lazySql;
+      let refetchSql: string | undefined;
+      let refetchBaseSql: string | undefined;
+      if (baseSql) {
+        refetchBaseSql = baseSql;
+        const sorting = sortingByIndex[setIdx] ?? [];
+        if (sorting.length > 0) {
+          const parsed = parseColumnId(sorting[0].id);
+          if (parsed) {
+            refetchSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+          }
+        }
+        refetchSql = refetchSql ?? baseSql;
+      }
+      onUpdateRows(sourceTable, updates, refetchSql, refetchBaseSql);
     },
     [
       sourceTable,
       onUpdateRows,
       pendingEditsByIndex,
       selectedByIndex,
+      sortingByIndex,
+      result,
     ],
   );
 

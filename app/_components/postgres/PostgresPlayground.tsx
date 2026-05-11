@@ -153,6 +153,7 @@ import {
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import type {
+  AddRowDialogState,
   ColumnKeyHints,
   CsvImportState,
   ImportColComparison,
@@ -1044,6 +1045,7 @@ function PostgresPlaygroundInner() {
     name: string;
     kind: "table" | "view" | "index" | "trigger";
   } | null>(null);
+  const [pendingTruncate, setPendingTruncate] = useState<string | null>(null);
   const [ddlDialog, setDdlDialog] = useState<{
     title: string;
     sql: string;
@@ -1082,6 +1084,7 @@ function PostgresPlaygroundInner() {
     string | null
   >(null);
   const addTableBodyRef = useRef<HTMLDivElement | null>(null);
+  const [addRowDialog, setAddRowDialog] = useState<AddRowDialogState | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
@@ -1157,6 +1160,12 @@ function PostgresPlaygroundInner() {
   const activeTabIdRef = useRef(activeTabId);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
+  const panesRef = useRef<HTMLElement | null>(null);
+  const editorPaneRef = useRef<HTMLDivElement | null>(null);
+  const resultsPaneRef = useRef<HTMLElement | null>(null);
+  const resizerRef = useRef<HTMLDivElement | null>(null);
 
   // ─── Selection tracking ───────────────────────────────────────────────
   const [hasEditorSelection, setHasEditorSelection] = useState(false);
@@ -2090,6 +2099,125 @@ function PostgresPlaygroundInner() {
     [resultsByTab],
   );
 
+  const deleteRowsFromTable = useCallback(
+    (
+      tableName: string,
+      pkColumns: string[],
+      pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (pkColumns.length === 0 || pkRows.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      void engine.deleteRows(tableName, pkColumns, pkRows).then((deleted) => {
+        showToast(
+          `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
+        );
+        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Failed to delete rows from "${tableName}": ${msg}`, "warn");
+      });
+    },
+    [runSqlForTab, showToast],
+  );
+
+  const updateRowsInTable = useCallback(
+    (
+      tableName: string,
+      updates: ReadonlyArray<{
+        rowIndex: number;
+        column: string;
+        value: unknown;
+      }>,
+      refetchSql?: string,
+      refetchBaseSql?: string,
+    ) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      if (updates.length === 0) return;
+      const tabId = activeTabIdRef.current;
+      void engine.updateRows(tableName, updates).then((count) => {
+        showToast(
+          `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
+        );
+        if (refetchSql) {
+          // Caller supplied a sort-preserving SQL; use it as-is and keep the
+          // base SQL (without ORDER BY) for subsequent column-header sorting.
+          void runSqlForTab(tabId, `${refetchSql};`, `Table: ${tableName}`, tableName, 0, refetchBaseSql ?? refetchSql);
+        } else {
+          // Re-fetch with PK ordering so the updated row does not move to the
+          // end of the result set (PostgreSQL changes a row's ctid on UPDATE,
+          // which would otherwise cause it to appear last in heap order).
+          const pkCols = (columnsByEntity[tableName] ?? [])
+            .filter((col) => col.pk > 0)
+            .sort((a, b) => a.pk - b.pk)
+            .map((col) => quoteIdent(col.name));
+          const orderBy =
+            pkCols.length > 0 ? ` ORDER BY ${pkCols.join(", ")}` : "";
+          // Pass the bare SELECT (without ORDER BY) as baseSql so that
+          // subsequent column-header sorting doesn't produce a double-ORDER-BY
+          // syntax error ("... ORDER BY pk ORDER BY col ASC").
+          const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
+          const sql = `${baseSql}${orderBy};`;
+          void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
+        }
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Failed to update cells in "${tableName}": ${msg}`, "warn");
+      });
+    },
+    [runSqlForTab, showToast, columnsByEntity, quoteIdent],
+  );
+
+  const openAddRow = useCallback(
+    async (name: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      try {
+        const cols = await engine.listColumns(name);
+        const initValues: Record<string, string> = {};
+        for (const c of cols) initValues[c.name] = "";
+        setAddRowDialog({
+          tableName: name,
+          columns: cols,
+          values: initValues,
+          addAnother: false,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Couldn't load columns: ${msg}`, "warn");
+      }
+    },
+    [showToast],
+  );
+
+  const submitAddRow = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || !addRowDialog) return;
+    const { tableName, columns, values, addAnother } = addRowDialog;
+    const columnNames = columns.map((c) => c.name);
+    const rowValues = columns.map((c) => {
+      const v = values[c.name] ?? "";
+      return v === "" ? null : v;
+    });
+    try {
+      await engine.insertRow(tableName, columnNames, rowValues);
+      showToast(`Row added to "${tableName}".`);
+      if (addAnother) {
+        const newValues: Record<string, string> = {};
+        for (const c of columns) newValues[c.name] = "";
+        setAddRowDialog({ ...addRowDialog, values: newValues });
+      } else {
+        setAddRowDialog(null);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Insert failed: ${msg}`, "warn");
+    }
+  }, [addRowDialog, showToast]);
+
   const copyEntityName = useCallback(
     (name: string) => {
       void navigator.clipboard?.writeText(name);
@@ -2193,6 +2321,25 @@ function PostgresPlaygroundInner() {
     }
   }, [pendingDropEntity, refreshSchema, showToast]);
 
+  const truncateEntity = useCallback((name: string) => {
+    setPendingTruncate(name);
+  }, []);
+
+  const confirmTruncate = useCallback(async () => {
+    const name = pendingTruncate;
+    if (!name) return;
+    setPendingTruncate(null);
+    try {
+      await engineRef.current?.truncateTable(name);
+      showToast(`Truncated table "${name}".`);
+    } catch (err) {
+      showToast(
+        `Truncate failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [pendingTruncate, showToast]);
+
   const exportEntity = useCallback(
     async (
       name: string,
@@ -2224,6 +2371,123 @@ function PostgresPlaygroundInner() {
     (name: string): number => rowCountByTable[name] ?? 0,
     [rowCountByTable],
   );
+
+  // ─── Resizer (vertical, between results panel and editor) ────────────
+  useEffect(() => {
+    const resizer = resizerRef.current;
+    const panes = panesRef.current;
+    const editorPane = editorPaneRef.current;
+    const resultsPane = resultsPaneRef.current;
+    if (!resizer || !panes || !editorPane || !resultsPane) return;
+    let dragging = false;
+    let startY = 0;
+    let startEditorH = 0;
+    let startResultsH = 0;
+    const onDown = (e: MouseEvent) => {
+      dragging = true;
+      startY = e.clientY;
+      startEditorH = editorPane.offsetHeight;
+      startResultsH = resultsPane.offsetHeight;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const total = startEditorH + startResultsH;
+      if (total <= 0) return;
+      const dy = e.clientY - startY;
+      const editorH = Math.min(
+        total - Math.round(total * 0.15),
+        Math.max(Math.round(total * 0.15), startEditorH + dy),
+      );
+      const editorFrac = editorH / total;
+      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      resizer.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    resizer.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      resizer.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+
+  // Clear any inline gridTemplateRows set by the resizer when entering
+  // view-data or er-diagram mode.
+  useEffect(() => {
+    const panes = panesRef.current;
+    if (!panes) return;
+    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
+      panes.style.gridTemplateRows = "";
+    }
+  }, [activeTab?.kind]);
+
+  // ─── Sidebar resizer (horizontal, between sidebar and panes) ─────────
+  useEffect(() => {
+    const shell = shellRef.current;
+    const resizer = sidebarResizerRef.current;
+    if (!shell || !resizer) return;
+    try {
+      const saved = Number(localStorage.getItem(storageKey("sidebar_w")));
+      if (Number.isFinite(saved) && saved >= 160 && saved <= 600) {
+        shell.style.setProperty("--sql-sidebar-width", `${saved}px`);
+      }
+    } catch {
+      // ignore
+    }
+    let dragging = false;
+    let startX = 0;
+    let startW = 0;
+    const onDown = (e: MouseEvent) => {
+      dragging = true;
+      startX = e.clientX;
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      startW = sidebar?.offsetWidth ?? 240;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const shellWidth = shell.offsetWidth;
+      const maxW = Math.max(200, Math.min(600, shellWidth - 320));
+      const next = Math.max(160, Math.min(maxW, startW + (e.clientX - startX)));
+      shell.style.setProperty("--sql-sidebar-width", `${next}px`);
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      resizer.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      const sidebar = shell.firstElementChild as HTMLElement | null;
+      const w = sidebar?.offsetWidth;
+      if (w) {
+        try {
+          localStorage.setItem(storageKey("sidebar_w"), String(w));
+        } catch {
+          // ignore
+        }
+      }
+    };
+    resizer.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      resizer.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   // ─── View Structure drawer ────────────────────────────────────────────
 
@@ -3179,6 +3443,38 @@ function PostgresPlaygroundInner() {
         </AlertDialog.Root>
 
         <AlertDialog.Root
+          open={pendingTruncate !== null}
+          onOpenChange={(next) => {
+            if (!next) setPendingTruncate(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Truncate table?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                Truncate table <strong>{pendingTruncate}</strong>? This deletes
+                every row but keeps the schema. The change is in-memory only and
+                will be undone next page load.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => void confirmTruncate()}
+                >
+                  Truncate
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
+        <AlertDialog.Root
           open={confirmRestoreOpen}
           onOpenChange={setConfirmRestoreOpen}
         >
@@ -3533,6 +3829,100 @@ function PostgresPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Add Row drawer ── */}
+        <Dialog.Root
+          open={addRowDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setAddRowDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Add Row
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    {addRowDialog?.tableName ?? ""}
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {addRowDialog && (
+                <div className="sql-modify-body">
+                  <div className="sql-add-row-fields">
+                    {addRowDialog.columns.map((c) => (
+                      <label key={c.name} className="sql-add-row-field">
+                        <span className="sql-add-row-field-label">
+                          <span className="sql-add-row-field-name">
+                            {c.name}
+                          </span>
+                          <span className="sql-add-row-field-type">
+                            {c.type || "—"}
+                          </span>
+                        </span>
+                        <input
+                          className="sql-rename-input"
+                          value={addRowDialog.values[c.name] ?? ""}
+                          onChange={(e) =>
+                            setAddRowDialog((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    values: {
+                                      ...prev.values,
+                                      [c.name]: e.target.value,
+                                    },
+                                  }
+                                : null,
+                            )
+                          }
+                          placeholder={c.notNull ? "required" : "NULL if empty"}
+                          aria-label={c.name}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  <label className="sql-add-row-another">
+                    <input
+                      type="checkbox"
+                      checked={addRowDialog.addAnother}
+                      onChange={(e) =>
+                        setAddRowDialog((prev) =>
+                          prev
+                            ? { ...prev, addAnother: e.target.checked }
+                            : null,
+                        )
+                      }
+                    />
+                    Keep open to add another row
+                  </label>
+                </div>
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={() => void submitAddRow()}
+                  disabled={!addRowDialog}
+                >
+                  Add Row
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         {/* ── Add Table drawer ── */}
         <Dialog.Root
           open={addTableDialog !== null}
@@ -3798,7 +4188,7 @@ function PostgresPlaygroundInner() {
           onError={(msg) => showToast(msg, "warn")}
         />
 
-        <div className="sql-shell postgres-shell">
+        <div className="sql-shell postgres-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
               <Select.Root
@@ -3907,6 +4297,8 @@ function PostgresPlaygroundInner() {
                       })
                     }
                     onPreview={previewEntity}
+                    onAddRow={(n) => void openAddRow(n)}
+                    onTruncate={truncateEntity}
                     onModifyStructure={(n) => void openViewStructure(n)}
                     onCount={countEntityRows}
                     onCopy={copyEntityName}
@@ -4013,10 +4405,12 @@ function PostgresPlaygroundInner() {
           </aside>
           <div
             className="sql-sidebar-resizer"
+            ref={sidebarResizerRef}
             role="separator"
             aria-orientation="vertical"
           />
           <main
+            ref={panesRef}
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
             <div className="sql-tabbar">
@@ -4093,6 +4487,7 @@ function PostgresPlaygroundInner() {
             </div>
             <div
               className="sql-editor-pane"
+              ref={editorPaneRef}
               style={
                 activeTab?.kind === "view-data" ||
                 activeTab?.kind === "er-diagram" ||
@@ -4229,6 +4624,8 @@ function PostgresPlaygroundInner() {
                 columnsByEntity={columnsByEntity}
                 foreignKeysByEntity={foreignKeysByEntity}
                 onPreview={previewEntity}
+                onAddRow={(n) => void openAddRow(n)}
+                onTruncate={truncateEntity}
                 onModifyStructure={(n) => void openViewStructure(n)}
                 onCount={countEntityRows}
                 onCopy={copyEntityName}
@@ -4250,15 +4647,18 @@ function PostgresPlaygroundInner() {
               <Fragment>
                 <div
                   className="sql-resizer"
+                  ref={resizerRef}
                   role="separator"
                   aria-orientation="horizontal"
                 />
-                <section className="sql-results-pane">
+                <section className="sql-results-pane" ref={resultsPaneRef}>
                   <ResultView
                     result={result}
                     loading={statusState === "loading"}
                     keyHints={resultKeyHints}
                     sourceTable={result?.sourceTable}
+                    onDeleteRows={deleteRowsFromTable}
+                    onUpdateRows={updateRowsInTable}
                     globalPageSize={globalPageSize}
                     onSetGlobalPageSize={setGlobalPageSize}
                     onLoadPage={handleLoadPage}

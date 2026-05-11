@@ -460,6 +460,8 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         column: string;
         value: unknown;
       }>,
+      refetchSql?: string,
+      refetchBaseSql?: string,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -470,8 +472,10 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
-        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
-        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+        const sql = refetchSql
+          ? `${refetchSql};`
+          : `SELECT * FROM ${quoteIdent(tableName)};`;
+        runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, refetchBaseSql);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Update failed: ${msg}`, "warn");
