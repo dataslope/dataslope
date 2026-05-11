@@ -232,7 +232,7 @@
 }
 
 .sql-tree-item:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--bg2) 60%, var(--bg3) 40%);
 }
 
 .sql-tree-popover-positioner {

@@ -826,18 +826,18 @@ body.pg-active {
   padding: 32px;
 }
 .welcome-icon {
+  color: var(--primary);
   font-size: 32px;
-  opacity: 0.5;
 }
 .welcome h3 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   margin: 0;
 }
 .welcome p {
   color: var(--text-dim);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.6;
   max-width: 240px;
   margin-top: 8px;
 }
