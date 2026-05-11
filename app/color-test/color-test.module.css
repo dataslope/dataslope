@@ -33,7 +33,9 @@
   border-radius: 8px;
   padding: 4px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .themeCard:hover {
@@ -43,7 +45,11 @@
 
 .themeCardActive {
   border-color: var(--text-complementary) !important;
-  background: color-mix(in srgb, var(--text-complementary) 10%, var(--bg2)) !important;
+  background: color-mix(
+    in srgb,
+    var(--text-complementary) 10%,
+    var(--bg2)
+  ) !important;
 }
 
 .themePreview {
@@ -125,6 +131,7 @@
   align-items: center;
   gap: 4px;
   width: 90px;
+  margin-bottom: 16px;
 }
 
 /* Dual-color swatch item (text colors showing both "Aa on bg" and solid fill) */
@@ -188,6 +195,7 @@
   font-family: var(--font-mono);
   color: var(--text-dim);
   letter-spacing: 0.02em;
+  margin-top: 4px;
 }
 
 .copyBtn {
@@ -200,7 +208,9 @@
   color: var(--text-dim);
   cursor: pointer;
   padding: 1px 3px;
-  transition: color 0.12s, background 0.12s;
+  transition:
+    color 0.12s,
+    background 0.12s;
   flex-shrink: 0;
 }
 
@@ -224,7 +234,7 @@
 
 .swatchLabel {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text);
   text-align: center;
 }
 
@@ -264,9 +274,21 @@
   gap: 6px;
 }
 
-.typoH1 { font-size: 24px; font-weight: 700; margin: 0; }
-.typoH2 { font-size: 20px; font-weight: 600; margin: 0; }
-.typoH3 { font-size: 16px; font-weight: 500; margin: 0; }
+.typoH1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+.typoH2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+.typoH3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
 
 /* ── Code block (pre) ── */
 .codeBlock {
@@ -302,7 +324,9 @@
   font-size: 13px;
   font-weight: 500;
   padding: 6px 12px;
-  transition: opacity 0.15s, filter 0.15s;
+  transition:
+    opacity 0.15s,
+    filter 0.15s;
 }
 
 .btn:disabled {
@@ -337,8 +361,14 @@
   border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
 }
 
-.btnSm { font-size: 12px; padding: 4px 8px; }
-.btnLg { font-size: 15px; padding: 9px 18px; }
+.btnSm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.btnLg {
+  font-size: 15px;
+  padding: 9px 18px;
+}
 
 /* ── Badges ── */
 .badge {
@@ -446,7 +476,9 @@
 }
 
 @media (max-width: 640px) {
-  .formGrid { grid-template-columns: 1fr; }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .formField {
@@ -485,7 +517,8 @@
 .select:focus,
 .textarea:focus {
   border-color: var(--text-complementary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-complementary) 15%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--text-complementary) 15%, transparent);
 }
 
 .select {
@@ -541,7 +574,11 @@
   color: var(--text);
 }
 
-.alertInfo svg { color: var(--text-dim); flex-shrink: 0; margin-top: 1px; }
+.alertInfo svg {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .alertSuccess {
   background: color-mix(in srgb, var(--text-muted) 10%, var(--bg3));
@@ -550,7 +587,11 @@
   color: var(--text);
 }
 
-.alertSuccess svg { color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
+.alertSuccess svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .alertComplementary {
   background: color-mix(in srgb, var(--text-complementary) 10%, var(--bg3));
@@ -559,7 +600,11 @@
   color: var(--text);
 }
 
-.alertComplementary svg { color: var(--text-complementary); flex-shrink: 0; margin-top: 1px; }
+.alertComplementary svg {
+  color: var(--text-complementary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .alertWarning {
   background: color-mix(in srgb, var(--yellow) 10%, var(--bg3));
@@ -568,7 +613,11 @@
   color: var(--text);
 }
 
-.alertWarning svg { color: var(--yellow); flex-shrink: 0; margin-top: 1px; }
+.alertWarning svg {
+  color: var(--yellow);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .alertError {
   background: color-mix(in srgb, var(--red) 10%, var(--bg3));
@@ -577,7 +626,11 @@
   color: var(--text);
 }
 
-.alertError svg { color: var(--red); flex-shrink: 0; margin-top: 1px; }
+.alertError svg {
+  color: var(--red);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 /* ── Inline code (used in alerts) ── */
 .inlineCode {
@@ -598,7 +651,9 @@
 }
 
 @media (max-width: 640px) {
-  .listGrid { grid-template-columns: 1fr; }
+  .listGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .navList {
@@ -620,9 +675,14 @@
   transition: background 0.12s;
 }
 
-.navItem:last-child { border-bottom: none; }
+.navItem:last-child {
+  border-bottom: none;
+}
 
-.navItem:hover { background: var(--bg3); color: var(--text); }
+.navItem:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
 
 .navItemActive {
   background: color-mix(in srgb, var(--text-complementary) 8%, var(--bg));

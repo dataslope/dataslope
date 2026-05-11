@@ -76,8 +76,8 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     fn: "#50fa7b",
     arg: "#ffb86c",
     str: "#f1fa8c",
-    accent1: "#ff79c6",
-    accent2: "#50fa7b",
+    accent1: "#50fa7b",
+    accent2: "#ff79c6",
   },
   monokai: {
     bg: "#272822",
@@ -91,8 +91,8 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     fn: "#a6e22e",
     arg: "#fd971f",
     str: "#e6db74",
-    accent1: "#f92672",
-    accent2: "#a6e22e",
+    accent1: "#a6e22e",
+    accent2: "#f92672",
   },
   "material-darker": {
     bg: "#212121",
@@ -316,8 +316,8 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     fn: "#a6e22e",
     arg: "#e7c547",
     str: "#e7db74",
-    accent1: "#ff6541",
-    accent2: "#a6e22e",
+    accent1: "#a6e22e",
+    accent2: "#ff6541",
   },
   idea: {
     bg: "#ffffff",
@@ -362,9 +362,8 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--bg3", p.bg3);
   root.style.setProperty("--border", p.border);
   root.style.setProperty("--text", p.text);
-  // `--text-dim` and `--text-muted` are intentionally NOT written here.
-  // They are hardcoded in playground.css `:root` as fixed neutral tones so
-  // secondary UI text remains legible without inheriting editor accent hues.
+  root.style.setProperty("--text-dim", p.dim);
+  root.style.setProperty("--text-muted", p.muted);
   root.style.setProperty("--text-complementary", p.fn);
   root.style.setProperty("--theme-primary", p.kw);
   root.style.setProperty("--accent1", p.accent1);

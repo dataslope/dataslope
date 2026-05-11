@@ -835,7 +835,7 @@ body.pg-active {
   margin: 0;
 }
 .welcome p {
-  color: var(--text-muted);
+  color: var(--text-dim);
   font-size: 12px;
   line-height: 1.5;
   max-width: 240px;
@@ -1237,11 +1237,11 @@ body.pg-active {
   border-radius: 4px 4px 0 0;
 }
 .settings-tab:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--bg2) 97%, var(--text) 3%);
 }
 .settings-tab[data-active] {
   color: var(--primary);
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--bg2) 97%, var(--text) 3%);
   border-bottom-color: var(--primary);
   font-weight: 600;
 }
@@ -1373,7 +1373,7 @@ body.pg-active {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: var(--text-muted);
+  color: var(--text-dim);
   opacity: 0.7;
   background: var(--bg2);
   border-radius: 4px;
@@ -2236,8 +2236,8 @@ input[type="range"].fs-slider:disabled {
   justify-content: center;
   padding: 1px 4px;
   border-radius: 4px;
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--accent1);
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 400;
