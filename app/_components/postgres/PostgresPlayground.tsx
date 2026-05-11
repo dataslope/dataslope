@@ -645,7 +645,7 @@ function PgStructureColumnRow({
           aria-label={`Remove column ${col.name || "unnamed column"}`}
           title="Remove column"
         >
-          <X size={13} aria-hidden="true" />
+          <Trash2 size={13} aria-hidden="true" />
         </button>
       </td>
     </tr>
@@ -943,6 +943,8 @@ function PostgresPlaygroundInner() {
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
     useState<PgStructureDialogState | null>(null);
+  const [addTableDialog, setAddTableDialog] =
+    useState<PgStructureDialogState | null>(null);
   const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
@@ -951,6 +953,10 @@ function PostgresPlaygroundInner() {
   const pgStructureValidation = useMemo(
     () => validatePgStructure(viewStructureDialog, columnsByEntity),
     [viewStructureDialog, columnsByEntity],
+  );
+  const addTableValidation = useMemo(
+    () => validatePgStructure(addTableDialog, columnsByEntity),
+    [addTableDialog, columnsByEntity],
   );
 
   // ─── Refs ─────────────────────────────────────────────────────────────
@@ -1931,6 +1937,81 @@ function PostgresPlaygroundInner() {
       );
     }
   }, [viewStructureDialog, columnsByEntity, refreshSchema, showToast]);
+
+  const openAddTable = useCallback(() => {
+    setAddTableDialog({
+      tableName: "",
+      newTableName: "new_table",
+      columns: [
+        {
+          id: newPgStructureId(),
+          originalName: null,
+          name: "id",
+          type: "bigserial",
+          nullable: false,
+          defaultValue: "",
+          isPk: true,
+          unique: false,
+          autoIncrement: true,
+          fkTable: "",
+          fkColumn: "",
+          fkOnDelete: "NO ACTION",
+          fkOnUpdate: "NO ACTION",
+          generated: null,
+        },
+      ],
+      originalSignature: "",
+    });
+  }, []);
+
+  const submitAddTable = useCallback(async () => {
+    const dialog = addTableDialog;
+    const engine = engineRef.current;
+    if (!dialog || !engine) return;
+    const validation = validatePgStructure(dialog, columnsByEntity);
+    if (!validation.isValid) {
+      showToast(validation.errors[0] ?? "Fix validation errors before saving.", "warn");
+      return;
+    }
+    const trimmedName = dialog.newTableName.trim();
+    try {
+      await engine.createTable(
+        trimmedName,
+        dialog.columns.map((col) => ({
+          name: col.name.trim(),
+          type: col.type.trim(),
+          notNull: !col.nullable,
+          primaryKey: col.isPk,
+          unique: col.unique,
+          autoIncrement: col.autoIncrement || isPgSerialType(col.type),
+          defaultValue: col.defaultValue.trim() || undefined,
+          foreignKey:
+            col.fkTable && col.fkColumn
+              ? {
+                  table: col.fkTable,
+                  column: col.fkColumn,
+                  onDelete: normalizePgFkAction(col.fkOnDelete),
+                  onUpdate: normalizePgFkAction(col.fkOnUpdate),
+                }
+              : undefined,
+          generated: col.generated
+            ? {
+                expression: col.generated.expression.trim(),
+                storageType: "STORED" as const,
+              }
+            : undefined,
+        })),
+      );
+      await refreshSchema();
+      showToast(`Created table "${trimmedName}".`);
+      setAddTableDialog(null);
+    } catch (err) {
+      showToast(
+        `Create failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [addTableDialog, columnsByEntity, refreshSchema, showToast]);
 
   // ─── Export database helpers ──────────────────────────────────────────
 
@@ -2919,6 +3000,171 @@ function PostgresPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Add Table drawer ── */}
+        <Dialog.Root
+          open={addTableDialog !== null}
+          onOpenChange={(next) => {
+            if (!next) setAddTableDialog(null);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
+            <Dialog.Popup className="sql-modify-drawer">
+              <header className="sql-modify-drawer-header">
+                <div className="sql-modify-drawer-heading">
+                  <Dialog.Title className="sql-modify-drawer-title">
+                    Add Table
+                  </Dialog.Title>
+                  <Dialog.Description className="sql-modify-drawer-subtitle">
+                    Create a new table
+                  </Dialog.Description>
+                </div>
+                <Dialog.Close
+                  className="sql-modify-drawer-close"
+                  aria-label="Close"
+                >
+                  <X size={16} aria-hidden="true" />
+                </Dialog.Close>
+              </header>
+              {addTableDialog && (
+                <div className="sql-modify-body">
+                  <label className="sql-modify-field">
+                    <span className="sql-modify-field-label">Table name</span>
+                    <input
+                      className={`sql-rename-input${addTableValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
+                      value={addTableDialog.newTableName}
+                      onChange={(e) =>
+                        setAddTableDialog((prev) =>
+                          prev ? { ...prev, newTableName: e.target.value } : null,
+                        )
+                      }
+                    />
+                  </label>
+                  {(() => {
+                    const regularCols = addTableDialog.columns.filter(
+                      (c) => !c.generated,
+                    );
+                    return (
+                      <>
+                        <div className="sql-modify-columns">
+                          <DndContext
+                            sensors={pgStructureSensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={(event: DragEndEvent) => {
+                              const { active, over } = event;
+                              if (!over || active.id === over.id) return;
+                              const cols = addTableDialog.columns;
+                              const oldIndex = cols.findIndex((c) => c.id === active.id);
+                              const newIndex = cols.findIndex((c) => c.id === over.id);
+                              if (oldIndex === -1 || newIndex === -1) return;
+                              setAddTableDialog({
+                                ...addTableDialog,
+                                columns: arrayMove(cols, oldIndex, newIndex),
+                              });
+                            }}
+                          >
+                            <SortableContext
+                              items={regularCols.map((c) => c.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="sql-modify-table-wrap">
+                                <table className="sql-modify-table">
+                                  <thead>
+                                    <tr>
+                                      <th className="sql-modify-drag-cell" aria-label="Drag handle" />
+                                      <th>Name</th>
+                                      <th>Type</th>
+                                      <th>Not null</th>
+                                      <th>Primary</th>
+                                      <th>Unique</th>
+                                      <th>Identity/<br />serial</th>
+                                      <th>Default</th>
+                                      <th>FK table</th>
+                                      <th>FK column</th>
+                                      <th>On delete</th>
+                                      <th>On update</th>
+                                      <th>Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {regularCols.map((col) => (
+                                      <PgStructureColumnRow
+                                        key={col.id}
+                                        col={col}
+                                        onChange={(patch) =>
+                                          setAddTableDialog((prev) =>
+                                            prev
+                                              ? {
+                                                  ...prev,
+                                                  columns: prev.columns.map((c) =>
+                                                    c.id === col.id ? { ...c, ...patch } : c,
+                                                  ),
+                                                }
+                                              : null,
+                                          )
+                                        }
+                                        onRemove={() =>
+                                          setAddTableDialog((prev) =>
+                                            prev
+                                              ? {
+                                                  ...prev,
+                                                  columns: prev.columns.filter((c) => c.id !== col.id),
+                                                }
+                                              : null,
+                                          )
+                                        }
+                                        hasError={addTableValidation.invalidColumnIds.has(col.id)}
+                                        knownTables={tables}
+                                        columnsByTable={columnsByEntity}
+                                      />
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </SortableContext>
+                          </DndContext>
+                        </div>
+                        <button
+                          type="button"
+                          className="confirm-btn confirm-btn-secondary sql-modify-add"
+                          onClick={() =>
+                            setAddTableDialog((prev) => {
+                              if (!prev) return null;
+                              return { ...prev, columns: [...prev.columns, makeNewPgColumn()] };
+                            })
+                          }
+                        >
+                          <Plus size={12} aria-hidden="true" /> Add column
+                        </button>
+                        {addTableValidation.errors.length > 0 && (
+                          <div className="sql-modify-validation" role="alert">
+                            {addTableValidation.errors.map((error) => (
+                              <div key={error}>{error}</div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+              <footer className="sql-modify-drawer-footer">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  onClick={() => void submitAddTable()}
+                  disabled={!addTableDialog || !addTableValidation.isValid}
+                >
+                  Create Table
+                </button>
+              </footer>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         {/* ── Import CSV dialog ── */}
         <ImportDialog
           flavor="csv"
@@ -3026,6 +3272,7 @@ function PostgresPlaygroundInner() {
                 expanded={tablesExpanded}
                 onToggle={() => setTablesExpanded((v) => !v)}
                 emptyMessage="No tables."
+                onAdd={openAddTable}
                 allExpanded={tables.length > 0 && tables.every((name) => expandedEntities.has(name))}
                 onExpandAll={() => setExpandedEntities(new Set(tables))}
                 onCollapseAll={() => setExpandedEntities(new Set())}
