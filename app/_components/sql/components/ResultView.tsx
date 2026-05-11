@@ -907,13 +907,29 @@ export function ResultView({
               >
                 {onExportResultSet && (
                   <Menu.Root>
-                    <Menu.Trigger
-                      className="sql-result-export-btn"
-                      title="Export result set"
-                      aria-label="Export result set"
-                    >
-                      <ArrowDownToLine size={13} aria-hidden="true" />
-                    </Menu.Trigger>
+                    <Popover.Root>
+                      <Popover.Trigger
+                        openOnHover
+                        delay={150}
+                        closeDelay={100}
+                        render={(triggerProps) => (
+                          <Menu.Trigger
+                            {...triggerProps}
+                            className="sql-result-export-btn"
+                            aria-label="Export result set"
+                          >
+                            <ArrowDownToLine size={13} aria-hidden="true" />
+                          </Menu.Trigger>
+                        )}
+                      />
+                      <Popover.Portal>
+                        <Popover.Positioner sideOffset={6} align="center" side="top">
+                          <Popover.Popup className="bui-popup sql-export-btn-popover">
+                            Export result set
+                          </Popover.Popup>
+                        </Popover.Positioner>
+                      </Popover.Portal>
+                    </Popover.Root>
                     <Menu.Portal>
                       <Menu.Positioner sideOffset={6} align="end" side="top">
                         <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
