@@ -31,7 +31,7 @@ import { useSettingsStore } from "../stores/useSettingsStore";
 import { useSqlPlaygroundStore } from "../stores/useSqlPlaygroundStore";
 import type { ResultSetExportScope, QueryHistoryEntry } from "../types";
 
-const LAZY_ALL_PAGE_SIZE = 500;
+const INFINITE_SCROLL_PAGE_SIZE = 500;
 
 export interface SqlPlaygroundRefs {
   engineRef: React.MutableRefObject<SqliteEngine | null>;
@@ -106,7 +106,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const lazyPageSizeForRun =
-        currentPageSize > 0 ? currentPageSize : LAZY_ALL_PAGE_SIZE;
+        currentPageSize > 0 ? currentPageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -243,7 +243,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const tabId = activeTabIdRef.current;
       const curResult = useTabStore.getState().resultsByTab[tabId];
       if (!curResult?.lazySql || !curResult.lazyInfinite) return;
-      const pageSize = curResult.lazyPageSize ?? LAZY_ALL_PAGE_SIZE;
+      const pageSize = curResult.lazyPageSize ?? INFINITE_SCROLL_PAGE_SIZE;
       const offset = page * pageSize;
       const currentSet = curResult.sets[0];
       if (!currentSet || currentSet.values.length !== offset) return;

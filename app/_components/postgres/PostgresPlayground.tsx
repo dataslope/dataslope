@@ -176,7 +176,7 @@ import { FK_ACTIONS } from "../sql/constants";
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
-const LAZY_ALL_PAGE_SIZE = 500;
+const INFINITE_SCROLL_PAGE_SIZE = 500;
 
 // ─── Postgres structure drawer types ────────────────────────────────────
 
@@ -1251,7 +1251,7 @@ function PostgresPlaygroundInner() {
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const lazyPageSizeForRun =
-        globalPageSize > 0 ? globalPageSize : LAZY_ALL_PAGE_SIZE;
+        globalPageSize > 0 ? globalPageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -2012,7 +2012,7 @@ function PostgresPlaygroundInner() {
       const tabId = activeTabIdRef.current;
       const curResult = resultsByTab[tabId];
       if (!curResult?.lazySql || !curResult.lazyInfinite) return;
-      const pageSize = curResult.lazyPageSize ?? LAZY_ALL_PAGE_SIZE;
+      const pageSize = curResult.lazyPageSize ?? INFINITE_SCROLL_PAGE_SIZE;
       const offset = page * pageSize;
       const currentSet = curResult.sets[0];
       if (!currentSet || currentSet.values.length !== offset) return;
