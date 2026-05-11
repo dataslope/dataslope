@@ -10,6 +10,7 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Popover } from "@base-ui-components/react/popover";
@@ -154,6 +155,9 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
   { value: 0, label: "All" },
 ];
 
+const VIRTUAL_ROW_HEIGHT_ESTIMATE = 30;
+const LOAD_MORE_THRESHOLD_ROWS = 25;
+
 // ────────────────────────────────────────────────────────────────────────
 // Exports
 // ────────────────────────────────────────────────────────────────────────
@@ -207,6 +211,7 @@ export function ResultView({
   globalPageSize,
   onSetGlobalPageSize,
   onLoadPage,
+  onLoadMorePage,
   onExportSnapshotChange,
   onExportResultSet,
 }: {
@@ -235,7 +240,8 @@ export function ResultView({
   ) => void;
   globalPageSize: number;
   onSetGlobalPageSize: (n: number) => void;
-  onLoadPage: (sql: string, page: number) => void;
+  onLoadPage: (sql: string, page: number, explicitPageSize?: number) => void;
+  onLoadMorePage?: (sql: string, page: number) => void;
   onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
   onExportResultSet?: (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => void;
 }) {
@@ -266,6 +272,7 @@ export function ResultView({
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
+  const resultSetsScrollRef = useRef<HTMLDivElement>(null);
   const prevResultRef = useRef<QueryRunResult | null>(null);
 
   useEffect(() => {
@@ -572,7 +579,7 @@ export function ResultView({
         allRows: set.values,
         rows: set.values,
         totalRows: result.lazyTotalCount ?? set.values.length,
-        pageSize: effective,
+        pageSize: result.lazyInfinite ? 0 : effective,
         currentPage: result.lazyPage ?? 0,
       });
       return;
@@ -660,22 +667,25 @@ export function ResultView({
     const set = result.sets[idx];
     if (!set) return null;
     const isLazy = result.lazySql !== undefined && idx === 0;
+    const isInfiniteAll = isLazy && result.lazyInfinite === true;
     const sorting = sortingByIndex[idx] ?? [];
     let totalRows: number;
     let currentPage: number;
     let startIdx: number;
     let visibleRows: QueryExecResult["values"];
     let originalIndices: number[];
-    if (isLazy) {
-      const effective =
-        globalPageSize > 0
-          ? globalPageSize
-          : Math.max(result.lazyTotalCount ?? 0, 1);
-      totalRows = result.lazyTotalCount ?? set.values.length;
-      currentPage = result.lazyPage ?? 0;
-      startIdx = currentPage * effective;
-      visibleRows = set.values;
-      originalIndices = set.values.map((_, ri) => startIdx + ri);
+      if (isLazy) {
+        const effective =
+          globalPageSize > 0
+            ? globalPageSize
+            : Math.max(result.lazyTotalCount ?? 0, 1);
+        totalRows = result.lazyTotalCount ?? set.values.length;
+        currentPage = isInfiniteAll ? 0 : (result.lazyPage ?? 0);
+        startIdx = isInfiniteAll
+          ? 0
+          : currentPage * (result.lazyPageSize ?? effective);
+        visibleRows = set.values;
+        originalIndices = set.values.map((_, ri) => startIdx + ri);
     } else {
       const st = getState(idx);
       totalRows = set.values.length;
@@ -708,7 +718,7 @@ export function ResultView({
       visibleRows = visibleIndexed.map((item) => item.values);
       originalIndices = visibleIndexed.map((item) => item.originalIndex);
     }
-    return { set, isLazy, sorting, totalRows, currentPage, startIdx, visibleRows, originalIndices };
+    return { set, isLazy, isInfiniteAll, sorting, totalRows, currentPage, startIdx, visibleRows, originalIndices };
   };
 
   const activeSetData = computeSetRenderData(safeSetIdx);
@@ -733,10 +743,10 @@ export function ResultView({
         </div>
       )}
       <div ref={flashWrapperRef} className="sql-result-flash-wrapper sql-result-flash-anim">
-        <div className="sql-result-sets">
+        <div ref={resultSetsScrollRef} className="sql-result-sets">
           {activeSetData && (() => {
             const idx = safeSetIdx;
-            const { set, isLazy, sorting, visibleRows, originalIndices } = activeSetData;
+            const { set, isLazy, isInfiniteAll, sorting, visibleRows, originalIndices, totalRows } = activeSetData;
             const pkCols = pkColumnsForSet(set);
             const selected = selectedByIndex[idx];
             const pendingEdits = pendingEditsByIndex[idx];
@@ -762,6 +772,17 @@ export function ResultView({
                 }
               }
             };
+            const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+            let effectiveLazySql = baseSql;
+            if (sorting.length > 0) {
+              const parsed = parseColumnId(sorting[0].id);
+              if (parsed) {
+                effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+              }
+            }
+            const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
+            const hasMoreRows =
+              isInfiniteAll && visibleRows.length < totalRows;
             return (
               <ResultTableBody
                 key={idx}
@@ -803,6 +824,18 @@ export function ResultView({
                         onDuplicateRow(sourceTable, columnNames, values)
                     : undefined
                 }
+                virtualized={isInfiniteAll}
+                scrollParentRef={resultSetsScrollRef}
+                hasMoreRows={hasMoreRows}
+                onLoadMoreRows={
+                  isInfiniteAll && onLoadMorePage && lazyPageSize > 0
+                    ? () =>
+                        onLoadMorePage(
+                          effectiveLazySql,
+                          Math.floor(visibleRows.length / lazyPageSize),
+                        )
+                    : undefined
+                }
               />
             );
           })()}
@@ -811,7 +844,7 @@ export function ResultView({
       <div className="sql-result-pagers">
         {activeSetData && (() => {
           const idx = safeSetIdx;
-          const { set, isLazy, sorting, totalRows, currentPage } = activeSetData;
+          const { set, isLazy, isInfiniteAll, sorting, totalRows, currentPage, visibleRows } = activeSetData;
           let handlePageChange: (p: number) => void;
           let handlePageSizeChange: (s: number) => void;
           if (isLazy) {
@@ -826,7 +859,7 @@ export function ResultView({
             handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
             handlePageSizeChange = (s: number) => {
               onSetGlobalPageSize(s);
-              onLoadPage(effectiveLazySql, 0);
+              onLoadPage(effectiveLazySql, 0, s);
             };
           } else {
             handlePageChange = (p: number) => setPage(idx, p);
@@ -850,6 +883,7 @@ export function ResultView({
               <ResultPager
                 key={idx}
                 totalRows={totalRows}
+                loadedRows={isInfiniteAll ? visibleRows.length : undefined}
                 index={idx}
                 showSetLabel={false}
                 pageSize={globalPageSize}
@@ -1054,6 +1088,10 @@ export function ResultTableBody({
   onSetActiveEditCell,
   onDeleteSingleRow,
   onDuplicateRow,
+  virtualized = false,
+  scrollParentRef,
+  hasMoreRows = false,
+  onLoadMoreRows,
 }: {
   set: QueryExecResult & { columnTypes?: string[] };
   visible: QueryExecResult["values"];
@@ -1075,6 +1113,10 @@ export function ResultTableBody({
   onSetActiveEditCell: (cellKey: string | null) => void;
   onDeleteSingleRow?: (absoluteRow: number) => void;
   onDuplicateRow?: (columnNames: string[], values: unknown[]) => void;
+  virtualized?: boolean;
+  scrollParentRef?: React.RefObject<HTMLDivElement | null>;
+  hasMoreRows?: boolean;
+  onLoadMoreRows?: () => void;
 }) {
   const rightClickedCellRef = useRef<{
     colIdx: number;
@@ -1408,6 +1450,236 @@ export function ResultTableBody({
     getSortedRowModel: getSortedRowModel(),
     manualSorting: true,
   });
+  const tableRows = table.getRowModel().rows;
+  const rowVirtualizer = useVirtualizer({
+    count: tableRows.length,
+    getScrollElement: () =>
+      virtualized ? (scrollParentRef?.current ?? null) : null,
+    estimateSize: () => VIRTUAL_ROW_HEIGHT_ESTIMATE,
+    overscan: 20,
+  });
+  const virtualRows = virtualized ? rowVirtualizer.getVirtualItems() : [];
+  const renderedRows = virtualized
+    ? virtualRows.map((virtualRow) => ({
+        row: tableRows[virtualRow.index],
+        virtualRow,
+      }))
+    : tableRows.map((row) => ({ row, virtualRow: null }));
+  const paddingTop =
+    virtualized && virtualRows.length > 0 ? (virtualRows[0]?.start ?? 0) : 0;
+  const paddingBottom =
+    virtualized && virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() -
+        (virtualRows[virtualRows.length - 1]?.end ?? 0)
+      : 0;
+  const loadMoreRequestedForCountRef = useRef<number | null>(null);
+  useEffect(() => {
+    loadMoreRequestedForCountRef.current = null;
+  }, [tableRows.length]);
+  const lastVirtualIndex = virtualRows[virtualRows.length - 1]?.index ?? -1;
+  useEffect(() => {
+    if (!virtualized || !hasMoreRows || !onLoadMoreRows) return;
+    if (lastVirtualIndex < tableRows.length - LOAD_MORE_THRESHOLD_ROWS) return;
+    if (loadMoreRequestedForCountRef.current === tableRows.length) return;
+    loadMoreRequestedForCountRef.current = tableRows.length;
+    onLoadMoreRows();
+  }, [
+    hasMoreRows,
+    lastVirtualIndex,
+    onLoadMoreRows,
+    tableRows.length,
+    virtualized,
+  ]);
+
+  const colSpan = table.getAllLeafColumns().length;
+
+  const renderRow = (row: (typeof tableRows)[number]) => {
+    const absoluteRow = row.original.absoluteRow;
+    const rowValues = row.original.values;
+    const checked = selectedRows?.has(absoluteRow) ?? false;
+    const cells = row.getVisibleCells().map((cell) => {
+      const isSelect = cell.column.id === "select";
+      const rawVal = isSelect ? undefined : cell.getValue();
+      const ci = isSelect
+        ? -1
+        : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
+      const cellKey = `${absoluteRow}:${ci}`;
+      const hasPendingEdit =
+        !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
+      return (
+        <td
+          key={cell.id}
+          className={
+            isSelect
+              ? "sql-result-td-select"
+              : hasPendingEdit
+                ? "sql-cell-edited-td"
+                : rawVal === null
+                  ? "sql-cell-null"
+                  : undefined
+          }
+          onContextMenu={
+            !isSelect && ci >= 0
+              ? () => {
+                  rightClickedCellRef.current = {
+                    colIdx: ci,
+                    value: rawVal,
+                  };
+                }
+              : undefined
+          }
+          onDoubleClick={
+            editable && !isSelect && ci >= 0
+              ? () => onSetActiveEditCell(cellKey)
+              : undefined
+          }
+        >
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </td>
+      );
+    });
+    return (
+      <ContextMenu.Root key={absoluteRow}>
+        <ContextMenu.Trigger
+          render={(props) => (
+            <tr
+              {...props}
+              className={checked ? "sql-result-row-selected" : undefined}
+            >
+              {cells}
+            </tr>
+          )}
+        />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner sideOffset={4}>
+            <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => {
+                  const cell = rightClickedCellRef.current;
+                  const text =
+                    cell !== null
+                      ? formatCellValue(cell.value)
+                      : "";
+                  navigator.clipboard
+                    .writeText(text)
+                    .catch(() => undefined);
+                }}
+              >
+                <div className="ex-title">Copy cell value</div>
+              </ContextMenu.Item>
+              {editable && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cell = rightClickedCellRef.current;
+                    if (cell === null || cell.colIdx < 0) return;
+                    const colName = set.columns[cell.colIdx] ?? "";
+                    const cellKey = `${absoluteRow}:${cell.colIdx}`;
+                    const current = pendingEdits?.has(cellKey)
+                      ? String(pendingEdits.get(cellKey) ?? "")
+                      : formatCellValue(cell.value);
+                    setModalEditCell({ cellKey, colName, value: current });
+                  }}
+                >
+                  <div className="ex-title">Edit cell in modal</div>
+                </ContextMenu.Item>
+              )}
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => {
+                  const obj = Object.fromEntries(
+                    set.columns.map((c, i) => [c, rowValues[i]]),
+                  );
+                  navigator.clipboard
+                    .writeText(JSON.stringify(obj, null, 2))
+                    .catch(() => undefined);
+                }}
+              >
+                <div className="ex-title">Copy row as JSON</div>
+              </ContextMenu.Item>
+              {sourceTable && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cols = set.columns
+                      .map((c) => quoteIdentSql(c))
+                      .join(", ");
+                    const vals = rowValues
+                      .map((v) => formatCellAsSql(v))
+                      .join(", ");
+                    const sql = `INSERT INTO ${quoteIdentSql(sourceTable)} (${cols}) VALUES (${vals});`;
+                    navigator.clipboard
+                      .writeText(sql)
+                      .catch(() => undefined);
+                  }}
+                >
+                  <div className="ex-title">Copy row as SQL</div>
+                </ContextMenu.Item>
+              )}
+              {onDuplicateRow &&
+                (canDuplicate ? (
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={() => {
+                      const autoIncCols = new Set(
+                        (constraintInfo ?? [])
+                          .filter((c) => c.isAutoIncrement)
+                          .map((c) => c.name),
+                      );
+                      const cols: string[] = [];
+                      const vals: unknown[] = [];
+                      set.columns.forEach((c, i) => {
+                        if (!autoIncCols.has(c)) {
+                          cols.push(c);
+                          vals.push(rowValues[i]);
+                        }
+                      });
+                      onDuplicateRow(cols, vals);
+                    }}
+                  >
+                    <div className="ex-title">Duplicate row</div>
+                  </ContextMenu.Item>
+                ) : (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={200}
+                      closeDelay={100}
+                      className="example-item sql-ctx-disabled"
+                      render={<div />}
+                      aria-disabled="true"
+                    >
+                      <div className="ex-title">Duplicate row</div>
+                    </Popover.Trigger>
+                    <Popover.Portal>
+                      <Popover.Positioner
+                        side="right"
+                        sideOffset={8}
+                      >
+                        <Popover.Popup className="bui-popup sql-unique-popover">
+                          {uniqueConstraintReason ||
+                            "Cannot duplicate: unique constraint"}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                ))}
+              {onDeleteSingleRow && (
+                <ContextMenu.Item
+                  className="example-item sql-ctx-danger"
+                  onClick={() => onDeleteSingleRow(absoluteRow)}
+                >
+                  <div className="ex-title">Delete row</div>
+                </ContextMenu.Item>
+              )}
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+    );
+  };
+
   return (
     <div className="sql-result-set">
       <div className="sql-result-table-wrap">
@@ -1438,197 +1710,19 @@ export function ResultTableBody({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => {
-              const absoluteRow = row.original.absoluteRow;
-              const rowValues = row.original.values;
-              const checked = selectedRows?.has(absoluteRow) ?? false;
-              const cells = row.getVisibleCells().map((cell) => {
-                const isSelect = cell.column.id === "select";
-                const rawVal = isSelect ? undefined : cell.getValue();
-                const ci = isSelect
-                  ? -1
-                  : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
-                const cellKey = `${absoluteRow}:${ci}`;
-                const hasPendingEdit =
-                  !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
-                return (
-                  <td
-                    key={cell.id}
-                    className={
-                      isSelect
-                        ? "sql-result-td-select"
-                        : hasPendingEdit
-                          ? "sql-cell-edited-td"
-                          : rawVal === null
-                            ? "sql-cell-null"
-                            : undefined
-                    }
-                    onContextMenu={
-                      !isSelect && ci >= 0
-                        ? () => {
-                            rightClickedCellRef.current = {
-                              colIdx: ci,
-                              value: rawVal,
-                            };
-                          }
-                        : undefined
-                    }
-                    onDoubleClick={
-                      editable && !isSelect && ci >= 0
-                        ? () => onSetActiveEditCell(cellKey)
-                        : undefined
-                    }
-                  >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext(),
-                    )}
-                  </td>
-                );
-              });
-              return (
-                <ContextMenu.Root key={absoluteRow}>
-                  <ContextMenu.Trigger
-                    render={(props) => (
-                      <tr
-                        {...props}
-                        className={
-                          checked ? "sql-result-row-selected" : undefined
-                        }
-                      >
-                        {cells}
-                      </tr>
-                    )}
-                  />
-                  <ContextMenu.Portal>
-                    <ContextMenu.Positioner sideOffset={4}>
-                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
-                        <ContextMenu.Item
-                          className="example-item"
-                          onClick={() => {
-                            const cell = rightClickedCellRef.current;
-                            const text =
-                              cell !== null
-                                ? formatCellValue(cell.value)
-                                : "";
-                            navigator.clipboard
-                              .writeText(text)
-                              .catch(() => undefined);
-                          }}
-                        >
-                          <div className="ex-title">Copy cell value</div>
-                        </ContextMenu.Item>
-                        {editable && (
-                          <ContextMenu.Item
-                            className="example-item"
-                            onClick={() => {
-                              const cell = rightClickedCellRef.current;
-                              if (cell === null || cell.colIdx < 0) return;
-                              const colName = set.columns[cell.colIdx] ?? "";
-                              const cellKey = `${absoluteRow}:${cell.colIdx}`;
-                              const current = pendingEdits?.has(cellKey)
-                                ? String(pendingEdits.get(cellKey) ?? "")
-                                : formatCellValue(cell.value);
-                              setModalEditCell({ cellKey, colName, value: current });
-                            }}
-                          >
-                            <div className="ex-title">Edit cell in modal</div>
-                          </ContextMenu.Item>
-                        )}
-                        <ContextMenu.Item
-                          className="example-item"
-                          onClick={() => {
-                            const obj = Object.fromEntries(
-                              set.columns.map((c, i) => [c, rowValues[i]]),
-                            );
-                            navigator.clipboard
-                              .writeText(JSON.stringify(obj, null, 2))
-                              .catch(() => undefined);
-                          }}
-                        >
-                          <div className="ex-title">Copy row as JSON</div>
-                        </ContextMenu.Item>
-                        {sourceTable && (
-                          <ContextMenu.Item
-                            className="example-item"
-                            onClick={() => {
-                              const cols = set.columns
-                                .map((c) => quoteIdentSql(c))
-                                .join(", ");
-                              const vals = rowValues
-                                .map((v) => formatCellAsSql(v))
-                                .join(", ");
-                              const sql = `INSERT INTO ${quoteIdentSql(sourceTable)} (${cols}) VALUES (${vals});`;
-                              navigator.clipboard
-                                .writeText(sql)
-                                .catch(() => undefined);
-                            }}
-                          >
-                            <div className="ex-title">Copy row as SQL</div>
-                          </ContextMenu.Item>
-                        )}
-                        {onDuplicateRow &&
-                          (canDuplicate ? (
-                            <ContextMenu.Item
-                              className="example-item"
-                              onClick={() => {
-                                const autoIncCols = new Set(
-                                  (constraintInfo ?? [])
-                                    .filter((c) => c.isAutoIncrement)
-                                    .map((c) => c.name),
-                                );
-                                const cols: string[] = [];
-                                const vals: unknown[] = [];
-                                set.columns.forEach((c, i) => {
-                                  if (!autoIncCols.has(c)) {
-                                    cols.push(c);
-                                    vals.push(rowValues[i]);
-                                  }
-                                });
-                                onDuplicateRow(cols, vals);
-                              }}
-                            >
-                              <div className="ex-title">Duplicate row</div>
-                            </ContextMenu.Item>
-                          ) : (
-                            <Popover.Root>
-                              <Popover.Trigger
-                                openOnHover
-                                delay={200}
-                                closeDelay={100}
-                                className="example-item sql-ctx-disabled"
-                                render={<div />}
-                                aria-disabled="true"
-                              >
-                                <div className="ex-title">Duplicate row</div>
-                              </Popover.Trigger>
-                              <Popover.Portal>
-                                <Popover.Positioner
-                                  side="right"
-                                  sideOffset={8}
-                                >
-                                  <Popover.Popup className="bui-popup sql-unique-popover">
-                                    {uniqueConstraintReason ||
-                                      "Cannot duplicate: unique constraint"}
-                                  </Popover.Popup>
-                                </Popover.Positioner>
-                              </Popover.Portal>
-                            </Popover.Root>
-                          ))}
-                        {onDeleteSingleRow && (
-                          <ContextMenu.Item
-                            className="example-item sql-ctx-danger"
-                            onClick={() => onDeleteSingleRow(absoluteRow)}
-                          >
-                            <div className="ex-title">Delete row</div>
-                          </ContextMenu.Item>
-                        )}
-                      </ContextMenu.Popup>
-                    </ContextMenu.Positioner>
-                  </ContextMenu.Portal>
-                </ContextMenu.Root>
-              );
-            })}
+            {paddingTop > 0 && (
+              <tr aria-hidden="true">
+                <td colSpan={colSpan} style={{ height: paddingTop, padding: 0 }} />
+              </tr>
+            )}
+            {renderedRows.map(({ row }) => (
+              <React.Fragment key={row.id}>{renderRow(row)}</React.Fragment>
+            ))}
+            {paddingBottom > 0 && (
+              <tr aria-hidden="true">
+                <td colSpan={colSpan} style={{ height: paddingBottom, padding: 0 }} />
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -1680,6 +1774,7 @@ export function ResultTableBody({
 
 export function ResultPager({
   totalRows,
+  loadedRows,
   index,
   showSetLabel,
   pageSize,
@@ -1695,6 +1790,7 @@ export function ResultPager({
   children,
 }: {
   totalRows: number;
+  loadedRows?: number;
   index: number;
   showSetLabel: boolean;
   pageSize: number;
@@ -1713,7 +1809,10 @@ export function ResultPager({
   const totalPages = Math.max(1, Math.ceil(totalRows / effective));
   const safePage = Math.min(page, totalPages - 1);
   const start = safePage * effective;
-  const end = Math.min(totalRows, start + effective);
+  const end =
+    pageSize === 0 && loadedRows !== undefined
+      ? Math.min(totalRows, loadedRows)
+      : Math.min(totalRows, start + effective);
 
   const [pageInput, setPageInput] = useState(String(safePage + 1));
   const [prevSafePage, setPrevSafePage] = useState(safePage);

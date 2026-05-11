@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { startTransition } from "react";
 import { Toast } from "@base-ui-components/react/toast";
 import type { EditorView } from "@codemirror/view";
@@ -29,7 +29,9 @@ import { useEngineStore } from "../stores/useEngineStore";
 import { useTabStore } from "../stores/useTabStore";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { useSqlPlaygroundStore } from "../stores/useSqlPlaygroundStore";
-import type { QueryRunResult, ResultSetExportScope, QueryHistoryEntry } from "../types";
+import type { ResultSetExportScope, QueryHistoryEntry } from "../types";
+
+const INFINITE_SCROLL_PAGE_SIZE = 500;
 
 export interface SqlPlaygroundRefs {
   engineRef: React.MutableRefObject<SqliteEngine | null>;
@@ -57,11 +59,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   const globalPageSize = useSqlPlaygroundStore((s) => s.globalPageSize);
   // Ref kept in sync so runSqlForTab can read synchronously without stale closures.
   const globalPageSizeRef = useRef(globalPageSize);
-  // Keep ref in sync
-  const globalPageSizeValue = useSqlPlaygroundStore((s) => s.globalPageSize);
-  if (globalPageSizeRef.current !== globalPageSizeValue) {
-    globalPageSizeRef.current = globalPageSizeValue;
-  }
+  useEffect(() => {
+    globalPageSizeRef.current = globalPageSize;
+  }, [globalPageSize]);
 
   const setStatusState = useEngineStore((s) => s.setStatusState);
   const setTables = useEngineStore((s) => s.setTables);
@@ -90,6 +90,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       sourceTable?: string,
       page = 0,
       baseSql?: string,
+      explicitPageSize?: number,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -101,12 +102,13 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       setStatusState("running");
       if (clearBeforeRun) setResultForTab(tabId, null);
       const t0 = performance.now();
-      const currentPageSize = globalPageSizeRef.current;
+      const currentPageSize =
+        explicitPageSize !== undefined ? explicitPageSize : globalPageSizeRef.current;
       const noComments = stripSqlComments(trimmed);
       const useLazy =
-        currentPageSize > 0 &&
-        isSingleSelectSql(trimmed, noComments) &&
-        !hasLimitClause(noComments);
+        isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
+      const lazyPageSizeForRun =
+        currentPageSize > 0 ? currentPageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -117,15 +119,15 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         if (useLazy) {
           const { result: lazySets, totalCount } = engine.execPaged(
             trimmed,
-            currentPageSize,
-            page * currentPageSize,
+            lazyPageSizeForRun,
+            page * lazyPageSizeForRun,
           );
           sets = lazySets;
           lazySql = trimmed.replace(/\s*;+\s*$/, "");
           lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
           lazyTotalCount = totalCount;
           lazyPage = page;
-          lazyPageSize = currentPageSize;
+          lazyPageSize = lazyPageSizeForRun;
         } else {
           sets = engine.exec(trimmed);
         }
@@ -140,6 +142,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyTotalCount,
           lazyPage,
           lazyPageSize,
+          lazyInfinite: currentPageSize === 0 && useLazy,
         });
         addHistoryEntry({
           sql: trimmed,
@@ -220,7 +223,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   );
 
   const handleLoadPage = useCallback(
-    (sql: string, page: number) => {
+    (sql: string, page: number, explicitPageSize?: number) => {
       const tabId = activeTabIdRef.current;
       const curResult = useTabStore.getState().resultsByTab[tabId];
       runSqlForTab(
@@ -230,9 +233,61 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         curResult?.sourceTable,
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
+        explicitPageSize,
       );
     },
     [runSqlForTab, activeTabIdRef],
+  );
+
+  const handleLoadMorePage = useCallback(
+    (sql: string, page: number) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const tabId = activeTabIdRef.current;
+      const curResult = useTabStore.getState().resultsByTab[tabId];
+      if (!curResult?.lazySql || !curResult.lazyInfinite) return;
+      const pageSize = curResult.lazyPageSize ?? INFINITE_SCROLL_PAGE_SIZE;
+      const offset = page * pageSize;
+      const currentSet = curResult.sets[0];
+      if (!currentSet || currentSet.values.length !== offset) return;
+      try {
+        const { result: nextSets, totalCount } = engine.execPaged(
+          sql,
+          pageSize,
+          offset,
+        );
+        const nextSet = nextSets[0];
+        if (!nextSet || nextSet.values.length === 0) return;
+        setResultsByTab((prev) => {
+          const latest = prev[tabId];
+          const latestSet = latest?.sets[0];
+          if (
+            !latest?.lazyInfinite ||
+            !latestSet ||
+            latestSet.values.length !== offset
+          ) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [tabId]: {
+              ...latest,
+              sets: [
+                {
+                  ...latestSet,
+                  values: [...latestSet.values, ...nextSet.values],
+                },
+                ...latest.sets.slice(1),
+              ],
+              lazyTotalCount: totalCount,
+            },
+          };
+        });
+      } catch {
+        // Keep the already-loaded rows visible if the next chunk fails.
+      }
+    },
+    [activeTabIdRef, engineRef, setResultsByTab],
   );
 
   const handleFetchAllRows = useCallback(
@@ -446,6 +501,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   return {
     runSqlForTab,
     handleLoadPage,
+    handleLoadMorePage,
     handleFetchAllRows,
     runActiveTab,
     runSelection,

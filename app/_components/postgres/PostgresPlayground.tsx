@@ -106,6 +106,7 @@ import {
   setStoredEditorTheme,
 } from "../playgroundTheme";
 import {
+  DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
   RuntimeInfoContent,
   SettingsPanel,
@@ -176,6 +177,7 @@ import { FK_ACTIONS } from "../sql/constants";
 const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
+const INFINITE_SCROLL_PAGE_SIZE = 500;
 
 // ─── Postgres structure drawer types ────────────────────────────────────
 
@@ -1232,6 +1234,7 @@ function PostgresPlaygroundInner() {
       sourceTable?: string,
       page = 0,
       baseSql?: string,
+      explicitPageSize?: number,
     ) => {
       const engine = engineRef.current;
       if (!engine || runningRef.current) return;
@@ -1248,9 +1251,11 @@ function PostgresPlaygroundInner() {
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
       const useLazy =
-        globalPageSize > 0 &&
-        isSingleSelectSql(trimmed, noComments) &&
-        !hasLimitClause(noComments);
+        isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
+      const effectivePageSize =
+        explicitPageSize !== undefined ? explicitPageSize : globalPageSize;
+      const lazyPageSizeForRun =
+        effectivePageSize > 0 ? effectivePageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
         let sets: QueryExecResult[];
         let lazySql: string | undefined;
@@ -1261,15 +1266,15 @@ function PostgresPlaygroundInner() {
         if (useLazy) {
           const lazy = await engine.execPaged(
             trimmed,
-            globalPageSize,
-            page * globalPageSize,
+            lazyPageSizeForRun,
+            page * lazyPageSizeForRun,
           );
           sets = lazy.result;
           lazySql = trimmed.replace(/\s*;+\s*$/, "");
           lazyBaseSql = (baseSql ?? trimmed).replace(/\s*;+\s*$/, "");
           lazyTotalCount = lazy.totalCount;
           lazyPage = page;
-          lazyPageSize = globalPageSize;
+          lazyPageSize = lazyPageSizeForRun;
         } else {
           sets = await engine.exec(trimmed);
         }
@@ -1286,6 +1291,7 @@ function PostgresPlaygroundInner() {
             lazyTotalCount,
             lazyPage,
             lazyPageSize,
+            lazyInfinite: effectivePageSize === 0 && useLazy,
           },
         }));
         addHistoryEntry({
@@ -1985,7 +1991,7 @@ function PostgresPlaygroundInner() {
   );
 
   const handleLoadPage = useCallback(
-    (sql: string, page: number) => {
+    (sql: string, page: number, explicitPageSize?: number) => {
       const tab = tabsRef.current.find(
         (candidate) => candidate.id === activeTabIdRef.current,
       );
@@ -1998,9 +2004,60 @@ function PostgresPlaygroundInner() {
         curResult?.sourceTable,
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
+        explicitPageSize,
       );
     },
     [resultsByTab, runSqlForTab],
+  );
+
+  const handleLoadMorePage = useCallback(
+    async (sql: string, page: number) => {
+      const engine = engineRef.current;
+      if (!engine || runningRef.current) return;
+      const tabId = activeTabIdRef.current;
+      const curResult = resultsByTab[tabId];
+      if (!curResult?.lazySql || !curResult.lazyInfinite) return;
+      const pageSize = curResult.lazyPageSize ?? INFINITE_SCROLL_PAGE_SIZE;
+      const offset = page * pageSize;
+      const currentSet = curResult.sets[0];
+      if (!currentSet || currentSet.values.length !== offset) return;
+      runningRef.current = true;
+      try {
+        const lazy = await engine.execPaged(sql, pageSize, offset);
+        const nextSet = lazy.result[0];
+        if (!nextSet || nextSet.values.length === 0) return;
+        setResultsByTab((prev) => {
+          const latest = prev[tabId];
+          const latestSet = latest?.sets[0];
+          if (
+            !latest?.lazyInfinite ||
+            !latestSet ||
+            latestSet.values.length !== offset
+          ) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [tabId]: {
+              ...latest,
+              sets: [
+                {
+                  ...latestSet,
+                  values: [...latestSet.values, ...nextSet.values],
+                },
+                ...latest.sets.slice(1),
+              ],
+              lazyTotalCount: lazy.totalCount,
+            },
+          };
+        });
+      } catch {
+        // Keep the already-loaded rows visible if the next chunk fails.
+      } finally {
+        runningRef.current = false;
+      }
+    },
+    [resultsByTab],
   );
 
   const copyEntityName = useCallback(
@@ -4161,17 +4218,21 @@ function PostgresPlaygroundInner() {
                 <section className="sql-results-pane">
                   <ResultView
                     result={result}
-                    loading={statusState === "running"}
+                    loading={statusState === "loading"}
                     keyHints={resultKeyHints}
                     sourceTable={result?.sourceTable}
                     globalPageSize={globalPageSize}
                     onSetGlobalPageSize={setGlobalPageSize}
                     onLoadPage={handleLoadPage}
+                    onLoadMorePage={(sql, page) =>
+                      void handleLoadMorePage(sql, page)
+                    }
                     onExportSnapshotChange={setResultSetExportSnapshot}
                     onExportResultSet={(format, scope) =>
                       void exportResultSet(format, scope)
                     }
                   />
+                  <DataslopeRunOverlay running={statusState === "running"} />
                 </section>
               </Fragment>
             )}

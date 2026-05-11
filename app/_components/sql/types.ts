@@ -36,6 +36,9 @@ export interface QueryRunResult {
   /** When lazy SQL pagination is active: the page size (rows per page)
    *  that was used to fetch this result. */
   lazyPageSize?: number;
+  /** True when the result is incrementally loading all rows for the
+   *  virtualized "All" result view. */
+  lazyInfinite?: boolean;
 }
 
 export interface ResultTableRow {
