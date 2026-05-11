@@ -1501,6 +1501,24 @@
 
 .sql-ddl-code-wrap .cm-editor .cm-scroller {
   overflow-x: hidden !important;
+  /* The View DDL dialog renders in a portal (outside .pg-root), so the
+     global scrollbar theme doesn't apply to the CodeMirror scroller.
+     Re-apply it here to match the rest of the playground. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sql-ddl-code-wrap .cm-editor .cm-scroller::-webkit-scrollbar {
+  width: 6px;
+}
+.sql-ddl-code-wrap .cm-editor .cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sql-ddl-code-wrap .cm-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.sql-ddl-code-wrap .cm-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
 }
 
 .sql-ddl-code-wrap .cm-editor .cm-content {
@@ -2134,6 +2152,27 @@
   overflow: auto;
   max-height: 160px;
   margin: 4px 0 8px;
+  /* Import dialog renders in a portal (outside .pg-root). Re-apply scrollbar
+     theme so it matches the rest of the playground. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sql-import-preview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sql-import-preview::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sql-import-preview::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.sql-import-preview::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+.sql-import-preview::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .sql-import-preview table {
@@ -2259,6 +2298,27 @@
   overflow: auto;
   max-height: 220px;
   margin: 4px 0 8px;
+  /* Import dialog renders in a portal (outside .pg-root). Re-apply scrollbar
+     theme so it matches the rest of the playground. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sql-import-col-compare::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sql-import-col-compare::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sql-import-col-compare::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.sql-import-col-compare::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+.sql-import-col-compare::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .sql-import-col-compare table {
@@ -3225,6 +3285,23 @@
   max-height: 280px;
   min-width: 220px;
   overflow: auto;
+  /* The combobox renders in a portal (outside .pg-root). Re-apply scrollbar
+     theme so it matches the rest of the playground. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.pg-type-popup::-webkit-scrollbar {
+  width: 6px;
+}
+.pg-type-popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+.pg-type-popup::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.pg-type-popup::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
 }
 
 .pg-type-group-label {
