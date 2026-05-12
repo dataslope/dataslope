@@ -1293,7 +1293,7 @@
 
 .sql-tab:hover {
   color: var(--text);
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
 }
@@ -1360,7 +1360,7 @@
   justify-content: center;
   background: transparent;
   border: 0;
-  color: var(--text-dim);
+  color: var(--text);
   width: 28px;
   /* Match the visual height of an inactive tab so the button reads
      as a sibling of the tabs rather than a separate toolbar control.
@@ -1368,13 +1368,12 @@
      same baseline (and stays inside the rounded tab strip). */
   height: 28px;
   margin: auto 4px -1px 4px;
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .sql-tab-add:hover {
-  color: var(--text);
   background: var(--bg3);
 }
 
