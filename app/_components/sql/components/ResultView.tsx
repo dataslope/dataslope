@@ -469,6 +469,23 @@ export function ResultView({
     }
   }, [result]);
 
+  const preserveStateForReload = useCallback(
+    (overrides?: {
+      selectedByIndex?: SelectedRowsByResult;
+      pendingEditsByIndex?: PendingEditsByResult;
+      sortingByIndex?: Record<number, SortingState>;
+    }) => {
+      preserveOnNextResultRef.current = {
+        selectedByIndex:
+          overrides?.selectedByIndex ?? cloneSelections(selectedByIndex),
+        pendingEditsByIndex:
+          overrides?.pendingEditsByIndex ?? clonePendingEdits(pendingEditsByIndex),
+        sortingByIndex: overrides?.sortingByIndex ?? { ...sortingByIndex },
+      };
+    },
+    [selectedByIndex, pendingEditsByIndex, sortingByIndex],
+  );
+
   const getState = useCallback(
     (idx: number) => pageStates[idx] ?? { page: 0 },
     [pageStates],
@@ -577,11 +594,7 @@ export function ResultView({
       if (updates.length === 0) return;
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
       delete nextPendingEdits[setIdx];
-      preserveOnNextResultRef.current = {
-        selectedByIndex: cloneSelections(selectedByIndex),
-        pendingEditsByIndex: nextPendingEdits,
-        sortingByIndex: { ...sortingByIndex },
-      };
+      preserveStateForReload({ pendingEditsByIndex: nextPendingEdits });
       // uses the same ORDER BY the user has applied, not the default order.
       const baseSql = result?.lazyBaseSql ?? result?.lazySql;
       let refetchSql: string | undefined;
@@ -606,6 +619,7 @@ export function ResultView({
       selectedByIndex,
       sortingByIndex,
       result,
+      preserveStateForReload,
     ],
   );
 
@@ -652,11 +666,10 @@ export function ResultView({
       pendingDelete,
       selectedRows,
     );
-    preserveOnNextResultRef.current = {
+    preserveStateForReload({
       selectedByIndex: nextSelectedByIndex,
       pendingEditsByIndex: nextPendingEdits,
-      sortingByIndex: { ...sortingByIndex },
-    };
+    });
   }, [
     pendingDelete,
     globalPageSize,
@@ -667,6 +680,7 @@ export function ResultView({
     pkColumnsForSet,
     selectedByIndex,
     sortingByIndex,
+    preserveStateForReload,
   ]);
 
   const requestDeleteSingleRow = useCallback(
@@ -714,11 +728,7 @@ export function ResultView({
       setIdx,
       deletedRows,
     );
-    preserveOnNextResultRef.current = {
-      selectedByIndex: cloneSelections(selectedByIndex),
-      pendingEditsByIndex: nextPendingEdits,
-      sortingByIndex: { ...sortingByIndex },
-    };
+    preserveStateForReload({ pendingEditsByIndex: nextPendingEdits });
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(nextPendingEdits);
     onDeleteRows(sourceTable, pkCols, [pkValues]);
@@ -732,6 +742,7 @@ export function ResultView({
     pkColumnsForSet,
     selectedByIndex,
     sortingByIndex,
+    preserveStateForReload,
   ]);
 
   useEffect(() => {
@@ -993,19 +1004,11 @@ export function ResultView({
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
                       const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
-                      preserveOnNextResultRef.current = {
-                        selectedByIndex: cloneSelections(selectedByIndex),
-                        pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
-                        sortingByIndex: newSortingByIndex,
-                      };
+                      preserveStateForReload({ sortingByIndex: newSortingByIndex });
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
-                    preserveOnNextResultRef.current = {
-                      selectedByIndex: cloneSelections(selectedByIndex),
-                      pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
-                      sortingByIndex: newSortingByIndex,
-                    };
+                    preserveStateForReload({ sortingByIndex: newSortingByIndex });
                     onLoadPage(baseSql, 0);
                   }
                 }
@@ -1108,19 +1111,11 @@ export function ResultView({
                 }
               }
               handlePageChange = (p: number) => {
-                preserveOnNextResultRef.current = {
-                  selectedByIndex: cloneSelections(selectedByIndex),
-                  pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
-                  sortingByIndex: { ...sortingByIndex },
-                };
+                preserveStateForReload();
                 onLoadPage(effectiveLazySql, p);
               };
               handlePageSizeChange = (s: number) => {
-                preserveOnNextResultRef.current = {
-                  selectedByIndex: cloneSelections(selectedByIndex),
-                  pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
-                  sortingByIndex: { ...sortingByIndex },
-                };
+                preserveStateForReload();
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
               };
