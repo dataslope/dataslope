@@ -1577,16 +1577,6 @@ function PostgresPlaygroundInner() {
             if (!update.docChanged) return;
             const id = activeTabIdRef.current;
             const code = update.state.doc.toString();
-            // Skip the React update when the editor's new doc already
-            // matches what we have in state (e.g. when the active-tab
-            // useEffect just dispatched view.dispatch to load the active
-            // tab's code). Without this guard, adding a new tab triggers
-            // an extra persistTabs after flushSync, whose re-render then
-            // runs first-mount work for the freshly added SqlTab
-            // (dnd-kit useSortable measurement, Base UI portal setup)
-            // and variably steals focus from the editor.
-            const currentTab = tabsRef.current.find((t) => t.id === id);
-            if (currentTab && currentTab.code === code) return;
             const next = tabsRef.current.map((tab) =>
               tab.id === id ? { ...tab, code } : tab,
             );
@@ -1682,10 +1672,7 @@ function PostgresPlaygroundInner() {
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
     }
-    // Use requestAnimationFrame so the focus call lands after all child-component
-    // effects (e.g. dnd-kit useSortable) that may otherwise steal focus when a
-    // new tab is first rendered.
-    window.requestAnimationFrame(() => view.focus());
+    view.focus();
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply editor theme.
@@ -1856,15 +1843,6 @@ function PostgresPlaygroundInner() {
       setTabs(next);
       setActiveTabId(tab.id);
     });
-    // The active-tab useEffect (run inside the flushSync above) has
-    // already swapped the editor doc to match the new tab's code, so
-    // we don't dispatch another change here — that previously fired
-    // the persist updateListener a second time after flushSync,
-    // queuing a re-render that variably stole focus from the editor.
-    // Focus the editor synchronously inside the click handler so the
-    // user can type immediately. The previous fix (the + button never
-    // receives focus on mousedown) is still preserved by the button's
-    // onMouseDown preventDefault.
     editorRef.current?.focus();
     saveTabs(activeDbIdRef.current, next);
     // Keep all referenced bindings in the dependency list; saveTabs and

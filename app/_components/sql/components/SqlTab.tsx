@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -34,8 +34,25 @@ export function SqlTab({
   const [draftTitle, setDraftTitle] = useState(tab.title);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  // Mount Base UI's Popover.Root only after a confirmed hover. Mounting
+  // it sooner (e.g. eagerly, or on the very first mouseenter) makes the
+  // popover's setup work run right when a new tab is added — the +
+  // button shifts under the cursor so mouseenter fires on the fresh tab
+  // without any real mouse movement, and the resulting popover work
+  // blocks the editor input that follows the click.
+  const [popoverMounted, setPopoverMounted] = useState(false);
   const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
+  const hoverTimerRef = useRef<number | null>(null);
+
+  const clearHoverTimer = useCallback(() => {
+    if (hoverTimerRef.current !== null) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearHoverTimer, [clearHoverTimer]);
 
   const {
     attributes,
@@ -139,12 +156,26 @@ export function SqlTab({
               role="tab"
               onAnimationEnd={handleAnimationEnd}
               onMouseEnter={() => {
-                const el = titleRef.current;
-                if (el && el.scrollWidth > el.clientWidth) {
-                  setPopoverOpen(true);
-                }
+                clearHoverTimer();
+                // Delay the popover decision so a mouseenter caused by
+                // a layout shift (clicking + makes the new tab appear
+                // under the stationary cursor) doesn't open the popover.
+                // Real hovers persist past this delay; layout-shift
+                // enters get cancelled by mouseleave when the user
+                // moves to the keyboard to type.
+                hoverTimerRef.current = window.setTimeout(() => {
+                  hoverTimerRef.current = null;
+                  const el = titleRef.current;
+                  if (el && el.scrollWidth > el.clientWidth) {
+                    setPopoverMounted(true);
+                    setPopoverOpen(true);
+                  }
+                }, 200);
               }}
-              onMouseLeave={() => setPopoverOpen(false)}
+              onMouseLeave={() => {
+                clearHoverTimer();
+                setPopoverOpen(false);
+              }}
             >
               {tab.kind === "view-data" && (
                 <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
@@ -155,24 +186,26 @@ export function SqlTab({
               {tab.kind === "query-history" && (
                 <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
-              <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <span ref={titleRef} className="sql-tab-title">
-                  {tab.title}
-                </span>
-                <Popover.Portal>
-                  <Popover.Positioner
-                    anchor={titleRef}
-                    side="top"
-                    sideOffset={6}
-                    align="center"
-                    className="sql-tab-name-positioner"
-                  >
-                    <Popover.Popup className="bui-popup sql-tab-name-popover">
-                      {tab.title}
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
+              <span ref={titleRef} className="sql-tab-title">
+                {tab.title}
+              </span>
+              {popoverMounted && (
+                <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      anchor={titleRef}
+                      side="top"
+                      sideOffset={6}
+                      align="center"
+                      className="sql-tab-name-positioner"
+                    >
+                      <Popover.Popup className="bui-popup sql-tab-name-popover">
+                        {tab.title}
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              )}
               <span
                 role="button"
                 tabIndex={-1}

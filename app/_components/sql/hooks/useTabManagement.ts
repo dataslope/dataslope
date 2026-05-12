@@ -66,15 +66,6 @@ export function useTabManagement(
       setTabs(next);
       setActiveTabId(tab.id);
     });
-    // The active-tab useEffect (run inside the flushSync above) has
-    // already swapped the editor doc to match the new tab's code, so
-    // we don't dispatch another change here — that previously fired
-    // the persist updateListener a second time after flushSync,
-    // queuing a re-render that variably stole focus from the editor.
-    // Focus the editor synchronously inside the click handler so the
-    // user can type immediately. The previous fix (the + button never
-    // receives focus on mousedown) is still preserved by the button's
-    // onMouseDown preventDefault.
     editorRef.current?.focus();
     saveTabs(activeDbIdRef.current, next);
     // Keep all referenced bindings in the dependency list; saveTabs and
