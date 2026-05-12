@@ -25,7 +25,7 @@ export function pickFallbackTab(
   // Walk the history from most-recent to oldest and take the first hit.
   for (let i = history.length - 1; i >= 0; i--) {
     if (remaining.has(history[i])) {
-      return finalTabs.find((t) => t.id === history[i])!;
+      return finalTabs.find((t) => t.id === history[i]) ?? finalTabs[0];
     }
   }
 
