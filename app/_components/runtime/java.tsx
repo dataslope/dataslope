@@ -6,6 +6,7 @@ import type {
   PackageInfo,
 } from "../types";
 import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
+import { getClangFormat } from "./clangFormat";
 
 // Run Java in the browser via CheerpJ
 // (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
@@ -602,6 +603,10 @@ export const javaAdapter: LanguageAdapter = {
     return new RegExp(
       `\\bimport\\s+(?:static\\s+)?${escaped}\\s*\\.\\s*(?:\\*|[A-Za-z_$][\\w$]*)\\s*;`,
     ).test(code);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getClangFormat();
+    return format(code, "Main.java", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage(

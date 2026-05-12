@@ -5,6 +5,7 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
+import { getWebFmt } from "./webFmt";
 
 // JavaScript runs natively in the browser — no WebAssembly runtime is
 // needed. We wrap user code in an `AsyncFunction` so top-level `await`
@@ -306,6 +307,10 @@ export const javascriptAdapter: LanguageAdapter = {
     return code.includes(
       `// ${name} is a built-in global — no import needed.`,
     );
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getWebFmt();
+    return format(code, "script.js");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Preparing JavaScript runtime…");

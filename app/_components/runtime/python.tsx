@@ -7,6 +7,7 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "../types";
+import { getRuffFmt } from "./ruffFmt";
 
 // Pyodide is loaded inside a dedicated Web Worker (see
 // `runtime/pyodide-worker.ts`). The worker pulls `pyodide.js` from the
@@ -729,6 +730,10 @@ export const pythonAdapter: LanguageAdapter = {
       "m",
     );
     return re.test(code);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getRuffFmt();
+    return format(code, "main.py");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting Python worker…");

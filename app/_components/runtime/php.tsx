@@ -5,6 +5,7 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
+import { getMagoFmt } from "./magoFmt";
 
 // Run PHP in the browser via php-wasm (https://github.com/seanmorris/php-wasm).
 // PhpWeb is an EventTarget that streams `output` and `error` events as
@@ -329,6 +330,10 @@ export const phpAdapter: LanguageAdapter = {
   importSnippet: (name) => `<?php // ${name} is part of the PHP standard library.`,
   hasImport(code, name) {
     return code.includes(`// ${name} is part of the PHP standard library.`);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getMagoFmt();
+    return format(code, "main.php");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading PHP runtime…");
