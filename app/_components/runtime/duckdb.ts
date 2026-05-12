@@ -84,7 +84,9 @@ function arrowToResult(table: ArrowLikeTable): QueryExecResult | null {
   for (let r = 0; r < table.numRows; r += 1) {
     values.push(columns.map((_, c) => toSqlValue(table.getChildAt(c)?.get(r))));
   }
-  return { columns, columnTypes, values };
+  return { columns, columnTypes, values } as QueryExecResult & {
+    columnTypes: string[];
+  };
 }
 
 async function loadDuckDbModule(): Promise<DuckDbModule> {

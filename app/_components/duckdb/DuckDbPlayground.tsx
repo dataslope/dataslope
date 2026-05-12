@@ -355,10 +355,10 @@ function validateDuckDbStructure(
     }
     if (
       col.autoIncrement &&
-      !/^(smallint|integer|bigint|smallserial|serial|bigserial)$/i.test(type)
+      !/^(tinyint|smallint|integer|bigint|hugeint)$/i.test(type)
     ) {
       errors.push(
-        `"${name || "Unnamed column"}" must use an integer/serial type for identity/serial.`,
+        `"${name || "Unnamed column"}" must use an integer type for identity columns.`,
       );
       invalidColumnIds.add(col.id);
     }
@@ -392,7 +392,7 @@ function makeNewDuckDbColumn(): DuckDbStructureColumn {
     id: newDuckDbStructureId(),
     originalName: null,
     name: "",
-    type: "text",
+    type: "VARCHAR",
     nullable: true,
     defaultValue: "",
     isPk: false,
@@ -635,7 +635,7 @@ function DuckDbStructureColumnRow({
         <ColumnFlag
           checked={col.autoIncrement || serialType}
           onChange={(autoIncrement) => onChange({ autoIncrement })}
-          label="Identity / serial"
+          label="Identity"
           showLabel={false}
         />
       </td>
@@ -2651,7 +2651,7 @@ function DuckDbPlaygroundInner() {
           id: newDuckDbStructureId(),
           originalName: null,
           name: "id",
-          type: "bigserial",
+          type: "INTEGER",
           nullable: false,
           defaultValue: "",
           isPk: true,
@@ -3700,11 +3700,7 @@ function DuckDbPlaygroundInner() {
                                       <th>Not null</th>
                                       <th>Primary</th>
                                       <th>Unique</th>
-                                      <th>
-                                        Identity/
-                                        <br />
-                                        serial
-                                      </th>
+                                      <th>Identity</th>
                                       <th>Default</th>
                                       <th>FK table</th>
                                       <th>FK column</th>
@@ -4082,11 +4078,7 @@ function DuckDbPlaygroundInner() {
                                       <th>Not null</th>
                                       <th>Primary</th>
                                       <th>Unique</th>
-                                      <th>
-                                        Identity/
-                                        <br />
-                                        serial
-                                      </th>
+                                      <th>Identity</th>
                                       <th>Default</th>
                                       <th>FK table</th>
                                       <th>FK column</th>

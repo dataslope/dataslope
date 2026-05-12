@@ -37,7 +37,7 @@ CREATE TABLE order_items (
   product_id INTEGER REFERENCES products(product_id),
   quantity INTEGER,
   unit_price DECIMAL(10,2),
-  line_total DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED
+  line_total DECIMAL(10,2)
 );
 CREATE INDEX idx_orders_customer_id ON orders(customer_id);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
@@ -58,12 +58,12 @@ INSERT INTO orders VALUES
   (2, 2, '2024-01-09', 'paid'),
   (3, 1, '2024-02-11', 'paid'),
   (4, 3, '2024-03-03', 'refunded');
-INSERT INTO order_items (order_item_id, order_id, product_id, quantity, unit_price) VALUES
-  (1, 1, 1, 2, 39.99),
-  (2, 1, 3, 1, 16.25),
-  (3, 2, 2, 1, 129.50),
-  (4, 3, 4, 1, 84.00),
-  (5, 4, 3, 4, 16.25);
+INSERT INTO order_items VALUES
+  (1, 1, 1, 2, 39.99, 79.98),
+  (2, 1, 3, 1, 16.25, 16.25),
+  (3, 2, 2, 1, 129.50, 129.50),
+  (4, 3, 4, 1, 84.00, 84.00),
+  (5, 4, 3, 4, 16.25, 65.00);
 `;
 
 export const DUCKDB_BLANK_DATABASE: DuckDbSampleDatabase = {
