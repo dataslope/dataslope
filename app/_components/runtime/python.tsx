@@ -7,28 +7,7 @@ import type {
   PackageInfo,
   PlotlyFigure,
 } from "../types";
-
-// Singleton init promise so the WASM module is only fetched once,
-// regardless of how many times the user clicks "Format code".
-// The version is pinned to match the installed npm package so the
-// JS and WASM builds always stay in sync — update both together.
-const RUFF_FMT_VERSION = "0.15.12";
-let ruffFmtInitPromise: Promise<{
-  format: (input: string, path?: string) => string;
-}> | null = null;
-
-function getRuffFmt() {
-  if (!ruffFmtInitPromise) {
-    ruffFmtInitPromise = (async () => {
-      const mod = await import("@wasm-fmt/ruff_fmt/web");
-      await mod.default(
-        `https://cdn.jsdelivr.net/npm/@wasm-fmt/ruff_fmt@${RUFF_FMT_VERSION}/ruff_fmt_bg.wasm`,
-      );
-      return { format: mod.format };
-    })();
-  }
-  return ruffFmtInitPromise;
-}
+import { getRuffFmt } from "./ruffFmt";
 
 // Pyodide is loaded inside a dedicated Web Worker (see
 // `runtime/pyodide-worker.ts`). The worker pulls `pyodide.js` from the
