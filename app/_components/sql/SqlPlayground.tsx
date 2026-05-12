@@ -4566,10 +4566,8 @@ function SqlPlaygroundInner() {
                 className="sql-tab-add"
                 // Prevent the button from stealing focus on mouse-down so
                 // focus stays wherever it was during the click.  The
-                // addTab hook queues a setTimeout(focus, 0) on the editor
-                // that runs after React commits — synchronous focus calls
-                // here lose the race to dnd-kit's post-commit work that
-                // ends up parking focus on the newly-active tab <button>.
+                // addTab hook commits the new tab and focuses the editor
+                // synchronously before the click handler returns.
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={addTab}
                 title="New query tab"

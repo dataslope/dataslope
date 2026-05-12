@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { startTransition } from "react";
+import { flushSync } from "react-dom";
 import { Toast } from "@base-ui-components/react/toast";
 import type { EditorView } from "@codemirror/view";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
@@ -59,22 +60,26 @@ export function useTabManagement(
     };
     const next = [...tabsRef.current, tab];
     tabsRef.current = next;
-    setTabs(next);
-    saveTabs(activeDbIdRef.current, next);
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     activeTabIdRef.current = tab.id;
-    setActiveTabId(tab.id);
-    // Mirror the working closeAllTabs pattern: clear the editor doc to
-    // match the new (empty) active tab and queue the focus call as a
-    // macrotask so it runs after React commits the new SqlTab.  The
-    // previous rAF-based attempt loses the focus race because dnd-kit's
-    // SortableContext re-registers the freshly mounted active tab as a
-    // sortable activator inside its own post-commit work, which (on at
-    // least Chromium) leaves the active tab <button> with focus.
+    flushSync(() => {
+      setTabs(next);
+      setActiveTabId(tab.id);
+    });
+    // Commit the new SqlTab during the click handler, then focus the
+    // editor synchronously. This keeps the previous fix (the + button
+    // never receives focus on mousedown) while avoiding any delayed
+    // rAF/timer focus that can lose immediately typed characters.
     const view = editorRef.current;
-    if (view) replaceDoc(view, initialCode);
-    window.setTimeout(() => editorRef.current?.focus(), 0);
-  }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId]);
+    if (view) {
+      replaceDoc(view, initialCode);
+      view.focus();
+    }
+    saveTabs(activeDbIdRef.current, next);
+    // Keep all referenced bindings in the dependency list; saveTabs and
+    // state setters are stable, so suppress exhaustive-deps' extra warning.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, saveTabs]);
 
   const openErDiagramTab = useCallback(() => {
     refreshTableMetadata();
