@@ -416,7 +416,7 @@
   padding: 4px 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -802,7 +802,6 @@
   top: 0;
   z-index: 1;
   background: var(--bg);
-  color: var(--text-dim);
   font-weight: 600;
   text-align: left;
   padding: 6px 10px;
@@ -858,7 +857,7 @@
 
 .sql-result-row-checkbox[data-checked],
 .sql-result-row-checkbox[data-indeterminate] {
-  background: var(--text-muted);
+  background: var(--accent1);
 }
 
 .sql-result-row-checkbox-ind {
@@ -949,15 +948,9 @@
   padding: 0;
 }
 
-.sql-result-pager-btn:hover:not(:disabled) {
+.sql-result-pager-btn:hover {
   background: var(--bg3);
   color: var(--text);
-}
-
-.sql-result-pager-btn:disabled {
-  color: var(--text-muted);
-  opacity: 0.35;
-  cursor: not-allowed;
 }
 
 .sql-result-pager-page {
@@ -1043,12 +1036,6 @@
   justify-content: flex-end;
 }
 
-.sql-result-pager-set {
-  color: var(--text-muted);
-  white-space: nowrap;
-  font-weight: 600;
-}
-
 /* ─── Result set export button & menu ─── */
 .sql-result-export-btn {
   display: inline-flex;
@@ -1079,7 +1066,7 @@
   padding: 4px 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -1430,13 +1417,6 @@
   border-radius: 6px;
 }
 
-.sql-toolbar-shortcut-sep {
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1;
-  opacity: 0.6;
-}
-
 .sql-toolbar .kbd {
   font-weight: normal;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
@@ -1637,7 +1617,7 @@
 .sql-modify-drawer-heading {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -1652,7 +1632,7 @@
 .sql-modify-drawer-subtitle {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--accent1);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1858,7 +1838,7 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.55;
-  color: var(--text-muted);
+  color: var(--text);
 }
 
 .sql-modify-cell-field {
@@ -2170,7 +2150,7 @@
 }
 
 .sql-dropzone-icon {
-  color: var(--text-muted);
+  color: var(--text-dim);
   margin-bottom: 4px;
 }
 
@@ -2332,7 +2312,7 @@
 .sql-export-disabled-popup {
   padding: 10px 12px;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-dim);
 }
 
 /* Column-comparison table shown in the import dialog when targeting an
@@ -2456,13 +2436,13 @@
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 4px;
   background: transparent;
   border: none;
   padding: 0;
   color: var(--text);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   width: 100%;
   text-align: left;
@@ -2478,7 +2458,7 @@
 }
 
 .sql-result-th-btn:hover .sql-result-th-chevron {
-  color: var(--text-dim);
+  color: var(--text);
 }
 
 /* ─── Sort instruction popover ─── */
@@ -2489,14 +2469,14 @@
   padding: 4px 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text);
   white-space: nowrap;
 }
 
 /* Subtle chevron for unsorted columns */
 .sql-result-th-chevron {
   flex-shrink: 0;
-  color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-dim);
   display: inline-flex;
   align-items: center;
   transition: color 120ms ease;
@@ -2504,12 +2484,12 @@
 
 /* Active sort chevron inherits the column-name text colour */
 .sql-result-th-chevron-active {
-  color: var(--text-dim);
+  color: var(--text);
 }
 
 /* Highlight the <th> of the currently sorted column */
-.sql-result-th-sorted {
-  background: color-mix(in srgb, var(--text) 4%, var(--bg)) !important;
+.sql-result-table thead th.sql-result-th-sorted {
+  background: var(--bg2);
 }
 
 /* Column data-type label rendered below the column name */
@@ -2517,7 +2497,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
-  color: var(--accent1);
+  color: color-mix(in srgb, var(--text-dim) 85%, var(--text));
   text-transform: lowercase;
   display: inline-flex;
   align-items: center;
@@ -2706,7 +2686,7 @@
 .sql-unique-popover {
   padding: 8px 10px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text);
   max-width: 240px;
   line-height: 1.5;
 }
@@ -3216,7 +3196,7 @@
   padding: 4px 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text);
   white-space: nowrap;
 }
 

@@ -171,7 +171,10 @@ interface ResultSetExportButtonProps {
   currentPageRows: number;
   totalRows: number;
   resultSetExportScope: ResultSetExportScope;
-  onExportResultSet: (format: ResultSetExportFormat, scope: ResultSetExportScope) => void;
+  onExportResultSet: (
+    format: ResultSetExportFormat,
+    scope: ResultSetExportScope,
+  ) => void;
   onSetResultSetExportScope: (scope: ResultSetExportScope) => void;
 }
 
@@ -248,7 +251,9 @@ function ResultSetExportButton({
               onClick={() => onExportResultSet("csv", resultSetExportScope)}
             >
               <div className="export-item-text">
-                <div className="ex-title">CSV <span className="ext-badge">.csv</span></div>
+                <div className="ex-title">
+                  CSV <span className="ext-badge">.csv</span>
+                </div>
                 <div className="ex-desc">Comma-separated values</div>
               </div>
             </Menu.Item>
@@ -257,7 +262,9 @@ function ResultSetExportButton({
               onClick={() => onExportResultSet("json", resultSetExportScope)}
             >
               <div className="export-item-text">
-                <div className="ex-title">JSON <span className="ext-badge">.json</span></div>
+                <div className="ex-title">
+                  JSON <span className="ext-badge">.json</span>
+                </div>
                 <div className="ex-desc">Array of row objects</div>
               </div>
             </Menu.Item>
@@ -266,7 +273,9 @@ function ResultSetExportButton({
               onClick={() => onExportResultSet("sql", resultSetExportScope)}
             >
               <div className="export-item-text">
-                <div className="ex-title">SQL <span className="ext-badge">.sql</span></div>
+                <div className="ex-title">
+                  SQL <span className="ext-badge">.sql</span>
+                </div>
                 <div className="ex-desc">INSERT statements</div>
               </div>
             </Menu.Item>
@@ -275,7 +284,9 @@ function ResultSetExportButton({
               onClick={() => onExportResultSet("parquet", resultSetExportScope)}
             >
               <div className="export-item-text">
-                <div className="ex-title">Parquet <span className="ext-badge">.parquet</span></div>
+                <div className="ex-title">
+                  Parquet <span className="ext-badge">.parquet</span>
+                </div>
                 <div className="ex-desc">Apache Parquet binary</div>
               </div>
             </Menu.Item>
@@ -284,7 +295,9 @@ function ResultSetExportButton({
               onClick={() => onExportResultSet("xlsx", resultSetExportScope)}
             >
               <div className="export-item-text">
-                <div className="ex-title">Excel <span className="ext-badge">.xlsx</span></div>
+                <div className="ex-title">
+                  Excel <span className="ext-badge">.xlsx</span>
+                </div>
                 <div className="ex-desc">Excel workbook (single sheet)</div>
               </div>
             </Menu.Item>
@@ -385,19 +398,23 @@ export function ResultView({
   onLoadPage: (sql: string, page: number, explicitPageSize?: number) => void;
   onLoadMorePage?: (sql: string, page: number) => void;
   onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
-  onExportResultSet?: (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => void;
+  onExportResultSet?: (
+    format: "csv" | "json" | "sql" | "parquet" | "xlsx",
+    scope: ResultSetExportScope,
+  ) => void;
   onOpenQueryTab?: (title: string, sql: string) => void;
 }) {
   const [resultSetExportScope, setResultSetExportScope] =
     useState<ResultSetExportScope>("all");
-  const [pageStates, setPageStates] = useState<Record<number, { page: number }>>(
-    {},
-  );
+  const [pageStates, setPageStates] = useState<
+    Record<number, { page: number }>
+  >({});
   const [sortingByIndex, setSortingByIndex] = useState<
     Record<number, SortingState>
   >({});
-  const [selectedByIndex, setSelectedByIndex] =
-    useState<SelectedRowsByResult>({});
+  const [selectedByIndex, setSelectedByIndex] = useState<SelectedRowsByResult>(
+    {},
+  );
   const [pendingEditsByIndex, setPendingEditsByIndex] =
     useState<PendingEditsByResult>({});
   const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
@@ -517,21 +534,18 @@ export function ResultView({
     [],
   );
 
-  const clearPendingEdit = useCallback(
-    (setIdx: number, cellKey: string) => {
-      setPendingEditsByIndex((prev) => {
-        const cur = new Map(prev[setIdx] ?? []);
-        cur.delete(cellKey);
-        if (cur.size === 0) {
-          const next = { ...prev };
-          delete next[setIdx];
-          return next;
-        }
-        return { ...prev, [setIdx]: cur };
-      });
-    },
-    [],
-  );
+  const clearPendingEdit = useCallback((setIdx: number, cellKey: string) => {
+    setPendingEditsByIndex((prev) => {
+      const cur = new Map(prev[setIdx] ?? []);
+      cur.delete(cellKey);
+      if (cur.size === 0) {
+        const next = { ...prev };
+        delete next[setIdx];
+        return next;
+      }
+      return { ...prev, [setIdx]: cur };
+    });
+  }, []);
 
   const setActiveEditCell = useCallback(
     (setIdx: number, cellKey: string | null) => {
@@ -726,7 +740,10 @@ export function ResultView({
       onExportSnapshotChange(null);
       return;
     }
-    const setIndex = Math.max(0, Math.min(activeSetIdx, result.sets.length - 1));
+    const setIndex = Math.max(
+      0,
+      Math.min(activeSetIdx, result.sets.length - 1),
+    );
     const set = result.sets[setIndex];
     if (!set) {
       onExportSnapshotChange(null);
@@ -737,7 +754,9 @@ export function ResultView({
       globalPageSize > 0
         ? globalPageSize
         : Math.max(
-            isLazy ? (result.lazyTotalCount ?? set.values.length) : set.values.length,
+            isLazy
+              ? (result.lazyTotalCount ?? set.values.length)
+              : set.values.length,
             1,
           );
     if (isLazy) {
@@ -803,8 +822,8 @@ export function ResultView({
         <h3>Run a query to see results</h3>
         <p>
           Press <kbd className="kbd">Run</kbd> or use the keyboard shortcut to
-          execute the active tab. Double-click any table or view in the sidebar to open
-          it in a new tab.
+          execute the active tab. Double-click any table or view in the sidebar
+          to open it in a new tab.
         </p>
       </div>
     );
@@ -830,7 +849,10 @@ export function ResultView({
   const pendingCount =
     pendingDelete !== null ? (selectedByIndex[pendingDelete]?.size ?? 0) : 0;
 
-  const safeSetIdx = Math.max(0, Math.min(activeSetIdx, result.sets.length - 1));
+  const safeSetIdx = Math.max(
+    0,
+    Math.min(activeSetIdx, result.sets.length - 1),
+  );
 
   const computeSetRenderData = (idx: number) => {
     const set = result.sets[idx];
@@ -843,18 +865,18 @@ export function ResultView({
     let startIdx: number;
     let visibleRows: QueryExecResult["values"];
     let originalIndices: number[];
-      if (isLazy) {
-        const effective =
-          globalPageSize > 0
-            ? globalPageSize
-            : Math.max(result.lazyTotalCount ?? 0, 1);
-        totalRows = result.lazyTotalCount ?? set.values.length;
-        currentPage = isInfiniteAll ? 0 : (result.lazyPage ?? 0);
-        startIdx = isInfiniteAll
-          ? 0
-          : currentPage * (result.lazyPageSize ?? effective);
-        visibleRows = set.values;
-        originalIndices = set.values.map((_, ri) => startIdx + ri);
+    if (isLazy) {
+      const effective =
+        globalPageSize > 0
+          ? globalPageSize
+          : Math.max(result.lazyTotalCount ?? 0, 1);
+      totalRows = result.lazyTotalCount ?? set.values.length;
+      currentPage = isInfiniteAll ? 0 : (result.lazyPage ?? 0);
+      startIdx = isInfiniteAll
+        ? 0
+        : currentPage * (result.lazyPageSize ?? effective);
+      visibleRows = set.values;
+      originalIndices = set.values.map((_, ri) => startIdx + ri);
     } else {
       const st = getState(idx);
       totalRows = set.values.length;
@@ -887,7 +909,17 @@ export function ResultView({
       visibleRows = visibleIndexed.map((item) => item.values);
       originalIndices = visibleIndexed.map((item) => item.originalIndex);
     }
-    return { set, isLazy, isInfiniteAll, sorting, totalRows, currentPage, startIdx, visibleRows, originalIndices };
+    return {
+      set,
+      isLazy,
+      isInfiniteAll,
+      sorting,
+      totalRows,
+      currentPage,
+      startIdx,
+      visibleRows,
+      originalIndices,
+    };
   };
 
   const activeSetData = computeSetRenderData(safeSetIdx);
@@ -896,7 +928,11 @@ export function ResultView({
   return (
     <>
       {result.sets.length > 1 && (
-        <div className="sql-result-set-tabs" role="tablist" aria-label="Result sets">
+        <div
+          className="sql-result-set-tabs"
+          role="tablist"
+          aria-label="Result sets"
+        >
           {result.sets.map((set, idx) => (
             <button
               key={idx}
@@ -913,7 +949,10 @@ export function ResultView({
           ))}
         </div>
       )}
-      <div ref={flashWrapperRef} className="sql-result-flash-wrapper sql-result-flash-anim">
+      <div
+        ref={flashWrapperRef}
+        className="sql-result-flash-wrapper sql-result-flash-anim"
+      >
         <div ref={resultSetsScrollRef} className="sql-result-sets">
           {activeSetIsNull && (
             <div ref={noResultsRef} className="sql-result-ok">
@@ -921,176 +960,205 @@ export function ResultView({
               Statement executed successfully — no result set returned.
             </div>
           )}
-          {activeSetData && (() => {
-            const idx = safeSetIdx;
-            const { set, isLazy, isInfiniteAll, sorting, visibleRows, originalIndices, totalRows } = activeSetData;
-            const pkCols = pkColumnsForSet(set);
-            const selected = selectedByIndex[idx];
-            const pendingEdits = pendingEditsByIndex[idx];
-            const handleSortingChange = (
-              newSorting: SortingState | ((old: SortingState) => SortingState),
-            ) => {
-              const resolved =
-                typeof newSorting === "function"
-                  ? newSorting(sorting)
-                  : newSorting;
-              setSortingByIndex((prev) => ({ ...prev, [idx]: resolved }));
-              setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
-              if (isLazy) {
-                const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-                if (resolved.length > 0) {
-                  const parsed = parseColumnId(resolved[0].id);
-                  if (parsed) {
-                    const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
-                    onLoadPage(sortedSql, 0);
+          {activeSetData &&
+            (() => {
+              const idx = safeSetIdx;
+              const {
+                set,
+                isLazy,
+                isInfiniteAll,
+                sorting,
+                visibleRows,
+                originalIndices,
+                totalRows,
+              } = activeSetData;
+              const pkCols = pkColumnsForSet(set);
+              const selected = selectedByIndex[idx];
+              const pendingEdits = pendingEditsByIndex[idx];
+              const handleSortingChange = (
+                newSorting:
+                  | SortingState
+                  | ((old: SortingState) => SortingState),
+              ) => {
+                const resolved =
+                  typeof newSorting === "function"
+                    ? newSorting(sorting)
+                    : newSorting;
+                setSortingByIndex((prev) => ({ ...prev, [idx]: resolved }));
+                setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
+                if (isLazy) {
+                  const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+                  if (resolved.length > 0) {
+                    const parsed = parseColumnId(resolved[0].id);
+                    if (parsed) {
+                      const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      onLoadPage(sortedSql, 0);
+                    }
+                  } else {
+                    onLoadPage(baseSql, 0);
                   }
-                } else {
-                  onLoadPage(baseSql, 0);
+                }
+              };
+              const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+              let effectiveLazySql = baseSql;
+              if (sorting.length > 0) {
+                const parsed = parseColumnId(sorting[0].id);
+                if (parsed) {
+                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
-            };
-            const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-            let effectiveLazySql = baseSql;
-            if (sorting.length > 0) {
-              const parsed = parseColumnId(sorting[0].id);
-              if (parsed) {
-                effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
-              }
-            }
-            const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
-            const hasMoreRows =
-              isInfiniteAll && visibleRows.length < totalRows;
-            return (
-              <ResultTableBody
-                key={idx}
-                set={set}
-                visible={visibleRows}
-                originalIndices={originalIndices}
-                sorting={sorting}
-                onSortingChange={handleSortingChange}
-                keyHints={keyHints}
-                deletable={pkCols !== null}
-                editable={isEditable}
-                sourceTable={sourceTable}
-                constraintInfo={constraintInfo}
-                selectedRows={selected}
-                pendingEdits={pendingEdits}
-                activeEditCell={activeEditCellByIndex[idx] ?? null}
-                onToggleRow={(absoluteRow) => toggleRowSelected(idx, absoluteRow)}
-                onToggleVisible={(absoluteIndices, select) =>
-                  setVisibleSelection(idx, absoluteIndices, select)
-                }
-                onSetPendingEdit={(cellKey, value) =>
-                  setPendingEdit(idx, cellKey, value)
-                }
-                onClearPendingEdit={(cellKey) =>
-                  clearPendingEdit(idx, cellKey)
-                }
-                onSetActiveEditCell={(cellKey) =>
-                  setActiveEditCell(idx, cellKey)
-                }
-                onDeleteSingleRow={
-                  pkCols !== null
-                    ? (absoluteRow) =>
-                        requestDeleteSingleRow(idx, absoluteRow)
-                    : undefined
-                }
-                onDuplicateRow={
-                  sourceTable && onDuplicateRow
-                    ? (columnNames, values) =>
-                        onDuplicateRow(sourceTable, columnNames, values)
-                    : undefined
-                }
-                virtualized={isInfiniteAll}
-                scrollParentRef={resultSetsScrollRef}
-                hasMoreRows={hasMoreRows}
-                onLoadMoreRows={
-                  isInfiniteAll && onLoadMorePage && lazyPageSize > 0
-                    ? () =>
-                        onLoadMorePage(
-                          effectiveLazySql,
-                          Math.floor(visibleRows.length / lazyPageSize),
-                        )
-                    : undefined
-                }
-                baseSql={baseSql || undefined}
-                onOpenQueryTab={onOpenQueryTab}
-              />
-            );
-          })()}
+              const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
+              const hasMoreRows =
+                isInfiniteAll && visibleRows.length < totalRows;
+              return (
+                <ResultTableBody
+                  key={idx}
+                  set={set}
+                  visible={visibleRows}
+                  originalIndices={originalIndices}
+                  sorting={sorting}
+                  onSortingChange={handleSortingChange}
+                  keyHints={keyHints}
+                  deletable={pkCols !== null}
+                  editable={isEditable}
+                  sourceTable={sourceTable}
+                  constraintInfo={constraintInfo}
+                  selectedRows={selected}
+                  pendingEdits={pendingEdits}
+                  activeEditCell={activeEditCellByIndex[idx] ?? null}
+                  onToggleRow={(absoluteRow) =>
+                    toggleRowSelected(idx, absoluteRow)
+                  }
+                  onToggleVisible={(absoluteIndices, select) =>
+                    setVisibleSelection(idx, absoluteIndices, select)
+                  }
+                  onSetPendingEdit={(cellKey, value) =>
+                    setPendingEdit(idx, cellKey, value)
+                  }
+                  onClearPendingEdit={(cellKey) =>
+                    clearPendingEdit(idx, cellKey)
+                  }
+                  onSetActiveEditCell={(cellKey) =>
+                    setActiveEditCell(idx, cellKey)
+                  }
+                  onDeleteSingleRow={
+                    pkCols !== null
+                      ? (absoluteRow) =>
+                          requestDeleteSingleRow(idx, absoluteRow)
+                      : undefined
+                  }
+                  onDuplicateRow={
+                    sourceTable && onDuplicateRow
+                      ? (columnNames, values) =>
+                          onDuplicateRow(sourceTable, columnNames, values)
+                      : undefined
+                  }
+                  virtualized={isInfiniteAll}
+                  scrollParentRef={resultSetsScrollRef}
+                  hasMoreRows={hasMoreRows}
+                  onLoadMoreRows={
+                    isInfiniteAll && onLoadMorePage && lazyPageSize > 0
+                      ? () =>
+                          onLoadMorePage(
+                            effectiveLazySql,
+                            Math.floor(visibleRows.length / lazyPageSize),
+                          )
+                      : undefined
+                  }
+                  baseSql={baseSql || undefined}
+                  onOpenQueryTab={onOpenQueryTab}
+                />
+              );
+            })()}
         </div>
       </div>
       <div className="sql-result-pagers">
-        {activeSetData && (() => {
-          const idx = safeSetIdx;
-          const { set, isLazy, isInfiniteAll, sorting, totalRows, currentPage, visibleRows } = activeSetData;
-          let handlePageChange: (p: number) => void;
-          let handlePageSizeChange: (s: number) => void;
-          if (isLazy) {
-            const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-            let effectiveLazySql = baseSql;
-            if (sorting.length > 0) {
-              const parsed = parseColumnId(sorting[0].id);
-              if (parsed) {
-                effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+        {activeSetData &&
+          (() => {
+            const idx = safeSetIdx;
+            const {
+              set,
+              isLazy,
+              isInfiniteAll,
+              sorting,
+              totalRows,
+              currentPage,
+              visibleRows,
+            } = activeSetData;
+            let handlePageChange: (p: number) => void;
+            let handlePageSizeChange: (s: number) => void;
+            if (isLazy) {
+              const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+              let effectiveLazySql = baseSql;
+              if (sorting.length > 0) {
+                const parsed = parseColumnId(sorting[0].id);
+                if (parsed) {
+                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                }
               }
+              handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
+              handlePageSizeChange = (s: number) => {
+                onSetGlobalPageSize(s);
+                onLoadPage(effectiveLazySql, 0, s);
+              };
+            } else {
+              handlePageChange = (p: number) => setPage(idx, p);
+              handlePageSizeChange = (s: number) => {
+                onSetGlobalPageSize(s);
+                setPage(idx, 0);
+              };
             }
-            handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
-            handlePageSizeChange = (s: number) => {
-              onSetGlobalPageSize(s);
-              onLoadPage(effectiveLazySql, 0, s);
-            };
-          } else {
-            handlePageChange = (p: number) => setPage(idx, p);
-            handlePageSizeChange = (s: number) => {
-              onSetGlobalPageSize(s);
-              setPage(idx, 0);
-            };
-          }
-          const pkCols = pkColumnsForSet(set);
-          const selected = selectedByIndex[idx];
-          const selectedCount = selected?.size ?? 0;
-          const pendingEdits = pendingEditsByIndex[idx];
-          const editCount = pendingEdits?.size ?? 0;
-          const effectivePageSize = globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
-          const hasMultiplePages = globalPageSize > 0 && totalRows > effectivePageSize;
-          const safePage = Math.min(currentPage, Math.max(0, Math.ceil(totalRows / effectivePageSize) - 1));
-          const pageStart = safePage * effectivePageSize;
-          const currentPageRows = Math.min(totalRows - pageStart, effectivePageSize);
-          return (
-            <>
-              <ResultPager
-                key={idx}
-                totalRows={totalRows}
-                loadedRows={isInfiniteAll ? visibleRows.length : undefined}
-                index={idx}
-                showSetLabel={false}
-                pageSize={globalPageSize}
-                page={currentPage}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-                deletable={pkCols !== null}
-                editable={isEditable}
-                editCount={editCount}
-                selectedCount={selectedCount}
-                onRequestDelete={() => requestDelete(idx)}
-                // eslint-disable-next-line react-hooks/refs
-                onCommitEdits={() => commitEdits(idx, set)}
-              >
-                {onExportResultSet && (
-                  <ResultSetExportButton
-                    hasMultiplePages={hasMultiplePages}
-                    currentPageRows={currentPageRows}
-                    totalRows={totalRows}
-                    resultSetExportScope={resultSetExportScope}
-                    onExportResultSet={onExportResultSet}
-                    onSetResultSetExportScope={setResultSetExportScope}
-                  />
-                )}
-              </ResultPager>
-            </>
-          );
-        })()}
+            const pkCols = pkColumnsForSet(set);
+            const selected = selectedByIndex[idx];
+            const selectedCount = selected?.size ?? 0;
+            const pendingEdits = pendingEditsByIndex[idx];
+            const editCount = pendingEdits?.size ?? 0;
+            const effectivePageSize =
+              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+            const hasMultiplePages =
+              globalPageSize > 0 && totalRows > effectivePageSize;
+            const safePage = Math.min(
+              currentPage,
+              Math.max(0, Math.ceil(totalRows / effectivePageSize) - 1),
+            );
+            const pageStart = safePage * effectivePageSize;
+            const currentPageRows = Math.min(
+              totalRows - pageStart,
+              effectivePageSize,
+            );
+            return (
+              <>
+                <ResultPager
+                  key={idx}
+                  totalRows={totalRows}
+                  loadedRows={isInfiniteAll ? visibleRows.length : undefined}
+                  index={idx}
+                  pageSize={globalPageSize}
+                  page={currentPage}
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                  deletable={pkCols !== null}
+                  editable={isEditable}
+                  editCount={editCount}
+                  selectedCount={selectedCount}
+                  onRequestDelete={() => requestDelete(idx)}
+                  // eslint-disable-next-line react-hooks/refs
+                  onCommitEdits={() => commitEdits(idx, set)}
+                >
+                  {onExportResultSet && (
+                    <ResultSetExportButton
+                      hasMultiplePages={hasMultiplePages}
+                      currentPageRows={currentPageRows}
+                      totalRows={totalRows}
+                      resultSetExportScope={resultSetExportScope}
+                      onExportResultSet={onExportResultSet}
+                      onSetResultSetExportScope={setResultSetExportScope}
+                    />
+                  )}
+                </ResultPager>
+              </>
+            );
+          })()}
       </div>
       <AlertDialog.Root
         open={pendingDelete !== null}
@@ -1193,7 +1261,9 @@ export function ResultTableBody({
   visible: QueryExecResult["values"];
   originalIndices: number[];
   sorting: SortingState;
-  onSortingChange: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
+  onSortingChange: (
+    updater: SortingState | ((old: SortingState) => SortingState),
+  ) => void;
   keyHints?: ColumnKeyHints;
   deletable: boolean;
   editable: boolean;
@@ -1358,13 +1428,15 @@ export function ResultTableBody({
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
               const sorted = column.getIsSorted();
-              const colType = set.columnTypes?.[ci] || inferColumnType(set.values, ci);
+              const colType =
+                set.columnTypes?.[ci] || inferColumnType(set.values, ci);
               const displayName = renamedColumnsRef.current.get(ci) ?? c;
-              const sortTitle = sorted === "asc"
-                ? "Sorted ascending — click to sort descending"
-                : sorted === "desc"
-                  ? "Sorted descending — click to clear sort"
-                  : "Click to sort ascending";
+              const sortTitle =
+                sorted === "asc"
+                  ? "Sorted ascending — click to sort descending"
+                  : sorted === "desc"
+                    ? "Sorted descending — click to clear sort"
+                    : "Click to sort ascending";
               const colId = `col-${ci}-${c}`;
 
               // Build the filter SQL for Filter NULL / Filter NON-NULL items.
@@ -1398,7 +1470,10 @@ export function ResultTableBody({
                                   delay={150}
                                   closeDelay={100}
                                   render={(triggerProps) => (
-                                    <span {...triggerProps} className="sql-result-th-key-trigger">
+                                    <span
+                                      {...triggerProps}
+                                      className="sql-result-th-key-trigger"
+                                    >
                                       <MdOutlineKey
                                         size={12}
                                         className="sql-result-th-pk"
@@ -1414,7 +1489,11 @@ export function ResultTableBody({
                                     className="sql-key-icon-popover-positioner"
                                   >
                                     <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <MdOutlineKey size={11} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <MdOutlineKey
+                                        size={11}
+                                        className="sql-key-icon-popover-icon"
+                                        aria-hidden="true"
+                                      />
                                       <span>Primary key</span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
@@ -1428,7 +1507,10 @@ export function ResultTableBody({
                                   delay={150}
                                   closeDelay={100}
                                   render={(triggerProps) => (
-                                    <span {...triggerProps} className="sql-result-th-key-trigger">
+                                    <span
+                                      {...triggerProps}
+                                      className="sql-result-th-key-trigger"
+                                    >
                                       <IoLink
                                         size={12}
                                         className="sql-result-th-fk"
@@ -1444,7 +1526,11 @@ export function ResultTableBody({
                                     className="sql-key-icon-popover-positioner"
                                   >
                                     <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <IoLink size={12} className="sql-key-icon-popover-icon" aria-hidden="true" />
+                                      <IoLink
+                                        size={12}
+                                        className="sql-key-icon-popover-icon"
+                                        aria-hidden="true"
+                                      />
                                       <span>Foreign key</span>
                                     </Popover.Popup>
                                   </Popover.Positioner>
@@ -1505,7 +1591,9 @@ export function ResultTableBody({
                           className="example-item"
                           onClick={() => {
                             setRenameDialog({ ci, originalName: c });
-                            setRenameInput(renamedColumnsRef.current.get(ci) ?? c);
+                            setRenameInput(
+                              renamedColumnsRef.current.get(ci) ?? c,
+                            );
                           }}
                         >
                           <div className="ex-title">Rename column</div>
@@ -1514,7 +1602,9 @@ export function ResultTableBody({
                           className="example-item"
                           disabled={sorted === "asc"}
                           onClick={() => {
-                            handleSortingChangeRef.current([{ id: colId, desc: false }]);
+                            handleSortingChangeRef.current([
+                              { id: colId, desc: false },
+                            ]);
                           }}
                         >
                           <div className="ex-title">Sort ascending</div>
@@ -1523,7 +1613,9 @@ export function ResultTableBody({
                           className="example-item"
                           disabled={sorted === "desc"}
                           onClick={() => {
-                            handleSortingChangeRef.current([{ id: colId, desc: true }]);
+                            handleSortingChangeRef.current([
+                              { id: colId, desc: true },
+                            ]);
                           }}
                         >
                           <div className="ex-title">Sort descending</div>
@@ -1544,7 +1636,10 @@ export function ResultTableBody({
                               className="example-item"
                               onClick={() => {
                                 const sql = `${filterBaseSql} WHERE ${quotedCol} IS NULL;`;
-                                onOpenQueryTabRef.current?.(`Filter: ${c} IS NULL`, sql);
+                                onOpenQueryTabRef.current?.(
+                                  `Filter: ${c} IS NULL`,
+                                  sql,
+                                );
                               }}
                             >
                               <div className="ex-title">Filter NULL values</div>
@@ -1553,17 +1648,24 @@ export function ResultTableBody({
                               className="example-item"
                               onClick={() => {
                                 const sql = `${filterBaseSql} WHERE ${quotedCol} IS NOT NULL;`;
-                                onOpenQueryTabRef.current?.(`Filter: ${c} IS NOT NULL`, sql);
+                                onOpenQueryTabRef.current?.(
+                                  `Filter: ${c} IS NOT NULL`,
+                                  sql,
+                                );
                               }}
                             >
-                              <div className="ex-title">Filter NON-NULL values</div>
+                              <div className="ex-title">
+                                Filter NON-NULL values
+                              </div>
                             </ContextMenu.Item>
                           </>
                         )}
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
-                            const values = visibleRef.current.map((row) => row[ci] ?? null);
+                            const values = visibleRef.current.map(
+                              (row) => row[ci] ?? null,
+                            );
                             navigator.clipboard
                               .writeText(JSON.stringify(values))
                               .catch(() => undefined);
@@ -1590,10 +1692,9 @@ export function ResultTableBody({
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
               if (isActiveEdit) {
-                const editVal =
-                  hasPendingEdit
-                    ? String(pendingValue ?? "")
-                    : formatCellValue(rawValue);
+                const editVal = hasPendingEdit
+                  ? String(pendingValue ?? "")
+                  : formatCellValue(rawValue);
                 return (
                   <input
                     className="sql-cell-input"
@@ -1727,7 +1828,8 @@ export function ResultTableBody({
       const rawVal = isSelect ? undefined : cell.getValue();
       const ci = isSelect
         ? -1
-        : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ?? -1);
+        : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ??
+          -1);
       const cellKey = `${absoluteRow}:${ci}`;
       const hasPendingEdit =
         !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
@@ -1782,13 +1884,8 @@ export function ResultTableBody({
                 className="example-item"
                 onClick={() => {
                   const cell = rightClickedCellRef.current;
-                  const text =
-                    cell !== null
-                      ? formatCellValue(cell.value)
-                      : "";
-                  navigator.clipboard
-                    .writeText(text)
-                    .catch(() => undefined);
+                  const text = cell !== null ? formatCellValue(cell.value) : "";
+                  navigator.clipboard.writeText(text).catch(() => undefined);
                 }}
               >
                 <div className="ex-title">Copy cell value</div>
@@ -1834,9 +1931,7 @@ export function ResultTableBody({
                       .map((v) => formatCellAsSql(v))
                       .join(", ");
                     const sql = `INSERT INTO ${quoteIdentSql(sourceTable)} (${cols}) VALUES (${vals});`;
-                    navigator.clipboard
-                      .writeText(sql)
-                      .catch(() => undefined);
+                    navigator.clipboard.writeText(sql).catch(() => undefined);
                   }}
                 >
                   <div className="ex-title">Copy row as SQL</div>
@@ -1878,10 +1973,7 @@ export function ResultTableBody({
                       <div className="ex-title">Duplicate row</div>
                     </Popover.Trigger>
                     <Popover.Portal>
-                      <Popover.Positioner
-                        side="right"
-                        sideOffset={8}
-                      >
+                      <Popover.Positioner side="right" sideOffset={8}>
                         <Popover.Popup className="bui-popup sql-unique-popover">
                           {uniqueConstraintReason ||
                             "Cannot duplicate: unique constraint"}
@@ -1937,7 +2029,10 @@ export function ResultTableBody({
           <tbody>
             {paddingTop > 0 && (
               <tr aria-hidden="true">
-                <td colSpan={colSpan} style={{ height: paddingTop, padding: 0 }} />
+                <td
+                  colSpan={colSpan}
+                  style={{ height: paddingTop, padding: 0 }}
+                />
               </tr>
             )}
             {renderedRows.map(({ row }) => (
@@ -1945,7 +2040,10 @@ export function ResultTableBody({
             ))}
             {paddingBottom > 0 && (
               <tr aria-hidden="true">
-                <td colSpan={colSpan} style={{ height: paddingBottom, padding: 0 }} />
+                <td
+                  colSpan={colSpan}
+                  style={{ height: paddingBottom, padding: 0 }}
+                />
               </tr>
             )}
           </tbody>
@@ -1958,13 +2056,16 @@ export function ResultTableBody({
         </div>
       )}
       {/* Edit-in-modal dialog */}
-      <Dialog.Root open={modalEditCell !== null} onOpenChange={(open) => { if (!open) setModalEditCell(null); }}>
+      <Dialog.Root
+        open={modalEditCell !== null}
+        onOpenChange={(open) => {
+          if (!open) setModalEditCell(null);
+        }}
+      >
         <Dialog.Portal>
           <Dialog.Backdrop className="confirm-backdrop" />
           <Dialog.Popup className="confirm-popup sql-cell-modal-popup">
-            <Dialog.Title className="confirm-title">
-              Edit cell
-            </Dialog.Title>
+            <Dialog.Title className="confirm-title">Edit cell</Dialog.Title>
             {modalEditCell && (
               <Dialog.Description className="confirm-desc">
                 Column: <strong>{modalEditCell.colName}</strong>
@@ -1982,7 +2083,12 @@ export function ResultTableBody({
                 <textarea
                   className="sql-cell-modal-textarea"
                   value={modalEditCell.value}
-                  onChange={(e) => setModalEditCell({ ...modalEditCell, value: e.target.value })}
+                  onChange={(e) =>
+                    setModalEditCell({
+                      ...modalEditCell,
+                      value: e.target.value,
+                    })
+                  }
                   autoFocus
                   rows={8}
                 />
@@ -1990,7 +2096,10 @@ export function ResultTableBody({
                   <Dialog.Close className="confirm-btn confirm-btn-secondary">
                     Cancel
                   </Dialog.Close>
-                  <button type="submit" className="confirm-btn confirm-btn-primary">
+                  <button
+                    type="submit"
+                    className="confirm-btn confirm-btn-primary"
+                  >
                     Apply
                   </button>
                 </div>
@@ -2002,7 +2111,9 @@ export function ResultTableBody({
       {/* Rename column dialog */}
       <Dialog.Root
         open={renameDialog !== null}
-        onOpenChange={(open) => { if (!open) setRenameDialog(null); }}
+        onOpenChange={(open) => {
+          if (!open) setRenameDialog(null);
+        }}
       >
         <Dialog.Portal>
           <Dialog.Backdrop className="confirm-backdrop" />
@@ -2063,7 +2174,6 @@ export function ResultPager({
   totalRows,
   loadedRows,
   index,
-  showSetLabel,
   pageSize,
   page,
   onPageChange,
@@ -2079,7 +2189,6 @@ export function ResultPager({
   totalRows: number;
   loadedRows?: number;
   index: number;
-  showSetLabel: boolean;
   pageSize: number;
   page: number;
   onPageChange: (p: number) => void;
@@ -2119,9 +2228,6 @@ export function ResultPager({
 
   return (
     <div className="sql-result-pager">
-      {showSetLabel && (
-        <span className="sql-result-pager-set">Set #{index + 1}</span>
-      )}
       <span className="sql-result-pager-info">
         {editable && editCount > 0 ? (
           <>
@@ -2230,7 +2336,8 @@ export function ResultPager({
             }}
             aria-label="Page number"
           />
-          {" / "}{totalPages}
+          {" / "}
+          {totalPages}
         </span>
         {safePage < totalPages - 1 && (
           <button
