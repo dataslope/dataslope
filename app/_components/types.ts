@@ -118,4 +118,9 @@ export interface LanguageAdapter {
   hasImport(code: string, packageName: string): boolean;
   /** Initialise the runtime. Called once after scripts/stylesheets load. */
   init(setLoadingMessage: (message: string) => void): Promise<LanguageRuntime>;
+  /** Optional: auto-format the given source code and return the formatted
+   *  string. Implemented by adapters that ship a browser-side formatter
+   *  (e.g. the C adapter uses clang-format via WASM). The playground UI
+   *  surfaces a "Format code" icon button when this method is present. */
+  formatCode?: (code: string) => Promise<string>;
 }

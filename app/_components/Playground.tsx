@@ -75,6 +75,7 @@ import {
   Eraser,
   Play,
   FileCode,
+  Wand2,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
@@ -483,6 +484,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     () => false,
   );
   const router = useRouter();
+
+  // Resolve the language icon for this adapter — used next to "Editor"
+  // and "Output" labels in the pane bars.
+  const PaneLangIcon = PLAYGROUND_ICONS[adapter.id] ?? null;
+  const paneLangIconSize = Math.round(
+    12 * (PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1),
+  );
 
   // ─── Runtime state ──────────────────────────────────────────────────────
   const [loadingMessage, setLoadingMessage] = useState(
@@ -1117,6 +1125,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
     void copyToClipboard(code, "Code");
   }, [copyToClipboard, showToast]);
+
+  const handleFormatCode = useCallback(async () => {
+    if (!adapter.formatCode) return;
+    const code = editorRef.current?.state.doc.toString() ?? "";
+    try {
+      const formatted = await adapter.formatCode(code);
+      editorRef.current?.dispatch({
+        changes: {
+          from: 0,
+          to: editorRef.current.state.doc.length,
+          insert: formatted,
+        },
+      });
+      showToast("Code formatted.", "info");
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : String(err);
+      showToast(
+        reason ? `Formatting failed: ${reason}` : "Formatting failed.",
+        "warn",
+      );
+    }
+  }, [adapter, showToast]);
 
   // Auto-scroll output on new cells.
   useEffect(() => {
@@ -1840,7 +1870,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         <div className="panes" data-mobile-tab={mobileTab} ref={panesRef}>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
-              <span className="pane-label">Editor</span>
+              <span className="pane-label">
+                {PaneLangIcon && (
+                  <PaneLangIcon size={paneLangIconSize} aria-hidden="true" />
+                )}
+                Editor
+              </span>
               <div className="pane-bar-sep" />
               <button
                 type="button"
@@ -1851,6 +1886,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               >
                 <CopyIcon />
               </button>
+              {adapter.formatCode && (
+                <button
+                  type="button"
+                  className="icon-btn"
+                  title="Format code"
+                  aria-label="Format code"
+                  disabled={!loaded}
+                  onClick={() => void handleFormatCode()}
+                >
+                  <Wand2 size={13} aria-hidden="true" />
+                </button>
+              )}
               <span
                 className="kbd-group"
                 title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
@@ -1891,6 +1938,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           <div className="output-pane">
             <div className="pane-bar">
               <span className="pane-label">
+                {PaneLangIcon && (
+                  <PaneLangIcon size={paneLangIconSize} aria-hidden="true" />
+                )}
                 {outputs.length === 0
                   ? "Output"
                   : `${outputs.length} ${outputs.length === 1 ? "Output" : "Outputs"}`}

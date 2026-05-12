@@ -38,6 +38,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.24",
     "@types/sql.js": "^1.4.9",
+    "@wasm-fmt/clang-format": "^22.1.4",
     "@xyflow/react": "^12.10.2",
     "apache-arrow": "^21.1.0",
     "elkjs": "^0.11.1",

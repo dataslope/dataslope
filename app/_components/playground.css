@@ -458,6 +458,9 @@ body.pg-active {
 }
 
 .pane-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
