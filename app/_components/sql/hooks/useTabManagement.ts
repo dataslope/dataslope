@@ -64,16 +64,17 @@ export function useTabManagement(
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-    // Mirror the working closeAllTabs pattern: clear the editor doc to
-    // match the new (empty) active tab and queue the focus call as a
-    // macrotask so it runs after React commits the new SqlTab.  The
-    // previous rAF-based attempt loses the focus race because dnd-kit's
-    // SortableContext re-registers the freshly mounted active tab as a
-    // sortable activator inside its own post-commit work, which (on at
-    // least Chromium) leaves the active tab <button> with focus.
+    // Clear the editor doc to match the new (empty) active tab, then
+    // focus the editor using a double-rAF so that dnd-kit's
+    // SortableContext has time to finish re-registering the new sortable
+    // in the first frame before we assert focus in the second frame —
+    // which still fires *before* the browser paints that second frame,
+    // avoiding the post-paint delay that setTimeout(0) caused.
     const view = editorRef.current;
     if (view) replaceDoc(view, initialCode);
-    window.setTimeout(() => editorRef.current?.focus(), 0);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => editorRef.current?.focus());
+    });
   }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId]);
 
   const openErDiagramTab = useCallback(() => {
