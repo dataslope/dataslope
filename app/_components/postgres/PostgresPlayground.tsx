@@ -3372,6 +3372,7 @@ function PostgresPlaygroundInner() {
           language={PLAYGROUND_ID}
           showOutputFontSizeControls={false}
           clearBeforeRunLabel="Clear Results Before Running"
+          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
@@ -4722,38 +4723,50 @@ function PostgresPlaygroundInner() {
                   onClear={clearHistory}
                 />
               </div>
-            ) : (
-              <Fragment>
-                <div
-                  className="sql-resizer"
-                  ref={resizerRef}
-                  role="separator"
-                  aria-orientation="horizontal"
-                />
-                <section className="sql-results-pane" ref={resultsPaneRef}>
-                  <ResultView
-                    result={result}
-                    loading={statusState === "loading"}
-                    keyHints={resultKeyHints}
-                    sourceTable={result?.sourceTable}
-                    onDeleteRows={deleteRowsFromTable}
-                    onUpdateRows={updateRowsInTable}
-                    globalPageSize={globalPageSize}
-                    onSetGlobalPageSize={setGlobalPageSize}
-                    onLoadPage={handleLoadPage}
-                    onLoadMorePage={(sql, page) =>
-                      void handleLoadMorePage(sql, page)
-                    }
-                    onExportSnapshotChange={setResultSetExportSnapshot}
-                    onExportResultSet={(format, scope) =>
-                      void exportResultSet(format, scope)
-                    }
-                    onOpenQueryTab={openTabAndRun}
-                  />
-                  <DataslopeRunOverlay running={statusState === "running"} />
-                </section>
-              </Fragment>
-            )}
+            ) : null}
+            <div
+              className="sql-resizer"
+              ref={resizerRef}
+              role="separator"
+              aria-orientation="horizontal"
+              style={
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
+                  ? { display: "none" }
+                  : undefined
+              }
+            />
+            <section
+              className="sql-results-pane"
+              ref={resultsPaneRef}
+              style={
+                activeTab?.kind === "er-diagram" ||
+                activeTab?.kind === "query-history"
+                  ? { display: "none" }
+                  : undefined
+              }
+            >
+              <ResultView
+                result={result}
+                loading={statusState === "loading"}
+                keyHints={resultKeyHints}
+                sourceTable={result?.sourceTable}
+                onDeleteRows={deleteRowsFromTable}
+                onUpdateRows={updateRowsInTable}
+                globalPageSize={globalPageSize}
+                onSetGlobalPageSize={setGlobalPageSize}
+                onLoadPage={handleLoadPage}
+                onLoadMorePage={(sql, page) =>
+                  void handleLoadMorePage(sql, page)
+                }
+                onExportSnapshotChange={setResultSetExportSnapshot}
+                onExportResultSet={(format, scope) =>
+                  void exportResultSet(format, scope)
+                }
+                onOpenQueryTab={openTabAndRun}
+              />
+              <DataslopeRunOverlay running={statusState === "running"} />
+            </section>
           </main>
         </div>
       </div>

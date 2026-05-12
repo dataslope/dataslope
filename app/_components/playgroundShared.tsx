@@ -269,6 +269,10 @@ export interface SettingsPanelProps {
   /** Optional override for the "Clear Output Before Running" row label
    *  — the SQL playground says "Clear Results Before Running". */
   clearBeforeRunLabel?: string;
+  /** Whether to render the "Clear Output/Results Before Running" row.
+   *  SQL playgrounds set this to false — the option only applies to
+   *  non-SQL playgrounds where outputs are appended. Defaults to true. */
+  showClearBeforeRunRow?: boolean;
   onClose: () => void;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
@@ -309,6 +313,7 @@ export function SettingsPanel({
   outputFontSizeLabel,
   showOutputFontSizeControls = true,
   clearBeforeRunLabel,
+  showClearBeforeRunRow = true,
   onClose,
   onRestoreDefaults,
   onClearLocalStorage,
@@ -435,6 +440,7 @@ export function SettingsPanel({
                   </label>
                 </div>
 
+                {showClearBeforeRunRow && (
                 <div className="setting-row">
                   <label className="setting-switch-row">
                     <span className="setting-switch-label">
@@ -452,6 +458,7 @@ export function SettingsPanel({
                     </Switch.Root>
                   </label>
                 </div>
+                )}
 
                 {extraGeneralRows}
 
