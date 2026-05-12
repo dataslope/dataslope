@@ -4,7 +4,6 @@ import React, { useCallback, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
-import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { History, Network, Table, X } from "lucide-react";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
@@ -32,10 +31,8 @@ export function SqlTab({
 }: SqlTabProps) {
   const [renameOpen, setRenameOpen] = useState(false);
   const [draftTitle, setDraftTitle] = useState(tab.title);
-  const [popoverOpen, setPopoverOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const closedRef = useRef(false);
-  const titleRef = useRef<HTMLSpanElement>(null);
 
   const {
     attributes,
@@ -138,13 +135,6 @@ export function SqlTab({
               aria-selected={active}
               role="tab"
               onAnimationEnd={handleAnimationEnd}
-              onMouseEnter={() => {
-                const el = titleRef.current;
-                if (el && el.scrollWidth > el.clientWidth) {
-                  setPopoverOpen(true);
-                }
-              }}
-              onMouseLeave={() => setPopoverOpen(false)}
             >
               {tab.kind === "view-data" && (
                 <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
@@ -155,24 +145,9 @@ export function SqlTab({
               {tab.kind === "query-history" && (
                 <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
-              <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <span ref={titleRef} className="sql-tab-title">
-                  {tab.title}
-                </span>
-                <Popover.Portal>
-                  <Popover.Positioner
-                    anchor={titleRef}
-                    side="top"
-                    sideOffset={6}
-                    align="center"
-                    className="sql-tab-name-positioner"
-                  >
-                    <Popover.Popup className="bui-popup sql-tab-name-popover">
-                      {tab.title}
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
+              <span className="sql-tab-title">
+                {tab.title}
+              </span>
               <span
                 role="button"
                 tabIndex={-1}

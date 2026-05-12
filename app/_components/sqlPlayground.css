@@ -1356,17 +1356,6 @@
   color: var(--text);
 }
 
-.sql-tab-name-positioner {
-  z-index: 9999;
-}
-
-.sql-tab-name-popover {
-  font-family: var(--font-ui);
-  font-size: 12px;
-  padding: 4px 8px;
-  white-space: nowrap;
-}
-
 .sql-tab-add {
   display: inline-flex;
   align-items: center;
