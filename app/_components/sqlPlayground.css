@@ -1262,12 +1262,8 @@
   transition:
     background 120ms ease,
     color 120ms ease;
-  /* Use `backwards`, not `both`. With `both`, the `to` keyframe's values
-     (opacity: 1, etc.) persist after the animation ends and — per the
-     CSS cascade — override inline styles. That silently hides the
-     `opacity: 0` and `transform: translate3d(...)` that @dnd-kit/sortable
-     writes on the dragged source tab, leaving it visible alongside the
-     DragOverlay clone (the "duplicate tab" bug). */
+  /* Use `backwards` so the `to` keyframe values don't persist after
+     the animation ends and override inline styles. */
   animation: sql-tab-appear 0.15s ease backwards;
 }
 
@@ -1354,17 +1350,6 @@
 .sql-tab-close:hover {
   background: var(--border);
   color: var(--text);
-}
-
-.sql-tab-name-positioner {
-  z-index: 9999;
-}
-
-.sql-tab-name-popover {
-  font-family: var(--font-ui);
-  font-size: 12px;
-  padding: 4px 8px;
-  white-space: nowrap;
 }
 
 .sql-tab-add {

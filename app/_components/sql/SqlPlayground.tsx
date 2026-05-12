@@ -18,20 +18,6 @@
 // so this playground retints in lockstep with every other one when the
 // user picks a different editor theme.
 
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS as DndCSS } from "@dnd-kit/utilities";
 import React, {
   startTransition,
   useCallback,
@@ -172,7 +158,7 @@ import {
 import type { QueryExecResult, SqlValue } from "sql.js";
 import { ErDiagramPane } from "../ErDiagramPane";
 import { ToastList } from "./components/ToastList";
-import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
+import { SqlTab } from "./components/SqlTab";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import {
   createSqlCompletionSource,
@@ -1460,7 +1446,7 @@ function SqlPlaygroundInner() {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
   const loadingFading = loaded && showLoadingOverlay;
-  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
+
 
   // ─── Refs ────────────────────────────────────────────────────────────
   const engineRef = useRef<SqliteEngine | null>(null);
@@ -1574,8 +1560,6 @@ function SqlPlaygroundInner() {
     duplicateTab,
     closeOtherTabs,
     closeAllTabs,
-    handleTabDragStart,
-    handleTabDragEnd,
     resetTabsForCurrentDb,
   } = useTabManagement(
     { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef },
@@ -1840,8 +1824,8 @@ function SqlPlaygroundInner() {
         // dispatched view.dispatch to load the active tab's code). Without
         // this guard, adding a new tab triggers an extra setTabs after
         // flushSync, which produces a re-render whose first-mount work
-        // (dnd-kit useSortable measurement, Base UI portal setup on the
-        // freshly mounted SqlTab) variably steals focus from the editor.
+        // (Base UI portal setup on the freshly mounted SqlTab) variably
+        // steals focus from the editor.
         const current = tabsRef.current.find((t) => t.id === id);
         if (current && current.code === value) return;
         const next = tabsRef.current.map((t) =>
@@ -2108,7 +2092,7 @@ function SqlPlaygroundInner() {
     // operation (activate, create, reorder, close, close-all).
     // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
     // Use requestAnimationFrame so the focus call lands after all child-component
-    // effects (e.g. dnd-kit useSortable registration) that may otherwise steal focus
+    // effects that may otherwise steal focus
     // when a new tab is first rendered.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
@@ -2380,34 +2364,6 @@ function SqlPlaygroundInner() {
     if (overrideName) return { ...base, filename: overrideName };
     return base;
   }, [activeDbId, customDb, customFilenames]);
-
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
-
-  const onTabDragStart = useCallback(
-    (event: DragStartEvent) => {
-      setDraggingTabId(String(event.active.id));
-      handleTabDragStart(event);
-    },
-    [handleTabDragStart],
-  );
-
-  const onTabDragEnd = useCallback(
-    (event: Parameters<typeof handleTabDragEnd>[0]) => {
-      setDraggingTabId(null);
-      handleTabDragEnd(event);
-    },
-    [handleTabDragEnd],
-  );
-
-  const onTabDragCancel = useCallback(() => {
-    setDraggingTabId(null);
-  }, []);
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -4513,58 +4469,40 @@ function SqlPlaygroundInner() {
             ref={panesRef}
           >
             <div className="sql-tabbar">
-              <DndContext
-                sensors={tabDragSensors}
-                collisionDetection={closestCenter}
-                onDragStart={onTabDragStart}
-                onDragEnd={onTabDragEnd}
-                onDragCancel={onTabDragCancel}
-              >
-                <SortableContext
-                  items={tabIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  <div className="sql-tabs" role="tablist">
-                    {tabs.map((t) => (
-                      <SqlTab
-                        key={t.id}
-                        tab={t}
-                        active={t.id === activeTabId}
-                        onActivate={() => {
-                          const prevId = activeTabIdRef.current;
-                          if (prevId !== t.id) {
-                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
-                          }
-                          activeTabIdRef.current = t.id;
-                          setActiveTabId(t.id);
-                          // When the user re-clicks the already-active tab the
-                          // useEffect that focuses the editor won't re-run
-                          // (activeTabId hasn't changed).  Focus it explicitly
-                          // so typing works immediately without a second click.
-                          if (
-                            prevId === t.id &&
-                            t.kind !== "er-diagram" &&
-                            t.kind !== "view-data" &&
-                            t.kind !== "query-history"
-                          ) {
-                            editorRef.current?.focus();
-                          }
-                        }}
-                        onClose={() => closeTab(t.id)}
-                        onRename={(name) => renameTab(t.id, name)}
-                        onDuplicate={() => duplicateTab(t.id)}
-                        onCloseOthers={() => closeOtherTabs(t.id)}
-                        onCloseAll={closeAllTabs}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-                <DragOverlay dropAnimation={null}>
-                  {draggingTab ? (
-                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+              <div className="sql-tabs" role="tablist">
+                {tabs.map((t) => (
+                  <SqlTab
+                    key={t.id}
+                    tab={t}
+                    active={t.id === activeTabId}
+                    onActivate={() => {
+                      const prevId = activeTabIdRef.current;
+                      if (prevId !== t.id) {
+                        tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
+                      }
+                      activeTabIdRef.current = t.id;
+                      setActiveTabId(t.id);
+                      // When the user re-clicks the already-active tab the
+                      // useEffect that focuses the editor won't re-run
+                      // (activeTabId hasn't changed).  Focus it explicitly
+                      // so typing works immediately without a second click.
+                      if (
+                        prevId === t.id &&
+                        t.kind !== "er-diagram" &&
+                        t.kind !== "view-data" &&
+                        t.kind !== "query-history"
+                      ) {
+                        editorRef.current?.focus();
+                      }
+                    }}
+                    onClose={() => closeTab(t.id)}
+                    onRename={(name) => renameTab(t.id, name)}
+                    onDuplicate={() => duplicateTab(t.id)}
+                    onCloseOthers={() => closeOtherTabs(t.id)}
+                    onCloseAll={closeAllTabs}
+                  />
+                ))}
+              </div>
               {/* The "new tab" (+) button sits outside the scrollable
                   .sql-tabs container so it remains pinned at the right
                   edge of the tab bar when tabs overflow horizontally.
