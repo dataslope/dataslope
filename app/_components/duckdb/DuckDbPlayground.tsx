@@ -740,7 +740,7 @@ function DuckDbStructureColumnRow({
 /** Row for a generated column inside the DuckDB structure drawer.
  *  DuckDB only supports STORED generated columns, so there is no
  *  storage-type selector — only the expression is editable. */
-function PgGeneratedColumnRow({
+function DuckDbGeneratedColumnRow({
   col,
   onExpressionChange,
   onRemove,
@@ -3808,7 +3808,7 @@ function DuckDbPlaygroundInner() {
                                 </thead>
                                 <tbody>
                                   {generatedCols.map((col) => (
-                                    <PgGeneratedColumnRow
+                                    <DuckDbGeneratedColumnRow
                                       key={col.id}
                                       col={col}
                                       theme={editorTheme}
