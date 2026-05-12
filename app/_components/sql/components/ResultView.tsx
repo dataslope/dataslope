@@ -430,6 +430,14 @@ export function ResultView({
     pendingEditsByIndex: PendingEditsByResult;
     sortingByIndex: Record<number, SortingState>;
   } | null>(null);
+  // Keep a ref to the latest sortingByIndex so the result-change effect can
+  // read it without adding sortingByIndex as a dependency (which would loop).
+  const sortingByIndexRef = useRef<Record<number, SortingState>>(sortingByIndex);
+  sortingByIndexRef.current = sortingByIndex;
+  // Cache sorting state per result-object so it survives tab switches.
+  const sortingCacheRef = useRef<WeakMap<QueryRunResult, Record<number, SortingState>>>(
+    new WeakMap(),
+  );
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
@@ -438,6 +446,12 @@ export function ResultView({
   const prevResultRef = useRef<QueryRunResult | null>(null);
 
   useEffect(() => {
+    // Save sorting for the outgoing result so it can be restored on tab switch back.
+    if (prevResultRef.current) {
+      sortingCacheRef.current.set(prevResultRef.current, {
+        ...sortingByIndexRef.current,
+      });
+    }
     const preserved = preserveOnNextResultRef.current;
     preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
@@ -446,7 +460,10 @@ export function ResultView({
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
-    setSortingByIndex(preserved?.sortingByIndex ?? {});
+    // Prefer explicit preserved state (after a reload), then cached state
+    // (returning to a tab), then fall back to a clean slate.
+    const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
+    setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
     const el = flashWrapperRef.current;
