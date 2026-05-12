@@ -2299,6 +2299,14 @@ input[type="range"].fs-slider:disabled {
   right: auto;
   width: 260px;
 }
+.bui-popup.pane-btn-popover {
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
 
 /* Menu items keep the same example-item / export-item presentation but
    need keyboard-highlight states from Base UI's `data-highlighted`. */
