@@ -2496,7 +2496,7 @@
 /* Subtle chevron for unsorted columns */
 .sql-result-th-chevron {
   flex-shrink: 0;
-  color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-dim);
   display: inline-flex;
   align-items: center;
   transition: color 120ms ease;
