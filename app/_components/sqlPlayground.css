@@ -2611,6 +2611,13 @@
   margin: 3px 0;
 }
 
+/* An item directly above a separator already provides a visible bottom
+   border via the .example-item rule. Suppress that border so the separator
+   is the only divider between the two groups (prevents a double-border). */
+.example-item:has(+ .sql-ctx-separator) {
+  border-bottom: none;
+}
+
 /* Disabled ContextMenu.Item (e.g. sort ascending when already sorted asc). */
 .bui-popup .example-item[data-disabled] {
   opacity: 0.4;
