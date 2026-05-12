@@ -1028,6 +1028,7 @@ export function ResultView({
                   effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
+              const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
               const hasMoreRows =
                 isInfiniteAll && visibleRows.length < totalRows;
               return (
