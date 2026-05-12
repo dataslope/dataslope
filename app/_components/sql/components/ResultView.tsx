@@ -428,7 +428,16 @@ export function ResultView({
   const preserveOnNextResultRef = useRef<{
     selectedByIndex: SelectedRowsByResult;
     pendingEditsByIndex: PendingEditsByResult;
+    sortingByIndex: Record<number, SortingState>;
   } | null>(null);
+  // Keep a ref to the latest sortingByIndex so the result-change effect can
+  // read it without adding sortingByIndex as a dependency (which would loop).
+  const sortingByIndexRef = useRef<Record<number, SortingState>>(sortingByIndex);
+  sortingByIndexRef.current = sortingByIndex;
+  // Cache sorting state per result-object so it survives tab switches.
+  const sortingCacheRef = useRef<WeakMap<QueryRunResult, Record<number, SortingState>>>(
+    new WeakMap(),
+  );
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
@@ -437,6 +446,12 @@ export function ResultView({
   const prevResultRef = useRef<QueryRunResult | null>(null);
 
   useEffect(() => {
+    // Save sorting for the outgoing result so it can be restored on tab switch back.
+    if (prevResultRef.current) {
+      sortingCacheRef.current.set(prevResultRef.current, {
+        ...sortingByIndexRef.current,
+      });
+    }
     const preserved = preserveOnNextResultRef.current;
     preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
@@ -445,6 +460,10 @@ export function ResultView({
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
+    // Prefer explicit preserved state (after a reload), then cached state
+    // (returning to a tab), then fall back to a clean slate.
+    const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
+    setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
     const el = flashWrapperRef.current;
@@ -466,6 +485,23 @@ export function ResultView({
       prevResultRef.current = result;
     }
   }, [result]);
+
+  const preserveStateForReload = useCallback(
+    (overrides?: {
+      selectedByIndex?: SelectedRowsByResult;
+      pendingEditsByIndex?: PendingEditsByResult;
+      sortingByIndex?: Record<number, SortingState>;
+    }) => {
+      preserveOnNextResultRef.current = {
+        selectedByIndex:
+          overrides?.selectedByIndex ?? cloneSelections(selectedByIndex),
+        pendingEditsByIndex:
+          overrides?.pendingEditsByIndex ?? clonePendingEdits(pendingEditsByIndex),
+        sortingByIndex: overrides?.sortingByIndex ?? { ...sortingByIndex },
+      };
+    },
+    [selectedByIndex, pendingEditsByIndex, sortingByIndex],
+  );
 
   const getState = useCallback(
     (idx: number) => pageStates[idx] ?? { page: 0 },
@@ -575,10 +611,7 @@ export function ResultView({
       if (updates.length === 0) return;
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
       delete nextPendingEdits[setIdx];
-      preserveOnNextResultRef.current = {
-        selectedByIndex: cloneSelections(selectedByIndex),
-        pendingEditsByIndex: nextPendingEdits,
-      };
+      preserveStateForReload({ pendingEditsByIndex: nextPendingEdits });
       setPendingEditsByIndex(nextPendingEdits);
       setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
       // Preserve the current sort order so the re-fetch after the update
@@ -592,7 +625,7 @@ export function ResultView({
         if (sorting.length > 0) {
           const parsed = parseColumnId(sorting[0].id);
           if (parsed) {
-            refetchSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+            refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
           }
         }
         refetchSql = refetchSql ?? baseSql;
@@ -606,6 +639,7 @@ export function ResultView({
       selectedByIndex,
       sortingByIndex,
       result,
+      preserveStateForReload,
     ],
   );
 
@@ -652,10 +686,10 @@ export function ResultView({
       pendingDelete,
       selectedRows,
     );
-    preserveOnNextResultRef.current = {
+    preserveStateForReload({
       selectedByIndex: nextSelectedByIndex,
       pendingEditsByIndex: nextPendingEdits,
-    };
+    });
     setPendingDelete(null);
     setSelectedByIndex(nextSelectedByIndex);
     setPendingEditsByIndex(nextPendingEdits);
@@ -669,6 +703,8 @@ export function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
+    sortingByIndex,
+    preserveStateForReload,
   ]);
 
   const requestDeleteSingleRow = useCallback(
@@ -716,10 +752,7 @@ export function ResultView({
       setIdx,
       deletedRows,
     );
-    preserveOnNextResultRef.current = {
-      selectedByIndex: cloneSelections(selectedByIndex),
-      pendingEditsByIndex: nextPendingEdits,
-    };
+    preserveStateForReload({ pendingEditsByIndex: nextPendingEdits });
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(nextPendingEdits);
     onDeleteRows(sourceTable, pkCols, [pkValues]);
@@ -732,6 +765,8 @@ export function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
+    sortingByIndex,
+    preserveStateForReload,
   ]);
 
   useEffect(() => {
@@ -988,13 +1023,16 @@ export function ResultView({
                 setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
                 if (isLazy) {
                   const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+                  const newSortingByIndex = { ...sortingByIndex, [idx]: resolved };
                   if (resolved.length > 0) {
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
-                      const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      const sortedSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      preserveStateForReload({ sortingByIndex: newSortingByIndex });
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
+                    preserveStateForReload({ sortingByIndex: newSortingByIndex });
                     onLoadPage(baseSql, 0);
                   }
                 }
@@ -1004,7 +1042,7 @@ export function ResultView({
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
               const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
@@ -1093,11 +1131,15 @@ export function ResultView({
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
-              handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
+              handlePageChange = (p: number) => {
+                preserveStateForReload();
+                onLoadPage(effectiveLazySql, p);
+              };
               handlePageSizeChange = (s: number) => {
+                preserveStateForReload();
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
               };
