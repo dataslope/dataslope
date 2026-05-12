@@ -774,6 +774,16 @@
   min-height: 0;
 }
 
+.sql-result-empty-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 13px;
+}
+
 .sql-result-table {
   width: 100%;
   border-collapse: collapse;
@@ -1933,7 +1943,7 @@
   border: 0;
   color: var(--text);
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   border-radius: 4px;
   display: inline-flex;
   align-items: center;

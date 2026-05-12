@@ -1473,6 +1473,7 @@ function SqlPlaygroundInner() {
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
   const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   const activeTabIdRef = useRef<string>("");
+  const lastActiveTabIdRef = useRef<string>("");
   const tabsRef = useRef<QueryTab[]>([]);
   const activeDbIdRef = useRef<string>(activeDbId);
   const panesRef = useRef<HTMLDivElement | null>(null);
@@ -1576,7 +1577,7 @@ function SqlPlaygroundInner() {
     handleTabDragEnd,
     resetTabsForCurrentDb,
   } = useTabManagement(
-    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef },
+    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef },
     refreshTableMetadata,
   );
 
@@ -4517,6 +4518,9 @@ function SqlPlaygroundInner() {
                         active={t.id === activeTabId}
                         onActivate={() => {
                           const prevId = activeTabIdRef.current;
+                          if (prevId !== t.id) {
+                            lastActiveTabIdRef.current = prevId;
+                          }
                           activeTabIdRef.current = t.id;
                           setActiveTabId(t.id);
                           // When the user re-clicks the already-active tab the

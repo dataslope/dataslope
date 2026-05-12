@@ -1158,6 +1158,7 @@ function PostgresPlaygroundInner() {
   const engineRef = useRef<PostgresEngine | null>(null);
   const tabsRef = useRef(tabs);
   const activeTabIdRef = useRef(activeTabId);
+  const lastActiveTabIdRef = useRef<string>("");
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -1832,6 +1833,7 @@ function PostgresPlaygroundInner() {
     };
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
+    window.setTimeout(() => editorRef.current?.focus(), 0);
   }, [persistTabs]);
 
   const openTabAndRun = useCallback(
@@ -1851,7 +1853,8 @@ function PostgresPlaygroundInner() {
 
   const closeTab = useCallback(
     (id: string) => {
-      const next = tabsRef.current.filter((tab) => tab.id !== id);
+      const current = tabsRef.current;
+      const next = current.filter((tab) => tab.id !== id);
       const fallback = next[0] ?? {
         id: newTabId(),
         title: "Query 1",
@@ -1860,7 +1863,12 @@ function PostgresPlaygroundInner() {
       };
       const finalTabs = next.length > 0 ? next : [fallback];
       persistTabs(finalTabs);
-      if (activeTabIdRef.current === id) setActiveTabId(fallback.id);
+      if (activeTabIdRef.current === id) {
+        const lastId = lastActiveTabIdRef.current;
+        const preferred = lastId ? finalTabs.find((tab) => tab.id === lastId) : null;
+        const adjacent = finalTabs[Math.max(0, current.findIndex((tab) => tab.id === id) - 1)];
+        setActiveTabId((preferred ?? adjacent ?? finalTabs[0]).id);
+      }
       setResultsByTab((prev) => {
         const { [id]: _deleted, ...rest } = prev;
         void _deleted;
@@ -4446,7 +4454,13 @@ function PostgresPlaygroundInner() {
                         key={tab.id}
                         tab={tab}
                         active={tab.id === activeTabId}
-                        onActivate={() => setActiveTabId(tab.id)}
+                        onActivate={() => {
+                          const prevId = activeTabIdRef.current;
+                          if (prevId !== tab.id) {
+                            lastActiveTabIdRef.current = prevId;
+                          }
+                          setActiveTabId(tab.id);
+                        }}
                         onClose={() => closeTab(tab.id)}
                         onRename={(title) =>
                           persistTabs(

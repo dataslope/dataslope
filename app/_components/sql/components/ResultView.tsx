@@ -33,6 +33,7 @@ import {
   Clock,
   Hash,
   Minus,
+  SearchX,
   ToggleLeft,
   Trash2,
   Type,
@@ -1496,7 +1497,6 @@ export function ResultTableBody({
                         >
                           <div className="ex-title">Rename column</div>
                         </ContextMenu.Item>
-                        <ContextMenu.Separator className="sql-ctx-separator" />
                         <ContextMenu.Item
                           className="example-item"
                           disabled={sorted === "asc"}
@@ -1527,7 +1527,6 @@ export function ResultTableBody({
                         )}
                         {filterBaseSql && onOpenQueryTabRef.current && (
                           <>
-                            <ContextMenu.Separator className="sql-ctx-separator" />
                             <ContextMenu.Item
                               className="example-item"
                               onClick={() => {
@@ -1548,7 +1547,6 @@ export function ResultTableBody({
                             </ContextMenu.Item>
                           </>
                         )}
-                        <ContextMenu.Separator className="sql-ctx-separator" />
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
@@ -1939,6 +1937,12 @@ export function ResultTableBody({
           </tbody>
         </table>
       </div>
+      {tableRows.length === 0 && (
+        <div className="sql-result-empty-msg">
+          <SearchX size={14} aria-hidden="true" />
+          No rows returned.
+        </div>
+      )}
       {/* Edit-in-modal dialog */}
       <Dialog.Root open={modalEditCell !== null} onOpenChange={(open) => { if (!open) setModalEditCell(null); }}>
         <Dialog.Portal>

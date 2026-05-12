@@ -19,13 +19,14 @@ export interface TabManagementRefs {
   tabsRef: React.MutableRefObject<QueryTab[]>;
   activeTabIdRef: React.MutableRefObject<string>;
   activeDbIdRef: React.MutableRefObject<string>;
+  lastActiveTabIdRef: React.MutableRefObject<string>;
 }
 
 export function useTabManagement(
   refs: TabManagementRefs,
   refreshTableMetadata: () => void,
 ) {
-  const { editorRef, tabsRef, activeTabIdRef, activeDbIdRef } = refs;
+  const { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef } = refs;
 
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
@@ -60,7 +61,8 @@ export function useTabManagement(
     saveTabs(activeDbIdRef.current, next);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [tabsRef, activeDbIdRef, activeTabIdRef, setTabs, setActiveTabId]);
+    window.setTimeout(() => editorRef.current?.focus(), 0);
+  }, [tabsRef, activeDbIdRef, activeTabIdRef, editorRef, setTabs, setActiveTabId]);
 
   const openErDiagramTab = useCallback(() => {
     refreshTableMetadata();
@@ -159,11 +161,14 @@ export function useTabManagement(
       setTabs(finalTabs);
       saveTabs(activeDbIdRef.current, finalTabs);
       if (activeTabIdRef.current === id) {
-        activeTabIdRef.current = finalTabs[0].id;
-        setActiveTabId(finalTabs[0].id);
+        const lastId = lastActiveTabIdRef.current;
+        const preferred = lastId ? finalTabs.find((t) => t.id === lastId) : null;
+        const fallback = preferred ?? finalTabs[Math.max(0, currentTabs.findIndex((t) => t.id === id) - 1)] ?? finalTabs[0];
+        activeTabIdRef.current = fallback.id;
+        setActiveTabId(fallback.id);
       }
     },
-    [tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId, setConfirmCloseTabId],
+    [tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef, setTabs, setActiveTabId, setConfirmCloseTabId],
   );
 
   const confirmCloseTab = useCallback(() => {
@@ -180,10 +185,13 @@ export function useTabManagement(
     setTabs(finalTabs);
     saveTabs(activeDbIdRef.current, finalTabs);
     if (activeTabIdRef.current === id) {
-      activeTabIdRef.current = finalTabs[0].id;
-      setActiveTabId(finalTabs[0].id);
+      const lastId = lastActiveTabIdRef.current;
+      const preferred = lastId ? finalTabs.find((t) => t.id === lastId) : null;
+      const fallback = preferred ?? finalTabs[Math.max(0, currentTabs.findIndex((t) => t.id === id) - 1)] ?? finalTabs[0];
+      activeTabIdRef.current = fallback.id;
+      setActiveTabId(fallback.id);
     }
-  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId, setConfirmCloseTabId]);
+  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef, setTabs, setActiveTabId, setConfirmCloseTabId]);
 
   const renameTab = useCallback(
     (id: string, newTitle: string) => {
