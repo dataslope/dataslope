@@ -89,6 +89,12 @@ const CARDS: CardEntry[] = [
     title: "PostgreSQL",
     desc: "Preview the mocked Postgres playground shell.",
   },
+  {
+    id: "duckdb",
+    href: "/playground/duckdb",
+    title: "DuckDB",
+    desc: "Run DuckDB queries against in-browser sample databases via duckdb-wasm.",
+  },
 ];
 
 // Render the brand icon for a given language adapter id. Falls back to

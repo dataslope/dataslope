@@ -317,11 +317,13 @@ export async function createDuckDbEngine(
     // Drop all user-created objects in the default schema.
     // DuckDB doesn't have a DROP DATABASE in in-memory mode,
     // so we drop all user tables, views, indexes in reverse dependency order.
+    // Filter `internal = false` to avoid touching built-in catalog entries
+    // (e.g. duckdb_columns, duckdb_tables) that also appear in schema 'main'.
     const tables = await queryRows<{ table_name: string }>(
-      `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' ORDER BY table_name`,
+      `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND internal = false ORDER BY table_name`,
     );
     const views = await queryRows<{ view_name: string }>(
-      `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' ORDER BY view_name`,
+      `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND internal = false ORDER BY view_name`,
     );
     const sequences = await queryRows<{ sequence_name: string }>(
       `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = 'main' ORDER BY sequence_name`,
@@ -404,14 +406,14 @@ export async function createDuckDbEngine(
 
     async listTables() {
       const rows = await queryRows<{ table_name: string }>(
-        `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' ORDER BY table_name`,
+        `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND internal = false ORDER BY table_name`,
       );
       return rows.map((r) => r.table_name);
     },
 
     async listViews() {
       const rows = await queryRows<{ view_name: string }>(
-        `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' ORDER BY view_name`,
+        `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND internal = false ORDER BY view_name`,
       );
       return rows.map((r) => r.view_name);
     },
@@ -640,7 +642,7 @@ export async function createDuckDbEngine(
     async getDDL(name) {
       // Check if it's a table
       const tableRows = await queryRows<{ table_name: string }>(
-        `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND table_name = '${name.replace(/'/g, "''")}' LIMIT 1`,
+        `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND internal = false AND table_name = '${name.replace(/'/g, "''")}' LIMIT 1`,
       );
       if (tableRows.length > 0) {
         const [cols, fks] = await Promise.all([
@@ -670,7 +672,7 @@ export async function createDuckDbEngine(
 
       // Check if it's a view
       const viewRows = await queryRows<{ sql: string | null }>(
-        `SELECT sql FROM duckdb_views() WHERE schema_name = 'main' AND view_name = '${name.replace(/'/g, "''")}' LIMIT 1`,
+        `SELECT sql FROM duckdb_views() WHERE schema_name = 'main' AND internal = false AND view_name = '${name.replace(/'/g, "''")}' LIMIT 1`,
       );
       if (viewRows.length > 0 && viewRows[0].sql) {
         return `${viewRows[0].sql};`;
