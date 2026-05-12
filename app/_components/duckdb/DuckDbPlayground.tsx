@@ -2324,7 +2324,7 @@ function DuckDbPlaygroundInner() {
         }));
       } catch (err) {
         // Non-fatal: the user can always run the query manually from the tab.
-        console.error("[Postgres] openEntityStructure failed:", err);
+        console.error("[DuckDB] openEntityStructure failed:", err);
       }
     },
     [persistTabs],
@@ -3377,7 +3377,6 @@ function DuckDbPlaygroundInner() {
               <DdlViewer
                 sql={ddlDialog?.sql ?? ""}
                 theme={editorTheme}
-                
               />
               <div className="confirm-actions">
                 <button
