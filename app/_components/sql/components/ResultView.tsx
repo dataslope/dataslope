@@ -60,6 +60,7 @@ import {
   pendingEditsAfterDeletedRows,
   inferColumnType,
 } from "../utils/cellUtils";
+import { stripTopLevelOrderBy } from "../utils/sqlAnalysis";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -595,6 +596,9 @@ export function ResultView({
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
       delete nextPendingEdits[setIdx];
       preserveStateForReload({ pendingEditsByIndex: nextPendingEdits });
+      setPendingEditsByIndex(nextPendingEdits);
+      setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+      // Preserve the current sort order so the re-fetch after the update
       // uses the same ORDER BY the user has applied, not the default order.
       const baseSql = result?.lazyBaseSql ?? result?.lazySql;
       let refetchSql: string | undefined;
@@ -605,7 +609,7 @@ export function ResultView({
         if (sorting.length > 0) {
           const parsed = parseColumnId(sorting[0].id);
           if (parsed) {
-            refetchSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+            refetchSql = `${stripTopLevelOrderBy(baseSql)} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
           }
         }
         refetchSql = refetchSql ?? baseSql;
@@ -670,6 +674,10 @@ export function ResultView({
       selectedByIndex: nextSelectedByIndex,
       pendingEditsByIndex: nextPendingEdits,
     });
+    setPendingDelete(null);
+    setSelectedByIndex(nextSelectedByIndex);
+    setPendingEditsByIndex(nextPendingEdits);
+    onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
     globalPageSize,
@@ -999,29 +1007,30 @@ export function ResultView({
                 setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
                 if (isLazy) {
                   const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+                  const baseForSort = stripTopLevelOrderBy(baseSql);
                   const newSortingByIndex = { ...sortingByIndex, [idx]: resolved };
                   if (resolved.length > 0) {
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
-                      const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      const sortedSql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
                       preserveStateForReload({ sortingByIndex: newSortingByIndex });
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
                     preserveStateForReload({ sortingByIndex: newSortingByIndex });
-                    onLoadPage(baseSql, 0);
+                    onLoadPage(baseForSort, 0);
                   }
                 }
               };
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              let effectiveLazySql = baseSql;
+              const baseForSort = stripTopLevelOrderBy(baseSql);
+              let effectiveLazySql = baseForSort;
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
-              const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
               const hasMoreRows =
                 isInfiniteAll && visibleRows.length < totalRows;
               return (
@@ -1103,11 +1112,12 @@ export function ResultView({
             let handlePageSizeChange: (s: number) => void;
             if (isLazy) {
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              let effectiveLazySql = baseSql;
+              const baseForSort = stripTopLevelOrderBy(baseSql);
+              let effectiveLazySql = baseForSort;
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
               handlePageChange = (p: number) => {
