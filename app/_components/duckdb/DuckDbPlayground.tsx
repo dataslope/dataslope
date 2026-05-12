@@ -2303,7 +2303,7 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       // Display SQL is for the editor tab only — actual execution uses
       // parameterized execParams below to prevent injection.
-      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
+      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'main'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Structure: ${name}`,
@@ -2314,7 +2314,7 @@ function DuckDbPlaygroundInner() {
       setActiveTabId(tab.id);
       if (!engine) return;
       // Run via parameterized query to avoid any injection risk.
-      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`;
+      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'main' AND table_name = ? ORDER BY ordinal_position`;
       try {
         const sets = await engine.execParams(paramSql, [name]);
         setResultsByTab((prev) => ({
