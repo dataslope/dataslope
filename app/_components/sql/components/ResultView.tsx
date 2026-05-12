@@ -60,7 +60,6 @@ import {
   pendingEditsAfterDeletedRows,
   inferColumnType,
 } from "../utils/cellUtils";
-import { stripTopLevelOrderBy } from "../utils/sqlAnalysis";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -609,7 +608,7 @@ export function ResultView({
         if (sorting.length > 0) {
           const parsed = parseColumnId(sorting[0].id);
           if (parsed) {
-            refetchSql = `${stripTopLevelOrderBy(baseSql)} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+            refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
           }
         }
         refetchSql = refetchSql ?? baseSql;
@@ -1007,28 +1006,26 @@ export function ResultView({
                 setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
                 if (isLazy) {
                   const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-                  const baseForSort = stripTopLevelOrderBy(baseSql);
                   const newSortingByIndex = { ...sortingByIndex, [idx]: resolved };
                   if (resolved.length > 0) {
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
-                      const sortedSql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      const sortedSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
                       preserveStateForReload({ sortingByIndex: newSortingByIndex });
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
                     preserveStateForReload({ sortingByIndex: newSortingByIndex });
-                    onLoadPage(baseForSort, 0);
+                    onLoadPage(baseSql, 0);
                   }
                 }
               };
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              const baseForSort = stripTopLevelOrderBy(baseSql);
-              let effectiveLazySql = baseForSort;
+              let effectiveLazySql = baseSql;
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
               const hasMoreRows =
@@ -1112,12 +1109,11 @@ export function ResultView({
             let handlePageSizeChange: (s: number) => void;
             if (isLazy) {
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              const baseForSort = stripTopLevelOrderBy(baseSql);
-              let effectiveLazySql = baseForSort;
+              let effectiveLazySql = baseSql;
               if (sorting.length > 0) {
                 const parsed = parseColumnId(sorting[0].id);
                 if (parsed) {
-                  effectiveLazySql = `${baseForSort} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
               handlePageChange = (p: number) => {
