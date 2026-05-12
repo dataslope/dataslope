@@ -1840,6 +1840,18 @@ function PostgresPlaygroundInner() {
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
+    // Match the working closeAllTabs pattern: queue the editor focus as
+    // a macrotask so it runs after React commits the new tab and dnd-kit
+    // finishes re-registering the sortable.  Synchronous focus and rAF
+    // both lose the race to whatever ends up parking focus on the
+    // newly-active tab <button>.
+    const view = editorRef.current;
+    if (view) {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: "" },
+      });
+    }
+    window.setTimeout(() => editorRef.current?.focus(), 0);
   }, [persistTabs]);
 
   const openTabAndRun = useCallback(
@@ -4524,16 +4536,11 @@ function PostgresPlaygroundInner() {
               <button
                 type="button"
                 className="sql-tab-add"
-                // Prevent the button from stealing focus on mouse-down.  See
-                // the matching SQLite playground for the full rationale —
-                // without this, the active tab <button> ends up focused
-                // after the click and the editor never receives the
-                // useEffect-scheduled focus call.
+                // Prevent the button from stealing focus on mouse-down so
+                // focus stays wherever it was.  The editor focus is
+                // queued from inside addTab via setTimeout(0).
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  addTab();
-                  editorRef.current?.focus();
-                }}
+                onClick={addTab}
                 aria-label="New query tab"
               >
                 <Plus size={12} aria-hidden="true" />

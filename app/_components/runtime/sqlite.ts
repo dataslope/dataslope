@@ -412,49 +412,84 @@ function parseGeneratedFromDDL(
   return result;
 }
 
-/** sql.js's Statement holds the raw `sqlite3_stmt*` pointer as a number
- *  on a `stmt` property — not part of the public type. We tunnel through
- *  it to call `sqlite3_column_decltype()`, which the higher-level API
- *  doesn't surface but which the wasm module does export. */
-interface RawStatement {
-  stmt: number;
-}
-
-/** Subset of the sql.js Emscripten module we reach into for the
- *  declared-type lookup. `_sqlite3_column_decltype` returns 0 for
- *  expression columns (no underlying table column), in which case the
- *  caller falls back to value-based inference. */
-interface SqlJsRawModule {
-  _sqlite3_column_decltype?: (stmtPtr: number, columnIdx: number) => number;
-  UTF8ToString?: (ptr: number) => string;
-}
-
-/** Read declared types for each column of a prepared statement. Returns
- *  an empty string for any column whose type is unknown to SQLite (e.g.
- *  computed expressions) so the consumer can fall back to inference. */
-function readDeclaredColumnTypes(
-  stmt: { getColumnNames(): string[] },
-  SQL: SqlJsStatic,
+/** Build a per-column declared-type list for a result set by looking
+ *  the column names up in the database's schema.
+ *
+ *  sql.js does NOT export `sqlite3_column_decltype` (verified against
+ *  the published 1.13.0 wasm — the export table only includes
+ *  `column_blob/bytes/count/double/name/text/type`), so we can't read
+ *  declared types directly from the prepared statement.  Instead we
+ *  parse FROM/JOIN clauses out of the SQL and consult
+ *  `PRAGMA table_info(<table>)` for every referenced table, keyed by
+ *  column name.  Unknown columns (computed expressions, columns from
+ *  CTEs, columns whose name doesn't match any referenced table) come
+ *  back as the empty string so the consumer can fall back to
+ *  value-based inference. */
+function resolveDeclaredColumnTypes(
+  db: Database,
+  sql: string,
+  columns: string[],
 ): string[] {
-  const colNames = stmt.getColumnNames();
-  const mod = SQL as unknown as SqlJsRawModule;
-  if (!mod._sqlite3_column_decltype || !mod.UTF8ToString) {
-    return colNames.map(() => "");
-  }
-  const ptr = (stmt as unknown as RawStatement).stmt;
-  if (typeof ptr !== "number") {
-    return colNames.map(() => "");
-  }
-  const out: string[] = [];
-  for (let i = 0; i < colNames.length; i++) {
+  const referenced = extractReferencedTables(sql);
+  // Build a column-name → declared-type map by walking each referenced
+  // table's `PRAGMA table_info`.  When two tables share a column name
+  // with conflicting types, the first table referenced in the SQL wins,
+  // which matches what a developer reading the query usually expects.
+  const byColumn = new Map<string, string>();
+  for (const table of referenced) {
+    let info: QueryExecResult[];
     try {
-      const strPtr = mod._sqlite3_column_decltype(ptr, i);
-      out.push(strPtr ? mod.UTF8ToString(strPtr) : "");
+      info = db.exec(`PRAGMA table_info(${quoteIdent(table)})`);
     } catch {
-      out.push("");
+      continue;
+    }
+    if (info.length === 0) continue;
+    const cols = info[0];
+    const nameIdx = cols.columns.indexOf("name");
+    const typeIdx = cols.columns.indexOf("type");
+    if (nameIdx < 0 || typeIdx < 0) continue;
+    for (const row of cols.values) {
+      const name = String(row[nameIdx] ?? "");
+      const type = String(row[typeIdx] ?? "");
+      if (name && !byColumn.has(name)) byColumn.set(name, type);
     }
   }
-  return out;
+  return columns.map((c) => byColumn.get(c) ?? "");
+}
+
+/** Pull every table name referenced by a FROM/JOIN clause out of an SQL
+ *  string.  Strips string literals and SQL comments first so identifiers
+ *  inside them aren't misread as table references.  Quoted identifiers
+ *  (`"users"`, `[users]`, `` `users` ``) are unquoted before being
+ *  returned.  Not a full SQL parser — designed to be good enough for
+ *  the common single-statement SELECTs the playground actually runs. */
+function extractReferencedTables(sql: string): string[] {
+  // Remove block comments, line comments, and string/identifier literals
+  // before scanning for FROM/JOIN so e.g. `FROM` inside a string doesn't
+  // produce a phantom table name.
+  const stripped = sql
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/--[^\n]*/g, " ")
+    .replace(/'(?:''|[^'])*'/g, "''")
+    .replace(/"(?:""|[^"])*"/g, (m) => m)
+    .replace(/`(?:``|[^`])*`/g, (m) => m);
+  const pattern =
+    /\b(?:FROM|JOIN)\s+(?:"([^"]+)"|`([^`]+)`|\[([^\]]+)\]|([A-Za-z_][\w]*))/gi;
+  const tables: string[] = [];
+  const seen = new Set<string>();
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(stripped)) !== null) {
+    const name = match[1] || match[2] || match[3] || match[4];
+    if (!name) continue;
+    // Skip SQL keywords that can follow JOIN (e.g. "JOIN LATERAL …") and
+    // common aliases that look like tables but aren't.
+    const upper = name.toUpperCase();
+    if (upper === "LATERAL" || upper === "SELECT") continue;
+    if (seen.has(name)) continue;
+    seen.add(name);
+    tables.push(name);
+  }
+  return tables;
 }
 
 export async function createSqliteEngine(
@@ -536,13 +571,23 @@ export async function createSqliteEngine(
             }
             results.push(null);
           } else {
-            // SELECT-like statement — collect rows (may be zero). Capture
-            // declared column types from the prepared statement so the
-            // ResultView can show real types even when the row set is
-            // empty (otherwise inference from `values` falls through to
-            // "NULL" and the type strip reads as "null" for every
-            // column).
-            const columnTypes = readDeclaredColumnTypes(stmt, SQL);
+            // SELECT-like statement — collect rows (may be zero). Resolve
+            // declared column types from PRAGMA table_info so the
+            // ResultView shows real types even when no rows are returned
+            // (otherwise value-based inference falls through to "NULL"
+            // and the type strip reads as "null" for every column).
+            // `iteratedSql` holds the slice of input that produced this
+            // statement; it's what we need to scan for FROM/JOIN refs.
+            const iteratedSql =
+              typeof (stmt as unknown as { getSQL?: () => string }).getSQL ===
+              "function"
+                ? (stmt as unknown as { getSQL: () => string }).getSQL()
+                : sql;
+            const columnTypes = resolveDeclaredColumnTypes(
+              db,
+              iteratedSql,
+              columns,
+            );
             const values: QueryExecResult["values"] = [];
             while (stmt.step()) {
               values.push(stmt.get() as QueryExecResult["values"][number]);
@@ -1287,7 +1332,7 @@ export async function createSqliteEngine(
           `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
         );
         const columns = stmt.getColumnNames();
-        const columnTypes = readDeclaredColumnTypes(stmt, SQL);
+        const columnTypes = resolveDeclaredColumnTypes(d, stripped, columns);
         const values: QueryExecResult["values"] = [];
         while (stmt.step()) {
           values.push(stmt.get() as QueryExecResult["values"][number]);
