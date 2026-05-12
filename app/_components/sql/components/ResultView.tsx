@@ -428,6 +428,7 @@ export function ResultView({
   const preserveOnNextResultRef = useRef<{
     selectedByIndex: SelectedRowsByResult;
     pendingEditsByIndex: PendingEditsByResult;
+    sortingByIndex: Record<number, SortingState>;
   } | null>(null);
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
@@ -445,6 +446,7 @@ export function ResultView({
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
+    setSortingByIndex(preserved?.sortingByIndex ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
     const el = flashWrapperRef.current;
@@ -578,10 +580,8 @@ export function ResultView({
       preserveOnNextResultRef.current = {
         selectedByIndex: cloneSelections(selectedByIndex),
         pendingEditsByIndex: nextPendingEdits,
+        sortingByIndex: { ...sortingByIndex },
       };
-      setPendingEditsByIndex(nextPendingEdits);
-      setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
-      // Preserve the current sort order so the re-fetch after the update
       // uses the same ORDER BY the user has applied, not the default order.
       const baseSql = result?.lazyBaseSql ?? result?.lazySql;
       let refetchSql: string | undefined;
@@ -655,11 +655,8 @@ export function ResultView({
     preserveOnNextResultRef.current = {
       selectedByIndex: nextSelectedByIndex,
       pendingEditsByIndex: nextPendingEdits,
+      sortingByIndex: { ...sortingByIndex },
     };
-    setPendingDelete(null);
-    setSelectedByIndex(nextSelectedByIndex);
-    setPendingEditsByIndex(nextPendingEdits);
-    onDeleteRows(sourceTable, pkCols, pkRows);
   }, [
     pendingDelete,
     globalPageSize,
@@ -669,6 +666,7 @@ export function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
+    sortingByIndex,
   ]);
 
   const requestDeleteSingleRow = useCallback(
@@ -719,6 +717,7 @@ export function ResultView({
     preserveOnNextResultRef.current = {
       selectedByIndex: cloneSelections(selectedByIndex),
       pendingEditsByIndex: nextPendingEdits,
+      sortingByIndex: { ...sortingByIndex },
     };
     setPendingDeleteSingleRow(null);
     setPendingEditsByIndex(nextPendingEdits);
@@ -732,6 +731,7 @@ export function ResultView({
     onDeleteRows,
     pkColumnsForSet,
     selectedByIndex,
+    sortingByIndex,
   ]);
 
   useEffect(() => {
