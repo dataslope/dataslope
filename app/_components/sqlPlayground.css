@@ -1054,15 +1054,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
+  gap: 3px;
   height: 22px;
   background: transparent;
   color: var(--text);
   border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
   border-radius: 4px;
   cursor: pointer;
-  padding: 0;
+  padding: 0 4px;
   margin-left: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+.sql-result-export-btn-label {
+  white-space: nowrap;
 }
 .sql-result-export-btn:hover {
   background: var(--bg3);
