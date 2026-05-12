@@ -454,7 +454,7 @@ export async function createDuckDbEngine(initialSampleId: string): Promise<DuckD
       return deleted;
     },
     async updateRows() {
-      throw new Error("DuckDB inline editing is only supported when a primary-key value is available in the result set; this view cannot be edited safely.");
+      throw new Error("DuckDB inline editing is not enabled because safe updates require primary-key values in the result set. Use an UPDATE statement with primary-key predicates instead.");
     },
     async insertRow(tableName, columnNames, values) {
       const cols = columnNames.map(quoteIdent).join(", ");

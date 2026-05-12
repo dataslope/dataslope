@@ -4728,9 +4728,9 @@ function DuckDbPlaygroundInner() {
             >
               {result?.sourceTable ? (
                 <div className="sql-import-warning" style={{ margin: "8px 10px 0" }}>
-                  DuckDB inline editing requires primary-key columns in the
-                  query result. Use an UPDATE statement with primary-key
-                  predicates when they are not present.
+                  Inline cell editing is not enabled for DuckDB because safe
+                  updates require primary-key values in the result set. Use an
+                  UPDATE statement with primary-key predicates instead.
                 </div>
               ) : null}
               <ResultView
