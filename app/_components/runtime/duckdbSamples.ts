@@ -13,7 +13,9 @@ export interface DuckDbSampleDatabase {
 
 // ─── E-Commerce sample ───────────────────────────────────────────────
 // A compact orders/products/customers schema that exercises DuckDB's
-// integer-family types, DECIMAL, DATE, and a STORED generated column.
+// integer-family types, DECIMAL, and DATE. Note: DuckDB-Wasm does not
+// currently support STORED generated columns via DDL, so line_total is
+// stored as a plain DECIMAL populated at INSERT time.
 // Mirrors the structure of the SQLite "credit card transactions" sample
 // so users switching playgrounds see familiar shapes.
 
@@ -43,7 +45,7 @@ CREATE TABLE order_items (
   product_id INTEGER REFERENCES products(product_id),
   quantity INTEGER,
   unit_price DECIMAL(10,2),
-  line_total DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+  line_total DECIMAL(12,2),
   PRIMARY KEY (order_id, product_id)
 );
 
@@ -80,23 +82,23 @@ INSERT INTO orders VALUES
   (1008,8,'2024-03-17','shipped'),
   (1009,9,'2024-04-04','pending'),
   (1010,10,'2024-04-21','shipped');
-INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
-  (1001,1,2,29.99),
-  (1001,3,4,9.50),
-  (1002,2,1,129.00),
-  (1002,4,3,4.25),
-  (1003,5,2,24.00),
-  (1004,6,2,18.75),
-  (1004,4,5,4.25),
-  (1005,7,1,45.00),
-  (1006,8,1,79.00),
-  (1006,3,3,9.50),
-  (1007,9,1,199.00),
-  (1008,10,1,38.50),
-  (1008,1,1,29.99),
-  (1009,2,1,129.00),
-  (1010,5,2,24.00),
-  (1010,6,1,18.75);
+INSERT INTO order_items VALUES
+  (1001,1,2,29.99,59.98),
+  (1001,3,4,9.50,38.00),
+  (1002,2,1,129.00,129.00),
+  (1002,4,3,4.25,12.75),
+  (1003,5,2,24.00,48.00),
+  (1004,6,2,18.75,37.50),
+  (1004,4,5,4.25,21.25),
+  (1005,7,1,45.00,45.00),
+  (1006,8,1,79.00,79.00),
+  (1006,3,3,9.50,28.50),
+  (1007,9,1,199.00,199.00),
+  (1008,10,1,38.50,38.50),
+  (1008,1,1,29.99,29.99),
+  (1009,2,1,129.00,129.00),
+  (1010,5,2,24.00,48.00),
+  (1010,6,1,18.75,18.75);
 
 CREATE VIEW order_totals AS
   SELECT o.order_id,
