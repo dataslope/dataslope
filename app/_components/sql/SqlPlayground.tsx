@@ -1835,6 +1835,15 @@ function SqlPlaygroundInner() {
         const id = activeTabIdRef.current;
         if (!id) return;
         const value = update.state.doc.toString();
+        // Skip the React update when the editor's new doc already matches
+        // what we have in state (e.g. when the active-tab useEffect just
+        // dispatched view.dispatch to load the active tab's code). Without
+        // this guard, adding a new tab triggers an extra setTabs after
+        // flushSync, which produces a re-render whose first-mount work
+        // (dnd-kit useSortable measurement, Base UI portal setup on the
+        // freshly mounted SqlTab) variably steals focus from the editor.
+        const current = tabsRef.current.find((t) => t.id === id);
+        if (current && current.code === value) return;
         const next = tabsRef.current.map((t) =>
           t.id === id ? { ...t, code: value } : t,
         );
