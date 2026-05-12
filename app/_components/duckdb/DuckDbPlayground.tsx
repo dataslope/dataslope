@@ -4728,8 +4728,9 @@ function DuckDbPlaygroundInner() {
             >
               {result?.sourceTable ? (
                 <div className="sql-import-warning" style={{ margin: "8px 10px 0" }}>
-                  DuckDB has no implicit rowid; inline cell editing is disabled.
-                  Use an UPDATE statement with primary-key predicates instead.
+                  DuckDB inline editing requires primary-key columns in the
+                  query result. Use an UPDATE statement with primary-key
+                  predicates when they are not present.
                 </div>
               ) : null}
               <ResultView
