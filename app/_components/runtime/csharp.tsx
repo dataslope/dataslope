@@ -6,6 +6,7 @@ import type {
   PackageInfo,
 } from "../types";
 import { loadDotnet, type DotnetApi } from "./dotnet";
+import { getClangFormat } from "./clangFormat";
 
 // Run C# in the browser via the official .NET WebAssembly runtime
 // (Mono compiled to WASM) + Roslyn's C# scripting engine
@@ -358,6 +359,10 @@ export const csharpAdapter: LanguageAdapter = {
     return new RegExp(
       `\\busing\\s+(?:static\\s+)?(?:[A-Za-z_][\\w]*\\s*=\\s*)?${escaped}(?:\\s*\\.\\s*[A-Za-z_][\\w]*)*\\s*;`,
     ).test(code);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getClangFormat();
+    return format(code, "Main.cs", "Microsoft");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     const api = await loadDotnet(setLoadingMessage);

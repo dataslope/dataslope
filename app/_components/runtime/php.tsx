@@ -6,6 +6,28 @@ import type {
   PackageInfo,
 } from "../types";
 
+// Singleton init promise so the WASM module is only fetched once,
+// regardless of how many times the user clicks "Format code".
+// The version is pinned to match the installed npm package so the
+// JS and WASM builds always stay in sync — update both together.
+const MAGO_FMT_VERSION = "0.10.3";
+let magoFmtInitPromise: Promise<{
+  format: (code: string, filename?: string) => string;
+}> | null = null;
+
+function getMagoFmt() {
+  if (!magoFmtInitPromise) {
+    magoFmtInitPromise = (async () => {
+      const mod = await import("@wasm-fmt/mago_fmt/web");
+      await mod.default(
+        `https://cdn.jsdelivr.net/npm/@wasm-fmt/mago_fmt@${MAGO_FMT_VERSION}/mago_fmt_bg.wasm`,
+      );
+      return { format: mod.format };
+    })();
+  }
+  return magoFmtInitPromise;
+}
+
 // Run PHP in the browser via php-wasm (https://github.com/seanmorris/php-wasm).
 // PhpWeb is an EventTarget that streams `output` and `error` events as
 // the script runs; we forward them into the playground's output pane.
@@ -329,6 +351,10 @@ export const phpAdapter: LanguageAdapter = {
   importSnippet: (name) => `<?php // ${name} is part of the PHP standard library.`,
   hasImport(code, name) {
     return code.includes(`// ${name} is part of the PHP standard library.`);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getMagoFmt();
+    return format(code, "main.php");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading PHP runtime…");

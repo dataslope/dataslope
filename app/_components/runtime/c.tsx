@@ -12,6 +12,7 @@ import {
   type BrowserccApi,
   type WasiShim,
 } from "./browsercc";
+import { getClangFormat } from "./clangFormat";
 
 // Run C in the browser via `browsercc`
 // (https://github.com/BertalanD/browsercc), which ships a precompiled
@@ -470,29 +471,6 @@ class CRuntime implements LanguageRuntime {
   }
 }
 
-// Singleton init promise so the WASM module is only fetched once,
-// regardless of how many times the user clicks "Format code".
-// The version is pinned to match the installed npm package so the
-// JS and WASM builds always stay in sync — update both together.
-const CLANG_FORMAT_VERSION = "22.1.4";
-let clangFormatInitPromise: Promise<{
-  format: (src: string, fname: string, style?: string) => string;
-}> | null = null;
-
-function getClangFormat() {
-  if (!clangFormatInitPromise) {
-    clangFormatInitPromise = (async () => {
-      const mod = await import("@wasm-fmt/clang-format/web");
-      // Load the WASM binary from CDN, matching the installed package
-      // version so the JS and WASM builds stay in sync.
-      await mod.default(
-        `https://cdn.jsdelivr.net/npm/@wasm-fmt/clang-format@${CLANG_FORMAT_VERSION}/clang-format.wasm`,
-      );
-      return { format: mod.format };
-    })();
-  }
-  return clangFormatInitPromise;
-}
 
 export const cAdapter: LanguageAdapter = {
   id: "c",

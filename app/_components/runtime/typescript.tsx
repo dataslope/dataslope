@@ -5,6 +5,7 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
+import { getWebFmt } from "./webFmt";
 
 // TypeScript runs in a two-step pipeline:
 //   1. Use the official TypeScript compiler API (loaded dynamically from
@@ -405,6 +406,10 @@ export const typescriptAdapter: LanguageAdapter = {
     return code.includes(
       `// ${name} is a built-in global — no import needed.`,
     );
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getWebFmt();
+    return format(code, "script.ts");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading TypeScript compiler…");

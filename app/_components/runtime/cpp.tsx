@@ -13,6 +13,7 @@ import {
   type BrowserccApi,
   type WasiShim,
 } from "./browsercc";
+import { getClangFormat } from "./clangFormat";
 
 // Run C++ in the browser via `browsercc`
 // (https://github.com/BertalanD/browsercc) — same toolchain as the C
@@ -599,6 +600,10 @@ export const cppAdapter: LanguageAdapter = {
     // Match `#include <name>` allowing arbitrary whitespace.
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getClangFormat();
+    return format(code, "main.cpp", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage(
