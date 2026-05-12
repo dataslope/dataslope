@@ -4566,9 +4566,8 @@ function SqlPlaygroundInner() {
                 className="sql-tab-add"
                 // Prevent the button from stealing focus on mouse-down so
                 // focus stays wherever it was during the click.  The
-                // addTab hook focuses the editor using a double-rAF that
-                // fires before the browser paints the second frame, after
-                // dnd-kit has had one frame to register the new sortable.
+                // addTab hook commits the new tab and focuses the editor
+                // synchronously before the click handler returns.
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={addTab}
                 title="New query tab"

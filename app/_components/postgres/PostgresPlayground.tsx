@@ -91,6 +91,7 @@ import React, {
   startTransition,
   useSyncExternalStore,
 } from "react";
+import { flushSync } from "react-dom";
 import "../playground.css";
 import "../sqlPlayground.css";
 import { ErDiagramPane } from "../ErDiagramPane";
@@ -1838,23 +1839,29 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
     };
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
-    persistTabs([...tabsRef.current, tab]);
-    setActiveTabId(tab.id);
-    // Clear the editor doc and focus using a double-rAF: the first frame
-    // lets dnd-kit's SortableContext finish re-registering the new
-    // sortable; the second rAF fires before the browser paints that next
-    // frame so the user never sees a focus-on-tab-button flash, and
-    // there is no post-paint macrotask delay like setTimeout(0) caused.
+    const next = [...tabsRef.current, tab];
+    tabsRef.current = next;
+    activeTabIdRef.current = tab.id;
+    flushSync(() => {
+      setTabs(next);
+      setActiveTabId(tab.id);
+    });
+    // Commit the new SqlTab during the click handler, then focus the
+    // editor synchronously. This keeps the previous fix (the + button
+    // never receives focus on mousedown) while avoiding any delayed
+    // rAF/timer focus that can lose immediately typed characters.
     const view = editorRef.current;
     if (view) {
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: "" },
       });
+      view.focus();
     }
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => editorRef.current?.focus());
-    });
-  }, [persistTabs]);
+    saveTabs(activeDbIdRef.current, next);
+    // Keep all referenced bindings in the dependency list; saveTabs and
+    // state setters are stable, so suppress exhaustive-deps' extra warning.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, saveTabs]);
 
   const openTabAndRun = useCallback(
     (title: string, sql: string) => {
@@ -4540,7 +4547,7 @@ function PostgresPlaygroundInner() {
                 className="sql-tab-add"
                 // Prevent the button from stealing focus on mouse-down so
                 // focus stays wherever it was.  The editor focus is
-                // handled inside addTab via a double-rAF.
+                // handled synchronously inside addTab.
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={addTab}
                 aria-label="New query tab"
