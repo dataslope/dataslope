@@ -1853,20 +1853,18 @@ function PostgresPlaygroundInner() {
 
   const closeTab = useCallback(
     (id: string) => {
-      const current = tabsRef.current;
-      const next = current.filter((tab) => tab.id !== id);
-      const fallback = next[0] ?? {
-        id: newTabId(),
-        title: "Query 1",
-        code: "",
-        pristineCode: "",
-      };
-      const finalTabs = next.length > 0 ? next : [fallback];
+      const currentTabs = tabsRef.current;
+      const next = currentTabs.filter((tab) => tab.id !== id);
+      const finalTabs =
+        next.length > 0
+          ? next
+          : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
       persistTabs(finalTabs);
       if (activeTabIdRef.current === id) {
         const lastId = lastActiveTabIdRef.current;
-        const preferred = lastId ? finalTabs.find((tab) => tab.id === lastId) : null;
-        const adjacent = finalTabs[Math.max(0, current.findIndex((tab) => tab.id === id) - 1)];
+        const preferred = lastId ? finalTabs.find((tab) => tab.id === lastId) : undefined;
+        const closedIdx = currentTabs.findIndex((tab) => tab.id === id);
+        const adjacent = finalTabs[Math.max(0, closedIdx - 1)];
         setActiveTabId((preferred ?? adjacent ?? finalTabs[0]).id);
       }
       setResultsByTab((prev) => {

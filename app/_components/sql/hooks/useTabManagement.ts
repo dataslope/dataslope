@@ -22,6 +22,27 @@ export interface TabManagementRefs {
   lastActiveTabIdRef: React.MutableRefObject<string>;
 }
 
+/**
+ * Picks which tab to activate after the tab with `closedId` is removed.
+ * Priority:
+ *   1. The previously active tab (lastActiveId), if it still exists.
+ *   2. The tab that occupied the position just before the closed one.
+ *   3. The first remaining tab.
+ */
+function pickFallbackTab(
+  finalTabs: QueryTab[],
+  closedId: string,
+  originalTabs: QueryTab[],
+  lastActiveId: string,
+): QueryTab {
+  const preferred = lastActiveId
+    ? finalTabs.find((t) => t.id === lastActiveId)
+    : undefined;
+  const closedIdx = originalTabs.findIndex((t) => t.id === closedId);
+  const adjacent = finalTabs[Math.max(0, closedIdx - 1)];
+  return preferred ?? adjacent ?? finalTabs[0];
+}
+
 export function useTabManagement(
   refs: TabManagementRefs,
   refreshTableMetadata: () => void,
@@ -161,9 +182,7 @@ export function useTabManagement(
       setTabs(finalTabs);
       saveTabs(activeDbIdRef.current, finalTabs);
       if (activeTabIdRef.current === id) {
-        const lastId = lastActiveTabIdRef.current;
-        const preferred = lastId ? finalTabs.find((t) => t.id === lastId) : null;
-        const fallback = preferred ?? finalTabs[Math.max(0, currentTabs.findIndex((t) => t.id === id) - 1)] ?? finalTabs[0];
+        const fallback = pickFallbackTab(finalTabs, id, currentTabs, lastActiveTabIdRef.current);
         activeTabIdRef.current = fallback.id;
         setActiveTabId(fallback.id);
       }
@@ -185,9 +204,7 @@ export function useTabManagement(
     setTabs(finalTabs);
     saveTabs(activeDbIdRef.current, finalTabs);
     if (activeTabIdRef.current === id) {
-      const lastId = lastActiveTabIdRef.current;
-      const preferred = lastId ? finalTabs.find((t) => t.id === lastId) : null;
-      const fallback = preferred ?? finalTabs[Math.max(0, currentTabs.findIndex((t) => t.id === id) - 1)] ?? finalTabs[0];
+      const fallback = pickFallbackTab(finalTabs, id, currentTabs, lastActiveTabIdRef.current);
       activeTabIdRef.current = fallback.id;
       setActiveTabId(fallback.id);
     }
