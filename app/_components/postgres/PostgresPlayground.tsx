@@ -1577,6 +1577,8 @@ function PostgresPlaygroundInner() {
             if (!update.docChanged) return;
             const id = activeTabIdRef.current;
             const code = update.state.doc.toString();
+            const currentTab = tabsRef.current.find((t) => t.id === id);
+            if (currentTab && currentTab.code === code) return;
             const next = tabsRef.current.map((tab) =>
               tab.id === id ? { ...tab, code } : tab,
             );

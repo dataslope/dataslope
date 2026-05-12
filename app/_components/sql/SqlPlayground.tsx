@@ -1835,6 +1835,8 @@ function SqlPlaygroundInner() {
         const id = activeTabIdRef.current;
         if (!id) return;
         const value = update.state.doc.toString();
+        const currentTab = tabsRef.current.find((t) => t.id === id);
+        if (currentTab && currentTab.code === value) return;
         const next = tabsRef.current.map((t) =>
           t.id === id ? { ...t, code: value } : t,
         );
