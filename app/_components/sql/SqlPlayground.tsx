@@ -1835,15 +1835,6 @@ function SqlPlaygroundInner() {
         const id = activeTabIdRef.current;
         if (!id) return;
         const value = update.state.doc.toString();
-        // Skip the React update when the editor's new doc already matches
-        // what we have in state (e.g. when the active-tab useEffect just
-        // dispatched view.dispatch to load the active tab's code). Without
-        // this guard, adding a new tab triggers an extra setTabs after
-        // flushSync, which produces a re-render whose first-mount work
-        // (dnd-kit useSortable measurement, Base UI portal setup on the
-        // freshly mounted SqlTab) variably steals focus from the editor.
-        const current = tabsRef.current.find((t) => t.id === id);
-        if (current && current.code === value) return;
         const next = tabsRef.current.map((t) =>
           t.id === id ? { ...t, code: value } : t,
         );
@@ -2105,18 +2096,14 @@ function SqlPlaygroundInner() {
       }
     }
     // Focus the editor so the user can type immediately after any tab
-    // operation (activate, create, reorder, close, close-all).
-    // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
-    // Use requestAnimationFrame so the focus call lands after all child-component
-    // effects (e.g. dnd-kit useSortable registration) that may otherwise steal focus
-    // when a new tab is first rendered.
+    // operation. Skip tabs whose editor pane is hidden.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
       tab?.kind !== "view-data" &&
       tab?.kind !== "query-history"
     ) {
-      window.requestAnimationFrame(() => view?.focus());
+      view?.focus();
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -34,8 +34,17 @@ export function SqlTab({
   const [draftTitle, setDraftTitle] = useState(tab.title);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  // Defer mounting Base UI's Popover.Root so it doesn't run its setup
+  // work during the synchronous flushSync render that creates a new tab —
+  // that work was delaying the editor.focus() call that follows.
+  const [popoverMounted, setPopoverMounted] = useState(false);
   const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setPopoverMounted(true), 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const {
     attributes,
@@ -141,6 +150,7 @@ export function SqlTab({
               onMouseEnter={() => {
                 const el = titleRef.current;
                 if (el && el.scrollWidth > el.clientWidth) {
+                  setPopoverMounted(true);
                   setPopoverOpen(true);
                 }
               }}
@@ -155,24 +165,26 @@ export function SqlTab({
               {tab.kind === "query-history" && (
                 <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
-              <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <span ref={titleRef} className="sql-tab-title">
-                  {tab.title}
-                </span>
-                <Popover.Portal>
-                  <Popover.Positioner
-                    anchor={titleRef}
-                    side="top"
-                    sideOffset={6}
-                    align="center"
-                    className="sql-tab-name-positioner"
-                  >
-                    <Popover.Popup className="bui-popup sql-tab-name-popover">
-                      {tab.title}
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
+              <span ref={titleRef} className="sql-tab-title">
+                {tab.title}
+              </span>
+              {popoverMounted && (
+                <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      anchor={titleRef}
+                      side="top"
+                      sideOffset={6}
+                      align="center"
+                      className="sql-tab-name-positioner"
+                    >
+                      <Popover.Popup className="bui-popup sql-tab-name-popover">
+                        {tab.title}
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              )}
               <span
                 role="button"
                 tabIndex={-1}
