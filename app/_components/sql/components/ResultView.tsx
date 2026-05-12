@@ -1531,7 +1531,7 @@ export function ResultTableBody({
                             <ContextMenu.Item
                               className="example-item"
                               onClick={() => {
-                                const sql = `${filterBaseSql!} WHERE ${quotedCol} IS NULL;`;
+                                const sql = `${filterBaseSql} WHERE ${quotedCol} IS NULL;`;
                                 onOpenQueryTabRef.current?.(`Filter: ${c} IS NULL`, sql);
                               }}
                             >
@@ -1540,7 +1540,7 @@ export function ResultTableBody({
                             <ContextMenu.Item
                               className="example-item"
                               onClick={() => {
-                                const sql = `${filterBaseSql!} WHERE ${quotedCol} IS NOT NULL;`;
+                                const sql = `${filterBaseSql} WHERE ${quotedCol} IS NOT NULL;`;
                                 onOpenQueryTabRef.current?.(`Filter: ${c} IS NOT NULL`, sql);
                               }}
                             >
