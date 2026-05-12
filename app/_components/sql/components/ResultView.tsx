@@ -988,13 +988,24 @@ export function ResultView({
                 setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
                 if (isLazy) {
                   const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+                  const newSortingByIndex = { ...sortingByIndex, [idx]: resolved };
                   if (resolved.length > 0) {
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
                       const sortedSql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      preserveOnNextResultRef.current = {
+                        selectedByIndex: cloneSelections(selectedByIndex),
+                        pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
+                        sortingByIndex: newSortingByIndex,
+                      };
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
+                    preserveOnNextResultRef.current = {
+                      selectedByIndex: cloneSelections(selectedByIndex),
+                      pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
+                      sortingByIndex: newSortingByIndex,
+                    };
                     onLoadPage(baseSql, 0);
                   }
                 }
@@ -1096,8 +1107,20 @@ export function ResultView({
                   effectiveLazySql = `${baseSql} ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
-              handlePageChange = (p: number) => onLoadPage(effectiveLazySql, p);
+              handlePageChange = (p: number) => {
+                preserveOnNextResultRef.current = {
+                  selectedByIndex: cloneSelections(selectedByIndex),
+                  pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
+                  sortingByIndex: { ...sortingByIndex },
+                };
+                onLoadPage(effectiveLazySql, p);
+              };
               handlePageSizeChange = (s: number) => {
+                preserveOnNextResultRef.current = {
+                  selectedByIndex: cloneSelections(selectedByIndex),
+                  pendingEditsByIndex: clonePendingEdits(pendingEditsByIndex),
+                  sortingByIndex: { ...sortingByIndex },
+                };
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
               };
