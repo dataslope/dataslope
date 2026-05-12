@@ -262,7 +262,7 @@ export function PragmaSettingsTab({
         <div className="pragma-actions">
           <button
             type="button"
-            className="settings-action-btn"
+            className="pragma-reset-btn"
             onClick={() => setDraft({ ...DEFAULT_PRAGMA_SETTINGS })}
           >
             <RotateCcw size={14} aria-hidden="true" />

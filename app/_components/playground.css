@@ -3125,6 +3125,32 @@ html[data-pg-theme="dark"] .welcome h3 {
   border-top: 1px solid var(--border);
 }
 
+/* Secondary reset button in the pragma actions bar. */
+.pragma-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.pragma-reset-btn:hover {
+  border-color: color-mix(in srgb, var(--text) 40%, var(--border) 60%);
+  background: var(--bg3);
+}
+.pragma-reset-btn svg {
+  flex-shrink: 0;
+}
+
 /* Primary save button. Disabled state makes it muted and non-interactive. */
 .pragma-save-btn {
   display: inline-flex;
