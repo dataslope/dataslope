@@ -1834,6 +1834,21 @@ function PostgresPlaygroundInner() {
     setActiveTabId(tab.id);
   }, [persistTabs]);
 
+  const openTabAndRun = useCallback(
+    (title: string, sql: string) => {
+      const tab: QueryTab = {
+        id: newTabId(),
+        title,
+        code: sql,
+        pristineCode: sql,
+      };
+      persistTabs([...tabsRef.current, tab]);
+      setActiveTabId(tab.id);
+      void runSqlForTab(tab.id, sql, title);
+    },
+    [persistTabs, runSqlForTab],
+  );
+
   const closeTab = useCallback(
     (id: string) => {
       const next = tabsRef.current.filter((tab) => tab.id !== id);
@@ -4669,6 +4684,7 @@ function PostgresPlaygroundInner() {
                     onExportResultSet={(format, scope) =>
                       void exportResultSet(format, scope)
                     }
+                    onOpenQueryTab={openTabAndRun}
                   />
                   <DataslopeRunOverlay running={statusState === "running"} />
                 </section>

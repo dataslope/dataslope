@@ -1875,36 +1875,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 Editor
               </span>
               <div className="pane-bar-sep" />
-              <Popover.Root>
-                <Popover.Trigger
-                  openOnHover
-                  delay={150}
-                  closeDelay={100}
-                  render={(triggerProps) => (
-                    <button
-                      {...triggerProps}
-                      type="button"
-                      className="icon-btn"
-                      aria-label="Copy code to clipboard"
-                      onClick={copyEditor}
-                    >
-                      <CopyIcon />
-                    </button>
-                  )}
-                />
-                <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                    <Popover.Popup className="bui-popup pane-btn-popover">
-                      Copy code
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-              {adapter.formatCode && (
-                <Popover.Root
-                  open={isFormatting ? false : formatPopoverOpen}
-                  onOpenChange={setFormatPopoverOpen}
-                >
+              <div className="pane-editor-btn-group">
+                <Popover.Root>
                   <Popover.Trigger
                     openOnHover
                     delay={150}
@@ -1914,45 +1886,75 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         {...triggerProps}
                         type="button"
                         className="icon-btn"
-                        aria-label="Format code"
-                        aria-busy={isFormatting}
-                        disabled={!loaded || isFormatting}
-                        onClick={() => void handleFormatCode()}
+                        aria-label="Copy code to clipboard"
+                        onClick={copyEditor}
                       >
-                        {isFormatting ? (
-                          <svg
-                            viewBox="0 0 13 13"
-                            width={13}
-                            height={13}
-                            className="run-btn-spinner"
-                            aria-hidden="true"
-                          >
-                            <circle
-                              cx="6.5"
-                              cy="6.5"
-                              r="5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeDasharray="15 9"
-                            />
-                          </svg>
-                        ) : (
-                          <Wand2 size={13} aria-hidden="true" />
-                        )}
+                        <CopyIcon />
                       </button>
                     )}
                   />
                   <Popover.Portal>
                     <Popover.Positioner sideOffset={6} align="center" side="bottom">
                       <Popover.Popup className="bui-popup pane-btn-popover">
-                        Format code
+                        Copy code
                       </Popover.Popup>
                     </Popover.Positioner>
                   </Popover.Portal>
                 </Popover.Root>
-              )}
+                {adapter.formatCode && (
+                  <Popover.Root
+                    open={isFormatting ? false : formatPopoverOpen}
+                    onOpenChange={setFormatPopoverOpen}
+                  >
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className="icon-btn"
+                          aria-label="Format code"
+                          aria-busy={isFormatting}
+                          disabled={!loaded || isFormatting}
+                          onClick={() => void handleFormatCode()}
+                        >
+                          {isFormatting ? (
+                            <svg
+                              viewBox="0 0 13 13"
+                              width={13}
+                              height={13}
+                              className="run-btn-spinner"
+                              aria-hidden="true"
+                            >
+                              <circle
+                                cx="6.5"
+                                cy="6.5"
+                                r="5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeDasharray="15 9"
+                              />
+                            </svg>
+                          ) : (
+                            <Wand2 size={13} aria-hidden="true" />
+                          )}
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          Format code
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+              </div>
               <span
                 className="kbd-group"
                 title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
