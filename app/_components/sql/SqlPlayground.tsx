@@ -2098,13 +2098,16 @@ function SqlPlaygroundInner() {
     // Focus the editor so the user can type immediately after any tab
     // operation (activate, create, reorder, close, close-all).
     // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
+    // Use requestAnimationFrame so the focus call lands after all child-component
+    // effects (e.g. dnd-kit useSortable registration) that may otherwise steal focus
+    // when a new tab is first rendered.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
       tab?.kind !== "view-data" &&
       tab?.kind !== "query-history"
     ) {
-      view?.focus();
+      window.requestAnimationFrame(() => view?.focus());
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps

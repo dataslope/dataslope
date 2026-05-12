@@ -671,6 +671,9 @@
   padding: 16px;
   color: var(--text-dim);
   font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .sql-result-sets {
@@ -733,6 +736,9 @@
   transition:
     color 100ms,
     background 100ms;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .sql-result-set-tab:hover {

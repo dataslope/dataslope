@@ -1299,7 +1299,7 @@ function PostgresPlaygroundInner() {
       const lazyPageSizeForRun =
         effectivePageSize > 0 ? effectivePageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
-        let sets: QueryExecResult[];
+        let sets: (QueryExecResult | null)[];
         let lazySql: string | undefined;
         let lazyBaseSql: string | undefined;
         let lazyTotalCount: number | undefined;
@@ -1671,7 +1671,10 @@ function PostgresPlaygroundInner() {
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
     }
-    view.focus();
+    // Use requestAnimationFrame so the focus call lands after all child-component
+    // effects (e.g. dnd-kit useSortable) that may otherwise steal focus when a
+    // new tab is first rendered.
+    window.requestAnimationFrame(() => view.focus());
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply editor theme.
@@ -1837,7 +1840,6 @@ function PostgresPlaygroundInner() {
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
-    window.setTimeout(() => editorRef.current?.focus(), 0);
   }, [persistTabs]);
 
   const openTabAndRun = useCallback(
@@ -2037,8 +2039,9 @@ function PostgresPlaygroundInner() {
     ) => {
       if (!result || result.sets.length === 0) return;
       const set = resultSetExportSnapshot
-        ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0])
-        : result.sets[0];
+        ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets.find((s) => s !== null))
+        : result.sets.find((s) => s !== null);
+      if (!set) return;
       const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows =
         scope === "page" && resultSetExportSnapshot
@@ -2046,7 +2049,7 @@ function PostgresPlaygroundInner() {
           : (resultSetExportSnapshot?.allRows ?? set.values);
       if (scope === "all" && result.lazySql && engineRef.current) {
         rows =
-          (await engineRef.current.exec(result.lazySql))[0]?.values ?? rows;
+          ((await engineRef.current.exec(result.lazySql)).find((s) => s !== null))?.values ?? rows;
       }
       const title = activeTab?.title ?? "result_set";
       const filename = `${toFileSafeName(title)}.${format}`;

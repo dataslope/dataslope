@@ -110,7 +110,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const lazyPageSizeForRun =
         currentPageSize > 0 ? currentPageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
-        let sets: QueryExecResult[];
+        let sets: (QueryExecResult | null)[];
         let lazySql: string | undefined;
         let lazyBaseSql: string | undefined;
         let lazyTotalCount: number | undefined;
@@ -129,7 +129,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPage = page;
           lazyPageSize = lazyPageSizeForRun;
         } else {
-          sets = engine.exec(trimmed);
+          sets = engine.execAll(trimmed);
         }
         const elapsedMs = performance.now() - t0;
         setResultForTab(tabId, {
@@ -386,8 +386,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       if (!result || result.sets.length === 0) return;
       const set =
         resultSetExportSnapshot
-          ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0])
-          : result.sets[0];
+          ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets.find((s) => s !== null))
+          : result.sets.find((s) => s !== null);
+      if (!set) return;
       const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows: QueryExecResult["values"];
       if (scope === "page" && resultSetExportSnapshot) {

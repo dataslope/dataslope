@@ -64,8 +64,7 @@ export function useTabManagement(
     tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-    window.setTimeout(() => editorRef.current?.focus(), 0);
-  }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId]);
+  }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, setTabs, setActiveTabId]);
 
   const openErDiagramTab = useCallback(() => {
     refreshTableMetadata();

@@ -24,6 +24,7 @@ import {
   ArrowDownToLine,
   Binary,
   Calendar,
+  CheckCircle,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -319,6 +320,8 @@ export function queryResultsIdentical(
   for (let i = 0; i < a.sets.length; i++) {
     const sa = a.sets[i];
     const sb = b.sets[i];
+    if (sa === null && sb === null) continue;
+    if (sa === null || sb === null) return false;
     if (sa.columns.length !== sb.columns.length) return false;
     if (!sa.columns.every((col, j) => col === sb.columns[j])) return false;
     if (sa.values.length !== sb.values.length) return false;
@@ -818,6 +821,7 @@ export function ResultView({
   if (result.sets.length === 0) {
     return (
       <div ref={noResultsRef} className="sql-result-ok">
+        <CheckCircle size={14} aria-hidden="true" />
         Statement executed successfully — no result set returned.
       </div>
     );
@@ -886,12 +890,13 @@ export function ResultView({
   };
 
   const activeSetData = computeSetRenderData(safeSetIdx);
+  const activeSetIsNull = result.sets[safeSetIdx] === null;
 
   return (
     <>
       {result.sets.length > 1 && (
         <div className="sql-result-set-tabs" role="tablist" aria-label="Result sets">
-          {result.sets.map((_, idx) => (
+          {result.sets.map((set, idx) => (
             <button
               key={idx}
               type="button"
@@ -901,6 +906,7 @@ export function ResultView({
               className={`sql-result-set-tab${safeSetIdx === idx ? " active" : ""}`}
               onClick={() => setActiveSetIdx(idx)}
             >
+              {set === null && <CheckCircle size={12} aria-hidden="true" />}
               Set {idx + 1}
             </button>
           ))}
@@ -908,6 +914,12 @@ export function ResultView({
       )}
       <div ref={flashWrapperRef} className="sql-result-flash-wrapper sql-result-flash-anim">
         <div ref={resultSetsScrollRef} className="sql-result-sets">
+          {activeSetIsNull && (
+            <div ref={noResultsRef} className="sql-result-ok">
+              <CheckCircle size={14} aria-hidden="true" />
+              Statement executed successfully — no result set returned.
+            </div>
+          )}
           {activeSetData && (() => {
             const idx = safeSetIdx;
             const { set, isLazy, isInfiniteAll, sorting, visibleRows, originalIndices, totalRows } = activeSetData;

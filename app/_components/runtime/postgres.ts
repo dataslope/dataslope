@@ -148,7 +148,7 @@ function rowsToQueryExecResult(
 export interface PostgresEngine {
   loadSampleDatabase: (id: string) => Promise<PostgresSampleDatabase>;
   loadBlankDatabase: () => Promise<PostgresSampleDatabase>;
-  exec: (sql: string) => Promise<QueryExecResult[]>;
+  exec: (sql: string) => Promise<(QueryExecResult | null)[]>;
   execParams: (sql: string, params: unknown[]) => Promise<QueryExecResult[]>;
   execPaged: (
     sql: string,
@@ -228,9 +228,7 @@ export async function createPostgresEngine(
 
     async exec(sql) {
       const results = await db.exec(sql);
-      return results
-        .map(resultToQueryExecResult)
-        .filter((result): result is QueryExecResult => result !== null);
+      return results.map(resultToQueryExecResult);
     },
 
     async execParams(sql, params) {
@@ -254,9 +252,10 @@ export async function createPostgresEngine(
       } catch {
         totalCount = 0;
       }
-      const result = await engine.exec(
+      const raw = await engine.exec(
         `${base} LIMIT ${Math.max(1, pageSize)} OFFSET ${Math.max(0, offset)}`,
       );
+      const result = raw.filter((r): r is QueryExecResult => r !== null);
       if (totalCount === 0) totalCount = result[0]?.values.length ?? 0;
       return { result, totalCount };
     },

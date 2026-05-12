@@ -129,6 +129,15 @@ export interface SqliteEngine {
   /** Execute a (potentially multi-statement) SQL string against the
    *  active database. Throws on syntax / runtime errors. */
   exec: (sql: string) => QueryExecResult[];
+  /**
+   * Like `exec`, but returns one entry per SQL statement in the input.
+   * – `QueryExecResult` for statements that produce a result set (SELECT,
+   *   PRAGMA with output, …).  A zero-row SELECT still has column names.
+   * – `null` for statements that ran successfully but returned no result set
+   *   (INSERT, UPDATE, DELETE, CREATE TABLE, …).
+   * Throws on syntax / runtime errors.
+   */
+  execAll: (sql: string) => (QueryExecResult | null)[];
   /** Names of every user table in the active database. */
   listTables: () => string[];
   /** Names of every view in the active database. */
@@ -460,6 +469,32 @@ export async function createSqliteEngine(
     },
     exec(sql: string) {
       return require().exec(sql);
+    },
+    execAll(sql: string): (QueryExecResult | null)[] {
+      const db = require();
+      const results: (QueryExecResult | null)[] = [];
+      for (const stmt of db.iterateStatements(sql)) {
+        try {
+          const columns = stmt.getColumnNames();
+          if (columns.length === 0) {
+            // Non-SELECT statement (INSERT, UPDATE, CREATE TABLE, …)
+            while (stmt.step()) {
+              // execute fully, discard any rows
+            }
+            results.push(null);
+          } else {
+            // SELECT-like statement — collect rows (may be zero)
+            const values: QueryExecResult["values"] = [];
+            while (stmt.step()) {
+              values.push(stmt.get() as QueryExecResult["values"][number]);
+            }
+            results.push({ columns, values });
+          }
+        } finally {
+          stmt.free();
+        }
+      }
+      return results;
     },
     listTables() {
       return listFromMaster("table");
@@ -1192,6 +1227,24 @@ export async function createSqliteEngine(
           : result.length > 0
             ? result[0].values.length + safeOffset
             : 0;
+      // When the query returns 0 rows (e.g. an empty table) sql.js's exec()
+      // returns an empty array, losing the column names.  Recover them by
+      // preparing the statement with LIMIT 0 so the ResultView can still
+      // display the column headers and the "No rows returned." message.
+      if (result.length === 0 && rowCount === 0) {
+        let stmt: ReturnType<Database["prepare"]> | null = null;
+        try {
+          stmt = d.prepare(`${stripped} LIMIT 0`);
+          const columns = stmt.getColumnNames();
+          if (columns.length > 0) {
+            return { result: [{ columns, values: [] }], totalCount: 0 };
+          }
+        } catch {
+          // Ignore — fall through to the empty result below.
+        } finally {
+          if (stmt) stmt.free();
+        }
+      }
       return { result, totalCount: rowCount };
     },
   };
