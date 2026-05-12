@@ -24,4 +24,5 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "csharp", label: "C# Playground", href: "/playground/csharp" },
   { id: "sqlite", label: "SQLite Playground", href: "/playground/sqlite" },
   { id: "postgres", label: "PostgreSQL Playground", href: "/playground/postgres" },
+  { id: "duckdb", label: "DuckDB Playground", href: "/playground/duckdb" },
 ];
