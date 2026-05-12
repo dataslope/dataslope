@@ -1672,10 +1672,10 @@ function PostgresPlaygroundInner() {
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
     }
-    // Use requestAnimationFrame so the focus call lands after all child-component
+    // Use queueMicrotask so the focus call lands after all child-component
     // effects (e.g. dnd-kit useSortable) that may otherwise steal focus when a
-    // new tab is first rendered.
-    window.requestAnimationFrame(() => view.focus());
+    // new tab is first rendered, while avoiding the frame-delay of rAF.
+    queueMicrotask(() => view.focus());
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply editor theme.
