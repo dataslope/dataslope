@@ -34,17 +34,25 @@ export function SqlTab({
   const [draftTitle, setDraftTitle] = useState(tab.title);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  // Defer mounting Base UI's Popover.Root so it doesn't run its setup
-  // work during the synchronous flushSync render that creates a new tab —
-  // that work was delaying the editor.focus() call that follows.
+  // Mount Base UI's Popover.Root only after a confirmed hover. Mounting
+  // it sooner (e.g. eagerly, or on the very first mouseenter) makes the
+  // popover's setup work run right when a new tab is added — the +
+  // button shifts under the cursor so mouseenter fires on the fresh tab
+  // without any real mouse movement, and the resulting popover work
+  // blocks the editor input that follows the click.
   const [popoverMounted, setPopoverMounted] = useState(false);
   const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
+  const hoverTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    const id = window.setTimeout(() => setPopoverMounted(true), 0);
-    return () => window.clearTimeout(id);
+  const clearHoverTimer = useCallback(() => {
+    if (hoverTimerRef.current !== null) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
   }, []);
+
+  useEffect(() => clearHoverTimer, [clearHoverTimer]);
 
   const {
     attributes,
@@ -148,13 +156,26 @@ export function SqlTab({
               role="tab"
               onAnimationEnd={handleAnimationEnd}
               onMouseEnter={() => {
-                const el = titleRef.current;
-                if (el && el.scrollWidth > el.clientWidth) {
-                  setPopoverMounted(true);
-                  setPopoverOpen(true);
-                }
+                clearHoverTimer();
+                // Delay the popover decision so a mouseenter caused by
+                // a layout shift (clicking + makes the new tab appear
+                // under the stationary cursor) doesn't open the popover.
+                // Real hovers persist past this delay; layout-shift
+                // enters get cancelled by mouseleave when the user
+                // moves to the keyboard to type.
+                hoverTimerRef.current = window.setTimeout(() => {
+                  hoverTimerRef.current = null;
+                  const el = titleRef.current;
+                  if (el && el.scrollWidth > el.clientWidth) {
+                    setPopoverMounted(true);
+                    setPopoverOpen(true);
+                  }
+                }, 200);
               }}
-              onMouseLeave={() => setPopoverOpen(false)}
+              onMouseLeave={() => {
+                clearHoverTimer();
+                setPopoverOpen(false);
+              }}
             >
               {tab.kind === "view-data" && (
                 <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
