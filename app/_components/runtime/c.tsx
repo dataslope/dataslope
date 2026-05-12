@@ -470,6 +470,27 @@ class CRuntime implements LanguageRuntime {
   }
 }
 
+// Singleton init promise so the WASM module is only fetched once,
+// regardless of how many times the user clicks "Format code".
+let clangFormatInitPromise: Promise<{
+  format: (src: string, fname: string, style?: string) => string;
+}> | null = null;
+
+function getClangFormat() {
+  if (!clangFormatInitPromise) {
+    clangFormatInitPromise = (async () => {
+      const mod = await import("@wasm-fmt/clang-format/web");
+      // Load the WASM binary from CDN, matching the installed package
+      // version so the JS and WASM builds stay in sync.
+      await mod.default(
+        "https://cdn.jsdelivr.net/npm/@wasm-fmt/clang-format@22.1.4/clang-format.wasm",
+      );
+      return { format: mod.format };
+    })();
+  }
+  return clangFormatInitPromise;
+}
+
 export const cAdapter: LanguageAdapter = {
   id: "c",
   displayName: "C Playground",
@@ -512,6 +533,10 @@ export const cAdapter: LanguageAdapter = {
     // Match `#include <name>` allowing arbitrary whitespace.
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return new RegExp(`#\\s*include\\s*<\\s*${escaped}\\s*>`).test(code);
+  },
+  async formatCode(code: string): Promise<string> {
+    const { format } = await getClangFormat();
+    return format(code, "main.c", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage(
