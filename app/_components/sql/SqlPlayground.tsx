@@ -2772,6 +2772,7 @@ function SqlPlaygroundInner() {
           language={PLAYGROUND_ID}
           showOutputFontSizeControls={false}
           clearBeforeRunLabel="Clear Results Before Running"
+          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
