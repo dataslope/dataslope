@@ -4748,6 +4748,7 @@ function SqlPlaygroundInner() {
                   onLoadMorePage={handleLoadMorePage}
                   onExportSnapshotChange={setResultSetExportSnapshot}
                   onExportResultSet={handleResultSetExport}
+                  onOpenQueryTab={(title, sql) => openTabAndRun(title, sql)}
                 />
               </div>
               <DataslopeRunOverlay running={statusState === "running"} />

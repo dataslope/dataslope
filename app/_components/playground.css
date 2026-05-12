@@ -1025,6 +1025,14 @@ body.pg-active {
   display: block;
 }
 
+/* Tight group wrapping Copy + Format icon buttons so they sit closer
+   together than the surrounding pane-bar gap. */
+.pane-editor-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 /* Anchor the cell-header copy button on the right edge regardless of
    whether `cell-time` (which uses `margin-left: auto`) is present. */
 .out-cell-header .out-cell-copy {

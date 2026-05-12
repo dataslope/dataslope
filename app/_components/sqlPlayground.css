@@ -2589,6 +2589,47 @@
   min-width: 180px;
 }
 
+/* ─── Column-header context menu ─── */
+
+/* Wrapper rendered by ContextMenu.Trigger inside each <th>. It fills the
+   cell so the entire header area is right-clickable without affecting the
+   existing button layout. */
+.sql-result-th-ctx-trigger {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sql-th-context-menu {
+  min-width: 190px;
+}
+
+/* Separator line inside context menus. */
+.sql-ctx-separator {
+  height: 1px;
+  background: var(--border);
+  margin: 3px 0;
+}
+
+/* An item directly above a separator already provides a visible bottom
+   border via the .example-item rule. Suppress that border so the separator
+   is the only divider between the two groups (prevents a double-border). */
+.example-item:has(+ .sql-ctx-separator) {
+  border-bottom: none;
+}
+
+/* Disabled ContextMenu.Item (e.g. sort ascending when already sorted asc). */
+.bui-popup .example-item[data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Rename-column dialog — slightly narrower than the edit-cell modal. */
+.sql-rename-col-popup {
+  width: min(400px, calc(100vw - 48px));
+}
+
 /* Disabled-looking context-menu pseudo-item (used for the Duplicate row
    button when a unique constraint prevents duplication). */
 .sql-ctx-disabled {

@@ -348,6 +348,7 @@ export function ResultView({
   onLoadMorePage,
   onExportSnapshotChange,
   onExportResultSet,
+  onOpenQueryTab,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -380,6 +381,7 @@ export function ResultView({
   onLoadMorePage?: (sql: string, page: number) => void;
   onExportSnapshotChange?: (snapshot: ResultSetExportSnapshot | null) => void;
   onExportResultSet?: (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => void;
+  onOpenQueryTab?: (title: string, sql: string) => void;
 }) {
   const [resultSetExportScope, setResultSetExportScope] =
     useState<ResultSetExportScope>("all");
@@ -997,6 +999,8 @@ export function ResultView({
                         )
                     : undefined
                 }
+                baseSql={baseSql || undefined}
+                onOpenQueryTab={onOpenQueryTab}
               />
             );
           })()}
@@ -1168,6 +1172,8 @@ export function ResultTableBody({
   scrollParentRef,
   hasMoreRows = false,
   onLoadMoreRows,
+  baseSql,
+  onOpenQueryTab,
 }: {
   set: QueryExecResult & { columnTypes?: string[] };
   visible: QueryExecResult["values"];
@@ -1193,6 +1199,8 @@ export function ResultTableBody({
   scrollParentRef?: React.RefObject<HTMLDivElement | null>;
   hasMoreRows?: boolean;
   onLoadMoreRows?: () => void;
+  baseSql?: string;
+  onOpenQueryTab?: (title: string, sql: string) => void;
 }) {
   const rightClickedCellRef = useRef<{
     colIdx: number;
@@ -1205,6 +1213,32 @@ export function ResultTableBody({
     value: string;
   } | null>(null);
 
+  // ── Column rename state ────────────────────────────────────────────────
+  const [renamedColumns, setRenamedColumns] = useState<Map<number, string>>(
+    new Map(),
+  );
+  const [renameDialog, setRenameDialog] = useState<{
+    ci: number;
+    originalName: string;
+  } | null>(null);
+  const [renameInput, setRenameInput] = useState("");
+
+  // Keep mutable refs so that click handlers inside the columns useMemo
+  // always access the latest values without needing them in the dep array.
+  const visibleRef = useRef(visible);
+  visibleRef.current = visible;
+  const renamedColumnsRef = useRef(renamedColumns);
+  renamedColumnsRef.current = renamedColumns;
+  const handleSortingChangeRef = useRef<
+    (updater: SortingState | ((old: SortingState) => SortingState)) => void
+  >(() => undefined);
+  const baseSqlRef = useRef(baseSql);
+  baseSqlRef.current = baseSql;
+  const sourceTableRef = useRef(sourceTable);
+  sourceTableRef.current = sourceTable;
+  const onOpenQueryTabRef = useRef(onOpenQueryTab);
+  onOpenQueryTabRef.current = onOpenQueryTab;
+
   const handleSortingChange = useCallback(
     (updater: SortingState | ((old: SortingState) => SortingState)) => {
       const next = typeof updater === "function" ? updater(sorting) : updater;
@@ -1212,6 +1246,7 @@ export function ResultTableBody({
     },
     [onSortingChange, sorting],
   );
+  handleSortingChangeRef.current = handleSortingChange;
 
   const { canDuplicate, uniqueConstraintReason } = useMemo(() => {
     if (!onDuplicateRow) {
@@ -1310,12 +1345,23 @@ export function ResultTableBody({
               const fk = keyHints?.fk.get(c);
               const sorted = column.getIsSorted();
               const colType = set.columnTypes?.[ci] || inferColumnType(set.values, ci);
+              const displayName = renamedColumnsRef.current.get(ci) ?? c;
               const sortTitle = sorted === "asc"
                 ? "Sorted ascending — click to sort descending"
                 : sorted === "desc"
                   ? "Sorted descending — click to clear sort"
                   : "Click to sort ascending";
-              return (
+              const colId = `col-${ci}-${c}`;
+
+              // Build the filter SQL for Filter NULL / Filter NON-NULL items.
+              const quotedCol = `"${c.replace(/"/g, '""')}"`;
+              const filterBaseSql = sourceTableRef.current
+                ? `SELECT * FROM "${sourceTableRef.current.replace(/"/g, '""')}"`
+                : baseSqlRef.current
+                  ? `SELECT * FROM (\n${baseSqlRef.current}\n) AS _q`
+                  : null;
+
+              const headerContent = (
                 <Popover.Root>
                   <Popover.Trigger
                     openOnHover
@@ -1391,7 +1437,7 @@ export function ResultTableBody({
                                 </Popover.Portal>
                               </Popover.Root>
                             )}
-                            <span>{c}</span>
+                            <span>{displayName}</span>
                           </span>
                           <span
                             className={
@@ -1427,6 +1473,97 @@ export function ResultTableBody({
                     </Popover.Positioner>
                   </Popover.Portal>
                 </Popover.Root>
+              );
+
+              return (
+                <ContextMenu.Root>
+                  <ContextMenu.Trigger
+                    render={(props) => (
+                      <div {...props} className="sql-result-th-ctx-trigger">
+                        {headerContent}
+                      </div>
+                    )}
+                  />
+                  <ContextMenu.Portal>
+                    <ContextMenu.Positioner sideOffset={4}>
+                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-th-context-menu">
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
+                            setRenameDialog({ ci, originalName: c });
+                            setRenameInput(renamedColumnsRef.current.get(ci) ?? c);
+                          }}
+                        >
+                          <div className="ex-title">Rename column</div>
+                        </ContextMenu.Item>
+                        <ContextMenu.Separator className="sql-ctx-separator" />
+                        <ContextMenu.Item
+                          className="example-item"
+                          disabled={sorted === "asc"}
+                          onClick={() => {
+                            handleSortingChangeRef.current([{ id: colId, desc: false }]);
+                          }}
+                        >
+                          <div className="ex-title">Sort ascending</div>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item
+                          className="example-item"
+                          disabled={sorted === "desc"}
+                          onClick={() => {
+                            handleSortingChangeRef.current([{ id: colId, desc: true }]);
+                          }}
+                        >
+                          <div className="ex-title">Sort descending</div>
+                        </ContextMenu.Item>
+                        {sorted !== false && (
+                          <ContextMenu.Item
+                            className="example-item"
+                            onClick={() => {
+                              handleSortingChangeRef.current([]);
+                            }}
+                          >
+                            <div className="ex-title">Reset sort</div>
+                          </ContextMenu.Item>
+                        )}
+                        {filterBaseSql && onOpenQueryTabRef.current && (
+                          <>
+                            <ContextMenu.Separator className="sql-ctx-separator" />
+                            <ContextMenu.Item
+                              className="example-item"
+                              onClick={() => {
+                                const sql = `${filterBaseSql} WHERE ${quotedCol} IS NULL;`;
+                                onOpenQueryTabRef.current?.(`Filter: ${c} IS NULL`, sql);
+                              }}
+                            >
+                              <div className="ex-title">Filter NULL values</div>
+                            </ContextMenu.Item>
+                            <ContextMenu.Item
+                              className="example-item"
+                              onClick={() => {
+                                const sql = `${filterBaseSql} WHERE ${quotedCol} IS NOT NULL;`;
+                                onOpenQueryTabRef.current?.(`Filter: ${c} IS NOT NULL`, sql);
+                              }}
+                            >
+                              <div className="ex-title">Filter NON-NULL values</div>
+                            </ContextMenu.Item>
+                          </>
+                        )}
+                        <ContextMenu.Separator className="sql-ctx-separator" />
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
+                            const values = visibleRef.current.map((row) => row[ci] ?? null);
+                            navigator.clipboard
+                              .writeText(JSON.stringify(values))
+                              .catch(() => undefined);
+                          }}
+                        >
+                          <div className="ex-title">Copy as JSON</div>
+                        </ContextMenu.Item>
+                      </ContextMenu.Popup>
+                    </ContextMenu.Positioner>
+                  </ContextMenu.Portal>
+                </ContextMenu.Root>
               );
             },
             cell: (info) => {
@@ -1841,6 +1978,62 @@ export function ResultTableBody({
                 </div>
               </form>
             )}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+      {/* Rename column dialog */}
+      <Dialog.Root
+        open={renameDialog !== null}
+        onOpenChange={(open) => { if (!open) setRenameDialog(null); }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup sql-rename-col-popup">
+            <Dialog.Title className="confirm-title">Rename column</Dialog.Title>
+            {renameDialog && (
+              <Dialog.Description className="confirm-desc">
+                Original name: <strong>{renameDialog.originalName}</strong>
+              </Dialog.Description>
+            )}
+            <form
+              className="sql-cell-modal-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (renameDialog === null) return;
+                const trimmed = renameInput.trim();
+                setRenamedColumns((prev) => {
+                  const next = new Map(prev);
+                  if (trimmed && trimmed !== renameDialog.originalName) {
+                    next.set(renameDialog.ci, trimmed);
+                  } else {
+                    next.delete(renameDialog.ci);
+                  }
+                  return next;
+                });
+                setRenameDialog(null);
+              }}
+            >
+              <input
+                type="text"
+                className="sql-rename-input"
+                value={renameInput}
+                onChange={(e) => setRenameInput(e.target.value)}
+                autoFocus
+                placeholder="Column display name"
+              />
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="submit"
+                  className="confirm-btn confirm-btn-primary"
+                  disabled={!renameInput.trim()}
+                >
+                  Rename
+                </button>
+              </div>
+            </form>
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
