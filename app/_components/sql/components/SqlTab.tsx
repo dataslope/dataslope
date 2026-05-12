@@ -156,14 +156,12 @@ export function SqlTab({
                 <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
               )}
               <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <Popover.Trigger
-                  nativeButton={false}
-                  render={<span ref={titleRef} className="sql-tab-title" />}
-                >
+                <span ref={titleRef} className="sql-tab-title">
                   {tab.title}
-                </Popover.Trigger>
+                </span>
                 <Popover.Portal>
                   <Popover.Positioner
+                    anchor={titleRef}
                     side="top"
                     sideOffset={6}
                     align="center"
