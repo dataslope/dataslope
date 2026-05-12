@@ -24,6 +24,14 @@ import { findSampleDatabase, type SqliteSampleDatabase } from "./sqliteSamples";
 
 export type { QueryExecResult } from "sql.js";
 
+/** Result of a SELECT-like statement with the per-column declared types
+ *  attached.  `columnTypes` may contain empty strings for computed /
+ *  expression columns that don't map back to a single declared SQLite
+ *  column type — the UI falls back to value-based inference for those. */
+export type QueryExecResultWithTypes = QueryExecResult & {
+  columnTypes?: string[];
+};
+
 /** Description of a single column inside a table, derived from
  *  `PRAGMA table_info(...)`. Exposed to the UI so the schema sidebar
  *  doesn't have to re-parse `QueryExecResult`. */
@@ -137,7 +145,7 @@ export interface SqliteEngine {
    *   (INSERT, UPDATE, DELETE, CREATE TABLE, …).
    * Throws on syntax / runtime errors.
    */
-  execAll: (sql: string) => (QueryExecResult | null)[];
+  execAll: (sql: string) => (QueryExecResultWithTypes | null)[];
   /** Names of every user table in the active database. */
   listTables: () => string[];
   /** Names of every view in the active database. */
@@ -269,7 +277,7 @@ export interface SqliteEngine {
     sql: string,
     pageSize: number,
     offset: number,
-  ) => { result: QueryExecResult[]; totalCount: number };
+  ) => { result: QueryExecResultWithTypes[]; totalCount: number };
 }
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
@@ -404,6 +412,51 @@ function parseGeneratedFromDDL(
   return result;
 }
 
+/** sql.js's Statement holds the raw `sqlite3_stmt*` pointer as a number
+ *  on a `stmt` property — not part of the public type. We tunnel through
+ *  it to call `sqlite3_column_decltype()`, which the higher-level API
+ *  doesn't surface but which the wasm module does export. */
+interface RawStatement {
+  stmt: number;
+}
+
+/** Subset of the sql.js Emscripten module we reach into for the
+ *  declared-type lookup. `_sqlite3_column_decltype` returns 0 for
+ *  expression columns (no underlying table column), in which case the
+ *  caller falls back to value-based inference. */
+interface SqlJsRawModule {
+  _sqlite3_column_decltype?: (stmtPtr: number, columnIdx: number) => number;
+  UTF8ToString?: (ptr: number) => string;
+}
+
+/** Read declared types for each column of a prepared statement. Returns
+ *  an empty string for any column whose type is unknown to SQLite (e.g.
+ *  computed expressions) so the consumer can fall back to inference. */
+function readDeclaredColumnTypes(
+  stmt: { getColumnNames(): string[] },
+  SQL: SqlJsStatic,
+): string[] {
+  const colNames = stmt.getColumnNames();
+  const mod = SQL as unknown as SqlJsRawModule;
+  if (!mod._sqlite3_column_decltype || !mod.UTF8ToString) {
+    return colNames.map(() => "");
+  }
+  const ptr = (stmt as unknown as RawStatement).stmt;
+  if (typeof ptr !== "number") {
+    return colNames.map(() => "");
+  }
+  const out: string[] = [];
+  for (let i = 0; i < colNames.length; i++) {
+    try {
+      const strPtr = mod._sqlite3_column_decltype(ptr, i);
+      out.push(strPtr ? mod.UTF8ToString(strPtr) : "");
+    } catch {
+      out.push("");
+    }
+  }
+  return out;
+}
+
 export async function createSqliteEngine(
   initialSampleId: string,
 ): Promise<SqliteEngine> {
@@ -470,9 +523,9 @@ export async function createSqliteEngine(
     exec(sql: string) {
       return require().exec(sql);
     },
-    execAll(sql: string): (QueryExecResult | null)[] {
+    execAll(sql: string): (QueryExecResultWithTypes | null)[] {
       const db = require();
-      const results: (QueryExecResult | null)[] = [];
+      const results: (QueryExecResultWithTypes | null)[] = [];
       for (const stmt of db.iterateStatements(sql)) {
         try {
           const columns = stmt.getColumnNames();
@@ -483,12 +536,18 @@ export async function createSqliteEngine(
             }
             results.push(null);
           } else {
-            // SELECT-like statement — collect rows (may be zero)
+            // SELECT-like statement — collect rows (may be zero). Capture
+            // declared column types from the prepared statement so the
+            // ResultView can show real types even when the row set is
+            // empty (otherwise inference from `values` falls through to
+            // "NULL" and the type strip reads as "null" for every
+            // column).
+            const columnTypes = readDeclaredColumnTypes(stmt, SQL);
             const values: QueryExecResult["values"] = [];
             while (stmt.step()) {
               values.push(stmt.get() as QueryExecResult["values"][number]);
             }
-            results.push({ columns, values });
+            results.push({ columns, columnTypes, values });
           }
         } finally {
           stmt.free();
@@ -1215,37 +1274,40 @@ export async function createSqliteEngine(
         // Count query failed; totalCount stays null and will be
         // derived from the page result length below.
       }
-      // Fetch only the requested page by appending LIMIT/OFFSET.  This
-      // preserves any top-level ORDER BY because the LIMIT clause
-      // applies after ORDER BY in SQLite's evaluation order.
-      const result = d.exec(
-        `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
-      );
-      const rowCount =
-        totalCount !== null
-          ? totalCount
-          : result.length > 0
-            ? result[0].values.length + safeOffset
-            : 0;
-      // When the query returns 0 rows (e.g. an empty table) sql.js's exec()
-      // returns an empty array, losing the column names.  Recover them by
-      // preparing the statement with LIMIT 0 so the ResultView can still
-      // display the column headers and the "No rows returned." message.
-      if (result.length === 0 && rowCount === 0) {
-        let stmt: ReturnType<Database["prepare"]> | null = null;
-        try {
-          stmt = d.prepare(`${stripped} LIMIT 0`);
-          const columns = stmt.getColumnNames();
-          if (columns.length > 0) {
-            return { result: [{ columns, values: [] }], totalCount: 0 };
-          }
-        } catch {
-          // Ignore — fall through to the empty result below.
-        } finally {
-          if (stmt) stmt.free();
+      // Fetch only the requested page by preparing the statement
+      // directly.  We can't use `d.exec()` here because it doesn't
+      // expose the prepared statement (which we need to read declared
+      // column types via `sqlite3_column_decltype`).  Using prepare/
+      // step also naturally preserves the column header even when the
+      // page is empty, so the 0-row LIMIT 0 fallback below is no
+      // longer necessary for that case.
+      let stmt: ReturnType<Database["prepare"]> | null = null;
+      try {
+        stmt = d.prepare(
+          `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
+        );
+        const columns = stmt.getColumnNames();
+        const columnTypes = readDeclaredColumnTypes(stmt, SQL);
+        const values: QueryExecResult["values"] = [];
+        while (stmt.step()) {
+          values.push(stmt.get() as QueryExecResult["values"][number]);
         }
+        const rowCount =
+          totalCount !== null
+            ? totalCount
+            : values.length + safeOffset;
+        if (columns.length === 0) {
+          // Non-SELECT statement that somehow reached the lazy path —
+          // return an empty result so the UI shows the success message.
+          return { result: [], totalCount: rowCount };
+        }
+        return {
+          result: [{ columns, columnTypes, values }],
+          totalCount: rowCount,
+        };
+      } finally {
+        if (stmt) stmt.free();
       }
-      return { result, totalCount: rowCount };
     },
   };
 }

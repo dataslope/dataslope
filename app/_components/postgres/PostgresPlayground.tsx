@@ -4524,7 +4524,16 @@ function PostgresPlaygroundInner() {
               <button
                 type="button"
                 className="sql-tab-add"
-                onClick={addTab}
+                // Prevent the button from stealing focus on mouse-down.  See
+                // the matching SQLite playground for the full rationale —
+                // without this, the active tab <button> ends up focused
+                // after the click and the editor never receives the
+                // useEffect-scheduled focus call.
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  addTab();
+                  editorRef.current?.focus();
+                }}
                 aria-label="New query tab"
               >
                 <Plus size={12} aria-hidden="true" />

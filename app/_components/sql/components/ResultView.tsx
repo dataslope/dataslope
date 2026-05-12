@@ -1658,6 +1658,7 @@ export function ResultTableBody({
       pendingEdits,
       selectedRows,
       set.columns,
+      set.columnTypes,
       set.values,
       someVisibleSelected,
       originalIndices,

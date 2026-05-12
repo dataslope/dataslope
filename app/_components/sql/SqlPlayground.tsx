@@ -4564,7 +4564,20 @@ function SqlPlaygroundInner() {
               <button
                 type="button"
                 className="sql-tab-add"
-                onClick={addTab}
+                // Prevent the button from stealing focus on mouse-down.  If
+                // focus was already on the CodeMirror editor it must stay
+                // there so the user can keep typing after the click; if it
+                // wasn't, the explicit editorRef.focus() call in onClick
+                // (plus the useEffect on activeTabId) will land focus on
+                // the editor.  Without this preventDefault the active tab
+                // <button> in the strip ends up with focus after the click
+                // because of how dnd-kit/base-ui re-register the newly
+                // active tab during the re-render.
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  addTab();
+                  editorRef.current?.focus();
+                }}
                 title="New query tab"
                 aria-label="New query tab"
               >
