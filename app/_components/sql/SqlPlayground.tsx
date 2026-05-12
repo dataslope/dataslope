@@ -186,6 +186,7 @@ import { useTabStore } from "./stores/useTabStore";
 import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
+import { pushTabHistory } from "./utils/tabUtils";
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
@@ -1473,7 +1474,7 @@ function SqlPlaygroundInner() {
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
   const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   const activeTabIdRef = useRef<string>("");
-  const lastActiveTabIdRef = useRef<string>("");
+  const tabHistoryRef = useRef<string[]>([]);
   const tabsRef = useRef<QueryTab[]>([]);
   const activeDbIdRef = useRef<string>(activeDbId);
   const panesRef = useRef<HTMLDivElement | null>(null);
@@ -1577,7 +1578,7 @@ function SqlPlaygroundInner() {
     handleTabDragEnd,
     resetTabsForCurrentDb,
   } = useTabManagement(
-    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef },
+    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef },
     refreshTableMetadata,
   );
 
@@ -4519,7 +4520,7 @@ function SqlPlaygroundInner() {
                         onActivate={() => {
                           const prevId = activeTabIdRef.current;
                           if (prevId !== t.id) {
-                            lastActiveTabIdRef.current = prevId;
+                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
                           }
                           activeTabIdRef.current = t.id;
                           setActiveTabId(t.id);

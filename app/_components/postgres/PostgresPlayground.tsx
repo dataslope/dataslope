@@ -152,6 +152,7 @@ import {
   stripSqlComments,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -1158,7 +1159,8 @@ function PostgresPlaygroundInner() {
   const engineRef = useRef<PostgresEngine | null>(null);
   const tabsRef = useRef(tabs);
   const activeTabIdRef = useRef(activeTabId);
-  const lastActiveTabIdRef = useRef<string>("");
+  /** MRU history stack (oldest → most-recent), never includes the current tab. */
+  const tabHistoryRef = useRef<string[]>([]);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -1794,6 +1796,7 @@ function PostgresPlaygroundInner() {
         } catch {
           /* ignore */
         }
+        tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
         await refreshSchema();
@@ -1831,6 +1834,7 @@ function PostgresPlaygroundInner() {
       code: "",
       pristineCode: "",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
     window.setTimeout(() => editorRef.current?.focus(), 0);
@@ -1844,6 +1848,7 @@ function PostgresPlaygroundInner() {
         code: sql,
         pristineCode: sql,
       };
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
       void runSqlForTab(tab.id, sql, title);
@@ -1860,12 +1865,11 @@ function PostgresPlaygroundInner() {
           ? next
           : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
       persistTabs(finalTabs);
+      // Prune closed tab from history before selecting fallback.
+      tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
       if (activeTabIdRef.current === id) {
-        const lastId = lastActiveTabIdRef.current;
-        const preferred = lastId ? finalTabs.find((tab) => tab.id === lastId) : undefined;
-        const closedIdx = currentTabs.findIndex((tab) => tab.id === id);
-        const adjacent = finalTabs[Math.max(0, closedIdx - 1)];
-        setActiveTabId((preferred ?? adjacent ?? finalTabs[0]).id);
+        const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
+        setActiveTabId(fallback.id);
       }
       setResultsByTab((prev) => {
         const { [id]: _deleted, ...rest } = prev;
@@ -1879,6 +1883,7 @@ function PostgresPlaygroundInner() {
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findPostgresSampleDatabase(activeDbIdRef.current);
     const fresh = makeTabs(sample.defaultTabs);
+    tabHistoryRef.current = [];
     persistTabs(fresh);
     setActiveTabId(fresh[0]?.id ?? "");
     setResultsByTab({});
@@ -1895,6 +1900,7 @@ function PostgresPlaygroundInner() {
         pristineCode: sql,
         kind: kind === "table" ? "view-data" : undefined,
       };
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
       void runSqlForTab(
@@ -1929,6 +1935,7 @@ function PostgresPlaygroundInner() {
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       setActiveTabId(existing.id);
       return;
     }
@@ -1939,6 +1946,7 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "er-diagram",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
@@ -1965,6 +1973,7 @@ function PostgresPlaygroundInner() {
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       setActiveTabId(existing.id);
       return;
     }
@@ -1975,6 +1984,7 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "query-history",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
@@ -4455,7 +4465,7 @@ function PostgresPlaygroundInner() {
                         onActivate={() => {
                           const prevId = activeTabIdRef.current;
                           if (prevId !== tab.id) {
-                            lastActiveTabIdRef.current = prevId;
+                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, tab.id);
                           }
                           setActiveTabId(tab.id);
                         }}
@@ -4475,10 +4485,14 @@ function PostgresPlaygroundInner() {
                             id: newTabId(),
                             title: `${tab.title} copy`,
                           };
+                          tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, dup.id);
                           persistTabs([...tabsRef.current, dup]);
                           setActiveTabId(dup.id);
                         }}
-                        onCloseOthers={() => persistTabs([tab])}
+                        onCloseOthers={() => {
+                          tabHistoryRef.current = [];
+                          persistTabs([tab]);
+                        }}
                         onCloseAll={() => {
                           const fresh = {
                             id: newTabId(),
@@ -4486,6 +4500,7 @@ function PostgresPlaygroundInner() {
                             code: "",
                             pristineCode: "",
                           };
+                          tabHistoryRef.current = [];
                           persistTabs([fresh]);
                           setActiveTabId(fresh.id);
                           window.setTimeout(

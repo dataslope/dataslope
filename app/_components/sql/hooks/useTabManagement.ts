@@ -10,6 +10,7 @@ import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import { newTabId, saveTabs } from "../../sqlitePlaygroundTabs";
 import { findSampleDatabase } from "../../runtime/sqliteSamples";
 import { replaceDoc } from "../utils/editorUtils";
+import { pickFallbackTab, pushTabHistory } from "../utils/tabUtils";
 import { useEngineStore } from "../stores/useEngineStore";
 import { useTabStore } from "../stores/useTabStore";
 import { useDialogStore } from "../stores/useDialogStore";
@@ -19,35 +20,15 @@ export interface TabManagementRefs {
   tabsRef: React.MutableRefObject<QueryTab[]>;
   activeTabIdRef: React.MutableRefObject<string>;
   activeDbIdRef: React.MutableRefObject<string>;
-  lastActiveTabIdRef: React.MutableRefObject<string>;
-}
-
-/**
- * Picks which tab to activate after the tab with `closedId` is removed.
- * Priority:
- *   1. The previously active tab (lastActiveId), if it still exists.
- *   2. The tab that occupied the position just before the closed one.
- *   3. The first remaining tab.
- */
-function pickFallbackTab(
-  finalTabs: QueryTab[],
-  closedId: string,
-  originalTabs: QueryTab[],
-  lastActiveId: string,
-): QueryTab {
-  const preferred = lastActiveId
-    ? finalTabs.find((t) => t.id === lastActiveId)
-    : undefined;
-  const closedIdx = originalTabs.findIndex((t) => t.id === closedId);
-  const adjacent = finalTabs[Math.max(0, closedIdx - 1)];
-  return preferred ?? adjacent ?? finalTabs[0];
+  /** MRU history stack (oldest → most-recent), never includes the current tab. */
+  tabHistoryRef: React.MutableRefObject<string[]>;
 }
 
 export function useTabManagement(
   refs: TabManagementRefs,
   refreshTableMetadata: () => void,
 ) {
-  const { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef } = refs;
+  const { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef } = refs;
 
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
@@ -80,10 +61,11 @@ export function useTabManagement(
     tabsRef.current = next;
     setTabs(next);
     saveTabs(activeDbIdRef.current, next);
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
     window.setTimeout(() => editorRef.current?.focus(), 0);
-  }, [tabsRef, activeDbIdRef, activeTabIdRef, editorRef, setTabs, setActiveTabId]);
+  }, [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId]);
 
   const openErDiagramTab = useCallback(() => {
     refreshTableMetadata();
@@ -105,6 +87,7 @@ export function useTabManagement(
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       activeTabIdRef.current = existing.id;
       setActiveTabId(existing.id);
       return;
@@ -120,9 +103,10 @@ export function useTabManagement(
     tabsRef.current = next;
     setTabs(next);
     saveTabs(currentActiveDbId, next);
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [refreshTableMetadata, tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId]);
+  }, [refreshTableMetadata, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId]);
 
   const openQueryHistoryTab = useCallback(() => {
     const currentTabs = tabsRef.current;
@@ -144,6 +128,7 @@ export function useTabManagement(
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       activeTabIdRef.current = existing.id;
       setActiveTabId(existing.id);
       return;
@@ -159,9 +144,10 @@ export function useTabManagement(
     tabsRef.current = next;
     setTabs(next);
     saveTabs(currentActiveDbId, next);
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     activeTabIdRef.current = tab.id;
     setActiveTabId(tab.id);
-  }, [tabsRef, activeTabIdRef, activeDbIdRef, setTabs, setActiveTabId]);
+  }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId]);
 
   const closeTab = useCallback(
     (id: string) => {
@@ -181,13 +167,15 @@ export function useTabManagement(
       tabsRef.current = finalTabs;
       setTabs(finalTabs);
       saveTabs(activeDbIdRef.current, finalTabs);
+      // Prune closed tab from history before selecting fallback.
+      tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
       if (activeTabIdRef.current === id) {
-        const fallback = pickFallbackTab(finalTabs, id, currentTabs, lastActiveTabIdRef.current);
+        const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
         activeTabIdRef.current = fallback.id;
         setActiveTabId(fallback.id);
       }
     },
-    [tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef, setTabs, setActiveTabId, setConfirmCloseTabId],
+    [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId],
   );
 
   const confirmCloseTab = useCallback(() => {
@@ -203,12 +191,14 @@ export function useTabManagement(
     tabsRef.current = finalTabs;
     setTabs(finalTabs);
     saveTabs(activeDbIdRef.current, finalTabs);
+    // Prune closed tab from history before selecting fallback.
+    tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
     if (activeTabIdRef.current === id) {
-      const fallback = pickFallbackTab(finalTabs, id, currentTabs, lastActiveTabIdRef.current);
+      const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
       activeTabIdRef.current = fallback.id;
       setActiveTabId(fallback.id);
     }
-  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, lastActiveTabIdRef, setTabs, setActiveTabId, setConfirmCloseTabId]);
+  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId]);
 
   const renameTab = useCallback(
     (id: string, newTitle: string) => {
@@ -240,10 +230,11 @@ export function useTabManagement(
       tabsRef.current = next;
       setTabs(next);
       saveTabs(activeDbIdRef.current, next);
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, copy.id);
       activeTabIdRef.current = copy.id;
       setActiveTabId(copy.id);
     },
-    [tabsRef, activeDbIdRef, activeTabIdRef, setTabs, setActiveTabId],
+    [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, setTabs, setActiveTabId],
   );
 
   const closeOtherTabs = useCallback(
@@ -254,10 +245,11 @@ export function useTabManagement(
       tabsRef.current = next;
       setTabs(next);
       saveTabs(activeDbIdRef.current, next);
+      tabHistoryRef.current = [];
       activeTabIdRef.current = target.id;
       setActiveTabId(target.id);
     },
-    [tabsRef, activeDbIdRef, activeTabIdRef, setTabs, setActiveTabId],
+    [tabsRef, activeDbIdRef, activeTabIdRef, tabHistoryRef, setTabs, setActiveTabId],
   );
 
   const closeAllTabs = useCallback(() => {
@@ -266,6 +258,7 @@ export function useTabManagement(
     ];
     tabsRef.current = fresh;
     activeTabIdRef.current = fresh[0].id;
+    tabHistoryRef.current = [];
     setTabs(fresh);
     saveTabs(activeDbIdRef.current, fresh);
     setActiveTabId(fresh[0].id);
@@ -273,7 +266,7 @@ export function useTabManagement(
     const view = editorRef.current;
     if (view) replaceDoc(view, "");
     window.setTimeout(() => editorRef.current?.focus(), 0);
-  }, [tabsRef, activeTabIdRef, activeDbIdRef, editorRef, setTabs, setActiveTabId, setResultsByTab]);
+  }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, setResultsByTab]);
 
   const handleTabDragStart = useCallback(
     (event: DragStartEvent) => {
@@ -310,6 +303,7 @@ export function useTabManagement(
     }));
     tabsRef.current = fresh;
     activeTabIdRef.current = fresh[0].id;
+    tabHistoryRef.current = [];
     setTabs(fresh);
     saveTabs(activeDbId, fresh);
     setActiveTabId(fresh[0].id);
@@ -322,6 +316,7 @@ export function useTabManagement(
     customDb,
     tabsRef,
     activeTabIdRef,
+    tabHistoryRef,
     editorRef,
     setTabs,
     setActiveTabId,
