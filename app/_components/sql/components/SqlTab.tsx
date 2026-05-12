@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
@@ -36,22 +34,6 @@ export function SqlTab({
   const [isClosing, setIsClosing] = useState(false);
   const closedRef = useRef(false);
   const titleRef = useRef<HTMLSpanElement>(null);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: tab.id });
-
-  const dragStyle: React.CSSProperties = {
-    transform: DndCSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0 : undefined,
-    zIndex: isDragging ? 10 : undefined,
-  };
 
   const openRename = useCallback(() => {
     setDraftTitle(tab.title);
@@ -129,10 +111,6 @@ export function SqlTab({
             <button
               type="button"
               {...props}
-              {...attributes}
-              {...listeners}
-              ref={setNodeRef}
-              style={dragStyle}
               className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}${isClosing ? " sql-tab--closing" : ""}`}
               onClick={onActivate}
               aria-selected={active}
@@ -228,33 +206,4 @@ export function SqlTab({
   );
 }
 
-/** Lightweight clone of a tab rendered inside DragOverlay (no DnD or context menu). */
-export function SqlTabDragOverlay({
-  tab,
-  active,
-}: {
-  tab: QueryTab;
-  active: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      className={`sql-tab${active ? " active" : ""}${tab.kind === "view-data" ? " sql-tab-view-data" : ""}${tab.kind === "er-diagram" ? " sql-tab-er-diagram" : ""}${tab.kind === "query-history" ? " sql-tab-query-history" : ""}`}
-      style={{ opacity: 0.85, cursor: "grabbing" }}
-    >
-      {tab.kind === "view-data" && (
-        <Table size={11} className="sql-tab-kind-icon" aria-hidden="true" />
-      )}
-      {tab.kind === "er-diagram" && (
-        <Network size={11} className="sql-tab-kind-icon" aria-hidden="true" />
-      )}
-      {tab.kind === "query-history" && (
-        <History size={11} className="sql-tab-kind-icon" aria-hidden="true" />
-      )}
-      <span className="sql-tab-title">{tab.title}</span>
-      <span className="sql-tab-close">
-        <X size={10} aria-hidden="true" />
-      </span>
-    </button>
-  );
-}
+

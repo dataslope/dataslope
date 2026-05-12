@@ -2,19 +2,16 @@
 
 import {
   DndContext,
-  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   arrayMove,
-  horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
@@ -125,7 +122,7 @@ import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
-import { SqlTab, SqlTabDragOverlay } from "../sql/components/SqlTab";
+import { SqlTab } from "../sql/components/SqlTab";
 import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
@@ -1186,14 +1183,6 @@ function PostgresPlaygroundInner() {
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findPostgresSampleDatabase(activeDbId);
-  const tabIds = useMemo(() => tabs.map((tab) => tab.id), [tabs]);
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
 
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
@@ -1203,30 +1192,6 @@ function PostgresPlaygroundInner() {
     },
     [],
   );
-
-  const handleTabDragStart = useCallback((event: DragStartEvent) => {
-    const id = String(event.active.id);
-    setDraggingTabId(id);
-    setActiveTabId(id);
-  }, []);
-
-  const handleTabDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setDraggingTabId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      const current = tabsRef.current;
-      const oldIndex = current.findIndex((t) => t.id === active.id);
-      const newIndex = current.findIndex((t) => t.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
-      persistTabs(arrayMove(current, oldIndex, newIndex));
-    },
-    [persistTabs],
-  );
-
-  const handleTabDragCancel = useCallback(() => {
-    setDraggingTabId(null);
-  }, []);
 
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
@@ -4479,79 +4444,61 @@ function PostgresPlaygroundInner() {
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
             <div className="sql-tabbar">
-              <DndContext
-                sensors={tabDragSensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleTabDragStart}
-                onDragEnd={handleTabDragEnd}
-                onDragCancel={handleTabDragCancel}
-              >
-                <SortableContext
-                  items={tabIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  <div className="sql-tabs" role="tablist">
-                    {tabs.map((tab) => (
-                      <SqlTab
-                        key={tab.id}
-                        tab={tab}
-                        active={tab.id === activeTabId}
-                        onActivate={() => {
-                          const prevId = activeTabIdRef.current;
-                          if (prevId !== tab.id) {
-                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, tab.id);
-                          }
-                          setActiveTabId(tab.id);
-                        }}
-                        onClose={() => closeTab(tab.id)}
-                        onRename={(title) =>
-                          persistTabs(
-                            tabsRef.current.map((candidate) =>
-                              candidate.id === tab.id
-                                ? { ...candidate, title }
-                                : candidate,
-                            ),
-                          )
-                        }
-                        onDuplicate={() => {
-                          const dup = {
-                            ...tab,
-                            id: newTabId(),
-                            title: `${tab.title} copy`,
-                          };
-                          tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, dup.id);
-                          persistTabs([...tabsRef.current, dup]);
-                          setActiveTabId(dup.id);
-                        }}
-                        onCloseOthers={() => {
-                          tabHistoryRef.current = [];
-                          persistTabs([tab]);
-                        }}
-                        onCloseAll={() => {
-                          const fresh = {
-                            id: newTabId(),
-                            title: "Query 1",
-                            code: "",
-                            pristineCode: "",
-                          };
-                          tabHistoryRef.current = [];
-                          persistTabs([fresh]);
-                          setActiveTabId(fresh.id);
-                          window.setTimeout(
-                            () => editorRef.current?.focus(),
-                            0,
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-                <DragOverlay dropAnimation={null}>
-                  {draggingTab ? (
-                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+              <div className="sql-tabs" role="tablist">
+                {tabs.map((tab) => (
+                  <SqlTab
+                    key={tab.id}
+                    tab={tab}
+                    active={tab.id === activeTabId}
+                    onActivate={() => {
+                      const prevId = activeTabIdRef.current;
+                      if (prevId !== tab.id) {
+                        tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, tab.id);
+                      }
+                      setActiveTabId(tab.id);
+                    }}
+                    onClose={() => closeTab(tab.id)}
+                    onRename={(title) =>
+                      persistTabs(
+                        tabsRef.current.map((candidate) =>
+                          candidate.id === tab.id
+                            ? { ...candidate, title }
+                            : candidate,
+                        ),
+                      )
+                    }
+                    onDuplicate={() => {
+                      const dup = {
+                        ...tab,
+                        id: newTabId(),
+                        title: `${tab.title} copy`,
+                      };
+                      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, dup.id);
+                      persistTabs([...tabsRef.current, dup]);
+                      setActiveTabId(dup.id);
+                    }}
+                    onCloseOthers={() => {
+                      tabHistoryRef.current = [];
+                      persistTabs([tab]);
+                    }}
+                    onCloseAll={() => {
+                      const fresh = {
+                        id: newTabId(),
+                        title: "Query 1",
+                        code: "",
+                        pristineCode: "",
+                      };
+                      tabHistoryRef.current = [];
+                      persistTabs([fresh]);
+                      setActiveTabId(fresh.id);
+                      window.setTimeout(
+                        () => editorRef.current?.focus(),
+                        0,
+                      );
+                    }}
+                  />
+                ))}
+              </div>
               <button
                 type="button"
                 className="sql-tab-add"

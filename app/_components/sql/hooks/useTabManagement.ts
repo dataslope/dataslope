@@ -5,8 +5,6 @@ import { startTransition } from "react";
 import { flushSync } from "react-dom";
 import { Toast } from "@base-ui-components/react/toast";
 import type { EditorView } from "@codemirror/view";
-import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import { newTabId, saveTabs } from "../../sqlitePlaygroundTabs";
 import { findSampleDatabase } from "../../runtime/sqliteSamples";
@@ -283,31 +281,6 @@ export function useTabManagement(
     window.setTimeout(() => editorRef.current?.focus(), 0);
   }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, setResultsByTab]);
 
-  const handleTabDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const id = String(event.active.id);
-      activeTabIdRef.current = id;
-      setActiveTabId(id);
-    },
-    [activeTabIdRef, setActiveTabId],
-  );
-
-  const handleTabDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      const currentTabs = tabsRef.current;
-      const oldIndex = currentTabs.findIndex((t) => t.id === active.id);
-      const newIndex = currentTabs.findIndex((t) => t.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
-      const next = arrayMove(currentTabs, oldIndex, newIndex);
-      tabsRef.current = next;
-      setTabs(next);
-      saveTabs(activeDbIdRef.current, next);
-    },
-    [tabsRef, activeDbIdRef, setTabs],
-  );
-
   const resetTabsForCurrentDb = useCallback(() => {
     const sample =
       customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
@@ -349,8 +322,6 @@ export function useTabManagement(
     duplicateTab,
     closeOtherTabs,
     closeAllTabs,
-    handleTabDragStart,
-    handleTabDragEnd,
     resetTabsForCurrentDb,
   };
 }
