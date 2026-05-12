@@ -9,8 +9,14 @@ export type { ColumnConstraintInfo, ForeignKeyInfo, TableColumnInfo, QueryExecRe
 
 /** The result object stored per tab. */
 export interface QueryRunResult {
-  /** The result sets returned by sql.js (one per SELECT-like statement). */
-  sets: QueryExecResult[];
+  /**
+   * One entry per SQL statement that was executed.
+   * – `QueryExecResult` means the statement produced a result set (may have
+   *   zero rows if the SELECT matched nothing).
+   * – `null` means the statement ran successfully but produced no result set
+   *   (e.g. INSERT, UPDATE, CREATE TABLE, …).
+   */
+  sets: (QueryExecResult | null)[];
   /** Time the run took in milliseconds. */
   elapsedMs: number;
   /** Optional error message if the run failed mid-way. */

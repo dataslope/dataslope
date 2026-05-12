@@ -186,6 +186,7 @@ import { useTabStore } from "./stores/useTabStore";
 import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
+import { pushTabHistory } from "./utils/tabUtils";
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
@@ -1473,6 +1474,7 @@ function SqlPlaygroundInner() {
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
   const setHasEditorSelectionRef = useRef(setHasEditorSelection);
   const activeTabIdRef = useRef<string>("");
+  const tabHistoryRef = useRef<string[]>([]);
   const tabsRef = useRef<QueryTab[]>([]);
   const activeDbIdRef = useRef<string>(activeDbId);
   const panesRef = useRef<HTMLDivElement | null>(null);
@@ -1576,7 +1578,7 @@ function SqlPlaygroundInner() {
     handleTabDragEnd,
     resetTabsForCurrentDb,
   } = useTabManagement(
-    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef },
+    { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef },
     refreshTableMetadata,
   );
 
@@ -2096,13 +2098,16 @@ function SqlPlaygroundInner() {
     // Focus the editor so the user can type immediately after any tab
     // operation (activate, create, reorder, close, close-all).
     // Skip "er-diagram" / "view-data" / "query-history" tabs whose editor pane is hidden.
+    // Use requestAnimationFrame so the focus call lands after all child-component
+    // effects (e.g. dnd-kit useSortable registration) that may otherwise steal focus
+    // when a new tab is first rendered.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
       tab?.kind !== "view-data" &&
       tab?.kind !== "query-history"
     ) {
-      view?.focus();
+      window.requestAnimationFrame(() => view?.focus());
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -4517,6 +4522,9 @@ function SqlPlaygroundInner() {
                         active={t.id === activeTabId}
                         onActivate={() => {
                           const prevId = activeTabIdRef.current;
+                          if (prevId !== t.id) {
+                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
+                          }
                           activeTabIdRef.current = t.id;
                           setActiveTabId(t.id);
                           // When the user re-clicks the already-active tab the

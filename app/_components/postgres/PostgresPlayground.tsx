@@ -152,6 +152,7 @@ import {
   stripSqlComments,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -1158,6 +1159,8 @@ function PostgresPlaygroundInner() {
   const engineRef = useRef<PostgresEngine | null>(null);
   const tabsRef = useRef(tabs);
   const activeTabIdRef = useRef(activeTabId);
+  /** MRU history stack (oldest → most-recent), never includes the current tab. */
+  const tabHistoryRef = useRef<string[]>([]);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -1296,7 +1299,7 @@ function PostgresPlaygroundInner() {
       const lazyPageSizeForRun =
         effectivePageSize > 0 ? effectivePageSize : INFINITE_SCROLL_PAGE_SIZE;
       try {
-        let sets: QueryExecResult[];
+        let sets: (QueryExecResult | null)[];
         let lazySql: string | undefined;
         let lazyBaseSql: string | undefined;
         let lazyTotalCount: number | undefined;
@@ -1668,7 +1671,10 @@ function PostgresPlaygroundInner() {
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
     }
-    view.focus();
+    // Use requestAnimationFrame so the focus call lands after all child-component
+    // effects (e.g. dnd-kit useSortable) that may otherwise steal focus when a
+    // new tab is first rendered.
+    window.requestAnimationFrame(() => view.focus());
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply editor theme.
@@ -1793,6 +1799,7 @@ function PostgresPlaygroundInner() {
         } catch {
           /* ignore */
         }
+        tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
         await refreshSchema();
@@ -1830,6 +1837,7 @@ function PostgresPlaygroundInner() {
       code: "",
       pristineCode: "",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
     persistTabs([...tabsRef.current, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
@@ -1842,6 +1850,7 @@ function PostgresPlaygroundInner() {
         code: sql,
         pristineCode: sql,
       };
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
       void runSqlForTab(tab.id, sql, title);
@@ -1851,16 +1860,19 @@ function PostgresPlaygroundInner() {
 
   const closeTab = useCallback(
     (id: string) => {
-      const next = tabsRef.current.filter((tab) => tab.id !== id);
-      const fallback = next[0] ?? {
-        id: newTabId(),
-        title: "Query 1",
-        code: "",
-        pristineCode: "",
-      };
-      const finalTabs = next.length > 0 ? next : [fallback];
+      const currentTabs = tabsRef.current;
+      const next = currentTabs.filter((tab) => tab.id !== id);
+      const finalTabs =
+        next.length > 0
+          ? next
+          : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
       persistTabs(finalTabs);
-      if (activeTabIdRef.current === id) setActiveTabId(fallback.id);
+      // Prune closed tab from history before selecting fallback.
+      tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
+      if (activeTabIdRef.current === id) {
+        const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
+        setActiveTabId(fallback.id);
+      }
       setResultsByTab((prev) => {
         const { [id]: _deleted, ...rest } = prev;
         void _deleted;
@@ -1873,6 +1885,7 @@ function PostgresPlaygroundInner() {
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findPostgresSampleDatabase(activeDbIdRef.current);
     const fresh = makeTabs(sample.defaultTabs);
+    tabHistoryRef.current = [];
     persistTabs(fresh);
     setActiveTabId(fresh[0]?.id ?? "");
     setResultsByTab({});
@@ -1889,6 +1902,7 @@ function PostgresPlaygroundInner() {
         pristineCode: sql,
         kind: kind === "table" ? "view-data" : undefined,
       };
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
       persistTabs([...tabsRef.current, tab]);
       setActiveTabId(tab.id);
       void runSqlForTab(
@@ -1923,6 +1937,7 @@ function PostgresPlaygroundInner() {
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       setActiveTabId(existing.id);
       return;
     }
@@ -1933,6 +1948,7 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "er-diagram",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
@@ -1959,6 +1975,7 @@ function PostgresPlaygroundInner() {
         setActiveTabId(finalTabs[0].id);
         return;
       }
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
       setActiveTabId(existing.id);
       return;
     }
@@ -1969,6 +1986,7 @@ function PostgresPlaygroundInner() {
       pristineCode: "",
       kind: "query-history",
     };
+    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
     persistTabs([...currentTabs, tab]);
     setActiveTabId(tab.id);
   }, [persistTabs]);
@@ -2021,8 +2039,9 @@ function PostgresPlaygroundInner() {
     ) => {
       if (!result || result.sets.length === 0) return;
       const set = resultSetExportSnapshot
-        ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets[0])
-        : result.sets[0];
+        ? (result.sets[resultSetExportSnapshot.setIndex] ?? result.sets.find((s) => s !== null))
+        : result.sets.find((s) => s !== null);
+      if (!set) return;
       const columns = resultSetExportSnapshot?.columns ?? set.columns;
       let rows =
         scope === "page" && resultSetExportSnapshot
@@ -2030,7 +2049,7 @@ function PostgresPlaygroundInner() {
           : (resultSetExportSnapshot?.allRows ?? set.values);
       if (scope === "all" && result.lazySql && engineRef.current) {
         rows =
-          (await engineRef.current.exec(result.lazySql))[0]?.values ?? rows;
+          ((await engineRef.current.exec(result.lazySql)).find((s) => s !== null))?.values ?? rows;
       }
       const title = activeTab?.title ?? "result_set";
       const filename = `${toFileSafeName(title)}.${format}`;
@@ -4446,7 +4465,13 @@ function PostgresPlaygroundInner() {
                         key={tab.id}
                         tab={tab}
                         active={tab.id === activeTabId}
-                        onActivate={() => setActiveTabId(tab.id)}
+                        onActivate={() => {
+                          const prevId = activeTabIdRef.current;
+                          if (prevId !== tab.id) {
+                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, tab.id);
+                          }
+                          setActiveTabId(tab.id);
+                        }}
                         onClose={() => closeTab(tab.id)}
                         onRename={(title) =>
                           persistTabs(
@@ -4463,10 +4488,14 @@ function PostgresPlaygroundInner() {
                             id: newTabId(),
                             title: `${tab.title} copy`,
                           };
+                          tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, dup.id);
                           persistTabs([...tabsRef.current, dup]);
                           setActiveTabId(dup.id);
                         }}
-                        onCloseOthers={() => persistTabs([tab])}
+                        onCloseOthers={() => {
+                          tabHistoryRef.current = [];
+                          persistTabs([tab]);
+                        }}
                         onCloseAll={() => {
                           const fresh = {
                             id: newTabId(),
@@ -4474,6 +4503,7 @@ function PostgresPlaygroundInner() {
                             code: "",
                             pristineCode: "",
                           };
+                          tabHistoryRef.current = [];
                           persistTabs([fresh]);
                           setActiveTabId(fresh.id);
                           window.setTimeout(
