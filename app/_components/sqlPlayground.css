@@ -1453,6 +1453,86 @@
   color: var(--danger, #e35a5a);
 }
 
+/* ─── Corner action button group (Format / Query History / future buttons) ───
+   Positioned at the top-right corner of the editor pane. Renders above the
+   editor content (z-index: 5, inside the isolated sql-editor-pane stacking
+   context) while portalled popovers escape that context and appear in the
+   document root. The corner-positioner class (z-index: 500) keeps those
+   tooltip popovers below the Import / Export / Settings menus (z-index: 9999)
+   but visible above all editor content. */
+.sql-editor-corner-actions {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  margin-top: 4px;
+  margin-right: 4px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  background: color-mix(in srgb, var(--bg2) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.sql-editor-corner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.sql-editor-corner-btn:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-editor-corner-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.sql-editor-corner-btn svg {
+  display: block;
+}
+
+.sql-editor-corner-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 1px;
+}
+
+/* Positioner for editor-corner tooltip popovers. z-index: 500 ensures they
+   appear above the editor pane contents but below the portalled
+   Import / Export / Settings menus which use bui-popup (z-index: 9999). */
+.sql-corner-positioner {
+  z-index: 500;
+}
+
+.bui-popup.sql-corner-popover {
+  z-index: 500;
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .sql-rename-popup {
   width: 360px;
 }
