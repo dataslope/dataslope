@@ -2509,6 +2509,7 @@
 
 /* ─── Inline cell editor ─── */
 .sql-cell-input {
+  box-sizing: border-box;
   width: 100%;
   min-width: 60px;
   background: var(--bg2);
