@@ -273,10 +273,10 @@ export function QueryHistoryPane({
 
   const totalPages = Math.max(1, Math.ceil(history.length / itemsPerPage));
 
-  // Clamp current page when history or page size changes.
+  // Clamp current page when total pages shrinks (e.g. after clear or page-size change).
   useEffect(() => {
-    setCurrentPage((p) => Math.min(p, Math.max(1, Math.ceil(history.length / itemsPerPage))));
-  }, [history.length, itemsPerPage]);
+    setCurrentPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
 
   const handleClear = useCallback(() => {
     onClear();
@@ -374,7 +374,7 @@ export function QueryHistoryPane({
                   className="sql-history-page-btn sql-history-page-btn--nav"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  aria-label="Previous page"
+                  aria-label={`Previous page (page ${currentPage} of ${totalPages})`}
                 >
                   ‹
                 </button>
@@ -405,7 +405,7 @@ export function QueryHistoryPane({
                   className="sql-history-page-btn sql-history-page-btn--nav"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  aria-label="Next page"
+                  aria-label={`Next page (page ${currentPage} of ${totalPages})`}
                 >
                   ›
                 </button>
