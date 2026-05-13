@@ -2065,7 +2065,7 @@ function DuckDbPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  const handleFormatCode = useCallback(async () => {
+  const handleFormatCode = useCallback(() => {
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
