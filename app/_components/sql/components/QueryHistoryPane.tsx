@@ -1,11 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { EditorState, Compartment } from "@codemirror/state";
 import { EditorView, drawSelection } from "@codemirror/view";
 import { indentUnit } from "@codemirror/language";
 import { sql as sqlLang, SQLite, PostgreSQL } from "@codemirror/lang-sql";
-import { CheckCircle, Clock, History, Trash2, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  ExternalLink,
+  History,
+  Timer,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import { Popover } from "@base-ui-components/react/popover";
 import { themeFor } from "../../cmExtensions";
 import type { QueryHistoryEntry } from "../types";
 
@@ -39,6 +48,42 @@ function formatTimeAgo(ts: number, now: number): string {
 function formatElapsed(ms: number): string {
   if (ms < 1000) return `${ms.toFixed(0)}ms`;
   return `${(ms / 1000).toFixed(3)}s`;
+}
+
+/**
+ * Build the page-button sequence for the pagination bar.
+ * Returns numbers (page indices, 1-based) and "…" ellipsis markers.
+ */
+function buildPageRange(current: number, total: number): (number | "…")[] {
+  if (total <= 1) return total === 1 ? [1] : [];
+  if (total <= 9) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages: (number | "…")[] = [];
+
+  // First 2 pages
+  pages.push(1, 2);
+
+  // Middle 5 centered on current, clamped to [3 … total-2]
+  let lo = Math.max(3, current - 2);
+  let hi = Math.min(total - 2, current + 2);
+
+  // Expand to ensure up to 5 pages in the middle window
+  while (hi - lo < 4) {
+    if (lo > 3) lo--;
+    else if (hi < total - 2) hi++;
+    else break;
+  }
+
+  if (lo > 3) pages.push("…");
+  for (let i = lo; i <= hi; i++) pages.push(i);
+  if (hi < total - 2) pages.push("…");
+
+  // Last 2 pages
+  pages.push(total - 1, total);
+
+  return pages;
 }
 
 // ─── Single history entry ─────────────────────────────────────────────────────
@@ -112,6 +157,7 @@ interface HistoryEntryRowProps {
   theme: string;
   isPostgres: boolean;
   now: number;
+  onOpenQueryTab?: (title: string, sql: string) => void;
 }
 
 function HistoryEntryRow({
@@ -119,6 +165,7 @@ function HistoryEntryRow({
   theme,
   isPostgres,
   now,
+  onOpenQueryTab,
 }: HistoryEntryRowProps) {
   return (
     <div
@@ -136,16 +183,52 @@ function HistoryEntryRow({
         <span className="sql-history-entry-source">{entry.source}</span>
         <span className="sql-history-entry-time">
           <Clock size={11} aria-hidden="true" />
-          <span
-            className="sql-history-entry-datetime"
-            title={formatDateTime(entry.executedAt)}
-          >
-            {formatTimeAgo(entry.executedAt, now)}
+          <Popover.Root>
+            <Popover.Trigger
+              openOnHover
+              delay={200}
+              closeDelay={80}
+              render={(triggerProps) => (
+                <span
+                  {...triggerProps}
+                  className="sql-history-entry-datetime"
+                >
+                  {formatTimeAgo(entry.executedAt, now)}
+                </span>
+              )}
+            />
+            <Popover.Portal>
+              <Popover.Positioner
+                className="sql-history-datetime-popover-positioner"
+                side="top"
+                sideOffset={6}
+              >
+                <Popover.Popup className="bui-popup sql-history-datetime-popover">
+                  {formatDateTime(entry.executedAt)}
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
+          <span className="sql-history-entry-dot" aria-hidden="true">
+            ·
           </span>
+          <Timer size={11} aria-hidden="true" />
           <span className="sql-history-entry-elapsed">
             {formatElapsed(entry.elapsedMs)}
           </span>
         </span>
+        {onOpenQueryTab && (
+          <button
+            type="button"
+            className="sql-history-open-btn"
+            onClick={() => onOpenQueryTab(entry.source, entry.sql)}
+            title="Open in query tab"
+            aria-label="Open in query tab"
+          >
+            <ExternalLink size={11} aria-hidden="true" />
+            Open in query tab
+          </button>
+        )}
       </div>
       {entry.error && (
         <div className="sql-history-entry-error">{entry.error}</div>
@@ -166,13 +249,17 @@ export interface QueryHistoryPaneProps {
   theme: string;
   isPostgres?: boolean;
   onClear: () => void;
+  onOpenQueryTab?: (title: string, sql: string) => void;
 }
+
+const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 
 export function QueryHistoryPane({
   history,
   theme,
   isPostgres = false,
   onClear,
+  onOpenQueryTab,
 }: QueryHistoryPaneProps) {
   // Refresh "X ago" labels roughly every 30 seconds.
   const [now, setNow] = React.useState(() => Date.now());
@@ -181,9 +268,32 @@ export function QueryHistoryPane({
     return () => window.clearInterval(id);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(25);
+
+  const totalPages = Math.max(1, Math.ceil(history.length / itemsPerPage));
+
+  // Clamp current page when history or page size changes.
+  useEffect(() => {
+    setCurrentPage((p) => Math.min(p, Math.max(1, Math.ceil(history.length / itemsPerPage))));
+  }, [history.length, itemsPerPage]);
+
   const handleClear = useCallback(() => {
     onClear();
+    setCurrentPage(1);
   }, [onClear]);
+
+  const handlePageSizeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setItemsPerPage(Number(e.target.value));
+      setCurrentPage(1);
+    },
+    [],
+  );
+
+  const pageStart = (currentPage - 1) * itemsPerPage;
+  const pageEntries = history.slice(pageStart, pageStart + itemsPerPage);
+  const pageRange = buildPageRange(currentPage, totalPages);
 
   return (
     <div className="sql-query-history-pane">
@@ -220,17 +330,89 @@ export function QueryHistoryPane({
           </p>
         </div>
       ) : (
-        <div className="sql-history-list">
-          {history.map((entry) => (
-            <HistoryEntryRow
-              key={entry.id}
-              entry={entry}
-              theme={theme}
-              isPostgres={isPostgres}
-              now={now}
-            />
-          ))}
-        </div>
+        <>
+          <div className="sql-history-list">
+            {pageEntries.map((entry) => (
+              <HistoryEntryRow
+                key={entry.id}
+                entry={entry}
+                theme={theme}
+                isPostgres={isPostgres}
+                now={now}
+                onOpenQueryTab={onOpenQueryTab}
+              />
+            ))}
+          </div>
+
+          {/* Pagination bar */}
+          <div className="sql-history-pagination">
+            <div className="sql-history-page-size-wrap">
+              <label
+                className="sql-history-page-size-label"
+                htmlFor="sql-history-page-size"
+              >
+                Per page
+              </label>
+              <select
+                id="sql-history-page-size"
+                className="sql-history-page-size-select"
+                value={itemsPerPage}
+                onChange={handlePageSizeChange}
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="sql-history-page-btns" role="navigation" aria-label="Query history pages">
+                <button
+                  type="button"
+                  className="sql-history-page-btn sql-history-page-btn--nav"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Previous page"
+                >
+                  ‹
+                </button>
+                {pageRange.map((item, idx) =>
+                  item === "…" ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="sql-history-page-ellipsis"
+                      aria-hidden="true"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`sql-history-page-btn${item === currentPage ? " sql-history-page-btn--active" : ""}`}
+                      onClick={() => setCurrentPage(item)}
+                      aria-label={`Page ${item}`}
+                      aria-current={item === currentPage ? "page" : undefined}
+                    >
+                      {item}
+                    </button>
+                  ),
+                )}
+                <button
+                  type="button"
+                  className="sql-history-page-btn sql-history-page-btn--nav"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Next page"
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

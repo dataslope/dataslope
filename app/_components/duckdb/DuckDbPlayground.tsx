@@ -4824,6 +4824,7 @@ function DuckDbPlaygroundInner() {
                   theme={editorTheme}
                   isPostgres={true}
                   onClear={clearHistory}
+                  onOpenQueryTab={openTabAndRun}
                 />
               </div>
             ) : null}
