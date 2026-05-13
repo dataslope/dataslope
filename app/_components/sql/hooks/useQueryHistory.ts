@@ -22,7 +22,10 @@ export function useQueryHistory(): UseQueryHistoryResult {
   const addHistoryEntry = useCallback(
     (entry: Omit<QueryHistoryEntry, "id">) => {
       const full: QueryHistoryEntry = { ...entry, id: newHistoryId() };
-      setHistory((prev) => [full, ...prev]);
+      setHistory((prev) => {
+        const next = [full, ...prev];
+        return next.length > 1000 ? next.slice(0, 1000) : next;
+      });
     },
     [],
   );

@@ -4903,6 +4903,7 @@ function SqlPlaygroundInner() {
                   theme={editorTheme}
                   isPostgres={false}
                   onClear={clearHistory}
+                  onOpenQueryTab={(title, sql) => openTabAndRun(title, sql)}
                 />
               </div>
             )}
