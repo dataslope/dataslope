@@ -16,6 +16,15 @@ export interface SqlCompletionSchema {
   entities: SqlCompletionEntity[];
 }
 
+// The three SQL flavors the playground supports. Each shares the same
+// completion engine; dialect-specific keyword/function catalogs and a few
+// context tweaks (RETURNING, QUALIFY, ILIKE, …) plug in via `dialectProfile`.
+export type SqlDialect = "sqlite" | "postgres" | "duckdb";
+
+export interface SqlCompletionOptions {
+  dialect?: SqlDialect;
+}
+
 type SqlCompletionMode =
   | "columns"
   | "tables"
@@ -98,7 +107,9 @@ const BOOST = {
   functionPenalty: 1,
 } as const;
 
-const SQL_KEYWORDS = [
+// Keywords/functions that show up in essentially every modern SQL dialect.
+// Dialect-specific additions are layered on top via `DIALECT_PROFILES`.
+const CORE_KEYWORDS = [
   "SELECT",
   "FROM",
   "WHERE",
@@ -162,7 +173,6 @@ const SQL_KEYWORDS = [
   "WITH",
   "RECURSIVE",
   "CAST",
-  "PRAGMA",
   "BEGIN",
   "COMMIT",
   "ROLLBACK",
@@ -180,46 +190,264 @@ const SQL_KEYWORDS = [
   "LAST",
   "TRUE",
   "FALSE",
-  "GLOB",
-  "REGEXP",
-  "MATCH",
   "ESCAPE",
   "COLLATE",
-  "ATTACH",
-  "DETACH",
   "DATABASE",
   "EXPLAIN",
   "ANALYZE",
-  "VACUUM",
-  "REINDEX",
-  "AUTOINCREMENT",
   "GENERATED",
   "ALWAYS",
   "STORED",
   "VIRTUAL",
-];
+  "RETURNING",
+  "OVER",
+  "WINDOW",
+  "PARTITION",
+  "FILTER",
+  "LATERAL",
+  "MATERIALIZED",
+  "CASCADE",
+  "RESTRICT",
+  "SCHEMA",
+  "SEQUENCE",
+  "CONSTRAINT",
+] as const;
 
-const SQL_FUNCTIONS = [
+const CORE_FUNCTIONS = [
   "COUNT",
   "SUM",
   "AVG",
   "MIN",
   "MAX",
-  "TOTAL",
   "ROUND",
   "ABS",
   "LOWER",
   "UPPER",
   "LENGTH",
-  "SUBSTR",
   "COALESCE",
-  "IFNULL",
   "NULLIF",
+] as const;
+
+// Dialect-specific keywords/functions layered on top of the core sets.
+const SQLITE_KEYWORDS = [
+  "PRAGMA",
+  "GLOB",
+  "REGEXP",
+  "MATCH",
+  "ATTACH",
+  "DETACH",
+  "VACUUM",
+  "REINDEX",
+  "AUTOINCREMENT",
+] as const;
+
+const SQLITE_FUNCTIONS = [
+  "TOTAL",
+  "SUBSTR",
+  "IFNULL",
   "DATE",
   "TIME",
   "DATETIME",
   "STRFTIME",
-];
+  "JULIANDAY",
+  "PRINTF",
+  "RANDOM",
+  "HEX",
+  "TYPEOF",
+] as const;
+
+// Postgres-specific extras (also covers most of what DuckDB's PG-compatible
+// surface exposes). Includes ILIKE, SIMILAR, ROLE/USER admin, JSON ops, …
+const POSTGRES_KEYWORDS = [
+  "ILIKE",
+  "SIMILAR",
+  "OVERLAPS",
+  "ANY",
+  "SOME",
+  "ARRAY",
+  "ENUM",
+  "DOMAIN",
+  "TYPE",
+  "EXTENSION",
+  "ROLE",
+  "USER",
+  "GRANT",
+  "REVOKE",
+  "TRUNCATE",
+  "VACUUM",
+  "REINDEX",
+  "INTERVAL",
+  "TIMESTAMP",
+  "TIMESTAMPTZ",
+  "JSONB",
+  "SERIAL",
+  "BIGSERIAL",
+  "BOOLEAN",
+  "TEXT",
+  "VARCHAR",
+  "INTEGER",
+  "BIGINT",
+  "NUMERIC",
+  "DECIMAL",
+  "REAL",
+  "DOUBLE",
+  "PRECISION",
+  "UUID",
+  "ZONE",
+  "CONFLICT",
+  "DO",
+  "NOTHING",
+  "EXCLUDED",
+  "RANGE",
+  "ROWS",
+  "GROUPS",
+  "PRECEDING",
+  "FOLLOWING",
+  "CURRENT",
+  "ROW",
+  "UNBOUNDED",
+  "TABLESAMPLE",
+] as const;
+
+const POSTGRES_FUNCTIONS = [
+  "NOW",
+  "CURRENT_TIMESTAMP",
+  "CURRENT_DATE",
+  "CURRENT_TIME",
+  "AGE",
+  "EXTRACT",
+  "DATE_TRUNC",
+  "DATE_PART",
+  "TO_CHAR",
+  "TO_DATE",
+  "TO_TIMESTAMP",
+  "TO_NUMBER",
+  "GENERATE_SERIES",
+  "ARRAY_AGG",
+  "STRING_AGG",
+  "JSON_AGG",
+  "JSONB_AGG",
+  "JSON_BUILD_OBJECT",
+  "JSONB_BUILD_OBJECT",
+  "JSON_OBJECT_AGG",
+  "JSONB_OBJECT_AGG",
+  "GREATEST",
+  "LEAST",
+  "POSITION",
+  "TRIM",
+  "LTRIM",
+  "RTRIM",
+  "LPAD",
+  "RPAD",
+  "SPLIT_PART",
+  "REGEXP_REPLACE",
+  "REGEXP_MATCH",
+  "REGEXP_MATCHES",
+  "SUBSTRING",
+  "CONCAT",
+  "CONCAT_WS",
+  "ROW_NUMBER",
+  "RANK",
+  "DENSE_RANK",
+  "LAG",
+  "LEAD",
+  "NTILE",
+  "FIRST_VALUE",
+  "LAST_VALUE",
+] as const;
+
+// DuckDB sits on top of the Postgres dialect but adds its own syntax
+// extensions: PIVOT/UNPIVOT, QUALIFY, ASOF JOIN, EXCLUDE/REPLACE in SELECT,
+// SEMI/ANTI joins, list/struct/map literals, and the `USING SAMPLE` clause.
+const DUCKDB_KEYWORDS = [
+  "PIVOT",
+  "UNPIVOT",
+  "QUALIFY",
+  "EXCLUDE",
+  "ASOF",
+  "POSITIONAL",
+  "SEMI",
+  "ANTI",
+  "SAMPLE",
+  "RESERVOIR",
+  "BERNOULLI",
+  "SYSTEM",
+  "ATTACH",
+  "DETACH",
+  "DESCRIBE",
+  "SHOW",
+  "SUMMARIZE",
+  "MAP",
+  "STRUCT",
+  "LIST",
+  "IGNORE",
+  "RESPECT",
+  "MACRO",
+] as const;
+
+const DUCKDB_FUNCTIONS = [
+  "LIST",
+  "LIST_AGG",
+  "ARRAY_AGG",
+  "STRING_AGG",
+  "STRING_SPLIT",
+  "STRUCT_PACK",
+  "STRUCT_EXTRACT",
+  "MAP",
+  "RANGE",
+  "GENERATE_SERIES",
+  "EPOCH",
+  "EPOCH_MS",
+  "STRFTIME",
+  "STRPTIME",
+  "DATE_TRUNC",
+  "DATE_PART",
+  "DATE_DIFF",
+  "DATE_ADD",
+  "DATE_SUB",
+  "REGEXP_MATCHES",
+  "REGEXP_EXTRACT",
+  "REGEXP_REPLACE",
+  "ROW_NUMBER",
+  "RANK",
+  "DENSE_RANK",
+  "LAG",
+  "LEAD",
+  "QUANTILE",
+  "MEDIAN",
+  "MODE",
+  "ARG_MAX",
+  "ARG_MIN",
+] as const;
+
+interface DialectProfile {
+  keywords: string[];
+  functions: string[];
+}
+
+// Build a dialect's full keyword/function set by layering its extensions
+// over the shared CORE_* lists. Duplicates collapse to a single entry, so
+// dialects can mention common identifiers (e.g. DuckDB declaring REPLACE)
+// without conflicting with the core.
+function buildProfile(
+  extraKeywords: readonly string[],
+  extraFunctions: readonly string[],
+): DialectProfile {
+  return {
+    keywords: [...new Set([...CORE_KEYWORDS, ...extraKeywords])],
+    functions: [...new Set([...CORE_FUNCTIONS, ...extraFunctions])],
+  };
+}
+
+const DIALECT_PROFILES: Record<SqlDialect, DialectProfile> = {
+  sqlite: buildProfile(SQLITE_KEYWORDS, SQLITE_FUNCTIONS),
+  postgres: buildProfile(POSTGRES_KEYWORDS, POSTGRES_FUNCTIONS),
+  // DuckDB stacks its extensions on top of the Postgres dialect.
+  duckdb: buildProfile(
+    [...POSTGRES_KEYWORDS, ...DUCKDB_KEYWORDS],
+    [...POSTGRES_FUNCTIONS, ...DUCKDB_FUNCTIONS],
+  ),
+};
 
 const clauseBoundaryKeywords = new Set([
   "SELECT",
@@ -246,6 +474,13 @@ const clauseBoundaryKeywords = new Set([
   "SET",
   "WITH",
   "RETURNING",
+  // DuckDB extras: QUALIFY filters window results, PIVOT/UNPIVOT reshape
+  // rows, WINDOW declares named windows used by OVER. All three behave as
+  // top-level clause boundaries when ordering follow-up suggestions.
+  "QUALIFY",
+  "WINDOW",
+  "PIVOT",
+  "UNPIVOT",
 ]);
 
 const tableTargetKeywords = new Set([
@@ -269,6 +504,9 @@ const columnTargetKeywords = new Set([
   "ORDER",
   "GROUP",
   "RETURNING",
+  // DuckDB: `QUALIFY <expr>` filters on window functions — same shape as
+  // HAVING, so completion-wise it wants column names + boolean operators.
+  "QUALIFY",
 ]);
 
 // Tokens that indicate the user is mid-expression and probably wants a column
@@ -287,6 +525,8 @@ const expressionContinuationTokens = new Set([
   "IN",
   "IS",
   "LIKE",
+  "ILIKE",
+  "SIMILAR",
   "BETWEEN",
   "(",
 ]);
@@ -400,19 +640,24 @@ const KW_NAME_TAIL: KeywordContext = {
   restrict: true,
 };
 
-const STATEMENT_STARTERS: KeywordContext = {
-  primary: [
-    "SELECT",
-    "WITH",
-    "INSERT",
-    "UPDATE",
-    "DELETE",
-    "CREATE",
-    "DROP",
-    "ALTER",
-    "REPLACE",
-  ],
-  secondary: [
+// Statement-starter keywords depend on the dialect: PRAGMA is SQLite-only,
+// TRUNCATE/GRANT/REVOKE are Postgres-flavored, COPY/EXPORT/IMPORT/DESCRIBE
+// are common in DuckDB. We share the same `primary` set so the most common
+// DML/DDL verbs always sort first regardless of dialect.
+const STATEMENT_STARTERS_BASE: readonly string[] = [
+  "SELECT",
+  "WITH",
+  "INSERT",
+  "UPDATE",
+  "DELETE",
+  "CREATE",
+  "DROP",
+  "ALTER",
+  "REPLACE",
+];
+
+const STATEMENT_STARTER_SECONDARY: Record<SqlDialect, readonly string[]> = {
+  sqlite: [
     "BEGIN",
     "COMMIT",
     "ROLLBACK",
@@ -424,7 +669,41 @@ const STATEMENT_STARTERS: KeywordContext = {
     "VACUUM",
     "REINDEX",
   ],
+  postgres: [
+    "BEGIN",
+    "COMMIT",
+    "ROLLBACK",
+    "EXPLAIN",
+    "ANALYZE",
+    "VACUUM",
+    "TRUNCATE",
+    "GRANT",
+    "REVOKE",
+    "COPY",
+  ],
+  duckdb: [
+    "BEGIN",
+    "COMMIT",
+    "ROLLBACK",
+    "EXPLAIN",
+    "ANALYZE",
+    "ATTACH",
+    "DETACH",
+    "DESCRIBE",
+    "SHOW",
+    "SUMMARIZE",
+    "PIVOT",
+    "UNPIVOT",
+    "COPY",
+  ],
 };
+
+function statementStartersFor(dialect: SqlDialect): KeywordContext {
+  return {
+    primary: STATEMENT_STARTERS_BASE,
+    secondary: STATEMENT_STARTER_SECONDARY[dialect],
+  };
+}
 
 function isIdentifierToken(token: string | undefined): boolean {
   if (!token) return false;
@@ -443,8 +722,9 @@ function resolveKeywordContext(
   tokens: string[],
   lastToken: string | undefined,
   lastClauseKeyword: string | undefined,
+  dialect: SqlDialect,
 ): KeywordContext | null {
-  if (tokens.length === 0) return STATEMENT_STARTERS;
+  if (tokens.length === 0) return statementStartersFor(dialect);
 
   // ── Direct follow-ups: the previous *token* dictates a tightly-scoped slot.
   switch (lastToken) {
@@ -463,16 +743,41 @@ function resolveKeywordContext(
     case "EXCEPT":
       return { primary: ["ALL", "SELECT"], restrict: true };
     case "INSERT":
-      return { primary: ["INTO", "OR"], restrict: true };
+      // SQLite uses `INSERT OR REPLACE`; Postgres/DuckDB use `INSERT INTO …
+      // ON CONFLICT …`. We don't suggest OR for non-SQLite dialects, but
+      // INTO is universal.
+      return dialect === "sqlite"
+        ? { primary: ["INTO", "OR"], restrict: true }
+        : { primary: ["INTO"], restrict: true };
     case "DELETE":
       return { primary: ["FROM"], restrict: true };
     case "UPDATE":
-      return { primary: ["OR"], secondary: ["REPLACE"] };
+      return dialect === "sqlite"
+        ? { primary: ["OR"], secondary: ["REPLACE"] }
+        : { primary: [], secondary: [] };
     case "CREATE":
-      return {
-        primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
-        secondary: ["UNIQUE", "TEMP", "TEMPORARY", "VIRTUAL"],
-      };
+      // Postgres/DuckDB allow CREATE [OR REPLACE] {TABLE,VIEW,…};
+      // SQLite doesn't have OR REPLACE for CREATE.
+      return dialect === "sqlite"
+        ? {
+            primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
+            secondary: ["UNIQUE", "TEMP", "TEMPORARY", "VIRTUAL"],
+          }
+        : {
+            primary: ["TABLE", "VIEW", "INDEX", "SCHEMA"],
+            secondary: [
+              "OR",
+              "REPLACE",
+              "UNIQUE",
+              "TEMP",
+              "TEMPORARY",
+              "MATERIALIZED",
+              "TYPE",
+              "SEQUENCE",
+              "EXTENSION",
+              ...(dialect === "duckdb" ? ["MACRO"] : []),
+            ],
+          };
     case "DROP":
       return {
         primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
@@ -501,12 +806,20 @@ function resolveKeywordContext(
       return { primary: ["FIRST", "LAST"], restrict: true };
     case "IS":
       return { primary: ["NULL", "NOT"], restrict: true };
-    case "NOT":
+    case "NOT": {
+      // SQLite has GLOB/REGEXP/MATCH operators; Postgres/DuckDB have
+      // ILIKE and SIMILAR TO. Tailor the follow-ups so users only see the
+      // operators their engine actually supports.
+      const dialectOps: readonly string[] =
+        dialect === "sqlite"
+          ? ["GLOB", "REGEXP", "MATCH"]
+          : ["ILIKE", "SIMILAR"];
       return {
         primary: ["NULL", "EXISTS", "IN", "LIKE", "BETWEEN"],
-        secondary: ["GLOB", "REGEXP", "MATCH"],
+        secondary: dialectOps,
         restrict: true,
       };
+    }
     case "BETWEEN":
       return { primary: [], secondary: ["AND"] };
     case "DISTINCT":
@@ -514,7 +827,11 @@ function resolveKeywordContext(
       return { primary: ["FROM"] };
     case "TEMP":
     case "TEMPORARY":
-      return { primary: ["TABLE", "VIEW", "TRIGGER"], restrict: true };
+      // SQLite supports TEMP TRIGGER but not TEMP INDEX; Postgres/DuckDB
+      // don't have triggers in the same form, so drop TRIGGER for them.
+      return dialect === "sqlite"
+        ? { primary: ["TABLE", "VIEW", "TRIGGER"], restrict: true }
+        : { primary: ["TABLE", "VIEW", "SEQUENCE"], restrict: true };
     case "UNIQUE":
       return { primary: ["INDEX"], restrict: true };
     case "RENAME":
@@ -552,7 +869,16 @@ function resolveKeywordContext(
         primary: ["DISTINCT", "ALL"],
         secondary: ["FROM", "CASE", "CAST", "NOT", "NULL"],
       };
-    case "FROM":
+    case "FROM": {
+      // DuckDB adds SEMI/ANTI/POSITIONAL/ASOF joins; Postgres adds LATERAL.
+      // We surface those as secondary completions only for the dialects
+      // that actually accept them.
+      const dialectJoinExtras: readonly string[] =
+        dialect === "duckdb"
+          ? ["SEMI", "ANTI", "ASOF", "POSITIONAL", "LATERAL"]
+          : dialect === "postgres"
+            ? ["LATERAL"]
+            : [];
       if (isIdentifierToken(lastToken)) {
         return {
           primary: ["WHERE", "JOIN", "GROUP", "ORDER", "LIMIT", "AS"],
@@ -568,13 +894,16 @@ function resolveKeywordContext(
             "UNION",
             "INTERSECT",
             "EXCEPT",
+            ...(dialect === "duckdb" ? ["QUALIFY"] : []),
+            ...dialectJoinExtras,
           ],
         };
       }
       return {
         primary: ["AS"],
-        secondary: ["JOIN", "WHERE"],
+        secondary: ["JOIN", "WHERE", ...dialectJoinExtras],
       };
+    }
     case "JOIN":
       if (isIdentifierToken(lastToken)) {
         return {
@@ -592,13 +921,15 @@ function resolveKeywordContext(
             "ORDER",
             "HAVING",
             "LIMIT",
+            ...(dialect === "duckdb" ? ["QUALIFY"] : []),
           ],
         };
       }
       return { primary: ["AS"] };
     case "ON":
     case "WHERE":
-    case "HAVING": {
+    case "HAVING":
+    case "QUALIFY": {
       if (isExpressionOperator(lastToken)) {
         return {
           primary: ["NOT", "NULL", "EXISTS", "CASE"],
@@ -606,6 +937,14 @@ function resolveKeywordContext(
         };
       }
       if (isIdentifierToken(lastToken)) {
+        // The mid-expression operator menu after `WHERE col `. SQLite's
+        // tail (GLOB/REGEXP/MATCH) differs from Postgres/DuckDB (ILIKE,
+        // SIMILAR); we splice in the right one so users don't see
+        // operators their engine rejects.
+        const dialectOps: readonly string[] =
+          dialect === "sqlite"
+            ? ["GLOB", "REGEXP", "MATCH"]
+            : ["ILIKE", "SIMILAR"];
         return {
           primary: ["AND", "OR", "IS", "NOT", "LIKE", "IN", "BETWEEN"],
           secondary: [
@@ -615,11 +954,10 @@ function resolveKeywordContext(
             "LIMIT",
             "OFFSET",
             "UNION",
-            "GLOB",
-            "REGEXP",
-            "MATCH",
+            ...dialectOps,
             "ESCAPE",
             "COLLATE",
+            ...(dialect === "duckdb" ? ["QUALIFY"] : []),
           ],
         };
       }
@@ -632,25 +970,71 @@ function resolveKeywordContext(
     case "ORDER":
       return {
         primary: ["BY"],
-        secondary: ["ASC", "DESC", "HAVING", "LIMIT", "OFFSET", "UNION"],
+        // QUALIFY is DuckDB-specific; keep it out of the SQLite/Postgres
+        // secondary list so it doesn't pollute their suggestions.
+        secondary: [
+          "ASC",
+          "DESC",
+          "HAVING",
+          "LIMIT",
+          "OFFSET",
+          "UNION",
+          ...(dialect === "duckdb" ? ["QUALIFY"] : []),
+        ],
       };
     case "INSERT":
       return {
         primary: ["INTO", "VALUES", "SELECT"],
-        secondary: ["DEFAULT", "OR", "REPLACE", "RETURNING"],
+        // SQLite: INSERT OR REPLACE. Postgres/DuckDB: INSERT … ON CONFLICT.
+        secondary: [
+          "DEFAULT",
+          ...(dialect === "sqlite" ? ["OR", "REPLACE"] : ["ON", "CONFLICT"]),
+          "RETURNING",
+        ],
       };
     case "UPDATE":
       return {
         primary: ["SET"],
-        secondary: ["WHERE", "OR", "REPLACE", "RETURNING"],
+        secondary: [
+          "WHERE",
+          ...(dialect === "sqlite" ? ["OR", "REPLACE"] : ["FROM"]),
+          "RETURNING",
+        ],
       };
     case "DELETE":
-      return { primary: ["FROM"], secondary: ["WHERE", "RETURNING"] };
-    case "CREATE":
       return {
-        primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
-        secondary: ["UNIQUE", "TEMP", "TEMPORARY", "IF", "NOT", "EXISTS"],
+        primary: ["FROM"],
+        // Postgres/DuckDB allow DELETE … USING <other table> for joins.
+        secondary: [
+          "WHERE",
+          ...(dialect !== "sqlite" ? ["USING"] : []),
+          "RETURNING",
+        ],
       };
+    case "CREATE":
+      return dialect === "sqlite"
+        ? {
+            primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
+            secondary: ["UNIQUE", "TEMP", "TEMPORARY", "IF", "NOT", "EXISTS"],
+          }
+        : {
+            primary: ["TABLE", "VIEW", "INDEX", "SCHEMA"],
+            secondary: [
+              "OR",
+              "REPLACE",
+              "UNIQUE",
+              "TEMP",
+              "TEMPORARY",
+              "MATERIALIZED",
+              "IF",
+              "NOT",
+              "EXISTS",
+              "TYPE",
+              "SEQUENCE",
+              "EXTENSION",
+              ...(dialect === "duckdb" ? ["MACRO"] : []),
+            ],
+          };
     case "DROP":
       return {
         primary: ["TABLE", "VIEW", "INDEX", "TRIGGER"],
@@ -691,6 +1075,7 @@ function isInsideUnclosedParen(prefix: string): boolean {
 
 function inferCompletionContext(
   context: CompletionContext,
+  dialect: SqlDialect,
 ): SqlCompletionContextInfo | null {
   const statement = currentStatementBeforeCursor(
     context.state.doc.toString(),
@@ -751,7 +1136,8 @@ function inferCompletionContext(
     .reverse()
     .find((token) => clauseBoundaryKeywords.has(token));
   const keywordContext =
-    resolveKeywordContext(tokens, lastToken, lastClauseKeyword) ?? undefined;
+    resolveKeywordContext(tokens, lastToken, lastClauseKeyword, dialect) ??
+    undefined;
 
   // Right after a clause keyword that introduces tables / columns.
   if (lastToken && tableTargetKeywords.has(lastToken)) {
@@ -942,11 +1328,14 @@ const KEYWORD_SECONDARY_BUMP = 5;
 const KEYWORD_OFF_CONTEXT_PENALTY = 25;
 
 function keywordOptions(
+  dialect: SqlDialect,
   boost: number,
   keywordContext?: KeywordContext,
   options: { includeFunctions?: boolean } = {},
 ): Completion[] {
   const { includeFunctions = true } = options;
+  const profile = DIALECT_PROFILES[dialect];
+  const dialectKeywordSet = new Set(profile.keywords);
   const primary = keywordContext ? new Set(keywordContext.primary) : null;
   const secondary = keywordContext?.secondary
     ? new Set(keywordContext.secondary)
@@ -954,26 +1343,32 @@ function keywordOptions(
   const restrict = keywordContext?.restrict ?? false;
   const hasContext = primary !== null;
 
+  // Primary/secondary entries from the context may reference keywords
+  // outside the active dialect (e.g. PRAGMA in Postgres). We keep them in
+  // the suggestion list anyway — the context resolver is already dialect-
+  // aware — but fall back to the dialect catalog for the unranked tail.
   const orderedKeywords = primary
     ? [
-        // Stable boost ordering means iteration order also drives display
-        // order — list primaries first so the popup shows them up top even
-        // before we sort by boost.
-        ...keywordContext!.primary.filter((kw) => SQL_KEYWORDS.includes(kw)),
-        ...(keywordContext!.secondary ?? []).filter((kw) =>
-          SQL_KEYWORDS.includes(kw),
-        ),
-        ...SQL_KEYWORDS.filter(
+        ...keywordContext!.primary,
+        ...(keywordContext!.secondary ?? []),
+        ...profile.keywords.filter(
           (kw) => !primary.has(kw) && !(secondary?.has(kw) ?? false),
         ),
       ]
-    : SQL_KEYWORDS;
+    : profile.keywords;
 
+  const seen = new Set<string>();
   const out: Completion[] = [];
   for (const keyword of orderedKeywords) {
+    if (seen.has(keyword)) continue;
+    seen.add(keyword);
     const isPrimary = primary?.has(keyword) ?? false;
     const isSecondary = secondary?.has(keyword) ?? false;
     if (restrict && !isPrimary && !isSecondary) continue;
+    // For non-restricted, dialect-aware mode: drop any keyword that the
+    // active dialect doesn't recognize *and* isn't pinned by context.
+    if (!restrict && !isPrimary && !isSecondary && !dialectKeywordSet.has(keyword))
+      continue;
     let kwBoost = boost;
     if (hasContext) {
       if (isPrimary) kwBoost = boost + KEYWORD_PRIMARY_BUMP;
@@ -988,7 +1383,7 @@ function keywordOptions(
     });
   }
   if (includeFunctions && !restrict) {
-    for (const fn of SQL_FUNCTIONS) {
+    for (const fn of profile.functions) {
       out.push(
         snippetCompletion(`${fn}(#{})`, {
           label: fn,
@@ -1090,9 +1485,11 @@ function dedupeOptions(options: Completion[]): Completion[] {
 
 export function createSqlCompletionSource(
   schema: SqlCompletionSchema,
+  options: SqlCompletionOptions = {},
 ): CompletionSource {
+  const dialect: SqlDialect = options.dialect ?? "sqlite";
   return (context) => {
-    const info = inferCompletionContext(context);
+    const info = inferCompletionContext(context, dialect);
     if (!info) return null;
 
     const statement = currentStatementBeforeCursor(
@@ -1102,12 +1499,12 @@ export function createSqlCompletionSource(
     const localSchema = effectiveSchema(schema, statement);
 
     const kw = info.keywordContext;
-    const options = (() => {
+    const completions = (() => {
       switch (info.mode) {
         case "tables":
           return [
             ...tableOptions(localSchema, BOOST.tableInTableContext),
-            ...keywordOptions(BOOST.keywordInTableContext, kw),
+            ...keywordOptions(dialect, BOOST.keywordInTableContext, kw),
           ];
         case "columns": {
           const cols = columnOptions(
@@ -1119,13 +1516,13 @@ export function createSqlCompletionSource(
             // No FROM/JOIN/UPDATE/INTO target in scope yet — column suggestions
             // would be misleading, so offer keywords + tables instead.
             return [
-              ...keywordOptions(BOOST.keywordInColumnContext, kw),
+              ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw),
               ...tableOptions(localSchema, BOOST.tableInColumnContext),
             ];
           }
           return [
             ...cols,
-            ...keywordOptions(BOOST.keywordInColumnContext, kw),
+            ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw),
             ...tableOptions(localSchema, BOOST.tableInColumnContext),
           ];
         }
@@ -1140,18 +1537,18 @@ export function createSqlCompletionSource(
           // New-object name slot: only legal trailing keywords like
           // `IF NOT EXISTS`. Tables and free functions would mislead the user
           // here, so we suppress them entirely.
-          return keywordOptions(BOOST.keywordInKeywordContext, kw, {
+          return keywordOptions(dialect, BOOST.keywordInKeywordContext, kw, {
             includeFunctions: false,
           });
         case "keywords":
           return [
-            ...keywordOptions(BOOST.keywordInKeywordContext, kw),
+            ...keywordOptions(dialect, BOOST.keywordInKeywordContext, kw),
             ...tableOptions(localSchema, BOOST.tableInKeywordContext),
           ];
       }
     })();
 
-    const uniqueOptions = dedupeOptions(options);
+    const uniqueOptions = dedupeOptions(completions);
     if (uniqueOptions.length === 0) return null;
     return {
       from: info.from,
