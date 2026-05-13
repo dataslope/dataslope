@@ -4,6 +4,7 @@ import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
 import {
   createSqlCompletionSource,
+  type SqlCompletionOptions,
   type SqlCompletionSchema,
 } from "../app/_components/sql/sqlCompletion";
 
@@ -27,15 +28,19 @@ const schema: SqlCompletionSchema = {
   ],
 };
 
-function complete(doc: string, explicit = false): CompletionResult | null {
-  const state = EditorState.create({ doc });
-  const source = createSqlCompletionSource(schema);
-  const result = source(new CompletionContext(state, doc.length, explicit));
-  if (result instanceof Promise) {
-    throw new Error("SQL completion source should be synchronous");
-  }
-  return result;
+function makeComplete(options: SqlCompletionOptions = {}) {
+  return (doc: string, explicit = false): CompletionResult | null => {
+    const state = EditorState.create({ doc });
+    const source = createSqlCompletionSource(schema, options);
+    const result = source(new CompletionContext(state, doc.length, explicit));
+    if (result instanceof Promise) {
+      throw new Error("SQL completion source should be synchronous");
+    }
+    return result;
+  };
 }
+
+const complete = makeComplete();
 
 function labels(result: CompletionResult | null): string[] {
   return result?.options.map((option) => option.label) ?? [];
@@ -268,5 +273,188 @@ describe("SQLite SQL completion source", () => {
       // Restricted to the name-slot keyword set.
       expect(labelList.sort()).toEqual(["EXISTS", "IF", "NOT"]);
     });
+  });
+
+  describe("dialect catalog filtering (SQLite)", () => {
+    it("exposes SQLite-only keywords like PRAGMA and GLOB", () => {
+      const result = complete("", true);
+      const labelSet = new Set(labels(result));
+      expect(labelSet.has("PRAGMA")).toBe(true);
+      expect(labelSet.has("GLOB")).toBe(true);
+      expect(labelSet.has("REGEXP")).toBe(true);
+      // ILIKE and SIMILAR are Postgres/DuckDB-only — should not appear here.
+      expect(labelSet.has("ILIKE")).toBe(false);
+      expect(labelSet.has("QUALIFY")).toBe(false);
+    });
+
+    it("includes STRFTIME function for SQLite", () => {
+      const result = complete("SELECT ", true);
+      expect(labels(result)).toContain("STRFTIME");
+    });
+  });
+});
+
+describe("PostgreSQL SQL completion source", () => {
+  const completePg = makeComplete({ dialect: "postgres" });
+
+  function topKw(result: CompletionResult | null, n = 8): string[] {
+    return (result?.options ?? [])
+      .filter((opt) => opt.type === "keyword")
+      .slice()
+      .sort((a, b) => (b.boost ?? 0) - (a.boost ?? 0))
+      .slice(0, n)
+      .map((opt) => opt.label);
+  }
+
+  it("offers ILIKE/SIMILAR after WHERE col and hides GLOB", () => {
+    const result = completePg("SELECT * FROM customers WHERE name ", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("ILIKE")).toBe(true);
+    expect(labelSet.has("SIMILAR")).toBe(true);
+    expect(labelSet.has("LIKE")).toBe(true);
+    // SQLite-only operators must not leak into Postgres completion.
+    expect(labelSet.has("GLOB")).toBe(false);
+    expect(labelSet.has("REGEXP")).toBe(false);
+  });
+
+  it("does not surface SQLite-only keywords", () => {
+    const result = completePg("", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("PRAGMA")).toBe(false);
+    expect(labelSet.has("AUTOINCREMENT")).toBe(false);
+  });
+
+  it("offers RETURNING/FROM after UPDATE clause", () => {
+    const result = completePg("UPDATE customers SET name = 'x' ", true);
+    const top = topKw(result, 10);
+    expect(top).toContain("WHERE");
+    expect(top).toContain("RETURNING");
+    expect(top).toContain("FROM");
+  });
+
+  it("offers ON CONFLICT after INSERT … VALUES (…)", () => {
+    const result = completePg(
+      "INSERT INTO customers (id, name) VALUES (1, 'a') ",
+      true,
+    );
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("ON")).toBe(true);
+    expect(labelSet.has("RETURNING")).toBe(true);
+  });
+
+  it("offers Postgres-flavored statement starters", () => {
+    const result = completePg("", true);
+    const top = topKw(result, 12);
+    expect(top).toContain("SELECT");
+    // Secondary set should include TRUNCATE/GRANT/REVOKE for Postgres.
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("TRUNCATE")).toBe(true);
+    expect(labelSet.has("GRANT")).toBe(true);
+  });
+
+  it("offers Postgres functions like NOW and GENERATE_SERIES", () => {
+    const result = completePg("SELECT ", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("NOW")).toBe(true);
+    expect(labelSet.has("GENERATE_SERIES")).toBe(true);
+    expect(labelSet.has("ARRAY_AGG")).toBe(true);
+    // SQLite-specific functions should not appear.
+    expect(labelSet.has("STRFTIME")).toBe(false);
+  });
+
+  it("includes LATERAL as a secondary join modifier after a table", () => {
+    const result = completePg("SELECT * FROM customers ", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("LATERAL")).toBe(true);
+  });
+
+  it("still completes table/column references correctly", () => {
+    const result = completePg("SELECT * FROM customers c WHERE c.");
+    expect(labels(result)).toEqual(["id", "name", "email"]);
+  });
+});
+
+describe("DuckDB SQL completion source", () => {
+  const completeDdb = makeComplete({ dialect: "duckdb" });
+
+  function topKw(result: CompletionResult | null, n = 8): string[] {
+    return (result?.options ?? [])
+      .filter((opt) => opt.type === "keyword")
+      .slice()
+      .sort((a, b) => (b.boost ?? 0) - (a.boost ?? 0))
+      .slice(0, n)
+      .map((opt) => opt.label);
+  }
+
+  it("offers QUALIFY after GROUP BY/ORDER BY", () => {
+    const result = completeDdb(
+      "SELECT * FROM customers GROUP BY name ",
+      true,
+    );
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("QUALIFY")).toBe(true);
+    expect(labelSet.has("HAVING")).toBe(true);
+  });
+
+  it("treats QUALIFY like HAVING for column scope", () => {
+    const result = completeDdb("SELECT * FROM customers QUALIFY ");
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("name")).toBe(true);
+    expect(labelSet.has("email")).toBe(true);
+  });
+
+  it("offers SEMI/ANTI/ASOF as join modifiers after a table", () => {
+    const result = completeDdb("SELECT * FROM customers ", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("SEMI")).toBe(true);
+    expect(labelSet.has("ANTI")).toBe(true);
+    expect(labelSet.has("ASOF")).toBe(true);
+  });
+
+  it("offers DuckDB-flavored statement starters", () => {
+    const result = completeDdb("", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("PIVOT")).toBe(true);
+    expect(labelSet.has("UNPIVOT")).toBe(true);
+    expect(labelSet.has("DESCRIBE")).toBe(true);
+    expect(labelSet.has("SUMMARIZE")).toBe(true);
+  });
+
+  it("exposes DuckDB-specific keywords like EXCLUDE and MACRO", () => {
+    const result = completeDdb("", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("EXCLUDE")).toBe(true);
+    expect(labelSet.has("MACRO")).toBe(true);
+  });
+
+  it("offers DuckDB functions like list_agg and arg_max", () => {
+    const result = completeDdb("SELECT ", true);
+    const labelSet = new Set(labels(result));
+    expect(labelSet.has("LIST_AGG")).toBe(true);
+    expect(labelSet.has("ARG_MAX")).toBe(true);
+    expect(labelSet.has("QUANTILE")).toBe(true);
+    // SQLite-only functions absent.
+    expect(labelSet.has("JULIANDAY")).toBe(false);
+  });
+
+  it("uses ILIKE/SIMILAR for the after-NOT operator menu", () => {
+    const result = completeDdb(
+      "SELECT * FROM customers WHERE name NOT ",
+      true,
+    );
+    const top = topKw(result, 12);
+    expect(top).toContain("ILIKE");
+    expect(top).toContain("SIMILAR");
+    expect(top).not.toContain("GLOB");
+  });
+
+  it("offers CREATE OR REPLACE flavors for CREATE", () => {
+    const result = completeDdb("CREATE ", true);
+    const top = topKw(result, 12);
+    expect(top).toContain("TABLE");
+    expect(top).toContain("VIEW");
+    expect(top).toContain("OR");
+    expect(top).toContain("REPLACE");
+    expect(top).toContain("MATERIALIZED");
   });
 });

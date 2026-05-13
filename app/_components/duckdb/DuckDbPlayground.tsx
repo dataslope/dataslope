@@ -1588,7 +1588,12 @@ function DuckDbPlaygroundInner() {
           ),
           completionComp.of(
             autocompletion({
-              override: [createSqlCompletionSource({ entities: [] })],
+              override: [
+                createSqlCompletionSource(
+                  { entities: [] },
+                  { dialect: "duckdb" },
+                ),
+              ],
             }),
           ),
           themeComp.of(themeFor(initialTheme)),
@@ -1766,7 +1771,11 @@ function DuckDbPlaygroundInner() {
         ),
         completionComp.reconfigure(
           autocompletion({
-            override: [createSqlCompletionSource(completionSchema)],
+            override: [
+              createSqlCompletionSource(completionSchema, {
+                dialect: "duckdb",
+              }),
+            ],
           }),
         ),
       ],

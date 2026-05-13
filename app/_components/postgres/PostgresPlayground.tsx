@@ -1564,7 +1564,12 @@ function PostgresPlaygroundInner() {
           ),
           completionComp.of(
             autocompletion({
-              override: [createSqlCompletionSource({ entities: [] })],
+              override: [
+                createSqlCompletionSource(
+                  { entities: [] },
+                  { dialect: "postgres" },
+                ),
+              ],
             }),
           ),
           themeComp.of(themeFor(initialTheme)),
@@ -1742,7 +1747,11 @@ function PostgresPlaygroundInner() {
         ),
         completionComp.reconfigure(
           autocompletion({
-            override: [createSqlCompletionSource(completionSchema)],
+            override: [
+              createSqlCompletionSource(completionSchema, {
+                dialect: "postgres",
+              }),
+            ],
           }),
         ),
       ],

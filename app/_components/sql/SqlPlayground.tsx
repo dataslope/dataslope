@@ -221,7 +221,7 @@ function replaceDoc(view: EditorView, value: string): void {
 const AUTOCOMPLETE_DELAY_MS = 75;
 
 function sqlAutocompletion(schema: SqlCompletionSchema) {
-  const source = createSqlCompletionSource(schema);
+  const source = createSqlCompletionSource(schema, { dialect: "sqlite" });
   return autocompletion({
     activateOnTyping: true,
     activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
