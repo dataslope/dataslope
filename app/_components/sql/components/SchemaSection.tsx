@@ -8,7 +8,7 @@ import {
   ChevronRight,
   ChevronsDown,
   ChevronsUp,
-  Plus,
+  Grid2x2Plus,
   Table,
 } from "lucide-react";
 
@@ -101,7 +101,7 @@ export function SchemaSection({
               <button
                 type="button"
                 {...props}
-                className="sql-tree-section-add"
+                className="sql-tree-section-expand-toggle"
                 onClick={allExpanded ? onCollapseAll : onExpandAll}
                 aria-label={expandCollapseHint}
               >
@@ -140,7 +140,7 @@ export function SchemaSection({
                 onClick={onAdd}
                 aria-label={addHint}
               >
-                <Plus size={12} aria-hidden="true" />
+                <Grid2x2Plus size={12} aria-hidden="true" />
               </button>
             )}
           />

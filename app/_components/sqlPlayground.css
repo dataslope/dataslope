@@ -183,6 +183,26 @@
   color: var(--text);
 }
 
+/* Expand / collapse all button in a section header — semantically
+   distinct from the "add" button that creates a new entity. */
+.sql-tree-section-expand-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px 4px 4px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sql-tree-section-expand-toggle:hover {
+  color: var(--text);
+}
+
 .sql-tree-section-body {
   display: flex;
   flex-direction: column;
@@ -211,6 +231,13 @@
   flex-direction: column;
 }
 
+/* Single row containing the entity toggle button and inline action buttons. */
+.sql-tree-item-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .sql-tree-chevron {
   display: inline-flex;
   align-items: center;
@@ -224,7 +251,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: transparent;
   border: 0;
   color: var(--text);
@@ -237,6 +265,31 @@
 
 .sql-tree-item:hover {
   background: color-mix(in srgb, var(--bg2) 60%, var(--bg3) 40%);
+}
+
+/* Inline action buttons for each entity row (view data, add row).
+   Always visible so users can discover them without hovering. */
+.sql-tree-entity-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.sql-tree-entity-action-btn:hover {
+  color: var(--text);
+}
+
+/* Right padding so the last action button doesn't butt against the edge. */
+.sql-tree-entity-action-btn:last-child {
+  padding-right: 8px;
 }
 
 .sql-tree-popover-positioner {
@@ -390,8 +443,11 @@
 }
 
 .sql-tree-column-name {
-  flex-shrink: 0;
   font-size: 12px;
+  /* Allow the name to shrink so very long names (after JS truncation)
+     don't overflow the row and crowd the type label. */
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .sql-tree-column-type {
@@ -399,6 +455,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
   /* Push the type label to the right edge of the column row so the
      name and type never compete for the same horizontal space. */
   margin-left: auto;

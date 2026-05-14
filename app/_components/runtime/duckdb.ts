@@ -436,6 +436,61 @@ export interface DuckDbEngine {
   runtimeVersion: () => string;
 }
 
+/** Drop all user-defined objects from the main schema.
+ *  Called before loading any sample so that revisiting the page or
+ *  switching samples never hits "Table with name … already exists!" errors.
+ *
+ *  Views are dropped first (they may depend on tables). Tables are then
+ *  dropped in multiple passes without CASCADE so that FK-referenced tables
+ *  are always dropped after the tables that reference them — DuckDB-Wasm
+ *  may not honour the CASCADE modifier on DROP TABLE even when it parses. */
+async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
+  async function listNames(sql: string): Promise<string[]> {
+    const t = await conn.query(sql);
+    const out: string[] = [];
+    for (let r = 0; r < t.numRows; r++) {
+      const v = t.getChildAt(0)?.get(r);
+      if (v != null) out.push(String(v));
+    }
+    return out;
+  }
+
+  const views = await listNames(
+    `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND NOT internal`,
+  );
+  for (const v of views) {
+    await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)}`);
+  }
+
+  // Drop tables in dependency order by retrying the list until all are gone.
+  // Each pass drops whichever tables no longer have dependents; tables that
+  // still have FK references from surviving tables are skipped and retried in
+  // the next pass.  At most N passes are needed for a chain of N tables, and
+  // the extra +1 pass ensures we still make a final attempt when the very last
+  // table in a chain of length N has been freed only at the end of pass N.
+  let remaining = await listNames(
+    `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
+  );
+  for (let pass = 0; pass < remaining.length + 1 && remaining.length > 0; pass++) {
+    const stillLeft: string[] = [];
+    for (const t of remaining) {
+      try {
+        await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)}`);
+      } catch {
+        stillLeft.push(t); // depends on another surviving table — retry later
+      }
+    }
+    remaining = stillLeft;
+  }
+
+  const seqs = await listNames(
+    `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = 'main'`,
+  );
+  for (const s of seqs) {
+    await conn.query(`DROP SEQUENCE IF EXISTS ${quoteIdent(s)}`);
+  }
+}
+
 async function bootstrapDatabase(
   sample: DuckDbSampleDatabase,
 ): Promise<DuckDbConnection> {
@@ -443,6 +498,9 @@ async function bootstrapDatabase(
   const conn = await db.connect();
   // Force consistent timestamp formatting for reproducible output.
   await conn.query("SET TimeZone='UTC'");
+  // Clear any previously loaded sample so that revisiting the page or
+  // switching samples never hits "Table with name … already exists!" errors.
+  await cleanDuckDbSchema(conn);
   if (sample.sql && sample.sql.trim()) {
     const stmts = splitDuckDbStatements(sample.sql);
     for (const stmt of stmts) {

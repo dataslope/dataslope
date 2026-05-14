@@ -4,11 +4,90 @@ import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
-import { ChevronDown, ChevronRight, Eye, Table } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, Plus, Table, View } from "lucide-react";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { ForeignKeyInfo, TableColumnInfo } from "../../runtime/sqlite";
 import { SINGLE_CLICK_DELAY_MS } from "../constants";
+
+// ─── Column text truncation helpers ─────────────────────────────────
+
+/** Compute column name/type character limits from the current viewport width.
+ *  Defined outside the hook so it is not recreated on every render. */
+function computeTreeColThresholds() {
+  if (typeof window === "undefined") return { nameMax: 18, typeMax: 9 };
+  const nameMax = Math.round(12 + window.innerWidth / 256);
+  const typeMax = Math.round(6 + window.innerWidth / 512);
+  return { nameMax, typeMax };
+}
+
+/** Returns dynamic character thresholds for column names and types that
+ *  scale with the window width so shorter names are never clipped on
+ *  wide screens and very long names are always clipped on narrow ones.
+ *
+ *  Formula rationale:
+ *  - The sidebar is typically ~240 px wide with ~120 px available for
+ *    the column name (after icons, gaps, and the type label).
+ *  - At a base window width of ~1024 px (narrow laptop) the name threshold
+ *    starts at 16 chars (12 + 1024/256) and scales up by ~1 char per 256 px
+ *    of additional window width.
+ *  - The type threshold starts at 8 chars and grows more slowly (one char
+ *    per 512 px) because type strings are typically short (e.g. "INTEGER"). */
+function useTreeColThresholds(): { nameMax: number; typeMax: number } {
+  const [thresholds, setThresholds] = useState(computeTreeColThresholds);
+  useEffect(() => {
+    const handler = () => setThresholds(computeTreeColThresholds());
+    window.addEventListener("resize", handler, { passive: true });
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return thresholds;
+}
+
+/** Renders `text` inside a `<span className={className}>`. When the text
+ *  exceeds `maxLen` characters it is visually truncated with an ellipsis
+ *  and a hover popover shows the full text. */
+function TruncatedText({
+  text,
+  className,
+  maxLen,
+}: {
+  text: string;
+  className?: string;
+  maxLen: number;
+}) {
+  const isTruncated = text.length > maxLen;
+  const display = isTruncated ? text.slice(0, maxLen) + "…" : text;
+
+  if (!isTruncated) {
+    return <span className={className}>{text}</span>;
+  }
+
+  return (
+    <Popover.Root>
+      <Popover.Trigger
+        openOnHover
+        delay={180}
+        closeDelay={80}
+        render={(props) => (
+          <span {...props} className={className}>
+            {display}
+          </span>
+        )}
+      />
+      <Popover.Portal>
+        <Popover.Positioner
+          className="sql-tree-popover-positioner"
+          sideOffset={4}
+          side="right"
+        >
+          <Popover.Popup className="bui-popup sql-tree-popover">
+            {text}
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
 
 export interface SchemaItemProps {
   name: string;
@@ -57,6 +136,7 @@ export function SchemaItem({
   onExport,
   onGetRowCount,
 }: SchemaItemProps) {
+  const { nameMax, typeMax } = useTreeColThresholds();
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
     if (exportRowCount === null) {
@@ -78,7 +158,10 @@ export function SchemaItem({
   const handleExportPointerLeave = useCallback(() => {
     exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
   }, []);
-  const Icon = kind === "view" ? Eye : Table;
+  // EntityIcon renders the table/view glyph on the tree row.  Views use
+  // lucide's dedicated "view" icon; tables use the "table" icon.  This is
+  // separate from the Eye icon used for the "View table data" action button.
+  const EntityIcon = kind === "view" ? View : Table;
   const pkCount = useMemo(
     () => (columns ?? []).filter((c) => c.pk > 0).length,
     [columns],
@@ -123,49 +206,86 @@ export function SchemaItem({
         <ContextMenu.Trigger
           render={(props) => (
             <div {...props} className="sql-tree-entity-trigger">
-              <Popover.Root>
-                <Popover.Trigger
-                  openOnHover
-                  delay={180}
-                  closeDelay={80}
-                  render={(triggerProps) => (
-                    <button
-                      type="button"
-                      {...triggerProps}
-                      className="sql-tree-item"
-                      onClick={handleSingleClick}
-                      onDoubleClick={handleDoubleClick}
-                      aria-expanded={expanded}
+              <div className="sql-tree-item-row">
+                <button
+                  type="button"
+                  className="sql-tree-item"
+                  onClick={handleSingleClick}
+                  onDoubleClick={handleDoubleClick}
+                  aria-expanded={expanded}
+                  title={itemHint}
+                >
+                  <span className="sql-tree-chevron" aria-hidden="true">
+                    {expanded ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </span>
+                  <EntityIcon size={12} aria-hidden="true" />
+                  <span className="sql-tree-item-name">{name}</span>
+                </button>
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={120}
+                    closeDelay={80}
+                    render={(btnProps) => (
+                      <button
+                        type="button"
+                        {...btnProps}
+                        className="sql-tree-entity-action-btn"
+                        onClick={() => onPreview(name, kind)}
+                        aria-label="View data"
+                      >
+                        <Eye size={12} aria-hidden="true" />
+                      </button>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      className="sql-tree-popover-positioner"
+                      sideOffset={6}
+                      align="start"
                     >
-                      <span className="sql-tree-chevron" aria-hidden="true">
-                        {expanded ? (
-                          <ChevronDown size={12} />
-                        ) : (
-                          <ChevronRight size={12} />
-                        )}
-                      </span>
-                      <Icon size={12} aria-hidden="true" />
-                      <span className="sql-tree-item-name">{name}</span>
-                    </button>
-                  )}
-                />
-                <Popover.Portal>
-                  <Popover.Positioner
-                    className="sql-tree-popover-positioner"
-                    sideOffset={6}
-                    side="right"
-                    align="start"
-                  >
-                    <Popover.Popup className="bui-popup sql-tree-popover">
-                      <span className="sql-tree-popover-name">
-                        <Icon size={12} aria-hidden="true" />
-                        <strong>{name}</strong>
-                      </span>
-                      <span className="sql-tree-popover-hint">{itemHint}</span>
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
+                      <Popover.Popup className="bui-popup sql-tree-popover">
+                        View data
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+                {kind === "table" && onAddRow && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={120}
+                      closeDelay={80}
+                      render={(btnProps) => (
+                        <button
+                          type="button"
+                          {...btnProps}
+                          className="sql-tree-entity-action-btn"
+                          onClick={() => onAddRow(name)}
+                          aria-label="Add row"
+                        >
+                          <Plus size={12} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner
+                        className="sql-tree-popover-positioner"
+                        sideOffset={6}
+                        align="start"
+                      >
+                        <Popover.Popup className="bui-popup sql-tree-popover">
+                          Add row
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+              </div>
               {expanded && (
                 <ul className="sql-tree-columns" role="list">
                   {columns === undefined ? (
@@ -245,10 +365,16 @@ export function SchemaItem({
                               </Popover.Root>
                             )}
                           </span>
-                          <span className="sql-tree-column-name">{c.name}</span>
-                          <span className="sql-tree-column-type">
-                            {c.type || "—"}
-                          </span>
+                          <TruncatedText
+                            text={c.name}
+                            className="sql-tree-column-name"
+                            maxLen={nameMax}
+                          />
+                          <TruncatedText
+                            text={c.type || "—"}
+                            className="sql-tree-column-type"
+                            maxLen={typeMax}
+                          />
                         </li>
                       );
                     })
@@ -262,7 +388,7 @@ export function SchemaItem({
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup examples-dropdown">
               <div className="ctx-table-name">
-                <Icon size={12} className="ctx-name-icon" aria-hidden="true" />
+                <EntityIcon size={12} className="ctx-name-icon" aria-hidden="true" />
                 {name}
               </div>
               <ContextMenu.Item
