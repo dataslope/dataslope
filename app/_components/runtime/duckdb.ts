@@ -465,7 +465,9 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   // Drop tables in dependency order by retrying the list until all are gone.
   // Each pass drops whichever tables no longer have dependents; tables that
   // still have FK references from surviving tables are skipped and retried in
-  // the next pass.  At most N passes are needed for a chain of N tables.
+  // the next pass.  At most N passes are needed for a chain of N tables, and
+  // the extra +1 pass ensures we still make a final attempt when the very last
+  // table in a chain of length N has been freed only at the end of pass N.
   let remaining = await listNames(
     `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
   );

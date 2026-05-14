@@ -12,6 +12,15 @@ import { SINGLE_CLICK_DELAY_MS } from "../constants";
 
 // ─── Column text truncation helpers ─────────────────────────────────
 
+/** Compute column name/type character limits from the current viewport width.
+ *  Defined outside the hook so it is not recreated on every render. */
+function computeTreeColThresholds() {
+  if (typeof window === "undefined") return { nameMax: 18, typeMax: 9 };
+  const nameMax = Math.round(12 + window.innerWidth / 256);
+  const typeMax = Math.round(6 + window.innerWidth / 512);
+  return { nameMax, typeMax };
+}
+
 /** Returns dynamic character thresholds for column names and types that
  *  scale with the window width so shorter names are never clipped on
  *  wide screens and very long names are always clipped on narrow ones.
@@ -25,15 +34,9 @@ import { SINGLE_CLICK_DELAY_MS } from "../constants";
  *  - The type threshold starts at 8 chars and grows more slowly (one char
  *    per 512 px) because type strings are typically short (e.g. "INTEGER"). */
 function useTreeColThresholds(): { nameMax: number; typeMax: number } {
-  const compute = () => {
-    if (typeof window === "undefined") return { nameMax: 18, typeMax: 9 };
-    const nameMax = Math.round(12 + window.innerWidth / 256);
-    const typeMax = Math.round(6 + window.innerWidth / 512);
-    return { nameMax, typeMax };
-  };
-  const [thresholds, setThresholds] = useState(compute);
+  const [thresholds, setThresholds] = useState(computeTreeColThresholds);
   useEffect(() => {
-    const handler = () => setThresholds(compute());
+    const handler = () => setThresholds(computeTreeColThresholds());
     window.addEventListener("resize", handler, { passive: true });
     return () => window.removeEventListener("resize", handler);
   }, []);
