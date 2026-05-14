@@ -155,34 +155,40 @@ export interface PostgresEngine {
     pageSize: number,
     offset: number,
   ) => Promise<{ result: QueryExecResult[]; totalCount: number }>;
-  listTables: () => Promise<string[]>;
-  listViews: () => Promise<string[]>;
-  listIndexes: () => Promise<string[]>;
-  listTriggers: () => Promise<string[]>;
-  listColumns: (name: string) => Promise<TableColumnInfo[]>;
-  listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
-  getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
-  createTable: (name: string, columns: ColumnSpec[]) => Promise<void>;
-  rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
+  listSchemas: (includeSystem?: boolean) => Promise<string[]>;
+  createSchema: (name: string) => Promise<void>;
+  listTables: (schema?: string) => Promise<string[]>;
+  listViews: (schema?: string) => Promise<string[]>;
+  listIndexes: (schema?: string) => Promise<string[]>;
+  listTriggers: (schema?: string) => Promise<string[]>;
+  listColumns: (name: string, schema?: string) => Promise<TableColumnInfo[]>;
+  listForeignKeys: (name: string, schema?: string) => Promise<ForeignKeyInfo[]>;
+  getColumnConstraintInfo: (tableName: string, schema?: string) => Promise<ColumnConstraintInfo[]>;
+  createTable: (name: string, columns: ColumnSpec[], schema?: string) => Promise<void>;
+  rebuildTable: (spec: TableRebuildSpec, schema?: string) => Promise<void>;
   dropEntity: (
     name: string,
     kind: "table" | "view" | "index" | "trigger",
+    schema?: string,
   ) => Promise<void>;
-  truncateTable: (name: string) => Promise<void>;
-  getDDL: (name: string) => Promise<string>;
+  truncateTable: (name: string, schema?: string) => Promise<void>;
+  getDDL: (name: string, schema?: string) => Promise<string>;
   deleteRows: (
     tableName: string,
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    schema?: string,
   ) => Promise<number>;
   updateRows: (
     tableName: string,
     updates: ReadonlyArray<{ rowIndex: number; column: string; value: unknown }>,
+    schema?: string,
   ) => Promise<number>;
   insertRow: (
     tableName: string,
     columnNames: string[],
     values: unknown[],
+    schema?: string,
   ) => Promise<void>;
   activeSample: () => PostgresSampleDatabase;
 }
@@ -260,47 +266,83 @@ export async function createPostgresEngine(
       return { result, totalCount };
     },
 
-    async listTables() {
-      const rows = await queryRows<{ table_name: string }>(`
+    async listSchemas(includeSystem = false) {
+      let rows: { nspname: string }[];
+      if (includeSystem) {
+        rows = await queryRows<{ nspname: string }>(`
+          SELECT nspname
+          FROM pg_catalog.pg_namespace
+          ORDER BY nspname
+        `);
+      } else {
+        rows = await queryRows<{ nspname: string }>(`
+          SELECT nspname
+          FROM pg_catalog.pg_namespace
+          WHERE nspname NOT LIKE 'pg\\_%'
+            AND nspname <> 'information_schema'
+          ORDER BY nspname
+        `);
+      }
+      return rows.map((row) => row.nspname);
+    },
+
+    async createSchema(name) {
+      await db.exec(`CREATE SCHEMA ${quoteIdent(name)}`);
+    },
+
+    async listTables(schema = "public") {
+      const rows = await queryRows<{ table_name: string }>(
+        `
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+        WHERE table_schema = $1 AND table_type = 'BASE TABLE'
         ORDER BY table_name
-      `);
+        `,
+        [schema],
+      );
       return rows.map((row) => row.table_name);
     },
 
-    async listViews() {
-      const rows = await queryRows<{ table_name: string }>(`
+    async listViews(schema = "public") {
+      const rows = await queryRows<{ table_name: string }>(
+        `
         SELECT table_name
         FROM information_schema.views
-        WHERE table_schema = 'public'
+        WHERE table_schema = $1
         ORDER BY table_name
-      `);
+        `,
+        [schema],
+      );
       return rows.map((row) => row.table_name);
     },
 
-    async listIndexes() {
-      const rows = await queryRows<{ indexname: string }>(`
+    async listIndexes(schema = "public") {
+      const rows = await queryRows<{ indexname: string }>(
+        `
         SELECT indexname
         FROM pg_indexes
-        WHERE schemaname = 'public'
+        WHERE schemaname = $1
         ORDER BY indexname
-      `);
+        `,
+        [schema],
+      );
       return rows.map((row) => row.indexname);
     },
 
-    async listTriggers() {
-      const rows = await queryRows<{ trigger_name: string }>(`
+    async listTriggers(schema = "public") {
+      const rows = await queryRows<{ trigger_name: string }>(
+        `
         SELECT trigger_name
         FROM information_schema.triggers
-        WHERE trigger_schema = 'public'
+        WHERE trigger_schema = $1
         ORDER BY trigger_name
-      `);
+        `,
+        [schema],
+      );
       return rows.map((row) => row.trigger_name);
     },
 
-    async listColumns(name) {
+    async listColumns(name, schema = "public") {
       const rows = await queryRows<{
         ordinal_position: number;
         column_name: string;
@@ -342,10 +384,10 @@ export async function createPostgresEngine(
          AND kcu.constraint_name = tc.constraint_name
          AND kcu.table_name = c.table_name
          AND kcu.column_name = c.column_name
-        WHERE c.table_schema = 'public' AND c.table_name = $1
+        WHERE c.table_schema = $2 AND c.table_name = $1
         ORDER BY c.ordinal_position
         `,
-        [name],
+        [name, schema],
       );
       return rows.map((row) => ({
         cid: Number(row.ordinal_position) - 1,
@@ -365,7 +407,7 @@ export async function createPostgresEngine(
       }));
     },
 
-    async listForeignKeys(name) {
+    async listForeignKeys(name, schema = "public") {
       const rows = await queryRows<{
         from_column: string;
         to_table: string;
@@ -390,12 +432,12 @@ export async function createPostgresEngine(
         JOIN information_schema.referential_constraints rc
           ON rc.constraint_name = tc.constraint_name
          AND rc.constraint_schema = tc.constraint_schema
-        WHERE tc.table_schema = 'public'
+        WHERE tc.table_schema = $2
           AND tc.table_name = $1
           AND tc.constraint_type = 'FOREIGN KEY'
         ORDER BY kcu.ordinal_position
         `,
-        [name],
+        [name, schema],
       );
       return rows.map((row) => ({
         from: row.from_column,
@@ -406,8 +448,8 @@ export async function createPostgresEngine(
       }));
     },
 
-    async getColumnConstraintInfo(tableName) {
-      const cols = await engine.listColumns(tableName);
+    async getColumnConstraintInfo(tableName, schema = "public") {
+      const cols = await engine.listColumns(tableName, schema);
       const uniqueRows = await queryRows<{ column_name: string }>(
         `
         SELECT kcu.column_name
@@ -415,11 +457,11 @@ export async function createPostgresEngine(
         JOIN information_schema.key_column_usage kcu
           ON kcu.constraint_name = tc.constraint_name
          AND kcu.constraint_schema = tc.constraint_schema
-        WHERE tc.table_schema = 'public'
+        WHERE tc.table_schema = $2
           AND tc.table_name = $1
           AND tc.constraint_type = 'UNIQUE'
         `,
-        [tableName],
+        [tableName, schema],
       );
       const unique = new Set(uniqueRows.map((row) => row.column_name));
       return cols.map((col) => ({
@@ -432,7 +474,7 @@ export async function createPostgresEngine(
       }));
     },
 
-    async createTable(name, columns) {
+    async createTable(name, columns, schema = "public") {
       const finalName = name.trim();
       if (!finalName) throw new Error("Table name cannot be empty.");
       const filteredCols = columns.filter((col) => col.name.trim()).map((col) => ({
@@ -441,11 +483,11 @@ export async function createPostgresEngine(
         type: (col.type || "text").trim(),
       }));
       if (filteredCols.length === 0) throw new Error("A table must have at least one column.");
-      const createSql = renderPgCreateTable(finalName, filteredCols);
+      const createSql = renderPgCreateTable(`${quoteIdent(schema)}.${finalName}`, filteredCols);
       await db.exec(createSql);
     },
 
-    async rebuildTable(spec) {
+    async rebuildTable(spec, schema = "public") {
       const finalName = spec.newName.trim();
       if (!finalName) throw new Error("Table name cannot be empty.");
       const columns = spec.columns.filter((col) => col.name.trim()).map((col) => ({
@@ -489,7 +531,8 @@ export async function createPostgresEngine(
           : columns;
 
       const tmpName = `${spec.originalName}__tmp_rebuild_${++pgRebuildCounter}`;
-      const createSql = renderPgCreateTable(tmpName, patchedColumns);
+      const schemaPrefix = `${quoteIdent(schema)}.`;
+      const createSql = renderPgCreateTable(`${schemaPrefix}${tmpName}`, patchedColumns);
       const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
@@ -498,11 +541,11 @@ export async function createPostgresEngine(
         await db.exec(createSql);
         if (copyable.length > 0) {
           await db.exec(
-            `INSERT INTO ${quoteIdent(tmpName)} (${targetCols}) SELECT ${sourceCols} FROM ${quoteIdent(spec.originalName)}`,
+            `INSERT INTO ${schemaPrefix}${quoteIdent(tmpName)} (${targetCols}) SELECT ${sourceCols} FROM ${schemaPrefix}${quoteIdent(spec.originalName)}`,
           );
         }
-        await db.exec(`DROP TABLE ${quoteIdent(spec.originalName)} CASCADE`);
-        await db.exec(`ALTER TABLE ${quoteIdent(tmpName)} RENAME TO ${quoteIdent(finalName)}`);
+        await db.exec(`DROP TABLE ${schemaPrefix}${quoteIdent(spec.originalName)} CASCADE`);
+        await db.exec(`ALTER TABLE ${schemaPrefix}${quoteIdent(tmpName)} RENAME TO ${quoteIdent(finalName)}`);
         await db.exec("COMMIT");
       } catch (err) {
         try {
@@ -514,7 +557,7 @@ export async function createPostgresEngine(
       }
     },
 
-    async dropEntity(name, kind) {
+    async dropEntity(name, kind, schema = "public") {
       const keyword =
         kind === "table"
           ? "TABLE"
@@ -525,30 +568,30 @@ export async function createPostgresEngine(
               : "TRIGGER";
       if (kind === "trigger") {
         const rows = await queryRows<{ event_object_table: string }>(
-          `SELECT event_object_table FROM information_schema.triggers WHERE trigger_schema = 'public' AND trigger_name = $1 LIMIT 1`,
-          [name],
+          `SELECT event_object_table FROM information_schema.triggers WHERE trigger_schema = $2 AND trigger_name = $1 LIMIT 1`,
+          [name, schema],
         );
         const table = rows[0]?.event_object_table;
         if (!table) return;
-        await db.exec(`DROP TRIGGER IF EXISTS ${quoteIdent(name)} ON ${quoteIdent(table)}`);
+        await db.exec(`DROP TRIGGER IF EXISTS ${quoteIdent(name)} ON ${quoteIdent(schema)}.${quoteIdent(table)}`);
       } else {
-        await db.exec(`DROP ${keyword} IF EXISTS ${quoteIdent(name)} CASCADE`);
+        await db.exec(`DROP ${keyword} IF EXISTS ${quoteIdent(schema)}.${quoteIdent(name)} CASCADE`);
       }
     },
 
-    async truncateTable(name) {
-      await db.exec(`TRUNCATE TABLE ${quoteIdent(name)} RESTART IDENTITY CASCADE`);
+    async truncateTable(name, schema = "public") {
+      await db.exec(`TRUNCATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} RESTART IDENTITY CASCADE`);
     },
 
-    async getDDL(name) {
+    async getDDL(name, schema = "public") {
       const tableRows = await queryRows<{ table_name: string }>(
-        `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1 AND table_type = 'BASE TABLE'`,
-        [name],
+        `SELECT table_name FROM information_schema.tables WHERE table_schema = $2 AND table_name = $1 AND table_type = 'BASE TABLE'`,
+        [name, schema],
       );
       if (tableRows.length > 0) {
         const [cols, fks] = await Promise.all([
-          engine.listColumns(name),
-          engine.listForeignKeys(name),
+          engine.listColumns(name, schema),
+          engine.listForeignKeys(name, schema),
         ]);
         const colSql = cols.map((col) => {
           if (col.generated) {
@@ -568,18 +611,18 @@ export async function createPostgresEngine(
             `  FOREIGN KEY (${quoteIdent(fk.from)}) REFERENCES ${quoteIdent(fk.table)}(${quoteIdent(fk.to)}) ON DELETE ${normalizeFkAction(fk.onDelete)} ON UPDATE ${normalizeFkAction(fk.onUpdate)}`,
           );
         }
-        return `CREATE TABLE ${quoteIdent(name)} (\n${colSql.join(",\n")}\n);`;
+        return `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} (\n${colSql.join(",\n")}\n);`;
       }
       const viewRows = await queryRows<{ definition: string }>(
-        `SELECT definition FROM pg_views WHERE schemaname = 'public' AND viewname = $1`,
-        [name],
+        `SELECT definition FROM pg_views WHERE schemaname = $2 AND viewname = $1`,
+        [name, schema],
       );
       if (viewRows.length > 0 && viewRows[0].definition) {
-        return `CREATE VIEW ${quoteIdent(name)} AS\n${viewRows[0].definition}`;
+        return `CREATE VIEW ${quoteIdent(schema)}.${quoteIdent(name)} AS\n${viewRows[0].definition}`;
       }
       const indexRows = await queryRows<{ indexdef: string }>(
-        `SELECT indexdef FROM pg_indexes WHERE schemaname = 'public' AND indexname = $1`,
-        [name],
+        `SELECT indexdef FROM pg_indexes WHERE schemaname = $2 AND indexname = $1`,
+        [name, schema],
       );
       if (indexRows.length > 0 && indexRows[0].indexdef) {
         return `${indexRows[0].indexdef};`;
@@ -590,11 +633,13 @@ export async function createPostgresEngine(
            pg_get_functiondef(p.oid) AS funcdef
          FROM pg_trigger t
          JOIN pg_class c ON c.oid = t.tgrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
          JOIN pg_proc p ON p.oid = t.tgfoid
          WHERE t.tgname = $1
+           AND n.nspname = $2
            AND NOT t.tgisinternal
          LIMIT 1`,
-        [name],
+        [name, schema],
       );
       if (trigRows.length > 0) {
         const { funcdef, triggerdef } = trigRows[0];
@@ -603,24 +648,26 @@ export async function createPostgresEngine(
       return "";
     },
 
-    async deleteRows(tableName, pkColumns, pkRows) {
+    async deleteRows(tableName, pkColumns, pkRows, schema = "public") {
       let deleted = 0;
+      const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       for (const row of pkRows) {
         const where = pkColumns.map((column, i) => `${quoteIdent(column)} = $${i + 1}`).join(" AND ");
-        const result = await db.query(`DELETE FROM ${quoteIdent(tableName)} WHERE ${where}`, [...row]);
+        const result = await db.query(`DELETE FROM ${qualifiedTable} WHERE ${where}`, [...row]);
         deleted += result.affectedRows ?? 0;
       }
       return deleted;
     },
 
-    async updateRows(tableName, updates) {
+    async updateRows(tableName, updates, schema = "public") {
       let count = 0;
+      const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       for (const update of updates) {
         await db.query(
-          `UPDATE ${quoteIdent(tableName)}
+          `UPDATE ${qualifiedTable}
            SET ${quoteIdent(update.column)} = $1
            WHERE ctid = (
-             SELECT ctid FROM ${quoteIdent(tableName)} ORDER BY ctid LIMIT 1 OFFSET $2
+             SELECT ctid FROM ${qualifiedTable} ORDER BY ctid LIMIT 1 OFFSET $2
            )`,
           [update.value, update.rowIndex],
         );
@@ -629,11 +676,11 @@ export async function createPostgresEngine(
       return count;
     },
 
-    async insertRow(tableName, columnNames, values) {
+    async insertRow(tableName, columnNames, values, schema = "public") {
       const cols = columnNames.map(quoteIdent).join(", ");
       const params = values.map((_, i) => `$${i + 1}`).join(", ");
       await db.query(
-        `INSERT INTO ${quoteIdent(tableName)} (${cols}) VALUES (${params})`,
+        `INSERT INTO ${quoteIdent(schema)}.${quoteIdent(tableName)} (${cols}) VALUES (${params})`,
         values,
       );
     },

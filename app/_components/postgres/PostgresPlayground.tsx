@@ -57,6 +57,7 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
 import { Select } from "@base-ui-components/react/select";
+import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui-components/react/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,6 +71,7 @@ import {
   FileText,
   GripVertical,
   History,
+  Layers,
   Network,
   Pencil,
   Play,
@@ -926,6 +928,10 @@ function PostgresPlaygroundInner() {
   const setClearBeforeRunState = usePostgresSettingsStore(
     (s) => s.setClearBeforeRun,
   );
+  const showSystemSchemas = usePostgresSettingsStore((s) => s.showSystemSchemas);
+  const setShowSystemSchemasState = usePostgresSettingsStore(
+    (s) => s.setShowSystemSchemas,
+  );
 
   const setFontSize = useCallback(
     (n: number) => {
@@ -1032,6 +1038,16 @@ function PostgresPlaygroundInner() {
   const [rowCountByTable, setRowCountByTable] = useState<
     Record<string, number>
   >({});
+
+  // ─── Schema state ─────────────────────────────────────────────────────
+  const [selectedSchema, setSelectedSchema] = useState("public");
+  const [schemas, setSchemas] = useState<string[]>(["public"]);
+  const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
+  const [createSchemaName, setCreateSchemaName] = useState("");
+  const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
+  // Refs so callbacks can read the latest values without stale closures.
+  const selectedSchemaRef = useRef("public");
+  const showSystemSchemasRef = useRef(false);
 
   // ─── Query history ────────────────────────────────────────────────────
   const {
@@ -1235,19 +1251,20 @@ function PostgresPlaygroundInner() {
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine) return;
+    const schema = selectedSchemaRef.current;
     const [nextTables, nextViews, nextIndexes, nextTriggers] =
       await Promise.all([
-        engine.listTables(),
-        engine.listViews(),
-        engine.listIndexes(),
-        engine.listTriggers(),
+        engine.listTables(schema),
+        engine.listViews(schema),
+        engine.listIndexes(schema),
+        engine.listTriggers(schema),
       ]);
     const entries = await Promise.all(
       [...nextTables, ...nextViews].map(async (name) => {
         const [colsResult, fksResult, countResult] = await Promise.allSettled([
-          engine.listColumns(name),
-          engine.listForeignKeys(name),
-          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`),
+          engine.listColumns(name, schema),
+          engine.listForeignKeys(name, schema),
+          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(schema)}.${quoteIdent(name)}`),
         ]);
         const cols = colsResult.status === "fulfilled" ? colsResult.value : [];
         const fks = fksResult.status === "fulfilled" ? fksResult.value : [];
@@ -1272,6 +1289,68 @@ function PostgresPlaygroundInner() {
       Object.fromEntries(entries.map(([name, , , count]) => [name, count])),
     );
   }, []);
+
+  const refreshSchemas = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const nextSchemas = await engine.listSchemas(showSystemSchemasRef.current);
+    setSchemas(nextSchemas);
+    // If the selected schema no longer exists, fall back to public.
+    if (!nextSchemas.includes(selectedSchemaRef.current)) {
+      selectedSchemaRef.current = "public";
+      setSelectedSchema("public");
+    }
+  }, []);
+
+  const handleSchemaChange = useCallback(
+    async (schema: string) => {
+      selectedSchemaRef.current = schema;
+      setSelectedSchema(schema);
+      setExpandedEntities(new Set());
+      await refreshSchema();
+    },
+    [refreshSchema],
+  );
+
+  function validateSchemaName(name: string, existingSchemas: string[]): string[] {
+    const errors: string[] = [];
+    const trimmed = name.trim();
+    if (!trimmed) {
+      errors.push("Schema name cannot be empty.");
+    } else if (/^pg_/i.test(trimmed)) {
+      errors.push('Schema names beginning with "pg_" are not allowed.');
+    } else if (existingSchemas.includes(trimmed)) {
+      errors.push(`Schema "${trimmed}" already exists.`);
+    }
+    return errors;
+  }
+
+  const handleCreateSchema = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const name = createSchemaName.trim();
+    const errors = validateSchemaName(name, schemas);
+    if (errors.length > 0) return;
+    setCreateSchemaSubmitting(true);
+    try {
+      await engine.createSchema(name);
+      await refreshSchemas();
+      selectedSchemaRef.current = name;
+      setSelectedSchema(name);
+      setExpandedEntities(new Set());
+      await refreshSchema();
+      setCreateSchemaDialogOpen(false);
+      setCreateSchemaName("");
+      showToast(`Schema "${name}" created.`);
+    } catch (err) {
+      showToast(
+        `Failed to create schema: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    } finally {
+      setCreateSchemaSubmitting(false);
+    }
+  }, [createSchemaName, schemas, refreshSchemas, refreshSchema, showToast]);
 
   const runSqlForTab = useCallback(
     async (
@@ -1643,7 +1722,7 @@ function PostgresPlaygroundInner() {
         const engine = await createPostgresEngine(initialDbId);
         if (cancelled) return;
         engineRef.current = engine;
-        await refreshSchema();
+        await Promise.all([refreshSchema(), refreshSchemas()]);
         setLoaded(true);
         setStatusState("ready");
       } catch (err) {
@@ -1725,6 +1804,12 @@ function PostgresPlaygroundInner() {
       `${effective}px`,
     );
   }, [outputFontSizeEnabled, outputFontSize, fontSize]);
+
+  // Keep showSystemSchemasRef in sync and refresh schemas when toggled.
+  useEffect(() => {
+    showSystemSchemasRef.current = showSystemSchemas;
+    void refreshSchemas();
+  }, [showSystemSchemas, refreshSchemas]);
 
   // Keep autocomplete schema in sync with current tables/views.
   useEffect(() => {
@@ -1813,7 +1898,11 @@ function PostgresPlaygroundInner() {
         tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
-        await refreshSchema();
+        // Reset to public schema on database switch.
+        selectedSchemaRef.current = "public";
+        setSelectedSchema("public");
+        setExpandedEntities(new Set());
+        await Promise.all([refreshSchema(), refreshSchemas()]);
         setStatusState("ready");
         showToast(`Loaded ${sample.filename}.`);
       } catch (err) {
@@ -1824,7 +1913,7 @@ function PostgresPlaygroundInner() {
         setStatusState("ready");
       }
     },
-    [persistTabs, refreshSchema, showToast],
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
   const requestDbSwitch = useCallback(
@@ -1915,7 +2004,8 @@ function PostgresPlaygroundInner() {
 
   const previewEntity = useCallback(
     (name: string, kind: "table" | "view") => {
-      const sql = `SELECT * FROM ${quoteIdent(name)};`;
+      const schema = selectedSchemaRef.current;
+      const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(name)};`;
       const tab: QueryTab = {
         id: newTabId(),
         title: name,
@@ -2182,11 +2272,12 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       if (pkColumns.length === 0 || pkRows.length === 0) return;
       const tabId = activeTabIdRef.current;
-      void engine.deleteRows(tableName, pkColumns, pkRows).then((deleted) => {
+      const schema = selectedSchemaRef.current;
+      void engine.deleteRows(tableName, pkColumns, pkRows, schema).then((deleted) => {
         showToast(
           `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
         );
-        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
         void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
@@ -2211,7 +2302,8 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       if (updates.length === 0) return;
       const tabId = activeTabIdRef.current;
-      void engine.updateRows(tableName, updates).then((count) => {
+      const schema = selectedSchemaRef.current;
+      void engine.updateRows(tableName, updates, schema).then((count) => {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
@@ -2232,7 +2324,7 @@ function PostgresPlaygroundInner() {
           // Pass the bare SELECT (without ORDER BY) as baseSql so that
           // subsequent column-header sorting doesn't produce a double-ORDER-BY
           // syntax error ("... ORDER BY pk ORDER BY col ASC").
-          const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
+          const baseSql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`;
           const sql = `${baseSql}${orderBy};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
         }
@@ -2249,7 +2341,7 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name);
+        const cols = await engine.listColumns(name, selectedSchemaRef.current);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -2276,7 +2368,7 @@ function PostgresPlaygroundInner() {
       return v === "" ? null : v;
     });
     try {
-      await engine.insertRow(tableName, columnNames, rowValues);
+      await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
       if (addAnother) {
         const newValues: Record<string, string> = {};
@@ -2301,7 +2393,8 @@ function PostgresPlaygroundInner() {
 
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
-      const sql = `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)};`;
+      const schema = selectedSchemaRef.current;
+      const sql = `SELECT COUNT(*) AS row_count FROM ${quoteIdent(schema)}.${quoteIdent(name)};`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Count: ${name}`,
@@ -2322,7 +2415,7 @@ function PostgresPlaygroundInner() {
   const viewDDL = useCallback(
     async (name: string) => {
       try {
-        const ddl = await engineRef.current?.getDDL(name);
+        const ddl = await engineRef.current?.getDDL(name, selectedSchemaRef.current);
         if (!ddl?.trim()) {
           showToast(`No DDL found for "${name}".`, "warn");
           return;
@@ -2339,9 +2432,10 @@ function PostgresPlaygroundInner() {
   const openEntityStructure = useCallback(
     async (name: string) => {
       const engine = engineRef.current;
+      const schema = selectedSchemaRef.current;
       // Display SQL is for the editor tab only — actual execution uses
       // parameterized execParams below to prevent injection.
-      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
+      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = '${schema.replace(/'/g, "''")}'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Structure: ${name}`,
@@ -2352,9 +2446,9 @@ function PostgresPlaygroundInner() {
       setActiveTabId(tab.id);
       if (!engine) return;
       // Run via parameterized query to avoid any injection risk.
-      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`;
+      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = $2 AND table_name = $1 ORDER BY ordinal_position`;
       try {
-        const sets = await engine.execParams(paramSql, [name]);
+        const sets = await engine.execParams(paramSql, [name, schema]);
         setResultsByTab((prev) => ({
           ...prev,
           [tab.id]: {
@@ -2383,7 +2477,7 @@ function PostgresPlaygroundInner() {
     if (!target) return;
     setPendingDropEntity(null);
     try {
-      await engineRef.current?.dropEntity(target.name, target.kind);
+      await engineRef.current?.dropEntity(target.name, target.kind, selectedSchemaRef.current);
       await refreshSchema();
       showToast(`Dropped ${target.kind} "${target.name}".`);
     } catch (err) {
@@ -2403,7 +2497,7 @@ function PostgresPlaygroundInner() {
     if (!name) return;
     setPendingTruncate(null);
     try {
-      await engineRef.current?.truncateTable(name);
+      await engineRef.current?.truncateTable(name, selectedSchemaRef.current);
       showToast(`Truncated table "${name}".`);
     } catch (err) {
       showToast(
@@ -2418,8 +2512,9 @@ function PostgresPlaygroundInner() {
       name: string,
       format: "csv" | "json" | "sql" | "parquet" | "xlsx",
     ) => {
+      const schema = selectedSchemaRef.current;
       const sets = await engineRef.current?.exec(
-        `SELECT * FROM ${quoteIdent(name)}`,
+        `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(name)}`,
       );
       const set = sets?.[0];
       if (!set) return;
@@ -2568,11 +2663,12 @@ function PostgresPlaygroundInner() {
     async (name: string) => {
       const engine = engineRef.current;
       if (!engine) return;
+      const schema = selectedSchemaRef.current;
       try {
         const [cols, fks, constraints] = await Promise.all([
-          engine.listColumns(name),
-          engine.listForeignKeys(name),
-          engine.getColumnConstraintInfo(name),
+          engine.listColumns(name, schema),
+          engine.listForeignKeys(name, schema),
+          engine.getColumnConstraintInfo(name, schema),
         ]);
         const fkByCol = new Map<string, ForeignKeyInfo>();
         for (const fk of fks) fkByCol.set(fk.from, fk);
@@ -2667,7 +2763,7 @@ function PostgresPlaygroundInner() {
               }
             : undefined,
         })),
-      });
+      }, selectedSchemaRef.current);
       await refreshSchema();
       showToast(`Updated structure of "${dialog.newTableName.trim()}".`);
       setViewStructureDialog(null);
@@ -2748,6 +2844,7 @@ function PostgresPlaygroundInner() {
               }
             : undefined,
         })),
+        selectedSchemaRef.current,
       );
       await refreshSchema();
       showToast(`Created table "${trimmedName}".`);
@@ -2765,18 +2862,19 @@ function PostgresPlaygroundInner() {
   const exportPostgresDatabase = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
+    const schema = selectedSchemaRef.current;
     try {
       const lines: string[] = [
         `-- PostgreSQL dump`,
         `-- Generated by Dataslope\n`,
       ];
       for (const tableName of tables) {
-        const ddl = await engine.getDDL(tableName);
+        const ddl = await engine.getDDL(tableName, schema);
         if (ddl) {
           lines.push(`${ddl};\n`);
         }
         const sets = await engine.exec(
-          `SELECT * FROM ${quoteIdent(tableName)}`,
+          `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`,
         );
         const set = sets?.[0];
         if (!set) continue;
@@ -2816,6 +2914,7 @@ function PostgresPlaygroundInner() {
   const exportPostgresDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
+    const schema = selectedSchemaRef.current;
     const baseName =
       activeSample.filename.replace(/\.[^.]+$/, "") || "database";
     const filename = `${baseName}.xlsx`;
@@ -2825,7 +2924,7 @@ function PostgresPlaygroundInner() {
       let sheetCount = 0;
       for (const tableName of tables) {
         const sets = await engine.exec(
-          `SELECT * FROM ${quoteIdent(tableName)}`,
+          `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`,
         );
         const set = sets?.[0];
         if (!set) continue;
@@ -3396,6 +3495,40 @@ function PostgresPlaygroundInner() {
               <span>Reset query tabs for {activeSample.label}</span>
             </button>
           }
+          extraTabs={[
+            {
+              value: "database",
+              trigger: (
+                <>
+                  <Database size={14} aria-hidden="true" />
+                  <span className="settings-tab-label">Database</span>
+                </>
+              ),
+              panel: (
+                <div className="settings-panel-pane">
+                  <div className="settings-body">
+                    <div className="setting-row">
+                      <label className="setting-switch-row">
+                        <span className="setting-switch-label">
+                          <Layers size={14} aria-hidden="true" />
+                          <span>Show system schemas</span>
+                        </span>
+                        <Switch.Root
+                          checked={showSystemSchemas}
+                          onCheckedChange={(checked) => {
+                            setShowSystemSchemasState(checked);
+                          }}
+                          className="bui-switch"
+                        >
+                          <Switch.Thumb className="bui-switch-thumb" />
+                        </Switch.Root>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
         />
 
         <Dialog.Root
@@ -3447,6 +3580,62 @@ function PostgresPlaygroundInner() {
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {/* ── Create schema dialog ── */}
+        <Dialog.Root
+          open={createSchemaDialogOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setCreateSchemaDialogOpen(false);
+              setCreateSchemaName("");
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup">
+              <Dialog.Title className="confirm-title">
+                Create Schema
+              </Dialog.Title>
+              <input
+                type="text"
+                className="sql-rename-input"
+                placeholder="Schema name"
+                value={createSchemaName}
+                onChange={(e) => setCreateSchemaName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleCreateSchema();
+                }}
+                autoFocus
+              />
+              {(() => {
+                const errors = validateSchemaName(createSchemaName, schemas);
+                return errors.length > 0 && createSchemaName.trim() !== "" ? (
+                  <div className="sql-schema-create-error">
+                    {errors[0]}
+                  </div>
+                ) : null;
+              })()}
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  disabled={
+                    createSchemaSubmitting ||
+                    validateSchemaName(createSchemaName, schemas).length > 0
+                  }
+                  onClick={() => void handleCreateSchema()}
+                >
+                  Create
+                </button>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
 
         <AlertDialog.Root
           open={pendingDbId !== null}
@@ -4338,6 +4527,70 @@ function PostgresPlaygroundInner() {
                   </Select.Positioner>
                 </Select.Portal>
               </Select.Root>
+            </div>
+            <div className="sql-schema-selector-wrap">
+              <div className="sql-db-selector-row">
+                <Select.Root
+                  value={selectedSchema}
+                  onValueChange={(value) => void handleSchemaChange(String(value))}
+                >
+                  <Select.Trigger
+                    className="sql-db-selector"
+                    aria-label="Select schema"
+                  >
+                    <Layers
+                      size={14}
+                      className="sql-db-selector-icon"
+                      aria-hidden="true"
+                    />
+                    <Select.Value className="sql-db-selector-value">
+                      {selectedSchema}
+                    </Select.Value>
+                    <Select.Icon className="playground-switcher-icon">
+                      <ChevronDown size={12} />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner
+                      className="sql-db-positioner"
+                      sideOffset={6}
+                      alignItemWithTrigger={false}
+                    >
+                      <Select.Popup className="bui-select-popup sql-db-popup">
+                        {schemas.map((schema) => (
+                          <Select.Item
+                            key={schema}
+                            value={schema}
+                            className="bui-select-item sql-db-item"
+                          >
+                            <span
+                              className="bui-select-item-icon"
+                              aria-hidden="true"
+                            >
+                              <Layers size={14} />
+                            </span>
+                            <span className="sql-db-item-text">
+                              <Select.ItemText>{schema}</Select.ItemText>
+                            </span>
+                          </Select.Item>
+                        ))}
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <button
+                  type="button"
+                  className="sql-schema-create-btn"
+                  title="Create schema"
+                  aria-label="Create schema"
+                  onClick={() => {
+                    setCreateSchemaName("");
+                    setCreateSchemaDialogOpen(true);
+                  }}
+                >
+                  <Plus size={14} aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <div className="sql-tree">
               <SchemaSection

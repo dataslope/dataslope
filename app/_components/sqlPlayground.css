@@ -4001,3 +4001,43 @@
   color: var(--text-dim);
   user-select: none;
 }
+
+/* ─── Schema selector ─── */
+.sql-schema-selector-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 4px 6px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-schema-create-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.12s, background 0.12s;
+  line-height: 1;
+}
+
+.sql-schema-create-btn:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-schema-create-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+/* Validation error inside the Create Schema dialog */
+.sql-schema-create-error {
+  font-size: 12px;
+  color: var(--danger, #ef4444);
+  padding: 6px 2px 0;
+}
