@@ -439,8 +439,11 @@ export interface DuckDbEngine {
 /** Drop all user-defined objects from the main schema.
  *  Called before loading any sample so that revisiting the page or
  *  switching samples never hits "Table with name … already exists!" errors.
- *  Views are dropped first (they may depend on tables), then tables with
- *  CASCADE (to handle FK references), then sequences. */
+ *
+ *  Views are dropped first (they may depend on tables). Tables are then
+ *  dropped in multiple passes without CASCADE so that FK-referenced tables
+ *  are always dropped after the tables that reference them — DuckDB-Wasm
+ *  may not honour the CASCADE modifier on DROP TABLE even when it parses. */
 async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   async function listNames(sql: string): Promise<string[]> {
     const t = await conn.query(sql);
@@ -456,14 +459,26 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
     `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND NOT internal`,
   );
   for (const v of views) {
-    await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)} CASCADE`);
+    await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)}`);
   }
 
-  const tables = await listNames(
+  // Drop tables in dependency order by retrying the list until all are gone.
+  // Each pass drops whichever tables no longer have dependents; tables that
+  // still have FK references from surviving tables are skipped and retried in
+  // the next pass.  At most N passes are needed for a chain of N tables.
+  let remaining = await listNames(
     `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
   );
-  for (const t of tables) {
-    await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)} CASCADE`);
+  for (let pass = 0; pass < remaining.length + 1 && remaining.length > 0; pass++) {
+    const stillLeft: string[] = [];
+    for (const t of remaining) {
+      try {
+        await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)}`);
+      } catch {
+        stillLeft.push(t); // depends on another surviving table — retry later
+      }
+    }
+    remaining = stillLeft;
   }
 
   const seqs = await listNames(

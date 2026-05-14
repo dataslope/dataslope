@@ -231,17 +231,11 @@
   flex-direction: column;
 }
 
-/* Single row containing the entity toggle button and any inline
-   action buttons (view data, add row). Action buttons are hidden
-   until the row is hovered so they never crowd the entity name. */
+/* Single row containing the entity toggle button and inline action buttons. */
 .sql-tree-item-row {
   display: flex;
   align-items: center;
   width: 100%;
-}
-
-.sql-tree-item-row:hover .sql-tree-item {
-  background: color-mix(in srgb, var(--bg2) 60%, var(--bg3) 40%);
 }
 
 .sql-tree-chevron {
@@ -273,10 +267,10 @@
   background: color-mix(in srgb, var(--bg2) 60%, var(--bg3) 40%);
 }
 
-/* Inline action buttons shown on table row hover (view data, add row).
-   Hidden by default; revealed when .sql-tree-item-row is hovered. */
+/* Inline action buttons for each entity row (view data, add row).
+   Always visible so users can discover them without hovering. */
 .sql-tree-entity-action-btn {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
@@ -293,12 +287,8 @@
   color: var(--text);
 }
 
-.sql-tree-item-row:hover .sql-tree-entity-action-btn {
-  display: inline-flex;
-}
-
 /* Right padding so the last action button doesn't butt against the edge. */
-.sql-tree-item-row:hover .sql-tree-entity-action-btn:last-child {
+.sql-tree-entity-action-btn:last-child {
   padding-right: 8px;
 }
 

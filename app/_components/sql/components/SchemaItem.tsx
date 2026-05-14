@@ -204,29 +204,38 @@ export function SchemaItem({
           render={(props) => (
             <div {...props} className="sql-tree-entity-trigger">
               <div className="sql-tree-item-row">
+                <button
+                  type="button"
+                  className="sql-tree-item"
+                  onClick={handleSingleClick}
+                  onDoubleClick={handleDoubleClick}
+                  aria-expanded={expanded}
+                  title={itemHint}
+                >
+                  <span className="sql-tree-chevron" aria-hidden="true">
+                    {expanded ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </span>
+                  <EntityIcon size={12} aria-hidden="true" />
+                  <span className="sql-tree-item-name">{name}</span>
+                </button>
                 <Popover.Root>
                   <Popover.Trigger
                     openOnHover
-                    delay={180}
+                    delay={120}
                     closeDelay={80}
-                    render={(triggerProps) => (
+                    render={(btnProps) => (
                       <button
                         type="button"
-                        {...triggerProps}
-                        className="sql-tree-item"
-                        onClick={handleSingleClick}
-                        onDoubleClick={handleDoubleClick}
-                        aria-expanded={expanded}
+                        {...btnProps}
+                        className="sql-tree-entity-action-btn"
+                        onClick={() => onPreview(name, kind)}
+                        aria-label="View data"
                       >
-                        <span className="sql-tree-chevron" aria-hidden="true">
-                          {expanded ? (
-                            <ChevronDown size={12} />
-                          ) : (
-                            <ChevronRight size={12} />
-                          )}
-                        </span>
-                        <EntityIcon size={12} aria-hidden="true" />
-                        <span className="sql-tree-item-name">{name}</span>
+                        <Eye size={12} aria-hidden="true" />
                       </button>
                     )}
                   />
@@ -234,82 +243,44 @@ export function SchemaItem({
                     <Popover.Positioner
                       className="sql-tree-popover-positioner"
                       sideOffset={6}
-                      side="right"
                       align="start"
                     >
                       <Popover.Popup className="bui-popup sql-tree-popover">
-                        <span className="sql-tree-popover-name">
-                          <EntityIcon size={12} aria-hidden="true" />
-                          <strong>{name}</strong>
-                        </span>
-                        <span className="sql-tree-popover-hint">{itemHint}</span>
+                        View data
                       </Popover.Popup>
                     </Popover.Positioner>
                   </Popover.Portal>
                 </Popover.Root>
-                {kind === "table" && (
-                  <>
-                    <Popover.Root>
-                      <Popover.Trigger
-                        openOnHover
-                        delay={120}
-                        closeDelay={80}
-                        render={(btnProps) => (
-                          <button
-                            type="button"
-                            {...btnProps}
-                            className="sql-tree-entity-action-btn"
-                            onClick={() => onPreview(name, kind)}
-                            aria-label="View table data"
-                          >
-                            <Eye size={12} aria-hidden="true" />
-                          </button>
-                        )}
-                      />
-                      <Popover.Portal>
-                        <Popover.Positioner
-                          className="sql-tree-popover-positioner"
-                          sideOffset={6}
-                          align="start"
+                {kind === "table" && onAddRow && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={120}
+                      closeDelay={80}
+                      render={(btnProps) => (
+                        <button
+                          type="button"
+                          {...btnProps}
+                          className="sql-tree-entity-action-btn"
+                          onClick={() => onAddRow(name)}
+                          aria-label="Add row"
                         >
-                          <Popover.Popup className="bui-popup sql-tree-popover">
-                            View table data
-                          </Popover.Popup>
-                        </Popover.Positioner>
-                      </Popover.Portal>
-                    </Popover.Root>
-                    {onAddRow && (
-                      <Popover.Root>
-                        <Popover.Trigger
-                          openOnHover
-                          delay={120}
-                          closeDelay={80}
-                          render={(btnProps) => (
-                            <button
-                              type="button"
-                              {...btnProps}
-                              className="sql-tree-entity-action-btn"
-                              onClick={() => onAddRow(name)}
-                              aria-label="Add row"
-                            >
-                              <Plus size={12} aria-hidden="true" />
-                            </button>
-                          )}
-                        />
-                        <Popover.Portal>
-                          <Popover.Positioner
-                            className="sql-tree-popover-positioner"
-                            sideOffset={6}
-                            align="start"
-                          >
-                            <Popover.Popup className="bui-popup sql-tree-popover">
-                              Add row
-                            </Popover.Popup>
-                          </Popover.Positioner>
-                        </Popover.Portal>
-                      </Popover.Root>
-                    )}
-                  </>
+                          <Plus size={12} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner
+                        className="sql-tree-popover-positioner"
+                        sideOffset={6}
+                        align="start"
+                      >
+                        <Popover.Popup className="bui-popup sql-tree-popover">
+                          Add row
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
                 )}
               </div>
               {expanded && (
