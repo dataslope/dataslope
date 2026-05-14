@@ -434,6 +434,12 @@ export interface DuckDbEngine {
   exportDatabase: () => Promise<{ data: Uint8Array; mimeType: string; suggestedExtension: string }>;
   activeSample: () => DuckDbSampleDatabase;
   runtimeVersion: () => string;
+  /** Close the engine's current connection. The shared DuckDB-Wasm module
+   *  is kept alive across navigations on purpose (its WASM bundle is large
+   *  and the browser already cached it), but the per-engine connection
+   *  must be released when the playground component unmounts so its
+   *  schema work cannot interleave with a freshly created engine. */
+  destroy: () => Promise<void>;
 }
 
 /** Drop all user-defined objects from the main schema.
@@ -491,23 +497,41 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   }
 }
 
+// All bootstrap operations share the same module-level DuckDB instance, which
+// means their schema-cleanup and CREATE-TABLE statements run against a single
+// catalog. Two concurrent bootstraps — e.g. an in-flight engine load whose
+// component unmounted and a fresh engine load from the next mount, or
+// React StrictMode's double-invoked effect, or two rapid database switches —
+// can interleave their cleanup and create steps and produce
+// "Table with name 'customers' already exists" errors. The promise chain
+// below queues every bootstrap so they execute one at a time.
+let _bootstrapChain: Promise<unknown> = Promise.resolve();
+
 async function bootstrapDatabase(
   sample: DuckDbSampleDatabase,
 ): Promise<DuckDbConnection> {
-  const { db } = await getDuckDbInstance();
-  const conn = await db.connect();
-  // Force consistent timestamp formatting for reproducible output.
-  await conn.query("SET TimeZone='UTC'");
-  // Clear any previously loaded sample so that revisiting the page or
-  // switching samples never hits "Table with name … already exists!" errors.
-  await cleanDuckDbSchema(conn);
-  if (sample.sql && sample.sql.trim()) {
-    const stmts = splitDuckDbStatements(sample.sql);
-    for (const stmt of stmts) {
-      await conn.query(stmt);
+  const run = async (): Promise<DuckDbConnection> => {
+    const { db } = await getDuckDbInstance();
+    const conn = await db.connect();
+    // Force consistent timestamp formatting for reproducible output.
+    await conn.query("SET TimeZone='UTC'");
+    // Clear any previously loaded sample so that revisiting the page or
+    // switching samples never hits "Table with name … already exists!" errors.
+    await cleanDuckDbSchema(conn);
+    if (sample.sql && sample.sql.trim()) {
+      const stmts = splitDuckDbStatements(sample.sql);
+      for (const stmt of stmts) {
+        await conn.query(stmt);
+      }
     }
-  }
-  return conn;
+    return conn;
+  };
+  const next = _bootstrapChain.then(run, run);
+  // Swallow rejection on the chain itself so a single failed bootstrap
+  // doesn't poison every subsequent call. The original error still reaches
+  // the caller via `next`.
+  _bootstrapChain = next.catch(() => undefined);
+  return next;
 }
 
 export async function createDuckDbEngine(
@@ -515,6 +539,7 @@ export async function createDuckDbEngine(
 ): Promise<DuckDbEngine> {
   let sample = findDuckDbSampleDatabase(initialSampleId);
   let conn = await bootstrapDatabase(sample);
+  let destroyed = false;
 
   async function rowsFor(sql: string, params?: unknown[]): Promise<unknown[][]> {
     let prepared = sql;
@@ -560,8 +585,20 @@ export async function createDuckDbEngine(
 
   const engine: DuckDbEngine = {
     async loadSampleDatabase(id) {
-      sample = findDuckDbSampleDatabase(id);
-      const next = await bootstrapDatabase(sample);
+      const target = findDuckDbSampleDatabase(id);
+      const next = await bootstrapDatabase(target);
+      if (destroyed) {
+        // The component unmounted while this switch was in flight. Don't
+        // adopt the new connection — close it so the orphaned bootstrap
+        // doesn't outlive the engine.
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        return sample;
+      }
+      sample = target;
       try {
         await conn.close();
       } catch {
@@ -572,8 +609,16 @@ export async function createDuckDbEngine(
     },
 
     async loadBlankDatabase() {
-      sample = DUCKDB_BLANK_DATABASE;
       const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE);
+      if (destroyed) {
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        return sample;
+      }
+      sample = DUCKDB_BLANK_DATABASE;
       try {
         await conn.close();
       } catch {
@@ -1098,6 +1143,16 @@ export async function createDuckDbEngine(
 
     runtimeVersion() {
       return DUCKDB_VERSION;
+    },
+
+    async destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      try {
+        await conn.close();
+      } catch {
+        /* ignore */
+      }
     },
   };
 
