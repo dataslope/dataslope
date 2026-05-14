@@ -1665,7 +1665,14 @@ function DuckDbPlaygroundInner() {
       try {
         setLoadingMessage("Loading DuckDB engine…");
         const engine = await createDuckDbEngine(initialDbId);
-        if (cancelled) return;
+        if (cancelled) {
+          // The component already unmounted while bootstrap was in flight.
+          // The engine never reaches engineRef, so the unmount cleanup
+          // can't destroy it — do it here instead so its connection
+          // doesn't outlive this mount and interfere with the next one.
+          void engine.destroy();
+          return;
+        }
         engineRef.current = engine;
         await refreshSchema();
         setLoaded(true);

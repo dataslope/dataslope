@@ -447,9 +447,14 @@ export interface DuckDbEngine {
  *  switching samples never hits "Table with name … already exists!" errors.
  *
  *  Views are dropped first (they may depend on tables). Tables are then
- *  dropped in multiple passes without CASCADE so that FK-referenced tables
- *  are always dropped after the tables that reference them — DuckDB-Wasm
- *  may not honour the CASCADE modifier on DROP TABLE even when it parses. */
+ *  dropped iteratively: each pass attempts to drop every remaining table
+ *  and re-queries the catalog to see which are left, looping until either
+ *  none remain or no progress is made (in which case the catalog is in an
+ *  unexpected state and we surface a clear error). Each drop tries CASCADE
+ *  first — DuckDB 1.30+ honours it, and falls back to a plain DROP TABLE
+ *  if an older WASM build rejects the keyword — so a table referenced by
+ *  FKs from other tables still in the catalog can be dropped without
+ *  having to compute a topological order. */
 async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   async function listNames(sql: string): Promise<string[]> {
     const t = await conn.query(sql);
@@ -461,39 +466,88 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
     return out;
   }
 
+  async function remainingTables(): Promise<string[]> {
+    return listNames(
+      `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
+    );
+  }
+
   const views = await listNames(
     `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND NOT internal`,
   );
   for (const v of views) {
-    await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)}`);
-  }
-
-  // Drop tables in dependency order by retrying the list until all are gone.
-  // Each pass drops whichever tables no longer have dependents; tables that
-  // still have FK references from surviving tables are skipped and retried in
-  // the next pass.  At most N passes are needed for a chain of N tables, and
-  // the extra +1 pass ensures we still make a final attempt when the very last
-  // table in a chain of length N has been freed only at the end of pass N.
-  let remaining = await listNames(
-    `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
-  );
-  for (let pass = 0; pass < remaining.length + 1 && remaining.length > 0; pass++) {
-    const stillLeft: string[] = [];
-    for (const t of remaining) {
+    try {
+      await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)} CASCADE`);
+    } catch {
       try {
-        await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)}`);
+        await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)}`);
       } catch {
-        stillLeft.push(t); // depends on another surviving table — retry later
+        /* surface as a remaining-table error below if it matters */
       }
     }
-    remaining = stillLeft;
+  }
+
+  let remaining = await remainingTables();
+  while (remaining.length > 0) {
+    const before = remaining.length;
+    for (const t of remaining) {
+      try {
+        await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)} CASCADE`);
+      } catch {
+        try {
+          await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)}`);
+        } catch {
+          // Still has dependents — leave it for the next pass.
+        }
+      }
+    }
+    remaining = await remainingTables();
+    if (remaining.length >= before) {
+      // No progress: either every remaining table has a circular FK
+      // dependency or DROP TABLE is silently leaving them behind. Drop
+      // each table's foreign-key constraints individually and retry one
+      // last time so the next bootstrap doesn't hit a stale catalog.
+      for (const t of remaining) {
+        const safe = t.replace(/'/g, "''");
+        const fks = await listNames(
+          `SELECT constraint_name FROM duckdb_constraints() WHERE schema_name = 'main' AND table_name = '${safe}' AND constraint_type = 'FOREIGN KEY' AND constraint_name IS NOT NULL`,
+        );
+        for (const fk of fks) {
+          try {
+            await conn.query(
+              `ALTER TABLE ${quoteIdent(t)} DROP CONSTRAINT ${quoteIdent(fk)}`,
+            );
+          } catch {
+            /* ignore — final DROP TABLE will surface a useful error */
+          }
+        }
+      }
+      for (const t of remaining) {
+        try {
+          await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)}`);
+        } catch {
+          /* will be reported below */
+        }
+      }
+      remaining = await remainingTables();
+      if (remaining.length > 0) {
+        throw new Error(
+          `Failed to clear DuckDB catalog: tables still present after cleanup: ${remaining.join(", ")}`,
+        );
+      }
+      break;
+    }
   }
 
   const seqs = await listNames(
     `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = 'main'`,
   );
   for (const s of seqs) {
-    await conn.query(`DROP SEQUENCE IF EXISTS ${quoteIdent(s)}`);
+    try {
+      await conn.query(`DROP SEQUENCE IF EXISTS ${quoteIdent(s)}`);
+    } catch {
+      /* ignore — sample SQL would re-create any name conflicts explicitly */
+    }
   }
 }
 
