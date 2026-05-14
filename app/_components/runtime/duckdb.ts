@@ -436,6 +436,44 @@ export interface DuckDbEngine {
   runtimeVersion: () => string;
 }
 
+/** Drop all user-defined objects from the main schema.
+ *  Called before loading any sample so that revisiting the page or
+ *  switching samples never hits "Table with name … already exists!" errors.
+ *  Views are dropped first (they may depend on tables), then tables with
+ *  CASCADE (to handle FK references), then sequences. */
+async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
+  async function listNames(sql: string): Promise<string[]> {
+    const t = await conn.query(sql);
+    const out: string[] = [];
+    for (let r = 0; r < t.numRows; r++) {
+      const v = t.getChildAt(0)?.get(r);
+      if (v != null) out.push(String(v));
+    }
+    return out;
+  }
+
+  const views = await listNames(
+    `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND NOT internal`,
+  );
+  for (const v of views) {
+    await conn.query(`DROP VIEW IF EXISTS ${quoteIdent(v)} CASCADE`);
+  }
+
+  const tables = await listNames(
+    `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal`,
+  );
+  for (const t of tables) {
+    await conn.query(`DROP TABLE IF EXISTS ${quoteIdent(t)} CASCADE`);
+  }
+
+  const seqs = await listNames(
+    `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = 'main'`,
+  );
+  for (const s of seqs) {
+    await conn.query(`DROP SEQUENCE IF EXISTS ${quoteIdent(s)}`);
+  }
+}
+
 async function bootstrapDatabase(
   sample: DuckDbSampleDatabase,
 ): Promise<DuckDbConnection> {
@@ -443,6 +481,9 @@ async function bootstrapDatabase(
   const conn = await db.connect();
   // Force consistent timestamp formatting for reproducible output.
   await conn.query("SET TimeZone='UTC'");
+  // Clear any previously loaded sample so that revisiting the page or
+  // switching samples never hits "Table with name … already exists!" errors.
+  await cleanDuckDbSchema(conn);
   if (sample.sql && sample.sql.trim()) {
     const stmts = splitDuckDbStatements(sample.sql);
     for (const stmt of stmts) {

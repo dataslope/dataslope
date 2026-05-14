@@ -4405,6 +4405,24 @@ function DuckDbPlaygroundInner() {
                 expanded={viewsExpanded}
                 onToggle={() => setViewsExpanded((v) => !v)}
                 emptyMessage="No views."
+                allExpanded={
+                  views.length > 0 &&
+                  views.every((name) => expandedEntities.has(name))
+                }
+                onExpandAll={() =>
+                  setExpandedEntities((prev) => {
+                    const next = new Set(prev);
+                    for (const name of views) next.add(name);
+                    return next;
+                  })
+                }
+                onCollapseAll={() =>
+                  setExpandedEntities((prev) => {
+                    const next = new Set(prev);
+                    for (const name of views) next.delete(name);
+                    return next;
+                  })
+                }
               >
                 {views.map((name) => (
                   <SchemaItem
