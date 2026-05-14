@@ -1319,6 +1319,8 @@ function PostgresPlaygroundInner() {
       errors.push("Schema name cannot be empty.");
     } else if (/^pg_/i.test(trimmed)) {
       errors.push('Schema names beginning with "pg_" are not allowed.');
+    } else if (trimmed === "information_schema") {
+      errors.push('Schema name "information_schema" is reserved.');
     } else if (existingSchemas.includes(trimmed)) {
       errors.push(`Schema "${trimmed}" already exists.`);
     }
