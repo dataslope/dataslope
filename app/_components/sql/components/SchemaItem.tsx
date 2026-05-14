@@ -14,7 +14,16 @@ import { SINGLE_CLICK_DELAY_MS } from "../constants";
 
 /** Returns dynamic character thresholds for column names and types that
  *  scale with the window width so shorter names are never clipped on
- *  wide screens and very long names are always clipped on narrow ones. */
+ *  wide screens and very long names are always clipped on narrow ones.
+ *
+ *  Formula rationale:
+ *  - The sidebar is typically ~240 px wide with ~120 px available for
+ *    the column name (after icons, gaps, and the type label).
+ *  - At a base window width of ~1024 px (narrow laptop) the name threshold
+ *    starts at 16 chars (12 + 1024/256) and scales up by ~1 char per 256 px
+ *    of additional window width.
+ *  - The type threshold starts at 8 chars and grows more slowly (one char
+ *    per 512 px) because type strings are typically short (e.g. "INTEGER"). */
 function useTreeColThresholds(): { nameMax: number; typeMax: number } {
   const compute = () => {
     if (typeof window === "undefined") return { nameMax: 18, typeMax: 9 };
@@ -146,7 +155,10 @@ export function SchemaItem({
   const handleExportPointerLeave = useCallback(() => {
     exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
   }, []);
-  const Icon = kind === "view" ? View : Table;
+  // EntityIcon renders the table/view glyph on the tree row.  Views use
+  // lucide's dedicated "view" icon; tables use the "table" icon.  This is
+  // separate from the Eye icon used for the "View table data" action button.
+  const EntityIcon = kind === "view" ? View : Table;
   const pkCount = useMemo(
     () => (columns ?? []).filter((c) => c.pk > 0).length,
     [columns],
@@ -213,7 +225,7 @@ export function SchemaItem({
                             <ChevronRight size={12} />
                           )}
                         </span>
-                        <Icon size={12} aria-hidden="true" />
+                        <EntityIcon size={12} aria-hidden="true" />
                         <span className="sql-tree-item-name">{name}</span>
                       </button>
                     )}
@@ -227,7 +239,7 @@ export function SchemaItem({
                     >
                       <Popover.Popup className="bui-popup sql-tree-popover">
                         <span className="sql-tree-popover-name">
-                          <Icon size={12} aria-hidden="true" />
+                          <EntityIcon size={12} aria-hidden="true" />
                           <strong>{name}</strong>
                         </span>
                         <span className="sql-tree-popover-hint">{itemHint}</span>
@@ -402,7 +414,7 @@ export function SchemaItem({
           <ContextMenu.Positioner sideOffset={6}>
             <ContextMenu.Popup className="bui-popup examples-dropdown">
               <div className="ctx-table-name">
-                <Icon size={12} className="ctx-name-icon" aria-hidden="true" />
+                <EntityIcon size={12} className="ctx-name-icon" aria-hidden="true" />
                 {name}
               </div>
               <ContextMenu.Item
