@@ -1665,7 +1665,14 @@ function DuckDbPlaygroundInner() {
       try {
         setLoadingMessage("Loading DuckDB engine…");
         const engine = await createDuckDbEngine(initialDbId);
-        if (cancelled) return;
+        if (cancelled) {
+          // The component already unmounted while bootstrap was in flight.
+          // The engine never reaches engineRef, so the unmount cleanup
+          // can't destroy it — do it here instead so its connection
+          // doesn't outlive this mount and interfere with the next one.
+          void engine.destroy();
+          return;
+        }
         engineRef.current = engine;
         await refreshSchema();
         setLoaded(true);
@@ -1686,6 +1693,16 @@ function DuckDbPlaygroundInner() {
       completionCompRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      // Release the per-mount DuckDB connection. The shared DuckDB-Wasm
+      // module is kept in module-level state on purpose so the WASM
+      // bundle doesn't have to be re-downloaded, but leaving the
+      // connection open lets its catalog work race with the connection
+      // a remount creates next.
+      const engine = engineRef.current;
+      engineRef.current = null;
+      if (engine) {
+        void engine.destroy();
+      }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1809,6 +1826,18 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
+      // Clear the sidebar schema state up front so the previous database's
+      // tables/views/indexes can never render under the new database's
+      // label while the bootstrap and `refreshSchema()` calls below are in
+      // flight.
+      setTables([]);
+      setViews([]);
+      setIndexes([]);
+      setTriggers([]);
+      setColumnsByEntity({});
+      setForeignKeysByEntity({});
+      setRowCountByTable({});
+      setExpandedEntities(new Set());
       try {
         const sample =
           nextId === DUCKDB_BLANK_DATABASE.id
