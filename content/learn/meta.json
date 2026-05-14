@@ -11,6 +11,8 @@
     "c",
     "cpp",
     "java",
-    "csharp"
+    "csharp",
+    "---",
+    "challenge-test"
   ]
 }
