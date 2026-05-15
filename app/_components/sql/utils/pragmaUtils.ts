@@ -10,10 +10,10 @@ const PRAGMA_SYNC_MAP: Record<string, string> = {
 const PRAGMA_PAGE_SIZE_MIN = 512;
 const PRAGMA_PAGE_SIZE_MAX = 65536;
 
-export function applyPragmasToEngine(
+export async function applyPragmasToEngine(
   engine: SqliteEngine,
   p: PragmaSettings,
-): void {
+): Promise<void> {
   const statements: string[] = [
     `PRAGMA foreign_keys = ${p.foreignKeys ? "ON" : "OFF"}`,
     `PRAGMA journal_mode = ${p.journalMode}`,
@@ -24,7 +24,7 @@ export function applyPragmasToEngine(
   ];
   for (const sql of statements) {
     try {
-      engine.exec(sql);
+      await engine.exec(sql);
     } catch {
       // Silently ignore unsupported pragmas (e.g. page_size on a non-empty db).
     }

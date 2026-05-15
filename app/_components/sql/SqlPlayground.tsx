@@ -875,10 +875,10 @@ const PRAGMA_SYNC_MAP: Record<string, string> = {
  *  changes in the Pragmas settings tab. Errors are swallowed so a single
  *  unsupported pragma (e.g. page_size on an existing database) does not
  *  prevent the other pragmas from being applied. */
-function applyPragmasToEngine(
+async function applyPragmasToEngine(
   engine: import("../runtime/sqlite").SqliteEngine,
   p: PragmaSettings,
-): void {
+): Promise<void> {
   const statements: string[] = [
     `PRAGMA foreign_keys = ${p.foreignKeys ? "ON" : "OFF"}`,
     `PRAGMA journal_mode = ${p.journalMode}`,
@@ -889,7 +889,7 @@ function applyPragmasToEngine(
   ];
   for (const sql of statements) {
     try {
-      engine.exec(sql);
+      await engine.exec(sql);
     } catch {
       // Silently ignore unsupported pragmas (e.g. page_size on a non-empty db).
     }
@@ -1670,7 +1670,7 @@ function SqlPlaygroundInner() {
         // ignore quota errors
       }
       if (engineRef.current) {
-        applyPragmasToEngine(engineRef.current, p);
+        void applyPragmasToEngine(engineRef.current, p);
       }
       showToast("Pragma settings saved.");
     },
@@ -1970,14 +1970,20 @@ function SqlPlaygroundInner() {
         // Apply any user-saved pragma settings to the freshly-initialised
         // database. pragmaSettingsRef is already populated from the
         // localStorage hydration effect that runs synchronously on mount.
-        applyPragmasToEngine(engine, pragmaSettingsRef.current);
+        await applyPragmasToEngine(engine, pragmaSettingsRef.current);
 
-        const sample = engine.activeSample();
+        const sample = await engine.activeSample();
         setActiveDbId(sample.id);
-        setTables(engine.listTables());
-        setViews(engine.listViews());
-        setIndexes(engine.listIndexes());
-        setTriggers(engine.listTriggers());
+        const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
+          engine.listTables(),
+          engine.listViews(),
+          engine.listIndexes(),
+          engine.listTriggers(),
+        ]);
+        setTables(nextTables);
+        setViews(nextViews);
+        setIndexes(nextIndexes);
+        setTriggers(nextTriggers);
 
         // Initialise the editor with the active tab's contents.
         const view = editorRef.current;
@@ -2042,40 +2048,47 @@ function SqlPlaygroundInner() {
     const sqlComp = sqlLangCompRef.current;
     const completionComp = completionCompRef.current;
     if (!engine || !view || !sqlComp || !completionComp) return;
-    const schema: Record<string, string[]> = {};
-    const completionSchema: SqlCompletionSchema = { entities: [] };
-    for (const name of tables) {
-      try {
-        schema[name] = engine.listColumns(name).map((c) => c.name);
-      } catch {
-        schema[name] = [];
+    let cancelled = false;
+    void (async () => {
+      const schema: Record<string, string[]> = {};
+      const completionSchema: SqlCompletionSchema = { entities: [] };
+      for (const name of tables) {
+        try {
+          schema[name] = (await engine.listColumns(name)).map((c) => c.name);
+        } catch {
+          schema[name] = [];
+        }
+        completionSchema.entities.push({
+          name,
+          columns: schema[name],
+          kind: "table",
+        });
       }
-      completionSchema.entities.push({
-        name,
-        columns: schema[name],
-        kind: "table",
-      });
-    }
-    for (const name of views) {
-      try {
-        schema[name] = engine.listColumns(name).map((c) => c.name);
-      } catch {
-        schema[name] = [];
+      for (const name of views) {
+        try {
+          schema[name] = (await engine.listColumns(name)).map((c) => c.name);
+        } catch {
+          schema[name] = [];
+        }
+        completionSchema.entities.push({
+          name,
+          columns: schema[name],
+          kind: "view",
+        });
       }
-      completionSchema.entities.push({
-        name,
-        columns: schema[name],
-        kind: "view",
+      if (cancelled) return;
+      view.dispatch({
+        effects: [
+          sqlComp.reconfigure(
+            sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
+          ),
+          completionComp.reconfigure(sqlAutocompletion(completionSchema)),
+        ],
       });
-    }
-    view.dispatch({
-      effects: [
-        sqlComp.reconfigure(
-          sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
-        ),
-        completionComp.reconfigure(sqlAutocompletion(completionSchema)),
-      ],
-    });
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [tables, views]);
 
   useEffect(() => {
@@ -3266,11 +3279,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importCsvState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importCsvState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportCsvState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importCsvState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportCsvState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3280,9 +3294,10 @@ function SqlPlaygroundInner() {
                                     prev.headers,
                                     tableCols,
                                   ),
-                                }
-                              : null,
-                          );
+                                  }
+                                : null,
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3309,9 +3324,10 @@ function SqlPlaygroundInner() {
                         value={importCsvState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportCsvState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportCsvState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3320,9 +3336,10 @@ function SqlPlaygroundInner() {
                                     prev.headers,
                                     tableCols,
                                   ),
-                                }
-                              : null,
-                          );
+                                  }
+                                : null,
+                            );
+                          })();
                         }}
                         autoFocus
                       >
@@ -3504,11 +3521,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importJsonState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importJsonState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportJsonState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importJsonState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportJsonState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3520,7 +3538,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3547,9 +3566,10 @@ function SqlPlaygroundInner() {
                         value={importJsonState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportJsonState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportJsonState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3560,7 +3580,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                         autoFocus
                       >
@@ -3742,11 +3763,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importParquetState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importParquetState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportParquetState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importParquetState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportParquetState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3758,7 +3780,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3785,9 +3808,10 @@ function SqlPlaygroundInner() {
                         value={importParquetState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportParquetState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportParquetState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3798,7 +3822,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                         autoFocus
                       >

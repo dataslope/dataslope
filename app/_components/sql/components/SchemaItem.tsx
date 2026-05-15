@@ -114,7 +114,7 @@ export interface SchemaItemProps {
     name: string,
     format: "csv" | "json" | "sql" | "parquet" | "xlsx",
   ) => void;
-  onGetRowCount: (name: string) => number;
+  onGetRowCount: (name: string) => number | Promise<number>;
 }
 
 export function SchemaItem({
@@ -140,7 +140,7 @@ export function SchemaItem({
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
     if (exportRowCount === null) {
-      setExportRowCount(onGetRowCount(name));
+      void Promise.resolve(onGetRowCount(name)).then(setExportRowCount);
     }
   }, [exportRowCount, onGetRowCount, name]);
 

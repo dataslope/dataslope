@@ -112,13 +112,26 @@ export function ModifyColumnRow({
     zIndex: isDragging ? 1 : undefined,
   };
 
-  const fkTargetColumns = useMemo(() => {
-    if (!engine || !col.fkTable) return [] as TableColumnInfo[];
-    try {
-      return engine.listColumns(col.fkTable);
-    } catch {
-      return [] as TableColumnInfo[];
+  const [fkTargetColumns, setFkTargetColumns] = useState<TableColumnInfo[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!engine || !col.fkTable) {
+      queueMicrotask(() => {
+        if (!cancelled) setFkTargetColumns([]);
+      });
+      return;
     }
+    void engine
+      .listColumns(col.fkTable)
+      .then((cols) => {
+        if (!cancelled) setFkTargetColumns(cols);
+      })
+      .catch(() => {
+        if (!cancelled) setFkTargetColumns([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [engine, col.fkTable]);
   return (
     <tr
@@ -427,8 +440,10 @@ export function ModifyStructureForm({
     const isExpanded = expandedItems.has(name);
     if (!isExpanded && !(name in itemDdls) && engine) {
       try {
-        const sql = engine.getDDL(name);
-        setItemDdls((prev) => ({ ...prev, [name]: sql }));
+        void engine
+          .getDDL(name)
+          .then((sql) => setItemDdls((prev) => ({ ...prev, [name]: sql })))
+          .catch(() => setItemDdls((prev) => ({ ...prev, [name]: "" })));
       } catch {
         setItemDdls((prev) => ({ ...prev, [name]: "" }));
       }
@@ -516,24 +531,35 @@ export function ModifyStructureForm({
     [state.columns],
   );
 
-  const tableIndexes = useMemo(() => {
-    if (!engine || !state.originalName) return [] as string[];
-    try {
-      return engine.listTableIndexes(state.originalName);
-    } catch {
-      return [] as string[];
+  const [tableIndexes, setTableIndexes] = useState<string[]>([]);
+  const [tableTriggers, setTableTriggers] = useState<string[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!engine || !state.originalName) {
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setTableIndexes([]);
+        setTableTriggers([]);
+      });
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, state.originalName, refreshKey]);
-
-  const tableTriggers = useMemo(() => {
-    if (!engine || !state.originalName) return [] as string[];
-    try {
-      return engine.listTableTriggers(state.originalName);
-    } catch {
-      return [] as string[];
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void Promise.all([
+      engine.listTableIndexes(state.originalName),
+      engine.listTableTriggers(state.originalName),
+    ])
+      .then(([indexes, triggers]) => {
+        if (cancelled) return;
+        setTableIndexes(indexes);
+        setTableTriggers(triggers);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTableIndexes([]);
+        setTableTriggers([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [engine, state.originalName, refreshKey]);
 
   return (

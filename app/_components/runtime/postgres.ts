@@ -1,6 +1,7 @@
 "use client";
 
 import { PGlite } from "@electric-sql/pglite";
+import { PGliteWorker } from "@electric-sql/pglite/worker";
 import type { QueryExecResult, SqlValue } from "sql.js";
 import type {
   ColumnSpec,
@@ -194,7 +195,9 @@ export interface PostgresEngine {
 }
 
 async function createFreshDatabase(sample: PostgresSampleDatabase): Promise<PGlite> {
-  const db = new PGlite();
+  const db = new PGliteWorker(
+    new Worker(new URL("./postgres-worker.ts", import.meta.url)),
+  ) as unknown as PGlite;
   await db.waitReady;
   await db.exec(sample.sql);
   return db;
@@ -225,7 +228,9 @@ export async function createPostgresEngine(
 
     async loadBlankDatabase() {
       sample = POSTGRES_BLANK_DATABASE;
-      const next = new PGlite();
+      const next = new PGliteWorker(
+        new Worker(new URL("./postgres-worker.ts", import.meta.url)),
+      ) as unknown as PGlite;
       await next.waitReady;
       await db.close();
       db = next;

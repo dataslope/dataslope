@@ -41,7 +41,7 @@ interface ErTableActions {
   onDrop: (name: string) => void;
   onViewDDL: (name: string) => void;
   onExport: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
-  onGetRowCount: (name: string) => number;
+  onGetRowCount: (name: string) => number | Promise<number>;
 }
 
 interface ErSelectionState {
@@ -109,7 +109,7 @@ function ErTableNode({ data }: NodeProps) {
   const [exportRowCount, setExportRowCount] = useState<number | null>(null);
   const ensureRowCount = useCallback(() => {
     if (exportRowCount === null && actions?.onGetRowCount) {
-      setExportRowCount(actions.onGetRowCount(tableName));
+      void Promise.resolve(actions.onGetRowCount(tableName)).then(setExportRowCount);
     }
   }, [exportRowCount, actions, tableName]);
 
@@ -695,7 +695,7 @@ export interface ErDiagramPaneProps {
   onDrop?: (name: string, kind: "table" | "view") => void;
   onViewDDL?: (name: string, kind: "table" | "view") => void;
   onExport?: (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => void;
-  onGetRowCount?: (name: string) => number;
+  onGetRowCount?: (name: string) => number | Promise<number>;
 }
 
 export function ErDiagramPane({

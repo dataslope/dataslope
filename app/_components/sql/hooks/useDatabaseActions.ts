@@ -124,7 +124,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   );
 
   const applyDbLoad = useCallback(
-    (sample: SqliteSampleDatabase) => {
+    async (sample: SqliteSampleDatabase) => {
       const engine = engineRef.current;
       if (!engine) return;
       saveTabs(activeDbIdRef.current, tabsRef.current);
@@ -140,11 +140,17 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       } catch {
         // ignore
       }
-      applyPragmasToEngine(engine, pragmaSettingsRef.current);
-      setTables(engine.listTables());
-      setViews(engine.listViews());
-      setIndexes(engine.listIndexes());
-      setTriggers(engine.listTriggers());
+      await applyPragmasToEngine(engine, pragmaSettingsRef.current);
+      const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
+        engine.listTables(),
+        engine.listViews(),
+        engine.listIndexes(),
+        engine.listTriggers(),
+      ]);
+      setTables(nextTables);
+      setViews(nextViews);
+      setIndexes(nextIndexes);
+      setTriggers(nextTriggers);
       setColumnsByEntity({});
       setForeignKeysByEntity({});
 
@@ -187,9 +193,11 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     (nextId: string) => {
       const engine = engineRef.current;
       if (!engine) return;
-      const sample = engine.loadSampleDatabase(nextId);
-      applyDbLoad(sample);
-      showToast(`Loaded ${sample.filename}.`);
+      void (async () => {
+        const sample = await engine.loadSampleDatabase(nextId);
+        await applyDbLoad(sample);
+        showToast(`Loaded ${sample.filename}.`);
+      })();
     },
     [applyDbLoad, showToast, engineRef],
   );
@@ -197,30 +205,34 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const performBlankLoad = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    const sample = engine.loadBlankDatabase();
-    setCustomFilenames((prev) => {
-      if (!(sample.id in prev)) return prev;
-      const next = { ...prev };
-      delete next[sample.id];
-      return next;
-    });
-    applyDbLoad(sample);
-    showToast("Created blank database.");
+    void (async () => {
+      const sample = await engine.loadBlankDatabase();
+      setCustomFilenames((prev) => {
+        if (!(sample.id in prev)) return prev;
+        const next = { ...prev };
+        delete next[sample.id];
+        return next;
+      });
+      await applyDbLoad(sample);
+      showToast("Created blank database.");
+    })();
   }, [applyDbLoad, showToast, engineRef, setCustomFilenames]);
 
   const performImportSqlite = useCallback(
     (bytes: Uint8Array, filename: string) => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const sample = engine.loadFromBytes(bytes, filename);
-        applyDbLoad(sample);
+        const sample = await engine.loadFromBytes(bytes, filename);
+        await applyDbLoad(sample);
         setImportSqliteOpen(false);
         showToast(`Imported ${filename}.`);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Import failed: ${msg}`, "warn");
       }
+      })();
     },
     [applyDbLoad, showToast, engineRef, setImportSqliteOpen],
   );
@@ -242,9 +254,10 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const exportDatabase = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
+    void (async () => {
     try {
-      const bytes = engine.exportDatabase();
-      const sample = engine.activeSample();
+      const bytes = await engine.exportDatabase();
+      const sample = await engine.activeSample();
       const overriddenFilename = customFilenames[activeDbId];
       const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
       const baseName = effectiveFilename
@@ -267,26 +280,27 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Export failed: ${msg}`, "warn");
     }
+    })();
   }, [activeDbId, customFilenames, showToast, engineRef]);
 
   const exportDatabaseToXlsx = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    const sample = engine.activeSample();
-    const overriddenFilename = customFilenames[activeDbId];
-    const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
-    const baseName = effectiveFilename
-      ? effectiveFilename.replace(/\.[^.]+$/, "")
-      : sample.id || "database";
-    const filename = `${baseName}.xlsx`;
     const tableList = [...tables];
     (async () => {
       try {
+        const sample = await engine.activeSample();
+        const overriddenFilename = customFilenames[activeDbId];
+        const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
+        const baseName = effectiveFilename
+          ? effectiveFilename.replace(/\.[^.]+$/, "")
+          : sample.id || "database";
+        const filename = `${baseName}.xlsx`;
         const mod = await initXlsxWasm();
         const workbook = new mod.Workbook();
         let sheetCount = 0;
         for (const tableName of tableList) {
-          const sets = engine.exec(`SELECT * FROM ${quoteIdent(tableName)}`);
+          const sets = await engine.exec(`SELECT * FROM ${quoteIdent(tableName)}`);
           if (!sets || sets.length === 0) continue;
           const { columns, values: rows } = sets[0];
           const sheetName = tableName.length > 31 ? tableName.slice(0, 31) : tableName;
@@ -407,6 +421,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importCsvState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
+    void (async () => {
     const { headers, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;
@@ -422,30 +437,30 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
-        engine.exec(
+        await engine.exec(
           `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
         );
       }
-      engine.exec("BEGIN");
+      await engine.exec("BEGIN");
       try {
         for (const row of rows) {
           const vals = row
             .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
             .join(", ");
           if (isExisting) {
-            engine.exec(
+            await engine.exec(
               `INSERT INTO ${tableIdent} (${safeCols.join(", ")}) VALUES (${vals})`,
             );
           } else {
-            engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+            await engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
           }
         }
-        engine.exec("COMMIT");
+        await engine.exec("COMMIT");
       } catch (insertErr) {
-        try { engine.exec("ROLLBACK"); } catch { /* ignore */ }
+        try { await engine.exec("ROLLBACK"); } catch { /* ignore */ }
         throw insertErr;
       }
-      setTables(engine.listTables());
+      setTables(await engine.listTables());
       setImportCsvOpen(false);
       setImportCsvState(null);
       showToast(
@@ -455,6 +470,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`CSV import failed: ${msg}`, "warn");
     }
+    })();
   }, [engineRef, showToast, setTables, setImportCsvOpen, setImportCsvState]);
 
   const handleJsonFile = useCallback(
@@ -521,6 +537,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importJsonState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
+    void (async () => {
     const { headers, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;
@@ -536,30 +553,30 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
-        engine.exec(
+        await engine.exec(
           `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
         );
       }
-      engine.exec("BEGIN");
+      await engine.exec("BEGIN");
       try {
         for (const row of rows) {
           const vals = row
             .map((v) => (v === "" ? "NULL" : `'${v.replace(/'/g, "''")}'`))
             .join(", ");
           if (isExisting) {
-            engine.exec(
+            await engine.exec(
               `INSERT INTO ${tableIdent} (${safeCols.join(", ")}) VALUES (${vals})`,
             );
           } else {
-            engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+            await engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
           }
         }
-        engine.exec("COMMIT");
+        await engine.exec("COMMIT");
       } catch (insertErr) {
-        try { engine.exec("ROLLBACK"); } catch { /* ignore */ }
+        try { await engine.exec("ROLLBACK"); } catch { /* ignore */ }
         throw insertErr;
       }
-      setTables(engine.listTables());
+      setTables(await engine.listTables());
       setImportJsonOpen(false);
       setImportJsonState(null);
       showToast(
@@ -569,6 +586,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`JSON import failed: ${msg}`, "warn");
     }
+    })();
   }, [engineRef, showToast, setTables, setImportJsonOpen, setImportJsonState]);
 
   const handleParquetFile = useCallback(
@@ -601,6 +619,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importParquetState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
+    void (async () => {
     const { columns, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;
@@ -616,11 +635,11 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
-        engine.exec(
+        await engine.exec(
           `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
         );
       }
-      engine.exec("BEGIN");
+      await engine.exec("BEGIN");
       try {
         for (const row of rows) {
           const vals = row
@@ -631,19 +650,19 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
             )
             .join(", ");
           if (isExisting) {
-            engine.exec(
+            await engine.exec(
               `INSERT INTO ${tableIdent} (${safeCols.join(", ")}) VALUES (${vals})`,
             );
           } else {
-            engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
+            await engine.exec(`INSERT INTO ${tableIdent} VALUES (${vals})`);
           }
         }
-        engine.exec("COMMIT");
+        await engine.exec("COMMIT");
       } catch (insertErr) {
-        try { engine.exec("ROLLBACK"); } catch { /* ignore */ }
+        try { await engine.exec("ROLLBACK"); } catch { /* ignore */ }
         throw insertErr;
       }
-      setTables(engine.listTables());
+      setTables(await engine.listTables());
       setImportParquetOpen(false);
       setImportParquetState(null);
       showToast(
@@ -653,6 +672,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Parquet import failed: ${msg}`, "warn");
     }
+    })();
   }, [engineRef, showToast, setTables, setImportParquetOpen, setImportParquetState]);
 
   return {
