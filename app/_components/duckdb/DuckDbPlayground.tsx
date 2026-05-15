@@ -2194,6 +2194,64 @@ function DuckDbPlaygroundInner() {
     });
   }, []);
 
+  const handleFilesMove = useCallback(
+    (sourcePath: string, destFolderPath: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        // Compute the new path: keep the source's leaf name, place it
+        // under destFolderPath (or at the root if dest is "").
+        const leaf = sourcePath.split("/").pop() ?? sourcePath;
+        const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
+        if (newPath === sourcePath) return;
+        // Reuse the rename helper — same mechanics: drop+re-register
+        // each file, update the in-memory list. Auto-expand the dest
+        // folder so the moved entry is visible after the drop.
+        const oldPrefix = `${sourcePath}/`;
+        const newPrefix = `${newPath}/`;
+        try {
+          const affected = virtualFiles.filter(
+            (f) => f.path === sourcePath || f.path.startsWith(oldPrefix),
+          );
+          for (const entry of affected) {
+            if (entry.isFolder) continue;
+            const bytes = await engine.readFileBuffer(entry.path);
+            if (!bytes) continue;
+            const dest =
+              entry.path === sourcePath
+                ? newPath
+                : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
+            await engine.dropFile(entry.path);
+            await engine.registerFileBuffer(dest, bytes);
+          }
+          setVirtualFiles((prev) =>
+            prev.map((f) => {
+              if (f.path === sourcePath) return { ...f, path: newPath };
+              if (f.path.startsWith(oldPrefix)) {
+                return {
+                  ...f,
+                  path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+                };
+              }
+              return f;
+            }),
+          );
+          if (destFolderPath) {
+            setExpandedFolders((prev) => {
+              const next = new Set(prev);
+              next.add(destFolderPath);
+              return next;
+            });
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Move failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [virtualFiles, showToast],
+  );
+
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
     async (sqlText: string, filename: string) => {
@@ -5418,6 +5476,7 @@ function DuckDbPlaygroundInner() {
                   onDelete={handleFilesDelete}
                   onRename={handleFilesRename}
                   onCreateFolder={handleFilesCreateFolder}
+                  onMove={handleFilesMove}
                 />
               )}
               {sidebarView === "schema" && (
@@ -5571,16 +5630,6 @@ function DuckDbPlaygroundInner() {
               >
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
-              </button>
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openQueryHistoryTab}
-                title="View Query History"
-                aria-label="View Query History"
-              >
-                <History size={13} aria-hidden="true" />
-                <span>History</span>
               </button>
             </div>
           </aside>

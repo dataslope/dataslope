@@ -719,6 +719,12 @@
   background: color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
+.sql-files-row-drop-target {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  outline: 1px solid var(--primary);
+  outline-offset: -1px;
+}
+
 .sql-files-chevron {
   flex-shrink: 0;
   color: var(--text-dim);
@@ -751,39 +757,54 @@
   flex-shrink: 0;
 }
 
-.sql-files-actions {
-  display: none;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-  margin-left: 4px;
+/* Context menu styling matches the Base UI menus used elsewhere
+   (examples-dropdown). Items already get the common .example-item
+   treatment; only file-tree-specific tweaks live here. */
+.sql-files-ctx-menu {
+  min-width: 160px;
 }
 
-.sql-files-row:hover .sql-files-actions {
-  display: inline-flex;
+.sql-files-ctx-sep {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
 }
 
-.sql-files-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-  color: var(--text-dim);
-  cursor: pointer;
-}
-
-.sql-files-action-btn:hover {
-  background: var(--bg2);
-  color: var(--text);
-}
-
-.sql-files-action-danger:hover {
+.sql-files-ctx-danger {
   color: var(--red);
+}
+.sql-files-ctx-danger:hover,
+.sql-files-ctx-danger[data-highlighted] {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+/* Info dialog (compact) */
+.sql-files-info-popup {
+  min-width: 360px;
+}
+
+.sql-files-info-grid {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 6px 14px;
+  padding: 4px 0 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.sql-files-info-label {
+  color: var(--text-dim);
+}
+
+.sql-files-info-value {
+  color: var(--text);
+  word-break: break-all;
+}
+
+.sql-files-info-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
 .sql-files-rename-input {
