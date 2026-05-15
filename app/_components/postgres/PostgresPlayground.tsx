@@ -20,40 +20,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
+import type { Compartment } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-  startCompletion,
-  acceptCompletion,
-} from "@codemirror/autocomplete";
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-} from "@codemirror/commands";
-import {
-  bracketMatching,
-  indentOnInput,
-  indentUnit,
-} from "@codemirror/language";
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { EditorState, Compartment } from "@codemirror/state";
-import {
-  EditorView,
-  crosshairCursor,
-  drawSelection,
-  dropCursor,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  keymap,
-  lineNumbers,
-  rectangularSelection,
-  tooltips,
-} from "@codemirror/view";
-import { sql as sqlLang, PostgreSQL } from "@codemirror/lang-sql";
+  createSqlEditorExtensions,
+  makeSqlAutocompletionExtension,
+  makeSqlEditorCompartments,
+  makeSqlLangExtension,
+} from "../sql/shared/editorSetup";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -181,10 +155,7 @@ import type {
   ResultSetExportSnapshot,
 } from "../sql/types";
 import type { RuntimeInfo } from "../types";
-import {
-  createSqlCompletionSource,
-  type SqlCompletionSchema,
-} from "../sql/sqlCompletion";
+import type { SqlCompletionSchema } from "../sql/sqlCompletion";
 import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
 import {
   importRowsIntoPostgres,
@@ -1659,10 +1630,7 @@ function PostgresPlaygroundInner() {
   useEffect(() => {
     let cancelled = false;
     if (editorHostRef.current && !editorRef.current) {
-      const langComp = new Compartment();
-      const completionComp = new Compartment();
-      const themeComp = new Compartment();
-      const wrapComp = new Compartment();
+      const compartments = makeSqlEditorCompartments();
       const initialTheme =
         getStoredEditorTheme(storageKey("editortheme")) ??
         DEFAULT_PLAYGROUND_SETTINGS.editorTheme;
@@ -1673,96 +1641,30 @@ function PostgresPlaygroundInner() {
       const view = new EditorView({
         doc: activeTab?.code ?? "",
         parent: editorHostRef.current,
-        extensions: [
-          history(),
-          drawSelection(),
-          dropCursor(),
-          EditorState.allowMultipleSelections.of(true),
-          indentOnInput(),
-          bracketMatching(),
-          closeBrackets(),
-          rectangularSelection(),
-          tooltips({ parent: document.body }),
-          lineNumbers(),
-          highlightActiveLineGutter(),
-          highlightActiveLine(),
-          highlightSelectionMatches(),
-          crosshairCursor(),
-          EditorState.tabSize.of(2),
-          indentUnit.of("  "),
-          langComp.of(
-            sqlLang({ dialect: PostgreSQL, upperCaseKeywords: false }),
-          ),
-          completionComp.of(
-            autocompletion({
-              override: [
-                createSqlCompletionSource(
-                  { entities: [] },
-                  { dialect: "postgres" },
-                ),
-              ],
-            }),
-          ),
-          themeComp.of(themeFor(initialTheme)),
-          wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
-          EditorView.updateListener.of((update) => {
-            if (update.selectionSet) {
-              const sel = update.state.selection.main;
-              setHasEditorSelectionRef.current(!sel.empty);
-            }
-            if (!update.docChanged) return;
+        extensions: createSqlEditorExtensions({
+          dialect: "postgres",
+          compartments,
+          initialTheme,
+          initialWordWrap,
+          onSelectionChange: (hasSelection) => {
+            setHasEditorSelectionRef.current(hasSelection);
+          },
+          onDocChange: (code) => {
             const id = activeTabIdRef.current;
-            const code = update.state.doc.toString();
             const next = tabsRef.current.map((tab) =>
               tab.id === id ? { ...tab, code } : tab,
             );
             persistTabs(next);
-          }),
-          keymap.of([
-            {
-              // Run selection if text is selected, otherwise run all.
-              key: "Mod-Enter",
-              run: (v) => {
-                const sel = v.state.selection.main;
-                if (!sel.empty) {
-                  const selected = v.state.sliceDoc(sel.from, sel.to);
-                  runSelectionRef.current(selected);
-                } else {
-                  runActiveTabRef.current();
-                }
-                return true;
-              },
-            },
-            {
-              // Always run all queries (ignores any selection).
-              key: "Mod-Shift-Enter",
-              run: () => {
-                runActiveTabRef.current();
-                return true;
-              },
-            },
-            {
-              key: "Ctrl-Space",
-              run: (v) => {
-                startCompletion(v);
-                return true;
-              },
-            },
-            ...closeBracketsKeymap,
-            ...defaultKeymap,
-            ...searchKeymap,
-            ...historyKeymap,
-            ...completionKeymap.filter((b) => b.key !== "Enter"),
-            { key: "Tab", run: acceptCompletion },
-            indentWithTab,
-          ]),
-        ],
+          },
+          onRunSelection: (text) => runSelectionRef.current(text),
+          onRunAll: () => runActiveTabRef.current(),
+        }),
       });
       editorRef.current = view;
-      langCompRef.current = langComp;
-      completionCompRef.current = completionComp;
-      themeCompRef.current = themeComp;
-      wrapCompRef.current = wrapComp;
+      langCompRef.current = compartments.lang;
+      completionCompRef.current = compartments.completion;
+      themeCompRef.current = compartments.theme;
+      wrapCompRef.current = compartments.wrap;
     }
     (async () => {
       try {
@@ -1894,17 +1796,9 @@ function PostgresPlaygroundInner() {
     }
     view.dispatch({
       effects: [
-        langComp.reconfigure(
-          sqlLang({ dialect: PostgreSQL, schema, upperCaseKeywords: false }),
-        ),
+        langComp.reconfigure(makeSqlLangExtension("postgres", schema)),
         completionComp.reconfigure(
-          autocompletion({
-            override: [
-              createSqlCompletionSource(completionSchema, {
-                dialect: "postgres",
-              }),
-            ],
-          }),
+          makeSqlAutocompletionExtension(completionSchema, "postgres"),
         ),
       ],
     });

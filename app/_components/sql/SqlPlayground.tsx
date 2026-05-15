@@ -44,40 +44,14 @@ import React, {
 } from "react";
 import "../playground.css";
 import "../sqlPlayground.css";
-import { EditorState, Compartment } from "@codemirror/state";
+import type { Compartment } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import {
-  EditorView,
-  keymap,
-  lineNumbers as lineNumbersExt,
-  highlightActiveLineGutter,
-  highlightActiveLine,
-  drawSelection,
-  dropCursor,
-  rectangularSelection,
-  crosshairCursor,
-  tooltips,
-} from "@codemirror/view";
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-} from "@codemirror/commands";
-import {
-  bracketMatching,
-  indentOnInput,
-  indentUnit,
-} from "@codemirror/language";
-import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-  startCompletion,
-  acceptCompletion,
-} from "@codemirror/autocomplete";
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { sql as sqlLang, SQLite } from "@codemirror/lang-sql";
+  createSqlEditorExtensions,
+  makeSqlAutocompletionExtension,
+  makeSqlEditorCompartments,
+  makeSqlLangExtension,
+} from "./shared/editorSetup";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
@@ -169,7 +143,7 @@ import {
   type SqliteEngine,
   type TableColumnInfo,
 } from "../runtime/sqlite";
-import type { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult } from "sql.js";
 import dynamic from "next/dynamic";
 
 // ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
@@ -182,10 +156,7 @@ const ErDiagramPane = dynamic(
 import { ToastList } from "./components/ToastList";
 import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
-import {
-  createSqlCompletionSource,
-  type SqlCompletionSchema,
-} from "./sqlCompletion";
+import type { SqlCompletionSchema } from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -224,19 +195,6 @@ function replaceDoc(view: EditorView, value: string): void {
   });
 }
 
-// CodeMirror's default is 100ms; 75ms keeps local schema suggestions feeling
-// immediate while still coalescing rapid typing before recomputing completions.
-const AUTOCOMPLETE_DELAY_MS = 75;
-
-function sqlAutocompletion(schema: SqlCompletionSchema) {
-  const source = createSqlCompletionSource(schema, { dialect: "sqlite" });
-  return autocompletion({
-    activateOnTyping: true,
-    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
-    closeOnBlur: true,
-    override: [source],
-  });
-}
 
 const PLAYGROUND_ID = "sqlite";
 
@@ -252,249 +210,6 @@ const RUNTIME_INFO: RuntimeInfo = {
     "Pure-JS build of SQLite compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
 };
 
-
-
-// ────────────────────────────────────────────────────────────────────────
-// CSV export helper
-// ────────────────────────────────────────────────────────────────────────
-
-function escapeCsvCell(val: unknown): string {
-  if (val === null || val === undefined) return "";
-  const s = String(val);
-  if (
-    s.includes(",") ||
-    s.includes("\n") ||
-    s.includes("\r") ||
-    s.includes('"')
-  ) {
-    return `"${s.replace(/"/g, '""')}"`;
-  }
-  return s;
-}
-
-function toFileSafeName(title: string): string {
-  return title.replace(/[/\\:*?"<>|\x00-\x1f]/g, "_").trim() || "result_set";
-}
-
-function triggerDownload(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-function exportResultToCsv(
-  columns: string[],
-  rows: QueryExecResult["values"],
-  filename: string,
-): void {
-  const lines = [
-    columns.map(escapeCsvCell).join(","),
-    ...rows.map((row) => row.map(escapeCsvCell).join(",")),
-  ];
-  triggerDownload(
-    new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8" }),
-    filename,
-  );
-}
-
-function exportResultToJson(
-  columns: string[],
-  rows: QueryExecResult["values"],
-  filename: string,
-): void {
-  const data = rows.map((row) => {
-    const obj: Record<string, unknown> = {};
-    columns.forEach((col, i) => {
-      obj[col] = row[i] ?? null;
-    });
-    return obj;
-  });
-  triggerDownload(
-    new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
-    filename,
-  );
-}
-
-function exportResultToSql(
-  columns: string[],
-  rows: QueryExecResult["values"],
-  filename: string,
-): void {
-  const quotedCols = columns
-    .map((c) => `"${c.replace(/"/g, '""')}"`)
-    .join(", ");
-  const lines = rows.map((row) => {
-    const vals = row
-      .map((v) => {
-        if (v === null || v === undefined) return "NULL";
-        if (typeof v === "number") return String(v);
-        return `'${String(v).replace(/'/g, "''")}'`;
-      })
-      .join(", ");
-    return `INSERT INTO result_set (${quotedCols}) VALUES (${vals});`;
-  });
-  triggerDownload(
-    new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }),
-    filename,
-  );
-}
-
-// ─── Parquet helpers ─────────────────────────────────────────────────────
-//
-// Loaded lazily on first use via dynamic imports so the WASM binary is
-// not bundled into the initial page chunk. The WASM is fetched from the
-// jsDelivr CDN, loaded once, and cached thereafter.
-
-let _parquetWasmInit: Promise<typeof import("parquet-wasm/esm")> | null = null;
-
-async function initParquetWasm(): Promise<typeof import("parquet-wasm/esm")> {
-  if (!_parquetWasmInit) {
-    _parquetWasmInit = (async () => {
-      const mod = await import("parquet-wasm/esm");
-      await mod.default(
-        "https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm",
-      );
-      return mod;
-    })();
-  }
-  return _parquetWasmInit;
-}
-
-async function exportResultToParquet(
-  columns: string[],
-  rows: QueryExecResult["values"],
-  filename: string,
-): Promise<void> {
-  const [
-    { tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray },
-    { Table: WasmParquetTable, writeParquet },
-  ] = await Promise.all([import("apache-arrow"), initParquetWasm()]);
-
-  // Build per-column value arrays, preserving nulls.
-  const colArrays: Record<string, unknown[]> = {};
-  for (const col of columns) colArrays[col] = [];
-  for (const row of rows) {
-    for (let i = 0; i < columns.length; i++) {
-      const v = row[i];
-      colArrays[columns[i]].push(v === undefined ? null : v);
-    }
-  }
-
-  // Detect column types: if every non-null value is a number treat as
-  // Float64, otherwise treat as Utf8 (string).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fields: Record<string, any> = {};
-  for (const col of columns) {
-    const vals = colArrays[col];
-    const isNumeric = vals.every((v) => v === null || typeof v === "number");
-    if (isNumeric) {
-      fields[col] = vectorFromArray(vals as (number | null)[], new Float64());
-    } else {
-      fields[col] = vectorFromArray(
-        vals.map((v) => (v === null ? null : String(v))),
-        new Utf8(),
-      );
-    }
-  }
-
-  const arrowTable = tableFromArrays(
-    fields as Parameters<typeof tableFromArrays>[0],
-  );
-  const ipcBytes = tableToIPC(arrowTable, "stream");
-  const wasmTable = WasmParquetTable.fromIPCStream(ipcBytes);
-  const parquetBytes = writeParquet(wasmTable);
-  triggerDownload(
-    new Blob([parquetBytes], { type: "application/octet-stream" }),
-    filename,
-  );
-}
-
-async function importParquetFile(
-  file: File,
-): Promise<{ columns: string[]; rows: QueryExecResult["values"] }> {
-  const [{ tableFromIPC }, mod] = await Promise.all([
-    import("apache-arrow"),
-    initParquetWasm(),
-  ]);
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const wasmTable = mod.readParquet(bytes);
-  const arrowTable = tableFromIPC(wasmTable.intoIPCStream());
-
-  const columns = arrowTable.schema.fields.map((f) => f.name);
-  // Pre-build column index map to avoid O(n) findIndex inside the row loop.
-  const colIndexMap = new Map(columns.map((name, i) => [name, i]));
-  const colVectors = columns.map((_, i) => arrowTable.getChildAt(i));
-  const rows: QueryExecResult["values"] = [];
-  for (let r = 0; r < arrowTable.numRows; r++) {
-    const row: QueryExecResult["values"][number] = [];
-    for (let c = 0; c < columns.length; c++) {
-      const val = colVectors[colIndexMap.get(columns[c])!]?.get(r);
-      row.push((val === undefined ? null : val) as SqlValue);
-    }
-    rows.push(row);
-  }
-  return { columns, rows };
-}
-
-// ─── XLSX helpers (wasm-xlsxwriter) ─────────────────────────────────────────
-//
-// Loaded lazily on first use via dynamic imports so the WASM binary is
-// not bundled into the initial page chunk. The WASM is fetched from the
-// jsDelivr CDN, loaded once, and cached thereafter.
-
-let _xlsxWasmInit: Promise<typeof import("wasm-xlsxwriter/web")> | null = null;
-
-async function initXlsxWasm(): Promise<typeof import("wasm-xlsxwriter/web")> {
-  if (!_xlsxWasmInit) {
-    _xlsxWasmInit = (async () => {
-      const mod = await import("wasm-xlsxwriter/web");
-      await mod.default(
-        "https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@0.13.0/web/wasm_xlsxwriter_bg.wasm",
-      );
-      return mod;
-    })();
-  }
-  return _xlsxWasmInit;
-}
-
-/** Convert a SQLite cell value to an ExcelData-compatible type. */
-function toExcelData(v: unknown): string | number | boolean | undefined {
-  if (v === null || v === undefined) return undefined;
-  if (typeof v === "number") return v;
-  if (typeof v === "boolean") return v;
-  if (v instanceof Uint8Array) return `[BLOB ${v.length} bytes]`;
-  return String(v);
-}
-
-/**
- * Export columns + rows to a single-sheet Excel (.xlsx) file.
- * The first row is the header row.
- */
-async function exportResultToXlsx(
-  columns: string[],
-  rows: QueryExecResult["values"],
-  filename: string,
-): Promise<void> {
-  const mod = await initXlsxWasm();
-  const workbook = new mod.Workbook();
-  const worksheet = workbook.addWorksheet();
-  // Header row
-  worksheet.writeRow(0, 0, columns);
-  // Data rows
-  for (let ri = 0; ri < rows.length; ri++) {
-    worksheet.writeRow(ri + 1, 0, rows[ri].map(toExcelData));
-  }
-  const bytes = workbook.saveToBufferSync();
-  triggerDownload(
-    new Blob([bytes], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    }),
-    filename,
-  );
-}
 
 // ────────────────────────────────────────────────────────────────────────
 // Modify Structure drawer
@@ -1817,116 +1532,39 @@ function SqlPlaygroundInner() {
         getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
       const initialWordWrap =
         localStorage.getItem(storageKey("wordwrap")) !== "false";
-
-      const themeComp = new Compartment();
-      const wrapComp = new Compartment();
-      const completionComp = new Compartment();
-      const sqlLangComp = new Compartment();
-
-      // Persist whichever tab is currently active. Tab id + tab list are
-      // read from refs so this listener doesn't need to close over state.
-      const persistListener = EditorView.updateListener.of((update) => {
-        if (!update.docChanged) return;
-        const id = activeTabIdRef.current;
-        if (!id) return;
-        const value = update.state.doc.toString();
-        const next = tabsRef.current.map((t) =>
-          t.id === id ? { ...t, code: value } : t,
-        );
-        tabsRef.current = next;
-        setTabs(next);
-        saveTabs(activeDbIdRef.current, next);
-      });
-
-      // Track whether the editor has an active text selection so the
-      // Run button can switch between "Run" and "Run Selection" modes.
-      const selectionListener = EditorView.updateListener.of((update) => {
-        if (!update.selectionSet && !update.docChanged) return;
-        const sel = update.state.selection.main;
-        setHasEditorSelectionRef.current(!sel.empty);
-      });
+      const compartments = makeSqlEditorCompartments();
 
       const view = new EditorView({
         doc: "",
         parent: editorHostRef.current,
-        extensions: [
-          history(),
-          drawSelection(),
-          dropCursor(),
-          EditorState.allowMultipleSelections.of(true),
-          indentOnInput(),
-          bracketMatching(),
-          closeBrackets(),
-          lineNumbersExt(),
-          highlightActiveLineGutter(),
-          highlightActiveLine(),
-          highlightSelectionMatches(),
-          rectangularSelection(),
-          crosshairCursor(),
-          EditorState.tabSize.of(2),
-          indentUnit.of("  "),
-          completionComp.of(sqlAutocompletion({ entities: [] })),
-          tooltips({ parent: document.body }),
-          keymap.of([
-            {
-              // Run selection if text is selected, otherwise run all.
-              key: "Mod-Enter",
-              run: (v) => {
-                const sel = v.state.selection.main;
-                if (!sel.empty) {
-                  const selected = v.state.sliceDoc(sel.from, sel.to);
-                  runSelectionRef.current(selected);
-                } else {
-                  runRef.current();
-                }
-                return true;
-              },
-            },
-            {
-              // Always run all queries (ignores any selection).
-              key: "Mod-Shift-Enter",
-              run: () => {
-                runRef.current();
-                return true;
-              },
-            },
-            {
-              key: "Ctrl-Space",
-              run: (v) => {
-                startCompletion(v);
-                return true;
-              },
-            },
-            ...closeBracketsKeymap,
-            ...defaultKeymap,
-            ...searchKeymap,
-            ...historyKeymap,
-            // Remove Enter from the default completion keymap so that Enter
-            // always inserts a newline. Tab accepts the active completion
-            // instead, falling through to indentWithTab when no completion
-            // is shown.
-            ...completionKeymap.filter((b) => b.key !== "Enter"),
-            { key: "Tab", run: acceptCompletion },
-            indentWithTab,
-          ]),
-          // Initial language config — the schema-aware variant is swapped
-          // in via `sqlLangComp.reconfigure(...)` once the engine reports
-          // its tables.
-          sqlLangComp.of(
-            sqlLang({ dialect: SQLite, upperCaseKeywords: false }),
-          ),
-          themeComp.of(themeFor(initialTheme)),
-          wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
-          persistListener,
-          selectionListener,
-        ],
+        extensions: createSqlEditorExtensions({
+          dialect: "sqlite",
+          compartments,
+          initialTheme,
+          initialWordWrap,
+          onSelectionChange: (hasSelection) => {
+            setHasEditorSelectionRef.current(hasSelection);
+          },
+          onDocChange: (code) => {
+            const id = activeTabIdRef.current;
+            if (!id) return;
+            const next = tabsRef.current.map((t) =>
+              t.id === id ? { ...t, code } : t,
+            );
+            tabsRef.current = next;
+            setTabs(next);
+            saveTabs(activeDbIdRef.current, next);
+          },
+          onRunSelection: (text) => runSelectionRef.current(text),
+          onRunAll: () => runRef.current(),
+        }),
       });
 
       editorRef.current = view;
-      themeCompRef.current = themeComp;
-      wrapCompRef.current = wrapComp;
-      completionCompRef.current = completionComp;
-      sqlLangCompRef.current = sqlLangComp;
+      themeCompRef.current = compartments.theme;
+      wrapCompRef.current = compartments.wrap;
+      completionCompRef.current = compartments.completion;
+      sqlLangCompRef.current = compartments.lang;
     }
 
     (async () => {
@@ -2052,10 +1690,10 @@ function SqlPlaygroundInner() {
       if (cancelled) return;
       view.dispatch({
         effects: [
-          sqlComp.reconfigure(
-            sqlLang({ dialect: SQLite, schema, upperCaseKeywords: false }),
+          sqlComp.reconfigure(makeSqlLangExtension("sqlite", schema)),
+          completionComp.reconfigure(
+            makeSqlAutocompletionExtension(completionSchema, "sqlite"),
           ),
-          completionComp.reconfigure(sqlAutocompletion(completionSchema)),
         ],
       });
     })();
