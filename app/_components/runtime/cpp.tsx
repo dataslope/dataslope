@@ -5,34 +5,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
-import {
-  loadBrowsercc,
-  loadCppPch,
-  loadWasiShim,
-  runWasiModule,
-  type BrowserccApi,
-  type WasiShim,
-} from "./browsercc";
 import { getClangFormat } from "./clangFormat";
 
-// Run C++ in the browser via `browsercc`
-// (https://github.com/BertalanD/browsercc) — same toolchain as the C
-// playground (see `./c.tsx` for the long-form notes), but the input
-// file name uses a `.cpp` extension so clang's driver picks C++ mode
-// (auto-linking libc++/libc++abi and accepting C++-only syntax like
-// templates, iostream, RAII, ...).
-//
-// Compile speed: parsing the libc++ headers (iostream, vector, map,
-// ...) on every run would make each Run click feel slow. browsercc
-// ships a prebuilt `bits/stdc++.h.pch` that pre-parses the entire
-// standard library; calling `getPrecompiledHeader(flags)` returns its
-// bytes when the supplied flags are PCH-compatible (currently exactly
-// `-O2 -std=c++20 -fno-exceptions`). We pin this playground to those
-// flags so every user compile gets the fast path.
-//
-// The PCH is a 19 MB download, so we kick it off in the background as
-// soon as the toolchain is available and reuse the same buffer for
-// every subsequent compile via `loadCppPch` in `./browsercc.ts`.
+// C++ runs inside a dedicated Web Worker via browsercc — see browsercc-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -479,82 +454,39 @@ int main() {
   },
 ];
 
-// Compile flags for every C++ run. These are pinned to the exact set
-// that browsercc's `getPrecompiledHeader` accepts so the prebuilt
-// libc++ PCH gets used on every compile (see the file-header note).
-// Changing any of these three flags would silently disable the PCH and
-// make every Run noticeably slower.
-const CPP_COMPILE_FLAGS = ["-O2", "-std=c++20", "-fno-exceptions"];
+// ─── Worker-based runtime ────────────────────────────────────────────────
 
-// Path inside the compiler sandbox where the PCH is mounted. The user
-// code never sees this path; we just point clang at it via
-// `-include-pch` so libc++ headers don't have to be re-parsed on every
-// run.
-const PCH_VFS_PATH = "/include/bits/stdc++.h.pch";
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "init-error"; message: string }
+  | { kind: "output"; id: number; cell: { type: string; content: string } }
+  | { kind: "done"; id: number }
+  | { kind: "error"; id: number; message: string };
 
-class CppRuntime implements LanguageRuntime {
-  // Resolves to the PCH ArrayBuffer when ready, or `null` if the PCH
-  // download failed (in which case we just compile without it — slower
-  // but still correct).
-  private pchPromise: Promise<ArrayBuffer | null>;
+class CppWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
 
-  constructor(
-    private api: BrowserccApi,
-    private shim: WasiShim,
-  ) {
-    // Kick off the PCH download in the background so it's almost
-    // certainly cached by the time the user clicks Run.
-    this.pchPromise = loadCppPch(api, CPP_COMPILE_FLAGS);
-  }
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // Wait for the background PCH download to settle. In the steady
-    // state this is already resolved and adds no measurable latency;
-    // on the very first run it just absorbs whatever's left of the
-    // one-time fetch.
-    const pch = await this.pchPromise;
-
-    const flags = [...CPP_COMPILE_FLAGS];
-    const extraFiles: Record<string, string | ArrayBuffer> = {};
-    if (pch) {
-      flags.push("-include-pch", PCH_VFS_PATH);
-      extraFiles[PCH_VFS_PATH] = pch;
-    }
-
-    // 1) Compile main.cpp -> WebAssembly module via browsercc. The
-    //    `.cpp` extension is what tells clang to use C++ driver mode
-    //    (auto-link libc++, accept C++-only syntax).
-    const { compileOutput, module } = await this.api.compile({
-      source: code,
-      fileName: "main.cpp",
-      flags,
-      extraFiles,
+    const id = ++this.nextId;
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(msg.cell as Parameters<EmitOutput>[0]);
+          return;
+        }
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code, language: "cpp" });
     });
-
-    const trimmedDiag = compileOutput.replace(/\n+$/, "");
-    if (trimmedDiag) {
-      emit({ type: "stderr", content: trimmedDiag });
-    }
-    if (!module) {
-      // `module === null` means clang or wasm-ld returned a non-zero
-      // exit code; the diagnostics above already say why.
-      return;
-    }
-
-    // 2) Run the compiled module in a WASI sandbox.
-    const { exitCode, stdout, stderr } = await runWasiModule(module, this.shim);
-    if (stdout) {
-      emit({ type: "stdout", content: stdout.replace(/\n+$/, "") });
-    }
-    if (stderr) {
-      emit({ type: "stderr", content: stderr.replace(/\n+$/, "") });
-    }
-    if (exitCode !== 0) {
-      emit({
-        type: "stderr",
-        content: `Program exited with code ${exitCode}.`,
-      });
-    }
   }
 }
 
@@ -606,10 +538,30 @@ export const cppAdapter: LanguageAdapter = {
     return format(code, "main.cpp", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage(
-      "Loading browsercc clang toolchain (this can take a moment on first load)…",
+    setLoadingMessage("Loading C++ worker…");
+    const worker = new Worker(
+      new URL("./browsercc-worker.ts", import.meta.url),
     );
-    const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
-    return new CppRuntime(api, shim);
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new CppWorkerRuntime(worker));
+        } else if (msg.kind === "init-error") {
+          worker.removeEventListener("message", onMessage);
+          worker.terminate();
+          reject(new Error(msg.message));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "C++ worker failed to start"));
+      });
+      worker.postMessage({ kind: "init" });
+    });
   },
 };
