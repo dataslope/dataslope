@@ -20,6 +20,7 @@ export function createSqliteAdapter(): SqlEngineAdapter {
   return {
     dialect: "sqlite",
     displayName: "SQLite",
+    // Preserve the existing SQLite tab/settings namespace from sqlitePlaygroundTabs.ts.
     storagePrefix: "pg_sqlite_",
     defaultPageSize: 50,
     supportsSchemas: false,
