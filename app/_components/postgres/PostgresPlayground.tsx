@@ -87,7 +87,6 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { format as sqlFormat } from "sql-formatter";
 import { FaInfo } from "react-icons/fa";
 import React, {
   Fragment,
@@ -102,7 +101,15 @@ import React, {
 import { flushSync } from "react-dom";
 import "../playground.css";
 import "../sqlPlayground.css";
-import { ErDiagramPane } from "../ErDiagramPane";
+import dynamic from "next/dynamic";
+
+// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
+// (~hundreds of KB of layout-algorithm code). It only renders when
+// the user opens the ER-diagram tab, so defer the chunk until then.
+const ErDiagramPane = dynamic(
+  () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
+  { ssr: false },
+);
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
@@ -2238,13 +2245,14 @@ function PostgresPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  const handleFormatCode = useCallback(() => {
+  const handleFormatCode = useCallback(async () => {
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
     if (!code.trim()) return;
     setIsFormatting(true);
     try {
+      const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "postgresql" });
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: formatted },

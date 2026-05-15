@@ -15,6 +15,12 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 const nextConfig: NextConfig = {
   // Treat MDX files under content/ as page sources via fumadocs-mdx.
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+  // Tell Next.js to rewrite barrel imports from these icon packages
+  // into deep specifier-level imports so we don't pull whole index
+  // graphs into every page's chunk.
+  experimental: {
+    optimizePackageImports: ["lucide-react", "react-icons"],
+  },
   // sql.js ships an Emscripten preamble that statically references the
   // Node-only `fs`/`path` modules. Those branches are dead code in the
   // browser (gated on `typeof process === "object"`), but Turbopack

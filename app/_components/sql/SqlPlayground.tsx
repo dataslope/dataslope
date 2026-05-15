@@ -131,7 +131,6 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { format as sqlFormat } from "sql-formatter";
 import { FaInfo } from "react-icons/fa";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
@@ -171,7 +170,15 @@ import {
   type TableColumnInfo,
 } from "../runtime/sqlite";
 import type { QueryExecResult, SqlValue } from "sql.js";
-import { ErDiagramPane } from "../ErDiagramPane";
+import dynamic from "next/dynamic";
+
+// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
+// (~hundreds of KB of layout-algorithm code). It only renders when
+// the user opens the ER-diagram tab, so defer the chunk until then.
+const ErDiagramPane = dynamic(
+  () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
+  { ssr: false },
+);
 import { ToastList } from "./components/ToastList";
 import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
@@ -1670,13 +1677,14 @@ function SqlPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  const handleFormatCode = useCallback(() => {
+  const handleFormatCode = useCallback(async () => {
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
     if (!code.trim()) return;
     setIsFormatting(true);
     try {
+      const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "sqlite" });
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: formatted },
