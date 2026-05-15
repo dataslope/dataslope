@@ -1288,10 +1288,11 @@ export async function createSqliteEngineInProcess(
       if (columnNames.length !== values.length) {
         throw new Error("Column count must match value count.");
       }
-      if (columnNames.length === 0) {
-        throw new Error("Cannot insert a row with no columns.");
-      }
       const d = require();
+      if (columnNames.length === 0) {
+        d.exec(`INSERT INTO ${quoteIdent(tableName)} DEFAULT VALUES`);
+        return;
+      }
       const cols = columnNames.map(quoteIdent).join(", ");
       const placeholders = columnNames
         .map((_, i) => `?${i + 1}`)

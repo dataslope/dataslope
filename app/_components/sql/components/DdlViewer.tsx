@@ -5,8 +5,10 @@ import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
   drawSelection,
+  keymap,
   lineNumbers as lineNumbersExt,
 } from "@codemirror/view";
+import { selectAll } from "@codemirror/commands";
 import { indentUnit } from "@codemirror/language";
 import { sql as sqlLang, SQLite, PostgreSQL } from "@codemirror/lang-sql";
 import { themeFor } from "../../cmExtensions";
@@ -46,7 +48,10 @@ export function DdlViewer({
       parent: hostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
-        EditorView.editable.of(false),
+        // Note: NOT calling EditorView.editable.of(false) — that strips
+        // `contenteditable` from the editor, which in turn drops focus,
+        // breaking Mod-a select-all and most clipboard interactions.
+        // `EditorState.readOnly.of(true)` already prevents writes.
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(2),
@@ -54,6 +59,10 @@ export function DdlViewer({
         // Wrap long lines to prevent horizontal scroll in the View DDL popup.
         EditorView.lineWrapping,
         sqlLang({ dialect: isPostgres ? PostgreSQL : SQLite, upperCaseKeywords: false }),
+        // Ctrl/Cmd-A selects all text inside the viewer instead of
+        // falling through to the browser default (which selects the
+        // entire dialog body).
+        keymap.of([{ key: "Mod-a", run: selectAll, preventDefault: true }]),
         themeComp.of(themeFor(theme)),
       ],
     });

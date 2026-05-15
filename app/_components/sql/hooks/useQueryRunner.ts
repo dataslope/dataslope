@@ -527,9 +527,22 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const engine = engineRef.current;
       if (!engine) return;
       const tabId = activeTabIdRef.current;
+      // Strip generated columns — SQLite rejects INSERTs that target them.
+      const cached = useEngineStore.getState().columnsByEntity[tableName] ?? [];
+      const generatedCols = new Set(
+        cached.filter((col) => col.generated !== null).map((col) => col.name),
+      );
+      const filteredNames: string[] = [];
+      const filteredValues: unknown[] = [];
+      for (let i = 0; i < columnNames.length; i++) {
+        if (!generatedCols.has(columnNames[i])) {
+          filteredNames.push(columnNames[i]);
+          filteredValues.push(values[i]);
+        }
+      }
       void (async () => {
       try {
-        await engine.insertRow(tableName, columnNames, values);
+        await engine.insertRow(tableName, filteredNames, filteredValues);
         showToast(`Duplicated row in "${tableName}".`);
         const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);

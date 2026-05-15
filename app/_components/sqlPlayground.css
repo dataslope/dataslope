@@ -153,7 +153,7 @@
 .sql-tree-loading-label {
   font-family: var(--font-ui);
   font-size: 12px;
-  color: var(--text-dim);
+  color: var(--text);
   /* Keep the label above the wave overlay that sits at the bottom */
   position: relative;
   z-index: 5;
@@ -621,6 +621,220 @@
   border-color: color-mix(in srgb, var(--border) 70%, var(--text) 30%);
 }
 
+.sql-sidebar-btn-active {
+  background: var(--bg3);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+/* ─── Files panel (DuckDB virtual-filesystem sidebar) ─── */
+.sql-files {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.sql-files-dragging {
+  outline: 2px dashed var(--primary);
+  outline-offset: -4px;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+.sql-files-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.sql-files-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.sql-files-toolbar-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.sql-files-hidden-input {
+  display: none;
+}
+
+.sql-files-target-hint {
+  padding: 4px 10px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-files-target-hint strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.sql-files-tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.sql-files-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 4px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+}
+
+.sql-files-row:hover {
+  background: var(--bg3);
+}
+
+.sql-files-row-selected {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.sql-files-row-drop-target {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  outline: 1px solid var(--primary);
+  outline-offset: -1px;
+}
+
+.sql-files-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.sql-files-chevron-spacer {
+  display: inline-block;
+  width: 11px;
+  flex-shrink: 0;
+}
+
+.sql-files-icon {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.sql-files-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-files-size {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+/* Context menu styling matches the Base UI menus used elsewhere
+   (examples-dropdown). Items already get the common .example-item
+   treatment; only file-tree-specific tweaks live here. */
+.sql-files-ctx-menu {
+  min-width: 160px;
+}
+
+.sql-files-ctx-sep {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
+}
+
+.sql-files-ctx-danger {
+  color: var(--red);
+}
+.sql-files-ctx-danger:hover,
+.sql-files-ctx-danger[data-highlighted] {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+/* Info dialog (compact) */
+.sql-files-info-popup {
+  min-width: 360px;
+}
+
+.sql-files-info-grid {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 6px 14px;
+  padding: 4px 0 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.sql-files-info-label {
+  color: var(--text-dim);
+}
+
+.sql-files-info-value {
+  color: var(--text);
+  word-break: break-all;
+}
+
+.sql-files-info-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.sql-files-rename-input {
+  flex: 1;
+  min-width: 0;
+  padding: 1px 4px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--primary);
+  border-radius: 3px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  outline: none;
+}
+
+.sql-files-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.sql-files-empty-hint {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--text-muted, var(--text-dim));
+  font-size: 11px;
+}
+
 /* ─── Panes ─── */
 .sql-panes {
   display: grid;
@@ -1078,11 +1292,12 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  height: 22px;
   background: var(--bg3);
   color: var(--text);
   border: none;
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 0 6px;
   font-family: var(--font-ui);
   font-size: 12px;
   cursor: pointer;
@@ -1134,7 +1349,7 @@
   border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
   border-radius: 4px;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 8px;
   margin-left: 4px;
   font-family: var(--font-ui);
   font-size: 11px;
@@ -1508,17 +1723,14 @@
   box-shadow: 0 1px 0 var(--border);
 }
 
-/* ─── Elapsed-time pill shown in the result pager ───
-   Appears to the right of the page controls; uses the same visual
-   language as the former editor-pane pill but lives inline inside the
-   pager flex row so it doesn't overlap other controls. */
+/* ─── Elapsed-time label shown next to "Rows X–Y of Z" ───
+   Sits inline inside .sql-result-pager-info so it reads as a
+   continuation of the row count, not a separate pill. */
 .sql-pager-elapsed {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
-  background: color-mix(in srgb, var(--bg3) 80%, transparent);
-  border-radius: 999px;
+  gap: 4px;
+  margin-left: 8px;
   color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
@@ -1528,10 +1740,11 @@
 }
 
 .sql-pager-elapsed svg {
-  color: var(--primary);
+  color: var(--text-dim);
   flex-shrink: 0;
 }
 
+.sql-pager-elapsed-err,
 .sql-pager-elapsed-err svg {
   color: var(--danger, #e35a5a);
 }
@@ -3475,7 +3688,8 @@
   color: var(--text-dim);
 }
 
-.pg-type-input-group {
+.pg-type-input-group,
+.duckdb-type-input-group {
   position: relative;
   display: flex;
   align-items: center;
@@ -3483,13 +3697,15 @@
   min-width: 160px;
 }
 
-.pg-type-input {
+.pg-type-input,
+.duckdb-type-input {
   min-width: 0;
   width: 100%;
   padding-right: 26px;
 }
 
-.pg-type-trigger {
+.pg-type-trigger,
+.duckdb-type-trigger {
   position: absolute;
   right: 4px;
   top: 50%;
@@ -3506,30 +3722,36 @@
   outline: none;
 }
 
-.pg-type-trigger:hover {
+.pg-type-trigger:hover,
+.duckdb-type-trigger:hover {
   color: var(--text);
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
-.pg-type-trigger:focus-visible {
+.pg-type-trigger:focus-visible,
+.duckdb-type-trigger:focus-visible {
   box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-.pg-type-trigger[data-popup-open] svg {
+.pg-type-trigger[data-popup-open] svg,
+.duckdb-type-trigger[data-popup-open] svg {
   transform: rotate(180deg);
 }
 
-.pg-type-trigger svg {
+.pg-type-trigger svg,
+.duckdb-type-trigger svg {
   transition: transform 0.15s ease;
 }
 
-.pg-type-positioner {
+.pg-type-positioner,
+.duckdb-type-positioner {
   /* Must sit above .sql-modify-drawer (z-index: 401) since the popup is
      portaled to the body and would otherwise render behind the drawer. */
   z-index: 500;
 }
 
-.pg-type-popup {
+.pg-type-popup,
+.duckdb-type-popup {
   max-height: 280px;
   min-width: 220px;
   overflow: auto;
@@ -3538,21 +3760,26 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.pg-type-popup::-webkit-scrollbar {
+.pg-type-popup::-webkit-scrollbar,
+.duckdb-type-popup::-webkit-scrollbar {
   width: 6px;
 }
-.pg-type-popup::-webkit-scrollbar-track {
+.pg-type-popup::-webkit-scrollbar-track,
+.duckdb-type-popup::-webkit-scrollbar-track {
   background: transparent;
 }
-.pg-type-popup::-webkit-scrollbar-thumb {
+.pg-type-popup::-webkit-scrollbar-thumb,
+.duckdb-type-popup::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
-.pg-type-popup::-webkit-scrollbar-thumb:hover {
+.pg-type-popup::-webkit-scrollbar-thumb:hover,
+.duckdb-type-popup::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
 }
 
-.pg-type-group-label {
+.pg-type-group-label,
+.duckdb-type-group-label {
   padding: 6px 10px 3px;
   font-size: 10px;
   font-weight: 700;
@@ -3561,7 +3788,8 @@
   letter-spacing: 0.05em;
 }
 
-.pg-type-empty {
+.pg-type-empty,
+.duckdb-type-empty {
   padding: 8px 10px;
   font-size: 12px;
   color: var(--text-dim);
@@ -4036,29 +4264,16 @@
   border-bottom: 1px solid var(--border);
 }
 
-.sql-schema-create-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
+/* "New schema…" entry inside the schema selector dropdown — visually
+   distinguished from regular schema items so it reads as an action
+   rather than a selectable schema. */
+.sql-db-item-action {
   color: var(--text-dim);
-  cursor: pointer;
-  padding: 6px;
-  transition: color 0.12s, background 0.12s;
-  line-height: 1;
 }
 
-.sql-schema-create-btn:hover {
-  color: var(--text);
-  background: var(--bg3);
-}
-
-.sql-schema-create-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary-glow);
+.sql-db-item-action .bui-select-item-icon,
+.sql-db-item-action .sql-db-item-text {
+  color: inherit;
 }
 
 /* Validation error inside the Create Schema dialog */
@@ -4066,4 +4281,25 @@
   font-size: 12px;
   color: var(--danger, #ef4444);
   padding: 6px 2px 0;
+}
+
+.sql-schema-create-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  min-width: 240px;
+}
+
+.sql-schema-create-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sql-schema-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
 }

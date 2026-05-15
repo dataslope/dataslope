@@ -14,7 +14,7 @@ import {
 import { useEngineStore } from "../stores/useEngineStore";
 import { useDialogStore } from "../stores/useDialogStore";
 import { useTabStore } from "../stores/useTabStore";
-import { DROP_KIND_LABELS } from "../constants";
+import { DROP_KIND_LABELS, FK_ACTIONS } from "../constants";
 import type { ModifyColumnDraft } from "../types";
 import { modifyDialogSignature } from "../types";
 import { dbScopedKey } from "../../sqlitePlaygroundTabs";
@@ -437,7 +437,9 @@ export function useSidebarActions(
       if (!engine) return;
       void (async () => {
       try {
-        const cols = await engine.listColumns(name);
+        const allCols = await engine.listColumns(name);
+        // Generated columns are computed by SQLite — never accept input.
+        const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -460,21 +462,19 @@ export function useSidebarActions(
     const dialog = useDialogStore.getState().addRowDialog;
     if (!engine || !dialog) return;
     const { tableName, columns, values, addAnother } = dialog;
-    const colNames = columns
-      .map((c) => `"${c.name.replace(/"/g, '""')}"`)
-      .join(", ");
-    const colValues = columns
-      .map((c) => {
-        const v = values[c.name] ?? "";
-        if (v === "") return "NULL";
-        return `'${v.replace(/'/g, "''")}'`;
-      })
-      .join(", ");
+    // For a blank input on a column with a DEFAULT, omit it so SQLite
+    // applies the default (otherwise we'd insert NULL).
+    const colNames: string[] = [];
+    const rowValues: unknown[] = [];
+    for (const c of columns) {
+      const raw = values[c.name] ?? "";
+      if (raw === "" && c.defaultValue !== null) continue;
+      colNames.push(c.name);
+      rowValues.push(raw === "" ? null : raw);
+    }
     void (async () => {
     try {
-      await engine.exec(
-        `INSERT INTO "${tableName.replace(/"/g, '""')}" (${colNames}) VALUES (${colValues})`,
-      );
+      await engine.insertRow(tableName, colNames, rowValues);
       showToast(`Row added to "${tableName}".`);
       if (addAnother) {
         const newValues: Record<string, string> = {};
@@ -533,10 +533,11 @@ export function useSidebarActions(
       setAddTableInvalidColIds(new Set(blankCols.map((c) => c.id)));
       return;
     }
+    const quoteIdent = (s: string) => `"${s.replace(/"/g, '""')}"`;
+    const normalizeFkAction = (a: string): string =>
+      (FK_ACTIONS as readonly string[]).includes(a) ? a : "NO ACTION";
     const colDefs = cols.map((c) => {
-      const parts: string[] = [
-        `"${c.name.trim().replace(/"/g, '""')}" ${c.type}`,
-      ];
+      const parts: string[] = [`${quoteIdent(c.name.trim())} ${c.type}`];
       if (c.notNull) parts.push("NOT NULL");
       if (c.primaryKey) {
         parts.push("PRIMARY KEY");
@@ -550,10 +551,10 @@ export function useSidebarActions(
       .filter((c) => c.fkTable && c.fkColumn)
       .map(
         (c) =>
-          `FOREIGN KEY ("${c.name.trim().replace(/"/g, '""')}") REFERENCES "${c.fkTable}"("${c.fkColumn}")`,
+          `FOREIGN KEY (${quoteIdent(c.name.trim())}) REFERENCES ${quoteIdent(c.fkTable)}(${quoteIdent(c.fkColumn)}) ON DELETE ${normalizeFkAction(c.fkOnDelete)} ON UPDATE ${normalizeFkAction(c.fkOnUpdate)}`,
       );
     const allDefs = [...colDefs, ...fkConstraints].join(", ");
-    const sql = `CREATE TABLE "${trimmedName.replace(/"/g, '""')}" (${allDefs})`;
+    const sql = `CREATE TABLE ${quoteIdent(trimmedName)} (${allDefs})`;
     void (async () => {
     try {
       await engine.exec(sql);

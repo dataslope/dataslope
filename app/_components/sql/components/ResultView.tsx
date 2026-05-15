@@ -232,7 +232,7 @@ function ResultSetExportButton({
               className="sql-result-export-btn"
               aria-label="Export result set"
             >
-              <ArrowDownToLine size={13} aria-hidden="true" />
+              <ArrowDownToLine size={11} aria-hidden="true" />
               <span className="sql-result-export-btn-label">Download</span>
             </Menu.Trigger>
           )}
@@ -1414,8 +1414,11 @@ export function ResultTableBody({
     if (!constraintInfo || constraintInfo.length === 0) {
       return { canDuplicate: true, uniqueConstraintReason: "" };
     }
+    // Auto-increment / IDENTITY columns regenerate on insert, so neither
+    // a PK nor a UNIQUE constraint on such a column actually blocks
+    // duplication — the new row gets a fresh value.
     const blocking = constraintInfo.filter(
-      (c) => (c.isPrimaryKey && !c.isAutoIncrement) || c.isUnique,
+      (c) => (c.isPrimaryKey || c.isUnique) && !c.isAutoIncrement,
     );
     if (blocking.length > 0) {
       const names = blocking.map((c) => c.name).join(", ");
@@ -2324,6 +2327,16 @@ export function ResultPager({
             <strong className="sql-result-pager-total">{totalRows}</strong>
           </>
         )}
+        {elapsedMs != null && (
+          <span
+            className={`sql-pager-elapsed${elapsedIsError ? " sql-pager-elapsed-err" : ""}`}
+            title="Last execution time"
+            aria-label="Last execution time"
+          >
+            <Clock size={11} aria-hidden="true" />
+            <span>{(elapsedMs / 1000).toFixed(3)}s</span>
+          </span>
+        )}
       </span>
       {editable && editCount > 0 && (
         <button
@@ -2442,16 +2455,6 @@ export function ResultPager({
         )}
       </div>
       {children}
-      {elapsedMs != null && (
-        <span
-          className={`sql-pager-elapsed${elapsedIsError ? " sql-pager-elapsed-err" : ""}`}
-          title="Last execution time"
-          aria-label="Last execution time"
-        >
-          <Clock size={11} aria-hidden="true" />
-          <span>{(elapsedMs / 1000).toFixed(3)}s</span>
-        </span>
-      )}
     </div>
   );
 }

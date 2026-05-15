@@ -86,6 +86,7 @@ import {
   Upload,
   Wand2,
   X,
+  FolderTree,
 } from "lucide-react";
 import { format as sqlFormat } from "sql-formatter";
 import { FaInfo } from "react-icons/fa";
@@ -144,6 +145,7 @@ import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
+import { FilesPanel, type VirtualFile } from "./FilesPanel";
 import {
   exportResultToCsv,
   exportResultToJson,
@@ -1074,11 +1076,19 @@ function DuckDbPlaygroundInner() {
   const [selectedSchema, setSelectedSchema] = useState("main");
   const [schemas, setSchemas] = useState<string[]>(["main"]);
   const [schemaLoading, setSchemaLoading] = useState(false);
+  const [dbLoading, setDbLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
   const selectedSchemaRef = useRef("main");
   const showSystemSchemasRef = useRef(true);
+
+  // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
+  const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
+  const [virtualFiles, setVirtualFiles] = useState<VirtualFile[]>([]);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set(),
+  );
 
   // ─── Query history ────────────────────────────────────────────────────
   const {
@@ -1137,6 +1147,7 @@ function DuckDbPlaygroundInner() {
     string | null
   >(null);
   const viewStructureBodyRef = useRef<HTMLDivElement | null>(null);
+  const schemaSelectorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<DuckDbStructureDialogState | null>(null);
   const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<
@@ -1892,6 +1903,7 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
+      setDbLoading(true);
       // Clear the sidebar schema state up front so the previous database's
       // tables/views/indexes can never render under the new database's
       // label while the bootstrap and `refreshSchema()` calls below are in
@@ -1904,6 +1916,11 @@ function DuckDbPlaygroundInner() {
       setForeignKeysByEntity({});
       setRowCountByTable({});
       setExpandedEntities(new Set());
+      // Reset the in-memory file tree — switching databases reinitialises
+      // DuckDB's virtual filesystem too, so any previously registered
+      // user files (CSV/JSON/Parquet) are no longer queryable anyway.
+      setVirtualFiles([]);
+      setExpandedFolders(new Set());
       try {
         const sample =
           nextId === DUCKDB_BLANK_DATABASE.id
@@ -1944,6 +1961,8 @@ function DuckDbPlaygroundInner() {
           "warn",
         );
         setStatusState("ready");
+      } finally {
+        setDbLoading(false);
       }
     },
     [persistTabs, refreshSchema, refreshSchemas, showToast],
@@ -1985,18 +2004,253 @@ function DuckDbPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !createSchemaName.trim()) return;
     setCreateSchemaSubmitting(true);
+    const newSchemaName = createSchemaName.trim();
     try {
-      await engine.createSchema(createSchemaName.trim());
+      await engine.createSchema(newSchemaName);
       setCreateSchemaDialogOpen(false);
       setCreateSchemaName("");
       await refreshSchemas();
+      await handleSchemaChange(newSchemaName);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Failed to create schema: ${msg}`, "warn");
     } finally {
       setCreateSchemaSubmitting(false);
     }
-  }, [createSchemaName, refreshSchemas, showToast]);
+  }, [createSchemaName, handleSchemaChange, refreshSchemas, showToast]);
+
+  // ─── Virtual filesystem (Files panel) ─────────────────────────────────
+  const registerVirtualFile = useCallback(
+    async (path: string, bytes: Uint8Array) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      await engine.registerFileBuffer(path, bytes);
+      setVirtualFiles((prev) => {
+        const filtered = prev.filter((f) => f.path !== path);
+        return [...filtered, { path, size: bytes.length, isFolder: false }];
+      });
+      // Auto-expand all ancestor folders so the new file is visible.
+      const segments = path.split("/").filter(Boolean);
+      if (segments.length > 1) {
+        setExpandedFolders((prev) => {
+          const next = new Set(prev);
+          let cur = "";
+          for (let i = 0; i < segments.length - 1; i++) {
+            cur = cur ? `${cur}/${segments[i]}` : segments[i];
+            next.add(cur);
+          }
+          return next;
+        });
+      }
+    },
+    [],
+  );
+
+  const handleFilesUpload = useCallback(
+    (fileList: FileList, parentPath: string) => {
+      void (async () => {
+        for (const file of Array.from(fileList)) {
+          try {
+            const buf = await file.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            const path = parentPath ? `${parentPath}/${file.name}` : file.name;
+            await registerVirtualFile(path, bytes);
+            showToast(`Uploaded "${path}".`);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            showToast(`Failed to upload "${file.name}": ${msg}`, "warn");
+          }
+        }
+      })();
+    },
+    [registerVirtualFile, showToast],
+  );
+
+  const handleFilesDownload = useCallback(
+    (path: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        try {
+          const bytes = await engine.readFileBuffer(path);
+          if (!bytes) {
+            showToast(`Could not read "${path}".`, "warn");
+            return;
+          }
+          const blob = new Blob([new Uint8Array(bytes)]);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = path.split("/").pop() ?? path;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Download failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesDelete = useCallback(
+    (path: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        // Determine which entries are removed (the path itself plus any
+        // children if it's a folder) so we can drop them all from the
+        // virtual filesystem.
+        const prefix = `${path}/`;
+        const toRemove = virtualFiles.filter(
+          (f) => f.path === path || f.path.startsWith(prefix),
+        );
+        for (const entry of toRemove) {
+          if (!entry.isFolder) {
+            await engine.dropFile(entry.path);
+          }
+        }
+        setVirtualFiles((prev) =>
+          prev.filter(
+            (f) => f.path !== path && !f.path.startsWith(prefix),
+          ),
+        );
+        showToast(`Deleted "${path}".`);
+      })();
+    },
+    [virtualFiles, showToast],
+  );
+
+  const handleFilesRename = useCallback(
+    (oldPath: string, newPath: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        const oldPrefix = `${oldPath}/`;
+        const newPrefix = `${newPath}/`;
+        try {
+          // Snapshot the entries we're renaming up-front so the iteration
+          // isn't affected by the state update below.
+          const affected = virtualFiles.filter(
+            (f) => f.path === oldPath || f.path.startsWith(oldPrefix),
+          );
+          for (const entry of affected) {
+            if (entry.isFolder) continue;
+            const bytes = await engine.readFileBuffer(entry.path);
+            if (!bytes) continue;
+            const dest = entry.path === oldPath
+              ? newPath
+              : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
+            await engine.dropFile(entry.path);
+            await engine.registerFileBuffer(dest, bytes);
+          }
+          setVirtualFiles((prev) =>
+            prev.map((f) => {
+              if (f.path === oldPath) return { ...f, path: newPath };
+              if (f.path.startsWith(oldPrefix)) {
+                return {
+                  ...f,
+                  path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+                };
+              }
+              return f;
+            }),
+          );
+          showToast(`Renamed to "${newPath}".`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Rename failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [virtualFiles, showToast],
+  );
+
+  const handleFilesCreateFolder = useCallback(
+    (parentPath: string, name: string) => {
+      const path = parentPath ? `${parentPath}/${name}` : name;
+      setVirtualFiles((prev) => {
+        if (prev.some((f) => f.path === path)) return prev;
+        return [...prev, { path, size: 0, isFolder: true }];
+      });
+      setExpandedFolders((prev) => {
+        const next = new Set(prev);
+        next.add(path);
+        if (parentPath) next.add(parentPath);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const toggleFilesFolder = useCallback((path: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }, []);
+
+  const handleFilesMove = useCallback(
+    (sourcePath: string, destFolderPath: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        // Compute the new path: keep the source's leaf name, place it
+        // under destFolderPath (or at the root if dest is "").
+        const leaf = sourcePath.split("/").pop() ?? sourcePath;
+        const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
+        if (newPath === sourcePath) return;
+        // Reuse the rename helper — same mechanics: drop+re-register
+        // each file, update the in-memory list. Auto-expand the dest
+        // folder so the moved entry is visible after the drop.
+        const oldPrefix = `${sourcePath}/`;
+        const newPrefix = `${newPath}/`;
+        try {
+          const affected = virtualFiles.filter(
+            (f) => f.path === sourcePath || f.path.startsWith(oldPrefix),
+          );
+          for (const entry of affected) {
+            if (entry.isFolder) continue;
+            const bytes = await engine.readFileBuffer(entry.path);
+            if (!bytes) continue;
+            const dest =
+              entry.path === sourcePath
+                ? newPath
+                : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
+            await engine.dropFile(entry.path);
+            await engine.registerFileBuffer(dest, bytes);
+          }
+          setVirtualFiles((prev) =>
+            prev.map((f) => {
+              if (f.path === sourcePath) return { ...f, path: newPath };
+              if (f.path.startsWith(oldPrefix)) {
+                return {
+                  ...f,
+                  path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+                };
+              }
+              return f;
+            }),
+          );
+          if (destFolderPath) {
+            setExpandedFolders((prev) => {
+              const next = new Set(prev);
+              next.add(destFolderPath);
+              return next;
+            });
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Move failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [virtualFiles, showToast],
+  );
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
@@ -2519,9 +2773,23 @@ function DuckDbPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
+      // Strip generated columns — DuckDB rejects INSERTs that target them.
+      const generatedCols = new Set(
+        (columnsByEntity[tableName] ?? [])
+          .filter((col) => col.generated !== null)
+          .map((col) => col.name),
+      );
+      const filteredNames: string[] = [];
+      const filteredValues: unknown[] = [];
+      for (let i = 0; i < columnNames.length; i++) {
+        if (!generatedCols.has(columnNames[i])) {
+          filteredNames.push(columnNames[i]);
+          filteredValues.push(values[i]);
+        }
+      }
       void (async () => {
         try {
-          await engine.insertRow(tableName, columnNames, values, schema);
+          await engine.insertRow(tableName, filteredNames, filteredValues, schema);
           showToast(`Duplicated row in "${tableName}".`);
           const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
@@ -2531,7 +2799,7 @@ function DuckDbPlaygroundInner() {
         }
       })();
     },
-    [quoteIdent, runSqlForTab, showToast],
+    [columnsByEntity, quoteIdent, runSqlForTab, showToast],
   );
 
   const openAddRow = useCallback(
@@ -2539,7 +2807,8 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name, selectedSchemaRef.current);
+        const allCols = await engine.listColumns(name, selectedSchemaRef.current);
+        const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -2560,11 +2829,14 @@ function DuckDbPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !addRowDialog) return;
     const { tableName, columns, values, addAnother } = addRowDialog;
-    const columnNames = columns.map((c) => c.name);
-    const rowValues = columns.map((c) => {
-      const v = values[c.name] ?? "";
-      return v === "" ? null : v;
-    });
+    const columnNames: string[] = [];
+    const rowValues: unknown[] = [];
+    for (const c of columns) {
+      const raw = values[c.name] ?? "";
+      if (raw === "" && c.defaultValue !== null) continue;
+      columnNames.push(c.name);
+      rowValues.push(raw === "" ? null : raw);
+    }
     try {
       await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
@@ -3200,6 +3472,10 @@ function DuckDbPlaygroundInner() {
             targetTable: tables[0] ?? "",
             colCompare: null,
           });
+          // Register the raw bytes with DuckDB's virtual filesystem so
+          // queries like `SELECT * FROM read_csv('file.csv')` work and
+          // surface the file in the Files panel.
+          void registerVirtualFile(file.name, new TextEncoder().encode(text));
         } catch (err) {
           showToast(
             `Could not parse CSV: ${err instanceof Error ? err.message : String(err)}`,
@@ -3209,7 +3485,7 @@ function DuckDbPlaygroundInner() {
       };
       reader.readAsText(file);
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const handleJsonFile = useCallback(
@@ -3261,6 +3537,10 @@ function DuckDbPlaygroundInner() {
             targetTable: tables[0] ?? "",
             colCompare: null,
           });
+          void registerVirtualFile(
+            file.name,
+            new TextEncoder().encode(text),
+          );
         } catch (err) {
           showToast(
             `Could not parse JSON: ${err instanceof Error ? err.message : String(err)}`,
@@ -3270,7 +3550,7 @@ function DuckDbPlaygroundInner() {
       };
       reader.readAsText(file);
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const handleParquetFile = useCallback(
@@ -3290,6 +3570,8 @@ function DuckDbPlaygroundInner() {
           targetTable: tables[0] ?? "",
           colCompare: null,
         });
+        const buf = await file.arrayBuffer();
+        await registerVirtualFile(file.name, new Uint8Array(buf));
       } catch (err) {
         showToast(
           `Parquet import failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -3297,7 +3579,7 @@ function DuckDbPlaygroundInner() {
         );
       }
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const submitImport = useCallback(
@@ -4023,23 +4305,22 @@ function DuckDbPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        {/* ── Create Schema dialog ── */}
-        <Dialog.Root
+        {/* ── Create Schema popover ── */}
+        <Popover.Root
           open={createSchemaDialogOpen}
           onOpenChange={(next) => {
-            if (!next) setCreateSchemaDialogOpen(false);
+            setCreateSchemaDialogOpen(next);
+            if (!next) setCreateSchemaName("");
           }}
         >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Create Schema
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Enter a name for the new DuckDB schema.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
+          <Popover.Portal>
+            <Popover.Positioner
+              anchor={schemaSelectorTriggerRef}
+              sideOffset={6}
+              align="start"
+            >
+              <Popover.Popup className="bui-popup sql-schema-create-popup">
+                <div className="sql-schema-create-title">Create schema</div>
                 <input
                   className="sql-rename-input"
                   value={createSchemaName}
@@ -4053,23 +4334,27 @@ function DuckDbPlaygroundInner() {
                     }
                   }}
                 />
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!createSchemaName.trim() || createSchemaSubmitting}
-                  onClick={() => void submitCreateSchema()}
-                >
-                  Create
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+                <div className="sql-schema-create-actions">
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-secondary"
+                    onClick={() => setCreateSchemaDialogOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    disabled={!createSchemaName.trim() || createSchemaSubmitting}
+                    onClick={() => void submitCreateSchema()}
+                  >
+                    Create
+                  </button>
+                </div>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
 
         {/* ── Rename Database dialog ── */}
         <Dialog.Root
@@ -4611,37 +4896,45 @@ function DuckDbPlaygroundInner() {
               {addRowDialog && (
                 <div className="sql-modify-body">
                   <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => (
-                      <label key={c.name} className="sql-add-row-field">
-                        <span className="sql-add-row-field-label">
-                          <span className="sql-add-row-field-name">
-                            {c.name}
+                    {addRowDialog.columns.map((c) => {
+                      const hasDefault = c.defaultValue !== null;
+                      const placeholder = hasDefault
+                        ? `auto (${c.defaultValue})`
+                        : c.notNull
+                          ? "required"
+                          : "NULL if empty";
+                      return (
+                        <label key={c.name} className="sql-add-row-field">
+                          <span className="sql-add-row-field-label">
+                            <span className="sql-add-row-field-name">
+                              {c.name}
+                            </span>
+                            <span className="sql-add-row-field-type">
+                              {c.type || "—"}
+                            </span>
                           </span>
-                          <span className="sql-add-row-field-type">
-                            {c.type || "—"}
-                          </span>
-                        </span>
-                        <input
-                          className="sql-rename-input"
-                          value={addRowDialog.values[c.name] ?? ""}
-                          onChange={(e) =>
-                            setAddRowDialog((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    values: {
-                                      ...prev.values,
-                                      [c.name]: e.target.value,
-                                    },
-                                  }
-                                : null,
-                            )
-                          }
-                          placeholder={c.notNull ? "required" : "NULL if empty"}
-                          aria-label={c.name}
-                        />
-                      </label>
-                    ))}
+                          <input
+                            className="sql-rename-input"
+                            value={addRowDialog.values[c.name] ?? ""}
+                            onChange={(e) =>
+                              setAddRowDialog((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                            placeholder={placeholder}
+                            aria-label={c.name}
+                          />
+                        </label>
+                      );
+                    })}
                   </div>
                   <label className="sql-add-row-another">
                     <input
@@ -5080,9 +5373,19 @@ function DuckDbPlaygroundInner() {
               <div className="sql-db-selector-row">
                 <Select.Root
                   value={selectedSchema}
-                  onValueChange={(value) => void handleSchemaChange(String(value))}
+                  onValueChange={(value) => {
+                    const v = String(value);
+                    if (v === "__new_schema__") {
+                      if (!loaded) return;
+                      setCreateSchemaName("");
+                      setCreateSchemaDialogOpen(true);
+                      return;
+                    }
+                    void handleSchemaChange(v);
+                  }}
                 >
                   <Select.Trigger
+                    ref={schemaSelectorTriggerRef}
                     className="sql-db-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
@@ -5126,6 +5429,18 @@ function DuckDbPlaygroundInner() {
                             <>
                               <div className="sql-db-popup-group-label">Schemas</div>
                               {userSchemas.map(schemaItem)}
+                              <Select.Item
+                                value="__new_schema__"
+                                disabled={!loaded}
+                                className="bui-select-item sql-db-item sql-db-item-action"
+                              >
+                                <span className="bui-select-item-icon" aria-hidden="true">
+                                  <Plus size={14} />
+                                </span>
+                                <span className="sql-db-item-text">
+                                  <Select.ItemText>New schema…</Select.ItemText>
+                                </span>
+                              </Select.Item>
                               {systemSchemas.length > 0 && (
                                 <>
                                   <div role="separator" aria-orientation="horizontal" className="sql-db-popup-sep" />
@@ -5140,28 +5455,32 @@ function DuckDbPlaygroundInner() {
                     </Select.Positioner>
                   </Select.Portal>
                 </Select.Root>
-                <button
-                  type="button"
-                  className="sql-schema-create-btn"
-                  title="Create schema"
-                  aria-label="Create schema"
-                  disabled={!loaded}
-                  onClick={() => {
-                    setCreateSchemaName("");
-                    setCreateSchemaDialogOpen(true);
-                  }}
-                >
-                  <Plus size={14} aria-hidden="true" />
-                </button>
               </div>
             </div>
             <div className="sql-tree">
-              {schemaLoading && (
+              {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
-                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <span className="sql-tree-loading-label">
+                    {dbLoading ? "Loading database…" : "Loading schema…"}
+                  </span>
                   <DataslopeRunOverlay running />
                 </div>
               )}
+              {sidebarView === "files" && (
+                <FilesPanel
+                  files={virtualFiles}
+                  expandedFolders={expandedFolders}
+                  onToggleFolder={toggleFilesFolder}
+                  onUpload={handleFilesUpload}
+                  onDownload={handleFilesDownload}
+                  onDelete={handleFilesDelete}
+                  onRename={handleFilesRename}
+                  onCreateFolder={handleFilesCreateFolder}
+                  onMove={handleFilesMove}
+                />
+              )}
+              {sidebarView === "schema" && (
+              <>
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
@@ -5282,8 +5601,26 @@ function DuckDbPlaygroundInner() {
                 empty group. `engine.listTriggers()` always resolves
                 to `[]` for the same reason.
               */}
+              </>
+              )}
             </div>
             <div className="sql-sidebar-footer">
+              <button
+                type="button"
+                className={`sql-sidebar-btn${sidebarView === "files" ? " sql-sidebar-btn-active" : ""}`}
+                onClick={() =>
+                  setSidebarView((v) => (v === "files" ? "schema" : "files"))
+                }
+                title={
+                  sidebarView === "files"
+                    ? "Show database schema"
+                    : "Show virtual filesystem"
+                }
+                aria-label="Toggle Files panel"
+              >
+                <FolderTree size={13} aria-hidden="true" />
+                <span>Files</span>
+              </button>
               <button
                 type="button"
                 className="sql-sidebar-btn"
@@ -5293,16 +5630,6 @@ function DuckDbPlaygroundInner() {
               >
                 <Network size={13} aria-hidden="true" />
                 <span>ER Diagram</span>
-              </button>
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openQueryHistoryTab}
-                title="View Query History"
-                aria-label="View Query History"
-              >
-                <History size={13} aria-hidden="true" />
-                <span>History</span>
               </button>
             </div>
           </aside>
