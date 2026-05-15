@@ -39,10 +39,9 @@ export function sqlShellStorageKey(
 }
 
 export function defaultSqlShellTabs(sample: SqlSample): SqlShellTab[] {
-  const seeds =
-    sample.defaultTabs && sample.defaultTabs.length > 0
-      ? sample.defaultTabs
-      : [{ title: "Query 1", code: DEFAULT_SQL }];
+  const seeds = sample.defaultTabs?.length
+    ? sample.defaultTabs
+    : [{ title: "Query 1", code: DEFAULT_SQL }];
 
   return seeds.map((seed) => ({
     id: createSqlShellTabId(),
@@ -112,7 +111,7 @@ export function loadSqlShellState(
   }
 
   const tabs = defaultSqlShellTabs(sample);
-  return { tabs, activeTabId: tabs[0]?.id ?? "" };
+  return { tabs, activeTabId: tabs[0].id };
 }
 
 export function saveSqlShellState(
