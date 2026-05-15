@@ -20,7 +20,7 @@ import type {
   SqlJsStatic,
   SqlValue,
 } from "sql.js";
-import { findSampleDatabase, type SqliteSampleDatabase } from "./sqliteSamples";
+import { findSampleDatabase, type SqliteSampleDatabase, type SqliteSampleMetadata } from "./sqliteSamples";
 
 export type { QueryExecResult } from "sql.js";
 
@@ -133,7 +133,7 @@ export interface TableRebuildSpec {
 export interface SqliteEngine {
   /** Replace the active in-memory database with a fresh build of the
    *  given sample. Returns the active sample for convenience. */
-  loadSampleDatabase: (id: string) => Promise<SqliteSampleDatabase>;
+  loadSampleDatabase: (id: string) => Promise<SqliteSampleMetadata>;
   /** Execute a (potentially multi-statement) SQL string against the
    *  active database. Throws on syntax / runtime errors. */
   exec: (sql: string) => Promise<QueryExecResult[]>;
@@ -199,7 +199,7 @@ export interface SqliteEngine {
    *  (system tables, certain virtual tables). */
   getDDL: (name: string) => Promise<string>;
   /** The sample database currently loaded into memory. */
-  activeSample: () => Promise<SqliteSampleDatabase>;
+  activeSample: () => Promise<SqliteSampleMetadata>;
   /** Serialise the active database to a SQLite file image. The bytes
    *  are exactly what would land on disk if SQLite wrote the database
    *  to a `.sqlite` file, so the result can be downloaded as-is or
@@ -232,12 +232,12 @@ export interface SqliteEngine {
   ) => Promise<number>;
   /** Replace the active in-memory database with a fresh empty database.
    *  Returns a synthetic SqliteSampleDatabase descriptor for the blank DB. */
-  loadBlankDatabase: () => Promise<SqliteSampleDatabase>;
+  loadBlankDatabase: () => Promise<SqliteSampleMetadata>;
   /** Replace the active in-memory database with a database loaded from
    *  the given bytes (e.g., a user-uploaded .sqlite file). The filename
    *  parameter is used only for display purposes. Returns a synthetic
    *  SqliteSampleDatabase descriptor. */
-  loadFromBytes: (bytes: Uint8Array, filename: string) => Promise<SqliteSampleDatabase>;
+  loadFromBytes: (bytes: Uint8Array, filename: string) => Promise<SqliteSampleMetadata>;
   /** Returns per-column constraint info for `<tableName>`, combining
    *  `PRAGMA table_info` (for primary key membership) with
    *  `PRAGMA index_list` / `PRAGMA index_info` (for UNIQUE constraints)
@@ -557,7 +557,8 @@ export async function createSqliteEngineInProcess(
   return {
     loadSampleDatabase(id: string) {
       build(findSampleDatabase(id));
-      return active;
+      const { seed: _seed, ...meta } = active;
+      return meta;
     },
     exec(sql: string) {
       return require().exec(sql);
@@ -1045,7 +1046,8 @@ export async function createSqliteEngineInProcess(
       return parts.map((p) => (p.endsWith(";") ? p : `${p};`)).join("\n\n");
     },
     activeSample() {
-      return active;
+      const { seed: _seed, ...meta } = active;
+      return meta;
     },
     exportDatabase() {
       // sql.js's `Database.export()` returns a `Uint8Array` containing
@@ -1175,7 +1177,8 @@ export async function createSqliteEngineInProcess(
         defaultTabs: [{ title: "Query 1", code: "" }],
       };
       active = blank;
-      return active;
+      const { seed: _seed, ...meta } = active;
+      return meta;
     },
     loadFromBytes(bytes: Uint8Array, filename: string) {
       if (db) {
@@ -1204,7 +1207,8 @@ export async function createSqliteEngineInProcess(
         defaultTabs: [{ title: "Query 1", code: "" }],
       };
       active = imported;
-      return imported;
+      const { seed: _seed, ...meta } = imported;
+      return meta;
     },
     getColumnConstraintInfo(tableName: string): ColumnConstraintInfo[] {
       const d = require();
