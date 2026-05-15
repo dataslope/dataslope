@@ -2431,9 +2431,24 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
+      // Exclude generated columns — PostgreSQL forbids inserting explicit
+      // values into GENERATED ALWAYS columns.
+      const generatedCols = new Set(
+        (columnsByEntity[tableName] ?? [])
+          .filter((col) => col.generated !== null)
+          .map((col) => col.name),
+      );
+      const filteredNames: string[] = [];
+      const filteredValues: unknown[] = [];
+      for (let i = 0; i < columnNames.length; i++) {
+        if (!generatedCols.has(columnNames[i])) {
+          filteredNames.push(columnNames[i]);
+          filteredValues.push(values[i]);
+        }
+      }
       void (async () => {
         try {
-          await engine.insertRow(tableName, columnNames, values, schema);
+          await engine.insertRow(tableName, filteredNames, filteredValues, schema);
           showToast(`Duplicated row in "${tableName}".`);
           const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
@@ -2443,7 +2458,7 @@ function PostgresPlaygroundInner() {
         }
       })();
     },
-    [quoteIdent, runSqlForTab, showToast],
+    [columnsByEntity, quoteIdent, runSqlForTab, showToast],
   );
 
   const openAddRow = useCallback(
