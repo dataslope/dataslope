@@ -1295,12 +1295,14 @@ function PostgresPlaygroundInner() {
     if (!engine) return;
     const nextSchemas = await engine.listSchemas(showSystemSchemasRef.current);
     setSchemas(nextSchemas);
-    // If the selected schema no longer exists, fall back to public.
+    // If the selected schema no longer exists, fall back to public and
+    // refresh the SQL tree so it reflects the new schema immediately.
     if (!nextSchemas.includes(selectedSchemaRef.current)) {
       selectedSchemaRef.current = "public";
       setSelectedSchema("public");
+      await refreshSchema();
     }
-  }, []);
+  }, [refreshSchema]);
 
   const handleSchemaChange = useCallback(
     async (schema: string) => {
@@ -4461,7 +4463,7 @@ function PostgresPlaygroundInner() {
                 onValueChange={(value) => requestDbSwitch(String(value))}
               >
                 <Select.Trigger
-                  className="sql-db-selector"
+                  className="sql-db-selector sql-database-selector"
                   aria-label="Select sample database"
                 >
                   <Database
@@ -4537,7 +4539,7 @@ function PostgresPlaygroundInner() {
                   onValueChange={(value) => void handleSchemaChange(String(value))}
                 >
                   <Select.Trigger
-                    className="sql-db-selector"
+                    className="sql-db-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
                     <Layers
