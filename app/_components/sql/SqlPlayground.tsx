@@ -3279,11 +3279,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importCsvState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importCsvState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportCsvState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importCsvState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportCsvState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3293,9 +3294,10 @@ function SqlPlaygroundInner() {
                                     prev.headers,
                                     tableCols,
                                   ),
-                                }
-                              : null,
-                          );
+                                  }
+                                : null,
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3322,9 +3324,10 @@ function SqlPlaygroundInner() {
                         value={importCsvState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportCsvState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportCsvState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3333,9 +3336,10 @@ function SqlPlaygroundInner() {
                                     prev.headers,
                                     tableCols,
                                   ),
-                                }
-                              : null,
-                          );
+                                  }
+                                : null,
+                            );
+                          })();
                         }}
                         autoFocus
                       >
@@ -3517,11 +3521,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importJsonState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importJsonState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportJsonState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importJsonState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportJsonState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3533,7 +3538,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3560,9 +3566,10 @@ function SqlPlaygroundInner() {
                         value={importJsonState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportJsonState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportJsonState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3573,7 +3580,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                         autoFocus
                       >
@@ -3755,11 +3763,12 @@ function SqlPlaygroundInner() {
                         className={`sql-import-mode-btn${importParquetState.targetMode === "existing" ? " active" : ""}`}
                         disabled={tables.length === 0}
                         onClick={() => {
-                          const targetTable =
-                            importParquetState.targetTable || tables[0] || "";
-                          const tableCols =
-                            engineRef.current?.listColumns(targetTable) ?? [];
-                          setImportParquetState((prev) =>
+                          void (async () => {
+                            const targetTable =
+                              importParquetState.targetTable || tables[0] || "";
+                            const tableCols =
+                              (await engineRef.current?.listColumns(targetTable)) ?? [];
+                            setImportParquetState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3771,7 +3780,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                       >
                         Existing table
@@ -3798,9 +3808,10 @@ function SqlPlaygroundInner() {
                         value={importParquetState.targetTable}
                         onChange={(e) => {
                           const newTable = e.target.value;
-                          const tableCols =
-                            engineRef.current?.listColumns(newTable) ?? [];
-                          setImportParquetState((prev) =>
+                          void (async () => {
+                            const tableCols =
+                              (await engineRef.current?.listColumns(newTable)) ?? [];
+                            setImportParquetState((prev) =>
                             prev
                               ? {
                                   ...prev,
@@ -3811,7 +3822,8 @@ function SqlPlaygroundInner() {
                                   ),
                                 }
                               : null,
-                          );
+                            );
+                          })();
                         }}
                         autoFocus
                       >

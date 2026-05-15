@@ -1,4 +1,4 @@
-import { createSqliteEngineInProcess } from "./sqlite";
+import { createSqliteEngineInProcess } from "./sqlite-core";
 
 type SqliteWorkerRequest = {
   id: number;
@@ -38,4 +38,3 @@ self.addEventListener("message", async (ev: MessageEvent<SqliteWorkerRequest>) =
     } satisfies SqliteWorkerResponse);
   }
 });
-

@@ -116,7 +116,9 @@ export function ModifyColumnRow({
   useEffect(() => {
     let cancelled = false;
     if (!engine || !col.fkTable) {
-      setFkTargetColumns([]);
+      queueMicrotask(() => {
+        if (!cancelled) setFkTargetColumns([]);
+      });
       return;
     }
     void engine
@@ -534,8 +536,11 @@ export function ModifyStructureForm({
   useEffect(() => {
     let cancelled = false;
     if (!engine || !state.originalName) {
-      setTableIndexes([]);
-      setTableTriggers([]);
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setTableIndexes([]);
+        setTableTriggers([]);
+      });
       return;
     }
     void Promise.all([
