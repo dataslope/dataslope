@@ -28,6 +28,10 @@ interface ShellStorage {
 const DEFAULT_SQL = "-- Start writing SQL here\nSELECT 1;";
 
 export function createSqlShellTabId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return `shell_${crypto.randomUUID()}`;
+  }
+
   return `shell_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
@@ -133,10 +137,10 @@ export function saveSqlShellState(
 }
 
 export function addSqlShellTab(state: SqlShellState): SqlShellState {
-  const nextIndex = state.tabs.length + 1;
+  const nextTabNumber = state.tabs.length + 1;
   const nextTab: SqlShellTab = {
     id: createSqlShellTabId(),
-    title: `Query ${nextIndex}`,
+    title: `Query ${nextTabNumber}`,
     code: "",
     pristineCode: "",
   };
@@ -186,8 +190,7 @@ export function SqlPlaygroundShell({
     loadSqlShellState(storage, adapter.storagePrefix, sample),
   );
 
-  const activeTab =
-    state.tabs.find((tab) => tab.id === state.activeTabId) ?? state.tabs[0];
+  const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId);
 
   const persist = useCallback(
     (next: SqlShellState) => {
