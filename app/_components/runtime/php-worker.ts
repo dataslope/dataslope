@@ -6,28 +6,45 @@ export {};
 // runs. Stub them here at module-level, before any imports, so the checks
 // pass in a worker context. Our `locateFile` override makes the fake
 // currentScript irrelevant; PHP execution never touches the real DOM.
+//
+// Simple assignment (`self.window = self`) is unreliable here: browsers may
+// define `window` on WorkerGlobalScope.prototype as non-configurable, making
+// the write a silent no-op. Object.defineProperty on globalThis forces the
+// property onto the own-properties of the global object, where a direct
+// identifier lookup will find it.
 {
-  const globals = self as unknown as Record<string, unknown>;
-  if (typeof document === "undefined") {
-    const docStub = {
-      currentScript: null,
-      querySelector: () => null,
-      querySelectorAll: () => [],
-      createElement: (tag: string) => {
-        const el: Record<string, unknown> = { style: {}, tagName: tag.toUpperCase() };
-        if (tag === "canvas") el.getContext = () => null;
-        return el;
-      },
-      createElementNS: (_ns: string, tag: string) => docStub.createElement(tag),
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      body: { appendChild: () => {}, removeChild: () => {} },
-    };
-    globals.document = docStub;
+  function defineGlobalIfMissing(name: string, value: unknown): void {
+    if (typeof (globalThis as Record<string, unknown>)[name] !== "undefined") return;
+    try {
+      Object.defineProperty(globalThis, name, {
+        value,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      });
+    } catch {
+      // Already defined and non-configurable — nothing we can do; PhpWeb will
+      // fail to init if the value is wrong, and the error message will say why.
+    }
   }
-  if (typeof window === "undefined") {
-    globals.window = self;
-  }
+
+  const docStub = {
+    currentScript: null,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    createElement: (tag: string) => {
+      const el: Record<string, unknown> = { style: {}, tagName: tag.toUpperCase() };
+      if (tag === "canvas") el.getContext = () => null;
+      return el;
+    },
+    createElementNS: (_ns: string, tag: string) => docStub.createElement(tag),
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    body: { appendChild: () => {}, removeChild: () => {} },
+  };
+
+  defineGlobalIfMissing("document", docStub);
+  defineGlobalIfMissing("window", globalThis);
 }
 
 // PHP (via php-wasm) runs inside a dedicated Web Worker so that:
