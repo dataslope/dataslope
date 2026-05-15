@@ -163,9 +163,25 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         setViews(newViews);
         setIndexes(newIndexes);
         setTriggers(newTriggers);
-        setColumnsByEntity({});
-        setForeignKeysByEntity({});
         const newEntitySet = new Set([...newTables, ...newViews]);
+        // Only purge column / FK data for entities that were actually
+        // dropped. Clearing everything on every run causes all expanded
+        // schema items to show "Loading…" and re-fetch their columns,
+        // which produces a visible blink in the sidebar.
+        setColumnsByEntity((prev) => {
+          const dropped = Object.keys(prev).filter((n) => !newEntitySet.has(n));
+          if (dropped.length === 0) return prev;
+          const next = { ...prev };
+          for (const d of dropped) delete next[d];
+          return next;
+        });
+        setForeignKeysByEntity((prev) => {
+          const dropped = Object.keys(prev).filter((n) => !newEntitySet.has(n));
+          if (dropped.length === 0) return prev;
+          const next = { ...prev };
+          for (const d of dropped) delete next[d];
+          return next;
+        });
         setExpandedEntities((prev) => {
           const dropped = [...prev].filter((n) => !newEntitySet.has(n));
           if (dropped.length === 0) return prev;

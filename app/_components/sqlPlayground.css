@@ -287,8 +287,11 @@
   color: var(--text);
 }
 
-/* Right padding so the last action button doesn't butt against the edge. */
-.sql-tree-entity-action-btn:last-child {
+/* Right padding so the last action button doesn't butt against the edge.
+   Use :last-of-type (rather than :last-child) so the rule continues to
+   apply when Base UI inserts FocusGuard <span> elements as DOM siblings
+   of the trigger button while a hover popover is open. */
+.sql-tree-entity-action-btn:last-of-type {
   padding-right: 8px;
 }
 
