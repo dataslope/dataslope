@@ -1724,7 +1724,15 @@ function PostgresPlaygroundInner() {
       try {
         setLoadingMessage("Loading PostgreSQL engine…");
         const engine = await createPostgresEngine(initialDbId);
-        if (cancelled) return;
+        if (cancelled) {
+          // Component unmounted while the engine was being created; close it
+          // immediately so the worker is terminated and its leader-election
+          // lock is released. Without this, the abandoned worker stays leader
+          // and any subsequent engine creation would proxy SQL to it instead
+          // of running against a fresh database.
+          void engine.close();
+          return;
+        }
         engineRef.current = engine;
         await Promise.all([refreshSchema(), refreshSchemas()]);
         setLoaded(true);
@@ -1745,6 +1753,13 @@ function PostgresPlaygroundInner() {
       completionCompRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      // Close the engine so the underlying PGliteWorker terminates and
+      // releases its leader-election lock. If we don't do this an
+      // unclosed worker from a previous visit stays the leader, causing
+      // new workers to proxy SQL to the old (already-populated) database.
+      const oldEngine = engineRef.current;
+      engineRef.current = null;
+      void oldEngine?.close();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -192,12 +192,24 @@ export interface PostgresEngine {
     schema?: string,
   ) => Promise<void>;
   activeSample: () => PostgresSampleDatabase;
+  close: () => Promise<void>;
+}
+
+function createFreshWorker(): PGlite {
+  // Pass a unique `id` so this PGliteWorker instance gets its own leader-
+  // election lock and BroadcastChannel. Without a unique id every instance
+  // with the same worker URL shares the same lock, meaning an unclosed
+  // PGliteWorker from a previous page visit stays leader while the new one
+  // becomes a follower — so SQL is silently proxied to the old (already-
+  // populated) database, causing "relation already exists" errors.
+  return new PGliteWorker(
+    new Worker(new URL("./postgres-worker.ts", import.meta.url)),
+    { id: `pglite-${crypto.randomUUID()}` },
+  ) as unknown as PGlite;
 }
 
 async function createFreshDatabase(sample: PostgresSampleDatabase): Promise<PGlite> {
-  const db = new PGliteWorker(
-    new Worker(new URL("./postgres-worker.ts", import.meta.url)),
-  ) as unknown as PGlite;
+  const db = createFreshWorker();
   await db.waitReady;
   await db.exec(sample.sql);
   return db;
@@ -228,9 +240,7 @@ export async function createPostgresEngine(
 
     async loadBlankDatabase() {
       sample = POSTGRES_BLANK_DATABASE;
-      const next = new PGliteWorker(
-        new Worker(new URL("./postgres-worker.ts", import.meta.url)),
-      ) as unknown as PGlite;
+      const next = createFreshWorker();
       await next.waitReady;
       await db.close();
       db = next;
@@ -692,6 +702,10 @@ export async function createPostgresEngine(
 
     activeSample() {
       return sample;
+    },
+
+    async close() {
+      await db.close();
     },
   };
 
