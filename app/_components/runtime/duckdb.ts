@@ -749,10 +749,22 @@ export async function createDuckDbEngine(
     },
 
     async listSchemas(includeSystem = false) {
+      if (includeSystem) {
+        // duckdb_schemas() in the WASM in-memory build doesn't expose the
+        // virtual schemas (information_schema, pg_catalog) because they are
+        // synthesized at query time and never written to the catalog.
+        // information_schema.schemata always includes the full list.
+        const rows = await rowsFor(
+          `SELECT schema_name FROM information_schema.schemata
+           WHERE catalog_name = current_database()
+           ORDER BY schema_name`,
+        );
+        return rows.map((r) => String(r[0]));
+      }
       const rows = await rowsFor(
-        includeSystem
-          ? `SELECT schema_name FROM duckdb_schemas() WHERE database_name = current_database() ORDER BY schema_name`
-          : `SELECT schema_name FROM duckdb_schemas() WHERE database_name = current_database() AND NOT internal ORDER BY schema_name`,
+        `SELECT schema_name FROM duckdb_schemas()
+         WHERE database_name = current_database() AND NOT internal
+         ORDER BY schema_name`,
       );
       return rows.map((r) => String(r[0]));
     },
