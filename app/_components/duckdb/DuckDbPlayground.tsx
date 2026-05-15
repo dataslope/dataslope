@@ -78,6 +78,7 @@ import {
   Table,
   Trash2,
   TriangleAlert,
+  Upload,
   Wand2,
   X,
 } from "lucide-react";
@@ -1092,6 +1093,15 @@ function DuckDbPlaygroundInner() {
   const [importParquetDragging, setImportParquetDragging] = useState(false);
   const [importParquetState, setImportParquetState] =
     useState<ParquetImportState | null>(null);
+  const [importSqlDumpOpen, setImportSqlDumpOpen] = useState(false);
+  const [importSqlDumpDragging, setImportSqlDumpDragging] = useState(false);
+
+  // ─── Rename / custom filename state ───────────────────────────────────
+  const [renameDbOpen, setRenameDbOpen] = useState(false);
+  const [renameDbName, setRenameDbName] = useState("");
+  const [renameDbExt, setRenameDbExt] = useState(".duckdb");
+  // Overrides the display name for the blank/imported database slot.
+  const [customDbFilename, setCustomDbFilename] = useState<string | null>(null);
 
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
@@ -1214,6 +1224,11 @@ function DuckDbPlaygroundInner() {
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findDuckDbSampleDatabase(activeDbId);
+  // customDbFilename applies only for the blank/imported database slot.
+  const displayFilename =
+    activeDbId === DUCKDB_BLANK_DATABASE.id && customDbFilename !== null
+      ? customDbFilename
+      : activeSample.filename;
   const tabIds = useMemo(() => tabs.map((tab) => tab.id), [tabs]);
   const tabDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -1893,7 +1908,60 @@ function DuckDbPlaygroundInner() {
     [performDbSwitch],
   );
 
-  // ─── Tab management ──────────────────────────────────────────────────
+  // ─── Import SQL dump ──────────────────────────────────────────────────
+  const performImportSqlDump = useCallback(
+    async (sqlText: string, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setStatusState("loading");
+      setTables([]);
+      setViews([]);
+      setIndexes([]);
+      setTriggers([]);
+      setColumnsByEntity({});
+      setForeignKeysByEntity({});
+      setRowCountByTable({});
+      setExpandedEntities(new Set());
+      try {
+        await engine.loadBlankDatabase();
+        await engine.exec(sqlText);
+        setActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(DUCKDB_BLANK_DATABASE.id);
+        persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
+        let nextActive = nextTabs[0]?.id ?? "";
+        try {
+          const savedActive = localStorage.getItem(
+            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
+          );
+          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
+            nextActive = savedActive;
+          }
+        } catch {
+          /* ignore */
+        }
+        tabHistoryRef.current = [];
+        setActiveTabId(nextActive);
+        setResultsByTab({});
+        await refreshSchema();
+        setStatusState("ready");
+        showToast(`Loaded "${filename}".`);
+      } catch (err) {
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, showToast],
+  );
+
   const addTab = useCallback(() => {
     const tab: QueryTab = {
       id: newTabId(),
@@ -2851,7 +2919,7 @@ function DuckDbPlaygroundInner() {
       }
       const sql = lines.join("\n");
       const baseName =
-        activeSample.filename.replace(/\.[^.]+$/, "") || "database";
+        displayFilename.replace(/\.[^.]+$/, "") || "database";
       const filename = `${baseName}.sql`;
       triggerDownload(
         new Blob([sql], { type: "text/plain;charset=utf-8" }),
@@ -2864,13 +2932,13 @@ function DuckDbPlaygroundInner() {
         "warn",
       );
     }
-  }, [tables, activeSample, showToast]);
+  }, [tables, displayFilename, showToast]);
 
   const exportDuckDbDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
     const baseName =
-      activeSample.filename.replace(/\.[^.]+$/, "") || "database";
+      displayFilename.replace(/\.[^.]+$/, "") || "database";
     const filename = `${baseName}.xlsx`;
     try {
       const mod = await initXlsxWasm();
@@ -2913,7 +2981,7 @@ function DuckDbPlaygroundInner() {
         "warn",
       );
     }
-  }, [tables, activeSample, showToast]);
+  }, [tables, displayFilename, showToast]);
 
   // ─── Import handlers ─────────────────────────────────────────────────
   const handleCsvFile = useCallback(
@@ -3501,6 +3569,156 @@ function DuckDbPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        {/* ── Import SQL dump dialog ── */}
+        <Dialog.Root
+          open={importSqlDumpOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportSqlDumpOpen(false);
+              setImportSqlDumpDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import SQL Dump
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Open a local <code>.sql</code> dump file as a new in-memory
+                database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This will replace the current database with the contents of
+                  the file. Your file will <strong>not</strong> be uploaded or
+                  persisted — it is only loaded into browser memory and will be
+                  gone on reload.
+                </span>
+              </div>
+              <div
+                className={`sql-dropzone${importSqlDumpDragging ? " dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setImportSqlDumpDragging(true);
+                }}
+                onDragLeave={() => setImportSqlDumpDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setImportSqlDumpDragging(false);
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const text = ev.target?.result as string | null;
+                    if (text == null) return;
+                    void performImportSqlDump(text, file.name);
+                  };
+                  reader.readAsText(file);
+                }}
+              >
+                <Upload
+                  size={28}
+                  className="sql-dropzone-icon"
+                  aria-hidden="true"
+                />
+                <span>Drop a SQL file here</span>
+                <span className="sql-dropzone-hint">
+                  or click to browse — .sql
+                </span>
+                <input
+                  type="file"
+                  accept=".sql"
+                  aria-label="Choose SQL dump file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const text = ev.target?.result as string | null;
+                      if (text == null) return;
+                      void performImportSqlDump(text, file.name);
+                    };
+                    reader.readAsText(file);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Rename Database dialog ── */}
+        <Dialog.Root
+          open={renameDbOpen}
+          onOpenChange={(next) => {
+            if (!next) setRenameDbOpen(false);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
+              <Dialog.Title className="confirm-title">
+                Rename Database
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Choose a new display name for the current database.
+              </Dialog.Description>
+              <div className="sql-rename-db-form">
+                <div className="sql-rename-db-name-row">
+                  <input
+                    className="sql-rename-input sql-rename-db-name-input"
+                    value={renameDbName}
+                    onChange={(e) => setRenameDbName(e.target.value)}
+                    placeholder="database name"
+                    aria-label="Database name"
+                    autoFocus
+                  />
+                  <select
+                    className="sql-rename-db-ext-select"
+                    value={renameDbExt}
+                    onChange={(e) => setRenameDbExt(e.target.value)}
+                    aria-label="File extension"
+                  >
+                    <option value=".duckdb">.duckdb</option>
+                    <option value=".sql">.sql</option>
+                    <option value=".db">.db</option>
+                  </select>
+                </div>
+              </div>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  disabled={!renameDbName.trim()}
+                  onClick={() => {
+                    const newFilename = `${renameDbName.trim()}${renameDbExt}`;
+                    setCustomDbFilename(newFilename);
+                    showToast(`Renamed to "${newFilename}".`);
+                    setRenameDbOpen(false);
+                  }}
+                >
+                  Rename
+                </button>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <AlertDialog.Root
           open={pendingDbId !== null}
           onOpenChange={(next) => {
@@ -3515,7 +3733,7 @@ function DuckDbPlaygroundInner() {
               </AlertDialog.Title>
               <AlertDialog.Description className="confirm-desc">
                 You have unsaved edits in the query tabs for{" "}
-                <strong>{activeSample.filename}</strong>. They will be saved and
+                <strong>{displayFilename}</strong>. They will be saved and
                 restored when you switch back, but loading another database will
                 replace what&rsquo;s currently in the editor.
               </AlertDialog.Description>
@@ -4312,7 +4530,30 @@ function DuckDbPlaygroundInner() {
             <div className="sql-db-selector-wrap">
               <Select.Root
                 value={activeDbId}
-                onValueChange={(value) => requestDbSwitch(String(value))}
+                onValueChange={(value) => {
+                  if (value === "__new_db__") {
+                    void performDbSwitch(DUCKDB_BLANK_DATABASE.id);
+                    return;
+                  }
+                  if (value === "__import_sql_dump__") {
+                    setImportSqlDumpOpen(true);
+                    return;
+                  }
+                  if (value === "__rename_db__") {
+                    const cur = displayFilename;
+                    const dotIdx = cur.lastIndexOf(".");
+                    if (dotIdx > 0) {
+                      setRenameDbName(cur.slice(0, dotIdx));
+                      setRenameDbExt(cur.slice(dotIdx));
+                    } else {
+                      setRenameDbName(cur);
+                      setRenameDbExt(".duckdb");
+                    }
+                    setRenameDbOpen(true);
+                    return;
+                  }
+                  requestDbSwitch(String(value));
+                }}
               >
                 <Select.Trigger
                   className="sql-db-selector"
@@ -4324,7 +4565,7 @@ function DuckDbPlaygroundInner() {
                     aria-hidden="true"
                   />
                   <Select.Value className="sql-db-selector-value">
-                    {activeSample.filename}
+                    {displayFilename}
                   </Select.Value>
                   <Select.Icon className="playground-switcher-icon">
                     <ChevronDown size={12} />
@@ -4337,6 +4578,64 @@ function DuckDbPlaygroundInner() {
                     alignItemWithTrigger={false}
                   >
                     <Select.Popup className="bui-select-popup sql-db-popup">
+                      <Select.Item
+                        value="__new_db__"
+                        className="bui-select-item sql-db-item"
+                      >
+                        <span
+                          className="bui-select-item-icon"
+                          aria-hidden="true"
+                        >
+                          <FilePlus size={14} />
+                        </span>
+                        <span className="sql-db-item-text">
+                          <Select.ItemText>New Database</Select.ItemText>
+                          <span className="sql-db-item-desc">
+                            Create a blank database
+                          </span>
+                        </span>
+                      </Select.Item>
+                      <Select.Item
+                        value="__import_sql_dump__"
+                        className="bui-select-item sql-db-item"
+                      >
+                        <span
+                          className="bui-select-item-icon"
+                          aria-hidden="true"
+                        >
+                          <Upload size={14} />
+                        </span>
+                        <span className="sql-db-item-text">
+                          <Select.ItemText>Import SQL Dump</Select.ItemText>
+                          <span className="sql-db-item-desc">
+                            Open a SQL dump file
+                          </span>
+                        </span>
+                      </Select.Item>
+                      <Select.Item
+                        value="__rename_db__"
+                        className="bui-select-item sql-db-item"
+                      >
+                        <span
+                          className="bui-select-item-icon"
+                          aria-hidden="true"
+                        >
+                          <Pencil size={14} />
+                        </span>
+                        <span className="sql-db-item-text">
+                          <Select.ItemText>
+                            Rename Current Database
+                          </Select.ItemText>
+                          <span className="sql-db-item-desc">
+                            Change the display name
+                          </span>
+                        </span>
+                      </Select.Item>
+                      <div
+                        role="separator"
+                        aria-orientation="horizontal"
+                        className="sql-db-popup-sep"
+                      />
                       <div className="sql-db-popup-group-label">
                         Sample databases
                       </div>
@@ -4360,25 +4659,6 @@ function DuckDbPlaygroundInner() {
                           </span>
                         </Select.Item>
                       ))}
-                      <Select.Item
-                        value={DUCKDB_BLANK_DATABASE.id}
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <FilePlus size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>
-                            {DUCKDB_BLANK_DATABASE.label}
-                          </Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            {DUCKDB_BLANK_DATABASE.description}
-                          </span>
-                        </span>
-                      </Select.Item>
                     </Select.Popup>
                   </Select.Positioner>
                 </Select.Portal>

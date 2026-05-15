@@ -27,7 +27,7 @@ export const usePostgresSettingsStore = create<PostgresSettingsState>((set) => (
   editorTheme: DEFAULT_PLAYGROUND_SETTINGS.editorTheme,
   wordWrap: DEFAULT_PLAYGROUND_SETTINGS.wordWrap,
   clearBeforeRun: DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun,
-  showSystemSchemas: false,
+  showSystemSchemas: true,
   setFontSize: (fontSize) => set({ fontSize }),
   setOutputFontSizeEnabled: (outputFontSizeEnabled) =>
     set({ outputFontSizeEnabled }),
