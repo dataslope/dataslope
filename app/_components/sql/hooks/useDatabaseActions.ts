@@ -14,7 +14,12 @@ import {
 } from "../../sqlitePlaygroundTabs";
 import { findSampleDatabase, SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
 import { replaceDoc } from "../utils/editorUtils";
-import { sanitizeImportColName } from "../utils/importUtils";
+import {
+  sanitizeImportColName,
+  parseCsv,
+  tableNameFromFilename,
+  readParquetFile,
+} from "../utils/importUtils";
 import {
   applyPragmasToEngine,
 } from "../utils/pragmaUtils";
@@ -36,36 +41,6 @@ export interface DatabaseActionsRefs {
   activeTabIdRef: React.MutableRefObject<string>;
   activeDbIdRef: React.MutableRefObject<string>;
   pragmaSettingsRef: React.MutableRefObject<PragmaSettings>;
-}
-
-async function importParquetFile(
-  file: File,
-): Promise<{ columns: string[]; rows: import("sql.js").QueryExecResult["values"] }> {
-  const mod = await (async () => {
-    const m = await import("parquet-wasm/esm");
-    await m.default(
-      "https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm",
-    );
-    return m;
-  })();
-  const { tableFromIPC } = await import("apache-arrow");
-  const bytes = await file.arrayBuffer();
-  const wasmTable = mod.readParquet(new Uint8Array(bytes));
-  const ipcBytes = wasmTable.intoIPCStream();
-  const arrowTable = tableFromIPC(ipcBytes);
-  const columns = arrowTable.schema.fields.map((f) => f.name);
-  const rows: import("sql.js").QueryExecResult["values"] = [];
-  for (const batch of arrowTable.batches) {
-    for (let r = 0; r < batch.numRows; r++) {
-      const row: import("sql.js").SqlValue[] = [];
-      for (let c = 0; c < columns.length; c++) {
-        const val = batch.getChildAt(c)?.get(r);
-        row.push(val === undefined ? null : val);
-      }
-      rows.push(row);
-    }
-  }
-  return { columns, rows };
 }
 
 export function useDatabaseActions(refs: DatabaseActionsRefs) {
@@ -332,60 +307,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   }, [activeDbId, customFilenames, tables, quoteIdent, showToast, engineRef]);
 
   // ─── CSV parse helper ─────────────────────────────────────────────
-  const parseCsv = useCallback(
-    (text: string): { headers: string[]; rows: string[][] } => {
-      const parseLine = (line: string): string[] => {
-        const fields: string[] = [];
-        let cur = "";
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (inQuotes) {
-            if (ch === '"') {
-              if (i + 1 < line.length && line[i + 1] === '"') {
-                cur += '"';
-                i += 1;
-              } else {
-                inQuotes = false;
-              }
-            } else {
-              cur += ch;
-            }
-          } else if (ch === '"') {
-            inQuotes = true;
-          } else if (ch === ",") {
-            fields.push(cur);
-            cur = "";
-          } else {
-            cur += ch;
-          }
-        }
-        fields.push(cur);
-        return fields;
-      };
-      const lines = text.split(/\r?\n/);
-      const nonEmpty = lines.filter((l) => l.trim() !== "");
-      if (nonEmpty.length === 0) return { headers: [], rows: [] };
-      const headers = parseLine(nonEmpty[0]);
-      const rows = nonEmpty.slice(1).map((l) => {
-        const vals = parseLine(l);
-        while (vals.length < headers.length) vals.push("");
-        return vals.slice(0, headers.length);
-      });
-      return { headers, rows };
-    },
-    [],
-  );
-
-  const tableNameFromFilename = useCallback((filename: string): string => {
-    const base = filename
-      .replace(/\.[^.]+$/, "")
-      .replace(/[^a-zA-Z0-9_]/g, "_")
-      .replace(/^_+|_+$/g, "")
-      .replace(/_+/g, "_");
-    return base || "imported_table";
-  }, []);
-
   const handleCsvFile = useCallback(
     (file: File) => {
       const reader = new FileReader();
@@ -413,7 +334,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       };
       reader.readAsText(file);
     },
-    [parseCsv, tableNameFromFilename, showToast, tables, setImportCsvState],
+    [showToast, tables, setImportCsvState],
   );
 
   const submitCsvImport = useCallback(() => {
@@ -529,7 +450,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       };
       reader.readAsText(file);
     },
-    [tableNameFromFilename, showToast, tables, setImportJsonState],
+    [showToast, tables, setImportJsonState],
   );
 
   const submitJsonImport = useCallback(() => {
@@ -593,7 +514,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     async (file: File) => {
       try {
         showToast("Reading parquet file…");
-        const { columns, rows } = await importParquetFile(file);
+        const { columns, rows } = await readParquetFile(file);
         if (columns.length === 0) {
           showToast("Parquet file appears to have no columns.", "warn");
           return;
@@ -611,7 +532,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         showToast(`Parquet import failed: ${msg}`, "warn");
       }
     },
-    [tableNameFromFilename, showToast, tables, setImportParquetState],
+    [showToast, tables, setImportParquetState],
   );
 
   const submitParquetImport = useCallback(() => {

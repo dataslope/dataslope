@@ -20,40 +20,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
+import type { Compartment } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-  startCompletion,
-  acceptCompletion,
-} from "@codemirror/autocomplete";
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-} from "@codemirror/commands";
-import {
-  bracketMatching,
-  indentOnInput,
-  indentUnit,
-} from "@codemirror/language";
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { EditorState, Compartment } from "@codemirror/state";
-import {
-  EditorView,
-  crosshairCursor,
-  drawSelection,
-  dropCursor,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  keymap,
-  lineNumbers,
-  rectangularSelection,
-  tooltips,
-} from "@codemirror/view";
-import { sql as sqlLang } from "@codemirror/lang-sql";
+  createSqlEditorExtensions,
+  makeSqlAutocompletionExtension,
+  makeSqlEditorCompartments,
+  makeSqlLangExtension,
+} from "../sql/shared/editorSetup";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -88,7 +62,6 @@ import {
   X,
   FolderTree,
 } from "lucide-react";
-import { format as sqlFormat } from "sql-formatter";
 import { FaInfo } from "react-icons/fa";
 import React, {
   Fragment,
@@ -103,7 +76,15 @@ import React, {
 import { flushSync } from "react-dom";
 import "../playground.css";
 import "../sqlPlayground.css";
-import { ErDiagramPane } from "../ErDiagramPane";
+import dynamic from "next/dynamic";
+
+// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
+// (~hundreds of KB of layout-algorithm code). It only renders when
+// the user opens the ER-diagram tab, so defer the chunk until then.
+const ErDiagramPane = dynamic(
+  () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
+  { ssr: false },
+);
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
@@ -176,10 +157,7 @@ import type {
   ResultSetExportSnapshot,
 } from "../sql/types";
 import type { RuntimeInfo } from "../types";
-import {
-  createSqlCompletionSource,
-  type SqlCompletionSchema,
-} from "../sql/sqlCompletion";
+import type { SqlCompletionSchema } from "../sql/sqlCompletion";
 import { useDuckDbSettingsStore } from "./stores/useDuckDbSettingsStore";
 import {
   importRowsIntoDuckDb,
@@ -1273,11 +1251,53 @@ function DuckDbPlaygroundInner() {
     ? tabs.find((t) => t.id === draggingTabId) ?? null
     : null;
 
+  // Trailing-edge debounce of `saveTabs` so a fast typist doesn't pay a
+  // synchronous JSON.stringify + localStorage.setItem on every keystroke.
+  // We still update `tabsRef.current` + React state immediately so the rest
+  // of the component sees fresh tab text right away — only the persist
+  // is deferred. Pending writes are flushed on tab/db switch and unmount.
+  const pendingSaveRef = useRef<{ dbId: string; tabs: QueryTab[] } | null>(
+    null,
+  );
+  const saveTimerRef = useRef<number | null>(null);
+  const flushPendingSave = useCallback(() => {
+    if (saveTimerRef.current !== null) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    const pending = pendingSaveRef.current;
+    if (pending) {
+      pendingSaveRef.current = null;
+      saveTabs(pending.dbId, pending.tabs);
+    }
+  }, []);
+  useEffect(() => {
+    // Best-effort persistence when the tab is hidden or unloaded.
+    const handler = () => flushPendingSave();
+    window.addEventListener("visibilitychange", handler);
+    window.addEventListener("pagehide", handler);
+    return () => {
+      window.removeEventListener("visibilitychange", handler);
+      window.removeEventListener("pagehide", handler);
+      flushPendingSave();
+    };
+  }, [flushPendingSave]);
+
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
       tabsRef.current = nextTabs;
       setTabs(nextTabs);
-      saveTabs(dbId, nextTabs);
+      pendingSaveRef.current = { dbId, tabs: nextTabs };
+      if (saveTimerRef.current === null) {
+        saveTimerRef.current = window.setTimeout(() => {
+          saveTimerRef.current = null;
+          const pending = pendingSaveRef.current;
+          if (pending) {
+            pendingSaveRef.current = null;
+            saveTabs(pending.dbId, pending.tabs);
+          }
+        }, 500);
+      }
     },
     [],
   );
@@ -1317,22 +1337,33 @@ function DuckDbPlaygroundInner() {
         engine.listIndexes(schema),
         engine.listTriggers(),
       ]);
-    const entries = await Promise.all(
-      [...nextTables, ...nextViews].map(async (name) => {
-        const [colsResult, fksResult, countResult] = await Promise.allSettled([
+    // Cap concurrency so a large catalog doesn't queue dozens of queries
+    // on the DuckDB worker at once. Two queries per table (columns + FKs)
+    // are cheap, so a small pool keeps the worker responsive.
+    const entityNames = [...nextTables, ...nextViews];
+    const entries: Array<readonly [string, TableColumnInfo[], ForeignKeyInfo[]]> =
+      new Array(entityNames.length);
+    const CONCURRENCY = 6;
+    let cursor = 0;
+    const workers = Array.from({ length: Math.min(CONCURRENCY, entityNames.length) }, async () => {
+      while (true) {
+        const i = cursor++;
+        if (i >= entityNames.length) return;
+        const name = entityNames[i];
+        const [colsResult, fksResult] = await Promise.allSettled([
           engine.listColumns(name, schema),
           engine.listForeignKeys(name, schema),
-          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(schema)}.${quoteIdent(name)}`),
         ]);
         const cols = colsResult.status === "fulfilled" ? colsResult.value : [];
         const fks = fksResult.status === "fulfilled" ? fksResult.value : [];
-        const count =
-          countResult.status === "fulfilled"
-            ? Number(countResult.value[0]?.values?.[0]?.[0] ?? 0)
-            : 0;
-        return [name, cols, fks, count] as const;
-      }),
-    );
+        entries[i] = [name, cols, fks] as const;
+      }
+    });
+    await Promise.all(workers);
+    // Drop stale row-count cache entries for entities that no longer
+    // exist; keep cached counts for still-present tables so the
+    // sidebar doesn't blink between "(N rows)" and a Promise resolution.
+    const surviving = new Set(entityNames);
     setTables(nextTables);
     setViews(nextViews);
     setIndexes(nextIndexes);
@@ -1343,9 +1374,18 @@ function DuckDbPlaygroundInner() {
     setForeignKeysByEntity(
       Object.fromEntries(entries.map(([name, , fks]) => [name, fks])),
     );
-    setRowCountByTable(
-      Object.fromEntries(entries.map(([name, , , count]) => [name, count])),
-    );
+    setRowCountByTable((prev) => {
+      let changed = false;
+      const next: Record<string, number> = {};
+      for (const k of Object.keys(prev)) {
+        if (surviving.has(k)) {
+          next[k] = prev[k];
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
   }, [quoteIdent]);
 
   const refreshSchemas = useCallback(async () => {
@@ -1626,10 +1666,7 @@ function DuckDbPlaygroundInner() {
   useEffect(() => {
     let cancelled = false;
     if (editorHostRef.current && !editorRef.current) {
-      const langComp = new Compartment();
-      const completionComp = new Compartment();
-      const themeComp = new Compartment();
-      const wrapComp = new Compartment();
+      const compartments = makeSqlEditorCompartments();
       const initialTheme =
         getStoredEditorTheme(storageKey("editortheme")) ??
         DEFAULT_PLAYGROUND_SETTINGS.editorTheme;
@@ -1640,96 +1677,30 @@ function DuckDbPlaygroundInner() {
       const view = new EditorView({
         doc: activeTab?.code ?? "",
         parent: editorHostRef.current,
-        extensions: [
-          history(),
-          drawSelection(),
-          dropCursor(),
-          EditorState.allowMultipleSelections.of(true),
-          indentOnInput(),
-          bracketMatching(),
-          closeBrackets(),
-          rectangularSelection(),
-          tooltips({ parent: document.body }),
-          lineNumbers(),
-          highlightActiveLineGutter(),
-          highlightActiveLine(),
-          highlightSelectionMatches(),
-          crosshairCursor(),
-          EditorState.tabSize.of(2),
-          indentUnit.of("  "),
-          langComp.of(
-            sqlLang({ upperCaseKeywords: false }),
-          ),
-          completionComp.of(
-            autocompletion({
-              override: [
-                createSqlCompletionSource(
-                  { entities: [] },
-                  { dialect: "duckdb" },
-                ),
-              ],
-            }),
-          ),
-          themeComp.of(themeFor(initialTheme)),
-          wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
-          EditorView.updateListener.of((update) => {
-            if (update.selectionSet) {
-              const sel = update.state.selection.main;
-              setHasEditorSelectionRef.current(!sel.empty);
-            }
-            if (!update.docChanged) return;
+        extensions: createSqlEditorExtensions({
+          dialect: "duckdb",
+          compartments,
+          initialTheme,
+          initialWordWrap,
+          onSelectionChange: (hasSelection) => {
+            setHasEditorSelectionRef.current(hasSelection);
+          },
+          onDocChange: (code) => {
             const id = activeTabIdRef.current;
-            const code = update.state.doc.toString();
             const next = tabsRef.current.map((tab) =>
               tab.id === id ? { ...tab, code } : tab,
             );
             persistTabs(next);
-          }),
-          keymap.of([
-            {
-              // Run selection if text is selected, otherwise run all.
-              key: "Mod-Enter",
-              run: (v) => {
-                const sel = v.state.selection.main;
-                if (!sel.empty) {
-                  const selected = v.state.sliceDoc(sel.from, sel.to);
-                  runSelectionRef.current(selected);
-                } else {
-                  runActiveTabRef.current();
-                }
-                return true;
-              },
-            },
-            {
-              // Always run all queries (ignores any selection).
-              key: "Mod-Shift-Enter",
-              run: () => {
-                runActiveTabRef.current();
-                return true;
-              },
-            },
-            {
-              key: "Ctrl-Space",
-              run: (v) => {
-                startCompletion(v);
-                return true;
-              },
-            },
-            ...closeBracketsKeymap,
-            ...defaultKeymap,
-            ...searchKeymap,
-            ...historyKeymap,
-            ...completionKeymap.filter((b) => b.key !== "Enter"),
-            { key: "Tab", run: acceptCompletion },
-            indentWithTab,
-          ]),
-        ],
+          },
+          onRunSelection: (text) => runSelectionRef.current(text),
+          onRunAll: () => runActiveTabRef.current(),
+        }),
       });
       editorRef.current = view;
-      langCompRef.current = langComp;
-      completionCompRef.current = completionComp;
-      themeCompRef.current = themeComp;
-      wrapCompRef.current = wrapComp;
+      langCompRef.current = compartments.lang;
+      completionCompRef.current = compartments.completion;
+      themeCompRef.current = compartments.theme;
+      wrapCompRef.current = compartments.wrap;
     }
     (async () => {
       try {
@@ -1844,7 +1815,13 @@ function DuckDbPlaygroundInner() {
     void refreshSchemas();
   }, [showSystemSchemas, refreshSchemas]);
 
-  // Keep autocomplete schema in sync with current tables/views.
+  // Keep autocomplete schema in sync with current tables/views. Skip the
+  // dispatch when nothing actually changed — refreshSchema() always
+  // creates fresh `columnsByEntity` / `foreignKeysByEntity` objects, so
+  // reference equality would fire this effect (and re-parse the entire
+  // editor doc) on every query / CSV import even when the visible schema
+  // hasn't moved.
+  const lastReconfigureKeyRef = useRef<string>("");
   useEffect(() => {
     const view = editorRef.current;
     const langComp = langCompRef.current;
@@ -1862,19 +1839,14 @@ function DuckDbPlaygroundInner() {
       schema[name] = cols;
       completionSchema.entities.push({ name, columns: cols, kind: "view" });
     }
+    const key = JSON.stringify(completionSchema.entities);
+    if (key === lastReconfigureKeyRef.current) return;
+    lastReconfigureKeyRef.current = key;
     view.dispatch({
       effects: [
-        langComp.reconfigure(
-          sqlLang({ schema, upperCaseKeywords: false }),
-        ),
+        langComp.reconfigure(makeSqlLangExtension("duckdb", schema)),
         completionComp.reconfigure(
-          autocompletion({
-            override: [
-              createSqlCompletionSource(completionSchema, {
-                dialect: "duckdb",
-              }),
-            ],
-          }),
+          makeSqlAutocompletionExtension(completionSchema, "duckdb"),
         ),
       ],
     });
@@ -1902,6 +1874,9 @@ function DuckDbPlaygroundInner() {
     async (nextId: string) => {
       const engine = engineRef.current;
       if (!engine || nextId === activeDbIdRef.current) return;
+      // Persist any pending edits to the outgoing database before
+      // its tabs go out of scope.
+      flushPendingSave();
       setStatusState("loading");
       setDbLoading(true);
       // Clear the sidebar schema state up front so the previous database's
@@ -1965,7 +1940,7 @@ function DuckDbPlaygroundInner() {
         setDbLoading(false);
       }
     },
-    [persistTabs, refreshSchema, refreshSchemas, showToast],
+    [flushPendingSave, persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
   const requestDbSwitch = useCallback(
@@ -2562,13 +2537,14 @@ function DuckDbPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  const handleFormatCode = useCallback(() => {
+  const handleFormatCode = useCallback(async () => {
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
     if (!code.trim()) return;
     setIsFormatting(true);
     try {
+      const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "sql" });
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: formatted },
@@ -3002,11 +2978,40 @@ function DuckDbPlaygroundInner() {
     [],
   );
 
-  // Row counts are precomputed by `refreshSchema` so this is a synchronous
-  // lookup. SchemaItem caches the first non-null result it sees, so we
-  // can't hand back a stale 0 while a real count is in flight.
+  // Row counts are fetched lazily on first use to avoid an N+1
+  // `SELECT COUNT(*)` fan-out during refreshSchema (which fires after
+  // every query and every CSV import). Cached results are returned
+  // synchronously so the sidebar doesn't blink. In-flight requests are
+  // de-duplicated per table.
+  const rowCountInFlightRef = useRef<Map<string, Promise<number>>>(new Map());
   const fetchEntityRowCount = useCallback(
-    (name: string): number => rowCountByTable[name] ?? 0,
+    (name: string): number | Promise<number> => {
+      const cached = rowCountByTable[name];
+      if (cached !== undefined) return cached;
+      const inflight = rowCountInFlightRef.current.get(name);
+      if (inflight) return inflight;
+      const engine = engineRef.current;
+      if (!engine) return 0;
+      const schema = selectedSchemaRef.current;
+      const promise = (async () => {
+        try {
+          const result = await engine.exec(
+            `SELECT COUNT(*) FROM ${quoteIdent(schema)}.${quoteIdent(name)}`,
+          );
+          const count = Number(result[0]?.values?.[0]?.[0] ?? 0);
+          setRowCountByTable((prev) =>
+            prev[name] === count ? prev : { ...prev, [name]: count },
+          );
+          return count;
+        } catch {
+          return 0;
+        } finally {
+          rowCountInFlightRef.current.delete(name);
+        }
+      })();
+      rowCountInFlightRef.current.set(name, promise);
+      return promise;
+    },
     [rowCountByTable],
   );
 
