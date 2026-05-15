@@ -87,6 +87,29 @@ let php: PhpWebInstance | null = null;
 let initPromise: Promise<void> | null = null;
 
 async function initPhp(): Promise<void> {
+  // PhpWeb is an Emscripten build targeting ENVIRONMENT=web, so it reads
+  // `document` during module init (typically for currentScript URL resolution
+  // and canvas detection). Workers have no DOM, so we install a minimal stub
+  // before importing the module. Our `locateFile` override makes the stub URL
+  // irrelevant; PHP itself never touches canvas or other DOM APIs at runtime.
+  if (typeof document === "undefined") {
+    const stub = {
+      currentScript: null,
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      createElement: (tag: string) => {
+        const el: Record<string, unknown> = { style: {}, tagName: tag.toUpperCase() };
+        if (tag === "canvas") el.getContext = () => null;
+        return el;
+      },
+      createElementNS: (_ns: string, tag: string) => stub.createElement(tag),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      body: { appendChild: () => {}, removeChild: () => {} },
+    };
+    (self as unknown as Record<string, unknown>).document = stub;
+  }
+
   post({ kind: "loading", message: "Loading PHP runtime…" });
   const mod = (await import("php-wasm/PhpWeb.mjs")) as unknown as {
     PhpWeb: new (args?: Record<string, unknown>) => PhpWebInstance;
