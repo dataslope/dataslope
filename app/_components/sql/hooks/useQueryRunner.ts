@@ -109,6 +109,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const lazyPageSizeForRun =
         currentPageSize > 0 ? currentPageSize : INFINITE_SCROLL_PAGE_SIZE;
+      void (async () => {
       try {
         let sets: (QueryExecResult | null)[];
         let lazySql: string | undefined;
@@ -117,7 +118,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         let lazyPage: number | undefined;
         let lazyPageSize: number | undefined;
         if (useLazy) {
-          const { result: lazySets, totalCount } = engine.execPaged(
+          const { result: lazySets, totalCount } = await engine.execPaged(
             trimmed,
             lazyPageSizeForRun,
             page * lazyPageSizeForRun,
@@ -129,7 +130,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPage = page;
           lazyPageSize = lazyPageSizeForRun;
         } else {
-          sets = engine.execAll(trimmed);
+          sets = await engine.execAll(trimmed);
         }
         const elapsedMs = performance.now() - t0;
         setResultForTab(tabId, {
@@ -152,12 +153,16 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           success: true,
         });
         setStatusState("ready");
-        const newTables = engine.listTables();
-        const newViews = engine.listViews();
+        const [newTables, newViews, newIndexes, newTriggers] = await Promise.all([
+          engine.listTables(),
+          engine.listViews(),
+          engine.listIndexes(),
+          engine.listTriggers(),
+        ]);
         setTables(newTables);
         setViews(newViews);
-        setIndexes(engine.listIndexes());
-        setTriggers(engine.listTriggers());
+        setIndexes(newIndexes);
+        setTriggers(newTriggers);
         setColumnsByEntity({});
         setForeignKeysByEntity({});
         const newEntitySet = new Set([...newTables, ...newViews]);
@@ -203,6 +208,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         setStatusState("error");
         window.setTimeout(() => setStatusState("ready"), 3000);
       }
+      })();
     },
     [
       clearBeforeRun,
@@ -250,8 +256,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const offset = page * pageSize;
       const currentSet = curResult.sets[0];
       if (!currentSet || currentSet.values.length !== offset) return;
+      void (async () => {
       try {
-        const { result: nextSets, totalCount } = engine.execPaged(
+        const { result: nextSets, totalCount } = await engine.execPaged(
           sql,
           pageSize,
           offset,
@@ -286,16 +293,17 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       } catch {
         // Keep the already-loaded rows visible if the next chunk fails.
       }
+      })();
     },
     [activeTabIdRef, engineRef, setResultsByTab],
   );
 
   const handleFetchAllRows = useCallback(
-    (sql: string): QueryExecResult["values"] => {
+    async (sql: string): Promise<QueryExecResult["values"]> => {
       const engine = engineRef.current;
       if (!engine) return [];
       try {
-        const results = engine.exec(sql);
+        const results = await engine.exec(sql);
         return results[0]?.values ?? [];
       } catch {
         return [];
@@ -381,6 +389,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
 
   const handleResultSetExport = useCallback(
     (format: "csv" | "json" | "sql" | "parquet" | "xlsx", scope: ResultSetExportScope) => {
+      void (async () => {
       const { resultsByTab, resultSetExportSnapshot, tabs, activeTabId } = useTabStore.getState();
       const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
       if (!result || result.sets.length === 0) return;
@@ -397,7 +406,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         result.lazySql !== undefined &&
         (resultSetExportSnapshot?.setIndex ?? 0) === 0
       ) {
-        rows = handleFetchAllRows(result.lazySql);
+        rows = await handleFetchAllRows(result.lazySql);
       } else if (resultSetExportSnapshot) {
         rows = resultSetExportSnapshot.allRows;
       } else {
@@ -424,6 +433,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       } else {
         exportResultToSql(columns, rows, filename);
       }
+      })();
     },
     [handleFetchAllRows, showToast],
   );
@@ -438,8 +448,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       if (!engine) return;
       if (pkColumns.length === 0 || pkRows.length === 0) return;
       const tabId = activeTabIdRef.current;
+      void (async () => {
       try {
-        const deleted = engine.deleteRows(tableName, pkColumns, pkRows);
+        const deleted = await engine.deleteRows(tableName, pkColumns, pkRows);
         showToast(
           `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
         );
@@ -449,6 +460,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Delete failed: ${msg}`, "warn");
       }
+      })();
     },
     [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
   );
@@ -468,8 +480,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       if (!engine) return;
       if (updates.length === 0) return;
       const tabId = activeTabIdRef.current;
+      void (async () => {
       try {
-        const count = engine.updateRows(tableName, updates);
+        const count = await engine.updateRows(tableName, updates);
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
@@ -481,6 +494,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Update failed: ${msg}`, "warn");
       }
+      })();
     },
     [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
   );
@@ -490,8 +504,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const engine = engineRef.current;
       if (!engine) return;
       const tabId = activeTabIdRef.current;
+      void (async () => {
       try {
-        engine.insertRow(tableName, columnNames, values);
+        await engine.insertRow(tableName, columnNames, values);
         showToast(`Duplicated row in "${tableName}".`);
         const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
@@ -499,6 +514,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Duplicate failed: ${msg}`, "warn");
       }
+      })();
     },
     [quoteIdent, runSqlForTab, showToast, engineRef, activeTabIdRef],
   );

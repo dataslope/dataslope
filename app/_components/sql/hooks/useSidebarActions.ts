@@ -80,13 +80,16 @@ export function useSidebarActions(
   const refreshEntityMetadata = useCallback((name: string) => {
     const engine = engineRef.current;
     if (!engine) return;
+    void (async () => {
     try {
-      const cols = engine.listColumns(name);
-      const fks = engine.listForeignKeys(name);
+      const [cols, fks] = await Promise.all([
+        engine.listColumns(name),
+        engine.listForeignKeys(name),
+      ]);
       setColumnsByEntity((prev) => ({ ...prev, [name]: cols }));
       setForeignKeysByEntity((prev) => ({ ...prev, [name]: fks }));
       try {
-        const constraints = engine.getColumnConstraintInfo(name);
+        const constraints = await engine.getColumnConstraintInfo(name);
         setConstraintsByEntity((prev) => ({ ...prev, [name]: constraints }));
       } catch {
         setConstraintsByEntity((prev) => {
@@ -112,6 +115,7 @@ export function useSidebarActions(
         return next;
       });
     }
+    })();
   }, [engineRef, setColumnsByEntity, setForeignKeysByEntity, setConstraintsByEntity]);
 
   const refreshTableMetadata = useCallback(() => {
@@ -178,12 +182,19 @@ export function useSidebarActions(
     const engine = engineRef.current;
     if (!engine) return;
     const { name, kind } = pending;
+    void (async () => {
     try {
-      engine.dropEntity(name, kind);
-      setTables(engine.listTables());
-      setViews(engine.listViews());
-      setIndexes(engine.listIndexes());
-      setTriggers(engine.listTriggers());
+      await engine.dropEntity(name, kind);
+      const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
+        engine.listTables(),
+        engine.listViews(),
+        engine.listIndexes(),
+        engine.listTriggers(),
+      ]);
+      setTables(nextTables);
+      setViews(nextViews);
+      setIndexes(nextIndexes);
+      setTriggers(nextTriggers);
       if (kind === "table" || kind === "view") {
         setResultsByTab((prev) => {
           const next = { ...prev };
@@ -226,6 +237,7 @@ export function useSidebarActions(
       showToast(`Drop failed: ${msg}`, "warn");
     }
     setPendingDropEntity(null);
+    })();
   }, [
     engineRef,
     setTables,
@@ -246,8 +258,9 @@ export function useSidebarActions(
     (name: string, kind: "index" | "trigger") => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const sql = engine.getDDL(name);
+        const sql = await engine.getDDL(name);
         if (!sql.trim()) {
           showToast(`No DDL recorded for ${kind} "${name}".`, "warn");
           return;
@@ -257,6 +270,7 @@ export function useSidebarActions(
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Couldn't read DDL: ${msg}`, "warn");
       }
+      })();
     },
     [engineRef, showToast, setDdlDialog],
   );
@@ -269,8 +283,9 @@ export function useSidebarActions(
     const engine = engineRef.current;
     const name = useDialogStore.getState().truncateConfirm;
     if (!engine || !name) return;
+    void (async () => {
     try {
-      engine.truncateTable(name);
+      await engine.truncateTable(name);
       showToast(`Truncated table "${name}".`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -278,18 +293,22 @@ export function useSidebarActions(
     } finally {
       setTruncateConfirm(null);
     }
+    })();
   }, [engineRef, showToast, setTruncateConfirm]);
 
   const openModifyStructure = useCallback(
     (name: string) => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const cols = engine.listColumns(name);
-        const fks = engine.listForeignKeys(name);
+        const [cols, fks, ddl] = await Promise.all([
+          engine.listColumns(name),
+          engine.listForeignKeys(name),
+          engine.getDDL(name),
+        ]);
         const fkByCol = new Map<string, ForeignKeyInfo>();
         for (const fk of fks) fkByCol.set(fk.from, fk);
-        const ddl = engine.getDDL(name);
         const autoIncMatch =
           /\bautoincrement\b/i.test(ddl) && cols.some((c) => c.pk === 1);
         const drafts: ModifyColumnDraft[] = cols.map((c) => {
@@ -322,6 +341,7 @@ export function useSidebarActions(
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Couldn't load structure: ${msg}`, "warn");
       }
+      })();
     },
     [engineRef, showToast, setModifyDialog],
   );
@@ -367,12 +387,19 @@ export function useSidebarActions(
         generated: c.generated ?? undefined,
       })),
     };
+    void (async () => {
     try {
-      engine.rebuildTable(spec);
-      setTables(engine.listTables());
-      setViews(engine.listViews());
-      setIndexes(engine.listIndexes());
-      setTriggers(engine.listTriggers());
+      await engine.rebuildTable(spec);
+      const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
+        engine.listTables(),
+        engine.listViews(),
+        engine.listIndexes(),
+        engine.listTriggers(),
+      ]);
+      setTables(nextTables);
+      setViews(nextViews);
+      setIndexes(nextIndexes);
+      setTriggers(nextTriggers);
       refreshEntityMetadata(trimmedName);
       if (trimmedName !== dialog.originalName) {
         setExpandedEntities((prev) => {
@@ -390,6 +417,7 @@ export function useSidebarActions(
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Save failed: ${msg}`, "warn");
     }
+    })();
   }, [
     engineRef,
     refreshEntityMetadata,
@@ -407,8 +435,9 @@ export function useSidebarActions(
     (name: string) => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const cols = engine.listColumns(name);
+        const cols = await engine.listColumns(name);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -421,6 +450,7 @@ export function useSidebarActions(
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Couldn't load columns: ${msg}`, "warn");
       }
+      })();
     },
     [engineRef, showToast, setAddRowDialog],
   );
@@ -440,8 +470,9 @@ export function useSidebarActions(
         return `'${v.replace(/'/g, "''")}'`;
       })
       .join(", ");
+    void (async () => {
     try {
-      engine.exec(
+      await engine.exec(
         `INSERT INTO "${tableName.replace(/"/g, '""')}" (${colNames}) VALUES (${colValues})`,
       );
       showToast(`Row added to "${tableName}".`);
@@ -456,6 +487,7 @@ export function useSidebarActions(
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Insert failed: ${msg}`, "warn");
     }
+    })();
   }, [engineRef, showToast, setAddRowDialog]);
 
   const openAddTable = useCallback(() => {
@@ -522,9 +554,10 @@ export function useSidebarActions(
       );
     const allDefs = [...colDefs, ...fkConstraints].join(", ");
     const sql = `CREATE TABLE "${trimmedName.replace(/"/g, '""')}" (${allDefs})`;
+    void (async () => {
     try {
-      engine.exec(sql);
-      setTables(engine.listTables());
+      await engine.exec(sql);
+      setTables(await engine.listTables());
       setAddTableDialog(null);
       setAddTableInvalidColIds(new Set());
       showToast(`Created table "${trimmedName}".`);
@@ -532,14 +565,16 @@ export function useSidebarActions(
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Create failed: ${msg}`, "warn");
     }
+    })();
   }, [engineRef, showToast, setTables, setAddTableDialog, setAddTableInvalidColIds]);
 
   const viewDDL = useCallback(
     (name: string, kind: "table" | "view") => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const sql = engine.getDDL(name);
+        const sql = await engine.getDDL(name);
         if (!sql.trim()) {
           showToast(
             `No DDL recorded for ${kind === "view" ? "view" : "table"} "${name}".`,
@@ -552,6 +587,7 @@ export function useSidebarActions(
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Couldn't read DDL: ${msg}`, "warn");
       }
+      })();
     },
     [engineRef, showToast, setDdlDialog],
   );
@@ -560,8 +596,9 @@ export function useSidebarActions(
     (name: string, format: "csv" | "json" | "sql" | "parquet" | "xlsx") => {
       const engine = engineRef.current;
       if (!engine) return;
+      void (async () => {
       try {
-        const sets = engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
+        const sets = await engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
         if (!sets || sets.length === 0) {
           showToast(`"${name}" is empty — no data to export.`, "warn");
           return;
@@ -590,16 +627,17 @@ export function useSidebarActions(
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Export failed: ${msg}`, "warn");
       }
+      })();
     },
     [engineRef, quoteIdent, showToast],
   );
 
   const getEntityRowCount = useCallback(
-    (name: string): number => {
+    async (name: string): Promise<number> => {
       const engine = engineRef.current;
       if (!engine) return 0;
       try {
-        const sets = engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`);
+        const sets = await engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`);
         if (!sets || sets.length === 0 || sets[0].values.length === 0) return 0;
         return Number(sets[0].values[0][0]) || 0;
       } catch {

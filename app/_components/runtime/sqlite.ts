@@ -133,10 +133,10 @@ export interface TableRebuildSpec {
 export interface SqliteEngine {
   /** Replace the active in-memory database with a fresh build of the
    *  given sample. Returns the active sample for convenience. */
-  loadSampleDatabase: (id: string) => SqliteSampleDatabase;
+  loadSampleDatabase: (id: string) => Promise<SqliteSampleDatabase>;
   /** Execute a (potentially multi-statement) SQL string against the
    *  active database. Throws on syntax / runtime errors. */
-  exec: (sql: string) => QueryExecResult[];
+  exec: (sql: string) => Promise<QueryExecResult[]>;
   /**
    * Like `exec`, but returns one entry per SQL statement in the input.
    * – `QueryExecResult` for statements that produce a result set (SELECT,
@@ -145,30 +145,30 @@ export interface SqliteEngine {
    *   (INSERT, UPDATE, DELETE, CREATE TABLE, …).
    * Throws on syntax / runtime errors.
    */
-  execAll: (sql: string) => (QueryExecResultWithTypes | null)[];
+  execAll: (sql: string) => Promise<(QueryExecResultWithTypes | null)[]>;
   /** Names of every user table in the active database. */
-  listTables: () => string[];
+  listTables: () => Promise<string[]>;
   /** Names of every view in the active database. */
-  listViews: () => string[];
+  listViews: () => Promise<string[]>;
   /** Names of every user-defined index in the active database. Built-in
    *  auto-indexes (created implicitly by `PRIMARY KEY` / `UNIQUE`) are
    *  excluded — they have no `CREATE INDEX` statement and aren't
    *  meaningful to the user. */
-  listIndexes: () => string[];
+  listIndexes: () => Promise<string[]>;
   /** Names of every trigger in the active database. */
-  listTriggers: () => string[];
+  listTriggers: () => Promise<string[]>;
   /** `SELECT * FROM "<name>" LIMIT <limit>` against the active
    *  database. Identifier is quoted to defend against names that
    *  collide with reserved words; sql.js does not expose a parameter
    *  binding for identifiers, so quoting is the only viable option. */
-  previewTable: (name: string, limit?: number) => QueryExecResult[];
+  previewTable: (name: string, limit?: number) => Promise<QueryExecResult[]>;
   /** `PRAGMA table_info(<name>)` — used by the sidebar context-menu
    *  "View Structure" action to render the column list of a table or
    *  view in the results pane. */
-  describeTable: (name: string) => QueryExecResult[];
+  describeTable: (name: string) => Promise<QueryExecResult[]>;
   /** `SELECT COUNT(*) FROM <name>` — used by the sidebar context-menu
    *  "Count Rows" action. */
-  countRows: (name: string) => QueryExecResult[];
+  countRows: (name: string) => Promise<QueryExecResult[]>;
   /** `DROP TABLE`/`DROP VIEW`/`DROP INDEX`/`DROP TRIGGER` — used by
    *  the sidebar context-menu "Drop" action. The kind is restricted to
    *  a fixed allowlist so the resulting statement can never be coerced
@@ -176,35 +176,35 @@ export interface SqliteEngine {
   dropEntity: (
     name: string,
     kind: "table" | "view" | "index" | "trigger",
-  ) => void;
+  ) => Promise<void>;
   /** `DELETE FROM <name>` — clears every row of a table without
    *  dropping the schema. SQLite has no `TRUNCATE` keyword; an
    *  unqualified DELETE is the standard equivalent. */
-  truncateTable: (name: string) => void;
+  truncateTable: (name: string) => Promise<void>;
   /** Structured form of `PRAGMA table_info(<name>)`. */
-  listColumns: (name: string) => TableColumnInfo[];
+  listColumns: (name: string) => Promise<TableColumnInfo[]>;
   /** Structured form of `PRAGMA foreign_key_list(<name>)`. */
-  listForeignKeys: (name: string) => ForeignKeyInfo[];
+  listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
   /** Apply the SQLite "rebuild table" pattern for the given spec:
    *  create a `<name>__new` with the new shape, copy over rows whose
    *  source column still exists (matched by `originalName`), drop the
    *  old table and rename the new one in place. Wrapped in a single
    *  transaction with foreign-key enforcement disabled so referencing
    *  tables aren't broken mid-flight. */
-  rebuildTable: (spec: TableRebuildSpec) => void;
+  rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
   /** Returns the original DDL string (`CREATE TABLE …` / `CREATE VIEW
    *  …`) recorded in `sqlite_master.sql` for the given entity, plus
    *  the `CREATE INDEX` statements for any indexes defined on it.
    *  Returns an empty string when the entity has no recorded DDL
    *  (system tables, certain virtual tables). */
-  getDDL: (name: string) => string;
+  getDDL: (name: string) => Promise<string>;
   /** The sample database currently loaded into memory. */
-  activeSample: () => SqliteSampleDatabase;
+  activeSample: () => Promise<SqliteSampleDatabase>;
   /** Serialise the active database to a SQLite file image. The bytes
    *  are exactly what would land on disk if SQLite wrote the database
    *  to a `.sqlite` file, so the result can be downloaded as-is or
    *  re-opened by any SQLite-compatible tool. */
-  exportDatabase: () => Uint8Array;
+  exportDatabase: () => Promise<Uint8Array>;
   /** Delete a set of rows from `<tableName>` identified by the values
    *  of their primary-key columns. Each entry in `pkRows` is the
    *  ordered list of primary-key values that identifies one row, in
@@ -214,7 +214,7 @@ export interface SqliteEngine {
     tableName: string,
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
-  ) => number;
+  ) => Promise<number>;
   /** Update individual cells in `<tableName>`. Each entry in `updates`
    *  identifies a row by its 0-based index in the table's natural scan
    *  order (via `rowid OFFSET rowIndex`) and sets one column to a new
@@ -229,21 +229,21 @@ export interface SqliteEngine {
       column: string;
       value: unknown;
     }>,
-  ) => number;
+  ) => Promise<number>;
   /** Replace the active in-memory database with a fresh empty database.
    *  Returns a synthetic SqliteSampleDatabase descriptor for the blank DB. */
-  loadBlankDatabase: () => SqliteSampleDatabase;
+  loadBlankDatabase: () => Promise<SqliteSampleDatabase>;
   /** Replace the active in-memory database with a database loaded from
    *  the given bytes (e.g., a user-uploaded .sqlite file). The filename
    *  parameter is used only for display purposes. Returns a synthetic
    *  SqliteSampleDatabase descriptor. */
-  loadFromBytes: (bytes: Uint8Array, filename: string) => SqliteSampleDatabase;
+  loadFromBytes: (bytes: Uint8Array, filename: string) => Promise<SqliteSampleDatabase>;
   /** Returns per-column constraint info for `<tableName>`, combining
    *  `PRAGMA table_info` (for primary key membership) with
    *  `PRAGMA index_list` / `PRAGMA index_info` (for UNIQUE constraints)
    *  and a DDL scan (for AUTOINCREMENT). Used by the result-table
    *  context menu to decide whether a row can be safely duplicated. */
-  getColumnConstraintInfo: (tableName: string) => ColumnConstraintInfo[];
+  getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
   /** Insert a single row into `<tableName>`. Column names and values
    *  are paired positionally and bound through sql.js's parameter API
    *  so no user-supplied value can be interpreted as SQL. Skipping
@@ -253,12 +253,12 @@ export interface SqliteEngine {
     tableName: string,
     columnNames: string[],
     values: unknown[],
-  ) => void;
+  ) => Promise<void>;
   /** Names of user-defined indexes on a specific table (excludes
    *  auto-indexes created by PRIMARY KEY / UNIQUE constraints). */
-  listTableIndexes: (tableName: string) => string[];
+  listTableIndexes: (tableName: string) => Promise<string[]>;
   /** Names of triggers defined on a specific table. */
-  listTableTriggers: (tableName: string) => string[];
+  listTableTriggers: (tableName: string) => Promise<string[]>;
   /** Execute a single SELECT (or WITH…SELECT) statement with server-side
    *  pagination. Returns the rows for one page together with the total
    *  row count so the UI can render "Rows 1–50 of 12,345" without ever
@@ -277,8 +277,20 @@ export interface SqliteEngine {
     sql: string,
     pageSize: number,
     offset: number,
-  ) => { result: QueryExecResultWithTypes[]; totalCount: number };
+  ) => Promise<{ result: QueryExecResultWithTypes[]; totalCount: number }>;
 }
+
+type SqliteEngineMethod = keyof SqliteEngine;
+
+type SqliteWorkerRequest = {
+  id: number;
+  method: SqliteEngineMethod;
+  args: unknown[];
+};
+
+type SqliteWorkerResponse =
+  | { id: number; ok: true; result: unknown }
+  | { id: number; ok: false; error: string };
 
 let sqlJsPromise: Promise<SqlJsStatic> | null = null;
 
@@ -492,9 +504,13 @@ function extractReferencedTables(sql: string): string[] {
   return tables;
 }
 
-export async function createSqliteEngine(
+export async function createSqliteEngineInProcess(
   initialSampleId: string,
-): Promise<SqliteEngine> {
+): Promise<{
+  [K in keyof SqliteEngine]: Awaited<ReturnType<SqliteEngine[K]>> extends infer R
+    ? (...args: Parameters<SqliteEngine[K]>) => R
+    : never;
+}> {
   const SQL = await loadSqlJs();
   let db: Database | null = null;
   let active: SqliteSampleDatabase = findSampleDatabase(initialSampleId);
@@ -1354,5 +1370,87 @@ export async function createSqliteEngine(
         if (stmt) stmt.free();
       }
     },
+  };
+}
+
+export async function createSqliteEngine(
+  initialSampleId: string,
+): Promise<SqliteEngine> {
+  const worker = new Worker(new URL("./sqlite-worker.ts", import.meta.url));
+  let nextId = 0;
+  const pending = new Map<
+    number,
+    {
+      resolve: (value: unknown) => void;
+      reject: (reason?: unknown) => void;
+    }
+  >();
+
+  worker.addEventListener("message", (ev: MessageEvent<SqliteWorkerResponse>) => {
+    const msg = ev.data;
+    const callbacks = pending.get(msg.id);
+    if (!callbacks) return;
+    pending.delete(msg.id);
+    if (msg.ok) callbacks.resolve(msg.result);
+    else callbacks.reject(new Error(msg.error));
+  });
+
+  worker.addEventListener("error", (ev) => {
+    const error = new Error(ev.message || "SQLite worker failed");
+    for (const callbacks of pending.values()) callbacks.reject(error);
+    pending.clear();
+  });
+
+  function call(method: SqliteEngineMethod, args: unknown[] = []): Promise<unknown> {
+    const id = ++nextId;
+    return new Promise((resolve, reject) => {
+      pending.set(id, { resolve, reject });
+      const transfer =
+        method === "loadFromBytes" && args[0] instanceof Uint8Array
+          ? [args[0].buffer]
+          : [];
+      worker.postMessage({ id, method, args } satisfies SqliteWorkerRequest, transfer);
+    });
+  }
+
+  await call("loadSampleDatabase", [initialSampleId]);
+
+  return {
+    loadSampleDatabase: (id) => call("loadSampleDatabase", [id]) as Promise<SqliteSampleDatabase>,
+    exec: (sql) => call("exec", [sql]) as Promise<QueryExecResult[]>,
+    execAll: (sql) => call("execAll", [sql]) as Promise<(QueryExecResultWithTypes | null)[]>,
+    listTables: () => call("listTables") as Promise<string[]>,
+    listViews: () => call("listViews") as Promise<string[]>,
+    listIndexes: () => call("listIndexes") as Promise<string[]>,
+    listTriggers: () => call("listTriggers") as Promise<string[]>,
+    previewTable: (name, limit) => call("previewTable", [name, limit]) as Promise<QueryExecResult[]>,
+    describeTable: (name) => call("describeTable", [name]) as Promise<QueryExecResult[]>,
+    countRows: (name) => call("countRows", [name]) as Promise<QueryExecResult[]>,
+    dropEntity: (name, kind) => call("dropEntity", [name, kind]) as Promise<void>,
+    truncateTable: (name) => call("truncateTable", [name]) as Promise<void>,
+    listColumns: (name) => call("listColumns", [name]) as Promise<TableColumnInfo[]>,
+    listForeignKeys: (name) => call("listForeignKeys", [name]) as Promise<ForeignKeyInfo[]>,
+    rebuildTable: (spec) => call("rebuildTable", [spec]) as Promise<void>,
+    getDDL: (name) => call("getDDL", [name]) as Promise<string>,
+    activeSample: () => call("activeSample") as Promise<SqliteSampleDatabase>,
+    exportDatabase: () => call("exportDatabase") as Promise<Uint8Array>,
+    deleteRows: (tableName, pkColumns, pkRows) =>
+      call("deleteRows", [tableName, pkColumns, pkRows]) as Promise<number>,
+    updateRows: (tableName, updates) =>
+      call("updateRows", [tableName, updates]) as Promise<number>,
+    loadBlankDatabase: () => call("loadBlankDatabase") as Promise<SqliteSampleDatabase>,
+    loadFromBytes: (bytes, filename) =>
+      call("loadFromBytes", [bytes, filename]) as Promise<SqliteSampleDatabase>,
+    getColumnConstraintInfo: (tableName) =>
+      call("getColumnConstraintInfo", [tableName]) as Promise<ColumnConstraintInfo[]>,
+    insertRow: (tableName, columnNames, values) =>
+      call("insertRow", [tableName, columnNames, values]) as Promise<void>,
+    listTableIndexes: (tableName) => call("listTableIndexes", [tableName]) as Promise<string[]>,
+    listTableTriggers: (tableName) => call("listTableTriggers", [tableName]) as Promise<string[]>,
+    execPaged: (sql, pageSize, offset) =>
+      call("execPaged", [sql, pageSize, offset]) as Promise<{
+        result: QueryExecResultWithTypes[];
+        totalCount: number;
+      }>,
   };
 }
