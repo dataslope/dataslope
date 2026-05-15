@@ -34,6 +34,10 @@ export interface SqliteSampleDatabase {
   defaultTabs: QueryTabSeed[];
 }
 
+/** Serialisable subset of SqliteSampleDatabase — safe to send through
+ *  postMessage (no function properties). */
+export type SqliteSampleMetadata = Omit<SqliteSampleDatabase, "seed">;
+
 // ────────────────────────────────────────────────────────────────────────
 // Sample 1: credit_card_transactions.db
 // Ported from public/SQL Playground.html, then extended with foreign

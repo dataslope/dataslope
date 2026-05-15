@@ -27,7 +27,7 @@ import { useEngineStore } from "../stores/useEngineStore";
 import { useTabStore } from "../stores/useTabStore";
 import { useDialogStore } from "../stores/useDialogStore";
 import type { PragmaSettings } from "../stores/usePragmaStore";
-import type { SqliteSampleDatabase } from "../../runtime/sqliteSamples";
+import type { SqliteSampleMetadata } from "../../runtime/sqliteSamples";
 
 export interface DatabaseActionsRefs {
   engineRef: React.MutableRefObject<SqliteEngine | null>;
@@ -124,7 +124,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   );
 
   const applyDbLoad = useCallback(
-    async (sample: SqliteSampleDatabase) => {
+    async (sample: SqliteSampleMetadata) => {
       const engine = engineRef.current;
       if (!engine) return;
       saveTabs(activeDbIdRef.current, tabsRef.current);

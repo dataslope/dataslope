@@ -10,7 +10,7 @@ export type {
 } from "./sqlite-core";
 
 import type { QueryExecResult } from "sql.js";
-import type { SqliteSampleDatabase } from "./sqliteSamples";
+import type { SqliteSampleMetadata } from "./sqliteSamples";
 import type {
   ColumnConstraintInfo,
   ForeignKeyInfo,
@@ -74,7 +74,7 @@ export async function createSqliteEngine(
   await call("loadSampleDatabase", [initialSampleId]);
 
   return {
-    loadSampleDatabase: (id) => call("loadSampleDatabase", [id]) as Promise<SqliteSampleDatabase>,
+    loadSampleDatabase: (id) => call("loadSampleDatabase", [id]) as Promise<SqliteSampleMetadata>,
     exec: (sql) => call("exec", [sql]) as Promise<QueryExecResult[]>,
     execAll: (sql) => call("execAll", [sql]) as Promise<(QueryExecResultWithTypes | null)[]>,
     listTables: () => call("listTables") as Promise<string[]>,
@@ -90,15 +90,15 @@ export async function createSqliteEngine(
     listForeignKeys: (name) => call("listForeignKeys", [name]) as Promise<ForeignKeyInfo[]>,
     rebuildTable: (spec) => call("rebuildTable", [spec]) as Promise<void>,
     getDDL: (name) => call("getDDL", [name]) as Promise<string>,
-    activeSample: () => call("activeSample") as Promise<SqliteSampleDatabase>,
+    activeSample: () => call("activeSample") as Promise<SqliteSampleMetadata>,
     exportDatabase: () => call("exportDatabase") as Promise<Uint8Array>,
     deleteRows: (tableName, pkColumns, pkRows) =>
       call("deleteRows", [tableName, pkColumns, pkRows]) as Promise<number>,
     updateRows: (tableName, updates) =>
       call("updateRows", [tableName, updates]) as Promise<number>,
-    loadBlankDatabase: () => call("loadBlankDatabase") as Promise<SqliteSampleDatabase>,
+    loadBlankDatabase: () => call("loadBlankDatabase") as Promise<SqliteSampleMetadata>,
     loadFromBytes: (bytes, filename) =>
-      call("loadFromBytes", [bytes, filename]) as Promise<SqliteSampleDatabase>,
+      call("loadFromBytes", [bytes, filename]) as Promise<SqliteSampleMetadata>,
     getColumnConstraintInfo: (tableName) =>
       call("getColumnConstraintInfo", [tableName]) as Promise<ColumnConstraintInfo[]>,
     insertRow: (tableName, columnNames, values) =>

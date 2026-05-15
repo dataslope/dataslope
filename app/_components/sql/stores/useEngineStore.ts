@@ -6,7 +6,7 @@ import type {
   ForeignKeyInfo,
   ColumnConstraintInfo,
 } from "../../runtime/sqlite";
-import type { SqliteSampleDatabase } from "../../runtime/sqliteSamples";
+import type { SqliteSampleMetadata } from "../../runtime/sqliteSamples";
 import { SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
 import { storageKey } from "../../sqlitePlaygroundTabs";
 
@@ -29,7 +29,7 @@ interface EngineState {
   tablesSectionExpanded: boolean;
   viewsSectionExpanded: boolean;
   activeDbId: string;
-  customDb: SqliteSampleDatabase | null;
+  customDb: SqliteSampleMetadata | null;
   customFilenames: Record<string, string>;
   // Setters
   setLoaded: (loaded: boolean) => void;
@@ -65,9 +65,9 @@ interface EngineState {
   setActiveDbId: (id: string) => void;
   setCustomDb: (
     db:
-      | SqliteSampleDatabase
+      | SqliteSampleMetadata
       | null
-      | ((prev: SqliteSampleDatabase | null) => SqliteSampleDatabase | null),
+      | ((prev: SqliteSampleMetadata | null) => SqliteSampleMetadata | null),
   ) => void;
   setCustomFilenames: (
     updater:
