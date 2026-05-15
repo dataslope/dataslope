@@ -5,30 +5,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
-import {
-  loadBrowsercc,
-  loadWasiShim,
-  runWasiModule,
-  type BrowserccApi,
-  type WasiShim,
-} from "./browsercc";
 import { getClangFormat } from "./clangFormat";
 
-// Run C in the browser via `browsercc`
-// (https://github.com/BertalanD/browsercc), which ships a precompiled
-// clang/lld toolchain plus a WASI sysroot (libc, headers) as plain
-// static assets. The user's source is handed to browsercc's `compile`,
-// which produces a WebAssembly module; we then execute it with
-// `@bjorn3/browser_wasi_shim` to capture stdout/stderr.
-//
-// Browsercc's `compile` infers the language from the input file name's
-// extension, so we pass `main.c` here and clang treats the input as C
-// (the C++ adapter does the same with `main.cpp`).
-//
-// Library + WASI-shim loading is centralised in `./browsercc.ts`, and
-// the resulting module is a process-wide singleton so navigating
-// between `/c` and `/cpp` reuses the same already-fetched ~95 MB
-// toolchain instead of re-downloading it.
+// C runs inside a dedicated Web Worker via browsercc — see browsercc-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -409,65 +388,39 @@ int main(void) {
   },
 ];
 
-// Compile flags shared across every C run. browsercc invokes the
-// underlying compiler as `clang++`, which puts the driver into g++
-// mode and would otherwise compile `.c` files as C++ — that breaks
-// idiomatic C like the implicit `void*` -> `T*` conversion from
-// `malloc`. `--driver-mode=gcc` flips the driver back to plain clang
-// so the `.c` extension is honoured and C-only flags are accepted.
-// We use `-std=gnu17` (rather than `-std=c17`) so common GNU
-// extensions in the standard headers — most visibly `M_PI`, `M_E`
-// and friends in `<math.h>` — remain visible to user code.
-// `-O2` matches what browsercc's PCH was built against (and produces
-// nicer binaries than `-O0` without measurable extra wait), and
-// `-Wall` surfaces obvious bugs in the user's snippet.
-const C_COMPILE_FLAGS = ["--driver-mode=gcc", "-O2", "-Wall", "-std=gnu17"];
+// ─── Worker-based runtime ────────────────────────────────────────────────
 
-class CRuntime implements LanguageRuntime {
-  constructor(
-    private api: BrowserccApi,
-    private shim: WasiShim,
-  ) {}
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "init-error"; message: string }
+  | { kind: "output"; id: number; cell: { type: string; content: string } }
+  | { kind: "done"; id: number }
+  | { kind: "error"; id: number; message: string };
+
+class CWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
+
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // 1) Compile main.c -> WebAssembly module via browsercc. The
-    //    extension on `fileName` is what tells clang to treat the input
-    //    as C (rather than the default C++ driver mode).
-    const { compileOutput, module } = await this.api.compile({
-      source: code,
-      fileName: "main.c",
-      flags: C_COMPILE_FLAGS,
+    const id = ++this.nextId;
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(msg.cell as Parameters<EmitOutput>[0]);
+          return;
+        }
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code, language: "c" });
     });
-
-    // browsercc combines clang's stdout and stderr in `compileOutput`.
-    // Surface non-empty diagnostics so warnings + errors are visible
-    // even on a successful build.
-    const trimmedDiag = compileOutput.replace(/\n+$/, "");
-    if (trimmedDiag) {
-      emit({ type: "stderr", content: trimmedDiag });
-    }
-    if (!module) {
-      // `module === null` means clang or wasm-ld returned a non-zero
-      // exit code; the diagnostics above already say why.
-      return;
-    }
-
-    // 2) Run the compiled module in a WASI sandbox and forward
-    //    stdout/stderr. We emit each stream as a single cell to match
-    //    the rest of the playground adapters.
-    const { exitCode, stdout, stderr } = await runWasiModule(module, this.shim);
-    if (stdout) {
-      emit({ type: "stdout", content: stdout.replace(/\n+$/, "") });
-    }
-    if (stderr) {
-      emit({ type: "stderr", content: stderr.replace(/\n+$/, "") });
-    }
-    if (exitCode !== 0) {
-      emit({
-        type: "stderr",
-        content: `Program exited with code ${exitCode}.`,
-      });
-    }
   }
 }
 
@@ -520,10 +473,30 @@ export const cAdapter: LanguageAdapter = {
     return format(code, "main.c", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage(
-      "Loading browsercc clang toolchain (this can take a moment on first load)…",
+    setLoadingMessage("Loading C worker…");
+    const worker = new Worker(
+      new URL("./browsercc-worker.ts", import.meta.url),
     );
-    const [api, shim] = await Promise.all([loadBrowsercc(), loadWasiShim()]);
-    return new CRuntime(api, shim);
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new CWorkerRuntime(worker));
+        } else if (msg.kind === "init-error") {
+          worker.removeEventListener("message", onMessage);
+          worker.terminate();
+          reject(new Error(msg.message));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "C worker failed to start"));
+      });
+      worker.postMessage({ kind: "init" });
+    });
   },
 };

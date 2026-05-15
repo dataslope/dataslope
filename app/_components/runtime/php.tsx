@@ -7,36 +7,7 @@ import type {
 } from "../types";
 import { getMagoFmt } from "./magoFmt";
 
-// Run PHP in the browser via php-wasm (https://github.com/seanmorris/php-wasm).
-// PhpWeb is an EventTarget that streams `output` and `error` events as
-// the script runs; we forward them into the playground's output pane.
-//
-// We pin the exact CDN-hosted version we depend on and override
-// `locateFile` so php-wasm fetches its `.wasm` / shared-library files
-// from jsDelivr instead of from a Next.js bundle URL — this mirrors how
-// pyodide / WebR are loaded and avoids having to teach Next.js how to
-// emit the WebAssembly assets that ship inside the npm package.
-
-const PHP_WASM_VERSION = "0.0.9-alpha-32";
-const PHP_WASM_CDN = `https://cdn.jsdelivr.net/npm/php-wasm@${PHP_WASM_VERSION}/`;
-
-/** The narrow slice of the PhpWeb API we consume. */
-interface PhpWebInstance extends EventTarget {
-  /** Resolves once the underlying Emscripten module is initialised. */
-  binary: Promise<unknown>;
-  /** Run a PHP script (the package internally prepends `?>` so the
-   *  argument is treated as a template — start with `<?php` to enter
-   *  PHP mode). Resolves once the script finishes. */
-  run(code: string): Promise<unknown>;
-  /** Reset the underlying PHP interpreter so user-defined variables,
-   *  functions, classes, constants, and superglobals from a previous
-   *  `run()` don't leak into the next one. */
-  refresh(): Promise<unknown>;
-}
-
-interface PhpOutputEvent extends Event {
-  detail: string[];
-}
+// PHP (via php-wasm) runs inside a dedicated Web Worker — see php-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -189,103 +160,39 @@ const PACKAGES: PackageInfo[] = [
   // without any require or include — there are no packages to install.
 ];
 
-// PHP error message lines look like:
-//   "PHP Parse error:  syntax error, unexpected ..."
-//   "PHP Fatal error:  Uncaught Error: ..."
-//   "PHP Warning:  Division by zero ..."
-//   "PHP Notice:  Undefined variable ..."
-//   "PHP Deprecated: ..."
-// php-wasm in CGI/web mode mixes these into the stdout stream rather
-// than emitting them as `error` events, so we partition the captured
-// output into "looks like a diagnostic" lines (routed to a stderr cell)
-// and everything else (the script's normal stdout). Trailing context
-// lines that start with whitespace (file/line-number annotations) stick
-// to the most recent diagnostic so multi-line messages stay together.
-const PHP_DIAGNOSTIC_RE =
-  /^(PHP\s+)?(Parse error|Fatal error|Warning|Notice|Deprecated|Strict Standards|Catchable fatal error)\b/i;
+// ─── Worker-based runtime ────────────────────────────────────────────────
 
-function splitPhpDiagnostics(raw: string): { stdout: string; stderr: string } {
-  if (!raw) return { stdout: "", stderr: "" };
-  const lines = raw.split("\n");
-  const stdoutLines: string[] = [];
-  const stderrLines: string[] = [];
-  let mode: "stdout" | "stderr" = "stdout";
-  for (const line of lines) {
-    if (PHP_DIAGNOSTIC_RE.test(line)) {
-      mode = "stderr";
-      stderrLines.push(line);
-    } else if (mode === "stderr" && /^\s+\S/.test(line)) {
-      // Indented continuation of the previous diagnostic (e.g. stack
-      // frames after "Stack trace:").
-      stderrLines.push(line);
-    } else if (mode === "stderr" && line.trim() === "") {
-      // A blank line ends the diagnostic block; subsequent non-error
-      // text falls back to stdout.
-      mode = "stdout";
-    } else {
-      stdoutLines.push(line);
-    }
-  }
-  return {
-    stdout: stdoutLines.join("\n"),
-    stderr: stderrLines.join("\n"),
-  };
-}
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "init-error"; message: string }
+  | { kind: "output"; id: number; cell: { type: string; content: string } }
+  | { kind: "done"; id: number }
+  | { kind: "error"; id: number; message: string };
 
-class PhpRuntime implements LanguageRuntime {
-  constructor(private php: PhpWebInstance) {}
+class PhpWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
+
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    let outputBuf = "";
-    let errorBuf = "";
-
-    const onOutput = (event: Event) => {
-      const detail = (event as PhpOutputEvent).detail;
-      if (detail) outputBuf += detail.join("");
-    };
-    const onError = (event: Event) => {
-      const detail = (event as PhpOutputEvent).detail;
-      if (detail) errorBuf += detail.join("");
-    };
-
-    this.php.addEventListener("output", onOutput);
-    this.php.addEventListener("error", onError);
-
-    try {
-      // Reset the interpreter so variables / functions / classes /
-      // constants from a previous run can't leak into this one — the
-      // playground guarantees a fresh execution state per Run click.
-      try {
-        await this.php.refresh();
-      } catch {
-        // `refresh` is best-effort; if it ever fails, fall through to
-        // running the user code anyway rather than blocking the run.
-      }
-      // php-wasm internally prepends `?>` to the script, so user code
-      // that begins with `<?php` enters PHP mode immediately.
-      await this.php.run(code);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      errorBuf += message + "\n";
-    } finally {
-      this.php.removeEventListener("output", onOutput);
-      this.php.removeEventListener("error", onError);
-    }
-
-    // php-wasm forwards PHP's CGI-style diagnostics (Parse / Fatal /
-    // Warning / Notice / Deprecated) through the `output` event rather
-    // than `error`, so split them out here and surface them in a
-    // dedicated stderr cell (which the playground renders with a red
-    // left border) instead of letting them blend into normal stdout.
-    const { stdout: splitStdout, stderr: splitStderr } =
-      splitPhpDiagnostics(outputBuf);
-    const stdout = splitStdout.replace(/\n+$/, "");
-    const stderr = [splitStderr, errorBuf]
-      .filter((s) => s)
-      .join("\n")
-      .replace(/\n+$/, "");
-    if (stdout) emit({ type: "stdout", content: stdout });
-    if (stderr) emit({ type: "stderr", content: stderr });
+    const id = ++this.nextId;
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(msg.cell as Parameters<EmitOutput>[0]);
+          return;
+        }
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code });
+    });
   }
 }
 
@@ -336,24 +243,28 @@ export const phpAdapter: LanguageAdapter = {
     return format(code, "main.php");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading PHP runtime…");
-    // Dynamic import keeps php-wasm (which touches `navigator`,
-    // `document.currentScript`, and other browser-only globals at
-    // import time) out of the SSR bundle.
-    const mod = (await import("php-wasm/PhpWeb.mjs")) as unknown as {
-      PhpWeb: new (args?: Record<string, unknown>) => PhpWebInstance;
-    };
-
-    setLoadingMessage("Initialising PHP (WebAssembly)…");
-    const php = new mod.PhpWeb({
-      // Resolve php-wasm's wasm / shared-library files against jsDelivr
-      // instead of relying on Next.js to emit them from node_modules.
-      locateFile: (path: string) => PHP_WASM_CDN + path,
+    setLoadingMessage("Loading PHP worker…");
+    const worker = new Worker(new URL("./php-worker.ts", import.meta.url));
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new PhpWorkerRuntime(worker));
+        } else if (msg.kind === "init-error") {
+          worker.removeEventListener("message", onMessage);
+          worker.terminate();
+          reject(new Error(msg.message));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "PHP worker failed to start"));
+      });
+      worker.postMessage({ kind: "init" });
     });
-
-    // `binary` resolves once the Emscripten module is fully ready.
-    await php.binary;
-
-    return new PhpRuntime(php);
   },
 };

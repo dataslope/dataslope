@@ -1,4 +1,3 @@
-import type { Shelter, WebR as WebRClass } from "webr";
 import type {
   EmitOutput,
   ExampleSnippet,
@@ -484,206 +483,39 @@ cat(as.yaml(data))
   },
 ];
 
-/** Render an R object (returned by captureR.result) as either an HTML table
- *  (data.frame-like) or a stringified value. */
-function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
-  if (rows.length === 0) return null;
-  const cols = Object.keys(rows[0] ?? {});
-  if (cols.length === 0) return null;
-  const escape = (v: unknown): string => {
-    const s = v === null || v === undefined ? "" : String(v);
-    return s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  };
-  const head = cols.map((c) => `<th>${escape(c)}</th>`).join("");
-  const body = rows
-    .map(
-      (r) =>
-        `<tr>${cols.map((c) => `<td>${escape(r[c])}</td>`).join("")}</tr>`,
-    )
-    .join("");
-  return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-}
+// ─── Worker-based runtime ────────────────────────────────────────────────
 
-/** Convert a column-major R data.frame (the shape `toJs()` returns for a
- *  data.frame) into row-major rows. Returns null if the shape doesn't look
- *  like a data.frame. */
-function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
-  if (!value || typeof value !== "object") return null;
-  // toJs() on a data.frame returns { type: 'list', names: [...], values: [Array, Array, ...] }
-  const v = value as { type?: string; names?: unknown; values?: unknown };
-  if (v.type !== "list") return null;
-  if (!Array.isArray(v.names) || !Array.isArray(v.values)) return null;
-  const names = v.names as string[];
-  const cols = v.values as unknown[];
-  if (cols.length === 0 || cols.length !== names.length) return null;
-  // Each column should be an array (or { values: [...] }) of equal length.
-  const arrays: unknown[][] = cols.map((c) => {
-    if (Array.isArray(c)) return c as unknown[];
-    if (c && typeof c === "object" && Array.isArray((c as { values?: unknown }).values)) {
-      return (c as { values: unknown[] }).values;
-    }
-    return [c];
-  });
-  const len = arrays[0].length;
-  if (!arrays.every((a) => a.length === len)) return null;
-  const rows: Record<string, unknown>[] = [];
-  for (let i = 0; i < len; i++) {
-    const row: Record<string, unknown> = {};
-    for (let j = 0; j < names.length; j++) {
-      row[names[j]] = arrays[j][i];
-    }
-    rows.push(row);
-  }
-  return rows;
-}
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "init-error"; message: string }
+  | { kind: "output"; id: number; cell: { type: string; content: string } }
+  | { kind: "done"; id: number }
+  | { kind: "error"; id: number; message: string };
 
-async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
-  // Render to an offscreen canvas → PNG → base64
-  const canvas = document.createElement("canvas");
-  canvas.width = bmp.width;
-  canvas.height = bmp.height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("2D context not available");
-  ctx.drawImage(bmp, 0, 0);
-  const blob: Blob | null = await new Promise((resolve) =>
-    canvas.toBlob((b) => resolve(b), "image/png"),
-  );
-  if (!blob) throw new Error("Failed to encode plot as PNG");
-  const buf = await blob.arrayBuffer();
-  let binary = "";
-  const bytes = new Uint8Array(buf);
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
+class RWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
 
-/** Base R packages that ship with WebR — never need to be installed. */
-const R_BUILTIN_PACKAGES = new Set([
-  "base", "compiler", "datasets", "graphics", "grDevices", "grid",
-  "methods", "parallel", "splines", "stats", "stats4", "tcltk",
-  "tools", "utils", "translations",
-]);
-
-/** Best-effort scan for `library(pkg)` / `require(pkg)` /
- *  `requireNamespace("pkg")` calls so we can preinstall packages from the
- *  WebR repository before executing user code. Strips comments first so
- *  commented-out calls are ignored. */
-function extractLibraryCalls(code: string): string[] {
-  const stripped = code
-    .split("\n")
-    .map((line) => {
-      // Remove anything after an unescaped `#` (R comment). This is a
-      // heuristic that ignores `#` inside strings, which is acceptable for
-      // package detection — false positives are filtered by name validity
-      // below and false negatives just fall through to the original error.
-      const idx = line.indexOf("#");
-      return idx >= 0 ? line.slice(0, idx) : line;
-    })
-    .join("\n");
-
-  const re =
-    /\b(?:library|require|requireNamespace|loadNamespace)\s*\(\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z_.][A-Za-z0-9_.]*))/g;
-  const found = new Set<string>();
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(stripped)) !== null) {
-    const name = m[1] ?? m[2] ?? m[3];
-    if (!name) continue;
-    if (!/^[A-Za-z][A-Za-z0-9_.]*$/.test(name)) continue;
-    if (R_BUILTIN_PACKAGES.has(name)) continue;
-    found.add(name);
-  }
-  return [...found];
-}
-
-class WebRRuntime implements LanguageRuntime {
-  /** Packages we've already installed (or attempted to install) so we
-   *  don't pay the round-trip on every Run click. */
-  private readonly installedPackages = new Set<string>();
-
-  constructor(private webR: WebRClass) {}
-
-  /** Install any WebR packages referenced by `library(...)` / `require(...)`
-   *  in `code` that we haven't already installed. Errors are non-fatal — we
-   *  let the user's code surface the underlying load error. Returns any
-   *  warning text to surface as stderr. */
-  private async ensurePackages(code: string): Promise<string> {
-    const referenced = extractLibraryCalls(code);
-    const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
-    if (toInstall.length === 0) return "";
-    // Optimistically mark as installed so failures don't retry every run.
-    for (const p of toInstall) this.installedPackages.add(p);
-    try {
-      await this.webR.installPackages(toInstall);
-      return "";
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      return `Failed to auto-install R package(s) [${toInstall.join(", ")}]: ${msg}\n`;
-    }
-  }
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    const installWarnings = await this.ensurePackages(code);
-
-    // Wipe variables left over from prior runs so each execution starts
-    // from a fresh `.GlobalEnv` — matches the playground's "no
-    // preserved state across runs" model.
-    await this.webR.evalRVoid(
-      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
-    );
-
-    const shelter: Shelter = await new this.webR.Shelter();
-    try {
-      // `withAutoprint: true` makes top-level expressions in user code
-      // behave like they would at an interactive R console — values that
-      // would normally be auto-printed (e.g. the result of a `ggplot(...)`
-      // pipeline) get sent through `print()`, which is what causes ggplot
-      // to actually draw on the canvas device. Without this, ggplot
-      // returns its plot object as `result.result` and no image is ever
-      // emitted.
-      const result = await shelter.captureR(code, {
-        withAutoprint: true,
-        captureGraphics: { width: 720, height: 432 },
-      });
-
-      // Stream stdout / stderr (output is in the order it was produced).
-      let stdoutBuf = "";
-      let stderrBuf = installWarnings;
-      for (const o of result.output) {
-        if (o.type === "stdout") stdoutBuf += String(o.data) + "\n";
-        else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
-      }
-      if (stdoutBuf.trim()) emit({ type: "stdout", content: stdoutBuf.trim() });
-      if (stderrBuf.trim()) emit({ type: "stderr", content: stderrBuf.trim() });
-
-      // Render captured graphics
-      for (const bmp of result.images) {
-        const b64 = await imageBitmapToPngBase64(bmp);
-        emit({ type: "image", content: b64 });
-        bmp.close();
-      }
-
-      // If the top-level value is a data.frame, render it as an HTML table.
-      // RObject.type() is asynchronous through the worker proxy.
-      try {
-        const t = await result.result.type();
-        if (t === "list") {
-          const js = (await result.result.toJs()) as unknown;
-          const rows = rowsFromDataFrame(js);
-          if (rows) {
-            const html = dataFrameToHtml(rows);
-            if (html) emit({ type: "html", content: html });
-          }
+    const id = ++this.nextId;
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(msg.cell as Parameters<EmitOutput>[0]);
+          return;
         }
-      } catch {
-        /* not convertible — ignore */
-      }
-    } finally {
-      await shelter.purge();
-    }
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code });
+    });
   }
 }
 
@@ -730,21 +562,28 @@ export const rAdapter: LanguageAdapter = {
     return re.test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading WebR…");
-    // Dynamic import keeps WebR (and its bundled service-worker code) out
-    // of the SSR bundle and only fetches it on the client.
-    const { WebR } = await import("webr");
-
-    setLoadingMessage("Initialising R runtime…");
-    const webR: WebRClass = new WebR();
-    await webR.init();
-
-    setLoadingMessage("Configuring graphics device…");
-    // Enable the canvas graphics device so plot() / ggplot output is captured.
-    await webR.evalRVoid(
-      `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
-    );
-
-    return new WebRRuntime(webR);
+    setLoadingMessage("Loading R worker…");
+    const worker = new Worker(new URL("./r-worker.ts", import.meta.url));
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new RWorkerRuntime(worker));
+        } else if (msg.kind === "init-error") {
+          worker.removeEventListener("message", onMessage);
+          worker.terminate();
+          reject(new Error(msg.message));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "R worker failed to start"));
+      });
+      worker.postMessage({ kind: "init" });
+    });
   },
 };
