@@ -1217,7 +1217,7 @@ export function ResultView({
                   onRequestDelete={() => requestDelete(idx)}
                   // eslint-disable-next-line react-hooks/refs
                   onCommitEdits={() => commitEdits(idx, set)}
-                  elapsedMs={result?.elapsedMs ?? null}
+                  elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
                 >
                   {onExportResultSet && (
@@ -2276,7 +2276,7 @@ export function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
-  elapsedMs?: number | null;
+  elapsedMs?: number;
   elapsedIsError?: boolean;
   children?: React.ReactNode;
 }) {
