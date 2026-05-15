@@ -1844,7 +1844,7 @@ function DuckDbPlaygroundInner() {
     view.dispatch({
       effects: [
         langComp.reconfigure(
-          sqlLang({ dialect: PostgreSQL, schema, upperCaseKeywords: false }),
+          sqlLang({ schema, upperCaseKeywords: false }),
         ),
         completionComp.reconfigure(
           autocompletion({
