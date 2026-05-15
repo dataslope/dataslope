@@ -7,19 +7,13 @@ import type {
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
-// TypeScript runs in a two-step pipeline:
-//   1. Use the official TypeScript compiler API (loaded dynamically from
-//      the `typescript` npm package) to transpile the user's source down
-//      to ES2022 JavaScript. We deliberately stick to `transpileModule`
-//      so we get the same behaviour as `tsc --isolatedModules` — no
-//      cross-file type-checking is needed for a single-file playground.
-//   2. Hand the resulting JS to an `AsyncFunction` so top-level `await`
-//      works, with `console.*` overridden so output streams into the
-//      playground's output pane.
+// TypeScript runs in a dedicated Web Worker (typescript-worker.ts) that:
+//   1. Imports the official TypeScript compiler and transpiles the user's
+//      source to ES2022 JavaScript via `transpileModule`.
+//   2. Executes the resulting JS via `AsyncFunction` (top-level await works).
 //
-// TypeScript's bundle is ~10MB unminified, so we lazy-load it on the
-// first run via dynamic import — that keeps the playground UI from
-// having to wait on it during the initial page load.
+// Moving both steps to a worker keeps the ~10MB compiler bundle off the
+// main thread and ensures heavy transpilation / execution never blocks the UI.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -192,175 +186,34 @@ const PACKAGES: PackageInfo[] = [
   // without any import statement, so there are no packages to list here.
 ];
 
-function formatArg(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (typeof value === "function") return value.toString();
-  if (typeof value === "object") {
-    try {
-      return JSON.stringify(value, jsonReplacer, 2);
-    } catch {
-      try {
-        return String(value);
-      } catch {
-        return "[object]";
-      }
-    }
-  }
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  return String(value);
-}
+type WorkerOutMessage =
+  | { kind: "loading"; message: string }
+  | { kind: "ready" }
+  | { kind: "stdout"; id: number; content: string }
+  | { kind: "stderr"; id: number; content: string }
+  | { kind: "done"; id: number };
 
-function jsonReplacer(_key: string, value: unknown): unknown {
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  if (typeof value === "function") return `[Function: ${value.name || "anonymous"}]`;
-  if (typeof value === "undefined") return "undefined";
-  return value;
-}
-
-function formatArgs(args: unknown[]): string {
-  return args.map(formatArg).join(" ");
-}
-
-/** Minimal slice of the `typescript` module surface we use. Declaring
- *  it locally keeps the import boundary explicit and means downstream
- *  TS users of this file aren't forced to take a `typescript` type
- *  dependency. */
-interface TsCompilerModule {
-  transpileModule(
-    input: string,
-    options: {
-      compilerOptions: Record<string, unknown>;
-      reportDiagnostics?: boolean;
-      fileName?: string;
-    },
-  ): {
-    outputText: string;
-    diagnostics?: Array<{
-      messageText: string | { messageText: string };
-      category: number;
-    }>;
-  };
-  ScriptTarget: { ES2022: number };
-  ModuleKind: { ESNext: number };
-  JsxEmit: { Preserve: number };
-  flattenDiagnosticMessageText(
-    diag: string | { messageText: string } | undefined,
-    newLine: string,
-  ): string;
-}
-
-class TypeScriptRuntime implements LanguageRuntime {
-  constructor(private ts: TsCompilerModule) {}
+class TypeScriptWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
+  constructor(private worker: Worker) {}
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    // 1) Transpile TS → JS. transpileModule does syntactic-only checks,
-    // which is the right trade-off for a single-file playground.
-    let outputText: string;
-    try {
-      const result = this.ts.transpileModule(code, {
-        compilerOptions: {
-          target: this.ts.ScriptTarget.ES2022,
-          module: this.ts.ModuleKind.ESNext,
-          // Allow top-level `await` in the generated JS so user code
-          // can use it without wrapping it in an IIFE.
-          isolatedModules: true,
-          esModuleInterop: true,
-          allowJs: true,
-          strict: false,
-          // Keep the output clean — strip type-only constructs.
-          removeComments: false,
-        },
-        reportDiagnostics: true,
-        fileName: "playground.ts",
-      });
-
-      const diagnostics = result.diagnostics ?? [];
-      const errors = diagnostics
-        .map((d) => this.ts.flattenDiagnosticMessageText(d.messageText, "\n"))
-        .filter(Boolean);
-      if (errors.length > 0) {
-        emit({
-          type: "stderr",
-          content: errors.map((m) => `TS: ${m}`).join("\n"),
-        });
-      }
-      outputText = result.outputText;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      emit({ type: "stderr", content: `TypeScript transpile error: ${message}` });
-      return;
-    }
-
-    // 2) Execute the transpiled JS in an AsyncFunction with a captured
-    // console. This mirrors what the JavaScript playground does.
-    let stdoutBuf = "";
-    let stderrBuf = "";
-
-    const flushStdout = () => {
-      if (stdoutBuf) {
-        emit({ type: "stdout", content: stdoutBuf.replace(/\n$/, "") });
-        stdoutBuf = "";
-      }
-    };
-    const flushStderr = () => {
-      if (stderrBuf) {
-        emit({ type: "stderr", content: stderrBuf.replace(/\n$/, "") });
-        stderrBuf = "";
-      }
-    };
-
-    const sandboxConsole = {
-      log: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      info: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      debug: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      warn: (...args: unknown[]) => {
-        stderrBuf += formatArgs(args) + "\n";
-      },
-      error: (...args: unknown[]) => {
-        stderrBuf += formatArgs(args) + "\n";
-      },
-      table: (value: unknown) => {
-        stdoutBuf += formatArg(value) + "\n";
-      },
-      dir: (value: unknown) => {
-        stdoutBuf += formatArg(value) + "\n";
-      },
-    };
-
-    const AsyncFunction = Object.getPrototypeOf(
-      async function () {},
-    ).constructor as new (...args: string[]) => (
-      console: typeof sandboxConsole,
-    ) => Promise<unknown>;
-
-    try {
-      // Prepend "use strict" so implicit-global assignments fail loudly
-      // instead of leaking onto `globalThis` between runs — the
-      // playground's contract is "fresh state per execution".
-      const fn = new AsyncFunction("console", `"use strict";\n${outputText}`);
-      const result = await fn(sandboxConsole);
-      flushStdout();
-      flushStderr();
-      if (result !== undefined) {
-        emit({ type: "stdout", content: formatArg(result) });
-      }
-    } catch (err) {
-      flushStdout();
-      flushStderr();
-      const message =
-        err instanceof Error
-          ? err.stack || `${err.name}: ${err.message}`
-          : String(err);
-      emit({ type: "stderr", content: message });
-    }
+    const id = ++this.nextId;
+    return new Promise<void>((resolve) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "stdout" || msg.kind === "stderr") {
+          if (msg.id === id) emit({ type: msg.kind, content: msg.content });
+          return;
+        }
+        if (msg.kind === "done" && msg.id === id) {
+          this.worker.removeEventListener("message", onMessage);
+          resolve();
+        }
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code });
+    });
   }
 }
 
@@ -376,7 +229,7 @@ export const typescriptAdapter: LanguageAdapter = {
     engine: "TypeScript compiler (in-browser) + native JS",
     engineUrl: "https://www.typescriptlang.org/",
     notes:
-      "Your code is transpiled to JavaScript in the browser using the official TypeScript compiler, then executed natively.",
+      "Your code is transpiled and executed in a Web Worker using the official TypeScript compiler — the UI stays responsive while your code runs.",
   },
   // The JS CodeMirror mode handles TypeScript via a typescript flag —
   // CodeMirror v5 exposes that as the `text/typescript` MIME alias.
@@ -412,14 +265,25 @@ export const typescriptAdapter: LanguageAdapter = {
     return format(code, "script.ts");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading TypeScript compiler…");
-    // Dynamic import keeps the ~10MB compiler out of the initial page
-    // bundle — it's only fetched on the first visit to /typescript.
-    const tsMod = (await import("typescript")) as unknown as {
-      default?: TsCompilerModule;
-    } & TsCompilerModule;
-    const ts: TsCompilerModule = tsMod.default ?? tsMod;
-    setLoadingMessage("Initialising TypeScript runtime…");
-    return new TypeScriptRuntime(ts);
+    setLoadingMessage("Starting TypeScript worker…");
+    const worker = new Worker(
+      new URL("./typescript-worker.ts", import.meta.url),
+    );
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "loading") {
+          setLoadingMessage(msg.message);
+        } else if (msg.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new TypeScriptWorkerRuntime(worker));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "TypeScript worker failed to start"));
+      });
+    });
   },
 };

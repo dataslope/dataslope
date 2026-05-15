@@ -7,10 +7,10 @@ import type {
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
-// JavaScript runs natively in the browser — no WebAssembly runtime is
-// needed. We wrap user code in an `AsyncFunction` so top-level `await`
-// works, and override `console.*` for the duration of the run so we can
-// stream output into the playground's output pane.
+// JavaScript runs in a dedicated Web Worker via the AsyncFunction constructor
+// so that user code (including top-level `await`) never blocks the UI.
+// The worker handles console.* interception and streams stdout/stderr back
+// to the main thread via postMessage.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -145,118 +145,33 @@ const PACKAGES: PackageInfo[] = [
   // without any import statement, so there are no packages to list here.
 ];
 
-/** Format `console.log`-style argument lists the way browsers/Node do:
- *  primitives via String(), objects via JSON with a fallback to a tag. */
-function formatArg(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (typeof value === "function") {
-    return value.toString();
-  }
-  if (typeof value === "object") {
-    try {
-      return JSON.stringify(value, jsonReplacer, 2);
-    } catch {
-      try {
-        return String(value);
-      } catch {
-        return "[object]";
-      }
-    }
-  }
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  return String(value);
-}
+type WorkerOutMessage =
+  | { kind: "ready" }
+  | { kind: "stdout"; id: number; content: string }
+  | { kind: "stderr"; id: number; content: string }
+  | { kind: "done"; id: number };
 
-/** Replacer used to make objects with circular references / non-JSON values
- *  (BigInt, undefined, functions) survive `JSON.stringify`. */
-function jsonReplacer(_key: string, value: unknown): unknown {
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  if (typeof value === "function") return `[Function: ${value.name || "anonymous"}]`;
-  if (typeof value === "undefined") return "undefined";
-  return value;
-}
+class JavaScriptWorkerRuntime implements LanguageRuntime {
+  private nextId = 0;
+  constructor(private worker: Worker) {}
 
-function formatArgs(args: unknown[]): string {
-  return args.map(formatArg).join(" ");
-}
-
-class JavaScriptRuntime implements LanguageRuntime {
   async run(code: string, emit: EmitOutput): Promise<void> {
-    let stdoutBuf = "";
-    let stderrBuf = "";
-
-    const flushStdout = () => {
-      if (stdoutBuf) {
-        emit({ type: "stdout", content: stdoutBuf.replace(/\n$/, "") });
-        stdoutBuf = "";
-      }
-    };
-    const flushStderr = () => {
-      if (stderrBuf) {
-        emit({ type: "stderr", content: stderrBuf.replace(/\n$/, "") });
-        stderrBuf = "";
-      }
-    };
-
-    // Build a console proxy that streams into our buffers. We deliberately
-    // don't replace the global `console` — instead we pass our proxy in
-    // as a parameter so concurrent tabs / unrelated UI logging is
-    // unaffected by user code.
-    const sandboxConsole = {
-      log: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      info: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      debug: (...args: unknown[]) => {
-        stdoutBuf += formatArgs(args) + "\n";
-      },
-      warn: (...args: unknown[]) => {
-        stderrBuf += formatArgs(args) + "\n";
-      },
-      error: (...args: unknown[]) => {
-        stderrBuf += formatArgs(args) + "\n";
-      },
-      table: (value: unknown) => {
-        stdoutBuf += formatArg(value) + "\n";
-      },
-      dir: (value: unknown) => {
-        stdoutBuf += formatArg(value) + "\n";
-      },
-    };
-
-    // `AsyncFunction` lets user code use top-level `await`. Wrapping in
-    // its own scope means user `var`/`let` declarations don't leak onto
-    // `globalThis`. We also enable strict mode so implicit-global
-    // assignments (`foo = 1` without `var`/`let`) throw instead of
-    // silently persisting onto `globalThis` between runs — keeping the
-    // playground's "fresh state per execution" guarantee.
-    const AsyncFunction = Object.getPrototypeOf(
-      async function () {},
-    ).constructor as new (...args: string[]) => (
-      console: typeof sandboxConsole,
-    ) => Promise<unknown>;
-
-    try {
-      const fn = new AsyncFunction("console", `"use strict";\n${code}`);
-      const result = await fn(sandboxConsole);
-      flushStdout();
-      flushStderr();
-      if (result !== undefined) {
-        emit({ type: "stdout", content: formatArg(result) });
-      }
-    } catch (err) {
-      flushStdout();
-      flushStderr();
-      const message =
-        err instanceof Error
-          ? err.stack || `${err.name}: ${err.message}`
-          : String(err);
-      emit({ type: "stderr", content: message });
-    }
+    const id = ++this.nextId;
+    return new Promise<void>((resolve) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind === "stdout" || msg.kind === "stderr") {
+          if (msg.id === id) emit({ type: msg.kind, content: msg.content });
+          return;
+        }
+        if (msg.kind === "done" && msg.id === id) {
+          this.worker.removeEventListener("message", onMessage);
+          resolve();
+        }
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "run", id, code });
+    });
   }
 }
 
@@ -272,7 +187,7 @@ export const javascriptAdapter: LanguageAdapter = {
     engine: "Native browser",
     engineUrl: "https://developer.mozilla.org/docs/Web/JavaScript",
     notes:
-      "Runs natively in your browser via the AsyncFunction constructor — top-level await is supported.",
+      "Runs in a Web Worker via the AsyncFunction constructor — top-level await is supported and the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "javascript",
   examples: EXAMPLES,
@@ -313,7 +228,22 @@ export const javascriptAdapter: LanguageAdapter = {
     return format(code, "script.js");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Preparing JavaScript runtime…");
-    return new JavaScriptRuntime();
+    setLoadingMessage("Starting JavaScript worker…");
+    const worker = new Worker(
+      new URL("./javascript-worker.ts", import.meta.url),
+    );
+    return new Promise<LanguageRuntime>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        if (ev.data.kind === "ready") {
+          worker.removeEventListener("message", onMessage);
+          resolve(new JavaScriptWorkerRuntime(worker));
+        }
+      };
+      worker.addEventListener("message", onMessage);
+      worker.addEventListener("error", (ev) => {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(ev.message || "JavaScript worker failed to start"));
+      });
+    });
   },
 };
