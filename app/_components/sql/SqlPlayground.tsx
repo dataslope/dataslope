@@ -109,7 +109,6 @@ import {
   ChevronsUp,
   ChevronUp,
   CircleHelp,
-  Clock,
   Eye,
   Database,
   FilePlus,
@@ -4688,16 +4687,6 @@ function SqlPlaygroundInner() {
                   </Popover.Portal>
                 </Popover.Root>
               </div>
-              {result && statusState !== "running" && (
-                <div
-                  className={`sql-editor-elapsed${result.error ? " sql-editor-elapsed-err" : ""}`}
-                  title="Last execution time"
-                  aria-label="Last execution time"
-                >
-                  <Clock size={11} aria-hidden="true" />
-                  <span>{(result.elapsedMs / 1000).toFixed(3)}s</span>
-                </div>
-              )}
               <div className="sql-toolbar">
                 <div className="sql-toolbar-shortcuts">
                   <span

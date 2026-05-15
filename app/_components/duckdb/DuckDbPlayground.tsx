@@ -1070,6 +1070,7 @@ function DuckDbPlaygroundInner() {
   // ─── Schema selector state ────────────────────────────────────────────
   const [selectedSchema, setSelectedSchema] = useState("main");
   const [schemas, setSchemas] = useState<string[]>(["main"]);
+  const [schemaLoading, setSchemaLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
@@ -1963,7 +1964,12 @@ function DuckDbPlaygroundInner() {
       if (!schema || schema === "null") return;
       selectedSchemaRef.current = schema;
       setSelectedSchema(schema);
-      await refreshSchema();
+      setSchemaLoading(true);
+      try {
+        await refreshSchema();
+      } finally {
+        setSchemaLoading(false);
+      }
     },
     [refreshSchema],
   );
@@ -5143,6 +5149,12 @@ function DuckDbPlaygroundInner() {
               </div>
             </div>
             <div className="sql-tree">
+              {schemaLoading && (
+                <div className="sql-tree-loading-overlay">
+                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <DataslopeRunOverlay running />
+                </div>
+              )}
               <SchemaSection
                 label="TABLES"
                 count={tables.length}

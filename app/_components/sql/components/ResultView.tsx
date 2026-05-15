@@ -493,6 +493,9 @@ export function ResultView({
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
+    // Scroll the result table back to the top whenever a new result arrives
+    // (fresh query run or lazy page navigation).
+    resultSetsScrollRef.current?.scrollTo(0, 0);
     const el = flashWrapperRef.current;
     const noEl = noResultsRef.current;
     if (el) {
@@ -540,6 +543,7 @@ export function ResultView({
       const cur = prev[idx] ?? { page: 0 };
       return { ...prev, [idx]: { ...cur, page } };
     });
+    resultSetsScrollRef.current?.scrollTo(0, 0);
   }, []);
 
   const pkColumnsForSet = useCallback(
@@ -1213,6 +1217,8 @@ export function ResultView({
                   onRequestDelete={() => requestDelete(idx)}
                   // eslint-disable-next-line react-hooks/refs
                   onCommitEdits={() => commitEdits(idx, set)}
+                  elapsedMs={result?.elapsedMs ?? null}
+                  elapsedIsError={!!result?.error}
                 >
                   {onExportResultSet && (
                     <ResultSetExportButton
@@ -2253,6 +2259,8 @@ export function ResultPager({
   selectedCount,
   onRequestDelete,
   onCommitEdits,
+  elapsedMs,
+  elapsedIsError,
   children,
 }: {
   totalRows: number;
@@ -2268,6 +2276,8 @@ export function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
+  elapsedMs?: number | null;
+  elapsedIsError?: boolean;
   children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -2432,6 +2442,16 @@ export function ResultPager({
         )}
       </div>
       {children}
+      {elapsedMs != null && (
+        <span
+          className={`sql-pager-elapsed${elapsedIsError ? " sql-pager-elapsed-err" : ""}`}
+          title="Last execution time"
+          aria-label="Last execution time"
+        >
+          <Clock size={11} aria-hidden="true" />
+          <span>{(elapsedMs / 1000).toFixed(3)}s</span>
+        </span>
+      )}
     </div>
   );
 }

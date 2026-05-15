@@ -1046,6 +1046,7 @@ function PostgresPlaygroundInner() {
   // ─── Schema state ─────────────────────────────────────────────────────
   const [selectedSchema, setSelectedSchema] = useState("public");
   const [schemas, setSchemas] = useState<string[]>(["public"]);
+  const [schemaLoading, setSchemaLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
@@ -1328,7 +1329,12 @@ function PostgresPlaygroundInner() {
       selectedSchemaRef.current = schema;
       setSelectedSchema(schema);
       setExpandedEntities(new Set());
-      await refreshSchema();
+      setSchemaLoading(true);
+      try {
+        await refreshSchema();
+      } finally {
+        setSchemaLoading(false);
+      }
     },
     [refreshSchema],
   );
@@ -4981,6 +4987,12 @@ function PostgresPlaygroundInner() {
               </div>
             </div>
             <div className="sql-tree">
+              {schemaLoading && (
+                <div className="sql-tree-loading-overlay">
+                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <DataslopeRunOverlay running />
+                </div>
+              )}
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
