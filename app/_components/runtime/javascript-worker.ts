@@ -10,8 +10,6 @@
 //                  { kind: "stderr"; id: number; content: string }
 //                  { kind: "done";   id: number }
 
-declare const self: DedicatedWorkerGlobalScope;
-
 type InMessage = { kind: "run"; id: number; code: string };
 
 type OutMessage =
