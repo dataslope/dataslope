@@ -191,6 +191,9 @@ const PLAYGROUND_ID = "duckdb";
 const STORAGE_PREFIX = "duckdb_";
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
+// Minimum time (ms) the "running" overlay is shown so the 180ms CSS
+// transition can complete and be clearly visible to the user.
+const MIN_ANIMATION_MS = 300;
 
 // ─── DuckDB structure drawer types ────────────────────────────────────
 
@@ -1422,6 +1425,10 @@ function DuckDbPlaygroundInner() {
           success: true,
         });
         await refreshSchema();
+        // Keep the running overlay visible long enough for the 180ms CSS
+        // transition to complete and be perceptible to the user.
+        const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
+        if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
         setStatusState("ready");
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);

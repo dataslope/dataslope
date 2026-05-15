@@ -32,6 +32,9 @@ import { useSqlPlaygroundStore } from "../stores/useSqlPlaygroundStore";
 import type { ResultSetExportScope, QueryHistoryEntry } from "../types";
 
 const INFINITE_SCROLL_PAGE_SIZE = 500;
+// Minimum time (ms) the "running" overlay is shown so the 180ms CSS
+// transition can complete and be clearly visible to the user.
+const MIN_ANIMATION_MS = 300;
 
 export interface SqlPlaygroundRefs {
   engineRef: React.MutableRefObject<SqliteEngine | null>;
@@ -152,7 +155,6 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           elapsedMs,
           success: true,
         });
-        setStatusState("ready");
         const [newTables, newViews, newIndexes, newTriggers] = await Promise.all([
           engine.listTables(),
           engine.listViews(),
@@ -203,6 +205,11 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           }
           return next;
         });
+        // Keep the running overlay visible long enough for the 180ms CSS
+        // transition to complete and be perceptible to the user.
+        const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
+        if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
+        setStatusState("ready");
       } catch (err) {
         const elapsedMs = performance.now() - t0;
         const msg = err instanceof Error ? err.message : String(err);
