@@ -13,6 +13,7 @@
     "java",
     "csharp",
     "---",
-    "challenge-test"
+    "challenge-test",
+    "mermaid-test"
   ]
 }

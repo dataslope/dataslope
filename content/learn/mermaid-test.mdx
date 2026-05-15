@@ -1,0 +1,74 @@
+---
+title: Mermaid Diagrams
+description: How to embed Mermaid.js diagrams in learn pages using fenced code blocks.
+---
+
+## Overview
+
+You can embed [Mermaid.js](https://mermaid.js.org/) diagrams directly in any learn page using a fenced code block with the `mermaid` language identifier. The diagram is rendered client-side and automatically adapts to the current light/dark theme.
+
+## Flowchart
+
+```mermaid
+graph TD;
+  A[Start] --> B{Is data clean?};
+  B -- Yes --> C[Run analysis];
+  B -- No --> D[Clean data];
+  D --> B;
+  C --> E[Publish results];
+```
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant App
+  participant Database
+
+  User->>App: Submit query
+  App->>Database: Execute SQL
+  Database-->>App: Return rows
+  App-->>User: Display results
+```
+
+## Entity-Relationship Diagram
+
+```mermaid
+erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  ORDER ||--|{ ORDER_ITEM : contains
+  PRODUCT ||--o{ ORDER_ITEM : "is part of"
+  CUSTOMER {
+    int id PK
+    string name
+    string email
+  }
+  ORDER {
+    int id PK
+    int customer_id FK
+    date created_at
+  }
+  ORDER_ITEM {
+    int id PK
+    int order_id FK
+    int product_id FK
+    int quantity
+  }
+  PRODUCT {
+    int id PK
+    string name
+    decimal price
+  }
+```
+
+## How to Add a Diagram
+
+Add a fenced code block with ` ```mermaid ` as the opening fence anywhere in your MDX file:
+
+````md
+```mermaid
+graph LR;
+  A --> B --> C;
+```
+````
