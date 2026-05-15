@@ -232,7 +232,7 @@ function ResultSetExportButton({
               className="sql-result-export-btn"
               aria-label="Export result set"
             >
-              <ArrowDownToLine size={13} aria-hidden="true" />
+              <ArrowDownToLine size={11} aria-hidden="true" />
               <span className="sql-result-export-btn-label">Download</span>
             </Menu.Trigger>
           )}

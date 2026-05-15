@@ -1990,18 +1990,20 @@ function DuckDbPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !createSchemaName.trim()) return;
     setCreateSchemaSubmitting(true);
+    const newSchemaName = createSchemaName.trim();
     try {
-      await engine.createSchema(createSchemaName.trim());
+      await engine.createSchema(newSchemaName);
       setCreateSchemaDialogOpen(false);
       setCreateSchemaName("");
       await refreshSchemas();
+      await handleSchemaChange(newSchemaName);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Failed to create schema: ${msg}`, "warn");
     } finally {
       setCreateSchemaSubmitting(false);
     }
-  }, [createSchemaName, refreshSchemas, showToast]);
+  }, [createSchemaName, handleSchemaChange, refreshSchemas, showToast]);
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(

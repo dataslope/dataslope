@@ -2979,6 +2979,26 @@ html[data-pg-theme="light"] .toast {
   background: var(--bg3);
 }
 
+.toast-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1;
+}
+.toast-copy:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
 /* ─── Dark editor themes — force white text on top-bar controls and
    the empty-output welcome heading so they remain legible against the
    editor-themed background (which can use a colored "muted" hue that

@@ -2449,17 +2449,23 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
-      // Exclude generated columns — PostgreSQL forbids inserting explicit
-      // values into GENERATED ALWAYS columns.
-      const generatedCols = new Set(
+      // Exclude generated columns and serial/sequence columns — PostgreSQL
+      // forbids explicit values for GENERATED ALWAYS columns and nextval()
+      // PKs will duplicate-key on reuse.
+      const skipCols = new Set(
         (columnsByEntity[tableName] ?? [])
-          .filter((col) => col.generated !== null)
+          .filter(
+            (col) =>
+              col.generated !== null ||
+              (col.defaultValue !== null &&
+                /nextval\(/i.test(col.defaultValue)),
+          )
           .map((col) => col.name),
       );
       const filteredNames: string[] = [];
       const filteredValues: unknown[] = [];
       for (let i = 0; i < columnNames.length; i++) {
-        if (!generatedCols.has(columnNames[i])) {
+        if (!skipCols.has(columnNames[i])) {
           filteredNames.push(columnNames[i]);
           filteredValues.push(values[i]);
         }
