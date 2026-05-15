@@ -131,6 +131,32 @@
   flex: 1;
   overflow-y: auto;
   padding: 6px 0;
+  position: relative;
+}
+
+/* ─── Schema-loading overlay (shown while a schema switch is in flight) ───
+   Covers the entire sql-tree with a semi-transparent backdrop and a
+   DataslopeRunOverlay wave at the bottom so the loading state matches the
+   code-execution animation used in the results pane. */
+.sql-tree-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--bg) 72%, transparent);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.sql-tree-loading-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+  /* Keep the label above the wave overlay that sits at the bottom */
+  position: relative;
+  z-index: 5;
 }
 
 .sql-tree-section {
@@ -1482,34 +1508,31 @@
   box-shadow: 0 1px 0 var(--border);
 }
 
-/* Last-execution-time pill, anchored to the top-right of the editor
-   pane. Mirrors the visual language of the toolbar so it reads as a
-   sibling control rather than chrome. */
-.sql-editor-elapsed {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 5;
+/* ─── Elapsed-time pill shown in the result pager ───
+   Appears to the right of the page controls; uses the same visual
+   language as the former editor-pane pill but lives inline inside the
+   pager flex row so it doesn't overlap other controls. */
+.sql-pager-elapsed {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 8px;
-  background: color-mix(in srgb, var(--bg2) 92%, transparent);
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--bg3) 80%, transparent);
   border-radius: 999px;
   color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
   line-height: 1;
-  backdrop-filter: blur(6px);
+  white-space: nowrap;
   pointer-events: none;
 }
 
-.sql-editor-elapsed svg {
+.sql-pager-elapsed svg {
   color: var(--primary);
   flex-shrink: 0;
 }
 
-.sql-editor-elapsed-err svg {
+.sql-pager-elapsed-err svg {
   color: var(--danger, #e35a5a);
 }
 

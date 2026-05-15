@@ -101,6 +101,9 @@ import {
 } from "./playgroundShared";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
+// Minimum time (ms) the "running" overlay is shown so the 180ms CSS
+// transition can complete and be clearly visible to the user.
+const MIN_ANIMATION_MS = 300;
 
 /** Minimal Plotly surface we use for rendering chart cells. */
 interface PlotlyAPI {
@@ -929,6 +932,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (collected.length === 0) {
         showToast("Code ran successfully — no output.");
       }
+      // Keep the running overlay visible long enough for the 180ms CSS
+      // transition to complete and be perceptible to the user.
+      const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
+      if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
       setStatusState("ready");
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;

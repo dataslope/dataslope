@@ -191,6 +191,9 @@ const PLAYGROUND_ID = "postgres";
 const STORAGE_PREFIX = "pg_postgres_";
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
+// Minimum time (ms) the "running" overlay is shown so the 180ms CSS
+// transition can complete and be clearly visible to the user.
+const MIN_ANIMATION_MS = 300;
 
 // ─── Postgres structure drawer types ────────────────────────────────────
 
@@ -1046,6 +1049,7 @@ function PostgresPlaygroundInner() {
   // ─── Schema state ─────────────────────────────────────────────────────
   const [selectedSchema, setSelectedSchema] = useState("public");
   const [schemas, setSchemas] = useState<string[]>(["public"]);
+  const [schemaLoading, setSchemaLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
@@ -1328,7 +1332,12 @@ function PostgresPlaygroundInner() {
       selectedSchemaRef.current = schema;
       setSelectedSchema(schema);
       setExpandedEntities(new Set());
-      await refreshSchema();
+      setSchemaLoading(true);
+      try {
+        await refreshSchema();
+      } finally {
+        setSchemaLoading(false);
+      }
     },
     [refreshSchema],
   );
@@ -1451,6 +1460,10 @@ function PostgresPlaygroundInner() {
           success: true,
         });
         await refreshSchema();
+        // Keep the running overlay visible long enough for the 180ms CSS
+        // transition to complete and be perceptible to the user.
+        const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
+        if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
         setStatusState("ready");
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -4981,6 +4994,12 @@ function PostgresPlaygroundInner() {
               </div>
             </div>
             <div className="sql-tree">
+              {schemaLoading && (
+                <div className="sql-tree-loading-overlay">
+                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <DataslopeRunOverlay running />
+                </div>
+              )}
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
