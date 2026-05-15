@@ -4896,7 +4896,7 @@ function PostgresPlaygroundInner() {
                           );
                           return (
                             <>
-                              {systemSchemas.length > 0 && (
+                              {userSchemas.length > 0 && (
                                 <div className="sql-db-popup-group-label">
                                   Schemas
                                 </div>
