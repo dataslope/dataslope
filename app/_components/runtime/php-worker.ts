@@ -107,7 +107,12 @@ async function initPhp(): Promise<void> {
       removeEventListener: () => {},
       body: { appendChild: () => {}, removeChild: () => {} },
     };
-    (self as unknown as Record<string, unknown>).document = stub;
+    const globals = self as unknown as Record<string, unknown>;
+    globals.document = stub;
+    // PhpWeb's Emscripten build also references `window` during init.
+    if (typeof window === "undefined") {
+      globals.window = self;
+    }
   }
 
   post({ kind: "loading", message: "Loading PHP runtime…" });
