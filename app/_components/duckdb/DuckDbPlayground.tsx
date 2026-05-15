@@ -1226,7 +1226,7 @@ function DuckDbPlaygroundInner() {
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatPopoverOpen, setFormatPopoverOpen] = useState(false);
   const isMac = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => detectIsMac(),
     () => false,
   );
@@ -2443,13 +2443,13 @@ function DuckDbPlaygroundInner() {
           next.length > 0
             ? next
             : [
-                {
-                  id: newTabId(),
-                  title: "Query 1",
-                  code: "",
-                  pristineCode: "",
-                },
-              ];
+              {
+                id: newTabId(),
+                title: "Query 1",
+                code: "",
+                pristineCode: "",
+              },
+            ];
         persistTabs(finalTabs);
         setActiveTabId(finalTabs[0].id);
         return;
@@ -2481,13 +2481,13 @@ function DuckDbPlaygroundInner() {
           next.length > 0
             ? next
             : [
-                {
-                  id: newTabId(),
-                  title: "Query 1",
-                  code: "",
-                  pristineCode: "",
-                },
-              ];
+              {
+                id: newTabId(),
+                title: "Query 1",
+                code: "",
+                pristineCode: "",
+              },
+            ];
         persistTabs(finalTabs);
         setActiveTabId(finalTabs[0].id);
         return;
@@ -3170,9 +3170,9 @@ function DuckDbPlaygroundInner() {
             fkOnUpdate: normalizeDuckDbFkAction(fk?.onUpdate),
             generated: c.generated
               ? {
-                  expression: c.generated.expression,
-                  originalExpression: c.generated.expression,
-                }
+                expression: c.generated.expression,
+                originalExpression: c.generated.expression,
+              }
               : null,
           };
         });
@@ -3224,18 +3224,18 @@ function DuckDbPlaygroundInner() {
           foreignKey:
             col.fkTable && col.fkColumn
               ? {
-                  table: col.fkTable,
-                  column: col.fkColumn,
-                  onDelete: normalizeDuckDbFkAction(col.fkOnDelete),
-                  onUpdate: normalizeDuckDbFkAction(col.fkOnUpdate),
-                }
+                table: col.fkTable,
+                column: col.fkColumn,
+                onDelete: normalizeDuckDbFkAction(col.fkOnDelete),
+                onUpdate: normalizeDuckDbFkAction(col.fkOnUpdate),
+              }
               : undefined,
           originalName: col.originalName ?? undefined,
           generated: col.generated
             ? {
-                expression: col.generated.expression.trim(),
-                storageType: "STORED" as const,
-              }
+              expression: col.generated.expression.trim(),
+              storageType: "STORED" as const,
+            }
             : undefined,
         })),
       });
@@ -3306,17 +3306,17 @@ function DuckDbPlaygroundInner() {
           foreignKey:
             col.fkTable && col.fkColumn
               ? {
-                  table: col.fkTable,
-                  column: col.fkColumn,
-                  onDelete: normalizeDuckDbFkAction(col.fkOnDelete),
-                  onUpdate: normalizeDuckDbFkAction(col.fkOnUpdate),
-                }
+                table: col.fkTable,
+                column: col.fkColumn,
+                onDelete: normalizeDuckDbFkAction(col.fkOnDelete),
+                onUpdate: normalizeDuckDbFkAction(col.fkOnUpdate),
+              }
               : undefined,
           generated: col.generated
             ? {
-                expression: col.generated.expression.trim(),
-                storageType: "STORED" as const,
-              }
+              expression: col.generated.expression.trim(),
+              storageType: "STORED" as const,
+            }
             : undefined,
         })),
       );
@@ -4695,14 +4695,14 @@ function DuckDbPlaygroundInner() {
                                           setViewStructureDialog((prev) =>
                                             prev
                                               ? {
-                                                  ...prev,
-                                                  columns: prev.columns.map(
-                                                    (c) =>
-                                                      c.id === col.id
-                                                        ? { ...c, ...patch }
-                                                        : c,
-                                                  ),
-                                                }
+                                                ...prev,
+                                                columns: prev.columns.map(
+                                                  (c) =>
+                                                    c.id === col.id
+                                                      ? { ...c, ...patch }
+                                                      : c,
+                                                ),
+                                              }
                                               : null,
                                           )
                                         }
@@ -4710,11 +4710,11 @@ function DuckDbPlaygroundInner() {
                                           setViewStructureDialog((prev) =>
                                             prev
                                               ? {
-                                                  ...prev,
-                                                  columns: prev.columns.filter(
-                                                    (c) => c.id !== col.id,
-                                                  ),
-                                                }
+                                                ...prev,
+                                                columns: prev.columns.filter(
+                                                  (c) => c.id !== col.id,
+                                                ),
+                                              }
                                               : null,
                                           )
                                         }
@@ -4793,20 +4793,20 @@ function DuckDbPlaygroundInner() {
                                         setViewStructureDialog((prev) =>
                                           prev
                                             ? {
-                                                ...prev,
-                                                columns: prev.columns.map(
-                                                  (c) =>
-                                                    c.id === id && c.generated
-                                                      ? {
-                                                          ...c,
-                                                          generated: {
-                                                            ...c.generated,
-                                                            expression,
-                                                          },
-                                                        }
-                                                      : c,
-                                                ),
-                                              }
+                                              ...prev,
+                                              columns: prev.columns.map(
+                                                (c) =>
+                                                  c.id === id && c.generated
+                                                    ? {
+                                                      ...c,
+                                                      generated: {
+                                                        ...c.generated,
+                                                        expression,
+                                                      },
+                                                    }
+                                                    : c,
+                                              ),
+                                            }
                                             : null,
                                         )
                                       }
@@ -4814,11 +4814,11 @@ function DuckDbPlaygroundInner() {
                                         setViewStructureDialog((prev) =>
                                           prev
                                             ? {
-                                                ...prev,
-                                                columns: prev.columns.filter(
-                                                  (c) => c.id !== id,
-                                                ),
-                                              }
+                                              ...prev,
+                                              columns: prev.columns.filter(
+                                                (c) => c.id !== id,
+                                              ),
+                                            }
                                             : null,
                                         )
                                       }
@@ -4925,12 +4925,12 @@ function DuckDbPlaygroundInner() {
                               setAddRowDialog((prev) =>
                                 prev
                                   ? {
-                                      ...prev,
-                                      values: {
-                                        ...prev.values,
-                                        [c.name]: e.target.value,
-                                      },
-                                    }
+                                    ...prev,
+                                    values: {
+                                      ...prev.values,
+                                      [c.name]: e.target.value,
+                                    },
+                                  }
                                   : null,
                               )
                             }
@@ -5081,14 +5081,14 @@ function DuckDbPlaygroundInner() {
                                           setAddTableDialog((prev) =>
                                             prev
                                               ? {
-                                                  ...prev,
-                                                  columns: prev.columns.map(
-                                                    (c) =>
-                                                      c.id === col.id
-                                                        ? { ...c, ...patch }
-                                                        : c,
-                                                  ),
-                                                }
+                                                ...prev,
+                                                columns: prev.columns.map(
+                                                  (c) =>
+                                                    c.id === col.id
+                                                      ? { ...c, ...patch }
+                                                      : c,
+                                                ),
+                                              }
                                               : null,
                                           )
                                         }
@@ -5096,11 +5096,11 @@ function DuckDbPlaygroundInner() {
                                           setAddTableDialog((prev) =>
                                             prev
                                               ? {
-                                                  ...prev,
-                                                  columns: prev.columns.filter(
-                                                    (c) => c.id !== col.id,
-                                                  ),
-                                                }
+                                                ...prev,
+                                                columns: prev.columns.filter(
+                                                  (c) => c.id !== col.id,
+                                                ),
+                                              }
                                               : null,
                                           )
                                         }
@@ -5485,131 +5485,141 @@ function DuckDbPlaygroundInner() {
                 />
               )}
               {sidebarView === "schema" && (
-              <>
-              <SchemaSection
-                label="TABLES"
-                count={tables.length}
-                expanded={tablesExpanded}
-                onToggle={() => setTablesExpanded((v) => !v)}
-                emptyMessage="No tables."
-                onAdd={openAddTable}
-                allExpanded={
-                  tables.length > 0 &&
-                  tables.every((name) => expandedEntities.has(name))
-                }
-                onExpandAll={() => setExpandedEntities(new Set(tables))}
-                onCollapseAll={() => setExpandedEntities(new Set())}
-              >
-                {tables.map((name) => (
-                  <SchemaItem
-                    key={name}
-                    name={name}
-                    kind="table"
-                    expanded={expandedEntities.has(name)}
-                    columns={columnsByEntity[name]}
-                    foreignKeys={foreignKeysByEntity[name]}
-                    onToggleExpanded={(entity) =>
+                <>
+                  <SchemaSection
+                    label="TABLES"
+                    count={tables.length}
+                    expanded={tablesExpanded}
+                    onToggle={() => setTablesExpanded((v) => !v)}
+                    emptyMessage="No tables."
+                    onAdd={openAddTable}
+                    allExpanded={
+                      tables.length > 0 &&
+                      tables.every((name) => expandedEntities.has(name))
+                    }
+                    onExpandAll={() => setExpandedEntities(new Set(tables))}
+                    onCollapseAll={() => setExpandedEntities(new Set())}
+                  >
+                    {tables.map((name) => (
+                      <SchemaItem
+                        key={name}
+                        name={name}
+                        kind="table"
+                        expanded={expandedEntities.has(name)}
+                        columns={columnsByEntity[name]}
+                        foreignKeys={foreignKeysByEntity[name]}
+                        onToggleExpanded={(entity) =>
+                          setExpandedEntities((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(entity)) next.delete(entity);
+                            else next.add(entity);
+                            return next;
+                          })
+                        }
+                        onPreview={previewEntity}
+                        onAddRow={(n) => void openAddRow(n)}
+                        onTruncate={truncateEntity}
+                        onModifyStructure={(n) => void openViewStructure(n)}
+                        onCount={countEntityRows}
+                        onCopy={copyEntityName}
+                        onDrop={requestDropEntity}
+                        onViewDDL={(n) => void viewDDL(n)}
+                        onExport={(n, f) => void exportEntity(n, f)}
+                        onGetRowCount={fetchEntityRowCount}
+                      />
+                    ))}
+                  </SchemaSection>
+                  <SchemaSection
+                    label="VIEWS"
+                    count={views.length}
+                    expanded={viewsExpanded}
+                    onToggle={() => setViewsExpanded((v) => !v)}
+                    emptyMessage="No views."
+                    allExpanded={
+                      views.length > 0 &&
+                      views.every((name) => expandedEntities.has(name))
+                    }
+                    onExpandAll={() =>
                       setExpandedEntities((prev) => {
                         const next = new Set(prev);
-                        if (next.has(entity)) next.delete(entity);
-                        else next.add(entity);
+                        for (const name of views) next.add(name);
                         return next;
                       })
                     }
-                    onPreview={previewEntity}
-                    onAddRow={(n) => void openAddRow(n)}
-                    onTruncate={truncateEntity}
-                    onModifyStructure={(n) => void openViewStructure(n)}
-                    onCount={countEntityRows}
-                    onCopy={copyEntityName}
-                    onDrop={requestDropEntity}
-                    onViewDDL={(n) => void viewDDL(n)}
-                    onExport={(n, f) => void exportEntity(n, f)}
-                    onGetRowCount={fetchEntityRowCount}
-                  />
-                ))}
-              </SchemaSection>
-              <SchemaSection
-                label="VIEWS"
-                count={views.length}
-                expanded={viewsExpanded}
-                onToggle={() => setViewsExpanded((v) => !v)}
-                emptyMessage="No views."
-                allExpanded={
-                  views.length > 0 &&
-                  views.every((name) => expandedEntities.has(name))
-                }
-                onExpandAll={() =>
-                  setExpandedEntities((prev) => {
-                    const next = new Set(prev);
-                    for (const name of views) next.add(name);
-                    return next;
-                  })
-                }
-                onCollapseAll={() =>
-                  setExpandedEntities((prev) => {
-                    const next = new Set(prev);
-                    for (const name of views) next.delete(name);
-                    return next;
-                  })
-                }
-              >
-                {views.map((name) => (
-                  <SchemaItem
-                    key={name}
-                    name={name}
-                    kind="view"
-                    expanded={expandedEntities.has(name)}
-                    columns={columnsByEntity[name]}
-                    foreignKeys={foreignKeysByEntity[name]}
-                    onToggleExpanded={(entity) =>
+                    onCollapseAll={() =>
                       setExpandedEntities((prev) => {
                         const next = new Set(prev);
-                        if (next.has(entity)) next.delete(entity);
-                        else next.add(entity);
+                        for (const name of views) next.delete(name);
                         return next;
                       })
                     }
-                    onPreview={previewEntity}
-                    onStructure={(n) => openEntityStructure(n)}
-                    onCount={countEntityRows}
-                    onCopy={copyEntityName}
-                    onDrop={requestDropEntity}
-                    onViewDDL={(n) => void viewDDL(n)}
-                    onExport={(n, f) => void exportEntity(n, f)}
-                    onGetRowCount={fetchEntityRowCount}
-                  />
-                ))}
-              </SchemaSection>
-              <SchemaSection
-                label="INDEXES"
-                count={indexes.length}
-                expanded={indexesExpanded}
-                onToggle={() => setIndexesExpanded((v) => !v)}
-                emptyMessage="No indexes."
-              >
-                {indexes.map((name) => (
-                  <SchemaLeafItem
-                    key={name}
-                    name={name}
-                    kind="index"
-                    onCopy={copyEntityName}
-                    onViewDDL={(n) => void viewDDL(n)}
-                    onDrop={requestDropEntity}
-                  />
-                ))}
-              </SchemaSection>
-              {/*
+                  >
+                    {views.map((name) => (
+                      <SchemaItem
+                        key={name}
+                        name={name}
+                        kind="view"
+                        expanded={expandedEntities.has(name)}
+                        columns={columnsByEntity[name]}
+                        foreignKeys={foreignKeysByEntity[name]}
+                        onToggleExpanded={(entity) =>
+                          setExpandedEntities((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(entity)) next.delete(entity);
+                            else next.add(entity);
+                            return next;
+                          })
+                        }
+                        onPreview={previewEntity}
+                        onStructure={(n) => openEntityStructure(n)}
+                        onCount={countEntityRows}
+                        onCopy={copyEntityName}
+                        onDrop={requestDropEntity}
+                        onViewDDL={(n) => void viewDDL(n)}
+                        onExport={(n, f) => void exportEntity(n, f)}
+                        onGetRowCount={fetchEntityRowCount}
+                      />
+                    ))}
+                  </SchemaSection>
+                  <SchemaSection
+                    label="INDEXES"
+                    count={indexes.length}
+                    expanded={indexesExpanded}
+                    onToggle={() => setIndexesExpanded((v) => !v)}
+                    emptyMessage="No indexes."
+                  >
+                    {indexes.map((name) => (
+                      <SchemaLeafItem
+                        key={name}
+                        name={name}
+                        kind="index"
+                        onCopy={copyEntityName}
+                        onViewDDL={(n) => void viewDDL(n)}
+                        onDrop={requestDropEntity}
+                      />
+                    ))}
+                  </SchemaSection>
+                  {/*
                 DuckDB has no triggers — the entire TRIGGERS sidebar
                 section from the Postgres playground is intentionally
                 omitted to avoid confusing users with a perpetually
                 empty group. `engine.listTriggers()` always resolves
                 to `[]` for the same reason.
               */}
-              </>
+                </>
               )}
             </div>
             <div className="sql-sidebar-footer">
+              <button
+                type="button"
+                className="sql-sidebar-btn"
+                onClick={openErDiagramTab}
+                title="View ER Diagram"
+                aria-label="View ER Diagram"
+              >
+                <Network size={13} aria-hidden="true" />
+                <span>ER Diagram</span>
+              </button>
               <button
                 type="button"
                 className={`sql-sidebar-btn${sidebarView === "files" ? " sql-sidebar-btn-active" : ""}`}
@@ -5625,16 +5635,6 @@ function DuckDbPlaygroundInner() {
               >
                 <FolderTree size={13} aria-hidden="true" />
                 <span>Files</span>
-              </button>
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openErDiagramTab}
-                title="View ER Diagram"
-                aria-label="View ER Diagram"
-              >
-                <Network size={13} aria-hidden="true" />
-                <span>ER Diagram</span>
               </button>
             </div>
           </aside>
@@ -5740,8 +5740,8 @@ function DuckDbPlaygroundInner() {
               ref={editorPaneRef}
               style={
                 activeTab?.kind === "view-data" ||
-                activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                  activeTab?.kind === "er-diagram" ||
+                  activeTab?.kind === "query-history"
                   ? { display: "none" }
                   : undefined
               }
@@ -5991,7 +5991,7 @@ function DuckDbPlaygroundInner() {
               aria-orientation="horizontal"
               style={
                 activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                  activeTab?.kind === "query-history"
                   ? { display: "none" }
                   : undefined
               }
@@ -6001,7 +6001,7 @@ function DuckDbPlaygroundInner() {
               ref={resultsPaneRef}
               style={
                 activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                  activeTab?.kind === "query-history"
                   ? { display: "none" }
                   : undefined
               }
@@ -6149,8 +6149,7 @@ function ImportDialog<
               prev ? ({ ...prev, colCompare: null } as S) : prev,
             );
             onError(
-              `Could not load columns for "${target}": ${
-                err instanceof Error ? err.message : String(err)
+              `Could not load columns for "${target}": ${err instanceof Error ? err.message : String(err)
               }`,
             );
           }
@@ -6180,8 +6179,7 @@ function ImportDialog<
           prev ? ({ ...prev, colCompare: null } as S) : prev,
         );
         onError(
-          `Could not load columns for "${newTable}": ${
-            err instanceof Error ? err.message : String(err)
+          `Could not load columns for "${newTable}": ${err instanceof Error ? err.message : String(err)
           }`,
         );
       }
@@ -6338,8 +6336,8 @@ function ImportDialog<
                           {row.map((cell, j) => (
                             <td key={j}>
                               {cell === null ||
-                              cell === undefined ||
-                              cell === "" ? (
+                                cell === undefined ||
+                                cell === "" ? (
                                 <em>NULL</em>
                               ) : (
                                 String(cell)
