@@ -1,6 +1,35 @@
 /// <reference lib="webworker" />
 export {};
 
+// PhpWeb is an Emscripten build compiled for ENVIRONMENT=web. It reads
+// `document` and `window` during module evaluation — before any async code
+// runs. Stub them here at module-level, before any imports, so the checks
+// pass in a worker context. Our `locateFile` override makes the fake
+// currentScript irrelevant; PHP execution never touches the real DOM.
+{
+  const globals = self as unknown as Record<string, unknown>;
+  if (typeof document === "undefined") {
+    const docStub = {
+      currentScript: null,
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      createElement: (tag: string) => {
+        const el: Record<string, unknown> = { style: {}, tagName: tag.toUpperCase() };
+        if (tag === "canvas") el.getContext = () => null;
+        return el;
+      },
+      createElementNS: (_ns: string, tag: string) => docStub.createElement(tag),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      body: { appendChild: () => {}, removeChild: () => {} },
+    };
+    globals.document = docStub;
+  }
+  if (typeof window === "undefined") {
+    globals.window = self;
+  }
+}
+
 // PHP (via php-wasm) runs inside a dedicated Web Worker so that:
 //   1. PHP execution doesn't block the main thread.
 //   2. The Emscripten module init is isolated from the UI loop.
@@ -87,34 +116,6 @@ let php: PhpWebInstance | null = null;
 let initPromise: Promise<void> | null = null;
 
 async function initPhp(): Promise<void> {
-  // PhpWeb is an Emscripten build targeting ENVIRONMENT=web, so it reads
-  // `document` during module init (typically for currentScript URL resolution
-  // and canvas detection). Workers have no DOM, so we install a minimal stub
-  // before importing the module. Our `locateFile` override makes the stub URL
-  // irrelevant; PHP itself never touches canvas or other DOM APIs at runtime.
-  if (typeof document === "undefined") {
-    const stub = {
-      currentScript: null,
-      querySelector: () => null,
-      querySelectorAll: () => [],
-      createElement: (tag: string) => {
-        const el: Record<string, unknown> = { style: {}, tagName: tag.toUpperCase() };
-        if (tag === "canvas") el.getContext = () => null;
-        return el;
-      },
-      createElementNS: (_ns: string, tag: string) => stub.createElement(tag),
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      body: { appendChild: () => {}, removeChild: () => {} },
-    };
-    const globals = self as unknown as Record<string, unknown>;
-    globals.document = stub;
-    // PhpWeb's Emscripten build also references `window` during init.
-    if (typeof window === "undefined") {
-      globals.window = self;
-    }
-  }
-
   post({ kind: "loading", message: "Loading PHP runtime…" });
   const mod = (await import("php-wasm/PhpWeb.mjs")) as unknown as {
     PhpWeb: new (args?: Record<string, unknown>) => PhpWebInstance;
