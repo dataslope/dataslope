@@ -1074,6 +1074,7 @@ function DuckDbPlaygroundInner() {
   const [selectedSchema, setSelectedSchema] = useState("main");
   const [schemas, setSchemas] = useState<string[]>(["main"]);
   const [schemaLoading, setSchemaLoading] = useState(false);
+  const [dbLoading, setDbLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
@@ -1137,6 +1138,7 @@ function DuckDbPlaygroundInner() {
     string | null
   >(null);
   const viewStructureBodyRef = useRef<HTMLDivElement | null>(null);
+  const schemaSelectorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<DuckDbStructureDialogState | null>(null);
   const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<
@@ -1892,6 +1894,7 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
+      setDbLoading(true);
       // Clear the sidebar schema state up front so the previous database's
       // tables/views/indexes can never render under the new database's
       // label while the bootstrap and `refreshSchema()` calls below are in
@@ -1944,6 +1947,8 @@ function DuckDbPlaygroundInner() {
           "warn",
         );
         setStatusState("ready");
+      } finally {
+        setDbLoading(false);
       }
     },
     [persistTabs, refreshSchema, refreshSchemas, showToast],
@@ -4041,23 +4046,22 @@ function DuckDbPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        {/* ── Create Schema dialog ── */}
-        <Dialog.Root
+        {/* ── Create Schema popover ── */}
+        <Popover.Root
           open={createSchemaDialogOpen}
           onOpenChange={(next) => {
-            if (!next) setCreateSchemaDialogOpen(false);
+            setCreateSchemaDialogOpen(next);
+            if (!next) setCreateSchemaName("");
           }}
         >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Create Schema
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Enter a name for the new DuckDB schema.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
+          <Popover.Portal>
+            <Popover.Positioner
+              anchor={schemaSelectorTriggerRef}
+              sideOffset={6}
+              align="start"
+            >
+              <Popover.Popup className="bui-popup sql-schema-create-popup">
+                <div className="sql-schema-create-title">Create schema</div>
                 <input
                   className="sql-rename-input"
                   value={createSchemaName}
@@ -4071,23 +4075,27 @@ function DuckDbPlaygroundInner() {
                     }
                   }}
                 />
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!createSchemaName.trim() || createSchemaSubmitting}
-                  onClick={() => void submitCreateSchema()}
-                >
-                  Create
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+                <div className="sql-schema-create-actions">
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-secondary"
+                    onClick={() => setCreateSchemaDialogOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="confirm-btn confirm-btn-primary"
+                    disabled={!createSchemaName.trim() || createSchemaSubmitting}
+                    onClick={() => void submitCreateSchema()}
+                  >
+                    Create
+                  </button>
+                </div>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
 
         {/* ── Rename Database dialog ── */}
         <Dialog.Root
@@ -5106,9 +5114,19 @@ function DuckDbPlaygroundInner() {
               <div className="sql-db-selector-row">
                 <Select.Root
                   value={selectedSchema}
-                  onValueChange={(value) => void handleSchemaChange(String(value))}
+                  onValueChange={(value) => {
+                    const v = String(value);
+                    if (v === "__new_schema__") {
+                      if (!loaded) return;
+                      setCreateSchemaName("");
+                      setCreateSchemaDialogOpen(true);
+                      return;
+                    }
+                    void handleSchemaChange(v);
+                  }}
                 >
                   <Select.Trigger
+                    ref={schemaSelectorTriggerRef}
                     className="sql-db-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
@@ -5152,6 +5170,18 @@ function DuckDbPlaygroundInner() {
                             <>
                               <div className="sql-db-popup-group-label">Schemas</div>
                               {userSchemas.map(schemaItem)}
+                              <Select.Item
+                                value="__new_schema__"
+                                disabled={!loaded}
+                                className="bui-select-item sql-db-item sql-db-item-action"
+                              >
+                                <span className="bui-select-item-icon" aria-hidden="true">
+                                  <Plus size={14} />
+                                </span>
+                                <span className="sql-db-item-text">
+                                  <Select.ItemText>New schema…</Select.ItemText>
+                                </span>
+                              </Select.Item>
                               {systemSchemas.length > 0 && (
                                 <>
                                   <div role="separator" aria-orientation="horizontal" className="sql-db-popup-sep" />
@@ -5166,25 +5196,14 @@ function DuckDbPlaygroundInner() {
                     </Select.Positioner>
                   </Select.Portal>
                 </Select.Root>
-                <button
-                  type="button"
-                  className="sql-schema-create-btn"
-                  title="Create schema"
-                  aria-label="Create schema"
-                  disabled={!loaded}
-                  onClick={() => {
-                    setCreateSchemaName("");
-                    setCreateSchemaDialogOpen(true);
-                  }}
-                >
-                  <Plus size={14} aria-hidden="true" />
-                </button>
               </div>
             </div>
             <div className="sql-tree">
-              {schemaLoading && (
+              {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
-                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <span className="sql-tree-loading-label">
+                    {dbLoading ? "Loading database…" : "Loading schema…"}
+                  </span>
                   <DataslopeRunOverlay running />
                 </div>
               )}

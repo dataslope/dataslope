@@ -1050,6 +1050,7 @@ function PostgresPlaygroundInner() {
   const [selectedSchema, setSelectedSchema] = useState("public");
   const [schemas, setSchemas] = useState<string[]>(["public"]);
   const [schemaLoading, setSchemaLoading] = useState(false);
+  const [dbLoading, setDbLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
@@ -1113,6 +1114,7 @@ function PostgresPlaygroundInner() {
     string | null
   >(null);
   const viewStructureBodyRef = useRef<HTMLDivElement | null>(null);
+  const schemaSelectorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [addTableDialog, setAddTableDialog] =
     useState<PgStructureDialogState | null>(null);
   const [addTableTouchedColIds, setAddTableTouchedColIds] = useState<
@@ -1924,6 +1926,7 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine || nextId === activeDbIdRef.current) return;
       setStatusState("loading");
+      setDbLoading(true);
       try {
         const sample =
           nextId === POSTGRES_BLANK_DATABASE.id
@@ -1965,6 +1968,8 @@ function PostgresPlaygroundInner() {
           "warn",
         );
         setStatusState("ready");
+      } finally {
+        setDbLoading(false);
       }
     },
     [persistTabs, refreshSchema, refreshSchemas, showToast],
@@ -4858,9 +4863,18 @@ function PostgresPlaygroundInner() {
               <div className="sql-db-selector-row">
                 <Select.Root
                   value={selectedSchema}
-                  onValueChange={(value) => void handleSchemaChange(String(value))}
+                  onValueChange={(value) => {
+                    const v = String(value);
+                    if (v === "__new_schema__") {
+                      setCreateSchemaName("");
+                      setCreateSchemaDialogOpen(true);
+                      return;
+                    }
+                    void handleSchemaChange(v);
+                  }}
                 >
                   <Select.Trigger
+                    ref={schemaSelectorTriggerRef}
                     className="sql-db-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
@@ -4919,6 +4933,20 @@ function PostgresPlaygroundInner() {
                                 </div>
                               )}
                               {userSchemas.map(schemaItem)}
+                              <Select.Item
+                                value="__new_schema__"
+                                className="bui-select-item sql-db-item sql-db-item-action"
+                              >
+                                <span
+                                  className="bui-select-item-icon"
+                                  aria-hidden="true"
+                                >
+                                  <Plus size={14} />
+                                </span>
+                                <span className="sql-db-item-text">
+                                  <Select.ItemText>New schema…</Select.ItemText>
+                                </span>
+                              </Select.Item>
                               {systemSchemas.length > 0 && (
                                 <>
                                   <div
@@ -4939,93 +4967,87 @@ function PostgresPlaygroundInner() {
                     </Select.Positioner>
                   </Select.Portal>
                 </Select.Root>
-                <Popover.Root
-                  open={createSchemaDialogOpen}
-                  onOpenChange={(next) => {
-                    setCreateSchemaDialogOpen(next);
-                    if (!next) setCreateSchemaName("");
-                  }}
-                >
-                  <Popover.Trigger
-                    render={
-                      <button
-                        type="button"
-                        className="sql-schema-create-btn"
-                        title="Create schema"
-                        aria-label="Create schema"
-                      >
-                        <Plus size={14} aria-hidden="true" />
-                      </button>
-                    }
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner sideOffset={6} align="end">
-                      <Popover.Popup className="bui-popup sql-schema-create-popup">
-                        <div className="sql-schema-create-title">
-                          Create schema
-                        </div>
-                        <input
-                          type="text"
-                          className="sql-rename-input"
-                          placeholder="Schema name"
-                          value={createSchemaName}
-                          onChange={(e) => setCreateSchemaName(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key !== "Enter") return;
-                            const errs = validateSchemaName(
-                              createSchemaName,
-                              schemas,
-                            );
-                            if (errs.length === 0 && createSchemaName.trim() !== "") {
-                              void handleCreateSchema();
-                            }
-                          }}
-                          autoFocus
-                        />
-                        {(() => {
-                          const errors = validateSchemaName(
+              </div>
+              <Popover.Root
+                open={createSchemaDialogOpen}
+                onOpenChange={(next) => {
+                  setCreateSchemaDialogOpen(next);
+                  if (!next) setCreateSchemaName("");
+                }}
+              >
+                <Popover.Portal>
+                  <Popover.Positioner
+                    anchor={schemaSelectorTriggerRef}
+                    sideOffset={6}
+                    align="start"
+                  >
+                    <Popover.Popup className="bui-popup sql-schema-create-popup">
+                      <div className="sql-schema-create-title">
+                        Create schema
+                      </div>
+                      <input
+                        type="text"
+                        className="sql-rename-input"
+                        placeholder="Schema name"
+                        value={createSchemaName}
+                        onChange={(e) => setCreateSchemaName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter") return;
+                          const errs = validateSchemaName(
                             createSchemaName,
                             schemas,
                           );
-                          return errors.length > 0 &&
-                            createSchemaName.trim() !== "" ? (
-                            <div className="sql-schema-create-error">
-                              {errors[0]}
-                            </div>
-                          ) : null;
-                        })()}
-                        <div className="sql-schema-create-actions">
-                          <button
-                            type="button"
-                            className="confirm-btn confirm-btn-secondary"
-                            onClick={() => setCreateSchemaDialogOpen(false)}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            className="confirm-btn confirm-btn-primary"
-                            disabled={
-                              createSchemaSubmitting ||
-                              createSchemaName.trim() === "" ||
-                              validateSchemaName(createSchemaName, schemas)
-                                .length > 0
-                            }
-                            onClick={() => void handleCreateSchema()}
-                          >
-                            Create
-                          </button>
-                        </div>
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-              </div>
+                          if (errs.length === 0 && createSchemaName.trim() !== "") {
+                            void handleCreateSchema();
+                          }
+                        }}
+                        autoFocus
+                      />
+                      {(() => {
+                        const errors = validateSchemaName(
+                          createSchemaName,
+                          schemas,
+                        );
+                        return errors.length > 0 &&
+                          createSchemaName.trim() !== "" ? (
+                          <div className="sql-schema-create-error">
+                            {errors[0]}
+                          </div>
+                        ) : null;
+                      })()}
+                      <div className="sql-schema-create-actions">
+                        <button
+                          type="button"
+                          className="confirm-btn confirm-btn-secondary"
+                          onClick={() => setCreateSchemaDialogOpen(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="confirm-btn confirm-btn-primary"
+                          disabled={
+                            createSchemaSubmitting ||
+                            createSchemaName.trim() === "" ||
+                            validateSchemaName(createSchemaName, schemas)
+                              .length > 0
+                          }
+                          onClick={() => void handleCreateSchema()}
+                        >
+                          Create
+                        </button>
+                      </div>
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
             </div>
             <div className="sql-tree">
-              {schemaLoading && (
+              {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
-                  <span className="sql-tree-loading-label">Loading schema…</span>
+                  <span className="sql-tree-loading-label">
+                    {dbLoading ? "Loading database…" : "Loading schema…"}
+                  </span>
                   <DataslopeRunOverlay running />
                 </div>
               )}

@@ -2327,6 +2327,16 @@ export function ResultPager({
             <strong className="sql-result-pager-total">{totalRows}</strong>
           </>
         )}
+        {elapsedMs != null && (
+          <span
+            className={`sql-pager-elapsed${elapsedIsError ? " sql-pager-elapsed-err" : ""}`}
+            title="Last execution time"
+            aria-label="Last execution time"
+          >
+            <Clock size={11} aria-hidden="true" />
+            <span>{(elapsedMs / 1000).toFixed(3)}s</span>
+          </span>
+        )}
       </span>
       {editable && editCount > 0 && (
         <button
@@ -2445,16 +2455,6 @@ export function ResultPager({
         )}
       </div>
       {children}
-      {elapsedMs != null && (
-        <span
-          className={`sql-pager-elapsed${elapsedIsError ? " sql-pager-elapsed-err" : ""}`}
-          title="Last execution time"
-          aria-label="Last execution time"
-        >
-          <Clock size={11} aria-hidden="true" />
-          <span>{(elapsedMs / 1000).toFixed(3)}s</span>
-        </span>
-      )}
     </div>
   );
 }
