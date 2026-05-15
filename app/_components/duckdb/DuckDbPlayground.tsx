@@ -4914,7 +4914,8 @@ function DuckDbPlaygroundInner() {
                   </Select.Portal>
                 </Select.Root>
                 <button
-                  className="sql-create-schema-btn"
+                  type="button"
+                  className="sql-schema-create-btn"
                   title="Create schema"
                   aria-label="Create schema"
                   disabled={!loaded}
@@ -4923,7 +4924,7 @@ function DuckDbPlaygroundInner() {
                     setCreateSchemaDialogOpen(true);
                   }}
                 >
-                  <Plus size={13} aria-hidden="true" />
+                  <Plus size={14} aria-hidden="true" />
                 </button>
               </div>
             </div>

@@ -741,8 +741,8 @@ export async function createDuckDbEngine(
     async listSchemas(includeSystem = false) {
       const rows = await rowsFor(
         includeSystem
-          ? `SELECT schema_name FROM duckdb_schemas() ORDER BY schema_name`
-          : `SELECT schema_name FROM duckdb_schemas() WHERE NOT internal ORDER BY schema_name`,
+          ? `SELECT schema_name FROM duckdb_schemas() WHERE database_name = current_database() ORDER BY schema_name`
+          : `SELECT schema_name FROM duckdb_schemas() WHERE database_name = current_database() AND NOT internal ORDER BY schema_name`,
       );
       return rows.map((r) => String(r[0]));
     },
