@@ -31,9 +31,12 @@
 :root {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
+}
 
-  /* Use pure white for the body and sidebar backgrounds in light mode.
-     Dark mode is unaffected because .dark already overrides these variables. */
+/* Use pure white for the body and sidebar backgrounds in light mode only.
+   :root:not(.dark) has higher specificity than fumadocs's .dark selector,
+   so fumadocs's dark-mode palette is unaffected. */
+:root:not(.dark) {
   --color-fd-background: hsl(0, 0%, 100%);
   --color-fd-card: hsl(0, 0%, 100%);
 }
