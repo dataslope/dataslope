@@ -1113,6 +1113,8 @@ function DuckDbPlaygroundInner() {
     useState<ParquetImportState | null>(null);
   const [importSqlDumpOpen, setImportSqlDumpOpen] = useState(false);
   const [importSqlDumpDragging, setImportSqlDumpDragging] = useState(false);
+  const [importDuckDbOpen, setImportDuckDbOpen] = useState(false);
+  const [importDuckDbDragging, setImportDuckDbDragging] = useState(false);
 
   // ─── Rename / custom filename state ───────────────────────────────────
   const [renameDbOpen, setRenameDbOpen] = useState(false);
@@ -2030,6 +2032,61 @@ function DuckDbPlaygroundInner() {
       }
     },
     [persistTabs, refreshSchema, showToast],
+  );
+
+  const performImportDuckDb = useCallback(
+    async (bytes: Uint8Array, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setStatusState("loading");
+      setTables([]);
+      setViews([]);
+      setIndexes([]);
+      setTriggers([]);
+      setColumnsByEntity({});
+      setForeignKeysByEntity({});
+      setRowCountByTable({});
+      setExpandedEntities(new Set());
+      try {
+        await engine.importFromBinary(bytes);
+        setActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(DUCKDB_BLANK_DATABASE.id);
+        persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
+        let nextActive = nextTabs[0]?.id ?? "";
+        try {
+          const savedActive = localStorage.getItem(
+            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
+          );
+          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
+            nextActive = savedActive;
+          }
+        } catch {
+          /* ignore */
+        }
+        tabHistoryRef.current = [];
+        setActiveTabId(nextActive);
+        setResultsByTab({});
+        setImportDuckDbOpen(false);
+        setImportDuckDbDragging(false);
+        await refreshSchemas();
+        await refreshSchema();
+        setStatusState("ready");
+        showToast(`Loaded "${filename}".`);
+      } catch (err) {
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
   const addTab = useCallback(() => {
@@ -2981,6 +3038,27 @@ function DuckDbPlaygroundInner() {
 
   // ─── Export database helpers ──────────────────────────────────────────
 
+  const exportDuckDbBinary = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || tables.length === 0) return;
+    try {
+      const bytes = await engine.exportAsBinary();
+      const baseName =
+        displayFilename.replace(/\.[^.]+$/, "") || "database";
+      const filename = `${baseName}.duckdb`;
+      triggerDownload(
+        new Blob([bytes], { type: "application/octet-stream" }),
+        filename,
+      );
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      showToast(
+        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [tables, displayFilename, showToast]);
+
   const exportDuckDbDatabase = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
@@ -3408,6 +3486,35 @@ function DuckDbPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="import-section-label">Database</div>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportSqlDumpOpen(true)}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          from SQL dump
+                          <span className="ext-badge">.sql</span>
+                        </div>
+                        <div className="ex-desc">
+                          Load database from a SQL dump file
+                        </div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportDuckDbOpen(true)}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          from DuckDB
+                          <span className="ext-badge">.duckdb</span>
+                        </div>
+                        <div className="ex-desc">
+                          Load database from a DuckDB file
+                        </div>
+                      </div>
+                    </Menu.Item>
                     <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
@@ -3516,6 +3623,20 @@ function DuckDbPlaygroundInner() {
                       <div className="sql-result-export-group-label">
                         DuckDB Database
                       </div>
+                      <Menu.Item
+                        className="example-item export-item"
+                        onClick={() => void exportDuckDbBinary()}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            DuckDB Binary
+                            <span className="ext-badge">.duckdb</span>
+                          </div>
+                          <div className="ex-desc">
+                            Native DuckDB file format
+                          </div>
+                        </div>
+                      </Menu.Item>
                       <Menu.Item
                         className="example-item export-item"
                         onClick={() => void exportDuckDbDatabase()}
@@ -3781,6 +3902,96 @@ function DuckDbPlaygroundInner() {
                       void performImportSqlDump(text, file.name);
                     };
                     reader.readAsText(file);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Import DuckDB binary dialog ── */}
+        <Dialog.Root
+          open={importDuckDbOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportDuckDbOpen(false);
+              setImportDuckDbDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import DuckDB File
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Open a local <code>.duckdb</code> file as a new in-memory
+                database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This will replace the current database with the contents of
+                  the file. Your file will <strong>not</strong> be uploaded or
+                  persisted — it is only loaded into browser memory and will be
+                  gone on reload.
+                </span>
+              </div>
+              <div
+                className={`sql-dropzone${importDuckDbDragging ? " dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setImportDuckDbDragging(true);
+                }}
+                onDragLeave={() => setImportDuckDbDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setImportDuckDbDragging(false);
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const buf = ev.target?.result;
+                    if (!(buf instanceof ArrayBuffer)) return;
+                    void performImportDuckDb(new Uint8Array(buf), file.name);
+                  };
+                  reader.readAsArrayBuffer(file);
+                }}
+              >
+                <Upload
+                  size={28}
+                  className="sql-dropzone-icon"
+                  aria-hidden="true"
+                />
+                <span>Drop a DuckDB file here</span>
+                <span className="sql-dropzone-hint">
+                  or click to browse — .duckdb
+                </span>
+                <input
+                  type="file"
+                  accept=".duckdb"
+                  aria-label="Choose DuckDB file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const buf = ev.target?.result;
+                      if (!(buf instanceof ArrayBuffer)) return;
+                      void performImportDuckDb(new Uint8Array(buf), file.name);
+                    };
+                    reader.readAsArrayBuffer(file);
                     e.target.value = "";
                   }}
                 />

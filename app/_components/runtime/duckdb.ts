@@ -434,6 +434,16 @@ export interface DuckDbEngine {
   /** Register a file's bytes with DuckDB's virtual filesystem so it
    *  can be queried via `read_csv_auto`, `read_parquet`, `read_json_auto`, … */
   registerFileBuffer: (name: string, buffer: Uint8Array) => Promise<void>;
+  /** Export the entire in-memory database as a native DuckDB binary file
+   *  by ATTACHing a temporary virtual-filesystem file, copying all data
+   *  via `COPY FROM DATABASE`, then reading the bytes back out.
+   *  Throws if the WASM build doesn't support `copyFileToBuffer`. */
+  exportAsBinary: () => Promise<Uint8Array>;
+  /** Replace the current in-memory database with the contents of a
+   *  native DuckDB binary file produced by `exportAsBinary` or the CLI.
+   *  Registers the bytes in the virtual filesystem, cleans the live
+   *  schema, ATTACHes the file read-only, and copies via `COPY FROM DATABASE`. */
+  importFromBinary: (bytes: Uint8Array) => Promise<void>;
   /** Best-effort whole-database export. Falls back to a multi-statement
    *  SQL script when binary export isn't available in the in-memory
    *  build (the common case in WASM). */
@@ -1167,6 +1177,91 @@ export async function createDuckDbEngine(
     async registerFileBuffer(name, buffer) {
       const { db } = await getDuckDbInstance();
       await db.registerFileBuffer(name, buffer);
+    },
+
+    async exportAsBinary() {
+      const { db } = await getDuckDbInstance();
+      if (!db.copyFileToBuffer) {
+        throw new Error(
+          "This DuckDB-Wasm build does not support binary file export.",
+        );
+      }
+      const exportFile = "_playground_export_tmp.duckdb";
+      const alias = "_playground_export_alias";
+      // Register an empty buffer so the virtual filesystem recognises the
+      // path before DuckDB ATTACHes and writes the real file header.
+      await db.registerFileBuffer(exportFile, new Uint8Array());
+      try {
+        await conn.query(
+          `ATTACH '${exportFile}' AS ${quoteIdent(alias)}`,
+        );
+        await conn.query(
+          `COPY FROM DATABASE memory TO ${quoteIdent(alias)}`,
+        );
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+        const bytes = await db.copyFileToBuffer(exportFile);
+        return bytes;
+      } finally {
+        try {
+          await conn.query(`DETACH ${quoteIdent(alias)}`);
+        } catch {
+          /* already detached — ignore */
+        }
+        try {
+          await db.dropFile?.(exportFile);
+        } catch {
+          /* ignore */
+        }
+      }
+    },
+
+    async importFromBinary(bytes) {
+      const { db } = await getDuckDbInstance();
+      const importFile = "_playground_import_tmp.duckdb";
+      const alias = "_playground_import_alias";
+      await db.registerFileBuffer(importFile, bytes);
+      try {
+        // cleanDuckDbSchema wipes the main schema; then we copy from the
+        // attached file database into the now-empty memory catalog.
+        await cleanDuckDbSchema(conn);
+        // Also drop any user-created schemas so the import is clean.
+        const schemaTable = await conn.query(
+          `SELECT schema_name FROM duckdb_schemas()
+           WHERE database_name = current_database()
+             AND NOT internal
+             AND schema_name <> 'main'`,
+        );
+        for (let r = 0; r < schemaTable.numRows; r++) {
+          const schName = schemaTable.getChildAt(0)?.get(r);
+          if (schName != null) {
+            try {
+              await conn.query(
+                `DROP SCHEMA IF EXISTS ${quoteIdent(String(schName))} CASCADE`,
+              );
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+        await conn.query(
+          `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
+        );
+        await conn.query(
+          `COPY FROM DATABASE ${quoteIdent(alias)} TO memory`,
+        );
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+      } finally {
+        try {
+          await conn.query(`DETACH ${quoteIdent(alias)}`);
+        } catch {
+          /* already detached — ignore */
+        }
+        try {
+          await db.dropFile?.(importFile);
+        } catch {
+          /* ignore */
+        }
+      }
     },
 
     async exportDatabase() {
