@@ -22,6 +22,7 @@ import {
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import {
   autocompletion,
+  closeBrackets,
   closeBracketsKeymap,
   completionKeymap,
   startCompletion,
@@ -49,6 +50,8 @@ import {
   highlightActiveLineGutter,
   keymap,
   lineNumbers,
+  rectangularSelection,
+  tooltips,
 } from "@codemirror/view";
 import { sql as sqlLang, PostgreSQL } from "@codemirror/lang-sql";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
@@ -1655,6 +1658,9 @@ function PostgresPlaygroundInner() {
           EditorState.allowMultipleSelections.of(true),
           indentOnInput(),
           bracketMatching(),
+          closeBrackets(),
+          rectangularSelection(),
+          tooltips({ parent: document.body }),
           lineNumbers(),
           highlightActiveLineGutter(),
           highlightActiveLine(),
@@ -2417,6 +2423,27 @@ function PostgresPlaygroundInner() {
       });
     },
     [runSqlForTab, showToast, columnsByEntity, quoteIdent],
+  );
+
+  const duplicateRowInTable = useCallback(
+    (tableName: string, columnNames: string[], values: unknown[]) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const tabId = activeTabIdRef.current;
+      const schema = selectedSchemaRef.current;
+      void (async () => {
+        try {
+          await engine.insertRow(tableName, columnNames, values, schema);
+          showToast(`Duplicated row in "${tableName}".`);
+          const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
+          void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Duplicate failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [quoteIdent, runSqlForTab, showToast],
   );
 
   const openAddRow = useCallback(
@@ -3369,6 +3396,7 @@ function PostgresPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="import-section-label">Database</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => setImportSqlDumpOpen(true)}
@@ -3383,6 +3411,7 @@ function PostgresPlaygroundInner() {
                         </div>
                       </div>
                     </Menu.Item>
+                    <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => {
@@ -5467,6 +5496,7 @@ function PostgresPlaygroundInner() {
                 sourceTable={result?.sourceTable}
                 onDeleteRows={deleteRowsFromTable}
                 onUpdateRows={updateRowsInTable}
+                onDuplicateRow={duplicateRowInTable}
                 globalPageSize={globalPageSize}
                 onSetGlobalPageSize={setGlobalPageSize}
                 onLoadPage={handleLoadPage}

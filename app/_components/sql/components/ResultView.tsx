@@ -66,6 +66,7 @@ import {
 // ────────────────────────────────────────────────────────────────────────
 
 function getSqliteErrorHint(error: string): string | null {
+  // SQLite patterns
   const nearMatch = error.match(/^near "(.+)": syntax error$/i);
   if (nearMatch) {
     return `Unexpected token "${nearMatch[1]}". Check for typos in SQL keywords or extra characters.`;
@@ -92,6 +93,32 @@ function getSqliteErrorHint(error: string): string | null {
   const ambiguousMatch = error.match(/^ambiguous column name: (.+)$/i);
   if (ambiguousMatch) {
     return `Column "${ambiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
+  }
+  // DuckDB patterns
+  const duckdbNoTableMatch = error.match(/Table with name "(.+)" does not exist/i);
+  if (duckdbNoTableMatch) {
+    return `Table "${duckdbNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
+  }
+  const duckdbNoColMatch = error.match(/Referenced column "(.+)" not found in FROM clause/i);
+  if (duckdbNoColMatch) {
+    return `Column "${duckdbNoColMatch[1]}" was not found. Verify column names with View Structure.`;
+  }
+  const duckdbBinderColMatch = error.match(/Binder Error:.*column "(.+)" does not exist/i);
+  if (duckdbBinderColMatch) {
+    return `Column "${duckdbBinderColMatch[1]}" was not found. Verify column names with View Structure.`;
+  }
+  // PostgreSQL patterns
+  const pgNoTableMatch = error.match(/relation "(.+)" does not exist/i);
+  if (pgNoTableMatch) {
+    return `Table/view "${pgNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
+  }
+  const pgNoColMatch = error.match(/column "(.+)" does not exist/i);
+  if (pgNoColMatch) {
+    return `Column "${pgNoColMatch[1]}" was not found. Verify column names with View Structure.`;
+  }
+  const pgAmbiguousMatch = error.match(/column reference "(.+)" is ambiguous/i);
+  if (pgAmbiguousMatch) {
+    return `Column "${pgAmbiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
   }
   return null;
 }
