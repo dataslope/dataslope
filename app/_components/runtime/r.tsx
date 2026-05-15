@@ -483,39 +483,210 @@ cat(as.yaml(data))
   },
 ];
 
-// ─── Worker-based runtime ────────────────────────────────────────────────
+// ─── WebR type shims ─────────────────────────────────────────────────────
+// Minimal shims so we don't need to import from "webr" directly; webr's
+// published types reference DOM globals that can conflict with tsconfig.
 
-type WorkerOutMessage =
-  | { kind: "loading"; message: string }
-  | { kind: "ready" }
-  | { kind: "init-error"; message: string }
-  | { kind: "output"; id: number; cell: { type: string; content: string } }
-  | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+interface RObjectProxy {
+  type(): Promise<string>;
+  toJs(): Promise<unknown>;
+}
+interface CaptureROutput {
+  type: string;
+  data: unknown;
+}
+interface CaptureRResult {
+  output: CaptureROutput[];
+  images: ImageBitmap[];
+  result: RObjectProxy;
+}
+interface ShelterInstance {
+  captureR(
+    code: string,
+    options: { withAutoprint: boolean; captureGraphics: { width: number; height: number } },
+  ): Promise<CaptureRResult>;
+  purge(): Promise<void>;
+}
+interface WebRShelterConstructor {
+  new (): Promise<ShelterInstance>;
+}
+interface WebRInstance {
+  Shelter: WebRShelterConstructor;
+  init(): Promise<void>;
+  evalRVoid(code: string): Promise<void>;
+  installPackages(pkgs: string[]): Promise<void>;
+}
 
-class RWorkerRuntime implements LanguageRuntime {
-  private nextId = 0;
+// ─── Helpers ─────────────────────────────────────────────────────────────
 
-  constructor(private worker: Worker) {}
+const R_BUILTIN_PACKAGES = new Set([
+  "base", "compiler", "datasets", "graphics", "grDevices", "grid",
+  "methods", "parallel", "splines", "stats", "stats4", "tcltk",
+  "tools", "utils", "translations",
+]);
+
+function extractLibraryCalls(code: string): string[] {
+  const stripped = code
+    .split("\n")
+    .map((line) => {
+      const idx = line.indexOf("#");
+      return idx >= 0 ? line.slice(0, idx) : line;
+    })
+    .join("\n");
+
+  const re =
+    /\b(?:library|require|requireNamespace|loadNamespace)\s*\(\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z_.][A-Za-z0-9_.]*))/g;
+  const found = new Set<string>();
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(stripped)) !== null) {
+    const name = m[1] ?? m[2] ?? m[3];
+    if (!name) continue;
+    if (!/^[A-Za-z][A-Za-z0-9_.]*$/.test(name)) continue;
+    if (R_BUILTIN_PACKAGES.has(name)) continue;
+    found.add(name);
+  }
+  return [...found];
+}
+
+async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
+  const canvas = new OffscreenCanvas(bmp.width, bmp.height);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("2D context not available");
+  ctx.drawImage(bmp, 0, 0);
+  const blob = await canvas.convertToBlob({ type: "image/png" });
+  const buf = await blob.arrayBuffer();
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
+  if (rows.length === 0) return null;
+  const cols = Object.keys(rows[0] ?? {});
+  if (cols.length === 0) return null;
+  const escape = (v: unknown): string => {
+    const s = v === null || v === undefined ? "" : String(v);
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  };
+  const head = cols.map((c) => `<th>${escape(c)}</th>`).join("");
+  const body = rows
+    .map(
+      (r) =>
+        `<tr>${cols.map((c) => `<td>${escape(r[c])}</td>`).join("")}</tr>`,
+    )
+    .join("");
+  return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as { type?: string; names?: unknown; values?: unknown };
+  if (v.type !== "list") return null;
+  if (!Array.isArray(v.names) || !Array.isArray(v.values)) return null;
+  const names = v.names as string[];
+  const cols = v.values as unknown[];
+  if (cols.length === 0 || cols.length !== names.length) return null;
+  const arrays: unknown[][] = cols.map((c) => {
+    if (Array.isArray(c)) return c as unknown[];
+    if (
+      c &&
+      typeof c === "object" &&
+      Array.isArray((c as { values?: unknown }).values)
+    ) {
+      return (c as { values: unknown[] }).values;
+    }
+    return [c];
+  });
+  const len = arrays[0].length;
+  if (!arrays.every((a) => a.length === len)) return null;
+  const rows: Record<string, unknown>[] = [];
+  for (let i = 0; i < len; i++) {
+    const row: Record<string, unknown> = {};
+    for (let j = 0; j < names.length; j++) {
+      row[names[j]] = arrays[j][i];
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+// ─── Runtime ─────────────────────────────────────────────────────────────
+
+// WebR manages its own dedicated internal worker; calling it from the main
+// thread is already non-blocking. No outer wrapper worker is needed.
+
+class WebRRuntime implements LanguageRuntime {
+  private installedPackages = new Set<string>();
+
+  constructor(private webR: WebRInstance) {}
+
+  private async ensurePackages(code: string): Promise<string> {
+    const referenced = extractLibraryCalls(code);
+    const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
+    if (toInstall.length === 0) return "";
+    for (const p of toInstall) this.installedPackages.add(p);
+    try {
+      await this.webR.installPackages(toInstall);
+      return "";
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return `Failed to auto-install R package(s) [${toInstall.join(", ")}]: ${msg}\n`;
+    }
+  }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
-    const id = ++this.nextId;
-    return new Promise<void>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
-        if (msg.id !== id) return;
-        if (msg.kind === "output") {
-          emit(msg.cell as Parameters<EmitOutput>[0]);
-          return;
+    const installWarnings = await this.ensurePackages(code);
+
+    await this.webR.evalRVoid(
+      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
+    );
+
+    const shelter: ShelterInstance = await new this.webR.Shelter();
+    try {
+      const result = await shelter.captureR(code, {
+        withAutoprint: true,
+        captureGraphics: { width: 720, height: 432 },
+      });
+
+      let stdoutBuf = "";
+      let stderrBuf = installWarnings;
+      for (const o of result.output) {
+        if (o.type === "stdout") stdoutBuf += String(o.data) + "\n";
+        else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
+      }
+      if (stdoutBuf.trim())
+        emit({ type: "stdout", content: stdoutBuf.trim() });
+      if (stderrBuf.trim())
+        emit({ type: "stderr", content: stderrBuf.trim() });
+
+      for (const bmp of result.images) {
+        const b64 = await imageBitmapToPngBase64(bmp);
+        emit({ type: "image", content: b64 });
+        bmp.close();
+      }
+
+      try {
+        const t = await result.result.type();
+        if (t === "list") {
+          const js = (await result.result.toJs()) as unknown;
+          const rows = rowsFromDataFrame(js);
+          if (rows) {
+            const html = dataFrameToHtml(rows);
+            if (html) emit({ type: "html", content: html });
+          }
         }
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "done") resolve();
-        else reject(new Error(msg.message));
-      };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code });
-    });
+      } catch {
+        /* not convertible — ignore */
+      }
+    } finally {
+      await shelter.purge();
+    }
   }
 }
 
@@ -562,28 +733,20 @@ export const rAdapter: LanguageAdapter = {
     return re.test(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading R worker…");
-    const worker = new Worker(new URL("./r-worker.ts", import.meta.url));
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind === "loading") {
-          setLoadingMessage(msg.message);
-        } else if (msg.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new RWorkerRuntime(worker));
-        } else if (msg.kind === "init-error") {
-          worker.removeEventListener("message", onMessage);
-          worker.terminate();
-          reject(new Error(msg.message));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "R worker failed to start"));
-      });
-      worker.postMessage({ kind: "init" });
-    });
+    setLoadingMessage("Loading WebR…");
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
+
+    setLoadingMessage("Initialising R runtime…");
+    const webR = new WebR();
+    await webR.init();
+
+    setLoadingMessage("Configuring graphics device…");
+    await webR.evalRVoid(
+      `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
+    );
+
+    return new WebRRuntime(webR);
   },
 };
