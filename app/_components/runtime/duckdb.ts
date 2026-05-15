@@ -392,42 +392,58 @@ export interface DuckDbEngine {
     pageSize: number,
     offset: number,
   ) => Promise<{ result: QueryExecResult[]; totalCount: number }>;
-  listTables: () => Promise<string[]>;
-  listViews: () => Promise<string[]>;
-  listIndexes: () => Promise<string[]>;
+  listSchemas: (includeSystem?: boolean) => Promise<string[]>;
+  createSchema: (name: string) => Promise<void>;
+  listTables: (schema?: string) => Promise<string[]>;
+  listViews: (schema?: string) => Promise<string[]>;
+  listIndexes: (schema?: string) => Promise<string[]>;
   /** DuckDB has no triggers; this always resolves to an empty array.
    *  Kept on the interface so the playground's schema-refresh code can
    *  call `listTriggers()` on either engine without conditional branches. */
   listTriggers: () => Promise<string[]>;
-  listSequences: () => Promise<string[]>;
-  listColumns: (name: string) => Promise<TableColumnInfo[]>;
-  listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
-  getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
+  listSequences: (schema?: string) => Promise<string[]>;
+  listColumns: (name: string, schema?: string) => Promise<TableColumnInfo[]>;
+  listForeignKeys: (name: string, schema?: string) => Promise<ForeignKeyInfo[]>;
+  getColumnConstraintInfo: (tableName: string, schema?: string) => Promise<ColumnConstraintInfo[]>;
   createTable: (name: string, columns: ColumnSpec[]) => Promise<void>;
   rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
   dropEntity: (
     name: string,
     kind: "table" | "view" | "index" | "trigger" | "sequence",
+    schema?: string,
   ) => Promise<void>;
-  truncateTable: (name: string) => Promise<void>;
-  getDDL: (name: string) => Promise<string>;
+  truncateTable: (name: string, schema?: string) => Promise<void>;
+  getDDL: (name: string, schema?: string) => Promise<string>;
   deleteRows: (
     tableName: string,
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
+    schema?: string,
   ) => Promise<number>;
   updateRows: (
     tableName: string,
     updates: ReadonlyArray<{ rowIndex: number; column: string; value: unknown }>,
+    schema?: string,
   ) => Promise<number>;
   insertRow: (
     tableName: string,
     columnNames: string[],
     values: unknown[],
+    schema?: string,
   ) => Promise<void>;
   /** Register a file's bytes with DuckDB's virtual filesystem so it
    *  can be queried via `read_csv_auto`, `read_parquet`, `read_json_auto`, … */
   registerFileBuffer: (name: string, buffer: Uint8Array) => Promise<void>;
+  /** Export the entire in-memory database as a native DuckDB binary file
+   *  by ATTACHing a temporary virtual-filesystem file, copying all data
+   *  via `COPY FROM DATABASE`, then reading the bytes back out.
+   *  Throws if the WASM build doesn't support `copyFileToBuffer`. */
+  exportAsBinary: () => Promise<Uint8Array>;
+  /** Replace the current in-memory database with the contents of a
+   *  native DuckDB binary file produced by `exportAsBinary` or the CLI.
+   *  Registers the bytes in the virtual filesystem, cleans the live
+   *  schema, ATTACHes the file read-only, and copies via `COPY FROM DATABASE`. */
+  importFromBinary: (bytes: Uint8Array) => Promise<void>;
   /** Best-effort whole-database export. Falls back to a multi-statement
    *  SQL script when binary export isn't available in the in-memory
    *  build (the common case in WASM). */
@@ -732,23 +748,59 @@ export async function createDuckDbEngine(
       return { result, totalCount };
     },
 
-    async listTables() {
+    async listSchemas(includeSystem = false) {
+      // Query without NOT internal — in DuckDB-WASM the default "main" schema
+      // has internal = TRUE, so the filter would silently exclude it.
       const rows = await rowsFor(
-        `SELECT table_name FROM duckdb_tables() WHERE schema_name = 'main' AND NOT internal ORDER BY table_name`,
+        `SELECT schema_name FROM duckdb_schemas()
+         WHERE database_name = current_database()
+         ORDER BY schema_name`,
+      );
+      const found = rows.map((r) => String(r[0]));
+      // Virtual schemas (information_schema, pg_catalog) have no catalog row
+      // in the WASM in-memory build — add them explicitly.
+      const virtualSystemSchemas = ["information_schema", "pg_catalog"];
+      if (includeSystem) {
+        for (const sys of virtualSystemSchemas) {
+          if (!found.includes(sys)) found.push(sys);
+        }
+        found.sort();
+        return found;
+      }
+      // When hiding system schemas, exclude known system schema names.
+      const systemSet = new Set(virtualSystemSchemas);
+      return found.filter((s) => !systemSet.has(s) && !s.startsWith("pg_"));
+    },
+
+    async createSchema(name) {
+      await conn.query(`CREATE SCHEMA ${quoteIdent(name)}`);
+    },
+
+    async listTables(schema = "main") {
+      const safe = schema.replace(/'/g, "''");
+      const rows = await rowsFor(
+        `SELECT table_name FROM duckdb_tables() WHERE schema_name = '${safe}' AND NOT internal ORDER BY table_name`,
       );
       return rows.map((r) => String(r[0]));
     },
 
-    async listViews() {
+    async listViews(schema = "main") {
+      const safe = schema.replace(/'/g, "''");
+      // System schemas (information_schema, pg_catalog) only contain views
+      // that are marked internal = TRUE. Drop the NOT internal filter so
+      // they appear in the sidebar when the user selects one of those schemas.
+      const isSystemSchema =
+        schema === "information_schema" || schema.startsWith("pg_");
       const rows = await rowsFor(
-        `SELECT view_name FROM duckdb_views() WHERE schema_name = 'main' AND NOT internal ORDER BY view_name`,
+        `SELECT view_name FROM duckdb_views() WHERE schema_name = '${safe}'${isSystemSchema ? "" : " AND NOT internal"} ORDER BY view_name`,
       );
       return rows.map((r) => String(r[0]));
     },
 
-    async listIndexes() {
+    async listIndexes(schema = "main") {
+      const safe = schema.replace(/'/g, "''");
       const rows = await rowsFor(
-        `SELECT index_name FROM duckdb_indexes() WHERE schema_name = 'main' ORDER BY index_name`,
+        `SELECT index_name FROM duckdb_indexes() WHERE schema_name = '${safe}' ORDER BY index_name`,
       );
       return rows.map((r) => String(r[0]));
     },
@@ -759,15 +811,17 @@ export async function createDuckDbEngine(
       return [];
     },
 
-    async listSequences() {
+    async listSequences(schema = "main") {
+      const safe = schema.replace(/'/g, "''");
       const rows = await rowsFor(
-        `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = 'main' ORDER BY sequence_name`,
+        `SELECT sequence_name FROM duckdb_sequences() WHERE schema_name = '${safe}' ORDER BY sequence_name`,
       );
       return rows.map((r) => String(r[0]));
     },
 
-    async listColumns(name) {
+    async listColumns(name, schema = "main") {
       const safe = name.replace(/'/g, "''");
+      const safeSch = schema.replace(/'/g, "''");
       const rows = await rowsFor(
         `SELECT
            column_index,
@@ -776,7 +830,7 @@ export async function createDuckDbEngine(
            is_nullable,
            column_default
          FROM duckdb_columns()
-         WHERE schema_name = 'main' AND table_name = '${safe}'
+         WHERE schema_name = '${safeSch}' AND table_name = '${safe}'
          ORDER BY column_index`,
       );
       // DuckDB exposes PK columns via duckdb_constraints rather than
@@ -784,7 +838,7 @@ export async function createDuckDbEngine(
       const pkRows = await rowsFor(
         `SELECT constraint_column_names
          FROM duckdb_constraints()
-         WHERE schema_name = 'main'
+         WHERE schema_name = '${safeSch}'
            AND table_name = '${safe}'
            AND constraint_type = 'PRIMARY KEY'
          LIMIT 1`,
@@ -818,15 +872,16 @@ export async function createDuckDbEngine(
       });
     },
 
-    async listForeignKeys(name) {
+    async listForeignKeys(name, schema = "main") {
       const safe = name.replace(/'/g, "''");
+      const safeSch = schema.replace(/'/g, "''");
       const rows = await rowsFor(
         `SELECT
            constraint_column_names,
            referenced_table,
            referenced_column_names
          FROM duckdb_constraints()
-         WHERE schema_name = 'main'
+         WHERE schema_name = '${safeSch}'
            AND table_name = '${safe}'
            AND constraint_type = 'FOREIGN KEY'`,
       );
@@ -854,13 +909,14 @@ export async function createDuckDbEngine(
       return out;
     },
 
-    async getColumnConstraintInfo(tableName) {
-      const cols = await engine.listColumns(tableName);
+    async getColumnConstraintInfo(tableName, schema = "main") {
+      const cols = await engine.listColumns(tableName, schema);
       const safe = tableName.replace(/'/g, "''");
+      const safeSch = schema.replace(/'/g, "''");
       const uniqueRows = await rowsFor(
         `SELECT constraint_column_names
          FROM duckdb_constraints()
-         WHERE schema_name = 'main'
+         WHERE schema_name = '${safeSch}'
            AND table_name = '${safe}'
            AND constraint_type = 'UNIQUE'`,
       );
@@ -982,7 +1038,7 @@ export async function createDuckDbEngine(
       }
     },
 
-    async dropEntity(name, kind) {
+    async dropEntity(name, kind, schema = "main") {
       if (kind === "trigger") {
         // Defensive — the playground UI never offers this for DuckDB,
         // but make the call a no-op instead of generating bad DDL.
@@ -996,20 +1052,21 @@ export async function createDuckDbEngine(
             : kind === "index"
               ? "INDEX"
               : "SEQUENCE";
-      await conn.query(`DROP ${keyword} IF EXISTS ${quoteIdent(name)}`);
+      await conn.query(`DROP ${keyword} IF EXISTS ${quoteIdent(schema)}.${quoteIdent(name)}`);
     },
 
-    async truncateTable(name) {
-      await conn.query(`DELETE FROM ${quoteIdent(name)}`);
+    async truncateTable(name, schema = "main") {
+      await conn.query(`DELETE FROM ${quoteIdent(schema)}.${quoteIdent(name)}`);
     },
 
-    async getDDL(name) {
+    async getDDL(name, schema = "main") {
       // Try the catalog's own pretty-printed DDL first — it round-trips
       // generated columns, defaults, and constraints faithfully.
       const safe = name.replace(/'/g, "''");
+      const safeSch = schema.replace(/'/g, "''");
       try {
         const tableRows = await rowsFor(
-          `SELECT sql FROM duckdb_tables() WHERE schema_name = 'main' AND table_name = '${safe}' AND sql IS NOT NULL`,
+          `SELECT sql FROM duckdb_tables() WHERE schema_name = '${safeSch}' AND table_name = '${safe}' AND sql IS NOT NULL`,
         );
         if (tableRows.length > 0 && tableRows[0][0]) {
           return `${String(tableRows[0][0]).replace(/;\s*$/, "")};`;
@@ -1019,7 +1076,7 @@ export async function createDuckDbEngine(
       }
       try {
         const viewRows = await rowsFor(
-          `SELECT sql FROM duckdb_views() WHERE schema_name = 'main' AND view_name = '${safe}' AND sql IS NOT NULL`,
+          `SELECT sql FROM duckdb_views() WHERE schema_name = '${safeSch}' AND view_name = '${safe}' AND sql IS NOT NULL`,
         );
         if (viewRows.length > 0 && viewRows[0][0]) {
           return `${String(viewRows[0][0]).replace(/;\s*$/, "")};`;
@@ -1029,7 +1086,7 @@ export async function createDuckDbEngine(
       }
       try {
         const indexRows = await rowsFor(
-          `SELECT sql FROM duckdb_indexes() WHERE schema_name = 'main' AND index_name = '${safe}' AND sql IS NOT NULL`,
+          `SELECT sql FROM duckdb_indexes() WHERE schema_name = '${safeSch}' AND index_name = '${safe}' AND sql IS NOT NULL`,
         );
         if (indexRows.length > 0 && indexRows[0][0]) {
           return `${String(indexRows[0][0]).replace(/;\s*$/, "")};`;
@@ -1039,8 +1096,8 @@ export async function createDuckDbEngine(
       }
       // Reconstruct from columns + FKs as a fallback.
       const [cols, fks] = await Promise.all([
-        engine.listColumns(name),
-        engine.listForeignKeys(name),
+        engine.listColumns(name, schema),
+        engine.listForeignKeys(name, schema),
       ]);
       if (cols.length === 0) return "";
       const lines = cols.map((col) => {
@@ -1066,7 +1123,8 @@ export async function createDuckDbEngine(
       return `CREATE TABLE ${quoteIdent(name)} (\n${lines.join(",\n")}\n);`;
     },
 
-    async deleteRows(tableName, pkColumns, pkRows) {
+    async deleteRows(tableName, pkColumns, pkRows, schema = "main") {
+      const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       let deleted = 0;
       for (const row of pkRows) {
         const where = pkColumns
@@ -1083,20 +1141,21 @@ export async function createDuckDbEngine(
           })
           .join(" AND ");
         const before = await rowsFor(
-          `SELECT COUNT(*) FROM ${quoteIdent(tableName)} WHERE ${where}`,
+          `SELECT COUNT(*) FROM ${qualifiedTable} WHERE ${where}`,
         );
         const matched = Number(before[0]?.[0] ?? 0);
-        await conn.query(`DELETE FROM ${quoteIdent(tableName)} WHERE ${where}`);
+        await conn.query(`DELETE FROM ${qualifiedTable} WHERE ${where}`);
         deleted += matched;
       }
       return deleted;
     },
 
-    async updateRows(tableName, updates) {
+    async updateRows(tableName, updates, schema = "main") {
       // DuckDB has no `rowid` and provides no implicit row identifier;
       // the playground's PK-aware update path is preferred. As a
       // fallback for PKless tables we use a CTID-style emulation via
       // ROW_NUMBER() OVER () over a stable ordering of the table.
+      const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       let count = 0;
       for (const update of updates) {
         const literal = (() => {
@@ -1107,10 +1166,10 @@ export async function createDuckDbEngine(
           return `'${String(v).replace(/'/g, "''")}'`;
         })();
         await conn.query(
-          `UPDATE ${quoteIdent(tableName)}
+          `UPDATE ${qualifiedTable}
            SET ${quoteIdent(update.column)} = ${literal}
            WHERE rowid = (
-             SELECT rowid FROM ${quoteIdent(tableName)}
+             SELECT rowid FROM ${qualifiedTable}
              ORDER BY rowid
              LIMIT 1 OFFSET ${update.rowIndex}
            )`,
@@ -1120,7 +1179,7 @@ export async function createDuckDbEngine(
       return count;
     },
 
-    async insertRow(tableName, columnNames, values) {
+    async insertRow(tableName, columnNames, values, schema = "main") {
       const cols = columnNames.map(quoteIdent).join(", ");
       const literals = values
         .map((v) => {
@@ -1131,13 +1190,98 @@ export async function createDuckDbEngine(
         })
         .join(", ");
       await conn.query(
-        `INSERT INTO ${quoteIdent(tableName)} (${cols}) VALUES (${literals})`,
+        `INSERT INTO ${quoteIdent(schema)}.${quoteIdent(tableName)} (${cols}) VALUES (${literals})`,
       );
     },
 
     async registerFileBuffer(name, buffer) {
       const { db } = await getDuckDbInstance();
       await db.registerFileBuffer(name, buffer);
+    },
+
+    async exportAsBinary() {
+      const { db } = await getDuckDbInstance();
+      if (!db.copyFileToBuffer) {
+        throw new Error(
+          "This DuckDB-Wasm build does not support binary file export.",
+        );
+      }
+      const exportFile = "_playground_export_tmp.duckdb";
+      const alias = "_playground_export_alias";
+      // Register an empty buffer so the virtual filesystem recognises the
+      // path before DuckDB ATTACHes and writes the real file header.
+      await db.registerFileBuffer(exportFile, new Uint8Array());
+      try {
+        await conn.query(
+          `ATTACH '${exportFile}' AS ${quoteIdent(alias)}`,
+        );
+        await conn.query(
+          `COPY FROM DATABASE memory TO ${quoteIdent(alias)}`,
+        );
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+        const bytes = await db.copyFileToBuffer(exportFile);
+        return bytes;
+      } finally {
+        try {
+          await conn.query(`DETACH ${quoteIdent(alias)}`);
+        } catch {
+          /* already detached — ignore */
+        }
+        try {
+          await db.dropFile?.(exportFile);
+        } catch {
+          /* ignore */
+        }
+      }
+    },
+
+    async importFromBinary(bytes) {
+      const { db } = await getDuckDbInstance();
+      const importFile = "_playground_import_tmp.duckdb";
+      const alias = "_playground_import_alias";
+      await db.registerFileBuffer(importFile, bytes);
+      try {
+        // cleanDuckDbSchema wipes the main schema; then we copy from the
+        // attached file database into the now-empty memory catalog.
+        await cleanDuckDbSchema(conn);
+        // Also drop any user-created schemas so the import is clean.
+        const schemaTable = await conn.query(
+          `SELECT schema_name FROM duckdb_schemas()
+           WHERE database_name = current_database()
+             AND NOT internal
+             AND schema_name <> 'main'`,
+        );
+        for (let r = 0; r < schemaTable.numRows; r++) {
+          const schName = schemaTable.getChildAt(0)?.get(r);
+          if (schName != null) {
+            try {
+              await conn.query(
+                `DROP SCHEMA IF EXISTS ${quoteIdent(String(schName))} CASCADE`,
+              );
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+        await conn.query(
+          `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
+        );
+        await conn.query(
+          `COPY FROM DATABASE ${quoteIdent(alias)} TO memory`,
+        );
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+      } finally {
+        try {
+          await conn.query(`DETACH ${quoteIdent(alias)}`);
+        } catch {
+          /* already detached — ignore */
+        }
+        try {
+          await db.dropFile?.(importFile);
+        } catch {
+          /* ignore */
+        }
+      }
     },
 
     async exportDatabase() {

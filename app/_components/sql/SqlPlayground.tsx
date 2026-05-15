@@ -246,41 +246,7 @@ const RUNTIME_INFO: RuntimeInfo = {
     "Pure-JS build of SQLite compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
 };
 
-// ────────────────────────────────────────────────────────────────────────
-// SQLite error hint helper — maps common engine error strings to short
-// plain-English suggestions that appear beneath the raw error message.
-// ────────────────────────────────────────────────────────────────────────
 
-function getSqliteErrorHint(error: string): string | null {
-  const nearMatch = error.match(/^near "(.+)": syntax error$/i);
-  if (nearMatch) {
-    return `Unexpected token "${nearMatch[1]}". Check for typos in SQL keywords or extra characters.`;
-  }
-  const noTableMatch = error.match(/^no such table: (.+)$/i);
-  if (noTableMatch) {
-    return `Table "${noTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
-  }
-  const noColumnMatch = error.match(/^no such column: (.+)$/i);
-  if (noColumnMatch) {
-    return `Column "${noColumnMatch[1]}" was not found. Verify column names with View Structure.`;
-  }
-  const uniqueMatch = error.match(/^UNIQUE constraint failed: (.+)$/i);
-  if (uniqueMatch) {
-    return `Duplicate value violates the UNIQUE constraint on "${uniqueMatch[1]}".`;
-  }
-  const notNullMatch = error.match(/^NOT NULL constraint failed: (.+)$/i);
-  if (notNullMatch) {
-    return `"${notNullMatch[1]}" requires a non-NULL value.`;
-  }
-  if (/^FOREIGN KEY constraint failed$/i.test(error)) {
-    return "The value does not exist in the referenced table.";
-  }
-  const ambiguousMatch = error.match(/^ambiguous column name: (.+)$/i);
-  if (ambiguousMatch) {
-    return `Column "${ambiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
-  }
-  return null;
-}
 
 // ────────────────────────────────────────────────────────────────────────
 // CSV export helper

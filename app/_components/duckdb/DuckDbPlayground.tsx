@@ -22,6 +22,7 @@ import {
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import {
   autocompletion,
+  closeBrackets,
   closeBracketsKeymap,
   completionKeymap,
   startCompletion,
@@ -49,14 +50,17 @@ import {
   highlightActiveLineGutter,
   keymap,
   lineNumbers,
+  rectangularSelection,
+  tooltips,
 } from "@codemirror/view";
-import { sql as sqlLang, PostgreSQL } from "@codemirror/lang-sql";
+import { sql as sqlLang } from "@codemirror/lang-sql";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
 import { Select } from "@base-ui-components/react/select";
+import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui-components/react/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,6 +74,7 @@ import {
   FileText,
   GripVertical,
   History,
+  Layers,
   Network,
   Pencil,
   Play,
@@ -948,6 +953,10 @@ function DuckDbPlaygroundInner() {
   const setClearBeforeRunState = useDuckDbSettingsStore(
     (s) => s.setClearBeforeRun,
   );
+  const showSystemSchemas = useDuckDbSettingsStore((s) => s.showSystemSchemas);
+  const setShowSystemSchemasState = useDuckDbSettingsStore(
+    (s) => s.setShowSystemSchemas,
+  );
 
   const setFontSize = useCallback(
     (n: number) => {
@@ -1058,6 +1067,15 @@ function DuckDbPlaygroundInner() {
     Record<string, number>
   >({});
 
+  // ─── Schema selector state ────────────────────────────────────────────
+  const [selectedSchema, setSelectedSchema] = useState("main");
+  const [schemas, setSchemas] = useState<string[]>(["main"]);
+  const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
+  const [createSchemaName, setCreateSchemaName] = useState("");
+  const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
+  const selectedSchemaRef = useRef("main");
+  const showSystemSchemasRef = useRef(true);
+
   // ─── Query history ────────────────────────────────────────────────────
   const {
     history: queryHistory,
@@ -1095,6 +1113,8 @@ function DuckDbPlaygroundInner() {
     useState<ParquetImportState | null>(null);
   const [importSqlDumpOpen, setImportSqlDumpOpen] = useState(false);
   const [importSqlDumpDragging, setImportSqlDumpDragging] = useState(false);
+  const [importDuckDbOpen, setImportDuckDbOpen] = useState(false);
+  const [importDuckDbDragging, setImportDuckDbDragging] = useState(false);
 
   // ─── Rename / custom filename state ───────────────────────────────────
   const [renameDbOpen, setRenameDbOpen] = useState(false);
@@ -1274,19 +1294,20 @@ function DuckDbPlaygroundInner() {
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine) return;
+    const schema = selectedSchemaRef.current;
     const [nextTables, nextViews, nextIndexes, nextTriggers] =
       await Promise.all([
-        engine.listTables(),
-        engine.listViews(),
-        engine.listIndexes(),
+        engine.listTables(schema),
+        engine.listViews(schema),
+        engine.listIndexes(schema),
         engine.listTriggers(),
       ]);
     const entries = await Promise.all(
       [...nextTables, ...nextViews].map(async (name) => {
         const [colsResult, fksResult, countResult] = await Promise.allSettled([
-          engine.listColumns(name),
-          engine.listForeignKeys(name),
-          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(name)}`),
+          engine.listColumns(name, schema),
+          engine.listForeignKeys(name, schema),
+          engine.exec(`SELECT COUNT(*) FROM ${quoteIdent(schema)}.${quoteIdent(name)}`),
         ]);
         const cols = colsResult.status === "fulfilled" ? colsResult.value : [];
         const fks = fksResult.status === "fulfilled" ? fksResult.value : [];
@@ -1310,7 +1331,19 @@ function DuckDbPlaygroundInner() {
     setRowCountByTable(
       Object.fromEntries(entries.map(([name, , , count]) => [name, count])),
     );
-  }, []);
+  }, [quoteIdent]);
+
+  const refreshSchemas = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const nextSchemas = await engine.listSchemas(showSystemSchemasRef.current);
+    setSchemas(nextSchemas);
+    if (!nextSchemas.includes(selectedSchemaRef.current)) {
+      selectedSchemaRef.current = "main";
+      setSelectedSchema("main");
+      await refreshSchema();
+    }
+  }, [refreshSchema]);
 
   const runSqlForTab = useCallback(
     async (
@@ -1595,6 +1628,9 @@ function DuckDbPlaygroundInner() {
           EditorState.allowMultipleSelections.of(true),
           indentOnInput(),
           bracketMatching(),
+          closeBrackets(),
+          rectangularSelection(),
+          tooltips({ parent: document.body }),
           lineNumbers(),
           highlightActiveLineGutter(),
           highlightActiveLine(),
@@ -1603,7 +1639,7 @@ function DuckDbPlaygroundInner() {
           EditorState.tabSize.of(2),
           indentUnit.of("  "),
           langComp.of(
-            sqlLang({ dialect: PostgreSQL, upperCaseKeywords: false }),
+            sqlLang({ upperCaseKeywords: false }),
           ),
           completionComp.of(
             autocompletion({
@@ -1689,6 +1725,7 @@ function DuckDbPlaygroundInner() {
           return;
         }
         engineRef.current = engine;
+        await refreshSchemas();
         await refreshSchema();
         setLoaded(true);
         setStatusState("ready");
@@ -1782,6 +1819,12 @@ function DuckDbPlaygroundInner() {
     );
   }, [outputFontSizeEnabled, outputFontSize, fontSize]);
 
+  // Sync showSystemSchemas ref and re-fetch schemas when the toggle changes.
+  useEffect(() => {
+    showSystemSchemasRef.current = showSystemSchemas;
+    void refreshSchemas();
+  }, [showSystemSchemas, refreshSchemas]);
+
   // Keep autocomplete schema in sync with current tables/views.
   useEffect(() => {
     const view = editorRef.current;
@@ -1803,7 +1846,7 @@ function DuckDbPlaygroundInner() {
     view.dispatch({
       effects: [
         langComp.reconfigure(
-          sqlLang({ dialect: PostgreSQL, schema, upperCaseKeywords: false }),
+          sqlLang({ schema, upperCaseKeywords: false }),
         ),
         completionComp.reconfigure(
           autocompletion({
@@ -1881,6 +1924,9 @@ function DuckDbPlaygroundInner() {
         tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
+        selectedSchemaRef.current = "main";
+        setSelectedSchema("main");
+        await refreshSchemas();
         await refreshSchema();
         setStatusState("ready");
         showToast(`Loaded ${sample.filename}.`);
@@ -1892,7 +1938,7 @@ function DuckDbPlaygroundInner() {
         setStatusState("ready");
       }
     },
-    [persistTabs, refreshSchema, showToast],
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
   const requestDbSwitch = useCallback(
@@ -1907,6 +1953,37 @@ function DuckDbPlaygroundInner() {
     },
     [performDbSwitch],
   );
+
+  const handleSchemaChange = useCallback(
+    async (schema: string) => {
+      // Base UI Select fires onValueChange(null) when no item matches the
+      // controlled value (e.g. while the schema list is empty during a
+      // fetch). Ignore those spurious calls to prevent "null" poisoning
+      // selectedSchemaRef and the subsequent SQL queries.
+      if (!schema || schema === "null") return;
+      selectedSchemaRef.current = schema;
+      setSelectedSchema(schema);
+      await refreshSchema();
+    },
+    [refreshSchema],
+  );
+
+  const submitCreateSchema = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || !createSchemaName.trim()) return;
+    setCreateSchemaSubmitting(true);
+    try {
+      await engine.createSchema(createSchemaName.trim());
+      setCreateSchemaDialogOpen(false);
+      setCreateSchemaName("");
+      await refreshSchemas();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Failed to create schema: ${msg}`, "warn");
+    } finally {
+      setCreateSchemaSubmitting(false);
+    }
+  }, [createSchemaName, refreshSchemas, showToast]);
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
@@ -1960,6 +2037,61 @@ function DuckDbPlaygroundInner() {
       }
     },
     [persistTabs, refreshSchema, showToast],
+  );
+
+  const performImportDuckDb = useCallback(
+    async (bytes: Uint8Array, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setStatusState("loading");
+      setTables([]);
+      setViews([]);
+      setIndexes([]);
+      setTriggers([]);
+      setColumnsByEntity({});
+      setForeignKeysByEntity({});
+      setRowCountByTable({});
+      setExpandedEntities(new Set());
+      try {
+        await engine.importFromBinary(bytes);
+        setActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(DUCKDB_BLANK_DATABASE.id);
+        persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
+        let nextActive = nextTabs[0]?.id ?? "";
+        try {
+          const savedActive = localStorage.getItem(
+            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
+          );
+          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
+            nextActive = savedActive;
+          }
+        } catch {
+          /* ignore */
+        }
+        tabHistoryRef.current = [];
+        setActiveTabId(nextActive);
+        setResultsByTab({});
+        setImportDuckDbOpen(false);
+        setImportDuckDbDragging(false);
+        await refreshSchemas();
+        await refreshSchema();
+        setStatusState("ready");
+        showToast(`Loaded "${filename}".`);
+      } catch (err) {
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
   const addTab = useCallback(() => {
@@ -2036,7 +2168,8 @@ function DuckDbPlaygroundInner() {
 
   const previewEntity = useCallback(
     (name: string, kind: "table" | "view") => {
-      const sql = `SELECT * FROM ${quoteIdent(name)};`;
+      const schema = selectedSchemaRef.current;
+      const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(name)};`;
       const tab: QueryTab = {
         id: newTabId(),
         title: name,
@@ -2303,11 +2436,12 @@ function DuckDbPlaygroundInner() {
       if (!engine) return;
       if (pkColumns.length === 0 || pkRows.length === 0) return;
       const tabId = activeTabIdRef.current;
-      void engine.deleteRows(tableName, pkColumns, pkRows).then((deleted) => {
+      const schema = selectedSchemaRef.current;
+      void engine.deleteRows(tableName, pkColumns, pkRows, schema).then((deleted) => {
         showToast(
           `Deleted ${deleted} row${deleted === 1 ? "" : "s"} from "${tableName}".`,
         );
-        const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
+        const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
         void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
@@ -2332,7 +2466,8 @@ function DuckDbPlaygroundInner() {
       if (!engine) return;
       if (updates.length === 0) return;
       const tabId = activeTabIdRef.current;
-      void engine.updateRows(tableName, updates).then((count) => {
+      const schema = selectedSchemaRef.current;
+      void engine.updateRows(tableName, updates, schema).then((count) => {
         showToast(
           `Updated ${count} cell${count === 1 ? "" : "s"} in "${tableName}".`,
         );
@@ -2353,7 +2488,7 @@ function DuckDbPlaygroundInner() {
           // Pass the bare SELECT (without ORDER BY) as baseSql so that
           // subsequent column-header sorting doesn't produce a double-ORDER-BY
           // syntax error ("... ORDER BY pk ORDER BY col ASC").
-          const baseSql = `SELECT * FROM ${quoteIdent(tableName)}`;
+          const baseSql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`;
           const sql = `${baseSql}${orderBy};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName, 0, baseSql);
         }
@@ -2365,12 +2500,33 @@ function DuckDbPlaygroundInner() {
     [runSqlForTab, showToast, columnsByEntity, quoteIdent],
   );
 
+  const duplicateRowInTable = useCallback(
+    (tableName: string, columnNames: string[], values: unknown[]) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      const tabId = activeTabIdRef.current;
+      const schema = selectedSchemaRef.current;
+      void (async () => {
+        try {
+          await engine.insertRow(tableName, columnNames, values, schema);
+          showToast(`Duplicated row in "${tableName}".`);
+          const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
+          void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Duplicate failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [quoteIdent, runSqlForTab, showToast],
+  );
+
   const openAddRow = useCallback(
     async (name: string) => {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name);
+        const cols = await engine.listColumns(name, selectedSchemaRef.current);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -2397,7 +2553,7 @@ function DuckDbPlaygroundInner() {
       return v === "" ? null : v;
     });
     try {
-      await engine.insertRow(tableName, columnNames, rowValues);
+      await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
       if (addAnother) {
         const newValues: Record<string, string> = {};
@@ -2422,7 +2578,8 @@ function DuckDbPlaygroundInner() {
 
   const countEntityRows = useCallback(
     (name: string, kind: "table" | "view") => {
-      const sql = `SELECT COUNT(*) AS row_count FROM ${quoteIdent(name)};`;
+      const schema = selectedSchemaRef.current;
+      const sql = `SELECT COUNT(*) AS row_count FROM ${quoteIdent(schema)}.${quoteIdent(name)};`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Count: ${name}`,
@@ -2443,7 +2600,7 @@ function DuckDbPlaygroundInner() {
   const viewDDL = useCallback(
     async (name: string) => {
       try {
-        const ddl = await engineRef.current?.getDDL(name);
+        const ddl = await engineRef.current?.getDDL(name, selectedSchemaRef.current);
         if (!ddl?.trim()) {
           showToast(`No DDL found for "${name}".`, "warn");
           return;
@@ -2462,7 +2619,9 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       // Display SQL is for the editor tab only — actual execution uses
       // parameterized execParams below to prevent injection.
-      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = 'main'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
+      const schema = selectedSchemaRef.current;
+      const safeSch = schema.replace(/'/g, "''");
+      const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = '${safeSch}'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
         id: newTabId(),
         title: `Structure: ${name}`,
@@ -2473,9 +2632,9 @@ function DuckDbPlaygroundInner() {
       setActiveTabId(tab.id);
       if (!engine) return;
       // Run via parameterized query to avoid any injection risk.
-      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'main' AND table_name = ? ORDER BY ordinal_position`;
+      const paramSql = `SELECT column_name AS name, data_type AS type, is_nullable, column_default AS default FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`;
       try {
-        const sets = await engine.execParams(paramSql, [name]);
+        const sets = await engine.execParams(paramSql, [schema, name]);
         setResultsByTab((prev) => ({
           ...prev,
           [tab.id]: {
@@ -2504,7 +2663,7 @@ function DuckDbPlaygroundInner() {
     if (!target) return;
     setPendingDropEntity(null);
     try {
-      await engineRef.current?.dropEntity(target.name, target.kind);
+      await engineRef.current?.dropEntity(target.name, target.kind, selectedSchemaRef.current);
       await refreshSchema();
       showToast(`Dropped ${target.kind} "${target.name}".`);
     } catch (err) {
@@ -2524,7 +2683,7 @@ function DuckDbPlaygroundInner() {
     if (!name) return;
     setPendingTruncate(null);
     try {
-      await engineRef.current?.truncateTable(name);
+      await engineRef.current?.truncateTable(name, selectedSchemaRef.current);
       showToast(`Truncated table "${name}".`);
     } catch (err) {
       showToast(
@@ -2690,10 +2849,11 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
+        const schema = selectedSchemaRef.current;
         const [cols, fks, constraints] = await Promise.all([
-          engine.listColumns(name),
-          engine.listForeignKeys(name),
-          engine.getColumnConstraintInfo(name),
+          engine.listColumns(name, schema),
+          engine.listForeignKeys(name, schema),
+          engine.getColumnConstraintInfo(name, schema),
         ]);
         const fkByCol = new Map<string, ForeignKeyInfo>();
         for (const fk of fks) fkByCol.set(fk.from, fk);
@@ -2883,6 +3043,27 @@ function DuckDbPlaygroundInner() {
 
   // ─── Export database helpers ──────────────────────────────────────────
 
+  const exportDuckDbBinary = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine || tables.length === 0) return;
+    try {
+      const bytes = await engine.exportAsBinary();
+      const baseName =
+        displayFilename.replace(/\.[^.]+$/, "") || "database";
+      const filename = `${baseName}.duckdb`;
+      triggerDownload(
+        new Blob([bytes], { type: "application/octet-stream" }),
+        filename,
+      );
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      showToast(
+        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [tables, displayFilename, showToast]);
+
   const exportDuckDbDatabase = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
@@ -2891,13 +3072,14 @@ function DuckDbPlaygroundInner() {
         `-- DuckDB dump`,
         `-- Generated by Dataslope\n`,
       ];
+      const schema = selectedSchemaRef.current;
       for (const tableName of tables) {
-        const ddl = await engine.getDDL(tableName);
+        const ddl = await engine.getDDL(tableName, schema);
         if (ddl) {
           lines.push(`${ddl};\n`);
         }
         const sets = await engine.exec(
-          `SELECT * FROM ${quoteIdent(tableName)}`,
+          `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`,
         );
         const set = sets?.[0];
         if (!set) continue;
@@ -2944,9 +3126,10 @@ function DuckDbPlaygroundInner() {
       const mod = await initXlsxWasm();
       const workbook = new mod.Workbook();
       let sheetCount = 0;
+      const xlsxSchema = selectedSchemaRef.current;
       for (const tableName of tables) {
         const sets = await engine.exec(
-          `SELECT * FROM ${quoteIdent(tableName)}`,
+          `SELECT * FROM ${quoteIdent(xlsxSchema)}.${quoteIdent(tableName)}`,
         );
         const set = sets?.[0];
         if (!set) continue;
@@ -3308,6 +3491,36 @@ function DuckDbPlaygroundInner() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={6} align="start">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                    <div className="import-section-label">Database</div>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportSqlDumpOpen(true)}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          from SQL dump
+                          <span className="ext-badge">.sql</span>
+                        </div>
+                        <div className="ex-desc">
+                          Load database from a SQL dump file
+                        </div>
+                      </div>
+                    </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportDuckDbOpen(true)}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          from DuckDB
+                          <span className="ext-badge">.duckdb</span>
+                        </div>
+                        <div className="ex-desc">
+                          Load database from a DuckDB file
+                        </div>
+                      </div>
+                    </Menu.Item>
+                    <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
                       onClick={() => {
@@ -3417,6 +3630,20 @@ function DuckDbPlaygroundInner() {
                       </div>
                       <Menu.Item
                         className="example-item export-item"
+                        onClick={() => void exportDuckDbBinary()}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            DuckDB Binary
+                            <span className="ext-badge">.duckdb</span>
+                          </div>
+                          <div className="ex-desc">
+                            Native DuckDB file format
+                          </div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
                         onClick={() => void exportDuckDbDatabase()}
                       >
                         <div className="export-item-text">
@@ -3517,6 +3744,40 @@ function DuckDbPlaygroundInner() {
               <span>Reset query tabs for {activeSample.label}</span>
             </button>
           }
+          extraTabs={[
+            {
+              value: "database",
+              trigger: (
+                <>
+                  <Database size={14} aria-hidden="true" />
+                  <span className="settings-tab-label">Database</span>
+                </>
+              ),
+              panel: (
+                <div className="settings-panel-pane">
+                  <div className="settings-body">
+                    <div className="setting-row">
+                      <label className="setting-switch-row">
+                        <span className="setting-switch-label">
+                          <Layers size={14} aria-hidden="true" />
+                          <span>Show system schemas</span>
+                        </span>
+                        <Switch.Root
+                          checked={showSystemSchemas}
+                          onCheckedChange={(checked) => {
+                            setShowSystemSchemasState(checked);
+                          }}
+                          className="bui-switch"
+                        >
+                          <Switch.Thumb className="bui-switch-thumb" />
+                        </Switch.Root>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
         />
 
         <Dialog.Root
@@ -3654,6 +3915,144 @@ function DuckDbPlaygroundInner() {
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
                 </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Import DuckDB binary dialog ── */}
+        <Dialog.Root
+          open={importDuckDbOpen}
+          onOpenChange={(next) => {
+            if (!next) {
+              setImportDuckDbOpen(false);
+              setImportDuckDbDragging(false);
+            }
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-import-popup">
+              <Dialog.Title className="confirm-title">
+                Import DuckDB File
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Open a local <code>.duckdb</code> file as a new in-memory
+                database.
+              </Dialog.Description>
+              <div className="sql-import-warning">
+                <TriangleAlert
+                  size={14}
+                  className="sql-import-warning-icon"
+                  aria-hidden="true"
+                />
+                <span>
+                  This will replace the current database with the contents of
+                  the file. Your file will <strong>not</strong> be uploaded or
+                  persisted — it is only loaded into browser memory and will be
+                  gone on reload.
+                </span>
+              </div>
+              <div
+                className={`sql-dropzone${importDuckDbDragging ? " dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setImportDuckDbDragging(true);
+                }}
+                onDragLeave={() => setImportDuckDbDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setImportDuckDbDragging(false);
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const buf = ev.target?.result;
+                    if (!(buf instanceof ArrayBuffer)) return;
+                    void performImportDuckDb(new Uint8Array(buf), file.name);
+                  };
+                  reader.readAsArrayBuffer(file);
+                }}
+              >
+                <Upload
+                  size={28}
+                  className="sql-dropzone-icon"
+                  aria-hidden="true"
+                />
+                <span>Drop a DuckDB file here</span>
+                <span className="sql-dropzone-hint">
+                  or click to browse — .duckdb
+                </span>
+                <input
+                  type="file"
+                  accept=".duckdb"
+                  aria-label="Choose DuckDB file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const buf = ev.target?.result;
+                      if (!(buf instanceof ArrayBuffer)) return;
+                      void performImportDuckDb(new Uint8Array(buf), file.name);
+                    };
+                    reader.readAsArrayBuffer(file);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              <div className="confirm-actions" style={{ marginTop: 16 }}>
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        {/* ── Create Schema dialog ── */}
+        <Dialog.Root
+          open={createSchemaDialogOpen}
+          onOpenChange={(next) => {
+            if (!next) setCreateSchemaDialogOpen(false);
+          }}
+        >
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
+              <Dialog.Title className="confirm-title">
+                Create Schema
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Enter a name for the new DuckDB schema.
+              </Dialog.Description>
+              <div className="sql-rename-db-form">
+                <input
+                  className="sql-rename-input"
+                  value={createSchemaName}
+                  onChange={(e) => setCreateSchemaName(e.target.value)}
+                  placeholder="schema name"
+                  aria-label="Schema name"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && createSchemaName.trim()) {
+                      void submitCreateSchema();
+                    }
+                  }}
+                />
+              </div>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn-primary"
+                  disabled={!createSchemaName.trim() || createSchemaSubmitting}
+                  onClick={() => void submitCreateSchema()}
+                >
+                  Create
+                </button>
               </div>
             </Dialog.Popup>
           </Dialog.Portal>
@@ -4664,6 +5063,85 @@ function DuckDbPlaygroundInner() {
                 </Select.Portal>
               </Select.Root>
             </div>
+            <div className="sql-schema-selector-wrap">
+              <div className="sql-db-selector-row">
+                <Select.Root
+                  value={selectedSchema}
+                  onValueChange={(value) => void handleSchemaChange(String(value))}
+                >
+                  <Select.Trigger
+                    className="sql-db-selector sql-schema-selector"
+                    aria-label="Select schema"
+                  >
+                    <Layers
+                      size={14}
+                      className="sql-db-selector-icon"
+                      aria-hidden="true"
+                    />
+                    <Select.Value className="sql-db-selector-value">
+                      {selectedSchema}
+                    </Select.Value>
+                    <Select.Icon className="playground-switcher-icon">
+                      <ChevronDown size={12} />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner
+                      className="sql-db-positioner"
+                      sideOffset={6}
+                      alignItemWithTrigger={false}
+                    >
+                      <Select.Popup className="bui-select-popup sql-db-popup">
+                        {(() => {
+                          const userSchemas = schemas.filter((s) => !s.startsWith("pg_") && s !== "information_schema");
+                          const systemSchemas = schemas.filter((s) => s.startsWith("pg_") || s === "information_schema");
+                          const schemaItem = (schema: string) => (
+                            <Select.Item
+                              key={schema}
+                              value={schema}
+                              className="bui-select-item sql-db-item"
+                            >
+                              <span className="bui-select-item-icon" aria-hidden="true">
+                                <Layers size={14} />
+                              </span>
+                              <span className="sql-db-item-text">
+                                <Select.ItemText>{schema}</Select.ItemText>
+                              </span>
+                            </Select.Item>
+                          );
+                          return (
+                            <>
+                              <div className="sql-db-popup-group-label">Schemas</div>
+                              {userSchemas.map(schemaItem)}
+                              {systemSchemas.length > 0 && (
+                                <>
+                                  <div role="separator" aria-orientation="horizontal" className="sql-db-popup-sep" />
+                                  <div className="sql-db-popup-group-label">System Catalogs</div>
+                                  {systemSchemas.map(schemaItem)}
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <button
+                  type="button"
+                  className="sql-schema-create-btn"
+                  title="Create schema"
+                  aria-label="Create schema"
+                  disabled={!loaded}
+                  onClick={() => {
+                    setCreateSchemaName("");
+                    setCreateSchemaDialogOpen(true);
+                  }}
+                >
+                  <Plus size={14} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
             <div className="sql-tree">
               <SchemaSection
                 label="TABLES"
@@ -5184,6 +5662,7 @@ function DuckDbPlaygroundInner() {
                 sourceTable={result?.sourceTable}
                 onDeleteRows={deleteRowsFromTable}
                 onUpdateRows={updateRowsInTable}
+                onDuplicateRow={duplicateRowInTable}
                 globalPageSize={globalPageSize}
                 onSetGlobalPageSize={setGlobalPageSize}
                 onLoadPage={handleLoadPage}
