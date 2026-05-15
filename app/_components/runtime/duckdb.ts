@@ -749,27 +749,27 @@ export async function createDuckDbEngine(
     },
 
     async listSchemas(includeSystem = false) {
+      // Query without NOT internal — in DuckDB-WASM the default "main" schema
+      // has internal = TRUE, so the filter would silently exclude it.
       const rows = await rowsFor(
-        includeSystem
-          ? `SELECT schema_name FROM duckdb_schemas()
-             WHERE database_name = current_database()
-             ORDER BY schema_name`
-          : `SELECT schema_name FROM duckdb_schemas()
-             WHERE database_name = current_database() AND NOT internal
-             ORDER BY schema_name`,
+        `SELECT schema_name FROM duckdb_schemas()
+         WHERE database_name = current_database()
+         ORDER BY schema_name`,
       );
       const found = rows.map((r) => String(r[0]));
+      // Virtual schemas (information_schema, pg_catalog) have no catalog row
+      // in the WASM in-memory build — add them explicitly.
+      const virtualSystemSchemas = ["information_schema", "pg_catalog"];
       if (includeSystem) {
-        // duckdb_schemas() in the WASM in-memory build never registers the
-        // virtual schemas (information_schema, pg_catalog) — they are
-        // synthesised on demand and have no catalog row. Add them explicitly
-        // so the schema selector can show them when the toggle is on.
-        for (const sys of ["information_schema", "pg_catalog"]) {
+        for (const sys of virtualSystemSchemas) {
           if (!found.includes(sys)) found.push(sys);
         }
         found.sort();
+        return found;
       }
-      return found;
+      // When hiding system schemas, exclude known system schema names.
+      const systemSet = new Set(virtualSystemSchemas);
+      return found.filter((s) => !systemSet.has(s) && !s.startsWith("pg_"));
     },
 
     async createSchema(name) {
@@ -786,8 +786,13 @@ export async function createDuckDbEngine(
 
     async listViews(schema = "main") {
       const safe = schema.replace(/'/g, "''");
+      // System schemas (information_schema, pg_catalog) only contain views
+      // that are marked internal = TRUE. Drop the NOT internal filter so
+      // they appear in the sidebar when the user selects one of those schemas.
+      const isSystemSchema =
+        schema === "information_schema" || schema.startsWith("pg_");
       const rows = await rowsFor(
-        `SELECT view_name FROM duckdb_views() WHERE schema_name = '${safe}' AND NOT internal ORDER BY view_name`,
+        `SELECT view_name FROM duckdb_views() WHERE schema_name = '${safe}'${isSystemSchema ? "" : " AND NOT internal"} ORDER BY view_name`,
       );
       return rows.map((r) => String(r[0]));
     },

@@ -5111,9 +5111,7 @@ function DuckDbPlaygroundInner() {
                           );
                           return (
                             <>
-                              {userSchemas.length > 0 && (
-                                <div className="sql-db-popup-group-label">Schemas</div>
-                              )}
+                              <div className="sql-db-popup-group-label">Schemas</div>
                               {userSchemas.map(schemaItem)}
                               {systemSchemas.length > 0 && (
                                 <>
