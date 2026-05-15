@@ -173,6 +173,25 @@ function toSqlValue(value: unknown): SqlValue {
   if (value instanceof Date) return value.toISOString();
   if (typeof value === "boolean") return value ? 1 : 0;
   if (typeof value === "number" || typeof value === "string") return value;
+  // Apache Arrow returns DECIMAL values as `Decimal` instances whose
+  // `toString()` produces the canonical numeric string (e.g. "950.00").
+  // Without this branch they fall through to JSON.stringify, which wraps
+  // the result in literal `"` characters — those then leak into the
+  // result table and break re-inserts (e.g. duplicate row → DuckDB sees
+  // '"950"' and can't coerce it to DECIMAL).
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    const proto = Object.getPrototypeOf(value) as { toString?: () => string } | null;
+    if (
+      proto &&
+      proto.toString &&
+      proto.toString !== Object.prototype.toString
+    ) {
+      const s = String(value);
+      if (/^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(s)) {
+        return s;
+      }
+    }
+  }
   // Arrow vector elements for STRUCT/LIST/MAP arrive as plain JS
   // objects/arrays; serialize them so the table renderer can show them
   // as text rather than `[object Object]`.
@@ -435,6 +454,13 @@ export interface DuckDbEngine {
   /** Register a file's bytes with DuckDB's virtual filesystem so it
    *  can be queried via `read_csv_auto`, `read_parquet`, `read_json_auto`, … */
   registerFileBuffer: (name: string, buffer: Uint8Array) => Promise<void>;
+  /** Read the bytes of a previously registered virtual-filesystem file
+   *  (e.g. so the user can download it). Returns null if the file isn't
+   *  registered or the WASM build lacks `copyFileToBuffer`. */
+  readFileBuffer: (name: string) => Promise<Uint8Array | null>;
+  /** Remove a file from DuckDB's virtual filesystem. Safe to call on a
+   *  name that wasn't registered. */
+  dropFile: (name: string) => Promise<void>;
   /** Export the entire in-memory database as a native DuckDB binary file
    *  by ATTACHing a temporary virtual-filesystem file, copying all data
    *  via `COPY FROM DATABASE`, then reading the bytes back out.
@@ -1203,6 +1229,25 @@ export async function createDuckDbEngine(
     async registerFileBuffer(name, buffer) {
       const { db } = await getDuckDbInstance();
       await db.registerFileBuffer(name, buffer);
+    },
+
+    async readFileBuffer(name) {
+      const { db } = await getDuckDbInstance();
+      if (!db.copyFileToBuffer) return null;
+      try {
+        return await db.copyFileToBuffer(name);
+      } catch {
+        return null;
+      }
+    },
+
+    async dropFile(name) {
+      const { db } = await getDuckDbInstance();
+      try {
+        await db.dropFile?.(name);
+      } catch {
+        /* unregistered already — ignore */
+      }
     },
 
     async exportAsBinary() {

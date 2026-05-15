@@ -86,6 +86,7 @@ import {
   Upload,
   Wand2,
   X,
+  FolderTree,
 } from "lucide-react";
 import { format as sqlFormat } from "sql-formatter";
 import { FaInfo } from "react-icons/fa";
@@ -144,6 +145,7 @@ import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
+import { FilesPanel, type VirtualFile } from "./FilesPanel";
 import {
   exportResultToCsv,
   exportResultToJson,
@@ -1081,6 +1083,13 @@ function DuckDbPlaygroundInner() {
   const selectedSchemaRef = useRef("main");
   const showSystemSchemasRef = useRef(true);
 
+  // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
+  const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
+  const [virtualFiles, setVirtualFiles] = useState<VirtualFile[]>([]);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set(),
+  );
+
   // ─── Query history ────────────────────────────────────────────────────
   const {
     history: queryHistory,
@@ -1907,6 +1916,11 @@ function DuckDbPlaygroundInner() {
       setForeignKeysByEntity({});
       setRowCountByTable({});
       setExpandedEntities(new Set());
+      // Reset the in-memory file tree — switching databases reinitialises
+      // DuckDB's virtual filesystem too, so any previously registered
+      // user files (CSV/JSON/Parquet) are no longer queryable anyway.
+      setVirtualFiles([]);
+      setExpandedFolders(new Set());
       try {
         const sample =
           nextId === DUCKDB_BLANK_DATABASE.id
@@ -2004,6 +2018,181 @@ function DuckDbPlaygroundInner() {
       setCreateSchemaSubmitting(false);
     }
   }, [createSchemaName, handleSchemaChange, refreshSchemas, showToast]);
+
+  // ─── Virtual filesystem (Files panel) ─────────────────────────────────
+  const registerVirtualFile = useCallback(
+    async (path: string, bytes: Uint8Array) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      await engine.registerFileBuffer(path, bytes);
+      setVirtualFiles((prev) => {
+        const filtered = prev.filter((f) => f.path !== path);
+        return [...filtered, { path, size: bytes.length, isFolder: false }];
+      });
+      // Auto-expand all ancestor folders so the new file is visible.
+      const segments = path.split("/").filter(Boolean);
+      if (segments.length > 1) {
+        setExpandedFolders((prev) => {
+          const next = new Set(prev);
+          let cur = "";
+          for (let i = 0; i < segments.length - 1; i++) {
+            cur = cur ? `${cur}/${segments[i]}` : segments[i];
+            next.add(cur);
+          }
+          return next;
+        });
+      }
+    },
+    [],
+  );
+
+  const handleFilesUpload = useCallback(
+    (fileList: FileList, parentPath: string) => {
+      void (async () => {
+        for (const file of Array.from(fileList)) {
+          try {
+            const buf = await file.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            const path = parentPath ? `${parentPath}/${file.name}` : file.name;
+            await registerVirtualFile(path, bytes);
+            showToast(`Uploaded "${path}".`);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            showToast(`Failed to upload "${file.name}": ${msg}`, "warn");
+          }
+        }
+      })();
+    },
+    [registerVirtualFile, showToast],
+  );
+
+  const handleFilesDownload = useCallback(
+    (path: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        try {
+          const bytes = await engine.readFileBuffer(path);
+          if (!bytes) {
+            showToast(`Could not read "${path}".`, "warn");
+            return;
+          }
+          const blob = new Blob([new Uint8Array(bytes)]);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = path.split("/").pop() ?? path;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Download failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesDelete = useCallback(
+    (path: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        // Determine which entries are removed (the path itself plus any
+        // children if it's a folder) so we can drop them all from the
+        // virtual filesystem.
+        const prefix = `${path}/`;
+        const toRemove = virtualFiles.filter(
+          (f) => f.path === path || f.path.startsWith(prefix),
+        );
+        for (const entry of toRemove) {
+          if (!entry.isFolder) {
+            await engine.dropFile(entry.path);
+          }
+        }
+        setVirtualFiles((prev) =>
+          prev.filter(
+            (f) => f.path !== path && !f.path.startsWith(prefix),
+          ),
+        );
+        showToast(`Deleted "${path}".`);
+      })();
+    },
+    [virtualFiles, showToast],
+  );
+
+  const handleFilesRename = useCallback(
+    (oldPath: string, newPath: string) => {
+      void (async () => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        const oldPrefix = `${oldPath}/`;
+        const newPrefix = `${newPath}/`;
+        try {
+          // Snapshot the entries we're renaming up-front so the iteration
+          // isn't affected by the state update below.
+          const affected = virtualFiles.filter(
+            (f) => f.path === oldPath || f.path.startsWith(oldPrefix),
+          );
+          for (const entry of affected) {
+            if (entry.isFolder) continue;
+            const bytes = await engine.readFileBuffer(entry.path);
+            if (!bytes) continue;
+            const dest = entry.path === oldPath
+              ? newPath
+              : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
+            await engine.dropFile(entry.path);
+            await engine.registerFileBuffer(dest, bytes);
+          }
+          setVirtualFiles((prev) =>
+            prev.map((f) => {
+              if (f.path === oldPath) return { ...f, path: newPath };
+              if (f.path.startsWith(oldPrefix)) {
+                return {
+                  ...f,
+                  path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+                };
+              }
+              return f;
+            }),
+          );
+          showToast(`Renamed to "${newPath}".`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Rename failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [virtualFiles, showToast],
+  );
+
+  const handleFilesCreateFolder = useCallback(
+    (parentPath: string, name: string) => {
+      const path = parentPath ? `${parentPath}/${name}` : name;
+      setVirtualFiles((prev) => {
+        if (prev.some((f) => f.path === path)) return prev;
+        return [...prev, { path, size: 0, isFolder: true }];
+      });
+      setExpandedFolders((prev) => {
+        const next = new Set(prev);
+        next.add(path);
+        if (parentPath) next.add(parentPath);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const toggleFilesFolder = useCallback((path: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }, []);
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
@@ -3225,6 +3414,10 @@ function DuckDbPlaygroundInner() {
             targetTable: tables[0] ?? "",
             colCompare: null,
           });
+          // Register the raw bytes with DuckDB's virtual filesystem so
+          // queries like `SELECT * FROM read_csv('file.csv')` work and
+          // surface the file in the Files panel.
+          void registerVirtualFile(file.name, new TextEncoder().encode(text));
         } catch (err) {
           showToast(
             `Could not parse CSV: ${err instanceof Error ? err.message : String(err)}`,
@@ -3234,7 +3427,7 @@ function DuckDbPlaygroundInner() {
       };
       reader.readAsText(file);
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const handleJsonFile = useCallback(
@@ -3286,6 +3479,10 @@ function DuckDbPlaygroundInner() {
             targetTable: tables[0] ?? "",
             colCompare: null,
           });
+          void registerVirtualFile(
+            file.name,
+            new TextEncoder().encode(text),
+          );
         } catch (err) {
           showToast(
             `Could not parse JSON: ${err instanceof Error ? err.message : String(err)}`,
@@ -3295,7 +3492,7 @@ function DuckDbPlaygroundInner() {
       };
       reader.readAsText(file);
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const handleParquetFile = useCallback(
@@ -3315,6 +3512,8 @@ function DuckDbPlaygroundInner() {
           targetTable: tables[0] ?? "",
           colCompare: null,
         });
+        const buf = await file.arrayBuffer();
+        await registerVirtualFile(file.name, new Uint8Array(buf));
       } catch (err) {
         showToast(
           `Parquet import failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -3322,7 +3521,7 @@ function DuckDbPlaygroundInner() {
         );
       }
     },
-    [showToast, tables],
+    [showToast, tables, registerVirtualFile],
   );
 
   const submitImport = useCallback(
@@ -5209,6 +5408,20 @@ function DuckDbPlaygroundInner() {
                   <DataslopeRunOverlay running />
                 </div>
               )}
+              {sidebarView === "files" && (
+                <FilesPanel
+                  files={virtualFiles}
+                  expandedFolders={expandedFolders}
+                  onToggleFolder={toggleFilesFolder}
+                  onUpload={handleFilesUpload}
+                  onDownload={handleFilesDownload}
+                  onDelete={handleFilesDelete}
+                  onRename={handleFilesRename}
+                  onCreateFolder={handleFilesCreateFolder}
+                />
+              )}
+              {sidebarView === "schema" && (
+              <>
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
@@ -5329,8 +5542,26 @@ function DuckDbPlaygroundInner() {
                 empty group. `engine.listTriggers()` always resolves
                 to `[]` for the same reason.
               */}
+              </>
+              )}
             </div>
             <div className="sql-sidebar-footer">
+              <button
+                type="button"
+                className={`sql-sidebar-btn${sidebarView === "files" ? " sql-sidebar-btn-active" : ""}`}
+                onClick={() =>
+                  setSidebarView((v) => (v === "files" ? "schema" : "files"))
+                }
+                title={
+                  sidebarView === "files"
+                    ? "Show database schema"
+                    : "Show virtual filesystem"
+                }
+                aria-label="Toggle Files panel"
+              >
+                <FolderTree size={13} aria-hidden="true" />
+                <span>Files</span>
+              </button>
               <button
                 type="button"
                 className="sql-sidebar-btn"
