@@ -23,7 +23,9 @@ export function findSqlSample<T extends SqlSampleCatalogEntry>(
   if (blankSample && id === blankSample.id) return blankSample;
   const sample = samples.find((entry) => entry.id === id) ?? samples[0];
   if (!sample) {
-    throw new Error("SQL sample catalog must contain at least one sample.");
+    throw new Error(
+      "SQL sample catalog must contain at least one sample. Check the samples array passed to findSqlSample.",
+    );
   }
   return sample;
 }

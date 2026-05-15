@@ -56,13 +56,32 @@ export function useSqlPlaygroundSettingsHydration(
   fallback: SqlPlaygroundSettingsState,
   setters: SqlPlaygroundSettingsSetters,
 ) {
+  const { fontSize, wordWrap, clearBeforeRun, editorTheme } = fallback;
+  const { setFontSize, setWordWrap, setClearBeforeRun, setEditorTheme } =
+    setters;
+
   useEffect(() => {
-    const hydrated = hydrateSqlPlaygroundSettings(storagePrefix, fallback);
-    setters.setFontSize(hydrated.fontSize);
-    setters.setWordWrap(hydrated.wordWrap);
-    setters.setClearBeforeRun(hydrated.clearBeforeRun);
-    setters.setEditorTheme(hydrated.editorTheme);
+    const hydrated = hydrateSqlPlaygroundSettings(storagePrefix, {
+      fontSize,
+      wordWrap,
+      clearBeforeRun,
+      editorTheme,
+    });
+    setFontSize(hydrated.fontSize);
+    setWordWrap(hydrated.wordWrap);
+    setClearBeforeRun(hydrated.clearBeforeRun);
+    setEditorTheme(hydrated.editorTheme);
     applyThemePalette(hydrated.editorTheme);
     applyMode(hydrated.editorTheme);
-  }, [fallback, setters, storagePrefix]);
+  }, [
+    clearBeforeRun,
+    editorTheme,
+    fontSize,
+    setClearBeforeRun,
+    setEditorTheme,
+    setFontSize,
+    setWordWrap,
+    storagePrefix,
+    wordWrap,
+  ]);
 }
