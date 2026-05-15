@@ -1,14 +1,14 @@
 "use client";
 
-import type { QueryTabSeed } from "./sqliteSamples";
+import {
+  createBlankSqlSample,
+  findSqlSample,
+  type QueryTabSeed,
+  type SqlSampleCatalogEntry,
+} from "./sqlSamples";
 
-export interface PostgresSampleDatabase {
-  id: string;
-  label: string;
-  filename: string;
-  description: string;
+export interface PostgresSampleDatabase extends SqlSampleCatalogEntry {
   sql: string;
-  defaultTabs: QueryTabSeed[];
 }
 
 const CREDIT_CARD_SQL = `
@@ -726,19 +726,14 @@ export const POSTGRES_SAMPLE_DATABASES: PostgresSampleDatabase[] = [
   },
 ];
 
-export const POSTGRES_BLANK_DATABASE: PostgresSampleDatabase = {
+export const POSTGRES_BLANK_DATABASE = createBlankSqlSample<PostgresSampleDatabase>({
   id: "blank",
   label: "New Database",
   filename: "untitled.pg",
   description: "Empty database — start from scratch.",
   sql: "",
-  defaultTabs: [{ title: "Query 1", code: "" }],
-};
+});
 
 export function findPostgresSampleDatabase(id: string): PostgresSampleDatabase {
-  if (id === POSTGRES_BLANK_DATABASE.id) return POSTGRES_BLANK_DATABASE;
-  return (
-    POSTGRES_SAMPLE_DATABASES.find((sample) => sample.id === id) ??
-    POSTGRES_SAMPLE_DATABASES[0]
-  );
+  return findSqlSample(POSTGRES_SAMPLE_DATABASES, POSTGRES_BLANK_DATABASE, id);
 }

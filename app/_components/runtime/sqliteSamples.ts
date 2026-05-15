@@ -5,15 +5,11 @@
 // loading a binary `.sqlite` file) is a one-entry change.
 
 import type { Database } from "sql.js";
+import { findSqlSample, type QueryTabSeed, type SqlSampleCatalogEntry } from "./sqlSamples";
 
-export interface QueryTabSeed {
-  /** Human-readable title shown in the tab strip. */
-  title: string;
-  /** Initial SQL contents of the tab. */
-  code: string;
-}
+export type { QueryTabSeed } from "./sqlSamples";
 
-export interface SqliteSampleDatabase {
+export interface SqliteSampleDatabase extends SqlSampleCatalogEntry {
   /** Stable id used in localStorage keys and the selector value. */
   id: string;
   /** Human-readable name shown in the selector trigger and dropdown. */
@@ -882,8 +878,5 @@ export const SQLITE_SAMPLE_DATABASES: SqliteSampleDatabase[] = [
  *  state even after the user deletes a sample we shipped in a previous
  *  release. */
 export function findSampleDatabase(id: string): SqliteSampleDatabase {
-  return (
-    SQLITE_SAMPLE_DATABASES.find((s) => s.id === id) ??
-    SQLITE_SAMPLE_DATABASES[0]
-  );
+  return findSqlSample(SQLITE_SAMPLE_DATABASES, null, id);
 }
