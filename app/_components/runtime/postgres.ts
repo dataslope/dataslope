@@ -555,6 +555,19 @@ export async function createPostgresEngine(
       const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
+      // Columns whose CREATE TABLE used SERIAL/BIGSERIAL/SMALLSERIAL —
+      // Postgres auto-creates sequences for those, named
+      // `<tableName>_<columnName>_seq`. After we rename the table from
+      // tmpName to finalName, the sequences keep the tmpName prefix and
+      // the column DEFAULTs still reference them by name. Collect the
+      // pairs so we can rename the sequences too, leaving the final
+      // schema clean of __tmp_rebuild artifacts.
+      const serialRenames = patchedColumns
+        .filter((col) => col.autoIncrement && !col.generated)
+        .map((col) => ({
+          oldSeq: `${tmpName}_${col.name}_seq`,
+          newSeq: `${finalName}_${col.name}_seq`,
+        }));
       try {
         await db.exec("BEGIN");
         await db.exec(createSql);
@@ -565,6 +578,12 @@ export async function createPostgresEngine(
         }
         await db.exec(`DROP TABLE ${schemaPrefix}${quoteIdent(spec.originalName)} CASCADE`);
         await db.exec(`ALTER TABLE ${schemaPrefix}${quoteIdent(tmpName)} RENAME TO ${quoteIdent(finalName)}`);
+        for (const { oldSeq, newSeq } of serialRenames) {
+          if (oldSeq === newSeq) continue;
+          await db.exec(
+            `ALTER SEQUENCE ${schemaPrefix}${quoteIdent(oldSeq)} RENAME TO ${quoteIdent(newSeq)}`,
+          );
+        }
         await db.exec("COMMIT");
       } catch (err) {
         try {
