@@ -1956,6 +1956,11 @@ function DuckDbPlaygroundInner() {
 
   const handleSchemaChange = useCallback(
     async (schema: string) => {
+      // Base UI Select fires onValueChange(null) when no item matches the
+      // controlled value (e.g. while the schema list is empty during a
+      // fetch). Ignore those spurious calls to prevent "null" poisoning
+      // selectedSchemaRef and the subsequent SQL queries.
+      if (!schema || schema === "null") return;
       selectedSchemaRef.current = schema;
       setSelectedSchema(schema);
       await refreshSchema();
