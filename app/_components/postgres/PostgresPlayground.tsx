@@ -2479,7 +2479,9 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name, selectedSchemaRef.current);
+        const allCols = await engine.listColumns(name, selectedSchemaRef.current);
+        // Generated columns are computed server-side — never accept input.
+        const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -2500,11 +2502,17 @@ function PostgresPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !addRowDialog) return;
     const { tableName, columns, values, addAnother } = addRowDialog;
-    const columnNames = columns.map((c) => c.name);
-    const rowValues = columns.map((c) => {
-      const v = values[c.name] ?? "";
-      return v === "" ? null : v;
-    });
+    // For a blank input on a column with a server-side default, omit the
+    // column so the default (nextval, now(), explicit DEFAULT) applies.
+    // Otherwise blank means NULL.
+    const columnNames: string[] = [];
+    const rowValues: unknown[] = [];
+    for (const c of columns) {
+      const raw = values[c.name] ?? "";
+      if (raw === "" && c.defaultValue !== null) continue;
+      columnNames.push(c.name);
+      rowValues.push(raw === "" ? null : raw);
+    }
     try {
       await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
@@ -3885,62 +3893,6 @@ function PostgresPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        {/* ── Create schema dialog ── */}
-        <Dialog.Root
-          open={createSchemaDialogOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setCreateSchemaDialogOpen(false);
-              setCreateSchemaName("");
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup">
-              <Dialog.Title className="confirm-title">
-                Create Schema
-              </Dialog.Title>
-              <input
-                type="text"
-                className="sql-rename-input"
-                placeholder="Schema name"
-                value={createSchemaName}
-                onChange={(e) => setCreateSchemaName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") void handleCreateSchema();
-                }}
-                autoFocus
-              />
-              {(() => {
-                const errors = validateSchemaName(createSchemaName, schemas);
-                return errors.length > 0 && createSchemaName.trim() !== "" ? (
-                  <div className="sql-schema-create-error">
-                    {errors[0]}
-                  </div>
-                ) : null;
-              })()}
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={
-                    createSchemaSubmitting ||
-                    validateSchemaName(createSchemaName, schemas).length > 0
-                  }
-                  onClick={() => void handleCreateSchema()}
-                >
-                  Create
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
-
-
         <AlertDialog.Root
           open={pendingDbId !== null}
           onOpenChange={(next) => {
@@ -4425,37 +4377,45 @@ function PostgresPlaygroundInner() {
               {addRowDialog && (
                 <div className="sql-modify-body">
                   <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => (
-                      <label key={c.name} className="sql-add-row-field">
-                        <span className="sql-add-row-field-label">
-                          <span className="sql-add-row-field-name">
-                            {c.name}
+                    {addRowDialog.columns.map((c) => {
+                      const hasDefault = c.defaultValue !== null;
+                      const placeholder = hasDefault
+                        ? `auto (${c.defaultValue})`
+                        : c.notNull
+                          ? "required"
+                          : "NULL if empty";
+                      return (
+                        <label key={c.name} className="sql-add-row-field">
+                          <span className="sql-add-row-field-label">
+                            <span className="sql-add-row-field-name">
+                              {c.name}
+                            </span>
+                            <span className="sql-add-row-field-type">
+                              {c.type || "—"}
+                            </span>
                           </span>
-                          <span className="sql-add-row-field-type">
-                            {c.type || "—"}
-                          </span>
-                        </span>
-                        <input
-                          className="sql-rename-input"
-                          value={addRowDialog.values[c.name] ?? ""}
-                          onChange={(e) =>
-                            setAddRowDialog((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    values: {
-                                      ...prev.values,
-                                      [c.name]: e.target.value,
-                                    },
-                                  }
-                                : null,
-                            )
-                          }
-                          placeholder={c.notNull ? "required" : "NULL if empty"}
-                          aria-label={c.name}
-                        />
-                      </label>
-                    ))}
+                          <input
+                            className="sql-rename-input"
+                            value={addRowDialog.values[c.name] ?? ""}
+                            onChange={(e) =>
+                              setAddRowDialog((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                            placeholder={placeholder}
+                            aria-label={c.name}
+                          />
+                        </label>
+                      );
+                    })}
                   </div>
                   <label className="sql-add-row-another">
                     <input
@@ -4979,18 +4939,87 @@ function PostgresPlaygroundInner() {
                     </Select.Positioner>
                   </Select.Portal>
                 </Select.Root>
-                <button
-                  type="button"
-                  className="sql-schema-create-btn"
-                  title="Create schema"
-                  aria-label="Create schema"
-                  onClick={() => {
-                    setCreateSchemaName("");
-                    setCreateSchemaDialogOpen(true);
+                <Popover.Root
+                  open={createSchemaDialogOpen}
+                  onOpenChange={(next) => {
+                    setCreateSchemaDialogOpen(next);
+                    if (!next) setCreateSchemaName("");
                   }}
                 >
-                  <Plus size={14} aria-hidden="true" />
-                </button>
+                  <Popover.Trigger
+                    render={
+                      <button
+                        type="button"
+                        className="sql-schema-create-btn"
+                        title="Create schema"
+                        aria-label="Create schema"
+                      >
+                        <Plus size={14} aria-hidden="true" />
+                      </button>
+                    }
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6} align="end">
+                      <Popover.Popup className="bui-popup sql-schema-create-popup">
+                        <div className="sql-schema-create-title">
+                          Create schema
+                        </div>
+                        <input
+                          type="text"
+                          className="sql-rename-input"
+                          placeholder="Schema name"
+                          value={createSchemaName}
+                          onChange={(e) => setCreateSchemaName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key !== "Enter") return;
+                            const errs = validateSchemaName(
+                              createSchemaName,
+                              schemas,
+                            );
+                            if (errs.length === 0 && createSchemaName.trim() !== "") {
+                              void handleCreateSchema();
+                            }
+                          }}
+                          autoFocus
+                        />
+                        {(() => {
+                          const errors = validateSchemaName(
+                            createSchemaName,
+                            schemas,
+                          );
+                          return errors.length > 0 &&
+                            createSchemaName.trim() !== "" ? (
+                            <div className="sql-schema-create-error">
+                              {errors[0]}
+                            </div>
+                          ) : null;
+                        })()}
+                        <div className="sql-schema-create-actions">
+                          <button
+                            type="button"
+                            className="confirm-btn confirm-btn-secondary"
+                            onClick={() => setCreateSchemaDialogOpen(false)}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            className="confirm-btn confirm-btn-primary"
+                            disabled={
+                              createSchemaSubmitting ||
+                              createSchemaName.trim() === "" ||
+                              validateSchemaName(createSchemaName, schemas)
+                                .length > 0
+                            }
+                            onClick={() => void handleCreateSchema()}
+                          >
+                            Create
+                          </button>
+                        </div>
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
               </div>
             </div>
             <div className="sql-tree">

@@ -1180,6 +1180,11 @@ export async function createDuckDbEngine(
     },
 
     async insertRow(tableName, columnNames, values, schema = "main") {
+      const qualified = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
+      if (columnNames.length === 0) {
+        await conn.query(`INSERT INTO ${qualified} DEFAULT VALUES`);
+        return;
+      }
       const cols = columnNames.map(quoteIdent).join(", ");
       const literals = values
         .map((v) => {
@@ -1190,7 +1195,7 @@ export async function createDuckDbEngine(
         })
         .join(", ");
       await conn.query(
-        `INSERT INTO ${quoteIdent(schema)}.${quoteIdent(tableName)} (${cols}) VALUES (${literals})`,
+        `INSERT INTO ${qualified} (${cols}) VALUES (${literals})`,
       );
     },
 

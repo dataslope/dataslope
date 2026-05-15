@@ -1414,8 +1414,11 @@ export function ResultTableBody({
     if (!constraintInfo || constraintInfo.length === 0) {
       return { canDuplicate: true, uniqueConstraintReason: "" };
     }
+    // Auto-increment / IDENTITY columns regenerate on insert, so neither
+    // a PK nor a UNIQUE constraint on such a column actually blocks
+    // duplication — the new row gets a fresh value.
     const blocking = constraintInfo.filter(
-      (c) => (c.isPrimaryKey && !c.isAutoIncrement) || c.isUnique,
+      (c) => (c.isPrimaryKey || c.isUnique) && !c.isAutoIncrement,
     );
     if (blocking.length > 0) {
       const names = blocking.map((c) => c.name).join(", ");

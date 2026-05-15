@@ -2519,9 +2519,23 @@ function DuckDbPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
+      // Strip generated columns — DuckDB rejects INSERTs that target them.
+      const generatedCols = new Set(
+        (columnsByEntity[tableName] ?? [])
+          .filter((col) => col.generated !== null)
+          .map((col) => col.name),
+      );
+      const filteredNames: string[] = [];
+      const filteredValues: unknown[] = [];
+      for (let i = 0; i < columnNames.length; i++) {
+        if (!generatedCols.has(columnNames[i])) {
+          filteredNames.push(columnNames[i]);
+          filteredValues.push(values[i]);
+        }
+      }
       void (async () => {
         try {
-          await engine.insertRow(tableName, columnNames, values, schema);
+          await engine.insertRow(tableName, filteredNames, filteredValues, schema);
           showToast(`Duplicated row in "${tableName}".`);
           const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
@@ -2531,7 +2545,7 @@ function DuckDbPlaygroundInner() {
         }
       })();
     },
-    [quoteIdent, runSqlForTab, showToast],
+    [columnsByEntity, quoteIdent, runSqlForTab, showToast],
   );
 
   const openAddRow = useCallback(
@@ -2539,7 +2553,8 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       try {
-        const cols = await engine.listColumns(name, selectedSchemaRef.current);
+        const allCols = await engine.listColumns(name, selectedSchemaRef.current);
+        const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
         setAddRowDialog({
@@ -2560,11 +2575,14 @@ function DuckDbPlaygroundInner() {
     const engine = engineRef.current;
     if (!engine || !addRowDialog) return;
     const { tableName, columns, values, addAnother } = addRowDialog;
-    const columnNames = columns.map((c) => c.name);
-    const rowValues = columns.map((c) => {
-      const v = values[c.name] ?? "";
-      return v === "" ? null : v;
-    });
+    const columnNames: string[] = [];
+    const rowValues: unknown[] = [];
+    for (const c of columns) {
+      const raw = values[c.name] ?? "";
+      if (raw === "" && c.defaultValue !== null) continue;
+      columnNames.push(c.name);
+      rowValues.push(raw === "" ? null : raw);
+    }
     try {
       await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
@@ -4611,37 +4629,45 @@ function DuckDbPlaygroundInner() {
               {addRowDialog && (
                 <div className="sql-modify-body">
                   <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => (
-                      <label key={c.name} className="sql-add-row-field">
-                        <span className="sql-add-row-field-label">
-                          <span className="sql-add-row-field-name">
-                            {c.name}
+                    {addRowDialog.columns.map((c) => {
+                      const hasDefault = c.defaultValue !== null;
+                      const placeholder = hasDefault
+                        ? `auto (${c.defaultValue})`
+                        : c.notNull
+                          ? "required"
+                          : "NULL if empty";
+                      return (
+                        <label key={c.name} className="sql-add-row-field">
+                          <span className="sql-add-row-field-label">
+                            <span className="sql-add-row-field-name">
+                              {c.name}
+                            </span>
+                            <span className="sql-add-row-field-type">
+                              {c.type || "—"}
+                            </span>
                           </span>
-                          <span className="sql-add-row-field-type">
-                            {c.type || "—"}
-                          </span>
-                        </span>
-                        <input
-                          className="sql-rename-input"
-                          value={addRowDialog.values[c.name] ?? ""}
-                          onChange={(e) =>
-                            setAddRowDialog((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    values: {
-                                      ...prev.values,
-                                      [c.name]: e.target.value,
-                                    },
-                                  }
-                                : null,
-                            )
-                          }
-                          placeholder={c.notNull ? "required" : "NULL if empty"}
-                          aria-label={c.name}
-                        />
-                      </label>
-                    ))}
+                          <input
+                            className="sql-rename-input"
+                            value={addRowDialog.values[c.name] ?? ""}
+                            onChange={(e) =>
+                              setAddRowDialog((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                            placeholder={placeholder}
+                            aria-label={c.name}
+                          />
+                        </label>
+                      );
+                    })}
                   </div>
                   <label className="sql-add-row-another">
                     <input

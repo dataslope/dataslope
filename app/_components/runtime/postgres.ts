@@ -102,7 +102,11 @@ function renderPgColumnDef(col: ColumnSpec): string {
   return parts.join(" ");
 }
 
-function renderPgCreateTable(name: string, columns: ColumnSpec[]): string {
+function renderPgCreateTable(
+  schema: string,
+  name: string,
+  columns: ColumnSpec[],
+): string {
   const defs = columns.map((col) => `  ${renderPgColumnDef(col)}`);
   const pk = columns.filter((col) => col.primaryKey);
   if (pk.length > 0) {
@@ -118,7 +122,7 @@ function renderPgCreateTable(name: string, columns: ColumnSpec[]): string {
       ].join(" "),
     );
   }
-  return `CREATE TABLE ${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
+  return `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
 }
 
 function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { columnTypes?: string[] } | null {
@@ -498,7 +502,7 @@ export async function createPostgresEngine(
         type: (col.type || "text").trim(),
       }));
       if (filteredCols.length === 0) throw new Error("A table must have at least one column.");
-      const createSql = renderPgCreateTable(`${quoteIdent(schema)}.${finalName}`, filteredCols);
+      const createSql = renderPgCreateTable(schema, finalName, filteredCols);
       await db.exec(createSql);
     },
 
@@ -547,7 +551,7 @@ export async function createPostgresEngine(
 
       const tmpName = `${spec.originalName}__tmp_rebuild_${++pgRebuildCounter}`;
       const schemaPrefix = `${quoteIdent(schema)}.`;
-      const createSql = renderPgCreateTable(`${schemaPrefix}${tmpName}`, patchedColumns);
+      const createSql = renderPgCreateTable(schema, tmpName, patchedColumns);
       const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
@@ -692,10 +696,15 @@ export async function createPostgresEngine(
     },
 
     async insertRow(tableName, columnNames, values, schema = "public") {
+      const qualified = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
+      if (columnNames.length === 0) {
+        await db.exec(`INSERT INTO ${qualified} DEFAULT VALUES`);
+        return;
+      }
       const cols = columnNames.map(quoteIdent).join(", ");
       const params = values.map((_, i) => `$${i + 1}`).join(", ");
       await db.query(
-        `INSERT INTO ${quoteIdent(schema)}.${quoteIdent(tableName)} (${cols}) VALUES (${params})`,
+        `INSERT INTO ${qualified} (${cols}) VALUES (${params})`,
         values,
       );
     },

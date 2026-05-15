@@ -3475,7 +3475,8 @@
   color: var(--text-dim);
 }
 
-.pg-type-input-group {
+.pg-type-input-group,
+.duckdb-type-input-group {
   position: relative;
   display: flex;
   align-items: center;
@@ -3483,13 +3484,15 @@
   min-width: 160px;
 }
 
-.pg-type-input {
+.pg-type-input,
+.duckdb-type-input {
   min-width: 0;
   width: 100%;
   padding-right: 26px;
 }
 
-.pg-type-trigger {
+.pg-type-trigger,
+.duckdb-type-trigger {
   position: absolute;
   right: 4px;
   top: 50%;
@@ -3506,30 +3509,36 @@
   outline: none;
 }
 
-.pg-type-trigger:hover {
+.pg-type-trigger:hover,
+.duckdb-type-trigger:hover {
   color: var(--text);
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
-.pg-type-trigger:focus-visible {
+.pg-type-trigger:focus-visible,
+.duckdb-type-trigger:focus-visible {
   box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-.pg-type-trigger[data-popup-open] svg {
+.pg-type-trigger[data-popup-open] svg,
+.duckdb-type-trigger[data-popup-open] svg {
   transform: rotate(180deg);
 }
 
-.pg-type-trigger svg {
+.pg-type-trigger svg,
+.duckdb-type-trigger svg {
   transition: transform 0.15s ease;
 }
 
-.pg-type-positioner {
+.pg-type-positioner,
+.duckdb-type-positioner {
   /* Must sit above .sql-modify-drawer (z-index: 401) since the popup is
      portaled to the body and would otherwise render behind the drawer. */
   z-index: 500;
 }
 
-.pg-type-popup {
+.pg-type-popup,
+.duckdb-type-popup {
   max-height: 280px;
   min-width: 220px;
   overflow: auto;
@@ -3538,21 +3547,26 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.pg-type-popup::-webkit-scrollbar {
+.pg-type-popup::-webkit-scrollbar,
+.duckdb-type-popup::-webkit-scrollbar {
   width: 6px;
 }
-.pg-type-popup::-webkit-scrollbar-track {
+.pg-type-popup::-webkit-scrollbar-track,
+.duckdb-type-popup::-webkit-scrollbar-track {
   background: transparent;
 }
-.pg-type-popup::-webkit-scrollbar-thumb {
+.pg-type-popup::-webkit-scrollbar-thumb,
+.duckdb-type-popup::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
-.pg-type-popup::-webkit-scrollbar-thumb:hover {
+.pg-type-popup::-webkit-scrollbar-thumb:hover,
+.duckdb-type-popup::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
 }
 
-.pg-type-group-label {
+.pg-type-group-label,
+.duckdb-type-group-label {
   padding: 6px 10px 3px;
   font-size: 10px;
   font-weight: 700;
@@ -3561,7 +3575,8 @@
   letter-spacing: 0.05em;
 }
 
-.pg-type-empty {
+.pg-type-empty,
+.duckdb-type-empty {
   padding: 8px 10px;
   font-size: 12px;
   color: var(--text-dim);
@@ -4066,4 +4081,25 @@
   font-size: 12px;
   color: var(--danger, #ef4444);
   padding: 6px 2px 0;
+}
+
+.sql-schema-create-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  min-width: 240px;
+}
+
+.sql-schema-create-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sql-schema-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
 }
