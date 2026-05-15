@@ -1,0 +1,150 @@
+---
+title: Challenge Card test page
+description: Sandbox page for the new `<ChallengeCard>` component.
+---
+
+This page exercises the new `<ChallengeCard>` component across a few
+shapes so we can iterate on it visually.
+
+## Pandas DataFrame challenge
+
+The canonical example from the design handoff — a Pandas groupby
+challenge with init code, a hint, and six tests.
+
+<ChallengeCard
+  adapter="python"
+  title="Summarize Sales by Category"
+  category="pandas · groupby · agg"
+  estimatedTime="~5 min"
+  instructions={<>
+    <p>
+      You have a DataFrame called <code>df</code> with sales data. It has
+      the following columns: <code>category</code>, <code>product</code>,{' '}
+      <code>units_sold</code>, and <code>revenue</code>.
+    </p>
+    <p>
+      Your task is to create a summary DataFrame called{' '}
+      <strong><code>summary</code></strong> that groups by{' '}
+      <code>category</code> and computes:
+    </p>
+    <ul>
+      <li>Total <code>units_sold</code> (sum)</li>
+      <li>Total <code>revenue</code> (sum)</li>
+      <li>Average <code>revenue</code> per transaction, named <code>avg_revenue</code></li>
+    </ul>
+    <p>
+      Round all numeric results to <strong>2 decimal places</strong> and
+      sort by <code>revenue</code> descending.
+    </p>
+  </>}
+  hint={<>
+    Use <code>.groupby("category").agg(...)</code> with keyword aggregations
+    like <code>units_sold=("units_sold", "sum")</code> to rename columns
+    inline. Then chain <code>.round(2)</code> and{' '}
+    <code>.sort_values("revenue", ascending=False)</code>.
+  </>}
+  initCode={`import pandas as pd
+
+_data = {
+    "category":   ["Electronics","Electronics","Electronics","Clothing","Clothing","Clothing","Food","Food","Food","Books","Books","Books","Electronics","Clothing","Food"],
+    "product":    ["Laptop","Phone","Tablet","Jacket","Shirt","Pants","Coffee","Tea","Juice","Novel","Textbook","Comic","Headphones","Dress","Snacks"],
+    "units_sold": [42, 128, 67, 95, 210, 180, 340, 200, 150, 88, 55, 120, 73, 140, 275],
+    "revenue":    [52080.0, 76800.0, 26130.0, 9025.0, 4200.0, 7200.0, 3400.0, 1400.0, 1050.0, 1320.0, 2750.0, 720.0, 18980.0, 8400.0, 1375.0]
+}
+df = pd.DataFrame(_data)
+`}
+  initialCode={`# df is already loaded — explore it first
+print(df.head())
+print()
+
+# Your solution:
+summary = None  # TODO: replace with your groupby + agg expression
+
+print(summary)
+`}
+  tests={[
+    {
+      id: "summary_exists",
+      name: "`summary` DataFrame exists",
+      description: "A variable named `summary` should be a pandas DataFrame",
+      code: `import pandas as pd
+assert isinstance(summary, pd.DataFrame), "summary is not a DataFrame"`,
+    },
+    {
+      id: "correct_columns",
+      name: "Has correct columns",
+      description: "summary must have: units_sold, revenue, avg_revenue",
+      code: `expected = {"units_sold", "revenue", "avg_revenue"}
+actual = set(summary.columns.tolist())
+missing = expected - actual
+assert not missing, f"Missing columns: {', '.join(sorted(missing))}"`,
+    },
+    {
+      id: "grouped_by_category",
+      name: "Grouped by category (4 rows)",
+      description: "One row per category — should have exactly 4 rows",
+      code: `assert len(summary) == 4, f"Expected 4 rows (one per category), got {len(summary)}"`,
+    },
+    {
+      id: "correct_revenue",
+      name: "Revenue totals are correct",
+      description: "Electronics total revenue should be ~173,990",
+      code: `elec_rev = float(summary.loc["Electronics", "revenue"])
+assert abs(elec_rev - 173990.0) < 1, f"Electronics revenue: got {elec_rev}, expected 173990.0"`,
+    },
+    {
+      id: "sorted_descending",
+      name: "Sorted by revenue (descending)",
+      description: "Highest revenue category should come first",
+      code: `revs = summary["revenue"].tolist()
+assert all(revs[i] >= revs[i+1] for i in range(len(revs)-1)), \
+    f"Revenue order {revs} is not descending"`,
+    },
+    {
+      id: "rounded",
+      name: "Values rounded to 2 decimal places",
+      description: "avg_revenue should be rounded",
+      code: `avg_vals = summary["avg_revenue"].tolist()
+assert all(round(v, 2) == v for v in avg_vals), \
+    f"Some avg_revenue values not rounded to 2dp: {avg_vals}"`,
+    },
+  ]}
+/>
+
+## Minimal challenge (no init, no hint)
+
+A no-frills challenge so we can verify the layout still works when the
+optional elements are omitted.
+
+<ChallengeCard
+  adapter="python"
+  title="Compute the mean of a list"
+  initialCode={`# Compute the average of the values below.
+values = [12, 7, 4, 21, 9, 18, 3]
+
+mean = None  # your code here
+print("mean =", mean)
+`}
+  instructions={<>
+    <p>
+      Assign the arithmetic mean of <code>values</code> to a variable
+      called <code>mean</code>.
+    </p>
+  </>}
+  tests={[
+    {
+      id: "mean_is_defined",
+      name: "`mean` is defined and numeric",
+      description: "`mean` should hold a number",
+      code: `assert mean is not None, "mean was not assigned"
+assert isinstance(mean, (int, float)), f"mean should be a number, got {type(mean).__name__}"`,
+    },
+    {
+      id: "mean_correct",
+      name: "Mean matches the expected value",
+      description: "The arithmetic mean of the seven inputs",
+      code: `import math
+assert math.isclose(mean, 74/7, rel_tol=1e-9), f"Expected {74/7}, got {mean}"`,
+    },
+  ]}
+/>

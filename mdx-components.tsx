@@ -13,11 +13,13 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import MdxCodeBlock from "@/app/_components/MdxCodeBlock";
+import MdxChallengeCard from "@/app/_components/MdxChallengeCard";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     CodeBlock: MdxCodeBlock,
+    ChallengeCard: MdxChallengeCard,
     ...components,
   };
 }

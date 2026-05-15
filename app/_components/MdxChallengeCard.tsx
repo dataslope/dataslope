@@ -1,0 +1,58 @@
+"use client";
+
+/**
+ * MDX-friendly wrapper around `<ChallengeCard>`.
+ *
+ * MDX content can't import TypeScript modules, so this component
+ * accepts the adapter as a string id (e.g. `"python"`) and resolves it
+ * to the corresponding adapter instance — mirroring `<MdxCodeBlock>`.
+ *
+ * Usage in MDX:
+ * ```mdx
+ * <ChallengeCard
+ *   adapter="python"
+ *   title="Summarize Sales by Category"
+ *   category="pandas · groupby · agg"
+ *   estimatedTime="~5 min"
+ *   instructions={<>
+ *     <p>You have a DataFrame called <code>df</code>…</p>
+ *   </>}
+ *   hint={<>Try <code>groupby(...).agg(...)</code>.</>}
+ *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
+ *   initialCode={`summary = None`}
+ *   tests={[
+ *     {
+ *       id: "summary_exists",
+ *       name: "`summary` exists",
+ *       description: "A variable named `summary` is defined",
+ *       code: `assert summary is not None`,
+ *     },
+ *   ]}
+ * />
+ * ```
+ */
+
+import ChallengeCard, { type ChallengeCardProps } from "./ChallengeCard";
+import { getAdapterById, type AdapterId } from "./runtime/adapters";
+import type { ChallengeTest } from "./challengeHarness";
+
+interface MdxChallengeCardProps
+  extends Omit<ChallengeCardProps, "adapter" | "tests"> {
+  adapter: AdapterId;
+  tests: ChallengeTest[];
+}
+
+export default function MdxChallengeCard({
+  adapter,
+  ...rest
+}: MdxChallengeCardProps) {
+  const resolved = getAdapterById(adapter);
+  if (!resolved) {
+    return (
+      <div role="alert" style={{ color: "#ef4444", padding: "0.75rem" }}>
+        Unknown ChallengeCard adapter id: <code>{adapter}</code>
+      </div>
+    );
+  }
+  return <ChallengeCard adapter={resolved} {...rest} />;
+}
