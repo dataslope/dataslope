@@ -471,6 +471,11 @@ export interface DuckDbEngine {
    *  Registers the bytes in the virtual filesystem, cleans the live
    *  schema, ATTACHes the file read-only, and copies via `COPY FROM DATABASE`. */
   importFromBinary: (bytes: Uint8Array) => Promise<void>;
+  /** Try to import a SQL dump as a new blank database. If any statement
+   *  fails partway through, restores the previously active sample so the
+   *  user's database is never left in a half-populated state. Throws the
+   *  underlying SQL error after a successful restore. */
+  importSqlDump: (sql: string) => Promise<DuckDbSampleDatabase>;
   /** Best-effort whole-database export. Falls back to a multi-statement
    *  SQL script when binary export isn't available in the in-memory
    *  build (the common case in WASM). */
@@ -722,6 +727,44 @@ export async function createDuckDbEngine(
         /* ignore */
       }
       conn = next;
+      return sample;
+    },
+
+    async importSqlDump(sql) {
+      // DuckDB-Wasm shares a single underlying instance across connections,
+      // so any "fresh" connection sees the same schema. We can't sandbox
+      // the import; the best we can do is bootstrap a blank schema, try
+      // the SQL there, and restore the previous sample if it fails.
+      const previousSample = sample;
+      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE);
+      try {
+        const stmts = splitDuckDbStatements(sql);
+        for (const stmt of stmts) {
+          await next.query(stmt);
+        }
+      } catch (err) {
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        const restored = await bootstrapDatabase(previousSample);
+        try {
+          await conn.close();
+        } catch {
+          /* ignore */
+        }
+        conn = restored;
+        sample = previousSample;
+        throw err;
+      }
+      try {
+        await conn.close();
+      } catch {
+        /* ignore */
+      }
+      conn = next;
+      sample = DUCKDB_BLANK_DATABASE;
       return sample;
     },
 
@@ -1291,6 +1334,8 @@ export async function createDuckDbEngine(
       const importFile = "_playground_import_tmp.duckdb";
       const alias = "_playground_import_alias";
       await db.registerFileBuffer(importFile, bytes);
+      const previousSample = sample;
+      let importFailed = false;
       try {
         // cleanDuckDbSchema wipes the main schema; then we copy from the
         // attached file database into the now-empty memory catalog.
@@ -1321,11 +1366,26 @@ export async function createDuckDbEngine(
           `COPY FROM DATABASE ${quoteIdent(alias)} TO memory`,
         );
         await conn.query(`DETACH ${quoteIdent(alias)}`);
-      } finally {
+      } catch (err) {
+        importFailed = true;
+        // Schema was wiped before the failing step; restore the previous
+        // sample so the user is never stranded on an empty database.
+        const restored = await bootstrapDatabase(previousSample);
         try {
-          await conn.query(`DETACH ${quoteIdent(alias)}`);
+          await conn.close();
         } catch {
-          /* already detached — ignore */
+          /* ignore */
+        }
+        conn = restored;
+        sample = previousSample;
+        throw err;
+      } finally {
+        if (!importFailed) {
+          try {
+            await conn.query(`DETACH ${quoteIdent(alias)}`);
+          } catch {
+            /* already detached — ignore */
+          }
         }
         try {
           await db.dropFile?.(importFile);

@@ -1936,8 +1936,9 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       setStatusState("loading");
       try {
-        await engine.loadBlankDatabase();
-        await engine.exec(sqlText);
+        // Imports into a sandbox worker first; only swaps in on success,
+        // so a failed import leaves the existing database intact.
+        await engine.importSqlDump(sqlText);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
         try {

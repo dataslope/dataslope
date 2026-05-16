@@ -2273,17 +2273,19 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
-      setTables([]);
-      setViews([]);
-      setIndexes([]);
-      setTriggers([]);
-      setColumnsByEntity({});
-      setForeignKeysByEntity({});
-      setRowCountByTable({});
-      setExpandedEntities(new Set());
       try {
-        await engine.loadBlankDatabase();
-        await engine.exec(sqlText);
+        // importSqlDump bootstraps a blank schema, runs the SQL there, and
+        // restores the previous sample on failure so the user is never
+        // stranded on a wiped database.
+        await engine.importSqlDump(sqlText);
+        setTables([]);
+        setViews([]);
+        setIndexes([]);
+        setTriggers([]);
+        setColumnsByEntity({});
+        setForeignKeysByEntity({});
+        setRowCountByTable({});
+        setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
         try {
@@ -2311,6 +2313,13 @@ function DuckDbPlaygroundInner() {
         setStatusState("ready");
         showToast(`Loaded "${filename}".`);
       } catch (err) {
+        // importSqlDump restored the previous sample on failure; re-read
+        // the schema so the sidebar reflects the restored state.
+        try {
+          await refreshSchema();
+        } catch {
+          /* ignore */
+        }
         showToast(
           `Import failed: ${err instanceof Error ? err.message : String(err)}`,
           "warn",
@@ -2326,16 +2335,19 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
-      setTables([]);
-      setViews([]);
-      setIndexes([]);
-      setTriggers([]);
-      setColumnsByEntity({});
-      setForeignKeysByEntity({});
-      setRowCountByTable({});
-      setExpandedEntities(new Set());
       try {
+        // importFromBinary wipes the schema before attaching; on failure it
+        // restores the previous sample internally so the user database is
+        // not left empty. Only clear UI state once import has succeeded.
         await engine.importFromBinary(bytes);
+        setTables([]);
+        setViews([]);
+        setIndexes([]);
+        setTriggers([]);
+        setColumnsByEntity({});
+        setForeignKeysByEntity({});
+        setRowCountByTable({});
+        setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
         try {
@@ -2366,6 +2378,14 @@ function DuckDbPlaygroundInner() {
         setStatusState("ready");
         showToast(`Loaded "${filename}".`);
       } catch (err) {
+        // importFromBinary restored the previous sample on failure; reread
+        // the schema so the sidebar reflects the restored state.
+        try {
+          await refreshSchemas();
+          await refreshSchema();
+        } catch {
+          /* ignore */
+        }
         showToast(
           `Import failed: ${err instanceof Error ? err.message : String(err)}`,
           "warn",
