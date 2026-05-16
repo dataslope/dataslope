@@ -764,7 +764,7 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
 
   // ─── Sample switch ────────────────────────────────────────────────
   const handleSampleSelect = useCallback(
-    (value: string) => {
+    (value: string | null) => {
       if (!value || value === activeSampleId) return;
       // Persist current tab state before leaving.
       saveSqlShellState(storage, adapter.storagePrefix, activeSampleId, shellStateRef.current);
