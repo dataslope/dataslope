@@ -53,7 +53,6 @@ import {
   Pencil,
   Play,
   Plus,
-  RotateCcw,
   Table,
   Trash2,
   TriangleAlert,
@@ -102,9 +101,9 @@ import {
   DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
   RuntimeInfoContent,
-  SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
+import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -4046,7 +4045,7 @@ function DuckDbPlaygroundInner() {
           </div>
         </header>
 
-        <SettingsPanel
+        <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -4061,23 +4060,11 @@ function DuckDbPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          showOutputFontSizeControls={false}
-          clearBeforeRunLabel="Clear Results Before Running"
-          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          extraGeneralRows={null}
-          extraActionRows={
-            <button
-              type="button"
-              className="settings-action-btn"
-              onClick={resetTabsForCurrentDb}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-              <span>Reset query tabs for {activeSample.label}</span>
-            </button>
-          }
+          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+          onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
             {
               value: "database",

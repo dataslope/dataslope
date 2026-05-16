@@ -128,9 +128,9 @@ import {
   DataslopeRunOverlay,
   LOADING_QUIPS,
   RuntimeInfoContent,
-  SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
+import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import {
@@ -2421,7 +2421,7 @@ function SqlPlaygroundInner() {
           </div>
         </header>
 
-        <SettingsPanel
+        <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -2436,23 +2436,11 @@ function SqlPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          showOutputFontSizeControls={false}
-          clearBeforeRunLabel="Clear Results Before Running"
-          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          extraGeneralRows={null}
-          extraActionRows={
-            <button
-              type="button"
-              className="settings-action-btn"
-              onClick={resetTabsForCurrentDb}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-              <span>Reset query tabs for {activeSample.label}</span>
-            </button>
-          }
+          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+          onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
             {
               value: "pragmas",
