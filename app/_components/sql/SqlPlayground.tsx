@@ -44,8 +44,6 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "./shared/editorSetup";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -101,11 +99,6 @@ import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { RuntimeInfo } from "../types";
 import { modifyDialogSignature } from "./types";
-import { PLAYGROUNDS } from "../playgrounds";
-import {
-  LANGUAGE_ICONS as PLAYGROUND_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
-} from "../languageIcons";
 import {
   applyMode,
   applyThemePalette,
@@ -149,8 +142,9 @@ const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false },
 );
-import { ToastList } from "./components/ToastList";
 import { SqlTabBar } from "./components/SqlTabBar";
+import { SqlPlaygroundShell } from "./components/SqlPlaygroundShell";
+import { ToastList } from "./components/ToastList";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import type { SqlCompletionSchema } from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
@@ -976,7 +970,6 @@ function PragmaSettingsTab({
 }
 
 function SqlPlaygroundInner() {
-  const router = useRouter();
   useEffect(() => {
     ensurePersistUnloadFlush();
   }, []);
@@ -2094,121 +2087,19 @@ function SqlPlaygroundInner() {
   }, [result, constraintsByEntity]);
 
   return (
-    <div className="pg-root">
-      {showLoadingOverlay && (
-        <div
-          className={`pyodide-loading${
-            statusState === "error" ? " has-error" : ""
-          }${loadingFading ? " hidden" : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              <span className="loading-hero-text">SQLite Playground</span>
-              <span className="loading-hero-text">SQLite Playground</span>
-              <span className="loading-hero-text">SQLite Playground</span>
-              <span className="loading-hero-text">SQLite Playground</span>
-            </div>
-          </div>
-          <div className="loading-bottom">
-            <div className="loading-quip">
-              {statusState === "error"
-                ? loadingMessage
-                : LOADING_QUIPS[quipIndex]}
-            </div>
-            <div className="loading-bar-wrap">
-              <div className="loading-bar" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="pg-app">
-        <header className="pg-header">
-          <div className="logo">
-            <Link href="/" aria-label="Dataslope home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/dataslope-logo-blue.svg"
-                alt="Dataslope logo"
-                className="brand-logo"
-              />
-            </Link>
-            <Link href="/" className="brand-name">
-              Dataslope
-            </Link>
-            <Select.Root
-              value={PLAYGROUND_ID}
-              onValueChange={(value) => {
-                const next = PLAYGROUNDS.find((p) => p.id === value);
-                if (next && next.id !== PLAYGROUND_ID) router.push(next.href);
-              }}
-            >
-              <Select.Trigger
-                className="playground-switcher"
-                aria-label="Switch playground"
-              >
-                {(() => {
-                  const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const factor =
-                    PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
-                  return Icon ? (
-                    <span
-                      className="playground-switcher-lang-icon"
-                      style={{ color: "var(--text)" }}
-                      aria-hidden="true"
-                    >
-                      <Icon size={Math.round(16 * factor)} />
-                    </span>
-                  ) : null;
-                })()}
-                <Select.Value />
-                <Select.Icon className="playground-switcher-icon">
-                  <svg viewBox="0 0 12 12" width={10} height={10}>
-                    <polyline
-                      points="2,4 6,8 10,4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner
-                  className="pg-lang-switcher-positioner"
-                  sideOffset={6}
-                  alignItemWithTrigger={false}
-                >
-                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
-                    {PLAYGROUNDS.map((p) => {
-                      const Icon = PLAYGROUND_ICONS[p.id];
-                      const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
-                      return (
-                        <Select.Item
-                          key={p.id}
-                          value={p.id}
-                          className="bui-select-item"
-                        >
-                          {Icon && (
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Icon size={Math.round(16 * factor)} />
-                            </span>
-                          )}
-                          <Select.ItemText>{p.label}</Select.ItemText>
-                        </Select.Item>
-                      );
-                    })}
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-          <div className="header-sep" />
+    <SqlPlaygroundShell
+      playgroundId={PLAYGROUND_ID}
+      playgroundTitle="SQLite Playground"
+      loaded={loaded}
+      statusState={statusState}
+      keepOverlayMounted={showLoadingOverlay}
+      loadingOverlayClassName={loadingFading ? "hidden" : ""}
+      loadingHeroRepeat={4}
+      loadingCaption={
+        statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]
+      }
+      headerActions={
+        <>
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger
@@ -2414,9 +2305,10 @@ function SqlPlaygroundInner() {
               </svg>
             </button>
           </div>
-        </header>
-
-        <SqlSettingsPanel
+        </>
+      }
+    >
+      <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -4085,7 +3977,6 @@ function SqlPlaygroundInner() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </SqlPlaygroundShell>
   );
 }

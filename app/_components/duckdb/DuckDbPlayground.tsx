@@ -34,8 +34,6 @@ import { Popover } from "@base-ui-components/react/popover";
 import { Select } from "@base-ui-components/react/select";
 import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui-components/react/toast";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -70,7 +68,6 @@ import React, {
   startTransition,
   useSyncExternalStore,
 } from "react";
-import { flushSync } from "react-dom";
 import "../playground.css";
 import "../sqlPlayground.css";
 import dynamic from "next/dynamic";
@@ -82,11 +79,6 @@ const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false },
 );
-import {
-  LANGUAGE_ICONS as PLAYGROUND_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
-} from "../languageIcons";
-import { PLAYGROUNDS } from "../playgrounds";
 import { themeFor } from "../cmExtensions";
 import {
   applyMode,
@@ -105,6 +97,8 @@ import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
+import { AddRowDialog } from "../sql/components/AddRowDialog";
+import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
@@ -133,8 +127,8 @@ import {
   DatabaseSelector,
   type DatabaseSelectorAction,
 } from "../sql/components/DatabaseSelector";
-import { ToastList } from "../sql/components/ToastList";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
+import { ToastList } from "../sql/components/ToastList";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
@@ -160,7 +154,9 @@ import {
   ensurePersistUnloadFlush,
   persistAsync,
 } from "../sql/utils/persistedStorage";
-import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
+import { pushTabHistory } from "../sql/utils/tabUtils";
+import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
+import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -873,7 +869,6 @@ function quoteIdent(name: string): string {
 type ImportFlavor = "csv" | "json" | "parquet";
 
 function DuckDbPlaygroundInner() {
-  const router = useRouter();
   // Coalesced localStorage writer for settings — install the
   // pagehide/visibilitychange flush listener once per playground mount.
   useEffect(() => {
@@ -979,43 +974,54 @@ function DuckDbPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading DuckDB engine…",
   );
-  const [tables, setTables] = useState<string[]>([]);
-  const [views, setViews] = useState<string[]>([]);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
-  // Triggers are not supported by DuckDB so the corresponding sidebar
-  // section is omitted entirely. We still keep the setter so the
-  // shared `refreshSchema()` logic from the Postgres playground can
-  // keep its single, uniform shape.
-  const [, setTriggers] = useState<string[]>([]);
-  const [indexes, setIndexes] = useState<string[]>([]);
-  const [columnsByEntity, setColumnsByEntity] = useState<
-    Record<string, TableColumnInfo[]>
-  >({});
-  const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
-    Record<string, ForeignKeyInfo[]>
-  >({});
-  const [expandedEntities, setExpandedEntities] = useState<Set<string>>(
-    new Set(),
-  );
   const [globalPageSize, setGlobalPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
-  const [rowCountByTable, setRowCountByTable] = useState<
-    Record<string, number>
-  >({});
 
   // ─── Schema selector state ────────────────────────────────────────────
-  const [selectedSchema, setSelectedSchema] = useState("main");
-  const [schemas, setSchemas] = useState<string[]>(["main"]);
-  const [schemaLoading, setSchemaLoading] = useState(false);
   const [dbLoading, setDbLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
-  const selectedSchemaRef = useRef("main");
   const showSystemSchemasRef = useRef(true);
+  const engineRef = useRef<DuckDbEngine | null>(null);
+  const schemaTree = useSchemaTree({
+    engineRef,
+    defaultSchema: "main",
+    showSystemSchemasRef,
+    clearEntitiesOnSchemaChange: false,
+  });
+  const {
+    tables,
+    setTables,
+    views,
+    setViews,
+    indexes,
+    setIndexes,
+    // DuckDB does not support triggers, but the hook still exposes the
+    // setter so the shared refreshSchema shape stays uniform with the
+    // Postgres playground.
+    setTriggers,
+    columnsByEntity,
+    setColumnsByEntity,
+    foreignKeysByEntity,
+    setForeignKeysByEntity,
+    expandedEntities,
+    setExpandedEntities,
+    rowCountByTable,
+    setRowCountByTable,
+    selectedSchema,
+    setSelectedSchema,
+    schemas,
+    setSchemas,
+    schemaLoading,
+    selectedSchemaRef,
+    refreshSchemas: refreshSchemasFromHook,
+    handleSchemaChange: handleSchemaChangeFromHook,
+  } = schemaTree;
 
   // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
   const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
@@ -1162,7 +1168,6 @@ function DuckDbPlaygroundInner() {
   const completionCompRef = useRef<Compartment | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
-  const engineRef = useRef<DuckDbEngine | null>(null);
   const tabsRef = useRef(tabs);
   const activeTabIdRef = useRef(activeTabId);
   /** MRU history stack (oldest → most-recent), never includes the current tab. */
@@ -1257,30 +1262,6 @@ function DuckDbPlaygroundInner() {
     [],
   );
 
-  const handleTabDragStart = useCallback((event: DragStartEvent) => {
-    const id = String(event.active.id);
-    setDraggingTabId(id);
-    setActiveTabId(id);
-  }, []);
-
-  const handleTabDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setDraggingTabId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      const current = tabsRef.current;
-      const oldIndex = current.findIndex((t) => t.id === active.id);
-      const newIndex = current.findIndex((t) => t.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
-      persistTabs(arrayMove(current, oldIndex, newIndex));
-    },
-    [persistTabs],
-  );
-
-  const handleTabDragCancel = useCallback(() => {
-    setDraggingTabId(null);
-  }, []);
-
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine) return;
@@ -1343,17 +1324,10 @@ function DuckDbPlaygroundInner() {
     });
   }, [quoteIdent]);
 
-  const refreshSchemas = useCallback(async () => {
-    const engine = engineRef.current;
-    if (!engine) return;
-    const nextSchemas = await engine.listSchemas(showSystemSchemasRef.current);
-    setSchemas(nextSchemas);
-    if (!nextSchemas.includes(selectedSchemaRef.current)) {
-      selectedSchemaRef.current = "main";
-      setSelectedSchema("main");
-      await refreshSchema();
-    }
-  }, [refreshSchema]);
+  const refreshSchemas = useCallback(
+    () => refreshSchemasFromHook(refreshSchema),
+    [refreshSchemasFromHook, refreshSchema],
+  );
 
   const runSqlForTab = useCallback(
     async (
@@ -1932,22 +1906,8 @@ function DuckDbPlaygroundInner() {
   );
 
   const handleSchemaChange = useCallback(
-    async (schema: string) => {
-      // Base UI Select fires onValueChange(null) when no item matches the
-      // controlled value (e.g. while the schema list is empty during a
-      // fetch). Ignore those spurious calls to prevent "null" poisoning
-      // selectedSchemaRef and the subsequent SQL queries.
-      if (!schema || schema === "null") return;
-      selectedSchemaRef.current = schema;
-      setSelectedSchema(schema);
-      setSchemaLoading(true);
-      try {
-        await refreshSchema();
-      } finally {
-        setSchemaLoading(false);
-      }
-    },
-    [refreshSchema],
+    (schema: string) => handleSchemaChangeFromHook(schema, refreshSchema),
+    [handleSchemaChangeFromHook, refreshSchema],
   );
 
   const submitCreateSchema = useCallback(async () => {
@@ -2337,81 +2297,32 @@ function DuckDbPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
-  const addTab = useCallback(() => {
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: `Query ${tabsRef.current.length + 1}`,
-      code: "",
-      pristineCode: "",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
-    const next = [...tabsRef.current, tab];
-    tabsRef.current = next;
-    activeTabIdRef.current = tab.id;
-    flushSync(() => {
-      setTabs(next);
-      setActiveTabId(tab.id);
-    });
-    editorRef.current?.focus();
-    saveTabs(activeDbIdRef.current, next);
-    // Keep all referenced bindings in the dependency list; saveTabs and
-    // state setters are stable, so suppress exhaustive-deps' extra warning.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, saveTabs]);
-
-  const openTabAndRun = useCallback(
-    (title: string, sql: string) => {
-      const tab: QueryTab = {
-        id: newTabId(),
-        title,
-        code: sql,
-        pristineCode: sql,
-      };
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
-      persistTabs([...tabsRef.current, tab]);
-      setActiveTabId(tab.id);
-      void runSqlForTab(tab.id, sql, title);
-    },
-    [persistTabs, runSqlForTab],
-  );
-
-  const closeTab = useCallback(
-    (id: string) => {
-      const currentTabs = tabsRef.current;
-      const next = currentTabs.filter((tab) => tab.id !== id);
-      const finalTabs =
-        next.length > 0
-          ? next
-          : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
-      persistTabs(finalTabs);
-      // Prune closed tab from history before selecting fallback.
-      tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
-      if (activeTabIdRef.current === id) {
-        const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
-        setActiveTabId(fallback.id);
-      }
-      setResultsByTab((prev) => {
-        const { [id]: _deleted, ...rest } = prev;
-        void _deleted;
-        return rest;
-      });
-    },
-    [persistTabs],
-  );
-
-  const resetTabsForCurrentDb = useCallback(() => {
-    const sample = findDuckDbSampleDatabase(activeDbIdRef.current);
-    const fresh = sample.defaultTabs.map((seed) => ({
-      ...seed,
-      id: newTabId(),
-      pristineCode: seed.code,
-    }));
-    tabHistoryRef.current = [];
-    persistTabs(fresh);
-    setActiveTabId(fresh[0]?.id ?? "");
-    setResultsByTab({});
-    showToast(`Reset query tabs for ${sample.label}.`);
-  }, [persistTabs, showToast]);
+  const {
+    addTab,
+    openTabAndRun,
+    closeTab,
+    resetTabsForCurrentDb,
+    handleTabDragStart,
+    handleTabDragEnd,
+    handleTabDragCancel,
+    openErDiagramTab,
+    openQueryHistoryTab,
+  } = useSqlTabManagement({
+    tabsRef,
+    activeTabIdRef,
+    activeDbIdRef,
+    tabHistoryRef,
+    editorRef,
+    setTabs,
+    setActiveTabId,
+    setResultsByTab,
+    setDraggingTabId,
+    persistTabs,
+    saveTabsImmediate: saveTabs,
+    findSampleDatabase: findDuckDbSampleDatabase,
+    showToast,
+    runSqlForTab,
+  });
 
   const previewEntity = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -2436,82 +2347,6 @@ function DuckDbPlaygroundInner() {
     },
     [persistTabs, runSqlForTab],
   );
-
-  const openErDiagramTab = useCallback(() => {
-    const currentTabs = tabsRef.current;
-    const currentActiveTabId = activeTabIdRef.current;
-    const existing = currentTabs.find((tab) => tab.kind === "er-diagram");
-    if (existing) {
-      if (existing.id === currentActiveTabId) {
-        const next = currentTabs.filter((t) => t.id !== existing.id);
-        const finalTabs =
-          next.length > 0
-            ? next
-            : [
-              {
-                id: newTabId(),
-                title: "Query 1",
-                code: "",
-                pristineCode: "",
-              },
-            ];
-        persistTabs(finalTabs);
-        setActiveTabId(finalTabs[0].id);
-        return;
-      }
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
-      setActiveTabId(existing.id);
-      return;
-    }
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: "ER Diagram",
-      code: "",
-      pristineCode: "",
-      kind: "er-diagram",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
-    persistTabs([...currentTabs, tab]);
-    setActiveTabId(tab.id);
-  }, [persistTabs]);
-
-  const openQueryHistoryTab = useCallback(() => {
-    const currentTabs = tabsRef.current;
-    const currentActiveTabId = activeTabIdRef.current;
-    const existing = currentTabs.find((tab) => tab.kind === "query-history");
-    if (existing) {
-      if (existing.id === currentActiveTabId) {
-        const next = currentTabs.filter((t) => t.id !== existing.id);
-        const finalTabs =
-          next.length > 0
-            ? next
-            : [
-              {
-                id: newTabId(),
-                title: "Query 1",
-                code: "",
-                pristineCode: "",
-              },
-            ];
-        persistTabs(finalTabs);
-        setActiveTabId(finalTabs[0].id);
-        return;
-      }
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
-      setActiveTabId(existing.id);
-      return;
-    }
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: "Query History",
-      code: "",
-      pristineCode: "",
-      kind: "query-history",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
-    persistTabs([...currentTabs, tab]);
-    setActiveTabId(tab.id);
-  }, [persistTabs]);
 
   // ─── Settings actions ────────────────────────────────────────────────
   const restoreDefaultSettings = useCallback(() => {
@@ -3674,114 +3509,14 @@ function DuckDbPlaygroundInner() {
   );
 
   return (
-    <div className="pg-root">
-      {!loaded && (
-        <div
-          className={`pyodide-loading${statusState === "error" ? " has-error" : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              <span className="loading-hero-text">DuckDB Playground</span>
-              <span className="loading-hero-text">DuckDB Playground</span>
-              <span className="loading-hero-text">DuckDB Playground</span>
-            </div>
-          </div>
-          <div className="loading-bottom">
-            <div className="loading-quip">{loadingMessage}</div>
-            <div className="loading-bar-wrap">
-              <div className="loading-bar" />
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="pg-app">
-        <header className="pg-header">
-          <div className="logo">
-            <Link href="/" aria-label="Dataslope home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/dataslope-logo-blue.svg"
-                alt="Dataslope logo"
-                className="brand-logo"
-              />
-            </Link>
-            <Link href="/" className="brand-name">
-              Dataslope
-            </Link>
-            <Select.Root
-              value={PLAYGROUND_ID}
-              onValueChange={(value) => {
-                const selectedPlayground = PLAYGROUNDS.find(
-                  (playground) => playground.id === value,
-                );
-                if (
-                  selectedPlayground &&
-                  selectedPlayground.id !== PLAYGROUND_ID
-                ) {
-                  router.push(selectedPlayground.href);
-                }
-              }}
-            >
-              <Select.Trigger
-                className="playground-switcher"
-                aria-label="Switch playground"
-              >
-                {(() => {
-                  const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const factor =
-                    PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
-                  return Icon ? (
-                    <span
-                      className="playground-switcher-lang-icon"
-                      style={{ color: "var(--text)" }}
-                      aria-hidden="true"
-                    >
-                      <Icon size={Math.round(16 * factor)} />
-                    </span>
-                  ) : null;
-                })()}
-                <Select.Value />
-                <Select.Icon className="playground-switcher-icon">
-                  <ChevronDown size={12} />
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner
-                  className="pg-lang-switcher-positioner"
-                  sideOffset={6}
-                  alignItemWithTrigger={false}
-                >
-                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
-                    {PLAYGROUNDS.map((playground) => {
-                      const Icon = PLAYGROUND_ICONS[playground.id];
-                      const factor =
-                        PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
-                      return (
-                        <Select.Item
-                          key={playground.id}
-                          value={playground.id}
-                          className="bui-select-item"
-                        >
-                          {Icon && (
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Icon size={Math.round(16 * factor)} />
-                            </span>
-                          )}
-                          <Select.ItemText>{playground.label}</Select.ItemText>
-                        </Select.Item>
-                      );
-                    })}
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-          <div className="header-sep" />
+    <SqlPlaygroundShell
+      playgroundId={PLAYGROUND_ID}
+      playgroundTitle="DuckDB Playground"
+      loaded={loaded}
+      statusState={statusState}
+      loadingCaption={loadingMessage}
+      headerActions={
+        <>
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger
@@ -4015,9 +3750,10 @@ function DuckDbPlaygroundInner() {
               </svg>
             </button>
           </div>
-        </header>
-
-        <SqlSettingsPanel
+        </>
+      }
+    >
+      <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -4503,106 +4239,11 @@ function DuckDbPlaygroundInner() {
         </Dialog.Root>
 
         {/* ── Add Row drawer ── */}
-        <Dialog.Root
-          open={addRowDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setAddRowDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
-            <Dialog.Popup className="sql-modify-drawer">
-              <header className="sql-modify-drawer-header">
-                <div className="sql-modify-drawer-heading">
-                  <Dialog.Title className="sql-modify-drawer-title">
-                    Add Row
-                  </Dialog.Title>
-                  <Dialog.Description className="sql-modify-drawer-subtitle">
-                    {addRowDialog?.tableName ?? ""}
-                  </Dialog.Description>
-                </div>
-                <Dialog.Close
-                  className="sql-modify-drawer-close"
-                  aria-label="Close"
-                >
-                  <X size={16} aria-hidden="true" />
-                </Dialog.Close>
-              </header>
-              {addRowDialog && (
-                <div className="sql-modify-body">
-                  <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => {
-                      const hasDefault = c.defaultValue !== null;
-                      const placeholder = hasDefault
-                        ? `auto (${c.defaultValue})`
-                        : c.notNull
-                          ? "required"
-                          : "NULL if empty";
-                      return (
-                        <label key={c.name} className="sql-add-row-field">
-                          <span className="sql-add-row-field-label">
-                            <span className="sql-add-row-field-name">
-                              {c.name}
-                            </span>
-                            <span className="sql-add-row-field-type">
-                              {c.type || "—"}
-                            </span>
-                          </span>
-                          <input
-                            className="sql-rename-input"
-                            value={addRowDialog.values[c.name] ?? ""}
-                            onChange={(e) =>
-                              setAddRowDialog((prev) =>
-                                prev
-                                  ? {
-                                    ...prev,
-                                    values: {
-                                      ...prev.values,
-                                      [c.name]: e.target.value,
-                                    },
-                                  }
-                                  : null,
-                              )
-                            }
-                            placeholder={placeholder}
-                            aria-label={c.name}
-                          />
-                        </label>
-                      );
-                    })}
-                  </div>
-                  <label className="sql-add-row-another">
-                    <input
-                      type="checkbox"
-                      checked={addRowDialog.addAnother}
-                      onChange={(e) =>
-                        setAddRowDialog((prev) =>
-                          prev
-                            ? { ...prev, addAnother: e.target.checked }
-                            : null,
-                        )
-                      }
-                    />
-                    Keep open to add another row
-                  </label>
-                </div>
-              )}
-              <footer className="sql-modify-drawer-footer">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  onClick={() => void submitAddRow()}
-                  disabled={!addRowDialog}
-                >
-                  Add Row
-                </button>
-              </footer>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <AddRowDialog
+          state={addRowDialog}
+          setState={setAddRowDialog}
+          onSubmit={() => void submitAddRow()}
+        />
 
         {/* ── Add Table drawer ── */}
         <Dialog.Root
@@ -5416,8 +5057,7 @@ function DuckDbPlaygroundInner() {
             </section>
           </main>
         </div>
-      </div>
-    </div>
+    </SqlPlaygroundShell>
   );
 }
 
