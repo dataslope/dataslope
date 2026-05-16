@@ -131,18 +131,17 @@ import {
   SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
+import { findSampleDatabase } from "../runtime/sqliteSamples";
+import { sqliteAdapter } from "./sqliteAdapter";
 import {
-  SQLITE_SAMPLE_DATABASES,
-  findSampleDatabase,
-} from "../runtime/sqliteSamples";
-import {
-  createSqliteEngine,
   type ColumnConstraintInfo,
   type ColumnSpec,
   type ForeignKeyInfo,
   type SqliteEngine,
   type TableColumnInfo,
 } from "../runtime/sqlite";
+
+const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
 import type { QueryExecResult } from "sql.js";
 import dynamic from "next/dynamic";
 
@@ -200,7 +199,7 @@ function replaceDoc(view: EditorView, value: string): void {
 }
 
 
-const PLAYGROUND_ID = "sqlite";
+const PLAYGROUND_ID = sqliteAdapter.playgroundId;
 
 const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
   { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
@@ -1580,7 +1579,7 @@ function SqlPlaygroundInner() {
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
           SQLITE_SAMPLE_DATABASES[0].id;
-        const engine = await createSqliteEngine(initialSampleId);
+        const engine = await sqliteAdapter.createEngine(initialSampleId);
         if (cancelled) return;
         engineRef.current = engine;
         setEngineForRender(engine);

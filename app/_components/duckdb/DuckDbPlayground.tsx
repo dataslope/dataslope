@@ -105,12 +105,12 @@ import {
   SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
-import {
-  DUCKDB_SAMPLE_DATABASES,
-  DUCKDB_BLANK_DATABASE,
-  findDuckDbSampleDatabase,
-} from "../runtime/duckdbSamples";
-import { createDuckDbEngine, type DuckDbEngine } from "../runtime/duckdb";
+import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
+import { duckdbAdapter } from "./duckdbAdapter";
+import { type DuckDbEngine } from "../runtime/duckdb";
+
+const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
+const DUCKDB_BLANK_DATABASE = duckdbAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
@@ -171,8 +171,8 @@ import {
 } from "./duckdbImport";
 import { FK_ACTIONS } from "../sql/constants";
 
-const PLAYGROUND_ID = "duckdb";
-const STORAGE_PREFIX = "duckdb_";
+const PLAYGROUND_ID = duckdbAdapter.playgroundId;
+const STORAGE_PREFIX = duckdbAdapter.storagePrefix;
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -1694,7 +1694,7 @@ function DuckDbPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading DuckDB engine…");
-        const engine = await createDuckDbEngine(initialDbId);
+        const engine = await duckdbAdapter.createEngine(initialDbId);
         if (cancelled) {
           // The component already unmounted while bootstrap was in flight.
           // The engine never reaches engineRef, so the unmount cleanup

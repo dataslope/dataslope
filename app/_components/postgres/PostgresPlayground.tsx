@@ -104,12 +104,12 @@ import {
   SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
-import {
-  POSTGRES_SAMPLE_DATABASES,
-  POSTGRES_BLANK_DATABASE,
-  findPostgresSampleDatabase,
-} from "../runtime/postgresSamples";
-import { createPostgresEngine, type PostgresEngine } from "../runtime/postgres";
+import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
+import { postgresAdapter } from "./postgresAdapter";
+import { type PostgresEngine } from "../runtime/postgres";
+
+const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
+const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
@@ -169,8 +169,8 @@ import {
 } from "./postgresImport";
 import { FK_ACTIONS } from "../sql/constants";
 
-const PLAYGROUND_ID = "postgres";
-const STORAGE_PREFIX = "pg_postgres_";
+const PLAYGROUND_ID = postgresAdapter.playgroundId;
+const STORAGE_PREFIX = postgresAdapter.storagePrefix;
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -1656,7 +1656,7 @@ function PostgresPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading PostgreSQL engine…");
-        const engine = await createPostgresEngine(initialDbId);
+        const engine = await postgresAdapter.createEngine(initialDbId);
         if (cancelled) {
           // Component unmounted while the engine was being created; close it
           // immediately so the worker is terminated and its leader-election
