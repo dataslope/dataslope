@@ -110,6 +110,7 @@ import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
+import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -4125,95 +4126,32 @@ function DuckDbPlaygroundInner() {
           onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
         />
 
-        {/* ── Import DuckDB binary dialog ── */}
-        <Dialog.Root
+        <ImportBinaryFileDialog
           open={importDuckDbOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setImportDuckDbOpen(false);
-              setImportDuckDbDragging(false);
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-import-popup">
-              <Dialog.Title className="confirm-title">
-                Import DuckDB File
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Open a local <code>.duckdb</code> file as a new in-memory
-                database.
-              </Dialog.Description>
-              <div className="sql-import-warning">
-                <TriangleAlert
-                  size={14}
-                  className="sql-import-warning-icon"
-                  aria-hidden="true"
-                />
-                <span>
-                  This will replace the current database with the contents of
-                  the file. Your file will <strong>not</strong> be uploaded or
-                  persisted — it is only loaded into browser memory and will be
-                  gone on reload.
-                </span>
-              </div>
-              <div
-                className={`sql-dropzone${importDuckDbDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportDuckDbDragging(true);
-                }}
-                onDragLeave={() => setImportDuckDbDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportDuckDbDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const buf = ev.target?.result;
-                    if (!(buf instanceof ArrayBuffer)) return;
-                    void performImportDuckDb(new Uint8Array(buf), file.name);
-                  };
-                  reader.readAsArrayBuffer(file);
-                }}
-              >
-                <Upload
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a DuckDB file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .duckdb
-                </span>
-                <input
-                  type="file"
-                  accept=".duckdb"
-                  aria-label="Choose DuckDB file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const buf = ev.target?.result;
-                      if (!(buf instanceof ArrayBuffer)) return;
-                      void performImportDuckDb(new Uint8Array(buf), file.name);
-                    };
-                    reader.readAsArrayBuffer(file);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          dragging={importDuckDbDragging}
+          onClose={() => setImportDuckDbOpen(false)}
+          onDraggingChange={setImportDuckDbDragging}
+          onImport={(data, filename) => void performImportDuckDb(data, filename)}
+          title="Import DuckDB File"
+          description={
+            <>
+              Open a local <code>.duckdb</code> file as a new in-memory
+              database.
+            </>
+          }
+          warningText={
+            <>
+              This will replace the current database with the contents of the
+              file. Your file will <strong>not</strong> be uploaded or persisted
+              — it is only loaded into browser memory and will be gone on
+              reload.
+            </>
+          }
+          dropText="Drop a DuckDB file here"
+          browseHint="or click to browse — .duckdb"
+          accept=".duckdb"
+          inputAriaLabel="Choose DuckDB file"
+        />
 
         {/* ── Create Schema popover ── */}
         <Popover.Root

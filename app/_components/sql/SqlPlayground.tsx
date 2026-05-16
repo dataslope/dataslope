@@ -134,6 +134,8 @@ import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
+import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
+import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import {
@@ -2586,164 +2588,60 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        {/* ── Import SQLite dialog ── */}
-        <Dialog.Root
+        <ImportBinaryFileDialog
           open={importSqliteOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setImportSqliteOpen(false);
-              setImportSqliteDragging(false);
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-import-popup">
-              <Dialog.Title className="confirm-title">
-                Import SQLite File
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Open a local <code>.sqlite</code> or <code>.db</code> file as a
-                new in-memory database.
-              </Dialog.Description>
-              <div className="sql-import-warning">
-                <TriangleAlert
-                  size={14}
-                  className="sql-import-warning-icon"
-                  aria-hidden="true"
-                />
-                <span>
-                  This is a playground environment. Your file will{" "}
-                  <strong>not</strong> be uploaded or persisted — it is only
-                  loaded into browser memory and will be gone on reload.
-                </span>
-              </div>
-              <div
-                className={`sql-dropzone${importSqliteDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportSqliteDragging(true);
-                }}
-                onDragLeave={() => setImportSqliteDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportSqliteDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const buf = ev.target?.result as ArrayBuffer | null;
-                    if (!buf) return;
-                    performImportSqlite(new Uint8Array(buf), file.name);
-                  };
-                  reader.readAsArrayBuffer(file);
-                }}
-              >
-                <Upload
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a SQLite file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .sqlite, .db
-                </span>
-                <input
-                  type="file"
-                  accept=".sqlite,.db,.sqlite3"
-                  aria-label="Choose SQLite file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const buf = ev.target?.result as ArrayBuffer | null;
-                      if (!buf) return;
-                      performImportSqlite(new Uint8Array(buf), file.name);
-                    };
-                    reader.readAsArrayBuffer(file);
-                    // Reset the input so the same file can be re-selected.
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          dragging={importSqliteDragging}
+          onClose={() => setImportSqliteOpen(false)}
+          onDraggingChange={setImportSqliteDragging}
+          onImport={(data, filename) => performImportSqlite(data, filename)}
+          title="Import SQLite File"
+          description={
+            <>
+              Open a local <code>.sqlite</code> or <code>.db</code> file as a
+              new in-memory database.
+            </>
+          }
+          warningText={
+            <>
+              This is a playground environment. Your file will{" "}
+              <strong>not</strong> be uploaded or persisted — it is only loaded
+              into browser memory and will be gone on reload.
+            </>
+          }
+          dropText="Drop a SQLite file here"
+          browseHint="or click to browse — .sqlite, .db"
+          accept=".sqlite,.db,.sqlite3"
+          inputAriaLabel="Choose SQLite file"
+        />
 
-        {/* ── Rename Database dialog ── */}
-        <Dialog.Root
+        <RenameDatabaseDialog
           open={renameDbOpen}
-          onOpenChange={(next) => {
-            if (!next) setRenameDbOpen(false);
+          name={renameDbBaseName}
+          ext={renameDbExt}
+          extensionOptions={[
+            { value: ".sqlite", label: ".sqlite (most common)" },
+            ".db",
+            ".sqlite3",
+            ".db3",
+          ]}
+          onNameChange={setRenameDbBaseName}
+          onExtChange={setRenameDbExt}
+          onClose={() => setRenameDbOpen(false)}
+          description="Choose a new filename for the current database."
+          onConfirm={(newFilename) => {
+            setCustomFilenames((prev) => ({
+              ...prev,
+              [activeDbId]: newFilename,
+            }));
+            if (customDb?.id === activeDbId) {
+              setCustomDb((prev) =>
+                prev ? { ...prev, filename: newFilename } : prev,
+              );
+            }
+            showToast(`Renamed to "${newFilename}".`);
+            setRenameDbOpen(false);
           }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Rename Database
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Choose a new filename for the current database.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
-                <div className="sql-rename-db-name-row">
-                  <input
-                    className="sql-rename-input sql-rename-db-name-input"
-                    value={renameDbBaseName}
-                    onChange={(e) => setRenameDbBaseName(e.target.value)}
-                    placeholder="database name"
-                    aria-label="Database name"
-                    autoFocus
-                  />
-                  <select
-                    className="sql-rename-db-ext-select"
-                    value={renameDbExt}
-                    onChange={(e) => setRenameDbExt(e.target.value)}
-                    aria-label="File extension"
-                  >
-                    <option value=".sqlite">.sqlite (most common)</option>
-                    <option value=".db">.db</option>
-                    <option value=".sqlite3">.sqlite3</option>
-                    <option value=".db3">.db3</option>
-                  </select>
-                </div>
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!renameDbBaseName.trim()}
-                  onClick={() => {
-                    const newFilename = `${renameDbBaseName.trim()}${renameDbExt}`;
-                    setCustomFilenames((prev) => ({
-                      ...prev,
-                      [activeDbId]: newFilename,
-                    }));
-                    if (customDb?.id === activeDbId) {
-                      setCustomDb((prev) =>
-                        prev ? { ...prev, filename: newFilename } : prev,
-                      );
-                    }
-                    showToast(`Renamed to "${newFilename}".`);
-                    setRenameDbOpen(false);
-                  }}
-                >
-                  Rename
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        />
 
         {/* ── Import CSV dialog ── */}
         <Dialog.Root

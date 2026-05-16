@@ -2,17 +2,25 @@
 
 import { Dialog } from "@base-ui-components/react/dialog";
 
+export interface ExtensionOption {
+  value: string;
+  /** Displayed in the dropdown. Defaults to `value` if omitted. */
+  label?: string;
+}
+
 export interface RenameDatabaseDialogProps {
   open: boolean;
   name: string;
   ext: string;
-  /** Extension `<option>` values, e.g. `[".pg", ".sql", ".dump"]`. */
-  extensionOptions: string[];
+  /** Extension options for the dropdown. Pass strings or `{ value, label }` pairs. */
+  extensionOptions: Array<string | ExtensionOption>;
   onNameChange: (name: string) => void;
   onExtChange: (ext: string) => void;
   onClose: () => void;
   /** Called with the assembled filename: `${name.trim()}${ext}`. */
   onConfirm: (newFilename: string) => void;
+  /** Overrides the default description text. */
+  description?: string;
 }
 
 export function RenameDatabaseDialog({
@@ -24,6 +32,7 @@ export function RenameDatabaseDialog({
   onExtChange,
   onClose,
   onConfirm,
+  description = "Choose a new display name for the current database.",
 }: RenameDatabaseDialogProps) {
   return (
     <Dialog.Root
@@ -37,7 +46,7 @@ export function RenameDatabaseDialog({
         <Dialog.Popup className="confirm-popup sql-rename-db-popup">
           <Dialog.Title className="confirm-title">Rename Database</Dialog.Title>
           <Dialog.Description className="confirm-desc">
-            Choose a new display name for the current database.
+            {description}
           </Dialog.Description>
           <div className="sql-rename-db-form">
             <div className="sql-rename-db-name-row">
@@ -55,11 +64,15 @@ export function RenameDatabaseDialog({
                 onChange={(e) => onExtChange(e.target.value)}
                 aria-label="File extension"
               >
-                {extensionOptions.map((o) => (
-                  <option key={o} value={o}>
-                    {o}
-                  </option>
-                ))}
+                {extensionOptions.map((o) => {
+                  const val = typeof o === "string" ? o : o.value;
+                  const label = typeof o === "string" ? o : (o.label ?? o.value);
+                  return (
+                    <option key={val} value={val}>
+                      {label}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
