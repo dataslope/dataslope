@@ -34,8 +34,6 @@ import { Popover } from "@base-ui-components/react/popover";
 import { Select } from "@base-ui-components/react/select";
 import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui-components/react/toast";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -81,11 +79,6 @@ const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false },
 );
-import {
-  LANGUAGE_ICONS as PLAYGROUND_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
-} from "../languageIcons";
-import { PLAYGROUNDS } from "../playgrounds";
 import { themeFor } from "../cmExtensions";
 import {
   applyMode,
@@ -105,6 +98,7 @@ import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmD
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import { AddRowDialog } from "../sql/components/AddRowDialog";
+import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
@@ -133,8 +127,8 @@ import {
   DatabaseSelector,
   type DatabaseSelectorAction,
 } from "../sql/components/DatabaseSelector";
-import { ToastList } from "../sql/components/ToastList";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
+import { ToastList } from "../sql/components/ToastList";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
@@ -875,7 +869,6 @@ function quoteIdent(name: string): string {
 type ImportFlavor = "csv" | "json" | "parquet";
 
 function DuckDbPlaygroundInner() {
-  const router = useRouter();
   // Coalesced localStorage writer for settings — install the
   // pagehide/visibilitychange flush listener once per playground mount.
   useEffect(() => {
@@ -1026,6 +1019,8 @@ function DuckDbPlaygroundInner() {
     setSchemas,
     schemaLoading,
     selectedSchemaRef,
+    refreshSchemas: refreshSchemasFromHook,
+    handleSchemaChange: handleSchemaChangeFromHook,
   } = schemaTree;
 
   // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
@@ -1330,8 +1325,8 @@ function DuckDbPlaygroundInner() {
   }, [quoteIdent]);
 
   const refreshSchemas = useCallback(
-    () => schemaTree.refreshSchemas(refreshSchema),
-    [schemaTree.refreshSchemas, refreshSchema],
+    () => refreshSchemasFromHook(refreshSchema),
+    [refreshSchemasFromHook, refreshSchema],
   );
 
   const runSqlForTab = useCallback(
@@ -1911,8 +1906,8 @@ function DuckDbPlaygroundInner() {
   );
 
   const handleSchemaChange = useCallback(
-    (schema: string) => schemaTree.handleSchemaChange(schema, refreshSchema),
-    [schemaTree.handleSchemaChange, refreshSchema],
+    (schema: string) => handleSchemaChangeFromHook(schema, refreshSchema),
+    [handleSchemaChangeFromHook, refreshSchema],
   );
 
   const submitCreateSchema = useCallback(async () => {
@@ -3514,114 +3509,14 @@ function DuckDbPlaygroundInner() {
   );
 
   return (
-    <div className="pg-root">
-      {!loaded && (
-        <div
-          className={`pyodide-loading${statusState === "error" ? " has-error" : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              <span className="loading-hero-text">DuckDB Playground</span>
-              <span className="loading-hero-text">DuckDB Playground</span>
-              <span className="loading-hero-text">DuckDB Playground</span>
-            </div>
-          </div>
-          <div className="loading-bottom">
-            <div className="loading-quip">{loadingMessage}</div>
-            <div className="loading-bar-wrap">
-              <div className="loading-bar" />
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="pg-app">
-        <header className="pg-header">
-          <div className="logo">
-            <Link href="/" aria-label="Dataslope home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/dataslope-logo-blue.svg"
-                alt="Dataslope logo"
-                className="brand-logo"
-              />
-            </Link>
-            <Link href="/" className="brand-name">
-              Dataslope
-            </Link>
-            <Select.Root
-              value={PLAYGROUND_ID}
-              onValueChange={(value) => {
-                const selectedPlayground = PLAYGROUNDS.find(
-                  (playground) => playground.id === value,
-                );
-                if (
-                  selectedPlayground &&
-                  selectedPlayground.id !== PLAYGROUND_ID
-                ) {
-                  router.push(selectedPlayground.href);
-                }
-              }}
-            >
-              <Select.Trigger
-                className="playground-switcher"
-                aria-label="Switch playground"
-              >
-                {(() => {
-                  const Icon = PLAYGROUND_ICONS[PLAYGROUND_ID];
-                  const factor =
-                    PLAYGROUND_ICON_SIZE_FACTOR[PLAYGROUND_ID] ?? 1;
-                  return Icon ? (
-                    <span
-                      className="playground-switcher-lang-icon"
-                      style={{ color: "var(--text)" }}
-                      aria-hidden="true"
-                    >
-                      <Icon size={Math.round(16 * factor)} />
-                    </span>
-                  ) : null;
-                })()}
-                <Select.Value />
-                <Select.Icon className="playground-switcher-icon">
-                  <ChevronDown size={12} />
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner
-                  className="pg-lang-switcher-positioner"
-                  sideOffset={6}
-                  alignItemWithTrigger={false}
-                >
-                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
-                    {PLAYGROUNDS.map((playground) => {
-                      const Icon = PLAYGROUND_ICONS[playground.id];
-                      const factor =
-                        PLAYGROUND_ICON_SIZE_FACTOR[playground.id] ?? 1;
-                      return (
-                        <Select.Item
-                          key={playground.id}
-                          value={playground.id}
-                          className="bui-select-item"
-                        >
-                          {Icon && (
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Icon size={Math.round(16 * factor)} />
-                            </span>
-                          )}
-                          <Select.ItemText>{playground.label}</Select.ItemText>
-                        </Select.Item>
-                      );
-                    })}
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-          <div className="header-sep" />
+    <SqlPlaygroundShell
+      playgroundId={PLAYGROUND_ID}
+      playgroundTitle="DuckDB Playground"
+      loaded={loaded}
+      statusState={statusState}
+      loadingCaption={loadingMessage}
+      headerActions={
+        <>
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger
@@ -3855,9 +3750,10 @@ function DuckDbPlaygroundInner() {
               </svg>
             </button>
           </div>
-        </header>
-
-        <SqlSettingsPanel
+        </>
+      }
+    >
+      <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -5161,8 +5057,7 @@ function DuckDbPlaygroundInner() {
             </section>
           </main>
         </div>
-      </div>
-    </div>
+    </SqlPlaygroundShell>
   );
 }
 
