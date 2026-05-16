@@ -19,19 +19,11 @@
 // user picks a different editor theme.
 
 import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS as DndCSS } from "@dnd-kit/utilities";
 import React, {
   startTransition,
   useCallback,
@@ -94,7 +86,6 @@ import {
   Network,
   Pencil,
   Play,
-  Plus,
   RotateCcw,
   Settings2,
   Table,
@@ -128,21 +119,26 @@ import {
   DataslopeRunOverlay,
   LOADING_QUIPS,
   RuntimeInfoContent,
-  SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
+import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
+import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialogs";
+import { DdlViewerDialog } from "./components/DdlViewerDialog";
+import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
+import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
+import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
+import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
+import { findSampleDatabase } from "../runtime/sqliteSamples";
+import { sqliteAdapter } from "./sqliteAdapter";
 import {
-  SQLITE_SAMPLE_DATABASES,
-  findSampleDatabase,
-} from "../runtime/sqliteSamples";
-import {
-  createSqliteEngine,
   type ColumnConstraintInfo,
   type ColumnSpec,
   type ForeignKeyInfo,
   type SqliteEngine,
   type TableColumnInfo,
 } from "../runtime/sqlite";
+
+const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
 import type { QueryExecResult } from "sql.js";
 import dynamic from "next/dynamic";
 
@@ -154,7 +150,7 @@ const ErDiagramPane = dynamic(
   { ssr: false },
 );
 import { ToastList } from "./components/ToastList";
-import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
+import { SqlTabBar } from "./components/SqlTabBar";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import type { SqlCompletionSchema } from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
@@ -166,15 +162,22 @@ import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
 import { pushTabHistory } from "./utils/tabUtils";
+import {
+  ensurePersistUnloadFlush,
+  persistAsync,
+} from "./utils/persistedStorage";
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
-import { DdlViewer } from "./components/DdlViewer";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
 import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
 import { SchemaLeafItem } from "./components/SchemaLeafItem";
 import { SchemaSection } from "./components/SchemaSection";
+import {
+  DatabaseSelector,
+  type DatabaseSelectorAction,
+} from "./components/DatabaseSelector";
 import {
   dbScopedKey,
   loadActiveTabId,
@@ -196,7 +199,28 @@ function replaceDoc(view: EditorView, value: string): void {
 }
 
 
-const PLAYGROUND_ID = "sqlite";
+const PLAYGROUND_ID = sqliteAdapter.playgroundId;
+
+const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
+  {
+    id: "__new_db__",
+    icon: <FilePlus size={14} />,
+    label: "New Database",
+    description: "Create a blank database",
+  },
+  {
+    id: "__import_sqlite__",
+    icon: <Upload size={14} />,
+    label: "Import SQLite File",
+    description: "Open a .sqlite or .db file",
+  },
+  {
+    id: "__rename_db__",
+    icon: <Pencil size={14} />,
+    label: "Rename Current Database",
+    description: "Change filename and extension",
+  },
+];
 
 const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
   { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
@@ -953,6 +977,9 @@ function PragmaSettingsTab({
 
 function SqlPlaygroundInner() {
   const router = useRouter();
+  useEffect(() => {
+    ensurePersistUnloadFlush();
+  }, []);
 
   // ─── Settings store ──────────────────────────────────────────────────
   const fontSize = useSettingsStore((s) => s.fontSize);
@@ -1151,7 +1178,6 @@ function SqlPlaygroundInner() {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
   const loadingFading = loaded && showLoadingOverlay;
-  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
 
   // ─── Refs ────────────────────────────────────────────────────────────
   const engineRef = useRef<SqliteEngine | null>(null);
@@ -1293,21 +1319,21 @@ function SqlPlaygroundInner() {
   const setFontSize = useCallback(
     (n: number) => {
       setFontSizeState(n);
-      localStorage.setItem(storageKey("fontsize"), String(n));
+      persistAsync(storageKey("fontsize"), String(n));
     },
     [setFontSizeState],
   );
   const setOutputFontSizeEnabled = useCallback(
     (b: boolean) => {
       setOutputFontSizeEnabledState(b);
-      localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
+      persistAsync(storageKey("outputfontsize_enabled"), String(b));
     },
     [setOutputFontSizeEnabledState],
   );
   const setOutputFontSize = useCallback(
     (n: number) => {
       setOutputFontSizeState(n);
-      localStorage.setItem(storageKey("outputfontsize"), String(n));
+      persistAsync(storageKey("outputfontsize"), String(n));
     },
     [setOutputFontSizeState],
   );
@@ -1321,14 +1347,14 @@ function SqlPlaygroundInner() {
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);
-      localStorage.setItem(storageKey("wordwrap"), String(b));
+      persistAsync(storageKey("wordwrap"), String(b));
     },
     [setWordWrapState],
   );
   const setClearBeforeRun = useCallback(
     (b: boolean) => {
       setClearBeforeRunState(b);
-      localStorage.setItem(storageKey("clearbeforerun"), String(b));
+      persistAsync(storageKey("clearbeforerun"), String(b));
     },
     [setClearBeforeRunState],
   );
@@ -1573,7 +1599,7 @@ function SqlPlaygroundInner() {
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
           SQLITE_SAMPLE_DATABASES[0].id;
-        const engine = await createSqliteEngine(initialSampleId);
+        const engine = await sqliteAdapter.createEngine(initialSampleId);
         if (cancelled) return;
         engineRef.current = engine;
         setEngineForRender(engine);
@@ -1688,9 +1714,11 @@ function SqlPlaygroundInner() {
         });
       }
       if (cancelled) return;
+      const langExt = await makeSqlLangExtension("sqlite", schema);
+      if (cancelled) return;
       view.dispatch({
         effects: [
-          sqlComp.reconfigure(makeSqlLangExtension("sqlite", schema)),
+          sqlComp.reconfigure(langExt),
           completionComp.reconfigure(
             makeSqlAutocompletionExtension(completionSchema, "sqlite"),
           ),
@@ -2388,7 +2416,7 @@ function SqlPlaygroundInner() {
           </div>
         </header>
 
-        <SettingsPanel
+        <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -2403,23 +2431,11 @@ function SqlPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          showOutputFontSizeControls={false}
-          clearBeforeRunLabel="Clear Results Before Running"
-          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          extraGeneralRows={null}
-          extraActionRows={
-            <button
-              type="button"
-              className="settings-action-btn"
-              onClick={resetTabsForCurrentDb}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-              <span>Reset query tabs for {activeSample.label}</span>
-            </button>
-          }
+          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+          onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
             {
               value: "pragmas",
@@ -2440,41 +2456,15 @@ function SqlPlaygroundInner() {
           ]}
         />
 
-        <AlertDialog.Root
+        <SwitchDatabaseDialog
           open={pendingDbId !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingDbId(null);
+          onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
+          currentDbFilename={activeSample.filename}
+          onConfirm={() => {
+            if (pendingDbId) performDbSwitch(pendingDbId);
+            setPendingDbId(null);
           }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Switch databases?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                You have unsaved edits in the query tabs for{" "}
-                <strong>{activeSample.filename}</strong>. They will be saved and
-                restored when you switch back, but loading another database will
-                replace what&rsquo;s currently in the editor.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    if (pendingDbId) performDbSwitch(pendingDbId);
-                    setPendingDbId(null);
-                  }}
-                >
-                  Switch database
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        />
 
         <AlertDialog.Root
           open={confirmCloseTabId !== null}
@@ -2507,68 +2497,15 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        <AlertDialog.Root
-          open={confirmRestoreOpen}
-          onOpenChange={setConfirmRestoreOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Restore default settings?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will reset SQLite&apos;s editor font size, word wrap,
-                run/result preferences, and the shared editor theme to their
-                built-in defaults. Your saved queries are not affected.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    restoreDefaultSettings();
-                    setConfirmRestoreOpen(false);
-                  }}
-                >
-                  Restore defaults
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={confirmClearStorageOpen}
-          onOpenChange={setConfirmClearStorageOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Clear all localStorage data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will permanently delete every saved setting and query
-                across <strong>all playgrounds</strong>. The page will reload
-                immediately. This can&rsquo;t be undone.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={clearAllLocalStorage}
-                >
-                  Clear &amp; reload
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SqlSettingsConfirmDialogs
+          dialectDisplayName="SQLite"
+          restoreOpen={confirmRestoreOpen}
+          onRestoreOpenChange={setConfirmRestoreOpen}
+          onRestoreConfirm={restoreDefaultSettings}
+          clearStorageOpen={confirmClearStorageOpen}
+          onClearStorageOpenChange={setConfirmClearStorageOpen}
+          onClearStorageConfirm={clearAllLocalStorage}
+        />
 
         <AlertDialog.Root
           open={truncateConfirm !== null}
@@ -2642,164 +2579,60 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        {/* ── Import SQLite dialog ── */}
-        <Dialog.Root
+        <ImportBinaryFileDialog
           open={importSqliteOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setImportSqliteOpen(false);
-              setImportSqliteDragging(false);
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-import-popup">
-              <Dialog.Title className="confirm-title">
-                Import SQLite File
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Open a local <code>.sqlite</code> or <code>.db</code> file as a
-                new in-memory database.
-              </Dialog.Description>
-              <div className="sql-import-warning">
-                <TriangleAlert
-                  size={14}
-                  className="sql-import-warning-icon"
-                  aria-hidden="true"
-                />
-                <span>
-                  This is a playground environment. Your file will{" "}
-                  <strong>not</strong> be uploaded or persisted — it is only
-                  loaded into browser memory and will be gone on reload.
-                </span>
-              </div>
-              <div
-                className={`sql-dropzone${importSqliteDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportSqliteDragging(true);
-                }}
-                onDragLeave={() => setImportSqliteDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportSqliteDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const buf = ev.target?.result as ArrayBuffer | null;
-                    if (!buf) return;
-                    performImportSqlite(new Uint8Array(buf), file.name);
-                  };
-                  reader.readAsArrayBuffer(file);
-                }}
-              >
-                <Upload
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a SQLite file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .sqlite, .db
-                </span>
-                <input
-                  type="file"
-                  accept=".sqlite,.db,.sqlite3"
-                  aria-label="Choose SQLite file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const buf = ev.target?.result as ArrayBuffer | null;
-                      if (!buf) return;
-                      performImportSqlite(new Uint8Array(buf), file.name);
-                    };
-                    reader.readAsArrayBuffer(file);
-                    // Reset the input so the same file can be re-selected.
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          dragging={importSqliteDragging}
+          onClose={() => setImportSqliteOpen(false)}
+          onDraggingChange={setImportSqliteDragging}
+          onImport={(data, filename) => performImportSqlite(data, filename)}
+          title="Import SQLite File"
+          description={
+            <>
+              Open a local <code>.sqlite</code> or <code>.db</code> file as a
+              new in-memory database.
+            </>
+          }
+          warningText={
+            <>
+              This is a playground environment. Your file will{" "}
+              <strong>not</strong> be uploaded or persisted — it is only loaded
+              into browser memory and will be gone on reload.
+            </>
+          }
+          dropText="Drop a SQLite file here"
+          browseHint="or click to browse — .sqlite, .db"
+          accept=".sqlite,.db,.sqlite3"
+          inputAriaLabel="Choose SQLite file"
+        />
 
-        {/* ── Rename Database dialog ── */}
-        <Dialog.Root
+        <RenameDatabaseDialog
           open={renameDbOpen}
-          onOpenChange={(next) => {
-            if (!next) setRenameDbOpen(false);
+          name={renameDbBaseName}
+          ext={renameDbExt}
+          extensionOptions={[
+            { value: ".sqlite", label: ".sqlite (most common)" },
+            ".db",
+            ".sqlite3",
+            ".db3",
+          ]}
+          onNameChange={setRenameDbBaseName}
+          onExtChange={setRenameDbExt}
+          onClose={() => setRenameDbOpen(false)}
+          description="Choose a new filename for the current database."
+          onConfirm={(newFilename) => {
+            setCustomFilenames((prev) => ({
+              ...prev,
+              [activeDbId]: newFilename,
+            }));
+            if (customDb?.id === activeDbId) {
+              setCustomDb((prev) =>
+                prev ? { ...prev, filename: newFilename } : prev,
+              );
+            }
+            showToast(`Renamed to "${newFilename}".`);
+            setRenameDbOpen(false);
           }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Rename Database
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Choose a new filename for the current database.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
-                <div className="sql-rename-db-name-row">
-                  <input
-                    className="sql-rename-input sql-rename-db-name-input"
-                    value={renameDbBaseName}
-                    onChange={(e) => setRenameDbBaseName(e.target.value)}
-                    placeholder="database name"
-                    aria-label="Database name"
-                    autoFocus
-                  />
-                  <select
-                    className="sql-rename-db-ext-select"
-                    value={renameDbExt}
-                    onChange={(e) => setRenameDbExt(e.target.value)}
-                    aria-label="File extension"
-                  >
-                    <option value=".sqlite">.sqlite (most common)</option>
-                    <option value=".db">.db</option>
-                    <option value=".sqlite3">.sqlite3</option>
-                    <option value=".db3">.db3</option>
-                  </select>
-                </div>
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!renameDbBaseName.trim()}
-                  onClick={() => {
-                    const newFilename = `${renameDbBaseName.trim()}${renameDbExt}`;
-                    setCustomFilenames((prev) => ({
-                      ...prev,
-                      [activeDbId]: newFilename,
-                    }));
-                    if (customDb?.id === activeDbId) {
-                      setCustomDb((prev) =>
-                        prev ? { ...prev, filename: newFilename } : prev,
-                      );
-                    }
-                    showToast(`Renamed to "${newFilename}".`);
-                    setRenameDbOpen(false);
-                  }}
-                >
-                  Rename
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        />
 
         {/* ── Import CSV dialog ── */}
         <Dialog.Root
@@ -3529,52 +3362,21 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        <Dialog.Root
+        <DdlViewerDialog
           open={ddlDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setDdlDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-ddl-popup">
-              <Dialog.Title className="confirm-title">
-                DDL: {ddlDialog?.title ?? ""}
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Read-only view of the original <code>CREATE</code> statement(s)
-                recorded in
-                <code> sqlite_master</code>.
-              </Dialog.Description>
-              <DdlViewer sql={ddlDialog?.sql ?? ""} theme={editorTheme} />
-              <div className="confirm-actions">
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-secondary"
-                  onClick={() => {
-                    if (
-                      ddlDialog &&
-                      typeof navigator !== "undefined" &&
-                      navigator.clipboard
-                    ) {
-                      navigator.clipboard
-                        .writeText(ddlDialog.sql)
-                        .then(() => showToast("Copied DDL to clipboard."))
-                        .catch(() =>
-                          showToast("Couldn't copy to clipboard.", "warn"),
-                        );
-                    }
-                  }}
-                >
-                  Copy
-                </button>
-                <Dialog.Close className="confirm-btn confirm-btn-primary">
-                  Close
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          onOpenChange={(next) => { if (!next) setDdlDialog(null); }}
+          title={ddlDialog?.title ?? ""}
+          sql={ddlDialog?.sql ?? ""}
+          theme={editorTheme}
+          description={
+            <>
+              Read-only view of the original <code>CREATE</code> statement(s)
+              recorded in <code>sqlite_master</code>.
+            </>
+          }
+          onCopied={() => showToast("Copied DDL to clipboard.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
         <Dialog.Root
           open={modifyDialog !== null}
@@ -3851,9 +3653,12 @@ function SqlPlaygroundInner() {
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
               <div className="sql-db-selector-row">
-                <Select.Root
+                <DatabaseSelector
                   value={activeDbId}
-                  onValueChange={(value) => {
+                  displayFilename={activeSample.filename}
+                  samples={SQLITE_SAMPLE_DATABASES}
+                  actions={SQLITE_DB_ACTIONS}
+                  onChange={(value) => {
                     if (value === "__new_db__") {
                       performBlankLoad();
                       return;
@@ -3885,126 +3690,9 @@ function SqlPlaygroundInner() {
                       setRenameDbOpen(true);
                       return;
                     }
-                    requestDbSwitch(String(value));
+                    requestDbSwitch(value);
                   }}
-                >
-                  <Select.Trigger
-                    className="sql-db-selector"
-                    aria-label="Select sample database"
-                  >
-                    <Database
-                      size={14}
-                      className="sql-db-selector-icon"
-                      aria-hidden="true"
-                    />
-                    <Select.Value className="sql-db-selector-value">
-                      {activeSample.filename}
-                    </Select.Value>
-                    <Select.Icon className="playground-switcher-icon">
-                      <svg viewBox="0 0 12 12" width={10} height={10}>
-                        <polyline
-                          points="2,4 6,8 10,4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    </Select.Icon>
-                  </Select.Trigger>
-                  <Select.Portal>
-                    <Select.Positioner
-                      className="sql-db-positioner"
-                      sideOffset={6}
-                      alignItemWithTrigger={false}
-                    >
-                      <Select.Popup className="bui-select-popup sql-db-popup">
-                        <Select.Item
-                          value="__new_db__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <FilePlus size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>New Database</Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Create a blank database
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <Select.Item
-                          value="__import_sqlite__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Upload size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>
-                              Import SQLite File
-                            </Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Open a .sqlite or .db file
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <Select.Item
-                          value="__rename_db__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Pencil size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>
-                              Rename Current Database
-                            </Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Change filename and extension
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <div
-                          role="separator"
-                          aria-orientation="horizontal"
-                          className="sql-db-popup-sep"
-                        />
-                        <div className="sql-db-popup-group-label">
-                          Sample databases
-                        </div>
-                        {SQLITE_SAMPLE_DATABASES.map((s) => (
-                          <Select.Item
-                            key={s.id}
-                            value={s.id}
-                            className="bui-select-item sql-db-item"
-                          >
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Database size={14} />
-                            </span>
-                            <span className="sql-db-item-text">
-                              <Select.ItemText>{s.filename}</Select.ItemText>
-                              <span className="sql-db-item-desc">
-                                {s.description}
-                              </span>
-                            </span>
-                          </Select.Item>
-                        ))}
-                      </Select.Popup>
-                    </Select.Positioner>
-                  </Select.Portal>
-                </Select.Root>
+                />
               </div>
             </div>
 
@@ -4165,80 +3853,44 @@ function SqlPlaygroundInner() {
             className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
             ref={panesRef}
           >
-            <div className="sql-tabbar">
-              <DndContext
-                sensors={tabDragSensors}
-                collisionDetection={closestCenter}
-                onDragStart={onTabDragStart}
-                onDragEnd={onTabDragEnd}
-                onDragCancel={onTabDragCancel}
-              >
-                <SortableContext
-                  items={tabIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  <div className="sql-tabs" role="tablist">
-                    {tabs.map((t) => (
-                      <SqlTab
-                        key={t.id}
-                        tab={t}
-                        active={t.id === activeTabId}
-                        onActivate={() => {
-                          const prevId = activeTabIdRef.current;
-                          if (prevId !== t.id) {
-                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
-                          }
-                          activeTabIdRef.current = t.id;
-                          setActiveTabId(t.id);
-                          // When the user re-clicks the already-active tab the
-                          // useEffect that focuses the editor won't re-run
-                          // (activeTabId hasn't changed).  Focus it explicitly
-                          // so typing works immediately without a second click.
-                          if (
-                            prevId === t.id &&
-                            t.kind !== "er-diagram" &&
-                            t.kind !== "view-data" &&
-                            t.kind !== "query-history"
-                          ) {
-                            editorRef.current?.focus();
-                          }
-                        }}
-                        onClose={() => closeTab(t.id)}
-                        onRename={(name) => renameTab(t.id, name)}
-                        onDuplicate={() => duplicateTab(t.id)}
-                        onCloseOthers={() => closeOtherTabs(t.id)}
-                        onCloseAll={closeAllTabs}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-                <DragOverlay dropAnimation={null}>
-                  {draggingTab ? (
-                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-              {/* The "new tab" (+) button sits outside the scrollable
-                  .sql-tabs container so it remains pinned at the right
-                  edge of the tab bar when tabs overflow horizontally.
-                  When the strip isn't full it naturally appears next
-                  to the last tab because both are flex children of
-                  .sql-tabbar. */}
-              <button
-                type="button"
-                className="sql-tab-add"
-                // Prevent the button from stealing focus on mouse-down so
-                // focus stays wherever it was during the click.  The
-                // addTab hook commits the new tab and focuses the editor
-                // synchronously before the click handler returns.
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={addTab}
-                title="New query tab"
-                aria-label="New query tab"
-              >
-                <Plus size={12} aria-hidden="true" />
-              </button>
-            </div>
+            <SqlTabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              draggingTab={draggingTab}
+              tabDragSensors={tabDragSensors}
+              onDragStart={onTabDragStart}
+              onDragEnd={onTabDragEnd}
+              onDragCancel={onTabDragCancel}
+              onTabActivate={(tabId) => {
+                const prevId = activeTabIdRef.current;
+                if (prevId !== tabId) {
+                  tabHistoryRef.current = pushTabHistory(
+                    tabHistoryRef.current,
+                    prevId,
+                    tabId,
+                  );
+                }
+                activeTabIdRef.current = tabId;
+                setActiveTabId(tabId);
+                // Re-click the already-active tab: focus the editor so
+                // typing works immediately without a second click.
+                const tab = tabs.find((t) => t.id === tabId);
+                if (
+                  prevId === tabId &&
+                  tab?.kind !== "er-diagram" &&
+                  tab?.kind !== "view-data" &&
+                  tab?.kind !== "query-history"
+                ) {
+                  editorRef.current?.focus();
+                }
+              }}
+              onTabClose={closeTab}
+              onTabRename={renameTab}
+              onTabDuplicate={duplicateTab}
+              onTabCloseOthers={closeOtherTabs}
+              onTabCloseAll={closeAllTabs}
+              onAddTab={addTab}
+            />
 
             <div
               className="sql-editor-pane"
@@ -4341,124 +3993,14 @@ function SqlPlaygroundInner() {
                   </Popover.Portal>
                 </Popover.Root>
               </div>
-              <div className="sql-toolbar">
-                <div className="sql-toolbar-shortcuts">
-                  <span
-                    className="kbd-group"
-                    title={
-                      isMac
-                        ? "Cmd + Enter — run selection or all"
-                        : "Ctrl + Enter — run selection or all"
-                    }
-                  >
-                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                    <span className="kbd-plus" aria-hidden="true">
-                      +
-                    </span>
-                    <kbd className="kbd">Enter</kbd>
-                  </span>
-                </div>
-                <div className="sql-toolbar-actions">
-                {hasEditorSelection ? (
-                  <div
-                    className={`run-btn-split${statusState === "running" ? " running" : ""}`}
-                  >
-                    <button
-                      type="button"
-                      className="run-btn-split-main"
-                      disabled={!loaded || statusState === "running"}
-                      onClick={runCurrentSelection}
-                    >
-                      {statusState === "running" ? (
-                        <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                          <circle
-                            cx="6"
-                            cy="6"
-                            r="4.5"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeDasharray="14 8"
-                          />
-                        </svg>
-                      ) : (
-                        <Play size={10} aria-hidden="true" />
-                      )}
-                      {statusState === "running" ? "Running…" : "Run Selection"}
-                    </button>
-                    <span
-                      className="run-btn-split-divider"
-                      aria-hidden="true"
-                    />
-                    <Menu.Root>
-                      <Menu.Trigger
-                        className="run-btn-split-chevron"
-                        disabled={!loaded || statusState === "running"}
-                        aria-label="Run options"
-                      >
-                        <ChevronDown size={11} aria-hidden="true" />
-                      </Menu.Trigger>
-                      <Menu.Portal>
-                        <Menu.Positioner sideOffset={6} align="end">
-                          <Menu.Popup className="bui-popup run-split-dropdown">
-                            <Menu.Item
-                              className="run-split-item"
-                              onClick={runCurrentSelection}
-                              disabled={!loaded || statusState === "running"}
-                            >
-                              <span className="run-split-item-label">
-                                Run Selection
-                              </span>
-                              <span className="run-split-item-kbd">
-                                {isMac ? "⌘Enter" : "Ctrl+Enter"}
-                              </span>
-                            </Menu.Item>
-                            <Menu.Item
-                              className="run-split-item"
-                              onClick={runActiveTab}
-                              disabled={!loaded || statusState === "running"}
-                            >
-                              <span className="run-split-item-label">
-                                Run All
-                              </span>
-                              <span className="run-split-item-kbd">
-                                {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
-                              </span>
-                            </Menu.Item>
-                          </Menu.Popup>
-                        </Menu.Positioner>
-                      </Menu.Portal>
-                    </Menu.Root>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className={`run-btn${statusState === "running" ? " running" : ""}`}
-                    disabled={!loaded || statusState === "running"}
-                    onClick={runActiveTab}
-                  >
-                    {statusState === "running" ? (
-                      <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                        <circle
-                          cx="6"
-                          cy="6"
-                          r="4.5"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeDasharray="14 8"
-                        />
-                      </svg>
-                    ) : (
-                      <Play size={10} aria-hidden="true" />
-                    )}
-                    {statusState === "running" ? "Running…" : "Run"}
-                  </button>
-                )}
-                </div>
-              </div>
+              <SqlEditorToolbar
+                loaded={loaded}
+                running={statusState === "running"}
+                hasEditorSelection={hasEditorSelection}
+                isMac={isMac}
+                onRunSelection={runCurrentSelection}
+                onRunAll={runActiveTab}
+              />
             </div>
 
             <div

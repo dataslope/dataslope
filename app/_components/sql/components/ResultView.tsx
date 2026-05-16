@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { memo, useState, useCallback, useEffect, useRef, useMemo } from "react";
 import React from "react";
 import {
   flexRender,
@@ -186,6 +186,12 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const VIRTUAL_ROW_HEIGHT_ESTIMATE = 30;
 const LOAD_MORE_THRESHOLD_ROWS = 25;
+// Stage 1 (DuckDB perf): when a paged result still contains more than
+// this many DOM rows (e.g. the user disabled pagination, or chose a
+// very large page size), switch the rendering path to the same
+// virtualizer infinite scroll uses so we don't push thousands of
+// <tr> elements into the DOM.
+const VIRTUALIZE_ROW_THRESHOLD = 200;
 
 // ─── Result set export button + tooltip ──────────────────────────────────
 // Encapsulated so it can track menu-open state with a hook and suppress
@@ -378,7 +384,9 @@ export function queryResultsIdentical(
   return true;
 }
 
-export function ResultView({
+export const ResultView = memo(ResultViewImpl);
+
+function ResultViewImpl({
   result,
   loading,
   keyHints,
@@ -1122,7 +1130,15 @@ export function ResultView({
                           onDuplicateRow(sourceTable, columnNames, values)
                       : undefined
                   }
-                  virtualized={isInfiniteAll}
+                  // Always virtualize when rendering more than
+                  // VIRTUALIZE_ROW_THRESHOLD rows (covers the
+                  // "no page limit" + large result-set case the
+                  // Stage 1 audit flagged). Infinite-scroll mode
+                  // always needs virtualization.
+                  virtualized={
+                    isInfiniteAll ||
+                    visibleRows.length > VIRTUALIZE_ROW_THRESHOLD
+                  }
                   scrollParentRef={resultSetsScrollRef}
                   hasMoreRows={hasMoreRows}
                   onLoadMoreRows={

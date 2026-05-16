@@ -196,6 +196,10 @@ export interface PostgresEngine {
     schema?: string,
   ) => Promise<void>;
   activeSample: () => PostgresSampleDatabase;
+  /** Try to import a SQL dump into a fresh sandbox worker. If the SQL
+   *  executes cleanly, swap the engine over to it. If it throws, the
+   *  sandbox is discarded and the existing database stays intact. */
+  importSqlDump: (sql: string) => Promise<PostgresSampleDatabase>;
   close: () => Promise<void>;
 }
 
@@ -729,6 +733,29 @@ export async function createPostgresEngine(
     },
 
     activeSample() {
+      return sample;
+    },
+
+    async importSqlDump(sql) {
+      const next = createFreshWorker();
+      await next.waitReady;
+      try {
+        await next.exec(sql);
+      } catch (err) {
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      }
+      try {
+        await db.close();
+      } catch {
+        /* ignore */
+      }
+      db = next;
+      sample = POSTGRES_BLANK_DATABASE;
       return sample;
     },
 

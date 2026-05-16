@@ -2,7 +2,6 @@
 
 import {
   DndContext,
-  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
@@ -14,7 +13,6 @@ import {
 import {
   SortableContext,
   arrayMove,
-  horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
@@ -53,7 +51,6 @@ import {
   Pencil,
   Play,
   Plus,
-  RotateCcw,
   Table,
   Trash2,
   TriangleAlert,
@@ -101,26 +98,40 @@ import {
   DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
   RuntimeInfoContent,
-  SettingsPanel,
   detectIsMac,
 } from "../playgroundShared";
-import {
-  POSTGRES_SAMPLE_DATABASES,
-  POSTGRES_BLANK_DATABASE,
-  findPostgresSampleDatabase,
-} from "../runtime/postgresSamples";
-import { createPostgresEngine, type PostgresEngine } from "../runtime/postgres";
+import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
+import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
+import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
+import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
+import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
+import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
+import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
+import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
+import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
+import { postgresAdapter } from "./postgresAdapter";
+import { type PostgresEngine } from "../runtime/postgres";
+
+const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
+const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
 import type { QueryExecResult } from "sql.js";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
-import { SqlTab, SqlTabDragOverlay } from "../sql/components/SqlTab";
+import {
+  createTabStorage,
+  tabsAreDirty,
+} from "../sql/shared/tabStorageUtils";
+import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
+import {
+  DatabaseSelector,
+  type DatabaseSelectorAction,
+} from "../sql/components/DatabaseSelector";
 import { ToastList } from "../sql/components/ToastList";
-import { DdlViewer } from "../sql/components/DdlViewer";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
@@ -142,6 +153,10 @@ import {
   stripSqlComments,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import {
+  ensurePersistUnloadFlush,
+  persistAsync,
+} from "../sql/utils/persistedStorage";
 import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
 import type {
   AddRowDialogState,
@@ -165,8 +180,30 @@ import {
 } from "./postgresImport";
 import { FK_ACTIONS } from "../sql/constants";
 
-const PLAYGROUND_ID = "postgres";
-const STORAGE_PREFIX = "pg_postgres_";
+const PLAYGROUND_ID = postgresAdapter.playgroundId;
+const STORAGE_PREFIX = postgresAdapter.storagePrefix;
+const { dbScopedKey, loadTabs, saveTabs } = createTabStorage(STORAGE_PREFIX);
+
+const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
+  {
+    id: "__new_db__",
+    icon: <FilePlus size={14} />,
+    label: "New Database",
+    description: "Create a blank database",
+  },
+  {
+    id: "__import_sql_dump__",
+    icon: <Upload size={14} />,
+    label: "Import SQL Dump",
+    description: "Open a SQL dump file",
+  },
+  {
+    id: "__rename_db__",
+    icon: <Pencil size={14} />,
+    label: "Rename Current Database",
+    description: "Change the display name",
+  },
+];
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -787,8 +824,6 @@ function PgGeneratedColumnRow({
 }
 
 const storageKey = (key: string) => `${STORAGE_PREFIX}${key}`;
-const dbScopedKey = (dbId: string, key: string) =>
-  `${STORAGE_PREFIX}db_${dbId}_${key}`;
 const DEFAULT_PAGE_SIZE = 50;
 
 const RUNTIME_INFO: RuntimeInfo = {
@@ -811,77 +846,13 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
-function makeTabs(defaults: { title: string; code: string }[]): QueryTab[] {
-  return defaults.map((seed) => ({
-    ...seed,
-    id: newTabId(),
-    pristineCode: seed.code,
-  }));
-}
-
-function loadTabs(dbId: string): QueryTab[] {
-  const sample = findPostgresSampleDatabase(dbId);
-  if (typeof window === "undefined") return makeTabs(sample.defaultTabs);
-  try {
-    const raw = localStorage.getItem(dbScopedKey(dbId, "tabs"));
-    if (raw) {
-      const parsed = JSON.parse(raw) as QueryTab[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((tab) => ({
-          id: typeof tab.id === "string" ? tab.id : newTabId(),
-          title: typeof tab.title === "string" ? tab.title : "Query",
-          code: typeof tab.code === "string" ? tab.code : "",
-          pristineCode:
-            typeof tab.pristineCode === "string"
-              ? tab.pristineCode
-              : typeof tab.code === "string"
-                ? tab.code
-                : "",
-          kind: tab.kind === "view-data" ? "view-data" : undefined,
-        }));
-      }
-    }
-  } catch {
-    // Fall back to defaults.
-  }
-  return makeTabs(sample.defaultTabs);
-}
-
-function saveTabs(dbId: string, tabs: QueryTab[]): void {
-  try {
-    localStorage.setItem(
-      dbScopedKey(dbId, "tabs"),
-      JSON.stringify(
-        tabs.filter(
-          (tab) => tab.kind !== "er-diagram" && tab.kind !== "query-history",
-        ),
-      ),
-    );
-  } catch {
-    // Ignore storage quota / private-mode errors.
-  }
-}
-
-function tabsAreDirty(
-  tabs: QueryTab[],
-  defaults: { title: string; code: string }[],
-): boolean {
-  if (tabs.length !== defaults.length) return true;
-  for (let i = 0; i < tabs.length; i += 1) {
-    if (
-      tabs[i].title !== defaults[i].title ||
-      tabs[i].code !== defaults[i].code
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
 type ImportFlavor = "csv" | "json" | "parquet";
 
 function PostgresPlaygroundInner() {
   const router = useRouter();
+  useEffect(() => {
+    ensurePersistUnloadFlush();
+  }, []);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
@@ -921,33 +892,21 @@ function PostgresPlaygroundInner() {
   const setFontSize = useCallback(
     (n: number) => {
       setFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("fontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("fontsize"), String(n));
     },
     [setFontSizeState],
   );
   const setOutputFontSizeEnabled = useCallback(
     (b: boolean) => {
       setOutputFontSizeEnabledState(b);
-      try {
-        localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize_enabled"), String(b));
     },
     [setOutputFontSizeEnabledState],
   );
   const setOutputFontSize = useCallback(
     (n: number) => {
       setOutputFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("outputfontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize"), String(n));
     },
     [setOutputFontSizeState],
   );
@@ -961,22 +920,14 @@ function PostgresPlaygroundInner() {
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);
-      try {
-        localStorage.setItem(storageKey("wordwrap"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("wordwrap"), String(b));
     },
     [setWordWrapState],
   );
   const setClearBeforeRun = useCallback(
     (b: boolean) => {
       setClearBeforeRunState(b);
-      try {
-        localStorage.setItem(storageKey("clearbeforerun"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("clearbeforerun"), String(b));
     },
     [setClearBeforeRunState],
   );
@@ -988,7 +939,9 @@ function PostgresPlaygroundInner() {
       : (localStorage.getItem(storageKey("db")) ??
         POSTGRES_SAMPLE_DATABASES[0].id);
   const [activeDbId, setActiveDbId] = useState(initialDbId);
-  const [tabs, setTabs] = useState<QueryTab[]>(() => loadTabs(initialDbId));
+  const [tabs, setTabs] = useState<QueryTab[]>(() =>
+    loadTabs(initialDbId, findPostgresSampleDatabase(initialDbId).defaultTabs),
+  );
   const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? "");
   const [resultsByTab, setResultsByTab] = useState<
     Record<string, QueryRunResult | null>
@@ -1209,7 +1162,6 @@ function PostgresPlaygroundInner() {
     activeDbId === POSTGRES_BLANK_DATABASE.id && customDbFilename !== null
       ? customDbFilename
       : activeSample.filename;
-  const tabIds = useMemo(() => tabs.map((tab) => tab.id), [tabs]);
   const tabDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
@@ -1669,7 +1621,7 @@ function PostgresPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading PostgreSQL engine…");
-        const engine = await createPostgresEngine(initialDbId);
+        const engine = await postgresAdapter.createEngine(initialDbId);
         if (cancelled) {
           // Component unmounted while the engine was being created; close it
           // immediately so the worker is terminated and its leader-election
@@ -1776,12 +1728,15 @@ function PostgresPlaygroundInner() {
     void refreshSchemas();
   }, [showSystemSchemas, refreshSchemas]);
 
-  // Keep autocomplete schema in sync with current tables/views.
+  // Keep autocomplete schema in sync with current tables/views. The
+  // reconfigure key memoization mirrors the DuckDB playground's
+  // Stage 1.2 fix so a query / CSV import that doesn't change the
+  // visible schema doesn't trigger a full editor re-parse.
+  const lastReconfigureKeyRef = useRef<string>("");
   useEffect(() => {
     const view = editorRef.current;
-    const langComp = langCompRef.current;
     const completionComp = completionCompRef.current;
-    if (!view || !langComp || !completionComp) return;
+    if (!view || !langCompRef.current || !completionComp) return;
     const schema: Record<string, string[]> = {};
     const completionSchema: SqlCompletionSchema = { entities: [] };
     for (const name of tables) {
@@ -1794,14 +1749,34 @@ function PostgresPlaygroundInner() {
       schema[name] = cols;
       completionSchema.entities.push({ name, columns: cols, kind: "view" });
     }
+    const key = JSON.stringify(completionSchema.entities);
+    if (key === lastReconfigureKeyRef.current) return;
     view.dispatch({
       effects: [
-        langComp.reconfigure(makeSqlLangExtension("postgres", schema)),
         completionComp.reconfigure(
           makeSqlAutocompletionExtension(completionSchema, "postgres"),
         ),
       ],
     });
+    // Lazy-load `@codemirror/lang-sql` (Stage 5.3) and apply the lang
+    // reconfigure once the chunk lands. Only commit
+    // `lastReconfigureKeyRef` after the dispatch fires so a
+    // StrictMode-cancelled effect can't make the next run skip the
+    // lang reconfigure for the current schema.
+    let cancelled = false;
+    void makeSqlLangExtension("postgres", schema).then((langExt) => {
+      if (cancelled) return;
+      const currentView = editorRef.current;
+      const currentLangComp = langCompRef.current;
+      if (!currentView || !currentLangComp) return;
+      currentView.dispatch({
+        effects: [currentLangComp.reconfigure(langExt)],
+      });
+      lastReconfigureKeyRef.current = key;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [tables, views, columnsByEntity]);
 
   // Drop result entries whose owning tab no longer exists.
@@ -1839,7 +1814,7 @@ function PostgresPlaygroundInner() {
         } catch {
           /* ignore */
         }
-        const nextTabs = loadTabs(sample.id);
+        const nextTabs = loadTabs(sample.id, sample.defaultTabs);
         persistTabs(nextTabs, sample.id);
         // Try to restore active tab id for this DB.
         let nextActive = nextTabs[0]?.id ?? "";
@@ -1896,8 +1871,9 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       setStatusState("loading");
       try {
-        await engine.loadBlankDatabase();
-        await engine.exec(sqlText);
+        // Imports into a sandbox worker first; only swaps in on success,
+        // so a failed import leaves the existing database intact.
+        await engine.importSqlDump(sqlText);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
         try {
@@ -1905,7 +1881,10 @@ function PostgresPlaygroundInner() {
         } catch {
           /* ignore */
         }
-        const nextTabs = loadTabs(POSTGRES_BLANK_DATABASE.id);
+        const nextTabs = loadTabs(
+          POSTGRES_BLANK_DATABASE.id,
+          POSTGRES_BLANK_DATABASE.defaultTabs,
+        );
         persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
         let nextActive = nextTabs[0]?.id ?? "";
         try {
@@ -2002,7 +1981,11 @@ function PostgresPlaygroundInner() {
 
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findPostgresSampleDatabase(activeDbIdRef.current);
-    const fresh = makeTabs(sample.defaultTabs);
+    const fresh = sample.defaultTabs.map((seed) => ({
+      ...seed,
+      id: newTabId(),
+      pristineCode: seed.code,
+    }));
     tabHistoryRef.current = [];
     persistTabs(fresh);
     setActiveTabId(fresh[0]?.id ?? "");
@@ -3538,7 +3521,7 @@ function PostgresPlaygroundInner() {
           </div>
         </header>
 
-        <SettingsPanel
+        <SqlSettingsPanel
           open={settingsOpen}
           fontSize={fontSize}
           setFontSize={setFontSize}
@@ -3553,23 +3536,11 @@ function PostgresPlaygroundInner() {
           clearBeforeRun={clearBeforeRun}
           setClearBeforeRun={setClearBeforeRun}
           language={PLAYGROUND_ID}
-          showOutputFontSizeControls={false}
-          clearBeforeRunLabel="Clear Results Before Running"
-          showClearBeforeRunRow={false}
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          extraGeneralRows={null}
-          extraActionRows={
-            <button
-              type="button"
-              className="settings-action-btn"
-              onClick={resetTabsForCurrentDb}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-              <span>Reset query tabs for {activeSample.label}</span>
-            </button>
-          }
+          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+          onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
             {
               value: "database",
@@ -3606,368 +3577,68 @@ function PostgresPlaygroundInner() {
           ]}
         />
 
-        <Dialog.Root
+        <DdlViewerDialog
           open={ddlDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setDdlDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-ddl-popup">
-              <Dialog.Title className="confirm-title">
-                DDL: {ddlDialog?.title ?? ""}
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Read-only view of the reconstructed <code>CREATE</code>{" "}
-                statement(s).
-              </Dialog.Description>
-              <DdlViewer
-                sql={ddlDialog?.sql ?? ""}
-                theme={editorTheme}
-                isPostgres
-              />
-              <div className="confirm-actions">
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-secondary"
-                  onClick={() => {
-                    if (
-                      ddlDialog &&
-                      typeof navigator !== "undefined" &&
-                      navigator.clipboard
-                    ) {
-                      navigator.clipboard
-                        .writeText(ddlDialog.sql)
-                        .then(() => showToast("Copied DDL to clipboard."))
-                        .catch(() =>
-                          showToast("Couldn't copy to clipboard.", "warn"),
-                        );
-                    }
-                  }}
-                >
-                  Copy
-                </button>
-                <Dialog.Close className="confirm-btn confirm-btn-primary">
-                  Close
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          onOpenChange={(next) => { if (!next) setDdlDialog(null); }}
+          title={ddlDialog?.title ?? ""}
+          sql={ddlDialog?.sql ?? ""}
+          theme={editorTheme}
+          isPostgres
+          onCopied={() => showToast("Copied DDL to clipboard.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
-        {/* ── Import SQL dump dialog ── */}
-        <Dialog.Root
+        <ImportSqlDumpDialog
           open={importSqlDumpOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setImportSqlDumpOpen(false);
-              setImportSqlDumpDragging(false);
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-import-popup">
-              <Dialog.Title className="confirm-title">
-                Import SQL Dump
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Open a local <code>.sql</code> dump file as a new in-memory
-                database.
-              </Dialog.Description>
-              <div className="sql-import-warning">
-                <TriangleAlert
-                  size={14}
-                  className="sql-import-warning-icon"
-                  aria-hidden="true"
-                />
-                <span>
-                  This will replace the current database with the contents of
-                  the file. Your file will <strong>not</strong> be uploaded or
-                  persisted — it is only loaded into browser memory and will be
-                  gone on reload.
-                </span>
-              </div>
-              <div
-                className={`sql-dropzone${importSqlDumpDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportSqlDumpDragging(true);
-                }}
-                onDragLeave={() => setImportSqlDumpDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportSqlDumpDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const text = ev.target?.result as string | null;
-                    if (text == null) return;
-                    void performImportSqlDump(text, file.name);
-                  };
-                  reader.readAsText(file);
-                }}
-              >
-                <Upload
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a SQL file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .sql
-                </span>
-                <input
-                  type="file"
-                  accept=".sql"
-                  aria-label="Choose SQL dump file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const text = ev.target?.result as string | null;
-                      if (text == null) return;
-                      void performImportSqlDump(text, file.name);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          dragging={importSqlDumpDragging}
+          onClose={() => setImportSqlDumpOpen(false)}
+          onDraggingChange={setImportSqlDumpDragging}
+          onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
+        />
 
-        {/* ── Rename Database dialog ── */}
-        <Dialog.Root
+        <RenameDatabaseDialog
           open={renameDbOpen}
-          onOpenChange={(next) => {
-            if (!next) setRenameDbOpen(false);
+          name={renameDbName}
+          ext={renameDbExt}
+          extensionOptions={[".pg", ".sql", ".dump"]}
+          onNameChange={setRenameDbName}
+          onExtChange={setRenameDbExt}
+          onClose={() => setRenameDbOpen(false)}
+          onConfirm={(newFilename) => {
+            setCustomDbFilename(newFilename);
+            showToast(`Renamed to "${newFilename}".`);
+            setRenameDbOpen(false);
           }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Rename Database
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Choose a new display name for the current database.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
-                <div className="sql-rename-db-name-row">
-                  <input
-                    className="sql-rename-input sql-rename-db-name-input"
-                    value={renameDbName}
-                    onChange={(e) => setRenameDbName(e.target.value)}
-                    placeholder="database name"
-                    aria-label="Database name"
-                    autoFocus
-                  />
-                  <select
-                    className="sql-rename-db-ext-select"
-                    value={renameDbExt}
-                    onChange={(e) => setRenameDbExt(e.target.value)}
-                    aria-label="File extension"
-                  >
-                    <option value=".pg">.pg</option>
-                    <option value=".sql">.sql</option>
-                    <option value=".dump">.dump</option>
-                  </select>
-                </div>
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!renameDbName.trim()}
-                  onClick={() => {
-                    const newFilename = `${renameDbName.trim()}${renameDbExt}`;
-                    setCustomDbFilename(newFilename);
-                    showToast(`Renamed to "${newFilename}".`);
-                    setRenameDbOpen(false);
-                  }}
-                >
-                  Rename
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        />
 
-        <AlertDialog.Root
+        <SwitchDatabaseDialog
           open={pendingDbId !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingDbId(null);
+          onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
+          currentDbFilename={displayFilename}
+          onConfirm={() => {
+            if (pendingDbId) void performDbSwitch(pendingDbId);
+            setPendingDbId(null);
           }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Switch databases?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                You have unsaved edits in the query tabs for{" "}
-                <strong>{displayFilename}</strong>. They will be saved and
-                restored when you switch back, but loading another database will
-                replace what&rsquo;s currently in the editor.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    if (pendingDbId) void performDbSwitch(pendingDbId);
-                    setPendingDbId(null);
-                  }}
-                >
-                  Switch database
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        />
 
-        <AlertDialog.Root
-          open={pendingDropEntity !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingDropEntity(null);
-          }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Drop {pendingDropEntity?.kind ?? "entity"}?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will permanently drop{" "}
-                <strong>{pendingDropEntity?.name ?? ""}</strong> from the
-                in-memory database. Reload the page to restore the sample.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => void performDropEntity()}
-                >
-                  Drop
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SchemaActionDialogs
+          dropEntityPending={pendingDropEntity}
+          onDropEntityOpenChange={(next) => { if (!next) setPendingDropEntity(null); }}
+          onDropEntityConfirm={() => void performDropEntity()}
+          truncatePending={pendingTruncate}
+          onTruncateOpenChange={(next) => { if (!next) setPendingTruncate(null); }}
+          onTruncateConfirm={() => void confirmTruncate()}
+        />
 
-        <AlertDialog.Root
-          open={pendingTruncate !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingTruncate(null);
-          }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Truncate table?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                Truncate table <strong>{pendingTruncate}</strong>? This deletes
-                every row but keeps the schema. The change is in-memory only and
-                will be undone next page load.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => void confirmTruncate()}
-                >
-                  Truncate
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={confirmRestoreOpen}
-          onOpenChange={setConfirmRestoreOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Restore default settings?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will reset PostgreSQL&apos;s editor font size, word wrap,
-                run/result preferences, and the shared editor theme to their
-                built-in defaults. Your saved queries are not affected.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    restoreDefaultSettings();
-                    setConfirmRestoreOpen(false);
-                  }}
-                >
-                  Restore
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={confirmClearStorageOpen}
-          onOpenChange={setConfirmClearStorageOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Clear all localStorage data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                Settings, saved queries, and per-database state for every
-                Dataslope playground will be erased. This action cannot be
-                undone — the page will reload immediately afterwards.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={clearAllLocalStorage}
-                >
-                  Clear &amp; reload
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SqlSettingsConfirmDialogs
+          dialectDisplayName="PostgreSQL"
+          restoreOpen={confirmRestoreOpen}
+          onRestoreOpenChange={setConfirmRestoreOpen}
+          onRestoreConfirm={restoreDefaultSettings}
+          clearStorageOpen={confirmClearStorageOpen}
+          onClearStorageOpenChange={setConfirmClearStorageOpen}
+          onClearStorageConfirm={clearAllLocalStorage}
+        />
 
         {/* ── View/Edit Structure drawer ── */}
         <Dialog.Root
@@ -4631,9 +4302,14 @@ function PostgresPlaygroundInner() {
         <div className="sql-shell postgres-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
-              <Select.Root
+              <DatabaseSelector
                 value={activeDbId}
-                onValueChange={(value) => {
+                displayFilename={displayFilename}
+                samples={POSTGRES_SAMPLE_DATABASES}
+                actions={POSTGRES_DB_ACTIONS}
+                triggerClassName="sql-database-selector"
+                chevron={<ChevronDown size={12} />}
+                onChange={(value) => {
                   if (value === "__new_db__") {
                     void performDbSwitch(POSTGRES_BLANK_DATABASE.id);
                     return;
@@ -4655,117 +4331,9 @@ function PostgresPlaygroundInner() {
                     setRenameDbOpen(true);
                     return;
                   }
-                  requestDbSwitch(String(value));
+                  requestDbSwitch(value);
                 }}
-              >
-                <Select.Trigger
-                  className="sql-db-selector sql-database-selector"
-                  aria-label="Select sample database"
-                >
-                  <Database
-                    size={14}
-                    className="sql-db-selector-icon"
-                    aria-hidden="true"
-                  />
-                  <Select.Value className="sql-db-selector-value">
-                    {displayFilename}
-                  </Select.Value>
-                  <Select.Icon className="playground-switcher-icon">
-                    <ChevronDown size={12} />
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner
-                    className="sql-db-positioner"
-                    sideOffset={6}
-                    alignItemWithTrigger={false}
-                  >
-                    <Select.Popup className="bui-select-popup sql-db-popup">
-                      <Select.Item
-                        value="__new_db__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <FilePlus size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>New Database</Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Create a blank database
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <Select.Item
-                        value="__import_sql_dump__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <Upload size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>Import SQL Dump</Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Open a SQL dump file
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <Select.Item
-                        value="__rename_db__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <Pencil size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>
-                            Rename Current Database
-                          </Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Change the display name
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <div
-                        role="separator"
-                        aria-orientation="horizontal"
-                        className="sql-db-popup-sep"
-                      />
-                      <div className="sql-db-popup-group-label">
-                        Sample databases
-                      </div>
-                      {POSTGRES_SAMPLE_DATABASES.map((sample) => (
-                        <Select.Item
-                          key={sample.id}
-                          value={sample.id}
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Database size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>{sample.filename}</Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              {sample.description}
-                            </span>
-                          </span>
-                        </Select.Item>
-                      ))}
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
+              />
             </div>
             <div className="sql-schema-selector-wrap">
               <div className="sql-db-selector-row">
@@ -5124,93 +4692,65 @@ function PostgresPlaygroundInner() {
             ref={panesRef}
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
           >
-            <div className="sql-tabbar">
-              <DndContext
-                sensors={tabDragSensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleTabDragStart}
-                onDragEnd={handleTabDragEnd}
-                onDragCancel={handleTabDragCancel}
-              >
-                <SortableContext
-                  items={tabIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  <div className="sql-tabs" role="tablist">
-                    {tabs.map((tab) => (
-                      <SqlTab
-                        key={tab.id}
-                        tab={tab}
-                        active={tab.id === activeTabId}
-                        onActivate={() => {
-                          const prevId = activeTabIdRef.current;
-                          if (prevId !== tab.id) {
-                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, tab.id);
-                          }
-                          setActiveTabId(tab.id);
-                        }}
-                        onClose={() => closeTab(tab.id)}
-                        onRename={(title) =>
-                          persistTabs(
-                            tabsRef.current.map((candidate) =>
-                              candidate.id === tab.id
-                                ? { ...candidate, title }
-                                : candidate,
-                            ),
-                          )
-                        }
-                        onDuplicate={() => {
-                          const dup = {
-                            ...tab,
-                            id: newTabId(),
-                            title: `${tab.title} copy`,
-                          };
-                          tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, dup.id);
-                          persistTabs([...tabsRef.current, dup]);
-                          setActiveTabId(dup.id);
-                        }}
-                        onCloseOthers={() => {
-                          tabHistoryRef.current = [];
-                          persistTabs([tab]);
-                        }}
-                        onCloseAll={() => {
-                          const fresh = {
-                            id: newTabId(),
-                            title: "Query 1",
-                            code: "",
-                            pristineCode: "",
-                          };
-                          tabHistoryRef.current = [];
-                          persistTabs([fresh]);
-                          setActiveTabId(fresh.id);
-                          window.setTimeout(
-                            () => editorRef.current?.focus(),
-                            0,
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-                <DragOverlay dropAnimation={null}>
-                  {draggingTab ? (
-                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-              <button
-                type="button"
-                className="sql-tab-add"
-                // Prevent the button from stealing focus on mouse-down so
-                // focus stays wherever it was.  The editor focus is
-                // handled synchronously inside addTab.
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={addTab}
-                aria-label="New query tab"
-              >
-                <Plus size={12} aria-hidden="true" />
-              </button>
-            </div>
+            <SqlTabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              draggingTab={draggingTab}
+              tabDragSensors={tabDragSensors}
+              onDragStart={handleTabDragStart}
+              onDragEnd={handleTabDragEnd}
+              onDragCancel={handleTabDragCancel}
+              onTabActivate={(tabId) => {
+                const prevId = activeTabIdRef.current;
+                if (prevId !== tabId) {
+                  tabHistoryRef.current = pushTabHistory(
+                    tabHistoryRef.current,
+                    prevId,
+                    tabId,
+                  );
+                }
+                setActiveTabId(tabId);
+              }}
+              onTabClose={closeTab}
+              onTabRename={(tabId, title) =>
+                persistTabs(
+                  tabsRef.current.map((t) =>
+                    t.id === tabId ? { ...t, title } : t,
+                  ),
+                )
+              }
+              onTabDuplicate={(tabId) => {
+                const tab = tabsRef.current.find((t) => t.id === tabId);
+                if (!tab) return;
+                const dup = { ...tab, id: newTabId(), title: `${tab.title} copy` };
+                tabHistoryRef.current = pushTabHistory(
+                  tabHistoryRef.current,
+                  activeTabIdRef.current,
+                  dup.id,
+                );
+                persistTabs([...tabsRef.current, dup]);
+                setActiveTabId(dup.id);
+              }}
+              onTabCloseOthers={(tabId) => {
+                const tab = tabsRef.current.find((t) => t.id === tabId);
+                if (!tab) return;
+                tabHistoryRef.current = [];
+                persistTabs([tab]);
+              }}
+              onTabCloseAll={() => {
+                const fresh = {
+                  id: newTabId(),
+                  title: "Query 1",
+                  code: "",
+                  pristineCode: "",
+                };
+                tabHistoryRef.current = [];
+                persistTabs([fresh]);
+                setActiveTabId(fresh.id);
+                window.setTimeout(() => editorRef.current?.focus(), 0);
+              }}
+              onAddTab={addTab}
+            />
             <div
               className="sql-editor-pane"
               ref={editorPaneRef}
@@ -5312,126 +4852,14 @@ function PostgresPlaygroundInner() {
                   </Popover.Portal>
                 </Popover.Root>
               </div>
-              <div className="sql-toolbar">
-                <div className="sql-toolbar-shortcuts">
-                  <span
-                    className="kbd-group"
-                    title={
-                      isMac
-                        ? "Cmd + Enter — run selection or all"
-                        : "Ctrl + Enter — run selection or all"
-                    }
-                  >
-                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                    <span className="kbd-plus" aria-hidden="true">
-                      +
-                    </span>
-                    <kbd className="kbd">Enter</kbd>
-                  </span>
-                </div>
-                <div className="sql-toolbar-actions">
-                  {hasEditorSelection ? (
-                    <div
-                      className={`run-btn-split${statusState === "running" ? " running" : ""}`}
-                    >
-                      <button
-                        type="button"
-                        className="run-btn-split-main"
-                        disabled={!loaded || statusState === "running"}
-                        onClick={runCurrentSelection}
-                      >
-                        {statusState === "running" ? (
-                          <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                            <circle
-                              cx="6"
-                              cy="6"
-                              r="4.5"
-                              fill="none"
-                              stroke="white"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeDasharray="14 8"
-                            />
-                          </svg>
-                        ) : (
-                          <Play size={10} aria-hidden="true" />
-                        )}
-                        {statusState === "running"
-                          ? "Running…"
-                          : "Run Selection"}
-                      </button>
-                      <span
-                        className="run-btn-split-divider"
-                        aria-hidden="true"
-                      />
-                      <Menu.Root>
-                        <Menu.Trigger
-                          className="run-btn-split-chevron"
-                          disabled={!loaded || statusState === "running"}
-                          aria-label="Run options"
-                        >
-                          <ChevronDown size={11} aria-hidden="true" />
-                        </Menu.Trigger>
-                        <Menu.Portal>
-                          <Menu.Positioner sideOffset={6} align="end">
-                            <Menu.Popup className="bui-popup run-split-dropdown">
-                              <Menu.Item
-                                className="run-split-item"
-                                onClick={runCurrentSelection}
-                                disabled={!loaded || statusState === "running"}
-                              >
-                                <span className="run-split-item-label">
-                                  Run Selection
-                                </span>
-                                <span className="run-split-item-kbd">
-                                  {isMac ? "⌘Enter" : "Ctrl+Enter"}
-                                </span>
-                              </Menu.Item>
-                              <Menu.Item
-                                className="run-split-item"
-                                onClick={runActiveTab}
-                                disabled={!loaded || statusState === "running"}
-                              >
-                                <span className="run-split-item-label">
-                                  Run All
-                                </span>
-                                <span className="run-split-item-kbd">
-                                  {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
-                                </span>
-                              </Menu.Item>
-                            </Menu.Popup>
-                          </Menu.Positioner>
-                        </Menu.Portal>
-                      </Menu.Root>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      className={`run-btn${statusState === "running" ? " running" : ""}`}
-                      disabled={!loaded || statusState === "running"}
-                      onClick={runActiveTab}
-                    >
-                      {statusState === "running" ? (
-                        <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                          <circle
-                            cx="6"
-                            cy="6"
-                            r="4.5"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeDasharray="14 8"
-                          />
-                        </svg>
-                      ) : (
-                        <Play size={10} aria-hidden="true" />
-                      )}
-                      {statusState === "running" ? "Running…" : "Run"}
-                    </button>
-                  )}
-                </div>
-              </div>
+              <SqlEditorToolbar
+                loaded={loaded}
+                running={statusState === "running"}
+                hasEditorSelection={hasEditorSelection}
+                isMac={isMac}
+                onRunSelection={runCurrentSelection}
+                onRunAll={runActiveTab}
+              />
             </div>
             {activeTab?.kind === "er-diagram" ? (
               <ErDiagramPane

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
@@ -117,7 +117,9 @@ export interface SchemaItemProps {
   onGetRowCount: (name: string) => number | Promise<number>;
 }
 
-export function SchemaItem({
+export const SchemaItem = memo(SchemaItemImpl);
+
+function SchemaItemImpl({
   name,
   kind,
   expanded,

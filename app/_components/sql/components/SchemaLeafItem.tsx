@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Hash, Zap } from "lucide-react";
@@ -18,7 +19,9 @@ export interface SchemaLeafItemProps {
   onDrop: (name: string, kind: "index" | "trigger") => void;
 }
 
-export function SchemaLeafItem({
+export const SchemaLeafItem = memo(SchemaLeafItemImpl);
+
+function SchemaLeafItemImpl({
   name,
   kind,
   onCopy,

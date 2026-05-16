@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Dialog } from "@base-ui-components/react/dialog";
@@ -20,7 +20,9 @@ export interface SqlTabProps {
   onCloseAll: () => void;
 }
 
-export function SqlTab({
+export const SqlTab = memo(SqlTabImpl);
+
+function SqlTabImpl({
   tab,
   active,
   onActivate,

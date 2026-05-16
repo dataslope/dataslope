@@ -1,6 +1,7 @@
 import type { QueryExecResult, SqlValue } from "sql.js";
 import type { TableColumnInfo } from "../../runtime/sqlite";
 import type { ImportColComparison } from "../types";
+import { ensureParquetWasm } from "./parquetWasm";
 
 /** Parse CSV text into headers and rows. Used by every SQL playground
  *  (sqlite, postgres, duckdb) so all three import flows behave
@@ -62,32 +63,13 @@ export function tableNameFromFilename(filename: string): string {
   return base || "imported_table";
 }
 
-let _parquetWasmInit:
-  | Promise<typeof import("parquet-wasm/esm")>
-  | null = null;
-/** Lazy-loaded parquet decoder shared across SQL playgrounds. The WASM
- *  binary is fetched from jsDelivr on first use and cached for the
- *  lifetime of the page. */
-async function initParquetWasm(): Promise<typeof import("parquet-wasm/esm")> {
-  if (!_parquetWasmInit) {
-    _parquetWasmInit = (async () => {
-      const m = await import("parquet-wasm/esm");
-      await m.default(
-        "https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm",
-      );
-      return m;
-    })();
-  }
-  return _parquetWasmInit;
-}
-
 /** Read a Parquet file and materialise it into the same column/row
  *  shape parseCsv returns, so callers can hand the result off to a
  *  shared import preview component. */
 export async function readParquetFile(
   file: File,
 ): Promise<{ columns: string[]; rows: QueryExecResult["values"] }> {
-  const mod = await initParquetWasm();
+  const mod = await ensureParquetWasm();
   const { tableFromIPC } = await import("apache-arrow");
   const bytes = await file.arrayBuffer();
   const wasmTable = mod.readParquet(new Uint8Array(bytes));

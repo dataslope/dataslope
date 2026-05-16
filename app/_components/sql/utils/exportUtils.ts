@@ -1,6 +1,7 @@
 "use client";
 
 import type { QueryExecResult } from "sql.js";
+import { ensureParquetWasm } from "./parquetWasm";
 
 export function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
@@ -112,21 +113,6 @@ export function exportResultToSql(
   );
 }
 
-let _parquetWasmInit: Promise<typeof import("parquet-wasm/esm")> | null = null;
-
-async function initParquetWasm(): Promise<typeof import("parquet-wasm/esm")> {
-  if (!_parquetWasmInit) {
-    _parquetWasmInit = (async () => {
-      const mod = await import("parquet-wasm/esm");
-      await mod.default(
-        "https://cdn.jsdelivr.net/npm/parquet-wasm@0.7.1/esm/parquet_wasm_bg.wasm",
-      );
-      return mod;
-    })();
-  }
-  return _parquetWasmInit;
-}
-
 export async function exportResultToParquet(
   columns: string[],
   rows: QueryExecResult["values"],
@@ -135,7 +121,7 @@ export async function exportResultToParquet(
   const [
     { tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray },
     { Table: WasmParquetTable, writeParquet },
-  ] = await Promise.all([import("apache-arrow"), initParquetWasm()]);
+  ] = await Promise.all([import("apache-arrow"), ensureParquetWasm()]);
 
   const colArrays: Record<string, unknown[]> = {};
   for (const col of columns) colArrays[col] = [];

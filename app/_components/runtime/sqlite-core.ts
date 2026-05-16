@@ -1181,6 +1181,20 @@ export async function createSqliteEngineInProcess(
       return meta;
     },
     loadFromBytes(bytes: Uint8Array, filename: string) {
+      // Build the new database first so a corrupt or unsupported file
+      // throws before we tear down the live one — keeps the playground
+      // in a working state if the bytes turn out to be invalid.
+      const next = new SQL.Database(bytes);
+      try {
+        next.run("PRAGMA foreign_keys = ON;");
+      } catch (err) {
+        try {
+          next.close();
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      }
       if (db) {
         try {
           db.close();
@@ -1188,8 +1202,7 @@ export async function createSqliteEngineInProcess(
           // Ignore close errors.
         }
       }
-      db = new SQL.Database(bytes);
-      db.run("PRAGMA foreign_keys = ON;");
+      db = next;
       // Derive a stable-ish id from the filename so the UI can
       // distinguish this from the blank placeholder.
       const basename = filename

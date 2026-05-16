@@ -5,25 +5,15 @@
 // loading a binary `.sqlite` file) is a one-entry change.
 
 import type { Database } from "sql.js";
+import {
+  findSqlSampleById,
+  type QueryTabSeed,
+  type SqlSampleDatabaseBase,
+} from "./sqlSamples";
 
-export interface QueryTabSeed {
-  /** Human-readable title shown in the tab strip. */
-  title: string;
-  /** Initial SQL contents of the tab. */
-  code: string;
-}
+export type { QueryTabSeed } from "./sqlSamples";
 
-export interface SqliteSampleDatabase {
-  /** Stable id used in localStorage keys and the selector value. */
-  id: string;
-  /** Human-readable name shown in the selector trigger and dropdown. */
-  label: string;
-  /** Display filename (e.g. `chinook.db`) shown next to the selector
-   *  trigger so the user sees the same on-disk metaphor used by other
-   *  SQLite tools. */
-  filename: string;
-  /** Short description shown under the label in the selector dropdown. */
-  description: string;
+export interface SqliteSampleDatabase extends SqlSampleDatabaseBase {
   /** Multi-statement DDL string. Run as one batch via `db.run`. */
   schema: string;
   /** Populates the database tables created by `schema`. Receives a fresh
@@ -882,8 +872,5 @@ export const SQLITE_SAMPLE_DATABASES: SqliteSampleDatabase[] = [
  *  state even after the user deletes a sample we shipped in a previous
  *  release. */
 export function findSampleDatabase(id: string): SqliteSampleDatabase {
-  return (
-    SQLITE_SAMPLE_DATABASES.find((s) => s.id === id) ??
-    SQLITE_SAMPLE_DATABASES[0]
-  );
+  return findSqlSampleById(id, SQLITE_SAMPLE_DATABASES);
 }
