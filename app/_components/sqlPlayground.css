@@ -584,6 +584,24 @@
   color: var(--text);
 }
 
+/* ─── Sidebar body — flex-row container below the db selector ─── */
+.sql-sidebar-body {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── Sidebar content — schema selector + tree next to the icon bar ─── */
+.sql-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .sql-sidebar-footer {
   color: var(--text-dim);
   font-family: var(--font-ui);
