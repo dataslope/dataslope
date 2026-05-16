@@ -82,6 +82,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const setResultsByTab = useTabStore((s) => s.setResultsByTab);
 
   const setImportSqliteOpen = useDialogStore((s) => s.setImportSqliteOpen);
+  const setImportSqlDumpOpen = useDialogStore((s) => s.setImportSqlDumpOpen);
   const setImportCsvOpen = useDialogStore((s) => s.setImportCsvOpen);
   const setImportCsvState = useDialogStore((s) => s.setImportCsvState);
   const importCsvState = useDialogStore((s) => s.importCsvState);
@@ -211,6 +212,119 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     },
     [applyDbLoad, showToast, engineRef, setImportSqliteOpen],
   );
+
+  const performImportSqlDump = useCallback(
+    (sqlText: string, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      void (async () => {
+        try {
+          // Load a fresh blank database then execute the dump on top of it.
+          const sample = await engine.loadBlankDatabase();
+          setCustomFilenames((prev) => {
+            if (!(sample.id in prev)) return prev;
+            const next = { ...prev };
+            delete next[sample.id];
+            return next;
+          });
+          await engine.execAll(sqlText);
+          await applyDbLoad(sample);
+          setImportSqlDumpOpen(false);
+          showToast(`Imported "${filename}".`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Import failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [applyDbLoad, showToast, engineRef, setCustomFilenames, setImportSqlDumpOpen],
+  );
+
+  const exportDatabaseAsSqlDump = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    void (async () => {
+      try {
+        const [tableList, viewList, indexList, triggerList] = await Promise.all([
+          engine.listTables(),
+          engine.listViews(),
+          engine.listIndexes(),
+          engine.listTriggers(),
+        ]);
+
+        const lines: string[] = [
+          "PRAGMA foreign_keys = OFF;",
+          "BEGIN TRANSACTION;",
+          "",
+        ];
+
+        // DDL + INSERT statements for each table
+        for (const name of tableList) {
+          const ddl = await engine.getDDL(name);
+          lines.push(`${ddl};`, "");
+
+          const results = await engine.exec(
+            `SELECT * FROM "${name.replace(/"/g, '""')}"`,
+          );
+          if (results && results.length > 0) {
+            const { columns, values } = results[0];
+            const colList = columns
+              .map((c) => `"${c.replace(/"/g, '""')}"`)
+              .join(", ");
+            for (const row of values) {
+              const valList = row
+                .map((v) => {
+                  if (v === null) return "NULL";
+                  if (typeof v === "number" || typeof v === "bigint")
+                    return String(v);
+                  if (v instanceof Uint8Array)
+                    return `X'${Array.from(v)
+                      .map((b) => b.toString(16).padStart(2, "0"))
+                      .join("")}'`;
+                  return `'${String(v).replace(/'/g, "''")}'`;
+                })
+                .join(", ");
+              lines.push(
+                `INSERT INTO "${name.replace(/"/g, '""')}" (${colList}) VALUES (${valList});`,
+              );
+            }
+            lines.push("");
+          }
+        }
+
+        // DDL for views, indexes, triggers
+        for (const name of [...viewList, ...indexList, ...triggerList]) {
+          const ddl = await engine.getDDL(name);
+          lines.push(`${ddl};`, "");
+        }
+
+        lines.push("COMMIT;");
+
+        const sqlText = lines.join("\n");
+        const sample = await engine.activeSample();
+        const overriddenFilename = customFilenames[activeDbId];
+        const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
+        const baseName = effectiveFilename
+          ? effectiveFilename.replace(/\.[^.]+$/, "")
+          : sample.id || "database";
+        const filename = `${baseName}.sql`;
+
+        const blob = new Blob([sqlText], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`Exported ${filename}.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Export failed: ${msg}`, "warn");
+      }
+    })();
+  }, [activeDbId, customFilenames, showToast, engineRef]);
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
@@ -601,9 +715,11 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     performDbSwitch,
     performBlankLoad,
     performImportSqlite,
+    performImportSqlDump,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,
+    exportDatabaseAsSqlDump,
     handleCsvFile,
     submitCsvImport,
     handleJsonFile,

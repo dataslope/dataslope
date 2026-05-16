@@ -717,6 +717,7 @@ export function ErDiagramPane({
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const layoutGen = useRef(0);
 
   // Reset selection synchronously when tables change (avoids useEffect state update).
@@ -781,6 +782,7 @@ export function ErDiagramPane({
       if (tables.length === 0) {
         setNodes([]);
         setEdges([]);
+        setIsLoading(false);
         return;
       }
       const { nodes: n, edges: e } = await computeElkLayout(
@@ -791,6 +793,7 @@ export function ErDiagramPane({
       if (cancelled || layoutGen.current !== gen) return; // stale — discard
       setNodes(n);
       setEdges(e);
+      setIsLoading(false);
     };
 
     runLayout().catch(console.error);
@@ -811,6 +814,22 @@ export function ErDiagramPane({
     <SelectionContext.Provider value={selectionInfo}>
       <TableActionsContext.Provider value={tableActions}>
         <div className="er-diagram-wrap">
+          {isLoading && (
+            <div className="er-diagram-loading-overlay" aria-hidden="true">
+              <div className="er-diagram-loading-wave">
+                <svg viewBox="0 0 240 40" preserveAspectRatio="none">
+                  <path
+                    className="dataslope-wave dataslope-wave--back"
+                    d="M0 26 C 20 14, 40 14, 60 26 S 100 38, 120 26 S 160 14, 180 26 S 220 38, 240 26 S 280 14, 300 26 S 340 38, 360 26 S 400 14, 420 26 S 460 38, 480 26 L 480 40 L 0 40 Z"
+                  />
+                  <path
+                    className="dataslope-wave dataslope-wave--front"
+                    d="M0 30 C 20 20, 40 20, 60 30 S 100 40, 120 30 S 160 20, 180 30 S 220 40, 240 30 S 280 20, 300 30 S 340 40, 360 30 S 400 20, 420 30 S 460 40, 480 30 L 480 40 L 0 40 Z"
+                  />
+                </svg>
+              </div>
+            </div>
+          )}
           <ReactFlow
             nodes={nodes}
             edges={edges}
