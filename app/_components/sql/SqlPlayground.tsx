@@ -19,19 +19,11 @@
 // user picks a different editor theme.
 
 import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS as DndCSS } from "@dnd-kit/utilities";
 import React, {
   startTransition,
   useCallback,
@@ -94,7 +86,6 @@ import {
   Network,
   Pencil,
   Play,
-  Plus,
   RotateCcw,
   Settings2,
   Table,
@@ -159,7 +150,7 @@ const ErDiagramPane = dynamic(
   { ssr: false },
 );
 import { ToastList } from "./components/ToastList";
-import { SqlTab, SqlTabDragOverlay } from "./components/SqlTab";
+import { SqlTabBar } from "./components/SqlTabBar";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import type { SqlCompletionSchema } from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
@@ -1187,7 +1178,6 @@ function SqlPlaygroundInner() {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
   const loadingFading = loaded && showLoadingOverlay;
-  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
 
   // ─── Refs ────────────────────────────────────────────────────────────
   const engineRef = useRef<SqliteEngine | null>(null);
@@ -3863,80 +3853,44 @@ function SqlPlaygroundInner() {
             className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
             ref={panesRef}
           >
-            <div className="sql-tabbar">
-              <DndContext
-                sensors={tabDragSensors}
-                collisionDetection={closestCenter}
-                onDragStart={onTabDragStart}
-                onDragEnd={onTabDragEnd}
-                onDragCancel={onTabDragCancel}
-              >
-                <SortableContext
-                  items={tabIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  <div className="sql-tabs" role="tablist">
-                    {tabs.map((t) => (
-                      <SqlTab
-                        key={t.id}
-                        tab={t}
-                        active={t.id === activeTabId}
-                        onActivate={() => {
-                          const prevId = activeTabIdRef.current;
-                          if (prevId !== t.id) {
-                            tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, prevId, t.id);
-                          }
-                          activeTabIdRef.current = t.id;
-                          setActiveTabId(t.id);
-                          // When the user re-clicks the already-active tab the
-                          // useEffect that focuses the editor won't re-run
-                          // (activeTabId hasn't changed).  Focus it explicitly
-                          // so typing works immediately without a second click.
-                          if (
-                            prevId === t.id &&
-                            t.kind !== "er-diagram" &&
-                            t.kind !== "view-data" &&
-                            t.kind !== "query-history"
-                          ) {
-                            editorRef.current?.focus();
-                          }
-                        }}
-                        onClose={() => closeTab(t.id)}
-                        onRename={(name) => renameTab(t.id, name)}
-                        onDuplicate={() => duplicateTab(t.id)}
-                        onCloseOthers={() => closeOtherTabs(t.id)}
-                        onCloseAll={closeAllTabs}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-                <DragOverlay dropAnimation={null}>
-                  {draggingTab ? (
-                    <SqlTabDragOverlay tab={draggingTab} active={draggingTab.id === activeTabId} />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-              {/* The "new tab" (+) button sits outside the scrollable
-                  .sql-tabs container so it remains pinned at the right
-                  edge of the tab bar when tabs overflow horizontally.
-                  When the strip isn't full it naturally appears next
-                  to the last tab because both are flex children of
-                  .sql-tabbar. */}
-              <button
-                type="button"
-                className="sql-tab-add"
-                // Prevent the button from stealing focus on mouse-down so
-                // focus stays wherever it was during the click.  The
-                // addTab hook commits the new tab and focuses the editor
-                // synchronously before the click handler returns.
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={addTab}
-                title="New query tab"
-                aria-label="New query tab"
-              >
-                <Plus size={12} aria-hidden="true" />
-              </button>
-            </div>
+            <SqlTabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              draggingTab={draggingTab}
+              tabDragSensors={tabDragSensors}
+              onDragStart={onTabDragStart}
+              onDragEnd={onTabDragEnd}
+              onDragCancel={onTabDragCancel}
+              onTabActivate={(tabId) => {
+                const prevId = activeTabIdRef.current;
+                if (prevId !== tabId) {
+                  tabHistoryRef.current = pushTabHistory(
+                    tabHistoryRef.current,
+                    prevId,
+                    tabId,
+                  );
+                }
+                activeTabIdRef.current = tabId;
+                setActiveTabId(tabId);
+                // Re-click the already-active tab: focus the editor so
+                // typing works immediately without a second click.
+                const tab = tabs.find((t) => t.id === tabId);
+                if (
+                  prevId === tabId &&
+                  tab?.kind !== "er-diagram" &&
+                  tab?.kind !== "view-data" &&
+                  tab?.kind !== "query-history"
+                ) {
+                  editorRef.current?.focus();
+                }
+              }}
+              onTabClose={closeTab}
+              onTabRename={renameTab}
+              onTabDuplicate={duplicateTab}
+              onTabCloseOthers={closeOtherTabs}
+              onTabCloseAll={closeAllTabs}
+              onAddTab={addTab}
+            />
 
             <div
               className="sql-editor-pane"
