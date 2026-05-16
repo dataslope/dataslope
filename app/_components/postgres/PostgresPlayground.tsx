@@ -107,6 +107,8 @@ import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmD
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
+import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
+import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
 import { type PostgresEngine } from "../runtime/postgres";
@@ -3642,155 +3644,28 @@ function PostgresPlaygroundInner() {
           onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
         />
 
-        {/* ── Import SQL dump dialog ── */}
-        <Dialog.Root
+        <ImportSqlDumpDialog
           open={importSqlDumpOpen}
-          onOpenChange={(next) => {
-            if (!next) {
-              setImportSqlDumpOpen(false);
-              setImportSqlDumpDragging(false);
-            }
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-import-popup">
-              <Dialog.Title className="confirm-title">
-                Import SQL Dump
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Open a local <code>.sql</code> dump file as a new in-memory
-                database.
-              </Dialog.Description>
-              <div className="sql-import-warning">
-                <TriangleAlert
-                  size={14}
-                  className="sql-import-warning-icon"
-                  aria-hidden="true"
-                />
-                <span>
-                  This will replace the current database with the contents of
-                  the file. Your file will <strong>not</strong> be uploaded or
-                  persisted — it is only loaded into browser memory and will be
-                  gone on reload.
-                </span>
-              </div>
-              <div
-                className={`sql-dropzone${importSqlDumpDragging ? " dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setImportSqlDumpDragging(true);
-                }}
-                onDragLeave={() => setImportSqlDumpDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setImportSqlDumpDragging(false);
-                  const file = e.dataTransfer.files[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const text = ev.target?.result as string | null;
-                    if (text == null) return;
-                    void performImportSqlDump(text, file.name);
-                  };
-                  reader.readAsText(file);
-                }}
-              >
-                <Upload
-                  size={28}
-                  className="sql-dropzone-icon"
-                  aria-hidden="true"
-                />
-                <span>Drop a SQL file here</span>
-                <span className="sql-dropzone-hint">
-                  or click to browse — .sql
-                </span>
-                <input
-                  type="file"
-                  accept=".sql"
-                  aria-label="Choose SQL dump file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const text = ev.target?.result as string | null;
-                      if (text == null) return;
-                      void performImportSqlDump(text, file.name);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          dragging={importSqlDumpDragging}
+          onClose={() => setImportSqlDumpOpen(false)}
+          onDraggingChange={setImportSqlDumpDragging}
+          onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
+        />
 
-        {/* ── Rename Database dialog ── */}
-        <Dialog.Root
+        <RenameDatabaseDialog
           open={renameDbOpen}
-          onOpenChange={(next) => {
-            if (!next) setRenameDbOpen(false);
+          name={renameDbName}
+          ext={renameDbExt}
+          extensionOptions={[".pg", ".sql", ".dump"]}
+          onNameChange={setRenameDbName}
+          onExtChange={setRenameDbExt}
+          onClose={() => setRenameDbOpen(false)}
+          onConfirm={(newFilename) => {
+            setCustomDbFilename(newFilename);
+            showToast(`Renamed to "${newFilename}".`);
+            setRenameDbOpen(false);
           }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-rename-db-popup">
-              <Dialog.Title className="confirm-title">
-                Rename Database
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Choose a new display name for the current database.
-              </Dialog.Description>
-              <div className="sql-rename-db-form">
-                <div className="sql-rename-db-name-row">
-                  <input
-                    className="sql-rename-input sql-rename-db-name-input"
-                    value={renameDbName}
-                    onChange={(e) => setRenameDbName(e.target.value)}
-                    placeholder="database name"
-                    aria-label="Database name"
-                    autoFocus
-                  />
-                  <select
-                    className="sql-rename-db-ext-select"
-                    value={renameDbExt}
-                    onChange={(e) => setRenameDbExt(e.target.value)}
-                    aria-label="File extension"
-                  >
-                    <option value=".pg">.pg</option>
-                    <option value=".sql">.sql</option>
-                    <option value=".dump">.dump</option>
-                  </select>
-                </div>
-              </div>
-              <div className="confirm-actions">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  disabled={!renameDbName.trim()}
-                  onClick={() => {
-                    const newFilename = `${renameDbName.trim()}${renameDbExt}`;
-                    setCustomDbFilename(newFilename);
-                    showToast(`Renamed to "${newFilename}".`);
-                    setRenameDbOpen(false);
-                  }}
-                >
-                  Rename
-                </button>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        />
 
         <SwitchDatabaseDialog
           open={pendingDbId !== null}
