@@ -3717,6 +3717,40 @@ function DuckDbPlaygroundInner() {
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
+                title="Query history"
+                aria-label="Query history"
+                onClick={openQueryHistoryTab}
+              >
+                <History size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    History
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
+                title="ER diagram"
+                aria-label="ER diagram"
+                onClick={openErDiagramTab}
+              >
+                <Network size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    ER Diagram
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
                 title="Runtime info"
                 aria-label="Runtime info"
               >
@@ -4542,32 +4576,24 @@ function DuckDbPlaygroundInner() {
                 }}
               />
             </div>
-            <SqlIconSidebar
-              buttons={[
-                {
-                  icon: <Table size={15} aria-hidden="true" />,
-                  label: "Tables",
-                  onClick: () => setSidebarView("schema"),
-                  isActive: sidebarView === "schema",
-                },
-                {
-                  icon: <FolderTree size={15} aria-hidden="true" />,
-                  label: "Files",
-                  onClick: () => setSidebarView("files"),
-                  isActive: sidebarView === "files",
-                },
-                {
-                  icon: <History size={15} aria-hidden="true" />,
-                  label: "History",
-                  onClick: openQueryHistoryTab,
-                },
-                {
-                  icon: <Network size={15} aria-hidden="true" />,
-                  label: "ER Diagram",
-                  onClick: openErDiagramTab,
-                },
-              ]}
-            />
+            <div className="sql-sidebar-body">
+              <SqlIconSidebar
+                buttons={[
+                  {
+                    icon: <Table size={15} aria-hidden="true" />,
+                    label: "Tables",
+                    onClick: () => setSidebarView("schema"),
+                    isActive: sidebarView === "schema",
+                  },
+                  {
+                    icon: <FolderTree size={15} aria-hidden="true" />,
+                    label: "Files",
+                    onClick: () => setSidebarView("files"),
+                    isActive: sidebarView === "files",
+                  },
+                ]}
+              />
+              <div className="sql-sidebar-content">
             {sidebarView === "schema" && (
             <div className="sql-schema-selector-wrap">
               <div className="sql-db-selector-row">
@@ -4804,6 +4830,8 @@ function DuckDbPlaygroundInner() {
               */}
                 </>
               )}
+            </div>
+              </div>
             </div>
           </aside>
           <div

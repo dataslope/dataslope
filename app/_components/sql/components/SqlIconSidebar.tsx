@@ -15,16 +15,20 @@ interface SqlIconSidebarProps {
 }
 
 /**
- * Thin horizontal icon strip rendered inside `.sql-sidebar`, just below
+ * Thin vertical icon sidebar rendered inside `.sql-sidebar`, below
  * `.sql-db-selector-wrap`.  Each button shows a Base UI hover-popover
  * label and highlights when `isActive` is true.
+ *
+ * Reuses the `.pg-icon-sidebar` / `.pg-icon-sidebar-btn` CSS from
+ * `playground.css` so the visual treatment stays consistent with the
+ * language playground (Python, R, etc.) activity bars.
  *
  * Used by the DuckDB playground today; the same component can be dropped
  * into the SQLite / Postgres `SqlPlayground` sidebar without any changes.
  */
 export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
   return (
-    <div className="sql-icon-sidebar">
+    <nav className="pg-icon-sidebar" aria-label="Panel navigation">
       {buttons.map((btn) => (
         <Popover.Root key={btn.label}>
           <Popover.Trigger
@@ -35,7 +39,7 @@ export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
               <button
                 {...triggerProps}
                 type="button"
-                className={`sql-icon-sidebar-btn${btn.isActive ? " active" : ""}`}
+                className={`pg-icon-sidebar-btn${btn.isActive ? " active" : ""}`}
                 aria-label={btn.label}
                 onClick={btn.onClick}
               >
@@ -44,7 +48,7 @@ export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
             )}
           />
           <Popover.Portal>
-            <Popover.Positioner sideOffset={6} side="bottom">
+            <Popover.Positioner sideOffset={6} side="right">
               <Popover.Popup className="bui-popup pane-btn-popover">
                 {btn.label}
               </Popover.Popup>
@@ -52,6 +56,6 @@ export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
           </Popover.Portal>
         </Popover.Root>
       ))}
-    </div>
+    </nav>
   );
 }
