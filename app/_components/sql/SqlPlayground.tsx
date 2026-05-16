@@ -132,6 +132,7 @@ import {
 } from "../playgroundShared";
 import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialogs";
+import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import {
@@ -173,7 +174,6 @@ import {
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
-import { DdlViewer } from "./components/DdlViewer";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
 import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
@@ -3498,52 +3498,21 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        <Dialog.Root
+        <DdlViewerDialog
           open={ddlDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setDdlDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-ddl-popup">
-              <Dialog.Title className="confirm-title">
-                DDL: {ddlDialog?.title ?? ""}
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Read-only view of the original <code>CREATE</code> statement(s)
-                recorded in
-                <code> sqlite_master</code>.
-              </Dialog.Description>
-              <DdlViewer sql={ddlDialog?.sql ?? ""} theme={editorTheme} />
-              <div className="confirm-actions">
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-secondary"
-                  onClick={() => {
-                    if (
-                      ddlDialog &&
-                      typeof navigator !== "undefined" &&
-                      navigator.clipboard
-                    ) {
-                      navigator.clipboard
-                        .writeText(ddlDialog.sql)
-                        .then(() => showToast("Copied DDL to clipboard."))
-                        .catch(() =>
-                          showToast("Couldn't copy to clipboard.", "warn"),
-                        );
-                    }
-                  }}
-                >
-                  Copy
-                </button>
-                <Dialog.Close className="confirm-btn confirm-btn-primary">
-                  Close
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          onOpenChange={(next) => { if (!next) setDdlDialog(null); }}
+          title={ddlDialog?.title ?? ""}
+          sql={ddlDialog?.sql ?? ""}
+          theme={editorTheme}
+          description={
+            <>
+              Read-only view of the original <code>CREATE</code> statement(s)
+              recorded in <code>sqlite_master</code>.
+            </>
+          }
+          onCopied={() => showToast("Copied DDL to clipboard.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
         <Dialog.Root
           open={modifyDialog !== null}

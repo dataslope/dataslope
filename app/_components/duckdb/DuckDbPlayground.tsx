@@ -105,6 +105,7 @@ import {
 } from "../playgroundShared";
 import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
+import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -125,7 +126,6 @@ import {
   type DatabaseSelectorAction,
 } from "../sql/components/DatabaseSelector";
 import { ToastList } from "../sql/components/ToastList";
-import { DdlViewer } from "../sql/components/DdlViewer";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
@@ -4102,55 +4102,16 @@ function DuckDbPlaygroundInner() {
           ]}
         />
 
-        <Dialog.Root
+        <DdlViewerDialog
           open={ddlDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setDdlDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop" />
-            <Dialog.Popup className="confirm-popup sql-ddl-popup">
-              <Dialog.Title className="confirm-title">
-                DDL: {ddlDialog?.title ?? ""}
-              </Dialog.Title>
-              <Dialog.Description className="confirm-desc">
-                Read-only view of the reconstructed <code>CREATE</code>{" "}
-                statement(s).
-              </Dialog.Description>
-              <DdlViewer
-                sql={ddlDialog?.sql ?? ""}
-                theme={editorTheme}
-                isPostgres
-              />
-              <div className="confirm-actions">
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-secondary"
-                  onClick={() => {
-                    if (
-                      ddlDialog &&
-                      typeof navigator !== "undefined" &&
-                      navigator.clipboard
-                    ) {
-                      navigator.clipboard
-                        .writeText(ddlDialog.sql)
-                        .then(() => showToast("Copied DDL to clipboard."))
-                        .catch(() =>
-                          showToast("Couldn't copy to clipboard.", "warn"),
-                        );
-                    }
-                  }}
-                >
-                  Copy
-                </button>
-                <Dialog.Close className="confirm-btn confirm-btn-primary">
-                  Close
-                </Dialog.Close>
-              </div>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+          onOpenChange={(next) => { if (!next) setDdlDialog(null); }}
+          title={ddlDialog?.title ?? ""}
+          sql={ddlDialog?.sql ?? ""}
+          theme={editorTheme}
+          isPostgres
+          onCopied={() => showToast("Copied DDL to clipboard.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
         {/* ── Import SQL dump dialog ── */}
         <Dialog.Root
