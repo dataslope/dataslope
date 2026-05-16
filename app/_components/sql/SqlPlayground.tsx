@@ -179,6 +179,10 @@ import { SchemaItem } from "./components/SchemaItem";
 import { SchemaLeafItem } from "./components/SchemaLeafItem";
 import { SchemaSection } from "./components/SchemaSection";
 import {
+  DatabaseSelector,
+  type DatabaseSelectorAction,
+} from "./components/DatabaseSelector";
+import {
   dbScopedKey,
   loadActiveTabId,
   loadTabs,
@@ -200,6 +204,27 @@ function replaceDoc(view: EditorView, value: string): void {
 
 
 const PLAYGROUND_ID = sqliteAdapter.playgroundId;
+
+const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
+  {
+    id: "__new_db__",
+    icon: <FilePlus size={14} />,
+    label: "New Database",
+    description: "Create a blank database",
+  },
+  {
+    id: "__import_sqlite__",
+    icon: <Upload size={14} />,
+    label: "Import SQLite File",
+    description: "Open a .sqlite or .db file",
+  },
+  {
+    id: "__rename_db__",
+    icon: <Pencil size={14} />,
+    label: "Rename Current Database",
+    description: "Change filename and extension",
+  },
+];
 
 const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
   { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
@@ -3859,9 +3884,12 @@ function SqlPlaygroundInner() {
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
               <div className="sql-db-selector-row">
-                <Select.Root
+                <DatabaseSelector
                   value={activeDbId}
-                  onValueChange={(value) => {
+                  displayFilename={activeSample.filename}
+                  samples={SQLITE_SAMPLE_DATABASES}
+                  actions={SQLITE_DB_ACTIONS}
+                  onChange={(value) => {
                     if (value === "__new_db__") {
                       performBlankLoad();
                       return;
@@ -3893,126 +3921,9 @@ function SqlPlaygroundInner() {
                       setRenameDbOpen(true);
                       return;
                     }
-                    requestDbSwitch(String(value));
+                    requestDbSwitch(value);
                   }}
-                >
-                  <Select.Trigger
-                    className="sql-db-selector"
-                    aria-label="Select sample database"
-                  >
-                    <Database
-                      size={14}
-                      className="sql-db-selector-icon"
-                      aria-hidden="true"
-                    />
-                    <Select.Value className="sql-db-selector-value">
-                      {activeSample.filename}
-                    </Select.Value>
-                    <Select.Icon className="playground-switcher-icon">
-                      <svg viewBox="0 0 12 12" width={10} height={10}>
-                        <polyline
-                          points="2,4 6,8 10,4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    </Select.Icon>
-                  </Select.Trigger>
-                  <Select.Portal>
-                    <Select.Positioner
-                      className="sql-db-positioner"
-                      sideOffset={6}
-                      alignItemWithTrigger={false}
-                    >
-                      <Select.Popup className="bui-select-popup sql-db-popup">
-                        <Select.Item
-                          value="__new_db__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <FilePlus size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>New Database</Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Create a blank database
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <Select.Item
-                          value="__import_sqlite__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Upload size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>
-                              Import SQLite File
-                            </Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Open a .sqlite or .db file
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <Select.Item
-                          value="__rename_db__"
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Pencil size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>
-                              Rename Current Database
-                            </Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              Change filename and extension
-                            </span>
-                          </span>
-                        </Select.Item>
-                        <div
-                          role="separator"
-                          aria-orientation="horizontal"
-                          className="sql-db-popup-sep"
-                        />
-                        <div className="sql-db-popup-group-label">
-                          Sample databases
-                        </div>
-                        {SQLITE_SAMPLE_DATABASES.map((s) => (
-                          <Select.Item
-                            key={s.id}
-                            value={s.id}
-                            className="bui-select-item sql-db-item"
-                          >
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Database size={14} />
-                            </span>
-                            <span className="sql-db-item-text">
-                              <Select.ItemText>{s.filename}</Select.ItemText>
-                              <span className="sql-db-item-desc">
-                                {s.description}
-                              </span>
-                            </span>
-                          </Select.Item>
-                        ))}
-                      </Select.Popup>
-                    </Select.Positioner>
-                  </Select.Portal>
-                </Select.Root>
+                />
               </div>
             </div>
 

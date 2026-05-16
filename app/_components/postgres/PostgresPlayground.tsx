@@ -119,6 +119,10 @@ import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
+import {
+  DatabaseSelector,
+  type DatabaseSelectorAction,
+} from "../sql/components/DatabaseSelector";
 import { ToastList } from "../sql/components/ToastList";
 import { DdlViewer } from "../sql/components/DdlViewer";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
@@ -171,6 +175,27 @@ import { FK_ACTIONS } from "../sql/constants";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
+
+const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
+  {
+    id: "__new_db__",
+    icon: <FilePlus size={14} />,
+    label: "New Database",
+    description: "Create a blank database",
+  },
+  {
+    id: "__import_sql_dump__",
+    icon: <Upload size={14} />,
+    label: "Import SQL Dump",
+    description: "Open a SQL dump file",
+  },
+  {
+    id: "__rename_db__",
+    icon: <Pencil size={14} />,
+    label: "Rename Current Database",
+    description: "Change the display name",
+  },
+];
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -4641,9 +4666,14 @@ function PostgresPlaygroundInner() {
         <div className="sql-shell postgres-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
-              <Select.Root
+              <DatabaseSelector
                 value={activeDbId}
-                onValueChange={(value) => {
+                displayFilename={displayFilename}
+                samples={POSTGRES_SAMPLE_DATABASES}
+                actions={POSTGRES_DB_ACTIONS}
+                triggerClassName="sql-database-selector"
+                chevron={<ChevronDown size={12} />}
+                onChange={(value) => {
                   if (value === "__new_db__") {
                     void performDbSwitch(POSTGRES_BLANK_DATABASE.id);
                     return;
@@ -4665,117 +4695,9 @@ function PostgresPlaygroundInner() {
                     setRenameDbOpen(true);
                     return;
                   }
-                  requestDbSwitch(String(value));
+                  requestDbSwitch(value);
                 }}
-              >
-                <Select.Trigger
-                  className="sql-db-selector sql-database-selector"
-                  aria-label="Select sample database"
-                >
-                  <Database
-                    size={14}
-                    className="sql-db-selector-icon"
-                    aria-hidden="true"
-                  />
-                  <Select.Value className="sql-db-selector-value">
-                    {displayFilename}
-                  </Select.Value>
-                  <Select.Icon className="playground-switcher-icon">
-                    <ChevronDown size={12} />
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner
-                    className="sql-db-positioner"
-                    sideOffset={6}
-                    alignItemWithTrigger={false}
-                  >
-                    <Select.Popup className="bui-select-popup sql-db-popup">
-                      <Select.Item
-                        value="__new_db__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <FilePlus size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>New Database</Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Create a blank database
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <Select.Item
-                        value="__import_sql_dump__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <Upload size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>Import SQL Dump</Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Open a SQL dump file
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <Select.Item
-                        value="__rename_db__"
-                        className="bui-select-item sql-db-item"
-                      >
-                        <span
-                          className="bui-select-item-icon"
-                          aria-hidden="true"
-                        >
-                          <Pencil size={14} />
-                        </span>
-                        <span className="sql-db-item-text">
-                          <Select.ItemText>
-                            Rename Current Database
-                          </Select.ItemText>
-                          <span className="sql-db-item-desc">
-                            Change the display name
-                          </span>
-                        </span>
-                      </Select.Item>
-                      <div
-                        role="separator"
-                        aria-orientation="horizontal"
-                        className="sql-db-popup-sep"
-                      />
-                      <div className="sql-db-popup-group-label">
-                        Sample databases
-                      </div>
-                      {POSTGRES_SAMPLE_DATABASES.map((sample) => (
-                        <Select.Item
-                          key={sample.id}
-                          value={sample.id}
-                          className="bui-select-item sql-db-item"
-                        >
-                          <span
-                            className="bui-select-item-icon"
-                            aria-hidden="true"
-                          >
-                            <Database size={14} />
-                          </span>
-                          <span className="sql-db-item-text">
-                            <Select.ItemText>{sample.filename}</Select.ItemText>
-                            <span className="sql-db-item-desc">
-                              {sample.description}
-                            </span>
-                          </span>
-                        </Select.Item>
-                      ))}
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
+              />
             </div>
             <div className="sql-schema-selector-wrap">
               <div className="sql-db-selector-row">
