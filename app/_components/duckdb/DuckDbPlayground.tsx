@@ -106,6 +106,7 @@ import {
 import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
+import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -4404,41 +4405,15 @@ function DuckDbPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        <AlertDialog.Root
+        <SwitchDatabaseDialog
           open={pendingDbId !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingDbId(null);
+          onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
+          currentDbFilename={displayFilename}
+          onConfirm={() => {
+            if (pendingDbId) void performDbSwitch(pendingDbId);
+            setPendingDbId(null);
           }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Switch databases?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                You have unsaved edits in the query tabs for{" "}
-                <strong>{displayFilename}</strong>. They will be saved and
-                restored when you switch back, but loading another database will
-                replace what&rsquo;s currently in the editor.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    if (pendingDbId) void performDbSwitch(pendingDbId);
-                    setPendingDbId(null);
-                  }}
-                >
-                  Switch database
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        />
 
         <AlertDialog.Root
           open={pendingDropEntity !== null}
