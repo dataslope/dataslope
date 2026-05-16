@@ -1880,6 +1880,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
+            {/* Files — placeholder for a future virtual-filesystem panel.
+                No click handler yet; the active state and panel switching
+                will be wired up when the Files view is implemented. */}
             <Popover.Root>
               <Popover.Trigger
                 openOnHover
