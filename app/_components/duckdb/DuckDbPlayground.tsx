@@ -128,6 +128,7 @@ import {
   type DatabaseSelectorAction,
 } from "../sql/components/DatabaseSelector";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
+import { SqlIconSidebar } from "../sql/components/SqlIconSidebar";
 import { ToastList } from "../sql/components/ToastList";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
@@ -4541,6 +4542,33 @@ function DuckDbPlaygroundInner() {
                 }}
               />
             </div>
+            <SqlIconSidebar
+              buttons={[
+                {
+                  icon: <Table size={15} aria-hidden="true" />,
+                  label: "Tables",
+                  onClick: () => setSidebarView("schema"),
+                  isActive: sidebarView === "schema",
+                },
+                {
+                  icon: <FolderTree size={15} aria-hidden="true" />,
+                  label: "Files",
+                  onClick: () => setSidebarView("files"),
+                  isActive: sidebarView === "files",
+                },
+                {
+                  icon: <History size={15} aria-hidden="true" />,
+                  label: "History",
+                  onClick: openQueryHistoryTab,
+                },
+                {
+                  icon: <Network size={15} aria-hidden="true" />,
+                  label: "ER Diagram",
+                  onClick: openErDiagramTab,
+                },
+              ]}
+            />
+            {sidebarView === "schema" && (
             <div className="sql-schema-selector-wrap">
               <div className="sql-db-selector-row">
                 <Select.Root
@@ -4629,6 +4657,7 @@ function DuckDbPlaygroundInner() {
                 </Select.Root>
               </div>
             </div>
+            )}
             <div className="sql-tree">
               {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
@@ -4775,34 +4804,6 @@ function DuckDbPlaygroundInner() {
               */}
                 </>
               )}
-            </div>
-            <div className="sql-sidebar-footer">
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openErDiagramTab}
-                title="View ER Diagram"
-                aria-label="View ER Diagram"
-              >
-                <Network size={13} aria-hidden="true" />
-                <span>ER Diagram</span>
-              </button>
-              <button
-                type="button"
-                className={`sql-sidebar-btn${sidebarView === "files" ? " sql-sidebar-btn-active" : ""}`}
-                onClick={() =>
-                  setSidebarView((v) => (v === "files" ? "schema" : "files"))
-                }
-                title={
-                  sidebarView === "files"
-                    ? "Show database schema"
-                    : "Show virtual filesystem"
-                }
-                aria-label="Toggle Files panel"
-              >
-                <FolderTree size={13} aria-hidden="true" />
-                <span>Files</span>
-              </button>
             </div>
           </aside>
           <div

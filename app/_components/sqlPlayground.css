@@ -584,6 +584,50 @@
   color: var(--text);
 }
 
+/* ─── DuckDB icon sidebar (horizontal icon strip below db-selector) ─── */
+.sql-icon-sidebar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sql-icon-sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.sql-icon-sidebar-btn:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-icon-sidebar-btn.active {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-icon-sidebar-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 .sql-sidebar-footer {
   color: var(--text-dim);
   font-family: var(--font-ui);

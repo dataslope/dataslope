@@ -78,6 +78,7 @@ import {
   Wand2,
   Code2,
   Terminal,
+  FolderTree,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
@@ -1853,6 +1854,58 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        <div className="pg-body">
+          <nav className="pg-icon-sidebar" aria-label="Panel navigation">
+            <Popover.Root>
+              <Popover.Trigger
+                openOnHover
+                delay={150}
+                closeDelay={100}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="pg-icon-sidebar-btn active"
+                    aria-label="Editor"
+                  >
+                    <Code2 size={16} aria-hidden="true" />
+                  </button>
+                )}
+              />
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} side="right">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    Editor
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                openOnHover
+                delay={150}
+                closeDelay={100}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="pg-icon-sidebar-btn"
+                    aria-label="Files"
+                  >
+                    <FolderTree size={16} aria-hidden="true" />
+                  </button>
+                )}
+              />
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} side="right">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    Files
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+          </nav>
+          <div className="pg-body-content">
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
           <button
             type="button"
@@ -2094,6 +2147,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           running={statusState === "running"}
           variant="mobile"
         />
+          </div>
+        </div>
       </div>
     </div>
   );
