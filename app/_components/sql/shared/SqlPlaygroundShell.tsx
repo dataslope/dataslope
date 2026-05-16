@@ -380,10 +380,10 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
 
   // ─── Settings ─────────────────────────────────────────────────────
-  const [fontSize, setFontSize] = useState(DEFAULT_PLAYGROUND_SETTINGS.fontSize);
-  const [wordWrap, setWordWrap] = useState(DEFAULT_PLAYGROUND_SETTINGS.wordWrap);
-  const [clearBeforeRun, setClearBeforeRun] = useState(DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun);
-  const [editorTheme, setEditorTheme] = useState(DEFAULT_PLAYGROUND_SETTINGS.editorTheme);
+  const [fontSize, setFontSize] = useState<number>(DEFAULT_PLAYGROUND_SETTINGS.fontSize);
+  const [wordWrap, setWordWrap] = useState<boolean>(DEFAULT_PLAYGROUND_SETTINGS.wordWrap);
+  const [clearBeforeRun, setClearBeforeRun] = useState<boolean>(DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun);
+  const [editorTheme, setEditorTheme] = useState<string>(DEFAULT_PLAYGROUND_SETTINGS.editorTheme);
 
   const clearBeforeRunRef = useRef(clearBeforeRun);
   useEffect(() => { clearBeforeRunRef.current = clearBeforeRun; }, [clearBeforeRun]);
