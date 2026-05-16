@@ -381,6 +381,7 @@ export function queryResultsIdentical(
 export function ResultView({
   result,
   loading,
+  loadingLabel,
   keyHints,
   sourceTable,
   constraintInfo,
@@ -397,6 +398,7 @@ export function ResultView({
 }: {
   result: QueryRunResult | null;
   loading: boolean;
+  loadingLabel?: string;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
@@ -877,7 +879,7 @@ export function ResultView({
     return (
       <div className="welcome">
         <div className="welcome-icon">⌬</div>
-        <h3>Loading SQLite engine…</h3>
+        <h3>{loadingLabel ?? "Loading SQL engine…"}</h3>
       </div>
     );
   }

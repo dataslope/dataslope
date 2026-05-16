@@ -11,8 +11,10 @@ import { EditorView } from "@codemirror/view";
 import type { Compartment } from "@codemirror/state";
 import { Select } from "@base-ui-components/react/select";
 import { Toast } from "@base-ui-components/react/toast";
-import { Database, ChevronDown, ChevronRight, Hash } from "lucide-react";
+import { Database, ChevronDown, ChevronRight, Hash, Settings2 } from "lucide-react";
 import { IoLink } from "react-icons/io5";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import "../../playground.css";
 import "../../sqlPlayground.css";
 import type { SqlEngineAdapter, SqlEngineHandle, SqlColumnInfo, SqlForeignKeyInfo, SqlSample } from "./SqlEngineAdapter";
@@ -29,14 +31,21 @@ import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
   detectIsMac,
+  SettingsPanel,
 } from "../../playgroundShared";
 import {
   applyMode,
   applyThemePalette,
   clearThemePalette,
   LIGHT_THEMES,
+  setStoredEditorTheme,
 } from "../../playgroundTheme";
 import { ToastList } from "../components/ToastList";
+import { PLAYGROUNDS } from "../../playgrounds";
+import {
+  LANGUAGE_ICONS as PLAYGROUND_ICONS,
+  LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
+} from "../../languageIcons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -313,6 +322,7 @@ function SchemaEntityRow({
 // ─── Main shell ───────────────────────────────────────────────────────────────
 
 function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps) {
+  const router = useRouter();
   const samples = useMemo(() => adapter.listSamples(), [adapter]);
   const isMac = useMemo(() => detectIsMac(), []);
 
@@ -384,6 +394,19 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
   const [wordWrap, setWordWrap] = useState<boolean>(DEFAULT_PLAYGROUND_SETTINGS.wordWrap);
   const [clearBeforeRun, setClearBeforeRun] = useState<boolean>(DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun);
   const [editorTheme, setEditorTheme] = useState<string>(DEFAULT_PLAYGROUND_SETTINGS.editorTheme);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const handleSetEditorTheme = useCallback((t: string) => {
+    setEditorTheme(t);
+    setStoredEditorTheme(t);
+  }, []);
+
+  const handleRestoreDefaults = useCallback(() => {
+    setFontSize(DEFAULT_PLAYGROUND_SETTINGS.fontSize);
+    setWordWrap(DEFAULT_PLAYGROUND_SETTINGS.wordWrap);
+    setClearBeforeRun(DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun);
+    handleSetEditorTheme(DEFAULT_PLAYGROUND_SETTINGS.editorTheme);
+  }, [handleSetEditorTheme]);
 
   const clearBeforeRunRef = useRef(clearBeforeRun);
   useEffect(() => { clearBeforeRunRef.current = clearBeforeRun; }, [clearBeforeRun]);
@@ -777,10 +800,107 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
   // ─── Render ───────────────────────────────────────────────────────
   const isDark = !LIGHT_THEMES.has(editorTheme);
 
+  const playgroundId = adapter.dialect === "postgres" ? "postgres" : adapter.dialect === "duckdb" ? "duckdb" : "sqlite";
+
   return (
+    <div className="pg-app" style={{ fontSize }}>
+      {/* ─── Top navigation bar ─── */}
+      <header className="pg-header">
+        <div className="logo">
+          <Link href="/" aria-label="Dataslope home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
+          </Link>
+          <Link href="/" className="brand-name">Dataslope</Link>
+          <Select.Root
+            value={playgroundId}
+            onValueChange={(value) => {
+              if (!value) return;
+              const next = PLAYGROUNDS.find((p) => p.id === value);
+              if (next && next.id !== playgroundId) router.push(next.href);
+            }}
+          >
+            <Select.Trigger className="playground-switcher" aria-label="Switch playground">
+              {(() => {
+                const Icon = PLAYGROUND_ICONS[playgroundId];
+                const factor = PLAYGROUND_ICON_SIZE_FACTOR[playgroundId] ?? 1;
+                return Icon ? (
+                  <span className="playground-switcher-lang-icon" style={{ color: "var(--text)" }} aria-hidden="true">
+                    <Icon size={Math.round(16 * factor)} />
+                  </span>
+                ) : null;
+              })()}
+              <Select.Value />
+              <Select.Icon className="playground-switcher-icon">
+                <svg viewBox="0 0 12 12" width={10} height={10}>
+                  <polyline points="2,4 6,8 10,4" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </Select.Icon>
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Positioner className="pg-lang-switcher-positioner" sideOffset={6} alignItemWithTrigger={false}>
+                <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
+                  {PLAYGROUNDS.map((p) => {
+                    const Icon = PLAYGROUND_ICONS[p.id];
+                    const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
+                    return (
+                      <Select.Item key={p.id} value={p.id} className="bui-select-item">
+                        {Icon && (
+                          <span className="bui-select-item-icon" aria-hidden="true">
+                            <Icon size={Math.round(16 * factor)} />
+                          </span>
+                        )}
+                        <Select.ItemText>{p.label}</Select.ItemText>
+                      </Select.Item>
+                    );
+                  })}
+                </Select.Popup>
+              </Select.Positioner>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+        <div className="header-sep" />
+        <div className="header-actions">
+          <button
+            type="button"
+            className="header-btn"
+            title="Settings"
+            aria-label="Settings"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <Settings2 size={14} aria-hidden="true" />
+            <span className="btn-label">Settings</span>
+          </button>
+        </div>
+      </header>
+
+      {/* ─── Settings panel ─── */}
+      <SettingsPanel
+        open={settingsOpen}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        outputFontSizeEnabled={false}
+        setOutputFontSizeEnabled={() => undefined}
+        outputFontSize={DEFAULT_PLAYGROUND_SETTINGS.fontSize}
+        setOutputFontSize={() => undefined}
+        showOutputFontSizeControls={false}
+        editorTheme={editorTheme}
+        setEditorTheme={handleSetEditorTheme}
+        wordWrap={wordWrap}
+        setWordWrap={setWordWrap}
+        clearBeforeRun={clearBeforeRun}
+        setClearBeforeRun={setClearBeforeRun}
+        showClearBeforeRunRow={false}
+        language={playgroundId}
+        onClose={() => setSettingsOpen(false)}
+        onRestoreDefaults={handleRestoreDefaults}
+        onClearLocalStorage={() => {
+          try { localStorage.clear(); } catch { /* ignore */ }
+        }}
+      />
+
     <div
       className="sql-shell"
-      style={{ fontSize }}
       aria-label={`${adapter.displayName} SQL playground`}
     >
       {/* Sidebar */}
@@ -957,6 +1077,7 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
             <ResultView
               result={result}
               loading={!loaded}
+              loadingLabel={`Loading ${adapter.displayName} engine…`}
               globalPageSize={globalPageSize}
               onSetGlobalPageSize={setGlobalPageSize}
               onLoadPage={(sql, page, explicitPageSize) => {
@@ -971,6 +1092,7 @@ function SqlPlaygroundShellInner({ adapter, sampleId }: SqlPlaygroundShellProps)
           <DataslopeRunOverlay running={status === "running"} />
         </div>
       </div>
+    </div>
     </div>
   );
 }
