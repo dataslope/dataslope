@@ -70,7 +70,6 @@ import React, {
   startTransition,
   useSyncExternalStore,
 } from "react";
-import { flushSync } from "react-dom";
 import "../playground.css";
 import "../sqlPlayground.css";
 import dynamic from "next/dynamic";
@@ -160,7 +159,9 @@ import {
   ensurePersistUnloadFlush,
   persistAsync,
 } from "../sql/utils/persistedStorage";
-import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
+import { pushTabHistory } from "../sql/utils/tabUtils";
+import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
+import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -979,43 +980,52 @@ function DuckDbPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading DuckDB engine…",
   );
-  const [tables, setTables] = useState<string[]>([]);
-  const [views, setViews] = useState<string[]>([]);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
-  // Triggers are not supported by DuckDB so the corresponding sidebar
-  // section is omitted entirely. We still keep the setter so the
-  // shared `refreshSchema()` logic from the Postgres playground can
-  // keep its single, uniform shape.
-  const [, setTriggers] = useState<string[]>([]);
-  const [indexes, setIndexes] = useState<string[]>([]);
-  const [columnsByEntity, setColumnsByEntity] = useState<
-    Record<string, TableColumnInfo[]>
-  >({});
-  const [foreignKeysByEntity, setForeignKeysByEntity] = useState<
-    Record<string, ForeignKeyInfo[]>
-  >({});
-  const [expandedEntities, setExpandedEntities] = useState<Set<string>>(
-    new Set(),
-  );
   const [globalPageSize, setGlobalPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
-  const [rowCountByTable, setRowCountByTable] = useState<
-    Record<string, number>
-  >({});
 
   // ─── Schema selector state ────────────────────────────────────────────
-  const [selectedSchema, setSelectedSchema] = useState("main");
-  const [schemas, setSchemas] = useState<string[]>(["main"]);
-  const [schemaLoading, setSchemaLoading] = useState(false);
   const [dbLoading, setDbLoading] = useState(false);
   const [createSchemaDialogOpen, setCreateSchemaDialogOpen] = useState(false);
   const [createSchemaName, setCreateSchemaName] = useState("");
   const [createSchemaSubmitting, setCreateSchemaSubmitting] = useState(false);
-  const selectedSchemaRef = useRef("main");
   const showSystemSchemasRef = useRef(true);
+  const engineRef = useRef<DuckDbEngine | null>(null);
+  const schemaTree = useSchemaTree({
+    engineRef,
+    defaultSchema: "main",
+    showSystemSchemasRef,
+    clearEntitiesOnSchemaChange: false,
+  });
+  const {
+    tables,
+    setTables,
+    views,
+    setViews,
+    indexes,
+    setIndexes,
+    // DuckDB does not support triggers, but the hook still exposes the
+    // setter so the shared refreshSchema shape stays uniform with the
+    // Postgres playground.
+    setTriggers,
+    columnsByEntity,
+    setColumnsByEntity,
+    foreignKeysByEntity,
+    setForeignKeysByEntity,
+    expandedEntities,
+    setExpandedEntities,
+    rowCountByTable,
+    setRowCountByTable,
+    selectedSchema,
+    setSelectedSchema,
+    schemas,
+    setSchemas,
+    schemaLoading,
+    selectedSchemaRef,
+  } = schemaTree;
 
   // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
   const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
@@ -1162,7 +1172,6 @@ function DuckDbPlaygroundInner() {
   const completionCompRef = useRef<Compartment | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
-  const engineRef = useRef<DuckDbEngine | null>(null);
   const tabsRef = useRef(tabs);
   const activeTabIdRef = useRef(activeTabId);
   /** MRU history stack (oldest → most-recent), never includes the current tab. */
@@ -1257,30 +1266,6 @@ function DuckDbPlaygroundInner() {
     [],
   );
 
-  const handleTabDragStart = useCallback((event: DragStartEvent) => {
-    const id = String(event.active.id);
-    setDraggingTabId(id);
-    setActiveTabId(id);
-  }, []);
-
-  const handleTabDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setDraggingTabId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      const current = tabsRef.current;
-      const oldIndex = current.findIndex((t) => t.id === active.id);
-      const newIndex = current.findIndex((t) => t.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
-      persistTabs(arrayMove(current, oldIndex, newIndex));
-    },
-    [persistTabs],
-  );
-
-  const handleTabDragCancel = useCallback(() => {
-    setDraggingTabId(null);
-  }, []);
-
   const refreshSchema = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine) return;
@@ -1343,17 +1328,10 @@ function DuckDbPlaygroundInner() {
     });
   }, [quoteIdent]);
 
-  const refreshSchemas = useCallback(async () => {
-    const engine = engineRef.current;
-    if (!engine) return;
-    const nextSchemas = await engine.listSchemas(showSystemSchemasRef.current);
-    setSchemas(nextSchemas);
-    if (!nextSchemas.includes(selectedSchemaRef.current)) {
-      selectedSchemaRef.current = "main";
-      setSelectedSchema("main");
-      await refreshSchema();
-    }
-  }, [refreshSchema]);
+  const refreshSchemas = useCallback(
+    () => schemaTree.refreshSchemas(refreshSchema),
+    [schemaTree, refreshSchema],
+  );
 
   const runSqlForTab = useCallback(
     async (
@@ -1932,22 +1910,8 @@ function DuckDbPlaygroundInner() {
   );
 
   const handleSchemaChange = useCallback(
-    async (schema: string) => {
-      // Base UI Select fires onValueChange(null) when no item matches the
-      // controlled value (e.g. while the schema list is empty during a
-      // fetch). Ignore those spurious calls to prevent "null" poisoning
-      // selectedSchemaRef and the subsequent SQL queries.
-      if (!schema || schema === "null") return;
-      selectedSchemaRef.current = schema;
-      setSelectedSchema(schema);
-      setSchemaLoading(true);
-      try {
-        await refreshSchema();
-      } finally {
-        setSchemaLoading(false);
-      }
-    },
-    [refreshSchema],
+    (schema: string) => schemaTree.handleSchemaChange(schema, refreshSchema),
+    [schemaTree, refreshSchema],
   );
 
   const submitCreateSchema = useCallback(async () => {
@@ -2337,81 +2301,32 @@ function DuckDbPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
-  const addTab = useCallback(() => {
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: `Query ${tabsRef.current.length + 1}`,
-      code: "",
-      pristineCode: "",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
-    const next = [...tabsRef.current, tab];
-    tabsRef.current = next;
-    activeTabIdRef.current = tab.id;
-    flushSync(() => {
-      setTabs(next);
-      setActiveTabId(tab.id);
-    });
-    editorRef.current?.focus();
-    saveTabs(activeDbIdRef.current, next);
-    // Keep all referenced bindings in the dependency list; saveTabs and
-    // state setters are stable, so suppress exhaustive-deps' extra warning.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, editorRef, setTabs, setActiveTabId, saveTabs]);
-
-  const openTabAndRun = useCallback(
-    (title: string, sql: string) => {
-      const tab: QueryTab = {
-        id: newTabId(),
-        title,
-        code: sql,
-        pristineCode: sql,
-      };
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
-      persistTabs([...tabsRef.current, tab]);
-      setActiveTabId(tab.id);
-      void runSqlForTab(tab.id, sql, title);
-    },
-    [persistTabs, runSqlForTab],
-  );
-
-  const closeTab = useCallback(
-    (id: string) => {
-      const currentTabs = tabsRef.current;
-      const next = currentTabs.filter((tab) => tab.id !== id);
-      const finalTabs =
-        next.length > 0
-          ? next
-          : [{ id: newTabId(), title: "Query 1", code: "", pristineCode: "" }];
-      persistTabs(finalTabs);
-      // Prune closed tab from history before selecting fallback.
-      tabHistoryRef.current = tabHistoryRef.current.filter((hid) => hid !== id);
-      if (activeTabIdRef.current === id) {
-        const fallback = pickFallbackTab(finalTabs, id, currentTabs, tabHistoryRef.current);
-        setActiveTabId(fallback.id);
-      }
-      setResultsByTab((prev) => {
-        const { [id]: _deleted, ...rest } = prev;
-        void _deleted;
-        return rest;
-      });
-    },
-    [persistTabs],
-  );
-
-  const resetTabsForCurrentDb = useCallback(() => {
-    const sample = findDuckDbSampleDatabase(activeDbIdRef.current);
-    const fresh = sample.defaultTabs.map((seed) => ({
-      ...seed,
-      id: newTabId(),
-      pristineCode: seed.code,
-    }));
-    tabHistoryRef.current = [];
-    persistTabs(fresh);
-    setActiveTabId(fresh[0]?.id ?? "");
-    setResultsByTab({});
-    showToast(`Reset query tabs for ${sample.label}.`);
-  }, [persistTabs, showToast]);
+  const {
+    addTab,
+    openTabAndRun,
+    closeTab,
+    resetTabsForCurrentDb,
+    handleTabDragStart,
+    handleTabDragEnd,
+    handleTabDragCancel,
+    openErDiagramTab,
+    openQueryHistoryTab,
+  } = useSqlTabManagement({
+    tabsRef,
+    activeTabIdRef,
+    activeDbIdRef,
+    tabHistoryRef,
+    editorRef,
+    setTabs,
+    setActiveTabId,
+    setResultsByTab,
+    setDraggingTabId,
+    persistTabs,
+    saveTabsImmediate: saveTabs,
+    findSampleDatabase: findDuckDbSampleDatabase,
+    showToast,
+    runSqlForTab,
+  });
 
   const previewEntity = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -2436,82 +2351,6 @@ function DuckDbPlaygroundInner() {
     },
     [persistTabs, runSqlForTab],
   );
-
-  const openErDiagramTab = useCallback(() => {
-    const currentTabs = tabsRef.current;
-    const currentActiveTabId = activeTabIdRef.current;
-    const existing = currentTabs.find((tab) => tab.kind === "er-diagram");
-    if (existing) {
-      if (existing.id === currentActiveTabId) {
-        const next = currentTabs.filter((t) => t.id !== existing.id);
-        const finalTabs =
-          next.length > 0
-            ? next
-            : [
-              {
-                id: newTabId(),
-                title: "Query 1",
-                code: "",
-                pristineCode: "",
-              },
-            ];
-        persistTabs(finalTabs);
-        setActiveTabId(finalTabs[0].id);
-        return;
-      }
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
-      setActiveTabId(existing.id);
-      return;
-    }
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: "ER Diagram",
-      code: "",
-      pristineCode: "",
-      kind: "er-diagram",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
-    persistTabs([...currentTabs, tab]);
-    setActiveTabId(tab.id);
-  }, [persistTabs]);
-
-  const openQueryHistoryTab = useCallback(() => {
-    const currentTabs = tabsRef.current;
-    const currentActiveTabId = activeTabIdRef.current;
-    const existing = currentTabs.find((tab) => tab.kind === "query-history");
-    if (existing) {
-      if (existing.id === currentActiveTabId) {
-        const next = currentTabs.filter((t) => t.id !== existing.id);
-        const finalTabs =
-          next.length > 0
-            ? next
-            : [
-              {
-                id: newTabId(),
-                title: "Query 1",
-                code: "",
-                pristineCode: "",
-              },
-            ];
-        persistTabs(finalTabs);
-        setActiveTabId(finalTabs[0].id);
-        return;
-      }
-      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, existing.id);
-      setActiveTabId(existing.id);
-      return;
-    }
-    const tab: QueryTab = {
-      id: newTabId(),
-      title: "Query History",
-      code: "",
-      pristineCode: "",
-      kind: "query-history",
-    };
-    tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, currentActiveTabId, tab.id);
-    persistTabs([...currentTabs, tab]);
-    setActiveTabId(tab.id);
-  }, [persistTabs]);
 
   // ─── Settings actions ────────────────────────────────────────────────
   const restoreDefaultSettings = useCallback(() => {
