@@ -113,9 +113,6 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
     });
     editorRef.current?.focus();
     saveTabsImmediate(activeDbIdRef.current, next);
-    // Same eslint suppression as the original copies — all referenced
-    // bindings are stable setters / refs.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     tabsRef,
     activeTabIdRef,
