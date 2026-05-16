@@ -12,6 +12,30 @@ All twelve playgrounds currently operate with **ephemeral, in-memory storage onl
 
 ---
 
+## Motivation: Why a Virtual Filesystem?
+
+The primary motivation for providing a virtual filesystem is to enable a **multi-file experience** for learners. A single-file REPL is sufficient for simple exercises, but it does not reflect how real-world projects are structured.
+
+**C and C++ are the clearest example.** In practice, C and C++ programs are split across multiple source files (`.c` / `.cpp`) and header files (`.h` / `.hpp`). A learner who only ever writes a single-file `main.c` never encounters:
+
+- How to declare a function in a header and implement it in a separate source file.
+- How the compiler resolves symbols across translation units.
+- How `#include` guards and `extern` declarations work in practice.
+- How a Makefile or build system links multiple object files together.
+
+A multi-file playground — even a simplified two-file editor — gives learners hands-on experience with these concepts that a single-file sandbox cannot provide. The same argument applies to **C++**: the interaction between `.hpp` template definitions, `.cpp` implementation files, and linking is a significant source of confusion for learners, and a playground that lets them experiment with this directly would be materially more valuable.
+
+Beyond C/C++, multi-file support has value in:
+
+- **Python**: separating a helper module (`utils.py`) from a main script (`main.py`) mirrors real project structure and lets learners practice `import`.
+- **PHP**: demonstrating OOP patterns (`require_once 'MyClass.php'`) or simple MVC layouts.
+- **Java**: exploring how classes in different files are compiled together and how the classpath resolves references.
+- **SQLite / PostgreSQL / DuckDB**: attaching multiple database files or running schema migrations stored in separate `.sql` files.
+
+The virtual filesystem is thus not just a persistence feature — it is a **pedagogical tool** that makes the playground environment closer to real development workflows.
+
+---
+
 ## Background: Storage APIs Compared
 
 | API | Persistence | Multi-tab | Performance | Browser support |
@@ -199,11 +223,19 @@ PHP multi-file support (include chains) is genuinely useful, especially for demo
 
 #### Technical limitations / challenges
 - Compiled binary caching is complex: the cache key must include all source files + compiler flags.
-- C playgrounds are primarily used for learning single-function patterns; multi-file projects would be unusual.
 - browsercc itself doesn't expose OPFS mounting today.
 
-#### Recommendation: **Not recommended** ⭐
-The C playground is a compile-and-run REPL. Users don't maintain project state across sessions. localStorage for code persistence suffices. OPFS adds complexity with minimal UX benefit.
+#### Multi-file learner value (updated)
+Multi-file C support is **more valuable than initially assessed** from a pedagogical standpoint. Key learner scenarios include:
+
+- Writing a `math_utils.h` header and a `math_utils.c` implementation file, then `#include`-ing the header in `main.c`. This teaches the declaration/definition split and why header guards exist.
+- Exploring how `extern` declarations work across translation units.
+- Simulating a minimal Makefile-style build: two `.c` files linked together into one WASI binary.
+
+The `extraFiles` injection mechanism already provides the underlying plumbing for multi-file compilation. The remaining work is a **multi-tab editor UI** and OPFS-backed file persistence across sessions. This is a meaningful feature for learners who want to understand modular C programming.
+
+#### Recommendation: **Partial fit** ⭐⭐ *(revised)*
+localStorage is still sufficient for code persistence in a single-file model. However, if a multi-tab editor is introduced, OPFS file persistence becomes worthwhile to allow learners to save and revisit multi-file C projects.
 
 ---
 
@@ -211,8 +243,18 @@ The C playground is a compile-and-run REPL. Users don't maintain project state a
 
 **Runtime:** Identical to C but uses `clangFormat` and C++ headers. The precompiled header (PCH) for `<bits/stdc++.h>` is already cached in-memory across navigations.
 
-#### Recommendation: **Not recommended** ⭐
-Same reasoning as C. PCH caching already addresses the most painful latency issue. OPFS integration provides negligible UX improvement.
+#### Multi-file learner value (updated)
+C++ has an even stronger case for multi-file support than C. Common learner pain points that a multi-file playground addresses:
+
+- Separating a class declaration (`MyClass.hpp`) from its implementation (`MyClass.cpp`). This mirrors how virtually all production C++ is written and teaches the linker's role.
+- Understanding template definitions in headers vs. explicit instantiation in `.cpp` files.
+- Demonstrating header-only libraries (e.g., put everything in `.hpp`) versus the more traditional split.
+- Practicing `#pragma once` / header guards in a context where multiple files can include the same header.
+
+The `<bits/stdc++.h>` PCH already addresses compile-time latency. Multi-file support is the next logical UX step for C++ learners.
+
+#### Recommendation: **Partial fit** ⭐⭐ *(revised)*
+Same as C — localStorage suffices for single-file use, but multi-tab + OPFS becomes meaningful once a multi-file editor is available. C++ arguably benefits even more than C due to the prevalence of header/source splitting in real C++ code.
 
 ---
 
@@ -231,6 +273,46 @@ Same reasoning as C. PCH caching already addresses the most painful latency issu
 - CheerpJ's `/str/` VFS can hold multiple class files, but the UI only supports a single-file editor.
 - True multi-file Java support would require a multi-tab editor and a class resolution strategy.
 
+#### Multi-tab editor: not a blocker
+A multi-tab editor is **not a prerequisite** for enabling multi-file Java support. It can be implemented incrementally if needed. The more fundamental technical challenge is **class resolution**, discussed below.
+
+#### Class Resolution Strategy in CheerpJ (detailed)
+
+This is the primary technical challenge for multi-file Java support in the browser. Here is how it works and what must be solved:
+
+**How CheerpJ resolves classes at runtime:**
+
+CheerpJ emulates the Java classloader hierarchy entirely within the browser. When the running JVM code requests a class (e.g., `Class.forName("com.example.Foo")` or simply references `Foo`), CheerpJ's runtime performs these steps in order:
+
+1. **Bootstrap classloader check** — looks in its bundled OpenJDK class library (JAR files served from the CheerpJ CDN). This covers all `java.*`, `javax.*`, and `sun.*` classes.
+2. **Application classloader check** — searches the configured `classPath` entries (URLs or paths on CheerpJ's VFS). Each entry is checked left-to-right, exactly as in a standard JVM.
+3. **`/str/` in-memory filesystem** — `cheerpjAddStringFile()` injects `.class` file bytes as in-memory paths. These are accessible to the classloader as if they were files at those paths.
+
+**The challenge with multi-file Java in a playground context:**
+
+In a single-file model, the flow is: compile `Main.java` → inject `Main.class` via `/str/` → run `cheerpjRunMain("Main")`. This works because there is only one class to resolve.
+
+In a multi-file model (e.g., `Main.java` + `MathUtils.java`), the following must all be handled:
+
+- **Compilation order** — `javac` must receive all source files simultaneously (or in correct dependency order) to resolve cross-file references at compile time. A naïve sequential compile will fail if `Main.java` references `MathUtils` before `MathUtils.class` exists.
+- **Multiple `.class` injection** — all compiled `.class` files (including inner classes like `MathUtils$Builder.class`) must be injected via `cheerpjAddStringFile()` before `cheerpjRunMain` is called.
+- **Package/directory structure** — Java's classloader maps package names to directory paths. A class `com.example.MathUtils` must appear at `/str/com/example/MathUtils.class`. The injection logic must replicate this directory structure on the `/str/` VFS for every class in every user file.
+- **Dynamic class loading** — if user code uses `Class.forName()`, `ServiceLoader`, or annotation processors, those classes must also be pre-injected into `/str/`. Otherwise, the classloader lookup will 404 against the VFS and throw a `ClassNotFoundException`.
+- **Classpath configuration** — CheerpJ's `cheerpjInit({ classPath: [...] })` must include the `/str/` root so the application classloader searches it. This is already done for the single-class model, but the path depth must be correct for packages.
+
+**Practical resolution strategy:**
+
+The recommended approach for a multi-file Java playground:
+
+1. Accept multiple source files (via multi-tab editor or a file list panel).
+2. Pass all `.java` files to a single `javac` invocation with `-sourcepath /src` (all files placed in the VFS before compilation).
+3. Collect all output `.class` files (including inner classes) from the compiler's output directory.
+4. For each `.class` file, call `cheerpjAddStringFile('/str/' + packagePath + '/' + className + '.class', classBytes)`.
+5. Call `cheerpjInit({ classPath: ['/str/'] })` (or ensure `/str/` is already on the path).
+6. Call `cheerpjRunMain('MainClassName', [])`.
+
+CheerpJ 3.0+ supports dynamic JAR loading via `cheerpjAddJar(url)`, which is an alternative to per-class injection for pre-compiled libraries. For user-authored multi-file code, the per-class `/str/` injection approach is more suitable since the classes are compiled on-the-fly.
+
 #### OPFS feasibility
 - ✅ CheerpJ internally uses **IndexedDB** as its primary persistence backend for its virtual filesystem (Linux overlay FS). OPFS is available as an opt-in performance enhancement in Chromium browsers.
 - CheerpJ's `/files/` mount point is backed by IndexedDB by default.
@@ -245,7 +327,7 @@ Same reasoning as C. PCH caching already addresses the most painful latency issu
 - CheerpJ's own runtime data (JVM classes, JIT cache) is persisted by CheerpJ internally via IndexedDB. **User source and compiled classes are not persisted** — they are injected fresh on each run.
 
 #### Recommendation: **Partial fit** ⭐⭐
-Persisting user `.java` source and compiled `.class` files across sessions via IndexedDB (bridged through CheerpJ's own VFS) is feasible but requires moderate effort. Multi-file Java support is the bigger feature that unlocks the most value; OPFS integration alone is secondary.
+Multi-file Java support is feasible once the class resolution strategy above is implemented. The multi-tab editor UI is not a blocker — even a simple file list panel would suffice. The class resolution logic (compiling all files together, injecting all `.class` outputs into `/str/`, maintaining package directory structure) is the core engineering challenge.
 
 ---
 
@@ -297,6 +379,21 @@ Persisting user `.java` source and compiled `.class` files across sessions via I
 1. Add a "Save Database" button that calls `db.export()` and stores the ArrayBuffer in IndexedDB under a user-named key.
 2. Add a "Load Database" dropdown that restores a previously saved database.
 3. Optionally auto-save on every query run.
+
+#### Alternative: Turso (libSQL) for the SQLite playground
+
+**Research summary:** Turso is a database-as-a-service platform built on [libSQL](https://libsql.org/), a fork of SQLite. It is best known for its *embedded replicas* feature, where a local SQLite file syncs with a remote Turso edge database.
+
+**Can Turso replace sql.js for the SQLite playground?** The short answer is **no** — at least not as a direct drop-in for a self-contained, no-server playground.
+
+Key findings:
+
+- **libSQL in the browser:** Turso/libSQL does not currently provide a WebAssembly build that runs SQLite fully in-browser the way sql.js or wa-sqlite do. The `@libsql/client` npm package targets Node.js and edge runtimes, not browser WASM execution.
+- **Embedded replicas require a local process:** Turso's embedded replica feature requires a native file system and a persistent local process (Node.js, mobile, desktop) that can sync with a remote Turso server. Browser environments do not satisfy these requirements.
+- **Browser-to-Turso sync:** You could send SQL queries from the browser to a Turso database via HTTP (Turso's REST API or WebSocket protocol), but this turns the playground into a server-backed tool and introduces API key management, network latency, and cost concerns — none of which fit a self-contained playground.
+- **GitHub discussion:** The Turso team has an open issue ([libsql#396](https://github.com/libsql/libsql/issues/396)) tracking browser embedded replica support, but it is not production-ready as of 2026.
+
+**Conclusion:** Turso is **not a viable alternative** to OPFS/IndexedDB persistence for the SQLite playground in its current form. The existing sql.js + IndexedDB export/import approach (Option 2 above), or a migration to wa-sqlite with OPFS, remain the recommended paths. Turso would only become relevant if the playground were redesigned to be server-backed, which is out of scope.
 
 #### Recommendation: **Strong fit** ⭐⭐⭐
 SQLite users most often want to persist their schema and data across sessions. This is the clearest persistence use case. Option 2 (IndexedDB export/import) has the best risk/reward ratio; wa-sqlite migration is a longer-term option.
@@ -564,3 +661,127 @@ Virtual filesystem persistence via OPFS is **feasible and beneficial** for the m
 3. **Python / R** — Emscripten OPFS mount in Worker, highest user value
 
 OPFS is the recommended primary backend for all Worker-based runtimes, with IndexedDB as the universal fallback. LocalStorage is appropriate only for lightweight code content persistence. A unified `PlaygroundPersistence` abstraction should be introduced to make persistence a first-class, consistent capability across all playgrounds.
+
+---
+
+## State Management Strategy (No Server-Side Sync)
+
+### Problem statement
+
+The playground has no server-side sync. All state must be managed and persisted entirely in the browser. The question is: **what state goes where?**
+
+There are several distinct categories of state, and each category has a different ideal home:
+
+| State category | Examples | Characteristics |
+|---|---|---|
+| **UI / ephemeral state** | Active tab, modal open, sidebar width | Session-only; no need to persist across reloads |
+| **User preferences** | Theme, editor font size, settings toggles | Small, JSON-serializable; should survive reloads |
+| **Editor content** | Current code in the editor | Text, per-playground, survives reloads |
+| **Playground files** | Multi-file VFS contents (`.c`, `.py`, headers) | Binary or text blobs; potentially large |
+| **Database state** | SQLite / PostgreSQL / DuckDB data | Binary blobs or OPFS-native file handles |
+
+### Option 1: Zustand with localStorage (status quo pattern)
+
+**What it is:** Zustand's `persist` middleware serializes a slice of React state to `localStorage` (or `sessionStorage`) as a JSON string. Existing stores (e.g., `useSettingsStore`) already follow this pattern.
+
+**When it fits:**
+- User preferences (theme, settings toggles, small configuration).
+- Editor content for single-file playgrounds (JS, TS, C, C++, PHP).
+- Storage prefix pattern already established (`sqlite:`, `pg_duckdb_`, etc.).
+
+**Limitations:**
+- `localStorage` is limited to ~5 MB per origin across all keys.
+- All data is synchronously serialized as a string — unsuitable for binary blobs or large files.
+- No concept of files or directories; everything is flat key→string.
+
+**Verdict:** Use for preferences and lightweight code persistence only.
+
+### Option 2: Zustand with IndexedDB storage adapter
+
+**What it is:** Zustand's `persist` middleware accepts a custom `storage` object implementing `getItem` / `setItem` / `removeItem`. You can plug in an IndexedDB adapter (e.g., [idb-keyval](https://github.com/jakearchibald/idb-keyval) or a custom wrapper) to store larger, structured data.
+
+**When it fits:**
+- Editor content for all playgrounds (no 5 MB limit).
+- Saving named SQLite database snapshots (ArrayBuffer from `db.export()`).
+- Storing OPFS-unavailable environments' fallback data.
+
+**Limitations:**
+- IndexedDB is asynchronous; Zustand's rehydration must handle async loading gracefully (use `onRehydrateStorage` callback).
+- More complex to debug than localStorage.
+- Still JSON-based unless you store raw `ArrayBuffer` values (requires a non-JSON serializer).
+
+**Verdict:** A good middle ground. Extend the existing Zustand store pattern with an IndexedDB storage adapter for medium-sized data and binary snapshots.
+
+### Option 3: OPFS as the primary file store
+
+**What it is:** All user files (source code, data uploads, database files) live in OPFS. Zustand (with localStorage or IndexedDB) stores only UI state and metadata (e.g., a list of file names, active file path). The actual file bytes are read/written directly via the OPFS File System API.
+
+**When it fits:**
+- Worker-based runtimes where synchronous OPFS handles are available (Pyodide, WebR, PGlite, DuckDB).
+- Multi-file playgrounds where files can be gigabytes (large CSV/Parquet uploads).
+- Scenarios where near-native I/O performance is needed.
+
+**Architecture pattern:**
+```
+Zustand store  →  holds UI state + file metadata (names, sizes, last-modified)
+OPFS           →  holds actual file bytes (binary-safe, large, fast)
+IndexedDB      →  fallback for browsers without full OPFS sync handle support
+```
+
+**Limitations:**
+- Browser support: full OPFS (including synchronous handle in Workers) requires Chrome 102+, Firefox 111+, Safari 16+. Needs graceful fallback.
+- OPFS is per-origin, not per-tab. Multiple playground tabs would share the same OPFS namespace — a namespace isolation strategy (e.g., per-runtime subdirectory) is required.
+- Cannot use Zustand's `persist` middleware directly for file bytes; requires a custom file management layer.
+
+**Verdict:** Recommended for all file data in Worker-based runtimes. Pair with Zustand for metadata and UI state.
+
+### Option 4: Hybrid strategy (recommended)
+
+Given the no-server constraint and the diversity of state types, a **hybrid strategy** is the most practical:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Zustand + localStorage                                          │
+│  → User preferences (theme, settings toggles, font size)        │
+│  → Editor content for simple playgrounds (JS/TS/C/C++)          │
+│  → Active file name, active tab, UI layout                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  Zustand + IndexedDB adapter                                     │
+│  → Named database snapshots (SQLite export ArrayBuffers)         │
+│  → Larger editor content where localStorage limit is a concern   │
+│  → Cross-session metadata for file lists                         │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  OPFS (via PlaygroundPersistence abstraction)                    │
+│  → Multi-file VFS contents for Emscripten runtimes              │
+│  → SQL database files (PGlite, DuckDB, wa-sqlite)               │
+│  → Large uploaded data assets (CSV, Parquet, images)            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### State hydration lifecycle
+
+On playground mount, the recommended hydration order is:
+
+1. **Zustand rehydration** (synchronous from localStorage; async from IndexedDB) — restores UI state and preferences immediately.
+2. **OPFS mount** (async, in Worker) — happens in parallel with UI render; show a loading indicator while files are being mounted.
+3. **Runtime initialization** — begins only after OPFS is mounted (for runtimes that need VFS to be ready before starting).
+4. **File list refresh** — after OPFS mount completes, update Zustand's file metadata to reflect what is in OPFS.
+
+### Summary table
+
+| State type | Recommended storage | Library / API |
+|---|---|---|
+| User preferences, toggles | localStorage | Zustand `persist` (existing pattern) |
+| Editor code (single-file) | localStorage | Zustand `persist` (existing pattern) |
+| Named DB snapshots (SQL) | IndexedDB | Zustand + idb-keyval or custom adapter |
+| Multi-file VFS contents | OPFS | `PlaygroundPersistence` abstraction |
+| SQL database files | OPFS (or IDB fallback) | PGlite / DuckDB / wa-sqlite native support |
+| UI ephemeral state | React state (no persistence) | Zustand (no `persist`) |
+
+### Key decision: no single storage layer for everything
+
+There is no single "right" answer that covers all state in this application. Attempting to funnel everything through Zustand + localStorage will hit size limits and performance walls for binary data. Attempting to use OPFS for everything requires building reactive abstractions on top of a file API, losing the simplicity of Zustand for UI state. The hybrid approach above matches each state type to the storage layer it is best suited for.
