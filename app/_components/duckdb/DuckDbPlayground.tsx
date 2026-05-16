@@ -107,6 +107,7 @@ import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
+import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -4415,69 +4416,14 @@ function DuckDbPlaygroundInner() {
           }}
         />
 
-        <AlertDialog.Root
-          open={pendingDropEntity !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingDropEntity(null);
-          }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Drop {pendingDropEntity?.kind ?? "entity"}?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will permanently drop{" "}
-                <strong>{pendingDropEntity?.name ?? ""}</strong> from the
-                in-memory database. Reload the page to restore the sample.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => void performDropEntity()}
-                >
-                  Drop
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={pendingTruncate !== null}
-          onOpenChange={(next) => {
-            if (!next) setPendingTruncate(null);
-          }}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Truncate table?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                Truncate table <strong>{pendingTruncate}</strong>? This deletes
-                every row but keeps the schema. The change is in-memory only and
-                will be undone next page load.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => void confirmTruncate()}
-                >
-                  Truncate
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SchemaActionDialogs
+          dropEntityPending={pendingDropEntity}
+          onDropEntityOpenChange={(next) => { if (!next) setPendingDropEntity(null); }}
+          onDropEntityConfirm={() => void performDropEntity()}
+          truncatePending={pendingTruncate}
+          onTruncateOpenChange={(next) => { if (!next) setPendingTruncate(null); }}
+          onTruncateConfirm={() => void confirmTruncate()}
+        />
 
         <SqlSettingsConfirmDialogs
           dialectDisplayName="DuckDB"
