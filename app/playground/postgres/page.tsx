@@ -1,7 +1,10 @@
 "use client";
 
-import PostgresPlayground from "../../_components/postgres/PostgresPlayground";
+import { SqlPlaygroundShell } from "../../_components/sql/shared/SqlPlaygroundShell";
+import { createPostgresAdapter } from "../../_components/postgres/postgresAdapter";
+
+const adapter = createPostgresAdapter();
 
 export default function PostgresPage() {
-  return <PostgresPlayground />;
+  return <SqlPlaygroundShell adapter={adapter} />;
 }

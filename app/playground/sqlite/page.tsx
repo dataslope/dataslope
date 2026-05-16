@@ -1,7 +1,10 @@
 "use client";
 
-import SqlPlayground from "../../_components/SqlPlayground";
+import { SqlPlaygroundShell } from "../../_components/sql/shared/SqlPlaygroundShell";
+import { createSqliteAdapter } from "../../_components/sql/sqliteAdapter";
+
+const adapter = createSqliteAdapter();
 
 export default function SqlitePage() {
-  return <SqlPlayground />;
+  return <SqlPlaygroundShell adapter={adapter} />;
 }
