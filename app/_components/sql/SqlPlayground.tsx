@@ -131,6 +131,7 @@ import {
   detectIsMac,
 } from "../playgroundShared";
 import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
+import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialogs";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import {
@@ -2528,68 +2529,15 @@ function SqlPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        <AlertDialog.Root
-          open={confirmRestoreOpen}
-          onOpenChange={setConfirmRestoreOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Restore default settings?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will reset SQLite&apos;s editor font size, word wrap,
-                run/result preferences, and the shared editor theme to their
-                built-in defaults. Your saved queries are not affected.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    restoreDefaultSettings();
-                    setConfirmRestoreOpen(false);
-                  }}
-                >
-                  Restore defaults
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={confirmClearStorageOpen}
-          onOpenChange={setConfirmClearStorageOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Clear all localStorage data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will permanently delete every saved setting and query
-                across <strong>all playgrounds</strong>. The page will reload
-                immediately. This can&rsquo;t be undone.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={clearAllLocalStorage}
-                >
-                  Clear &amp; reload
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SqlSettingsConfirmDialogs
+          dialectDisplayName="SQLite"
+          restoreOpen={confirmRestoreOpen}
+          onRestoreOpenChange={setConfirmRestoreOpen}
+          onRestoreConfirm={restoreDefaultSettings}
+          clearStorageOpen={confirmClearStorageOpen}
+          onClearStorageOpenChange={setConfirmClearStorageOpen}
+          onClearStorageConfirm={clearAllLocalStorage}
+        />
 
         <AlertDialog.Root
           open={truncateConfirm !== null}

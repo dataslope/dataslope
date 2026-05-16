@@ -104,6 +104,7 @@ import {
   detectIsMac,
 } from "../playgroundShared";
 import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
+import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { type DuckDbEngine } from "../runtime/duckdb";
@@ -4542,68 +4543,15 @@ function DuckDbPlaygroundInner() {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        <AlertDialog.Root
-          open={confirmRestoreOpen}
-          onOpenChange={setConfirmRestoreOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Restore default settings?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                This will reset DuckDB&apos;s editor font size, word wrap,
-                run/result preferences, and the shared editor theme to their
-                built-in defaults. Your saved queries are not affected.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    restoreDefaultSettings();
-                    setConfirmRestoreOpen(false);
-                  }}
-                >
-                  Restore
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
-
-        <AlertDialog.Root
-          open={confirmClearStorageOpen}
-          onOpenChange={setConfirmClearStorageOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
-                Clear all localStorage data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
-                Settings, saved queries, and per-database state for every
-                Dataslope playground will be erased. This action cannot be
-                undone — the page will reload immediately afterwards.
-              </AlertDialog.Description>
-              <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={clearAllLocalStorage}
-                >
-                  Clear &amp; reload
-                </AlertDialog.Close>
-              </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <SqlSettingsConfirmDialogs
+          dialectDisplayName="DuckDB"
+          restoreOpen={confirmRestoreOpen}
+          onRestoreOpenChange={setConfirmRestoreOpen}
+          onRestoreConfirm={restoreDefaultSettings}
+          clearStorageOpen={confirmClearStorageOpen}
+          onClearStorageOpenChange={setConfirmClearStorageOpen}
+          onClearStorageConfirm={clearAllLocalStorage}
+        />
 
         {/* ── View/Edit Structure drawer ── */}
         <Dialog.Root
