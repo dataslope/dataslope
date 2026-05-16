@@ -144,6 +144,10 @@ import {
   stripSqlComments,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import {
+  ensurePersistUnloadFlush,
+  persistAsync,
+} from "../sql/utils/persistedStorage";
 import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
 import type {
   AddRowDialogState,
@@ -905,6 +909,11 @@ type ImportFlavor = "csv" | "json" | "parquet";
 
 function DuckDbPlaygroundInner() {
   const router = useRouter();
+  // Coalesced localStorage writer for settings — install the
+  // pagehide/visibilitychange flush listener once per playground mount.
+  useEffect(() => {
+    ensurePersistUnloadFlush();
+  }, []);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
@@ -944,33 +953,21 @@ function DuckDbPlaygroundInner() {
   const setFontSize = useCallback(
     (n: number) => {
       setFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("fontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("fontsize"), String(n));
     },
     [setFontSizeState],
   );
   const setOutputFontSizeEnabled = useCallback(
     (b: boolean) => {
       setOutputFontSizeEnabledState(b);
-      try {
-        localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize_enabled"), String(b));
     },
     [setOutputFontSizeEnabledState],
   );
   const setOutputFontSize = useCallback(
     (n: number) => {
       setOutputFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("outputfontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize"), String(n));
     },
     [setOutputFontSizeState],
   );
@@ -984,22 +981,14 @@ function DuckDbPlaygroundInner() {
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);
-      try {
-        localStorage.setItem(storageKey("wordwrap"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("wordwrap"), String(b));
     },
     [setWordWrapState],
   );
   const setClearBeforeRun = useCallback(
     (b: boolean) => {
       setClearBeforeRunState(b);
-      try {
-        localStorage.setItem(storageKey("clearbeforerun"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("clearbeforerun"), String(b));
     },
     [setClearBeforeRunState],
   );
@@ -1824,9 +1813,8 @@ function DuckDbPlaygroundInner() {
   const lastReconfigureKeyRef = useRef<string>("");
   useEffect(() => {
     const view = editorRef.current;
-    const langComp = langCompRef.current;
     const completionComp = completionCompRef.current;
-    if (!view || !langComp || !completionComp) return;
+    if (!view || !langCompRef.current || !completionComp) return;
     const schema: Record<string, string[]> = {};
     const completionSchema: SqlCompletionSchema = { entities: [] };
     for (const name of tables) {
@@ -1841,15 +1829,36 @@ function DuckDbPlaygroundInner() {
     }
     const key = JSON.stringify(completionSchema.entities);
     if (key === lastReconfigureKeyRef.current) return;
-    lastReconfigureKeyRef.current = key;
+    // Dispatch the completion reconfigure immediately so user-defined
+    // tables/views show up in autocomplete the moment the schema lands.
     view.dispatch({
       effects: [
-        langComp.reconfigure(makeSqlLangExtension("duckdb", schema)),
         completionComp.reconfigure(
           makeSqlAutocompletionExtension(completionSchema, "duckdb"),
         ),
       ],
     });
+    // `@codemirror/lang-sql` is lazy-loaded (Stage 5.3) so the lang
+    // compartment reconfigure has to await the chunk. The view + key
+    // checks below guard against stale dispatches if the user typed,
+    // imported, or destroyed the editor before the chunk resolved.
+    // We only mark `lastReconfigureKeyRef` as up-to-date once the lang
+    // dispatch actually fires — that way a StrictMode-cancelled effect
+    // won't make the next run incorrectly skip the lang reconfigure.
+    let cancelled = false;
+    void makeSqlLangExtension("duckdb", schema).then((langExt) => {
+      if (cancelled) return;
+      const currentView = editorRef.current;
+      const currentLangComp = langCompRef.current;
+      if (!currentView || !currentLangComp) return;
+      currentView.dispatch({
+        effects: [currentLangComp.reconfigure(langExt)],
+      });
+      lastReconfigureKeyRef.current = key;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [tables, views, columnsByEntity]);
 
   // Drop result entries whose owning tab no longer exists.

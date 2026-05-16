@@ -142,6 +142,10 @@ import {
   stripSqlComments,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import {
+  ensurePersistUnloadFlush,
+  persistAsync,
+} from "../sql/utils/persistedStorage";
 import { pickFallbackTab, pushTabHistory } from "../sql/utils/tabUtils";
 import type {
   AddRowDialogState,
@@ -882,6 +886,9 @@ type ImportFlavor = "csv" | "json" | "parquet";
 
 function PostgresPlaygroundInner() {
   const router = useRouter();
+  useEffect(() => {
+    ensurePersistUnloadFlush();
+  }, []);
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
@@ -921,33 +928,21 @@ function PostgresPlaygroundInner() {
   const setFontSize = useCallback(
     (n: number) => {
       setFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("fontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("fontsize"), String(n));
     },
     [setFontSizeState],
   );
   const setOutputFontSizeEnabled = useCallback(
     (b: boolean) => {
       setOutputFontSizeEnabledState(b);
-      try {
-        localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize_enabled"), String(b));
     },
     [setOutputFontSizeEnabledState],
   );
   const setOutputFontSize = useCallback(
     (n: number) => {
       setOutputFontSizeState(n);
-      try {
-        localStorage.setItem(storageKey("outputfontsize"), String(n));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("outputfontsize"), String(n));
     },
     [setOutputFontSizeState],
   );
@@ -961,22 +956,14 @@ function PostgresPlaygroundInner() {
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);
-      try {
-        localStorage.setItem(storageKey("wordwrap"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("wordwrap"), String(b));
     },
     [setWordWrapState],
   );
   const setClearBeforeRun = useCallback(
     (b: boolean) => {
       setClearBeforeRunState(b);
-      try {
-        localStorage.setItem(storageKey("clearbeforerun"), String(b));
-      } catch {
-        /* ignore */
-      }
+      persistAsync(storageKey("clearbeforerun"), String(b));
     },
     [setClearBeforeRunState],
   );
@@ -1776,12 +1763,15 @@ function PostgresPlaygroundInner() {
     void refreshSchemas();
   }, [showSystemSchemas, refreshSchemas]);
 
-  // Keep autocomplete schema in sync with current tables/views.
+  // Keep autocomplete schema in sync with current tables/views. The
+  // reconfigure key memoization mirrors the DuckDB playground's
+  // Stage 1.2 fix so a query / CSV import that doesn't change the
+  // visible schema doesn't trigger a full editor re-parse.
+  const lastReconfigureKeyRef = useRef<string>("");
   useEffect(() => {
     const view = editorRef.current;
-    const langComp = langCompRef.current;
     const completionComp = completionCompRef.current;
-    if (!view || !langComp || !completionComp) return;
+    if (!view || !langCompRef.current || !completionComp) return;
     const schema: Record<string, string[]> = {};
     const completionSchema: SqlCompletionSchema = { entities: [] };
     for (const name of tables) {
@@ -1794,14 +1784,34 @@ function PostgresPlaygroundInner() {
       schema[name] = cols;
       completionSchema.entities.push({ name, columns: cols, kind: "view" });
     }
+    const key = JSON.stringify(completionSchema.entities);
+    if (key === lastReconfigureKeyRef.current) return;
     view.dispatch({
       effects: [
-        langComp.reconfigure(makeSqlLangExtension("postgres", schema)),
         completionComp.reconfigure(
           makeSqlAutocompletionExtension(completionSchema, "postgres"),
         ),
       ],
     });
+    // Lazy-load `@codemirror/lang-sql` (Stage 5.3) and apply the lang
+    // reconfigure once the chunk lands. Only commit
+    // `lastReconfigureKeyRef` after the dispatch fires so a
+    // StrictMode-cancelled effect can't make the next run skip the
+    // lang reconfigure for the current schema.
+    let cancelled = false;
+    void makeSqlLangExtension("postgres", schema).then((langExt) => {
+      if (cancelled) return;
+      const currentView = editorRef.current;
+      const currentLangComp = langCompRef.current;
+      if (!currentView || !currentLangComp) return;
+      currentView.dispatch({
+        effects: [currentLangComp.reconfigure(langExt)],
+      });
+      lastReconfigureKeyRef.current = key;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [tables, views, columnsByEntity]);
 
   // Drop result entries whose owning tab no longer exists.

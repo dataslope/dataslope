@@ -166,6 +166,10 @@ import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
 import { pushTabHistory } from "./utils/tabUtils";
+import {
+  ensurePersistUnloadFlush,
+  persistAsync,
+} from "./utils/persistedStorage";
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
@@ -953,6 +957,9 @@ function PragmaSettingsTab({
 
 function SqlPlaygroundInner() {
   const router = useRouter();
+  useEffect(() => {
+    ensurePersistUnloadFlush();
+  }, []);
 
   // ─── Settings store ──────────────────────────────────────────────────
   const fontSize = useSettingsStore((s) => s.fontSize);
@@ -1293,21 +1300,21 @@ function SqlPlaygroundInner() {
   const setFontSize = useCallback(
     (n: number) => {
       setFontSizeState(n);
-      localStorage.setItem(storageKey("fontsize"), String(n));
+      persistAsync(storageKey("fontsize"), String(n));
     },
     [setFontSizeState],
   );
   const setOutputFontSizeEnabled = useCallback(
     (b: boolean) => {
       setOutputFontSizeEnabledState(b);
-      localStorage.setItem(storageKey("outputfontsize_enabled"), String(b));
+      persistAsync(storageKey("outputfontsize_enabled"), String(b));
     },
     [setOutputFontSizeEnabledState],
   );
   const setOutputFontSize = useCallback(
     (n: number) => {
       setOutputFontSizeState(n);
-      localStorage.setItem(storageKey("outputfontsize"), String(n));
+      persistAsync(storageKey("outputfontsize"), String(n));
     },
     [setOutputFontSizeState],
   );
@@ -1321,14 +1328,14 @@ function SqlPlaygroundInner() {
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);
-      localStorage.setItem(storageKey("wordwrap"), String(b));
+      persistAsync(storageKey("wordwrap"), String(b));
     },
     [setWordWrapState],
   );
   const setClearBeforeRun = useCallback(
     (b: boolean) => {
       setClearBeforeRunState(b);
-      localStorage.setItem(storageKey("clearbeforerun"), String(b));
+      persistAsync(storageKey("clearbeforerun"), String(b));
     },
     [setClearBeforeRunState],
   );
@@ -1688,9 +1695,11 @@ function SqlPlaygroundInner() {
         });
       }
       if (cancelled) return;
+      const langExt = await makeSqlLangExtension("sqlite", schema);
+      if (cancelled) return;
       view.dispatch({
         effects: [
-          sqlComp.reconfigure(makeSqlLangExtension("sqlite", schema)),
+          sqlComp.reconfigure(langExt),
           completionComp.reconfigure(
             makeSqlAutocompletionExtension(completionSchema, "sqlite"),
           ),

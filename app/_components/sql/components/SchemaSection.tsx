@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Popover } from "@base-ui-components/react/popover";
 import {
@@ -28,7 +28,9 @@ export interface SchemaSectionProps {
   onCollapseAll?: () => void;
 }
 
-export function SchemaSection({
+export const SchemaSection = memo(SchemaSectionImpl);
+
+function SchemaSectionImpl({
   label,
   count,
   expanded,

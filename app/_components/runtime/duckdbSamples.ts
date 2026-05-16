@@ -1,12 +1,12 @@
 "use client";
 
-import type { QueryTabSeed } from "./sqliteSamples";
+import {
+  findSqlSampleById,
+  type QueryTabSeed,
+  type SqlSampleDatabaseBase,
+} from "./sqlSamples";
 
-export interface DuckDbSampleDatabase {
-  id: string;
-  label: string;
-  filename: string;
-  description: string;
+export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
   sql: string;
   defaultTabs: QueryTabSeed[];
 }
@@ -245,9 +245,5 @@ export const DUCKDB_BLANK_DATABASE: DuckDbSampleDatabase = {
 };
 
 export function findDuckDbSampleDatabase(id: string): DuckDbSampleDatabase {
-  if (id === DUCKDB_BLANK_DATABASE.id) return DUCKDB_BLANK_DATABASE;
-  return (
-    DUCKDB_SAMPLE_DATABASES.find((sample) => sample.id === id) ??
-    DUCKDB_SAMPLE_DATABASES[0]
-  );
+  return findSqlSampleById(id, DUCKDB_SAMPLE_DATABASES, DUCKDB_BLANK_DATABASE);
 }

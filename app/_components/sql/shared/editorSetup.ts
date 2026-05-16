@@ -15,11 +15,6 @@ import {
   indentWithTab,
 } from "@codemirror/commands";
 import {
-  PostgreSQL,
-  SQLite,
-  sql as sqlLang,
-} from "@codemirror/lang-sql";
-import {
   bracketMatching,
   indentOnInput,
   indentUnit,
@@ -82,13 +77,34 @@ export interface CreateSqlEditorExtensionsOptions {
   onRunAll: () => void;
 }
 
+// Stage 5.3 — `@codemirror/lang-sql` is loaded on demand so it lives in
+// its own chunk instead of bloating each SQL playground's main bundle.
+// The chunk is small enough that fetching it in parallel with engine
+// boot keeps the user-visible editor mount instant: the editor renders
+// immediately with no syntax highlighting / lang-aware completions and
+// the lang compartment is reconfigured as soon as the dynamic import
+// resolves (typically before the user even finishes the database boot).
+type LangSqlModule = typeof import("@codemirror/lang-sql");
+let _langSqlPromise: Promise<LangSqlModule> | null = null;
+function loadLangSql(): Promise<LangSqlModule> {
+  if (!_langSqlPromise) {
+    _langSqlPromise = import("@codemirror/lang-sql");
+  }
+  return _langSqlPromise;
+}
+/** Returns a Promise that resolves to the `@codemirror/lang-sql`
+ *  module. Cached so concurrent callers share one fetch. */
+export function ensureLangSqlLoaded(): Promise<LangSqlModule> {
+  return loadLangSql();
+}
+
 /** Returns the dialect-specific argument for `@codemirror/lang-sql`'s
  *  `sql({ dialect })` factory. DuckDB has no native dialect descriptor,
  *  so we fall back to undefined (which lets lang-sql use its default
  *  generic SQL grammar). */
-export function sqlLangDialect(dialect: SqlDialect) {
-  if (dialect === "postgres") return PostgreSQL;
-  if (dialect === "sqlite") return SQLite;
+function pickLangDialect(mod: LangSqlModule, dialect: SqlDialect) {
+  if (dialect === "postgres") return mod.PostgreSQL;
+  if (dialect === "sqlite") return mod.SQLite;
   return undefined;
 }
 
@@ -108,14 +124,19 @@ export function makeSqlAutocompletionExtension(
  *  dispatch (when the schema or dialect changes after the editor is
  *  mounted). The optional `schema` is the lang-sql shape used for
  *  built-in completions — it's the same `Record<table, columns>`
- *  the SQLite playground has always passed. */
-export function makeSqlLangExtension(
+ *  the SQLite playground has always passed.
+ *
+ *  Returns a Promise so callers can re-use the lazy-loaded chunk
+ *  without re-importing it. Each playground caches the resolved
+ *  module via the shared `loadLangSql` promise above. */
+export async function makeSqlLangExtension(
   dialect: SqlDialect,
   schema?: Record<string, string[]>,
-): Extension {
-  return sqlLang({
+): Promise<Extension> {
+  const mod = await loadLangSql();
+  return mod.sql({
     schema,
-    dialect: sqlLangDialect(dialect),
+    dialect: pickLangDialect(mod, dialect),
     upperCaseKeywords: false,
   });
 }
@@ -126,7 +147,12 @@ export function makeSqlLangExtension(
  *  Postgres, and DuckDB playgrounds. The four CodeMirror compartments
  *  (lang / completion / theme / wrap) are passed in by the caller so
  *  it can hold onto them for later `.reconfigure(...)` dispatches
- *  (schema updates, theme toggles, word-wrap toggles). */
+ *  (schema updates, theme toggles, word-wrap toggles).
+ *
+ *  The `lang` compartment is intentionally seeded with an empty
+ *  extension. The caller is expected to dispatch a reconfigure with
+ *  the resolved `makeSqlLangExtension(...)` once it lands — this lets
+ *  us defer the lang-sql chunk without blocking editor mount. */
 export function createSqlEditorExtensions(
   opts: CreateSqlEditorExtensionsOptions,
 ): Extension[] {
@@ -159,12 +185,9 @@ export function createSqlEditorExtensions(
     crosshairCursor(),
     EditorState.tabSize.of(2),
     indentUnit.of("  "),
-    compartments.lang.of(
-      sqlLang({
-        dialect: sqlLangDialect(dialect),
-        upperCaseKeywords: false,
-      }),
-    ),
+    // Lang compartment seeded empty; reconfigured once the lazy-loaded
+    // `@codemirror/lang-sql` chunk resolves (see `makeSqlLangExtension`).
+    compartments.lang.of([]),
     compartments.completion.of(
       makeSqlAutocompletionExtension(initialSchema, dialect),
     ),
@@ -221,3 +244,4 @@ export function createSqlEditorExtensions(
     ]),
   ];
 }
+
