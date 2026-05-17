@@ -3223,6 +3223,40 @@ function PostgresPlaygroundInner() {
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
+                title="Query history"
+                aria-label="Query history"
+                onClick={openQueryHistoryTab}
+              >
+                <History size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    History
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
+                title="ER diagram"
+                aria-label="ER diagram"
+                onClick={openErDiagramTab}
+              >
+                <Network size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    ER Diagram
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
                 title="Runtime info"
                 aria-label="Runtime info"
               >
@@ -4302,28 +4336,6 @@ function PostgresPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
-            </div>
-            <div className="sql-sidebar-footer">
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openErDiagramTab}
-                title="View ER Diagram"
-                aria-label="View ER Diagram"
-              >
-                <Network size={13} aria-hidden="true" />
-                <span>ER Diagram</span>
-              </button>
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openQueryHistoryTab}
-                title="View Query History"
-                aria-label="View Query History"
-              >
-                <History size={13} aria-hidden="true" />
-                <span>History</span>
-              </button>
             </div>
           </aside>
           <div

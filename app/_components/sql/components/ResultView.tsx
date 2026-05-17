@@ -18,6 +18,7 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
+import { Toast } from "@base-ui-components/react/toast";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
 import {
@@ -1377,6 +1378,7 @@ export function ResultTableBody({
   baseSql?: string;
   onOpenQueryTab?: (title: string, sql: string) => void;
 }) {
+  const toastManager = Toast.useToastManager();
   const rightClickedCellRef = useRef<{
     colIdx: number;
     value: unknown;
@@ -2009,6 +2011,9 @@ export function ResultTableBody({
                   );
                   navigator.clipboard
                     .writeText(JSON.stringify(obj, null, 2))
+                    .then(() => {
+                      toastManager.add({ title: "Row copied as JSON", data: { kind: "info" } });
+                    })
                     .catch(() => undefined);
                 }}
               >

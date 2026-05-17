@@ -75,6 +75,7 @@ import {
   CircleHelp,
   Eye,
   Database,
+  FileCode2,
   FilePlus,
   FileText,
   FileJson,
@@ -119,6 +120,7 @@ import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialog
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
 import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
+import { ImportSqlDumpDialog } from "./components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
@@ -207,6 +209,18 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
     icon: <Upload size={14} />,
     label: "Import SQLite File",
     description: "Open a .sqlite or .db file",
+  },
+  {
+    id: "__import_sql_dump__",
+    icon: <FileCode2 size={14} />,
+    label: "Import SQL Dump",
+    description: "Load database from a .sql file",
+  },
+  {
+    id: "__export_sql_dump__",
+    icon: <FileCode2 size={14} />,
+    label: "Export SQL Dump",
+    description: "Download DDL + data as a .sql file",
   },
   {
     id: "__rename_db__",
@@ -1123,6 +1137,12 @@ function SqlPlaygroundInner() {
   const setImportSqliteDragging = useDialogStore(
     (s) => s.setImportSqliteDragging,
   );
+  const importSqlDumpOpen = useDialogStore((s) => s.importSqlDumpOpen);
+  const setImportSqlDumpOpen = useDialogStore((s) => s.setImportSqlDumpOpen);
+  const importSqlDumpDragging = useDialogStore((s) => s.importSqlDumpDragging);
+  const setImportSqlDumpDragging = useDialogStore(
+    (s) => s.setImportSqlDumpDragging,
+  );
   const importCsvOpen = useDialogStore((s) => s.importCsvOpen);
   const setImportCsvOpen = useDialogStore((s) => s.setImportCsvOpen);
   const importCsvDragging = useDialogStore((s) => s.importCsvDragging);
@@ -1297,9 +1317,11 @@ function SqlPlaygroundInner() {
     performDbSwitch,
     performBlankLoad,
     performImportSqlite,
+    performImportSqlDump,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,
+    exportDatabaseAsSqlDump,
     handleCsvFile,
     submitCsvImport,
     handleJsonFile,
@@ -2129,6 +2151,20 @@ function SqlPlaygroundInner() {
                         </div>
                       </div>
                     </Menu.Item>
+                    <Menu.Item
+                      className="example-item export-item"
+                      onClick={() => setImportSqlDumpOpen(true)}
+                    >
+                      <div className="export-item-text">
+                        <div className="ex-title">
+                          from SQL dump
+                          <span className="ext-badge">.sql</span>
+                        </div>
+                        <div className="ex-desc">
+                          Load database from a SQL dump file
+                        </div>
+                      </div>
+                    </Menu.Item>
                     <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
@@ -2251,6 +2287,18 @@ function SqlPlaygroundInner() {
                       </Menu.Item>
                       <Menu.Item
                         className="example-item export-item"
+                        onClick={exportDatabaseAsSqlDump}
+                      >
+                        <div className="export-item-text">
+                          <div className="ex-title">
+                            SQL Dump
+                            <span className="ext-badge">.sql</span>
+                          </div>
+                          <div className="ex-desc">DDL + INSERT statements</div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item
+                        className="example-item export-item"
                         onClick={exportDatabaseToXlsx}
                       >
                         <div className="export-item-text">
@@ -2266,6 +2314,40 @@ function SqlPlaygroundInner() {
                 </Menu.Portal>
               </Menu.Root>
             )}
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
+                title="Query history"
+                aria-label="Query history"
+                onClick={openQueryHistoryTab}
+              >
+                <History size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    History
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                className="header-btn icon-only"
+                title="ER diagram"
+                aria-label="ER diagram"
+                onClick={openErDiagramTab}
+              >
+                <Network size={14} aria-hidden="true" />
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    ER Diagram
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
             <Popover.Root>
               <Popover.Trigger
                 className="header-btn icon-only"
@@ -2495,6 +2577,14 @@ function SqlPlaygroundInner() {
           browseHint="or click to browse — .sqlite, .db"
           accept=".sqlite,.db,.sqlite3"
           inputAriaLabel="Choose SQLite file"
+        />
+
+        <ImportSqlDumpDialog
+          open={importSqlDumpOpen}
+          dragging={importSqlDumpDragging}
+          onClose={() => setImportSqlDumpOpen(false)}
+          onDraggingChange={setImportSqlDumpDragging}
+          onImport={(sql, filename) => performImportSqlDump(sql, filename)}
         />
 
         <RenameDatabaseDialog
@@ -3559,6 +3649,14 @@ function SqlPlaygroundInner() {
                       setImportSqliteOpen(true);
                       return;
                     }
+                    if (value === "__import_sql_dump__") {
+                      setImportSqlDumpOpen(true);
+                      return;
+                    }
+                    if (value === "__export_sql_dump__") {
+                      exportDatabaseAsSqlDump();
+                      return;
+                    }
                     if (value === "__rename_db__") {
                       // Pre-populate with current filename (strip extension).
                       const cur = activeSample.filename;
@@ -3706,29 +3804,6 @@ function SqlPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
-            </div>
-
-            <div className="sql-sidebar-footer">
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openErDiagramTab}
-                title="View ER Diagram"
-                aria-label="View ER Diagram"
-              >
-                <Network size={13} aria-hidden="true" />
-                <span>ER Diagram</span>
-              </button>
-              <button
-                type="button"
-                className="sql-sidebar-btn"
-                onClick={openQueryHistoryTab}
-                title="View Query History"
-                aria-label="View Query History"
-              >
-                <History size={13} aria-hidden="true" />
-                <span>History</span>
-              </button>
             </div>
           </aside>
 

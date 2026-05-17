@@ -136,6 +136,7 @@ body.pg-active {
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  position: relative;
   z-index: 10;
 }
 
@@ -242,6 +243,12 @@ body.pg-active {
 }
 .pg-lang-switcher-popup {
   z-index: 500;
+}
+/* Icon sidebar hover-popovers must render above in-page elements that
+   create stacking contexts (e.g. .sql-schema-selector-wrap with
+   position: relative; z-index: 1, and .pg-icon-sidebar with z-index: 5). */
+.pg-icon-sidebar-popover-positioner {
+  z-index: 600;
 }
 .bui-select-popup[data-starting-style],
 .bui-select-popup[data-ending-style] {
