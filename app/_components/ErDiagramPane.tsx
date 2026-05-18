@@ -822,6 +822,7 @@ export function ErDiagramPane({
       cancelled = true;
       if (pendingTimeoutId !== undefined) window.clearTimeout(pendingTimeoutId);
     };
+  // `finishLoading` is defined inside the effect and does not need to be listed.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, columnsByEntity, foreignKeysByEntity]);
 

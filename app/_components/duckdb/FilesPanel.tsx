@@ -12,6 +12,7 @@ import {
   FolderPlus,
   Folder,
   FolderOpen,
+  FolderSymlink,
   FileText,
   ChevronRight,
   ChevronDown,
@@ -346,7 +347,7 @@ function TreeRow({
                   className="example-item"
                   onClick={() => onCopyPath(node.fullPath)}
                 >
-                  <Copy size={12} aria-hidden="true" />
+                  <FolderSymlink size={12} aria-hidden="true" />
                   <div className="ex-title">Copy Path</div>
                 </ContextMenu.Item>
               )}
