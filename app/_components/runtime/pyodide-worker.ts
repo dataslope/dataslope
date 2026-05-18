@@ -106,7 +106,7 @@ async function initPyodide(): Promise<void> {
   };
 
   post({ kind: "loading", message: "Installing packages…" });
-  await pyodide.loadPackage(["numpy", "pandas", "matplotlib"], pkgCallbacks);
+  await pyodide.loadPackage(["numpy", "pandas", "matplotlib", "scipy"], pkgCallbacks);
   await pyodide.loadPackage("micropip", pkgCallbacks);
   const micropip = pyodide.pyimport("micropip");
   await micropip.install("plotly");
@@ -123,8 +123,15 @@ _display_outputs = []
 
 def display(*objs):
     import pandas as pd
+    import matplotlib.axes
+    import matplotlib.figure
     for obj in objs:
         if obj is None:
+            continue
+        # Matplotlib Axes/Figure objects are captured by the auto-flush that
+        # runs after user code executes—skip them here to avoid printing
+        # an unhelpful repr like "<Axes: ylabel='Density'>".
+        if isinstance(obj, (matplotlib.axes.Axes, matplotlib.figure.Figure)):
             continue
         if isinstance(obj, pd.DataFrame):
             _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
@@ -294,6 +301,16 @@ try:
 except: pass
 
 _execute_with_last_display(_user_code_str)
+
+# Auto-flush any matplotlib figures that the user did not explicitly show.
+# This handles patterns like df.x.plot.density() which create a figure
+# and return an Axes object without ever calling plt.show().
+for _fig_num in list(plt.get_fignums()):
+    _fig = plt.figure(_fig_num)
+    _buf = io.BytesIO()
+    _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
+    _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
+plt.close("all")
 
 _plotly.io.show = _orig_plotly_show
 try: _go.Figure.show = _orig_go_show
