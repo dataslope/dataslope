@@ -717,10 +717,22 @@ export function ErDiagramPane({
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Four-phase overlay lifecycle — mirrors the pyodide-style fade used by
+  // the R / Python playgrounds:
+  //   "covering"    ELK still computing; opaque background hides the empty
+  //                 ReactFlow canvas.
+  //   "transparent" ELK is done before the minimum animation duration; the
+  //                 background goes clear so the diagram is visible behind
+  //                 the still-running wave animation.
+  //   "hidden"      Minimum duration has elapsed; CSS opacity transitions
+  //                 to 0 (same transition as .pyodide-loading.hidden).
+  //   null          Overlay unmounted after transition ends.
+  const [overlayPhase, setOverlayPhase] = useState<
+    "covering" | "transparent" | "hidden" | null
+  >("covering");
   const layoutGen = useRef(0);
-  // Track when this render cycle started so we can enforce a minimum
-  // loading-animation duration and avoid a jarring "blink" for fast layouts.
+  // Track when each layout cycle started so we can enforce a minimum
+  // animation duration and avoid a jarring "blink" for fast schemas.
   const loadStartRef = useRef(Date.now());
   const MIN_LOADING_MS = 800;
 
@@ -781,21 +793,34 @@ export function ErDiagramPane({
   useEffect(() => {
     let cancelled = false;
     const gen = ++layoutGen.current;
-    let pendingTimeoutId: number | undefined;
+    let pendingTimeoutId: ReturnType<typeof window.setTimeout> | undefined;
     // Reset the start time each time the layout recomputes so the minimum
     // duration applies to the current loading session.
     loadStartRef.current = Date.now();
-    setIsLoading(true);
+    setOverlayPhase("covering");
 
-    const finishLoading = () => {
+    // Called once the diagram data (nodes/edges) is ready, or immediately
+    // for the empty-schema case. When the ELK layout finished before the
+    // minimum duration, `diagramReady` is true and we switch to the
+    // "transparent" phase so the diagram shows through the still-running
+    // wave animation. After the remaining minimum duration we start the
+    // CSS opacity fade ("hidden") that mirrors the pyodide overlay pattern.
+    const finishLoading = (diagramReady: boolean) => {
       const elapsed = Date.now() - loadStartRef.current;
       const remaining = MIN_LOADING_MS - elapsed;
       if (remaining > 0) {
+        // Still within the minimum duration window: expose diagram behind
+        // the overlay (if there is one) and wait out the remainder.
+        if (diagramReady && !cancelled && layoutGen.current === gen) {
+          setOverlayPhase("transparent");
+        }
         pendingTimeoutId = window.setTimeout(() => {
-          if (!cancelled && layoutGen.current === gen) setIsLoading(false);
+          if (!cancelled && layoutGen.current === gen) setOverlayPhase("hidden");
         }, remaining);
       } else {
-        setIsLoading(false);
+        // Already past the minimum duration: skip "transparent" and go
+        // straight to the fade-out.
+        if (!cancelled && layoutGen.current === gen) setOverlayPhase("hidden");
       }
     };
 
@@ -803,7 +828,7 @@ export function ErDiagramPane({
       if (tables.length === 0) {
         setNodes([]);
         setEdges([]);
-        finishLoading();
+        finishLoading(false);
         return;
       }
       const { nodes: n, edges: e } = await computeElkLayout(
@@ -814,7 +839,7 @@ export function ErDiagramPane({
       if (cancelled || layoutGen.current !== gen) return; // stale — discard
       setNodes(n);
       setEdges(e);
-      finishLoading();
+      finishLoading(true);
     };
 
     runLayout().catch(console.error);
@@ -838,8 +863,25 @@ export function ErDiagramPane({
     <SelectionContext.Provider value={selectionInfo}>
       <TableActionsContext.Provider value={tableActions}>
         <div className="er-diagram-wrap">
-          {isLoading && (
-            <div className="er-diagram-loading-overlay" aria-hidden="true">
+          {overlayPhase !== null && (
+            <div
+              className={[
+                "er-diagram-loading-overlay",
+                overlayPhase === "transparent" && "er-diagram-loading-overlay--transparent",
+                overlayPhase === "hidden" && "er-diagram-loading-overlay--hidden",
+              ].filter(Boolean).join(" ")}
+              aria-hidden="true"
+              onTransitionEnd={(e) => {
+                // Unmount only when our own opacity transition completes.
+                if (
+                  e.target === e.currentTarget &&
+                  e.propertyName === "opacity" &&
+                  overlayPhase === "hidden"
+                ) {
+                  setOverlayPhase(null);
+                }
+              }}
+            >
               <div className="er-diagram-loading-wave">
                 <svg viewBox="0 0 240 40" preserveAspectRatio="none">
                   <path

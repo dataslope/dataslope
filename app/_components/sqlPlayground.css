@@ -3433,6 +3433,19 @@
   align-items: stretch;
   justify-content: flex-end;
   pointer-events: none;
+  /* Fade-out matches the pyodide-style overlay: opacity 0.4s */
+  transition: opacity 0.4s ease;
+}
+
+/* ELK layout is done but the minimum animation duration is still running:
+   clear the background so the diagram is visible behind the wave. */
+.er-diagram-loading-overlay--transparent {
+  background: transparent;
+}
+
+/* Minimum duration elapsed: fade out just like .pyodide-loading.hidden */
+.er-diagram-loading-overlay--hidden {
+  opacity: 0;
 }
 
 .er-diagram-loading-wave {
