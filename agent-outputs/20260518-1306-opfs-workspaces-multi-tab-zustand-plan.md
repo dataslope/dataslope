@@ -6,6 +6,51 @@
 
 ---
 
+## Implementation Status
+
+| Phase | Status | Notes |
+|---|---|---|
+| **Phase 1: OPFS Infrastructure** | ✅ **COMPLETE** | All four files created; 65 unit tests pass; `tsc --noEmit` clean |
+| Phase 2: SQLite Engine Migration | ⬜ Not started | Prerequisite for Phase 3 |
+| Phase 3: SQLite OPFS Persistence | ⬜ Not started | Requires Phase 2 |
+| Phase 4: PostgreSQL & DuckDB OPFS | ⬜ Not started | |
+| Phase 5: Non-SQL Multi-Tab + OPFS | ⬜ Not started | |
+| Phase 6: Workspace Manager UI | ⬜ Not started | |
+
+### Phase 1 — Files Created
+
+```
+app/_components/opfs/
+  featureDetect.ts    ← isOpfsSupported(), hasSyncAccessHandles(), hasWebLocks()
+  workspace.ts        ← newWorkspaceId(), createWorkspace(), openWorkspace(),
+                         deleteWorkspace(), getWorkspaceRegistry(),
+                         updateWorkspaceRegistry(), acquireWorkspaceLock()
+  fileStorage.ts      ← writeFile(), readFile(), deleteFile(), listFiles(),
+                         flushFileWrites() + async write queue + pagehide flush
+  databaseStorage.ts  ← writeDatabase(), readDatabase(), flushDatabaseWrites()
+                         + debounced write queue + pagehide flush
+
+__tests__/
+  opfsMock.ts                  ← in-memory FileSystem Access API mock for tests
+  opfs.featureDetect.test.ts   ← 9 tests
+  opfs.workspace.test.ts       ← 18 tests
+  opfs.fileStorage.test.ts     ← 12 tests
+  opfs.databaseStorage.test.ts ← 7 tests
+```
+
+### Where the next agent picks up
+
+**Start with Phase 2** — migrate the SQLite engine from `sql.js` to `@sqlite.org/sqlite-wasm`. See §7.1 Phase 2 and §8.1 for the full checklist. Do not begin Phase 3 (SQLite OPFS persistence) until the engine migration is complete and all existing SQLite tests pass.
+
+Key files the Phase 2 agent must study first:
+- `app/_components/runtime/sqlite-core.ts` — current `sql.js` API usage
+- `app/_components/runtime/sqlite-worker.ts` — worker message protocol
+- `app/_components/sql/SqlPlayground.tsx` — `QueryExecResult` shape consumed by `ResultView`
+- `app/_components/sql/types.ts` — shared result types
+- `next.config.ts` — WASM content-type / header configuration
+
+---
+
 ## Table of Contents
 
 1. [Current State Audit](#1-current-state-audit)
@@ -524,123 +569,6 @@ export interface LanguageAdapter {
 }
 ```
 
-### 4.8 CLI Terminal per Playground for Multi-File Compilation
-
-#### Is it technically possible?
-
-Yes — a browser-based terminal for each playground is technically feasible. The standard approach is:
-
-1. **[xterm.js](https://xtermjs.org/)** as the terminal UI — the same library used by VS Code, GitHub Codespaces, and StackBlitz. It renders a fully functional terminal emulator in a `<canvas>` element and is well-maintained.
-2. A **command parser** in the playground's worker that interprets a restricted set of commands (not a full shell).
-3. The **existing language runtime** executing the parsed commands.
-
-#### Design for the C/C++ Playground CLI
-
-For compiled languages (C, C++, Java, C#), a CLI interface provides the most benefit because multi-file compilation is naturally expressed as a command:
-
-```
-$ compile main.c utils.c math.c -o program
-Compiling... done (3 files, 148ms)
-$ run program
-Hello, World!
-$ run program --verbose
-...
-```
-
-**Implementation sketch:**
-
-- When the user opens the terminal tab, xterm.js is mounted and a readline-like input handler collects lines.
-- Each submitted line is sent to a `handleCommand(line: string)` function in the worker.
-- The command handler recognizes a small vocabulary:
-  - `compile [files...] [-o outname]` — maps to the existing `browsercc` compile pipeline, but accepts a list of filenames instead of just the active file. The filenames are resolved from the workspace's OPFS file list.
-  - `run [outname] [args...]` — executes the most recently compiled binary.
-  - `ls` — lists files in the current workspace.
-  - `clear` — clears the terminal.
-  - `help` — prints available commands.
-- Output from compilation (errors, warnings) and from the program (`stdout`/`stderr`) is streamed back to the terminal via postMessage.
-
-**How multi-file compilation works in this model:**
-
-- The user writes `main.c` in tab 1 and `utils.c` in tab 2.
-- In the terminal tab, they type `compile main.c utils.c -o program`.
-- The worker reads both files from the workspace dirty buffer / OPFS.
-- It passes all source files to the WASM-based C compiler (`browsercc`/clang).
-- The compiled binary (WASM or emulated ELF) is stored in the worker's memory and identified by the output name.
-- `run program` executes it.
-
-**Limitations and mitigations:**
-
-| Challenge | Mitigation |
-|---|---|
-| No real filesystem in browser | Use workspace OPFS files as the virtual filesystem; worker reads them on demand |
-| No shell expansion (`*.c`) | Implement glob expansion in the command parser using the known workspace file list |
-| No piping or process control | Not needed for the initial CLI; document the limitation |
-| xterm.js bundle size (~400KB gzipped) | Load lazily only when the terminal tab is first opened |
-| Stdin for interactive programs | xterm.js supports stdin passthrough; wire keystrokes to the running WASM process |
-
-**Is this worth it?**  
-Yes, for C/C++ specifically, where the concept of separate compilation units is fundamental and cannot be expressed with a single "Run" button. For interpreted languages (Python, R, JS), multi-file support via MEMFS/VFS (§4.4) is sufficient and a CLI is optional.
-
-### 4.9 SQL REPL Terminal
-
-#### Is it technically possible?
-
-Yes — a SQL REPL terminal for SQLite, PostgreSQL, and DuckDB playgrounds is technically straightforward. The SQL engines are already running in workers with an async message-passing interface. Wrapping that interface in a readline loop and displaying results in xterm.js is a well-understood pattern.
-
-#### Design
-
-When the user clicks a terminal icon in the SQL playground tab bar, a new `terminal` tab opens. Inside it, xterm.js renders a `psql`/`sqlite3`-style prompt:
-
-```
-sqlite> SELECT name FROM sqlite_master WHERE type='table';
-┌──────────────┐
-│ name         │
-├──────────────┤
-│ employees    │
-│ departments  │
-└──────────────┘
-3 rows (2ms)
-
-sqlite> .tables
-employees  departments  salaries
-
-sqlite> .help
-.tables         List all tables
-.schema [name]  Show DDL for table
-.mode [box|csv] Change output format
-.exit           Close the terminal
-sqlite>
-```
-
-**Implementation sketch:**
-
-- The terminal tab mounts xterm.js with a `readline`-style input accumulator.
-- On `Enter`, the accumulated buffer is sent to the engine worker via the existing query message channel.
-- The result (column names + rows) is formatted as a box-draw table (using a small formatting utility) and written to xterm.js output.
-- Dot-commands (`.tables`, `.schema`, `.mode`, `.exit`) are intercepted client-side before being sent to the engine; they call the same `SqliteEngine` introspection methods already used by the schema tree.
-- Input history (up/down arrow) is maintained in a local array.
-- Tab completion: pressing `Tab` mid-word suggests table/column names from the schema cache already held in Zustand (`useTabStore` / schema state).
-
-**Multi-line statements:**
-
-- The REPL detects incomplete SQL (missing `;`) and shows a continuation prompt (`   ...>`), accumulating lines until a `;` terminates the statement.
-- This is the same heuristic used by `sqlite3` CLI and `psql`.
-
-**Benefits:**
-
-- Power users familiar with `sqlite3` or `psql` CLIs get a familiar interface alongside the graphical editor.
-- Useful for scripting repetitive operations during a session without leaving the playground.
-- Complements (not replaces) the graphical query editor — both tabs can be open simultaneously.
-
-**Limitations:**
-
-| Challenge | Mitigation |
-|---|---|
-| No persistent command history across page loads | Persist history array to workspace OPFS (`terminal_history.json`) |
-| Large result sets flood the terminal | Limit to first 100 rows by default; show a "... N more rows" message |
-| `.import` / file I/O commands | Map to workspace OPFS files; `import` reads from the OPFS file list |
-| xterm.js bundle size | Shared with the CLI terminal (§4.8); load lazily once, cache the module |
-
 ---
 
 ## 5. Technical Challenges and Mitigations
@@ -845,30 +773,18 @@ interface PlaygroundState {
 
 ### 7.1 Phased Rollout
 
-#### Phase 1: OPFS Infrastructure (Foundational)
+#### Phase 1: OPFS Infrastructure (Foundational) ✅ COMPLETE
 
 **Goal:** Create the shared OPFS workspace layer without changing any playground UI.
 
-1. **Create `app/_components/opfs/workspace.ts`**:
-   - `newWorkspaceId()`, `createWorkspace()`, `openWorkspace()`, `deleteWorkspace()`
-   - `getWorkspaceRegistry()`, `updateWorkspaceRegistry()`
-   - Uses the async OPFS API; no sync access handles in Phase 1.
+**Status:** Implemented. All files created and unit-tested. `tsc --noEmit` passes. See the Implementation Status section at the top for the full file list.
 
-2. **Create `app/_components/opfs/fileStorage.ts`**:
-   - `readFile(workspaceId, fileId)` → `string`
-   - `writeFile(workspaceId, fileId, content)` → `void`
-   - `deleteFile(workspaceId, fileId)` → `void`
-   - `listFiles(workspaceId)` → `string[]`
-   - Internal: async write queue with idle flushing and `pagehide` flush.
-
-3. **Create `app/_components/opfs/databaseStorage.ts`**:
-   - `readDatabase(workspaceId, name)` → `Uint8Array | null`
-   - `writeDatabase(workspaceId, name, data: Uint8Array)` → `void`
-   - Debounced write with immediate flush on `pagehide`.
-
-4. **Add OPFS feature detection** and a `localStorage`-only fallback path.
-
-5. **No UI changes** in Phase 1.
+1. **`app/_components/opfs/featureDetect.ts`** ✅ — `isOpfsSupported()`, `hasSyncAccessHandles()`, `hasWebLocks()`
+2. **`app/_components/opfs/workspace.ts`** ✅ — `newWorkspaceId()`, `createWorkspace()`, `openWorkspace()`, `deleteWorkspace()`, `getWorkspaceRegistry()`, `updateWorkspaceRegistry()`, `acquireWorkspaceLock()`
+3. **`app/_components/opfs/fileStorage.ts`** ✅ — `readFile()`, `writeFile()`, `deleteFile()`, `listFiles()`, `flushFileWrites()` + async write queue + pagehide flush
+4. **`app/_components/opfs/databaseStorage.ts`** ✅ — `readDatabase()`, `writeDatabase()`, `flushDatabaseWrites()` + debounced write queue + pagehide flush
+5. **OPFS feature detection** ✅ — `isOpfsSupported()` guards all OPFS calls; every public function falls back gracefully when OPFS is unavailable.
+6. **No UI changes** in Phase 1. ✅
 
 #### Phase 2: Migrate SQLite Engine from sql.js to @sqlite.org/sqlite-wasm
 
@@ -940,60 +856,49 @@ See §8.1 for the full pre-migration checklist.
 4. **Workspace size estimate**: use `fileStorage.estimateSize(workspaceId)`.
 5. **Tab isolation notice**: shown once when the user opens a playground in a second tab with the same workspace.
 
-#### Phase 7: Terminal Integration (SQL REPL + CLI)
-
-**Goal:** Add terminal tabs to SQL and compiled-language playgrounds.
-
-1. **Install xterm.js** lazily (`@xterm/xterm`, `@xterm/addon-fit`). See §8.5 for integration notes.
-2. **Create `app/_components/terminal/terminalFormatter.ts`**: box/csv/column output formatter for SQL results (§8.3).
-3. **Create `app/_components/terminal/SqlRepl.tsx`**: SQL REPL for SQLite, PostgreSQL, and DuckDB (§4.9).
-   - Connect to the existing engine worker via the existing message channel.
-   - Support multi-line statement accumulation, input history, and tab completion from schema cache.
-4. **Add a terminal tab** to the SQL playground tab bar (using the generic `TabBar`).
-5. **Create `app/_components/terminal/CliTerminal.tsx`**: CLI terminal for C/C++ (and optionally Java/C#) multi-file compilation (§4.8).
-   - Extend C/C++ adapter to accept `files: Map<string, string>` input for `compile` command.
-6. **Add a terminal tab** to the C/C++ playground tab bars.
-
 ### 7.2 File Structure Changes
 
 ```
 app/
   _components/
-    opfs/                            ← NEW
+    opfs/                            ← ✅ DONE (Phase 1)
       workspace.ts                   ← workspace CRUD
       fileStorage.ts                 ← file read/write with async queue
       databaseStorage.ts             ← database bytes persistence
       featureDetect.ts               ← browser capability checks
-    tabs/                            ← NEW
+    tabs/                            ← NEW (Phase 5)
       tabTypes.ts                    ← TabDescriptor, TabKind types
       TabBar.tsx                     ← generic reusable tab bar
-    terminal/                        ← NEW
-      SqlRepl.tsx                    ← SQL REPL terminal (xterm.js)
-      CliTerminal.tsx                ← CLI terminal for compiled languages
-      terminalFormatter.ts           ← box/csv/column output formatter
-    stores/                          ← NEW
+    stores/                          ← NEW (Phase 5)
       createPlaygroundStore.ts       ← Zustand factory for non-SQL
-    playgroundTabs.ts                ← NEW: PlaygroundFile type + helpers
-    Playground.tsx                   ← MODIFIED: use Zustand + OPFS + generic tabs
-    playgrounds.ts                   ← MODIFIED: add defaultFileExtension
+    playgroundTabs.ts                ← NEW (Phase 5): PlaygroundFile type + helpers
+    Playground.tsx                   ← MODIFIED (Phase 5): use Zustand + OPFS + generic tabs
+    playgrounds.ts                   ← MODIFIED (Phase 5): add defaultFileExtension
     sql/
       components/
-        SqlTabBar.tsx                ← MODIFIED: refactored to use generic TabBar
+        SqlTabBar.tsx                ← MODIFIED (Phase 5): refactored to use generic TabBar
     runtime/
-      python.tsx                     ← MODIFIED: entryPoint, defaultFileExtension
-      javascript.tsx                 ← MODIFIED
-      r.tsx                          ← MODIFIED
-      typescript.tsx                 ← MODIFIED
-      php.tsx                        ← MODIFIED
-      c.tsx                          ← MODIFIED
-      cpp.tsx                        ← MODIFIED
-      java.tsx                       ← MODIFIED
-      csharp.tsx                     ← MODIFIED
-      sqlite-core.ts                 ← MODIFIED: rewritten for @sqlite.org/sqlite-wasm promiser API
-      sqlite-worker.ts               ← MODIFIED: init message
-      postgres-worker.ts             ← MODIFIED: OPFS PGlite path
-      duckdb.ts                      ← MODIFIED: OPFS checkpoint
-    sqlitePlaygroundTabs.ts          ← MODIFIED: OPFS-backed tab save/load
+      python.tsx                     ← MODIFIED (Phase 5): entryPoint, defaultFileExtension
+      javascript.tsx                 ← MODIFIED (Phase 5)
+      r.tsx                          ← MODIFIED (Phase 5)
+      typescript.tsx                 ← MODIFIED (Phase 5)
+      php.tsx                        ← MODIFIED (Phase 5)
+      c.tsx                          ← MODIFIED (Phase 5)
+      cpp.tsx                        ← MODIFIED (Phase 5)
+      java.tsx                       ← MODIFIED (Phase 5)
+      csharp.tsx                     ← MODIFIED (Phase 5)
+      sqlite-core.ts                 ← MODIFIED (Phase 2): rewritten for @sqlite.org/sqlite-wasm promiser API
+      sqlite-worker.ts               ← MODIFIED (Phase 2/3): init message
+      postgres-worker.ts             ← MODIFIED (Phase 4): OPFS PGlite path
+      duckdb.ts                      ← MODIFIED (Phase 4): OPFS checkpoint
+    sqlitePlaygroundTabs.ts          ← MODIFIED (Phase 3): OPFS-backed tab save/load
+
+__tests__/
+  opfsMock.ts                        ← ✅ DONE (Phase 1): in-memory OPFS mock
+  opfs.featureDetect.test.ts         ← ✅ DONE (Phase 1)
+  opfs.workspace.test.ts             ← ✅ DONE (Phase 1)
+  opfs.fileStorage.test.ts           ← ✅ DONE (Phase 1)
+  opfs.databaseStorage.test.ts       ← ✅ DONE (Phase 1)
 ```
 
 ### 7.3 Testing Strategy
@@ -1017,10 +922,9 @@ Before and after each phase:
 
 1. **Workspace-per-tab auto-create vs user-explicit?** Recommendation: auto-create a default workspace, with optional user management (Option C from §3.4).
 2. **SQLite engine migration order:** Migrate to `@sqlite.org/sqlite-wasm` in Phase 2 before any OPFS persistence work. This avoids building sql.js-specific export/import infrastructure that would be immediately discarded. See §8.1 for the pre-migration checklist.
-3. **Multi-file execution depth:** Phase 4 should start with active-file-only execution. Full multi-file compilation (C/C++/Java/C#) is a separate, larger effort and should be scoped separately. A CLI terminal (§4.8) is the recommended UX for multi-file compiled languages.
+3. **Multi-file execution depth:** Phase 5 should start with active-file-only execution. Full multi-file compilation (C/C++/Java/C#) is a separate, larger effort and should be scoped separately.
 4. **Workspace sharing UI:** Not in scope for the initial rollout. Can be added as "Export workspace as ZIP" in Phase 5.
-5. **Generic tab system vs per-playground tab bars?** Recommendation: build a shared `TabBar` + `TabDescriptor` system (§4.5) and refactor the SQL playground's tab bar to use it. This enables Settings, ER Diagram, Query History, and Terminal to all live as tabs uniformly.
-6. **Terminal integration (xterm.js)?** Recommend lazy-loading xterm.js only when a terminal tab is first opened. Add a SQL REPL terminal first (lowest risk, highest value); then add CLI terminals for C/C++ in a follow-up.
+5. **Generic tab system vs per-playground tab bars?** Recommendation: build a shared `TabBar` + `TabDescriptor` system (§4.5) and refactor the SQL playground's tab bar to use it. This enables Settings, ER Diagram, and Query History to all live as tabs uniformly.
 
 ---
 
@@ -1047,43 +951,6 @@ Moving Settings from a dialog to a tab affects all playgrounds. Implement in thi
 3. Migrate the **SQL playground** settings: the settings dialog (`SettingsDialog`) becomes a `settings` tab type rendered inside the generic tab bar, reusing all existing settings components.
 4. Ensure that keyboard shortcut to open settings (if any) now opens or focuses the settings tab rather than the modal.
 5. A `settings` tab cannot be duplicated and shows a dedicated icon (gear). It is always openable from the toolbar regardless of how many other tabs are open.
-
-### 8.3 SQL REPL Terminal: Output Formatting Utility
-
-The REPL needs a text-based table formatter. A minimal box-drawing formatter is ~50 lines of TypeScript and has no dependencies. Do not pull in a third-party table formatting library for this.
-
-Key formatting modes to support (matching `sqlite3` CLI):
-- `box` (default): Unicode box-drawing characters (`┌`, `─`, `┐`, `│`, `├`, `┤`, `└`, `┘`)
-- `csv`: comma-separated output, useful for piping output
-- `column`: padded column alignment without borders
-
-The active mode is toggled with `.mode [box|csv|column]` and stored in the terminal tab's local state (not persisted).
-
-### 8.4 CLI Terminal: Compiler Integration Points
-
-For the C/C++ CLI terminal (§4.8), the integration points with the existing runtime are:
-
-| CLI command | Existing adapter hook | Notes |
-|---|---|---|
-| `compile [files]` | `adapter.run(code, ...)` | Must be extended to accept a `files: Map<string, string>` argument rather than a single code string |
-| `run [binary]` | Same as above | Re-executes the most recently compiled WASM binary |
-| `ls` | `fileStorage.listFiles(workspaceId)` | Shows workspace files |
-| `.help` | Static string | No adapter hook needed |
-
-The key adapter change is allowing the C/C++ runtime to receive multiple source files and concatenate or pass them all to clang's input in one compilation invocation. For Java and C#, the analogous change is passing multiple `.java`/`.cs` files.
-
-For interpreted languages (Python, R, PHP), the CLI terminal is less critical — the "Run" button already executes all workspace files when `supportsMultiFile` is true. A REPL mode (not a CLI) is more appropriate for Python and R, where the user can evaluate expressions interactively. The Python REPL would leverage Pyodide's `pyodide.runPython()` directly, and the R REPL would use WebR's eval function.
-
-### 8.5 xterm.js Integration Notes
-
-[xterm.js](https://xtermjs.org/) v5 is the recommended version.
-
-- **Installation**: `npm install @xterm/xterm @xterm/addon-fit @xterm/addon-web-links`
-- **Bundle size**: ~400KB gzipped. Use dynamic `import()` to lazy-load only when a terminal tab is first opened.
-- **`FitAddon`**: Resizes the terminal to fill its container. Must be called after the xterm.js `Terminal` is opened and whenever the container resizes. Use a `ResizeObserver` on the terminal container div.
-- **Rendering**: Use `term.write(data)` for output and listen to `term.onData(handler)` for user keystrokes. For the REPL input accumulator, maintain a local string that grows on printable characters and is submitted on `\r` (Enter).
-- **Color support**: xterm.js respects ANSI escape codes. The SQL REPL can color keywords blue and errors red by prefixing strings with ANSI sequences.
-- **Accessibility**: xterm.js has basic accessibility support via the `@xterm/addon-serialize` and screen reader announcements. Ensure the terminal tab has a descriptive `aria-label`.
 
 ---
 
@@ -1252,4 +1119,4 @@ export async function acquireWorkspaceLock(
 
 ---
 
-*End of report. This document is intended for a coding agent implementing the described changes. Implement phases sequentially; do not skip the foundational OPFS infrastructure in Phase 1. Key decisions resolved since initial draft: (1) @sqlite.org/sqlite-wasm migration moved to Phase 2, before OPFS persistence, to avoid duplicated sql.js-specific work; (2) backward compatibility with existing localStorage data is not required (project is in development); (3) generic TabBar/TabDescriptor system replaces per-playground tab bars; (4) Settings dialog moves to a tab in all playgrounds; (5) SQL REPL and CLI terminals added as Phase 7 using xterm.js.*
+*End of report. This document is intended for a coding agent implementing the described changes. Implement phases sequentially; do not skip the foundational OPFS infrastructure in Phase 1 (already complete — see Implementation Status above). Key decisions resolved since initial draft: (1) @sqlite.org/sqlite-wasm migration moved to Phase 2, before OPFS persistence, to avoid duplicated sql.js-specific work; (2) backward compatibility with existing localStorage data is not required (project is in development); (3) generic TabBar/TabDescriptor system replaces per-playground tab bars; (4) Settings dialog moves to a tab in all playgrounds; (5) terminal integration (CLI and SQL REPL) has been removed from scope.*
