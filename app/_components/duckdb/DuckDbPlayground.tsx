@@ -8,7 +8,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -26,7 +25,6 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "../sql/shared/editorSetup";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Menu } from "@base-ui-components/react/menu";
@@ -47,7 +45,6 @@ import {
   Layers,
   Network,
   Pencil,
-  Play,
   Plus,
   Table,
   Trash2,
@@ -1019,7 +1016,6 @@ function DuckDbPlaygroundInner() {
     selectedSchema,
     setSelectedSchema,
     schemas,
-    setSchemas,
     schemaLoading,
     selectedSchemaRef,
     refreshSchemas: refreshSchemasFromHook,
@@ -1574,6 +1570,7 @@ function DuckDbPlaygroundInner() {
         savedActiveTab &&
         tabsRef.current.some((tab) => tab.id === savedActiveTab)
       ) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTabId(savedActiveTab);
       }
     } catch {
@@ -1820,6 +1817,7 @@ function DuckDbPlaygroundInner() {
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResultsByTab((prev) => {
       const ids = new Set(tabs.map((tab) => tab.id));
       let changed = false;
@@ -4514,6 +4512,7 @@ function DuckDbPlaygroundInner() {
             setImportCsvState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleCsvFile}
           onSubmit={() => void submitImport("csv")}
@@ -4536,6 +4535,7 @@ function DuckDbPlaygroundInner() {
             setImportJsonState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleJsonFile}
           onSubmit={() => void submitImport("json")}
@@ -4558,6 +4558,7 @@ function DuckDbPlaygroundInner() {
             setImportParquetState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={(f) => void handleParquetFile(f)}
           onSubmit={() => void submitImport("parquet")}

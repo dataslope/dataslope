@@ -733,7 +733,7 @@ export function ErDiagramPane({
   const layoutGen = useRef(0);
   // Track when each layout cycle started so we can enforce a minimum
   // animation duration and avoid a jarring "blink" for fast schemas.
-  const loadStartRef = useRef(Date.now());
+  const loadStartRef = useRef<number>(0);
   const MIN_LOADING_MS = 800;
 
   // Reset selection synchronously when tables change (avoids useEffect state update).
@@ -797,6 +797,7 @@ export function ErDiagramPane({
     // Reset the start time each time the layout recomputes so the minimum
     // duration applies to the current loading session.
     loadStartRef.current = Date.now();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOverlayPhase("covering");
 
     // Called once the diagram data (nodes/edges) is ready, or immediately
@@ -847,8 +848,6 @@ export function ErDiagramPane({
       cancelled = true;
       if (pendingTimeoutId !== undefined) window.clearTimeout(pendingTimeoutId);
     };
-  // `finishLoading` is defined inside the effect and does not need to be listed.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, columnsByEntity, foreignKeysByEntity]);
 
   if (tables.length === 0) {
