@@ -867,7 +867,13 @@ export function ErDiagramPane({
             <div
               className={[
                 "er-diagram-loading-overlay",
-                overlayPhase === "transparent" && "er-diagram-loading-overlay--transparent",
+                // Keep --transparent during the hidden phase so the background
+                // stays clear while the opacity fades to 0. Without this, the
+                // base background: var(--bg) snaps back opaque the instant the
+                // hidden phase starts, making the diagram flash invisible before
+                // it gradually reappears as the opacity fade completes.
+                (overlayPhase === "transparent" || overlayPhase === "hidden") &&
+                  "er-diagram-loading-overlay--transparent",
                 overlayPhase === "hidden" && "er-diagram-loading-overlay--hidden",
               ].filter(Boolean).join(" ")}
               aria-hidden="true"
