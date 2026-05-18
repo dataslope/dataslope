@@ -1893,7 +1893,12 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (activeTab?.kind !== "er-diagram") return;
     refreshTableMetadata();
-  }, [activeTab?.kind, tables, refreshTableMetadata]);
+    // Intentionally omit activeTab?.kind: we only want this to fire when
+    // `tables` changes (e.g. a new table was created), not on every switch
+    // back to the ER diagram tab. The initial refresh on tab-open is already
+    // handled inside openErDiagramTab().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tables, refreshTableMetadata]);
 
   // Lazy-load (and re-load) metadata for every currently-expanded
   // sidebar entity that has no cached `columnsByEntity` entry.
