@@ -134,7 +134,7 @@ import {
 } from "../runtime/sqlite";
 
 const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
-import type { QueryExecResult } from "../runtime/sqlite-wasm-adapter";
+import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import dynamic from "next/dynamic";
 
 // ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js

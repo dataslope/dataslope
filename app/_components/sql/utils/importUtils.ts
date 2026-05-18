@@ -1,4 +1,4 @@
-import type { QueryExecResult, SqlValue } from "../../runtime/sqlite-wasm-adapter";
+import type { QueryExecResult, SqlValue } from "../../runtime/sqlite-wasm";
 import type { TableColumnInfo } from "../../runtime/sqlite";
 import type { ImportColComparison } from "../types";
 import { ensureParquetWasm } from "./parquetWasm";

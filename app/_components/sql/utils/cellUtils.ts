@@ -1,4 +1,4 @@
-import type { QueryExecResult } from "../../runtime/sqlite-wasm-adapter";
+import type { QueryExecResult } from "../../runtime/sqlite-wasm";
 import type { PendingEditsByResult } from "../types";
 
 /** Compare two SQLite cell values for client-side sorting. NULL sorts

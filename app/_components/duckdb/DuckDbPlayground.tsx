@@ -112,7 +112,7 @@ import { type DuckDbEngine } from "../runtime/duckdb";
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
 const DUCKDB_BLANK_DATABASE = duckdbAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
-import type { QueryExecResult } from "../runtime/sqlite-wasm-adapter";
+import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import {

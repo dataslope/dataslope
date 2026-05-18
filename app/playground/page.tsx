@@ -81,7 +81,7 @@ const CARDS: CardEntry[] = [
     id: "sqlite",
     href: "/playground/sqlite",
     title: "SQLite",
-    desc: "Run SQLite queries against in-browser sample databases via sql.js.",
+    desc: "Run SQLite queries against in-browser sample databases via sqlite-wasm.",
   },
   {
     id: "postgres",

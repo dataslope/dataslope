@@ -4,7 +4,7 @@
 // the user lands on that database — so adding a new sample (or, later,
 // loading a binary `.sqlite` file) is a one-entry change.
 
-import type { SqlJsLikeDB as Database } from "./sqlite-wasm-adapter";
+import type { Database } from "./sqlite-wasm";
 import {
   findSqlSampleById,
   type QueryTabSeed,
@@ -186,14 +186,22 @@ const CC_SCHEMA = `
 
 type Row = Array<string | number | null>;
 
+/** Bulk-insert helper that re-uses a single prepared statement.
+ *
+ * sqlite-wasm's `PreparedStatement.bind()` does not implicitly clear
+ * previous bindings, so we pass `true` to `reset()` to mirror the
+ * sql.js `Statement.run()` convenience semantics (rebind cleanly per
+ * row, step once per row). */
 function bulkInsert(db: Database, sql: string, rows: Row[]): void {
   const stmt = db.prepare(sql);
   try {
     for (const row of rows) {
-      stmt.run(row);
+      stmt.bind(row);
+      stmt.step();
+      stmt.reset(true);
     }
   } finally {
-    stmt.free();
+    stmt.finalize();
   }
 }
 
