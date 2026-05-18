@@ -110,6 +110,7 @@ import {
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
+  ErDiagramLoadingFallback,
   LOADING_QUIPS,
   RuntimeInfoContent,
   detectIsMac,
@@ -141,7 +142,7 @@ import dynamic from "next/dynamic";
 // the user opens the ER-diagram tab, so defer the chunk until then.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
-  { ssr: false },
+  { ssr: false, loading: ErDiagramLoadingFallback },
 );
 import { SqlTabBar } from "./components/SqlTabBar";
 import { SqlPlaygroundShell } from "./components/SqlPlaygroundShell";
@@ -1892,7 +1893,12 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (activeTab?.kind !== "er-diagram") return;
     refreshTableMetadata();
-  }, [activeTab?.kind, tables, refreshTableMetadata]);
+    // Intentionally omit activeTab?.kind: we only want this to fire when
+    // `tables` changes (e.g. a new table was created), not on every switch
+    // back to the ER diagram tab. The initial refresh on tab-open is already
+    // handled inside openErDiagramTab().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tables, refreshTableMetadata]);
 
   // Lazy-load (and re-load) metadata for every currently-expanded
   // sidebar entity that has no cached `columnsByEntity` entry.
@@ -4026,8 +4032,15 @@ function SqlPlaygroundInner() {
               <DataslopeRunOverlay running={statusState === "running"} />
             </div>
 
-            {activeTab?.kind === "er-diagram" && (
-              <div className="sql-er-pane">
+            {tabs.some((t) => t.kind === "er-diagram") && (
+              <div
+                className="sql-er-pane"
+                style={
+                  activeTab?.kind !== "er-diagram"
+                    ? { display: "none" }
+                    : undefined
+                }
+              >
                 <ErDiagramPane
                   tables={tables}
                   columnsByEntity={columnsByEntity}

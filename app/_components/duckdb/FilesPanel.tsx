@@ -12,11 +12,13 @@ import {
   FolderPlus,
   Folder,
   FolderOpen,
+  FolderSymlink,
   FileText,
   ChevronRight,
   ChevronDown,
   Info,
   Play,
+  Copy,
 } from "lucide-react";
 
 /** File extensions DuckDB can query directly with SELECT * FROM "file". */
@@ -161,6 +163,8 @@ interface TreeRowProps {
   onRequestDelete: (node: TreeNode) => void;
   onRequestInfo: (node: TreeNode) => void;
   onOpenQuery?: (path: string) => void;
+  onCopyFileName: (path: string) => void;
+  onCopyPath: (path: string) => void;
   onDragStart: (path: string) => void;
   onDragEnd: () => void;
   onDragOverFolder: (path: string) => void;
@@ -186,6 +190,8 @@ function TreeRow({
   onRequestDelete,
   onRequestInfo,
   onOpenQuery,
+  onCopyFileName,
+  onCopyPath,
   onDragStart,
   onDragEnd,
   onDragOverFolder,
@@ -327,6 +333,24 @@ function TreeRow({
                   <div className="ex-title">Download</div>
                 </ContextMenu.Item>
               )}
+              {!node.isFolder && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onCopyFileName(node.fullPath)}
+                >
+                  <Copy size={12} aria-hidden="true" />
+                  <div className="ex-title">Copy File Name</div>
+                </ContextMenu.Item>
+              )}
+              {!node.isFolder && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onCopyPath(node.fullPath)}
+                >
+                  <FolderSymlink size={12} aria-hidden="true" />
+                  <div className="ex-title">Copy Path</div>
+                </ContextMenu.Item>
+              )}
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => onStartRename(node.fullPath)}
@@ -343,7 +367,6 @@ function TreeRow({
                   {node.isFolder ? "Folder info" : "File info"}
                 </div>
               </ContextMenu.Item>
-              <div className="sql-files-ctx-sep" role="separator" />
               <ContextMenu.Item
                 className="example-item sql-files-ctx-danger"
                 onClick={() => onRequestDelete(node)}
@@ -377,6 +400,8 @@ function TreeRow({
             onRequestDelete={onRequestDelete}
             onRequestInfo={onRequestInfo}
             onOpenQuery={onOpenQuery}
+            onCopyFileName={onCopyFileName}
+            onCopyPath={onCopyPath}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOverFolder={onDragOverFolder}
@@ -500,6 +525,15 @@ export function FilesPanel({
     },
     [countDescendants],
   );
+
+  const handleCopyFileName = useCallback((path: string) => {
+    const name = path.split("/").pop() ?? path;
+    void navigator.clipboard.writeText(name);
+  }, []);
+
+  const handleCopyPath = useCallback((path: string) => {
+    void navigator.clipboard.writeText(path);
+  }, []);
 
   // ─── Drag-and-drop wiring ───────────────────────────────────────────
   // External drops (OS file drops) are accepted at the panel level. The
@@ -706,6 +740,8 @@ export function FilesPanel({
               onRequestDelete={handleRequestDelete}
               onRequestInfo={handleRequestInfo}
               onOpenQuery={onOpenQuery}
+              onCopyFileName={handleCopyFileName}
+              onCopyPath={handleCopyPath}
               onDragStart={handleInternalDragStart}
               onDragEnd={handleInternalDragEnd}
               onDragOverFolder={handleDragOverFolder}

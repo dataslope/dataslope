@@ -789,18 +789,6 @@
   gap: 7px;
 }
 
-/* Suppress the example-item bottom border just before the separator so
-   there is no double border between the last normal item and the divider. */
-.sql-files-ctx-menu .example-item:has(+ .sql-files-ctx-sep) {
-  border-bottom: none;
-}
-
-.sql-files-ctx-sep {
-  height: 1px;
-  margin: 4px 0;
-  background: var(--border);
-}
-
 .sql-files-ctx-danger {
   color: var(--red);
 }
@@ -3442,10 +3430,22 @@
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  align-items: stretch;
+  justify-content: flex-end;
   pointer-events: none;
+  /* Fade-out matches the pyodide-style overlay: opacity 0.4s */
+  transition: opacity 0.4s ease;
+}
+
+/* ELK layout is done but the minimum animation duration is still running:
+   clear the background so the diagram is visible behind the wave. */
+.er-diagram-loading-overlay--transparent {
+  background: transparent;
+}
+
+/* Minimum duration elapsed: fade out just like .pyodide-loading.hidden */
+.er-diagram-loading-overlay--hidden {
+  opacity: 0;
 }
 
 .er-diagram-loading-wave {
@@ -3453,6 +3453,8 @@
   width: 100%;
   height: 44px;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 35%, transparent 100%);
 }
 
 .er-diagram-loading-wave svg {
