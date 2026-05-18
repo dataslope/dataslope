@@ -191,7 +191,7 @@ Additional considerations before migrating:
 
 **wa-sqlite** (community alternative): Has a native OPFS VFS (`OPFSCoopSyncVFS`, `OPFSPermutedVFS`) that gives SQLite real-time incremental page writes. Migration would require replacing `sql.js` with `wa-sqlite`, which is a significant refactor of `sqlite-core.ts`. Less actively maintained than `@sqlite.org/sqlite-wasm`.
 
-**Recommendation:** For Phase 1, use the export/import approach with **sql.js** (simpler, lower risk). Plan a Phase 2b migration to **`@sqlite.org/sqlite-wasm`** as a follow-up — it is the right long-term choice because of native OPFS, incremental writes, and official support. Do not migrate both OPFS infrastructure and the SQLite engine in the same phase; separate concerns reduce risk.
+**Recommendation:** Migrate to **`@sqlite.org/sqlite-wasm`** before implementing SQLite OPFS persistence. Building the sql.js export/import approach first would require effort that must be discarded the moment the engine is replaced — a clear duplication of work. `@sqlite.org/sqlite-wasm` is the right long-term choice because of native OPFS VFS, incremental page writes, and official SQLite team maintenance. Complete the engine migration (Phase 2) first; then implement OPFS persistence (Phase 3) using the native `opfs` VFS, which makes the write-path trivially simple. Do not add new features to sql.js that will be thrown away during the migration.
 
 ### 2.7 PGlite + OPFS
 
@@ -692,10 +692,12 @@ Writing a large SQLite database to OPFS on every change is expensive. A 50 MB da
 
 ### 5.5 SQLite Worker Communication for OPFS
 
-The current SQLite worker (`sqlite-worker.ts`) creates a `createSqliteEngineInProcess()` with an in-memory database. To add OPFS persistence:
-1. The worker needs access to the OPFS path to read/write the `.db` file.
-2. Since OPFS sync access handles only work in workers, the export/import must happen inside the worker.
-3. Add `loadFromOpfs(path)` and `saveToOpfs(path)` methods to `SqliteEngine`.
+After the Phase 2 engine migration to `@sqlite.org/sqlite-wasm`, the worker hosts SQLite via the `sqlite3Worker1Promiser` API. Adding OPFS persistence in Phase 3 requires only passing the OPFS URI to the engine — no manual export/import loop is needed:
+
+1. The worker receives the workspace OPFS path from the main thread via an `"init"` message before any queries run.
+2. The worker opens (or creates) the database with the native OPFS VFS: `sqlite3.open({ filename: 'file:sqlite.db?vfs=opfs', ... })`. SQLite writes individual dirty pages incrementally through the VFS — no `db.export()` call or full-DB serialization is ever needed.
+3. Remove the `loadFromOpfs` / `saveToOpfs` helpers that would have been required for the sql.js export approach; the VFS handles persistence transparently.
+4. A `"checkpoint"` message is no longer required for normal saves. Retain a `"sync"` message to force an OPFS flush before page unload, calling `sqlite3_wal_checkpoint` if WAL mode is enabled.
 
 ### 5.6 Initialization Sequence with OPFS
 
@@ -868,20 +870,31 @@ interface PlaygroundState {
 
 5. **No UI changes** in Phase 1.
 
-#### Phase 2: SQLite OPFS Persistence
+#### Phase 2: Migrate SQLite Engine from sql.js to @sqlite.org/sqlite-wasm
 
-**Goal:** Migrate SQLite database storage from in-memory ephemeral to OPFS-persisted.
+**Goal:** Replace sql.js with the official `@sqlite.org/sqlite-wasm` build before any OPFS work touches the SQLite layer. This eliminates duplicated effort — every sql.js-specific workaround (export/import, full-DB serialization) would be thrown away the moment the engine is replaced.
 
-1. Add `loadFromOpfs(path: string)` and `saveToOpfs(path: string)` to the `SqliteEngine` interface.
-2. Implement them in `sqlite-core.ts`: use `localStorage` to store the OPFS path; `db.export()` → write to OPFS file.
-3. Modify the SQLite worker `sqlite-worker.ts` to call `loadFromOpfs` on initialization if an OPFS file exists.
-4. Add a `saveToOpfs` call in the worker in response to a new `"checkpoint"` message type, invoked from the main thread on `pagehide`.
-5. Add workspace ID to the SQLite playground via `sessionStorage` lookup.
+1. **Install `@sqlite.org/sqlite-wasm`**: pin the exact version (no `^`). Configure `next.config.js` to serve the WASM binary with `Content-Type: application/wasm`.
+2. **Rewrite `sqlite-core.ts`**: replace all `db.exec()` / `db.run()` / `db.prepare()` / `db.export()` calls with the `sqlite3Worker1Promiser` API. The promiser uses `db.exec({ sql, callback })` where each row is received via callback rather than returned as an array.
+3. **Rewrite `sqlite-worker.ts`**: switch from `initSqlJs()` to loading `@sqlite.org/sqlite-wasm` inside the worker. Update the message protocol between `SqlPlayground.tsx` and the worker to match the new async promiser interface.
+4. **Adapt result format**: sql.js returns `QueryExecResult[]` (`{ columns, values }`). Reconstruct equivalent objects from the row-callback style so that `SqliteEngine`'s interface remains stable and `ResultView` requires no changes.
+5. **Migrate sample database loading**: replace `new SQL.Database(byteArray)` with the `@sqlite.org/sqlite-wasm` deserialization API (`db.deserialize()` or direct OPFS file write before opening).
+6. **Run full test suite** and verify all existing SQLite functionality (query execution, schema inspection, pagination, table editing, DDL export) is identical before proceeding to Phase 3.
+
+See §8.1 for the full pre-migration checklist.
+
+#### Phase 3: SQLite OPFS Persistence
+
+**Goal:** Migrate SQLite database storage from in-memory ephemeral to OPFS-persisted, using the native OPFS VFS now available from `@sqlite.org/sqlite-wasm`.
+
+1. Add a workspace ID to the SQLite playground via `sessionStorage` lookup (see §3.5).
+2. Update the SQLite worker's `"init"` message to receive the OPFS workspace path from the main thread.
+3. Open (or create) the database with the native OPFS VFS in the worker: `sqlite3.open({ filename: 'file:sqlite.db?vfs=opfs', uri: true })`. Incremental page writes happen automatically — no explicit checkpoint or export is needed during normal operation.
+4. On first open (no existing OPFS file), load the bundled sample database and write it into the OPFS-backed database. This becomes the workspace's persistent starting state.
+5. Add a `"sync"` message type handled in the worker that calls `sqlite3_wal_checkpoint` (if WAL mode is active) to flush pages before page unload.
 6. Update `sqlitePlaygroundTabs.ts`: replace `localStorage.setItem(dbScopedKey(dbId, "tabs"), ...)` with `fileStorage.writeFile(workspaceId, "tabs.json", ...)`.
 
 **Key concern:** Do not break the existing sample database loading flow. The fallback when no OPFS file exists must be indistinguishable from the current behavior.
-
-#### Phase 3: PostgreSQL and DuckDB OPFS Persistence
 
 **Goal:** Migrate PGlite and DuckDB to OPFS-backed storage.
 
