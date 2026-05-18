@@ -22,7 +22,6 @@ import {
   loadSqlite3,
   openDatabase,
   type Database,
-  type PreparedStatement,
   type QueryExecResult,
   type SqlValue,
 } from "./sqlite-wasm";
@@ -532,7 +531,7 @@ function dropAllUserObjects(db: Database): void {
               : "TABLE";
       for (const name of names) {
         try {
-          db.exec(`DROP ${keyword} IF EXISTS "${name.replace(/"/g, '""')}"`);
+          db.exec(`DROP ${keyword} IF EXISTS ${quoteIdent(name)}`);
         } catch {
           // Drops can race against schema dependencies; ignore and let
           // a later iteration pick up the leftovers.
@@ -578,7 +577,7 @@ function copyDatabaseContents(src: Database, dst: Database): void {
       for (const row of tableRows[0].values) {
         const name = String(row[0]);
         if (!name) continue;
-        const q = `"${name.replace(/"/g, '""')}"`;
+        const q = quoteIdent(name);
         let data: QueryExecResult[];
         try {
           data = execAll(src, `SELECT * FROM ${q}`);
@@ -586,9 +585,7 @@ function copyDatabaseContents(src: Database, dst: Database): void {
           continue;
         }
         if (data.length === 0 || data[0].values.length === 0) continue;
-        const cols = data[0].columns
-          .map((c) => `"${c.replace(/"/g, '""')}"`)
-          .join(", ");
+        const cols = data[0].columns.map(quoteIdent).join(", ");
         const placeholders = data[0].columns.map(() => "?").join(", ");
         const stmt = dst.prepare(
           `INSERT INTO ${q} (${cols}) VALUES (${placeholders})`,
@@ -645,13 +642,30 @@ export async function createSqliteEngineInProcess(
     });
   }
 
+  /** Returns true when the OPFS-backed DB already contains user
+   *  objects, meaning we should re-attach to an existing workspace
+   *  rather than overwriting it with a fresh sample seed. */
+  function hasUserObjects(d: Database): boolean {
+    try {
+      const rows = execAll(
+        d,
+        `SELECT 1 FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' LIMIT 1`,
+      );
+      return rows.length > 0 && rows[0].values.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
   function build(sample: SqliteSampleDatabase, opts: { skipSeed?: boolean } = {}): void {
+    let firstOpenOfPersistent = false;
     if (persistent) {
       // Open the persistent file lazily on the first build call, and
       // wipe its current schema on subsequent calls so a sample swap
       // doesn't accumulate stale tables.
       if (!db) {
         db = openFresh();
+        firstOpenOfPersistent = true;
       } else {
         dropAllUserObjects(db);
       }
@@ -670,7 +684,14 @@ export async function createSqliteEngineInProcess(
     // so we opt in once per database build. The `rebuildTable` flow
     // toggles it off/on around its own work.
     db.exec("PRAGMA foreign_keys = ON;");
-    if (!opts.skipSeed) {
+    // First-open detection: if we just opened a persistent (OPFS) DB
+    // file that already contains user objects, do NOT reseed — the
+    // user is re-attaching to a saved workspace. This is the core of
+    // Phase 3's persistence behaviour.
+    const shouldSkipSeed =
+      opts.skipSeed === true ||
+      (firstOpenOfPersistent && hasUserObjects(db));
+    if (!shouldSkipSeed) {
       if (sample.schema) db.exec(sample.schema);
       sample.seed(db);
     }

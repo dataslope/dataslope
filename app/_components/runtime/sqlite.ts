@@ -33,6 +33,7 @@ type SqliteWorkerResponse =
 
 export async function createSqliteEngine(
   initialSampleId: string,
+  workspaceId?: string | null,
 ): Promise<SqliteEngine> {
   const worker = new Worker(new URL("./sqlite-worker.ts", import.meta.url));
   let nextId = 0;
@@ -71,7 +72,7 @@ export async function createSqliteEngine(
     });
   }
 
-  await call("loadSampleDatabase", [initialSampleId]);
+  await call("loadSampleDatabase", [initialSampleId, workspaceId ?? null]);
 
   return {
     loadSampleDatabase: (id) => call("loadSampleDatabase", [id]) as Promise<SqliteSampleMetadata>,

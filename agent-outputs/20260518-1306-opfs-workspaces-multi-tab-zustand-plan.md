@@ -11,9 +11,9 @@
 | Phase | Status | Notes |
 |---|---|---|
 | **Phase 1: OPFS Infrastructure** | ✅ **COMPLETE** | All four files created; 65 unit tests pass; `tsc --noEmit` clean |
-| Phase 2: SQLite Engine Migration | ⬜ Not started | Prerequisite for Phase 3 |
-| Phase 3: SQLite OPFS Persistence | ⬜ Not started | Requires Phase 2 |
-| Phase 4: PostgreSQL & DuckDB OPFS | ⬜ Not started | |
+| **Phase 2: SQLite Engine Migration** | ✅ **COMPLETE** | Rewritten on top of `@sqlite.org/sqlite-wasm` 3.53.0-build1; `sql.js` removed |
+| **Phase 3: SQLite OPFS Persistence** | ✅ **COMPLETE** | SAH Pool VFS, workspace-aware engine, first-open detection |
+| **Phase 4: PostgreSQL & DuckDB OPFS** | ✅ **COMPLETE** | PGlite `opfs-ahp://` dataDir; DuckDB snapshot-and-restore via `databaseStorage` |
 | Phase 5: Non-SQL Multi-Tab + OPFS | ⬜ Not started | |
 | Phase 6: Workspace Manager UI | ⬜ Not started | |
 
@@ -38,16 +38,215 @@ __tests__/
   opfs.databaseStorage.test.ts ← 7 tests
 ```
 
+### Phase 2 — SQLite Engine Rewrite (`@sqlite.org/sqlite-wasm`)
+
+**What changed**
+
+- `sql.js` + `@types/sql.js` removed from `package.json`. The previous
+  Turbopack aliases for sql.js's emscripten stubs (`fs`, `path`, `crypto`)
+  were removed from `next.config.ts` and `app/_components/runtime/emptyModule.ts`
+  was deleted.
+- `@sqlite.org/sqlite-wasm@3.53.0-build1` added (pinned). The package is
+  installed only for its TypeScript declarations; the actual runtime is
+  fetched from jsDelivr at load time. This mirrors the pattern already
+  used for `@duckdb/duckdb-wasm` and `parquet-wasm`, and it sidesteps a
+  Turbopack build error caused by the package's
+  `new Worker(new URL(dynamicProxyUri, import.meta.url))` (an unreachable
+  code path when we use the SAH Pool VFS, but Turbopack rejects it at
+  build time).
+- **New file `app/_components/runtime/sqlite-wasm.ts`** — small runtime /
+  helpers module (~360 lines). Exports:
+  - `loadSqlite3()` — memoised CDN init.
+  - `openDatabase(sqlite3, opts)` — opens an `oo1.DB` against `:memory:`
+    or a named VFS, optionally pre-seeded from a `.sqlite` byte image
+    via `sqlite3_deserialize`.
+  - `iterateStatements(db, sql)` — generator yielding one
+    `PreparedStatement` per top-level statement (with SQL-aware split
+    that handles `BEGIN…END` trigger bodies, comments, quoted ids, etc.).
+  - `execAll(db, sql)` — multi-statement convenience returning
+    `QueryExecResult[]` matching the legacy sql.js shape so the UI does
+    not need to change.
+  - `getRow(stmt)` / `coerceValue(v)` — BigInt → Number/string coercion
+    so the rest of the playground never sees `bigint`.
+  - `exportDatabase(sqlite3, db)` — wraps `sqlite3_js_db_export`.
+- **`sqlite-core.ts` rewritten** (no adapter layer): types
+  (`Database`, `PreparedStatement`) are imported directly from
+  sqlite-wasm; sql.js call patterns were mechanically translated:
+  `db.run(sql)` → `db.exec(sql)`, `db.exec(sql)` (rows) →
+  `execAll(db, sql)`, `db.iterateStatements(sql)` →
+  `iterateStatements(db, sql)`, `stmt.free()` → `stmt.finalize()`,
+  `stmt.get()` → `getRow(stmt)`, `db.export()` →
+  `exportDatabase(sqlite3, db)`. `loadFromBytes` was adapted to use
+  `sqlite3_deserialize` for in-memory targets and a schema-+-row copy
+  fallback for OPFS-backed targets.
+- `sqliteSamples.ts` bulk-insert helper rewritten to use sqlite-wasm's
+  `bind/step/reset(true)` directly.
+- The 12 type-import sites that referenced `sql.js` types
+  (`SqlValue`, `QueryExecResult`) were repointed to `./sqlite-wasm`.
+
+**New engine surface**
+
+```ts
+export interface SqliteEngineOpenOptions {
+  filename?: string;  // defaults to ":memory:"
+  flags?: string;     // defaults to "c"
+  vfs?: string;       // optional VFS name; if set the DB is persistent
+  skipSeed?: boolean; // skip sample DDL bootstrap on open
+}
+
+createSqliteEngineInProcess(sampleId, options?)  // in-process / tests
+createSqliteEngine(sampleId, workspaceId?)       // worker-backed entry point
+```
+
+The engine internally distinguishes **in-memory** from **persistent**
+mode (`options.vfs` set). In persistent mode it opens the DB file once
+on first build, then wipes the schema in place on subsequent sample
+swaps so the on-disk file always reflects the active sample.
+
+### Phase 3 — SQLite OPFS Persistence
+
+**What changed**
+
+- **`sqlite-worker.ts`** now installs the SAH Pool VFS lazily (memoised
+  per worker) via `sqlite3.installOpfsSAHPoolVfs({ initialCapacity: 12 })`.
+  The worker's init message has been extended from `[sampleId]` to
+  `[sampleId, workspaceId?]`. When a workspace ID is present and the
+  SAH Pool installs successfully, the engine is opened with
+  `vfs: "opfs-sahpool"` and
+  `filename: "/workspaces/<wsId>/sqlite.db"`. SAH Pool VFS failure
+  (private mode, Safari < 17.2, etc.) is silently downgraded to
+  in-memory.
+- The worker's first-call dispatch was restructured: on init, the
+  engine is built with the requested sample inside
+  `createSqliteEngineInProcess`, then the worker short-circuits the
+  first `loadSampleDatabase` call by returning `engine.activeSample()`
+  rather than re-running the build (which would wipe an existing OPFS
+  workspace).
+- **First-open detection in `sqlite-core.ts`**: the new
+  `hasUserObjects(db)` helper inspects `sqlite_master` after the
+  persistent file is first opened. If user objects exist, the sample
+  seed is automatically skipped so the user re-attaches to their saved
+  workspace.
+- **New file `app/_components/opfs/activeWorkspace.ts`** — small
+  bootstrap helper exposing `getActiveWorkspaceId(playgroundId)`,
+  `setActiveWorkspaceId(playgroundId, wsId)`, and
+  `ensureActiveWorkspace(playgroundId)`. It persists the active
+  workspace ID per-tab in `sessionStorage` (so two tabs of the same
+  playground can later target different workspaces in Phase 5), and
+  auto-creates a default workspace via `createWorkspace()` when none
+  exists. Falls back to a registry-only entry when OPFS is unavailable.
+- `engineAdapter.ts` interface now declares
+  `createEngine(sampleId, workspaceId?)`. `sqliteAdapter`,
+  `postgresAdapter`, and `duckdbAdapter` were all updated.
+- `SqlPlayground.tsx` (the SQLite shell) now calls
+  `ensureActiveWorkspace(PLAYGROUND_ID)` before
+  `sqliteAdapter.createEngine(...)` and forwards the workspace ID.
+
+### Phase 4 — Postgres & DuckDB OPFS Persistence
+
+**Postgres / PGlite (`runtime/postgres.ts`)**
+
+- `createFreshWorker({ dataDir })` now forwards a PGlite `dataDir`
+  option to the worker. When a workspace ID is provided to
+  `createPostgresEngine(sampleId, workspaceId?)`, the engine constructs
+  `dataDir = "opfs-ahp://workspaces/<wsId>/postgres"` and PGlite uses
+  the OPFS Access Handle Pool VFS to persist the cluster.
+- **First-open detection** via `pgHasUserTables(db)` —
+  `SELECT count(*) FROM pg_tables WHERE schemaname = 'public'`. If
+  the cluster already has user tables, the sample seed is skipped on
+  reload.
+- **Sample-switch policy**: in workspace (persistent) mode,
+  `loadSampleDatabase` / `loadBlankDatabase` reset the cluster in-place
+  with `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` instead of
+  spinning up a fresh PGlite worker (which would orphan the OPFS
+  files). In the non-workspace path the legacy fresh-worker-per-sample
+  behaviour is preserved.
+- `PostgresPlayground.tsx` resolves the active workspace via
+  `ensureActiveWorkspace("postgres")` and forwards the ID.
+
+**DuckDB (`runtime/duckdb.ts`)**
+
+- DuckDB-Wasm has no native OPFS VFS, so persistence is implemented as
+  **snapshot-and-restore** against the workspace's `db/duckdb.db` file
+  in OPFS, using `databaseStorage.{readDatabase,writeDatabase}`.
+- On engine init with a workspace ID:
+  1. `bootstrapDatabase(sample)` runs as before (creates an in-memory
+     DB with the sample seed).
+  2. `restoreFromOpfs()` attempts to read `duckdb.db` from OPFS and, on
+     success, wipes the freshly-seeded schema and `COPY FROM DATABASE`
+     the snapshot in via an `ATTACH '<file>' AS … (READ_ONLY)`.
+  3. If no snapshot exists, an initial snapshot is queued immediately
+     so the file is created for next time.
+- A debounced `scheduleSnapshot()` (1.5s) is invoked after every `exec`
+  and after every catalog-mutating engine method (`loadSampleDatabase`,
+  `loadBlankDatabase`, `importSqlDump`, `importFromBinary`,
+  `rebuildTable`, `dropEntity`, `truncateTable`, `deleteRows`,
+  `updateRows`, `insertRow`). The wrap is applied centrally after the
+  engine literal is constructed.
+- Snapshots are taken via `exportAsBinaryInternal()` (inline
+  reimplementation of the public `exportAsBinary` method so it stays
+  available during init and destroy), then handed to
+  `writeDatabase(wsId, "duckdb.db", bytes)` which debounces and flushes
+  on `pagehide` / `visibilitychange`. An additional `pagehide` listener
+  in the engine queues a final snapshot for best-effort tab-close
+  survival.
+- `DuckDbPlayground.tsx` resolves the active workspace via
+  `ensureActiveWorkspace("duckdb")` and forwards the ID.
+
+### Caveats & Follow-ups
+
+- **DuckDB persistence is best-effort.** `exportAsBinary` is async and
+  `pagehide` does not await async handlers, so a hard tab-close before
+  a queued snapshot completes can lose the most recent few seconds of
+  changes. Adequate for a playground; revisit when DuckDB-Wasm ships a
+  native OPFS VFS.
+- **sqlite-wasm version pinning.** `SQLITE_WASM_VERSION` in
+  `runtime/sqlite-wasm.ts` must be kept in sync with the
+  `@sqlite.org/sqlite-wasm` version pinned in `package.json` (npm
+  install only provides the TypeScript declarations; the runtime is
+  CDN-fetched).
+- **SAH Pool capacity.** Initial capacity is hard-coded to 12 in
+  `sqlite-worker.ts`, comfortably covering several workspaces' DB +
+  journal files per worker. Phase 6's Workspace Manager UI may want to
+  surface a warning if the pool is full.
+- **PGlite sample switch.** In workspace mode `loadSampleDatabase`
+  resets the schema in-place. This intentionally preserves any
+  extensions loaded into the cluster; if a sample expects a
+  freshly-initialised cluster (no extensions), it will see whatever
+  the previous sample loaded.
+- **Postgres `loadBlankDatabase` workspace mode** wipes the public
+  schema instead of creating a fresh worker. If a downstream feature
+  needs a truly pristine PGlite for the blank database, the workspace
+  ID should be temporarily unset before that call.
+- **DuckDB initial snapshot** runs immediately on first visit so the
+  OPFS file exists even before the user has made any changes. If the
+  sample seed itself is expensive, consider deferring the first
+  snapshot until after the user's first mutation.
+- **No new tests yet** for Phases 2-4. The existing 221-test suite
+  passes (covers Postgres, DuckDB, OPFS Phase-1 helpers, and shared
+  SQL utils). Integration-level OPFS persistence tests will need a
+  browser-level harness (Playwright) and were deferred — record an
+  issue when prioritising Phase 5.
+
 ### Where the next agent picks up
 
-**Start with Phase 2** — migrate the SQLite engine from `sql.js` to `@sqlite.org/sqlite-wasm`. See §7.1 Phase 2 and §8.1 for the full checklist. Do not begin Phase 3 (SQLite OPFS persistence) until the engine migration is complete and all existing SQLite tests pass.
+**Continue with Phase 5 — Non-SQL Multi-Tab + OPFS.** Phases 2-4 leave
+the SQLite / Postgres / DuckDB playgrounds workspace-aware and
+OPFS-persistent. The next agent should:
 
-Key files the Phase 2 agent must study first:
-- `app/_components/runtime/sqlite-core.ts` — current `sql.js` API usage
-- `app/_components/runtime/sqlite-worker.ts` — worker message protocol
-- `app/_components/sql/SqlPlayground.tsx` — `QueryExecResult` shape consumed by `ResultView`
-- `app/_components/sql/types.ts` — shared result types
-- `next.config.ts` — WASM content-type / header configuration
+1. Generalise the SQL playground's tab model to non-SQL playgrounds
+   (Python, JavaScript, etc.) per §4 of this plan.
+2. Persist editor file contents to OPFS via the existing
+   `fileStorage.ts` helpers, keyed by workspace ID.
+3. Reuse `ensureActiveWorkspace(playgroundId)` from
+   `app/_components/opfs/activeWorkspace.ts`.
+
+Key files the Phase 5 agent should study first:
+- `app/_components/opfs/activeWorkspace.ts` — workspace bootstrap
+- `app/_components/opfs/fileStorage.ts` — file persistence helpers
+- `app/_components/sql/SqlPlayground.tsx` — reference shell with tabs
+- `app/_components/python/PythonPlayground.tsx` (and siblings) —
+  current single-file shells that need multi-tab support
 
 ---
 

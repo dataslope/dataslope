@@ -107,6 +107,7 @@ import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
+import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
 import { type DuckDbEngine } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
@@ -1636,7 +1637,21 @@ function DuckDbPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading DuckDB engine…");
-        const engine = await duckdbAdapter.createEngine(initialDbId);
+        // Resolve (or auto-create) the active workspace so DuckDB can
+        // restore prior session state from OPFS (and snapshot back to
+        // it on the next mutation). Best-effort: an unavailable OPFS
+        // simply means the engine runs purely in-memory.
+        let workspaceId: string | null = null;
+        try {
+          const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
+          workspaceId = workspace.id;
+        } catch {
+          /* proceed in-memory */
+        }
+        const engine = await duckdbAdapter.createEngine(
+          initialDbId,
+          workspaceId,
+        );
         if (cancelled) {
           // The component already unmounted while bootstrap was in flight.
           // The engine never reaches engineRef, so the unmount cleanup
