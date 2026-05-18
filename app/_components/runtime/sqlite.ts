@@ -9,7 +9,7 @@ export type {
   TableRebuildSpec,
 } from "./sqlite-core";
 
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "./sqlite-wasm-adapter";
 import type { SqliteSampleMetadata } from "./sqliteSamples";
 import type {
   ColumnConstraintInfo,

@@ -2,7 +2,7 @@
 
 import { PGlite } from "@electric-sql/pglite";
 import { PGliteWorker } from "@electric-sql/pglite/worker";
-import type { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult, SqlValue } from "./sqlite-wasm-adapter";
 import type {
   ColumnSpec,
   ColumnConstraintInfo,

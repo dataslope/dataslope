@@ -1,6 +1,6 @@
 "use client";
 
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../../runtime/sqlite-wasm-adapter";
 import { ensureParquetWasm } from "./parquetWasm";
 
 export function triggerDownload(blob: Blob, filename: string): void {

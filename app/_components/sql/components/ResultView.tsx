@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 import { MdOutlineKey } from "react-icons/md";
 import { IoLink } from "react-icons/io5";
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../../runtime/sqlite-wasm-adapter";
 import type {
   QueryRunResult,
   ResultTableRow,

@@ -4,7 +4,7 @@
 // the user lands on that database — so adding a new sample (or, later,
 // loading a binary `.sqlite` file) is a one-entry change.
 
-import type { Database } from "sql.js";
+import type { SqlJsLikeDB as Database } from "./sqlite-wasm-adapter";
 import {
   findSqlSampleById,
   type QueryTabSeed,

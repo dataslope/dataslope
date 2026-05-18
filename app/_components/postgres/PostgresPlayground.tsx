@@ -110,7 +110,7 @@ import { type PostgresEngine } from "../runtime/postgres";
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
 const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../runtime/sqlite-wasm-adapter";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import {

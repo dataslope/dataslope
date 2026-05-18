@@ -21,18 +21,10 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
-  // sql.js ships an Emscripten preamble that statically references the
-  // Node-only `fs`/`path` modules. Those branches are dead code in the
-  // browser (gated on `typeof process === "object"`), but Turbopack
-  // can't see through the gate at build time, so we alias them to an
-  // empty stub for the client bundle.
-  turbopack: {
-    resolveAlias: {
-      fs: { browser: "./app/_components/runtime/emptyModule.ts" },
-      path: { browser: "./app/_components/runtime/emptyModule.ts" },
-      crypto: { browser: "./app/_components/runtime/emptyModule.ts" },
-    },
-  },
+  // The previous SQLite engine (sql.js) needed Node-only `fs`/`path`/
+  // `crypto` aliased to an empty stub in the client bundle. The current
+  // engine (@sqlite.org/sqlite-wasm) ships a clean browser build with
+  // no such gates, so no Turbopack aliases are required here.
   redirects: async () => [
     {
       source: "/_dotnet/:path*",

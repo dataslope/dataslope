@@ -14,15 +14,16 @@
 // Initialisation is memoised so navigating away and back doesn't
 // re-download the wasm module.
 
-import type {
-  Database,
-  QueryExecResult,
-  SqlJsStatic,
-  SqlValue,
-} from "sql.js";
+import {
+  loadSqlite3,
+  openDatabase,
+  type QueryExecResult,
+  type SqlJsLikeDB as Database,
+  type SqlValue,
+} from "./sqlite-wasm-adapter";
 import { findSampleDatabase, type SqliteSampleDatabase, type SqliteSampleMetadata } from "./sqliteSamples";
 
-export type { QueryExecResult } from "sql.js";
+export type { QueryExecResult } from "./sqlite-wasm-adapter";
 
 /** Result of a SELECT-like statement with the per-column declared types
  *  attached.  `columnTypes` may contain empty strings for computed /
@@ -280,23 +281,25 @@ export interface SqliteEngine {
   ) => Promise<{ result: QueryExecResultWithTypes[]; totalCount: number }>;
 }
 
-let sqlJsPromise: Promise<SqlJsStatic> | null = null;
+/** Options for opening the engine's database — used by Phase 3 to
+ *  switch from in-memory storage to OPFS persistence. When `vfs` is
+ *  provided (e.g. `"opfs-sahpool"`), the database is opened against
+ *  that VFS and `filename` becomes the OPFS-relative path. */
+export interface SqliteEngineOpenOptions {
+  /** Database filename. Defaults to `":memory:"`. */
+  filename?: string;
+  /** Open-mode flags (sqlite-wasm OO1: `c` create, `w` write, `r`
+   *  read-only, `t` trace). Defaults to `"c"`. */
+  flags?: string;
+  /** Optional SQLite VFS name. When set, the DB is OPFS-backed. */
+  vfs?: string;
+  /** When true, skip seeding the sample's schema/data. Used when the
+   *  on-disk database already exists (Phase 3 persistence). */
+  skipSeed?: boolean;
+}
 
-function loadSqlJs(): Promise<SqlJsStatic> {
-  if (!sqlJsPromise) {
-    // Dynamic import so the bundler treats sql.js as a client-only
-    // chunk; its emscripten preamble references `fs`/`path`, which
-    // Next/Turbopack cannot statically resolve in the SSR pass.
-    sqlJsPromise = import("sql.js").then((mod) => {
-      const init = (mod.default ?? mod) as (
-        cfg?: { locateFile?: (file: string) => string },
-      ) => Promise<SqlJsStatic>;
-      return init({
-        locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/sql.js@1.14.1/dist/${file}`,
-      });
-    });
-  }
-  return sqlJsPromise;
+function loadSqlJs() {
+  return loadSqlite3();
 }
 
 /** Treat any identifier whose value isn't a safe `[A-Za-z_][A-Za-z0-9_]*`
@@ -492,37 +495,183 @@ function extractReferencedTables(sql: string): string[] {
   return tables;
 }
 
+/** Drop every user-created table, view, index, and trigger from the
+ *  database, leaving the schema empty.  Used when loading a sample or
+ *  blank database into a persistent (OPFS-backed) DB instead of
+ *  closing and re-opening the file.  Foreign-key enforcement is
+ *  disabled around the drops so cross-table references don't block. */
+function dropAllUserObjects(db: Database): void {
+  // Iterate kinds in a sensible drop order: triggers / views first
+  // (they reference tables), then tables (auto-drops their auto-index),
+  // then any remaining user indexes.
+  db.run("PRAGMA foreign_keys = OFF;");
+  try {
+    for (const kind of ["trigger", "view", "table", "index"] as const) {
+      const stmt = db.prepare(
+        `SELECT name FROM sqlite_master WHERE type = $t AND name NOT LIKE 'sqlite_%'`,
+      );
+      const names: string[] = [];
+      try {
+        stmt.bind({ $t: kind });
+        while (stmt.step()) {
+          const row = stmt.get();
+          if (typeof row[0] === "string") names.push(row[0]);
+        }
+      } finally {
+        stmt.free();
+      }
+      const keyword =
+        kind === "trigger"
+          ? "TRIGGER"
+          : kind === "view"
+            ? "VIEW"
+            : kind === "index"
+              ? "INDEX"
+              : "TABLE";
+      for (const name of names) {
+        try {
+          db.run(`DROP ${keyword} IF EXISTS "${name.replace(/"/g, '""')}"`);
+        } catch {
+          // Drops can race against schema dependencies; ignore and let
+          // a later iteration pick up the leftovers.
+        }
+      }
+    }
+  } finally {
+    db.run("PRAGMA foreign_keys = ON;");
+  }
+}
+
+/** Best-effort full-database copy from `src` -> `dst`.  Used by
+ *  `loadFromBytes` when a persistent (OPFS) DB is active, since we
+ *  cannot deserialise an arbitrary byte image directly into an
+ *  OPFS-backed file. */
+function copyDatabaseContents(src: Database, dst: Database): void {
+  // Re-emit every CREATE statement from sqlite_master.
+  const schemaRows = src.exec(
+    `SELECT type, name, sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'index' THEN 1 WHEN 'view' THEN 2 WHEN 'trigger' THEN 3 ELSE 4 END`,
+  );
+  dst.run("PRAGMA foreign_keys = OFF;");
+  dst.run("BEGIN");
+  try {
+    if (schemaRows.length > 0) {
+      for (const row of schemaRows[0].values) {
+        const sql = String(row[2] ?? "");
+        if (!sql) continue;
+        try {
+          dst.run(sql);
+        } catch {
+          // Skip individual statements that fail (e.g. references to
+          // missing modules); continue with the rest of the import.
+        }
+      }
+    }
+    // Copy table rows.
+    const tableRows = src.exec(
+      `SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'`,
+    );
+    if (tableRows.length > 0) {
+      for (const row of tableRows[0].values) {
+        const name = String(row[0]);
+        if (!name) continue;
+        const q = `"${name.replace(/"/g, '""')}"`;
+        let data: QueryExecResult[];
+        try {
+          data = src.exec(`SELECT * FROM ${q}`);
+        } catch {
+          continue;
+        }
+        if (data.length === 0 || data[0].values.length === 0) continue;
+        const cols = data[0].columns
+          .map((c) => `"${c.replace(/"/g, '""')}"`)
+          .join(", ");
+        const placeholders = data[0].columns.map(() => "?").join(", ");
+        const stmt = dst.prepare(
+          `INSERT INTO ${q} (${cols}) VALUES (${placeholders})`,
+        );
+        try {
+          for (const r of data[0].values) {
+            stmt.run(r as unknown as SqlValue[]);
+          }
+        } finally {
+          stmt.free();
+        }
+      }
+    }
+    dst.run("COMMIT");
+  } catch (err) {
+    try {
+      dst.run("ROLLBACK");
+    } catch {
+      /* ignore */
+    }
+    throw err;
+  } finally {
+    dst.run("PRAGMA foreign_keys = ON;");
+  }
+}
+
 export async function createSqliteEngineInProcess(
   initialSampleId: string,
+  openOptions: SqliteEngineOpenOptions = {},
 ): Promise<{
   [K in keyof SqliteEngine]: Awaited<ReturnType<SqliteEngine[K]>> extends infer R
     ? (...args: Parameters<SqliteEngine[K]>) => R
     : never;
 }> {
-  const SQL = await loadSqlJs();
+  const sqlite3 = await loadSqlJs();
   let db: Database | null = null;
   let active: SqliteSampleDatabase = findSampleDatabase(initialSampleId);
 
-  function build(sample: SqliteSampleDatabase): void {
-    if (db) {
-      try {
-        db.close();
-      } catch {
-        // Ignore — closing a half-broken db shouldn't block the rebuild.
+  // When a persistent (OPFS-backed) VFS is used, we open the database
+  // file once and *re-use* it across sample switches.  Switching
+  // samples in OPFS mode wipes the existing schema instead of opening
+  // a fresh in-memory database, so the on-disk file always reflects
+  // the active sample.
+  const persistent =
+    typeof openOptions.vfs === "string" && openOptions.vfs.length > 0;
+
+  function openFresh(): Database {
+    return openDatabase(sqlite3, {
+      filename: openOptions.filename,
+      flags: openOptions.flags,
+      vfs: openOptions.vfs,
+    });
+  }
+
+  function build(sample: SqliteSampleDatabase, opts: { skipSeed?: boolean } = {}): void {
+    if (persistent) {
+      // Open the persistent file lazily on the first build call, and
+      // wipe its current schema on subsequent calls so a sample swap
+      // doesn't accumulate stale tables.
+      if (!db) {
+        db = openFresh();
+      } else {
+        dropAllUserObjects(db);
       }
+    } else {
+      if (db) {
+        try {
+          db.close();
+        } catch {
+          // Ignore — closing a half-broken db shouldn't block the rebuild.
+        }
+      }
+      db = openFresh();
     }
-    db = new SQL.Database();
     // Enforce foreign-key constraints declared in the sample schema.
     // SQLite ships with this off by default for backwards compatibility,
     // so we opt in once per database build. The `rebuildTable` flow
     // toggles it off/on around its own work.
     db.run("PRAGMA foreign_keys = ON;");
-    db.run(sample.schema);
-    sample.seed(db);
+    if (!opts.skipSeed) {
+      if (sample.schema) db.run(sample.schema);
+      sample.seed(db);
+    }
     active = sample;
   }
 
-  build(active);
+  build(active, { skipSeed: openOptions.skipSeed });
 
   function require(): Database {
     if (!db) throw new Error("SQLite database is not initialised");
@@ -1158,15 +1307,21 @@ export async function createSqliteEngineInProcess(
       return count;
     },
     loadBlankDatabase() {
-      if (db) {
-        try {
-          db.close();
-        } catch {
-          // Ignore close errors.
+      if (persistent && db) {
+        // Persistent mode: wipe the on-disk file rather than closing it
+        // so the OPFS-backed VFS keeps tracking the same database file.
+        dropAllUserObjects(db);
+      } else {
+        if (db) {
+          try {
+            db.close();
+          } catch {
+            // Ignore close errors.
+          }
         }
+        db = openFresh();
       }
-      db = new SQL.Database();
-      db.run("PRAGMA foreign_keys = ON;");
+      db!.run("PRAGMA foreign_keys = ON;");
       const blank: SqliteSampleDatabase = {
         id: "__blank__",
         label: "Blank Database",
@@ -1181,28 +1336,46 @@ export async function createSqliteEngineInProcess(
       return meta;
     },
     loadFromBytes(bytes: Uint8Array, filename: string) {
-      // Build the new database first so a corrupt or unsupported file
-      // throws before we tear down the live one — keeps the playground
-      // in a working state if the bytes turn out to be invalid.
-      const next = new SQL.Database(bytes);
-      try {
-        next.run("PRAGMA foreign_keys = ON;");
-      } catch (err) {
+      if (persistent && db) {
+        // Persistent mode: open a transient in-memory DB from `bytes`
+        // to validate, dump every CREATE/INSERT into the on-disk DB,
+        // then close the transient one. We can't sqlite3_deserialize
+        // into an OPFS-backed DB because the OPFS VFS requires the
+        // file backing to remain in place.
+        const transient = openDatabase(sqlite3, { bytes });
         try {
-          next.close();
-        } catch {
-          /* ignore */
+          transient.run("PRAGMA foreign_keys = ON;");
+          dropAllUserObjects(db);
+          // Copy every CREATE statement + every row out via a small
+          // backup loop. For most user uploads this is fine; for very
+          // large databases the user should be using the export/import
+          // flow instead.
+          copyDatabaseContents(transient, db);
+        } finally {
+          transient.close();
         }
-        throw err;
-      }
-      if (db) {
+      } else {
+        // In-memory mode: just open a fresh DB from the bytes.
+        const next = openDatabase(sqlite3, { bytes });
         try {
-          db.close();
-        } catch {
-          // Ignore close errors.
+          next.run("PRAGMA foreign_keys = ON;");
+        } catch (err) {
+          try {
+            next.close();
+          } catch {
+            /* ignore */
+          }
+          throw err;
         }
+        if (db) {
+          try {
+            db.close();
+          } catch {
+            // Ignore close errors.
+          }
+        }
+        db = next;
       }
-      db = next;
       // Derive a stable-ish id from the filename so the UI can
       // distinguish this from the blank placeholder.
       const basename = filename

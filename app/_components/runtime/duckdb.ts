@@ -10,7 +10,7 @@
 // surface the engine actually touches.
 "use client";
 
-import type { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult, SqlValue } from "./sqlite-wasm-adapter";
 import type {
   ColumnSpec,
   ColumnConstraintInfo,
