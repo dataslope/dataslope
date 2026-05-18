@@ -896,6 +896,8 @@ See §8.1 for the full pre-migration checklist.
 
 **Key concern:** Do not break the existing sample database loading flow. The fallback when no OPFS file exists must be indistinguishable from the current behavior.
 
+#### Phase 4: PostgreSQL and DuckDB OPFS Persistence
+
 **Goal:** Migrate PGlite and DuckDB to OPFS-backed storage.
 
 **PostgreSQL:**
@@ -908,7 +910,7 @@ See §8.1 for the full pre-migration checklist.
 2. On load, check for an existing OPFS file; if present, `registerFileBuffer()` before the first query.
 3. Save/restore logic lives in `runtime/duckdb.ts`.
 
-#### Phase 4: Non-SQL Playground Multi-Tab + OPFS
+#### Phase 5: Non-SQL Playground Multi-Tab + OPFS
 
 **Goal:** Add multi-tab file editing to all 9 non-SQL playgrounds using the generic tab system.
 
@@ -928,7 +930,7 @@ See §8.1 for the full pre-migration checklist.
 7. **Add workspace initialization** in the page component for each playground route.
 8. **Extend `LanguageAdapter`** with `defaultFileExtension` and `entryPoint` fields.
 
-#### Phase 5: Workspace Manager UI
+#### Phase 6: Workspace Manager UI
 
 **Goal:** Surface workspace management in the UI.
 
@@ -938,7 +940,7 @@ See §8.1 for the full pre-migration checklist.
 4. **Workspace size estimate**: use `fileStorage.estimateSize(workspaceId)`.
 5. **Tab isolation notice**: shown once when the user opens a playground in a second tab with the same workspace.
 
-#### Phase 6: Terminal Integration (SQL REPL + CLI)
+#### Phase 7: Terminal Integration (SQL REPL + CLI)
 
 **Goal:** Add terminal tabs to SQL and compiled-language playgrounds.
 
@@ -951,12 +953,6 @@ See §8.1 for the full pre-migration checklist.
 5. **Create `app/_components/terminal/CliTerminal.tsx`**: CLI terminal for C/C++ (and optionally Java/C#) multi-file compilation (§4.8).
    - Extend C/C++ adapter to accept `files: Map<string, string>` input for `compile` command.
 6. **Add a terminal tab** to the C/C++ playground tab bars.
-
-#### Phase 2b (optional, post-Phase 2): Migrate SQLite to @sqlite.org/sqlite-wasm
-
-**Goal:** Replace sql.js with the official `@sqlite.org/sqlite-wasm` for native OPFS incremental writes (§2.6, §8.1).
-
-This is a significant, isolated refactor of `sqlite-core.ts` and `sqlite-worker.ts`. It should only be started after Phase 2 (sql.js + OPFS export/import) is stable in production, so that any performance issues with the export approach are measured before migrating.
 
 ### 7.2 File Structure Changes
 
@@ -993,37 +989,14 @@ app/
       cpp.tsx                        ← MODIFIED
       java.tsx                       ← MODIFIED
       csharp.tsx                     ← MODIFIED
-      sqlite-core.ts                 ← MODIFIED: loadFromOpfs/saveToOpfs
+      sqlite-core.ts                 ← MODIFIED: rewritten for @sqlite.org/sqlite-wasm promiser API
       sqlite-worker.ts               ← MODIFIED: init message
       postgres-worker.ts             ← MODIFIED: OPFS PGlite path
       duckdb.ts                      ← MODIFIED: OPFS checkpoint
     sqlitePlaygroundTabs.ts          ← MODIFIED: OPFS-backed tab save/load
 ```
 
-### 7.3 Backward Compatibility
-
-**Existing localStorage data must be migrated or gracefully ignored:**
-
-1. For non-SQL playgrounds: on first load after the upgrade, read the existing `pg_${adapter.id}_code` from localStorage and use it as the content of the default workspace's first file. Then delete the localStorage key.
-2. For SQLite tabs: read the existing `pg_sqlite_db_${dbId}_tabs` from localStorage and write it to the new workspace's OPFS `tabs.json`. Then delete the localStorage key.
-3. For settings (font size, theme, word wrap): keep these in localStorage — they are user preferences, not workspace data.
-
-**Migration helper:**
-```ts
-// app/_components/opfs/migration.ts
-async function migrateLocalStorageToOpfs(adapterId: string, workspaceId: string) {
-  const codeKey = `pg_${adapterId}_code`;
-  const code = localStorage.getItem(codeKey);
-  if (code) {
-    await fileStorage.writeFile(workspaceId, 'main', code);
-    localStorage.removeItem(codeKey);
-  }
-}
-```
-
-Run this once during workspace initialization (before loading files from OPFS).
-
-### 7.4 Testing Strategy
+### 7.3 Testing Strategy
 
 1. **Unit tests**: `workspace.ts`, `fileStorage.ts` — mock `navigator.storage.getDirectory()` with an in-memory implementation. Vitest already runs in the repo (`npm run test`).
 2. **Integration tests**: E2E with Playwright. Add tests to `e2e/` for:
@@ -1033,17 +1006,17 @@ Run this once during workspace initialization (before loading files from OPFS).
    - OPFS fallback when OPFS is unavailable (mock `navigator.storage.getDirectory` to throw)
 3. **Manual browser testing**: Test in Chrome, Firefox, and Safari before each phase ships.
 
-### 7.5 Performance Benchmarks to Track
+### 7.4 Performance Benchmarks to Track
 
 Before and after each phase:
 - Time from page load to "ready" state (measures OPFS init overhead)
 - Time for a round-trip SQLite query (measures write-queue impact)
 - Memory usage with 5 workspace files open (measures dirty buffer overhead)
 
-### 7.6 Key Decision Points (Resolve Before Implementation)
+### 7.5 Key Decision Points (Resolve Before Implementation)
 
 1. **Workspace-per-tab auto-create vs user-explicit?** Recommendation: auto-create a default workspace, with optional user management (Option C from §3.4).
-2. **SQLite: keep sql.js or migrate to @sqlite.org/sqlite-wasm?** Recommendation: keep sql.js in Phase 2 for the OPFS migration; plan a dedicated Phase 2b to migrate the engine to `@sqlite.org/sqlite-wasm` for native incremental OPFS writes. Do not attempt both in one phase.
+2. **SQLite engine migration order:** Migrate to `@sqlite.org/sqlite-wasm` in Phase 2 before any OPFS persistence work. This avoids building sql.js-specific export/import infrastructure that would be immediately discarded. See §8.1 for the pre-migration checklist.
 3. **Multi-file execution depth:** Phase 4 should start with active-file-only execution. Full multi-file compilation (C/C++/Java/C#) is a separate, larger effort and should be scoped separately. A CLI terminal (§4.8) is the recommended UX for multi-file compiled languages.
 4. **Workspace sharing UI:** Not in scope for the initial rollout. Can be added as "Export workspace as ZIP" in Phase 5.
 5. **Generic tab system vs per-playground tab bars?** Recommendation: build a shared `TabBar` + `TabDescriptor` system (§4.5) and refactor the SQL playground's tab bar to use it. This enables Settings, ER Diagram, Query History, and Terminal to all live as tabs uniformly.
@@ -1053,9 +1026,9 @@ Before and after each phase:
 
 ## 8. Additional Considerations
 
-### 8.1 @sqlite.org/sqlite-wasm Migration Checklist
+### 8.1 @sqlite.org/sqlite-wasm Migration Checklist (Phase 2 Prerequisite)
 
-When the time comes to migrate from sql.js to `@sqlite.org/sqlite-wasm`, address the following before starting:
+Complete all items below before starting Phase 2 implementation:
 
 - [ ] Audit all call sites of `db.exec()`, `db.run()`, `db.prepare()`, and `db.export()` in `sqlite-core.ts` — each must be rewritten for the promiser API.
 - [ ] Update result parsing in `SqlPlayground.tsx` (the `QueryExecResult` shape consumed by `ResultView`) to match the row-callback style of `@sqlite.org/sqlite-wasm`.
@@ -1279,4 +1252,4 @@ export async function acquireWorkspaceLock(
 
 ---
 
-*End of report. This document is intended for a coding agent implementing the described changes. Implement phases sequentially; do not skip the foundational OPFS infrastructure in Phase 1. Key decisions resolved since initial draft: (1) sql.js stays for Phase 2, @sqlite.org/sqlite-wasm deferred to Phase 2b; (2) generic TabBar/TabDescriptor system replaces per-playground tab bars; (3) Settings dialog moves to a tab in all playgrounds; (4) SQL REPL and CLI terminals added as Phase 6 using xterm.js.*
+*End of report. This document is intended for a coding agent implementing the described changes. Implement phases sequentially; do not skip the foundational OPFS infrastructure in Phase 1. Key decisions resolved since initial draft: (1) @sqlite.org/sqlite-wasm migration moved to Phase 2, before OPFS persistence, to avoid duplicated sql.js-specific work; (2) backward compatibility with existing localStorage data is not required (project is in development); (3) generic TabBar/TabDescriptor system replaces per-playground tab bars; (4) Settings dialog moves to a tab in all playgrounds; (5) SQL REPL and CLI terminals added as Phase 7 using xterm.js.*
