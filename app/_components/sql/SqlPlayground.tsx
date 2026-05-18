@@ -73,7 +73,6 @@ import {
   ChevronsUp,
   ChevronUp,
   CircleHelp,
-  Eye,
   Database,
   FileCode2,
   FilePlus,
@@ -174,6 +173,7 @@ import {
   DatabaseSelector,
   type DatabaseSelectorAction,
 } from "./components/DatabaseSelector";
+import { SqlIconSidebar } from "./components/SqlIconSidebar";
 import {
   dbScopedKey,
   loadActiveTabId,
@@ -1442,6 +1442,10 @@ function SqlPlaygroundInner() {
     try {
       const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "sqlite" });
+      if (formatted === code) {
+        showToast("Already formatted — nothing to change.");
+        return;
+      }
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: formatted },
       });
@@ -1450,7 +1454,7 @@ function SqlPlaygroundInner() {
     } finally {
       setIsFormatting(false);
     }
-  }, []);
+  }, [showToast]);
 
   // ─── Loading overlay fade-out ────────────────────────────────────────
   useEffect(() => {
@@ -2364,28 +2368,6 @@ function SqlPlaygroundInner() {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
-            <button
-              type="button"
-              className="header-btn icon-only"
-              onClick={() => {
-                setSettingsOpen(true);
-              }}
-              title="Settings"
-              aria-label="Settings"
-            >
-              <svg
-                className="stroke-icon"
-                viewBox="0 0 24 24"
-                width={15}
-                height={15}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
           </div>
         </>
       }
@@ -3686,6 +3668,30 @@ function SqlPlaygroundInner() {
               </div>
             </div>
 
+            <div className="sql-sidebar-body">
+              <SqlIconSidebar
+                buttons={[
+                  {
+                    icon: <Table size={15} aria-hidden="true" />,
+                    label: "Tables",
+                    onClick: () => {},
+                    isActive: true,
+                  },
+                ]}
+                bottomButtons={[
+                  {
+                    icon: (
+                      <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                      </svg>
+                    ),
+                    label: "Settings",
+                    onClick: () => setSettingsOpen(true),
+                  },
+                ]}
+              />
+              <div className="sql-sidebar-content">
             <div className="sql-tree">
               <SchemaSection
                 label="Tables"
@@ -3804,6 +3810,8 @@ function SqlPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
+            </div>
+              </div>
             </div>
           </aside>
 

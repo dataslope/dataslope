@@ -452,11 +452,27 @@ body.pg-active {
   align-items: center;
   width: 40px;
   padding: 6px 0;
-  gap: 2px;
   background: var(--bg);
   border-right: 1px solid var(--border);
   flex-shrink: 0;
   z-index: 5;
+}
+
+/* Top group: regular panel buttons. Bottom group is pinned to the bottom. */
+.pg-icon-sidebar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.pg-icon-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 4px;
 }
 
 .pg-icon-sidebar-btn {

@@ -1137,6 +1137,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setIsFormatting(true);
     try {
       const formatted = await adapter.formatCode(code);
+      if (formatted === code) {
+        showToast("Already formatted — nothing to change.");
+        return;
+      }
       editorRef.current?.dispatch({
         changes: {
           from: 0,
@@ -1479,19 +1483,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
-
-            <button
-              type="button"
-              className="header-btn icon-only"
-              onClick={() => setSettingsOpen(true)}
-              title="Settings"
-              aria-label="Settings"
-            >
-              <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
           </div>
 
           {/* Mobile-only consolidated menu — replaces the header buttons
@@ -1856,57 +1847,89 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
         <div className="pg-body">
           <nav className="pg-icon-sidebar" aria-label="Panel navigation">
-            <Popover.Root>
-              <Popover.Trigger
-                openOnHover
-                delay={150}
-                closeDelay={100}
-                render={(triggerProps) => (
-                  <button
-                    {...triggerProps}
-                    type="button"
-                    className="pg-icon-sidebar-btn active"
-                    aria-label="Editor"
-                  >
-                    <Code2 size={16} aria-hidden="true" />
-                  </button>
-                )}
-              />
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} side="right">
-                  <Popover.Popup className="bui-popup pane-btn-popover">
-                    Editor
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-            {/* Files — placeholder for a future virtual-filesystem panel.
-                No click handler yet; the active state and panel switching
-                will be wired up when the Files view is implemented. */}
-            <Popover.Root>
-              <Popover.Trigger
-                openOnHover
-                delay={150}
-                closeDelay={100}
-                render={(triggerProps) => (
-                  <button
-                    {...triggerProps}
-                    type="button"
-                    className="pg-icon-sidebar-btn"
-                    aria-label="Files"
-                  >
-                    <FolderTree size={16} aria-hidden="true" />
-                  </button>
-                )}
-              />
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} side="right">
-                  <Popover.Popup className="bui-popup pane-btn-popover">
-                    Files
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
+            <div className="pg-icon-sidebar-top">
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={150}
+                  closeDelay={100}
+                  render={(triggerProps) => (
+                    <button
+                      {...triggerProps}
+                      type="button"
+                      className="pg-icon-sidebar-btn active"
+                      aria-label="Editor"
+                    >
+                      <Code2 size={16} aria-hidden="true" />
+                    </button>
+                  )}
+                />
+                <Popover.Portal>
+                  <Popover.Positioner sideOffset={6} side="right">
+                    <Popover.Popup className="bui-popup pane-btn-popover">
+                      Editor
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+              {/* Files — placeholder for a future virtual-filesystem panel.
+                  No click handler yet; the active state and panel switching
+                  will be wired up when the Files view is implemented. */}
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={150}
+                  closeDelay={100}
+                  render={(triggerProps) => (
+                    <button
+                      {...triggerProps}
+                      type="button"
+                      className="pg-icon-sidebar-btn"
+                      aria-label="Files"
+                    >
+                      <FolderTree size={16} aria-hidden="true" />
+                    </button>
+                  )}
+                />
+                <Popover.Portal>
+                  <Popover.Positioner sideOffset={6} side="right">
+                    <Popover.Popup className="bui-popup pane-btn-popover">
+                      Files
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
+            <div className="pg-icon-sidebar-bottom">
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={150}
+                  closeDelay={100}
+                  render={(triggerProps) => (
+                    <button
+                      {...triggerProps}
+                      type="button"
+                      className="pg-icon-sidebar-btn"
+                      aria-label="Settings"
+                      onClick={() => setSettingsOpen(true)}
+                    >
+                      <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                      </svg>
+                    </button>
+                  )}
+                />
+                <Popover.Portal>
+                  <Popover.Positioner sideOffset={6} side="right">
+                    <Popover.Popup className="bui-popup pane-btn-popover">
+                      Settings
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
           </nav>
           <div className="pg-body-content">
         <div className="mobile-tabs" role="tablist" aria-label="Pane">

@@ -16,7 +16,30 @@ import {
   ChevronRight,
   ChevronDown,
   Info,
+  Play,
 } from "lucide-react";
+
+/** File extensions DuckDB can query directly with SELECT * FROM "file". */
+const DUCKDB_READABLE_EXTS = new Set([
+  ".csv",
+  ".tsv",
+  ".parquet",
+  ".json",
+  ".jsonl",
+  ".ndjson",
+  ".xlsx",
+  ".orc",
+  ".avro",
+  ".arrow",
+  ".feather",
+  ".ipc",
+]);
+
+function isDuckDbReadable(path: string): boolean {
+  const dot = path.lastIndexOf(".");
+  if (dot < 0) return false;
+  return DUCKDB_READABLE_EXTS.has(path.slice(dot).toLowerCase());
+}
 
 export interface VirtualFile {
   /** Slash-separated path, e.g. "data/sales.csv". The leading "/" is
@@ -47,6 +70,8 @@ interface FilesPanelProps {
   onRename: (path: string, newName: string) => void;
   onCreateFolder: (parentPath: string, name: string) => void;
   onMove: (sourcePath: string, destFolderPath: string) => void;
+  /** Called when the user chooses "Query in DuckDB" for a readable file. */
+  onOpenQuery?: (path: string) => void;
 }
 
 function buildTree(files: VirtualFile[]): TreeNode {
@@ -135,6 +160,7 @@ interface TreeRowProps {
   onDownload: (path: string) => void;
   onRequestDelete: (node: TreeNode) => void;
   onRequestInfo: (node: TreeNode) => void;
+  onOpenQuery?: (path: string) => void;
   onDragStart: (path: string) => void;
   onDragEnd: () => void;
   onDragOverFolder: (path: string) => void;
@@ -159,6 +185,7 @@ function TreeRow({
   onDownload,
   onRequestDelete,
   onRequestInfo,
+  onOpenQuery,
   onDragStart,
   onDragEnd,
   onDragOverFolder,
@@ -282,6 +309,15 @@ function TreeRow({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={4}>
             <ContextMenu.Popup className="bui-popup examples-dropdown sql-files-ctx-menu">
+              {!node.isFolder && isDuckDbReadable(node.fullPath) && onOpenQuery && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onOpenQuery(node.fullPath)}
+                >
+                  <Play size={12} aria-hidden="true" />
+                  <div className="ex-title">Query with SELECT</div>
+                </ContextMenu.Item>
+              )}
               {!node.isFolder && (
                 <ContextMenu.Item
                   className="example-item"
@@ -340,6 +376,7 @@ function TreeRow({
             onDownload={onDownload}
             onRequestDelete={onRequestDelete}
             onRequestInfo={onRequestInfo}
+            onOpenQuery={onOpenQuery}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOverFolder={onDragOverFolder}
@@ -361,6 +398,7 @@ export function FilesPanel({
   onRename,
   onCreateFolder,
   onMove,
+  onOpenQuery,
 }: FilesPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -667,6 +705,7 @@ export function FilesPanel({
               onDownload={onDownload}
               onRequestDelete={handleRequestDelete}
               onRequestInfo={handleRequestInfo}
+              onOpenQuery={onOpenQuery}
               onDragStart={handleInternalDragStart}
               onDragEnd={handleInternalDragEnd}
               onDragOverFolder={handleDragOverFolder}

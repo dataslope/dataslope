@@ -4,7 +4,7 @@ import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Popover } from "@base-ui-components/react/popover";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
-import { ChevronDown, ChevronRight, Eye, Plus, Table, View } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Search, Table, View } from "lucide-react";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { ForeignKeyInfo, TableColumnInfo } from "../../runtime/sqlite";
@@ -162,7 +162,7 @@ function SchemaItemImpl({
   }, []);
   // EntityIcon renders the table/view glyph on the tree row.  Views use
   // lucide's dedicated "view" icon; tables use the "table" icon.  This is
-  // separate from the Eye icon used for the "View table data" action button.
+  // separate from the Search icon used for the "View table data" action button.
   const EntityIcon = kind === "view" ? View : Table;
   const pkCount = useMemo(
     () => (columns ?? []).filter((c) => c.pk > 0).length,
@@ -240,7 +240,7 @@ function SchemaItemImpl({
                         onClick={() => onPreview(name, kind)}
                         aria-label="View data"
                       >
-                        <Eye size={12} aria-hidden="true" />
+                        <Search size={12} aria-hidden="true" />
                       </button>
                     )}
                   />

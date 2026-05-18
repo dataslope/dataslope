@@ -12,6 +12,8 @@ export interface SqlIconSidebarButton {
 
 interface SqlIconSidebarProps {
   buttons: SqlIconSidebarButton[];
+  /** Buttons pinned to the bottom of the sidebar (e.g. Settings). */
+  bottomButtons?: SqlIconSidebarButton[];
 }
 
 /**
@@ -23,17 +25,27 @@ interface SqlIconSidebarProps {
  * `playground.css` so the visual treatment stays consistent with the
  * language playground (Python, R, etc.) activity bars.
  *
- * Used by the DuckDB playground today; the same component can be dropped
- * into the SQLite / Postgres `SqlPlayground` sidebar without any changes.
+ * `buttons` appear at the top; `bottomButtons` are pinned to the bottom.
  */
-export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
+export function SqlIconSidebar({ buttons, bottomButtons }: SqlIconSidebarProps) {
   return (
     <nav className="pg-icon-sidebar" aria-label="Panel navigation">
-      {buttons.map((btn) => (
-        <React.Fragment key={btn.label}>
-          <IconSidebarButton btn={btn} />
-        </React.Fragment>
-      ))}
+      <div className="pg-icon-sidebar-top">
+        {buttons.map((btn) => (
+          <React.Fragment key={btn.label}>
+            <IconSidebarButton btn={btn} />
+          </React.Fragment>
+        ))}
+      </div>
+      {bottomButtons && bottomButtons.length > 0 && (
+        <div className="pg-icon-sidebar-bottom">
+          {bottomButtons.map((btn) => (
+            <React.Fragment key={btn.label}>
+              <IconSidebarButton btn={btn} />
+            </React.Fragment>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }

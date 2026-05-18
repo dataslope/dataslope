@@ -782,6 +782,19 @@
   min-width: 160px;
 }
 
+/* Lay icons and labels on the same line. */
+.sql-files-ctx-menu .example-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Suppress the example-item bottom border just before the separator so
+   there is no double border between the last normal item and the divider. */
+.sql-files-ctx-menu .example-item:has(+ .sql-files-ctx-sep) {
+  border-bottom: none;
+}
+
 .sql-files-ctx-sep {
   height: 1px;
   margin: 4px 0;
