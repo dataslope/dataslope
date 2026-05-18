@@ -129,7 +129,7 @@ def display(*objs):
         if obj is None:
             continue
         # Matplotlib Axes/Figure objects are captured by the auto-flush that
-        # runs after user code executes — skip them here to avoid printing
+        # runs after user code executes—skip them here to avoid printing
         # an unhelpful repr like "<Axes: ylabel='Density'>".
         if isinstance(obj, (matplotlib.axes.Axes, matplotlib.figure.Figure)):
             continue
@@ -309,8 +309,7 @@ for _fig_num in list(plt.get_fignums()):
     _fig = plt.figure(_fig_num)
     _buf = io.BytesIO()
     _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
-    _buf.seek(0)
-    _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.read()).decode()})
+    _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
 plt.close("all")
 
 _plotly.io.show = _orig_plotly_show
