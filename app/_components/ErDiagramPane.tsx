@@ -793,7 +793,7 @@ export function ErDiagramPane({
   useEffect(() => {
     let cancelled = false;
     const gen = ++layoutGen.current;
-    let pendingTimeoutId: ReturnType<typeof window.setTimeout> | undefined;
+    let pendingTimeoutId: number | undefined;
     // Reset the start time each time the layout recomputes so the minimum
     // duration applies to the current loading session.
     loadStartRef.current = Date.now();
