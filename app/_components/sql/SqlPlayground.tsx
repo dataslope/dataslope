@@ -110,6 +110,7 @@ import {
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
+  ErDiagramLoadingFallback,
   LOADING_QUIPS,
   RuntimeInfoContent,
   detectIsMac,
@@ -141,7 +142,7 @@ import dynamic from "next/dynamic";
 // the user opens the ER-diagram tab, so defer the chunk until then.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
-  { ssr: false },
+  { ssr: false, loading: ErDiagramLoadingFallback },
 );
 import { SqlTabBar } from "./components/SqlTabBar";
 import { SqlPlaygroundShell } from "./components/SqlPlaygroundShell";

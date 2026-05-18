@@ -719,6 +719,10 @@ export function ErDiagramPane({
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const layoutGen = useRef(0);
+  // Track when this render cycle started so we can enforce a minimum
+  // loading-animation duration and avoid a jarring "blink" for fast layouts.
+  const loadStartRef = useRef(Date.now());
+  const MIN_LOADING_MS = 800;
 
   // Reset selection synchronously when tables change (avoids useEffect state update).
   const [prevTables, setPrevTables] = useState(tables);
@@ -777,12 +781,29 @@ export function ErDiagramPane({
   useEffect(() => {
     let cancelled = false;
     const gen = ++layoutGen.current;
+    let pendingTimeoutId: number | undefined;
+    // Reset the start time each time the layout recomputes so the minimum
+    // duration applies to the current loading session.
+    loadStartRef.current = Date.now();
+    setIsLoading(true);
+
+    const finishLoading = () => {
+      const elapsed = Date.now() - loadStartRef.current;
+      const remaining = MIN_LOADING_MS - elapsed;
+      if (remaining > 0) {
+        pendingTimeoutId = window.setTimeout(() => {
+          if (!cancelled && layoutGen.current === gen) setIsLoading(false);
+        }, remaining);
+      } else {
+        setIsLoading(false);
+      }
+    };
 
     const runLayout = async () => {
       if (tables.length === 0) {
         setNodes([]);
         setEdges([]);
-        setIsLoading(false);
+        finishLoading();
         return;
       }
       const { nodes: n, edges: e } = await computeElkLayout(
@@ -793,13 +814,15 @@ export function ErDiagramPane({
       if (cancelled || layoutGen.current !== gen) return; // stale — discard
       setNodes(n);
       setEdges(e);
-      setIsLoading(false);
+      finishLoading();
     };
 
     runLayout().catch(console.error);
     return () => {
       cancelled = true;
+      if (pendingTimeoutId !== undefined) window.clearTimeout(pendingTimeoutId);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, columnsByEntity, foreignKeysByEntity]);
 
   if (tables.length === 0) {

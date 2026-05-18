@@ -77,7 +77,7 @@ import dynamic from "next/dynamic";
 // the user opens the ER-diagram tab, so defer the chunk until then.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
-  { ssr: false },
+  { ssr: false, loading: ErDiagramLoadingFallback },
 );
 import { themeFor } from "../cmExtensions";
 import {
@@ -90,6 +90,7 @@ import {
 import {
   DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
+  ErDiagramLoadingFallback,
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
@@ -1935,10 +1936,15 @@ function DuckDbPlaygroundInner() {
     async (path: string, bytes: Uint8Array) => {
       const engine = engineRef.current;
       if (!engine) return;
+      // Capture size before transferring the buffer to the DuckDB-WASM
+      // worker — the worker takes ownership of the underlying ArrayBuffer
+      // via postMessage transfer, which detaches it in the main thread and
+      // makes bytes.length → 0 after the await.
+      const size = bytes.length;
       await engine.registerFileBuffer(path, bytes);
       setVirtualFiles((prev) => {
         const filtered = prev.filter((f) => f.path !== path);
-        return [...filtered, { path, size: bytes.length, isFolder: false }];
+        return [...filtered, { path, size, isFolder: false }];
       });
       // Auto-expand all ancestor folders so the new file is visible.
       const segments = path.split("/").filter(Boolean);

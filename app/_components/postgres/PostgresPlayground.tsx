@@ -76,7 +76,7 @@ import dynamic from "next/dynamic";
 // the user opens the ER-diagram tab, so defer the chunk until then.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
-  { ssr: false },
+  { ssr: false, loading: ErDiagramLoadingFallback },
 );
 import { themeFor } from "../cmExtensions";
 import {
@@ -89,6 +89,7 @@ import {
 import {
   DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
+  ErDiagramLoadingFallback,
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
