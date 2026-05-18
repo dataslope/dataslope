@@ -2,7 +2,7 @@
 
 import { PGlite } from "@electric-sql/pglite";
 import { PGliteWorker } from "@electric-sql/pglite/worker";
-import type { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult, SqlValue } from "./sqlite-wasm";
 import type {
   ColumnSpec,
   ColumnConstraintInfo,
@@ -203,31 +203,76 @@ export interface PostgresEngine {
   close: () => Promise<void>;
 }
 
-function createFreshWorker(): PGlite {
+function createFreshWorker(opts: { dataDir?: string } = {}): PGlite {
   // Pass a unique `id` so this PGliteWorker instance gets its own leader-
   // election lock and BroadcastChannel. Without a unique id every instance
   // with the same worker URL shares the same lock, meaning an unclosed
   // PGliteWorker from a previous page visit stays leader while the new one
   // becomes a follower — so SQL is silently proxied to the old (already-
   // populated) database, causing "relation already exists" errors.
+  //
+  // When `dataDir` is provided (Phase 4 OPFS persistence), it is forwarded
+  // to the worker's `init` callback which passes it to `new PGlite(opts)`.
+  // PGlite recognises the `opfs-ahp://` scheme and uses the OPFS Access
+  // Handle Pool VFS to persist data across reloads.
   return new PGliteWorker(
     new Worker(new URL("./postgres-worker.ts", import.meta.url)),
-    { id: `pglite-${crypto.randomUUID()}` },
+    {
+      id: `pglite-${crypto.randomUUID()}`,
+      ...(opts.dataDir ? { dataDir: opts.dataDir } : {}),
+    },
   ) as unknown as PGlite;
 }
 
-async function createFreshDatabase(sample: PostgresSampleDatabase): Promise<PGlite> {
-  const db = createFreshWorker();
+/** True when the connected PGlite cluster already has at least one
+ *  user table in the `public` schema — i.e. it is an existing OPFS
+ *  workspace we should *not* re-seed. */
+async function pgHasUserTables(db: PGlite): Promise<boolean> {
+  try {
+    const res = await db.query<{ count: string }>(
+      `SELECT count(*)::text AS count FROM pg_tables WHERE schemaname = 'public'`,
+    );
+    return Number(res.rows[0]?.count ?? "0") > 0;
+  } catch {
+    return false;
+  }
+}
+
+interface CreateDbOptions {
+  /** OPFS dataDir (e.g. `"opfs-ahp://workspaces/ws_x/postgres"`).
+   *  When omitted, PGlite runs in-memory. */
+  dataDir?: string;
+  /** When true, never run the sample seed (used by `loadSampleDatabase`
+   *  to force a clean rebuild even when the workspace was previously
+   *  populated). */
+  forceSeed?: boolean;
+}
+
+async function createFreshDatabase(
+  sample: PostgresSampleDatabase,
+  opts: CreateDbOptions = {},
+): Promise<PGlite> {
+  const db = createFreshWorker({ dataDir: opts.dataDir });
   await db.waitReady;
-  await db.exec(sample.sql);
+  // First-open detection for OPFS-backed databases: skip the sample
+  // seed when the cluster already has user tables, so a returning user
+  // re-attaches to their saved workspace rather than overwriting it.
+  if (opts.dataDir && !opts.forceSeed && (await pgHasUserTables(db))) {
+    return db;
+  }
+  if (sample.sql) await db.exec(sample.sql);
   return db;
 }
 
 export async function createPostgresEngine(
   initialSampleId: string,
+  workspaceId?: string | null,
 ): Promise<PostgresEngine> {
   let sample = findPostgresSampleDatabase(initialSampleId);
-  let db = await createFreshDatabase(sample);
+  const dataDir = workspaceId
+    ? `opfs-ahp://workspaces/${workspaceId}/postgres`
+    : undefined;
+  let db = await createFreshDatabase(sample, { dataDir });
 
   async function queryRows<T extends Record<string, unknown> = Record<string, unknown>>(
     sql: string,
@@ -237,17 +282,47 @@ export async function createPostgresEngine(
     return result.rows;
   }
 
+  /** When a workspace is active we cannot point PGlite at a fresh
+   *  dataDir on sample switch (that would orphan the OPFS files), so
+   *  we drop all user objects in the existing cluster and re-run the
+   *  sample seed against it. When no workspace is active we keep the
+   *  legacy "spin up a brand-new in-memory PGlite per sample" path. */
+  async function rebuildForSample(target: PostgresSampleDatabase): Promise<PGlite> {
+    if (dataDir) {
+      // In-place reset of the persistent cluster. PGlite supports
+      // `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` to wipe
+      // every user object in one statement; we keep extensions intact.
+      try {
+        await db.exec(`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`);
+      } catch {
+        // If the bulk reset fails (e.g. permissions on a system extension),
+        // fall through to per-table drops as a best-effort fallback.
+      }
+      if (target.sql) await db.exec(target.sql);
+      return db;
+    }
+    const next = await createFreshDatabase(target, { dataDir, forceSeed: true });
+    await db.close();
+    return next;
+  }
+
   const engine: PostgresEngine = {
     async loadSampleDatabase(id) {
       sample = findPostgresSampleDatabase(id);
-      const next = await createFreshDatabase(sample);
-      await db.close();
-      db = next;
+      db = await rebuildForSample(sample);
       return sample;
     },
 
     async loadBlankDatabase() {
       sample = POSTGRES_BLANK_DATABASE;
+      if (dataDir) {
+        try {
+          await db.exec(`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`);
+        } catch {
+          /* best-effort */
+        }
+        return sample;
+      }
       const next = createFreshWorker();
       await next.waitReady;
       await db.close();

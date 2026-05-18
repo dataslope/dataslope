@@ -105,12 +105,13 @@ import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
+import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
 import { type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
 const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
 import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import {
@@ -1586,7 +1587,21 @@ function PostgresPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading PostgreSQL engine…");
-        const engine = await postgresAdapter.createEngine(initialDbId);
+        // Resolve (or auto-create) the active workspace for this
+        // playground tab so PGlite can persist its data directory to
+        // OPFS. Best-effort: falls back to in-memory when OPFS isn't
+        // available.
+        let workspaceId: string | null = null;
+        try {
+          const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
+          workspaceId = workspace.id;
+        } catch {
+          /* proceed in-memory */
+        }
+        const engine = await postgresAdapter.createEngine(
+          initialDbId,
+          workspaceId,
+        );
         if (cancelled) {
           // Component unmounted while the engine was being created; close it
           // immediately so the worker is terminated and its leader-election

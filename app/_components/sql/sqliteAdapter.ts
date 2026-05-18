@@ -21,7 +21,7 @@ export const sqliteAdapter: SqlEngineAdapter<
   // Legacy storage prefix kept verbatim so users' existing
   // localStorage state (tabs, settings, page sizes) is preserved.
   storagePrefix: "pg_sqlite_",
-  createEngine: (sampleId) => createSqliteEngine(sampleId),
+  createEngine: (sampleId, workspaceId) => createSqliteEngine(sampleId, workspaceId),
   samples: SQLITE_SAMPLE_DATABASES,
   defaultTabsFor: (sample) => sample.defaultTabs,
 };

@@ -3,7 +3,7 @@ import type {
   ForeignKeyInfo,
   TableColumnInfo,
 } from "../runtime/sqlite";
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../runtime/sqlite-wasm";
 
 export type { ColumnConstraintInfo, ForeignKeyInfo, TableColumnInfo, QueryExecResult };
 

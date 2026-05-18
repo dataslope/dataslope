@@ -10,7 +10,7 @@
 // surface the engine actually touches.
 "use client";
 
-import type { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult, SqlValue } from "./sqlite-wasm";
 import type {
   ColumnSpec,
   ColumnConstraintInfo,
@@ -638,10 +638,146 @@ async function bootstrapDatabase(
 
 export async function createDuckDbEngine(
   initialSampleId: string,
+  workspaceId?: string | null,
 ): Promise<DuckDbEngine> {
   let sample = findDuckDbSampleDatabase(initialSampleId);
   let conn = await bootstrapDatabase(sample);
   let destroyed = false;
+
+  // ─── OPFS persistence (Phase 4) ─────────────────────────────────────
+  // DuckDB-Wasm has no native OPFS VFS, so persistence is implemented
+  // via periodic snapshot-and-restore against the workspace's
+  // `db/duckdb.db` file in OPFS. Snapshots are produced by
+  // `exportAsBinary` (ATTACH + COPY FROM DATABASE) and queued through
+  // `databaseStorage.writeDatabase`, which debounces writes and flushes
+  // on `pagehide` / `visibilitychange`.
+  const DUCKDB_FILE = "duckdb.db";
+  let snapshotTimer: ReturnType<typeof setTimeout> | null = null;
+  let snapshotInFlight = false;
+  let snapshotPending = false;
+
+  async function takeSnapshot(): Promise<void> {
+    if (!workspaceId || destroyed) return;
+    if (snapshotInFlight) {
+      snapshotPending = true;
+      return;
+    }
+    snapshotInFlight = true;
+    try {
+      const bytes = await exportAsBinaryInternal();
+      if (!destroyed) {
+        const { writeDatabase } = await import("../opfs/databaseStorage");
+        writeDatabase(workspaceId, DUCKDB_FILE, bytes);
+      }
+    } catch {
+      // Snapshots are best-effort; the in-memory DB is still intact.
+    } finally {
+      snapshotInFlight = false;
+      if (snapshotPending) {
+        snapshotPending = false;
+        scheduleSnapshot(0);
+      }
+    }
+  }
+
+  function scheduleSnapshot(delayMs = 1500): void {
+    if (!workspaceId) return;
+    if (snapshotTimer) clearTimeout(snapshotTimer);
+    snapshotTimer = setTimeout(() => {
+      snapshotTimer = null;
+      void takeSnapshot();
+    }, delayMs);
+  }
+
+  /** Inline snapshot helper that doesn't go through the engine surface
+   *  (so it stays available when the engine is being constructed and
+   *  during `destroy`). Mirrors the public `exportAsBinary` method
+   *  defined further down. */
+  async function exportAsBinaryInternal(): Promise<Uint8Array> {
+    const { db } = await getDuckDbInstance();
+    if (!db.copyFileToBuffer) {
+      throw new Error("This DuckDB-Wasm build does not support binary file export.");
+    }
+    const exportFile = "_playground_snapshot_tmp.duckdb";
+    const alias = "_playground_snapshot_alias";
+    await db.registerFileBuffer(exportFile, new Uint8Array());
+    try {
+      await conn.query(`ATTACH '${exportFile}' AS ${quoteIdent(alias)}`);
+      await conn.query(`COPY FROM DATABASE memory TO ${quoteIdent(alias)}`);
+      await conn.query(`DETACH ${quoteIdent(alias)}`);
+      return await db.copyFileToBuffer(exportFile);
+    } finally {
+      try {
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+      } catch {
+        /* already detached */
+      }
+      try {
+        await db.dropFile?.(exportFile);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  /** Restore a previously-saved snapshot into the freshly-bootstrapped
+   *  connection. The connection has already had `sample.sql` applied
+   *  by `bootstrapDatabase`; we wipe that and replace it with the
+   *  snapshot's contents. Failure leaves the sample data intact. */
+  async function restoreFromOpfs(): Promise<boolean> {
+    if (!workspaceId) return false;
+    try {
+      const { readDatabase } = await import("../opfs/databaseStorage");
+      const bytes = await readDatabase(workspaceId, DUCKDB_FILE);
+      if (!bytes || bytes.byteLength === 0) return false;
+      const { db } = await getDuckDbInstance();
+      const importFile = "_playground_restore_tmp.duckdb";
+      const alias = "_playground_restore_alias";
+      await db.registerFileBuffer(importFile, bytes);
+      try {
+        await cleanDuckDbSchema(conn);
+        await conn.query(
+          `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
+        );
+        await conn.query(`COPY FROM DATABASE ${quoteIdent(alias)} TO memory`);
+        await conn.query(`DETACH ${quoteIdent(alias)}`);
+        return true;
+      } finally {
+        try {
+          await conn.query(`DETACH ${quoteIdent(alias)}`);
+        } catch {
+          /* ignore */
+        }
+        try {
+          await db.dropFile?.(importFile);
+        } catch {
+          /* ignore */
+        }
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  if (workspaceId) {
+    const restored = await restoreFromOpfs();
+    if (!restored) {
+      // No snapshot yet (first visit) — keep the sample data and take
+      // an initial snapshot so the file exists for next time.
+      scheduleSnapshot(0);
+    }
+    // Best-effort flush on tab close.  databaseStorage already flushes
+    // pending writes on `pagehide`; we only need to make sure a fresh
+    // snapshot has been *queued* by that point.
+    if (typeof window !== "undefined") {
+      const flushHandler = () => {
+        // Fire-and-forget: pagehide doesn't await.
+        void takeSnapshot();
+      };
+      window.addEventListener("pagehide", flushHandler);
+      window.addEventListener("visibilitychange", flushHandler);
+    }
+  }
 
   async function rowsFor(sql: string, params?: unknown[]): Promise<unknown[][]> {
     let prepared = sql;
@@ -775,6 +911,10 @@ export async function createDuckDbEngine(
         const table = await conn.query(stmt);
         out.push(arrowToQueryExecResult(table));
       }
+      // Queue an OPFS snapshot after every user-driven exec. The
+      // helper debounces, so a burst of statements only produces one
+      // write.
+      scheduleSnapshot();
       return out;
     },
 
@@ -1457,6 +1597,10 @@ export async function createDuckDbEngine(
     async destroy() {
       if (destroyed) return;
       destroyed = true;
+      if (snapshotTimer) {
+        clearTimeout(snapshotTimer);
+        snapshotTimer = null;
+      }
       try {
         await conn.close();
       } catch {
@@ -1464,6 +1608,38 @@ export async function createDuckDbEngine(
       }
     },
   };
+
+  // Wrap engine methods that can mutate the DuckDB catalog so they
+  // queue an OPFS snapshot on completion. `exec` already does this
+  // inline; the methods below are catalog/admin operations that bypass
+  // user-typed SQL. Wrapping them centrally keeps the OPFS persistence
+  // policy in one place rather than scattered through each method body.
+  if (workspaceId) {
+    const MUTATING_METHODS: readonly (keyof DuckDbEngine)[] = [
+      "loadSampleDatabase",
+      "loadBlankDatabase",
+      "importSqlDump",
+      "importFromBinary",
+      "rebuildTable",
+      "dropEntity",
+      "truncateTable",
+      "deleteRows",
+      "updateRows",
+      "insertRow",
+    ];
+    for (const key of MUTATING_METHODS) {
+      const original = engine[key] as unknown as (
+        ...args: unknown[]
+      ) => Promise<unknown>;
+      (engine as unknown as Record<string, unknown>)[key as string] = async (
+        ...args: unknown[]
+      ): Promise<unknown> => {
+        const result = await original.apply(engine, args);
+        scheduleSnapshot();
+        return result;
+      };
+    }
+  }
 
   return engine;
 }

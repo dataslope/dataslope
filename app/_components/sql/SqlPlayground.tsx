@@ -125,6 +125,7 @@ import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
+import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
 import {
   type ColumnConstraintInfo,
   type ColumnSpec,
@@ -134,7 +135,7 @@ import {
 } from "../runtime/sqlite";
 
 const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
-import type { QueryExecResult } from "sql.js";
+import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import dynamic from "next/dynamic";
 
 // ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
@@ -1619,7 +1620,22 @@ function SqlPlaygroundInner() {
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
           SQLITE_SAMPLE_DATABASES[0].id;
-        const engine = await sqliteAdapter.createEngine(initialSampleId);
+        // Resolve (or auto-create) the active workspace for this
+        // playground tab so the engine can persist its database
+        // to OPFS. When OPFS is unavailable, `ensureActiveWorkspace`
+        // still returns a registry-only entry and the engine falls
+        // back to in-memory mode.
+        let workspaceId: string | null = null;
+        try {
+          const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
+          workspaceId = workspace.id;
+        } catch {
+          // Workspace bootstrap is best-effort — proceed in-memory.
+        }
+        const engine = await sqliteAdapter.createEngine(
+          initialSampleId,
+          workspaceId,
+        );
         if (cancelled) return;
         engineRef.current = engine;
         setEngineForRender(engine);
