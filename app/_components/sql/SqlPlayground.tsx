@@ -4027,8 +4027,15 @@ function SqlPlaygroundInner() {
               <DataslopeRunOverlay running={statusState === "running"} />
             </div>
 
-            {activeTab?.kind === "er-diagram" && (
-              <div className="sql-er-pane">
+            {tabs.some((t) => t.kind === "er-diagram") && (
+              <div
+                className="sql-er-pane"
+                style={
+                  activeTab?.kind !== "er-diagram"
+                    ? { display: "none" }
+                    : undefined
+                }
+              >
                 <ErDiagramPane
                   tables={tables}
                   columnsByEntity={columnsByEntity}

@@ -5034,23 +5034,33 @@ function DuckDbPlaygroundInner() {
                 onRunAll={runActiveTab}
               />
             </div>
-            {activeTab?.kind === "er-diagram" ? (
-              <ErDiagramPane
-                tables={tables}
-                columnsByEntity={columnsByEntity}
-                foreignKeysByEntity={foreignKeysByEntity}
-                onPreview={previewEntity}
-                onAddRow={(n) => void openAddRow(n)}
-                onTruncate={truncateEntity}
-                onModifyStructure={(n) => void openViewStructure(n)}
-                onCount={countEntityRows}
-                onCopy={copyEntityName}
-                onDrop={requestDropEntity}
-                onViewDDL={(name) => void viewDDL(name)}
-                onExport={(name, format) => void exportEntity(name, format)}
-                onGetRowCount={fetchEntityRowCount}
-              />
-            ) : activeTab?.kind === "query-history" ? (
+            {tabs.some((t) => t.kind === "er-diagram") && (
+              <div
+                className="sql-er-pane"
+                style={
+                  activeTab?.kind !== "er-diagram"
+                    ? { display: "none" }
+                    : undefined
+                }
+              >
+                <ErDiagramPane
+                  tables={tables}
+                  columnsByEntity={columnsByEntity}
+                  foreignKeysByEntity={foreignKeysByEntity}
+                  onPreview={previewEntity}
+                  onAddRow={(n) => void openAddRow(n)}
+                  onTruncate={truncateEntity}
+                  onModifyStructure={(n) => void openViewStructure(n)}
+                  onCount={countEntityRows}
+                  onCopy={copyEntityName}
+                  onDrop={requestDropEntity}
+                  onViewDDL={(name) => void viewDDL(name)}
+                  onExport={(name, format) => void exportEntity(name, format)}
+                  onGetRowCount={fetchEntityRowCount}
+                />
+              </div>
+            )}
+            {activeTab?.kind === "query-history" && (
               <div className="sql-er-pane">
                 <QueryHistoryPane
                   history={queryHistory}
@@ -5060,7 +5070,7 @@ function DuckDbPlaygroundInner() {
                   onOpenQueryTab={openTabAndRun}
                 />
               </div>
-            ) : null}
+            )}
             <div
               className="sql-resizer"
               ref={resizerRef}
