@@ -79,6 +79,7 @@ import {
   Code2,
   Terminal,
   FolderTree,
+  X,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import {
@@ -121,6 +122,15 @@ import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { FileCode2 } from "lucide-react";
+import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
+import {
+  deleteDataEntry,
+  loadDataFiles,
+  readDataFile,
+  renameDataEntry,
+  upsertDataFolder,
+  writeDataFile,
+} from "./files/opfsDataStorage";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -489,6 +499,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
     useState(false);
+
+  // ─── Files pane (OPFS-backed virtual filesystem) ─────────────────────
+  const [filesPaneOpen, setFilesPaneOpen] = useState(false);
+  const [virtualFiles, setVirtualFiles] = useState<VirtualFile[]>([]);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set(),
+  );
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
@@ -796,7 +813,188 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     saveManifest(adapter.id, workspaceId, files, activeFileId);
   }, [adapter.id, workspaceId, files, activeFileId, workspaceReady]);
 
-  // Boot the runtime + mount the editor.
+  // Load uploaded data files from OPFS once the workspace is ready.
+  useEffect(() => {
+    if (!workspaceReady || !workspaceId) return;
+    let cancelled = false;
+    void loadDataFiles(workspaceId).then((loaded) => {
+      if (!cancelled) setVirtualFiles(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceReady, workspaceId]);
+
+  // ─── Files pane handlers ───────────────────────────────────────────────
+  const handleFilesUpload = useCallback(
+    (fileList: FileList, parentPath: string) => {
+      void (async () => {
+        for (const file of Array.from(fileList)) {
+          try {
+            const buf = await file.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            const path = parentPath ? `${parentPath}/${file.name}` : file.name;
+            if (workspaceIdRef.current) {
+              await writeDataFile(workspaceIdRef.current, path, bytes);
+            }
+            setVirtualFiles((prev) => {
+              const filtered = prev.filter((f) => f.path !== path);
+              return [...filtered, { path, size: bytes.length, isFolder: false }];
+            });
+            // Auto-expand ancestor folders so the new file is visible.
+            const segments = path.split("/").filter(Boolean);
+            if (segments.length > 1) {
+              setExpandedFolders((prev) => {
+                const next = new Set(prev);
+                let cur = "";
+                for (let i = 0; i < segments.length - 1; i++) {
+                  cur = cur ? `${cur}/${segments[i]}` : segments[i];
+                  next.add(cur);
+                }
+                return next;
+              });
+            }
+            showToast(`Uploaded "${path}".`);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            showToast(`Failed to upload "${file.name}": ${msg}`, "warn");
+          }
+        }
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesDownload = useCallback(
+    (path: string) => {
+      void (async () => {
+        const wsId = workspaceIdRef.current;
+        if (!wsId) return;
+        try {
+          const bytes = await readDataFile(wsId, path);
+          if (!bytes) {
+            showToast(`Could not read "${path}".`, "warn");
+            return;
+          }
+          const blob = new Blob([bytes]);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = path.split("/").pop() ?? path;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Download failed: ${msg}`, "warn");
+        }
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesDelete = useCallback(
+    (path: string) => {
+      void (async () => {
+        const wsId = workspaceIdRef.current;
+        if (wsId) {
+          await deleteDataEntry(wsId, path);
+        }
+        const prefix = `${path}/`;
+        setVirtualFiles((prev) =>
+          prev.filter((f) => f.path !== path && !f.path.startsWith(prefix)),
+        );
+        showToast(`Deleted "${path}".`);
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesRename = useCallback(
+    (oldPath: string, newPath: string) => {
+      void (async () => {
+        const wsId = workspaceIdRef.current;
+        if (wsId) {
+          await renameDataEntry(wsId, oldPath, newPath);
+        }
+        const oldPrefix = `${oldPath}/`;
+        const newPrefix = `${newPath}/`;
+        setVirtualFiles((prev) =>
+          prev.map((f) => {
+            if (f.path === oldPath) return { ...f, path: newPath };
+            if (f.path.startsWith(oldPrefix)) {
+              return { ...f, path: `${newPrefix}${f.path.slice(oldPrefix.length)}` };
+            }
+            return f;
+          }),
+        );
+        showToast(`Renamed to "${newPath}".`);
+      })();
+    },
+    [showToast],
+  );
+
+  const handleFilesCreateFolder = useCallback(
+    (parentPath: string, name: string) => {
+      const path = parentPath ? `${parentPath}/${name}` : name;
+      setVirtualFiles((prev) => {
+        if (prev.some((f) => f.path === path)) return prev;
+        return [...prev, { path, size: 0, isFolder: true }];
+      });
+      setExpandedFolders((prev) => {
+        const next = new Set(prev);
+        next.add(path);
+        if (parentPath) next.add(parentPath);
+        return next;
+      });
+      const wsId = workspaceIdRef.current;
+      if (wsId) void upsertDataFolder(wsId, path);
+    },
+    [],
+  );
+
+  const handleFilesToggleFolder = useCallback((path: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }, []);
+
+  const handleFilesMove = useCallback(
+    (sourcePath: string, destFolderPath: string) => {
+      void (async () => {
+        const leaf = sourcePath.split("/").pop() ?? sourcePath;
+        const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
+        if (newPath === sourcePath) return;
+        const wsId = workspaceIdRef.current;
+        if (wsId) {
+          await renameDataEntry(wsId, sourcePath, newPath);
+        }
+        const oldPrefix = `${sourcePath}/`;
+        const newPrefix = `${newPath}/`;
+        setVirtualFiles((prev) =>
+          prev.map((f) => {
+            if (f.path === sourcePath) return { ...f, path: newPath };
+            if (f.path.startsWith(oldPrefix)) {
+              return { ...f, path: `${newPrefix}${f.path.slice(oldPrefix.length)}` };
+            }
+            return f;
+          }),
+        );
+        if (destFolderPath) {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            next.add(destFolderPath);
+            return next;
+          });
+        }
+      })();
+    },
+    [],
+  );
   useEffect(() => {
     let cancelled = false;
 
@@ -2244,9 +2442,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   </Popover.Positioner>
                 </Popover.Portal>
               </Popover.Root>
-              {/* Files — placeholder for a future virtual-filesystem panel.
-                  No click handler yet; the active state and panel switching
-                  will be wired up when the Files view is implemented. */}
+              {/* Files — toggles the virtual-filesystem sidebar panel. */}
               <Popover.Root>
                 <Popover.Trigger
                   openOnHover
@@ -2256,8 +2452,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className="pg-icon-sidebar-btn"
+                      className={`pg-icon-sidebar-btn${filesPaneOpen ? " active" : ""}`}
                       aria-label="Files"
+                      aria-pressed={filesPaneOpen}
+                      onClick={() => setFilesPaneOpen((v) => !v)}
                     >
                       <FolderTree size={16} aria-hidden="true" />
                     </button>
@@ -2303,6 +2501,32 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Popover.Root>
             </div>
           </nav>
+          {filesPaneOpen && (
+            <div className="pg-files-sidebar">
+              <div className="pg-files-sidebar-header">
+                <span className="pg-files-sidebar-title">Files</span>
+                <button
+                  type="button"
+                  className="pg-files-sidebar-close"
+                  aria-label="Close files panel"
+                  onClick={() => setFilesPaneOpen(false)}
+                >
+                  <X size={13} aria-hidden="true" />
+                </button>
+              </div>
+              <FilesPanel
+                files={virtualFiles}
+                expandedFolders={expandedFolders}
+                onToggleFolder={handleFilesToggleFolder}
+                onUpload={handleFilesUpload}
+                onDownload={handleFilesDownload}
+                onDelete={handleFilesDelete}
+                onRename={handleFilesRename}
+                onCreateFolder={handleFilesCreateFolder}
+                onMove={handleFilesMove}
+              />
+            </div>
+          )}
           <div className="pg-body-content">
         {/* File tabs: one tab per workspace file. The active tab's
             editor + output pane appear directly below — switching tabs
