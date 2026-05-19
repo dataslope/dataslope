@@ -516,8 +516,268 @@ body.pg-active {
   min-height: 0;
 }
 
+/* ─── Files sidebar panel (between icon sidebar and body content) ─── */
+.pg-files-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pg-files-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 6px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.pg-files-sidebar-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pg-files-sidebar-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pg-files-sidebar-close:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+/* ─── Shared files panel component (pg-files-*) ─── */
+.pg-files {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.pg-files-dragging {
+  outline: 2px dashed var(--primary);
+  outline-offset: -4px;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+.pg-files-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+.pg-files-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.pg-files-toolbar-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.pg-files-hidden-input {
+  display: none;
+}
+
+.pg-files-target-hint {
+  padding: 6px 10px;
+  background: var(--bg2);
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pg-files-target-hint strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pg-files-tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.pg-files-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 4px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+}
+
+.pg-files-row:hover {
+  background: var(--bg3);
+}
+
+.pg-files-row-selected {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.pg-files-row-drop-target {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  outline: 1px solid var(--primary);
+  outline-offset: -1px;
+}
+
+.pg-files-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.pg-files-chevron-spacer {
+  display: inline-block;
+  width: 11px;
+  flex-shrink: 0;
+}
+
+.pg-files-icon {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.pg-files-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pg-files-size {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+/* Context menu styling matches the Base UI menus used elsewhere
+   (examples-dropdown). Items already get the common .example-item
+   treatment; only file-tree-specific tweaks live here. */
+.pg-files-ctx-menu {
+  min-width: 160px;
+}
+
+/* Lay icons and labels on the same line. */
+.pg-files-ctx-menu .example-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pg-files-ctx-danger {
+  color: var(--red);
+}
+
+.pg-files-ctx-danger:hover,
+.pg-files-ctx-danger[data-highlighted] {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+/* Info dialog (compact) */
+.pg-files-info-popup {
+  min-width: 360px;
+}
+
+.pg-files-info-grid {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 6px 14px;
+  padding: 4px 0 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.pg-files-info-label {
+  color: var(--text-dim);
+}
+
+.pg-files-info-value {
+  color: var(--text);
+  word-break: break-all;
+}
+
+.pg-files-info-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.pg-files-rename-input {
+  flex: 1;
+  min-width: 0;
+  padding: 1px 4px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--primary);
+  border-radius: 3px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  outline: none;
+}
+
+.pg-files-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.pg-files-empty-hint {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--text-muted, var(--text-dim));
+  font-size: 11px;
+}
+
 @media (max-width: 768px) {
   .pg-icon-sidebar {
+    display: none;
+  }
+  .pg-files-sidebar {
     display: none;
   }
 }
