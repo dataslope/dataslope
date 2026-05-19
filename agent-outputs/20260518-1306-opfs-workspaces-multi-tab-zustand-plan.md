@@ -516,20 +516,38 @@ landed them on `claude/implement-workspace-features-nz1zP`:
 - **User add: Workspace tab files appear in the Files pane.**
   `Playground.tsx` now projects each `PlaygroundFile` (every entry
   in the tab strip) into the FilesPanel's `VirtualFile[]` so the
-  pane shows code files (e.g. `main.py`, `untitled_2.py`) alongside
-  uploaded data files. Code files always render at the root of the
-  tree — they cannot be moved into folders, since the entry-point
-  resolution assumes flat layout. Handlers are wrapped so a
-  `delete` on a code file closes the tab (`closeFileTab`, which
-  retains the "can't close the last file" guard), `rename`
-  forwards the bare filename to `renameFileTab` with a collision
-  check against existing code filenames, `download` serialises the
-  dirty buffer into a Blob, and `move` shows a toast. The merge
-  also filters data files whose path collides with a code
-  filename: code wins because it's the live editor target. New
-  memos: `codeFilenames`, `codeFileIdByName`,
+  pane shows code files (e.g. `main.py`, `src/utils.py`) alongside
+  uploaded data files. Handlers are wrapped so a `delete` on a
+  code file closes the tab (`closeFileTab`, which retains the
+  "can't close the last file" guard), `rename` forwards through
+  `renameFileTab`, `download` serialises the dirty buffer into a
+  Blob, and `move` relocates the file by routing through
+  `renameFileTab`. The merge also filters data files whose path
+  collides with a code filename: code wins because it's the live
+  editor target. New memos: `codeFilePaths`, `codeFileIdByPath`,
   `mergedVirtualFiles`; new wrapped handlers
   `mergedHandleFilesDownload` / `Delete` / `Rename` / `Move`.
+
+- **User add: code files can live at any path (not just root).**
+  `PlaygroundFile.filename` is now treated as a workspace-virtual
+  path that may include `/` segments (e.g. `src/utils.py`). Knock-on
+  changes:
+  - The tab strip label uses the leaf (basename) so tabs stay
+    compact regardless of nesting depth.
+  - Export-as-… uses the leaf when deriving the download filename.
+  - `renameFileTab` now distinguishes leaf-only renames (preserve
+    parent directory) from full-path renames (replace outright), so
+    a tab-strip rename of `src/foo.py` → `bar.py` produces
+    `src/bar.py` rather than dropping the `src/` prefix, while
+    typing `lib/bar.py` in the same dialog moves the file. It also
+    rejects renames that would collide with another tab.
+  - Files-pane Move on a code file relocates the file into the
+    destination folder by feeding `${destFolder}/${leaf}` back into
+    `renameFileTab`.
+
+  OPFS storage is keyed by the stable per-file `id`, so changing a
+  file's path costs nothing on disk — the manifest re-saves the new
+  path and the file content stays put.
 
 #### ⏳ Outstanding from the original plan
 

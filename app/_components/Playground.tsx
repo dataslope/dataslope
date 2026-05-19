@@ -1529,13 +1529,44 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (fileId: string, newName: string) => {
       const trimmed = newName.trim();
       if (!trimmed) return;
+      const target = filesRef.current.find((f) => f.id === fileId);
+      if (!target) return;
+      // Two input shapes converge here:
+      //  - Full path (contains "/") — replace the workspace path
+      //    outright (e.g. user types `src/utils.py` to move the
+      //    file).
+      //  - Leaf only (no "/") — preserve the file's existing parent
+      //    directory so a tab-strip rename of `src/foo.py` to
+      //    `bar.py` becomes `src/bar.py`, not `bar.py` at the root.
+      let nextPath: string;
+      if (trimmed.includes("/")) {
+        nextPath = trimmed;
+      } else {
+        const lastSlash = target.filename.lastIndexOf("/");
+        const parentDir =
+          lastSlash >= 0 ? target.filename.slice(0, lastSlash + 1) : "";
+        nextPath = `${parentDir}${trimmed}`;
+      }
+      if (nextPath === target.filename) return;
+      // Refuse to overwrite another tab at the same path.
+      if (
+        filesRef.current.some(
+          (f) => f.id !== fileId && f.filename === nextPath,
+        )
+      ) {
+        showToast(
+          `A file at "${nextPath}" already exists in this workspace.`,
+          "warn",
+        );
+        return;
+      }
       const next = filesRef.current.map((f) =>
-        f.id === fileId ? { ...f, filename: trimmed } : f,
+        f.id === fileId ? { ...f, filename: nextPath } : f,
       );
       filesRef.current = next;
       setFiles(next);
     },
-    [setFiles],
+    [setFiles, showToast],
   );
 
   /** Reorder the file tabs after a drag-and-drop drop. The generic
@@ -1563,24 +1594,25 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   //
   // The Files pane shows two distinct kinds of entries:
   //   1. Workspace code files — one per tab in the tab strip
-  //      (e.g. `main.py`, `untitled_2.py`). Their content lives in
+  //      (e.g. `main.py`, `src/utils.py`). Their content lives in
   //      the per-file dirty buffer + OPFS.
   //   2. User data files — anything uploaded via the panel
   //      (e.g. `data.csv`, `images/cat.png`). Their content lives in
   //      OPFS under `data/`.
   //
-  // Code files always render at the root of the tree. If a data file
-  // collides with a code file's filename, the code file wins (it's
-  // the live editor target) and the data file is hidden — uploads
-  // already enforce uniqueness within `data/` so this only matters
-  // for the cross-namespace edge case.
+  // Code files may live at any path (root or inside folders) — the
+  // tab strip just shows the leaf. If a data file's path collides
+  // with a code file's path, the code file wins (it's the live
+  // editor target) and the data file is hidden — uploads already
+  // enforce uniqueness within `data/` so this only matters for the
+  // cross-namespace edge case.
 
-  const codeFilenames = useMemo(
+  const codeFilePaths = useMemo(
     () => new Set(files.map((f) => f.filename)),
     [files],
   );
 
-  const codeFileIdByName = useMemo(
+  const codeFileIdByPath = useMemo(
     () => new Map(files.map((f) => [f.filename, f.id])),
     [files],
   );
@@ -1596,15 +1628,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       isFolder: false,
     }));
     const filteredData = virtualFiles.filter(
-      (f) => !codeFilenames.has(f.path),
+      (f) => !codeFilePaths.has(f.path),
     );
     return [...codeEntries, ...filteredData];
-  }, [files, dirtyBuffers, virtualFiles, codeFilenames]);
+  }, [files, dirtyBuffers, virtualFiles, codeFilePaths]);
 
   /** Resolves the workspace tab id for a Files-pane path, if any. */
   const tabIdForFilesPath = useCallback(
-    (path: string): string | null => codeFileIdByName.get(path) ?? null,
-    [codeFileIdByName],
+    (path: string): string | null => codeFileIdByPath.get(path) ?? null,
+    [codeFileIdByPath],
   );
 
   const mergedHandleFilesDownload = useCallback(
@@ -1656,42 +1688,40 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (oldPath: string, newPath: string) => {
       const tabId = tabIdForFilesPath(oldPath);
       if (tabId) {
-        // Code file rename → bare filename only (paths must stay at
-        // the root of the tree).
-        const leaf = newPath.split("/").pop() ?? newPath;
-        if (codeFilenames.has(leaf) && leaf !== oldPath) {
-          showToast(
-            `A file named "${leaf}" already exists in this workspace.`,
-            "warn",
-          );
-          return;
-        }
-        renameFileTab(tabId, leaf);
+        // FilesPanel hands us the already-reconstructed full path
+        // (parent dir + new leaf). `renameFileTab` enforces collision
+        // detection across the workspace.
+        renameFileTab(tabId, newPath);
         return;
       }
       handleFilesRename(oldPath, newPath);
     },
-    [
-      codeFilenames,
-      handleFilesRename,
-      renameFileTab,
-      showToast,
-      tabIdForFilesPath,
-    ],
+    [handleFilesRename, renameFileTab, tabIdForFilesPath],
   );
 
   const mergedHandleFilesMove = useCallback(
     (sourcePath: string, destFolderPath: string) => {
-      if (tabIdForFilesPath(sourcePath) !== null) {
-        // Code files always live at the root of the Files tree —
-        // moving them into a folder would invalidate the
-        // language-specific entry-point resolution.
-        showToast("Code files can't be moved into folders.", "warn");
+      const tabId = tabIdForFilesPath(sourcePath);
+      if (tabId) {
+        // Code file move: relocate to the destination folder while
+        // preserving the leaf filename. `renameFileTab` handles the
+        // collision check.
+        const leaf = sourcePath.split("/").pop() ?? sourcePath;
+        const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
+        if (newPath === sourcePath) return;
+        renameFileTab(tabId, newPath);
+        if (destFolderPath) {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            next.add(destFolderPath);
+            return next;
+          });
+        }
         return;
       }
       handleFilesMove(sourcePath, destFolderPath);
     },
-    [handleFilesMove, showToast, tabIdForFilesPath],
+    [handleFilesMove, renameFileTab, tabIdForFilesPath],
   );
 
   // Apply an example to the editor immediately. Use `requestExample` for
@@ -1786,8 +1816,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const active = filesRef.current.find(
         (f) => f.id === activeFileIdRef.current,
       );
-      const base = active
-        ? active.filename.replace(/\.[^.]+$/, "")
+      // Use the leaf of the workspace path (`"src/main.py"` →
+      // `"main"`) so an export of `src/utils.py` downloads
+      // `utils.<ext>` rather than `src/utils.<ext>`.
+      const activeLeaf = active
+        ? active.filename.split("/").pop() ?? active.filename
+        : "";
+      const base = activeLeaf
+        ? activeLeaf.replace(/\.[^.]+$/, "")
         : adapter.exportBaseFilename;
       a.download = `${base || adapter.exportBaseFilename}.${format.extension}`;
       document.body.appendChild(a);
@@ -1986,14 +2022,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () =>
-      files.map((f) => ({
-        id: f.id,
-        kind: "code" as const,
-        label: f.filename,
-        icon: <FileCode2 size={11} aria-hidden="true" />,
-        closeable: files.length > 1,
-        renameable: true,
-      })),
+      files.map((f) => {
+        // PlaygroundFile.filename may be a multi-segment path
+        // (e.g. "src/utils.py"); the tab strip is too narrow for the
+        // full path, so we show only the leaf and let the Files pane
+        // expose the rest.
+        const leaf = f.filename.split("/").pop() ?? f.filename;
+        return {
+          id: f.id,
+          kind: "code" as const,
+          label: leaf,
+          icon: <FileCode2 size={11} aria-hidden="true" />,
+          closeable: files.length > 1,
+          renameable: true,
+        };
+      }),
     [files],
   );
 

@@ -15,7 +15,10 @@ export interface PlaygroundFile {
   /** Stable tab id. Doubles as the OPFS filename — never derive it from
    *  `filename` since renames must not touch OPFS. */
   id: string;
-  /** User-visible filename (e.g. "main.py", "utils.py"). */
+  /** User-visible path inside the workspace's virtual filesystem
+   *  (e.g. `"main.py"`, `"src/utils.py"`). May include `/` to nest
+   *  files inside folders; the tab strip displays only the leaf name
+   *  (basename). */
   filename: string;
   /** Filename at creation, used to detect rename. */
   pristineFilename: string;
