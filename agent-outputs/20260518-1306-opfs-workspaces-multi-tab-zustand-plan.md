@@ -513,6 +513,24 @@ landed them on `claude/implement-workspace-features-nz1zP`:
   - A new `workspaceIdRef` mirrors `activeWorkspace.id` so the
     handlers don't need to participate in dep arrays.
 
+- **User add: Workspace tab files appear in the Files pane.**
+  `Playground.tsx` now projects each `PlaygroundFile` (every entry
+  in the tab strip) into the FilesPanel's `VirtualFile[]` so the
+  pane shows code files (e.g. `main.py`, `untitled_2.py`) alongside
+  uploaded data files. Code files always render at the root of the
+  tree — they cannot be moved into folders, since the entry-point
+  resolution assumes flat layout. Handlers are wrapped so a
+  `delete` on a code file closes the tab (`closeFileTab`, which
+  retains the "can't close the last file" guard), `rename`
+  forwards the bare filename to `renameFileTab` with a collision
+  check against existing code filenames, `download` serialises the
+  dirty buffer into a Blob, and `move` shows a toast. The merge
+  also filters data files whose path collides with a code
+  filename: code wins because it's the live editor target. New
+  memos: `codeFilenames`, `codeFileIdByName`,
+  `mergedVirtualFiles`; new wrapped handlers
+  `mergedHandleFilesDownload` / `Delete` / `Rename` / `Move`.
+
 #### ⏳ Outstanding from the original plan
 
 1. **Refactor `SqlTabBar` onto the generic `TabBar`** (§4.5). The

@@ -1559,6 +1559,141 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [setFiles],
   );
 
+  // ─── Merge workspace tabs into the Files pane ─────────────────────────
+  //
+  // The Files pane shows two distinct kinds of entries:
+  //   1. Workspace code files — one per tab in the tab strip
+  //      (e.g. `main.py`, `untitled_2.py`). Their content lives in
+  //      the per-file dirty buffer + OPFS.
+  //   2. User data files — anything uploaded via the panel
+  //      (e.g. `data.csv`, `images/cat.png`). Their content lives in
+  //      OPFS under `data/`.
+  //
+  // Code files always render at the root of the tree. If a data file
+  // collides with a code file's filename, the code file wins (it's
+  // the live editor target) and the data file is hidden — uploads
+  // already enforce uniqueness within `data/` so this only matters
+  // for the cross-namespace edge case.
+
+  const codeFilenames = useMemo(
+    () => new Set(files.map((f) => f.filename)),
+    [files],
+  );
+
+  const codeFileIdByName = useMemo(
+    () => new Map(files.map((f) => [f.filename, f.id])),
+    [files],
+  );
+
+  const mergedVirtualFiles = useMemo<VirtualFile[]>(() => {
+    const codeEntries: VirtualFile[] = files.map((f) => ({
+      path: f.filename,
+      // Byte-size estimate from the dirty buffer. Approximate (string
+      // length, not UTF-8 byte length) but accurate enough for the
+      // pane's size column — the same approximation FilesPanel uses
+      // everywhere else.
+      size: dirtyBuffers.get(f.id)?.length ?? 0,
+      isFolder: false,
+    }));
+    const filteredData = virtualFiles.filter(
+      (f) => !codeFilenames.has(f.path),
+    );
+    return [...codeEntries, ...filteredData];
+  }, [files, dirtyBuffers, virtualFiles, codeFilenames]);
+
+  /** Resolves the workspace tab id for a Files-pane path, if any. */
+  const tabIdForFilesPath = useCallback(
+    (path: string): string | null => codeFileIdByName.get(path) ?? null,
+    [codeFileIdByName],
+  );
+
+  const mergedHandleFilesDownload = useCallback(
+    (path: string) => {
+      const tabId = tabIdForFilesPath(path);
+      if (tabId) {
+        // Code file download: serialise the (possibly unsaved) dirty
+        // buffer into a Blob. Falls back to an empty file when the
+        // buffer hasn't been populated yet.
+        const content = dirtyBuffersRef.current.get(tabId) ?? "";
+        try {
+          const blob = new Blob([content], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = path.split("/").pop() ?? path;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Download failed: ${msg}`, "warn");
+        }
+        return;
+      }
+      handleFilesDownload(path);
+    },
+    [handleFilesDownload, showToast, tabIdForFilesPath],
+  );
+
+  const mergedHandleFilesDelete = useCallback(
+    (path: string) => {
+      const tabId = tabIdForFilesPath(path);
+      if (tabId) {
+        // Delete-from-Files-pane on a code file maps to "close the
+        // tab". `closeFileTab` already refuses to drop the last
+        // remaining file (the editor needs at least one target) and
+        // surfaces its own toast.
+        closeFileTab(tabId);
+        return;
+      }
+      handleFilesDelete(path);
+    },
+    [closeFileTab, handleFilesDelete, tabIdForFilesPath],
+  );
+
+  const mergedHandleFilesRename = useCallback(
+    (oldPath: string, newPath: string) => {
+      const tabId = tabIdForFilesPath(oldPath);
+      if (tabId) {
+        // Code file rename → bare filename only (paths must stay at
+        // the root of the tree).
+        const leaf = newPath.split("/").pop() ?? newPath;
+        if (codeFilenames.has(leaf) && leaf !== oldPath) {
+          showToast(
+            `A file named "${leaf}" already exists in this workspace.`,
+            "warn",
+          );
+          return;
+        }
+        renameFileTab(tabId, leaf);
+        return;
+      }
+      handleFilesRename(oldPath, newPath);
+    },
+    [
+      codeFilenames,
+      handleFilesRename,
+      renameFileTab,
+      showToast,
+      tabIdForFilesPath,
+    ],
+  );
+
+  const mergedHandleFilesMove = useCallback(
+    (sourcePath: string, destFolderPath: string) => {
+      if (tabIdForFilesPath(sourcePath) !== null) {
+        // Code files always live at the root of the Files tree —
+        // moving them into a folder would invalidate the
+        // language-specific entry-point resolution.
+        showToast("Code files can't be moved into folders.", "warn");
+        return;
+      }
+      handleFilesMove(sourcePath, destFolderPath);
+    },
+    [handleFilesMove, showToast, tabIdForFilesPath],
+  );
+
   // Apply an example to the editor immediately. Use `requestExample` for
   // user-initiated picks so we can prompt before discarding work.
   const applyExample = useCallback(
@@ -2596,15 +2731,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </button>
               </div>
               <FilesPanel
-                files={virtualFiles}
+                files={mergedVirtualFiles}
                 expandedFolders={expandedFolders}
                 onToggleFolder={handleFilesToggleFolder}
                 onUpload={handleFilesUpload}
-                onDownload={handleFilesDownload}
-                onDelete={handleFilesDelete}
-                onRename={handleFilesRename}
+                onDownload={mergedHandleFilesDownload}
+                onDelete={mergedHandleFilesDelete}
+                onRename={mergedHandleFilesRename}
                 onCreateFolder={handleFilesCreateFolder}
-                onMove={handleFilesMove}
+                onMove={mergedHandleFilesMove}
               />
             </div>
           )}
