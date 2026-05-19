@@ -634,6 +634,8 @@ type WorkerOutMessage =
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string }
   | {
       kind: "complete-result";
       id: number;
@@ -681,6 +683,33 @@ class PyodideWorkerRuntime implements LanguageRuntime {
       };
       this.worker.addEventListener("message", onMessage);
       this.worker.postMessage({ kind: "complete", id, line, column });
+    });
+  }
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const id = ++this.nextId;
+    // Filter to plain files Python is likely to consume — staging
+    // archives, hidden dotfiles, etc. is fine but we always send the
+    // workspace's exact filenames so the user's mental model matches
+    // what shows up in `os.listdir()`.
+    const payload: Array<[string, Uint8Array]> = [];
+    for (const [path, bytes] of files) payload.push([path, bytes]);
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (
+          msg.kind !== "prepare-fs-done" &&
+          msg.kind !== "prepare-fs-error"
+        ) {
+          return;
+        }
+        if (msg.id !== id) return;
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "prepare-fs-done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "prepare-fs", id, files: payload });
     });
   }
 }

@@ -44,7 +44,13 @@ interface OutputCellMessage {
 type InMessage =
   | { kind: "init" }
   | { kind: "run"; id: number; code: string }
-  | { kind: "complete"; id: number; line: string; column: number };
+  | { kind: "complete"; id: number; line: string; column: number }
+  | {
+      kind: "prepare-fs";
+      id: number;
+      /** Workspace-relative paths → file bytes. */
+      files: Array<[string, Uint8Array]>;
+    };
 
 type OutMessage =
   | { kind: "loading"; message: string }
@@ -53,6 +59,8 @@ type OutMessage =
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string }
   | {
       kind: "complete-result";
       id: number;
@@ -398,6 +406,84 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
   return next;
 }
 
+// ─── Multi-file VFS staging ────────────────────────────────────────────
+// Files supplied to `prepareFs` are written to Pyodide's MEMFS at
+// `/home/pyodide/` so user code can `import other_module`, open data
+// files with relative paths, etc. We track the set of paths from the
+// previous run so renames/deletes in the UI also delete the stale files
+// from the VFS (otherwise an old `utils.py` could still be importable
+// after it's been removed from the editor).
+const stagedPaths = new Set<string>();
+const STAGED_ROOT = "/home/pyodide";
+
+function joinStagedPath(relPath: string): string {
+  // Workspace paths are always relative; defensively strip any leading
+  // slashes so the join doesn't escape the staged root.
+  const trimmed = relPath.replace(/^\/+/, "");
+  return `${STAGED_ROOT}/${trimmed}`;
+}
+
+async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
+  if (!pyodide) return;
+  const FS = (pyodide as unknown as { FS: PyodideFS }).FS;
+
+  const nextPaths = new Set<string>();
+  for (const [relPath, bytes] of files) {
+    const abs = joinStagedPath(relPath);
+    nextPaths.add(abs);
+    // Ensure parent directories exist (mkdir -p semantics).
+    ensureDirs(FS, abs);
+    try {
+      FS.writeFile(abs, bytes);
+    } catch (err) {
+      // Surface filesystem-level errors with the offending path so the
+      // user can debug invalid filenames.
+      throw new Error(
+        `Failed to write ${relPath}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // Remove paths staged on previous runs that aren't part of the new
+  // snapshot — keeps deletes/renames in sync.
+  for (const prev of stagedPaths) {
+    if (!nextPaths.has(prev)) {
+      try {
+        FS.unlink(prev);
+      } catch {
+        /* file may already be gone — ignore */
+      }
+    }
+  }
+  stagedPaths.clear();
+  for (const p of nextPaths) stagedPaths.add(p);
+}
+
+interface PyodideFS {
+  writeFile(path: string, data: Uint8Array | string): void;
+  unlink(path: string): void;
+  mkdir(path: string): void;
+  analyzePath(path: string): { exists: boolean };
+}
+
+function ensureDirs(FS: PyodideFS, absFilePath: string): void {
+  const idx = absFilePath.lastIndexOf("/");
+  if (idx <= 0) return;
+  const parent = absFilePath.slice(0, idx);
+  const parts = parent.split("/").filter(Boolean);
+  let cur = "";
+  for (const part of parts) {
+    cur += `/${part}`;
+    if (!FS.analyzePath(cur).exists) {
+      try {
+        FS.mkdir(cur);
+      } catch {
+        /* directory may have been created concurrently — ignore */
+      }
+    }
+  }
+}
+
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   const msg = ev.data;
   if (msg.kind === "init") {
@@ -441,6 +527,24 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
         // Completions are best-effort — return an empty list rather than
         // surfacing the error to the user.
         post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
+      }
+    });
+    return;
+  }
+
+  if (msg.kind === "prepare-fs") {
+    const { id, files } = msg;
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        await prepareFs(files);
+        post({ kind: "prepare-fs-done", id });
+      } catch (err) {
+        post({
+          kind: "prepare-fs-error",
+          id,
+          message: err instanceof Error ? err.message : String(err),
+        });
       }
     });
     return;

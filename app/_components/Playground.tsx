@@ -585,6 +585,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const activeFileIdRef = useRef("");
   const workspaceIdRef = useRef("");
   const filesRef = useRef<PlaygroundFile[]>([]);
+  const virtualFilesRef = useRef<VirtualFile[]>([]);
   const dirtyBuffersRef = useRef(dirtyBuffers);
   useEffect(() => {
     activeFileIdRef.current = activeFileId;
@@ -595,6 +596,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     filesRef.current = files;
   }, [files]);
+  useEffect(() => {
+    virtualFilesRef.current = virtualFiles;
+  }, [virtualFiles]);
   useEffect(() => {
     dirtyBuffersRef.current = dirtyBuffers;
   }, [dirtyBuffers]);
@@ -1343,6 +1347,59 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     })();
   }, []);
 
+  /** Build the file map handed to `runtime.prepareFileSystem` before
+   *  each run. Includes every open code tab (using the dirty editor
+   *  buffer when present, falling back to the OPFS-persisted copy) and
+   *  every uploaded data file (read straight from OPFS). Paths use the
+   *  workspace-relative names exactly as shown in the Files pane. */
+  const collectWorkspaceFilesForRun = useCallback(async (): Promise<
+    Map<string, Uint8Array>
+  > => {
+    const wsId = workspaceIdRef.current;
+    const out = new Map<string, Uint8Array>();
+    const encoder = new TextEncoder();
+
+    // Code tabs: prefer the in-memory dirty buffer (unsaved edits),
+    // otherwise read the persisted copy from OPFS. We do the OPFS reads
+    // in parallel so workspaces with many files don't serialise.
+    const activeId = activeFileIdRef.current;
+    const view = editorRef.current;
+    const reads = filesRef.current.map(async (f) => {
+      // The active editor may hold edits not yet flushed to the dirty
+      // buffer — read straight from CodeMirror in that case.
+      if (view && f.id === activeId) {
+        out.set(f.filename, encoder.encode(view.state.doc.toString()));
+        return;
+      }
+      const buffered = dirtyBuffersRef.current.get(f.id);
+      if (buffered !== undefined) {
+        out.set(f.filename, encoder.encode(buffered));
+        return;
+      }
+      if (wsId) {
+        const text = await opfsReadFile(wsId, f.id);
+        out.set(f.filename, encoder.encode(text ?? ""));
+      } else {
+        out.set(f.filename, encoder.encode(""));
+      }
+    });
+    await Promise.all(reads);
+
+    // Data files (binary). Skip folder markers — only real files have
+    // OPFS content.
+    if (wsId) {
+      const dataReads = virtualFilesRef.current
+        .filter((vf) => !vf.isFolder)
+        .map(async (vf) => {
+          const bytes = await readDataFile(wsId, vf.path);
+          if (bytes) out.set(vf.path, bytes);
+        });
+      await Promise.all(dataReads);
+    }
+
+    return out;
+  }, []);
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -1367,6 +1424,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const firstId = outputCounter.current + 1;
     newRunFirstIdRef.current = firstId;
     try {
+      // Stage all currently-open workspace files into the runtime's
+      // virtual file system so multi-file `import`s, `include`s, etc.
+      // resolve correctly. Includes:
+      //   - All code tabs (latest dirty buffer takes precedence over
+      //     the on-disk OPFS copy so unsaved edits are visible).
+      //   - All uploaded data files (read straight from OPFS).
+      // Adapters that don't override `prepareFileSystem` keep
+      // single-file semantics — the call is a no-op.
+      if (rt.prepareFileSystem) {
+        const fileMap = await collectWorkspaceFilesForRun();
+        try {
+          await rt.prepareFileSystem(fileMap);
+        } catch (stageErr) {
+          // Surface staging errors as a non-fatal stderr cell — execution
+          // proceeds with whatever files made it into the VFS.
+          const msg =
+            stageErr instanceof Error ? stageErr.message : String(stageErr);
+          collected.push({
+            type: "stderr",
+            content: `Failed to stage workspace files: ${msg}`,
+          });
+        }
+      }
       await rt.run(code, (cell) => collected.push(cell));
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       setOutputsForFile(targetFileId, (prev) => [
@@ -1412,7 +1492,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [clearBeforeRun, setOutputsForFile, showToast]);
+  }, [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {

@@ -73,6 +73,21 @@ export interface LanguageRuntime {
   /** Optional: compute completions for the given line up to ``column``.
    *  Adapters that don't implement autocomplete simply omit this. */
   complete?(line: string, column: number): Promise<CompletionResult>;
+  /** Optional: stage workspace files into the runtime's virtual file
+   *  system before `run()` is invoked. Called by the playground with the
+   *  full set of currently-open files (code tabs and uploaded data
+   *  files), keyed by their workspace-relative path
+   *  (e.g. `"utils.py"`, `"data/sales.csv"`).
+   *
+   *  Runtimes that don't support multi-file execution simply omit this
+   *  hook — the playground falls back to single-file `run(code, …)`
+   *  semantics in that case.
+   *
+   *  Implementations should mirror the supplied snapshot exactly: files
+   *  present in `files` should overwrite existing entries, and files
+   *  the runtime created on previous runs that are no longer in `files`
+   *  should be removed so renames and deletions in the UI propagate. */
+  prepareFileSystem?(files: Map<string, Uint8Array>): Promise<void>;
 }
 
 export interface LanguageAdapter {
