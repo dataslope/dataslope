@@ -91,6 +91,13 @@ export function WorkspaceBadge({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
   const [registry, setRegistry] = useState<WorkspaceEntry[]>([]);
+  // Cached byte-size estimates for the recent workspaces, prefetched
+  // whenever the popover opens. State is retained between opens so
+  // subsequent opens render the previous size synchronously and update
+  // in place when the fresh estimate lands.
+  const [popoverSizes, setPopoverSizes] = useState<Map<string, number>>(
+    () => new Map(),
+  );
 
   // Hydrate registry on the client only — `getWorkspaceRegistry` reads
   // localStorage which is undefined on the server. Re-read whenever the
@@ -114,6 +121,31 @@ export function WorkspaceBadge({
         .slice(0, RECENT_LIMIT),
     [registry, playgroundId],
   );
+
+  // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`
+  // call is independent so we fire them in parallel and stream results
+  // into the size map as they land — no flicker on subsequent opens
+  // because the previous map is retained between renders.
+  useEffect(() => {
+    if (!popoverOpen) return;
+    let cancelled = false;
+    const ids = recent.map((ws) => ws.id);
+    void Promise.all(
+      ids.map(async (id) => {
+        const bytes = await estimateWorkspaceSize(id);
+        if (cancelled) return;
+        setPopoverSizes((prev) => {
+          if (prev.get(id) === bytes) return prev;
+          const next = new Map(prev);
+          next.set(id, bytes);
+          return next;
+        });
+      }),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [popoverOpen, recent]);
 
   const handleSwitch = useCallback(
     (workspaceId: string) => {
@@ -189,6 +221,12 @@ export function WorkspaceBadge({
                         </span>
                         <span className="workspace-popover-item-meta">
                           Last opened {formatRelative(ws.lastUsedAt)}
+                          {popoverSizes.has(ws.id) && (
+                            <>
+                              {" · "}
+                              {formatBytes(popoverSizes.get(ws.id) ?? 0)}
+                            </>
+                          )}
                         </span>
                       </span>
                     </button>

@@ -499,6 +499,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
     useState(false);
+  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] =
+    useState(false);
 
   // ─── Files pane (OPFS-backed virtual filesystem) ─────────────────────
   const [filesPaneOpen, setFilesPaneOpen] = useState(false);
@@ -1324,6 +1326,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     window.location.reload();
   }, []);
 
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading. Backed by the shared
+  // `clearAllLocalData` helper so every playground gets the same
+  // behaviour. Best-effort: failures inside one surface don't block
+  // the others, and we always reload.
+  const clearAllLocalData = useCallback(() => {
+    void (async () => {
+      try {
+        const mod = await import("./storage/clearAllData");
+        await mod.clearAllLocalData();
+      } catch {
+        /* fall through to reload regardless */
+      }
+      window.location.reload();
+    })();
+  }, []);
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -1510,13 +1529,199 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (fileId: string, newName: string) => {
       const trimmed = newName.trim();
       if (!trimmed) return;
+      const target = filesRef.current.find((f) => f.id === fileId);
+      if (!target) return;
+      // Two input shapes converge here:
+      //  - Full path (contains "/") — replace the workspace path
+      //    outright (e.g. user types `src/utils.py` to move the
+      //    file).
+      //  - Leaf only (no "/") — preserve the file's existing parent
+      //    directory so a tab-strip rename of `src/foo.py` to
+      //    `bar.py` becomes `src/bar.py`, not `bar.py` at the root.
+      let nextPath: string;
+      if (trimmed.includes("/")) {
+        nextPath = trimmed;
+      } else {
+        const lastSlash = target.filename.lastIndexOf("/");
+        const parentDir =
+          lastSlash >= 0 ? target.filename.slice(0, lastSlash + 1) : "";
+        nextPath = `${parentDir}${trimmed}`;
+      }
+      if (nextPath === target.filename) return;
+      // Refuse to overwrite another tab at the same path.
+      if (
+        filesRef.current.some(
+          (f) => f.id !== fileId && f.filename === nextPath,
+        )
+      ) {
+        showToast(
+          `A file at "${nextPath}" already exists in this workspace.`,
+          "warn",
+        );
+        return;
+      }
       const next = filesRef.current.map((f) =>
-        f.id === fileId ? { ...f, filename: trimmed } : f,
+        f.id === fileId ? { ...f, filename: nextPath } : f,
       );
       filesRef.current = next;
       setFiles(next);
     },
+    [setFiles, showToast],
+  );
+
+  /** Reorder the file tabs after a drag-and-drop drop. The generic
+   *  TabBar hands us the new tab order (TabDescriptors); we project it
+   *  back onto the `files` array via id lookup so the manifest stays
+   *  authoritative. */
+  const reorderFileTabs = useCallback(
+    (nextDescriptors: TabDescriptor[]) => {
+      const byId = new Map(filesRef.current.map((f) => [f.id, f]));
+      const next: PlaygroundFile[] = [];
+      for (const d of nextDescriptors) {
+        const f = byId.get(d.id);
+        if (f) next.push(f);
+      }
+      // Defensive: ensure we didn't drop any files (e.g. a transient
+      // mismatch between descriptors and the file list).
+      if (next.length !== filesRef.current.length) return;
+      filesRef.current = next;
+      setFiles(next);
+    },
     [setFiles],
+  );
+
+  // ─── Merge workspace tabs into the Files pane ─────────────────────────
+  //
+  // The Files pane shows two distinct kinds of entries:
+  //   1. Workspace code files — one per tab in the tab strip
+  //      (e.g. `main.py`, `src/utils.py`). Their content lives in
+  //      the per-file dirty buffer + OPFS.
+  //   2. User data files — anything uploaded via the panel
+  //      (e.g. `data.csv`, `images/cat.png`). Their content lives in
+  //      OPFS under `data/`.
+  //
+  // Code files may live at any path (root or inside folders) — the
+  // tab strip just shows the leaf. If a data file's path collides
+  // with a code file's path, the code file wins (it's the live
+  // editor target) and the data file is hidden — uploads already
+  // enforce uniqueness within `data/` so this only matters for the
+  // cross-namespace edge case.
+
+  const codeFilePaths = useMemo(
+    () => new Set(files.map((f) => f.filename)),
+    [files],
+  );
+
+  const codeFileIdByPath = useMemo(
+    () => new Map(files.map((f) => [f.filename, f.id])),
+    [files],
+  );
+
+  const mergedVirtualFiles = useMemo<VirtualFile[]>(() => {
+    const codeEntries: VirtualFile[] = files.map((f) => ({
+      path: f.filename,
+      // Byte-size estimate from the dirty buffer. Approximate (string
+      // length, not UTF-8 byte length) but accurate enough for the
+      // pane's size column — the same approximation FilesPanel uses
+      // everywhere else.
+      size: dirtyBuffers.get(f.id)?.length ?? 0,
+      isFolder: false,
+    }));
+    const filteredData = virtualFiles.filter(
+      (f) => !codeFilePaths.has(f.path),
+    );
+    return [...codeEntries, ...filteredData];
+  }, [files, dirtyBuffers, virtualFiles, codeFilePaths]);
+
+  /** Resolves the workspace tab id for a Files-pane path, if any. */
+  const tabIdForFilesPath = useCallback(
+    (path: string): string | null => codeFileIdByPath.get(path) ?? null,
+    [codeFileIdByPath],
+  );
+
+  const mergedHandleFilesDownload = useCallback(
+    (path: string) => {
+      const tabId = tabIdForFilesPath(path);
+      if (tabId) {
+        // Code file download: serialise the (possibly unsaved) dirty
+        // buffer into a Blob. Falls back to an empty file when the
+        // buffer hasn't been populated yet.
+        const content = dirtyBuffersRef.current.get(tabId) ?? "";
+        try {
+          const blob = new Blob([content], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = path.split("/").pop() ?? path;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          showToast(`Download failed: ${msg}`, "warn");
+        }
+        return;
+      }
+      handleFilesDownload(path);
+    },
+    [handleFilesDownload, showToast, tabIdForFilesPath],
+  );
+
+  const mergedHandleFilesDelete = useCallback(
+    (path: string) => {
+      const tabId = tabIdForFilesPath(path);
+      if (tabId) {
+        // Delete-from-Files-pane on a code file maps to "close the
+        // tab". `closeFileTab` already refuses to drop the last
+        // remaining file (the editor needs at least one target) and
+        // surfaces its own toast.
+        closeFileTab(tabId);
+        return;
+      }
+      handleFilesDelete(path);
+    },
+    [closeFileTab, handleFilesDelete, tabIdForFilesPath],
+  );
+
+  const mergedHandleFilesRename = useCallback(
+    (oldPath: string, newPath: string) => {
+      const tabId = tabIdForFilesPath(oldPath);
+      if (tabId) {
+        // FilesPanel hands us the already-reconstructed full path
+        // (parent dir + new leaf). `renameFileTab` enforces collision
+        // detection across the workspace.
+        renameFileTab(tabId, newPath);
+        return;
+      }
+      handleFilesRename(oldPath, newPath);
+    },
+    [handleFilesRename, renameFileTab, tabIdForFilesPath],
+  );
+
+  const mergedHandleFilesMove = useCallback(
+    (sourcePath: string, destFolderPath: string) => {
+      const tabId = tabIdForFilesPath(sourcePath);
+      if (tabId) {
+        // Code file move: relocate to the destination folder while
+        // preserving the leaf filename. `renameFileTab` handles the
+        // collision check.
+        const leaf = sourcePath.split("/").pop() ?? sourcePath;
+        const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
+        if (newPath === sourcePath) return;
+        renameFileTab(tabId, newPath);
+        if (destFolderPath) {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            next.add(destFolderPath);
+            return next;
+          });
+        }
+        return;
+      }
+      handleFilesMove(sourcePath, destFolderPath);
+    },
+    [handleFilesMove, renameFileTab, tabIdForFilesPath],
   );
 
   // Apply an example to the editor immediately. Use `requestExample` for
@@ -1611,8 +1816,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const active = filesRef.current.find(
         (f) => f.id === activeFileIdRef.current,
       );
-      const base = active
-        ? active.filename.replace(/\.[^.]+$/, "")
+      // Use the leaf of the workspace path (`"src/main.py"` →
+      // `"main"`) so an export of `src/utils.py` downloads
+      // `utils.<ext>` rather than `src/utils.<ext>`.
+      const activeLeaf = active
+        ? active.filename.split("/").pop() ?? active.filename
+        : "";
+      const base = activeLeaf
+        ? activeLeaf.replace(/\.[^.]+$/, "")
         : adapter.exportBaseFilename;
       a.download = `${base || adapter.exportBaseFilename}.${format.extension}`;
       document.body.appendChild(a);
@@ -1811,14 +2022,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () =>
-      files.map((f) => ({
-        id: f.id,
-        kind: "code" as const,
-        label: f.filename,
-        icon: <FileCode2 size={11} aria-hidden="true" />,
-        closeable: files.length > 1,
-        renameable: true,
-      })),
+      files.map((f) => {
+        // PlaygroundFile.filename may be a multi-segment path
+        // (e.g. "src/utils.py"); the tab strip is too narrow for the
+        // full path, so we show only the leaf and let the Files pane
+        // expose the rest.
+        const leaf = f.filename.split("/").pop() ?? f.filename;
+        return {
+          id: f.id,
+          kind: "code" as const,
+          label: leaf,
+          icon: <FileCode2 size={11} aria-hidden="true" />,
+          closeable: files.length > 1,
+          renameable: true,
+        };
+      }),
     [files],
   );
 
@@ -2295,6 +2513,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
         />
 
         <PackagesDrawer
@@ -2415,6 +2634,46 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
+        {/* Nuclear wipe: drops localStorage AND OPFS AND IndexedDB AND
+            caches. Mirrors the lighter "Clear all localStorage" dialog
+            but with stronger language so the user understands they're
+            also losing every workspace, database, and uploaded file. */}
+        <AlertDialog.Root
+          open={confirmClearAllDataOpen}
+          onOpenChange={setConfirmClearAllDataOpen}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Clear all local data?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                This will permanently delete every saved setting, code
+                snippet, <strong>workspace</strong>, persisted{" "}
+                <strong>database</strong>, and uploaded{" "}
+                <strong>data file</strong> across{" "}
+                <strong>all playgrounds</strong> — including localStorage,
+                OPFS, IndexedDB, and any cached assets. The page will
+                reload immediately. This can&rsquo;t be undone.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    clearAllLocalData();
+                  }}
+                >
+                  Clear &amp; reload
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
         <div className="pg-body">
           <nav className="pg-icon-sidebar" aria-label="Panel navigation">
             <div className="pg-icon-sidebar-top">
@@ -2515,15 +2774,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </button>
               </div>
               <FilesPanel
-                files={virtualFiles}
+                files={mergedVirtualFiles}
                 expandedFolders={expandedFolders}
                 onToggleFolder={handleFilesToggleFolder}
                 onUpload={handleFilesUpload}
-                onDownload={handleFilesDownload}
-                onDelete={handleFilesDelete}
-                onRename={handleFilesRename}
+                onDownload={mergedHandleFilesDownload}
+                onDelete={mergedHandleFilesDelete}
+                onRename={mergedHandleFilesRename}
                 onCreateFolder={handleFilesCreateFolder}
-                onMove={handleFilesMove}
+                onMove={mergedHandleFilesMove}
               />
             </div>
           )}
@@ -2540,6 +2799,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             onCloseTab={files.length > 1 ? closeFileTab : undefined}
             onAddTab={addNewFile}
             onRenameTab={renameFileTab}
+            onReorderTabs={files.length > 1 ? reorderFileTabs : undefined}
             className="pg-file-tabbar"
           />
         )}

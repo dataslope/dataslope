@@ -44,6 +44,7 @@ interface DialogState {
   confirmCloseTabId: string | null;
   confirmRestoreOpen: boolean;
   confirmClearStorageOpen: boolean;
+  confirmClearAllDataOpen: boolean;
   exportNoTabsHover: boolean;
   // Setters
   setSettingsOpen: (open: boolean) => void;
@@ -108,6 +109,7 @@ interface DialogState {
   setConfirmCloseTabId: (id: string | null) => void;
   setConfirmRestoreOpen: (open: boolean) => void;
   setConfirmClearStorageOpen: (open: boolean) => void;
+  setConfirmClearAllDataOpen: (open: boolean) => void;
   setExportNoTabsHover: (hover: boolean) => void;
 }
 
@@ -143,6 +145,7 @@ export const useDialogStore = create<DialogState>((set) => ({
   confirmCloseTabId: null,
   confirmRestoreOpen: false,
   confirmClearStorageOpen: false,
+  confirmClearAllDataOpen: false,
   exportNoTabsHover: false,
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
   setDdlDialog: (ddlDialog) => set({ ddlDialog }),
@@ -213,6 +216,8 @@ export const useDialogStore = create<DialogState>((set) => ({
   setPendingDbId: (pendingDbId) => set({ pendingDbId }),
   setConfirmCloseTabId: (confirmCloseTabId) => set({ confirmCloseTabId }),
   setConfirmRestoreOpen: (confirmRestoreOpen) => set({ confirmRestoreOpen }),
+  setConfirmClearAllDataOpen: (confirmClearAllDataOpen) =>
+    set({ confirmClearAllDataOpen }),
   setConfirmClearStorageOpen: (confirmClearStorageOpen) =>
     set({ confirmClearStorageOpen }),
   setExportNoTabsHover: (exportNoTabsHover) => set({ exportNoTabsHover }),

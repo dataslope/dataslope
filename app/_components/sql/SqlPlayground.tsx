@@ -126,6 +126,7 @@ import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { acquireWorkspaceLock } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import {
   type ColumnConstraintInfo,
@@ -1102,6 +1103,12 @@ function SqlPlaygroundInner() {
   const setConfirmClearStorageOpen = useDialogStore(
     (s) => s.setConfirmClearStorageOpen,
   );
+  const confirmClearAllDataOpen = useDialogStore(
+    (s) => s.confirmClearAllDataOpen,
+  );
+  const setConfirmClearAllDataOpen = useDialogStore(
+    (s) => s.setConfirmClearAllDataOpen,
+  );
   const confirmCloseTabId = useDialogStore((s) => s.confirmCloseTabId);
   const setConfirmCloseTabId = useDialogStore((s) => s.setConfirmCloseTabId);
   const pendingDbId = useDialogStore((s) => s.pendingDbId);
@@ -1442,6 +1449,22 @@ function SqlPlaygroundInner() {
     window.location.reload();
   }, []);
 
+  // Nuclear wipe: clears localStorage, OPFS, IndexedDB, and caches.
+  // Backed by the shared `clearAllLocalData` helper so every playground
+  // gets the same behaviour. Best-effort: failures inside one surface
+  // don't block the others, and we always reload.
+  const clearAllLocalData = useCallback(() => {
+    void (async () => {
+      try {
+        const mod = await import("../storage/clearAllData");
+        await mod.clearAllLocalData();
+      } catch {
+        /* fall through to reload regardless */
+      }
+      window.location.reload();
+    })();
+  }, []);
+
   const handleFormatCode = useCallback(async () => {
     const view = editorRef.current;
     if (!view) return;
@@ -1637,6 +1660,24 @@ function SqlPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
+          // Tab-isolation notice: warn once per (workspace × session)
+          // when another tab already holds the OPFS lock for this
+          // workspace, so the user knows edits here can conflict.
+          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          try {
+            if (window.sessionStorage.getItem(noticeKey) !== "1") {
+              const hasLock = await acquireWorkspaceLock(workspace.id);
+              if (!cancelled && !hasLock) {
+                window.sessionStorage.setItem(noticeKey, "1");
+                showToast(
+                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                  "warn",
+                );
+              }
+            }
+          } catch {
+            /* sessionStorage / Locks unavailable — ignore. */
+          }
         } catch {
           // Workspace bootstrap is best-effort — proceed in-memory.
         }
@@ -2427,6 +2468,7 @@ function SqlPlaygroundInner() {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
           resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
           onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
@@ -2498,6 +2540,9 @@ function SqlPlaygroundInner() {
           clearStorageOpen={confirmClearStorageOpen}
           onClearStorageOpenChange={setConfirmClearStorageOpen}
           onClearStorageConfirm={clearAllLocalStorage}
+          clearAllDataOpen={confirmClearAllDataOpen}
+          onClearAllDataOpenChange={setConfirmClearAllDataOpen}
+          onClearAllDataConfirm={clearAllLocalData}
         />
 
         <AlertDialog.Root

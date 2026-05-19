@@ -106,6 +106,7 @@ import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { acquireWorkspaceLock } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { type PostgresEngine } from "../runtime/postgres";
 
@@ -1015,6 +1016,7 @@ function PostgresPlaygroundInner() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
+  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
   const [pendingDbId, setPendingDbId] = useState<string | null>(null);
   const [pendingDropEntity, setPendingDropEntity] = useState<{
     name: string;
@@ -1602,6 +1604,21 @@ function PostgresPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
+          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          try {
+            if (window.sessionStorage.getItem(noticeKey) !== "1") {
+              const hasLock = await acquireWorkspaceLock(workspace.id);
+              if (!cancelled && !hasLock) {
+                window.sessionStorage.setItem(noticeKey, "1");
+                showToast(
+                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                  "warn",
+                );
+              }
+            }
+          } catch {
+            /* sessionStorage / Locks unavailable — ignore. */
+          }
         } catch {
           /* proceed in-memory */
         }
@@ -1983,6 +2000,20 @@ function PostgresPlaygroundInner() {
       /* ignore */
     }
     window.location.reload();
+  }, []);
+
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading.
+  const clearAllLocalData = useCallback(() => {
+    void (async () => {
+      try {
+        const mod = await import("../storage/clearAllData");
+        await mod.clearAllLocalData();
+      } catch {
+        /* fall through to reload regardless */
+      }
+      window.location.reload();
+    })();
   }, []);
 
   const handleFormatCode = useCallback(async () => {
@@ -3328,6 +3359,7 @@ function PostgresPlaygroundInner() {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
           resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
           onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
@@ -3427,6 +3459,9 @@ function PostgresPlaygroundInner() {
           clearStorageOpen={confirmClearStorageOpen}
           onClearStorageOpenChange={setConfirmClearStorageOpen}
           onClearStorageConfirm={clearAllLocalStorage}
+          clearAllDataOpen={confirmClearAllDataOpen}
+          onClearAllDataOpenChange={setConfirmClearAllDataOpen}
+          onClearAllDataConfirm={clearAllLocalData}
         />
 
         {/* ── View/Edit Structure drawer ── */}

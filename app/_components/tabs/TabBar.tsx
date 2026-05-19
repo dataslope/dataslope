@@ -1,8 +1,25 @@
 "use client";
 
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS as DndCSS } from "@dnd-kit/utilities";
 import { Plus, X } from "lucide-react";
 import type { TabDescriptor } from "./tabTypes";
 
@@ -13,6 +30,13 @@ export interface TabBarProps {
   onCloseTab?: (id: string) => void;
   onAddTab?: () => void;
   onRenameTab?: (id: string, newLabel: string) => void;
+  /**
+   * Optional handler that receives the post-drop tab order. When
+   * provided, the bar mounts a `DndContext` + horizontal
+   * `SortableContext` so users can drag tabs to reorder them. Pass
+   * `undefined` to keep the bar non-draggable (cheaper render path).
+   */
+  onReorderTabs?: (nextTabs: TabDescriptor[]) => void;
   /** Optional className appended to the root tabbar element. */
   className?: string;
 }
@@ -29,27 +53,45 @@ export function TabBar({
   onCloseTab,
   onAddTab,
   onRenameTab,
+  onReorderTabs,
   className,
 }: TabBarProps) {
   const cls = ["pg-tabbar", className].filter(Boolean).join(" ");
+  const sortable = !!onReorderTabs;
+
+  const strip = (
+    <div className="pg-tabs" role="tablist">
+      {tabs.map((tab) => (
+        <TabItem
+          key={tab.id}
+          tab={tab}
+          active={tab.id === activeTabId}
+          sortable={sortable}
+          onSelect={() => onSelectTab(tab.id)}
+          onClose={onCloseTab ? () => onCloseTab(tab.id) : undefined}
+          onRename={
+            onRenameTab
+              ? (label) => onRenameTab(tab.id, label)
+              : undefined
+          }
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className={cls}>
-      <div className="pg-tabs" role="tablist">
-        {tabs.map((tab) => (
-          <TabItem
-            key={tab.id}
-            tab={tab}
-            active={tab.id === activeTabId}
-            onSelect={() => onSelectTab(tab.id)}
-            onClose={onCloseTab ? () => onCloseTab(tab.id) : undefined}
-            onRename={
-              onRenameTab
-                ? (label) => onRenameTab(tab.id, label)
-                : undefined
-            }
-          />
-        ))}
-      </div>
+      {sortable ? (
+        <DndStrip
+          tabs={tabs}
+          activeTabId={activeTabId}
+          onReorderTabs={onReorderTabs!}
+        >
+          {strip}
+        </DndStrip>
+      ) : (
+        strip
+      )}
       {onAddTab && (
         <button
           type="button"
@@ -65,9 +107,75 @@ export function TabBar({
   );
 }
 
+interface DndStripProps {
+  tabs: TabDescriptor[];
+  activeTabId: string;
+  onReorderTabs: (next: TabDescriptor[]) => void;
+  children: React.ReactNode;
+}
+
+function DndStrip({
+  tabs,
+  activeTabId,
+  onReorderTabs,
+  children,
+}: DndStripProps) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const draggingTab = useMemo(
+    () => (draggingId ? tabs.find((t) => t.id === draggingId) ?? null : null),
+    [draggingId, tabs],
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setDraggingId(String(event.active.id));
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setDraggingId(null);
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const from = tabs.findIndex((t) => t.id === active.id);
+      const to = tabs.findIndex((t) => t.id === over.id);
+      if (from === -1 || to === -1) return;
+      onReorderTabs(arrayMove(tabs, from, to));
+    },
+    [onReorderTabs, tabs],
+  );
+
+  const handleDragCancel = useCallback(() => setDraggingId(null), []);
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
+      <SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
+        {children}
+      </SortableContext>
+      <DragOverlay dropAnimation={null}>
+        {draggingTab ? (
+          <TabOverlay
+            tab={draggingTab}
+            active={draggingTab.id === activeTabId}
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
 interface TabItemProps {
   tab: TabDescriptor;
   active: boolean;
+  sortable: boolean;
   onSelect: () => void;
   onClose?: () => void;
   onRename?: (label: string) => void;
@@ -76,6 +184,7 @@ interface TabItemProps {
 const TabItem = memo(function TabItem({
   tab,
   active,
+  sortable,
   onSelect,
   onClose,
   onRename,
@@ -87,6 +196,19 @@ const TabItem = memo(function TabItem({
   const [draftLabel, setDraftLabel] = useState(tab.label);
   const [isClosing, setIsClosing] = useState(false);
   const closedRef = useRef(false);
+
+  // useSortable must be called unconditionally; when `sortable` is
+  // false we just don't apply its props/refs, so the tab renders as a
+  // static button.
+  const sortableState = useSortable({ id: tab.id, disabled: !sortable });
+  const dragStyle: React.CSSProperties = sortable
+    ? {
+        transform: DndCSS.Transform.toString(sortableState.transform),
+        transition: sortableState.transition,
+        opacity: sortableState.isDragging ? 0 : undefined,
+        zIndex: sortableState.isDragging ? 10 : undefined,
+      }
+    : {};
 
   const openRename = useCallback(() => {
     if (!renameable) return;
@@ -169,6 +291,10 @@ const TabItem = memo(function TabItem({
             <button
               type="button"
               {...props}
+              {...(sortable ? sortableState.attributes : {})}
+              {...(sortable ? sortableState.listeners : {})}
+              ref={sortable ? sortableState.setNodeRef : undefined}
+              style={dragStyle}
               className={`pg-tab${active ? " active" : ""} pg-tab--kind-${tab.kind}${isClosing ? " pg-tab--closing" : ""}`}
               onClick={onSelect}
               onDoubleClick={openRename}
@@ -233,3 +359,32 @@ const TabItem = memo(function TabItem({
     </>
   );
 });
+
+/** Lightweight clone rendered inside `DragOverlay` while a tab is
+ *  being dragged. No interactive affordances — DnD-kit handles the
+ *  drop animation. */
+function TabOverlay({
+  tab,
+  active,
+}: {
+  tab: TabDescriptor;
+  active: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`pg-tab${active ? " active" : ""} pg-tab--kind-${tab.kind}`}
+      style={{ opacity: 0.85, cursor: "grabbing" }}
+    >
+      {tab.icon && (
+        <span className="pg-tab-icon" aria-hidden="true">
+          {tab.icon}
+        </span>
+      )}
+      <span className="pg-tab-title">{tab.label}</span>
+      <span className="pg-tab-close">
+        <X size={10} aria-hidden="true" />
+      </span>
+    </button>
+  );
+}

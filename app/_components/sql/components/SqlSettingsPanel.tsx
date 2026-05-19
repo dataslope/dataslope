@@ -25,6 +25,9 @@ export interface SqlSettingsPanelProps {
   onClose: () => void;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
+  /** Optional — when provided, surfaces a "Clear all local data" action
+   *  alongside the localStorage clear. */
+  onClearAllLocalData?: () => void;
   /** Text for the "Reset query tabs for …" action button. */
   resetTabsLabel: string;
   /** Called when the user clicks the reset-tabs button. */
@@ -52,6 +55,7 @@ export function SqlSettingsPanel({
   onClose,
   onRestoreDefaults,
   onClearLocalStorage,
+  onClearAllLocalData,
   resetTabsLabel,
   onResetTabs,
   extraTabs,
@@ -78,6 +82,7 @@ export function SqlSettingsPanel({
       onClose={onClose}
       onRestoreDefaults={onRestoreDefaults}
       onClearLocalStorage={onClearLocalStorage}
+      onClearAllLocalData={onClearAllLocalData}
       extraGeneralRows={null}
       extraActionRows={
         <button
