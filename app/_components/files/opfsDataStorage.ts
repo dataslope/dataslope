@@ -127,7 +127,7 @@ export async function writeDataFile(
       create: true,
     });
     const writable = await fh.createWritable();
-    await writable.write(bytes.buffer as ArrayBuffer);
+    await writable.write(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
     await writable.close();
 
     // Update manifest
@@ -227,7 +227,7 @@ export async function renameDataEntry(
       const bytes = new Uint8Array(await file.arrayBuffer());
       const dstFh = await dir.getFileHandle(encodePath(dest), { create: true });
       const writable = await dstFh.createWritable();
-      await writable.write(bytes);
+      await writable.write(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
       await writable.close();
       await dir.removeEntry(encodePath(entry.path));
     } catch {
