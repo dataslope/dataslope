@@ -1492,6 +1492,36 @@
   background: var(--bg3);
 }
 
+/* ─── SQL playground tab bar (uses generic .pg-tab classes via TabBar) ─── */
+/* When the generic TabBar is rendered with className="sql-tabbar" the
+   pg-tab DOM is reused unchanged; these rules layer SQL-specific
+   colour/cursor cues over the kind-aware classes. Legacy sql-tab*
+   selectors are left in place above for any external consumers. */
+.sql-tabbar .pg-tab {
+  cursor: grab;
+}
+
+.sql-tabbar .pg-tab:active {
+  cursor: grabbing;
+}
+
+.pg-tab--kind-view-data .pg-tab-icon,
+.pg-tab--kind-er-diagram .pg-tab-icon,
+.pg-tab--kind-query-history .pg-tab-icon {
+  color: color-mix(in srgb, var(--primary) 70%, var(--text-dim));
+}
+
+.pg-tab-name-positioner {
+  z-index: 9999;
+}
+
+.pg-tab-name-popover {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
 .sql-toolbar {
   display: inline-flex;
   align-items: center;
@@ -4227,4 +4257,26 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
+}
+/* Inline Settings tab pane for the SQL playgrounds. Replaces the legacy
+   modal-only `SqlSettingsPanel` dialog when settings is opened from the
+   sidebar gear button. */
+.sql-settings-tab-pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.sql-settings-tab-pane .settings-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sql-settings-tab-pane .settings-panel-pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }

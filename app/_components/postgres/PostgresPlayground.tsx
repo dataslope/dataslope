@@ -93,7 +93,9 @@ import {
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
-import { SqlSettingsPanel } from "../sql/components/SqlSettingsPanel";
+import {
+  SqlSettingsPanelContent,
+} from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
@@ -121,6 +123,9 @@ import {
   tabsAreDirty,
 } from "../sql/shared/tabStorageUtils";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
+import { SETTINGS_TAB_ID } from "../playgroundTabs";
+import type { TabDescriptor } from "../tabs/tabTypes";
+import { Settings as SettingsIcon } from "lucide-react";
 import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
@@ -1171,6 +1176,12 @@ function PostgresPlaygroundInner() {
 
   const activeTab =
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
+  const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
+  const openSettingsTab = useCallback(() => {
+    setSettingsOpen(true);
+    activeTabIdRef.current = SETTINGS_TAB_ID;
+    setActiveTabId(SETTINGS_TAB_ID);
+  }, []);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findPostgresSampleDatabase(activeDbId);
   // customDbFilename applies only for the blank/imported database slot.
@@ -1178,13 +1189,11 @@ function PostgresPlaygroundInner() {
     activeDbId === POSTGRES_BLANK_DATABASE.id && customDbFilename !== null
       ? customDbFilename
       : activeSample.filename;
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
+  // Tab reordering is delegated to the generic TabBar; no externalised
+  // drag state or sensors are needed for the tab strip. `setDraggingTabId`
+  // remains in the hook signature for legacy compatibility — passed a
+  // no-op below.
+  const setDraggingTabId = useCallback(() => {}, []);
 
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
@@ -1927,9 +1936,7 @@ function PostgresPlaygroundInner() {
     openTabAndRun,
     closeTab,
     resetTabsForCurrentDb,
-    handleTabDragStart,
-    handleTabDragEnd,
-    handleTabDragCancel,
+    reorderTabs,
     openErDiagramTab,
     openQueryHistoryTab,
   } = useSqlTabManagement({
@@ -3341,63 +3348,6 @@ function PostgresPlaygroundInner() {
         </>
       }
     >
-      <SqlSettingsPanel
-          open={settingsOpen}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          outputFontSizeEnabled={outputFontSizeEnabled}
-          setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-          outputFontSize={outputFontSize}
-          setOutputFontSize={setOutputFontSize}
-          editorTheme={editorTheme}
-          setEditorTheme={setEditorTheme}
-          wordWrap={wordWrap}
-          setWordWrap={setWordWrap}
-          clearBeforeRun={clearBeforeRun}
-          setClearBeforeRun={setClearBeforeRun}
-          language={PLAYGROUND_ID}
-          onClose={() => setSettingsOpen(false)}
-          onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-          onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
-          onResetTabs={resetTabsForCurrentDb}
-          extraTabs={[
-            {
-              value: "database",
-              trigger: (
-                <>
-                  <Database size={14} aria-hidden="true" />
-                  <span className="settings-tab-label">Database</span>
-                </>
-              ),
-              panel: (
-                <div className="settings-panel-pane">
-                  <div className="settings-body">
-                    <div className="setting-row">
-                      <label className="setting-switch-row">
-                        <span className="setting-switch-label">
-                          <Layers size={14} aria-hidden="true" />
-                          <span>Show system schemas</span>
-                        </span>
-                        <Switch.Root
-                          checked={showSystemSchemas}
-                          onCheckedChange={(checked) => {
-                            setShowSystemSchemasState(checked);
-                          }}
-                          className="bui-switch"
-                        >
-                          <Switch.Thumb className="bui-switch-thumb" />
-                        </Switch.Root>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ),
-            },
-          ]}
-        />
-
         <DdlViewerDialog
           open={ddlDialog !== null}
           onOpenChange={(next) => { if (!next) setDdlDialog(null); }}
@@ -4086,7 +4036,7 @@ function PostgresPlaygroundInner() {
                       </svg>
                     ),
                     label: "Settings",
-                    onClick: () => setSettingsOpen(true),
+                    onClick: openSettingsTab,
                   },
                 ]}
               />
@@ -4426,18 +4376,41 @@ function PostgresPlaygroundInner() {
           />
           <main
             ref={panesRef}
-            className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
+            className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
           >
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}
-              draggingTab={draggingTab}
-              tabDragSensors={tabDragSensors}
-              onDragStart={handleTabDragStart}
-              onDragEnd={handleTabDragEnd}
-              onDragCancel={handleTabDragCancel}
+              onReorderTabs={reorderTabs}
+              extraTabs={
+                settingsOpen
+                  ? [
+                      {
+                        id: SETTINGS_TAB_ID,
+                        kind: "settings",
+                        label: "Settings",
+                        icon: <SettingsIcon size={11} aria-hidden="true" />,
+                        closeable: true,
+                        renameable: false,
+                      } as TabDescriptor,
+                    ]
+                  : undefined
+              }
+              onExtraTabClose={(tabId) => {
+                if (tabId === SETTINGS_TAB_ID) {
+                  setSettingsOpen(false);
+                  const fallback = tabs[0]?.id;
+                  if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
+                    setActiveTabId(fallback);
+                  }
+                }
+              }}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
+                if (tabId === SETTINGS_TAB_ID) {
+                  setActiveTabId(SETTINGS_TAB_ID);
+                  return;
+                }
                 if (prevId !== tabId) {
                   tabHistoryRef.current = pushTabHistory(
                     tabHistoryRef.current,
@@ -4493,7 +4466,8 @@ function PostgresPlaygroundInner() {
               style={
                 activeTab?.kind === "view-data" ||
                 activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                activeTab?.kind === "query-history" ||
+                isSettingsTabActive
                   ? { display: "none" }
                   : undefined
               }
@@ -4631,6 +4605,64 @@ function PostgresPlaygroundInner() {
                   isPostgres={true}
                   onClear={clearHistory}
                   onOpenQueryTab={openTabAndRun}
+                />
+              </div>
+            )}
+            {isSettingsTabActive && (
+              <div className="sql-settings-tab-pane">
+                <SqlSettingsPanelContent
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  outputFontSizeEnabled={outputFontSizeEnabled}
+                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                  outputFontSize={outputFontSize}
+                  setOutputFontSize={setOutputFontSize}
+                  editorTheme={editorTheme}
+                  setEditorTheme={setEditorTheme}
+                  wordWrap={wordWrap}
+                  setWordWrap={setWordWrap}
+                  clearBeforeRun={clearBeforeRun}
+                  setClearBeforeRun={setClearBeforeRun}
+                  language={PLAYGROUND_ID}
+                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                  resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+                  onResetTabs={resetTabsForCurrentDb}
+                  extraTabs={[
+                    {
+                      value: "database",
+                      trigger: (
+                        <>
+                          <Database size={14} aria-hidden="true" />
+                          <span className="settings-tab-label">Database</span>
+                        </>
+                      ),
+                      panel: (
+                        <div className="settings-panel-pane">
+                          <div className="settings-body">
+                            <div className="setting-row">
+                              <label className="setting-switch-row">
+                                <span className="setting-switch-label">
+                                  <Layers size={14} aria-hidden="true" />
+                                  <span>Show system schemas</span>
+                                </span>
+                                <Switch.Root
+                                  checked={showSystemSchemas}
+                                  onCheckedChange={(checked) => {
+                                    setShowSystemSchemasState(checked);
+                                  }}
+                                  className="bui-switch"
+                                >
+                                  <Switch.Thumb className="bui-switch-thumb" />
+                                </Switch.Root>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    },
+                  ]}
                 />
               </div>
             )}

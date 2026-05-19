@@ -98,7 +98,7 @@ import {
   DataslopeRunOverlay,
   LOADING_QUIPS,
   RuntimeInfoContent,
-  SettingsPanel,
+  SettingsPanelContent,
   detectIsMac,
 } from "./playgroundShared";
 import { TabBar } from "./tabs/TabBar";
@@ -121,7 +121,7 @@ import {
 import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
-import { FileCode2 } from "lucide-react";
+import { FileCode2, Settings } from "lucide-react";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
 import {
   deleteDataEntry,
@@ -585,6 +585,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const activeFileIdRef = useRef("");
   const workspaceIdRef = useRef("");
   const filesRef = useRef<PlaygroundFile[]>([]);
+  const virtualFilesRef = useRef<VirtualFile[]>([]);
   const dirtyBuffersRef = useRef(dirtyBuffers);
   useEffect(() => {
     activeFileIdRef.current = activeFileId;
@@ -595,6 +596,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     filesRef.current = files;
   }, [files]);
+  useEffect(() => {
+    virtualFilesRef.current = virtualFiles;
+  }, [virtualFiles]);
   useEffect(() => {
     dirtyBuffersRef.current = dirtyBuffers;
   }, [dirtyBuffers]);
@@ -1343,6 +1347,59 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     })();
   }, []);
 
+  /** Build the file map handed to `runtime.prepareFileSystem` before
+   *  each run. Includes every open code tab (using the dirty editor
+   *  buffer when present, falling back to the OPFS-persisted copy) and
+   *  every uploaded data file (read straight from OPFS). Paths use the
+   *  workspace-relative names exactly as shown in the Files pane. */
+  const collectWorkspaceFilesForRun = useCallback(async (): Promise<
+    Map<string, Uint8Array>
+  > => {
+    const wsId = workspaceIdRef.current;
+    const out = new Map<string, Uint8Array>();
+    const encoder = new TextEncoder();
+
+    // Code tabs: prefer the in-memory dirty buffer (unsaved edits),
+    // otherwise read the persisted copy from OPFS. We do the OPFS reads
+    // in parallel so workspaces with many files don't serialise.
+    const activeId = activeFileIdRef.current;
+    const view = editorRef.current;
+    const reads = filesRef.current.map(async (f) => {
+      // The active editor may hold edits not yet flushed to the dirty
+      // buffer — read straight from CodeMirror in that case.
+      if (view && f.id === activeId) {
+        out.set(f.filename, encoder.encode(view.state.doc.toString()));
+        return;
+      }
+      const buffered = dirtyBuffersRef.current.get(f.id);
+      if (buffered !== undefined) {
+        out.set(f.filename, encoder.encode(buffered));
+        return;
+      }
+      if (wsId) {
+        const text = await opfsReadFile(wsId, f.id);
+        out.set(f.filename, encoder.encode(text ?? ""));
+      } else {
+        out.set(f.filename, encoder.encode(""));
+      }
+    });
+    await Promise.all(reads);
+
+    // Data files (binary). Skip folder markers — only real files have
+    // OPFS content.
+    if (wsId) {
+      const dataReads = virtualFilesRef.current
+        .filter((vf) => !vf.isFolder)
+        .map(async (vf) => {
+          const bytes = await readDataFile(wsId, vf.path);
+          if (bytes) out.set(vf.path, bytes);
+        });
+      await Promise.all(dataReads);
+    }
+
+    return out;
+  }, []);
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -1367,6 +1424,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const firstId = outputCounter.current + 1;
     newRunFirstIdRef.current = firstId;
     try {
+      // Stage all currently-open workspace files into the runtime's
+      // virtual file system so multi-file `import`s, `include`s, etc.
+      // resolve correctly. Includes:
+      //   - All code tabs (latest dirty buffer takes precedence over
+      //     the on-disk OPFS copy so unsaved edits are visible).
+      //   - All uploaded data files (read straight from OPFS).
+      // Adapters that don't override `prepareFileSystem` keep
+      // single-file semantics — the call is a no-op.
+      if (rt.prepareFileSystem) {
+        const fileMap = await collectWorkspaceFilesForRun();
+        try {
+          await rt.prepareFileSystem(fileMap);
+        } catch (stageErr) {
+          // Surface staging errors as a non-fatal stderr cell — execution
+          // proceeds with whatever files made it into the VFS.
+          const msg =
+            stageErr instanceof Error ? stageErr.message : String(stageErr);
+          collected.push({
+            type: "stderr",
+            content: `Failed to stage workspace files: ${msg}`,
+          });
+        }
+      }
       await rt.run(code, (cell) => collected.push(cell));
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       setOutputsForFile(targetFileId, (prev) => [
@@ -1412,7 +1492,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [clearBeforeRun, setOutputsForFile, showToast]);
+  }, [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -1485,8 +1565,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     updateDirtyBuffer,
   ]);
 
+  /** Open the Settings tab, or focus it if already open. The settings
+   *  panel renders inline inside the editor pane when active. */
+  const openSettingsTab = useCallback(() => {
+    flushActiveFileToBuffer();
+    setSettingsOpen(true);
+    setActiveTabId(SETTINGS_TAB_ID);
+  }, [flushActiveFileToBuffer, setActiveTabId]);
+
+  /** Close the Settings tab and return focus to the previously-active
+   *  code file. Used by the TabBar's close affordance. */
+  const closeSettingsTab = useCallback(() => {
+    setSettingsOpen(false);
+    if (activeTabId === SETTINGS_TAB_ID) {
+      const targetId = activeFileIdRef.current;
+      if (targetId) {
+        setActiveTabId(targetId);
+      } else if (filesRef.current.length > 0) {
+        setActiveTabId(filesRef.current[0].id);
+      }
+    }
+  }, [activeTabId, setActiveTabId]);
+
   const closeFileTab = useCallback(
     (fileId: string) => {
+      if (fileId === SETTINGS_TAB_ID) {
+        closeSettingsTab();
+        return;
+      }
       const current = filesRef.current;
       if (current.length <= 1) {
         // Refuse to close the last file — the playground needs at
@@ -1518,6 +1624,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [
       clearDirtyBuffer,
       clearOutputsForFile,
+      closeSettingsTab,
       setActiveFileId,
       setActiveTabId,
       setFiles,
@@ -2021,8 +2128,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [loaded, statusState]);
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
-    () =>
-      files.map((f) => {
+    () => {
+      const list: TabDescriptor[] = files.map((f) => {
         // PlaygroundFile.filename may be a multi-segment path
         // (e.g. "src/utils.py"); the tab strip is too narrow for the
         // full path, so we show only the leaf and let the Files pane
@@ -2036,8 +2143,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           closeable: files.length > 1,
           renameable: true,
         };
-      }),
-    [files],
+      });
+      if (settingsOpen) {
+        list.push({
+          id: SETTINGS_TAB_ID,
+          kind: "settings",
+          label: "Settings",
+          icon: <Settings size={11} aria-hidden="true" />,
+          closeable: true,
+          renameable: false,
+        });
+      }
+      return list;
+    },
+    [files, settingsOpen],
   );
 
   const capabilitiesBlurb = useMemo(
@@ -2482,7 +2601,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         className="mobile-menu-action"
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          setSettingsOpen(true);
+                          openSettingsTab();
                         }}
                       >
                         <span>Settings</span>
@@ -2494,27 +2613,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </Drawer.Portal>
           </Drawer.Root>
         </header>
-
-        <SettingsPanel
-          open={settingsOpen}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          outputFontSizeEnabled={outputFontSizeEnabled}
-          setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-          outputFontSize={outputFontSize}
-          setOutputFontSize={setOutputFontSize}
-          editorTheme={editorTheme}
-          setEditorTheme={setEditorTheme}
-          wordWrap={wordWrap}
-          setWordWrap={setWordWrap}
-          clearBeforeRun={clearBeforeRun}
-          setClearBeforeRun={setClearBeforeRun}
-          language={adapter.id}
-          onClose={() => setSettingsOpen(false)}
-          onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-          onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-        />
 
         <PackagesDrawer
           open={packagesOpen}
@@ -2741,7 +2839,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       type="button"
                       className="pg-icon-sidebar-btn"
                       aria-label="Settings"
-                      onClick={() => setSettingsOpen(true)}
+                      onClick={openSettingsTab}
                     >
                       <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
                         <circle cx="12" cy="12" r="3" />
@@ -2938,7 +3036,37 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 {statusState === "running" ? "Running…" : "Run"}
               </button>
             </div>
-            <div className="editor-wrap" ref={editorHostRef} />
+            <div
+              className="editor-wrap"
+              ref={editorHostRef}
+              style={
+                activeTabId === SETTINGS_TAB_ID
+                  ? { display: "none" }
+                  : undefined
+              }
+            />
+            {activeTabId === SETTINGS_TAB_ID && (
+              <div className="editor-wrap pg-settings-tab-pane">
+                <SettingsPanelContent
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  outputFontSizeEnabled={outputFontSizeEnabled}
+                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                  outputFontSize={outputFontSize}
+                  setOutputFontSize={setOutputFontSize}
+                  editorTheme={editorTheme}
+                  setEditorTheme={setEditorTheme}
+                  wordWrap={wordWrap}
+                  setWordWrap={setWordWrap}
+                  clearBeforeRun={clearBeforeRun}
+                  setClearBeforeRun={setClearBeforeRun}
+                  language={adapter.id}
+                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                />
+              </div>
+            )}
             <div
               className="resizer"
               ref={resizerRef}

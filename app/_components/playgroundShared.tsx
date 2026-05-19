@@ -8,7 +8,6 @@
 // duplicating them.
 
 import { Fragment, useState, type ReactNode } from "react";
-import { Dialog } from "@base-ui-components/react/dialog";
 import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
 import {
@@ -271,7 +270,6 @@ function ThemePreviewSnippet({
 }
 
 export interface SettingsPanelProps {
-  open: boolean;
   fontSize: number;
   setFontSize: (n: number) => void;
   outputFontSizeEnabled: boolean;
@@ -299,7 +297,6 @@ export interface SettingsPanelProps {
    *  SQL playgrounds set this to false — the option only applies to
    *  non-SQL playgrounds where outputs are appended. Defaults to true. */
   showClearBeforeRunRow?: boolean;
-  onClose: () => void;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
   /** Wipe every browser-side storage surface this app uses
@@ -325,10 +322,11 @@ export interface SettingsPanelProps {
   }>;
 }
 
-/** Tabbed settings dialog (General + Editor Themes) shared across all
- *  playgrounds. */
-export function SettingsPanel({
-  open,
+/** Tabbed settings UI body (General + Editor Themes + extra tabs)
+ *  shared across all playgrounds. Rendered inline inside a tab pane in
+ *  every playground — the legacy modal-dialog form has been retired in
+ *  favour of the "Settings as a tab" affordance. */
+export function SettingsPanelContent({
   fontSize,
   setFontSize,
   outputFontSizeEnabled,
@@ -346,7 +344,6 @@ export function SettingsPanel({
   showOutputFontSizeControls = true,
   clearBeforeRunLabel,
   showClearBeforeRunRow = true,
-  onClose,
   onRestoreDefaults,
   onClearLocalStorage,
   onClearAllLocalData,
@@ -357,28 +354,11 @@ export function SettingsPanel({
   const [tab, setTab] = useState<string>("general");
 
   return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) onClose();
-      }}
+    <Tabs.Root
+      value={tab}
+      onValueChange={(v) => setTab(String(v))}
+      className="settings-tabs"
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="settings-overlay" />
-        <Dialog.Popup className="settings-panel" aria-label="Settings">
-          <Dialog.Title className="settings-sr-title">Settings</Dialog.Title>
-          <Dialog.Close
-            className="settings-close settings-close-floating"
-            aria-label="Close settings"
-          >
-            ✕
-          </Dialog.Close>
-
-          <Tabs.Root
-            value={tab}
-            onValueChange={(v) => setTab(String(v))}
-            className="settings-tabs"
-          >
             <Tabs.List
               className="settings-tabs-list"
               aria-label="Settings sections"
@@ -588,8 +568,5 @@ export function SettingsPanel({
               <Fragment key={t.value}>{t.panel}</Fragment>
             ))}
           </Tabs.Root>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
   );
 }
