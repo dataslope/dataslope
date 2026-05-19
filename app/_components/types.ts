@@ -107,6 +107,13 @@ export interface LanguageAdapter {
   exportFormats: ExportFormat[];
   /** Base filename (without extension) used when exporting, e.g. "script". */
   exportBaseFilename: string;
+  /** Default file extension (no dot) for new tabs in this playground —
+   *  e.g. "py", "js", "cpp". Used to seed the initial workspace file
+   *  and to suggest names for "+" new tabs. */
+  defaultFileExtension: string;
+  /** Filename treated as the entry point for multi-file runs. When
+   *  unset, the active tab's file is the entry point. */
+  entryPoint?: string;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
   /** Build the snippet inserted at the top of the editor when the user

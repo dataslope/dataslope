@@ -240,6 +240,8 @@ export const typescriptAdapter: LanguageAdapter = {
     { extension: "ts", label: "TypeScript (.ts)", mimeType: "text/typescript" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "ts",
+  entryPoint: "index.ts",
   packagesFooter: (
     <>
       Code is transpiled in-browser by the official{" "}

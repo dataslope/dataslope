@@ -449,6 +449,8 @@ export const cAdapter: LanguageAdapter = {
     { extension: "h", label: "C header (.h)", mimeType: "text/x-chdr" },
   ],
   exportBaseFilename: "main",
+  defaultFileExtension: "c",
+  entryPoint: "main.c",
   packagesFooter: (
     <>
       Headers above are part of the{" "}

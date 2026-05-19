@@ -706,6 +706,8 @@ export const pythonAdapter: LanguageAdapter = {
     { extension: "py", label: "Python (.py)", mimeType: "text/x-python" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "py",
+  entryPoint: "main.py",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

@@ -201,3 +201,42 @@ export async function listFiles(workspaceId: string): Promise<string[]> {
 export async function flushFileWrites(): Promise<void> {
   await flush();
 }
+
+/**
+ * Recursively sums every file size under a workspace's OPFS directory.
+ * Returns a byte count suitable for display in the Workspace Manager UI.
+ * Returns `0` when OPFS is unavailable or the workspace has no backing
+ * directory.
+ */
+export async function estimateWorkspaceSize(
+  workspaceId: string,
+): Promise<number> {
+  if (!isOpfsSupported()) return 0;
+  try {
+    const root = await navigator.storage.getDirectory();
+    const wsDir = await root.getDirectoryHandle("workspaces", {
+      create: false,
+    });
+    const wDir = await wsDir.getDirectoryHandle(workspaceId, { create: false });
+    return await sumDirectory(wDir);
+  } catch {
+    return 0;
+  }
+}
+
+async function sumDirectory(dir: FileSystemDirectoryHandle): Promise<number> {
+  let total = 0;
+  for await (const [, handle] of dir as unknown as IterableDir) {
+    if (handle.kind === "directory") {
+      total += await sumDirectory(handle as FileSystemDirectoryHandle);
+    } else {
+      try {
+        const file = await (handle as FileSystemFileHandle).getFile();
+        total += file.size;
+      } catch {
+        // Unreadable file — skip.
+      }
+    }
+  }
+  return total;
+}

@@ -67,6 +67,24 @@ export function setActiveWorkspaceId(
 }
 
 /**
+ * Switches the active workspace for a playground and reloads the page.
+ * Uses a reload (rather than tearing down + re-bootstrapping the engine
+ * and editor in place) because every workspace switch needs to rebuild
+ * the runtime / database state from scratch — a reload is both simpler
+ * and indistinguishable from an in-place re-bootstrap from the user's
+ * perspective.
+ */
+export function switchActiveWorkspace(
+  playgroundId: string,
+  workspaceId: string,
+): void {
+  setActiveWorkspaceId(playgroundId, workspaceId);
+  if (typeof window !== "undefined") {
+    window.location.reload();
+  }
+}
+
+/**
  * Resolve (or create) the active workspace for a playground.
  *
  * Returns the full `WorkspaceEntry` (id, name, createdAt, etc.) so

@@ -217,6 +217,8 @@ export const phpAdapter: LanguageAdapter = {
     { extension: "php", label: "PHP (.php)", mimeType: "application/x-php" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "php",
+  entryPoint: "index.php",
   packagesFooter: (
     <>
       Functions above are part of the{" "}

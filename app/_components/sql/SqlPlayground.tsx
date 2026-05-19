@@ -126,6 +126,7 @@ import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import {
   type ColumnConstraintInfo,
   type ColumnSpec,
@@ -1188,6 +1189,12 @@ function SqlPlaygroundInner() {
     null,
   );
   const [quipIndex, setQuipIndex] = useState<number>(0);
+  // Active workspace surfaced in the header WorkspaceBadge. Resolved
+  // asynchronously by the bootstrap effect below.
+  const [activeWorkspace, setActiveWorkspace] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   // ─── Derived values ──────────────────────────────────────────────────
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
@@ -1629,6 +1636,7 @@ function SqlPlaygroundInner() {
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
+          setActiveWorkspace({ id: workspace.id, name: workspace.name });
         } catch {
           // Workspace bootstrap is best-effort — proceed in-memory.
         }
@@ -2148,6 +2156,13 @@ function SqlPlaygroundInner() {
       }
       headerActions={
         <>
+          {activeWorkspace && (
+            <WorkspaceBadge
+              playgroundId={PLAYGROUND_ID}
+              activeWorkspaceId={activeWorkspace.id}
+              activeWorkspaceName={activeWorkspace.name}
+            />
+          )}
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger

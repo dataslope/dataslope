@@ -105,6 +105,7 @@ import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { type DuckDbEngine } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
@@ -974,6 +975,10 @@ function DuckDbPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading DuckDB engine…",
   );
+  const [activeWorkspace, setActiveWorkspace] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
@@ -1642,6 +1647,7 @@ function DuckDbPlaygroundInner() {
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
+          setActiveWorkspace({ id: workspace.id, name: workspace.name });
         } catch {
           /* proceed in-memory */
         }
@@ -3559,6 +3565,13 @@ function DuckDbPlaygroundInner() {
       loadingCaption={loadingMessage}
       headerActions={
         <>
+          {activeWorkspace && (
+            <WorkspaceBadge
+              playgroundId={PLAYGROUND_ID}
+              activeWorkspaceId={activeWorkspace.id}
+              activeWorkspaceName={activeWorkspace.name}
+            />
+          )}
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger

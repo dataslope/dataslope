@@ -582,6 +582,8 @@ export const javaAdapter: LanguageAdapter = {
     },
   ],
   exportBaseFilename: "Main",
+  defaultFileExtension: "java",
+  entryPoint: "Main.java",
   packagesFooter: (
     <>
       Packages above are part of the{" "}
