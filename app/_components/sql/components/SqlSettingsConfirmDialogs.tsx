@@ -10,6 +10,11 @@ export interface SqlSettingsConfirmDialogsProps {
   clearStorageOpen: boolean;
   onClearStorageOpenChange: (open: boolean) => void;
   onClearStorageConfirm: () => void;
+  /** Confirm dialog for the nuclear "Clear all local data" action.
+   *  Optional so callers can opt in. */
+  clearAllDataOpen?: boolean;
+  onClearAllDataOpenChange?: (open: boolean) => void;
+  onClearAllDataConfirm?: () => void;
 }
 
 export function SqlSettingsConfirmDialogs({
@@ -20,6 +25,9 @@ export function SqlSettingsConfirmDialogs({
   clearStorageOpen,
   onClearStorageOpenChange,
   onClearStorageConfirm,
+  clearAllDataOpen,
+  onClearAllDataOpenChange,
+  onClearAllDataConfirm,
 }: SqlSettingsConfirmDialogsProps) {
   return (
     <>
@@ -52,6 +60,42 @@ export function SqlSettingsConfirmDialogs({
           </AlertDialog.Popup>
         </AlertDialog.Portal>
       </AlertDialog.Root>
+
+      {onClearAllDataConfirm && onClearAllDataOpenChange && (
+        <AlertDialog.Root
+          open={!!clearAllDataOpen}
+          onOpenChange={onClearAllDataOpenChange}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Clear all local data?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                This will permanently delete every saved setting, query,
+                {" "}<strong>workspace</strong>, persisted{" "}
+                <strong>database</strong>, and uploaded{" "}
+                <strong>data file</strong> across{" "}
+                <strong>all Dataslope playgrounds</strong> — including
+                localStorage, OPFS, IndexedDB, and any cached assets. The
+                page will reload immediately. This cannot be undone.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={onClearAllDataConfirm}
+                >
+                  Clear &amp; reload
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+      )}
 
       <AlertDialog.Root
         open={clearStorageOpen}

@@ -105,6 +105,15 @@ import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { acquireWorkspaceLock } from "../opfs/workspace";
+import {
+  deleteDataEntry as opfsDeleteDataEntry,
+  loadDataFiles as opfsLoadDataFiles,
+  readDataFile as opfsReadDataFile,
+  renameDataEntry as opfsRenameDataEntry,
+  upsertDataFolder as opfsUpsertDataFolder,
+  writeDataFile as opfsWriteDataFile,
+} from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { type DuckDbEngine } from "../runtime/duckdb";
 
@@ -979,6 +988,14 @@ function DuckDbPlaygroundInner() {
     id: string;
     name: string;
   } | null>(null);
+  // Mirror activeWorkspace.id in a ref so the file-pane handlers can
+  // read the current workspace synchronously without participating in
+  // useCallback dep arrays (which would force them to rebuild every
+  // time the workspace switches).
+  const workspaceIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    workspaceIdRef.current = activeWorkspace?.id ?? null;
+  }, [activeWorkspace]);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
@@ -1045,6 +1062,7 @@ function DuckDbPlaygroundInner() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
+  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
   const [pendingDbId, setPendingDbId] = useState<string | null>(null);
   const [pendingDropEntity, setPendingDropEntity] = useState<{
     name: string;
@@ -1648,6 +1666,21 @@ function DuckDbPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
+          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          try {
+            if (window.sessionStorage.getItem(noticeKey) !== "1") {
+              const hasLock = await acquireWorkspaceLock(workspace.id);
+              if (!cancelled && !hasLock) {
+                window.sessionStorage.setItem(noticeKey, "1");
+                showToast(
+                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                  "warn",
+                );
+              }
+            }
+          } catch {
+            /* sessionStorage / Locks unavailable — ignore. */
+          }
         } catch {
           /* proceed in-memory */
         }
@@ -1668,6 +1701,44 @@ function DuckDbPlaygroundInner() {
         await refreshSchema();
         setLoaded(true);
         setStatusState("ready");
+
+        // Rehydrate user-uploaded data files from OPFS into DuckDB's
+        // virtual filesystem so previously-uploaded CSV / JSON /
+        // Parquet remain queryable across reloads. Best-effort: an
+        // unavailable OPFS just leaves the panel empty.
+        if (workspaceId) {
+          try {
+            const persisted = await opfsLoadDataFiles(workspaceId);
+            if (cancelled) return;
+            for (const entry of persisted) {
+              if (entry.isFolder) continue;
+              const bytes = await opfsReadDataFile(workspaceId, entry.path);
+              if (cancelled) return;
+              if (!bytes) continue;
+              try {
+                await engine.registerFileBuffer(entry.path, bytes);
+              } catch {
+                /* skip unreadable entry — UI still shows it as available */
+              }
+            }
+            if (!cancelled && persisted.length > 0) {
+              setVirtualFiles(persisted);
+              const folders = new Set<string>();
+              for (const e of persisted) {
+                const segments = e.path.split("/");
+                segments.pop();
+                let cur = "";
+                for (const s of segments) {
+                  cur = cur ? `${cur}/${s}` : s;
+                  folders.add(cur);
+                }
+              }
+              setExpandedFolders((prev) => new Set([...prev, ...folders]));
+            }
+          } catch {
+            /* OPFS rehydrate best-effort */
+          }
+        }
       } catch (err) {
         if (cancelled) return;
         setLoadingMessage(
@@ -1990,6 +2061,18 @@ function DuckDbPlaygroundInner() {
             const buf = await file.arrayBuffer();
             const bytes = new Uint8Array(buf);
             const path = parentPath ? `${parentPath}/${file.name}` : file.name;
+            // Persist a copy to OPFS *before* handing the buffer to the
+            // DuckDB-WASM worker — the worker detaches the underlying
+            // ArrayBuffer via postMessage transfer, so we can't rely on
+            // the bytes still being readable after `registerFileBuffer`.
+            const wsId = workspaceIdRef.current;
+            if (wsId) {
+              try {
+                await opfsWriteDataFile(wsId, path, bytes);
+              } catch {
+                /* OPFS write best-effort */
+              }
+            }
             await registerVirtualFile(path, bytes);
             showToast(`Uploaded "${path}".`);
           } catch (err) {
@@ -2048,6 +2131,16 @@ function DuckDbPlaygroundInner() {
             await engine.dropFile(entry.path);
           }
         }
+        // Also drop the OPFS copy so the file doesn't reappear on the
+        // next page load.
+        const wsId = workspaceIdRef.current;
+        if (wsId) {
+          try {
+            await opfsDeleteDataEntry(wsId, path);
+          } catch {
+            /* OPFS delete best-effort */
+          }
+        }
         setVirtualFiles((prev) =>
           prev.filter(
             (f) => f.path !== path && !f.path.startsWith(prefix),
@@ -2081,6 +2174,16 @@ function DuckDbPlaygroundInner() {
               : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
             await engine.dropFile(entry.path);
             await engine.registerFileBuffer(dest, bytes);
+          }
+          // Mirror the rename inside OPFS so the on-disk copy follows
+          // the new path.
+          const wsId = workspaceIdRef.current;
+          if (wsId) {
+            try {
+              await opfsRenameDataEntry(wsId, oldPath, newPath);
+            } catch {
+              /* OPFS rename best-effort */
+            }
           }
           setVirtualFiles((prev) =>
             prev.map((f) => {
@@ -2117,6 +2220,11 @@ function DuckDbPlaygroundInner() {
         if (parentPath) next.add(parentPath);
         return next;
       });
+      // Persist the folder marker so empty folders survive reloads.
+      const wsId = workspaceIdRef.current;
+      if (wsId) {
+        void opfsUpsertDataFolder(wsId, path);
+      }
     },
     [],
   );
@@ -2159,6 +2267,16 @@ function DuckDbPlaygroundInner() {
                 : `${newPrefix}${entry.path.slice(oldPrefix.length)}`;
             await engine.dropFile(entry.path);
             await engine.registerFileBuffer(dest, bytes);
+          }
+          // Mirror the move inside OPFS (also renames children of a
+          // moved folder).
+          const wsId = workspaceIdRef.current;
+          if (wsId) {
+            try {
+              await opfsRenameDataEntry(wsId, sourcePath, newPath);
+            } catch {
+              /* OPFS rename best-effort */
+            }
           }
           setVirtualFiles((prev) =>
             prev.map((f) => {
@@ -2419,6 +2537,20 @@ function DuckDbPlaygroundInner() {
       /* ignore */
     }
     window.location.reload();
+  }, []);
+
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading.
+  const clearAllLocalData = useCallback(() => {
+    void (async () => {
+      try {
+        const mod = await import("../storage/clearAllData");
+        await mod.clearAllLocalData();
+      } catch {
+        /* fall through to reload regardless */
+      }
+      window.location.reload();
+    })();
   }, []);
 
   const handleFormatCode = useCallback(async () => {
@@ -3840,6 +3972,7 @@ function DuckDbPlaygroundInner() {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
           resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
           onResetTabs={resetTabsForCurrentDb}
           extraTabs={[
@@ -4017,6 +4150,9 @@ function DuckDbPlaygroundInner() {
           clearStorageOpen={confirmClearStorageOpen}
           onClearStorageOpenChange={setConfirmClearStorageOpen}
           onClearStorageConfirm={clearAllLocalStorage}
+          clearAllDataOpen={confirmClearAllDataOpen}
+          onClearAllDataOpenChange={setConfirmClearAllDataOpen}
+          onClearAllDataConfirm={clearAllLocalData}
         />
 
         {/* ── View/Edit Structure drawer ── */}

@@ -499,6 +499,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
     useState(false);
+  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] =
+    useState(false);
 
   // ─── Files pane (OPFS-backed virtual filesystem) ─────────────────────
   const [filesPaneOpen, setFilesPaneOpen] = useState(false);
@@ -1324,6 +1326,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     window.location.reload();
   }, []);
 
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading. Backed by the shared
+  // `clearAllLocalData` helper so every playground gets the same
+  // behaviour. Best-effort: failures inside one surface don't block
+  // the others, and we always reload.
+  const clearAllLocalData = useCallback(() => {
+    void (async () => {
+      try {
+        const mod = await import("./storage/clearAllData");
+        await mod.clearAllLocalData();
+      } catch {
+        /* fall through to reload regardless */
+      }
+      window.location.reload();
+    })();
+  }, []);
+
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(async () => {
     const editor = editorRef.current;
@@ -1513,6 +1532,27 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const next = filesRef.current.map((f) =>
         f.id === fileId ? { ...f, filename: trimmed } : f,
       );
+      filesRef.current = next;
+      setFiles(next);
+    },
+    [setFiles],
+  );
+
+  /** Reorder the file tabs after a drag-and-drop drop. The generic
+   *  TabBar hands us the new tab order (TabDescriptors); we project it
+   *  back onto the `files` array via id lookup so the manifest stays
+   *  authoritative. */
+  const reorderFileTabs = useCallback(
+    (nextDescriptors: TabDescriptor[]) => {
+      const byId = new Map(filesRef.current.map((f) => [f.id, f]));
+      const next: PlaygroundFile[] = [];
+      for (const d of nextDescriptors) {
+        const f = byId.get(d.id);
+        if (f) next.push(f);
+      }
+      // Defensive: ensure we didn't drop any files (e.g. a transient
+      // mismatch between descriptors and the file list).
+      if (next.length !== filesRef.current.length) return;
       filesRef.current = next;
       setFiles(next);
     },
@@ -2295,6 +2335,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           onClose={() => setSettingsOpen(false)}
           onRestoreDefaults={() => setConfirmRestoreOpen(true)}
           onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
         />
 
         <PackagesDrawer
@@ -2406,6 +2447,46 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   className="confirm-btn confirm-btn-danger"
                   onClick={() => {
                     clearAllLocalStorage();
+                  }}
+                >
+                  Clear &amp; reload
+                </AlertDialog.Close>
+              </div>
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
+
+        {/* Nuclear wipe: drops localStorage AND OPFS AND IndexedDB AND
+            caches. Mirrors the lighter "Clear all localStorage" dialog
+            but with stronger language so the user understands they're
+            also losing every workspace, database, and uploaded file. */}
+        <AlertDialog.Root
+          open={confirmClearAllDataOpen}
+          onOpenChange={setConfirmClearAllDataOpen}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="confirm-backdrop" />
+            <AlertDialog.Popup className="confirm-popup">
+              <AlertDialog.Title className="confirm-title">
+                Clear all local data?
+              </AlertDialog.Title>
+              <AlertDialog.Description className="confirm-desc">
+                This will permanently delete every saved setting, code
+                snippet, <strong>workspace</strong>, persisted{" "}
+                <strong>database</strong>, and uploaded{" "}
+                <strong>data file</strong> across{" "}
+                <strong>all playgrounds</strong> — including localStorage,
+                OPFS, IndexedDB, and any cached assets. The page will
+                reload immediately. This can&rsquo;t be undone.
+              </AlertDialog.Description>
+              <div className="confirm-actions">
+                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                  Cancel
+                </AlertDialog.Close>
+                <AlertDialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    clearAllLocalData();
                   }}
                 >
                   Clear &amp; reload
@@ -2540,6 +2621,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             onCloseTab={files.length > 1 ? closeFileTab : undefined}
             onAddTab={addNewFile}
             onRenameTab={renameFileTab}
+            onReorderTabs={files.length > 1 ? reorderFileTabs : undefined}
             className="pg-file-tabbar"
           />
         )}

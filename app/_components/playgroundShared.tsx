@@ -302,6 +302,12 @@ export interface SettingsPanelProps {
   onClose: () => void;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
+  /** Wipe every browser-side storage surface this app uses
+   *  (localStorage + sessionStorage + OPFS + IndexedDB + caches) and
+   *  reload. More thorough than `onClearLocalStorage`. Optional so
+   *  callers can opt into surfacing the action — when omitted the row
+   *  is hidden. */
+  onClearAllLocalData?: () => void;
   /** Optional extra rows appended inside the General tab — used by the
    *  SQL playground to surface a per-DB "Reset query tabs" action. */
   extraGeneralRows?: ReactNode;
@@ -343,6 +349,7 @@ export function SettingsPanel({
   onClose,
   onRestoreDefaults,
   onClearLocalStorage,
+  onClearAllLocalData,
   extraGeneralRows,
   extraActionRows,
   extraTabs,
@@ -506,6 +513,16 @@ export function SettingsPanel({
                     <Trash2 size={14} aria-hidden="true" />
                     <span>Clear all localStorage data</span>
                   </button>
+                  {onClearAllLocalData && (
+                    <button
+                      type="button"
+                      className="settings-action-btn settings-action-danger"
+                      onClick={onClearAllLocalData}
+                    >
+                      <Trash2 size={14} aria-hidden="true" />
+                      <span>Clear all local data (storage + OPFS)</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </Tabs.Panel>

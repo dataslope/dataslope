@@ -447,47 +447,118 @@ app/_components/
 
 ### Where the next agent picks up
 
-**All six phases of the original plan are complete.** The remaining
-work falls into clearly-scoped follow-up tasks:
+**All six phases of the original plan are complete.** Follow-up
+session 2026-05-19 picked up items 3, 6, 7 + two user-driven
+additions ("Clear all local data" + DuckDB FilesPanel ↔ OPFS) and
+landed them on `claude/implement-workspace-features-nz1zP`:
+
+#### ✅ Done in 2026-05-19 follow-up session
+
+- **Item 3 — DnD tab reordering for non-SQL playgrounds.** The generic
+  `app/_components/tabs/TabBar.tsx` now accepts an optional
+  `onReorderTabs?: (next: TabDescriptor[]) => void` prop. When passed
+  the bar mounts a `DndContext` + horizontal `SortableContext` and
+  each `TabItem` is wired through `useSortable`. `Playground.tsx`
+  passes a `reorderFileTabs` callback that projects the new
+  descriptor order back onto `files` via id lookup, then commits via
+  the Zustand store's `setFiles`. `useSortable` is invoked
+  unconditionally with `{ disabled: !sortable }` so the bar stays a
+  single static call path. A `TabOverlay` clone is shown via
+  `DragOverlay` while dragging.
+
+- **Item 6 — Tab-isolation notice in SQL playgrounds.** Each SQL
+  playground bootstrap effect (`SqlPlayground.tsx`,
+  `PostgresPlayground.tsx`, `DuckDbPlayground.tsx`) now mirrors the
+  non-SQL `Playground.tsx` pattern: after `ensureActiveWorkspace`,
+  call `acquireWorkspaceLock(workspaceId)`, and if the lock is
+  unavailable show the one-time `pg_ws_warned_<id>` toast.
+
+- **Item 7 — Workspace size in popover.**
+  `WorkspaceBadge.tsx` now prefetches `estimateWorkspaceSize(id)` for
+  every workspace listed in the popover as soon as it opens.
+  The fetched sizes live in component state, so subsequent opens
+  render the cached value synchronously and update in place when the
+  fresh estimate lands. The "Last opened …" meta line now reads
+  "Last opened … · 12.4 KB".
+
+- **User add: "Clear all local data" action.** New helper
+  `app/_components/storage/clearAllData.ts` clears localStorage +
+  sessionStorage + OPFS (iterating `root.entries()` and
+  `removeEntry(name, { recursive: true })` on each) + IndexedDB (via
+  `indexedDB.databases()` where supported) + Cache Storage. The
+  `SettingsPanel` (`playgroundShared.tsx`) gained an optional
+  `onClearAllLocalData?` prop that renders an extra red action below
+  the existing "Clear all localStorage data" button. The SQL shell's
+  `SqlSettingsConfirmDialogs` gained matching optional
+  `clearAllDataOpen` / `onClearAllDataOpenChange` /
+  `onClearAllDataConfirm` props. All four playground shells
+  (Playground.tsx, SqlPlayground, PostgresPlayground, DuckDbPlayground)
+  now surface the new action, each with its own AlertDialog
+  confirmation. The shared SQL dialog store gained a
+  `confirmClearAllDataOpen` boolean.
+
+- **User add: DuckDB FilesPanel ↔ OPFS.** Previously DuckDB's
+  uploaded data files lived only in DuckDB-WASM's MEMFS and vanished
+  on reload. Now `DuckDbPlayground.tsx` mirrors every FilesPanel
+  operation into OPFS via the existing `opfsDataStorage` helpers:
+  - On bootstrap, after the engine and schemas are ready, walk the
+    manifest via `opfsLoadDataFiles`, re-register each file with the
+    engine, and seed `virtualFiles` + auto-expand ancestor folders.
+  - Upload writes to OPFS *before* `registerFileBuffer` (the worker
+    detaches the ArrayBuffer via transfer, so we must snapshot
+    first).
+  - Delete / Rename / Move / Create-Folder all call the matching
+    `opfs*DataEntry` / `opfs*Folder` helper after the engine
+    operation succeeds.
+  - A new `workspaceIdRef` mirrors `activeWorkspace.id` so the
+    handlers don't need to participate in dep arrays.
+
+#### ⏳ Outstanding from the original plan
 
 1. **Refactor `SqlTabBar` onto the generic `TabBar`** (§4.5). The
-   `app/_components/tabs/TabBar.tsx` component built in Phase 5 is
-   intentionally content-agnostic. `SqlTabBar` should adopt it as its
-   foundation. Two complications make this its own PR:
-   - The SQL tab's context menu has Duplicate / Close Others / Close
-     All entries — the generic bar currently exposes only Rename and
-     Close. Either generalise the context menu (preferred) via a
-     `contextMenuItems?: ContextMenuItem[]` prop on `TabDescriptor`,
-     or render the SQL menu separately and lift the rest of the bar.
-   - SQL tabs carry `kind: "view-data" | "er-diagram" |
-     "query-history"` with kind-specific icons. The generic
-     `TabDescriptor.icon` slot already covers this; the SQL bar's
-     special-case CSS classes (`.sql-tab-view-data` etc.) can map to
-     the generic `.pg-tab--kind-${kind}` classes.
+   generic `TabBar` now supports DnD so the bar is feature-compatible,
+   but `SqlTabBar`'s context menu still has Duplicate / Close Others /
+   Close All entries the generic bar lacks. Two paths forward:
+   - Generalise via a `contextMenuItems?: ContextMenuItem[]` prop on
+     `TabDescriptor` (preferred), OR
+   - Lift only the drag wrapper from `SqlTabBar` (it can now delegate
+     to the generic DnD strip we just added) and keep the SQL-specific
+     ContextMenu in `SqlTab.tsx`.
+
+   The SQL bar's kind-specific CSS (`.sql-tab-view-data` etc.) can map
+   straight onto the generic `.pg-tab--kind-${kind}` classes the
+   generic bar already emits.
 
 2. **Move Settings from a dialog to a tab** (§4.5, §8.2). The
-   `SettingsPanel` component currently uses Base UI's `Dialog`. To
-   render inline as a tab, extract its body into a `<SettingsContent>`
-   component that does not assume a dialog wrapper. Then add a
+   `SettingsPanel` component still uses Base UI's `Dialog`. To render
+   inline as a tab, extract its body (the `Tabs.Root` with General /
+   Themes / `extraTabs` panels) into a `<SettingsContent>` component
+   that does not assume a dialog wrapper. Then add a
    `kind: "settings"` tab in `Playground.tsx` (and the SQL shells),
    gated on `settingsTabOpen` in the existing Phase-5 store (the
    field is already in the store — the toggle just needs the click
    handler to switch tabs and add the descriptor). The gear icon
-   button in the sidebar then opens the settings tab instead of the
-   dialog.
-
-3. **Drag-and-drop tab reordering for non-SQL playgrounds.** The
-   generic `TabBar` does not yet wrap `@dnd-kit`. Lift the
-   `SortableContext` + sensor setup from `SqlTabBar.tsx` into
-   `TabBar.tsx` behind an `onReorderTabs?` prop, and wire it through
-   `Playground.tsx` to update `files` in the Zustand store.
+   button then opens the settings tab instead of the dialog. Watch
+   out for the `.settings-panel` CSS (~line 1463 of `playground.css`)
+   — it positions the dialog as a fixed top-right popup; the inline
+   version needs to inherit the editor pane's layout instead. The
+   close-button affordance becomes the tab's own X.
 
 4. **Multi-file execution per language** (§4.4). Phase 5 ships
    active-file-only execution. To support cross-file imports, each
-   runtime needs to receive a file map `{ filename: code }`:
-   - **Python / R / PHP**: write all workspace files to the
-     respective VFS (`pyodide.FS.writeFile`, WebR VFS, php-wasm VFS)
-     before running the entry point.
+   runtime needs to receive a file map `{ filename: code }`. Audited
+   in 2026-05-19 follow-up: *none* of the existing non-SQL adapters
+   (`runtime/python.tsx`, `r.tsx`, `php.tsx`, `javascript.tsx`,
+   `typescript.tsx`, `c.tsx`, `cpp.tsx`, `java.tsx`, `csharp.tsx`)
+   touch a VFS at all today — the `LanguageRuntime` interface only
+   has `run(code, emit)`. To unlock multi-file:
+   - Extend `LanguageRuntime` with an optional
+     `writeFile(path: string, content: string | Uint8Array)` method
+     and an optional `entryPoint?: string` argument to `run`.
+   - **Python / R / PHP**: write all workspace files (and the
+     FilesPanel data files — see follow-up #8 below) to the
+     respective VFS (`pyodide.FS.writeFile` from inside the worker,
+     WebR VFS, php-wasm VFS) before running the entry point.
    - **TypeScript**: the TS compiler already accepts multiple
      sources; thread the file map through `typescript-worker.ts`.
    - **C / C++ / Java / C#**: their respective WASM compilers accept
@@ -502,28 +573,68 @@ work falls into clearly-scoped follow-up tasks:
    dependency via several packages; if not, a small DEFLATE-only
    implementation suffices.
 
-6. **Tab-isolation notice in SQL playgrounds.** Phase 6 wired the
-   one-time `acquireWorkspaceLock` toast only into `Playground.tsx`
-   (non-SQL). Add the same pattern after `ensureActiveWorkspace` in
-   each of the three SQL playground bootstrap effects.
+#### 🚨 Newly-discovered gaps (audit, 2026-05-19)
 
-7. **Workspace size in the popover.** The drawer shows byte sizes; the
-   popover currently shows only "last opened". The async
-   `estimateWorkspaceSize` can be prefetched on popover open and
-   cached in a ref so the size renders without flicker.
+8. **FilesPanel data files are NOT exposed to non-SQL runtimes.** In
+   `Playground.tsx` the FilesPanel persists uploads to OPFS
+   correctly, *but* none of the non-SQL language adapters wire the
+   resulting `virtualFiles` array into the runtime's filesystem.
+   `LanguageRuntime.run` only receives the active-tab code string —
+   there's no path for Python's `open("data.csv")` (or R, PHP, JS,
+   TS, …) to ever reach a user-uploaded file. The DuckDB FilesPanel
+   *is* functional because DuckDB-WASM registers buffers directly.
+   This is essentially a prerequisite for follow-up #4: extend
+   `LanguageRuntime` with `writeFile` and have `Playground.tsx`
+   flush every `VirtualFile` into the runtime's VFS before invoking
+   `run`. Each adapter then needs to implement `writeFile`:
+   - **Python**: route through `pyodide-worker.ts` →
+     `pyodide.FS.writeFile`
+   - **R**: route through WebR's `evalRString`-driven VFS shim (R
+     doesn't have a stable FS API yet — may need a wrapper)
+   - **PHP**: `php-worker.ts` → `php.writeFile`
+   - **JavaScript / TypeScript**: synthetic `import.meta.fs` shim
+     or expose via `globalThis.__playgroundFs` for code to read
+   - **C / C++ / Java / C#**: pass into the compile step's source set
+
+   Without this, the FilesPanel in non-SQL playgrounds is purely
+   decorative (uploads persist across reloads but can't be read by
+   user code).
+
+9. **SQL playground query tabs are workspace-agnostic.** Tabs are
+   stored at `pg_<dialect>_db_<dbId>_tabs` in localStorage — keyed
+   by *database id*, not by workspace id. Switching workspaces in
+   SQL playgrounds keeps the same tab set per database, which is
+   probably the intended behaviour (the database itself is
+   workspace-scoped in OPFS), but it does mean `clearAllLocalStorage`
+   in one playground wipes another playground's tab state. The
+   stronger "Clear all local data" action makes this less of an
+   issue, but if cross-workspace tab isolation is ever needed the
+   key shape needs to change to `pg_<dialect>_<wsId>_<dbId>_tabs`.
+
+#### Still relevant from earlier list
+
+6. *(Done — see above.)*
+7. *(Done — see above.)*
 
 Key files for any follow-up agent:
-- `app/_components/tabs/TabBar.tsx` — generic tab strip
+- `app/_components/tabs/TabBar.tsx` — generic tab strip (now with
+  optional DnD reorder)
 - `app/_components/playgroundTabs.ts` — `PlaygroundFile` type +
   manifest helpers
 - `app/_components/stores/createPlaygroundStore.ts` — Zustand factory
   (already has a `settingsTabOpen` flag wired up but not yet
   rendered)
 - `app/_components/workspace/WorkspaceBadge.tsx` — reference for
-  popover + drawer patterns
+  popover + drawer patterns (now prefetches sizes)
+- `app/_components/storage/clearAllData.ts` — the "wipe everything"
+  helper; reuse for any other "factory reset" UX
+- `app/_components/files/opfsDataStorage.ts` — OPFS helpers for the
+  FilesPanel data files; DuckDB now also uses these
 - `app/_components/Playground.tsx` — reference non-SQL shell
 - `app/_components/sql/components/SqlTabBar.tsx` — the bar to
-  generalise
+  generalise (item 1 above)
+- `app/_components/playgroundShared.tsx` — shared `SettingsPanel`
+  (still dialog-based; see item 2 above)
 
 ---
 
