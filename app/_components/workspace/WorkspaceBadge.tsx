@@ -18,6 +18,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -28,12 +29,14 @@ import { Drawer } from "@base-ui/react/drawer";
 import {
   Check,
   Copy as CopyIcon,
+  Download,
   Folder,
   HardDrive,
   Pencil,
   Plus,
   Settings2,
   Trash2,
+  Upload,
 } from "lucide-react";
 import {
   createWorkspace,
@@ -45,6 +48,10 @@ import {
 } from "../opfs/workspace";
 import { switchActiveWorkspace } from "../opfs/activeWorkspace";
 import { estimateWorkspaceSize } from "../opfs/fileStorage";
+import {
+  downloadWorkspaceZip,
+  importWorkspaceFromZip,
+} from "../opfs/workspaceArchive";
 
 const RECENT_LIMIT = 6;
 
@@ -309,6 +316,11 @@ function WorkspaceManagerDrawer({
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<WorkspaceEntry | null>(null);
+  const [busy, setBusy] = useState<{ id: string; action: "export" | "import" } | null>(
+    null,
+  );
+  const [importError, setImportError] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
 
   // Recompute byte sizes whenever the drawer opens or the workspace list
   // changes. We rebuild the full map rather than diffing because the
@@ -335,6 +347,44 @@ function WorkspaceManagerDrawer({
     const created = await createWorkspace(defaultName, playgroundId);
     switchActiveWorkspace(playgroundId, created.id);
   }, [playgroundId]);
+
+  const handleExport = useCallback(
+    async (ws: WorkspaceEntry) => {
+      setBusy({ id: ws.id, action: "export" });
+      try {
+        const ok = await downloadWorkspaceZip(ws.id);
+        if (!ok) {
+          setImportError(
+            "Couldn't export workspace — persistent storage may be unavailable.",
+          );
+        }
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setBusy(null);
+      }
+    },
+    [],
+  );
+
+  const handleImport = useCallback(
+    async (file: File) => {
+      setImportError(null);
+      setBusy({ id: "__import__", action: "import" });
+      try {
+        const result = await importWorkspaceFromZip(file, {
+          expectedPlayground: playgroundId,
+        });
+        onRegistryChange();
+        switchActiveWorkspace(playgroundId, result.entry.id);
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setBusy(null);
+      }
+    },
+    [playgroundId, onRegistryChange],
+  );
 
   return (
     <>
@@ -372,16 +422,73 @@ function WorkspaceManagerDrawer({
                 </div>
 
                 <div className="pkg-body workspace-manager-body">
-                  <button
-                    type="button"
-                    className="workspace-manager-new"
-                    onClick={() => {
-                      void handleCreateNew();
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexWrap: "wrap",
                     }}
                   >
-                    <Plus size={14} aria-hidden="true" />
-                    <span>Create new workspace</span>
-                  </button>
+                    <button
+                      type="button"
+                      className="workspace-manager-new"
+                      onClick={() => {
+                        void handleCreateNew();
+                      }}
+                    >
+                      <Plus size={14} aria-hidden="true" />
+                      <span>Create new workspace</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="workspace-manager-new"
+                      onClick={() => importInputRef.current?.click()}
+                      title="Import a workspace ZIP archive"
+                    >
+                      <Upload size={14} aria-hidden="true" />
+                      <span>Import ZIP</span>
+                    </button>
+                    <input
+                      ref={importInputRef}
+                      type="file"
+                      accept=".zip,application/zip"
+                      style={{ display: "none" }}
+                      onChange={(event) => {
+                        const f = event.target.files?.[0] ?? null;
+                        // Reset so re-selecting the same file refires
+                        // the change handler.
+                        event.target.value = "";
+                        if (f) void handleImport(f);
+                      }}
+                    />
+                  </div>
+                  {importError && (
+                    <div
+                      role="alert"
+                      style={{
+                        marginTop: 8,
+                        padding: "8px 10px",
+                        borderRadius: 6,
+                        background: "var(--error-bg, rgba(220,38,38,0.08))",
+                        color: "var(--error-fg, #b91c1c)",
+                        fontSize: 12,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {importError}
+                    </div>
+                  )}
+                  {busy?.action === "import" && (
+                    <div
+                      style={{
+                        marginTop: 8,
+                        fontSize: 12,
+                        color: "var(--text-dim)",
+                      }}
+                    >
+                      Importing workspace…
+                    </div>
+                  )}
 
                   {list.length === 0 && (
                     <div
@@ -442,6 +549,19 @@ function WorkspaceManagerDrawer({
                           </div>
                         </div>
                         <div className="workspace-manager-item-actions">
+                          <ActionButton
+                            label="Export"
+                            onClick={() => void handleExport(ws)}
+                            icon={<Download size={12} aria-hidden="true" />}
+                            disabled={
+                              busy?.id === ws.id && busy.action === "export"
+                            }
+                            disabledTitle={
+                              busy?.id === ws.id && busy.action === "export"
+                                ? "Export in progress…"
+                                : undefined
+                            }
+                          />
                           <ActionButton
                             label="Rename"
                             onClick={() => setRenameTarget(ws)}
