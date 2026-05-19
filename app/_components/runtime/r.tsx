@@ -711,6 +711,8 @@ export const rAdapter: LanguageAdapter = {
     { extension: "r", label: "R (.r)", mimeType: "text/x-r-source" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "R",
+  entryPoint: "script.R",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

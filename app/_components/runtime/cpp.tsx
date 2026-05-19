@@ -514,6 +514,8 @@ export const cppAdapter: LanguageAdapter = {
     { extension: "hpp", label: "C++ header (.hpp)", mimeType: "text/x-c++hdr" },
   ],
   exportBaseFilename: "main",
+  defaultFileExtension: "cpp",
+  entryPoint: "main.cpp",
   packagesFooter: (
     <>
       Headers above are part of the{" "}

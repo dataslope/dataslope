@@ -100,6 +100,25 @@ import {
   SettingsPanel,
   detectIsMac,
 } from "./playgroundShared";
+import { TabBar } from "./tabs/TabBar";
+import type { TabDescriptor } from "./tabs/tabTypes";
+import {
+  SETTINGS_TAB_ID,
+  defaultFiles,
+  loadManifest,
+  newFileId,
+  saveManifest,
+  suggestNextFilename,
+  type PlaygroundFile,
+} from "./playgroundTabs";
+import { getPlaygroundStore } from "./stores/createPlaygroundStore";
+import {
+  deleteFile as opfsDeleteFile,
+  readFile as opfsReadFile,
+  writeFile as opfsWriteFile,
+} from "./opfs/fileStorage";
+import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
+import { FileCode2 } from "lucide-react";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -512,7 +531,60 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
-  const [outputs, setOutputs] = useState<OutputCell[]>([]);
+
+  // ─── Per-adapter playground store ───────────────────────────────────────
+  // Workspaces, files (tabs), per-file dirty buffers and per-file output
+  // history all live in a Zustand store keyed by adapter id so the state
+  // survives navigation between unrelated UI surfaces.
+  const useStore = getPlaygroundStore(adapter.id);
+  const workspaceId = useStore((s) => s.workspaceId);
+  const files = useStore((s) => s.files);
+  const activeFileId = useStore((s) => s.activeFileId);
+  const activeTabId = useStore((s) => s.activeTabId);
+  const dirtyBuffers = useStore((s) => s.dirtyBuffers);
+  const outputsByFile = useStore((s) => s.outputsByFile);
+  const setWorkspace = useStore((s) => s.setWorkspace);
+  const setFiles = useStore((s) => s.setFiles);
+  const setActiveFileId = useStore((s) => s.setActiveFileId);
+  const setActiveTabId = useStore((s) => s.setActiveTabId);
+  const updateDirtyBuffer = useStore((s) => s.updateDirtyBuffer);
+  const clearDirtyBuffer = useStore((s) => s.clearDirtyBuffer);
+  const setOutputsForFile = useStore((s) => s.setOutputsForFile);
+  const clearOutputsForFile = useStore((s) => s.clearOutputsForFile);
+
+  // Derived: the active file's outputs (the output pane is per-tab).
+  const outputs = useMemo(
+    () => outputsByFile.get(activeFileId) ?? [],
+    [outputsByFile, activeFileId],
+  );
+
+  // Refs let stale closures (CodeMirror persist listener, async run loop)
+  // read the latest workspace + file ids without being rebuilt.
+  const activeFileIdRef = useRef("");
+  const workspaceIdRef = useRef("");
+  const filesRef = useRef<PlaygroundFile[]>([]);
+  const dirtyBuffersRef = useRef(dirtyBuffers);
+  useEffect(() => {
+    activeFileIdRef.current = activeFileId;
+  }, [activeFileId]);
+  useEffect(() => {
+    workspaceIdRef.current = workspaceId ?? "";
+  }, [workspaceId]);
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+  useEffect(() => {
+    dirtyBuffersRef.current = dirtyBuffers;
+  }, [dirtyBuffers]);
+
+  // Suppress the persist listener while we programmatically replace the
+  // editor doc (tab switches, example loads). Without this every doc
+  // replacement would write the *previous* file's content into the
+  // *new* file's dirty buffer.
+  const suppressPersistRef = useRef(false);
+
+  const [workspaceReady, setWorkspaceReady] = useState(false);
+
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatPopoverOpen, setFormatPopoverOpen] = useState(false);
   const outputCounter = useRef(0);
@@ -604,6 +676,103 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);
 
+  // ─── Workspace + file manifest bootstrap ────────────────────────────────
+  // Resolves (or auto-creates) the active workspace for this language,
+  // hydrates the file manifest from localStorage, and seeds the
+  // in-memory dirty buffer by reading each file's contents from OPFS.
+  // Once complete, the editor mount effect can dispatch a doc
+  // replacement so the user lands on their saved code.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const ws = await ensureActiveWorkspace(adapter.id);
+        if (cancelled) return;
+
+        const manifest = loadManifest(adapter.id, ws.id);
+        let files: PlaygroundFile[];
+        let activeId: string;
+        if (manifest) {
+          files = manifest.files;
+          activeId = manifest.activeFileId;
+        } else {
+          files = defaultFiles(adapter);
+          activeId = files[0].id;
+          // Seed the file with the legacy single-file code (if any) so
+          // users migrating from Phase-4 don't lose their work.
+          const legacy = localStorage.getItem(storageKey("code"));
+          if (legacy && legacy.length > 0) {
+            opfsWriteFile(ws.id, files[0].id, legacy);
+          }
+          saveManifest(adapter.id, ws.id, files, activeId);
+        }
+
+        // Read each file's content from OPFS into the dirty buffer.
+        // Files without OPFS content fall back to the first example as
+        // a sensible starter (matches the single-file behaviour from
+        // before Phase 5).
+        for (const f of files) {
+          const stored = await opfsReadFile(ws.id, f.id);
+          if (cancelled) return;
+          if (stored != null) {
+            updateDirtyBuffer(f.id, stored);
+          } else if (f.id === activeId) {
+            const legacy = localStorage.getItem(storageKey("code"));
+            const seed = legacy ?? adapter.examples[0]?.code ?? "";
+            updateDirtyBuffer(f.id, seed);
+            if (seed) opfsWriteFile(ws.id, f.id, seed);
+          } else {
+            updateDirtyBuffer(f.id, "");
+          }
+        }
+
+        if (cancelled) return;
+        setWorkspace(ws.id, ws.name);
+        setFiles(files);
+        setActiveFileId(activeId);
+        setActiveTabId(activeId);
+        // Sync refs eagerly so the editor's persist listener can use them
+        // immediately on the next dispatch.
+        workspaceIdRef.current = ws.id;
+        activeFileIdRef.current = activeId;
+        filesRef.current = files;
+        setWorkspaceReady(true);
+      } catch {
+        // Workspace bootstrap failed (OPFS down, lock contention, etc.);
+        // fall back to a single in-memory file so the playground still
+        // works.
+        if (cancelled) return;
+        const files = defaultFiles(adapter);
+        const activeId = files[0].id;
+        const legacy =
+          typeof window !== "undefined"
+            ? localStorage.getItem(storageKey("code"))
+            : null;
+        const seed = legacy ?? adapter.examples[0]?.code ?? "";
+        updateDirtyBuffer(activeId, seed);
+        setFiles(files);
+        setActiveFileId(activeId);
+        setActiveTabId(activeId);
+        activeFileIdRef.current = activeId;
+        filesRef.current = files;
+        setWorkspaceReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adapter.id]);
+
+  // Persist the manifest whenever files or active file change. Skipped
+  // until the workspace has finished bootstrapping so the initial
+  // hydration doesn't immediately overwrite a freshly-loaded manifest.
+  useEffect(() => {
+    if (!workspaceReady || !workspaceId) return;
+    saveManifest(adapter.id, workspaceId, files, activeFileId);
+  }, [adapter.id, workspaceId, files, activeFileId, workspaceReady]);
+
   // Boot the runtime + mount the editor.
   useEffect(() => {
     let cancelled = false;
@@ -648,15 +817,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
       // Listen for doc changes to persist + auto-trigger completion on `.`,
       // matching the v5 inputRead "type a dot" UX.
+      // The persist target is the *currently active file*: contents
+      // land in the file's in-memory dirty buffer (synchronous) and in
+      // OPFS via an async queue. We deliberately read the active file
+      // and workspace ids from refs so tab switches don't require
+      // rebuilding the editor extensions.
       const persistListener = EditorView.updateListener.of((update) => {
         if (!update.docChanged) return;
-        try {
-          localStorage.setItem(
-            storageKey("code"),
-            update.state.doc.toString(),
-          );
-        } catch {
-          // Quota exceeded / private mode — ignore.
+        if (!suppressPersistRef.current) {
+          const fileId = activeFileIdRef.current;
+          const wsId = workspaceIdRef.current;
+          if (fileId) {
+            const content = update.state.doc.toString();
+            updateDirtyBuffer(fileId, content);
+            if (wsId) opfsWriteFile(wsId, fileId, content);
+          }
         }
         for (const tr of update.transactions) {
           if (!tr.isUserEvent("input.type")) continue;
@@ -671,6 +846,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       });
 
       const view = new EditorView({
+        // The editor mounts before the workspace bootstrap resolves; we
+        // start with the legacy localStorage entry (if any) for a
+        // zero-flash first paint, then the workspace effect dispatches
+        // a doc replacement with whatever the OPFS read returned.
         doc:
           localStorage.getItem(storageKey("code")) ??
           adapter.examples[0]?.code ??
@@ -775,6 +954,30 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     applyThemePalette(editorTheme);
     applyMode(editorTheme);
   }, [editorTheme]);
+
+  // Sync the CodeMirror document to the active file's dirty buffer.
+  // Runs whenever the active file id changes (tab switch) or the
+  // workspace finishes bootstrapping. The persist listener is suppressed
+  // during the replacement so the change isn't echoed back as a "save".
+  useEffect(() => {
+    if (!workspaceReady) return;
+    if (activeTabId === SETTINGS_TAB_ID) return;
+    const view = editorRef.current;
+    if (!view) return;
+    if (!activeFileId) return;
+    const target = dirtyBuffersRef.current.get(activeFileId) ?? "";
+    if (view.state.doc.toString() === target) return;
+    suppressPersistRef.current = true;
+    try {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: target },
+        // Drop selection to the start so it's never out of range.
+        selection: { anchor: 0 },
+      });
+    } finally {
+      suppressPersistRef.current = false;
+    }
+  }, [activeFileId, activeTabId, workspaceReady]);
 
   // Push word-wrap changes into CodeMirror after init.
   useEffect(() => {
@@ -907,12 +1110,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     if (!editor || !rt) return;
     const code = editor.state.doc.toString().trim();
     if (!code) return;
+    // Snapshot the active file id at run start: even if the user
+    // switches tabs mid-run, the outputs should be routed to the file
+    // whose code we actually executed.
+    const targetFileId = activeFileIdRef.current;
+    if (!targetFileId) return;
 
     setStatusState("running");
 
     if (clearBeforeRun) {
-      setOutputs([]);
-      outputCounter.current = 0;
+      setOutputsForFile(targetFileId, []);
     }
 
     const t0 = performance.now();
@@ -922,7 +1129,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     try {
       await rt.run(code, (cell) => collected.push(cell));
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
-      setOutputs((prev) => [
+      setOutputsForFile(targetFileId, (prev) => [
         ...prev,
         ...collected.map((c) => ({
           ...c,
@@ -941,7 +1148,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const msg = err instanceof Error ? err.message : String(err);
-      setOutputs((prev) => [
+      setOutputsForFile(targetFileId, (prev) => [
         ...prev,
         ...collected.map((c) => ({
           ...c,
@@ -965,7 +1172,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [clearBeforeRun, showToast]);
+  }, [clearBeforeRun, setOutputsForFile, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -975,12 +1182,121 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [runCode]);
 
   const clearOutput = useCallback(() => {
-    setOutputs([]);
-    outputCounter.current = 0;
+    const fileId = activeFileIdRef.current;
+    if (fileId) clearOutputsForFile(fileId);
     if (loaded) {
       setStatusState("ready");
     }
-  }, [loaded]);
+  }, [clearOutputsForFile, loaded]);
+
+  // ─── File tab management ────────────────────────────────────────────────
+
+  /** Flush the current editor doc into the active file's dirty buffer
+   *  + OPFS, so the contents survive a tab switch. */
+  const flushActiveFileToBuffer = useCallback(() => {
+    const view = editorRef.current;
+    const fileId = activeFileIdRef.current;
+    const wsId = workspaceIdRef.current;
+    if (!view || !fileId) return;
+    const content = view.state.doc.toString();
+    updateDirtyBuffer(fileId, content);
+    if (wsId) opfsWriteFile(wsId, fileId, content);
+  }, [updateDirtyBuffer]);
+
+  const selectTab = useCallback(
+    (tabId: string) => {
+      if (tabId === activeTabId) return;
+      flushActiveFileToBuffer();
+      if (tabId === SETTINGS_TAB_ID) {
+        setActiveTabId(SETTINGS_TAB_ID);
+        return;
+      }
+      setActiveTabId(tabId);
+      setActiveFileId(tabId);
+      activeFileIdRef.current = tabId;
+    },
+    [activeTabId, flushActiveFileToBuffer, setActiveFileId, setActiveTabId],
+  );
+
+  const addNewFile = useCallback(() => {
+    flushActiveFileToBuffer();
+    const wsId = workspaceIdRef.current;
+    const id = newFileId();
+    const filename = suggestNextFilename(adapter, filesRef.current);
+    const newFile: PlaygroundFile = {
+      id,
+      filename,
+      pristineFilename: filename,
+    };
+    const next = [...filesRef.current, newFile];
+    filesRef.current = next;
+    setFiles(next);
+    updateDirtyBuffer(id, "");
+    if (wsId) opfsWriteFile(wsId, id, "");
+    activeFileIdRef.current = id;
+    setActiveFileId(id);
+    setActiveTabId(id);
+  }, [
+    adapter,
+    flushActiveFileToBuffer,
+    setActiveFileId,
+    setActiveTabId,
+    setFiles,
+    updateDirtyBuffer,
+  ]);
+
+  const closeFileTab = useCallback(
+    (fileId: string) => {
+      const current = filesRef.current;
+      if (current.length <= 1) {
+        // Refuse to close the last file — the playground needs at
+        // least one editor target. Could be relaxed later by recreating
+        // a default file on close.
+        showToast("Can't close the last file.", "warn");
+        return;
+      }
+      const wsId = workspaceIdRef.current;
+      const remaining = current.filter((f) => f.id !== fileId);
+      filesRef.current = remaining;
+      setFiles(remaining);
+      clearDirtyBuffer(fileId);
+      clearOutputsForFile(fileId);
+      if (wsId) void opfsDeleteFile(wsId, fileId);
+      if (activeFileIdRef.current === fileId) {
+        // Pick a neighbour: prefer the tab that visually replaces the
+        // closed one — i.e. the previous tab in tab order, falling back
+        // to the first remaining tab.
+        const closedIdx = current.findIndex((f) => f.id === fileId);
+        const next =
+          remaining[Math.max(0, Math.min(closedIdx - 1, remaining.length - 1))]
+            ?.id ?? remaining[0].id;
+        activeFileIdRef.current = next;
+        setActiveFileId(next);
+        setActiveTabId(next);
+      }
+    },
+    [
+      clearDirtyBuffer,
+      clearOutputsForFile,
+      setActiveFileId,
+      setActiveTabId,
+      setFiles,
+      showToast,
+    ],
+  );
+
+  const renameFileTab = useCallback(
+    (fileId: string, newName: string) => {
+      const trimmed = newName.trim();
+      if (!trimmed) return;
+      const next = filesRef.current.map((f) =>
+        f.id === fileId ? { ...f, filename: trimmed } : f,
+      );
+      filesRef.current = next;
+      setFiles(next);
+    },
+    [setFiles],
+  );
 
   // Apply an example to the editor immediately. Use `requestExample` for
   // user-initiated picks so we can prompt before discarding work.
@@ -1068,7 +1384,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${adapter.exportBaseFilename}.${format.extension}`;
+      // When the active file has been renamed, prefer its filename
+      // base over the adapter's generic export name so a user who
+      // edited "utils.py" downloads "utils.py" rather than "script.py".
+      const active = filesRef.current.find(
+        (f) => f.id === activeFileIdRef.current,
+      );
+      const base = active
+        ? active.filename.replace(/\.[^.]+$/, "")
+        : adapter.exportBaseFilename;
+      a.download = `${base || adapter.exportBaseFilename}.${format.extension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1262,6 +1587,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       window.clearInterval(id);
     };
   }, [loaded, statusState]);
+
+  const fileTabDescriptors = useMemo<TabDescriptor[]>(
+    () =>
+      files.map((f) => ({
+        id: f.id,
+        kind: "code" as const,
+        label: f.filename,
+        icon: <FileCode2 size={11} aria-hidden="true" />,
+        closeable: files.length > 1,
+        renameable: true,
+      })),
+    [files],
+  );
 
   const capabilitiesBlurb = useMemo(
     () => buildCapabilitiesBlurb(adapter.outputCapabilities),
@@ -1932,6 +2270,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </div>
           </nav>
           <div className="pg-body-content">
+        {/* File tabs: one tab per workspace file. The active tab's
+            editor + output pane appear directly below — switching tabs
+            swaps both the editor doc and the output history so each
+            file feels like its own self-contained workspace. */}
+        {files.length > 0 && (
+          <TabBar
+            tabs={fileTabDescriptors}
+            activeTabId={activeTabId || activeFileId}
+            onSelectTab={selectTab}
+            onCloseTab={files.length > 1 ? closeFileTab : undefined}
+            onAddTab={addNewFile}
+            onRenameTab={renameFileTab}
+            className="pg-file-tabbar"
+          />
+        )}
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
           <button
             type="button"

@@ -197,6 +197,8 @@ export const javascriptAdapter: LanguageAdapter = {
     { extension: "mjs", label: "ES Module (.mjs)", mimeType: "text/javascript" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "js",
+  entryPoint: "index.js",
   packagesFooter: (
     <>
       JavaScript runs natively in your browser — there&apos;s no extra

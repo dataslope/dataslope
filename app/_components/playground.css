@@ -3290,3 +3290,147 @@ html[data-pg-theme="dark"] .welcome h3 {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+   Generic playground tab bar (used for file tabs in non-SQL playgrounds).
+   Visually mirrors the SQL playground's existing tab bar so language and
+   SQL playgrounds feel uniform.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.pg-tabbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  min-height: 34px;
+  padding-top: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  min-width: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pg-tabs {
+  display: flex;
+  align-items: stretch;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.pg-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 12px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 0;
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 60px;
+  max-width: 240px;
+  overflow: hidden;
+  margin-bottom: -1px;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+  animation: pg-tab-appear 0.15s ease backwards;
+}
+
+@keyframes pg-tab-appear {
+  from { opacity: 0; max-width: 0; }
+  to   { opacity: 1; max-width: 240px; }
+}
+
+.pg-tab--closing {
+  animation: pg-tab-close 0.15s ease both;
+  pointer-events: none;
+}
+
+@keyframes pg-tab-close {
+  from { opacity: 1; transform: scaleX(1); max-width: 240px; }
+  to   { opacity: 0; transform: scaleX(0.7); max-width: 0; }
+}
+
+.pg-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+.pg-tab.active {
+  background: var(--bg);
+  color: var(--text);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  box-shadow: inset 0 2px 0 0 var(--primary);
+}
+
+.pg-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.pg-tab.active .pg-tab-icon {
+  color: var(--text);
+}
+
+.pg-tab-title {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.pg-tab-close {
+  background: transparent;
+  border: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.pg-tab-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.pg-tab-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  width: 28px;
+  height: 28px;
+  margin: auto 4px -1px 4px;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pg-tab-add:hover {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+}

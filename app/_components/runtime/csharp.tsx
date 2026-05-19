@@ -338,6 +338,8 @@ export const csharpAdapter: LanguageAdapter = {
     { extension: "cs",  label: "C# source (.cs)",  mimeType: "text/x-csharp" },
   ],
   exportBaseFilename: "script",
+  defaultFileExtension: "cs",
+  entryPoint: "Program.cs",
   packagesFooter: (
     <>
       Namespaces above are part of the{" "}
