@@ -31,6 +31,14 @@ export interface SqlTabBarProps {
   /** Called with the new tab order after a drag-and-drop reorder. */
   onReorderTabs: (next: QueryTab[]) => void;
   onAddTab: () => void;
+  /** Additional non-`QueryTab` descriptors appended to the tab strip
+   *  (e.g. the inline Settings tab). Handlers (`onSelectTab`,
+   *  `onCloseTab`) on these descriptors fall through to the generic
+   *  TabBar; SqlTabBar only uses them for activation/close routing
+   *  when the descriptor id doesn't match a `QueryTab`. */
+  extraTabs?: TabDescriptor[];
+  /** Called when an `extraTabs` descriptor is closed. */
+  onExtraTabClose?: (tabId: string) => void;
 }
 
 export function SqlTabBar({
@@ -44,10 +52,12 @@ export function SqlTabBar({
   onTabCloseAll,
   onReorderTabs,
   onAddTab,
+  extraTabs,
+  onExtraTabClose,
 }: SqlTabBarProps) {
   const descriptors = useMemo<TabDescriptor[]>(
-    () =>
-      tabs.map((tab) => {
+    () => {
+      const queryDescriptors = tabs.map<TabDescriptor>((tab) => {
         // ER-diagram, view-data, and query-history tabs are transient
         // — duplicate and rename don't make sense. SqlTab used to hide
         // these entries selectively; we mirror that via per-descriptor
@@ -97,8 +107,12 @@ export function SqlTabBar({
           renameDialogDescription: "Choose a short name for this query tab.",
           contextMenuItems: extras,
         };
-      }),
-    [tabs, onTabDuplicate, onTabCloseOthers, onTabCloseAll],
+      });
+      return extraTabs && extraTabs.length > 0
+        ? [...queryDescriptors, ...extraTabs]
+        : queryDescriptors;
+    },
+    [tabs, onTabDuplicate, onTabCloseOthers, onTabCloseAll, extraTabs],
   );
 
   return (
@@ -107,12 +121,20 @@ export function SqlTabBar({
       tabs={descriptors}
       activeTabId={activeTabId}
       onSelectTab={onTabActivate}
-      onCloseTab={onTabClose}
+      onCloseTab={(tabId) => {
+        // Route close requests to the QueryTab handler when applicable;
+        // fall through to `onExtraTabClose` for non-QueryTab entries
+        // (e.g. the Settings tab).
+        const isQueryTab = tabs.some((t) => t.id === tabId);
+        if (isQueryTab) onTabClose(tabId);
+        else onExtraTabClose?.(tabId);
+      }}
       onRenameTab={onTabRename}
       onReorderTabs={(next) => {
         // Project the descriptor order back onto the QueryTab[] model
         // — the descriptors are derived from `tabs`, so we can recover
-        // the originals via id lookup.
+        // the originals via id lookup. Non-QueryTab `extraTabs` are
+        // skipped so reordering only affects the persisted tab list.
         const byId = new Map(tabs.map((t) => [t.id, t]));
         const reordered: QueryTab[] = [];
         for (const d of next) {

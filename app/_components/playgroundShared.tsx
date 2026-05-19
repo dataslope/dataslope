@@ -327,35 +327,8 @@ export interface SettingsPanelProps {
 
 /** Tabbed settings dialog (General + Editor Themes) shared across all
  *  playgrounds. */
-export function SettingsPanel({
-  open,
-  fontSize,
-  setFontSize,
-  outputFontSizeEnabled,
-  setOutputFontSizeEnabled,
-  outputFontSize,
-  setOutputFontSize,
-  editorTheme,
-  setEditorTheme,
-  wordWrap,
-  setWordWrap,
-  clearBeforeRun,
-  setClearBeforeRun,
-  language,
-  outputFontSizeLabel,
-  showOutputFontSizeControls = true,
-  clearBeforeRunLabel,
-  showClearBeforeRunRow = true,
-  onClose,
-  onRestoreDefaults,
-  onClearLocalStorage,
-  onClearAllLocalData,
-  extraGeneralRows,
-  extraActionRows,
-  extraTabs,
-}: SettingsPanelProps) {
-  const [tab, setTab] = useState<string>("general");
-
+export function SettingsPanel(props: SettingsPanelProps) {
+  const { open, onClose } = props;
   return (
     <Dialog.Root
       open={open}
@@ -373,12 +346,50 @@ export function SettingsPanel({
           >
             ✕
           </Dialog.Close>
+          <SettingsPanelContent {...props} />
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
 
-          <Tabs.Root
-            value={tab}
-            onValueChange={(v) => setTab(String(v))}
-            className="settings-tabs"
-          >
+/** Body of the Settings panel — the Tabs.Root containing General /
+ *  Themes / extra tabs. Extracted so the same UI can be rendered both
+ *  as a dialog (legacy `SettingsPanel`) and inline inside a tab pane
+ *  (new "Settings as a tab" affordance, see Playground.tsx). */
+export function SettingsPanelContent({
+  fontSize,
+  setFontSize,
+  outputFontSizeEnabled,
+  setOutputFontSizeEnabled,
+  outputFontSize,
+  setOutputFontSize,
+  editorTheme,
+  setEditorTheme,
+  wordWrap,
+  setWordWrap,
+  clearBeforeRun,
+  setClearBeforeRun,
+  language,
+  outputFontSizeLabel,
+  showOutputFontSizeControls = true,
+  clearBeforeRunLabel,
+  showClearBeforeRunRow = true,
+  onRestoreDefaults,
+  onClearLocalStorage,
+  onClearAllLocalData,
+  extraGeneralRows,
+  extraActionRows,
+  extraTabs,
+}: Omit<SettingsPanelProps, "open" | "onClose">) {
+  const [tab, setTab] = useState<string>("general");
+
+  return (
+    <Tabs.Root
+      value={tab}
+      onValueChange={(v) => setTab(String(v))}
+      className="settings-tabs"
+    >
             <Tabs.List
               className="settings-tabs-list"
               aria-label="Settings sections"
@@ -588,8 +599,5 @@ export function SettingsPanel({
               <Fragment key={t.value}>{t.panel}</Fragment>
             ))}
           </Tabs.Root>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
   );
 }

@@ -4,6 +4,7 @@ import { RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   SettingsPanel,
+  SettingsPanelContent,
   type SettingsPanelProps,
 } from "../../playgroundShared";
 
@@ -37,64 +38,94 @@ export interface SqlSettingsPanelProps {
   extraTabs?: SettingsPanelProps["extraTabs"];
 }
 
-export function SqlSettingsPanel({
-  open,
-  fontSize,
-  setFontSize,
-  outputFontSizeEnabled,
-  setOutputFontSizeEnabled,
-  outputFontSize,
-  setOutputFontSize,
-  editorTheme,
-  setEditorTheme,
-  wordWrap,
-  setWordWrap,
-  clearBeforeRun,
-  setClearBeforeRun,
-  language,
-  onClose,
-  onRestoreDefaults,
-  onClearLocalStorage,
-  onClearAllLocalData,
-  resetTabsLabel,
-  onResetTabs,
-  extraTabs,
-}: SqlSettingsPanelProps) {
-  return (
-    <SettingsPanel
-      open={open}
-      fontSize={fontSize}
-      setFontSize={setFontSize}
-      outputFontSizeEnabled={outputFontSizeEnabled}
-      setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-      outputFontSize={outputFontSize}
-      setOutputFontSize={setOutputFontSize}
-      editorTheme={editorTheme}
-      setEditorTheme={setEditorTheme}
-      wordWrap={wordWrap}
-      setWordWrap={setWordWrap}
-      clearBeforeRun={clearBeforeRun}
-      setClearBeforeRun={setClearBeforeRun}
-      language={language}
-      showOutputFontSizeControls={false}
-      clearBeforeRunLabel="Clear Results Before Running"
-      showClearBeforeRunRow={false}
-      onClose={onClose}
-      onRestoreDefaults={onRestoreDefaults}
-      onClearLocalStorage={onClearLocalStorage}
-      onClearAllLocalData={onClearAllLocalData}
-      extraGeneralRows={null}
-      extraActionRows={
-        <button
-          type="button"
-          className="settings-action-btn"
-          onClick={onResetTabs}
-        >
-          <RotateCcw size={14} aria-hidden="true" />
-          <span>{resetTabsLabel}</span>
-        </button>
-      }
-      extraTabs={extraTabs}
-    />
-  );
+export function SqlSettingsPanel(props: SqlSettingsPanelProps) {
+  const sharedProps = buildSharedProps(props);
+  return <SettingsPanel {...sharedProps} />;
 }
+
+/** Body-only variant of the SQL settings panel — same controls, no
+ *  Dialog wrapper. Used when settings is rendered inline as a tab pane
+ *  instead of as a modal dialog. */
+export function SqlSettingsPanelContent(
+  props: Omit<SqlSettingsPanelProps, "open" | "onClose">,
+) {
+  // `SettingsPanelContent` doesn't need open/onClose; pass placeholders
+  // through buildSharedProps so we can share the shape mapping.
+  const shared = buildSharedProps({
+    ...props,
+    open: true,
+    onClose: () => {},
+  });
+  // SettingsPanelContent's prop type omits open/onClose, so strip them.
+  const {
+    open: _open,
+    onClose: _onClose,
+    ...content
+  } = shared;
+  void _open;
+  void _onClose;
+  return <SettingsPanelContent {...content} />;
+}
+
+function buildSharedProps(props: SqlSettingsPanelProps): SettingsPanelProps {
+  const {
+    open,
+    fontSize,
+    setFontSize,
+    outputFontSizeEnabled,
+    setOutputFontSizeEnabled,
+    outputFontSize,
+    setOutputFontSize,
+    editorTheme,
+    setEditorTheme,
+    wordWrap,
+    setWordWrap,
+    clearBeforeRun,
+    setClearBeforeRun,
+    language,
+    onClose,
+    onRestoreDefaults,
+    onClearLocalStorage,
+    onClearAllLocalData,
+    resetTabsLabel,
+    onResetTabs,
+    extraTabs,
+  } = props;
+  const extraActionRows: ReactNode = (
+    <button
+      type="button"
+      className="settings-action-btn"
+      onClick={onResetTabs}
+    >
+      <RotateCcw size={14} aria-hidden="true" />
+      <span>{resetTabsLabel}</span>
+    </button>
+  );
+  return {
+    open,
+    fontSize,
+    setFontSize,
+    outputFontSizeEnabled,
+    setOutputFontSizeEnabled,
+    outputFontSize,
+    setOutputFontSize,
+    editorTheme,
+    setEditorTheme,
+    wordWrap,
+    setWordWrap,
+    clearBeforeRun,
+    setClearBeforeRun,
+    language,
+    showOutputFontSizeControls: false,
+    clearBeforeRunLabel: "Clear Results Before Running",
+    showClearBeforeRunRow: false,
+    onClose,
+    onRestoreDefaults,
+    onClearLocalStorage,
+    onClearAllLocalData,
+    extraGeneralRows: null,
+    extraActionRows,
+    extraTabs,
+  };
+}
+

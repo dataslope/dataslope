@@ -3980,3 +3980,27 @@ html[data-pg-theme="dark"] .welcome h3 {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+   Settings rendered inline inside a tab pane (instead of the legacy
+   dialog). Reuses the `.settings-tabs` / `.settings-body` styling but
+   stretches to fill the editor pane.
+   ─────────────────────────────────────────────────────────────────────── */
+.pg-settings-tab-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+  min-height: 0;
+}
+.pg-settings-tab-pane .settings-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pg-settings-tab-pane .settings-panel-pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}

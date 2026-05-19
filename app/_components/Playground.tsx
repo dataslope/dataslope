@@ -98,7 +98,7 @@ import {
   DataslopeRunOverlay,
   LOADING_QUIPS,
   RuntimeInfoContent,
-  SettingsPanel,
+  SettingsPanelContent,
   detectIsMac,
 } from "./playgroundShared";
 import { TabBar } from "./tabs/TabBar";
@@ -121,7 +121,7 @@ import {
 import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
-import { FileCode2 } from "lucide-react";
+import { FileCode2, Settings } from "lucide-react";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
 import {
   deleteDataEntry,
@@ -1485,8 +1485,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     updateDirtyBuffer,
   ]);
 
+  /** Open the Settings tab, or focus it if already open. The settings
+   *  panel renders inline inside the editor pane when active. */
+  const openSettingsTab = useCallback(() => {
+    flushActiveFileToBuffer();
+    setSettingsOpen(true);
+    setActiveTabId(SETTINGS_TAB_ID);
+  }, [flushActiveFileToBuffer, setActiveTabId]);
+
+  /** Close the Settings tab and return focus to the previously-active
+   *  code file. Used by the TabBar's close affordance. */
+  const closeSettingsTab = useCallback(() => {
+    setSettingsOpen(false);
+    if (activeTabId === SETTINGS_TAB_ID) {
+      const targetId = activeFileIdRef.current;
+      if (targetId) {
+        setActiveTabId(targetId);
+      } else if (filesRef.current.length > 0) {
+        setActiveTabId(filesRef.current[0].id);
+      }
+    }
+  }, [activeTabId, setActiveTabId]);
+
   const closeFileTab = useCallback(
     (fileId: string) => {
+      if (fileId === SETTINGS_TAB_ID) {
+        closeSettingsTab();
+        return;
+      }
       const current = filesRef.current;
       if (current.length <= 1) {
         // Refuse to close the last file — the playground needs at
@@ -1518,6 +1544,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [
       clearDirtyBuffer,
       clearOutputsForFile,
+      closeSettingsTab,
       setActiveFileId,
       setActiveTabId,
       setFiles,
@@ -2021,8 +2048,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [loaded, statusState]);
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
-    () =>
-      files.map((f) => {
+    () => {
+      const list: TabDescriptor[] = files.map((f) => {
         // PlaygroundFile.filename may be a multi-segment path
         // (e.g. "src/utils.py"); the tab strip is too narrow for the
         // full path, so we show only the leaf and let the Files pane
@@ -2036,8 +2063,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           closeable: files.length > 1,
           renameable: true,
         };
-      }),
-    [files],
+      });
+      if (settingsOpen) {
+        list.push({
+          id: SETTINGS_TAB_ID,
+          kind: "settings",
+          label: "Settings",
+          icon: <Settings size={11} aria-hidden="true" />,
+          closeable: true,
+          renameable: false,
+        });
+      }
+      return list;
+    },
+    [files, settingsOpen],
   );
 
   const capabilitiesBlurb = useMemo(
@@ -2482,7 +2521,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         className="mobile-menu-action"
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          setSettingsOpen(true);
+                          openSettingsTab();
                         }}
                       >
                         <span>Settings</span>
@@ -2494,27 +2533,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </Drawer.Portal>
           </Drawer.Root>
         </header>
-
-        <SettingsPanel
-          open={settingsOpen}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          outputFontSizeEnabled={outputFontSizeEnabled}
-          setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-          outputFontSize={outputFontSize}
-          setOutputFontSize={setOutputFontSize}
-          editorTheme={editorTheme}
-          setEditorTheme={setEditorTheme}
-          wordWrap={wordWrap}
-          setWordWrap={setWordWrap}
-          clearBeforeRun={clearBeforeRun}
-          setClearBeforeRun={setClearBeforeRun}
-          language={adapter.id}
-          onClose={() => setSettingsOpen(false)}
-          onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-          onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-        />
 
         <PackagesDrawer
           open={packagesOpen}
@@ -2741,7 +2759,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       type="button"
                       className="pg-icon-sidebar-btn"
                       aria-label="Settings"
-                      onClick={() => setSettingsOpen(true)}
+                      onClick={openSettingsTab}
                     >
                       <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
                         <circle cx="12" cy="12" r="3" />
@@ -2938,7 +2956,37 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 {statusState === "running" ? "Running…" : "Run"}
               </button>
             </div>
-            <div className="editor-wrap" ref={editorHostRef} />
+            <div
+              className="editor-wrap"
+              ref={editorHostRef}
+              style={
+                activeTabId === SETTINGS_TAB_ID
+                  ? { display: "none" }
+                  : undefined
+              }
+            />
+            {activeTabId === SETTINGS_TAB_ID && (
+              <div className="editor-wrap pg-settings-tab-pane">
+                <SettingsPanelContent
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  outputFontSizeEnabled={outputFontSizeEnabled}
+                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                  outputFontSize={outputFontSize}
+                  setOutputFontSize={setOutputFontSize}
+                  editorTheme={editorTheme}
+                  setEditorTheme={setEditorTheme}
+                  wordWrap={wordWrap}
+                  setWordWrap={setWordWrap}
+                  clearBeforeRun={clearBeforeRun}
+                  setClearBeforeRun={setClearBeforeRun}
+                  language={adapter.id}
+                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                />
+              </div>
+            )}
             <div
               className="resizer"
               ref={resizerRef}

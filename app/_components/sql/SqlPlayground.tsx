@@ -109,7 +109,7 @@ import {
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
-import { SqlSettingsPanel } from "./components/SqlSettingsPanel";
+import { SqlSettingsPanelContent } from "./components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
@@ -142,6 +142,9 @@ const ErDiagramPane = dynamic(
   { ssr: false, loading: ErDiagramLoadingFallback },
 );
 import { SqlTabBar } from "./components/SqlTabBar";
+import { SETTINGS_TAB_ID } from "../playgroundTabs";
+import type { TabDescriptor } from "../tabs/tabTypes";
+import { Settings as SettingsIcon } from "lucide-react";
 import { SqlPlaygroundShell } from "./components/SqlPlaygroundShell";
 import { ToastList } from "./components/ToastList";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
@@ -1198,6 +1201,7 @@ function SqlPlaygroundInner() {
   } | null>(null);
 
   // ─── Derived values ──────────────────────────────────────────────────
+  const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
   const loadingFading = loaded && showLoadingOverlay;
@@ -1224,6 +1228,12 @@ function SqlPlaygroundInner() {
   const shellRef = useRef<HTMLDivElement | null>(null);
   const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
   const quipSeedRef = useRef<number>(-1);
+
+  const openSettingsTab = useCallback(() => {
+    setSettingsOpen(true);
+    activeTabIdRef.current = SETTINGS_TAB_ID;
+    setActiveTabId(SETTINGS_TAB_ID);
+  }, [setSettingsOpen, setActiveTabId]);
 
   // ─── Ref sync effects ────────────────────────────────────────────────
   useEffect(() => {
@@ -2419,48 +2429,7 @@ function SqlPlaygroundInner() {
         </>
       }
     >
-      <SqlSettingsPanel
-          open={settingsOpen}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          outputFontSizeEnabled={outputFontSizeEnabled}
-          setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-          outputFontSize={outputFontSize}
-          setOutputFontSize={setOutputFontSize}
-          editorTheme={editorTheme}
-          setEditorTheme={setEditorTheme}
-          wordWrap={wordWrap}
-          setWordWrap={setWordWrap}
-          clearBeforeRun={clearBeforeRun}
-          setClearBeforeRun={setClearBeforeRun}
-          language={PLAYGROUND_ID}
-          onClose={() => setSettingsOpen(false)}
-          onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-          onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-          onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-          resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
-          onResetTabs={resetTabsForCurrentDb}
-          extraTabs={[
-            {
-              value: "pragmas",
-              trigger: (
-                <>
-                  <Settings2 size={14} aria-hidden="true" />
-                  <span className="settings-tab-label">Pragmas</span>
-                </>
-              ),
-              panel: (
-                <PragmaSettingsTab
-                  key={settingsOpen ? "open" : "closed"}
-                  savedPragmas={pragmaSettings}
-                  onSave={savePragmaSettings}
-                />
-              ),
-            },
-          ]}
-        />
-
-        <SwitchDatabaseDialog
+      <SwitchDatabaseDialog
           open={pendingDbId !== null}
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
           currentDbFilename={activeSample.filename}
@@ -3738,7 +3707,7 @@ function SqlPlaygroundInner() {
                       </svg>
                     ),
                     label: "Settings",
-                    onClick: () => setSettingsOpen(true),
+                    onClick: openSettingsTab,
                   },
                 ]}
               />
@@ -3876,15 +3845,45 @@ function SqlPlaygroundInner() {
           />
 
           <div
-            className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}`}
+            className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
             ref={panesRef}
           >
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}
               onReorderTabs={reorderTabs}
+              extraTabs={
+                settingsOpen
+                  ? [
+                      {
+                        id: SETTINGS_TAB_ID,
+                        kind: "settings",
+                        label: "Settings",
+                        icon: <SettingsIcon size={11} aria-hidden="true" />,
+                        closeable: true,
+                        renameable: false,
+                      } as TabDescriptor,
+                    ]
+                  : undefined
+              }
+              onExtraTabClose={(tabId) => {
+                if (tabId === SETTINGS_TAB_ID) {
+                  setSettingsOpen(false);
+                  // Return focus to the most-recent non-settings tab.
+                  const fallback = tabs[0]?.id;
+                  if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
+                    activeTabIdRef.current = fallback;
+                    setActiveTabId(fallback);
+                  }
+                }
+              }}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
+                if (tabId === SETTINGS_TAB_ID) {
+                  activeTabIdRef.current = SETTINGS_TAB_ID;
+                  setActiveTabId(SETTINGS_TAB_ID);
+                  return;
+                }
                 if (prevId !== tabId) {
                   tabHistoryRef.current = pushTabHistory(
                     tabHistoryRef.current,
@@ -3920,7 +3919,8 @@ function SqlPlaygroundInner() {
               style={
                 activeTab?.kind === "view-data" ||
                 activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                activeTab?.kind === "query-history" ||
+                isSettingsTabActive
                   ? { display: "none" }
                   : undefined
               }
@@ -4109,6 +4109,48 @@ function SqlPlaygroundInner() {
                   isPostgres={false}
                   onClear={clearHistory}
                   onOpenQueryTab={(title, sql) => openTabAndRun(title, sql)}
+                />
+              </div>
+            )}
+
+            {isSettingsTabActive && (
+              <div className="sql-settings-tab-pane">
+                <SqlSettingsPanelContent
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  outputFontSizeEnabled={outputFontSizeEnabled}
+                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                  outputFontSize={outputFontSize}
+                  setOutputFontSize={setOutputFontSize}
+                  editorTheme={editorTheme}
+                  setEditorTheme={setEditorTheme}
+                  wordWrap={wordWrap}
+                  setWordWrap={setWordWrap}
+                  clearBeforeRun={clearBeforeRun}
+                  setClearBeforeRun={setClearBeforeRun}
+                  language={PLAYGROUND_ID}
+                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                  resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
+                  onResetTabs={resetTabsForCurrentDb}
+                  extraTabs={[
+                    {
+                      value: "pragmas",
+                      trigger: (
+                        <>
+                          <Settings2 size={14} aria-hidden="true" />
+                          <span className="settings-tab-label">Pragmas</span>
+                        </>
+                      ),
+                      panel: (
+                        <PragmaSettingsTab
+                          savedPragmas={pragmaSettings}
+                          onSave={savePragmaSettings}
+                        />
+                      ),
+                    },
+                  ]}
                 />
               </div>
             )}
