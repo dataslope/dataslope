@@ -110,7 +110,137 @@ For APIs that don't send permissive CORS headers, a CORS proxy is the only viabl
 2. **Third-party proxies** (`corsproxy.io`, `allorigins.win`) — acceptable for non-sensitive public APIs but unsuitable for authenticated or private endpoints.
 3. **User-supplied proxy** — expose a setting where users specify a proxy URL. Similar to the BYOK AI pattern already in this codebase.
 
-### 2.3 Fetch / XHR / WebSocket
+### 2.3 CORS Proxy via Service Worker
+
+> **New research (2026-05-19):** Can a single service worker provide transparent CORS proxying for all playground runtimes, and would this create conflicts between competing service workers?
+
+#### Feasibility: Yes — a single root-scope SW is the right approach
+
+A service worker registered at the root scope (`/`) can intercept `fetch()` calls from both the main page and from every **dedicated Web Worker** the page spawns. All current runtimes in this codebase run in dedicated Web Workers:
+
+| Runtime | Execution context | SW can intercept user fetches? |
+|---|---|---|
+| JavaScript | `javascript-worker.ts` (Web Worker) | ✅ Yes |
+| TypeScript | `typescript-worker.ts` (Web Worker) | ✅ Yes |
+| Python (Pyodide) | `pyodide-worker.ts` (Web Worker) | ✅ Yes |
+| R (WebR) | Web Worker | ✅ Yes |
+| PHP | Web Worker | ✅ Yes |
+| C / C++ / C# / Java | Web Worker | ✅ Yes |
+| SQLite / PostgreSQL / DuckDB | Web Worker / WASM | ✅ Yes (if any user fetch is made) |
+
+Browser support for SW interception of Worker `fetch()` events:
+- **Chrome** 68+ ✅
+- **Firefox** 84+ ✅
+- **Safari** 14.1+ ✅ (SW interception of worker fetches was a known gap in older Safari versions)
+
+First-load caveat: a dedicated worker created during the first page load before the SW has activated may not be controlled by the SW. This is a one-time issue on the very first visit; subsequent loads have all workers controlled.
+
+#### No conflicts between service workers — IF implemented as a single merged SW
+
+The Service Worker specification guarantees that **a client (page) is controlled by exactly one SW** — the one with the most specific matching scope. Consequences:
+
+1. **Two SWs at the same root scope (`/`)** cannot co-exist. When a new SW registers at the same scope, it enters the "waiting" state and takes over on the next page load, replacing the old SW. Having both an almostnode virtual-server SW and a separate CORS-proxy SW registered at `/` would cause them to fight for control on every update cycle.
+
+2. **Two SWs at different sub-scopes** (e.g., `/playground/python/` and `/playground/javascript/`) are isolated from each other — each only controls its own scope's clients. However, this approach conflicts with almostnode's requirement that its SW lives at the root scope (to intercept `/__virtual__/{port}/` requests).
+
+3. **Conclusion: merge both responsibilities into one SW file.** A single root-scope SW can simultaneously handle almostnode's `/__virtual__/` routing AND CORS proxy interception. There is no inherent conflict once they are co-located in the same SW.
+
+#### Implementation pattern for the merged SW
+
+The CORS proxy logic intercepts outbound cross-origin fetches from worker contexts and rewrites them to pass through a server-side route handler (e.g., `/api/cors-proxy`):
+
+```js
+// __sw__.js  (merged almostnode + CORS proxy)
+
+// --- almostnode virtual-server routing (unchanged) ---
+import { createServiceWorkerHandler } from 'almostnode/sw';
+const almostnodeHandler = createServiceWorkerHandler();
+
+// --- CORS proxy routing ---
+const PROXY_ENDPOINT = '/api/cors-proxy';
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // 1. almostnode virtual paths (highest priority)
+  if (url.pathname.startsWith('/__virtual__/')) {
+    event.respondWith(almostnodeHandler(request));
+    return;
+  }
+
+  // 2. Transparent CORS proxy for opted-in cross-origin requests
+  //    Runtimes set the X-Cors-Proxy header to signal proxy intent.
+  if (
+    request.headers.has('X-Cors-Proxy') &&
+    url.origin !== self.location.origin
+  ) {
+    event.respondWith(
+      fetch(
+        `${PROXY_ENDPOINT}?url=${encodeURIComponent(request.url)}`,
+        {
+          method: request.method,
+          headers: (() => {
+            // Strip the sentinel header before forwarding
+            const h = new Headers(request.headers);
+            h.delete('X-Cors-Proxy');
+            return h;
+          })(),
+          body: request.method === 'GET' || request.method === 'HEAD'
+            ? undefined : request.body,
+          duplex: 'half',
+        },
+      ),
+    );
+    return;
+  }
+  // 3. All other requests: pass through normally
+});
+```
+
+The server-side route handler at `app/api/cors-proxy/route.ts`:
+
+```ts
+// Very minimal — add auth / allowlist / rate-limit as needed
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const target = searchParams.get('url');
+  if (!target) return new Response('Missing url', { status: 400 });
+  const upstream = await fetch(target, {
+    headers: { 'User-Agent': 'dataslope-cors-proxy/1.0' },
+  });
+  const body = await upstream.arrayBuffer();
+  return new Response(body, {
+    status: upstream.status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': upstream.headers.get('Content-Type') ?? 'application/octet-stream',
+    },
+  });
+}
+```
+
+#### Distinguishing runtime-internal fetches from user-code fetches
+
+The tricky problem is that runtimes themselves make many cross-origin fetches that work fine without proxying (Pyodide loading from `cdn.jsdelivr.net`, WebR loading from `webr.r-wasm.org`, DuckDB loading WASM from jsDelivr, etc.). Proxying all cross-origin fetches would be wasteful and potentially break CDN caching.
+
+**Recommended approach: opt-in via a request header from the runtime adapter**
+
+Each runtime adapter that supports user-driven HTTP requests (JS, TS, Python, R) wraps the user's `fetch` global (or the `http`/`https` shim) to inject an `X-Cors-Proxy: 1` header before the request leaves the worker. The SW only proxies requests carrying this header. Runtime-internal fetches (loading WASM, loading packages) never set this header and are not affected.
+
+For Python specifically, since Pyodide patches `XMLHttpRequest` and `fetch` internally, the adapter can monkey-patch the patched version to inject the header on requests made from user Python code (after `pyodide.runPythonAsync` begins execution).
+
+**Alternative approach: passive retry on opaque/failure**
+
+The SW attempts the original request. If the response is `type === 'opaque'` (no-cors mode) or a network error, it retries via the proxy. This requires no changes to the runtime adapters but doubles round-trips for proxied requests and adds latency. Not recommended as the primary strategy.
+
+#### Security considerations for the CORS proxy
+
+- **Authentication headers in proxied requests:** The proxy route on the server strips cookies and `Authorization` headers by default to prevent credential forwarding. User code that needs to send auth must use an allowed list configured in the route handler.
+- **Open proxy risk:** The `/api/cors-proxy` route must validate or restrict the `url` parameter. A rate-limit and/or domain allowlist (configurable per-workspace) prevents abuse as an open public proxy.
+- **Sandbox isolation:** When the cross-origin iframe sandbox is active (almostnode Phase 4), user code runs on a different origin. The SW at the host origin does **not** control a cross-origin iframe. In that mode, the iframe's own almostnode environment handles CORS differently (requests appear to originate from the sandbox domain). The CORS proxy SW is therefore most applicable to the Web Worker execution mode (Phases 1–3).
+
+### 2.4 Fetch / XHR / WebSocket
 
 | API | Status | Notes |
 |---|---|---|
@@ -123,7 +253,7 @@ For APIs that don't send permissive CORS headers, a CORS proxy is the only viabl
 | `node:tls` | ❌ Stubbed only | Same as above |
 | `node:dgram` (UDP) | ❌ Stubbed only | No UDP in browser |
 
-### 2.4 Security Implications
+### 2.5 Security Implications
 
 - **Cross-origin sandbox (recommended):** User code in a sandboxed iframe cannot read the host page's cookies, localStorage, or DOM. Network requests from the iframe still go through the browser's normal CORS policy. This is the correct threat model for user-supplied code.  
 - **Same-origin Worker:** Code can access IndexedDB and make arbitrary network requests. Cannot touch the main thread's DOM. Acceptable if user code is trusted (e.g., course content authored by the platform).  
@@ -257,10 +387,13 @@ The service worker (`__sw__.js`) is **only required** when using `ServerBridge` 
 |---|---|
 | `runtime.execute()` / `runtime.runFile()` | ❌ No |
 | npm package installation | ❌ No |
+| CORS proxy for user-code HTTP requests | ✅ Yes (optional, see §2.3) |
 | Express server accessible via URL in an `<iframe>` | ✅ Yes |
 | Next.js / Vite dev server in an `<iframe>` | ✅ Yes |
 
-The SW intercepts requests to `/__virtual__/{port}/{path}`, forwards them to the registered virtual server's `handleRequest()` method, and streams the response back. It does not intercept any other requests.
+The SW intercepts requests to `/__virtual__/{port}/{path}`, forwards them to the registered virtual server's `handleRequest()` method, and streams the response back. It does not intercept any other requests **unless the CORS proxy feature is enabled** (see §2.3 for the merged SW design).
+
+**Merged SW: one file, two responsibilities.** If the CORS proxy feature is enabled alongside almostnode, both routing rules live in a single `__sw__.js` file. This is required because only one SW can control a given scope — having two separate SW files fighting over the root `/` scope causes them to alternate on each update cycle.
 
 **Conflict with Next.js App Router:** The existing app already runs under Next.js. Adding the almostnode service worker requires registering it via a Next.js App Router route handler:
 
@@ -382,6 +515,7 @@ No changes to the `LanguageAdapter` interface, `Playground.tsx`, or the tab/work
 ### 5.2 Browser Limitations
 
 - **Service worker scope:** The SW must be registered at the root scope (`/`) to intercept `/__virtual__/*` requests. If the Next.js app already registers a service worker (e.g., for PWA), there will be a conflict. The current app does not appear to use a SW.
+- **SW interception of Web Workers:** Dedicated Web Workers inherit their controlling SW from the parent page in Chrome 68+, Firefox 84+, and Safari 14.1+. First-load timing caveat: workers created before the SW activates (first page visit) are not controlled — this clears on the next reload. All runtime workers in this codebase are dedicated workers, so SW interception works transparently for the CORS proxy feature across all playgrounds.
 - **Cross-Origin Isolation headers (`COOP`/`COEP`):** Required if using `SharedArrayBuffer` or `Atomics`. almostnode does not require these for its base use case; they are only needed for WebAssembly threads. The current app does not set COOP/COEP headers.
 - **Safari:** Service workers in Safari have had historically poor reliability but are supported in Safari 16+. Testing required.
 - **`iframe` `sandbox` attribute conflicts:** If the preview iframe uses `sandbox="allow-scripts"` without `allow-same-origin`, the service worker cannot intercept its fetch requests. The SW interception only works with `allow-same-origin` in the iframe's sandbox attribute.
@@ -402,6 +536,8 @@ No changes to the `LanguageAdapter` interface, `Playground.tsx`, or the tab/work
 - The SW must survive app restarts — if the SW is updated (new almostnode version), old SW may be cached and serve stale virtual server responses.
 - In SSR/RSC environments (like the current Next.js app), the SW only runs client-side. This is correct behavior but must not be confused with server-side routing.
 - Workspace isolation: multiple playground tabs all share the same SW. The SW routes based on port numbers — two tabs using port `3000` will conflict. Port numbers should be randomly assigned per workspace instance.
+- **Only one SW per scope.** If both almostnode dev-server routing and CORS proxy interception are needed, they **must** be merged into a single `__sw__.js` file. Two separate SW registrations at root scope will alternate control on each update, causing one to overwrite the other. The merge approach (see §2.3) fully resolves this: both features share one fetch event handler with priority-ordered routing rules.
+- **CORS proxy SW does not help cross-origin iframe mode.** Once almostnode runs inside a cross-origin iframe (Phase 4, `sandbox.dataslope.io`), the host page's SW does not control the iframe. In that mode, CORS proxy must be handled either by the sandbox's own SW or by having user code target the proxy URL directly. The SW-based proxy is therefore best suited to Web Worker execution mode (Phases 1–3).
 
 ### 5.5 Security Concerns
 
@@ -559,10 +695,27 @@ For the JS/TS playground, present an **npm install panel** in the packages drawe
 
 ### 6.6 Suggested Milestones / Phases
 
+#### Phase 0: CORS Proxy for All Runtimes (independent of almostnode, 1–2 days)
+
+This phase is **independent of almostnode** and can be shipped now. It benefits all 12 existing playgrounds immediately (JS, TS, Python, R, PHP, C, C++, Java, C#, SQLite, PostgreSQL, DuckDB).
+
+- [ ] Add `app/api/cors-proxy/route.ts` server-side proxy endpoint with:
+  - URL validation (reject non-http/https, add domain denylist as needed).
+  - Rate-limiting header forwarding.
+  - Proper CORS response headers (`Access-Control-Allow-Origin: *`).
+- [ ] Add `app/__sw__.js/route.ts` root-scope service worker that:
+  - Intercepts fetch events carrying the `X-Cors-Proxy: 1` header.
+  - Rewrites cross-origin requests through `/api/cors-proxy`.
+  - Passes all other requests through unchanged.
+- [ ] Register the SW in the root layout (`app/layout.tsx`) with a simple `navigator.serviceWorker.register('/__sw__.js')` call on mount.
+- [ ] In each existing runtime worker (JS, TS, Python, R), wrap `fetch` / `XMLHttpRequest` to inject `X-Cors-Proxy: 1` on cross-origin requests made within user code execution. For Pyodide, patch the `js.fetch` shim after user code begins.
+- [ ] Run `npm run test` and `npm run build` to confirm no regressions.
+- [ ] Test manually: Python `requests.get("https://httpbin.org/get")` returns a result; direct CDN fetches (pyodide, WebR) are not intercepted.
+
 #### Phase 1: Basic almostnode JS/TS Runtime (2–3 days)
 
 - [ ] Install `almostnode` npm package.
-- [ ] Add service worker route: `app/__sw__.js/route.ts`.
+- [ ] **Merge almostnode SW into the CORS proxy SW** already created in Phase 0: extend `app/__sw__.js/route.ts` to also serve the almostnode virtual-server handler, or update the existing `__sw__.js` to include both routing rules (almostnode `/__virtual__/` first, then CORS proxy, then pass-through).
 - [ ] Create `almostnode-javascript.tsx` adapter:
   - `init()` creates `createContainer()` with `onConsole` callback.
   - `run()` calls `runtime.execute(code)` and flushes console output.
@@ -594,6 +747,7 @@ For the JS/TS playground, present an **npm install panel** in the packages drawe
 - [ ] Switch both adapters to `createRuntime({ sandbox: 'https://sandbox.dataslope.io' })`.
 - [ ] Verify that existing console output streaming works over `postMessage` cross-origin protocol.
 - [ ] Update CSP headers if needed.
+- [ ] For the cross-origin sandbox mode: CORS proxy SW does not control the iframe; add direct proxy URL support (`/api/cors-proxy?url=...`) so almostnode user code can target it explicitly if needed.
 
 #### Phase 5: Dev Server Playgrounds (Optional, 1–2 weeks)
 
@@ -650,6 +804,9 @@ For the JS/TS playground, present an **npm install panel** in the packages drawe
 | tsconfig path aliases | ✅ Via TypeScript transpiler pre-processing |
 | Dynamic imports | ⚠️ URL-based only; VFS paths not resolvable |
 | Remote network access | ✅ Via `http`/`https` shims (CORS applies) |
+| **CORS proxy via single SW — feasible?** | **✅ Yes — see §2.3** |
+| **Multiple SW conflicts?** | **✅ No conflict if merged into one root-scope SW** |
+| **SW intercepts all runtime Web Workers?** | **✅ Chrome 68+, Firefox 84+, Safari 14.1+** |
 | Next.js playground support | ✅ Built-in `NextDevServer` |
 | Express playground support | ✅ Via Runtime + ServerBridge |
 | Vite playground support | ✅ Built-in `ViteDevServer` |
@@ -659,6 +816,15 @@ For the JS/TS playground, present an **npm install panel** in the packages drawe
 | Bundle size | ✅ ~250KB gzipped (smaller than current TS compiler) |
 | Migration risk | 🟢 Low — additive adapter approach, existing contract unchanged |
 
-**Recommendation:** Proceed with almostnode integration in Phases 1–4. The basic JS/TS runtime replacement is low-risk, high-value, and directly enables multi-file module resolution and npm package support that the current `AsyncFunction`-based workers fundamentally cannot provide. Phases 5–6 (dev server playgrounds) should be treated as separate feature work once the core runtime migration is proven stable.
+**Recommendation:** Proceed with almostnode integration in Phases 0–4.
 
-The most important prerequisite before any coding begins is: **deploy the cross-origin sandbox** (`generateSandboxFiles()` → Vercel or equivalent). This is a one-time infrastructure task that unblocks the secure execution path for all future phases.
+**Phase 0 (CORS proxy SW) is the highest-priority quick win** — it can be shipped today, independent of almostnode, and immediately unblocks user-driven HTTP requests in all 12 existing playgrounds. The implementation adds:
+1. `app/api/cors-proxy/route.ts` — server-side proxy endpoint.
+2. `app/__sw__.js/route.ts` — root-scope service worker with opt-in interception.
+3. Thin `X-Cors-Proxy` header injection in each runtime worker.
+
+No conflicts between service workers exist as long as all routing logic is co-located in the single root-scope `__sw__.js`. The almostnode SW (added in Phase 1) is merged into that same file, not registered separately.
+
+The basic JS/TS runtime replacement (Phases 1–3) is low-risk, high-value, and directly enables multi-file module resolution and npm package support that the current `AsyncFunction`-based workers fundamentally cannot provide. Phases 5–6 (dev server playgrounds) should be treated as separate feature work once the core runtime migration is proven stable.
+
+The most important prerequisite before Phase 1 begins is: **deploy the cross-origin sandbox** (`generateSandboxFiles()` → Vercel or equivalent). This is a one-time infrastructure task that unblocks the secure execution path for all future phases.
