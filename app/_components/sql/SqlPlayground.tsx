@@ -18,12 +18,6 @@
 // so this playground retints in lockstep with every other one when the
 // user picks a different editor theme.
 
-import {
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-} from "@dnd-kit/core";
 import React, {
   startTransition,
   useCallback,
@@ -1320,8 +1314,7 @@ function SqlPlaygroundInner() {
     duplicateTab,
     closeOtherTabs,
     closeAllTabs,
-    handleTabDragStart,
-    handleTabDragEnd,
+    reorderTabs,
     resetTabsForCurrentDb,
   } = useTabManagement(
     { editorRef, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef },
@@ -2132,33 +2125,9 @@ function SqlPlaygroundInner() {
     return base;
   }, [activeDbId, customDb, customFilenames]);
 
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
-
-  const onTabDragStart = useCallback(
-    (event: DragStartEvent) => {
-      setDraggingTabId(String(event.active.id));
-      handleTabDragStart(event);
-    },
-    [handleTabDragStart],
-  );
-
-  const onTabDragEnd = useCallback(
-    (event: Parameters<typeof handleTabDragEnd>[0]) => {
-      setDraggingTabId(null);
-      handleTabDragEnd(event);
-    },
-    [handleTabDragEnd],
-  );
-
-  const onTabDragCancel = useCallback(() => {
-    setDraggingTabId(null);
-  }, []);
+  // Drag-and-drop tab reordering is handled by the generic TabBar
+  // internally; SqlPlayground no longer needs its own DnD sensors or
+  // dragging-tab state for the tab strip.
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -3913,11 +3882,7 @@ function SqlPlaygroundInner() {
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}
-              draggingTab={draggingTab}
-              tabDragSensors={tabDragSensors}
-              onDragStart={onTabDragStart}
-              onDragEnd={onTabDragEnd}
-              onDragCancel={onTabDragCancel}
+              onReorderTabs={reorderTabs}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
                 if (prevId !== tabId) {

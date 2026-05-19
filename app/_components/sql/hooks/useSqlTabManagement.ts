@@ -245,6 +245,15 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
     setDraggingTabId(null);
   }, [setDraggingTabId]);
 
+  /** Persist a new tab order produced by the generic TabBar's drag-and-
+   *  drop. Accepts a pre-arranged QueryTab[] rather than a DragEndEvent. */
+  const reorderTabs = useCallback(
+    (next: QueryTab[]) => {
+      persistTabs(next);
+    },
+    [persistTabs],
+  );
+
   const openSpecialTab = useCallback(
     (kind: "er-diagram" | "query-history", title: string) => {
       const currentTabs = tabsRef.current;
@@ -312,6 +321,7 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
     handleTabDragStart,
     handleTabDragEnd,
     handleTabDragCancel,
+    reorderTabs,
     openErDiagramTab,
     openQueryHistoryTab,
   };

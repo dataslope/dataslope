@@ -3,6 +3,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { ContextMenu } from "@base-ui-components/react/context-menu";
+import { Popover } from "@base-ui-components/react/popover";
 import {
   DndContext,
   DragOverlay,
@@ -191,11 +192,28 @@ const TabItem = memo(function TabItem({
 }: TabItemProps) {
   const closeable = tab.closeable !== false;
   const renameable = tab.renameable === true && !!onRename;
+  const hideBuiltins = tab.hideBuiltinMenuItems === true;
+  const extraItems = tab.contextMenuItems ?? [];
 
   const [renameOpen, setRenameOpen] = useState(false);
   const [draftLabel, setDraftLabel] = useState(tab.label);
   const [isClosing, setIsClosing] = useState(false);
   const closedRef = useRef(false);
+
+  // Truncation tooltip: when the label overflows the tab, show the
+  // full text in a popover after a short hover delay. Mirrors the
+  // SQL playground's previous SqlTab behaviour.
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipMounted, setTooltipMounted] = useState(false);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const hoverTimerRef = useRef<number | null>(null);
+  const clearHoverTimer = useCallback(() => {
+    if (hoverTimerRef.current !== null) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  }, []);
+  useEffect(() => clearHoverTimer, [clearHoverTimer]);
 
   // useSortable must be called unconditionally; when `sortable` is
   // false we just don't apply its props/refs, so the tab renders as a
@@ -244,6 +262,10 @@ const TabItem = memo(function TabItem({
     closedRef.current = false;
   }, [tab.id]);
 
+  const showBuiltinRename = !hideBuiltins && renameable;
+  const showBuiltinClose = !hideBuiltins && closeable;
+  const hasMenu = showBuiltinRename || showBuiltinClose || extraItems.length > 0;
+
   return (
     <>
       {renameable && (
@@ -251,9 +273,12 @@ const TabItem = memo(function TabItem({
           <Dialog.Portal>
             <Dialog.Backdrop className="confirm-backdrop" />
             <Dialog.Popup className="confirm-popup sql-rename-popup">
-              <Dialog.Title className="confirm-title">Rename tab</Dialog.Title>
+              <Dialog.Title className="confirm-title">
+                {tab.renameDialogTitle ?? "Rename tab"}
+              </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Choose a name for this tab.
+                {tab.renameDialogDescription ??
+                  "Choose a name for this tab."}
               </Dialog.Description>
               <form
                 className="sql-rename-form"
@@ -302,13 +327,47 @@ const TabItem = memo(function TabItem({
               aria-selected={active}
               role="tab"
               data-tab-id={tab.id}
+              onMouseEnter={() => {
+                clearHoverTimer();
+                hoverTimerRef.current = window.setTimeout(() => {
+                  hoverTimerRef.current = null;
+                  const el = titleRef.current;
+                  if (el && el.scrollWidth > el.clientWidth) {
+                    setTooltipMounted(true);
+                    setTooltipOpen(true);
+                  }
+                }, 200);
+              }}
+              onMouseLeave={() => {
+                clearHoverTimer();
+                setTooltipOpen(false);
+              }}
             >
               {tab.icon && (
                 <span className="pg-tab-icon" aria-hidden="true">
                   {tab.icon}
                 </span>
               )}
-              <span className="pg-tab-title">{tab.label}</span>
+              <span ref={titleRef} className="pg-tab-title">
+                {tab.label}
+              </span>
+              {tooltipMounted && (
+                <Popover.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      anchor={titleRef}
+                      side="top"
+                      sideOffset={6}
+                      align="center"
+                      className="pg-tab-name-positioner"
+                    >
+                      <Popover.Popup className="bui-popup pg-tab-name-popover">
+                        {tab.label}
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              )}
               {closeable && (
                 <span
                   role="button"
@@ -333,28 +392,43 @@ const TabItem = memo(function TabItem({
             </button>
           )}
         />
-        <ContextMenu.Portal>
-          <ContextMenu.Positioner sideOffset={6}>
-            <ContextMenu.Popup className="bui-popup">
-              {renameable && (
-                <ContextMenu.Item
-                  className="example-item"
-                  onClick={openRename}
-                >
-                  <div className="ex-title">Rename</div>
-                </ContextMenu.Item>
-              )}
-              {closeable && (
-                <ContextMenu.Item
-                  className="example-item"
-                  onClick={handleClose}
-                >
-                  <div className="ex-title">Close</div>
-                </ContextMenu.Item>
-              )}
-            </ContextMenu.Popup>
-          </ContextMenu.Positioner>
-        </ContextMenu.Portal>
+        {hasMenu && (
+          <ContextMenu.Portal>
+            <ContextMenu.Positioner sideOffset={6}>
+              <ContextMenu.Popup className="bui-popup">
+                {showBuiltinRename && (
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={openRename}
+                  >
+                    <div className="ex-title">Rename</div>
+                  </ContextMenu.Item>
+                )}
+                {showBuiltinClose && (
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={handleClose}
+                  >
+                    <div className="ex-title">Close</div>
+                  </ContextMenu.Item>
+                )}
+                {extraItems.map((item) => (
+                  <ContextMenu.Item
+                    key={item.key}
+                    className={`example-item${item.danger ? " example-item-danger" : ""}`}
+                    onClick={item.onSelect}
+                  >
+                    <div className="ex-title">
+                      {item.icon}
+                      {item.icon ? " " : null}
+                      {item.label}
+                    </div>
+                  </ContextMenu.Item>
+                ))}
+              </ContextMenu.Popup>
+            </ContextMenu.Positioner>
+          </ContextMenu.Portal>
+        )}
       </ContextMenu.Root>
     </>
   );

@@ -1178,13 +1178,11 @@ function PostgresPlaygroundInner() {
     activeDbId === POSTGRES_BLANK_DATABASE.id && customDbFilename !== null
       ? customDbFilename
       : activeSample.filename;
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
+  // Tab reordering is delegated to the generic TabBar; no externalised
+  // drag state or sensors are needed for the tab strip. `setDraggingTabId`
+  // remains in the hook signature for legacy compatibility — passed a
+  // no-op below.
+  const setDraggingTabId = useCallback(() => {}, []);
 
   const persistTabs = useCallback(
     (nextTabs: QueryTab[], dbId = activeDbIdRef.current) => {
@@ -1927,9 +1925,7 @@ function PostgresPlaygroundInner() {
     openTabAndRun,
     closeTab,
     resetTabsForCurrentDb,
-    handleTabDragStart,
-    handleTabDragEnd,
-    handleTabDragCancel,
+    reorderTabs,
     openErDiagramTab,
     openQueryHistoryTab,
   } = useSqlTabManagement({
@@ -4431,11 +4427,7 @@ function PostgresPlaygroundInner() {
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}
-              draggingTab={draggingTab}
-              tabDragSensors={tabDragSensors}
-              onDragStart={handleTabDragStart}
-              onDragEnd={handleTabDragEnd}
-              onDragCancel={handleTabDragCancel}
+              onReorderTabs={reorderTabs}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
                 if (prevId !== tabId) {

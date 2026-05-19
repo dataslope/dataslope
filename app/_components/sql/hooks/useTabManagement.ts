@@ -299,6 +299,18 @@ export function useTabManagement(
     [tabsRef, activeDbIdRef, setTabs],
   );
 
+  /** Persist a new tab order produced by the generic TabBar's drag-and-
+   *  drop. Equivalent to handleTabDragEnd but accepts a pre-arranged
+   *  QueryTab[] rather than a DragEndEvent. */
+  const reorderTabs = useCallback(
+    (next: QueryTab[]) => {
+      tabsRef.current = next;
+      setTabs(next);
+      saveTabs(activeDbIdRef.current, next);
+    },
+    [tabsRef, activeDbIdRef, setTabs],
+  );
+
   const resetTabsForCurrentDb = useCallback(() => {
     const sample =
       customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
@@ -342,6 +354,7 @@ export function useTabManagement(
     closeAllTabs,
     handleTabDragStart,
     handleTabDragEnd,
+    reorderTabs,
     resetTabsForCurrentDb,
   };
 }

@@ -1225,13 +1225,11 @@ function DuckDbPlaygroundInner() {
     activeDbId === DUCKDB_BLANK_DATABASE.id && customDbFilename !== null
       ? customDbFilename
       : activeSample.filename;
-  const tabDragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-  const [draggingTabId, setDraggingTabId] = useState<string | null>(null);
-  const draggingTab = draggingTabId
-    ? tabs.find((t) => t.id === draggingTabId) ?? null
-    : null;
+  // Tab reordering is delegated to the generic TabBar; no externalised
+  // drag state or sensors are needed for the tab strip. `setDraggingTabId`
+  // remains in the hook signature for legacy compatibility — passed a
+  // no-op below.
+  const setDraggingTabId = useCallback(() => {}, []);
 
   // Trailing-edge debounce of `saveTabs` so a fast typist doesn't pay a
   // synchronous JSON.stringify + localStorage.setItem on every keystroke.
@@ -2446,9 +2444,7 @@ function DuckDbPlaygroundInner() {
     openTabAndRun,
     closeTab,
     resetTabsForCurrentDb,
-    handleTabDragStart,
-    handleTabDragEnd,
-    handleTabDragCancel,
+    reorderTabs,
     openErDiagramTab,
     openQueryHistoryTab,
   } = useSqlTabManagement({
@@ -5033,11 +5029,7 @@ function DuckDbPlaygroundInner() {
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}
-              draggingTab={draggingTab}
-              tabDragSensors={tabDragSensors}
-              onDragStart={handleTabDragStart}
-              onDragEnd={handleTabDragEnd}
-              onDragCancel={handleTabDragCancel}
+              onReorderTabs={reorderTabs}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
                 if (prevId !== tabId) {
