@@ -316,10 +316,10 @@ function WorkspaceManagerDrawer({
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<WorkspaceEntry | null>(null);
-  const [busy, setBusy] = useState<{ id: string; action: "export" | "import" } | null>(
-    null,
-  );
-  const [importError, setImportError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<
+    { id: string; action: "export" | "import" } | null
+  >(null);
+  const [operationError, setOperationError] = useState<string | null>(null);
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
   // Recompute byte sizes whenever the drawer opens or the workspace list
@@ -354,12 +354,12 @@ function WorkspaceManagerDrawer({
       try {
         const ok = await downloadWorkspaceZip(ws.id);
         if (!ok) {
-          setImportError(
+          setOperationError(
             "Couldn't export workspace — persistent storage may be unavailable.",
           );
         }
       } catch (err) {
-        setImportError(err instanceof Error ? err.message : String(err));
+        setOperationError(err instanceof Error ? err.message : String(err));
       } finally {
         setBusy(null);
       }
@@ -369,7 +369,7 @@ function WorkspaceManagerDrawer({
 
   const handleImport = useCallback(
     async (file: File) => {
-      setImportError(null);
+      setOperationError(null);
       setBusy({ id: "__import__", action: "import" });
       try {
         const result = await importWorkspaceFromZip(file, {
@@ -378,7 +378,7 @@ function WorkspaceManagerDrawer({
         onRegistryChange();
         switchActiveWorkspace(playgroundId, result.entry.id);
       } catch (err) {
-        setImportError(err instanceof Error ? err.message : String(err));
+        setOperationError(err instanceof Error ? err.message : String(err));
       } finally {
         setBusy(null);
       }
@@ -462,7 +462,7 @@ function WorkspaceManagerDrawer({
                       }}
                     />
                   </div>
-                  {importError && (
+                  {operationError && (
                     <div
                       role="alert"
                       style={{
@@ -475,7 +475,7 @@ function WorkspaceManagerDrawer({
                         lineHeight: 1.4,
                       }}
                     >
-                      {importError}
+                      {operationError}
                     </div>
                   )}
                   {busy?.action === "import" && (
