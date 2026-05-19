@@ -699,15 +699,27 @@ For the JS/TS playground, present an **npm install panel** in the packages drawe
 
 This phase is **independent of almostnode** and can be shipped now. It benefits all 12 existing playgrounds immediately (JS, TS, Python, R, PHP, C, C++, Java, C#, SQLite, PostgreSQL, DuckDB).
 
-- [ ] Add `app/api/cors-proxy/route.ts` server-side proxy endpoint with:
-  - URL validation (reject non-http/https, add domain denylist as needed).
-  - Rate-limiting header forwarding.
-  - Proper CORS response headers (`Access-Control-Allow-Origin: *`).
-- [ ] Add `app/__sw__.js/route.ts` root-scope service worker that:
+> **Architecture decision (2026-05-19):** The server-side proxy endpoint is implemented as a **Cloudflare Worker** (`cloudflare-cors-proxy/`) rather than a Next.js route handler. This keeps the proxy independently deployable, edge-native (zero cold starts), and decoupled from the Next.js app. The playground calls the worker via `?url=<encoded>` query parameter. See `cloudflare-cors-proxy/README.md` for deployment steps.
+
+**Completed**
+
+- [x] Create `cloudflare-cors-proxy/` Cloudflare Worker package:
+  - [x] `src/index.ts` — full proxy logic: Origin allowlist enforcement, SSRF protection (private/loopback IP blocking), hop-by-hop and credential header stripping, `redirect: "follow"` upstream, CORS headers injected on response.
+  - [x] `wrangler.toml` — worker name, compatibility date, `ALLOWED_ORIGINS` var (localhost, dataslope.com, www.dataslope.com, dataslope-playground.vercel.app).
+  - [x] `package.json` — wrangler 4.x + `@cloudflare/workers-types`, `ws` overridden to ≥8.20.1 (advisory GHSA-58qx-3vcg-4xpx).
+  - [x] `tsconfig.json` — strict TypeScript targeting the Workers runtime.
+  - [x] `README.md` — explains the proxy, security model, setup, deployment, and how to wire `NEXT_PUBLIC_CORS_PROXY_URL` into the playground.
+  - [x] TypeScript type-checks clean (`tsc --noEmit`), zero npm audit vulnerabilities.
+
+**Remaining**
+
+- [ ] Deploy the worker to Cloudflare (`npx wrangler deploy` from `cloudflare-cors-proxy/`) and note the deployed URL.
+- [ ] Set `NEXT_PUBLIC_CORS_PROXY_URL` in Vercel environment variables and `.env.local`.
+- [ ] Add `app/__sw__.js` root-scope service worker that:
   - Intercepts fetch events carrying the `X-Cors-Proxy: 1` header.
-  - Rewrites cross-origin requests through `/api/cors-proxy`.
+  - Rewrites cross-origin requests through the Cloudflare Worker URL.
   - Passes all other requests through unchanged.
-- [ ] Register the SW in the root layout (`app/layout.tsx`) with a simple `navigator.serviceWorker.register('/__sw__.js')` call on mount.
+- [ ] Register the SW in the root layout (`app/layout.tsx`) with `navigator.serviceWorker.register('/__sw__.js')` on mount.
 - [ ] In each existing runtime worker (JS, TS, Python, R), wrap `fetch` / `XMLHttpRequest` to inject `X-Cors-Proxy: 1` on cross-origin requests made within user code execution. For Pyodide, patch the `js.fetch` shim after user code begins.
 - [ ] Run `npm run test` and `npm run build` to confirm no regressions.
 - [ ] Test manually: Python `requests.get("https://httpbin.org/get")` returns a result; direct CDN fetches (pyodide, WebR) are not intercepted.
@@ -715,7 +727,7 @@ This phase is **independent of almostnode** and can be shipped now. It benefits 
 #### Phase 1: Basic almostnode JS/TS Runtime (2–3 days)
 
 - [ ] Install `almostnode` npm package.
-- [ ] **Merge almostnode SW into the CORS proxy SW** already created in Phase 0: extend `app/__sw__.js/route.ts` to also serve the almostnode virtual-server handler, or update the existing `__sw__.js` to include both routing rules (almostnode `/__virtual__/` first, then CORS proxy, then pass-through).
+- [ ] **Merge almostnode SW into the CORS proxy SW** already created in Phase 0: update `app/__sw__.js` to include both routing rules (almostnode `/__virtual__/` first, then `X-Cors-Proxy` rewrite to the Cloudflare Worker URL, then pass-through).
 - [ ] Create `almostnode-javascript.tsx` adapter:
   - `init()` creates `createContainer()` with `onConsole` callback.
   - `run()` calls `runtime.execute(code)` and flushes console output.
@@ -747,7 +759,7 @@ This phase is **independent of almostnode** and can be shipped now. It benefits 
 - [ ] Switch both adapters to `createRuntime({ sandbox: 'https://sandbox.dataslope.io' })`.
 - [ ] Verify that existing console output streaming works over `postMessage` cross-origin protocol.
 - [ ] Update CSP headers if needed.
-- [ ] For the cross-origin sandbox mode: CORS proxy SW does not control the iframe; add direct proxy URL support (`/api/cors-proxy?url=...`) so almostnode user code can target it explicitly if needed.
+- [ ] For the cross-origin sandbox mode: CORS proxy SW does not control the iframe; the sandbox's user code should call the Cloudflare Worker URL directly (`NEXT_PUBLIC_CORS_PROXY_URL?url=...`) instead.
 
 #### Phase 5: Dev Server Playgrounds (Optional, 1–2 weeks)
 
@@ -818,10 +830,10 @@ This phase is **independent of almostnode** and can be shipped now. It benefits 
 
 **Recommendation:** Proceed with almostnode integration in Phases 0–4.
 
-**Phase 0 (CORS proxy SW) is the highest-priority quick win** — it can be shipped today, independent of almostnode, and immediately unblocks user-driven HTTP requests in all 12 existing playgrounds. The implementation adds:
-1. `app/api/cors-proxy/route.ts` — server-side proxy endpoint.
-2. `app/__sw__.js/route.ts` — root-scope service worker with opt-in interception.
-3. Thin `X-Cors-Proxy` header injection in each runtime worker.
+**Phase 0 (CORS proxy) is the highest-priority quick win** — it benefits all 12 existing playgrounds immediately, independent of almostnode. The server-side proxy is implemented as a **Cloudflare Worker** (`cloudflare-cors-proxy/`) rather than a Next.js route handler for edge performance, independent deployability, and future-proofing. The remaining Phase 0 work is:
+1. Deploy the worker to Cloudflare and set `NEXT_PUBLIC_CORS_PROXY_URL` in Vercel.
+2. `app/__sw__.js` — root-scope service worker that rewrites `X-Cors-Proxy: 1` requests through the Cloudflare Worker URL.
+3. Thin `X-Cors-Proxy` header injection in each runtime worker (JS, TS, Python, R).
 
 No conflicts between service workers exist as long as all routing logic is co-located in the single root-scope `__sw__.js`. The almostnode SW (added in Phase 1) is merged into that same file, not registered separately.
 
