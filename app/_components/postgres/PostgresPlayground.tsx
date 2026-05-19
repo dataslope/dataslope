@@ -106,6 +106,7 @@ import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
 import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
+import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
@@ -951,6 +952,10 @@ function PostgresPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading PostgreSQL engine…",
   );
+  const [activeWorkspace, setActiveWorkspace] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
@@ -1596,6 +1601,7 @@ function PostgresPlaygroundInner() {
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
+          setActiveWorkspace({ id: workspace.id, name: workspace.name });
         } catch {
           /* proceed in-memory */
         }
@@ -3075,6 +3081,13 @@ function PostgresPlaygroundInner() {
       loadingCaption={loadingMessage}
       headerActions={
         <>
+          {activeWorkspace && (
+            <WorkspaceBadge
+              playgroundId={PLAYGROUND_ID}
+              activeWorkspaceId={activeWorkspace.id}
+              activeWorkspaceName={activeWorkspace.name}
+            />
+          )}
           <div className="header-actions desktop-only">
             <Menu.Root>
               <Menu.Trigger

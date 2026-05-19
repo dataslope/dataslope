@@ -118,6 +118,8 @@ import {
   writeFile as opfsWriteFile,
 } from "./opfs/fileStorage";
 import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
+import { acquireWorkspaceLock } from "./opfs/workspace";
+import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { FileCode2 } from "lucide-react";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
@@ -538,6 +540,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // survives navigation between unrelated UI surfaces.
   const useStore = getPlaygroundStore(adapter.id);
   const workspaceId = useStore((s) => s.workspaceId);
+  const workspaceName = useStore((s) => s.workspaceName);
   const files = useStore((s) => s.files);
   const activeFileId = useStore((s) => s.activeFileId);
   const activeTabId = useStore((s) => s.activeTabId);
@@ -738,6 +741,26 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         activeFileIdRef.current = activeId;
         filesRef.current = files;
         setWorkspaceReady(true);
+
+        // Tab-isolation notice: if another tab already holds the lock
+        // for this workspace, surface a one-time toast so the user
+        // knows their edits in this tab are unsafe. Shown at most once
+        // per (workspace × session) via sessionStorage.
+        const noticeKey = `pg_ws_warned_${ws.id}`;
+        try {
+          if (window.sessionStorage.getItem(noticeKey) !== "1") {
+            const hasLock = await acquireWorkspaceLock(ws.id);
+            if (!cancelled && !hasLock) {
+              window.sessionStorage.setItem(noticeKey, "1");
+              showToast(
+                "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                "warn",
+              );
+            }
+          }
+        } catch {
+          /* sessionStorage / Locks unavailable — ignore. */
+        }
       } catch {
         // Workspace bootstrap failed (OPFS down, lock contention, etc.);
         // fall back to a single in-memory file so the playground still
@@ -1727,6 +1750,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </Select.Root>
           </div>
           <div className="header-sep" />
+
+          {/* Workspace badge: visible on every breakpoint. Clicking opens
+              a popover with this playground's recent workspaces and a
+              "Manage" entry into the full workspace drawer. */}
+          {workspaceReady && (
+            <WorkspaceBadge
+              playgroundId={adapter.id}
+              activeWorkspaceId={workspaceId}
+              activeWorkspaceName={workspaceName}
+            />
+          )}
 
           {/* Desktop action group — hidden on narrow viewports in favour
               of the consolidated mobile menu below. */}

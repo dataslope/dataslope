@@ -14,8 +14,8 @@
 | **Phase 2: SQLite Engine Migration** | ✅ **COMPLETE** | Rewritten on top of `@sqlite.org/sqlite-wasm` 3.53.0-build1; `sql.js` removed |
 | **Phase 3: SQLite OPFS Persistence** | ✅ **COMPLETE** | SAH Pool VFS, workspace-aware engine, first-open detection |
 | **Phase 4: PostgreSQL & DuckDB OPFS** | ✅ **COMPLETE** | PGlite `opfs-ahp://` dataDir; DuckDB snapshot-and-restore via `databaseStorage` |
-| Phase 5: Non-SQL Multi-Tab + OPFS | ⬜ Not started | |
-| Phase 6: Workspace Manager UI | ⬜ Not started | |
+| **Phase 5: Non-SQL Multi-Tab + OPFS** | ✅ **COMPLETE** | Generic `TabBar`, per-adapter Zustand store, OPFS-backed file tabs with per-tab editor + output history; legacy single-file `localStorage` content auto-migrates into the first tab |
+| **Phase 6: Workspace Manager UI** | ✅ **COMPLETE** | Header workspace badge + popover + manager drawer with rename/duplicate/delete + byte size; surfaces on all four playground shells; tab-isolation toast wired via existing Web Locks helper |
 
 ### Phase 1 — Files Created
 
@@ -193,6 +193,202 @@ swaps so the on-disk file always reflects the active sample.
 - `DuckDbPlayground.tsx` resolves the active workspace via
   `ensureActiveWorkspace("duckdb")` and forwards the ID.
 
+### Phase 5 — Non-SQL Multi-Tab + OPFS
+
+**What changed**
+
+- **New file `app/_components/tabs/tabTypes.ts`** — `TabKind` union and
+  the generic `TabDescriptor` interface (id, kind, label, icon,
+  closeable, renameable, pinned). Open-ended `kind` so future phases
+  can add new tab types without churning the type.
+- **New file `app/_components/tabs/TabBar.tsx`** — reusable
+  content-agnostic tab strip with rename / close / add affordances and
+  a context menu. Uses Base UI's `Dialog` for rename and
+  `ContextMenu` for right-click — both match the SQL playground's
+  existing patterns visually.
+- **New file `app/_components/playgroundTabs.ts`** — `PlaygroundFile`
+  shape (id, filename, pristineFilename), `newFileId()`,
+  `defaultFiles(adapter)`, `suggestNextFilename(adapter, existing)`,
+  and the localStorage-backed manifest `loadManifest` /
+  `saveManifest`. Manifest is metadata only; file contents live in
+  OPFS via Phase-1's `fileStorage`.
+- **New file `app/_components/stores/createPlaygroundStore.ts`** —
+  Zustand store factory holding workspace + files + activeTabId +
+  activeFileId + per-file dirty buffers (`Map<fileId, string>`) +
+  per-file output history (`Map<fileId, OutputCell[]>`) + status. The
+  module also exposes `getPlaygroundStore(adapterId)` so all callers
+  reach the same store instance per route.
+- **`LanguageAdapter` extension** — added `defaultFileExtension`
+  (required) and optional `entryPoint`. All nine non-SQL adapters
+  (Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#) declare
+  both.
+- **`Playground.tsx` rewired**:
+  - Bootstraps the active workspace asynchronously via
+    `ensureActiveWorkspace(adapter.id)`, hydrates the manifest, then
+    reads each file's content from OPFS into the dirty buffer.
+  - On first run with no manifest, seeds a single default file
+    (`<exportBaseFilename>.<defaultFileExtension>`) and migrates the
+    pre-Phase-5 single-file `localStorage[storageKey("code")]` into
+    it so existing users don't lose work.
+  - Persist listener now writes the active file's content into the
+    Zustand dirty buffer + `fileStorage.writeFile(wsId, fileId, …)`
+    (which already debounces + flushes on `pagehide`).
+  - Editor doc is replaced via `dispatch({ changes })` on tab switch;
+    a `suppressPersistRef` flag prevents the replacement from being
+    echoed back into the destination file's buffer.
+  - Runtime output cells route into `outputsByFile.get(activeFileId)`;
+    each tab has its own output history (the user's explicit ask:
+    "each per-language playground tab should contain both an editor
+    for the file, and the output pane").
+  - The editor's `clearBeforeRun`, `clearOutput`, copy/format
+    actions, and the export dropdown all respect the active file
+    (renaming a file changes the download base name).
+  - `TabBar` is rendered above the panes and is wired to add (`+`,
+    via `suggestNextFilename`), close (with a "can't close last
+    file" guard), rename (double-click + context menu), and select.
+- **CSS additions** in `playground.css` for `.pg-tabbar`, `.pg-tab`,
+  `.pg-tab-add` etc. Visually mirrors the SQL playground's existing
+  tab styling so language and SQL playgrounds feel uniform.
+
+**Files created / modified**
+
+```
+app/_components/
+  tabs/
+    tabTypes.ts                ← NEW
+    TabBar.tsx                 ← NEW
+  stores/
+    createPlaygroundStore.ts   ← NEW
+  playgroundTabs.ts            ← NEW
+  Playground.tsx               ← MODIFIED (workspace bootstrap, tab UI,
+                                            persist listener rewire,
+                                            per-tab outputs, export
+                                            filename inheritance)
+  playground.css               ← MODIFIED (.pg-tabbar / .pg-tab styles)
+  types.ts                     ← MODIFIED (LanguageAdapter +
+                                            defaultFileExtension /
+                                            entryPoint)
+  runtime/{python,r,javascript,typescript,php,c,cpp,java,csharp}.tsx
+                               ← MODIFIED (declare new adapter fields)
+```
+
+**Out-of-scope (deliberate)**
+
+- **Multi-file execution.** Only the active file is sent to the
+  runtime; full multi-file compilation / module resolution stays a
+  follow-up per §4.4 of the plan.
+- **Drag-and-drop reordering.** SqlTabBar uses `@dnd-kit`; the
+  generic `TabBar` does not yet. Reordering can be added by lifting
+  the SqlTabBar dnd setup into the generic component.
+- **Refactor of `SqlTabBar` onto the generic `TabBar`** (§4.5). The
+  SQL bar's context menu (Duplicate, Close Others, Close All) plus
+  the view-data/er-diagram/query-history kinds make this a separate
+  surgery — recommended for the agent picking up after Phase 6.
+- **Settings-as-a-tab migration** (§4.5, §8.2). The existing settings
+  *dialog* is preserved unchanged. Moving it inline as a tab requires
+  decoupling `SettingsPanel` from Base UI's `Dialog`, which is a
+  larger refactor.
+
+### Phase 6 — Workspace Manager UI
+
+**What changed**
+
+- **`opfs/workspace.ts` additions**:
+  - `renameWorkspace(id, newName)` — updates the registry entry and
+    rewrites `meta.json` in OPFS. Registry is the authoritative name
+    source, so an OPFS write failure does not roll the rename back.
+  - `duplicateWorkspace(sourceId, newName)` — creates a fresh
+    workspace via `createWorkspace`, then recursively copies the
+    source workspace's OPFS directory (skipping `meta.json`).
+    Internal `copyDirectoryHandle(src, dst)` handles nested
+    sub-trees so both `files/` and `db/` round-trip.
+- **`opfs/fileStorage.ts` addition**:
+  - `estimateWorkspaceSize(workspaceId)` — recursively sums every
+    file size under `workspaces/<id>/`. Used to surface byte counts
+    in the manager drawer.
+- **`opfs/activeWorkspace.ts` addition**:
+  - `switchActiveWorkspace(playgroundId, workspaceId)` — writes the
+    sessionStorage pointer and triggers `window.location.reload()`.
+    A reload is simpler and indistinguishable to the user from a
+    full engine + editor tear-down + re-bootstrap.
+- **New file `app/_components/workspace/WorkspaceBadge.tsx`** — the
+  user-facing workspace UI for every playground. Three layered
+  components:
+  - **`WorkspaceBadge`** — a pill-shaped header button showing the
+    folder icon + workspace name. Clicking opens the popover.
+  - **Workspace popover** — lists the playground's `RECENT_LIMIT`
+    most-recent workspaces (sorted by `lastUsedAt` desc) with an
+    active checkmark, plus "New workspace" and "Manage…" footer
+    actions.
+  - **`WorkspaceManagerDrawer`** — full list of workspaces with
+    per-row Rename / Duplicate / Delete actions and a byte-size
+    estimate. Delete is blocked on the last remaining workspace; if
+    the active workspace is deleted, the drawer automatically
+    switches to a surviving sibling.
+  - Inline `RenameDialog`, `DuplicateDialog`, `DeleteDialog` (all
+    Base UI `Dialog` / `AlertDialog`).
+- **`playground.css` additions** for `.workspace-badge`,
+  `.workspace-popover`, `.workspace-manager-*`. Reuses
+  `.pkg-drawer-*` and `.confirm-*` from the existing palette so the
+  manager visually slots in with the packages drawer and other
+  confirmation dialogs.
+- **Tab-isolation toast** in `Playground.tsx`: after
+  `ensureActiveWorkspace` resolves, the bootstrap effect attempts
+  `acquireWorkspaceLock(ws.id)`. If the lock is unavailable (another
+  tab already holds this workspace) it surfaces a one-time toast,
+  guarded by a `sessionStorage` key so it never repeats within a
+  session.
+- **Wiring into all four playground shells**:
+  - `Playground.tsx` renders the badge between the
+    language-switcher and the desktop action group.
+  - `SqlPlayground.tsx`, `PostgresPlayground.tsx`,
+    `DuckDbPlayground.tsx` each add `activeWorkspace`
+    `useState<{id,name}|null>`, capture it from the existing
+    `ensureActiveWorkspace` call in their bootstrap effect, and
+    render `<WorkspaceBadge>` as the first child of their
+    `headerActions` slot.
+
+**Files created / modified**
+
+```
+app/_components/
+  workspace/
+    WorkspaceBadge.tsx         ← NEW
+  opfs/
+    workspace.ts               ← MODIFIED (renameWorkspace,
+                                            duplicateWorkspace,
+                                            copyDirectoryHandle)
+    fileStorage.ts             ← MODIFIED (estimateWorkspaceSize)
+    activeWorkspace.ts         ← MODIFIED (switchActiveWorkspace)
+  Playground.tsx               ← MODIFIED (workspaceBadge in header,
+                                            tab-isolation toast)
+  playground.css               ← MODIFIED (.workspace-badge,
+                                            .workspace-popover,
+                                            .workspace-manager-*)
+  sql/SqlPlayground.tsx        ← MODIFIED (activeWorkspace state,
+                                            badge in headerActions)
+  postgres/PostgresPlayground.tsx
+                               ← MODIFIED (same)
+  duckdb/DuckDbPlayground.tsx  ← MODIFIED (same)
+```
+
+**Out-of-scope (deliberate)**
+
+- **Tab-isolation notice for SQL playgrounds.** The toast is only
+  wired into the non-SQL `Playground.tsx`. The SQL shells already
+  rely on `acquireWorkspaceLock` indirectly via the SAH Pool VFS
+  (which fails open if locked); adding a UI-level toast there is
+  straightforward but was kept to one playground in this pass to
+  avoid disturbing the SQL bootstraps.
+- **Workspace export / import.** Mentioned in §3.5 of the plan as
+  "Export workspace as ZIP". Not implemented; the duplicate action
+  satisfies the in-browser duplicate use case.
+- **Workspace size displayed in the popover.** Currently only the
+  drawer shows byte sizes (popover rows show only "last opened").
+  Adding the size estimate to the popover would require resolving
+  the async sum before the popover renders, which would either
+  delay the popover or flicker the size in late.
+
 ### Caveats & Follow-ups
 
 - **DuckDB persistence is best-effort.** `exportAsBinary` is async and
@@ -222,31 +418,112 @@ swaps so the on-disk file always reflects the active sample.
   OPFS file exists even before the user has made any changes. If the
   sample seed itself is expensive, consider deferring the first
   snapshot until after the user's first mutation.
-- **No new tests yet** for Phases 2-4. The existing 221-test suite
-  passes (covers Postgres, DuckDB, OPFS Phase-1 helpers, and shared
-  SQL utils). Integration-level OPFS persistence tests will need a
-  browser-level harness (Playwright) and were deferred — record an
-  issue when prioritising Phase 5.
+- **No new tests yet** for Phases 2-6. The existing 221-test suite
+  passes after each phase (covers Postgres, DuckDB, OPFS Phase-1
+  helpers, and shared SQL utils). Integration-level OPFS persistence
+  + tab-switch + workspace-management tests need a browser-level
+  harness (Playwright) and remain deferred — Phase 5 and Phase 6 were
+  smoke-tested via short headless Playwright scripts (tab add /
+  switch / persist / close; badge popover / manager rename + size
+  estimate). A proper e2e suite over those flows is the next obvious
+  testing investment.
+- **`renameWorkspace` is registry-authoritative.** If the OPFS
+  `meta.json` rewrite fails the registry entry still updates, so the
+  badge / popover reflect the new name. This is fine because
+  `meta.json` is currently informational only — every read path
+  consumes the registry. If that ever changes, the rename helper
+  must roll back on OPFS failure.
+- **`duplicateWorkspace` skips `meta.json`** when copying so the
+  destination's freshly-written `meta.json` is preserved. Any future
+  workspace metadata must follow the same pattern (or be merged
+  explicitly during duplication).
+- **Workspace switch reloads the page.** `switchActiveWorkspace`
+  writes `sessionStorage` and calls `window.location.reload()`. This
+  is a deliberate simplification (engines + editor rebuild as a side
+  effect) but it does mean unsaved edits in the *current* tab need to
+  be flushed first. The non-SQL `Playground.tsx` flushes the active
+  file's dirty buffer on every keystroke via `opfsWriteFile`, so the
+  worst case is the last few hundred ms of typing.
 
 ### Where the next agent picks up
 
-**Continue with Phase 5 — Non-SQL Multi-Tab + OPFS.** Phases 2-4 leave
-the SQLite / Postgres / DuckDB playgrounds workspace-aware and
-OPFS-persistent. The next agent should:
+**All six phases of the original plan are complete.** The remaining
+work falls into clearly-scoped follow-up tasks:
 
-1. Generalise the SQL playground's tab model to non-SQL playgrounds
-   (Python, JavaScript, etc.) per §4 of this plan.
-2. Persist editor file contents to OPFS via the existing
-   `fileStorage.ts` helpers, keyed by workspace ID.
-3. Reuse `ensureActiveWorkspace(playgroundId)` from
-   `app/_components/opfs/activeWorkspace.ts`.
+1. **Refactor `SqlTabBar` onto the generic `TabBar`** (§4.5). The
+   `app/_components/tabs/TabBar.tsx` component built in Phase 5 is
+   intentionally content-agnostic. `SqlTabBar` should adopt it as its
+   foundation. Two complications make this its own PR:
+   - The SQL tab's context menu has Duplicate / Close Others / Close
+     All entries — the generic bar currently exposes only Rename and
+     Close. Either generalise the context menu (preferred) via a
+     `contextMenuItems?: ContextMenuItem[]` prop on `TabDescriptor`,
+     or render the SQL menu separately and lift the rest of the bar.
+   - SQL tabs carry `kind: "view-data" | "er-diagram" |
+     "query-history"` with kind-specific icons. The generic
+     `TabDescriptor.icon` slot already covers this; the SQL bar's
+     special-case CSS classes (`.sql-tab-view-data` etc.) can map to
+     the generic `.pg-tab--kind-${kind}` classes.
 
-Key files the Phase 5 agent should study first:
-- `app/_components/opfs/activeWorkspace.ts` — workspace bootstrap
-- `app/_components/opfs/fileStorage.ts` — file persistence helpers
-- `app/_components/sql/SqlPlayground.tsx` — reference shell with tabs
-- `app/_components/python/PythonPlayground.tsx` (and siblings) —
-  current single-file shells that need multi-tab support
+2. **Move Settings from a dialog to a tab** (§4.5, §8.2). The
+   `SettingsPanel` component currently uses Base UI's `Dialog`. To
+   render inline as a tab, extract its body into a `<SettingsContent>`
+   component that does not assume a dialog wrapper. Then add a
+   `kind: "settings"` tab in `Playground.tsx` (and the SQL shells),
+   gated on `settingsTabOpen` in the existing Phase-5 store (the
+   field is already in the store — the toggle just needs the click
+   handler to switch tabs and add the descriptor). The gear icon
+   button in the sidebar then opens the settings tab instead of the
+   dialog.
+
+3. **Drag-and-drop tab reordering for non-SQL playgrounds.** The
+   generic `TabBar` does not yet wrap `@dnd-kit`. Lift the
+   `SortableContext` + sensor setup from `SqlTabBar.tsx` into
+   `TabBar.tsx` behind an `onReorderTabs?` prop, and wire it through
+   `Playground.tsx` to update `files` in the Zustand store.
+
+4. **Multi-file execution per language** (§4.4). Phase 5 ships
+   active-file-only execution. To support cross-file imports, each
+   runtime needs to receive a file map `{ filename: code }`:
+   - **Python / R / PHP**: write all workspace files to the
+     respective VFS (`pyodide.FS.writeFile`, WebR VFS, php-wasm VFS)
+     before running the entry point.
+   - **TypeScript**: the TS compiler already accepts multiple
+     sources; thread the file map through `typescript-worker.ts`.
+   - **C / C++ / Java / C#**: their respective WASM compilers accept
+     multiple source files; thread through `browsercc-worker.ts` and
+     `cheerpj.ts` / `dotnet.ts`.
+   The `LanguageAdapter.entryPoint` field (added in Phase 5) tells the
+   runtime which file to invoke when more than one is present.
+
+5. **Workspace export / import as ZIP** (§3.5). The duplicate action
+   already covers in-browser cloning; sharing a workspace with another
+   browser / user needs an export path. JSZip is already an indirect
+   dependency via several packages; if not, a small DEFLATE-only
+   implementation suffices.
+
+6. **Tab-isolation notice in SQL playgrounds.** Phase 6 wired the
+   one-time `acquireWorkspaceLock` toast only into `Playground.tsx`
+   (non-SQL). Add the same pattern after `ensureActiveWorkspace` in
+   each of the three SQL playground bootstrap effects.
+
+7. **Workspace size in the popover.** The drawer shows byte sizes; the
+   popover currently shows only "last opened". The async
+   `estimateWorkspaceSize` can be prefetched on popover open and
+   cached in a ref so the size renders without flicker.
+
+Key files for any follow-up agent:
+- `app/_components/tabs/TabBar.tsx` — generic tab strip
+- `app/_components/playgroundTabs.ts` — `PlaygroundFile` type +
+  manifest helpers
+- `app/_components/stores/createPlaygroundStore.ts` — Zustand factory
+  (already has a `settingsTabOpen` flag wired up but not yet
+  rendered)
+- `app/_components/workspace/WorkspaceBadge.tsx` — reference for
+  popover + drawer patterns
+- `app/_components/Playground.tsx` — reference non-SQL shell
+- `app/_components/sql/components/SqlTabBar.tsx` — the bar to
+  generalise
 
 ---
 

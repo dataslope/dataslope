@@ -209,6 +209,107 @@ export async function deleteWorkspace(id: string): Promise<void> {
   updateWorkspaceRegistry(registry);
 }
 
+/**
+ * Renames a workspace in-place. Updates both `meta.json` (best-effort) and the
+ * registry entry. Returns the updated entry, or `null` if the workspace was
+ * not in the registry.
+ */
+export async function renameWorkspace(
+  id: string,
+  newName: string,
+): Promise<WorkspaceEntry | null> {
+  const trimmed = newName.trim();
+  if (!trimmed) return null;
+  const registry = getWorkspaceRegistry();
+  const idx = registry.findIndex((e) => e.id === id);
+  if (idx === -1) return null;
+  const updated: WorkspaceEntry = { ...registry[idx], name: trimmed };
+  registry[idx] = updated;
+  updateWorkspaceRegistry(registry);
+
+  if (isOpfsSupported()) {
+    try {
+      const dir = await getWorkspaceDir(id, false);
+      const meta: WorkspaceMeta = {
+        name: trimmed,
+        playground: updated.playground,
+        createdAt: updated.createdAt,
+      };
+      const metaFh = await dir.getFileHandle("meta.json", { create: true });
+      const writable = await metaFh.createWritable();
+      await writable.write(JSON.stringify(meta));
+      await writable.close();
+    } catch {
+      // Meta write failed — registry is the authoritative name source, so the
+      // rename is still effective.
+    }
+  }
+
+  return updated;
+}
+
+/**
+ * Duplicates a workspace's OPFS directory tree into a freshly-created
+ * workspace. Both top-level subdirectories (`files/`, `db/`) and their
+ * contents are copied. Returns the new workspace entry, or `null` when the
+ * source workspace is not in the registry.
+ *
+ * When OPFS is unavailable, the new workspace is registered with no backing
+ * data — callers fall back to the in-memory path just like `createWorkspace`.
+ */
+export async function duplicateWorkspace(
+  sourceId: string,
+  newName: string,
+): Promise<WorkspaceEntry | null> {
+  const registry = getWorkspaceRegistry();
+  const source = registry.find((e) => e.id === sourceId);
+  if (!source) return null;
+
+  const created = await createWorkspace(newName, source.playground);
+
+  if (isOpfsSupported()) {
+    try {
+      const wsDir = await getWorkspacesDir();
+      const srcDir = await wsDir.getDirectoryHandle(sourceId, {
+        create: false,
+      });
+      const dstDir = await wsDir.getDirectoryHandle(created.id, {
+        create: true,
+      });
+      await copyDirectoryHandle(srcDir, dstDir);
+    } catch {
+      // Source directory missing or unreadable — leave the new workspace
+      // empty (the registry entry is still valid).
+    }
+  }
+
+  return created;
+}
+
+/** Recursively copies the contents of `src` into `dst`. Skips `meta.json`
+ *  since the destination already has its own. */
+async function copyDirectoryHandle(
+  src: FileSystemDirectoryHandle,
+  dst: FileSystemDirectoryHandle,
+): Promise<void> {
+  type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
+  for await (const [name, handle] of src as unknown as IterableDir) {
+    if (name === "meta.json") continue;
+    if (handle.kind === "directory") {
+      const child = handle as FileSystemDirectoryHandle;
+      const dstChild = await dst.getDirectoryHandle(name, { create: true });
+      await copyDirectoryHandle(child, dstChild);
+    } else {
+      const fileHandle = handle as FileSystemFileHandle;
+      const file = await fileHandle.getFile();
+      const dstFh = await dst.getFileHandle(name, { create: true });
+      const writable = await dstFh.createWritable();
+      await writable.write(await file.arrayBuffer());
+      await writable.close();
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Web Locks — cross-tab workspace exclusivity
 // ---------------------------------------------------------------------------
