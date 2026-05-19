@@ -469,6 +469,7 @@ function ResultViewImpl({
   // Keep a ref to the latest sortingByIndex so the result-change effect can
   // read it without adding sortingByIndex as a dependency (which would loop).
   const sortingByIndexRef = useRef<Record<number, SortingState>>(sortingByIndex);
+  // eslint-disable-next-line react-hooks/refs
   sortingByIndexRef.current = sortingByIndex;
   // Cache sorting state per result-object so it survives tab switches.
   const sortingCacheRef = useRef<WeakMap<QueryRunResult, Record<number, SortingState>>>(
@@ -1068,10 +1069,12 @@ function ResultViewImpl({
                     const parsed = parseColumnId(resolved[0].id);
                     if (parsed) {
                       const sortedSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
+                      // eslint-disable-next-line react-hooks/refs
                       preserveStateForReload({ sortingByIndex: newSortingByIndex });
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
+                    // eslint-disable-next-line react-hooks/refs
                     preserveStateForReload({ sortingByIndex: newSortingByIndex });
                     onLoadPage(baseSql, 0);
                   }
@@ -1182,16 +1185,21 @@ function ResultViewImpl({
                   effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
+              // eslint-disable-next-line react-hooks/refs
               handlePageChange = (p: number) => {
+                // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
                 onLoadPage(effectiveLazySql, p);
               };
+              // eslint-disable-next-line react-hooks/refs
               handlePageSizeChange = (s: number) => {
+                // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
               };
             } else {
+              // eslint-disable-next-line react-hooks/refs
               handlePageChange = (p: number) => setPage(idx, p);
               handlePageSizeChange = (s: number) => {
                 onSetGlobalPageSize(s);

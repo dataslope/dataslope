@@ -1524,6 +1524,7 @@ function PostgresPlaygroundInner() {
         savedActiveTab &&
         tabsRef.current.some((tab) => tab.id === savedActiveTab)
       ) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTabId(savedActiveTab);
       }
     } catch {
@@ -1761,6 +1762,7 @@ function PostgresPlaygroundInner() {
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResultsByTab((prev) => {
       const ids = new Set(tabs.map((tab) => tab.id));
       let changed = false;
@@ -3928,6 +3930,7 @@ function PostgresPlaygroundInner() {
             setImportCsvState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleCsvFile}
           onSubmit={() => void submitImport("csv")}
@@ -3950,6 +3953,7 @@ function PostgresPlaygroundInner() {
             setImportJsonState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleJsonFile}
           onSubmit={() => void submitImport("json")}
@@ -3972,6 +3976,7 @@ function PostgresPlaygroundInner() {
             setImportParquetState((prev) => updater(prev))
           }
           tables={tables}
+          // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={(f) => void handleParquetFile(f)}
           onSubmit={() => void submitImport("parquet")}

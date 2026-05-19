@@ -5,7 +5,7 @@
  * manipulating global stubs before each case.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 // Reset module between groups so the module-level globals are re-evaluated.
 // We import after setting up stubs in each test instead.

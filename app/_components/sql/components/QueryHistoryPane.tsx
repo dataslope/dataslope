@@ -275,6 +275,7 @@ export function QueryHistoryPane({
 
   // Clamp current page when total pages shrinks (e.g. after clear or page-size change).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage((p) => Math.min(p, totalPages));
   }, [totalPages]);
 
