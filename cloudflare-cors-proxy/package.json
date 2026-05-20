@@ -1,0 +1,18 @@
+{
+  "name": "dataslope-cors-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250515.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.93.0"
+  },
+  "overrides": {
+    "ws": "^8.20.1"
+  }
+}

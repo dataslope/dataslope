@@ -1,0 +1,10 @@
+name = "dataslope-cors-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-05-19"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Comma-separated list of allowed Origin hosts (no trailing slash).
+# Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
+# for production secrets, or set them here for non-sensitive defaults.
+ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope-playground.vercel.app"
