@@ -12,7 +12,7 @@ export interface SwitchDatabaseDialogProps {
   /** Called when the user chooses to overwrite the current workspace. */
   onOverwrite: () => void;
   /** Called when the user chooses to open the new database in a new workspace. */
-  onCreateNew: () => void | Promise<void>;
+  onCreateNew: () => Promise<void>;
 }
 
 export function SwitchDatabaseDialog({
