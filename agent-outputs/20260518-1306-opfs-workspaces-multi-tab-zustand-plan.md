@@ -549,21 +549,101 @@ landed them on `claude/implement-workspace-features-nz1zP`:
   file's path costs nothing on disk — the manifest re-saves the new
   path and the file content stays put.
 
+#### ✅ Done in 2026-05-20 follow-up session
+
+- **Item 1 — SqlTabBar parity for the non-SQL `TabBar`.** The
+  outstanding "Refactor `SqlTabBar` onto the generic `TabBar`" item
+  was already implemented at the structural level (commit `1e78326`,
+  `refactor: replace SqlTabBar/SqlTab with generic TabBar wrapper`),
+  which introduced `TabDescriptor.contextMenuItems` /
+  `hideBuiltinMenuItems` and re-pointed every SQL shell at the
+  generic strip. This session brought the **non-SQL `Playground.tsx`
+  tab bar to full SQL-bar feature parity** so the SQL behaviour acts
+  as the single golden standard across every playground.
+
+  Concretely:
+
+  - **Duplicate / Close Others / Close All context-menu entries** in
+    `app/_components/Playground.tsx`. Three new handlers
+    (`duplicateFileTab`, `closeOtherFileTabs`, `closeAllFileTabs`)
+    mirror the SQL `useTabManagement.ts` shapes:
+    - `duplicateFileTab(id)` derives `<stem>_copy<ext>` (or
+      `<stem>_copy_2<ext>`, `_copy_3<ext>`, … on collision) inside
+      the source's parent directory, snapshots the source's latest
+      dirty buffer into the copy, writes the copy to OPFS, and
+      activates it.
+    - `closeOtherFileTabs(id)` keeps only the requested tab,
+      clears the others' dirty buffers + outputs, deletes their
+      OPFS-backed files, and reactivates the kept tab.
+    - `closeAllFileTabs()` wipes every tab (buffers + outputs +
+      OPFS) and replaces them with a single fresh `defaultFiles()`
+      entry so the editor always has something to type into,
+      matching SQL's "Close All replaces with `Query 1`" behaviour.
+    These three handlers are appended as `contextMenuItems` on each
+    code-tab descriptor in `fileTabDescriptors`; the built-in
+    Rename / Close items come from `TabBar` itself. "Close Others"
+    is dropped from the menu when only one file is open (would be
+    a no-op).
+  - **Cursor focus parity.** The doc-sync `useEffect` that runs on
+    `activeFileId` / `activeTabId` / `workspaceReady` change now
+    ends with `view.focus()`, the same pattern the SQL playground
+    uses in `SqlPlayground.tsx`'s tab-switch effect. Switching
+    tabs, creating a new tab via "+", duplicating, and Close All
+    all land focus straight on CodeMirror so the user can type
+    immediately. The Settings tab still early-returns before the
+    focus call, so opening Settings doesn't steal focus from the
+    settings form.
+  - **Stem-vs-all rename selection.** Added
+    `TabDescriptor.renameSelectsStem?: boolean` to
+    `tabs/tabTypes.ts`. In `TabBar.tsx` the rename input is now
+    grabbed via a ref + `requestAnimationFrame` after the Base UI
+    Dialog mounts; when `renameSelectsStem` is true the input
+    selects from `0` to the last `.` (so `main.py` → "main" is
+    selected, ext preserved), otherwise it falls back to
+    `el.select()` (full selection — matches SQL query tabs with no
+    extension). `Playground.tsx`'s code-tab descriptors set
+    `renameSelectsStem: true`; SQL tabs leave the field unset so
+    the entire title is selected as before.
+  - **Shared rename input styling.** The
+    `.sql-rename-popup` / `.sql-rename-form` / `.sql-rename-input`
+    rules (input width, padding, `var(--bg3)` background, focus
+    glow via `var(--primary-glow)`, themed placeholder) moved from
+    `sqlPlayground.css` to `playground.css`. The SQL playgrounds
+    still pick them up because they import `playground.css` first,
+    and the non-SQL `Playground.tsx` (which imports only
+    `playground.css`) now renders the rename dialog with the same
+    styled input rather than a default browser textbox.
+  - **Rename dialog copy.** Non-SQL code tabs set
+    `renameDialogTitle: "Rename file"` and a description that
+    documents the dual leaf-vs-full-path semantics already
+    implemented in `renameFileTab` (typing a bare leaf preserves
+    the parent directory; typing a `/`-segmented path moves the
+    file).
+
+  **Files touched:**
+  - `app/_components/tabs/tabTypes.ts` — added
+    `renameSelectsStem?: boolean` field on `TabDescriptor`.
+  - `app/_components/tabs/TabBar.tsx` — replaced the `autoFocus`
+    attribute on the rename input with a ref + RAF effect that
+    focuses and selects either the stem or the full label.
+  - `app/_components/Playground.tsx` — added `duplicateFileTab`,
+    `closeOtherFileTabs`, `closeAllFileTabs` callbacks; wired them
+    into `fileTabDescriptors.contextMenuItems`; set
+    `renameSelectsStem: true` / `renameDialogTitle` /
+    `renameDialogDescription` on code-tab descriptors; appended
+    `view.focus()` to the doc-sync effect.
+  - `app/_components/playground.css` — added the
+    `.sql-rename-popup` / `.sql-rename-form` / `.sql-rename-input`
+    rule block.
+  - `app/_components/sqlPlayground.css` — removed the same rules
+    (replaced with a redirect comment).
+
+  Verification: `npx tsc --noEmit` clean, `npx eslint` clean on the
+  touched files (one targeted `react-hooks/refs` disable inside the
+  descriptor map — the closures it constructs only fire on click,
+  not during render), `npx vitest run` 221/221 passing.
+
 #### ⏳ Outstanding from the original plan
-
-1. **Refactor `SqlTabBar` onto the generic `TabBar`** (§4.5). The
-   generic `TabBar` now supports DnD so the bar is feature-compatible,
-   but `SqlTabBar`'s context menu still has Duplicate / Close Others /
-   Close All entries the generic bar lacks. Two paths forward:
-   - Generalise via a `contextMenuItems?: ContextMenuItem[]` prop on
-     `TabDescriptor` (preferred), OR
-   - Lift only the drag wrapper from `SqlTabBar` (it can now delegate
-     to the generic DnD strip we just added) and keep the SQL-specific
-     ContextMenu in `SqlTab.tsx`.
-
-   The SQL bar's kind-specific CSS (`.sql-tab-view-data` etc.) can map
-   straight onto the generic `.pg-tab--kind-${kind}` classes the
-   generic bar already emits.
 
 2. **Move Settings from a dialog to a tab** (§4.5, §8.2). The
    `SettingsPanel` component still uses Base UI's `Dialog`. To render

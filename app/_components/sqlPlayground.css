@@ -1673,37 +1673,10 @@
   pointer-events: none;
 }
 
-.sql-rename-popup {
-  width: 360px;
-}
-
-.sql-rename-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.sql-rename-input {
-  width: 100%;
-  padding: 8px 10px;
-  background: var(--bg3);
-  border: none;
-  border-radius: 6px;
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 13px;
-  outline: none;
-  box-shadow: none;
-}
-
-.sql-rename-input:focus {
-  border-color: transparent;
-  box-shadow: 0 0 0 2px var(--primary-glow);
-}
-
-.sql-rename-input::placeholder {
-  color: color-mix(in srgb, var(--text-dim) 60%, transparent);
-}
+/* `.sql-rename-popup` / `.sql-rename-form` / `.sql-rename-input` and
+   its `:focus` / `::placeholder` rules moved to `playground.css` so
+   the generic TabBar's rename dialog stays styled in non-SQL
+   playgrounds. */
 
 /* ─── View DDL CodeMirror wrapper ─── */
 .sql-ddl-code-wrap {

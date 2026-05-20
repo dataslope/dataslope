@@ -102,7 +102,7 @@ import {
   detectIsMac,
 } from "./playgroundShared";
 import { TabBar } from "./tabs/TabBar";
-import type { TabDescriptor } from "./tabs/tabTypes";
+import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
   SETTINGS_TAB_ID,
   defaultFiles,
@@ -1193,17 +1193,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     if (!view) return;
     if (!activeFileId) return;
     const target = dirtyBuffersRef.current.get(activeFileId) ?? "";
-    if (view.state.doc.toString() === target) return;
-    suppressPersistRef.current = true;
-    try {
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: target },
-        // Drop selection to the start so it's never out of range.
-        selection: { anchor: 0 },
-      });
-    } finally {
-      suppressPersistRef.current = false;
+    if (view.state.doc.toString() !== target) {
+      suppressPersistRef.current = true;
+      try {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: target },
+          // Drop selection to the start so it's never out of range.
+          selection: { anchor: 0 },
+        });
+      } finally {
+        suppressPersistRef.current = false;
+      }
     }
+    // Focus the editor so the user can type immediately after a tab
+    // switch, new-file, duplicate, or close-all action. The Settings
+    // tab is handled above (early return), so we never steal focus
+    // from the settings form here.
+    view.focus();
   }, [activeFileId, activeTabId, workspaceReady]);
 
   // Push word-wrap changes into CodeMirror after init.
@@ -1697,6 +1703,132 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [setFiles],
   );
 
+  /** Duplicate the file tab identified by `fileId`. The copy is
+   *  inserted immediately after the source, takes a derived filename
+   *  (`foo.py` → `foo_copy.py`, with `_copy_2`, `_copy_3`, … suffixes
+   *  on collision), and copies the source's dirty buffer + OPFS
+   *  contents under a fresh tab id. The duplicate becomes the active
+   *  tab so the user can keep editing the clone immediately. */
+  const duplicateFileTab = useCallback(
+    (fileId: string) => {
+      flushActiveFileToBuffer();
+      const current = filesRef.current;
+      const idx = current.findIndex((f) => f.id === fileId);
+      if (idx < 0) return;
+      const source = current[idx];
+
+      // Derive a copy filename that preserves the extension and the
+      // parent directory. The numeric suffix only appears when needed.
+      const lastSlash = source.filename.lastIndexOf("/");
+      const parentDir =
+        lastSlash >= 0 ? source.filename.slice(0, lastSlash + 1) : "";
+      const leaf =
+        lastSlash >= 0 ? source.filename.slice(lastSlash + 1) : source.filename;
+      const dot = leaf.lastIndexOf(".");
+      const stem = dot > 0 ? leaf.slice(0, dot) : leaf;
+      const ext = dot > 0 ? leaf.slice(dot) : "";
+      const taken = new Set(current.map((f) => f.filename.toLowerCase()));
+      let copyName = `${parentDir}${stem}_copy${ext}`;
+      let n = 2;
+      while (taken.has(copyName.toLowerCase())) {
+        copyName = `${parentDir}${stem}_copy_${n}${ext}`;
+        n += 1;
+      }
+
+      const wsId = workspaceIdRef.current;
+      const newId = newFileId();
+      const copy: PlaygroundFile = {
+        id: newId,
+        filename: copyName,
+        pristineFilename: copyName,
+      };
+      const next = [...current.slice(0, idx + 1), copy, ...current.slice(idx + 1)];
+      filesRef.current = next;
+      setFiles(next);
+
+      // Mirror the source's current buffer into the duplicate so the
+      // user sees identical contents on switch. Read from the latest
+      // dirty buffer (the active tab was just flushed above).
+      const sourceContent = dirtyBuffersRef.current.get(source.id) ?? "";
+      updateDirtyBuffer(newId, sourceContent);
+      if (wsId) opfsWriteFile(wsId, newId, sourceContent);
+
+      activeFileIdRef.current = newId;
+      setActiveFileId(newId);
+      setActiveTabId(newId);
+    },
+    [
+      flushActiveFileToBuffer,
+      setActiveFileId,
+      setActiveTabId,
+      setFiles,
+      updateDirtyBuffer,
+    ],
+  );
+
+  /** Close every file tab except `fileId`. The kept tab becomes the
+   *  active tab. Mirrors the SQL playground's "Close Others". */
+  const closeOtherFileTabs = useCallback(
+    (fileId: string) => {
+      const current = filesRef.current;
+      const keep = current.find((f) => f.id === fileId);
+      if (!keep) return;
+      if (current.length <= 1) return;
+      flushActiveFileToBuffer();
+      const wsId = workspaceIdRef.current;
+      for (const f of current) {
+        if (f.id === fileId) continue;
+        clearDirtyBuffer(f.id);
+        clearOutputsForFile(f.id);
+        if (wsId) void opfsDeleteFile(wsId, f.id);
+      }
+      const next = [keep];
+      filesRef.current = next;
+      setFiles(next);
+      activeFileIdRef.current = keep.id;
+      setActiveFileId(keep.id);
+      setActiveTabId(keep.id);
+    },
+    [
+      clearDirtyBuffer,
+      clearOutputsForFile,
+      flushActiveFileToBuffer,
+      setActiveFileId,
+      setActiveTabId,
+      setFiles,
+    ],
+  );
+
+  /** Close every file tab and replace them with a single fresh default
+   *  file. Mirrors the SQL playground's "Close All", which always
+   *  leaves the user with one empty tab to type into. */
+  const closeAllFileTabs = useCallback(() => {
+    const current = filesRef.current;
+    const wsId = workspaceIdRef.current;
+    for (const f of current) {
+      clearDirtyBuffer(f.id);
+      clearOutputsForFile(f.id);
+      if (wsId) void opfsDeleteFile(wsId, f.id);
+    }
+    const fresh = defaultFiles(adapter);
+    const newActive = fresh[0];
+    filesRef.current = fresh;
+    setFiles(fresh);
+    updateDirtyBuffer(newActive.id, "");
+    if (wsId) opfsWriteFile(wsId, newActive.id, "");
+    activeFileIdRef.current = newActive.id;
+    setActiveFileId(newActive.id);
+    setActiveTabId(newActive.id);
+  }, [
+    adapter,
+    clearDirtyBuffer,
+    clearOutputsForFile,
+    setActiveFileId,
+    setActiveTabId,
+    setFiles,
+    updateDirtyBuffer,
+  ]);
+
   // ─── Merge workspace tabs into the Files pane ─────────────────────────
   //
   // The Files pane shows two distinct kinds of entries:
@@ -2129,19 +2261,50 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () => {
+      const multiple = files.length > 1;
+      // The context-menu closures defer to `useCallback` handlers
+      // that intentionally read refs internally. The handlers only
+      // run on user click — never during render — so the
+      // `react-hooks/refs` rule's transitive check is a false alarm
+      // here.
+      // eslint-disable-next-line react-hooks/refs
       const list: TabDescriptor[] = files.map((f) => {
         // PlaygroundFile.filename may be a multi-segment path
         // (e.g. "src/utils.py"); the tab strip is too narrow for the
         // full path, so we show only the leaf and let the Files pane
         // expose the rest.
         const leaf = f.filename.split("/").pop() ?? f.filename;
+        const extras: TabContextMenuItem[] = [
+          {
+            key: "duplicate",
+            label: "Duplicate",
+            onSelect: () => duplicateFileTab(f.id),
+          },
+        ];
+        if (multiple) {
+          extras.push({
+            key: "close-others",
+            label: "Close Others",
+            onSelect: () => closeOtherFileTabs(f.id),
+          });
+        }
+        extras.push({
+          key: "close-all",
+          label: "Close All",
+          onSelect: () => closeAllFileTabs(),
+        });
         return {
           id: f.id,
           kind: "code" as const,
           label: leaf,
           icon: <FileCode2 size={11} aria-hidden="true" />,
-          closeable: files.length > 1,
+          closeable: multiple,
           renameable: true,
+          renameDialogTitle: "Rename file",
+          renameDialogDescription:
+            "Use a leaf name (e.g. utils.py) to keep the file in its current folder, or a full path to move it.",
+          renameSelectsStem: true,
+          contextMenuItems: extras,
         };
       });
       if (settingsOpen) {
@@ -2156,7 +2319,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
       return list;
     },
-    [files, settingsOpen],
+    [
+      closeAllFileTabs,
+      closeOtherFileTabs,
+      duplicateFileTab,
+      files,
+      settingsOpen,
+    ],
   );
 
   const capabilitiesBlurb = useMemo(

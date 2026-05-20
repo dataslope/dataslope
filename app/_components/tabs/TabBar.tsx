@@ -199,6 +199,7 @@ const TabItem = memo(function TabItem({
   const [draftLabel, setDraftLabel] = useState(tab.label);
   const [isClosing, setIsClosing] = useState(false);
   const closedRef = useRef(false);
+  const renameInputRef = useRef<HTMLInputElement>(null);
 
   // Truncation tooltip: when the label overflows the tab, show the
   // full text in a popover after a short hover delay. Mirrors the
@@ -262,6 +263,28 @@ const TabItem = memo(function TabItem({
     closedRef.current = false;
   }, [tab.id]);
 
+  // Focus the rename input when the dialog opens, and select either the
+  // full label or just the stem (the bit before the last `.`) so the
+  // user can immediately start typing. The Dialog mounts asynchronously
+  // — wait one frame so the input is in the DOM before we touch it.
+  useEffect(() => {
+    if (!renameOpen) return;
+    const id = window.requestAnimationFrame(() => {
+      const el = renameInputRef.current;
+      if (!el) return;
+      el.focus();
+      const value = el.value;
+      if (tab.renameSelectsStem) {
+        const dot = value.lastIndexOf(".");
+        const end = dot > 0 ? dot : value.length;
+        el.setSelectionRange(0, end);
+      } else {
+        el.select();
+      }
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [renameOpen, tab.renameSelectsStem]);
+
   const showBuiltinRename = !hideBuiltins && renameable;
   const showBuiltinClose = !hideBuiltins && closeable;
   const hasMenu = showBuiltinRename || showBuiltinClose || extraItems.length > 0;
@@ -288,10 +311,10 @@ const TabItem = memo(function TabItem({
                 }}
               >
                 <input
+                  ref={renameInputRef}
                   className="sql-rename-input"
                   value={draftLabel}
                   onChange={(e) => setDraftLabel(e.target.value)}
-                  autoFocus
                 />
                 <div className="confirm-actions">
                   <Dialog.Close className="confirm-btn confirm-btn-secondary">

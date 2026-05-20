@@ -54,4 +54,10 @@ export interface TabDescriptor {
    *  hide Rename). Built-in entries still fire via the dialog and X
    *  affordances when the underlying flags allow it. */
   hideBuiltinMenuItems?: boolean;
+  /** When true, the rename dialog selects only the "stem" (substring
+   *  before the last `.`) when opened, so a user can immediately type
+   *  to replace the basename without nuking the extension. When false
+   *  (default) the entire label is selected — matches the SQL query-
+   *  tab behaviour where labels have no extension. */
+  renameSelectsStem?: boolean;
 }

@@ -3165,6 +3165,41 @@ input[type="range"].fs-slider:disabled {
     0 0 0 4px var(--text-muted);
 }
 
+/* ─── Tab rename dialog (used by the generic TabBar across every
+       playground; SQL bar relies on these too, so they live here in
+       the shared stylesheet rather than `sqlPlayground.css`). ─── */
+.sql-rename-popup {
+  width: 360px;
+}
+
+.sql-rename-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sql-rename-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg3);
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  outline: none;
+  box-shadow: none;
+}
+
+.sql-rename-input:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+.sql-rename-input::placeholder {
+  color: color-mix(in srgb, var(--text-dim) 60%, transparent);
+}
+
 /* ─── Toast viewport (Base UI Toast — stacked / hover-to-expand) ───
    Modeled on Base UI's docs hero demo so multiple toasts stack into
    a single card with the older ones peeking from behind, and expand
