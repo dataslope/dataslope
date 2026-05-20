@@ -400,11 +400,37 @@ type WorkerOutMessage =
 
 class CWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
+  /** Staged workspace files (path → text content). Populated by
+   *  `prepareFileSystem` before each run so other `.c`/`.h` files in
+   *  the workspace are available to the compiler. */
+  private stagedFiles: Map<string, string> = new Map();
 
   constructor(private worker: Worker) {}
 
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const decoder = new TextDecoder();
+    this.stagedFiles = new Map();
+    for (const [path, bytes] of files) {
+      // Only stage C source and header files for the compiler VFS.
+      if (path.endsWith(".c") || path.endsWith(".h")) {
+        this.stagedFiles.set(path, decoder.decode(bytes));
+      }
+    }
+  }
+
   async run(code: string, emit: EmitOutput): Promise<void> {
     const id = ++this.nextId;
+    // For multi-file projects, prefer the staged main.c content so the
+    // correct entry point is always compiled even when the user has
+    // another file open. Fall back to `code` for single-file workspaces.
+    const source = this.stagedFiles.get("main.c") ?? code;
+    // All other staged files (non-entry-point) are provided as extra
+    // files so the compiler can resolve #include "..." directives and
+    // compile additional translation units.
+    const files: Array<[string, string]> = [];
+    for (const [path, content] of this.stagedFiles) {
+      if (path !== "main.c") files.push([path, content]);
+    }
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
@@ -419,7 +445,7 @@ class CWorkerRuntime implements LanguageRuntime {
         else reject(new Error(msg.message));
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code, language: "c" });
+      this.worker.postMessage({ kind: "run", id, code: source, language: "c", files });
     });
   }
 }
