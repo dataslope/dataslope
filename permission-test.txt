@@ -1,0 +1,2 @@
+This is a test file to verify that file permissions work correctly in Claude Code.
+Testing whether previous permission issues have been resolved.
