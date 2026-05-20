@@ -36,16 +36,22 @@ Updated Pyodide, WebR, php-wasm, and duckdb-wasm to their latest stable versions
 ### php-wasm
 | | Version |
 |---|---|
-| **Current** | `0.0.9-alpha-32` |
-| **Latest stable** | `0.1.0` |
+| **Before** | `0.0.9-alpha-32` |
+| **After** | `0.1.0` |
 
-**No changes made** — `0.1.0` is the latest published stable release, but it introduces breaking changes incompatible with the existing worker-based integration:
+**Files changed:**
+- `package.json` — dependency version bumped from `0.0.9-alpha-32` to `0.1.0` (still pinned, no `^` prefix).
+- `app/_components/runtime/php-worker.ts`:
+  - `PHP_WASM_VERSION` bumped to `0.1.0`.
+  - CDN switched from `cdn.jsdelivr.net` to `unpkg.com` — jsDelivr now 403s on every file in this package because php-wasm 0.1.0 exceeds the 150 MB package cap (see [seanmorris/php-wasm#103](https://github.com/seanmorris/php-wasm/issues/103)). unpkg has no equivalent limit and is the upstream-recommended fallback.
+  - `PhpWeb.mjs` is now imported directly from the CDN URL with `webpackIgnore` / `turbopackIgnore` magic comments instead of via the bundled `php-wasm/PhpWeb` subpath. Reason: the v0.1.0 `PhpWeb` constructor uses dynamic `import('./phpX.Y-web.mjs')` to pick the runtime, and the bundler can't rewrite those relative specifiers into a worker chunk that resolves at the right base URL. Loading the entry point straight from unpkg keeps the whole module graph (`PhpWeb.mjs` → `php8.4-web.mjs` → hashed `.wasm`) on a single origin where `import.meta.url` and `locateFile` agree.
+  - `locateFile` now returns `undefined` for `libxml2.so` instead of resolving it to a CDN URL. PhpBase in 0.1.0 has a built-in `libxml2.so → data:,` suppression that only triggers when the user-supplied `locateFile` returns `undefined`; otherwise the request 404s on every init.
+  - Local `PhpWebInstance` interface removed in favour of the now-shipped TypeScript types (`import("php-wasm/PhpWeb").PhpWeb`).
+- `app/_components/runtime/modules.d.ts` — the `declare module "php-wasm/PhpWeb.mjs"` shim is deleted; the package now ships its own `.d.mts` files.
 
-- `PhpWeb` in `0.1.0` now uses dynamic `import('./php8.4-web.mjs')` internally (default PHP 8.4), which breaks the Next.js/webpack bundling in the Web Worker context.
-- WASM files are now hash-named (e.g., `e31ec3faf3e2323a2b4a448342b50307765b8217.wasm`) and the Emscripten environment assumptions changed.
-- The upgrade caused a runtime "Aborted(both async and sync fetching of the wasm failed)" error on every PHP Playground load.
+**Verification:** Playwright e2e (`PHP runs the default example`) passes; a manual CDP probe of `/playground/php` shows the default Hello-World example printing under PHP 8.4.1 with no console errors, no failed network requests, and no `Aborted(both async and sync fetching of the wasm failed)`.
 
-The version was reverted to `0.0.9-alpha-32` (pinned, no `^` range prefix) to prevent accidental future auto-upgrade to the broken `0.1.0`.
+**Incidental fix surfaced during verification:** the inline theme-bootstrap script in `app/layout.tsx` had a template-literal bug — `\/playground(?:\/|$)` collapses to `/playground(?:/|$)` after JS parsing, which renders an unterminated regex literal and throws `SyntaxError: Invalid regular expression flags` on **every** page of the site. Doubled the backslashes (`\\/`) in the template literal so the emitted inline script reads `/^\/playground(?:\/|$)/`. Pre-existing bug, unrelated to the php-wasm upgrade, but is in this diff because the same probe session caught it.
 
 ---
 

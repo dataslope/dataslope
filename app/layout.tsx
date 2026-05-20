@@ -34,7 +34,7 @@ const themeBootstrapScript = `
       "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",accent1:"#a71d5d",accent2:"#005cc5"}
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
-    if (!/^\/playground(?:\/|$)/.test(location.pathname)) return;
+    if (!/^\\/playground(?:\\/|$)/.test(location.pathname)) return;
     var theme = localStorage.getItem("pg_editor_theme");
     if (!theme || !palettes[theme]) return;
     var p = palettes[theme];

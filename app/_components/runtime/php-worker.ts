@@ -63,14 +63,21 @@ export {};
 
 declare const self: DedicatedWorkerGlobalScope;
 
-const PHP_WASM_VERSION = "0.0.9-alpha-32";
-const PHP_WASM_CDN = `https://cdn.jsdelivr.net/npm/php-wasm@${PHP_WASM_VERSION}/`;
+const PHP_WASM_VERSION = "0.1.0";
+// php-wasm 0.1.0 exceeds jsDelivr's 150 MB package limit, so jsDelivr returns
+// 403 for every file in the package — see seanmorris/php-wasm#103. unpkg has
+// no such limit and is the upstream-recommended CDN until that's resolved.
+const PHP_WASM_CDN = `https://unpkg.com/php-wasm@${PHP_WASM_VERSION}/`;
 
-interface PhpWebInstance extends EventTarget {
-  binary: Promise<unknown>;
-  run(code: string): Promise<unknown>;
-  refresh(): Promise<unknown>;
-}
+// PhpWeb is loaded from the CDN at runtime rather than bundled. Its
+// constructor uses dynamic `import('./phpX.Y-web.mjs')` to pull in the
+// chosen PHP build, and the bundler can't rewrite those relative specifiers
+// correctly into the worker chunk. Loading the entry point straight from the
+// CDN keeps the whole module graph (and its sibling `.wasm`/`.mjs` files)
+// on unpkg, where `locateFile` and the built-in relative imports agree on
+// the base URL. The webpack/turbopack ignore comments stop the bundler from
+// trying to resolve the URL string.
+const PHP_WASM_ENTRY = `${PHP_WASM_CDN}PhpWeb.mjs`;
 
 interface PhpOutputEvent extends Event {
   detail: string[];
@@ -129,18 +136,25 @@ function splitPhpDiagnostics(raw: string): { stdout: string; stderr: string } {
 
 // ─── PHP state ───────────────────────────────────────────────────────────
 
-let php: PhpWebInstance | null = null;
+type PhpWebClass = typeof import("php-wasm/PhpWeb").PhpWeb;
+
+let php: InstanceType<PhpWebClass> | null = null;
 let initPromise: Promise<void> | null = null;
 
 async function initPhp(): Promise<void> {
   post({ kind: "loading", message: "Loading PHP runtime…" });
-  const mod = (await import("php-wasm/PhpWeb.mjs")) as unknown as {
-    PhpWeb: new (args?: Record<string, unknown>) => PhpWebInstance;
-  };
+  const mod = (await import(
+    /* webpackIgnore: true */ /* turbopackIgnore: true */ PHP_WASM_ENTRY
+  )) as { PhpWeb: PhpWebClass };
 
   post({ kind: "loading", message: "Initialising PHP (WebAssembly)…" });
   php = new mod.PhpWeb({
-    locateFile: (path: string) => PHP_WASM_CDN + path,
+    // Return undefined for paths php-wasm handles internally — most
+    // importantly `libxml2.so`, which PhpBase suppresses with a data: URL
+    // when no sharedLib supplies it (PhpBase.mjs in v0.1.0). If we resolve
+    // it to a CDN URL the request 404s on every init.
+    locateFile: (path: string) =>
+      path === "libxml2.so" ? undefined : PHP_WASM_CDN + path,
   });
   await php.binary;
 
