@@ -229,9 +229,12 @@ interface PhpFS {
   mkdir(path: string): void;
 }
 
+interface PhpBinary {
+  FS: PhpFS;
+}
+
 // Staging root matches PHP's default Emscripten CWD so that
 // `require 'math_utils.php'` resolves to `/math_utils.php`.
-const STAGED_ROOT = "/";
 const stagedPaths = new Set<string>();
 
 function joinStagedPath(relPath: string): string {
@@ -256,9 +259,13 @@ function ensureDirs(FS: PhpFS, absFilePath: string): void {
   }
 }
 
-function prepareFs(files: Array<[string, Uint8Array]>): void {
+async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   if (!php) return;
-  const FS = (php as unknown as { FS: PhpFS }).FS;
+  // FS lives on the resolved Emscripten module, not on the PhpWeb instance.
+  // See PhpBase.mjs: `this.binary = phpBinLoader.then(...).then(async php => { ... return php; })`
+  // and PhpWeb.mjs refresh(): `const php = await this.binary; php.FS.syncfs(...)`
+  const module = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
+  const FS = module.FS;
 
   const nextPaths = new Set<string>();
   for (const [relPath, bytes] of files) {
@@ -309,7 +316,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        prepareFs(msg.files);
+        await prepareFs(msg.files);
         post({ kind: "prepare-fs-done", id });
       } catch (err) {
         post({
