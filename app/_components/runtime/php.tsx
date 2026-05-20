@@ -168,12 +168,37 @@ type WorkerOutMessage =
   | { kind: "init-error"; message: string }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string };
 
 class PhpWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
 
   constructor(private worker: Worker) {}
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const id = ++this.nextId;
+    const payload: Array<[string, Uint8Array]> = [];
+    for (const [path, bytes] of files) payload.push([path, bytes]);
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (
+          msg.kind !== "prepare-fs-done" &&
+          msg.kind !== "prepare-fs-error"
+        ) {
+          return;
+        }
+        if (msg.id !== id) return;
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "prepare-fs-done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "prepare-fs", id, files: payload });
+    });
+  }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
     const id = ++this.nextId;

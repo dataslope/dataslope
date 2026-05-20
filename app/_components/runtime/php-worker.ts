@@ -91,7 +91,8 @@ interface OutputCellMessage {
 
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string };
+  | { kind: "run"; id: number; code: string }
+  | { kind: "prepare-fs"; id: number; files: Array<[string, Uint8Array]> };
 
 type OutMessage =
   | { kind: "loading"; message: string }
@@ -99,7 +100,9 @@ type OutMessage =
   | { kind: "init-error"; message: string }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string };
 
 function post(msg: OutMessage) {
   self.postMessage(msg);
@@ -215,6 +218,83 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
   return next;
 }
 
+// ─── Multi-file VFS staging ────────────────────────────────────────────
+// Files supplied to `prepareFs` are written to PHP's Emscripten MEMFS at
+// `/` (the default working directory) so user code can `require`,
+// `include`, and open files with relative paths.
+
+interface PhpFS {
+  writeFile(path: string, data: Uint8Array | string): void;
+  unlink(path: string): void;
+  mkdir(path: string): void;
+}
+
+interface PhpBinary {
+  FS: PhpFS;
+}
+
+// Staging root matches PHP's default Emscripten CWD so that
+// `require 'math_utils.php'` resolves to `/math_utils.php`.
+const stagedPaths = new Set<string>();
+
+function joinStagedPath(relPath: string): string {
+  const trimmed = relPath.replace(/^\/+/, "");
+  if (!trimmed) throw new Error("Invalid empty file path");
+  return `/${trimmed}`;
+}
+
+function ensureDirs(FS: PhpFS, absFilePath: string): void {
+  const idx = absFilePath.lastIndexOf("/");
+  if (idx < 0) return;
+  const parent = absFilePath.slice(0, idx);
+  const parts = parent.split("/").filter(Boolean);
+  let cur = "";
+  for (const part of parts) {
+    cur += `/${part}`;
+    try {
+      FS.mkdir(cur);
+    } catch {
+      // Directory already exists -- ignore.
+    }
+  }
+}
+
+async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
+  if (!php) return;
+  // FS lives on the resolved Emscripten module, not on the PhpWeb instance.
+  // See PhpBase.mjs: `this.binary = phpBinLoader.then(...).then(async php => { ... return php; })`
+  // and PhpWeb.mjs refresh(): `const php = await this.binary; php.FS.syncfs(...)`
+  const module = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
+  const FS = module.FS;
+
+  const nextPaths = new Set<string>();
+  for (const [relPath, bytes] of files) {
+    const abs = joinStagedPath(relPath);
+    nextPaths.add(abs);
+    ensureDirs(FS, abs);
+    try {
+      FS.writeFile(abs, bytes);
+    } catch (err) {
+      throw new Error(
+        `Failed to write ${relPath}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // Remove paths from a previous run that are no longer in the snapshot.
+  for (const prev of stagedPaths) {
+    if (!nextPaths.has(prev)) {
+      try {
+        FS.unlink(prev);
+      } catch {
+        /* file may already be gone -- ignore */
+      }
+    }
+  }
+  stagedPaths.clear();
+  for (const p of nextPaths) stagedPaths.add(p);
+}
+
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   const msg = ev.data;
 
@@ -228,6 +308,24 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
         throw err;
       });
     }
+    return;
+  }
+
+  if (msg.kind === "prepare-fs") {
+    const { id } = msg;
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        await prepareFs(msg.files);
+        post({ kind: "prepare-fs-done", id });
+      } catch (err) {
+        post({
+          kind: "prepare-fs-error",
+          id,
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+    });
     return;
   }
 
