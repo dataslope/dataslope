@@ -510,8 +510,14 @@ interface ShelterInstance {
 interface WebRShelterConstructor {
   new (): Promise<ShelterInstance>;
 }
+interface WebRFS {
+  writeFile(path: string, data: Uint8Array): Promise<void>;
+  mkdir(path: string): Promise<void>;
+  unlink(path: string): Promise<void>;
+}
 interface WebRInstance {
   Shelter: WebRShelterConstructor;
+  FS: WebRFS;
   init(): Promise<void>;
   evalRVoid(code: string): Promise<void>;
   installPackages(pkgs: string[]): Promise<void>;
@@ -621,10 +627,69 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // WebR manages its own dedicated internal worker; calling it from the main
 // thread is already non-blocking. No outer wrapper worker is needed.
 
+// Working directory inside the WebR Emscripten FS (matches `getwd()` output).
+const WEB_USER_HOME = "/home/web_user";
+
 class WebRRuntime implements LanguageRuntime {
   private installedPackages = new Set<string>();
+  // Absolute FS paths written during the previous prepareFileSystem call.
+  // Used to remove stale files when tabs are renamed or deleted.
+  private stagedPaths = new Set<string>();
 
   constructor(private webR: WebRInstance) {}
+
+  private joinStagedPath(relPath: string): string {
+    const trimmed = relPath.replace(/^\/+/, "");
+    return `${WEB_USER_HOME}/${trimmed}`;
+  }
+
+  private async ensureParentDirs(absFilePath: string): Promise<void> {
+    const idx = absFilePath.lastIndexOf("/");
+    if (idx <= 0) return;
+    const parent = absFilePath.slice(0, idx);
+    const parts = parent.split("/").filter(Boolean);
+    let cur = "";
+    for (const part of parts) {
+      cur += `/${part}`;
+      try {
+        await this.webR.FS.mkdir(cur);
+      } catch {
+        // Directory already exists — ignore.
+      }
+    }
+  }
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const fs = this.webR.FS;
+    const nextPaths = new Set<string>();
+
+    for (const [relPath, bytes] of files) {
+      const abs = this.joinStagedPath(relPath);
+      nextPaths.add(abs);
+      await this.ensureParentDirs(abs);
+      try {
+        await fs.writeFile(abs, bytes);
+      } catch (err) {
+        throw new Error(
+          `Failed to write ${relPath}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    // Remove files staged on a previous run that are no longer present so
+    // renames and deletes in the UI propagate to the R filesystem.
+    for (const prev of this.stagedPaths) {
+      if (!nextPaths.has(prev)) {
+        try {
+          await fs.unlink(prev);
+        } catch {
+          /* file may already be gone -- ignore */
+        }
+      }
+    }
+    this.stagedPaths.clear();
+    for (const p of nextPaths) this.stagedPaths.add(p);
+  }
 
   private async ensurePackages(code: string): Promise<string> {
     const referenced = extractLibraryCalls(code);
