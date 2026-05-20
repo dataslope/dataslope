@@ -203,6 +203,17 @@ async function runCode(
   let fileName: string;
   const extraFiles: Record<string, string | ArrayBuffer> = {};
 
+  // Build a combined source using the "unity build" strategy: all extra
+  // source files are concatenated before the entry point so that symbols
+  // defined in helper files (e.g. dog.c) are available when the entry
+  // point (main.c / main.cpp) is compiled.  Headers are placed in the
+  // compiler VFS via extraFiles so that #include "dog.h" resolves.
+  //
+  // This avoids passing additional source file paths as positional
+  // arguments to clang, which is not supported by browsercc's compile()
+  // API and would cause "Clang driver failed with code 1".
+  let extraSource = "";
+
   if (language === "cpp") {
     const pch = await pchPromise;
     flags = [...CPP_COMPILE_FLAGS];
@@ -211,31 +222,29 @@ async function runCode(
       extraFiles[PCH_VFS_PATH] = pch;
     }
     fileName = "main.cpp";
-    // Add other workspace files to the compiler VFS; compile extra
-    // C++ translation units alongside the entry point.
     for (const [path, content] of files) {
-      if (path === fileName) continue;
-      extraFiles[path] = content;
       if (path.endsWith(".cpp") || path.endsWith(".cc") || path.endsWith(".cxx")) {
-        flags.push(path);
+        extraSource += content + "\n";
+      } else if (path.endsWith(".h") || path.endsWith(".hpp")) {
+        extraFiles[path] = content;
       }
     }
   } else {
     flags = [...C_COMPILE_FLAGS];
     fileName = "main.c";
-    // Add other workspace files to the compiler VFS; compile extra
-    // C translation units alongside the entry point.
     for (const [path, content] of files) {
-      if (path === fileName) continue;
-      extraFiles[path] = content;
       if (path.endsWith(".c")) {
-        flags.push(path);
+        extraSource += content + "\n";
+      } else if (path.endsWith(".h")) {
+        extraFiles[path] = content;
       }
     }
   }
 
+  const combinedSource = extraSource ? extraSource + code : code;
+
   const { compileOutput, module } = await browserccApi.compile({
-    source: code,
+    source: combinedSource,
     fileName,
     flags,
     extraFiles: Object.keys(extraFiles).length > 0 ? extraFiles : undefined,
