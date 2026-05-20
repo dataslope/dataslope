@@ -9,10 +9,9 @@ import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import {
   newTabId,
   saveTabs,
-  tabsAreDirty,
   storageKey,
 } from "../../sqlitePlaygroundTabs";
-import { findSampleDatabase, SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
+import { SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
 import { replaceDoc } from "../utils/editorUtils";
 import {
   sanitizeImportColName,
@@ -170,12 +169,24 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const engine = engineRef.current;
       if (!engine) return;
       void (async () => {
-        const sample = await engine.loadSampleDatabase(nextId);
-        await applyDbLoad(sample);
-        showToast(`Loaded ${sample.filename}.`);
+        if (nextId === "__blank__") {
+          const sample = await engine.loadBlankDatabase();
+          setCustomFilenames((prev) => {
+            if (!(sample.id in prev)) return prev;
+            const next = { ...prev };
+            delete next[sample.id];
+            return next;
+          });
+          await applyDbLoad(sample);
+          showToast("Created blank database.");
+        } else {
+          const sample = await engine.loadSampleDatabase(nextId);
+          await applyDbLoad(sample);
+          showToast(`Loaded ${sample.filename}.`);
+        }
       })();
     },
-    [applyDbLoad, showToast, engineRef],
+    [applyDbLoad, showToast, engineRef, setCustomFilenames],
   );
 
   const performBlankLoad = useCallback(() => {
@@ -328,16 +339,12 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
-      if (nextId === activeDbId) return;
-      const curSample =
-        customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
-      if (tabsAreDirty(tabsRef.current, curSample.defaultTabs)) {
-        setPendingDbId(nextId);
-        return;
-      }
-      performDbSwitch(nextId);
+      // For blank database, always show the dialog (it's always a "switch").
+      // For sample databases, skip if already active.
+      if (nextId !== "__blank__" && nextId === activeDbId) return;
+      setPendingDbId(nextId);
     },
-    [activeDbId, customDb, performDbSwitch, tabsRef, setPendingDbId],
+    [activeDbId, setPendingDbId],
   );
 
   const exportDatabase = useCallback(() => {
@@ -713,7 +720,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   return {
     applyDbLoad,
     performDbSwitch,
-    performBlankLoad,
     performImportSqlite,
     performImportSqlDump,
     requestDbSwitch,
