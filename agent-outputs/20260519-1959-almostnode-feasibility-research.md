@@ -710,6 +710,7 @@ This phase is **independent of almostnode** and can be shipped now. It benefits 
   - [x] `tsconfig.json` — strict TypeScript targeting the Workers runtime.
   - [x] `README.md` — explains the proxy, security model, setup, deployment, and how to wire `NEXT_PUBLIC_CORS_PROXY_URL` into the playground.
   - [x] TypeScript type-checks clean (`tsc --noEmit`), zero npm audit vulnerabilities.
+- [x] Fix `src/index.ts` Origin validation (2026-05-20): requests with **no `Origin` header** (browser navigation, `curl`, Postman) were incorrectly rejected with `{"error":"Origin not allowed"}`. The fix treats a missing `Origin` as implicitly allowed — only browser cross-origin fetch/XHR requests reliably send an `Origin` header. Requests that _do_ carry an `Origin` are still validated against the `ALLOWED_ORIGINS` allowlist and the localhost development shortcut.
 
 **Remaining**
 

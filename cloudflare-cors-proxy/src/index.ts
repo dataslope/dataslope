@@ -152,18 +152,22 @@ export default {
     // ------------------------------------------------------------------
     // 1. Determine and validate the request Origin
     // ------------------------------------------------------------------
-    const requestOrigin = request.headers.get("Origin") ?? "";
-    const normalizedOrigin = requestOrigin.replace(/\/+$/, "");
+    const rawOrigin = request.headers.get("Origin");
+    // null means no Origin header was sent (browser navigation, curl, Postman…).
+    const normalizedOrigin = rawOrigin ? rawOrigin.replace(/\/+$/, "") : null;
 
-    // Allow requests with no Origin only in development (wrangler dev).
-    // In production every browser request carries an Origin header.
+    // Requests without an Origin header are always allowed — only browser
+    // cross-origin fetch/XHR requests reliably include an Origin header.
+    // Short-circuit evaluation means isLocalhostOrigin() is only called when
+    // normalizedOrigin is a non-null string (TypeScript narrows accordingly).
     const isAllowedOrigin =
+      normalizedOrigin === null ||
       allowedOrigins.has(normalizedOrigin) ||
       // Also allow any localhost port during local development.
       isLocalhostOrigin(normalizedOrigin);
 
     const corsHeaders = isAllowedOrigin
-      ? buildCorsHeaders(normalizedOrigin || "*")
+      ? buildCorsHeaders(normalizedOrigin ?? "*")
       : buildCorsHeaders("null");
 
     // ------------------------------------------------------------------
