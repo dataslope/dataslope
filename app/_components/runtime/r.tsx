@@ -640,12 +640,13 @@ class WebRRuntime implements LanguageRuntime {
 
   private joinStagedPath(relPath: string): string {
     const trimmed = relPath.replace(/^\/+/, "");
+    if (!trimmed) throw new Error("Invalid empty file path");
     return `${WEB_USER_HOME}/${trimmed}`;
   }
 
   private async ensureParentDirs(absFilePath: string): Promise<void> {
     const idx = absFilePath.lastIndexOf("/");
-    if (idx <= 0) return;
+    if (idx < 0) return;
     const parent = absFilePath.slice(0, idx);
     const parts = parent.split("/").filter(Boolean);
     let cur = "";
