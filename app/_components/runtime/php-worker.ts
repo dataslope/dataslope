@@ -63,7 +63,7 @@ export {};
 
 declare const self: DedicatedWorkerGlobalScope;
 
-const PHP_WASM_VERSION = "0.0.9-alpha-32";
+const PHP_WASM_VERSION = "0.1.0";
 const PHP_WASM_CDN = `https://cdn.jsdelivr.net/npm/php-wasm@${PHP_WASM_VERSION}/`;
 
 interface PhpWebInstance extends EventTarget {
