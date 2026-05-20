@@ -464,7 +464,29 @@ function findMainClassName(source: string): string {
 }
 
 class JavaRuntime implements LanguageRuntime {
+  // Paths inside CheerpJ's /str/ virtual filesystem that have been
+  // staged by prepareFileSystem. The active file (from run()) is
+  // always added to this set so javac sees all workspace files.
+  private stagedJavaPaths: string[] = [];
+
   constructor(private api: CheerpJApi) {}
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    this.stagedJavaPaths = [];
+    for (const [path, bytes] of files) {
+      // Only stage .java files; skip binary data files.
+      if (!path.endsWith(".java")) continue;
+      // Use only the basename (no subdirectory) — CheerpJ's /str/
+      // is a flat virtual filesystem, and javac is invoked with
+      // individual file paths rather than a source root.
+      const filename = path.includes("/") ? path.split("/").pop()! : path;
+      const virtualPath = `${SOURCE_DIR}${filename}`;
+      this.api.cheerpjAddStringFile(virtualPath, bytes);
+      if (!this.stagedJavaPaths.includes(virtualPath)) {
+        this.stagedJavaPaths.push(virtualPath);
+      }
+    }
+  }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
     const className = findMainClassName(code);
@@ -472,10 +494,22 @@ class JavaRuntime implements LanguageRuntime {
 
     // 1) Mount the user's source under /str/<Class>.java so javac can
     //    read it. CheerpJ's `cheerpjAddStringFile` takes raw bytes.
+    //    Always update the active file so unsaved edits are visible
+    //    even if prepareFileSystem was already called with an older copy.
     const encoder = new TextEncoder();
     this.api.cheerpjAddStringFile(sourcePath, encoder.encode(code));
 
-    // 2) Capture javac's diagnostics + the program's output by
+    // 2) Build the full list of source files to compile. Start with
+    //    the files staged by prepareFileSystem (all .java workspace
+    //    files), then ensure the active file's path is included too
+    //    (it may not be in stagedJavaPaths if prepareFileSystem wasn't
+    //    called, e.g. for single-file workspaces).
+    const filesToCompile = [...this.stagedJavaPaths];
+    if (!filesToCompile.includes(sourcePath)) {
+      filesToCompile.push(sourcePath);
+    }
+
+    // 3) Capture javac's diagnostics + the program's output by
     //    intercepting console.log / console.error for the duration of
     //    each invocation. CheerpJ writes Java's System.out/System.err
     //    to those globals (verified in cj3.js — there's no other
@@ -512,14 +546,15 @@ class JavaRuntime implements LanguageRuntime {
       }
     };
 
-    // 3) Compile <Class>.java -> /files/<Class>.class. `-Xlint` matches
-    //    JavaFiddle's defaults so common pitfalls (unchecked casts,
-    //    deprecated APIs) surface as warnings.
+    // 4) Compile all staged .java files together. Passing every source
+    //    file in a single javac invocation lets the compiler resolve
+    //    cross-file references (e.g. Main.java using Dog from Dog.java)
+    //    in one pass. `-Xlint` matches JavaFiddle's defaults.
     const javacResult = await runWithCapture(() =>
       this.api.cheerpjRunMain(
         "com.sun.tools.javac.Main",
         CLASSPATH,
-        sourcePath,
+        ...filesToCompile,
         "-d",
         OUTPUT_DIR,
         "-Xlint",
@@ -537,7 +572,7 @@ class JavaRuntime implements LanguageRuntime {
       return;
     }
 
-    // 4) Run the user's main() with /files/ on the classpath.
+    // 5) Run the user's main() with /files/ on the classpath.
     const runResult = await runWithCapture(() =>
       this.api.cheerpjRunMain(className, CLASSPATH),
     );

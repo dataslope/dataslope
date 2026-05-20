@@ -288,13 +288,81 @@ Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
   },
 ];
 
+/** Strip leading `using` directives (and any preceding blank lines /
+ *  single-line comments) from a C# source string so the body can be
+ *  appended after the entry-point file without triggering the Roslyn
+ *  parse error "A using clause must precede all other elements".
+ *
+ *  Handles `using Ns;`, `using static Ns.Type;`, `using Alias = Ns;`,
+ *  and `global using Ns;`. Only strips directives at the very top of
+ *  the file (before any non-using, non-blank, non-comment line) — any
+ *  using directive that appears after a class or namespace declaration
+ *  is intentionally left in place. Multi-line using directives (an
+ *  extremely rare formatting style) are not stripped. */
+function stripCSharpUsings(source: string): string {
+  const lines = source.split("\n");
+  let i = 0;
+  while (i < lines.length) {
+    const trimmed = lines[i].trim();
+    if (
+      trimmed === "" ||
+      trimmed.startsWith("//") ||
+      // Matches: using Ns;  using static Ns.T;  using A = Ns;  global using Ns;
+      (/^(?:global\s+)?using(?:\s+static)?\s/.test(trimmed) &&
+        trimmed.endsWith(";"))
+    ) {
+      i++;
+    } else {
+      break;
+    }
+  }
+  return lines.slice(i).join("\n");
+}
+
 class CSharpRuntime implements LanguageRuntime {
+  // Bytes of workspace .cs files that are NOT the entry point
+  // (Program.cs). Populated by prepareFileSystem before each run.
+  private extraSources: Uint8Array[] = [];
+
   constructor(private api: DotnetApi) {}
 
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    this.extraSources = [];
+    for (const [path, bytes] of files) {
+      if (!path.endsWith(".cs")) continue;
+      // Skip the entry-point file — its content is passed directly to
+      // run() as `code` and must not be appended again.
+      const filename = path.includes("/") ? path.split("/").pop()! : path;
+      if (filename === "Program.cs") continue;
+      this.extraSources.push(bytes);
+    }
+  }
+
   async run(code: string, emit: EmitOutput): Promise<void> {
+    // When there are extra .cs files in the workspace, append their
+    // class/type bodies after the entry-point code. The entry-point's
+    // `using` directives stay at the top of `code`, while using
+    // directives from the extra files are stripped to avoid the Roslyn
+    // error "A using clause must precede all other elements in a
+    // namespace or type declaration". In C# class references are
+    // resolved across the whole compilation unit regardless of
+    // declaration order, so appending the extra bodies last is safe.
+    let combined = code;
+    if (this.extraSources.length > 0) {
+      const decoder = new TextDecoder();
+      const extraBodies: string[] = [];
+      for (const bytes of this.extraSources) {
+        const body = stripCSharpUsings(decoder.decode(bytes));
+        if (body.trim()) extraBodies.push(body);
+      }
+      if (extraBodies.length > 0) {
+        combined = code + "\n" + extraBodies.join("\n");
+      }
+    }
+
     let result;
     try {
-      result = await this.api.runScript(code);
+      result = await this.api.runScript(combined);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       emit({ type: "stderr", content: message });
