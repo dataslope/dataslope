@@ -41,7 +41,7 @@ export function SwitchDatabaseDialog({
             </Dialog.Close>
             <Dialog.Close
               className="confirm-btn confirm-btn-secondary"
-              onClick={() => void onCreateNew()}
+              onClick={() => { void onCreateNew().catch(console.error); }}
             >
               Open in new workspace
             </Dialog.Close>
