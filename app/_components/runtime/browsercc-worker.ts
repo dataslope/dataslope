@@ -76,7 +76,17 @@ interface OutputCellMessage {
 
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string; language: "c" | "cpp" };
+  | {
+      kind: "run";
+      id: number;
+      code: string;
+      language: "c" | "cpp";
+      /** Extra workspace files (path → text content) to make available
+       *  during compilation. Headers and additional source files from the
+       *  multi-file workspace are passed here so `#include "dog.h"` and
+       *  multi-translation-unit builds work correctly. */
+      files?: Array<[string, string]>;
+    };
 
 type OutMessage =
   | { kind: "loading"; message: string }
@@ -185,31 +195,50 @@ async function runCode(
   id: number,
   code: string,
   language: "c" | "cpp",
+  files: Array<[string, string]>,
 ): Promise<void> {
   if (!browserccApi || !wasiShim) throw new Error("Runtime not initialised");
 
   let flags: string[];
   let fileName: string;
-  let extraFiles: Record<string, string | ArrayBuffer> | undefined;
+  const extraFiles: Record<string, string | ArrayBuffer> = {};
 
   if (language === "cpp") {
     const pch = await pchPromise;
     flags = [...CPP_COMPILE_FLAGS];
     if (pch) {
       flags.push("-include-pch", PCH_VFS_PATH);
-      extraFiles = { [PCH_VFS_PATH]: pch };
+      extraFiles[PCH_VFS_PATH] = pch;
     }
     fileName = "main.cpp";
+    // Add other workspace files to the compiler VFS; compile extra
+    // C++ translation units alongside the entry point.
+    for (const [path, content] of files) {
+      if (path === fileName) continue;
+      extraFiles[path] = content;
+      if (path.endsWith(".cpp") || path.endsWith(".cc") || path.endsWith(".cxx")) {
+        flags.push(path);
+      }
+    }
   } else {
-    flags = C_COMPILE_FLAGS;
+    flags = [...C_COMPILE_FLAGS];
     fileName = "main.c";
+    // Add other workspace files to the compiler VFS; compile extra
+    // C translation units alongside the entry point.
+    for (const [path, content] of files) {
+      if (path === fileName) continue;
+      extraFiles[path] = content;
+      if (path.endsWith(".c")) {
+        flags.push(path);
+      }
+    }
   }
 
   const { compileOutput, module } = await browserccApi.compile({
     source: code,
     fileName,
     flags,
-    extraFiles,
+    extraFiles: Object.keys(extraFiles).length > 0 ? extraFiles : undefined,
   });
 
   const trimmedDiag = compileOutput.replace(/\n+$/, "");
@@ -257,11 +286,11 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   }
 
   if (msg.kind === "run") {
-    const { id, code, language } = msg;
+    const { id, code, language, files = [] } = msg;
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await runCode(id, code, language);
+        await runCode(id, code, language, files);
         post({ kind: "done", id });
       } catch (err) {
         post({
