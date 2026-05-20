@@ -36,12 +36,16 @@ Updated Pyodide, WebR, php-wasm, and duckdb-wasm to their latest stable versions
 ### php-wasm
 | | Version |
 |---|---|
-| **Before** | `0.0.9-alpha-32` |
-| **After** | `0.1.0` |
+| **Current** | `0.0.9-alpha-32` |
+| **Latest stable** | `0.1.0` |
 
-**Files changed:**
-- `package.json` — dependency version bumped from `^0.0.9-alpha-32` to `^0.1.0`
-- `app/_components/runtime/php-worker.ts` — `PHP_WASM_VERSION` constant updated from `"0.0.9-alpha-32"` to `"0.1.0"` (used to build the CDN URL)
+**No changes made** — `0.1.0` is the latest published stable release, but it introduces breaking changes incompatible with the existing worker-based integration:
+
+- `PhpWeb` in `0.1.0` now uses dynamic `import('./php8.4-web.mjs')` internally (default PHP 8.4), which breaks the Next.js/webpack bundling in the Web Worker context.
+- WASM files are now hash-named (e.g., `e31ec3faf3e2323a2b4a448342b50307765b8217.wasm`) and the Emscripten environment assumptions changed.
+- The upgrade caused a runtime "Aborted(both async and sync fetching of the wasm failed)" error on every PHP Playground load.
+
+The version was reverted to `0.0.9-alpha-32` (pinned, no `^` range prefix) to prevent accidental future auto-upgrade to the broken `0.1.0`.
 
 ---
 
