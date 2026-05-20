@@ -172,7 +172,7 @@ export function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
         <span className="info-popover-label">GitHub</span>
         <span className="info-popover-val">
           <a
-            href="https://github.com/subwaymatch/dataslope-playground"
+            href="https://github.com/dataslope/dataslope"
             target="_blank"
             rel="noreferrer"
             className="info-github-link"
@@ -359,214 +359,213 @@ export function SettingsPanelContent({
       onValueChange={(v) => setTab(String(v))}
       className="settings-tabs"
     >
-            <Tabs.List
-              className="settings-tabs-list"
-              aria-label="Settings sections"
-            >
-              <Tabs.Tab value="general" className="settings-tab">
-                <Sliders size={14} aria-hidden="true" />
-                <span className="settings-tab-label">General</span>
-              </Tabs.Tab>
-              <Tabs.Tab value="themes" className="settings-tab">
-                <Palette size={14} aria-hidden="true" />
-                <span className="settings-tab-label">Themes</span>
-              </Tabs.Tab>
-              {extraTabs?.map((t) => (
-                <Tabs.Tab key={t.value} value={t.value} className="settings-tab">
-                  {t.trigger}
-                </Tabs.Tab>
-              ))}
-            </Tabs.List>
+      <Tabs.List
+        className="settings-tabs-list"
+        aria-label="Settings sections"
+      >
+        <Tabs.Tab value="general" className="settings-tab">
+          <Sliders size={14} aria-hidden="true" />
+          <span className="settings-tab-label">General</span>
+        </Tabs.Tab>
+        <Tabs.Tab value="themes" className="settings-tab">
+          <Palette size={14} aria-hidden="true" />
+          <span className="settings-tab-label">Themes</span>
+        </Tabs.Tab>
+        {extraTabs?.map((t) => (
+          <Tabs.Tab key={t.value} value={t.value} className="settings-tab">
+            {t.trigger}
+          </Tabs.Tab>
+        ))}
+      </Tabs.List>
 
-            <Tabs.Panel value="general" className="settings-panel-pane">
-              <div className="settings-body">
-                <div className="setting-row">
-                  <div className="setting-label">
-                    <ALargeSmall size={14} aria-hidden="true" />
-                    <span>Editor Font Size</span>
-                  </div>
-                  <div className="font-size-row">
-                    <input
-                      type="range"
-                      className="fs-slider"
-                      min={10}
-                      max={22}
-                      step={1}
-                      value={fontSize}
-                      onChange={(e) => setFontSize(Number(e.target.value))}
-                    />
-                    <span className="font-size-val">{fontSize}px</span>
-                  </div>
-                </div>
+      <Tabs.Panel value="general" className="settings-panel-pane">
+        <div className="settings-body">
+          <div className="setting-row">
+            <div className="setting-label">
+              <ALargeSmall size={14} aria-hidden="true" />
+              <span>Editor Font Size</span>
+            </div>
+            <div className="font-size-row">
+              <input
+                type="range"
+                className="fs-slider"
+                min={10}
+                max={22}
+                step={1}
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+              />
+              <span className="font-size-val">{fontSize}px</span>
+            </div>
+          </div>
 
-                {showOutputFontSizeControls && (
-                  <div className="setting-row">
-                    <label className="setting-checkbox-row">
-                      <input
-                        type="checkbox"
-                        checked={outputFontSizeEnabled}
-                        onChange={(e) =>
-                          setOutputFontSizeEnabled(e.target.checked)
-                        }
-                      />
-                      <span>
-                        {outputFontSizeLabel ??
-                          "Use Different Font Size for Outputs"}
-                      </span>
-                    </label>
-                    <div
-                      className={`font-size-row${
-                        outputFontSizeEnabled ? "" : " disabled"
-                      }`}
-                    >
-                      <input
-                        type="range"
-                        className="fs-slider"
-                        min={10}
-                        max={22}
-                        step={1}
-                        value={outputFontSizeEnabled ? outputFontSize : fontSize}
-                        onChange={(e) =>
-                          setOutputFontSize(Number(e.target.value))
-                        }
-                        disabled={!outputFontSizeEnabled}
-                        aria-label="Output font size"
-                      />
-                      <span className="font-size-val">{outputFontSizeEnabled ? outputFontSize : fontSize}px</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="setting-row">
-                  <label className="setting-switch-row">
-                    <span className="setting-switch-label">
-                      <WrapText size={14} aria-hidden="true" />
-                      <span>Word Wrap</span>
-                    </span>
-                    <Switch.Root
-                      checked={wordWrap}
-                      onCheckedChange={setWordWrap}
-                      className="bui-switch"
-                    >
-                      <Switch.Thumb className="bui-switch-thumb" />
-                    </Switch.Root>
-                  </label>
-                </div>
-
-                {showClearBeforeRunRow && (
-                <div className="setting-row">
-                  <label className="setting-switch-row">
-                    <span className="setting-switch-label">
-                      <Eraser size={14} aria-hidden="true" />
-                      <span>
-                        {clearBeforeRunLabel ?? "Clear Output Before Running"}
-                      </span>
-                    </span>
-                    <Switch.Root
-                      checked={clearBeforeRun}
-                      onCheckedChange={setClearBeforeRun}
-                      className="bui-switch"
-                    >
-                      <Switch.Thumb className="bui-switch-thumb" />
-                    </Switch.Root>
-                  </label>
-                </div>
-                )}
-
-                {extraGeneralRows}
-
-                <div className="settings-actions">
-                  {extraActionRows}
-                  <button
-                    type="button"
-                    className="settings-action-btn"
-                    onClick={onRestoreDefaults}
-                  >
-                    <RotateCcw size={14} aria-hidden="true" />
-                    <span>Restore default settings</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="settings-action-btn settings-action-danger"
-                    onClick={onClearLocalStorage}
-                  >
-                    <Trash2 size={14} aria-hidden="true" />
-                    <span>Clear all localStorage data</span>
-                  </button>
-                  {onClearAllLocalData && (
-                    <button
-                      type="button"
-                      className="settings-action-btn settings-action-danger"
-                      onClick={onClearAllLocalData}
-                    >
-                      <Trash2 size={14} aria-hidden="true" />
-                      <span>Clear all local data (storage + OPFS)</span>
-                    </button>
-                  )}
-                </div>
+          {showOutputFontSizeControls && (
+            <div className="setting-row">
+              <label className="setting-checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={outputFontSizeEnabled}
+                  onChange={(e) =>
+                    setOutputFontSizeEnabled(e.target.checked)
+                  }
+                />
+                <span>
+                  {outputFontSizeLabel ??
+                    "Use Different Font Size for Outputs"}
+                </span>
+              </label>
+              <div
+                className={`font-size-row${outputFontSizeEnabled ? "" : " disabled"
+                  }`}
+              >
+                <input
+                  type="range"
+                  className="fs-slider"
+                  min={10}
+                  max={22}
+                  step={1}
+                  value={outputFontSizeEnabled ? outputFontSize : fontSize}
+                  onChange={(e) =>
+                    setOutputFontSize(Number(e.target.value))
+                  }
+                  disabled={!outputFontSizeEnabled}
+                  aria-label="Output font size"
+                />
+                <span className="font-size-val">{outputFontSizeEnabled ? outputFontSize : fontSize}px</span>
               </div>
-            </Tabs.Panel>
+            </div>
+          )}
 
-            <Tabs.Panel value="themes" className="settings-panel-pane">
-              <div className="settings-body settings-body-themes">
-                <div
-                  className="theme-grid"
-                  role="radiogroup"
-                  aria-label="Editor theme"
+          <div className="setting-row">
+            <label className="setting-switch-row">
+              <span className="setting-switch-label">
+                <WrapText size={14} aria-hidden="true" />
+                <span>Word Wrap</span>
+              </span>
+              <Switch.Root
+                checked={wordWrap}
+                onCheckedChange={setWordWrap}
+                className="bui-switch"
+              >
+                <Switch.Thumb className="bui-switch-thumb" />
+              </Switch.Root>
+            </label>
+          </div>
+
+          {showClearBeforeRunRow && (
+            <div className="setting-row">
+              <label className="setting-switch-row">
+                <span className="setting-switch-label">
+                  <Eraser size={14} aria-hidden="true" />
+                  <span>
+                    {clearBeforeRunLabel ?? "Clear Output Before Running"}
+                  </span>
+                </span>
+                <Switch.Root
+                  checked={clearBeforeRun}
+                  onCheckedChange={setClearBeforeRun}
+                  className="bui-switch"
                 >
-                  {ALL_THEMES.map((t) => {
-                    const palette =
-                      THEME_PALETTES[t.value] ?? THEME_PALETTES.dracula;
-                    const selected = editorTheme === t.value;
-                    return (
-                      <button
-                        key={t.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        className={`theme-card${selected ? " selected" : ""}`}
-                        onClick={() => setEditorTheme(t.value)}
+                  <Switch.Thumb className="bui-switch-thumb" />
+                </Switch.Root>
+              </label>
+            </div>
+          )}
+
+          {extraGeneralRows}
+
+          <div className="settings-actions">
+            {extraActionRows}
+            <button
+              type="button"
+              className="settings-action-btn"
+              onClick={onRestoreDefaults}
+            >
+              <RotateCcw size={14} aria-hidden="true" />
+              <span>Restore default settings</span>
+            </button>
+            <button
+              type="button"
+              className="settings-action-btn settings-action-danger"
+              onClick={onClearLocalStorage}
+            >
+              <Trash2 size={14} aria-hidden="true" />
+              <span>Clear all localStorage data</span>
+            </button>
+            {onClearAllLocalData && (
+              <button
+                type="button"
+                className="settings-action-btn settings-action-danger"
+                onClick={onClearAllLocalData}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                <span>Clear all local data (storage + OPFS)</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </Tabs.Panel>
+
+      <Tabs.Panel value="themes" className="settings-panel-pane">
+        <div className="settings-body settings-body-themes">
+          <div
+            className="theme-grid"
+            role="radiogroup"
+            aria-label="Editor theme"
+          >
+            {ALL_THEMES.map((t) => {
+              const palette =
+                THEME_PALETTES[t.value] ?? THEME_PALETTES.dracula;
+              const selected = editorTheme === t.value;
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  className={`theme-card${selected ? " selected" : ""}`}
+                  onClick={() => setEditorTheme(t.value)}
+                >
+                  <div
+                    className="theme-card-preview"
+                    style={{
+                      background: palette.bg,
+                      color: palette.text,
+                      borderColor: palette.border,
+                    }}
+                  >
+                    <ThemePreviewSnippet
+                      palette={palette}
+                      language={language}
+                    />
+                  </div>
+                  <div className="theme-card-label">
+                    <span className="theme-card-name">
+                      {t.label}
+                      {t.value === "lucario" && (
+                        <span className="theme-card-default-badge">
+                          Default
+                        </span>
+                      )}
+                    </span>
+                    {selected && (
+                      <span
+                        className="theme-card-check"
+                        aria-hidden="true"
                       >
-                        <div
-                          className="theme-card-preview"
-                          style={{
-                            background: palette.bg,
-                            color: palette.text,
-                            borderColor: palette.border,
-                          }}
-                        >
-                          <ThemePreviewSnippet
-                            palette={palette}
-                            language={language}
-                          />
-                        </div>
-                        <div className="theme-card-label">
-                          <span className="theme-card-name">
-                            {t.label}
-                            {t.value === "lucario" && (
-                              <span className="theme-card-default-badge">
-                                Default
-                              </span>
-                            )}
-                          </span>
-                          {selected && (
-                            <span
-                              className="theme-card-check"
-                              aria-hidden="true"
-                            >
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </Tabs.Panel>
-            {extraTabs?.map((t) => (
-              <Fragment key={t.value}>{t.panel}</Fragment>
-            ))}
-          </Tabs.Root>
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </Tabs.Panel>
+      {extraTabs?.map((t) => (
+        <Fragment key={t.value}>{t.panel}</Fragment>
+      ))}
+    </Tabs.Root>
   );
 }

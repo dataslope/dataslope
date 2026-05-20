@@ -3,7 +3,7 @@
 
 **Date:** 2026-05-19  
 **Status:** Research Complete — Implementation-Ready  
-**Repo context:** `subwaymatch/dataslope-playground`
+**Repo context:** `dataslope/dataslope`
 
 ---
 
@@ -705,7 +705,7 @@ This phase is **independent of almostnode** and can be shipped now. It benefits 
 
 - [x] Create `cloudflare-cors-proxy/` Cloudflare Worker package:
   - [x] `src/index.ts` — full proxy logic: Origin allowlist enforcement, SSRF protection (private/loopback IP blocking), hop-by-hop and credential header stripping, `redirect: "follow"` upstream, CORS headers injected on response.
-  - [x] `wrangler.toml` — worker name, compatibility date, `ALLOWED_ORIGINS` var (localhost, dataslope.com, www.dataslope.com, dataslope-playground.vercel.app).
+  - [x] `wrangler.toml` — worker name, compatibility date, `ALLOWED_ORIGINS` var (localhost, dataslope.com, www.dataslope.com, dataslope.vercel.app).
   - [x] `package.json` — wrangler 4.x + `@cloudflare/workers-types`, `ws` overridden to ≥8.20.1 (advisory GHSA-58qx-3vcg-4xpx).
   - [x] `tsconfig.json` — strict TypeScript targeting the Workers runtime.
   - [x] `README.md` — explains the proxy, security model, setup, deployment, and how to wire `NEXT_PUBLIC_CORS_PROXY_URL` into the playground.

@@ -7,4 +7,4 @@ compatibility_flags = ["nodejs_compat"]
 # Comma-separated list of allowed Origin hosts (no trailing slash).
 # Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
 # for production secrets, or set them here for non-sensitive defaults.
-ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope-playground.vercel.app"
+ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app"

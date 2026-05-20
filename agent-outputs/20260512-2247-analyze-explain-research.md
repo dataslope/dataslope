@@ -705,7 +705,7 @@ QUERY PLAN
 | SQLiteStudio | Same | Raw text, no rendering |
 | SQL Fiddle / dbfiddle | Same | Raw text, no rendering |
 | Observable/Jupyter | Kernel-dependent; typically raw text | Raw text, no rendering |
-| dataslope-playground | (Not yet implemented) | Gap |
+| dataslope | (Not yet implemented) | Gap |
 
 **No current browser-based SQLite tool renders EQP visually.** This is a clear opportunity.
 

@@ -60,7 +60,7 @@ The following origins are whitelisted by default:
 | `http://localhost:3000` | Local development |
 | `https://dataslope.com` | Production site |
 | `https://www.dataslope.com` | Production site (www) |
-| `https://dataslope-playground.vercel.app` | Vercel preview/staging |
+| `https://dataslope.vercel.app` | Vercel preview/staging |
 
 Any `localhost` port is also allowed automatically during local development (`wrangler dev`).
 
@@ -132,7 +132,7 @@ For production, set the allowed origins as a [Cloudflare secret](https://develop
 ```bash
 npx wrangler secret put ALLOWED_ORIGINS
 # Paste the comma-separated list when prompted:
-# https://dataslope.com,https://www.dataslope.com,https://dataslope-playground.vercel.app
+# https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app
 ```
 
 Secrets take precedence over `[vars]` in `wrangler.toml`.

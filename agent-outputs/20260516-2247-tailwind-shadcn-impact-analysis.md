@@ -1,7 +1,7 @@
 # Tailwind CSS + shadcn/ui Integration Analysis
 
 **Date:** 2026-05-16  
-**Repository:** `subwaymatch/dataslope-playground`  
+**Repository:** `dataslope/dataslope`  
 **Scope:** Impact analysis of adding Tailwind CSS globally and shadcn/ui to a project that already has complex, hand-written CSS
 
 ---

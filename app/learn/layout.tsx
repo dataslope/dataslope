@@ -38,7 +38,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
             </Link>
           ),
         }}
-        githubUrl="https://github.com/subwaymatch/dataslope-playground/"
+        githubUrl="https://github.com/dataslope/dataslope/"
       >
         {children}
       </DocsLayout>

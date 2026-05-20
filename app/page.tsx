@@ -42,7 +42,7 @@ export default function Home() {
             Color Theme Test
           </Link>
           <a
-            href="https://github.com/subwaymatch/dataslope-playground/"
+            href="https://github.com/dataslope/dataslope/"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.ctaSecondary}

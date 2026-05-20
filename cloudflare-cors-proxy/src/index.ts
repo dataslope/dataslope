@@ -22,7 +22,7 @@
 export interface Env {
   /**
    * Comma-separated list of allowed Origin values, e.g.:
-   *   "http://localhost:3000,https://dataslope.com,https://dataslope-playground.vercel.app"
+   *   "http://localhost:3000,https://dataslope.com,https://dataslope.vercel.app"
    *
    * Configure in wrangler.toml [vars] for development, or via
    * `wrangler secret put ALLOWED_ORIGINS` / Cloudflare dashboard for production.
