@@ -104,8 +104,8 @@ import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
-import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
-import { acquireWorkspaceLock } from "../opfs/workspace";
+import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
+import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import {
   deleteDataEntry as opfsDeleteDataEntry,
   loadDataFiles as opfsLoadDataFiles,
@@ -125,7 +125,6 @@ import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
 import {
   createTabStorage,
-  tabsAreDirty,
 } from "../sql/shared/tabStorageUtils";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { SETTINGS_TAB_ID } from "../playgroundTabs";
@@ -1993,15 +1992,10 @@ function DuckDbPlaygroundInner() {
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
-      if (nextId === activeDbIdRef.current) return;
-      const curSample = findDuckDbSampleDatabase(activeDbIdRef.current);
-      if (tabsAreDirty(tabsRef.current, curSample.defaultTabs)) {
-        setPendingDbId(nextId);
-        return;
-      }
-      void performDbSwitch(nextId);
+      if (nextId !== DUCKDB_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
+      setPendingDbId(nextId);
     },
-    [performDbSwitch],
+    [setPendingDbId],
   );
 
   const handleSchemaChange = useCallback(
@@ -4074,10 +4068,21 @@ function DuckDbPlaygroundInner() {
         <SwitchDatabaseDialog
           open={pendingDbId !== null}
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
-          currentDbFilename={displayFilename}
-          onConfirm={() => {
+          currentWorkspaceName={activeWorkspace?.name ?? "Default DuckDB Workspace"}
+          newDbFilename={pendingDbId ? findDuckDbSampleDatabase(pendingDbId).filename : ""}
+          onOverwrite={() => {
             if (pendingDbId) void performDbSwitch(pendingDbId);
             setPendingDbId(null);
+          }}
+          onCreateNew={async () => {
+            if (!pendingDbId) return;
+            try {
+              localStorage.setItem(storageKey("db"), pendingDbId);
+            } catch { /* ignore */ }
+            const label = findDuckDbSampleDatabase(pendingDbId).label;
+            const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
+            setPendingDbId(null);
+            switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}
         />
 
@@ -4673,7 +4678,7 @@ function DuckDbPlaygroundInner() {
                 chevron={<ChevronDown size={12} />}
                 onChange={(value) => {
                   if (value === "__new_db__") {
-                    void performDbSwitch(DUCKDB_BLANK_DATABASE.id);
+                    requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
                     return;
                   }
                   if (value === "__import_sql_dump__") {

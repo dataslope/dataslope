@@ -1,49 +1,59 @@
 "use client";
 
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Dialog } from "@base-ui-components/react/dialog";
 
 export interface SwitchDatabaseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Filename of the database the user is switching away from. */
-  currentDbFilename: string;
-  /** Called when the user confirms the switch. */
-  onConfirm: () => void;
+  /** Name of the current workspace (shown in the description). */
+  currentWorkspaceName: string;
+  /** Filename of the database the user is switching to. */
+  newDbFilename: string;
+  /** Called when the user chooses to overwrite the current workspace. */
+  onOverwrite: () => void;
+  /** Called when the user chooses to open the new database in a new workspace. */
+  onCreateNew: () => void | Promise<void>;
 }
 
 export function SwitchDatabaseDialog({
   open,
   onOpenChange,
-  currentDbFilename,
-  onConfirm,
+  currentWorkspaceName,
+  newDbFilename,
+  onOverwrite,
+  onCreateNew,
 }: SwitchDatabaseDialogProps) {
   return (
-    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="confirm-backdrop" />
-        <AlertDialog.Popup className="confirm-popup">
-          <AlertDialog.Title className="confirm-title">
-            Switch databases?
-          </AlertDialog.Title>
-          <AlertDialog.Description className="confirm-desc">
-            You have unsaved edits in the query tabs for{" "}
-            <strong>{currentDbFilename}</strong>. They will be saved and
-            restored when you switch back, but loading another database will
-            replace what&rsquo;s currently in the editor.
-          </AlertDialog.Description>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup">
+          <Dialog.Title className="confirm-title">
+            Switch to <strong>{newDbFilename}</strong>?
+          </Dialog.Title>
+          <Dialog.Description className="confirm-desc">
+            Choose how to open this database in workspace{" "}
+            <strong>{currentWorkspaceName}</strong>.
+          </Dialog.Description>
           <div className="confirm-actions">
-            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+            <Dialog.Close className="confirm-btn confirm-btn-secondary">
               Cancel
-            </AlertDialog.Close>
-            <AlertDialog.Close
-              className="confirm-btn confirm-btn-danger"
-              onClick={onConfirm}
+            </Dialog.Close>
+            <Dialog.Close
+              className="confirm-btn confirm-btn-secondary"
+              onClick={() => void onCreateNew()}
             >
-              Switch database
-            </AlertDialog.Close>
+              Open in new workspace
+            </Dialog.Close>
+            <Dialog.Close
+              className="confirm-btn confirm-btn-danger"
+              onClick={onOverwrite}
+            >
+              Overwrite this workspace
+            </Dialog.Close>
           </div>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

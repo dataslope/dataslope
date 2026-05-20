@@ -119,8 +119,8 @@ import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
-import { ensureActiveWorkspace } from "../opfs/activeWorkspace";
-import { acquireWorkspaceLock } from "../opfs/workspace";
+import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
+import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import {
   type ColumnConstraintInfo,
@@ -182,7 +182,6 @@ import {
   newTabId,
   saveTabs,
   storageKey,
-  tabsAreDirty,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
 import { themeFor } from "../cmExtensions";
@@ -1334,7 +1333,6 @@ function SqlPlaygroundInner() {
   const {
     applyDbLoad,
     performDbSwitch,
-    performBlankLoad,
     performImportSqlite,
     performImportSqlDump,
     requestDbSwitch,
@@ -2135,6 +2133,14 @@ function SqlPlaygroundInner() {
     return base;
   }, [activeDbId, customDb, customFilenames]);
 
+  // Filename of the pending database (shown in the switch-database dialog).
+  const pendingDbFilename = useMemo(() => {
+    if (!pendingDbId) return "";
+    if (pendingDbId === "__blank__") return "blank.sqlite";
+    const sample = findSampleDatabase(pendingDbId);
+    return customFilenames[pendingDbId] ?? sample.filename;
+  }, [pendingDbId, customFilenames]);
+
   // Drag-and-drop tab reordering is handled by the generic TabBar
   // internally; SqlPlayground no longer needs its own DnD sensors or
   // dragging-tab state for the tab strip.
@@ -2432,10 +2438,23 @@ function SqlPlaygroundInner() {
       <SwitchDatabaseDialog
           open={pendingDbId !== null}
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
-          currentDbFilename={activeSample.filename}
-          onConfirm={() => {
+          currentWorkspaceName={activeWorkspace?.name ?? "Default SQLite Workspace"}
+          newDbFilename={pendingDbFilename}
+          onOverwrite={() => {
             if (pendingDbId) performDbSwitch(pendingDbId);
             setPendingDbId(null);
+          }}
+          onCreateNew={async () => {
+            if (!pendingDbId) return;
+            try {
+              localStorage.setItem(storageKey("db"), pendingDbId);
+            } catch { /* ignore */ }
+            const label = pendingDbId === "__blank__"
+              ? "New SQLite Database"
+              : findSampleDatabase(pendingDbId).label;
+            const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
+            setPendingDbId(null);
+            switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}
         />
 
@@ -3644,7 +3663,7 @@ function SqlPlaygroundInner() {
                   actions={SQLITE_DB_ACTIONS}
                   onChange={(value) => {
                     if (value === "__new_db__") {
-                      performBlankLoad();
+                      requestDbSwitch("__blank__");
                       return;
                     }
                     if (value === "__import_sqlite__") {
