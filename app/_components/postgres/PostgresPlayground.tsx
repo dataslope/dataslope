@@ -4663,25 +4663,23 @@ function PostgresPlaygroundInner() {
                         </>
                       ),
                       panel: (
-                        <div className="settings-panel-pane">
-                          <div className="settings-body">
-                            <div className="setting-row">
-                              <label className="setting-switch-row">
-                                <span className="setting-switch-label">
-                                  <Layers size={14} aria-hidden="true" />
-                                  <span>Show system schemas</span>
-                                </span>
-                                <Switch.Root
-                                  checked={showSystemSchemas}
-                                  onCheckedChange={(checked) => {
-                                    setShowSystemSchemasState(checked);
-                                  }}
-                                  className="bui-switch"
-                                >
-                                  <Switch.Thumb className="bui-switch-thumb" />
-                                </Switch.Root>
-                              </label>
-                            </div>
+                        <div className="settings-body">
+                          <div className="setting-row">
+                            <label className="setting-switch-row">
+                              <span className="setting-switch-label">
+                                <Layers size={14} aria-hidden="true" />
+                                <span>Show system schemas</span>
+                              </span>
+                              <Switch.Root
+                                checked={showSystemSchemas}
+                                onCheckedChange={(checked) => {
+                                  setShowSystemSchemasState(checked);
+                                }}
+                                className="bui-switch"
+                              >
+                                <Switch.Thumb className="bui-switch-thumb" />
+                              </Switch.Root>
+                            </label>
                           </div>
                         </div>
                       ),

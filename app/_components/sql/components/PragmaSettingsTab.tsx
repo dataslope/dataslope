@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Popover } from "@base-ui-components/react/popover";
-import { Tabs } from "@base-ui-components/react/tabs";
 import { CircleHelp, RotateCcw } from "lucide-react";
 import {
   DEFAULT_PRAGMA_SETTINGS,
@@ -122,8 +121,7 @@ export function PragmaSettingsTab({
     draft.caseSensitiveLike !== savedPragmas.caseSensitiveLike;
 
   return (
-    <Tabs.Panel value="pragmas" className="settings-panel-pane">
-      <div className="settings-body pragma-settings-body">
+    <div className="settings-body pragma-settings-body">
         {/* Foreign keys */}
         <div className="pragma-row">
           <div className="pragma-label-wrap">
@@ -277,7 +275,5 @@ export function PragmaSettingsTab({
             Save
           </button>
         </div>
-      </div>
-    </Tabs.Panel>
   );
 }
