@@ -990,6 +990,67 @@ Diagnostics emitted by `ts.transpileModule` are buffered during
 `prepare-fs` and replayed as stderr cells at the start of the next
 `run`, so users see compile errors next to the failed execution.
 
+### 8.6a Build-time gotcha #2: Turbopack chunks the worker via `importScripts` (2026-05-21)
+
+After the initial migration shipped, both playgrounds threw at worker
+startup:
+
+```
+Failed to load: Uncaught SyntaxError: Failed to execute 'importScripts'
+on 'WorkerGlobalScope': Identifier 'e1' has already been declared
+```
+
+Source: Turbopack's worker runtime contains this line:
+
+```js
+new e(u, i ? {...i, type: void 0} : void 0)
+```
+
+`type: void 0` **overrides any `type` option passed to the Worker
+constructor**, forcing classic-worker mode. Its bootstrap script then
+does `importScripts.apply(self, chunks)` to load every chunk of the
+almostnode bundle. Two chunks happen to mint the same minified
+top-level identifier (`e1`), and the worker aborts before our handlers
+attach.
+
+**Why we didn't catch it in the e2e suite initially:** my Playwright
+run after deleting `.next/cache` produced a chunk graph that *didn't*
+collide on `e1`; the next clean build did. The collision is sensitive
+to the global chunk-minifier state.
+
+**Fix shipped:** route around Turbopack's worker bundler entirely.
+`scripts/build-almostnode-workers.mjs` runs esbuild over the two
+worker source files, producing self-contained ES modules at
+`public/_workers/javascript-worker.js` and `public/_workers/typescript-
+worker.js`. The adapters now do:
+
+```ts
+new Worker("/_workers/javascript-worker.js", { type: "module" })
+```
+
+— a static URL Turbopack treats as opaque (no static analysis, no
+chunking, no `importScripts`). Module-worker semantics are honoured by
+the browser directly.
+
+The script:
+
+- Runs from `postinstall`, `prebuild`, and `predev` (chained into
+  `dev` and `build` for clarity).
+- Stubs every `node:*` specifier to a no-op CJS proxy because
+  `just-bash`'s browser bundle (transitively pulled in by almostnode)
+  still references `node:zlib`, `node:async_hooks`, `node:dns` in dead
+  code branches that esbuild's resolver otherwise complains about.
+- Outputs to `public/_workers/`, which is `.gitignore`d.
+
+This keeps the rest of the app on Turbopack (no build-speed
+regression) while making the almostnode workers a deterministic
+single-file bundle.
+
+Validated against both `next dev` and `next start` via Playwright (the
+ad-hoc prod smoke test was deleted after passing; the regression guard
+remaining in `e2e/playgrounds.spec.ts` asserts no `importScripts`
+error appears during runtime init).
+
 ### 8.6 Remaining work / follow-ups for the next coding agent
 
 The scope of this task was strictly the runtime swap. Several items
