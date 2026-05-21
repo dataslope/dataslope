@@ -343,8 +343,14 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting TypeScript worker…");
+    // Module worker (`type: "module"`) — see javascript.tsx for the
+    // rationale: a classic worker tries to load almostnode's split
+    // chunks via `importScripts()`, which throws
+    // `SyntaxError: Identifier 'e1' has already been declared` from
+    // colliding minified top-level bindings in two chunks.
     const worker = new Worker(
       new URL("./typescript-worker.ts", import.meta.url),
+      { type: "module" },
     );
     return new Promise<LanguageRuntime>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {

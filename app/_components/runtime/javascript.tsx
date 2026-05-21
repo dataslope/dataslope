@@ -296,8 +296,16 @@ export const javascriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting almostnode runtime…");
+    // Module worker (`type: "module"`) — required because almostnode's
+    // bundle is large enough that Turbopack splits it into multiple
+    // chunks. A classic worker would load each chunk via
+    // `importScripts()`, and two chunks have colliding minified
+    // top-level identifiers, throwing
+    // `SyntaxError: Identifier 'e1' has already been declared`.
+    // Module workers use native ESM imports and avoid the clash.
     const worker = new Worker(
       new URL("./javascript-worker.ts", import.meta.url),
+      { type: "module" },
     );
     return new Promise<LanguageRuntime>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
