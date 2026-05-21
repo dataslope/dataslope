@@ -7,10 +7,12 @@ import type {
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
-// JavaScript runs in a dedicated Web Worker via the AsyncFunction constructor
-// so that user code (including top-level `await`) never blocks the UI.
-// The worker handles console.* interception and streams stdout/stderr back
-// to the main thread via postMessage.
+// JavaScript runs in a dedicated Web Worker backed by almostnode — a
+// browser-native Node.js runtime. The worker stages every open file
+// (code tabs + uploaded data) into almostnode's VirtualFS, then
+// executes the entry file with CommonJS semantics. `require()` works,
+// 40+ Node.js modules are shimmed (`fs`, `path`, `http`, `events`,
+// `crypto`, …), and multi-file imports resolve from VirtualFS.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -18,7 +20,7 @@ const EXAMPLES: ExampleSnippet[] = [
     title: "Hello World",
     desc: "Basic console output, math & strings",
     code: `// Hello, JavaScript Playground!
-console.log("Node-like environment? No — this runs in your browser.");
+console.log("Node-like environment in your browser, powered by almostnode.");
 console.log("π ≈", Math.PI);
 console.log("e ≈", Math.E);
 
@@ -92,6 +94,42 @@ console.log(\`\\nTotal wall time: \${elapsed}ms (parallel)\`);
 `,
   },
   {
+    key: "node_modules",
+    title: "Node.js Modules",
+    desc: "require('path'), require('crypto'), require('os')",
+    code: `// almostnode shims Node.js core modules — require() them just
+// like in a Node script.
+const path = require("node:path");
+const crypto = require("node:crypto");
+const os = require("node:os");
+
+console.log("path.join =>", path.join("/users", "ada", "notes.txt"));
+console.log("path.basename =>", path.basename("/users/ada/notes.txt"));
+
+const hash = crypto.createHash("sha256").update("hello").digest("hex");
+console.log("sha256('hello') =>", hash);
+
+console.log("platform =>", os.platform());
+console.log("EOL bytes =>", JSON.stringify(os.EOL));
+`,
+  },
+  {
+    key: "multi_file",
+    title: "Multi-File Modules",
+    desc: "Split logic across files with require()",
+    code: `// Add another tab named "utils.js" with the contents:
+//
+//   exports.greet = (name) => \`Hello, \${name}!\`;
+//   exports.shout = (s) => s.toUpperCase() + "!";
+//
+// then run this file — \`require\` resolves from the workspace VFS.
+const utils = require("./utils");
+
+console.log(utils.greet("almostnode"));
+console.log(utils.shout("multi-file modules just work"));
+`,
+  },
+  {
     key: "classes",
     title: "Classes & Iterators",
     desc: "Generator-based iteration",
@@ -140,13 +178,17 @@ console.log(\`\\nAverage score: \${avg.toFixed(1)}\`);
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // JavaScript runs natively in the browser — all standard globals
-  // (console, Math, Date, Promise, fetch, etc.) are always available
-  // without any import statement, so there are no packages to list here.
+  // No installable packages are surfaced yet — npm package install in
+  // the packages drawer is a future feature (see the integration plan
+  // in agent-outputs/). almostnode's bundled Node.js shims (`fs`,
+  // `path`, `crypto`, …) are always available via require() without
+  // any UI plumbing.
 ];
 
 type WorkerOutMessage =
   | { kind: "ready" }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string }
   | { kind: "stdout"; id: number; content: string }
   | { kind: "stderr"; id: number; content: string }
   | { kind: "done"; id: number };
@@ -154,6 +196,26 @@ type WorkerOutMessage =
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
   constructor(private worker: Worker) {}
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const id = ++this.nextId;
+    const payload: Array<[string, Uint8Array]> = [];
+    for (const [path, bytes] of files) payload.push([path, bytes]);
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "prepare-fs-done" && msg.kind !== "prepare-fs-error") {
+          return;
+        }
+        if (msg.id !== id) return;
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "prepare-fs-done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "prepare-fs", id, files: payload });
+    });
+  }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
     const id = ++this.nextId;
@@ -170,7 +232,12 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
         }
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code });
+      this.worker.postMessage({
+        kind: "run",
+        id,
+        code,
+        entryPath: "index.js",
+      });
     });
   }
 }
@@ -184,10 +251,10 @@ export const javascriptAdapter: LanguageAdapter = {
   runtimeInfo: {
     language: "JavaScript",
     version: "ES2023+",
-    engine: "Native browser",
-    engineUrl: "https://developer.mozilla.org/docs/Web/JavaScript",
+    engine: "almostnode (browser-native Node.js)",
+    engineUrl: "https://almostnode.dev/",
     notes:
-      "Runs in a Web Worker via the AsyncFunction constructor — top-level await is supported and the UI stays responsive while your code executes.",
+      "Runs in a Web Worker on top of almostnode — multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
   },
   codeMirrorMode: "javascript",
   examples: EXAMPLES,
@@ -201,39 +268,48 @@ export const javascriptAdapter: LanguageAdapter = {
   entryPoint: "index.js",
   packagesFooter: (
     <>
-      JavaScript runs natively in your browser — there&apos;s no extra
-      runtime to load. The entries above are{" "}
-      <a
-        href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects"
-        target="_blank"
-        rel="noreferrer"
-      >
-        built-in globals
-      </a>
-      , so they&apos;re always available.
+      JavaScript runs via{" "}
+      <a href="https://almostnode.dev/" target="_blank" rel="noreferrer">
+        almostnode
+      </a>{" "}
+      in a Web Worker. Built-in browser globals (console, fetch, Promise,
+      …) are always available, and Node.js core modules can be brought in
+      with{" "}
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
+        require(&apos;node:fs&apos;)
+      </code>{" "}
+      style imports.
     </>
   ),
-  // The "import" affordance doesn't really apply to a sandboxed JS
-  // environment with no module loader, so we just drop in a pointer to
-  // the global. This keeps the packages-drawer click consistent with
-  // the other playgrounds.
-  importSnippet: (name) => `// ${name} is a built-in global — no import needed.`,
+  importSnippet: (name) => `const ${name} = require("${name}");`,
   hasImport(code, name) {
-    // Treat the snippet as "already inserted" if the same hint comment
-    // is present, so clicking the package twice doesn't duplicate it.
-    return code.includes(
-      `// ${name} is a built-in global — no import needed.`,
-    );
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Match `require("name")` or `require('name')` anywhere in the file.
+    // We don't require the const/let binding so users who write
+    // `require("x").doThing()` aren't pestered to insert again.
+    const re = new RegExp(`require\\(\\s*["'\`]${escapedName}["'\`]\\s*\\)`);
+    return re.test(code);
   },
   async formatCode(code: string): Promise<string> {
     const { format } = await getWebFmt();
     return format(code, "script.js");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Starting JavaScript worker…");
-    const worker = new Worker(
-      new URL("./javascript-worker.ts", import.meta.url),
-    );
+    setLoadingMessage("Starting almostnode runtime…");
+    // The worker is pre-bundled by `scripts/build-almostnode-workers
+    // .mjs` to `public/_workers/javascript-worker.js`. We point the
+    // Worker constructor at the resulting static URL (not at
+    // `new URL("./javascript-worker.ts", import.meta.url)`) so
+    // Turbopack never sees the import — Turbopack's worker bundler
+    // splits almostnode's ~16 MB tree across many chunks loaded via
+    // `importScripts`, where colliding minified top-level identifiers
+    // throw `Identifier 'e1' has already been declared` at startup.
+    // The pre-bundled file is a single self-contained ES module, so
+    // no chunking, no collision, and `{ type: "module" }` is honoured
+    // by the browser directly.
+    const worker = new Worker("/_workers/javascript-worker.js", {
+      type: "module",
+    });
     return new Promise<LanguageRuntime>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         if (ev.data.kind === "ready") {

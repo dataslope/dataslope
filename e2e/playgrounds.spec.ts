@@ -62,8 +62,25 @@ async function runAndCollectOutput(page: Page) {
 
 test.describe("Playgrounds (fast)", () => {
   test("JavaScript runs the default example", async ({ page }) => {
+    // Regression guard: almostnode's bundle is large enough that Turbopack
+    // splits the worker into multiple chunks. A classic Worker would load
+    // them via importScripts() and throw "Identifier 'e1' has already been
+    // declared" before our adapter ever wires up. The fix is `type:
+    // "module"` in the Worker constructor — catch any regression here.
+    const initErrors: string[] = [];
+    page.on("pageerror", (err) => initErrors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error") initErrors.push(msg.text());
+    });
+
     await page.goto("/playground/javascript");
     await waitForRuntimeReady(page);
+
+    expect(
+      initErrors.find((m) => m.includes("importScripts")),
+      `expected no importScripts error during worker init, got:\n${initErrors.join("\n")}`,
+    ).toBeUndefined();
+
     const cells = await runAndCollectOutput(page);
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
@@ -72,8 +89,19 @@ test.describe("Playgrounds (fast)", () => {
   });
 
   test("TypeScript runs the default example", async ({ page }) => {
+    const initErrors: string[] = [];
+    page.on("pageerror", (err) => initErrors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error") initErrors.push(msg.text());
+    });
+
     await page.goto("/playground/typescript");
     await waitForRuntimeReady(page);
+
+    expect(
+      initErrors.find((m) => m.includes("importScripts")),
+      `expected no importScripts error during worker init, got:\n${initErrors.join("\n")}`,
+    ).toBeUndefined();
     const cells = await runAndCollectOutput(page);
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();

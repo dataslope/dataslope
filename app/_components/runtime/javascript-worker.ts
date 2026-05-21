@@ -1,129 +1,110 @@
 /// <reference lib="webworker" />
 
-// Web Worker that executes JavaScript code via AsyncFunction so that
-// user-code execution is off the main thread and can't block the UI.
+// Web Worker that executes JavaScript code via almostnode — a browser-
+// native Node.js runtime. The worker accepts multi-file workspaces,
+// stages them into almostnode's VirtualFS, and runs the entry file with
+// CommonJS semantics (`require()`, `module.exports`, 40+ Node module
+// shims like `fs`, `path`, `http`, `events`).
 //
 // Protocol
-//   Main → Worker  { kind: "run"; id: number; code: string }
+//   Main → Worker  { kind: "prepare-fs"; id: number;
+//                    files: Array<[path, Uint8Array]> }
+//                  { kind: "run"; id: number; code: string;
+//                    entryPath: string }
 //   Worker → Main  { kind: "ready" }
+//                  { kind: "prepare-fs-done"; id: number }
+//                  { kind: "prepare-fs-error"; id: number; message: string }
 //                  { kind: "stdout"; id: number; content: string }
 //                  { kind: "stderr"; id: number; content: string }
-//                  { kind: "done";   id: number }
+//                  { kind: "done"; id: number }
 
-type InMessage = { kind: "run"; id: number; code: string };
+import { VirtualFS } from "almostnode";
+import {
+  normalizeVfsPath,
+  runEntry,
+  stageFiles,
+  wrapEntryAsAsyncIIFE,
+} from "./almostnode-worker-shared";
+
+declare const self: DedicatedWorkerGlobalScope;
+
+type InMessage =
+  | { kind: "prepare-fs"; id: number; files: Array<[string, Uint8Array]> }
+  | { kind: "run"; id: number; code: string; entryPath: string };
 
 type OutMessage =
   | { kind: "ready" }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string }
   | { kind: "stdout"; id: number; content: string }
   | { kind: "stderr"; id: number; content: string }
   | { kind: "done"; id: number };
 
-function post(msg: OutMessage) {
+function post(msg: OutMessage): void {
   self.postMessage(msg);
 }
 
-function formatArg(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (typeof value === "function") return value.toString();
-  if (typeof value === "object") {
-    try {
-      return JSON.stringify(value, jsonReplacer, 2);
-    } catch {
-      try {
-        return String(value);
-      } catch {
-        return "[object]";
-      }
-    }
-  }
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  return String(value);
-}
+// Module-scope VFS so `prepare-fs` and `run` see the same state across
+// messages. Recreated on every `prepare-fs` call so deletions/renames
+// from the editor flow through cleanly.
+let vfs: VirtualFS = new VirtualFS();
 
-function jsonReplacer(_key: string, value: unknown): unknown {
-  if (typeof value === "bigint") return `${value.toString()}n`;
-  if (typeof value === "function")
-    return `[Function: ${value.name || "anonymous"}]`;
-  if (typeof value === "undefined") return "undefined";
-  return value;
-}
-
-function formatArgs(args: unknown[]): string {
-  return args.map(formatArg).join(" ");
-}
-
-async function runCode(id: number, code: string): Promise<void> {
-  let stdoutBuf = "";
-  let stderrBuf = "";
-
-  const sandboxConsole = {
-    log: (...args: unknown[]) => {
-      stdoutBuf += formatArgs(args) + "\n";
-    },
-    info: (...args: unknown[]) => {
-      stdoutBuf += formatArgs(args) + "\n";
-    },
-    debug: (...args: unknown[]) => {
-      stdoutBuf += formatArgs(args) + "\n";
-    },
-    warn: (...args: unknown[]) => {
-      stderrBuf += formatArgs(args) + "\n";
-    },
-    error: (...args: unknown[]) => {
-      stderrBuf += formatArgs(args) + "\n";
-    },
-    table: (value: unknown) => {
-      stdoutBuf += formatArg(value) + "\n";
-    },
-    dir: (value: unknown) => {
-      stdoutBuf += formatArg(value) + "\n";
-    },
-  };
-
-  const AsyncFunction = Object.getPrototypeOf(
-    async function () {},
-  ).constructor as new (...args: string[]) => (
-    console: typeof sandboxConsole,
-  ) => Promise<unknown>;
-
+async function handlePrepareFs(
+  id: number,
+  files: Array<[string, Uint8Array]>,
+): Promise<void> {
   try {
-    const fn = new AsyncFunction("console", `"use strict";\n${code}`);
-    const result = await fn(sandboxConsole);
-    if (stdoutBuf)
-      post({ kind: "stdout", id, content: stdoutBuf.replace(/\n$/, "") });
-    if (stderrBuf)
-      post({ kind: "stderr", id, content: stderrBuf.replace(/\n$/, "") });
-    if (result !== undefined) {
-      post({ kind: "stdout", id, content: formatArg(result) });
-    }
+    vfs = stageFiles(files);
+    post({ kind: "prepare-fs-done", id });
   } catch (err) {
-    if (stdoutBuf)
-      post({ kind: "stdout", id, content: stdoutBuf.replace(/\n$/, "") });
-    if (stderrBuf)
-      post({ kind: "stderr", id, content: stderrBuf.replace(/\n$/, "") });
-    const message =
-      err instanceof Error
-        ? err.stack || `${err.name}: ${err.message}`
-        : String(err);
-    post({ kind: "stderr", id, content: message });
+    const message = err instanceof Error ? err.message : String(err);
+    post({ kind: "prepare-fs-error", id, message });
   }
+}
+
+async function handleRun(
+  id: number,
+  code: string,
+  entryPath: string,
+): Promise<void> {
+  const entryVfsPath = normalizeVfsPath(entryPath);
+
+  // Prefer the staged copy of the entry file (Playground passes it via
+  // prepare-fs whenever multi-file mode is in use). If the worker is
+  // invoked single-file — no prepare-fs — fall back to the inline
+  // `code` argument. This lets the worker work for both flows without
+  // a separate code path on the caller side.
+  const decoder = new TextDecoder();
+  const entrySource = vfs.existsSync(entryVfsPath)
+    ? decoder.decode(vfs.readFileSync(entryVfsPath))
+    : code;
+
+  // Rewrite the entry file so top-level `await` is legal. See the wrap
+  // helper for the precise transform.
+  vfs.writeFileSync(entryVfsPath, wrapEntryAsAsyncIIFE(entrySource));
+
+  await runEntry(vfs, entryVfsPath, {
+    stdout: (content) => post({ kind: "stdout", id, content }),
+    stderr: (content) => post({ kind: "stderr", id, content }),
+  });
+
   post({ kind: "done", id });
 }
 
-// Serialise concurrent run requests so async user code can't interleave.
-let workQueue: Promise<unknown> = Promise.resolve();
+// Serialise concurrent run requests so async user code can't interleave
+// across runs — matches the behaviour of the legacy worker.
+let queue: Promise<unknown> = Promise.resolve();
 function enqueue(task: () => Promise<void>): void {
-  workQueue = workQueue.then(task, task).catch(() => {});
+  queue = queue.then(task, task).catch(() => {});
 }
 
-// No async init — JS runs natively, signal readiness immediately.
 post({ kind: "ready" });
 
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
-  if (ev.data.kind === "run") {
-    const { id, code } = ev.data;
-    enqueue(() => runCode(id, code));
+  const data = ev.data;
+  if (data.kind === "prepare-fs") {
+    enqueue(() => handlePrepareFs(data.id, data.files));
+  } else if (data.kind === "run") {
+    enqueue(() => handleRun(data.id, data.code, data.entryPath));
   }
 });
