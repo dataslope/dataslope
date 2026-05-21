@@ -244,6 +244,14 @@ body.pg-active {
 .pg-lang-switcher-popup {
   z-index: 500;
 }
+/* All header-level dropdowns/popovers/menus (workspace, examples, export,
+   runtime info) need a high z-index so they paint above the pg-header
+   stacking context (z-index: 10) and the settings tab overlay (z-index: 10).
+   The Positioner element creates its own stacking context; giving it an
+   explicit z-index ensures it wins in the root stacking order. */
+.pg-header-positioner {
+  z-index: 500;
+}
 /* Icon sidebar hover-popovers must render above in-page elements that
    create stacking contexts (e.g. .sql-schema-selector-wrap with
    position: relative; z-index: 1, and .pg-icon-sidebar with z-index: 5). */
@@ -789,6 +797,13 @@ body.pg-active {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  position: relative;
+}
+
+/* Hide editor/output pane bars when the settings tab is active, since
+   the settings overlay covers both panes. */
+.panes[data-settings-active] .pane-bar {
+  display: none;
 }
 
 /* ─── Editor pane ─── */
@@ -4019,14 +4034,19 @@ html[data-pg-theme="dark"] .welcome h3 {
 /* ───────────────────────────────────────────────────────────────────────
    Settings rendered inline inside a tab pane (instead of the legacy
    dialog). Reuses the `.settings-tabs` / `.settings-body` styling but
-   stretches to fill the editor pane.
+   stretches to cover both `.editor-pane` and `.output-pane` via absolute
+   positioning anchored to the `.panes` container.
    ─────────────────────────────────────────────────────────────────────── */
 .pg-settings-tab-pane {
+  /* Overlay the full .panes container (which has position: relative) so
+     the settings content spans both the editor and output panes. */
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   overflow: hidden;
-  min-height: 0;
 }
 .pg-settings-tab-pane .settings-tabs {
   flex: 1 1 auto;
@@ -4038,4 +4058,12 @@ html[data-pg-theme="dark"] .welcome h3 {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+}
+/* Limit the inner content width so labels and switches don't spread too
+   far apart on wide screens. Left-aligned (no auto-centering) so the
+   content sits flush to the left with its own built-in padding. */
+.pg-settings-tab-pane .settings-body,
+.pg-settings-tab-pane .settings-body-themes,
+.pg-settings-tab-pane .settings-actions {
+  max-width: 720px;
 }

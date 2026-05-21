@@ -1227,11 +1227,27 @@ function SqlPlaygroundInner() {
   const shellRef = useRef<HTMLDivElement | null>(null);
   const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
   const quipSeedRef = useRef<number>(-1);
+  const settingsOpenRef = useRef<boolean>(false);
 
   const openSettingsTab = useCallback(() => {
-    setSettingsOpen(true);
-    activeTabIdRef.current = SETTINGS_TAB_ID;
-    setActiveTabId(SETTINGS_TAB_ID);
+    if (activeTabIdRef.current === SETTINGS_TAB_ID) {
+      // Settings tab is active — close it and return to a query tab.
+      setSettingsOpen(false);
+      const fallback = tabsRef.current[0]?.id;
+      if (fallback) {
+        activeTabIdRef.current = fallback;
+        setActiveTabId(fallback);
+      }
+    } else if (settingsOpenRef.current) {
+      // Settings tab is in the tab bar but not active — activate it.
+      activeTabIdRef.current = SETTINGS_TAB_ID;
+      setActiveTabId(SETTINGS_TAB_ID);
+    } else {
+      // Settings tab is not open — add it and make it active.
+      setSettingsOpen(true);
+      activeTabIdRef.current = SETTINGS_TAB_ID;
+      setActiveTabId(SETTINGS_TAB_ID);
+    }
   }, [setSettingsOpen, setActiveTabId]);
 
   // ─── Ref sync effects ────────────────────────────────────────────────
@@ -1244,6 +1260,9 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     activeDbIdRef.current = activeDbId;
   }, [activeDbId]);
+  useEffect(() => {
+    settingsOpenRef.current = settingsOpen;
+  }, [settingsOpen]);
 
   // ─── isMac ───────────────────────────────────────────────────────────
   const isMac = useSyncExternalStore(
@@ -4065,7 +4084,8 @@ function SqlPlaygroundInner() {
               ref={resultsPaneRef}
               style={
                 activeTab?.kind === "er-diagram" ||
-                activeTab?.kind === "query-history"
+                activeTab?.kind === "query-history" ||
+                isSettingsTabActive
                   ? { display: "none" }
                   : undefined
               }

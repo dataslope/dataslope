@@ -484,6 +484,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Tracks where the settings tab is positioned within the file tab strip
+  // so the user can drag it anywhere. Infinity = append at the end (default).
+  // Resets to Infinity when settings is closed so it starts fresh on re-open.
+  const [settingsTabIndex, setSettingsTabIndex] = useState<number>(Infinity);
   // Mobile consolidated-menu drawer. We render this as a Dialog (bottom
   // sheet) instead of a Menu so its inline sub-sections (Examples,
   // Information, …) can't be cut off the side of a narrow viewport.
@@ -587,6 +591,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const filesRef = useRef<PlaygroundFile[]>([]);
   const virtualFilesRef = useRef<VirtualFile[]>([]);
   const dirtyBuffersRef = useRef(dirtyBuffers);
+  const settingsOpenRef = useRef(false);
+  const activeTabIdRef = useRef(activeTabId);
+  useEffect(() => {
+    settingsOpenRef.current = settingsOpen;
+    // Reset tab position when settings is closed so it starts at the end
+    // next time the user opens it.
+    if (!settingsOpen) setSettingsTabIndex(Infinity);
+  }, [settingsOpen]);
+  useEffect(() => {
+    activeTabIdRef.current = activeTabId;
+  }, [activeTabId]);
   useEffect(() => {
     activeFileIdRef.current = activeFileId;
   }, [activeFileId]);
@@ -1571,13 +1586,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     updateDirtyBuffer,
   ]);
 
-  /** Open the Settings tab, or focus it if already open. The settings
-   *  panel renders inline inside the editor pane when active. */
+  /** Toggle the Settings tab. Opens and activates it if not present,
+   *  activates it if present but inactive, or closes it if already active. */
   const openSettingsTab = useCallback(() => {
     flushActiveFileToBuffer();
-    setSettingsOpen(true);
-    setActiveTabId(SETTINGS_TAB_ID);
-  }, [flushActiveFileToBuffer, setActiveTabId]);
+    if (activeTabIdRef.current === SETTINGS_TAB_ID) {
+      // Settings tab is active — close it and return to the active file.
+      setSettingsOpen(false);
+      const targetId = activeFileIdRef.current;
+      if (targetId) {
+        setActiveTabId(targetId);
+      } else if (filesRef.current.length > 0) {
+        setActiveTabId(filesRef.current[0].id);
+      }
+    } else if (settingsOpenRef.current) {
+      // Settings tab is in the tab bar but not active — activate it.
+      setActiveTabId(SETTINGS_TAB_ID);
+    } else {
+      // Settings tab is not open — add it and make it active.
+      setSettingsOpen(true);
+      setActiveTabId(SETTINGS_TAB_ID);
+    }
+  }, [flushActiveFileToBuffer, setSettingsOpen, setActiveTabId]);
 
   /** Close the Settings tab and return focus to the previously-active
    *  code file. Used by the TabBar's close affordance. */
@@ -1688,6 +1718,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
    *  authoritative. */
   const reorderFileTabs = useCallback(
     (nextDescriptors: TabDescriptor[]) => {
+      // Sync the settings tab's new position so it stays where the user
+      // dropped it after a drag-and-drop.
+      const newSettingsIdx = nextDescriptors.findIndex(
+        (d) => d.id === SETTINGS_TAB_ID,
+      );
+      if (newSettingsIdx >= 0) setSettingsTabIndex(newSettingsIdx);
+
       const byId = new Map(filesRef.current.map((f) => [f.id, f]));
       const next: PlaygroundFile[] = [];
       for (const d of nextDescriptors) {
@@ -1700,7 +1737,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       filesRef.current = next;
       setFiles(next);
     },
-    [setFiles],
+    [setFiles, setSettingsTabIndex],
   );
 
   /** Duplicate the file tab identified by `fileId`. The copy is
@@ -2308,14 +2345,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         };
       });
       if (settingsOpen) {
-        list.push({
+        const settingsDescriptor: TabDescriptor = {
           id: SETTINGS_TAB_ID,
           kind: "settings",
           label: "Settings",
           icon: <Settings size={11} aria-hidden="true" />,
           closeable: true,
           renameable: false,
-        });
+        };
+        // Insert at the tracked position so the user can reorder it freely.
+        // Clamp to [0, list.length] so a stale index never goes out of bounds.
+        const insertAt = Math.min(
+          Number.isFinite(settingsTabIndex) ? settingsTabIndex : list.length,
+          list.length,
+        );
+        list.splice(insertAt, 0, settingsDescriptor);
       }
       return list;
     },
@@ -2325,6 +2369,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       duplicateFileTab,
       files,
       settingsOpen,
+      settingsTabIndex,
     ],
   );
 
@@ -2425,8 +2470,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Positioner sideOffset={0} alignItemWithTrigger={false}>
-                  <Select.Popup className="bui-select-popup">
+                <Select.Positioner sideOffset={0} alignItemWithTrigger={false} className="pg-lang-switcher-positioner">
+                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
                       const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
@@ -2479,7 +2524,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span className="btn-label">Examples</span>
               </Menu.Trigger>
               <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start">
+                <Menu.Positioner sideOffset={6} align="start" className="pg-header-positioner">
                   <Menu.Popup className="bui-popup examples-dropdown">
                     {adapter.examples.map((ex) => (
                       <Menu.Item
@@ -2506,7 +2551,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span className="btn-label">Export</span>
               </Menu.Trigger>
               <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start">
+                <Menu.Positioner sideOffset={6} align="start" className="pg-header-positioner">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
                     {adapter.exportFormats.map((fmt) => (
                       <Menu.Item
@@ -2552,7 +2597,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <FaInfo size={13} aria-hidden="true" />
               </Popover.Trigger>
               <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end">
+                <Popover.Positioner sideOffset={6} align="end" className="pg-header-positioner">
                   <Popover.Popup className="bui-popup info-popover">
                     <RuntimeInfoContent info={adapter.runtimeInfo} />
                   </Popover.Popup>
@@ -3063,10 +3108,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             tabs={fileTabDescriptors}
             activeTabId={activeTabId || activeFileId}
             onSelectTab={selectTab}
-            onCloseTab={files.length > 1 ? closeFileTab : undefined}
+            onCloseTab={closeFileTab}
             onAddTab={addNewFile}
             onRenameTab={renameFileTab}
-            onReorderTabs={files.length > 1 ? reorderFileTabs : undefined}
+            onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
             className="pg-file-tabbar"
           />
         )}
@@ -3091,7 +3136,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </button>
         </div>
 
-        <div className="panes" data-mobile-tab={mobileTab} ref={panesRef}>
+        <div className="panes" data-mobile-tab={mobileTab} data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined} ref={panesRef}>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">
@@ -3208,34 +3253,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <div
               className="editor-wrap"
               ref={editorHostRef}
-              style={
-                activeTabId === SETTINGS_TAB_ID
-                  ? { display: "none" }
-                  : undefined
-              }
             />
-            {activeTabId === SETTINGS_TAB_ID && (
-              <div className="editor-wrap pg-settings-tab-pane">
-                <SettingsPanelContent
-                  fontSize={fontSize}
-                  setFontSize={setFontSize}
-                  outputFontSizeEnabled={outputFontSizeEnabled}
-                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-                  outputFontSize={outputFontSize}
-                  setOutputFontSize={setOutputFontSize}
-                  editorTheme={editorTheme}
-                  setEditorTheme={setEditorTheme}
-                  wordWrap={wordWrap}
-                  setWordWrap={setWordWrap}
-                  clearBeforeRun={clearBeforeRun}
-                  setClearBeforeRun={setClearBeforeRun}
-                  language={adapter.id}
-                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-                />
-              </div>
-            )}
             <div
               className="resizer"
               ref={resizerRef}
@@ -3330,6 +3348,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </div>
             <DataslopeRunOverlay running={statusState === "running"} />
           </div>
+          {activeTabId === SETTINGS_TAB_ID && (
+            <div className="pg-settings-tab-pane">
+              <SettingsPanelContent
+                fontSize={fontSize}
+                setFontSize={setFontSize}
+                outputFontSizeEnabled={outputFontSizeEnabled}
+                setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                outputFontSize={outputFontSize}
+                setOutputFontSize={setOutputFontSize}
+                editorTheme={editorTheme}
+                setEditorTheme={setEditorTheme}
+                wordWrap={wordWrap}
+                setWordWrap={setWordWrap}
+                clearBeforeRun={clearBeforeRun}
+                setClearBeforeRun={setClearBeforeRun}
+                language={adapter.id}
+                onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+              />
+            </div>
+          )}
         </div>
         {/* A second instance of the overlay rendered outside the
             tab-switched `.panes` so it stays visible on mobile while

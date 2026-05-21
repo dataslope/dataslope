@@ -199,7 +199,7 @@ export function WorkspaceBadge({
           </svg>
         </Popover.Trigger>
         <Popover.Portal>
-          <Popover.Positioner sideOffset={6} align="start">
+          <Popover.Positioner sideOffset={6} align="start" className="pg-header-positioner">
             <Popover.Popup className="bui-popup workspace-popover">
               <div className="workspace-popover-header">
                 Workspaces for {playgroundLabel(playgroundId)}
