@@ -18,11 +18,33 @@ export interface PlotlyFigure {
   layout?: Record<string, unknown>;
 }
 
+export interface EntryFileInfo {
+  /** Workspace-relative filename. */
+  filename: string;
+  /** Kind of entry point. `"main"` denotes an explicit `main()` /
+   *  `Main()` function. `"topLevel"` (C# only) denotes top-level
+   *  statements outside of any class. */
+  kind: "main" | "topLevel";
+}
+
 export interface ExampleSnippet {
   key: string;
   title: string;
   desc: string;
   code: string;
+  /** Optional additional files for multi-file examples. When present,
+   *  loading the example replaces the entire workspace with `code`
+   *  (used as the entry file's contents) plus these extra files.
+   *  Each file's `filename` should be a workspace-relative path. */
+  files?: ExampleFile[];
+  /** Filename for the primary `code` snippet when `files` is set.
+   *  Defaults to the adapter's primary entry filename when omitted. */
+  entryFilename?: string;
+}
+
+export interface ExampleFile {
+  filename: string;
+  content: string;
 }
 
 export interface PackageInfo {
@@ -60,6 +82,16 @@ export interface ExportFormat {
  *  become available. */
 export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
 
+/** Optional context passed to `runtime.run` describing which workspace
+ *  file the user chose as the entry point for this run. Used by
+ *  multi-entry-point adapters (C, C++, Java, C#). */
+export interface RunOptions {
+  /** Workspace-relative path of the chosen entry file. Adapters use
+   *  this to pick the right translation unit / class to compile and
+   *  to exclude that file from the "extra sources" list. */
+  entryFilename?: string;
+}
+
 export interface CompletionResult {
   /** Suggested completions for the current cursor prefix. */
   list: string[];
@@ -69,7 +101,7 @@ export interface CompletionResult {
 }
 
 export interface LanguageRuntime {
-  run(code: string, emit: EmitOutput): Promise<void>;
+  run(code: string, emit: EmitOutput, options?: RunOptions): Promise<void>;
   /** Optional: compute completions for the given line up to ``column``.
    *  Adapters that don't implement autocomplete simply omit this. */
   complete?(line: string, column: number): Promise<CompletionResult>;
@@ -129,6 +161,24 @@ export interface LanguageAdapter {
   /** Filename treated as the entry point for multi-file runs. When
    *  unset, the active tab's file is the entry point. */
   entryPoint?: string;
+  /** Optional: classify which workspace files contain entry points
+   *  (i.e. `main()` / `Main()` / top-level statements). Used by the
+   *  Run button to populate a split-button dropdown when multiple
+   *  entry files exist in the workspace. Files passed in are the
+   *  current text contents of every code tab. */
+  findEntryFiles?(
+    files: { filename: string; content: string }[],
+  ): EntryFileInfo[];
+  /** Optional: workspace path of the canonical primary entry file
+   *  (e.g. `"main.c"`, `"Program.cs"`). Used as the preferred default
+   *  when the active tab is a non-entry file and a primary file
+   *  exists. Distinct from `entryPoint` so adapters can mark a
+   *  primary even when the runtime supports multiple entries. */
+  primaryEntryFilename?: string;
+  /** Optional: short label used inside the Run button when this
+   *  filename is the chosen entry. Defaults to the basename without
+   *  extension (e.g. `"main.c"` → `"main"`). */
+  entryLabel?: (filename: string) => string;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
   /** Build the snippet inserted at the top of the editor when the user

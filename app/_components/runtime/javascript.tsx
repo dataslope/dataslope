@@ -4,6 +4,7 @@ import type {
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
@@ -175,6 +176,32 @@ const avg = people.reduce((s, p) => s + p.score, 0) / people.length;
 console.log(\`\\nAverage score: \${avg.toFixed(1)}\`);
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "require() a helper module alongside index.js",
+    code: `const { hello, bye } = require("./greetings");
+
+console.log(hello("JavaScript Playground"));
+console.log(bye("JavaScript Playground"));
+`,
+    files: [
+      {
+        filename: "greetings.js",
+        content: `function hello(name) {
+  return \`Hello, \${name}!\`;
+}
+
+function bye(name) {
+  return \`Goodbye, \${name}!\`;
+}
+
+module.exports = { hello, bye };
+`,
+      },
+    ],
+    entryFilename: "index.js",
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -217,7 +244,11 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
     });
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     const id = ++this.nextId;
     return new Promise<void>((resolve) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -236,7 +267,10 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
         kind: "run",
         id,
         code,
-        entryPath: "index.js",
+        // The Playground passes the active file's path. Falling back
+        // to "index.js" preserves single-file behaviour for callers
+        // that don't supply options (e.g. tests / legacy bootstraps).
+        entryPath: options?.entryFilename ?? "index.js",
       });
     });
   }
@@ -263,7 +297,7 @@ export const javascriptAdapter: LanguageAdapter = {
     { extension: "js", label: "JavaScript (.js)", mimeType: "text/javascript" },
     { extension: "mjs", label: "ES Module (.mjs)", mimeType: "text/javascript" },
   ],
-  exportBaseFilename: "script",
+  exportBaseFilename: "index",
   defaultFileExtension: "js",
   entryPoint: "index.js",
   packagesFooter: (

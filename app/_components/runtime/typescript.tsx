@@ -4,6 +4,7 @@ import type {
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
@@ -217,6 +218,30 @@ console.log("\\nFirst safe user:");
 console.log(JSON.stringify(safe[1], null, 2));
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Import a typed helper module alongside index.ts",
+    code: `import { hello, bye } from "./greetings";
+
+console.log(hello("TypeScript Playground"));
+console.log(bye("TypeScript Playground"));
+`,
+    files: [
+      {
+        filename: "greetings.ts",
+        content: `export function hello(name: string): string {
+  return \`Hello, \${name}!\`;
+}
+
+export function bye(name: string): string {
+  return \`Goodbye, \${name}!\`;
+}
+`,
+      },
+    ],
+    entryFilename: "index.ts",
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -258,7 +283,11 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
     });
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     const id = ++this.nextId;
     return new Promise<void>((resolve) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -277,7 +306,10 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
         kind: "run",
         id,
         code,
-        entryPath: "index.ts",
+        // The Playground passes the active file's path. Falling back
+        // to "index.ts" preserves single-file behaviour for callers
+        // that don't supply options.
+        entryPath: options?.entryFilename ?? "index.ts",
       });
     });
   }
@@ -304,7 +336,7 @@ export const typescriptAdapter: LanguageAdapter = {
   exportFormats: [
     { extension: "ts", label: "TypeScript (.ts)", mimeType: "text/typescript" },
   ],
-  exportBaseFilename: "script",
+  exportBaseFilename: "index",
   defaultFileExtension: "ts",
   entryPoint: "index.ts",
   packagesFooter: (

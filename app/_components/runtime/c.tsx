@@ -1,9 +1,11 @@
 import type {
   EmitOutput,
   ExampleSnippet,
+  EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { getClangFormat } from "./clangFormat";
 
@@ -186,7 +188,54 @@ int main(void) {
 }
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Split helpers into a header + source file alongside main.c",
+    code: `#include <stdio.h>
+#include "mathx.h"
+
+int main(void) {
+    int a = 6, b = 7;
+    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+    return 0;
+}
+`,
+    files: [
+      {
+        filename: "mathx.h",
+        content: `#ifndef MATHX_H
+#define MATHX_H
+
+int add(int a, int b);
+int mul(int a, int b);
+
+#endif
+`,
+      },
+      {
+        filename: "mathx.c",
+        content: `#include "mathx.h"
+
+int add(int a, int b) { return a + b; }
+int mul(int a, int b) { return a * b; }
+`,
+      },
+    ],
+    entryFilename: "main.c",
+  },
 ];
+
+/** Detect whether a C source file declares a `main()` function. */
+function hasCMain(source: string): boolean {
+  const cleaned = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''");
+  return /\bint\s+main\s*\(/.test(cleaned);
+}
 
 const PACKAGES: PackageInfo[] = [
   // Highlights from the C standard library — always available, no
@@ -418,18 +467,24 @@ class CWorkerRuntime implements LanguageRuntime {
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     const id = ++this.nextId;
-    // For multi-file projects, prefer the staged main.c content so the
-    // correct entry point is always compiled even when the user has
-    // another file open. Fall back to `code` for single-file workspaces.
-    const source = this.stagedFiles.get("main.c") ?? code;
+    // Pick the entry translation unit. The Playground passes the chosen
+    // entry filename via `options.entryFilename` (defaults to "main.c").
+    // If the user is running a non-active entry, prefer the staged copy
+    // so we always compile the latest workspace contents.
+    const entry = options?.entryFilename ?? "main.c";
+    const source = this.stagedFiles.get(entry) ?? code;
     // All other staged files (non-entry-point) are provided as extra
     // files so the compiler can resolve #include "..." directives and
     // compile additional translation units.
     const files: Array<[string, string]> = [];
     for (const [path, content] of this.stagedFiles) {
-      if (path !== "main.c") files.push([path, content]);
+      if (path !== entry) files.push([path, content]);
     }
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -477,6 +532,15 @@ export const cAdapter: LanguageAdapter = {
   exportBaseFilename: "main",
   defaultFileExtension: "c",
   entryPoint: "main.c",
+  primaryEntryFilename: "main.c",
+  findEntryFiles(files): EntryFileInfo[] {
+    const out: EntryFileInfo[] = [];
+    for (const f of files) {
+      if (!f.filename.endsWith(".c")) continue;
+      if (hasCMain(f.content)) out.push({ filename: f.filename, kind: "main" });
+    }
+    return out;
+  },
   packagesFooter: (
     <>
       Headers above are part of the{" "}

@@ -1,9 +1,11 @@
 import type {
   EmitOutput,
   ExampleSnippet,
+  EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { loadDotnet, type DotnetApi } from "./dotnet";
 import { getClangFormat } from "./clangFormat";
@@ -145,7 +147,86 @@ record Rect(double Width, double Height)             : Shape;
 record Triangle(double Base, double Height)          : Shape;
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Top-level Program.cs that uses a Greeter class from another file",
+    code: `var g = new Greeter("C# Playground");
+Console.WriteLine(g.Hello());
+Console.WriteLine(g.Bye());
+`,
+    files: [
+      {
+        filename: "Greeter.cs",
+        content: `public class Greeter
+{
+    private readonly string _name;
+
+    public Greeter(string name)
+    {
+        _name = name;
+    }
+
+    public string Hello() => $"Hello, {_name}!";
+    public string Bye()   => $"Goodbye, {_name}!";
+}
+`,
+      },
+    ],
+    entryFilename: "Program.cs",
+  },
 ];
+
+/** Strip block + line comments and string/char literals so simple
+ *  regex probes don't false-match inside them. */
+function stripCSharpNoise(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/@?"(?:""|\\.|[^"\\])*"/g, '""')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''");
+}
+
+/** Returns true if `source` declares an explicit `static … Main(` method.
+ *  Matches both `Main` and `Main<T>(...)` style entrypoints. */
+function hasCSharpExplicitMain(source: string): boolean {
+  const cleaned = stripCSharpNoise(source);
+  return /\bstatic\s+(?:async\s+)?[\w<>?\[\],.\s]*?\bMain\s*\(/.test(cleaned);
+}
+
+/** Returns true if `source` contains C# top-level statements: any
+ *  non-blank, non-comment, non-using, non-namespace, non-type-decl
+ *  line at file scope. The C# spec restricts top-level statements to
+ *  one compilation unit; we report the file as top-level when its
+ *  first executable token is at file scope. */
+function hasCSharpTopLevel(source: string): boolean {
+  // Find the first non-using / non-comment / non-namespace / non-type
+  // line. If it starts with a statement-like token (identifier / `var`
+  // / a literal / a brace block), treat as top-level.
+  const cleaned = stripCSharpNoise(source);
+  // Strip using directives at file scope.
+  const lines = cleaned.split("\n");
+  let depth = 0;
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (depth > 0) {
+      // Only inspect file-scope text; track brace depth so we skip
+      // bodies of namespaces / types.
+      depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
+      continue;
+    }
+    if (/^(?:global\s+)?using(?:\s+static)?\s.*;$/.test(line)) continue;
+    if (/^namespace\b/.test(line) || /^(?:public\s+|internal\s+|sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|struct|record|interface|enum)\b/.test(line)) {
+      depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
+      continue;
+    }
+    // First file-scope executable token. This counts as top-level
+    // statements.
+    return true;
+  }
+  return false;
+}
 
 const PACKAGES: PackageInfo[] = [
   // Highlights from the .NET base class library — always available
@@ -320,25 +401,27 @@ function stripCSharpUsings(source: string): string {
 }
 
 class CSharpRuntime implements LanguageRuntime {
-  // Bytes of workspace .cs files that are NOT the entry point
-  // (Program.cs). Populated by prepareFileSystem before each run.
-  private extraSources: Uint8Array[] = [];
+  /** All staged workspace .cs files (path → bytes). The Playground
+   *  passes the chosen entry filename to `run()`, and the runtime
+   *  treats every other .cs file as an "extra" appended after the
+   *  entry code. */
+  private stagedFiles: Map<string, Uint8Array> = new Map();
 
   constructor(private api: DotnetApi) {}
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
-    this.extraSources = [];
+    this.stagedFiles = new Map();
     for (const [path, bytes] of files) {
       if (!path.endsWith(".cs")) continue;
-      // Skip the entry-point file — its content is passed directly to
-      // run() as `code` and must not be appended again.
-      const filename = path.includes("/") ? path.split("/").pop()! : path;
-      if (filename === "Program.cs") continue;
-      this.extraSources.push(bytes);
+      this.stagedFiles.set(path, bytes);
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     // When there are extra .cs files in the workspace, append their
     // class/type bodies after the entry-point code. The entry-point's
     // `using` directives stay at the top of `code`, while using
@@ -347,17 +430,19 @@ class CSharpRuntime implements LanguageRuntime {
     // namespace or type declaration". In C# class references are
     // resolved across the whole compilation unit regardless of
     // declaration order, so appending the extra bodies last is safe.
+    const entry = options?.entryFilename ?? "Program.cs";
+    const decoder = new TextDecoder();
+    const extraBodies: string[] = [];
+    for (const [path, bytes] of this.stagedFiles) {
+      // Skip the entry file — its content is passed directly via
+      // `code` and must not be appended again.
+      if (path === entry) continue;
+      const body = stripCSharpUsings(decoder.decode(bytes));
+      if (body.trim()) extraBodies.push(body);
+    }
     let combined = code;
-    if (this.extraSources.length > 0) {
-      const decoder = new TextDecoder();
-      const extraBodies: string[] = [];
-      for (const bytes of this.extraSources) {
-        const body = stripCSharpUsings(decoder.decode(bytes));
-        if (body.trim()) extraBodies.push(body);
-      }
-      if (extraBodies.length > 0) {
-        combined = code + "\n" + extraBodies.join("\n");
-      }
+    if (extraBodies.length > 0) {
+      combined = code + "\n" + extraBodies.join("\n");
     }
 
     let result;
@@ -405,9 +490,25 @@ export const csharpAdapter: LanguageAdapter = {
     { extension: "csx", label: "C# script (.csx)", mimeType: "text/x-csharp" },
     { extension: "cs",  label: "C# source (.cs)",  mimeType: "text/x-csharp" },
   ],
-  exportBaseFilename: "script",
+  exportBaseFilename: "Program",
   defaultFileExtension: "cs",
   entryPoint: "Program.cs",
+  primaryEntryFilename: "Program.cs",
+  findEntryFiles(files): EntryFileInfo[] {
+    const out: EntryFileInfo[] = [];
+    for (const f of files) {
+      if (!f.filename.endsWith(".cs")) continue;
+      // Prefer top-level classification because top-level statements
+      // imply executable file scope. (A file with both is a compile
+      // error per CS8802 anyway, which we let Roslyn surface.)
+      if (hasCSharpTopLevel(f.content)) {
+        out.push({ filename: f.filename, kind: "topLevel" });
+      } else if (hasCSharpExplicitMain(f.content)) {
+        out.push({ filename: f.filename, kind: "main" });
+      }
+    }
+    return out;
+  },
   packagesFooter: (
     <>
       Namespaces above are part of the{" "}
