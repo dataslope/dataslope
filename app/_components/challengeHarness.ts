@@ -1,32 +1,98 @@
 /**
- * Language-specific test harnesses for the `ChallengeCard` component.
+ * Language-specific test harnesses for the `ChallengeCard` component
+ * plus a stdout-expectation evaluator used by compiled languages.
  *
- * The component is otherwise language-agnostic: each test is a `{ id,
- * name, description, code }` record where `code` is a snippet of the
- * target language that throws / raises on failure and is silent on
- * success. The harness wraps every test with a try/catch idiom and
- * frames each result with a sentinel line:
+ * Each test in `ChallengeTest[]` is one of two shapes:
  *
- *   __DSTEST__:<id>:PASS
- *   __DSTEST__:<id>:FAIL:<json-encoded detail>
+ *   1. **Native test** — `{ id, name, description, code }` where `code`
+ *      is a snippet of the target language that `throw`s/`assert`s on
+ *      failure and is silent on success. The harness wraps every test
+ *      with a try/catch idiom and frames each result with a sentinel
+ *      line:
  *
- * Anything between the `__DSTEST_BEGIN__` sentinel and the end of
- * stdout belongs to the harness — the component strips those lines
- * from the user-visible output and parses them into test results.
+ *        __DSTEST__:<id>:PASS
+ *        __DSTEST__:<id>:FAIL:<json-encoded detail>
  *
- * To extend support for a new language (e.g. JavaScript / TypeScript /
- * SQL), add a builder here keyed by the adapter id. The component
- * looks the builder up at check time and surfaces a clear error if
- * none is registered.
+ *      Anything between the `__DSTEST_BEGIN__` sentinel and the end of
+ *      stdout belongs to the harness — the component strips those
+ *      lines from the user-visible output and parses them into test
+ *      results.
+ *
+ *   2. **Stdout-based test** — `{ id, name, description, expect }`
+ *      where `expect` declares expectations against the user code's
+ *      captured stdout/stderr. Useful for compiled languages (C, C++,
+ *      Java, C#) where injecting a per-test harness into a single
+ *      `main()`-style program isn't practical. Evaluated in JS by
+ *      `evaluateStdoutExpect` after the run completes.
+ *
+ * To extend support for a new language that has an interactive
+ * interpreter, add a `HarnessBuilder` keyed by the adapter id. The
+ * component looks the builder up at check time and surfaces a clear
+ * error if none is registered (and falls back to stdout-only mode if
+ * every test is stdout-based).
  */
 
-export interface ChallengeTest {
+/** Declarative stdout / stderr expectation for a single test case.
+ *  All listed fields are conjunctive — the test passes only when every
+ *  field matches. Use one or more of these together. */
+export interface StdoutExpect {
+  /** Stdout must equal this string exactly (after trimming trailing
+   *  whitespace on both sides). */
+  stdoutEquals?: string;
+  /** Stdout must contain this substring (or every substring in the
+   *  array). Whitespace is preserved as-is. */
+  stdoutContains?: string | string[];
+  /** Stdout must NOT contain this substring (or any of them). */
+  stdoutDoesNotContain?: string | string[];
+  /** Stdout must match this regex. Provide as a string (with optional
+   *  flags via `stdoutMatchesFlags`) so the value round-trips through
+   *  MDX, where a literal `RegExp` cannot be expressed. */
+  stdoutMatches?: string;
+  /** Regex flags for `stdoutMatches`. Defaults to `"s"` (dot matches
+   *  newlines) so multi-line stdout matches feel natural. */
+  stdoutMatchesFlags?: string;
+  /** Each line of stdout (after trim) must equal the corresponding
+   *  element of this array. Lines beyond the array are ignored unless
+   *  `stdoutLinesExact` is true. */
+  stdoutLines?: string[];
+  /** When set with `stdoutLines`, requires the line counts to match
+   *  exactly. */
+  stdoutLinesExact?: boolean;
+  /** Stderr must be empty (no diagnostics, warnings, or compile
+   *  errors). */
+  noStderr?: boolean;
+  /** Stderr must contain this substring. */
+  stderrContains?: string | string[];
+}
+
+export interface ChallengeTestBase {
   id: string;
   name: string;
   description: string;
-  /** Test body in the target language. Should `assert` / `throw` on
-   *  failure and execute silently on success. */
+}
+
+/** A test that injects code into the runtime alongside the learner's
+ *  code. The `code` snippet should `assert`/`throw` on failure and be
+ *  silent on success. */
+export interface NativeChallengeTest extends ChallengeTestBase {
   code: string;
+}
+
+/** A test that evaluates the run's captured stdout/stderr against a
+ *  declarative expectation. Useful for compiled languages where
+ *  injecting per-test code into a single `main()` is awkward. */
+export interface StdoutChallengeTest extends ChallengeTestBase {
+  expect: StdoutExpect;
+}
+
+export type ChallengeTest = NativeChallengeTest | StdoutChallengeTest;
+
+export function isStdoutTest(t: ChallengeTest): t is StdoutChallengeTest {
+  return "expect" in t && t.expect !== undefined;
+}
+
+export function isNativeTest(t: ChallengeTest): t is NativeChallengeTest {
+  return "code" in t && typeof (t as NativeChallengeTest).code === "string";
 }
 
 /** Sentinel printed once, before any per-test result, so the component
@@ -103,7 +169,121 @@ export function parseHarnessOutput(stdout: string): {
   return { clean: cleanLines.join("\n"), results };
 }
 
-type HarnessBuilder = (tests: ChallengeTest[]) => string;
+/** Evaluate a stdout-based test against the captured stdout/stderr.
+ *  Returns the same shape as `ParsedTestResult` for symmetric handling
+ *  in the UI. */
+export function evaluateStdoutExpect(
+  test: StdoutChallengeTest,
+  stdout: string,
+  stderr: string,
+): ParsedTestResult {
+  const exp = test.expect;
+  const ensureArray = (v: string | string[] | undefined): string[] =>
+    v === undefined ? [] : Array.isArray(v) ? v : [v];
+
+  if (exp.stdoutEquals !== undefined) {
+    const a = stdout.trim();
+    const b = exp.stdoutEquals.trim();
+    if (a !== b) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Expected stdout to equal:\n${b}\n\nGot:\n${a || "(empty)"}`,
+      };
+    }
+  }
+
+  for (const needle of ensureArray(exp.stdoutContains)) {
+    if (!stdout.includes(needle)) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Expected stdout to contain: ${JSON.stringify(needle)}`,
+      };
+    }
+  }
+
+  for (const needle of ensureArray(exp.stdoutDoesNotContain)) {
+    if (stdout.includes(needle)) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Stdout should not contain: ${JSON.stringify(needle)}`,
+      };
+    }
+  }
+
+  if (exp.stdoutMatches !== undefined) {
+    let re: RegExp;
+    try {
+      re = new RegExp(exp.stdoutMatches, exp.stdoutMatchesFlags ?? "s");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Invalid regex in test: ${msg}`,
+      };
+    }
+    if (!re.test(stdout)) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Expected stdout to match /${exp.stdoutMatches}/${exp.stdoutMatchesFlags ?? "s"}`,
+      };
+    }
+  }
+
+  if (exp.stdoutLines !== undefined) {
+    const actual = stdout
+      .split("\n")
+      .map((l) => l.replace(/\s+$/, ""));
+    // Drop trailing empty lines so a stray final newline doesn't fail
+    // an otherwise-correct match.
+    while (actual.length > 0 && actual[actual.length - 1] === "") {
+      actual.pop();
+    }
+    const expected = exp.stdoutLines.map((l) => l.replace(/\s+$/, ""));
+    if (exp.stdoutLinesExact && actual.length !== expected.length) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Expected ${expected.length} line(s) of stdout, got ${actual.length}.`,
+      };
+    }
+    for (let i = 0; i < expected.length; i++) {
+      if (actual[i] !== expected[i]) {
+        return {
+          id: test.id,
+          pass: false,
+          detail: `Line ${i + 1} mismatch.\n  expected: ${JSON.stringify(expected[i])}\n  got:      ${JSON.stringify(actual[i] ?? "")}`,
+        };
+      }
+    }
+  }
+
+  if (exp.noStderr && stderr.trim().length > 0) {
+    return {
+      id: test.id,
+      pass: false,
+      detail: `Expected no stderr output, got:\n${stderr.trim()}`,
+    };
+  }
+
+  for (const needle of ensureArray(exp.stderrContains)) {
+    if (!stderr.includes(needle)) {
+      return {
+        id: test.id,
+        pass: false,
+        detail: `Expected stderr to contain: ${JSON.stringify(needle)}`,
+      };
+    }
+  }
+
+  return { id: test.id, pass: true, detail: null };
+}
+
+type HarnessBuilder = (tests: NativeChallengeTest[]) => string;
 
 /**
  * Python harness — uses a per-test wrapper function so the assertion
@@ -217,33 +397,93 @@ const buildRHarness: HarnessBuilder = (tests) => {
   return lines.join("\n");
 };
 
+/**
+ * PHP harness — runs each test body inline inside a try/catch so the
+ * snippet can see file-scope variables defined by the learner's code
+ * (PHP closures would otherwise require explicit `use(...)` captures).
+ * Snippets should `throw new Exception("…")` on failure.
+ */
+const buildPhpHarness: HarnessBuilder = (tests) => {
+  const lines: string[] = [];
+  // The user's code begins with `<?php` and may or may not close with
+  // `?>`. The harness opens a fresh `<?php` block so the concatenated
+  // script remains valid even if the user closed PHP mode at the end
+  // of their snippet.
+  lines.push(`?>`);
+  lines.push(`<?php`);
+  lines.push(`echo "${HARNESS_BEGIN}\\n";`);
+  tests.forEach((t) => {
+    const body = t.code.trim() || "/* empty */";
+    lines.push("try {");
+    for (const raw of body.split("\n")) lines.push("    " + raw);
+    lines.push(
+      `    echo "${HARNESS_RESULT_PREFIX}" . ${JSON.stringify(t.id)} . ":PASS\\n";`,
+    );
+    lines.push("} catch (\\Throwable $__dstest_e) {");
+    lines.push("    $__dstest_msg = $__dstest_e->getMessage();");
+    lines.push(
+      "    if ($__dstest_msg === '') $__dstest_msg = get_class($__dstest_e);",
+    );
+    lines.push(
+      `    echo "${HARNESS_RESULT_PREFIX}" . ${JSON.stringify(t.id)} . ":FAIL:" . json_encode($__dstest_msg) . "\\n";`,
+    );
+    lines.push("}");
+    lines.push("");
+  });
+  return lines.join("\n");
+};
+
 const HARNESS_BUILDERS: Record<string, HarnessBuilder> = {
   python: buildPythonHarness,
   javascript: buildJsHarness,
   typescript: buildJsHarness,
   r: buildRHarness,
+  php: buildPhpHarness,
 };
 
-/** Build the harness snippet for the given adapter. Throws if no
- *  builder is registered — callers should surface that as a UI error
- *  rather than silently dropping the check button. */
+/** Build the harness snippet for the given adapter for the subset of
+ *  tests that are native (have a `code` field). Stdout-based tests are
+ *  ignored here — they're evaluated separately after the run.
+ *
+ *  Returns an empty string when there are no native tests, so the
+ *  caller can avoid invoking the harness machinery entirely. */
 export function buildHarness(
   adapterId: string,
   tests: ChallengeTest[],
 ): string {
+  const native = tests.filter(isNativeTest);
+  if (native.length === 0) return "";
   const builder = HARNESS_BUILDERS[adapterId];
   if (!builder) {
     throw new Error(
-      `No challenge test harness registered for adapter "${adapterId}". ` +
-        `Add one to challengeHarness.ts.`,
+      `No native challenge test harness registered for adapter "${adapterId}". ` +
+        `Use stdout-based \`expect\` tests for compiled languages, or add a ` +
+        `harness builder to challengeHarness.ts.`,
     );
   }
-  return builder(tests);
+  return builder(native);
 }
 
-/** True iff a harness exists for the given adapter id. The component
- *  uses this to disable the check button (rather than blow up at click
- *  time) when an adapter doesn't yet support challenges. */
-export function hasHarness(adapterId: string): boolean {
+/** True iff a native harness exists for the given adapter id. */
+export function hasNativeHarness(adapterId: string): boolean {
   return adapterId in HARNESS_BUILDERS;
+}
+
+/** True iff the given tests can be evaluated for `adapterId`. Native
+ *  tests require a harness builder; stdout-based tests work on any
+ *  runtime that emits stdout/stderr. */
+export function canRunTests(
+  adapterId: string,
+  tests: ChallengeTest[],
+): boolean {
+  if (tests.length === 0) return false;
+  const hasNative = tests.some(isNativeTest);
+  return !hasNative || hasNativeHarness(adapterId);
+}
+
+/** Backwards-compatible alias. The previous component checked
+ *  `hasHarness(adapter.id)` to decide whether to show the check button;
+ *  the new `canRunTests` is a superset. */
+export function hasHarness(adapterId: string): boolean {
+  return hasNativeHarness(adapterId);
 }

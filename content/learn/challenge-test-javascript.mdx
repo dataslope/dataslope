@@ -1,0 +1,147 @@
+---
+title: Challenge Cards — JavaScript
+description: Sandbox for `<ChallengeCard>` JavaScript variations.
+---
+
+JavaScript challenges run via the **almostnode** WASM runtime — no
+server, no Node install. Each card here uses the same JS harness; only
+the test bodies differ.
+
+## 1. Function return value
+
+<ChallengeCard
+  adapter="javascript"
+  title="Sum of an array"
+  category="basics · reduce"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Define a function <code>sumArray(xs)</code> that returns the sum of
+      all numbers in the array <code>xs</code>. An empty array should
+      return <code>0</code>.
+    </p>
+  </>}
+  initialCode={`function sumArray(xs) {
+  // your code here
+  return 0;
+}
+
+console.log(sumArray([1, 2, 3, 4, 5]));
+`}
+  tests={[
+    {
+      id: "small",
+      name: "Small array",
+      description: "[1, 2, 3, 4, 5] → 15",
+      code: `if (sumArray([1, 2, 3, 4, 5]) !== 15) throw new Error("sumArray([1..5]) should be 15");`,
+    },
+    {
+      id: "empty",
+      name: "Empty array returns 0",
+      description: "[] → 0",
+      code: `if (sumArray([]) !== 0) throw new Error("sumArray([]) should be 0");`,
+    },
+    {
+      id: "negatives",
+      name: "Handles negative numbers",
+      description: "[-1, -2, 3] → 0",
+      code: `if (sumArray([-1, -2, 3]) !== 0) throw new Error("sumArray([-1,-2,3]) should be 0");`,
+    },
+  ]}
+/>
+
+## 2. Object transformations
+
+<ChallengeCard
+  adapter="javascript"
+  title="Group orders by customer"
+  category="objects · reduce"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Given the array <code>orders</code> defined above, build an object
+      called <code>byCustomer</code> mapping each customer name to the
+      total amount they spent (summed across their orders).
+    </p>
+  </>}
+  hint={<>
+    Start from <code>{`{}`}</code> and use <code>reduce</code> or a
+    simple <code>for</code> loop. Initialise each customer's slot to
+    zero before adding.
+  </>}
+  initCode={`const orders = [
+  { customer: "Ada",   amount: 120 },
+  { customer: "Linus", amount: 80 },
+  { customer: "Ada",   amount: 30 },
+  { customer: "Grace", amount: 200 },
+  { customer: "Linus", amount: 50 },
+];
+`}
+  initialCode={`let byCustomer = null; // TODO
+
+console.log(byCustomer);
+`}
+  tests={[
+    {
+      id: "is_object",
+      name: "byCustomer is an object",
+      description: "Should be a plain object, not null",
+      code: `if (byCustomer === null || typeof byCustomer !== "object") throw new Error("byCustomer should be an object");`,
+    },
+    {
+      id: "ada",
+      name: "Ada's total = 150",
+      description: "Two orders: 120 + 30",
+      code: `if (byCustomer.Ada !== 150) throw new Error(\`Ada should be 150, got \${byCustomer.Ada}\`);`,
+    },
+    {
+      id: "linus",
+      name: "Linus' total = 130",
+      description: "Two orders: 80 + 50",
+      code: `if (byCustomer.Linus !== 130) throw new Error(\`Linus should be 130, got \${byCustomer.Linus}\`);`,
+    },
+    {
+      id: "grace",
+      name: "Grace's total = 200",
+      description: "Single order: 200",
+      code: `if (byCustomer.Grace !== 200) throw new Error(\`Grace should be 200, got \${byCustomer.Grace}\`);`,
+    },
+  ]}
+/>
+
+## 3. Async / promise basics
+
+<ChallengeCard
+  adapter="javascript"
+  title="Wrap a callback in a Promise"
+  category="async · promises"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Define a function <code>delay(ms)</code> that returns a Promise
+      which resolves to the string <code>"done"</code> after{' '}
+      <code>ms</code> milliseconds. Use{' '}
+      <code>setTimeout</code>.
+    </p>
+  </>}
+  initialCode={`function delay(ms) {
+  // your code here
+}
+
+delay(10).then((v) => console.log(v));
+`}
+  tests={[
+    {
+      id: "returns_promise",
+      name: "delay returns a Promise",
+      description: "delay(0) should be thenable",
+      code: `const p = delay(0); if (!p || typeof p.then !== "function") throw new Error("delay should return a Promise");`,
+    },
+    {
+      id: "resolves_to_done",
+      name: "Resolves to `done`",
+      description: "delay(5) eventually resolves to 'done'",
+      code: `const v = await delay(5); if (v !== "done") throw new Error(\`Expected "done", got \${v}\`);`,
+    },
+  ]}
+/>

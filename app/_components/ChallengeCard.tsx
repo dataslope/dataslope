@@ -61,7 +61,10 @@ import type {
 } from "./types";
 import {
   buildHarness,
-  hasHarness,
+  canRunTests,
+  evaluateStdoutExpect,
+  isNativeTest,
+  isStdoutTest,
   parseHarnessOutput,
   type ChallengeTest,
   type ParsedTestResult,
@@ -249,7 +252,7 @@ export default function ChallengeCard({
     () => false,
   );
 
-  const canCheck = hasHarness(adapter.id) && tests.length > 0;
+  const canCheck = canRunTests(adapter.id, tests);
 
   // ─── Editor mount ───────────────────────────────────────────────────
   useEffect(() => {
@@ -443,8 +446,10 @@ export default function ChallengeCard({
     if (!canCheck) return;
     const userCode = editorRef.current?.state.doc.toString() ?? "";
     const userPart = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
+    // Build a native harness for the subset of tests that have a `code`
+    // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);
-    const combined = `${userPart}\n${harness}`;
+    const combined = harness ? `${userPart}\n${harness}` : userPart;
 
     // Pre-populate the test panel in pending state so the user sees the
     // list immediately while the runtime warms up.
@@ -465,10 +470,19 @@ export default function ChallengeCard({
 
       // Split stdout cells into "user-visible" + parsed harness results.
       // Non-stdout cells (html / image / plot / stderr) pass through
-      // untouched — the harness only emits text.
+      // untouched — the harness only emits text. Also collect the raw
+      // stdout/stderr text so we can evaluate stdout-based expectations
+      // against it.
       const finalCells: OutputCell[] = [];
       const allResults: ParsedTestResult[] = [];
+      let cleanStdout = "";
+      let stderrText = "";
       for (const cell of cells) {
+        if (cell.type === "stderr") {
+          stderrText += (stderrText ? "\n" : "") + cell.content;
+          finalCells.push(cell);
+          continue;
+        }
         if (cell.type !== "stdout") {
           finalCells.push(cell);
           continue;
@@ -476,9 +490,18 @@ export default function ChallengeCard({
         const { clean, results } = parseHarnessOutput(cell.content);
         allResults.push(...results);
         if (clean.length > 0) {
+          cleanStdout += (cleanStdout ? "\n" : "") + clean;
           finalCells.push({ ...cell, content: clean });
         }
       }
+
+      // Evaluate stdout-based tests against the cleaned stdout.
+      for (const t of tests) {
+        if (isStdoutTest(t)) {
+          allResults.push(evaluateStdoutExpect(t, cleanStdout, stderrText));
+        }
+      }
+
       setOutputs(finalCells);
       setElapsed(formatElapsed(elapsedMs));
 
@@ -492,7 +515,9 @@ export default function ChallengeCard({
           state: r ? (r.pass ? "pass" : "fail") : "fail",
           detail: r
             ? r.detail
-            : "Test did not produce a result (the runtime may have errored before reaching this check).",
+            : isNativeTest(t)
+              ? "Test did not produce a result (the runtime may have errored before reaching this check)."
+              : "Test did not run.",
         };
       });
       setTestResults(displayed);

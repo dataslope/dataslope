@@ -1,0 +1,117 @@
+---
+title: Challenge Cards — R
+description: Sandbox for `<ChallengeCard>` R variations.
+---
+
+R challenges run via **WebR** in your browser. The harness uses
+`tryCatch` to frame each test result and `jsonlite::toJSON` to
+serialise failure messages.
+
+## 1. Vector arithmetic
+
+<ChallengeCard
+  adapter="r"
+  title="Mean, median, sd"
+  category="base R · summary stats"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Define three variables — <code>m</code>, <code>md</code>, and{' '}
+      <code>s</code> — holding the mean, median, and standard
+      deviation of the vector <code>x</code>.
+    </p>
+  </>}
+  initCode={`x <- c(2, 4, 4, 4, 5, 5, 7, 9)`}
+  initialCode={`m  <- NA
+md <- NA
+s  <- NA
+
+cat("mean:", m, "median:", md, "sd:", s, "\\n")
+`}
+  tests={[
+    {
+      id: "mean",
+      name: "Mean is correct",
+      description: "mean(x) = 5",
+      code: `if (!isTRUE(all.equal(m, 5))) stop(sprintf("expected mean 5, got %s", m))`,
+    },
+    {
+      id: "median",
+      name: "Median is correct",
+      description: "median(x) = 4.5",
+      code: `if (!isTRUE(all.equal(md, 4.5))) stop(sprintf("expected median 4.5, got %s", md))`,
+    },
+    {
+      id: "sd",
+      name: "Standard deviation is correct",
+      description: "sd(x) ≈ 2.138",
+      code: `if (!isTRUE(all.equal(s, sd(c(2,4,4,4,5,5,7,9))))) stop("sd mismatch")`,
+    },
+  ]}
+/>
+
+## 2. Data frame slicing
+
+<ChallengeCard
+  adapter="r"
+  title="Filter a data frame"
+  category="data frames · subset"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Build a data frame called <code>filtered</code> containing only
+      the rows of <code>df</code> where <code>score &gt;= 80</code>.
+    </p>
+  </>}
+  initCode={`df <- data.frame(
+  name  = c("Ada", "Linus", "Grace", "Alan"),
+  score = c(92, 88, 75, 81),
+  stringsAsFactors = FALSE
+)`}
+  initialCode={`filtered <- NULL # TODO
+
+print(filtered)
+`}
+  tests={[
+    {
+      id: "is_df",
+      name: "filtered is a data frame",
+      description: "Should be a data.frame instance",
+      code: `if (!is.data.frame(filtered)) stop("filtered must be a data.frame")`,
+    },
+    {
+      id: "row_count",
+      name: "3 rows after filtering",
+      description: "Ada, Linus, Alan should remain",
+      code: `if (nrow(filtered) != 3) stop(sprintf("expected 3 rows, got %d", nrow(filtered)))`,
+    },
+    {
+      id: "no_grace",
+      name: "Grace was excluded",
+      description: "score 75 is below the cutoff",
+      code: `if ("Grace" %in% filtered$name) stop("Grace should be excluded")`,
+    },
+  ]}
+/>
+
+## 3. Stdout match
+
+<ChallengeCard
+  adapter="r"
+  title="Print 1 to 5"
+  initialCode={`# print one number per line
+`}
+  instructions={<>
+    <p>Print the numbers 1, 2, 3, 4, 5 — one per line.</p>
+  </>}
+  tests={[
+    {
+      id: "lines",
+      name: "Five lines of output",
+      description: "Each line is just the number",
+      expect: {
+        stdoutLines: ["[1] 1", "[1] 2", "[1] 3", "[1] 4", "[1] 5"],
+      },
+    },
+  ]}
+/>
