@@ -709,10 +709,12 @@ dataslope uses WebAssembly (WASM) runtimes for **every supported language** — 
 | Language | WASM Runtime |
 |---|---|
 | Python | Pyodide |
-| JavaScript / TypeScript | Native browser V8 (no WASM needed) |
+| JavaScript / TypeScript | almostnode |
 | C | browsercc (Emscripten-compiled Clang) |
 | C++ | browsercc (Emscripten-compiled Clang) |
-| SQL (SQLite) | sql.js (SQLite compiled to WASM) |
+| C# | .NET WASM runtime (dotnet.wasm / Blazor WebAssembly) |
+| Java | CheerpJ (WASM-compiled JVM) |
+| SQL (SQLite) | @sqlite.org/sqlite-wasm |
 | SQL (DuckDB) | @duckdb/duckdb-wasm |
 | SQL (PostgreSQL) | PGlite (PostgreSQL compiled to WASM via Emscripten) |
 
@@ -726,21 +728,21 @@ dataslope uses WebAssembly (WASM) runtimes for **every supported language** — 
 
 4. **Offline capability.** Once WASM binaries and any data files are cached (via service worker or browser cache), exercises can run offline. This is impossible with a server-side model.
 
-5. **Existing codebase leverage.** The dataslope codebase already has fully working WASM runtimes for SQLite, DuckDB, PostgreSQL (PGlite), Python (Pyodide), C, and C++. Exercise blocks can reuse these runtimes directly with minimal glue code.
+5. **Existing codebase leverage.** The dataslope codebase already has fully working WASM runtimes for SQLite, DuckDB, PostgreSQL (PGlite), Python (Pyodide), C, C++, C# (.NET WASM), and Java (CheerpJ). Exercise blocks can reuse these runtimes directly with minimal glue code.
 
 #### Technical challenges of the WASM approach
 
-1. **Binary size and load time.** Each WASM runtime is large: Pyodide (~10 MB gzip), DuckDB-Wasm (~5 MB), PGlite (~8 MB), sql.js (~1 MB). A page that eagerly loads all runtimes would be unusably slow. **Mitigation**: Lazy-load each runtime on first use; show a loading indicator. Cache aggressively using `Cache-Control: immutable` and service workers.
+1. **Binary size and load time.** Each WASM runtime is large: Pyodide (~10 MB gzip), DuckDB-Wasm (~5 MB), PGlite (~8 MB), @sqlite.org/sqlite-wasm (~1 MB), .NET WASM (~3–10 MB depending on trimming), CheerpJ (~10+ MB). A page that eagerly loads all runtimes would be unusably slow. **Mitigation**: Lazy-load each runtime on first use; show a loading indicator. Cache aggressively using `Cache-Control: immutable` and service workers.
 
 2. **Memory limits.** Browsers impose per-tab memory limits (typically 2–4 GB on desktop, significantly less on mobile). Generating very large datasets (100k+ rows) in-browser consumes real heap memory inside the WASM sandbox. A 100k-row table with 10 columns of mixed types can use 30–100 MB of WASM heap. **Mitigation**: Use DuckDB-Wasm (which is more memory-efficient than Pyodide for tabular data), limit dataset sizes, or stream from remote Parquet files.
 
 3. **Pyodide package loading.** Pyodide must download Python packages (numpy, pandas, etc.) from its CDN on first use. This can add 5–30 seconds of load time for exercises that import heavy packages. **Mitigation**: Pre-warm Pyodide with a `micropip.install` list in `preExerciseCode`; cache packages via the Pyodide package cache.
 
-4. **SQL dialect consistency.** SQLite (sql.js), DuckDB, and PGlite each have different SQL dialects, function sets, and type systems. An exercise written for DuckDB (e.g., using `read_parquet()` or `LIST` types) will not work in SQLite. **Mitigation**: Exercise definitions must specify their target SQL runtime explicitly (e.g., `language: "sql-duckdb"`). The exercise block renders the appropriate engine badge and initialises the correct runtime.
+4. **SQL dialect consistency.** SQLite (@sqlite.org/sqlite-wasm), DuckDB, and PGlite each have different SQL dialects, function sets, and type systems. An exercise written for DuckDB (e.g., using `read_parquet()` or `LIST` types) will not work in SQLite. **Mitigation**: Exercise definitions must specify their target SQL runtime explicitly (e.g., `language: "sql-duckdb"`). The exercise block renders the appropriate engine badge and initialises the correct runtime.
 
 5. **Concurrency and shared WASM state.** If multiple exercises on the same page share a WASM runtime instance, one exercise's data could leak into another's. **Mitigation**: Each exercise block should own an isolated runtime instance (or, for PGlite, an isolated in-memory database). DuckDB-Wasm supports multiple isolated connections to the same bundle; PGlite creates a fresh in-memory Postgres instance per component mount.
 
-6. **C/C++ compilation latency.** The browsercc runtime compiles C/C++ code via an Emscripten-compiled Clang. Compilation inside a Web Worker takes 1–5 seconds per run. **Mitigation**: Show a spinner during compilation; the first run is always slower than subsequent runs if intermediate state can be cached.
+6. **Compilation latency (compiled languages).** The browsercc runtime compiles C/C++ code via an Emscripten-compiled Clang in a Web Worker; this takes 1–5 seconds per run. C# requires the .NET WASM AOT or interpreter to JIT the IL; Java via CheerpJ must translate bytecode at runtime. **Mitigation**: Show a spinner during compilation. For C# and Java, pre-warm the runtime on component mount so the first learner-triggered run is faster.
 
 7. **No native subprocess or file I/O.** WASM runtimes cannot spawn processes, open files from the host file system, or make arbitrary network requests. Any file system access must be virtualised (Emscripten's FS, Pyodide's in-memory FS). This is generally acceptable for exercises but must be documented for exercise authors.
 
@@ -928,6 +930,8 @@ interface ExerciseBlock {
 
 **When to use multi-file**:
 - C/C++ exercises with a header file (`types.h`) the learner must implement alongside a `main.c`.
+- C# exercises that span multiple source files (e.g., `Program.cs` + `Helper.cs`).
+- Java exercises with multiple classes spread across files (e.g., `Main.java` + `Node.java`).
 - Python exercises that span a module and a usage file (`utils.py` + `main.py`).
 - SQL exercises where the schema DDL is shown read-only in one tab and the learner writes queries in another.
 
@@ -943,12 +947,12 @@ Different languages use fundamentally different mechanisms for providing runtime
 
 | Input type | Languages | Mechanism |
 |---|---|---|
-| **Function arguments** | Python, JS/TS, C, C++ | Test harness calls the learner's function with typed arguments |
-| **stdin** | C, C++, Python (some) | Input piped as a string to the program's standard input stream |
+| **Function arguments** | Python, JS/TS, C, C++, C#, Java | Test harness calls the learner's function with typed arguments |
+| **stdin** | C, C++, Python, C#, Java (some) | Input piped as a string to the program's standard input stream |
 | **SQL query parameters** | SQL (all dialects) | Parameterised queries (`:param` or `$1` style) |
 | **Database state** | SQL (all dialects) | Pre-populated tables created by `initDb` / `initSql` |
 | **Environment variables** | Python, JS/TS | Set in the WASM sandbox before execution |
-| **File system** | C, C++, Python | Files written to the virtualised WASM file system before execution |
+| **File system** | C, C++, Python, C#, Java | Files written to the virtualised WASM file system before execution |
 
 #### Recommended input model
 
@@ -965,8 +969,10 @@ interface TestCase {
 The `testCode` (the SCT / test harness) receives these inputs via a well-known binding:
 
 - **Python**: The test harness is injected after the learner's code. `inputs` are available as local variables (e.g., `__input_n = 5`). The harness calls `result = solution(n)` and asserts.
-- **JS/TS**: The test harness is a JS module that imports the learner's code and calls exported functions with the provided arguments.
+- **JS/TS (almostnode)**: The test harness is a JS module that imports the learner's code (executed via the almostnode runtime) and calls exported functions with the provided arguments.
 - **C/C++**: The test harness compiles alongside the learner's code. Inputs can be passed as `argv` or as `#define` constants injected at compile time, or via stdin.
+- **C#**: The test harness is a `.cs` file added as an extra source file. It calls the learner's class/method with typed arguments using standard xUnit-style assertions, compiled and run by the .NET WASM runtime.
+- **Java**: The test harness is a `TestHarness.java` file compiled alongside the learner's source via CheerpJ. It invokes the learner's class/method and compares output to the expected value.
 - **SQL**: Inputs are provided as table data (via `initDb`) or as query parameters. The test harness runs the learner's SQL and the reference SQL against the same database state, then compares result sets.
 
 #### stdin support (C/C++, Python)
@@ -992,8 +998,10 @@ SQL exercises may need to validate more than one query (e.g., "write a `SELECT` 
 For the initial implementation, support:
 1. **SQL exercises**: `initDb` / `initSql` for database state; single-query validation via result set comparison.
 2. **Python exercises**: Function-call model — learner implements a function, test harness calls it with typed arguments.
-3. **JS/TS exercises**: Same as Python — export a function, test harness imports and calls it.
+3. **JS/TS exercises (almostnode)**: Same as Python — export a function, test harness imports and calls it.
 4. **C/C++ exercises**: Stdin/stdout model (simplest) or multi-file with a provided test harness file.
+5. **C# exercises**: Multi-file model — learner implements a class/method, provided `TestHarness.cs` calls it.
+6. **Java exercises**: Multi-file model — learner implements a class, provided `TestHarness.java` calls it.
 
 Defer environment-variable and file-system input types until there is a concrete exercise that requires them.
 
@@ -1001,144 +1009,202 @@ Defer environment-variable and file-system input types until there is a concrete
 
 ## Coding Agent Prompt
 
-The following prompt can be used to instruct a coding agent to implement the exercise code block component.
+The following prompts can be used to instruct a coding agent to implement the two exercise block components. SQL exercises (SQLite, DuckDB, PostgreSQL) have unique database-initialisation requirements and a result-set comparison testing model, so they are split into a dedicated component separate from all other language exercises.
 
 ---
 
+### Prompt A — `SqlExerciseBlock`
+
 ```
-You are implementing a coding exercise block component for the dataslope/dataslope Next.js application.
+You are implementing a SQL coding exercise block component for the dataslope/dataslope Next.js application.
 
 ## Context
 
 The repository is a Next.js 14+ app (TypeScript, Tailwind CSS). It already has fully working
-WebAssembly runtimes for the following languages, located in `app/_components/runtime/`:
+WebAssembly SQL runtimes located in `app/_components/runtime/`:
 
-- SQLite  → `sqlite.ts`  (sql.js WASM)
-- DuckDB  → `duckdb.ts`  (@duckdb/duckdb-wasm)
-- PostgreSQL → `postgres.ts` (PGlite)
-- Python  → `pyodide.ts` (Pyodide)
-- C       → `c.tsx`       (browsercc / Emscripten Clang)
-- C++     → `cpp.tsx`     (browsercc / Emscripten Clang)
+- SQLite     → `sqlite.ts`   (@sqlite.org/sqlite-wasm)
+- DuckDB     → `duckdb.ts`   (@duckdb/duckdb-wasm)
+- PostgreSQL  → `postgres.ts` (PGlite — PostgreSQL compiled to WASM via Emscripten)
 
-All runtimes expose a common async `run(code: string): Promise<RunResult>` interface (plus
-language-specific extras like `exec` for SQL engines).
+All SQL engines expose an async `exec(sql: string): Promise<QueryResult>` interface.
 
 ## Task
 
-Implement an `ExerciseBlock` React component and its supporting types. The component is an
-interactive coding exercise block that:
+Implement a `SqlExerciseBlock` React component and its supporting types. The component is an
+interactive SQL coding exercise block that:
 
-1. Accepts an `ExerciseBlock` definition (see schema below).
-2. Initialises the appropriate WASM runtime for the exercise language.
-3. For SQL exercises, calls `initDb(engine)` (or runs `initSql`) before the first execution.
-4. Renders a Monaco editor (or reuses the existing editor in the codebase) with the starter code.
-5. If `files` has more than one entry, renders a tab bar above the editor. Tabs are fixed —
-   learners cannot add or remove tabs. Each tab corresponds to one file.
-6. Provides a single "Run" button that executes the learner's code and then runs `testCode`
-   against the result. Displays pass/fail per test case.
-7. If `solutionCode` is provided, renders a "Show Solution" button that opens the solution in a
-   read-only modal editor. Does NOT replace the learner's code.
-8. Does NOT include any hint system.
-9. Shows a loading indicator while the WASM runtime is initialising.
-10. Is fully self-contained — no server requests for code execution.
+1. Accepts a `SqlExerciseDefinition` (see schema below).
+2. Initialises the appropriate SQL WASM runtime for the exercise dialect.
+3. Before the first execution, calls `initDb(engine)` if provided, or runs `initSql` if provided.
+4. Renders a Monaco editor with the starter SQL code (single file; no tab bar).
+5. Provides a "Run" button that executes the learner's SQL against the initialised database,
+   then runs the `testFn` validation function and displays pass/fail per test assertion.
+6. If `solutionCode` is provided, renders a "Show Solution" button that opens the solution SQL
+   in a read-only modal editor. Does NOT replace the learner's code in the main editor.
+7. Does NOT include any hint system — no "Give Hint" button, no `hints` field.
+8. Shows a loading indicator while the WASM runtime is initialising.
+9. Is fully self-contained — no server requests for code execution.
 
 ## Type definitions to implement
 
 ```typescript
-// A single file in the exercise (for multi-file exercises)
-interface ExerciseFile {
-  name: string;       // e.g. "main.py", "solution.sql"
-  content: string;    // initial content shown to the learner
-  readonly?: boolean; // if true, the editor tab is non-editable
+// Supported SQL dialects / engines
+type SqlLanguage = "sql-sqlite" | "sql-duckdb" | "sql-postgres";
+
+// A union of the three SQL engine types already in the codebase
+type SqlEngine = SqliteEngine | DuckDBEngine | PostgresEngine;
+
+// Result of a single test assertion
+interface TestAssertionResult {
+  label: string;
+  passed: boolean;
+  message?: string; // shown on failure
 }
 
-// A single test case
-interface TestCase {
-  label?: string;                   // human-readable description
-  inputs?: Record<string, unknown>; // named inputs for the test harness
-  expectedOutput?: unknown;         // expected result (used by auto-assert helpers)
-}
+// The full SQL exercise definition
+interface SqlExerciseDefinition {
+  // Which SQL engine to use
+  language: SqlLanguage;
 
-// The full exercise definition
-interface ExerciseBlock {
-  // Language identifier — must match a supported runtime
-  language:
-    | "sql-sqlite"
-    | "sql-duckdb"
-    | "sql-postgres"
-    | "python"
-    | "javascript"
-    | "typescript"
-    | "c"
-    | "cpp";
+  // Starter SQL shown to the learner in the editor
+  starterCode: string;
 
-  // File(s) shown in the editor. If length === 1, no tab bar is rendered.
-  files: ExerciseFile[];
-
-  // SQL only: async function to initialise the database before the first run
+  // Optional: async function to create tables and seed data before the first run.
+  // Called once on mount. Mutually exclusive with initSql (prefer initDb for
+  // programmatic/large datasets).
   initDb?: (engine: SqlEngine) => Promise<void>;
 
-  // SQL only: SQL string to execute before the first run (alternative to initDb)
+  // Optional: plain SQL string executed before the first run (alternative to
+  // initDb; suitable for small hand-authored INSERT statements).
   initSql?: string;
 
-  // Code that tests the learner's code. For SQL: a JS async function that
-  // receives the engine and the learner's query result. For Python/JS: a
-  // string of test-harness code injected after the learner's code.
-  testCode: string | ((engine: SqlEngine, result: QueryResult) => Promise<TestResult[]>);
-
-  // Test cases (optional — some exercises use testCode without explicit cases)
-  testCases?: TestCase[];
+  // Validation function called after the learner's SQL has run.
+  // Receives the engine (so it can run follow-up queries) and the result of
+  // the learner's SQL. Returns an array of assertion results.
+  testFn: (
+    engine: SqlEngine,
+    result: QueryResult
+  ) => Promise<TestAssertionResult[]>;
 
   // Optional canonical solution. If present, a "Show Solution" button appears.
   solutionCode?: string;
 }
 ```
 
-## Test cases to implement
+## Additional requirements
 
-Write test cases (using the existing test framework in the repo, e.g. Jest/Vitest) for the
-following scenarios:
+- Place the component in `app/_components/exercise/SqlExerciseBlock.tsx`.
+- Place shared types in `app/_components/exercise/types.ts`.
+- Reuse the existing Monaco editor integration from the codebase where possible.
+- Reuse the existing DuckDB, SQLite (@sqlite.org/sqlite-wasm), and PGlite runtime classes directly.
+- Do not add any new npm dependencies unless strictly necessary. If you add one, check it
+  against the GitHub Advisory Database for known vulnerabilities first.
+- Follow the existing TypeScript and Tailwind CSS patterns in the codebase.
+- Run `npm run build` after implementation to confirm there are no type errors or build failures.
+```
 
-1. **SQL exercise initialisation**: given an `initDb` function that creates a `products` table
-   with 100 rows, assert that `SELECT COUNT(*) FROM products` returns 100 after initialisation.
+---
 
-2. **SQL exercise pass**: given a simple `SELECT` exercise where the correct answer is
-   `SELECT * FROM products ORDER BY price DESC LIMIT 5`, assert that the learner's code passes
-   when they submit the correct query.
+### Prompt B — `CodeExerciseBlock`
 
-3. **SQL exercise fail**: assert that a wrong query (e.g., missing `ORDER BY`) produces at
-   least one failing test case.
+```
+You are implementing a general-purpose coding exercise block component for the
+dataslope/dataslope Next.js application, covering all non-SQL languages.
 
-4. **Solution button visibility**: assert that the "Show Solution" button is rendered when
-   `solutionCode` is provided, and is NOT rendered when `solutionCode` is absent.
+## Context
 
-5. **No hint button**: assert that no element with text "hint" (case-insensitive) is rendered
-   by the exercise block.
+The repository is a Next.js 14+ app (TypeScript, Tailwind CSS). It already has fully working
+WebAssembly runtimes for the following languages, located in `app/_components/runtime/`:
 
-6. **Multi-file tab bar**: given a `files` array with two entries, assert that the tab bar
-   renders with two tabs showing the correct file names. Assert that learners cannot add or
-   remove tabs (no "+" or "×" button present).
+- Python          → `pyodide.ts`  (Pyodide)
+- JavaScript / TS → `almostnode.ts` (almostnode — https://almostnode.dev/)
+- C               → `c.tsx`        (browsercc / Emscripten-compiled Clang)
+- C++             → `cpp.tsx`      (browsercc / Emscripten-compiled Clang)
+- C#              → `csharp.ts`    (.NET WASM / dotnet.wasm)
+- Java            → `java.ts`      (CheerpJ — WASM-compiled JVM)
 
-7. **Single-file no tab bar**: given a `files` array with one entry, assert that no tab bar
-   is rendered.
+All runtimes expose a common async `run(files: CodeFile[]): Promise<RunResult>` interface,
+where `RunResult` contains stdout, stderr, and an exit code.
 
-8. **Read-only file tab**: given a file with `readonly: true`, assert that the editor for
-   that tab is in read-only mode and does not accept input.
+## Task
 
-9. **Python exercise pass**: given a Python exercise where the learner must implement
-   `def add(a, b): return a + b`, assert that the test harness correctly evaluates
-   `add(2, 3) == 5`.
+Implement a `CodeExerciseBlock` React component and its supporting types. The component is an
+interactive coding exercise block for non-SQL languages that:
 
-10. **Loading state**: assert that a loading indicator is shown while the WASM runtime is
-    initialising, and disappears after initialisation completes.
+1. Accepts a `CodeExerciseDefinition` (see schema below).
+2. Initialises the appropriate WASM runtime for the exercise language.
+3. Renders a Monaco editor with the starter code. If `files` has more than one entry, renders
+   a fixed tab bar above the editor — learners cannot add or remove tabs. Each tab corresponds
+   to one `CodeFile`. Files marked `readonly: true` open in read-only mode.
+4. Provides a "Run" button that executes all files through the runtime, then evaluates the
+   `testFn` against the output and displays pass/fail per test assertion.
+5. If `solutionCode` is provided, renders a "Show Solution" button that opens the solution in a
+   read-only modal editor. Does NOT replace the learner's code.
+6. Does NOT include any hint system — no "Give Hint" button, no `hints` field.
+7. Shows a loading indicator while the WASM runtime is initialising.
+8. Is fully self-contained — no server requests for code execution.
+
+## Type definitions to implement
+
+```typescript
+// Supported non-SQL languages
+type CodeLanguage =
+  | "python"
+  | "javascript"
+  | "typescript"
+  | "c"
+  | "cpp"
+  | "csharp"
+  | "java";
+
+// A single source file shown in the editor
+interface CodeFile {
+  name: string;       // tab label and file name (e.g. "main.py", "Helper.cs")
+  content: string;    // initial content shown to the learner
+  readonly?: boolean; // if true, the editor tab is non-editable
+}
+
+// Result of a single test assertion
+interface TestAssertionResult {
+  label: string;
+  passed: boolean;
+  message?: string; // shown on failure
+}
+
+// The standard run result returned by all code runtimes
+interface RunResult {
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
+// The full code exercise definition
+interface CodeExerciseDefinition {
+  // Which language / runtime to use
+  language: CodeLanguage;
+
+  // File(s) shown in the editor. If length === 1, no tab bar is rendered.
+  files: CodeFile[];
+
+  // Validation function called after the learner's code has run.
+  // Receives the RunResult (stdout, stderr, exitCode).
+  // Returns an array of assertion results.
+  testFn: (result: RunResult) => Promise<TestAssertionResult[]>;
+
+  // Optional canonical solution (shown in a read-only modal on request).
+  solutionCode?: string;
+}
+```
 
 ## Additional requirements
 
-- Place the component in `app/_components/exercise/ExerciseBlock.tsx`.
-- Place shared types in `app/_components/exercise/types.ts`.
-- Place test cases in `app/_components/exercise/__tests__/ExerciseBlock.test.tsx`.
-- Reuse existing Monaco editor integration from the codebase where possible.
-- Reuse the existing DuckDB, SQLite, PGlite, Pyodide, and browsercc runtime classes directly.
+- Place the component in `app/_components/exercise/CodeExerciseBlock.tsx`.
+- Place shared types (CodeFile, TestAssertionResult, RunResult, etc.) in
+  `app/_components/exercise/types.ts` — share with SqlExerciseBlock where applicable.
+- Reuse the existing Monaco editor integration from the codebase where possible.
+- Reuse the existing Pyodide, almostnode, browsercc, .NET WASM, and CheerpJ runtime classes
+  directly — do not re-implement them.
 - Do not add any new npm dependencies unless strictly necessary. If you add one, check it
   against the GitHub Advisory Database for known vulnerabilities first.
 - Follow the existing TypeScript and Tailwind CSS patterns in the codebase.
