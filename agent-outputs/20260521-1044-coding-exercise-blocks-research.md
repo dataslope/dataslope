@@ -635,11 +635,11 @@ Based on the research, the following implementation patterns are most relevant f
    - `language`: `python` | `sql-sqlite` | `sql-duckdb` | `sql-postgres`
    - `preExerciseCode`: Sets up tables/data before exercise
    - `starterCode`: What the user sees initially
-   - `solution`: Reference solution (hidden)
+   - `solutionCode`: Optional reference solution (shown on demand via "Show Solution" button)
    - `testCode`: SCT-style test code that runs after user code
-   - `hints`: Array of progressive hint strings
    - `schemaPreview`: Table schema shown in sidebar
    - `runButton` / `checkButton`: Separate execution modes
+   - *No `hints` field* — learners are expected to use LLMs for help
 
 ---
 
@@ -652,3 +652,561 @@ Based on the research, the following implementation patterns are most relevant f
 - **StrataScratch pricing**: Exact pricing page returned 404; approximate pricing from secondary sources.
 - **HackerRank SQL comparison ordering**: Not explicitly documented; observed to be order-independent from community reports.
 - **LeetCode SQL ordering**: Not explicitly documented by LeetCode; community-reported as order-independent unless ORDER BY is in the answer.
+
+---
+
+## dataslope-Specific Design Decisions
+
+This section documents design decisions specific to the dataslope exercise block implementation, covering business model, WebAssembly runtimes, SQL database initialisation, hint strategy, solution reveal, file structure, and input handling.
+
+---
+
+### Business Model and Access
+
+dataslope's learning content is **completely free and requires no login.** All exercises, lessons, and reference material are accessible to guests without an account.
+
+This has several direct consequences for the exercise block architecture:
+
+- **No authentication checks.** Exercise blocks do not call an API to validate a session token before running code. All execution happens client-side via WASM runtimes, so there is nothing to gate behind a login wall.
+- **No server-side progress tracking (initially).** Because users are guests, there is no user record to associate progress with. Progress state (e.g., which exercises have been completed) can be stored in `localStorage` for continuity within a single browser, but it is not synced to a server.
+- **No per-user exercise quotas.** Server-based platforms (LeetCode, HackerRank) can limit submissions to control infrastructure costs. Because dataslope runs all code in the browser, there is no per-submission cost — learners can run exercises as many times as they like.
+- **No email capture or upsell modals.** Guest access is a first-class experience, not a degraded free tier used to funnel sign-ups.
+
+#### Future monetisation
+
+Monetisation may be introduced later through two mechanisms, neither of which breaks the free-guest model:
+
+1. **Advertising**: Display ads shown to guests on exercise/lesson pages (analogous to SQLZoo's ad-supported model). Ad revenue funds infrastructure (CDN, domain, dataset hosting) without charging learners.
+
+2. **Paid-member AI features**: Optional features that require an account and a subscription, such as:
+   - **AI-assisted coding**: An AI copilot inside the exercise editor that can explain errors, suggest next steps, or generate code snippets on request.
+   - **AI-assisted debugging**: An AI that analyses the learner's failing test output and provides a targeted explanation of what went wrong and how to fix it.
+   - **AI code review**: After passing the tests, an AI that critiques the learner's solution for style, efficiency, or best practices.
+
+   These features sit on top of the free exercise experience — they do not restrict access to exercises themselves. A non-paying guest can always run exercises and see test results; they just won't have the AI layer.
+
+#### Comparison to other platforms
+
+| Platform | Guest access | Login required | Free tier |
+|---|---|---|---|
+| **dataslope** | ✅ Full access | ❌ Never required | ✅ All content |
+| SQLZoo | ✅ Full access | ❌ | ✅ Ad-supported |
+| Exercism | ✅ Most content | ✅ For submission/mentoring | ✅ All exercises |
+| LeetCode | ✅ ~1,800 problems | ✅ For submission | ⚠️ Limited |
+| DataCamp | ⚠️ Very limited | ✅ Required | ⚠️ Very limited |
+| Codecademy | ⚠️ Some courses | ✅ Required | ⚠️ Limited |
+
+dataslope most closely resembles **SQLZoo** in its access model (fully free, guest-first, ad-supported), but with a broader language scope and a richer in-browser execution architecture.
+
+---
+
+### WebAssembly Runtimes for All Languages (Including SQL)
+
+dataslope uses WebAssembly (WASM) runtimes for **every supported language** — including SQL. This is a deliberate architectural choice that has both advantages and challenges.
+
+#### Current WASM runtimes in the codebase
+
+| Language | WASM Runtime |
+|---|---|
+| Python | Pyodide |
+| JavaScript / TypeScript | almostnode |
+| C | browsercc (Emscripten-compiled Clang) |
+| C++ | browsercc (Emscripten-compiled Clang) |
+| C# | .NET WASM runtime (dotnet.wasm / Blazor WebAssembly) |
+| Java | CheerpJ (WASM-compiled JVM) |
+| SQL (SQLite) | @sqlite.org/sqlite-wasm |
+| SQL (DuckDB) | @duckdb/duckdb-wasm |
+| SQL (PostgreSQL) | PGlite (PostgreSQL compiled to WASM via Emscripten) |
+
+#### Advantages of a universal WASM architecture
+
+1. **Zero server cost for exercise execution.** Every exercise — regardless of language — runs entirely in the learner's browser. There are no sandboxed containers to provision, no per-execution cloud bills, and no request latency from a round-trip to a code-execution server (unlike LeetCode, HackerRank, DataCamp, Exercism, and Codewars, which all run user code server-side).
+
+2. **Consistency across languages.** The exercise block component does not need to special-case "use a server for Python, use the browser for SQL." Every runtime conforms to the same interface: initialise, run code, return result. This simplifies the exercise block's architecture significantly.
+
+3. **Deterministic, reproducible execution.** Because the runtime is bundled with the page (or loaded once from a CDN), every learner runs the same binary with the same behaviour. There is no "works on my judge, fails on yours" mismatch.
+
+4. **Offline capability.** Once WASM binaries and any data files are cached (via service worker or browser cache), exercises can run offline. This is impossible with a server-side model.
+
+5. **Existing codebase leverage.** The dataslope codebase already has fully working WASM runtimes for SQLite, DuckDB, PostgreSQL (PGlite), Python (Pyodide), C, C++, C# (.NET WASM), and Java (CheerpJ). Exercise blocks can reuse these runtimes directly with minimal glue code.
+
+#### Technical challenges of the WASM approach
+
+1. **Binary size and load time.** Each WASM runtime is large: Pyodide (~10 MB gzip), DuckDB-Wasm (~5 MB), PGlite (~8 MB), @sqlite.org/sqlite-wasm (~1 MB), .NET WASM (~3–10 MB depending on trimming), CheerpJ (~10+ MB). A page that eagerly loads all runtimes would be unusably slow. **Mitigation**: Lazy-load each runtime on first use; show a loading indicator. Cache aggressively using `Cache-Control: immutable` and service workers.
+
+2. **Memory limits.** Browsers impose per-tab memory limits (typically 2–4 GB on desktop, significantly less on mobile). Generating very large datasets (100k+ rows) in-browser consumes real heap memory inside the WASM sandbox. A 100k-row table with 10 columns of mixed types can use 30–100 MB of WASM heap. **Mitigation**: Use DuckDB-Wasm (which is more memory-efficient than Pyodide for tabular data), limit dataset sizes, or stream from remote Parquet files.
+
+3. **Pyodide package loading.** Pyodide must download Python packages (numpy, pandas, etc.) from its CDN on first use. This can add 5–30 seconds of load time for exercises that import heavy packages. **Mitigation**: Pre-warm Pyodide with a `micropip.install` list in `preExerciseCode`; cache packages via the Pyodide package cache.
+
+4. **SQL dialect consistency.** SQLite (@sqlite.org/sqlite-wasm), DuckDB, and PGlite each have different SQL dialects, function sets, and type systems. An exercise written for DuckDB (e.g., using `read_parquet()` or `LIST` types) will not work in SQLite. **Mitigation**: Exercise definitions must specify their target SQL runtime explicitly (e.g., `language: "sql-duckdb"`). The exercise block renders the appropriate engine badge and initialises the correct runtime.
+
+5. **Concurrency and shared WASM state.** If multiple exercises on the same page share a WASM runtime instance, one exercise's data could leak into another's. **Mitigation**: Each exercise block should own an isolated runtime instance (or, for PGlite, an isolated in-memory database). DuckDB-Wasm supports multiple isolated connections to the same bundle; PGlite creates a fresh in-memory Postgres instance per component mount.
+
+6. **Compilation latency (compiled languages).** The browsercc runtime compiles C/C++ code via an Emscripten-compiled Clang in a Web Worker; this takes 1–5 seconds per run. C# requires the .NET WASM AOT or interpreter to JIT the IL; Java via CheerpJ must translate bytecode at runtime. **Mitigation**: Show a spinner during compilation. For C# and Java, pre-warm the runtime on component mount so the first learner-triggered run is faster.
+
+7. **No native subprocess or file I/O.** WASM runtimes cannot spawn processes, open files from the host file system, or make arbitrary network requests. Any file system access must be virtualised (Emscripten's FS, Pyodide's in-memory FS). This is generally acceptable for exercises but must be documented for exercise authors.
+
+#### Architecture summary
+
+The universal WASM approach makes the exercise block architecture **simpler** overall: there is one code path, one run loop, and one result type regardless of language. The primary complexity shifts from "how do we run code" to "how do we load the right runtime efficiently." Given that the runtimes already exist in the codebase, the incremental work for exercise blocks is primarily around the exercise definition schema and the test harness, not the execution layer.
+
+---
+
+### SQL Exercise Database Initialisation
+
+SQL exercises need a populated database before the learner writes their first query. Unlike Python or JavaScript exercises (where the starter code itself can define variables), SQL requires the tables and data to exist before the user's SQL runs. The following approaches are available.
+
+#### Option A — Accept a JS/TS function (`initDb`) to create data from scratch
+
+The exercise definition accepts an `initDb` async function. This function receives the engine instance and is responsible for creating tables and populating them. The exercise block calls `initDb(engine)` once before the learner's first run.
+
+```typescript
+// Exercise definition
+const exercise: SqlExercise = {
+  language: "sql-duckdb",
+  initDb: async (engine: DuckDBEngine) => {
+    // Create schema
+    await engine.exec(`
+      CREATE TABLE products (
+        id      INTEGER PRIMARY KEY,
+        name    VARCHAR,
+        price   DECIMAL(10,2),
+        category VARCHAR
+      );
+    `);
+
+    // Populate with generated data — flexible, no remote fetch required
+    await engine.exec(`
+      INSERT INTO products
+      SELECT
+        i                                   AS id,
+        'Product ' || i                     AS name,
+        (random() * 990 + 10)::DECIMAL(10,2) AS price,
+        CASE (i % 3)
+          WHEN 0 THEN 'Electronics'
+          WHEN 1 THEN 'Clothing'
+          ELSE 'Food'
+        END                                 AS category
+      FROM range(1, 10001) t(i);
+    `);
+  },
+  starterCode: "SELECT * FROM products LIMIT 10;",
+  testCode: `...`,
+};
+```
+
+This approach is maximally flexible:
+
+- **Deterministic generation**: Use DuckDB's `setseed()` or a seeded JS PRNG to ensure every learner gets identical data.
+- **Procedural generation with `numpy-ts`**: For exercises that benefit from NumPy-style distributions (normal, exponential, Poisson), use [`numpy-ts`](https://www.npmjs.com/package/numpy-ts) or [`jstat`](https://jstat.github.io/) in the `initDb` function to generate typed arrays and bulk-insert them via the engine's `insertRows` API. Example:
+
+```typescript
+import { normal } from "numpy-ts"; // hypothetical; actual API may vary
+
+initDb: async (engine) => {
+  const salaries = normal({ mean: 75000, std: 20000, size: 50000 });
+  await engine.exec("CREATE TABLE employees (id INTEGER, salary REAL)");
+  await engine.exec(
+    `INSERT INTO employees SELECT i, salaries[i] FROM range(50000) t(i)`,
+    // or batch-insert via Arrow / typed array binding
+  );
+},
+```
+
+- **Fetching remote data**: The `initDb` function can `fetch()` a remote CSV or Parquet file and insert it into the engine. For DuckDB, this can be as simple as `engine.exec("CREATE TABLE t AS SELECT * FROM read_parquet('https://...')")`.
+- **Reusable helpers**: Common dataset generators (e.g., a `generateEcommerceDb(engine, rows)` helper) can be shared across multiple exercises without duplicating SQL.
+
+#### Option B — SQL `initSql` string
+
+For simpler exercises, accept a plain SQL string that is executed before the exercise. This is analogous to DataCamp's `pre-exercise-code` block and SQLZoo's pre-loaded datasets.
+
+```typescript
+const exercise: SqlExercise = {
+  language: "sql-sqlite",
+  initSql: `
+    CREATE TABLE orders (id INTEGER PRIMARY KEY, customer TEXT, amount REAL);
+    INSERT INTO orders VALUES (1, 'Alice', 120.50), (2, 'Bob', 340.00), (3, 'Carol', 89.99);
+  `,
+  starterCode: "-- Write a query to find orders over $100\n",
+};
+```
+
+This is the simplest approach and is sufficient for small, hand-authored datasets (dozens to a few hundred rows).
+
+#### Option C — Remote Parquet/CSV fetch (DuckDB only)
+
+For exercises that require realistic large datasets (10k–1M rows), `initDb` can call DuckDB's native HTTP fetch:
+
+```typescript
+initDb: async (engine) => {
+  await engine.exec(`
+    CREATE TABLE nyc_taxi AS
+    SELECT * FROM read_parquet(
+      'https://github.com/dataslope/datasets/releases/download/v1/nyc_yellow_2023_sample.parquet'
+    );
+  `);
+},
+```
+
+The Parquet file is fetched once and cached in the browser. A 100k-row table compresses to ~1–5 MB in Parquet format — acceptable as a one-time CDN fetch.
+
+#### Recommended initialisation strategy
+
+| Dataset size | Recommended approach |
+|---|---|
+| < 100 rows | `initSql` string (hand-authored INSERT statements) |
+| 100 – 100,000 rows | `initDb` JS/TS function with in-engine SQL generation (DuckDB `range()` + `random()` with `setseed()`) |
+| > 100,000 rows | `initDb` fetching a Parquet file from GitHub Releases / CDN, or DuckDB remote `read_parquet()` |
+
+---
+
+### No Hints
+
+Exercise blocks in dataslope **do not include a hint system.** This is an intentional design decision.
+
+The rationale is that learners are expected — and encouraged — to use LLMs (ChatGPT, Claude, GitHub Copilot, etc.) when they are stuck. LLMs are dramatically more capable than static hint strings: they can explain the concept, show an example, diagnose the specific error in the learner's code, and suggest a next step tailored to what the learner has already written.
+
+A static `hints` array (as used by DataCamp and Codecademy) made sense in 2015 when AI assistants did not exist. Today, a static hint competes poorly with "explain this SQL error to me" in a chat window. Shipping a hint system would add implementation complexity, create content-authoring burden (every exercise needs well-written hints), and ultimately be less useful to learners than the tools they already have.
+
+**Implication for the exercise block UI**: There is no "Give Hint" button, no `hints` property in the exercise schema, and no hint-reveal animation. The UI is simpler as a result.
+
+---
+
+### Optional `solutionCode` Parameter
+
+Each exercise definition may include an optional `solutionCode` field. If `solutionCode` is provided, the exercise block renders a **"Show Solution"** button. If `solutionCode` is absent, no button is rendered.
+
+```typescript
+interface ExerciseBlock {
+  language: string;
+  starterCode: string;
+  testCode: string;
+  solutionCode?: string; // optional
+  // ...other fields
+}
+```
+
+**UI behaviour when `solutionCode` is present**:
+- A "Show Solution" button appears below the editor (or in the toolbar).
+- Clicking it opens a modal or drawer that renders the solution code in a read-only code editor (same Monaco instance, read-only mode).
+- The learner's current code in the editor is **not replaced** — they can view the solution and then return to their own attempt.
+- A confirmation prompt ("Are you sure? Viewing the solution may reduce learning benefit") is optional but probably unnecessary — learners who click "Show Solution" have already decided they want to see it.
+
+**Rationale**: Not all exercises need a solution. Exploratory exercises ("write any query that returns the top 10 products by revenue") have many valid answers and a `solutionCode` would be misleading. For concept-verification exercises ("write a query using a window function to compute running totals"), a canonical solution is helpful as a reference after the learner has attempted the exercise.
+
+---
+
+### File Structure: Single-File Default, Optional Multi-File Tabs
+
+#### Default: single file
+
+By default, every exercise block is a **single-file editor**. The learner sees one editor pane with no tab bar. This is the simplest, lowest-friction experience and matches the model used by LeetCode, DataCamp, Codecademy, and most other platforms.
+
+#### Multi-file exercises
+
+Some exercises — particularly those involving modules, header files (C/C++), or multi-component programs — benefit from a multi-file structure. When an exercise has more than one file, the editor renders a **tab bar** above the editor. Each tab corresponds to one file.
+
+**Tab bar rules**:
+- The tabs are **fixed and predefined** by the exercise author. Learners cannot create new tabs or remove existing tabs.
+- Learners **can switch between tabs** and edit any of the files shown.
+- Each file has a name (e.g., `main.py`, `helpers.py`, or `solution.sql`, `schema.sql`).
+- Files that the learner should not modify (e.g., a test harness or read-only schema file) can be marked `readonly: true` in the exercise definition — they will appear as a non-editable tab.
+
+```typescript
+interface ExerciseFile {
+  name: string;          // tab label and file name
+  content: string;       // initial content shown to learner
+  readonly?: boolean;    // if true, editor is read-only for this file
+}
+
+interface ExerciseBlock {
+  language: string;
+  files: ExerciseFile[]; // if length === 1, no tab bar rendered
+  testCode: string;
+  solutionCode?: string;
+  // ...
+}
+```
+
+**When to use multi-file**:
+- C/C++ exercises with a header file (`types.h`) the learner must implement alongside a `main.c`.
+- C# exercises that span multiple source files (e.g., `Program.cs` + `Helper.cs`).
+- Java exercises with multiple classes spread across files (e.g., `Main.java` + `Node.java`).
+- Python exercises that span a module and a usage file (`utils.py` + `main.py`).
+- SQL exercises where the schema DDL is shown read-only in one tab and the learner writes queries in another.
+
+**Consistency with the existing codebase**: The C and C++ runtimes already implement `prepareFileSystem` to stage multiple `.c`/`.h`/`.cpp`/`.hpp` files in memory and pass them to the browsercc worker as `extraFiles`. The multi-file exercise structure aligns directly with this existing model.
+
+---
+
+### Supporting Multiple Inputs Across Languages
+
+Different languages use fundamentally different mechanisms for providing runtime inputs to code. The exercise block must accommodate all of them.
+
+#### Categories of input
+
+| Input type | Languages | Mechanism |
+|---|---|---|
+| **Function arguments** | Python, JS/TS, C, C++, C#, Java | Test harness calls the learner's function with typed arguments |
+| **stdin** | C, C++, Python, C#, Java (some) | Input piped as a string to the program's standard input stream |
+| **SQL query parameters** | SQL (all dialects) | Parameterised queries (`:param` or `$1` style) |
+| **Database state** | SQL (all dialects) | Pre-populated tables created by `initDb` / `initSql` |
+| **Environment variables** | Python, JS/TS | Set in the WASM sandbox before execution |
+| **File system** | C, C++, Python, C#, Java | Files written to the virtualised WASM file system before execution |
+
+#### Recommended input model
+
+The exercise block should support a **typed `inputs` array** in the exercise definition. Each element describes one test case input:
+
+```typescript
+interface TestCase {
+  label?: string;           // e.g. "Basic case", "Edge case: empty list"
+  inputs: Record<string, unknown>; // named inputs passed to the test harness
+  expectedOutput?: unknown; // optional; used by the test runner to auto-assert
+}
+```
+
+The `testCode` (the SCT / test harness) receives these inputs via a well-known binding:
+
+- **Python**: The test harness is injected after the learner's code. `inputs` are available as local variables (e.g., `__input_n = 5`). The harness calls `result = solution(n)` and asserts.
+- **JS/TS (almostnode)**: The test harness is a JS module that imports the learner's code (executed via the almostnode runtime) and calls exported functions with the provided arguments.
+- **C/C++**: The test harness compiles alongside the learner's code. Inputs can be passed as `argv` or as `#define` constants injected at compile time, or via stdin.
+- **C#**: The test harness is a `.cs` file added as an extra source file. It calls the learner's class/method with typed arguments using standard xUnit-style assertions, compiled and run by the .NET WASM runtime.
+- **Java**: The test harness is a `TestHarness.java` file compiled alongside the learner's source via CheerpJ. It invokes the learner's class/method and compares output to the expected value.
+- **SQL**: Inputs are provided as table data (via `initDb`) or as query parameters. The test harness runs the learner's SQL and the reference SQL against the same database state, then compares result sets.
+
+#### stdin support (C/C++, Python)
+
+For exercises that use stdin (classic competitive-programming style, also used by HackerRank), the `inputs` field can include a `stdin` string:
+
+```typescript
+{
+  label: "Single number",
+  inputs: { stdin: "42\n" },
+  expectedOutput: { stdout: "84\n" }
+}
+```
+
+The WASM runtime sets up a virtual stdin before execution and captures stdout after.
+
+#### SQL-specific: multiple test queries
+
+SQL exercises may need to validate more than one query (e.g., "write a `SELECT` to find X" and "write an `UPDATE` to set Y"). In this case, `testCode` can be a sequence of SQL + assertion pairs, or a JS function that runs multiple checks against the engine after the learner's SQL has executed.
+
+#### Practical recommendation
+
+For the initial implementation, support:
+1. **SQL exercises**: `initDb` / `initSql` for database state; single-query validation via result set comparison.
+2. **Python exercises**: Function-call model — learner implements a function, test harness calls it with typed arguments.
+3. **JS/TS exercises (almostnode)**: Same as Python — export a function, test harness imports and calls it.
+4. **C/C++ exercises**: Stdin/stdout model (simplest) or multi-file with a provided test harness file.
+5. **C# exercises**: Multi-file model — learner implements a class/method, provided `TestHarness.cs` calls it.
+6. **Java exercises**: Multi-file model — learner implements a class, provided `TestHarness.java` calls it.
+
+Defer environment-variable and file-system input types until there is a concrete exercise that requires them.
+
+---
+
+## Coding Agent Prompt
+
+The following prompts can be used to instruct a coding agent to implement the two exercise block components. SQL exercises (SQLite, DuckDB, PostgreSQL) have unique database-initialisation requirements and a result-set comparison testing model, so they are split into a dedicated component separate from all other language exercises.
+
+---
+
+### Prompt A — `SqlExerciseBlock`
+
+```
+You are implementing a SQL coding exercise block component for the dataslope/dataslope Next.js application.
+
+## Context
+
+The repository is a Next.js 14+ app (TypeScript, Tailwind CSS). It already has fully working
+WebAssembly SQL runtimes located in `app/_components/runtime/`:
+
+- SQLite     → `sqlite.ts`   (@sqlite.org/sqlite-wasm)
+- DuckDB     → `duckdb.ts`   (@duckdb/duckdb-wasm)
+- PostgreSQL  → `postgres.ts` (PGlite — PostgreSQL compiled to WASM via Emscripten)
+
+All SQL engines expose an async `exec(sql: string): Promise<QueryResult>` interface.
+
+## Task
+
+Implement a `SqlExerciseBlock` React component and its supporting types. The component is an
+interactive SQL coding exercise block that:
+
+1. Accepts a `SqlExerciseDefinition` (see schema below).
+2. Initialises the appropriate SQL WASM runtime for the exercise dialect.
+3. Before the first execution, calls `initDb(engine)` if provided, or runs `initSql` if provided.
+4. Renders a Monaco editor with the starter SQL code (single file; no tab bar).
+5. Provides a "Run" button that executes the learner's SQL against the initialised database,
+   then runs the `testFn` validation function and displays pass/fail per test assertion.
+6. If `solutionCode` is provided, renders a "Show Solution" button that opens the solution SQL
+   in a read-only modal editor. Does NOT replace the learner's code in the main editor.
+7. Does NOT include any hint system — no "Give Hint" button, no `hints` field.
+8. Shows a loading indicator while the WASM runtime is initialising.
+9. Is fully self-contained — no server requests for code execution.
+
+## Type definitions to implement
+
+```typescript
+// Supported SQL dialects / engines
+type SqlLanguage = "sql-sqlite" | "sql-duckdb" | "sql-postgres";
+
+// A union of the three SQL engine types already in the codebase
+type SqlEngine = SqliteEngine | DuckDBEngine | PostgresEngine;
+
+// Result of a single test assertion
+interface TestAssertionResult {
+  label: string;
+  passed: boolean;
+  message?: string; // shown on failure
+}
+
+// The full SQL exercise definition
+interface SqlExerciseDefinition {
+  // Which SQL engine to use
+  language: SqlLanguage;
+
+  // Starter SQL shown to the learner in the editor
+  starterCode: string;
+
+  // Optional: async function to create tables and seed data before the first run.
+  // Called once on mount. Mutually exclusive with initSql (prefer initDb for
+  // programmatic/large datasets).
+  initDb?: (engine: SqlEngine) => Promise<void>;
+
+  // Optional: plain SQL string executed before the first run (alternative to
+  // initDb; suitable for small hand-authored INSERT statements).
+  initSql?: string;
+
+  // Validation function called after the learner's SQL has run.
+  // Receives the engine (so it can run follow-up queries) and the result of
+  // the learner's SQL. Returns an array of assertion results.
+  testFn: (
+    engine: SqlEngine,
+    result: QueryResult
+  ) => Promise<TestAssertionResult[]>;
+
+  // Optional canonical solution. If present, a "Show Solution" button appears.
+  solutionCode?: string;
+}
+```
+
+## Additional requirements
+
+- Place the component in `app/_components/exercise/SqlExerciseBlock.tsx`.
+- Place shared types in `app/_components/exercise/types.ts`.
+- Reuse the existing Monaco editor integration from the codebase where possible.
+- Reuse the existing DuckDB, SQLite (@sqlite.org/sqlite-wasm), and PGlite runtime classes directly.
+- Do not add any new npm dependencies unless strictly necessary. If you add one, check it
+  against the GitHub Advisory Database for known vulnerabilities first.
+- Follow the existing TypeScript and Tailwind CSS patterns in the codebase.
+- Run `npm run build` after implementation to confirm there are no type errors or build failures.
+```
+
+---
+
+### Prompt B — `CodeExerciseBlock`
+
+```
+You are implementing a general-purpose coding exercise block component for the
+dataslope/dataslope Next.js application, covering all non-SQL languages.
+
+## Context
+
+The repository is a Next.js 14+ app (TypeScript, Tailwind CSS). It already has fully working
+WebAssembly runtimes for the following languages, located in `app/_components/runtime/`:
+
+- Python          → `pyodide.ts`  (Pyodide)
+- JavaScript / TS → `almostnode.ts` (almostnode — https://almostnode.dev/)
+- C               → `c.tsx`        (browsercc / Emscripten-compiled Clang)
+- C++             → `cpp.tsx`      (browsercc / Emscripten-compiled Clang)
+- C#              → `csharp.ts`    (.NET WASM / dotnet.wasm)
+- Java            → `java.ts`      (CheerpJ — WASM-compiled JVM)
+
+All runtimes expose a common async `run(files: CodeFile[]): Promise<RunResult>` interface,
+where `RunResult` contains stdout, stderr, and an exit code.
+
+## Task
+
+Implement a `CodeExerciseBlock` React component and its supporting types. The component is an
+interactive coding exercise block for non-SQL languages that:
+
+1. Accepts a `CodeExerciseDefinition` (see schema below).
+2. Initialises the appropriate WASM runtime for the exercise language.
+3. Renders a Monaco editor with the starter code. If `files` has more than one entry, renders
+   a fixed tab bar above the editor — learners cannot add or remove tabs. Each tab corresponds
+   to one `CodeFile`. Files marked `readonly: true` open in read-only mode.
+4. Provides a "Run" button that executes all files through the runtime, then evaluates the
+   `testFn` against the output and displays pass/fail per test assertion.
+5. If `solutionCode` is provided, renders a "Show Solution" button that opens the solution in a
+   read-only modal editor. Does NOT replace the learner's code.
+6. Does NOT include any hint system — no "Give Hint" button, no `hints` field.
+7. Shows a loading indicator while the WASM runtime is initialising.
+8. Is fully self-contained — no server requests for code execution.
+
+## Type definitions to implement
+
+```typescript
+// Supported non-SQL languages
+type CodeLanguage =
+  | "python"
+  | "javascript"
+  | "typescript"
+  | "c"
+  | "cpp"
+  | "csharp"
+  | "java";
+
+// A single source file shown in the editor
+interface CodeFile {
+  name: string;       // tab label and file name (e.g. "main.py", "Helper.cs")
+  content: string;    // initial content shown to the learner
+  readonly?: boolean; // if true, the editor tab is non-editable
+}
+
+// Result of a single test assertion
+interface TestAssertionResult {
+  label: string;
+  passed: boolean;
+  message?: string; // shown on failure
+}
+
+// The standard run result returned by all code runtimes
+interface RunResult {
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
+// The full code exercise definition
+interface CodeExerciseDefinition {
+  // Which language / runtime to use
+  language: CodeLanguage;
+
+  // File(s) shown in the editor. If length === 1, no tab bar is rendered.
+  files: CodeFile[];
+
+  // Validation function called after the learner's code has run.
+  // Receives the RunResult (stdout, stderr, exitCode).
+  // Returns an array of assertion results.
+  testFn: (result: RunResult) => Promise<TestAssertionResult[]>;
+
+  // Optional canonical solution (shown in a read-only modal on request).
+  solutionCode?: string;
+}
+```
+
+## Additional requirements
+
+- Place the component in `app/_components/exercise/CodeExerciseBlock.tsx`.
+- Place shared types (CodeFile, TestAssertionResult, RunResult, etc.) in
+  `app/_components/exercise/types.ts` — share with SqlExerciseBlock where applicable.
+- Reuse the existing Monaco editor integration from the codebase where possible.
+- Reuse the existing Pyodide, almostnode, browsercc, .NET WASM, and CheerpJ runtime classes
+  directly — do not re-implement them.
+- Do not add any new npm dependencies unless strictly necessary. If you add one, check it
+  against the GitHub Advisory Database for known vulnerabilities first.
+- Follow the existing TypeScript and Tailwind CSS patterns in the codebase.
+- Run `npm run build` after implementation to confirm there are no type errors or build failures.
+```
