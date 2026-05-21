@@ -614,8 +614,6 @@ export const cppAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "cpp",
-  entryPoint: "main.cpp",
-  primaryEntryFilename: "main.cpp",
   findEntryFiles(files): EntryFileInfo[] {
     const out: EntryFileInfo[] = [];
     for (const f of files) {

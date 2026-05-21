@@ -802,7 +802,6 @@ export const rAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "r",
-  entryPoint: "main.r",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

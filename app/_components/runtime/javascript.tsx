@@ -299,7 +299,6 @@ export const javascriptAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "index",
   defaultFileExtension: "js",
-  entryPoint: "index.js",
   packagesFooter: (
     <>
       JavaScript runs via{" "}

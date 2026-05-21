@@ -759,7 +759,6 @@ export const pythonAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "py",
-  entryPoint: "main.py",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

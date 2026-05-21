@@ -492,8 +492,6 @@ export const csharpAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "Program",
   defaultFileExtension: "cs",
-  entryPoint: "Program.cs",
-  primaryEntryFilename: "Program.cs",
   findEntryFiles(files): EntryFileInfo[] {
     const out: EntryFileInfo[] = [];
     for (const f of files) {

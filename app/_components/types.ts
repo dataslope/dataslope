@@ -158,9 +158,6 @@ export interface LanguageAdapter {
    *  e.g. "py", "js", "cpp". Used to seed the initial workspace file
    *  and to suggest names for "+" new tabs. */
   defaultFileExtension: string;
-  /** Filename treated as the entry point for multi-file runs. When
-   *  unset, the active tab's file is the entry point. */
-  entryPoint?: string;
   /** Optional: classify which workspace files contain entry points
    *  (i.e. `main()` / `Main()` / top-level statements). Used by the
    *  Run button to populate a split-button dropdown when multiple
@@ -169,12 +166,6 @@ export interface LanguageAdapter {
   findEntryFiles?(
     files: { filename: string; content: string }[],
   ): EntryFileInfo[];
-  /** Optional: workspace path of the canonical primary entry file
-   *  (e.g. `"main.c"`, `"Program.cs"`). Used as the preferred default
-   *  when the active tab is a non-entry file and a primary file
-   *  exists. Distinct from `entryPoint` so adapters can mark a
-   *  primary even when the runtime supports multiple entries. */
-  primaryEntryFilename?: string;
   /** Optional: short label used inside the Run button when this
    *  filename is the chosen entry. Defaults to the basename without
    *  extension (e.g. `"main.c"` → `"main"`). */

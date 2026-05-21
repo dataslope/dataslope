@@ -338,7 +338,6 @@ export const typescriptAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "index",
   defaultFileExtension: "ts",
-  entryPoint: "index.ts",
   packagesFooter: (
     <>
       Code is transpiled in-browser by the official{" "}

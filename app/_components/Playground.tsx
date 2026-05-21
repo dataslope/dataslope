@@ -79,6 +79,7 @@ import {
   Code2,
   Terminal,
   FolderTree,
+  ChevronDown,
   X,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
@@ -108,6 +109,7 @@ import {
   defaultFiles,
   loadManifest,
   newFileId,
+  primaryEntryFilename,
   saveManifest,
   suggestNextFilename,
   type PlaygroundFile,
@@ -167,6 +169,149 @@ function buildCapabilitiesBlurb(
   if (items.length === 2)
     return `Supports text, ${items[0]}, and ${items[1]}.`;
   return `Supports text, ${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}.`;
+}
+
+/** Compute the basename without extension for the Run button label. */
+function entryStem(filename: string): string {
+  const leaf = filename.includes("/") ? filename.split("/").pop()! : filename;
+  const dot = leaf.lastIndexOf(".");
+  return dot > 0 ? leaf.slice(0, dot) : leaf;
+}
+
+/** Describes one option in the Run split-button dropdown. */
+interface RunDropdownItem {
+  label: string;
+  /** Workspace path of the file to execute when this item is clicked. */
+  entryFilename: string;
+}
+
+/** Result of `computeRunButtonState`: drives the Run button UI in
+ *  `Playground.tsx` for both multi-entry-point languages (C, C++,
+ *  Java, C#) and single-entry-point languages (Python, R, JS, TS,
+ *  PHP). */
+interface RunButtonState {
+  /** Text rendered inside the primary button after the play icon. */
+  primaryLabel: string;
+  /** Workspace path of the file the primary button executes. `null`
+   *  means "run the active editor as-is" (used when the active file
+   *  is the canonical entry). */
+  primaryEntry: string | null;
+  /** Items rendered in the chevron dropdown. Empty array → hide
+   *  chevron. */
+  dropdownItems: RunDropdownItem[];
+}
+
+/** Resolve the Run button's label, primary action, and chevron items
+ *  for the current workspace. The logic differs between adapters that
+ *  declare `findEntryFiles` (C / C++ / Java / C#: multiple entry
+ *  points) and those that don't (Python / R / JS / TS / PHP: any
+ *  file runs, the canonical default may show in the dropdown). */
+function computeRunButtonState(
+  adapter: LanguageAdapter,
+  files: PlaygroundFile[],
+  activeFileId: string,
+  fileContents: Map<string, string>,
+): RunButtonState {
+  const stemFor = adapter.entryLabel ?? entryStem;
+  const activeFile = files.find((f) => f.id === activeFileId) ?? null;
+  const primary = primaryEntryFilename(adapter);
+  const primaryFile = files.find((f) => f.filename === primary) ?? null;
+
+  // Multi-entry-point adapters (C, C++, Java, C#).
+  if (adapter.findEntryFiles) {
+    const inputs = files.map((f) => ({
+      filename: f.filename,
+      content: fileContents.get(f.filename) ?? "",
+    }));
+    const entries = adapter.findEntryFiles(inputs);
+    // Sort entries by filename for stable, alphabetical chevron order.
+    entries.sort((a, b) => a.filename.localeCompare(b.filename));
+
+    const activeEntry = activeFile
+      ? entries.find((e) => e.filename === activeFile.filename) ?? null
+      : null;
+
+    if (activeEntry) {
+      // C# top-level files use the bare "Run" label per spec — the
+      // file simply executes itself top-to-bottom.
+      const label =
+        activeEntry.kind === "topLevel"
+          ? "Run"
+          : `Run \`${stemFor(activeEntry.filename)}\``;
+      const dropdown = entries
+        .filter((e) => e.filename !== activeEntry.filename)
+        .map((e) => ({
+          label:
+            e.kind === "topLevel"
+              ? `Run \`${stemFor(e.filename)}\` (top-level)`
+              : `Run \`${stemFor(e.filename)}\``,
+          entryFilename: e.filename,
+        }));
+      return {
+        primaryLabel: label,
+        primaryEntry: activeEntry.filename,
+        dropdownItems: dropdown,
+      };
+    }
+
+    // Active file is not an entry point: fall back to primary, then
+    // first entry alphabetically.
+    if (entries.length === 0) {
+      // No entry points at all in the workspace — keep the button
+      // usable but unlabelled. The runtime will surface a compile
+      // error if the user clicks it.
+      return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
+    }
+    const primaryEntry =
+      entries.find((e) => e.filename === primary) ?? entries[0];
+    if (entries.length === 1) {
+      // Only one entry exists and the user isn't on it — show plain
+      // "Run" with no chevron per the spec, but still target that
+      // entry when clicked.
+      return {
+        primaryLabel: "Run",
+        primaryEntry: primaryEntry.filename,
+        dropdownItems: [],
+      };
+    }
+    const dropdown = entries
+      .filter((e) => e.filename !== primaryEntry.filename)
+      .map((e) => ({
+        label:
+          e.kind === "topLevel"
+            ? `Run \`${stemFor(e.filename)}\` (top-level)`
+            : `Run \`${stemFor(e.filename)}\``,
+        entryFilename: e.filename,
+      }));
+    return {
+      primaryLabel: `Run \`${stemFor(primaryEntry.filename)}\``,
+      primaryEntry: primaryEntry.filename,
+      dropdownItems: dropdown,
+    };
+  }
+
+  // Single-entry-point adapters (Python, R, JS, TS, PHP). Any file
+  // runs; the dropdown surfaces the canonical default file when it
+  // exists in the workspace and isn't currently active.
+  if (!activeFile) {
+    return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
+  }
+  const isActiveDefault =
+    primaryFile !== null && primaryFile.id === activeFile.id;
+  if (isActiveDefault || !primaryFile) {
+    // Active is the default file (or no default exists) — plain "Run".
+    return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
+  }
+  return {
+    primaryLabel: `Run \`${stemFor(activeFile.filename)}\``,
+    primaryEntry: null,
+    dropdownItems: [
+      {
+        label: `Run \`${stemFor(primaryFile.filename)}\``,
+        entryFilename: primaryFile.filename,
+      },
+    ],
+  };
 }
 
 // Plotly dark layout defaults applied to every chart when the user doesn't
@@ -1422,17 +1567,49 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, []);
 
   // ─── Actions ────────────────────────────────────────────────────────────
-  const runCode = useCallback(async () => {
+  const runCode = useCallback(
+    async (entryOverride?: string) => {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
     if (!editor || !rt) return;
-    const code = editor.state.doc.toString().trim();
-    if (!code) return;
     // Snapshot the active file id at run start: even if the user
     // switches tabs mid-run, the outputs should be routed to the file
     // whose code we actually executed.
     const targetFileId = activeFileIdRef.current;
     if (!targetFileId) return;
+
+    // Resolve the entry file (chevron picks override the active tab,
+    // otherwise the active tab is the entry). When the override
+    // points at a non-active file we read its content from the dirty
+    // buffer / OPFS instead of the live editor.
+    const activeFile =
+      filesRef.current.find((f) => f.id === targetFileId) ?? null;
+    const entryFilename = entryOverride ?? activeFile?.filename;
+    let code: string;
+    if (entryOverride && activeFile && entryOverride !== activeFile.filename) {
+      const entryFile = filesRef.current.find(
+        (f) => f.filename === entryOverride,
+      );
+      if (entryFile) {
+        const buffered = dirtyBuffersRef.current.get(entryFile.id);
+        if (buffered !== undefined) {
+          code = buffered;
+        } else if (workspaceIdRef.current) {
+          const text = await opfsReadFile(
+            workspaceIdRef.current,
+            entryFile.id,
+          );
+          code = text ?? "";
+        } else {
+          code = "";
+        }
+      } else {
+        code = "";
+      }
+    } else {
+      code = editor.state.doc.toString();
+    }
+    if (!code.trim()) return;
 
     setStatusState("running");
 
@@ -1468,7 +1645,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           });
         }
       }
-      await rt.run(code, (cell) => collected.push(cell));
+      await rt.run(
+        code,
+        (cell) => collected.push(cell),
+        entryFilename ? { entryFilename } : undefined,
+      );
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       setOutputsForFile(targetFileId, (prev) => [
         ...prev,
@@ -1513,7 +1694,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // user doesn't have to swipe back themselves.
       setMobileTab("output");
     }
-  }, [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
+  },
+  [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -1529,6 +1711,24 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setStatusState("ready");
     }
   }, [clearOutputsForFile, loaded]);
+
+  // Build a filename → content map covering every code tab so the Run
+  // button can detect entry-point declarations (`main`, `Main`,
+  // top-level statements) and produce the correct label / dropdown.
+  // Reads from `dirtyBuffers` so the label updates as the user types.
+  const fileContentsByPath = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const f of files) {
+      map.set(f.filename, dirtyBuffers.get(f.id) ?? "");
+    }
+    return map;
+  }, [files, dirtyBuffers]);
+
+  const runButtonState = useMemo(
+    () =>
+      computeRunButtonState(adapter, files, activeFileId, fileContentsByPath),
+    [adapter, files, activeFileId, fileContentsByPath],
+  );
 
   // ─── File tab management ────────────────────────────────────────────────
 
@@ -2002,8 +2202,78 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // Apply an example to the editor immediately. Use `requestExample` for
   // user-initiated picks so we can prompt before discarding work.
+  // Multi-file examples (`ex.files` set) replace the entire workspace
+  // file set: the entry file gets `ex.code` and each extra file is
+  // staged as a sibling tab. Single-file examples (no `ex.files`) keep
+  // the legacy behaviour of replacing only the active editor's
+  // contents.
   const applyExample = useCallback(
     (ex: ExampleSnippet) => {
+      if (ex.files && ex.files.length > 0) {
+        // Multi-file: rebuild the workspace's file list. Compute the
+        // entry filename (defaults to the adapter's canonical primary)
+        // and use it as the active tab.
+        const entryFilename =
+          ex.entryFilename ?? primaryEntryFilename(adapter);
+        // Wipe any OPFS copies of the previous file set so the new
+        // example starts from a clean slate. We intentionally keep
+        // the workspace id stable so the URL doesn't change.
+        const wsId = workspaceIdRef.current;
+        if (wsId) {
+          for (const f of filesRef.current) {
+            void opfsDeleteFile(wsId, f.id);
+          }
+        }
+        const entryFile: PlaygroundFile = {
+          id: newFileId(),
+          filename: entryFilename,
+          pristineFilename: entryFilename,
+        };
+        const extraFiles: PlaygroundFile[] = ex.files.map((ef) => ({
+          id: newFileId(),
+          filename: ef.filename,
+          pristineFilename: ef.filename,
+        }));
+        const newFiles = [entryFile, ...extraFiles];
+
+        // Seed every file's dirty buffer + OPFS copy with its example
+        // content so reloads / tab switches show the correct text.
+        updateDirtyBuffer(entryFile.id, ex.code);
+        if (wsId) void opfsWriteFile(wsId, entryFile.id, ex.code);
+        for (let i = 0; i < ex.files.length; i++) {
+          const ef = ex.files[i];
+          const f = extraFiles[i];
+          updateDirtyBuffer(f.id, ef.content);
+          if (wsId) void opfsWriteFile(wsId, f.id, ef.content);
+        }
+
+        setFiles(newFiles);
+        filesRef.current = newFiles;
+        setActiveFileId(entryFile.id);
+        setActiveTabId(entryFile.id);
+        activeFileIdRef.current = entryFile.id;
+
+        // Replace the editor doc with the entry file's code now that
+        // the active file points at the entry tab.
+        const view = editorRef.current;
+        if (view) {
+          suppressPersistRef.current = true;
+          try {
+            view.dispatch({
+              changes: { from: 0, to: view.state.doc.length, insert: ex.code },
+            });
+          } finally {
+            suppressPersistRef.current = false;
+          }
+          view.focus();
+        }
+        setMobileTab(MOBILE_EDITOR_TAB);
+        showToast(`Loaded ${ex.title} (${newFiles.length} files).`);
+        return;
+      }
+
+      // Single-file fallback: drop new content into the active editor
+      // without disturbing other tabs.
       const view = editorRef.current;
       if (view) {
         view.dispatch({
@@ -2014,7 +2284,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setMobileTab(MOBILE_EDITOR_TAB);
       showToast(`Loaded ${ex.title} in the editor.`);
     },
-    [showToast],
+    [
+      adapter,
+      setActiveFileId,
+      setActiveTabId,
+      setFiles,
+      showToast,
+      updateDirtyBuffer,
+    ],
   );
 
   const requestExample = useCallback(
@@ -3232,23 +3509,81 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span className="kbd-plus" aria-hidden="true">+</span>
                 <kbd className="kbd">Enter</kbd>
               </span>
-              <button
-                type="button"
-                className={`run-btn${statusState === "running" ? " running" : ""}`}
-                disabled={!loaded || statusState === "running"}
-                onClick={() => {
-                  void runCode();
-                }}
+              <div
+                className={`pg-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}`}
               >
-                {statusState === "running" ? (
-                  <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                    <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
-                  </svg>
-                ) : (
-                  <Play size={10} aria-hidden="true" />
+                <Popover.Root>
+                  <Popover.Trigger
+                    render={(props) => (
+                      <button
+                        {...props}
+                        type="button"
+                        className={`run-btn pg-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
+                        disabled={!loaded || statusState === "running"}
+                        onClick={() => {
+                          void runCode(runButtonState.primaryEntry ?? undefined);
+                        }}
+                      >
+                        {statusState === "running" ? (
+                          <svg viewBox="0 0 12 12" className="run-btn-spinner">
+                            <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
+                          </svg>
+                        ) : (
+                          <Play size={10} aria-hidden="true" />
+                        )}
+                        <span className="pg-run-multi-label">
+                          {statusState === "running"
+                            ? "Running…"
+                            : runButtonState.primaryLabel}
+                        </span>
+                      </button>
+                    )}
+                  />
+                  {/* Hover popover that surfaces the full label when the
+                      button truncates with an ellipsis. */}
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6}>
+                      <Popover.Popup className="bui-popup pane-btn-popover">
+                        {runButtonState.primaryLabel}
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+                {runButtonState.dropdownItems.length > 0 && (
+                  <Menu.Root>
+                    <Menu.Trigger
+                      render={(props) => (
+                        <button
+                          {...props}
+                          type="button"
+                          className={`run-btn pg-run-multi-chevron${statusState === "running" ? " running" : ""}`}
+                          disabled={!loaded || statusState === "running"}
+                          aria-label="More run options"
+                        >
+                          <ChevronDown size={12} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={6} align="end">
+                        <Menu.Popup className="bui-popup pg-run-multi-dropdown">
+                          {runButtonState.dropdownItems.map((item) => (
+                            <Menu.Item
+                              key={item.entryFilename}
+                              className="pg-run-multi-item"
+                              onClick={() => {
+                                void runCode(item.entryFilename);
+                              }}
+                            >
+                              {item.label}
+                            </Menu.Item>
+                          ))}
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.Root>
                 )}
-                {statusState === "running" ? "Running…" : "Run"}
-              </button>
+              </div>
             </div>
             <div
               className="editor-wrap"

@@ -531,8 +531,6 @@ export const cAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "c",
-  entryPoint: "main.c",
-  primaryEntryFilename: "main.c",
   findEntryFiles(files): EntryFileInfo[] {
     const out: EntryFileInfo[] = [];
     for (const f of files) {

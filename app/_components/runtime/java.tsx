@@ -682,8 +682,6 @@ export const javaAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "Main",
   defaultFileExtension: "java",
-  entryPoint: "Main.java",
-  primaryEntryFilename: "Main.java",
   findEntryFiles(files): EntryFileInfo[] {
     const out: EntryFileInfo[] = [];
     for (const f of files) {

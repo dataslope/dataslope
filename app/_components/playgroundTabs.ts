@@ -24,15 +24,24 @@ export interface PlaygroundFile {
   pristineFilename: string;
 }
 
+/** Convenience: the canonical "primary" filename for a workspace —
+ *  `${exportBaseFilename}.${defaultFileExtension}`. Used as the
+ *  default file in fresh workspaces and (for non-multi-entry
+ *  languages) as the file shown in the Run dropdown when the user
+ *  is on a non-default tab. */
+export function primaryEntryFilename(adapter: LanguageAdapter): string {
+  const base = adapter.exportBaseFilename || "main";
+  const ext = adapter.defaultFileExtension || "txt";
+  return `${base}.${ext}`;
+}
+
 export function newFileId(): string {
   return `f_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
 /** Default initial file set for a freshly-created workspace. */
 export function defaultFiles(adapter: LanguageAdapter): PlaygroundFile[] {
-  const base = adapter.exportBaseFilename || "main";
-  const ext = adapter.defaultFileExtension || "txt";
-  const filename = `${base}.${ext}`;
+  const filename = primaryEntryFilename(adapter);
   return [
     { id: newFileId(), filename, pristineFilename: filename },
   ];

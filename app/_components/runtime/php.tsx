@@ -269,7 +269,6 @@ export const phpAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "index",
   defaultFileExtension: "php",
-  entryPoint: "index.php",
   packagesFooter: (
     <>
       Functions above are part of the{" "}
