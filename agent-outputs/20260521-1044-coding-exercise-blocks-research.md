@@ -635,11 +635,11 @@ Based on the research, the following implementation patterns are most relevant f
    - `language`: `python` | `sql-sqlite` | `sql-duckdb` | `sql-postgres`
    - `preExerciseCode`: Sets up tables/data before exercise
    - `starterCode`: What the user sees initially
-   - `solution`: Reference solution (hidden)
+   - `solutionCode`: Optional reference solution (shown on demand via "Show Solution" button)
    - `testCode`: SCT-style test code that runs after user code
-   - `hints`: Array of progressive hint strings
    - `schemaPreview`: Table schema shown in sidebar
    - `runButton` / `checkButton`: Separate execution modes
+   - *No `hints` field* — learners are expected to use LLMs for help
 
 ---
 
@@ -657,7 +657,46 @@ Based on the research, the following implementation patterns are most relevant f
 
 ## dataslope-Specific Design Decisions
 
-This section documents design decisions specific to the dataslope exercise block implementation, covering WebAssembly runtimes, SQL database initialisation, hint strategy, solution reveal, file structure, and input handling.
+This section documents design decisions specific to the dataslope exercise block implementation, covering business model, WebAssembly runtimes, SQL database initialisation, hint strategy, solution reveal, file structure, and input handling.
+
+---
+
+### Business Model and Access
+
+dataslope's learning content is **completely free and requires no login.** All exercises, lessons, and reference material are accessible to guests without an account.
+
+This has several direct consequences for the exercise block architecture:
+
+- **No authentication checks.** Exercise blocks do not call an API to validate a session token before running code. All execution happens client-side via WASM runtimes, so there is nothing to gate behind a login wall.
+- **No server-side progress tracking (initially).** Because users are guests, there is no user record to associate progress with. Progress state (e.g., which exercises have been completed) can be stored in `localStorage` for continuity within a single browser, but it is not synced to a server.
+- **No per-user exercise quotas.** Server-based platforms (LeetCode, HackerRank) can limit submissions to control infrastructure costs. Because dataslope runs all code in the browser, there is no per-submission cost — learners can run exercises as many times as they like.
+- **No email capture or upsell modals.** Guest access is a first-class experience, not a degraded free tier used to funnel sign-ups.
+
+#### Future monetisation
+
+Monetisation may be introduced later through two mechanisms, neither of which breaks the free-guest model:
+
+1. **Advertising**: Display ads shown to guests on exercise/lesson pages (analogous to SQLZoo's ad-supported model). Ad revenue funds infrastructure (CDN, domain, dataset hosting) without charging learners.
+
+2. **Paid-member AI features**: Optional features that require an account and a subscription, such as:
+   - **AI-assisted coding**: An AI copilot inside the exercise editor that can explain errors, suggest next steps, or generate code snippets on request.
+   - **AI-assisted debugging**: An AI that analyses the learner's failing test output and provides a targeted explanation of what went wrong and how to fix it.
+   - **AI code review**: After passing the tests, an AI that critiques the learner's solution for style, efficiency, or best practices.
+
+   These features sit on top of the free exercise experience — they do not restrict access to exercises themselves. A non-paying guest can always run exercises and see test results; they just won't have the AI layer.
+
+#### Comparison to other platforms
+
+| Platform | Guest access | Login required | Free tier |
+|---|---|---|---|
+| **dataslope** | ✅ Full access | ❌ Never required | ✅ All content |
+| SQLZoo | ✅ Full access | ❌ | ✅ Ad-supported |
+| Exercism | ✅ Most content | ✅ For submission/mentoring | ✅ All exercises |
+| LeetCode | ✅ ~1,800 problems | ✅ For submission | ⚠️ Limited |
+| DataCamp | ⚠️ Very limited | ✅ Required | ⚠️ Very limited |
+| Codecademy | ⚠️ Some courses | ✅ Required | ⚠️ Limited |
+
+dataslope most closely resembles **SQLZoo** in its access model (fully free, guest-first, ad-supported), but with a broader language scope and a richer in-browser execution architecture.
 
 ---
 
