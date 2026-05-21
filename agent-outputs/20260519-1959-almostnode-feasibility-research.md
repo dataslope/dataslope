@@ -2,8 +2,14 @@
 ## Replacing the JS/TS Playground Runtimes with almostnode for Multi-File Module Resolution
 
 **Date:** 2026-05-19  
-**Status:** Research Complete — Implementation-Ready  
+**Status:** Phases 1–2 implemented (multi-file JS/TS runtime swap landed)  
 **Repo context:** `dataslope/dataslope`
+
+> **Update 2026-05-21:** The JavaScript and TypeScript playgrounds have
+> been migrated to almostnode in-place (no separate `*-v2` IDs). See
+> §8 *Implementation Notes (2026-05-21)* at the bottom of this document
+> for what shipped, the gotchas encountered, and the remaining
+> follow-ups for the next coding agent.
 
 ---
 
@@ -841,3 +847,245 @@ No conflicts between service workers exist as long as all routing logic is co-lo
 The basic JS/TS runtime replacement (Phases 1–3) is low-risk, high-value, and directly enables multi-file module resolution and npm package support that the current `AsyncFunction`-based workers fundamentally cannot provide. Phases 5–6 (dev server playgrounds) should be treated as separate feature work once the core runtime migration is proven stable.
 
 The most important prerequisite before Phase 1 begins is: **deploy the cross-origin sandbox** (`generateSandboxFiles()` → Vercel or equivalent). This is a one-time infrastructure task that unblocks the secure execution path for all future phases.
+
+---
+
+## 8. Implementation Notes (2026-05-21)
+
+This section documents the actual migration that landed in commit on
+branch `claude/almostnode-playground-runtime-rZD9D`. The task was to
+**replace** the existing JS/TS playground runtimes with almostnode
+in-place (no `*-v2` IDs) and ship multi-file support with shimmed
+Node.js modules. Phases 0 (CORS proxy SW), 4 (cross-origin sandbox), 5
+(dev servers), and 6 (legacy cleanup of files that were already removed)
+remain untouched and are described in §6.6.
+
+### 8.1 What shipped
+
+| File | Change |
+|---|---|
+| `package.json` | Added `almostnode@^0.2.14` to `dependencies`; chained `node scripts/patch-almostnode.mjs` onto the `postinstall` script after `fumadocs-mdx`. |
+| `scripts/patch-almostnode.mjs` | New — see §8.3. Rewrites a hard-coded server-absolute asset URL inside `almostnode/dist/index.{mjs,cjs}` so Next.js / Turbopack can resolve it. |
+| `app/_components/runtime/almostnode-worker-shared.ts` | New — shared helpers (`stageFiles`, `wrapEntryAsAsyncIIFE`, `runEntry`, `formatArg`, `normalizeVfsPath`) used by both worker bundles. |
+| `app/_components/runtime/javascript-worker.ts` | **Replaced** in place. Drops `AsyncFunction`; spawns an almostnode `VirtualFS` + `Runtime`, stages files via a `prepare-fs` message, executes the entry file via `runFileAsync`. |
+| `app/_components/runtime/typescript-worker.ts` | **Replaced** in place. Transpiles every staged `.ts`/`.tsx`/`.mts`/`.cts` file to `.js` with the bundled TypeScript compiler (CJS emit), then hands the staged JS off to the same almostnode runner. |
+| `app/_components/runtime/javascript.tsx` | Adapter now implements `prepareFileSystem` and posts `prepare-fs` before `run`. Updated `runtimeInfo`, `packagesFooter`, and `importSnippet` (`const x = require("x");`). New `node_modules` and `multi_file` examples were added; the rest of the canonical examples are preserved. |
+| `app/_components/runtime/typescript.tsx` | Same shape as `javascript.tsx`; uses ESM-style `importSnippet` (`import * as x from "x";`) but `hasImport` accepts either ESM or CJS forms so duplicate-insert detection stays robust. New `node_modules` and `multi_file` examples added. |
+
+The public `LanguageAdapter` IDs remain `"javascript"` and `"typescript"`
+— routes (`/playground/javascript`, `/playground/typescript`) and
+workspace localStorage keys are untouched.
+
+### 8.2 Architecture as it landed
+
+```
+LanguageAdapter (javascript.tsx | typescript.tsx)
+    │  init() ─────────► new Worker(new URL("./{javascript|typescript}-worker.ts", import.meta.url))
+    │  prepareFileSystem(files) ─► postMessage("prepare-fs")
+    │  run(code, emit)            ─► postMessage("run", entryPath)
+    ▼
+Worker (javascript-worker.ts | typescript-worker.ts)
+    │  on "prepare-fs": vfs = stageFiles(files [+ transpile .ts→.js])
+    │  on "run":
+    │    1. read entry file from VFS (fallback: inline `code` arg)
+    │    2. wrap in `module.exports = (async () => { ... })()`
+    │    3. new Runtime(vfs, { onConsole: stream-out })
+    │    4. await runtime.runFileAsync(entryVfsPath)
+    │    5. await module.exports (the wrapper promise) so top-level
+    │       `await` resolves before "done" is posted
+    ▼
+almostnode { VirtualFS, Runtime } (loaded via the same-origin Web Worker)
+```
+
+Console output is captured by passing `onConsole: (method, args) => …`
+to the `Runtime` constructor. `warn`/`error` are routed to stderr cells;
+everything else (`log`/`info`/`debug`/`dir`/`table`) lands on stdout —
+matching the legacy worker's mapping exactly.
+
+### 8.3 Build-time gotcha: hard-coded asset URL in `almostnode/dist/index.mjs`
+
+`almostnode@0.2.14` ships a bundled `index.mjs` whose internal
+`WorkerRuntime` constructor reads:
+
+```js
+this.worker = new Worker(
+  new URL("/assets/runtime-worker-D6Dmsis4.js", import.meta.url),
+  { type: "module" },
+);
+```
+
+The leading-slash URL assumes the bundle is served from an HTTP origin
+that exposes `node_modules` at root — the Vite dev-server setup the
+library was authored against. Under Next.js 16 / Turbopack, the URL
+resolves to the filesystem root and the build aborts with
+`Module not found: Can't resolve '/assets/runtime-worker-D6Dmsis4.js'`.
+
+The migrated playground never instantiates `WorkerRuntime` (the
+LanguageAdapter contract already provides its own dedicated Web Worker,
+and almostnode's `Runtime` runs inside that worker on the main JS
+thread). But Turbopack performs static URL analysis on every
+`new URL(…, import.meta.url)` in `index.mjs` regardless of dead-code,
+so the bad string had to disappear from the bundle.
+
+**Fix:** A small post-install patch (`scripts/patch-almostnode.mjs`)
+rewrites the URL from `"/assets/runtime-worker-…"` → `"./assets/runtime-
+worker-…"`. The asset itself lives at
+`node_modules/almostnode/dist/assets/runtime-worker-D6Dmsis4.js`, which
+is exactly what the corrected relative URL resolves to. The patch is
+idempotent (regex skips already-rewritten files) and runs on every
+`npm install`, so fresh CI checkouts get a working build automatically.
+
+Upstream fix: filed as a follow-up in §8.6.
+
+### 8.4 Top-level `await` and the IIFE wrapper
+
+The legacy runtime executed user code via `new AsyncFunction(code)`, so
+top-level `await` (used by the canonical async examples) just worked.
+almostnode's `Runtime`, in contrast, wraps each module in a synchronous
+CommonJS shell, so top-level `await` is a hard syntax error.
+
+To preserve the existing semantics without forcing users to learn a new
+contract, **the entry file is rewritten before execution** so its body
+runs inside an async IIFE assigned to `module.exports`:
+
+```js
+module.exports = (async () => {
+  <user code>
+})();
+```
+
+The runner then `await`s `result.exports` (the IIFE's promise) before
+posting `done` — guaranteeing async work flushes its console output and
+that thrown errors reach stderr before the cell is marked complete.
+
+This transform applies **only to the entry file**, not to `require()`d
+modules. A user `require("./utils.js")` still gets the original CJS
+semantics of `utils.js`. The transform is a no-op for synchronous
+entry-file code.
+
+### 8.5 TypeScript: pre-transpile to `.js` before staging
+
+almostnode's resolver tries the file extensions `.js`, `.json`, and
+`.node` only — it has no `.ts` awareness. The library mentions
+TypeScript support in its README ("First-class TypeScript/TSX
+transformation via esbuild-wasm"), but inspection of `dist/runtime.mjs`
+shows the esbuild path is only wired into the *npm install* transformer
+(`src/transform.ts`) and depends on `typeof window !== 'undefined'`,
+which is false in a dedicated Web Worker.
+
+To keep the worker self-contained (no `window` polyfill, no
+network-fetched WASM at run time) the TypeScript adapter transpiles
+every `.ts`/`.tsx`/`.mts`/`.cts` file with the already-bundled
+`typescript` package, then writes the result to its `.js`-suffixed
+sibling path in VFS. The original `.ts` path is **not** also written,
+which avoids two competing copies of the same module under different
+extensions confusing the resolver.
+
+`require("./utils")` (no extension) resolves to `./utils.js` exactly as
+it would in Node. `require("./utils.ts")` (with extension) will **not**
+resolve — a small papercut documented in the new `multi_file` example
+in `typescript.tsx`.
+
+Diagnostics emitted by `ts.transpileModule` are buffered during
+`prepare-fs` and replayed as stderr cells at the start of the next
+`run`, so users see compile errors next to the failed execution.
+
+### 8.6 Remaining work / follow-ups for the next coding agent
+
+The scope of this task was strictly the runtime swap. Several items
+from §6 of the original research remain on the table — they were either
+called out explicitly as out-of-scope or are *enabled by* the swap but
+not part of it:
+
+1. **npm package installation in the packages drawer.** Both adapters
+   ship `PACKAGES: PackageInfo[] = []`, so the Packages button is
+   still hidden (the existing e2e tests assert this). Wiring the
+   drawer to `container.npm.install(name)` and persisting the resulting
+   `node_modules/` tree via `vfs.toSnapshot()` → OPFS is Phase 3 of
+   §6.6.
+
+2. **VFS snapshot persistence.** The current implementation creates a
+   fresh `VirtualFS` on every `prepare-fs` call. That's intentional for
+   correctness (deletions in the file pane propagate cleanly) but it
+   means any installed npm packages would be discarded between runs.
+   Phase 3 must persist the snapshot per workspace before npm install
+   is usable.
+
+3. **CORS proxy service worker (Phase 0 in §6.6).** Independent of
+   almostnode. The Cloudflare Worker already exists at
+   `cloudflare-cors-proxy/` and is deploy-ready. The remaining bullets
+   under §6.6's *Phase 0* checklist (deploying it, wiring
+   `NEXT_PUBLIC_CORS_PROXY_URL`, adding the root-scope `__sw__.js`,
+   monkey-patching `fetch` inside each runtime worker) still need to
+   land for outbound HTTP requests from playground code to reach
+   non-CORS-friendly APIs.
+
+4. **Cross-origin sandbox deployment.** The current implementation
+   runs almostnode's `Runtime` directly inside the existing same-origin
+   Web Worker (`new Runtime(vfs, …)`, *not* `createRuntime(vfs, {
+   sandbox: … })`). This matches the prior security level of the legacy
+   `AsyncFunction` worker, but does not improve it. For user-supplied
+   code, deploying the sandbox to a separate origin (Phase 4) and
+   switching the adapter to `createRuntime({ sandbox: "https://…" })`
+   is the right next step.
+
+5. **Unit tests for the new runtime.**
+   `__tests__/javascript.test.ts` and `__tests__/typescript.test.ts`
+   still verify the *legacy* `AsyncFunction`-based execution model by
+   re-implementing it inline — they don't exercise the new worker code
+   path. The tests are passing as legacy-semantics reference checks
+   but no longer test the production runtime. Either:
+   - mock the `almostnode` module and write integration tests that
+     drive `JavaScriptWorkerRuntime.prepareFileSystem` +
+     `JavaScriptWorkerRuntime.run` through a fake `Worker`; or
+   - rely on the Playwright e2e suite at `e2e/playgrounds.spec.ts`
+     (which exercises the real adapter end-to-end) and drop the
+     vitest re-implementations as historical artefacts.
+
+6. **Upstream fix for the asset URL bug.** The post-install patch in
+   `scripts/patch-almostnode.mjs` is a workaround. Filing a PR against
+   [macaly/almostnode](https://github.com/macaly/almostnode) to ship
+   relative asset URLs (`./assets/...`) in the prebuilt bundle is the
+   permanent fix. Once a patched almostnode release is consumed, the
+   post-install hook can be removed.
+
+7. **Dynamic `require(variable)` of `.ts` paths.** Documented gotcha:
+   `require("./utils.ts")` (explicit `.ts`) will not resolve in the TS
+   playground because the staged file is `./utils.js`. A future
+   refinement could double-stage each TS file under both its `.ts` and
+   `.js` paths so explicit-extension requires keep working.
+
+### 8.7 Validation performed
+
+| Check | Command | Result |
+|---|---|---|
+| TypeScript compile | `npx tsc --noEmit` | ✅ clean (0 errors) |
+| Unit tests | `npm run test` | ✅ 221 passed across 9 files |
+| Lint (new files) | `npm run lint` | ✅ no new errors (one pre-existing `no-assign-module-variable` in `php-worker.ts` is unrelated) |
+| Production build | `npm run build` | ✅ compiles in ~3 min, all 29 static pages generated, including `/playground/javascript` and `/playground/typescript` |
+| E2E suite | `npm run test:e2e` | ⚠️ not executed in this environment — see §8.6 item 5. The Playwright suite at `e2e/playgrounds.spec.ts` is the authoritative end-to-end check and should be run before merging. |
+
+### 8.8 Known regressions / behavioural changes for users
+
+These are intentional consequences of the runtime swap that users may
+notice:
+
+- **`import`/`export` syntax at the top of the entry file** now goes
+  through the wrapping IIFE. In the TypeScript playground, the TS
+  compiler downlevels ES module syntax to `require()`/`module.exports`
+  before wrapping — so `import lodash from "lodash"` Just Works. In the
+  raw JavaScript playground, top-level `import` is *not* available
+  (the entry file is plain CJS); users should write
+  `const lodash = require("lodash")` instead. The JS adapter's
+  `importSnippet` now generates the `require` form to nudge users in
+  the right direction.
+- **Module-level `module.exports = X` in the entry file is
+  overwritten** by the IIFE wrapper. The entry file is a script, not a
+  library — this matters in practice for nobody.
+- **`console.log`/`info`/`debug` output now batches per-call.** The
+  legacy runtime buffered all output until the run finished, then
+  flushed it as a single stdout cell. almostnode's `onConsole` fires
+  per-call, so a long-running script with many `console.log`s now
+  produces many small cells. This is closer to a real-Node interactive
+  REPL feel; if the old batched-output behaviour is preferred, the
+  worker's `runEntry` helper can buffer with a debounced flush.

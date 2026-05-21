@@ -7,13 +7,16 @@ import type {
 } from "../types";
 import { getWebFmt } from "./webFmt";
 
-// TypeScript runs in a dedicated Web Worker (typescript-worker.ts) that:
-//   1. Imports the official TypeScript compiler and transpiles the user's
-//      source to ES2022 JavaScript via `transpileModule`.
-//   2. Executes the resulting JS via `AsyncFunction` (top-level await works).
+// TypeScript runs in a dedicated Web Worker (typescript-worker.ts):
+//   1. Every .ts/.tsx file in the workspace is transpiled to JavaScript
+//      via the official TypeScript compiler.
+//   2. The transpiled .js files are staged into almostnode's VirtualFS.
+//   3. almostnode's Runtime executes the entry file with CommonJS
+//      semantics, so require()/module.exports across files Just Works.
 //
-// Moving both steps to a worker keeps the ~10MB compiler bundle off the
-// main thread and ensures heavy transpilation / execution never blocks the UI.
+// almostnode's resolver doesn't recognise .ts paths, so we do the
+// transpile-then-stage dance ourselves rather than handing raw .ts to
+// the runtime.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -143,6 +146,43 @@ console.log(\`\\nTotal wall time: \${elapsed}ms (parallel)\`);
 `,
   },
   {
+    key: "node_modules",
+    title: "Node.js Modules",
+    desc: "Typed access to crypto, path, os",
+    code: `// almostnode shims Node.js core modules. We import via require()
+// so types come from declaration merging at runtime — the TS compiler
+// emits this exactly as written.
+const path: typeof import("node:path") = require("node:path");
+const crypto: typeof import("node:crypto") = require("node:crypto");
+const os: typeof import("node:os") = require("node:os");
+
+console.log("join =>", path.join("/users", "ada", "notes.txt"));
+console.log("basename =>", path.basename("/users/ada/notes.txt"));
+
+const hash: string = crypto.createHash("sha256").update("hello").digest("hex");
+console.log("sha256('hello') =>", hash);
+
+console.log("platform =>", os.platform());
+`,
+  },
+  {
+    key: "multi_file",
+    title: "Multi-File Modules",
+    desc: "Split logic across .ts files",
+    code: `// Add another tab named "utils.ts" with the contents:
+//
+//   export const greet = (name: string): string => \`Hello, \${name}!\`;
+//   export const shout = (s: string): string => s.toUpperCase() + "!";
+//
+// then run this file — TypeScript's CommonJS emit resolves the import
+// through almostnode's VirtualFS.
+import { greet, shout } from "./utils";
+
+console.log(greet("almostnode"));
+console.log(shout("multi-file TypeScript just works"));
+`,
+  },
+  {
     key: "utility_types",
     title: "Utility Types",
     desc: "Pick / Omit / Record in action",
@@ -180,15 +220,16 @@ console.log(JSON.stringify(safe[1], null, 2));
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // TypeScript is transpiled in-browser by the official TypeScript
-  // compiler, then executed natively. All standard browser globals
-  // (console, Math, Date, Promise, fetch, etc.) are always available
-  // without any import statement, so there are no packages to list here.
+  // npm package installation through the packages drawer is a future
+  // feature. Node.js core modules (fs, path, crypto, …) are reachable
+  // via require() out of the box thanks to almostnode's shims.
 ];
 
 type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
+  | { kind: "prepare-fs-done"; id: number }
+  | { kind: "prepare-fs-error"; id: number; message: string }
   | { kind: "stdout"; id: number; content: string }
   | { kind: "stderr"; id: number; content: string }
   | { kind: "done"; id: number };
@@ -196,6 +237,26 @@ type WorkerOutMessage =
 class TypeScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
   constructor(private worker: Worker) {}
+
+  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    const id = ++this.nextId;
+    const payload: Array<[string, Uint8Array]> = [];
+    for (const [path, bytes] of files) payload.push([path, bytes]);
+    return new Promise<void>((resolve, reject) => {
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "prepare-fs-done" && msg.kind !== "prepare-fs-error") {
+          return;
+        }
+        if (msg.id !== id) return;
+        this.worker.removeEventListener("message", onMessage);
+        if (msg.kind === "prepare-fs-done") resolve();
+        else reject(new Error(msg.message));
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({ kind: "prepare-fs", id, files: payload });
+    });
+  }
 
   async run(code: string, emit: EmitOutput): Promise<void> {
     const id = ++this.nextId;
@@ -212,7 +273,12 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
         }
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code });
+      this.worker.postMessage({
+        kind: "run",
+        id,
+        code,
+        entryPath: "index.ts",
+      });
     });
   }
 }
@@ -226,13 +292,12 @@ export const typescriptAdapter: LanguageAdapter = {
   runtimeInfo: {
     language: "TypeScript",
     version: "5.7",
-    engine: "TypeScript compiler (in-browser) + native JS",
-    engineUrl: "https://www.typescriptlang.org/",
+    engine: "TypeScript 5.7 → almostnode (browser-native Node.js)",
+    engineUrl: "https://almostnode.dev/",
     notes:
-      "Your code is transpiled and executed in a Web Worker using the official TypeScript compiler — the UI stays responsive while your code runs.",
+      "Code is transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
   },
-  // The JS CodeMirror mode handles TypeScript via a typescript flag —
-  // CodeMirror v5 exposes that as the `text/typescript` MIME alias.
+  // CodeMirror v5 exposes TypeScript via the `text/typescript` MIME alias.
   codeMirrorMode: "text/typescript",
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -247,20 +312,30 @@ export const typescriptAdapter: LanguageAdapter = {
       Code is transpiled in-browser by the official{" "}
       <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer">
         TypeScript compiler
+      </a>{" "}
+      and executed by{" "}
+      <a href="https://almostnode.dev/" target="_blank" rel="noreferrer">
+        almostnode
       </a>
-      , then executed natively. Type-checking is{" "}
-      <em>syntactic-only</em> (the equivalent of{" "}
+      . Type-checking is <em>syntactic-only</em> (the equivalent of{" "}
       <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
         tsc --isolatedModules
       </code>
       ), so cross-file type errors aren&apos;t reported.
     </>
   ),
-  importSnippet: (name) => `// ${name} is a built-in global — no import needed.`,
+  importSnippet: (name) => `import * as ${name} from "${name}";`,
   hasImport(code, name) {
-    return code.includes(
-      `// ${name} is a built-in global — no import needed.`,
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Match either an ES `import ... from "name"` or a CJS
+    // `require("name")` so users with either style aren't pestered.
+    const importRe = new RegExp(
+      `(^|\\n)\\s*import[^;]*from\\s*["'\`]${escapedName}["'\`]`,
     );
+    const requireRe = new RegExp(
+      `require\\(\\s*["'\`]${escapedName}["'\`]\\s*\\)`,
+    );
+    return importRe.test(code) || requireRe.test(code);
   },
   async formatCode(code: string): Promise<string> {
     const { format } = await getWebFmt();

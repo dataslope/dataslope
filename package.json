@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "fumadocs-mdx && next dev",
     "build": "fumadocs-mdx && next build",
-    "postinstall": "fumadocs-mdx",
+    "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
@@ -43,6 +43,7 @@
     "@wasm-fmt/ruff_fmt": "^0.15.12",
     "@wasm-fmt/web_fmt": "^0.2.9",
     "@xyflow/react": "^12.10.2",
+    "almostnode": "^0.2.14",
     "apache-arrow": "^21.1.0",
     "elkjs": "^0.11.1",
     "fumadocs-core": "^16.8.5",
