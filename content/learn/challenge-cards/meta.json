@@ -1,19 +1,21 @@
 {
-  "title": "Learn",
+  "title": "Challenge Cards",
   "pages": [
     "index",
     "---",
     "python",
-    "r",
     "javascript",
     "typescript",
+    "r",
     "php",
+    "---",
     "c",
     "cpp",
     "java",
     "csharp",
     "---",
-    "challenge-cards",
-    "mermaid-test"
+    "sqlite",
+    "duckdb",
+    "postgres"
   ]
 }

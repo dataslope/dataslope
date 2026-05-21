@@ -1,0 +1,292 @@
+---
+title: Challenge Cards — PHP
+description: Sandbox for `<ChallengeCard>` PHP variations.
+---
+
+PHP challenges run via **php-wasm** in your browser. Test bodies are
+inlined inside a `try { ... } catch (\Throwable $e) { ... }` block, so
+they can see file-scope variables defined by the learner's code.
+
+## 1. Function definition
+
+<ChallengeCard
+  adapter="php"
+  title="Greeting function"
+  category="functions · strings"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Define a function <code>greet($name)</code> that returns the
+      string <code>"Hello, NAME!"</code> with <code>NAME</code>{' '}
+      replaced by the argument.
+    </p>
+  </>}
+  initialCode={`<?php
+function greet($name) {
+    // your code here
+    return "";
+}
+
+echo greet("World") . "\\n";
+`}
+  solutionCode={`<?php
+function greet(string $name): string {
+    return "Hello, $name!";
+}
+
+echo greet("Ada") . "\\n";
+echo greet("Linus") . "\\n";
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Greeting with name",
+      description: `greet("Ada") returns "Hello, Ada!"`,
+      code: `if (greet("Ada") !== "Hello, Ada!") throw new Exception("expected 'Hello, Ada!'");`,
+    },
+    {
+      id: "empty",
+      name: "Empty name",
+      description: `greet("") returns "Hello, !"`,
+      code: `if (greet("") !== "Hello, !") throw new Exception("expected 'Hello, !'");`,
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="php"
+  title="Greeting function"
+  category="functions · strings"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Define a function <code>greet($name)</code> that returns the
+      string <code>"Hello, NAME!"</code> with <code>NAME</code>{' '}
+      replaced by the argument.
+    </p>
+  </>}
+  initialCode={`<?php
+function greet($name) {
+    // your code here
+    return "";
+}
+
+echo greet("World") . "\\n";
+`}
+  solutionCode={`<?php
+function greet(string $name): string {
+    return "Hello, $name!";
+}
+
+echo greet("Ada") . "\\n";
+echo greet("Linus") . "\\n";
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Greeting with name",
+      description: `greet("Ada") returns "Hello, Ada!"`,
+      code: `if (greet("Ada") !== "Hello, Ada!") throw new Exception("expected 'Hello, Ada!'");`,
+    },
+    {
+      id: "empty",
+      name: "Empty name",
+      description: `greet("") returns "Hello, !"`,
+      code: `if (greet("") !== "Hello, !") throw new Exception("expected 'Hello, !'");`,
+    },
+  ]}
+/>
+```
+
+## 2. Array transformation
+
+<ChallengeCard
+  adapter="php"
+  title="Sum prices for in-stock items"
+  category="arrays · array_filter · array_sum"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Given the <code>$items</code> array of associative arrays, compute
+      the sum of <code>price</code> across all items where{' '}
+      <code>in_stock</code> is true. Assign the result to{' '}
+      <code>$total</code>.
+    </p>
+  </>}
+  initCode={`<?php
+$items = [
+    ["name" => "A", "price" => 10.0, "in_stock" => true],
+    ["name" => "B", "price" => 15.5, "in_stock" => false],
+    ["name" => "C", "price" => 7.25, "in_stock" => true],
+    ["name" => "D", "price" => 12.0, "in_stock" => true],
+];
+`}
+  initialCode={`<?php
+$total = 0; // TODO
+
+echo $total;
+`}
+  solutionCode={`<?php
+$items = [
+    ["name" => "Apple",  "price" => 1.20, "in_stock" => true],
+    ["name" => "Bread",  "price" => 3.50, "in_stock" => false],
+    ["name" => "Cheese", "price" => 5.00, "in_stock" => true],
+];
+
+$total = 0.0;
+foreach ($items as $item) {
+    if ($item["in_stock"]) $total += $item["price"];
+}
+echo $total;
+`}
+  tests={[
+    {
+      id: "type",
+      name: "$total is numeric",
+      description: "Should be a float or int",
+      code: `if (!is_numeric($total)) throw new Exception("\$total must be numeric");`,
+    },
+    {
+      id: "value",
+      name: "Sum is 29.25",
+      description: "10.0 + 7.25 + 12.0 = 29.25",
+      code: `if (abs($total - 29.25) > 1e-9) throw new Exception("expected 29.25, got " . $total);`,
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="php"
+  title="Sum prices for in-stock items"
+  category="arrays · array_filter · array_sum"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Given the <code>$items</code> array of associative arrays, compute
+      the sum of <code>price</code> across all items where{' '}
+      <code>in_stock</code> is true. Assign the result to{' '}
+      <code>$total</code>.
+    </p>
+  </>}
+  initCode={`<?php
+$items = [
+    ["name" => "A", "price" => 10.0, "in_stock" => true],
+    ["name" => "B", "price" => 15.5, "in_stock" => false],
+    ["name" => "C", "price" => 7.25, "in_stock" => true],
+    ["name" => "D", "price" => 12.0, "in_stock" => true],
+];
+`}
+  initialCode={`<?php
+$total = 0; // TODO
+
+echo $total;
+`}
+  solutionCode={`<?php
+$items = [
+    ["name" => "Apple",  "price" => 1.20, "in_stock" => true],
+    ["name" => "Bread",  "price" => 3.50, "in_stock" => false],
+    ["name" => "Cheese", "price" => 5.00, "in_stock" => true],
+];
+
+$total = 0.0;
+foreach ($items as $item) {
+    if ($item["in_stock"]) $total += $item["price"];
+}
+echo $total;
+`}
+  tests={[
+    {
+      id: "type",
+      name: "$total is numeric",
+      description: "Should be a float or int",
+      code: `if (!is_numeric($total)) throw new Exception("\$total must be numeric");`,
+    },
+    {
+      id: "value",
+      name: "Sum is 29.25",
+      description: "10.0 + 7.25 + 12.0 = 29.25",
+      code: `if (abs($total - 29.25) > 1e-9) throw new Exception("expected 29.25, got " . $total);`,
+    },
+  ]}
+/>
+```
+
+## 3. Stdout match
+
+<ChallengeCard
+  adapter="php"
+  title="Print the multiplication table for 7"
+  initialCode={`<?php
+// Print 7 × 1 through 7 × 5, one per line.
+`}
+  instructions={<>
+    <p>
+      Print five lines, where line <em>i</em> reads{' '}
+      <code>{`7 x i = (7*i)`}</code>. Example first line:{' '}
+      <code>7 x 1 = 7</code>.
+    </p>
+  </>}
+  solutionCode={`<?php
+for ($i = 1; $i <= 10; $i++) {
+    echo "7 * $i = " . (7 * $i) . "\\n";
+}
+`}
+  tests={[
+    {
+      id: "lines",
+      name: "Exact multiplication table",
+      description: "Five lines, no extra whitespace",
+      expect: {
+        stdoutLines: [
+          "7 x 1 = 7",
+          "7 x 2 = 14",
+          "7 x 3 = 21",
+          "7 x 4 = 28",
+          "7 x 5 = 35",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="php"
+  title="Print the multiplication table for 7"
+  initialCode={`<?php
+// Print 7 × 1 through 7 × 5, one per line.
+`}
+  instructions={<>
+    <p>
+      Print five lines, where line <em>i</em> reads{' '}
+      <code>{`7 x i = (7*i)`}</code>. Example first line:{' '}
+      <code>7 x 1 = 7</code>.
+    </p>
+  </>}
+  solutionCode={`<?php
+for ($i = 1; $i <= 10; $i++) {
+    echo "7 * $i = " . (7 * $i) . "\\n";
+}
+`}
+  tests={[
+    {
+      id: "lines",
+      name: "Exact multiplication table",
+      description: "Five lines, no extra whitespace",
+      expect: {
+        stdoutLines: [
+          "7 x 1 = 7",
+          "7 x 2 = 14",
+          "7 x 3 = 21",
+          "7 x 4 = 28",
+          "7 x 5 = 35",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+```

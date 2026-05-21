@@ -1,0 +1,295 @@
+---
+title: Challenge Cards — TypeScript
+description: Sandbox for `<ChallengeCard>` TypeScript variations.
+---
+
+TypeScript challenges share the JS harness (the runtime strips types
+before execution).
+
+## 1. Typed function signatures
+
+<ChallengeCard
+  adapter="typescript"
+  title="Generic identity function"
+  category="generics · types"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Define a generic function <code>identity&lt;T&gt;(x: T): T</code> that
+      returns its argument unchanged. The test checks that it preserves
+      both the value and the type at runtime (TypeScript erases types,
+      so we only verify the value).
+    </p>
+  </>}
+  initialCode={`function identity<T>(x: T): T {
+  // your code here
+  return x;
+}
+
+console.log(identity(42));
+console.log(identity("hello"));
+`}
+  solutionCode={`function identity<T>(value: T): T {
+  return value;
+}
+
+console.log(identity<number>(42));
+console.log(identity<string>("hello"));
+`}
+  tests={[
+    {
+      id: "number",
+      name: "Preserves a number",
+      description: "identity(42) === 42",
+      code: `if (identity(42) !== 42) throw new Error("expected 42");`,
+    },
+    {
+      id: "string",
+      name: "Preserves a string",
+      description: "identity('hi') === 'hi'",
+      code: `if (identity("hi") !== "hi") throw new Error("expected 'hi'");`,
+    },
+    {
+      id: "object",
+      name: "Preserves object reference",
+      description: "identity(obj) === obj",
+      code: `const obj = { a: 1 }; if (identity(obj) !== obj) throw new Error("expected same reference");`,
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="typescript"
+  title="Generic identity function"
+  category="generics · types"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Define a generic function <code>identity&lt;T&gt;(x: T): T</code> that
+      returns its argument unchanged. The test checks that it preserves
+      both the value and the type at runtime (TypeScript erases types,
+      so we only verify the value).
+    </p>
+  </>}
+  initialCode={`function identity<T>(x: T): T {
+  // your code here
+  return x;
+}
+
+console.log(identity(42));
+console.log(identity("hello"));
+`}
+  solutionCode={`function identity<T>(value: T): T {
+  return value;
+}
+
+console.log(identity<number>(42));
+console.log(identity<string>("hello"));
+`}
+  tests={[
+    {
+      id: "number",
+      name: "Preserves a number",
+      description: "identity(42) === 42",
+      code: `if (identity(42) !== 42) throw new Error("expected 42");`,
+    },
+    {
+      id: "string",
+      name: "Preserves a string",
+      description: "identity('hi') === 'hi'",
+      code: `if (identity("hi") !== "hi") throw new Error("expected 'hi'");`,
+    },
+    {
+      id: "object",
+      name: "Preserves object reference",
+      description: "identity(obj) === obj",
+      code: `const obj = { a: 1 }; if (identity(obj) !== obj) throw new Error("expected same reference");`,
+    },
+  ]}
+/>
+```
+
+## 2. Discriminated unions
+
+<ChallengeCard
+  adapter="typescript"
+  title="Area of a Shape"
+  category="discriminated unions · pattern matching"
+  estimatedTime="~5 min"
+  instructions={<>
+    <p>
+      Define a function <code>area(shape: Shape)</code> that returns the
+      area of the given shape, where <code>Shape</code> is the
+      discriminated union below.
+    </p>
+    <ul>
+      <li>Circle: π · r²</li>
+      <li>Square: side²</li>
+      <li>Rect: width · height</li>
+    </ul>
+  </>}
+  initCode={`type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
+  | { kind: "rect"; width: number; height: number };
+`}
+  initialCode={`function area(shape: Shape): number {
+  // your code here
+  return 0;
+}
+
+console.log(area({ kind: "circle", radius: 1 }));
+console.log(area({ kind: "square", side: 4 }));
+console.log(area({ kind: "rect", width: 3, height: 5 }));
+`}
+  solutionCode={`type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "rectangle"; width: number; height: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":    return Math.PI * s.radius * s.radius;
+    case "rectangle": return s.width * s.height;
+  }
+}
+
+console.log(area({ kind: "rectangle", width: 3, height: 4 }));
+console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
+`}
+  tests={[
+    {
+      id: "circle",
+      name: "Circle uses π·r²",
+      description: "radius=2 → ≈12.566",
+      code: `const a = area({ kind: "circle", radius: 2 }); if (Math.abs(a - Math.PI*4) > 1e-6) throw new Error(\`Got \${a}\`);`,
+    },
+    {
+      id: "square",
+      name: "Square uses side²",
+      description: "side=4 → 16",
+      code: `if (area({ kind: "square", side: 4 }) !== 16) throw new Error("expected 16");`,
+    },
+    {
+      id: "rect",
+      name: "Rect uses w·h",
+      description: "3 × 5 = 15",
+      code: `if (area({ kind: "rect", width: 3, height: 5 }) !== 15) throw new Error("expected 15");`,
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="typescript"
+  title="Area of a Shape"
+  category="discriminated unions · pattern matching"
+  estimatedTime="~5 min"
+  instructions={<>
+    <p>
+      Define a function <code>area(shape: Shape)</code> that returns the
+      area of the given shape, where <code>Shape</code> is the
+      discriminated union below.
+    </p>
+    <ul>
+      <li>Circle: π · r²</li>
+      <li>Square: side²</li>
+      <li>Rect: width · height</li>
+    </ul>
+  </>}
+  initCode={`type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
+  | { kind: "rect"; width: number; height: number };
+`}
+  initialCode={`function area(shape: Shape): number {
+  // your code here
+  return 0;
+}
+
+console.log(area({ kind: "circle", radius: 1 }));
+console.log(area({ kind: "square", side: 4 }));
+console.log(area({ kind: "rect", width: 3, height: 5 }));
+`}
+  solutionCode={`type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "rectangle"; width: number; height: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":    return Math.PI * s.radius * s.radius;
+    case "rectangle": return s.width * s.height;
+  }
+}
+
+console.log(area({ kind: "rectangle", width: 3, height: 4 }));
+console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
+`}
+  tests={[
+    {
+      id: "circle",
+      name: "Circle uses π·r²",
+      description: "radius=2 → ≈12.566",
+      code: `const a = area({ kind: "circle", radius: 2 }); if (Math.abs(a - Math.PI*4) > 1e-6) throw new Error(\`Got \${a}\`);`,
+    },
+    {
+      id: "square",
+      name: "Square uses side²",
+      description: "side=4 → 16",
+      code: `if (area({ kind: "square", side: 4 }) !== 16) throw new Error("expected 16");`,
+    },
+    {
+      id: "rect",
+      name: "Rect uses w·h",
+      description: "3 × 5 = 15",
+      code: `if (area({ kind: "rect", width: 3, height: 5 }) !== 15) throw new Error("expected 15");`,
+    },
+  ]}
+/>
+```
+
+## 3. Minimal challenge — stdout match
+
+<ChallengeCard
+  adapter="typescript"
+  title="Print Hello, TS!"
+  initialCode={`// Print the exact greeting below.
+`}
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
+  </>}
+  solutionCode={`const message: string = "Hello, TS!";
+console.log(message);
+`}
+  tests={[
+    {
+      id: "stdout",
+      name: "Exact greeting",
+      description: "Stdout must be exactly `Hello, TS!`",
+      expect: { stdoutEquals: "Hello, TS!" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="typescript"
+  title="Print Hello, TS!"
+  initialCode={`// Print the exact greeting below.
+`}
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
+  </>}
+  solutionCode={`const message: string = "Hello, TS!";
+console.log(message);
+`}
+  tests={[
+    {
+      id: "stdout",
+      name: "Exact greeting",
+      description: "Stdout must be exactly `Hello, TS!`",
+      expect: { stdoutEquals: "Hello, TS!" },
+    },
+  ]}
+/>
+```

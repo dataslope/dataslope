@@ -61,7 +61,10 @@ import type {
 } from "./types";
 import {
   buildHarness,
-  hasHarness,
+  canRunTests,
+  evaluateStdoutExpect,
+  isNativeTest,
+  isStdoutTest,
   parseHarnessOutput,
   type ChallengeTest,
   type ParsedTestResult,
@@ -94,8 +97,6 @@ export interface ChallengeCardProps {
   estimatedTime?: string;
   /** Rendered above the editor. Pass MDX content or React elements. */
   instructions: React.ReactNode;
-  /** Optional hint, revealed when the user clicks "Show hint". */
-  hint?: React.ReactNode;
   /** Optional initialization code prepended verbatim to the user's
    *  code on every run. Rendered in a collapsed-by-default read-only
    *  panel above the editor, mirroring `<CodeBlock>`'s `initCode`. */
@@ -103,6 +104,9 @@ export interface ChallengeCardProps {
   /** Starting source loaded into the editor. The Reset button restores
    *  this exact text. */
   initialCode: string;
+  /** Canonical reference solution. When provided, a "Show Solution"
+   *  button appears in the toolbar that opens a read-only modal. */
+  solutionCode?: string;
   /** Tests run when "Check Answer" is pressed. Each test's `code`
    *  should `assert`/`throw`/`stop()` on failure and be silent on
    *  success — the language-specific harness wraps the rest. */
@@ -149,24 +153,6 @@ function PlayIcon() {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  );
-}
-
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
   const color = LANGUAGE_ICON_COLORS[adapter.id];
@@ -206,9 +192,9 @@ export default function ChallengeCard({
   category,
   estimatedTime,
   instructions,
-  hint,
   initCode,
   initialCode,
+  solutionCode,
   tests,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
@@ -221,6 +207,8 @@ export default function ChallengeCard({
   const editorRef = useRef<EditorView | null>(null);
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
   const initEditorRef = useRef<EditorView | null>(null);
+  const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
+  const solutionEditorRef = useRef<EditorView | null>(null);
   // Per-card runtime. Each `<ChallengeCard>` gets its own instance —
   // sharing across cards would let one challenge's state (Pyodide
   // globals, micropip installs, monkey-patched modules) influence
@@ -238,7 +226,7 @@ export default function ChallengeCard({
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [elapsed, setElapsed] = useState<string>("");
   const [initExpanded, setInitExpanded] = useState(false);
-  const [hintOpen, setHintOpen] = useState(false);
+  const [solutionOpen, setSolutionOpen] = useState(false);
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
@@ -249,7 +237,7 @@ export default function ChallengeCard({
     () => false,
   );
 
-  const canCheck = hasHarness(adapter.id) && tests.length > 0;
+  const canCheck = canRunTests(adapter.id, tests);
 
   // ─── Editor mount ───────────────────────────────────────────────────
   useEffect(() => {
@@ -308,6 +296,39 @@ export default function ChallengeCard({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mount the read-only solution editor lazily when the modal opens.
+  useEffect(() => {
+    if (!solutionOpen || !solutionCode) return;
+    if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
+    const languageComp = new Compartment();
+    const view = new EditorView({
+      doc: solutionCode,
+      parent: solutionEditorHostRef.current,
+      extensions: [
+        EditorState.readOnly.of(true),
+        EditorView.editable.of(false),
+        drawSelection(),
+        lineNumbersExt(),
+        EditorState.tabSize.of(4),
+        indentUnit.of("    "),
+        EditorView.lineWrapping,
+        languageComp.of([]),
+        themeFor(CM_EDITOR_THEME),
+      ],
+    });
+    solutionEditorRef.current = view;
+    void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+      if (ext && solutionEditorRef.current === view) {
+        view.dispatch({ effects: languageComp.reconfigure(ext) });
+      }
+    });
+    return () => {
+      view.destroy();
+      solutionEditorRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [solutionOpen]);
 
   // Mount the read-only init editor lazily when expanded.
   useEffect(() => {
@@ -443,8 +464,10 @@ export default function ChallengeCard({
     if (!canCheck) return;
     const userCode = editorRef.current?.state.doc.toString() ?? "";
     const userPart = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
+    // Build a native harness for the subset of tests that have a `code`
+    // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);
-    const combined = `${userPart}\n${harness}`;
+    const combined = harness ? `${userPart}\n${harness}` : userPart;
 
     // Pre-populate the test panel in pending state so the user sees the
     // list immediately while the runtime warms up.
@@ -465,10 +488,19 @@ export default function ChallengeCard({
 
       // Split stdout cells into "user-visible" + parsed harness results.
       // Non-stdout cells (html / image / plot / stderr) pass through
-      // untouched — the harness only emits text.
+      // untouched — the harness only emits text. Also collect the raw
+      // stdout/stderr text so we can evaluate stdout-based expectations
+      // against it.
       const finalCells: OutputCell[] = [];
       const allResults: ParsedTestResult[] = [];
+      let cleanStdout = "";
+      let stderrText = "";
       for (const cell of cells) {
+        if (cell.type === "stderr") {
+          stderrText += (stderrText ? "\n" : "") + cell.content;
+          finalCells.push(cell);
+          continue;
+        }
         if (cell.type !== "stdout") {
           finalCells.push(cell);
           continue;
@@ -476,9 +508,18 @@ export default function ChallengeCard({
         const { clean, results } = parseHarnessOutput(cell.content);
         allResults.push(...results);
         if (clean.length > 0) {
+          cleanStdout += (cleanStdout ? "\n" : "") + clean;
           finalCells.push({ ...cell, content: clean });
         }
       }
+
+      // Evaluate stdout-based tests against the cleaned stdout.
+      for (const t of tests) {
+        if (isStdoutTest(t)) {
+          allResults.push(evaluateStdoutExpect(t, cleanStdout, stderrText));
+        }
+      }
+
       setOutputs(finalCells);
       setElapsed(formatElapsed(elapsedMs));
 
@@ -492,7 +533,9 @@ export default function ChallengeCard({
           state: r ? (r.pass ? "pass" : "fail") : "fail",
           detail: r
             ? r.detail
-            : "Test did not produce a result (the runtime may have errored before reaching this check).",
+            : isNativeTest(t)
+              ? "Test did not produce a result (the runtime may have errored before reaching this check)."
+              : "Test did not run.",
         };
       });
       setTestResults(displayed);
@@ -577,40 +620,57 @@ export default function ChallengeCard({
     >
       {/* ── Header ── */}
       <div className={styles.header}>
-        <div className={styles.badge}>
-          <span className={styles.badgeDot} /> {badge}
-        </div>
-        <div className={styles.titleArea}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.meta}>
-            {estimatedTime && (
-              <span className={styles.metaPill}>
-                <Clock size={11} aria-hidden />
-                {estimatedTime}
-              </span>
-            )}
-            {estimatedTime && category && (
-              <span className={styles.metaSep}>·</span>
-            )}
-            {category && <span>{category}</span>}
+        <div className={styles.headerMain}>
+          <div className={styles.headerTop}>
+            <div className={styles.badge}>
+              <span className={styles.badgeDot} /> {badge}
+            </div>
+            <span className={styles.headerBlockId}>
+              <Box size={12} aria-hidden /> {blockId}
+            </span>
+            <span className={styles.headerRuntimeLabel}>
+              <LanguageGlyph adapter={adapter} />
+              {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
+            </span>
+            <span
+              className={styles.statusDot}
+              data-status={status}
+              title={statusMessage || status}
+              aria-label={statusMessage || status}
+            />
+            <div className={styles.headerStatus}>
+              {totalTests > 0 && bannerState !== null ? (
+                allPassed ? (
+                  <div className={styles.statusPass}>
+                    <Check size={14} strokeWidth={2.5} aria-hidden />
+                    Passed
+                  </div>
+                ) : (
+                  <div className={styles.statusPending}>
+                    <span className={styles.statusPendingCount}>
+                      {passedCount}/{totalTests}
+                    </span>
+                    <span className={styles.statusPendingLabel}>tests</span>
+                  </div>
+                )
+              ) : null}
+            </div>
           </div>
-        </div>
-        <div className={styles.statusArea}>
-          {totalTests > 0 && bannerState !== null ? (
-            allPassed ? (
-              <div className={styles.statusPass}>
-                <Check size={14} strokeWidth={2.5} aria-hidden />
-                Passed
-              </div>
-            ) : (
-              <div className={styles.statusPending}>
-                <span className={styles.statusPendingCount}>
-                  {passedCount}/{totalTests}
+          <div className={styles.title}>{title}</div>
+          {(estimatedTime || category) && (
+            <div className={styles.meta}>
+              {estimatedTime && (
+                <span className={styles.metaPill}>
+                  <Clock size={11} aria-hidden />
+                  {estimatedTime}
                 </span>
-                <span className={styles.statusPendingLabel}>tests</span>
-              </div>
-            )
-          ) : null}
+              )}
+              {estimatedTime && category && (
+                <span className={styles.metaSep}>·</span>
+              )}
+              {category && <span>{category}</span>}
+            </div>
+          )}
         </div>
       </div>
 
@@ -618,38 +678,6 @@ export default function ChallengeCard({
       <div className={styles.instructions}>
         <div className={styles.instructionsLabel}>Instructions</div>
         <div className={styles.instructionsBody}>{instructions}</div>
-        {hint && (
-          <>
-            <button
-              type="button"
-              className={styles.hintToggle}
-              onClick={() => setHintOpen((v) => !v)}
-              aria-expanded={hintOpen}
-            >
-              <HelpIcon />
-              {hintOpen ? "Hide hint" : "Show hint"}
-            </button>
-            {hintOpen && <div className={styles.hintBox}>{hint}</div>}
-          </>
-        )}
-      </div>
-
-      {/* ── PyBlock-style topbar ── */}
-      <div className={styles.topbar}>
-        <span className={styles.blockId}>
-          <Box size={13} aria-hidden /> {blockId}
-        </span>
-        <span className={styles.topbarDivider} aria-hidden />
-        <span className={styles.runtimeLabel}>
-          <LanguageGlyph adapter={adapter} />
-          {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
-        </span>
-        <span
-          className={styles.statusDot}
-          data-status={status}
-          title={statusMessage || status}
-          aria-label={statusMessage || status}
-        />
       </div>
 
       {/* ── Init code (collapsed by default) ── */}
@@ -725,6 +753,17 @@ export default function ChallengeCard({
           )}
           <span>{isBusy ? "Running…" : "Run"}</span>
         </button>
+        {canCheck && (
+          <button
+            type="button"
+            className={styles.checkBtn}
+            onClick={() => void check()}
+            disabled={isBusy}
+          >
+            <Check size={12} strokeWidth={2.5} aria-hidden />
+            Check Answer
+          </button>
+        )}
         {!isBusy && (
           <span
             className={styles.kbdHint}
@@ -734,6 +773,17 @@ export default function ChallengeCard({
             <span className={styles.kbdPlus} aria-hidden>+</span>
             <kbd className={styles.kbd}>Enter</kbd>
           </span>
+        )}
+        <span className={styles.toolbarSpacer} />
+        {solutionCode && (
+          <button
+            type="button"
+            className={styles.resetBtn}
+            onClick={() => setSolutionOpen(true)}
+            disabled={isBusy}
+          >
+            Show Solution
+          </button>
         )}
         <button
           type="button"
@@ -753,18 +803,6 @@ export default function ChallengeCard({
         >
           <CopyIcon />
         </button>
-        <span className={styles.toolbarSpacer} />
-        {canCheck && (
-          <button
-            type="button"
-            className={styles.checkBtn}
-            onClick={() => void check()}
-            disabled={isBusy}
-          >
-            <Check size={12} strokeWidth={2.5} aria-hidden />
-            Check Answer
-          </button>
-        )}
       </div>
 
       {/* ── Output panel ── */}
@@ -888,6 +926,111 @@ export default function ChallengeCard({
           )}
         </div>
       )}
+
+      {/* ── Solution modal ── */}
+      {solutionOpen && solutionCode && (
+        <SolutionModal
+          onClose={() => setSolutionOpen(false)}
+          editorHostRef={solutionEditorHostRef}
+          source={solutionCode}
+        />
+      )}
+    </div>
+  );
+}
+
+function SolutionModal({
+  onClose,
+  editorHostRef,
+  source,
+}: {
+  onClose: () => void;
+  editorHostRef: React.RefObject<HTMLDivElement | null>;
+  source: string;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const copySolution = useCallback(async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(source);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [source]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Reference solution"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(15, 23, 42, 0.55)",
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+      }}
+    >
+      <div
+        className={styles.card}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: "720px",
+          width: "100%",
+          maxHeight: "80vh",
+          margin: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div className={styles.header} style={{ borderBottom: "1px solid var(--ch-border-light)" }}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} /> Solution
+          </div>
+          <div className={styles.titleArea}>
+            <div className={styles.title}>Reference solution</div>
+            <div className={styles.meta}>
+              <span>One valid answer — there may be others.</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => void copySolution()}
+            aria-label="Copy solution"
+            title="Copy solution"
+            className={styles.copyBtn}
+            style={{ marginLeft: "auto" }}
+          >
+            <CopyIcon />
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className={styles.copyBtn}
+          >
+            <X size={14} strokeWidth={2.4} aria-hidden />
+          </button>
+        </div>
+        <div
+          ref={editorHostRef}
+          className={styles.editor}
+          style={{ flex: 1, overflow: "auto" }}
+          aria-label="Solution editor (read-only)"
+        />
+      </div>
     </div>
   );
 }

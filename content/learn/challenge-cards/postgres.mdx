@@ -1,0 +1,341 @@
+---
+title: Challenge Cards — PostgreSQL
+description: Sandbox for `<SqlChallengeCard dialect="postgres">` variations.
+---
+
+PostgreSQL challenges run via **PGlite** — a full PostgreSQL instance
+compiled to WebAssembly that boots entirely in your browser.
+
+## 1. JOIN basics
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="List orders with customer names"
+  category="JOIN · SELECT"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Join <code>orders</code> and <code>customers</code> and return
+      one row per order with the columns <code>order_id</code>,{' '}
+      <code>customer_name</code>, and <code>amount</code>. Sort by{' '}
+      <code>order_id</code> ascending.
+    </p>
+  </>}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(10, 2)
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Linus'), ('Grace');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 120.00), (2,  80.00),
+  (1,  30.00), (3, 200.00),
+  (2,  50.00);`}
+  initialCode={`SELECT
+  o.id AS order_id,
+  c.name AS customer_name,
+  o.amount
+FROM orders o
+-- your JOIN and ORDER BY here
+;
+`}
+  solutionSql={`SELECT
+  o.id AS order_id,
+  c.name AS customer_name,
+  o.amount
+FROM orders o
+JOIN customers c ON c.id = o.customer_id
+ORDER BY o.id ASC;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "One per order",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has order_id, customer_name, amount",
+      description: "In that exact order",
+      expectedColumns: ["order_id", "customer_name", "amount"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Same rows, same order",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
+```jsx
+<SqlChallengeCard
+  dialect="postgres"
+  title="List orders with customer names"
+  category="JOIN · SELECT"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Join <code>orders</code> and <code>customers</code> and return
+      one row per order with the columns <code>order_id</code>,{' '}
+      <code>customer_name</code>, and <code>amount</code>. Sort by{' '}
+      <code>order_id</code> ascending.
+    </p>
+  </>}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(10, 2)
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Linus'), ('Grace');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 120.00), (2,  80.00),
+  (1,  30.00), (3, 200.00),
+  (2,  50.00);`}
+  initialCode={`SELECT
+  o.id AS order_id,
+  c.name AS customer_name,
+  o.amount
+FROM orders o
+-- your JOIN and ORDER BY here
+;
+`}
+  solutionSql={`SELECT
+  o.id AS order_id,
+  c.name AS customer_name,
+  o.amount
+FROM orders o
+JOIN customers c ON c.id = o.customer_id
+ORDER BY o.id ASC;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "One per order",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has order_id, customer_name, amount",
+      description: "In that exact order",
+      expectedColumns: ["order_id", "customer_name", "amount"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Same rows, same order",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+```
+
+## 2. CTE + aggregation
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Top customer by total spend"
+  category="CTE · GROUP BY"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Return the single customer who has spent the most across all
+      their orders, with columns <code>customer_name</code> and{' '}
+      <code>total_spent</code>.
+    </p>
+  </>}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(10, 2)
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Linus'), ('Grace');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 120.00), (2,  80.00),
+  (1,  30.00), (3, 200.00),
+  (2,  50.00);`}
+  initialCode={`-- Your query here:
+SELECT c.name AS customer_name, 0 AS total_spent
+FROM customers c
+LIMIT 1;
+`}
+  solutionSql={`WITH spend AS (
+  SELECT customer_id, SUM(amount) AS total_spent
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT c.name AS customer_name, s.total_spent
+FROM spend s
+JOIN customers c ON c.id = s.customer_id
+ORDER BY s.total_spent DESC
+LIMIT 1;`}
+  tests={[
+    {
+      id: "one_row",
+      name: "Returns exactly one row",
+      description: "The top customer",
+      expectedRowCount: 1,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace, with 200.00",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+```jsx
+<SqlChallengeCard
+  dialect="postgres"
+  title="Top customer by total spend"
+  category="CTE · GROUP BY"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Return the single customer who has spent the most across all
+      their orders, with columns <code>customer_name</code> and{' '}
+      <code>total_spent</code>.
+    </p>
+  </>}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(10, 2)
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Linus'), ('Grace');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 120.00), (2,  80.00),
+  (1,  30.00), (3, 200.00),
+  (2,  50.00);`}
+  initialCode={`-- Your query here:
+SELECT c.name AS customer_name, 0 AS total_spent
+FROM customers c
+LIMIT 1;
+`}
+  solutionSql={`WITH spend AS (
+  SELECT customer_id, SUM(amount) AS total_spent
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT c.name AS customer_name, s.total_spent
+FROM spend s
+JOIN customers c ON c.id = s.customer_id
+ORDER BY s.total_spent DESC
+LIMIT 1;`}
+  tests={[
+    {
+      id: "one_row",
+      name: "Returns exactly one row",
+      description: "The top customer",
+      expectedRowCount: 1,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace, with 200.00",
+      matchesSolution: true,
+    },
+  ]}
+/>
+```
+
+## 3. UPDATE with post-state check
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Apply a 10% discount to large orders"
+  category="UPDATE · DML"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Reduce every <code>orders.amount</code> by 10% (multiply by{' '}
+      <code>0.9</code>) for orders where <code>amount &gt; 100</code>.
+      Use a single <code>UPDATE</code> statement.
+    </p>
+  </>}
+  initSql={`CREATE TABLE orders (
+  id     SERIAL PRIMARY KEY,
+  amount NUMERIC(10, 2)
+);
+INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
+  initialCode={`-- UPDATE the rows where amount > 100
+`}
+  tests={[
+    {
+      id: "count_large",
+      name: "Three orders were over 100",
+      description: "120, 200, and 150 should be reduced",
+      runAfterSql:
+        "SELECT COUNT(*) FROM orders WHERE amount IN (108.00, 180.00, 135.00);",
+      runAfterEquals: 3,
+    },
+    {
+      id: "small_unchanged",
+      name: "Small orders are unchanged",
+      description: "80 and 50 should still be there",
+      runAfterSql:
+        "SELECT COUNT(*) FROM orders WHERE amount IN (80.00, 50.00);",
+      runAfterEquals: 2,
+    },
+  ]}
+/>
+
+```jsx
+<SqlChallengeCard
+  dialect="postgres"
+  title="Apply a 10% discount to large orders"
+  category="UPDATE · DML"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Reduce every <code>orders.amount</code> by 10% (multiply by{' '}
+      <code>0.9</code>) for orders where <code>amount &gt; 100</code>.
+      Use a single <code>UPDATE</code> statement.
+    </p>
+  </>}
+  initSql={`CREATE TABLE orders (
+  id     SERIAL PRIMARY KEY,
+  amount NUMERIC(10, 2)
+);
+INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
+  initialCode={`-- UPDATE the rows where amount > 100
+`}
+  tests={[
+    {
+      id: "count_large",
+      name: "Three orders were over 100",
+      description: "120, 200, and 150 should be reduced",
+      runAfterSql:
+        "SELECT COUNT(*) FROM orders WHERE amount IN (108.00, 180.00, 135.00);",
+      runAfterEquals: 3,
+    },
+    {
+      id: "small_unchanged",
+      name: "Small orders are unchanged",
+      description: "80 and 50 should still be there",
+      runAfterSql:
+        "SELECT COUNT(*) FROM orders WHERE amount IN (80.00, 50.00);",
+      runAfterEquals: 2,
+    },
+  ]}
+/>
+```

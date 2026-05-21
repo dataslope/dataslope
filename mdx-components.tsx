@@ -14,6 +14,7 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import MdxCodeBlock from "@/app/_components/MdxCodeBlock";
 import MdxChallengeCard from "@/app/_components/MdxChallengeCard";
+import MdxSqlChallengeCard from "@/app/_components/MdxSqlChallengeCard";
 import { Mermaid } from "@/app/_components/mdx/mermaid";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
@@ -21,6 +22,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ...defaultMdxComponents,
     CodeBlock: MdxCodeBlock,
     ChallengeCard: MdxChallengeCard,
+    SqlChallengeCard: MdxSqlChallengeCard,
     Mermaid,
     ...components,
   };

@@ -56,11 +56,53 @@
 /* ─── Header ──────────────────────────────────────────────────────── */
 
 .header {
-  padding: 16px 20px 14px;
+  padding: 14px 20px 12px;
   border-bottom: 1px solid var(--ch-border-light);
   display: flex;
   align-items: flex-start;
   gap: 14px;
+}
+
+.headerMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.headerTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.headerStatus {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+.headerBlockId {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-mono);
+}
+.headerBlockId svg {
+  opacity: 0.65;
+}
+.headerRuntimeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--ch-text-secondary);
+}
+.headerRuntimeLabel svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .badge {
@@ -77,7 +119,6 @@
   border-radius: 5px;
   padding: 2px 8px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 .badgeDot {
   width: 5px;
@@ -316,6 +357,16 @@
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+}
+/* Suppress CodeMirror's default dotted focus outline — the surrounding
+   card chrome already conveys focus. */
+.editor :global(.cm-editor.cm-focused),
+.editor :global(.cm-editor) {
+  outline: none !important;
+}
+.initEditor :global(.cm-editor.cm-focused),
+.initEditor :global(.cm-editor) {
+  outline: none !important;
 }
 
 /* Init code wrapper — collapsible read-only init panel. */
@@ -769,4 +820,302 @@
   font-weight: 400;
   opacity: 0.8;
   margin-left: 2px;
+}
+
+/* ─── SQL result table ────────────────────────────────────────────────
+   Used by `SqlChallengeCard` to render the result rows of the
+   learner's most recent SELECT. Same visual language as the existing
+   HTML-cell tables but rendered from a structured `QueryResult` rather
+   than user-printed HTML, so it gets sticky headers, a row count, and
+   styling that matches the light-paper / dark-paper card chrome. */
+.sqlResultPanel {
+  background: var(--ch-bg);
+  border-top: 1px solid var(--ch-border-light);
+}
+.sqlResultHeader {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px 6px;
+  gap: 8px;
+}
+.sqlResultLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ch-text-muted);
+}
+.sqlResultCount {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-mono);
+}
+.sqlResultScroll {
+  max-height: 320px;
+  overflow: auto;
+  margin: 0 14px 14px;
+  border: 1px solid var(--ch-border-light);
+  border-radius: 6px;
+}
+.sqlResultTable {
+  border-collapse: collapse;
+  font-family: var(--ch-font-mono);
+  font-size: 12px;
+  width: 100%;
+}
+.sqlResultTable th {
+  background: var(--ch-bg-subtle);
+  border-bottom: 1px solid var(--ch-border);
+  border-right: 1px solid var(--ch-border-light);
+  padding: 6px 12px;
+  text-align: left;
+  font-size: 11px;
+  color: var(--ch-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.sqlResultTable th:last-child { border-right: none; }
+.sqlResultTable td {
+  border-bottom: 1px solid var(--ch-border-light);
+  border-right: 1px solid var(--ch-border-light);
+  padding: 4px 12px;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--ch-text);
+}
+.sqlResultTable td:last-child { border-right: none; }
+.sqlResultTable tr:last-child td { border-bottom: none; }
+.sqlResultTable tr:hover td { background: var(--ch-bg-subtle); }
+.sqlNullValue {
+  color: var(--ch-text-muted);
+  font-style: italic;
+}
+.sqlEmptyResult {
+  padding: 14px;
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  font-style: italic;
+  text-align: center;
+}
+.sqlMessage {
+  padding: 10px 14px 14px;
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-mono);
+}
+.dialectBadge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ch-font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ch-text-secondary);
+  background: var(--ch-bg-subtle);
+  border: 1px solid var(--ch-border-light);
+  border-radius: 4px;
+  padding: 1px 7px;
+  margin-right: 4px;
+}
+
+/* ─── Dark mode ───────────────────────────────────────────────────────
+   Fumadocs toggles a `.dark` class on `<html>`. We rebind the card's
+   CSS variables so the same selectors keep working — no extra rules
+   per element needed. Aim is "paper card in a dark theme": subtle
+   slate-tinted surface, soft borders, slightly desaturated semantic
+   colours so accents don't burn next to body text. */
+:global(html.dark) .card {
+  --ch-bg: #0f172a;
+  --ch-bg-muted: #111827;
+  --ch-bg-subtle: #0b1220;
+  --ch-border: #1f2937;
+  --ch-border-light: #1a2433;
+  --ch-text: #e5e7eb;
+  --ch-text-secondary: #c7cdd6;
+  --ch-text-muted: #8a93a3;
+  --ch-accent: #3b82f6;
+  --ch-accent-hover: #60a5fa;
+  --ch-green: #4ade80;
+  --ch-green-dot: #22c55e;
+  --ch-green-bg: rgba(34, 197, 94, 0.12);
+  --ch-red: #f87171;
+  --ch-red-bg: rgba(239, 68, 68, 0.12);
+  --ch-purple: #c4b5fd;
+  --ch-purple-bg: rgba(139, 92, 246, 0.14);
+  --ch-purple-border: rgba(139, 92, 246, 0.32);
+  --ch-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+:global(html.dark) .instructionsBody code {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+:global(html.dark) .hintBox {
+  background: rgba(59, 130, 246, 0.10);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #bfdbfe;
+}
+:global(html.dark) .hintBox code {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #dbeafe;
+}
+:global(html.dark) .initToggle:hover {
+  background: #1a2433;
+}
+:global(html.dark) .resetBtn:hover:not(:disabled),
+:global(html.dark) .copyBtn:hover {
+  background: #1a2433;
+}
+:global(html.dark) .checkBtn:hover:not(:disabled) {
+  background: #1a2433;
+  border-color: #475569;
+}
+:global(html.dark) .kbd {
+  background: #1f2937;
+  color: #cbd5e1;
+  box-shadow: 0 1px 0 #0b1220;
+}
+:global(html.dark) .testItem {
+  background: #0b1220;
+  border-color: #1a2433;
+}
+:global(html.dark) .testPanelHeader:hover {
+  background: #1a2433;
+}
+:global(html.dark) .testPill[data-state="pending"] {
+  background: #1f2937;
+  border-color: #334155;
+}
+:global(html.dark) .banner[data-state="pass"] .bannerIcon {
+  background: rgba(34, 197, 94, 0.22);
+}
+:global(html.dark) .banner[data-state="fail"] .bannerIcon {
+  background: rgba(239, 68, 68, 0.22);
+}
+:global(html.dark) .outCellHtml :global(th) {
+  background: #111827;
+  border-color: #1f2937;
+  color: #94a3b8;
+}
+:global(html.dark) .outCellHtml :global(td) {
+  border-color: #1a2433;
+  color: var(--ch-text);
+}
+:global(html.dark) .outCellHtml :global(tr:hover td) {
+  background: #111827;
+}
+
+/* ─── Table viewer (SQL) ────────────────────────────────────────────── */
+
+.tableViewer {
+  background: var(--ch-bg-muted);
+  border-bottom: 1px solid var(--ch-border-light);
+}
+.tableViewerHeader {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  gap: 10px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--ch-font-ui);
+  user-select: none;
+}
+.tableViewerHeader:hover {
+  background: #f4f4f5;
+}
+:global(html.dark) .tableViewerHeader:hover {
+  background: #1a2433;
+}
+.tableViewerLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ch-text-muted);
+}
+.tableViewerCount {
+  margin-left: auto;
+  font-family: var(--ch-font-mono);
+  font-size: 11.5px;
+  color: var(--ch-text-muted);
+}
+.tableViewerTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px 6px;
+  flex-wrap: wrap;
+}
+.tableViewerTab {
+  font-family: var(--ch-font-mono);
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--ch-border-light);
+  background: var(--ch-bg);
+  color: var(--ch-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tableViewerTab:hover {
+  border-color: var(--ch-border);
+  color: var(--ch-text);
+}
+.tableViewerTabActive {
+  background: var(--ch-purple-bg);
+  border-color: var(--ch-purple-border);
+  color: var(--ch-purple);
+}
+.tableViewerSchema {
+  color: var(--ch-text-muted);
+  font-weight: 400;
+}
+.tableViewerScroll {
+  max-height: 220px;
+  overflow: auto;
+  margin: 0 14px 12px;
+  border: 1px solid var(--ch-border-light);
+  border-radius: 6px;
+}
+.tableViewerEmpty {
+  margin: 0 14px 12px;
+  padding: 10px 12px;
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-border-light);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-mono);
+}
+.tableViewerEmpty code {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: #0f172a;
+}
+:global(html.dark) .tableViewerEmpty code {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+.tableViewerFootnote {
+  padding: 4px 10px;
+  font-family: var(--ch-font-mono);
+  font-size: 11px;
+  color: var(--ch-text-muted);
+  border-top: 1px solid var(--ch-border-light);
+  background: var(--ch-bg-subtle);
 }
