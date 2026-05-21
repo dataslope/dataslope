@@ -275,5 +275,6 @@ export function PragmaSettingsTab({
             Save
           </button>
         </div>
+      </div>
   );
 }
