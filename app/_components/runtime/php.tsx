@@ -152,6 +152,32 @@ foreach ($letters as $ch => $n) {
 }
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "require a helper file alongside index.php",
+    code: `<?php
+require_once __DIR__ . "/greetings.php";
+
+echo hello("PHP Playground") . "\\n";
+echo bye("PHP Playground") . "\\n";
+`,
+    files: [
+      {
+        filename: "greetings.php",
+        content: `<?php
+function hello(string $name): string {
+    return "Hello, {$name}!";
+}
+
+function bye(string $name): string {
+    return "Goodbye, {$name}!";
+}
+`,
+      },
+    ],
+    entryFilename: "index.php",
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -241,9 +267,8 @@ export const phpAdapter: LanguageAdapter = {
   exportFormats: [
     { extension: "php", label: "PHP (.php)", mimeType: "application/x-php" },
   ],
-  exportBaseFilename: "script",
+  exportBaseFilename: "index",
   defaultFileExtension: "php",
-  entryPoint: "index.php",
   packagesFooter: (
     <>
       Functions above are part of the{" "}

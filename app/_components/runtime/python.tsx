@@ -284,6 +284,29 @@ for f, c in zip(features, model.coef_):
 print(f"  Intercept  : {model.intercept_:+,.0f}")
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Import a helper module defined alongside main.py",
+    code: `from greetings import hello, bye
+
+print(hello("Python Playground"))
+print(bye("Python Playground"))
+`,
+    files: [
+      {
+        filename: "greetings.py",
+        content: `def hello(name: str) -> str:
+    return f"Hello, {name}!"
+
+
+def bye(name: str) -> str:
+    return f"Goodbye, {name}!"
+`,
+      },
+    ],
+    entryFilename: "main.py",
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -734,9 +757,8 @@ export const pythonAdapter: LanguageAdapter = {
   exportFormats: [
     { extension: "py", label: "Python (.py)", mimeType: "text/x-python" },
   ],
-  exportBaseFilename: "script",
+  exportBaseFilename: "main",
   defaultFileExtension: "py",
-  entryPoint: "main.py",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

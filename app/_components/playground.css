@@ -1026,6 +1026,96 @@ body.pg-active {
   flex-shrink: 0;
 }
 
+/* ─── Multi-entry-point split run button (non-SQL playgrounds) ─────
+ *
+ * Visual style copied from `.run-btn-split-main` above (per spec —
+ * deliberately not reusing the class name) so the C / C++ / Java /
+ * C# / Python / R / JS / TS / PHP playgrounds get the same primary
+ * button + chevron + divider treatment as the SQL playground's
+ * "Run Selection / Run All" split control. */
+.pg-run-multi {
+  display: flex;
+  align-items: stretch;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--primary);
+  transition: all 0.15s;
+  /* Cap the overall width so very long labels truncate inside the
+   * primary button instead of pushing the toolbar out of bounds. */
+  max-width: 240px;
+}
+.pg-run-multi.running {
+  opacity: 0.75;
+}
+.pg-run-multi-main {
+  /* Override `.run-btn` background to participate in the shared group
+   * background; the parent provides the brand color. */
+  background: transparent !important;
+  border-radius: 0;
+  padding: 5px 12px;
+  min-width: 0;
+}
+.pg-run-multi-main:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.pg-run-multi-main:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+}
+.pg-run-multi-main.has-chevron {
+  /* Visual divider between primary action and the chevron — same
+   * 1px translucent-white treatment as `.run-btn-split-divider`. */
+  box-shadow: inset -1px 0 0 0 rgba(255, 255, 255, 0.3);
+}
+.pg-run-multi-label {
+  /* Truncate long entry-file labels with an ellipsis. The full label
+   * shows in a Base UI popover on hover. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.pg-run-multi-chevron {
+  background: transparent !important;
+  border-radius: 0;
+  padding: 5px 8px;
+  flex-shrink: 0;
+}
+.pg-run-multi-chevron:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.pg-run-multi-chevron:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+}
+.pg-run-multi-chevron svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  fill: white;
+  stroke: white;
+}
+
+.pg-run-multi-dropdown {
+  min-width: 200px;
+}
+.pg-run-multi-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  border-radius: 4px;
+}
+.pg-run-multi-item[data-highlighted],
+.pg-run-multi-item:hover {
+  background: var(--bg3);
+}
+
 .editor-wrap {
   flex: 1;
   overflow: hidden;

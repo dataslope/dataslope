@@ -297,6 +297,30 @@ cat("\\nCounts by level:\\n")
 parsed |> count(level) |> print()
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Source a helper script alongside main.r",
+    code: `source("greetings.r")
+
+cat(hello("R Playground"), "\\n")
+cat(bye("R Playground"), "\\n")
+`,
+    files: [
+      {
+        filename: "greetings.r",
+        content: `hello <- function(name) {
+  paste0("Hello, ", name, "!")
+}
+
+bye <- function(name) {
+  paste0("Goodbye, ", name, "!")
+}
+`,
+      },
+    ],
+    entryFilename: "main.r",
+  },
 ];
 
 const PACKAGES: PackageInfo[] = [
@@ -776,9 +800,8 @@ export const rAdapter: LanguageAdapter = {
   exportFormats: [
     { extension: "r", label: "R (.r)", mimeType: "text/x-r-source" },
   ],
-  exportBaseFilename: "script",
-  defaultFileExtension: "R",
-  entryPoint: "script.R",
+  exportBaseFilename: "main",
+  defaultFileExtension: "r",
   packagesFooter: (
     <>
       Packages run in WebAssembly via{" "}

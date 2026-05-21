@@ -1,9 +1,11 @@
 import type {
   EmitOutput,
   ExampleSnippet,
+  EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { getClangFormat } from "./clangFormat";
 
@@ -187,7 +189,65 @@ int main() {
 }
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Split a Greeter class into a header + source file",
+    code: `#include <iostream>
+#include "greeter.hpp"
+
+int main() {
+    Greeter g("C++ Playground");
+    std::cout << g.hello() << "\\n";
+    std::cout << g.bye() << "\\n";
+    return 0;
+}
+`,
+    files: [
+      {
+        filename: "greeter.hpp",
+        content: `#ifndef GREETER_HPP
+#define GREETER_HPP
+
+#include <string>
+
+class Greeter {
+public:
+    explicit Greeter(std::string name);
+    std::string hello() const;
+    std::string bye() const;
+
+private:
+    std::string name_;
+};
+
+#endif
+`,
+      },
+      {
+        filename: "greeter.cpp",
+        content: `#include "greeter.hpp"
+
+Greeter::Greeter(std::string name) : name_(std::move(name)) {}
+
+std::string Greeter::hello() const { return "Hello, " + name_ + "!"; }
+std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
+`,
+      },
+    ],
+    entryFilename: "main.cpp",
+  },
 ];
+
+/** Detect whether a C++ source file declares a `main()` function. */
+function hasCppMain(source: string): boolean {
+  const cleaned = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''");
+  return /\bint\s+main\s*\(/.test(cleaned);
+}
 
 const PACKAGES: PackageInfo[] = [
   // Highlights from the C++ standard library — always available, no
@@ -490,18 +550,25 @@ class CppWorkerRuntime implements LanguageRuntime {
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     const id = ++this.nextId;
-    // For multi-file projects, prefer the staged main.cpp content so
-    // the correct entry point is always compiled even when the user has
-    // another file open. Fall back to `code` for single-file workspaces.
-    const source = this.stagedFiles.get("main.cpp") ?? code;
+    // Pick the entry translation unit. The Playground passes the chosen
+    // entry filename via `options.entryFilename` (defaults to
+    // "main.cpp"). If the user is running a non-active entry, prefer
+    // the staged copy so we always compile the latest workspace
+    // contents.
+    const entry = options?.entryFilename ?? "main.cpp";
+    const source = this.stagedFiles.get(entry) ?? code;
     // All other staged files (non-entry-point) are provided as extra
     // files so the compiler can resolve #include "..." directives and
     // compile additional translation units.
     const files: Array<[string, string]> = [];
     for (const [path, content] of this.stagedFiles) {
-      if (path !== "main.cpp") files.push([path, content]);
+      if (path !== entry) files.push([path, content]);
     }
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -547,7 +614,20 @@ export const cppAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "cpp",
-  entryPoint: "main.cpp",
+  findEntryFiles(files): EntryFileInfo[] {
+    const out: EntryFileInfo[] = [];
+    for (const f of files) {
+      if (
+        !f.filename.endsWith(".cpp") &&
+        !f.filename.endsWith(".cc") &&
+        !f.filename.endsWith(".cxx")
+      ) {
+        continue;
+      }
+      if (hasCppMain(f.content)) out.push({ filename: f.filename, kind: "main" });
+    }
+    return out;
+  },
   packagesFooter: (
     <>
       Headers above are part of the{" "}

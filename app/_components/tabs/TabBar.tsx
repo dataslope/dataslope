@@ -87,6 +87,7 @@ export function TabBar({
           tabs={tabs}
           activeTabId={activeTabId}
           onReorderTabs={onReorderTabs!}
+          onSelectTab={onSelectTab}
         >
           {strip}
         </DndStrip>
@@ -112,6 +113,7 @@ interface DndStripProps {
   tabs: TabDescriptor[];
   activeTabId: string;
   onReorderTabs: (next: TabDescriptor[]) => void;
+  onSelectTab: (id: string) => void;
   children: React.ReactNode;
 }
 
@@ -119,6 +121,7 @@ function DndStrip({
   tabs,
   activeTabId,
   onReorderTabs,
+  onSelectTab,
   children,
 }: DndStripProps) {
   const sensors = useSensors(
@@ -131,9 +134,17 @@ function DndStrip({
     [draggingId, tabs],
   );
 
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    setDraggingId(String(event.active.id));
-  }, []);
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const id = String(event.active.id);
+      setDraggingId(id);
+      // Mirror VSCode: dragging a tab to reorder it should also activate
+      // it. Do this on drag start so the editor switches as soon as the
+      // user picks the tab up, not only on drop.
+      if (id !== activeTabId) onSelectTab(id);
+    },
+    [activeTabId, onSelectTab],
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {

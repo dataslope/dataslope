@@ -1,9 +1,11 @@
 import type {
   EmitOutput,
   ExampleSnippet,
+  EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
@@ -184,7 +186,52 @@ public class Main {
 }
 `,
   },
+  {
+    key: "multifile",
+    title: "Multi-file Project",
+    desc: "Use a Greeter class defined in a separate Greeter.java",
+    code: `public class Main {
+    public static void main(String[] args) {
+        Greeter g = new Greeter("Java Playground");
+        System.out.println(g.hello());
+        System.out.println(g.bye());
+    }
+}
+`,
+    files: [
+      {
+        filename: "Greeter.java",
+        content: `public class Greeter {
+    private final String name;
+
+    public Greeter(String name) {
+        this.name = name;
+    }
+
+    public String hello() {
+        return "Hello, " + name + "!";
+    }
+
+    public String bye() {
+        return "Goodbye, " + name + "!";
+    }
+}
+`,
+      },
+    ],
+    entryFilename: "Main.java",
+  },
 ];
+
+/** Detect whether a Java source file declares a `public static void main`. */
+function hasJavaMain(source: string): boolean {
+  const cleaned = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''");
+  return /\b(?:public\s+)?static\s+(?:public\s+)?void\s+main\s*\(/.test(cleaned);
+}
 
 const PACKAGES: PackageInfo[] = [
   // Highlights from the Java 8 standard library — always available, no
@@ -488,8 +535,25 @@ class JavaRuntime implements LanguageRuntime {
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
-    const className = findMainClassName(code);
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
+    // The Playground passes the chosen entry file's contents as `code`
+    // and its filename via `options.entryFilename` so the user can pick
+    // which class with a `main` method to execute. When omitted, fall
+    // back to detecting the main class from `code` (legacy single-file
+    // behaviour).
+    let className: string;
+    if (options?.entryFilename) {
+      const base = options.entryFilename.includes("/")
+        ? options.entryFilename.split("/").pop()!
+        : options.entryFilename;
+      className = base.replace(/\.java$/, "");
+    } else {
+      className = findMainClassName(code);
+    }
     const sourcePath = `${SOURCE_DIR}${className}.java`;
 
     // 1) Mount the user's source under /str/<Class>.java so javac can
@@ -618,7 +682,14 @@ export const javaAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "Main",
   defaultFileExtension: "java",
-  entryPoint: "Main.java",
+  findEntryFiles(files): EntryFileInfo[] {
+    const out: EntryFileInfo[] = [];
+    for (const f of files) {
+      if (!f.filename.endsWith(".java")) continue;
+      if (hasJavaMain(f.content)) out.push({ filename: f.filename, kind: "main" });
+    }
+    return out;
+  },
   packagesFooter: (
     <>
       Packages above are part of the{" "}
