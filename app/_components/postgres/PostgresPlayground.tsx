@@ -1196,7 +1196,7 @@ function PostgresPlaygroundInner() {
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
     }
-  }, []);
+  }, [setSettingsOpen, setActiveTabId]);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findPostgresSampleDatabase(activeDbId);
   // customDbFilename applies only for the blank/imported database slot.

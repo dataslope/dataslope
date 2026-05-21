@@ -1600,7 +1600,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setSettingsOpen(true);
       setActiveTabId(SETTINGS_TAB_ID);
     }
-  }, [flushActiveFileToBuffer, setActiveTabId]);
+  }, [flushActiveFileToBuffer, setSettingsOpen, setActiveTabId]);
 
   /** Close the Settings tab and return focus to the previously-active
    *  code file. Used by the TabBar's close affordance. */
