@@ -217,7 +217,14 @@ function hasCSharpTopLevel(source: string): boolean {
       continue;
     }
     if (/^(?:global\s+)?using(?:\s+static)?\s.*;$/.test(line)) continue;
-    if (/^namespace\b/.test(line) || /^(?:public\s+|internal\s+|sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|struct|record|interface|enum)\b/.test(line)) {
+    // Match either a `namespace` keyword or a type declaration (with
+    // any leading visibility/modifier keywords). Type-decl lines start
+    // a body whose contents we ignore for the purpose of detecting
+    // top-level statements at file scope.
+    const NAMESPACE_RE = /^namespace\b/;
+    const TYPE_DECL_RE =
+      /^(?:public\s+|internal\s+|sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|struct|record|interface|enum)\b/;
+    if (NAMESPACE_RE.test(line) || TYPE_DECL_RE.test(line)) {
       depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
       continue;
     }
