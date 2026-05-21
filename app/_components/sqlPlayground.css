@@ -4231,16 +4231,26 @@
   gap: 8px;
   margin-top: 4px;
 }
+/* When the Settings tab is active, collapse the editor pane (row 2 stays 1fr
+   to host the settings overlay) and the resizer + results rows so only the
+   tab-bar row and the settings pane are visible. */
+.sql-panes--settings {
+  grid-template-rows: auto 1fr 0 0;
+}
+
 /* Inline Settings tab pane for the SQL playgrounds. Replaces the legacy
    modal-only `SqlSettingsPanel` dialog when settings is opened from the
-   sidebar gear button. */
+   sidebar gear button. Spans grid rows 2-4 so it covers the editor, resizer,
+   and results areas. */
 .sql-settings-tab-pane {
-  flex: 1 1 auto;
-  min-height: 0;
+  /* Span across editor (row 2), resizer (row 3), and results (row 4) rows
+     so the settings content fills the entire content area below the tab bar. */
+  grid-row: 2 / 5;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   overflow: hidden;
+  min-height: 0;
 }
 .sql-settings-tab-pane .settings-tabs {
   flex: 1 1 auto;

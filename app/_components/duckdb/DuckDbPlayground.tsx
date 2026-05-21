@@ -1204,6 +1204,7 @@ function DuckDbPlaygroundInner() {
   const editorPaneRef = useRef<HTMLDivElement | null>(null);
   const resultsPaneRef = useRef<HTMLElement | null>(null);
   const resizerRef = useRef<HTMLDivElement | null>(null);
+  const settingsOpenRef = useRef(false);
 
   // ─── Selection tracking ───────────────────────────────────────────────
   const [hasEditorSelection, setHasEditorSelection] = useState(false);
@@ -1222,9 +1223,24 @@ function DuckDbPlaygroundInner() {
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const openSettingsTab = useCallback(() => {
-    setSettingsOpen(true);
-    activeTabIdRef.current = SETTINGS_TAB_ID;
-    setActiveTabId(SETTINGS_TAB_ID);
+    if (activeTabIdRef.current === SETTINGS_TAB_ID) {
+      // Settings tab is active — close it and return to a query tab.
+      setSettingsOpen(false);
+      const fallback = tabsRef.current[0]?.id;
+      if (fallback) {
+        activeTabIdRef.current = fallback;
+        setActiveTabId(fallback);
+      }
+    } else if (settingsOpenRef.current) {
+      // Settings tab is in the tab bar but not active — activate it.
+      activeTabIdRef.current = SETTINGS_TAB_ID;
+      setActiveTabId(SETTINGS_TAB_ID);
+    } else {
+      // Settings tab is not open — add it and make it active.
+      setSettingsOpen(true);
+      activeTabIdRef.current = SETTINGS_TAB_ID;
+      setActiveTabId(SETTINGS_TAB_ID);
+    }
   }, []);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findDuckDbSampleDatabase(activeDbId);
@@ -1549,6 +1565,9 @@ function DuckDbPlaygroundInner() {
   useEffect(() => {
     activeDbIdRef.current = activeDbId;
   }, [activeDbId]);
+  useEffect(() => {
+    settingsOpenRef.current = settingsOpen;
+  }, [settingsOpen]);
 
   // ─── Hydrate persisted settings on mount ─────────────────────────────
   useEffect(() => {
@@ -5288,7 +5307,8 @@ function DuckDbPlaygroundInner() {
               ref={resultsPaneRef}
               style={
                 activeTab?.kind === "er-diagram" ||
-                  activeTab?.kind === "query-history"
+                  activeTab?.kind === "query-history" ||
+                  isSettingsTabActive
                   ? { display: "none" }
                   : undefined
               }

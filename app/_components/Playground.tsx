@@ -587,6 +587,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const filesRef = useRef<PlaygroundFile[]>([]);
   const virtualFilesRef = useRef<VirtualFile[]>([]);
   const dirtyBuffersRef = useRef(dirtyBuffers);
+  const settingsOpenRef = useRef(false);
+  const activeTabIdRef = useRef(activeTabId);
+  useEffect(() => {
+    settingsOpenRef.current = settingsOpen;
+  }, [settingsOpen]);
+  useEffect(() => {
+    activeTabIdRef.current = activeTabId;
+  }, [activeTabId]);
   useEffect(() => {
     activeFileIdRef.current = activeFileId;
   }, [activeFileId]);
@@ -1571,12 +1579,27 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     updateDirtyBuffer,
   ]);
 
-  /** Open the Settings tab, or focus it if already open. The settings
-   *  panel renders inline inside the editor pane when active. */
+  /** Toggle the Settings tab. Opens and activates it if not present,
+   *  activates it if present but inactive, or closes it if already active. */
   const openSettingsTab = useCallback(() => {
     flushActiveFileToBuffer();
-    setSettingsOpen(true);
-    setActiveTabId(SETTINGS_TAB_ID);
+    if (activeTabIdRef.current === SETTINGS_TAB_ID) {
+      // Settings tab is active — close it and return to the active file.
+      setSettingsOpen(false);
+      const targetId = activeFileIdRef.current;
+      if (targetId) {
+        setActiveTabId(targetId);
+      } else if (filesRef.current.length > 0) {
+        setActiveTabId(filesRef.current[0].id);
+      }
+    } else if (settingsOpenRef.current) {
+      // Settings tab is in the tab bar but not active — activate it.
+      setActiveTabId(SETTINGS_TAB_ID);
+    } else {
+      // Settings tab is not open — add it and make it active.
+      setSettingsOpen(true);
+      setActiveTabId(SETTINGS_TAB_ID);
+    }
   }, [flushActiveFileToBuffer, setActiveTabId]);
 
   /** Close the Settings tab and return focus to the previously-active
@@ -3091,7 +3114,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </button>
         </div>
 
-        <div className="panes" data-mobile-tab={mobileTab} ref={panesRef}>
+        <div className="panes" data-mobile-tab={mobileTab} data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined} ref={panesRef}>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">
@@ -3208,34 +3231,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <div
               className="editor-wrap"
               ref={editorHostRef}
-              style={
-                activeTabId === SETTINGS_TAB_ID
-                  ? { display: "none" }
-                  : undefined
-              }
             />
-            {activeTabId === SETTINGS_TAB_ID && (
-              <div className="editor-wrap pg-settings-tab-pane">
-                <SettingsPanelContent
-                  fontSize={fontSize}
-                  setFontSize={setFontSize}
-                  outputFontSizeEnabled={outputFontSizeEnabled}
-                  setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-                  outputFontSize={outputFontSize}
-                  setOutputFontSize={setOutputFontSize}
-                  editorTheme={editorTheme}
-                  setEditorTheme={setEditorTheme}
-                  wordWrap={wordWrap}
-                  setWordWrap={setWordWrap}
-                  clearBeforeRun={clearBeforeRun}
-                  setClearBeforeRun={setClearBeforeRun}
-                  language={adapter.id}
-                  onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-                  onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-                  onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-                />
-              </div>
-            )}
             <div
               className="resizer"
               ref={resizerRef}
@@ -3330,6 +3326,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </div>
             <DataslopeRunOverlay running={statusState === "running"} />
           </div>
+          {activeTabId === SETTINGS_TAB_ID && (
+            <div className="pg-settings-tab-pane">
+              <SettingsPanelContent
+                fontSize={fontSize}
+                setFontSize={setFontSize}
+                outputFontSizeEnabled={outputFontSizeEnabled}
+                setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                outputFontSize={outputFontSize}
+                setOutputFontSize={setOutputFontSize}
+                editorTheme={editorTheme}
+                setEditorTheme={setEditorTheme}
+                wordWrap={wordWrap}
+                setWordWrap={setWordWrap}
+                clearBeforeRun={clearBeforeRun}
+                setClearBeforeRun={setClearBeforeRun}
+                language={adapter.id}
+                onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+              />
+            </div>
+          )}
         </div>
         {/* A second instance of the overlay rendered outside the
             tab-switched `.panes` so it stays visible on mobile while
