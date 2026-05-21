@@ -1,0 +1,119 @@
+---
+title: Challenge Cards — C++
+description: Sandbox for `<ChallengeCard>` C++ variations.
+---
+
+C++ challenges compile via **browsercc** (clang + lld with the C++20
+standard) and run as WASI binaries in your browser.
+
+## 1. Stream output
+
+<ChallengeCard
+  adapter="cpp"
+  title="Print a greeting with iostream"
+  category="basics · iostream"
+  estimatedTime="~1 min"
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, C++!</code>.</p>
+  </>}
+  initialCode={`#include <iostream>
+
+int main() {
+    // your code here
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "hello",
+      name: "Prints `Hello, C++!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, C++!" },
+    },
+  ]}
+/>
+
+## 2. Containers and algorithms
+
+<ChallengeCard
+  adapter="cpp"
+  title="Sort and print"
+  category="vector · algorithm"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Given the integer vector below, sort it in ascending order and
+      print each element on its own line.
+    </p>
+  </>}
+  hint={<>
+    <code>std::sort</code> from <code>&lt;algorithm&gt;</code> works
+    in-place on the iterator range.
+  </>}
+  initialCode={`#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+    // your code here
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "sorted",
+      name: "Sorted ascending",
+      description: "10 lines, sorted",
+      expect: {
+        stdoutLines: ["1", "1", "2", "3", "3", "4", "5", "5", "6", "9"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+## 3. Class definition (stdout)
+
+<ChallengeCard
+  adapter="cpp"
+  title="Implement a Counter class"
+  category="classes · methods"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Define a class <code>Counter</code> with a member function{' '}
+      <code>tick()</code> that increments an internal counter and a{' '}
+      <code>value()</code> method that returns its current value. The
+      driver code in <code>main</code> will then print the counter
+      after each tick.
+    </p>
+  </>}
+  initialCode={`#include <iostream>
+
+class Counter {
+public:
+    // your code here
+};
+
+int main() {
+    Counter c;
+    for (int i = 0; i < 3; i++) {
+        c.tick();
+        std::cout << c.value() << "\\n";
+    }
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "counts",
+      name: "Counts 1, 2, 3",
+      description: "Three ticks produce 1, 2, 3 on separate lines",
+      expect: {
+        stdoutLines: ["1", "2", "3"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>

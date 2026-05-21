@@ -1,0 +1,103 @@
+---
+title: Challenge Cards — Java
+description: Sandbox for `<ChallengeCard>` Java variations.
+---
+
+Java challenges compile in the browser via **CheerpJ** (an
+in-browser OpenJDK). Tests use the stdout-based mode because the JVM
+process exits after `main` returns.
+
+The class name in your source must match the filename CheerpJ derives
+from it. Keep the class named `Main` for these exercises.
+
+## 1. Hello, Java
+
+<ChallengeCard
+  adapter="java"
+  title="Print a greeting"
+  category="basics · System.out"
+  estimatedTime="~1 min"
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, Java!</code>.</p>
+  </>}
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        // your code here
+    }
+}
+`}
+  tests={[
+    {
+      id: "hello",
+      name: "Prints `Hello, Java!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, Java!" },
+    },
+  ]}
+/>
+
+## 2. String manipulation
+
+<ChallengeCard
+  adapter="java"
+  title="Reverse a String"
+  category="strings"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Reverse the string <code>"DataSlope"</code> and print it on its
+      own line.
+    </p>
+  </>}
+  hint={<>
+    <code>StringBuilder</code> has a <code>reverse()</code> method, or
+    you can walk the characters by hand.
+  </>}
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        String s = "DataSlope";
+        // your code here
+    }
+}
+`}
+  tests={[
+    {
+      id: "reversed",
+      name: "Prints reversed string",
+      description: "Output: `epolSataD`",
+      expect: { stdoutEquals: "epolSataD" },
+    },
+  ]}
+/>
+
+## 3. Loops and conditionals
+
+<ChallengeCard
+  adapter="java"
+  title="Print even numbers"
+  category="loops · conditionals"
+  estimatedTime="~2 min"
+  instructions={<>
+    <p>
+      Print every even number from <strong>2</strong> to <strong>10</strong>
+      (inclusive), one per line.
+    </p>
+  </>}
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        // your code here
+    }
+}
+`}
+  tests={[
+    {
+      id: "evens",
+      name: "Prints 2, 4, 6, 8, 10",
+      description: "Five lines, one per even number",
+      expect: {
+        stdoutLines: ["2", "4", "6", "8", "10"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>

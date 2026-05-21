@@ -1,0 +1,53 @@
+---
+title: Challenge Cards
+description: Interactive coding exercises for every supported language, running entirely in your browser via WebAssembly.
+---
+
+Challenge Cards are interactive coding exercises that run entirely in your
+browser — no server, no sign-in required. Each card has a starter snippet,
+optional read-only setup code, a hint, and a suite of automated tests.
+
+## Languages
+
+### Interpreted
+
+| Language | Runtime | Page |
+|---|---|---|
+| Python | Pyodide 3.13 | [Python challenges](./python) |
+| JavaScript | almostnode (Node.js via WASM) | [JavaScript challenges](./javascript) |
+| TypeScript | almostnode + tsc | [TypeScript challenges](./typescript) |
+| R | WebR | [R challenges](./r) |
+| PHP | php-wasm | [PHP challenges](./php) |
+
+### Compiled
+
+| Language | Runtime | Page |
+|---|---|---|
+| C | Emscripten | [C challenges](./c) |
+| C++ | Emscripten | [C++ challenges](./cpp) |
+| Java | CheerpJ | [Java challenges](./java) |
+| C# | .NET WASM | [C# challenges](./csharp) |
+
+### SQL
+
+| Dialect | Runtime | Page |
+|---|---|---|
+| SQLite | @sqlite.org/sqlite-wasm | [SQLite challenges](./sqlite) |
+| DuckDB | @duckdb/duckdb-wasm | [DuckDB challenges](./duckdb) |
+| PostgreSQL | PGlite | [PostgreSQL challenges](./postgres) |
+
+## How tests work
+
+Non-SQL challenges support two test modes that can be mixed on a single card:
+
+- **Native tests** — assert against language values using `code: string` (a
+  snippet injected after your code that throws if an assertion fails). Best for
+  interpreter languages where you can inspect variables directly.
+- **Stdout tests** — assert against what your program prints using an
+  `expect` object (supports `stdoutLines`, `stdoutContains`, regex matching,
+  and more). The natural fit for compiled languages such as C, C++, Java, and
+  C# where injecting per-test code into a single `main()` is impractical.
+
+SQL challenges use a third mode: **result-set tests** — comparing returned
+rows against expected values or a reference solution, with optional post-DML
+state checks via `runAfterSql`.
