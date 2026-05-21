@@ -27,6 +27,13 @@ int main(void) {
     return 0;
 }
 `}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    printf("Hello, C!\\n");
+    return 0;
+}
+`}
   tests={[
     {
       id: "hello",
@@ -43,6 +50,46 @@ int main(void) {
   ]}
 />
 
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="Hello, C!"
+  category="basics · printf"
+  estimatedTime="~1 min"
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, C!</code>.</p>
+  </>}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    // your code here
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    printf("Hello, C!\\n");
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "hello",
+      name: "Prints `Hello, C!`",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "Hello, C!" },
+    },
+    {
+      id: "no_stderr",
+      name: "No diagnostics",
+      description: "Stderr should be empty",
+      expect: { noStderr: true },
+    },
+  ]}
+/>
+```
+
 ## 2. Sum the first N integers
 
 <ChallengeCard
@@ -57,16 +104,22 @@ int main(void) {
       The expected output is <code>5050</code>.
     </p>
   </>}
-  hint={<>
-    There's a closed form, <code>N(N+1)/2</code>, but a plain{' '}
-    <code>for</code> loop accumulator works fine too.
-  </>}
   initialCode={`#include <stdio.h>
 
 int main(void) {
     int N = 100;
     long sum = 0;
     // your code here
+    printf("%ld\\n", sum);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    int N = 100;
+    long sum = 0;
+    for (int i = 1; i <= N; i++) sum += i;
     printf("%ld\\n", sum);
     return 0;
 }
@@ -80,6 +133,50 @@ int main(void) {
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="Sum 1..N"
+  category="loops · arithmetic"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Compute the sum of integers from 1 to <code>N</code> (inclusive)
+      where <code>N = 100</code>, and print it followed by a newline.
+      The expected output is <code>5050</code>.
+    </p>
+  </>}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int N = 100;
+    long sum = 0;
+    // your code here
+    printf("%ld\\n", sum);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    int N = 100;
+    long sum = 0;
+    for (int i = 1; i <= N; i++) sum += i;
+    printf("%ld\\n", sum);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "sum_100",
+      name: "Sum of 1..100 is 5050",
+      description: "Single line: `5050`",
+      expect: { stdoutEquals: "5050" },
+    },
+  ]}
+/>
+```
 
 ## 3. Print a multiplication table
 
@@ -104,6 +201,15 @@ int main(void) {
     return 0;
 }
 `}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    for (int i = 1; i <= 5; i++) {
+        printf("3 * %d = %d\\n", i, 3 * i);
+    }
+    return 0;
+}
+`}
   tests={[
     {
       id: "table",
@@ -122,3 +228,54 @@ int main(void) {
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="3 × table from 1 to 5"
+  category="loops · printf"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Print the multiplication table of 3 for multipliers 1 through 5,
+      one per line, formatted exactly like:
+    </p>
+    <pre><code>3 * 1 = 3
+3 * 2 = 6
+...</code></pre>
+  </>}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    // your code here
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    for (int i = 1; i <= 5; i++) {
+        printf("3 * %d = %d\\n", i, 3 * i);
+    }
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "table",
+      name: "Exact multiplication table",
+      description: "5 lines, no trailing whitespace",
+      expect: {
+        stdoutLines: [
+          "3 * 1 = 3",
+          "3 * 2 = 6",
+          "3 * 3 = 9",
+          "3 * 4 = 12",
+          "3 * 5 = 15",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+```

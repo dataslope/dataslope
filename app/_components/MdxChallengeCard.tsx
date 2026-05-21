@@ -17,7 +17,6 @@
  *   instructions={<>
  *     <p>You have a DataFrame called <code>df</code>…</p>
  *   </>}
- *   hint={<>Try <code>groupby(...).agg(...)</code>.</>}
  *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
  *   initialCode={`summary = None`}
  *   tests={[

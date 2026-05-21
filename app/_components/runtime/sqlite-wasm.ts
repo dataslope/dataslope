@@ -381,13 +381,16 @@ export function execAll(db: Database, sql: string): QueryExecResult[] {
   const out: QueryExecResult[] = [];
   for (const stmt of iterateStatements(db, sql)) {
     try {
-      const columns = stmt.getColumnNames();
-      if (columns.length === 0) {
+      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws "Column
+      // index 0 is out of range" when `columnCount === 0` (DDL/DML).
+      // Guard with `columnCount` so DML statements drain cleanly.
+      if (stmt.columnCount === 0) {
         while (stmt.step()) {
           /* drain */
         }
         continue;
       }
+      const columns = stmt.getColumnNames();
       const values: SqlValue[][] = [];
       while (stmt.step()) values.push(getRow(stmt));
       out.push({ columns, values });

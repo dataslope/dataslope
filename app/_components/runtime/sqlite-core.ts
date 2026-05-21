@@ -744,14 +744,17 @@ export async function createSqliteEngineInProcess(
       const results: (QueryExecResultWithTypes | null)[] = [];
       for (const stmt of iterateStatements(db, sql)) {
         try {
-          const columns = stmt.getColumnNames();
-          if (columns.length === 0) {
+          // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws
+          // "Column index 0 is out of range" when `columnCount === 0`,
+          // so we must check `columnCount` directly first.
+          if (stmt.columnCount === 0) {
             // Non-SELECT statement (INSERT, UPDATE, CREATE TABLE, …)
             while (stmt.step()) {
               // execute fully, discard any rows
             }
             results.push(null);
           } else {
+            const columns = stmt.getColumnNames();
             // SELECT-like statement — collect rows (may be zero). Resolve
             // declared column types from PRAGMA table_info so the
             // ResultView shows real types even when no rows are returned
@@ -1554,6 +1557,12 @@ export async function createSqliteEngineInProcess(
         stmt = d.prepare(
           `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
         );
+        if (stmt.columnCount === 0) {
+          // Non-SELECT statement that somehow reached the lazy path —
+          // drain and return an empty result so the UI shows success.
+          while (stmt.step()) { /* drain */ }
+          return { result: [], totalCount: totalCount ?? safeOffset };
+        }
         const columns = stmt.getColumnNames();
         const columnTypes = resolveDeclaredColumnTypes(d, stripped, columns);
         const values: QueryExecResult["values"] = [];
@@ -1564,11 +1573,6 @@ export async function createSqliteEngineInProcess(
           totalCount !== null
             ? totalCount
             : values.length + safeOffset;
-        if (columns.length === 0) {
-          // Non-SELECT statement that somehow reached the lazy path —
-          // return an empty result so the UI shows the success message.
-          return { result: [], totalCount: rowCount };
-        }
         return {
           result: [{ columns, columnTypes, values }],
           totalCount: rowCount,

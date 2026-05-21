@@ -110,6 +110,14 @@ export interface SqlChallengeTest {
   runAfterRowCount?: number;
 }
 
+/** Specification for which tables the table viewer should display.
+ *  When `tables` is undefined, every user table in the default schema
+ *  is shown. To override, pass an array of table names or
+ *  `{schema, table}` pairs. */
+export type SqlTableViewerSpec =
+  | string
+  | { schema?: string; table: string };
+
 export interface SqlChallengeCardProps {
   dialect: SqlDialect;
   title: string;
@@ -117,7 +125,6 @@ export interface SqlChallengeCardProps {
   category?: string;
   estimatedTime?: string;
   instructions: React.ReactNode;
-  hint?: React.ReactNode;
   /** Setup SQL run once before the learner's first execution. Creates
    *  tables, populates seed data, etc. Replaces DataCamp's
    *  `pre-exercise-code` block. */
@@ -128,8 +135,23 @@ export interface SqlChallengeCardProps {
    *  button appears in the toolbar; tests can also reference it via
    *  `matchesSolution: true`. */
   solutionSql?: string;
+  /** Hand-picked tables (and optional schemas) to display in the table
+   *  viewer. When omitted, every user table in the default schema is
+   *  shown. Set to `false` to suppress the viewer entirely. */
+  tables?: SqlTableViewerSpec[] | false;
+  /** Maximum rows to fetch per table in the viewer. Default: 50. */
+  tableRowLimit?: number;
   /** Per-assertion tests evaluated after the learner runs their SQL. */
   tests: SqlChallengeTest[];
+}
+
+/** One table entry in the viewer panel. */
+interface TableViewerEntry {
+  schema: string | null;
+  table: string;
+  result: SqlResult | null;
+  error: string | null;
+  truncated: boolean;
 }
 
 // ─── Engine adapter ───────────────────────────────────────────────────
@@ -203,6 +225,44 @@ function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
     case "postgres":
       return createPostgresChallengeEngine();
   }
+}
+
+/** Default schema where a dialect's user tables live unless qualified
+ *  otherwise. SQLite has no schema concept (we use `main`); DuckDB
+ *  uses `main`; PostgreSQL uses `public`. */
+function defaultSchemaFor(dialect: SqlDialect): string {
+  return dialect === "postgres" ? "public" : "main";
+}
+
+/** SQL fragment that lists every user table in the default schema for
+ *  a given dialect. Used by the table viewer to enumerate tables when
+ *  the author didn't hand-pick a list. Returns rows of
+ *  (schema, table_name). */
+function listTablesSqlFor(dialect: SqlDialect): string {
+  if (dialect === "sqlite") {
+    return `SELECT 'main' AS schema_name, name AS table_name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name;`;
+  }
+  if (dialect === "duckdb") {
+    return `SELECT table_schema AS schema_name, table_name FROM information_schema.tables WHERE table_schema = 'main' AND table_type = 'BASE TABLE' ORDER BY table_name;`;
+  }
+  return `SELECT table_schema AS schema_name, table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name;`;
+}
+
+/** Quote a SQL identifier with double quotes, escaping any embedded
+ *  double quote. Same approach used by sqlite-core's `quoteIdent`. */
+function quoteIdent(name: string): string {
+  return `"${name.replace(/"/g, '""')}"`;
+}
+
+/** Build a qualified table reference for a given dialect, quoting
+ *  every component. */
+function qualifiedTable(
+  dialect: SqlDialect,
+  schema: string | null,
+  table: string,
+): string {
+  if (dialect === "sqlite" || !schema) return quoteIdent(table);
+  return `${quoteIdent(schema)}.${quoteIdent(table)}`;
 }
 
 // ─── Result-set comparison helpers ────────────────────────────────────
@@ -475,24 +535,6 @@ function PlayIcon() {
     </svg>
   );
 }
-function HelpIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  );
-}
-
 export default function SqlChallengeCard({
   dialect,
   title,
@@ -500,10 +542,11 @@ export default function SqlChallengeCard({
   category,
   estimatedTime,
   instructions,
-  hint,
   initSql,
   initialCode,
   solutionSql,
+  tables,
+  tableRowLimit = 50,
   tests,
 }: SqlChallengeCardProps) {
   const blockId = useBlockId(dialect);
@@ -528,8 +571,10 @@ export default function SqlChallengeCard({
   const [resultMessage, setResultMessage] = useState<string>("");
   const [resultError, setResultError] = useState<string>("");
   const [elapsed, setElapsed] = useState<string>("");
-  const [hintOpen, setHintOpen] = useState(false);
   const [solutionOpen, setSolutionOpen] = useState(false);
+  const [tableEntries, setTableEntries] = useState<TableViewerEntry[]>([]);
+  const [tableViewerOpen, setTableViewerOpen] = useState(true);
+  const [activeTableIdx, setActiveTableIdx] = useState(0);
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
@@ -664,6 +709,76 @@ export default function SqlChallengeCard({
     };
   }, []);
 
+  // ─── Table viewer ───────────────────────────────────────────────────
+  const tableViewerEnabled = tables !== false;
+
+  /** Refresh the table viewer's contents. Lists tables (either the
+   *  hand-picked subset or every user table in the default schema),
+   *  then runs `SELECT ... LIMIT N` against each. Errors per table are
+   *  isolated so one broken entry doesn't blank the panel. */
+  const refreshTableViewer = useCallback(
+    async (engine: SqlEngineLike) => {
+      if (!tableViewerEnabled) return;
+      const defaultSchema = defaultSchemaFor(dialect);
+      let plan: { schema: string | null; table: string }[];
+      if (Array.isArray(tables)) {
+        plan = tables.map((t) =>
+          typeof t === "string"
+            ? { schema: defaultSchema, table: t }
+            : { schema: t.schema ?? defaultSchema, table: t.table },
+        );
+      } else {
+        try {
+          const listed = await engine.exec(listTablesSqlFor(dialect));
+          const row = listed.find((r) => r.columns.length > 0);
+          plan = (row?.values ?? []).map((r) => ({
+            schema: String(r[0] ?? defaultSchema),
+            table: String(r[1] ?? ""),
+          }));
+        } catch {
+          plan = [];
+        }
+      }
+      const limit = Math.max(1, Math.floor(tableRowLimit));
+      const fetchLimit = limit + 1;
+      const entries: TableViewerEntry[] = await Promise.all(
+        plan.map(async ({ schema, table }) => {
+          if (!table) {
+            return {
+              schema,
+              table,
+              result: null,
+              error: "Empty table name.",
+              truncated: false,
+            };
+          }
+          try {
+            const ref = qualifiedTable(dialect, schema, table);
+            const out = await engine.exec(`SELECT * FROM ${ref} LIMIT ${fetchLimit};`);
+            const last = out.findLast?.((r) => r.columns.length > 0) ??
+              [...out].reverse().find((r) => r.columns.length > 0) ?? null;
+            if (!last) {
+              return { schema, table, result: null, error: null, truncated: false };
+            }
+            const truncated = last.values.length > limit;
+            const trimmed: SqlResult = truncated
+              ? { columns: last.columns, values: last.values.slice(0, limit) }
+              : last;
+            return { schema, table, result: trimmed, error: null, truncated };
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            return { schema, table, result: null, error: msg, truncated: false };
+          }
+        }),
+      );
+      setTableEntries(entries);
+      setActiveTableIdx((idx) =>
+        entries.length === 0 ? 0 : Math.min(idx, entries.length - 1),
+      );
+    },
+    [dialect, tableViewerEnabled, tableRowLimit, tables],
+  );
+
   // ─── Engine bootstrap ───────────────────────────────────────────────
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
@@ -681,9 +796,20 @@ export default function SqlChallengeCard({
       if (initSql && initSql.trim()) {
         await engine.exec(initSql);
       }
+      await refreshTableViewer(engine);
     }
     return engine;
-  }, [dialect, initSql]);
+  }, [dialect, initSql, refreshTableViewer]);
+
+  // Eagerly boot the engine on mount so the table viewer can populate
+  // before the learner clicks Run. The engine is per-card and isolated,
+  // so doing this once per mount is safe.
+  useEffect(() => {
+    if (!tableViewerEnabled) return;
+    void ensureEngine().catch(() => {
+      /* surface errors via the per-table error column instead of blocking mount */
+    });
+  }, [ensureEngine, tableViewerEnabled]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   /**
@@ -752,6 +878,14 @@ export default function SqlChallengeCard({
       }
       setStatus("ready");
       setStatusMessage("Done");
+      if (tableViewerEnabled) {
+        try {
+          const engine = await ensureEngine();
+          await refreshTableViewer(engine);
+        } catch {
+          /* viewer refresh failure shouldn't mask the run's success */
+        }
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setResultSet(null);
@@ -759,7 +893,7 @@ export default function SqlChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     }
-  }, [executeSql]);
+  }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
@@ -916,7 +1050,14 @@ export default function SqlChallengeCard({
     setStatusMessage(
       allPass ? "All tests passed" : `${passed}/${displayed.length} passed`,
     );
-  }, [canCheck, ensureEngine, executeSql, solutionSql, tests]);
+    if (tableViewerEnabled) {
+      try {
+        await refreshTableViewer(engine);
+      } catch {
+        /* viewer refresh failure shouldn't mask the run's outcome */
+      }
+    }
+  }, [canCheck, ensureEngine, executeSql, refreshTableViewer, solutionSql, tableViewerEnabled, tests]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
   useEffect(() => {
@@ -924,6 +1065,11 @@ export default function SqlChallengeCard({
   }, [run]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
+  // Reset restores the starter code AND re-seeds the database so
+  // INSERT/UPDATE/DELETE exercises can be retried from a clean slate.
+  // We do this by destroying the engine and clearing the seed flag —
+  // `ensureEngine()` will boot a fresh instance on the next user
+  // action, and the table-viewer effect will repopulate the panel.
   const reset = useCallback(() => {
     runSeqRef.current++;
     const view = editorRef.current;
@@ -931,6 +1077,12 @@ export default function SqlChallengeCard({
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: initialCode },
       });
+    }
+    const oldEngine = enginePromiseRef.current;
+    enginePromiseRef.current = null;
+    engineSeededRef.current = false;
+    if (oldEngine) {
+      void oldEngine.then((e) => e.destroy?.()).catch(() => {});
     }
     setResultSet(null);
     setResultError("");
@@ -940,7 +1092,13 @@ export default function SqlChallengeCard({
     setStatusMessage("");
     setTestResults([]);
     setBannerState(null);
-  }, [initialCode]);
+    setTableEntries([]);
+    if (tableViewerEnabled) {
+      void ensureEngine().catch(() => {
+        /* see mount-time bootstrap */
+      });
+    }
+  }, [initialCode, ensureEngine, tableViewerEnabled]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -972,40 +1130,58 @@ export default function SqlChallengeCard({
     >
       {/* ── Header ── */}
       <div className={styles.header}>
-        <div className={styles.badge}>
-          <span className={styles.badgeDot} /> {badge}
-        </div>
-        <div className={styles.titleArea}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.meta}>
-            {estimatedTime && (
-              <span className={styles.metaPill}>
-                <Clock size={11} aria-hidden />
-                {estimatedTime}
-              </span>
-            )}
-            {estimatedTime && category && (
-              <span className={styles.metaSep}>·</span>
-            )}
-            {category && <span>{category}</span>}
+        <div className={styles.headerMain}>
+          <div className={styles.headerTop}>
+            <div className={styles.badge}>
+              <span className={styles.badgeDot} /> {badge}
+            </div>
+            <span className={styles.headerBlockId}>
+              <Box size={12} aria-hidden /> {blockId}
+            </span>
+            <span className={styles.dialectBadge}>{dialect.toUpperCase()}</span>
+            <span className={styles.headerRuntimeLabel}>
+              <Database size={13} aria-hidden />
+              {engineLabel}
+            </span>
+            <span
+              className={styles.statusDot}
+              data-status={status}
+              title={statusMessage || status}
+              aria-label={statusMessage || status}
+            />
+            <div className={styles.headerStatus}>
+              {totalTests > 0 && bannerState !== null ? (
+                allPassed ? (
+                  <div className={styles.statusPass}>
+                    <Check size={14} strokeWidth={2.5} aria-hidden />
+                    Passed
+                  </div>
+                ) : (
+                  <div className={styles.statusPending}>
+                    <span className={styles.statusPendingCount}>
+                      {passedCount}/{totalTests}
+                    </span>
+                    <span className={styles.statusPendingLabel}>tests</span>
+                  </div>
+                )
+              ) : null}
+            </div>
           </div>
-        </div>
-        <div className={styles.statusArea}>
-          {totalTests > 0 && bannerState !== null ? (
-            allPassed ? (
-              <div className={styles.statusPass}>
-                <Check size={14} strokeWidth={2.5} aria-hidden />
-                Passed
-              </div>
-            ) : (
-              <div className={styles.statusPending}>
-                <span className={styles.statusPendingCount}>
-                  {passedCount}/{totalTests}
+          <div className={styles.title}>{title}</div>
+          {(estimatedTime || category) && (
+            <div className={styles.meta}>
+              {estimatedTime && (
+                <span className={styles.metaPill}>
+                  <Clock size={11} aria-hidden />
+                  {estimatedTime}
                 </span>
-                <span className={styles.statusPendingLabel}>tests</span>
-              </div>
-            )
-          ) : null}
+              )}
+              {estimatedTime && category && (
+                <span className={styles.metaSep}>·</span>
+              )}
+              {category && <span>{category}</span>}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1013,40 +1189,64 @@ export default function SqlChallengeCard({
       <div className={styles.instructions}>
         <div className={styles.instructionsLabel}>Instructions</div>
         <div className={styles.instructionsBody}>{instructions}</div>
-        {hint && (
-          <>
-            <button
-              type="button"
-              className={styles.hintToggle}
-              onClick={() => setHintOpen((v) => !v)}
-              aria-expanded={hintOpen}
-            >
-              <HelpIcon />
-              {hintOpen ? "Hide hint" : "Show hint"}
-            </button>
-            {hintOpen && <div className={styles.hintBox}>{hint}</div>}
-          </>
-        )}
       </div>
 
-      {/* ── Topbar ── */}
-      <div className={styles.topbar}>
-        <span className={styles.blockId}>
-          <Box size={13} aria-hidden /> {blockId}
-        </span>
-        <span className={styles.topbarDivider} aria-hidden />
-        <span className={styles.dialectBadge}>{dialect.toUpperCase()}</span>
-        <span className={styles.runtimeLabel}>
-          <Database size={14} aria-hidden />
-          {engineLabel}
-        </span>
-        <span
-          className={styles.statusDot}
-          data-status={status}
-          title={statusMessage || status}
-          aria-label={statusMessage || status}
-        />
-      </div>
+      {/* ── Table viewer ── */}
+      {tableViewerEnabled && tableEntries.length > 0 && (
+        <div className={styles.tableViewer}>
+          <button
+            type="button"
+            className={styles.tableViewerHeader}
+            onClick={() => setTableViewerOpen((v) => !v)}
+            aria-expanded={tableViewerOpen}
+          >
+            <span className={styles.tableViewerLabel}>Tables</span>
+            <span className={styles.tableViewerCount}>
+              {tableEntries.length} {tableEntries.length === 1 ? "table" : "tables"}
+            </span>
+            <ChevronDown
+              size={14}
+              aria-hidden
+              className={`${styles.testChevron} ${
+                tableViewerOpen ? styles.testChevronOpen : ""
+              }`}
+            />
+          </button>
+          {tableViewerOpen && (
+            <>
+              <div className={styles.tableViewerTabs} role="tablist">
+                {tableEntries.map((entry, idx) => (
+                  <button
+                    key={`${entry.schema ?? ""}.${entry.table}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={idx === activeTableIdx}
+                    className={`${styles.tableViewerTab} ${
+                      idx === activeTableIdx ? styles.tableViewerTabActive : ""
+                    }`}
+                    onClick={() => setActiveTableIdx(idx)}
+                  >
+                    {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
+                      <>
+                        <span className={styles.tableViewerSchema}>{entry.schema}.</span>
+                        {entry.table}
+                      </>
+                    ) : (
+                      entry.table
+                    )}
+                  </button>
+                ))}
+              </div>
+              {tableEntries[activeTableIdx] && (
+                <TableViewerPane
+                  entry={tableEntries[activeTableIdx]}
+                  limit={tableRowLimit}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* ── Editor ── */}
       <div
@@ -1085,6 +1285,17 @@ export default function SqlChallengeCard({
           )}
           <span>{isBusy ? "Running…" : "Run"}</span>
         </button>
+        {canCheck && (
+          <button
+            type="button"
+            className={styles.checkBtn}
+            onClick={() => void check()}
+            disabled={isBusy}
+          >
+            <Check size={12} strokeWidth={2.5} aria-hidden />
+            Check Answer
+          </button>
+        )}
         {!isBusy && (
           <span
             className={styles.kbdHint}
@@ -1094,6 +1305,17 @@ export default function SqlChallengeCard({
             <span className={styles.kbdPlus} aria-hidden>+</span>
             <kbd className={styles.kbd}>Enter</kbd>
           </span>
+        )}
+        <span className={styles.toolbarSpacer} />
+        {solutionSql && (
+          <button
+            type="button"
+            className={styles.resetBtn}
+            onClick={() => setSolutionOpen(true)}
+            disabled={isBusy}
+          >
+            Show Solution
+          </button>
         )}
         <button
           type="button"
@@ -1113,28 +1335,6 @@ export default function SqlChallengeCard({
         >
           <CopyIcon />
         </button>
-        {solutionSql && (
-          <button
-            type="button"
-            className={styles.resetBtn}
-            onClick={() => setSolutionOpen(true)}
-            disabled={isBusy}
-          >
-            Show Solution
-          </button>
-        )}
-        <span className={styles.toolbarSpacer} />
-        {canCheck && (
-          <button
-            type="button"
-            className={styles.checkBtn}
-            onClick={() => void check()}
-            disabled={isBusy}
-          >
-            <Check size={12} strokeWidth={2.5} aria-hidden />
-            Check Answer
-          </button>
-        )}
       </div>
 
       {/* ── Result panel ── */}
@@ -1307,6 +1507,7 @@ export default function SqlChallengeCard({
         <SolutionModal
           onClose={() => setSolutionOpen(false)}
           editorHostRef={solutionEditorHostRef}
+          source={solutionSql}
         />
       )}
     </div>
@@ -1316,14 +1517,13 @@ export default function SqlChallengeCard({
 function SolutionModal({
   onClose,
   editorHostRef,
+  source,
 }: {
   onClose: () => void;
   editorHostRef: React.RefObject<HTMLDivElement | null>;
+  source: string;
 }) {
-  // Trap-free modal: click on backdrop to close, Esc to close. Small
-  // surface — no focus management beyond what the underlying editor
-  // provides — because the alternative (a full dialog framework) is
-  // disproportionate for a read-only code viewer.
+  // Trap-free modal: click on backdrop to close, Esc to close.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -1331,6 +1531,16 @@ function SolutionModal({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  const copySolution = useCallback(async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(source);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [source]);
 
   return (
     <div
@@ -1373,10 +1583,19 @@ function SolutionModal({
           </div>
           <button
             type="button"
+            onClick={() => void copySolution()}
+            aria-label="Copy solution"
+            title="Copy solution"
+            className={styles.copyBtn}
+            style={{ marginLeft: "auto" }}
+          >
+            <CopyIcon />
+          </button>
+          <button
+            type="button"
             onClick={onClose}
             aria-label="Close"
             className={styles.copyBtn}
-            style={{ marginLeft: "auto" }}
           >
             <X size={14} strokeWidth={2.4} aria-hidden />
           </button>
@@ -1388,6 +1607,71 @@ function SolutionModal({
           aria-label="Solution editor (read-only)"
         />
       </div>
+    </div>
+  );
+}
+
+/** Renders a single table's contents inside the table viewer panel.
+ *  Errors and empty-table cases produce a contextual message rather
+ *  than a blank pane. */
+function TableViewerPane({
+  entry,
+  limit,
+}: {
+  entry: TableViewerEntry;
+  limit: number;
+}) {
+  if (entry.error) {
+    return (
+      <div className={styles.tableViewerEmpty} style={{ color: "var(--ch-red)" }}>
+        {entry.error}
+      </div>
+    );
+  }
+  const r = entry.result;
+  if (!r || r.columns.length === 0) {
+    return <div className={styles.tableViewerEmpty}>Table has no columns.</div>;
+  }
+  if (r.values.length === 0) {
+    return (
+      <div className={styles.tableViewerEmpty}>
+        <code>{entry.table}</code> is empty.
+      </div>
+    );
+  }
+  return (
+    <div className={styles.tableViewerScroll}>
+      <table className={styles.sqlResultTable}>
+        <thead>
+          <tr>
+            {r.columns.map((c, i) => (
+              <th key={i}>{c}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {r.values.map((row, ri) => (
+            <tr key={ri}>
+              {row.map((cell, ci) => (
+                <td key={ci}>
+                  {cell === null || cell === undefined ? (
+                    <span className={styles.sqlNullValue}>NULL</span>
+                  ) : cell instanceof Uint8Array ? (
+                    `<${cell.byteLength} bytes>`
+                  ) : (
+                    String(cell)
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {entry.truncated && (
+        <div className={styles.tableViewerFootnote}>
+          Showing first {limit} row{limit === 1 ? "" : "s"}.
+        </div>
+      )}
     </div>
   );
 }

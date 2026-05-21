@@ -26,6 +26,14 @@ class Program
     }
 }
 `}
+  solutionCode={`using System;
+
+class Program {
+    static void Main() {
+        Console.WriteLine("Hello, C#!");
+    }
+}
+`}
   tests={[
     {
       id: "hello",
@@ -35,6 +43,44 @@ class Program
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="csharp"
+  title="Print a greeting"
+  category="basics · Console.WriteLine"
+  estimatedTime="~1 min"
+  instructions={<>
+    <p>Make the program print exactly <code>Hello, C#!</code>.</p>
+  </>}
+  initialCode={`using System;
+
+class Program
+{
+    static void Main()
+    {
+        // your code here
+    }
+}
+`}
+  solutionCode={`using System;
+
+class Program {
+    static void Main() {
+        Console.WriteLine("Hello, C#!");
+    }
+}
+`}
+  tests={[
+    {
+      id: "hello",
+      name: "Prints `Hello, C#!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, C#!" },
+    },
+  ]}
+/>
+```
 
 ## 2. LINQ basics
 
@@ -49,9 +95,49 @@ class Program
       sum of squares of its elements and print the result.
     </p>
   </>}
-  hint={<>
-    LINQ's <code>Sum</code> with a projection works in one line:{' '}
-    <code>nums.Sum(x =&gt; x * x)</code>.
+  initialCode={`using System;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        int[] nums = { 1, 2, 3, 4, 5 };
+        // your code here
+    }
+}
+`}
+  solutionCode={`using System;
+
+class Program {
+    static void Main() {
+        int sum = 0;
+        for (int i = 1; i <= 10; i++) sum += i * i;
+        Console.WriteLine(sum);
+    }
+}
+`}
+  tests={[
+    {
+      id: "sum_squares",
+      name: "Sum of squares is 55",
+      description: "1+4+9+16+25 = 55",
+      expect: { stdoutEquals: "55" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="csharp"
+  title="Sum of squares"
+  category="linq · arrays"
+  estimatedTime="~3 min"
+  instructions={<>
+    <p>
+      Given the integer array <code>nums</code> below, compute the
+      sum of squares of its elements and print the result.
+    </p>
   </>}
   initialCode={`using System;
 using System.Linq;
@@ -65,6 +151,16 @@ class Program
     }
 }
 `}
+  solutionCode={`using System;
+
+class Program {
+    static void Main() {
+        int sum = 0;
+        for (int i = 1; i <= 10; i++) sum += i * i;
+        Console.WriteLine(sum);
+    }
+}
+`}
   tests={[
     {
       id: "sum_squares",
@@ -74,6 +170,7 @@ class Program
     },
   ]}
 />
+```
 
 ## 3. Class with property
 
@@ -116,6 +213,25 @@ class Program
     }
 }
 `}
+  solutionCode={`using System;
+
+class Point {
+    public double X, Y;
+    public Point(double x, double y) { X = x; Y = y; }
+    public double DistanceTo(Point other) {
+        double dx = X - other.X, dy = Y - other.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+}
+
+class Program {
+    static void Main() {
+        var a = new Point(0, 0);
+        var b = new Point(3, 4);
+        Console.WriteLine(a.DistanceTo(b));
+    }
+}
+`}
   tests={[
     {
       id: "distance",
@@ -125,3 +241,73 @@ class Program
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="csharp"
+  title="Implement a Point's distance"
+  category="classes · properties"
+  estimatedTime="~4 min"
+  instructions={<>
+    <p>
+      Add a method <code>DistanceTo(Point other)</code> to the{' '}
+      <code>Point</code> class that returns the Euclidean distance
+      between two points. The driver code prints the distance from{' '}
+      (0, 0) to (3, 4), which should be exactly <code>5</code>.
+    </p>
+  </>}
+  initialCode={`using System;
+
+class Point
+{
+    public double X { get; }
+    public double Y { get; }
+
+    public Point(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    // your code here
+}
+
+class Program
+{
+    static void Main()
+    {
+        var a = new Point(0, 0);
+        var b = new Point(3, 4);
+        Console.WriteLine(a.DistanceTo(b));
+    }
+}
+`}
+  solutionCode={`using System;
+
+class Point {
+    public double X, Y;
+    public Point(double x, double y) { X = x; Y = y; }
+    public double DistanceTo(Point other) {
+        double dx = X - other.X, dy = Y - other.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+}
+
+class Program {
+    static void Main() {
+        var a = new Point(0, 0);
+        var b = new Point(3, 4);
+        Console.WriteLine(a.DistanceTo(b));
+    }
+}
+`}
+  tests={[
+    {
+      id: "distance",
+      name: "Distance is 5",
+      description: "DistanceTo((3, 4)) from origin",
+      expect: { stdoutEquals: "5" },
+    },
+  ]}
+/>
+```
