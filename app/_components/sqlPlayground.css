@@ -4263,3 +4263,10 @@
   min-height: 0;
   overflow: auto;
 }
+/* Limit the inner content width so labels and switches don't spread too
+   far apart on wide screens. Left-aligned with its own built-in padding. */
+.sql-settings-tab-pane .settings-body,
+.sql-settings-tab-pane .settings-body-themes,
+.sql-settings-tab-pane .settings-actions {
+  max-width: 720px;
+}

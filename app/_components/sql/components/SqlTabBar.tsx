@@ -13,7 +13,7 @@
  * "Refactor `SqlTabBar` onto the generic `TabBar`".
  */
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { History, Network, Table } from "lucide-react";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import { TabBar } from "../../tabs/TabBar";
@@ -55,6 +55,17 @@ export function SqlTabBar({
   extraTabs,
   onExtraTabClose,
 }: SqlTabBarProps) {
+  // Track where the settings (extra) tab sits within the full descriptor
+  // list so the user can drag it anywhere among the query tabs.
+  // Infinity means "append at the end" — the natural starting position.
+  const [settingsIdx, setSettingsIdx] = useState<number>(Infinity);
+
+  // Reset position to the end whenever the settings tab is removed so
+  // that it starts fresh the next time the user opens it.
+  useEffect(() => {
+    if (!extraTabs || extraTabs.length === 0) setSettingsIdx(Infinity);
+  }, [extraTabs]);
+
   const descriptors = useMemo<TabDescriptor[]>(
     () => {
       const queryDescriptors = tabs.map<TabDescriptor>((tab) => {
@@ -108,11 +119,22 @@ export function SqlTabBar({
           contextMenuItems: extras,
         };
       });
-      return extraTabs && extraTabs.length > 0
-        ? [...queryDescriptors, ...extraTabs]
-        : queryDescriptors;
+
+      // Insert the settings (extra) tab at its tracked position so the
+      // user can reorder it freely. When there is no extra tab (settings
+      // closed) or the position hasn't been set yet, it goes at the end.
+      const settingsTab = extraTabs && extraTabs.length > 0 ? extraTabs[0] : null;
+      if (!settingsTab) return queryDescriptors;
+
+      const insertAt = Math.min(
+        Number.isFinite(settingsIdx) ? settingsIdx : queryDescriptors.length,
+        queryDescriptors.length,
+      );
+      const result = [...queryDescriptors];
+      result.splice(insertAt, 0, settingsTab);
+      return result;
     },
-    [tabs, onTabDuplicate, onTabCloseOthers, onTabCloseAll, extraTabs],
+    [tabs, onTabDuplicate, onTabCloseOthers, onTabCloseAll, extraTabs, settingsIdx],
   );
 
   return (
@@ -131,6 +153,14 @@ export function SqlTabBar({
       }}
       onRenameTab={onTabRename}
       onReorderTabs={(next) => {
+        // Track where the settings tab landed so it stays at its new
+        // position after the drop.
+        const settingsTab = extraTabs?.[0];
+        if (settingsTab) {
+          const newIdx = next.findIndex((d) => d.id === settingsTab.id);
+          if (newIdx >= 0) setSettingsIdx(newIdx);
+        }
+
         // Project the descriptor order back onto the QueryTab[] model
         // — the descriptors are derived from `tabs`, so we can recover
         // the originals via id lookup. Non-QueryTab `extraTabs` are
