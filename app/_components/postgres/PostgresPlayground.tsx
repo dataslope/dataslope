@@ -834,7 +834,7 @@ const DEFAULT_PAGE_SIZE = 50;
 const RUNTIME_INFO: RuntimeInfo = {
   language: "PostgreSQL",
   version: "17",
-  engine: "PGlite 0.4",
+  engine: "PGlite 0.4.5",
   engineUrl: "https://pglite.dev/",
   notes:
     "Pure-WASM build of PostgreSQL that runs entirely in your browser. Each sample database is rebuilt in memory on every page load.",

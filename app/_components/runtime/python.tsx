@@ -746,7 +746,7 @@ export const pythonAdapter: LanguageAdapter = {
   runtimeInfo: {
     language: "Python",
     version: "3.13.2",
-    engine: "Pyodide 0.29",
+    engine: "Pyodide 0.29.4",
     engineUrl: "https://pyodide.org",
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
