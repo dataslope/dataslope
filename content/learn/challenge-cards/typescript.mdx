@@ -11,8 +11,6 @@ before execution).
 <ChallengeCard
   adapter="typescript"
   title="Generic identity function"
-  category="generics · types"
-  estimatedTime="~2 min"
   instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
   initialCode={`function identity<T>(x: T): T {
   // your code here
@@ -55,8 +53,6 @@ console.log(identity<string>("hello"));
 <ChallengeCard
   adapter="typescript"
   title="Generic identity function"
-  category="generics · types"
-  estimatedTime="~2 min"
   instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
   initialCode={`function identity<T>(x: T): T {
   // your code here
@@ -101,8 +97,6 @@ console.log(identity<string>("hello"));
 <ChallengeCard
   adapter="typescript"
   title="Area of a Shape"
-  category="discriminated unions · pattern matching"
-  estimatedTime="~5 min"
   instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
 
 - Circle: π · r²
@@ -162,8 +156,6 @@ console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
 <ChallengeCard
   adapter="typescript"
   title="Area of a Shape"
-  category="discriminated unions · pattern matching"
-  estimatedTime="~5 min"
   instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
 
 - Circle: π · r²

@@ -30,13 +30,12 @@
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box, RotateCcw, Check, X, ChevronDown, Clock, Eye } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye } from "lucide-react";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
@@ -68,6 +67,12 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { themeFor } from "./cmExtensions";
+import {
+  clearPersistedCode,
+  loadPersistedCode,
+  persistKey,
+  savePersistedCode,
+} from "./codePersistence";
 import styles from "./ChallengeCard.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -135,8 +140,6 @@ export interface SqlChallengeCardProps {
   dialect: SqlDialect;
   title: string;
   badge?: string;
-  category?: string;
-  estimatedTime?: string;
   /** Rendered above the editor. Pass MDX content / React elements, or a
    *  markdown string for terser authoring. Strings support paragraphs,
    *  bullet lists, **bold**, *italic*, and `inline code`. */
@@ -508,24 +511,6 @@ function detectIsMac(): boolean {
 
 const CM_EDITOR_THEME = "idea";
 
-function useBlockId(dialect: SqlDialect): string {
-  const reactId = useId();
-  return useMemo(() => {
-    let h = 0;
-    for (let i = 0; i < reactId.length; i++) {
-      h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
-    }
-    const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
-    const prefix =
-      dialect === "sqlite"
-        ? "Sqlite"
-        : dialect === "duckdb"
-          ? "DuckDb"
-          : "Postgres";
-    return `${prefix}Block-${suffix}`;
-  }, [reactId, dialect]);
-}
-
 /** Map a SQL dialect to the corresponding key in the shared
  *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label
  *  uses the same brand glyph as the playground language switcher. */
@@ -564,8 +549,6 @@ export default function SqlChallengeCard({
   dialect,
   title,
   badge = "SQL Challenge",
-  category,
-  estimatedTime,
   instructions,
   initSql,
   initialCode,
@@ -574,12 +557,22 @@ export default function SqlChallengeCard({
   tableRowLimit = 50,
   tests,
 }: SqlChallengeCardProps) {
-  const blockId = useBlockId(dialect);
-
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
+  // Debounce handle for localStorage persistence (see editor mount).
+  const persistSaveTimerRef = useRef<number | null>(null);
+
+  // Stable localStorage key for the user's SQL buffer. `dialect` is in
+  // the fingerprint because the same starter SQL might mean different
+  // things across engines (e.g. `RETURNING` is Postgres/SQLite but not
+  // historically DuckDB), and `title` disambiguates challenges that
+  // happen to share starter text.
+  const persistedKey = useMemo(
+    () => persistKey("sql-challenge", `${dialect}|${title}|${initialCode}`),
+    [dialect, title, initialCode],
+  );
 
   // Each card owns its own engine instance — sharing across cards
   // would let one challenge's CREATE TABLE leak into another's
@@ -626,8 +619,13 @@ export default function SqlChallengeCard({
     const themeComp = new Compartment();
     const languageComp = new Compartment();
 
+    // Restore any previously-saved SQL buffer; fall back to the MDX
+    // starter when nothing is stored.
+    const persisted = loadPersistedCode(persistedKey);
+    const initialDoc = persisted ?? initialCode;
+
     const view = new EditorView({
-      doc: initialCode,
+      doc: initialDoc,
       parent: editorHostRef.current,
       extensions: [
         history(),
@@ -657,6 +655,17 @@ export default function SqlChallengeCard({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(CM_EDITOR_THEME)),
+        // Debounced persist of the user's SQL so reloads / nav restore
+        // their in-progress query.
+        EditorView.updateListener.of((update) => {
+          if (!update.docChanged) return;
+          if (persistSaveTimerRef.current !== null)
+            window.clearTimeout(persistSaveTimerRef.current);
+          persistSaveTimerRef.current = window.setTimeout(() => {
+            persistSaveTimerRef.current = null;
+            savePersistedCode(persistedKey, update.state.doc.toString());
+          }, 400);
+        }),
       ],
     });
     editorRef.current = view;
@@ -674,6 +683,12 @@ export default function SqlChallengeCard({
     })();
 
     return () => {
+      // Flush any pending debounced save so the last keystroke survives.
+      if (persistSaveTimerRef.current !== null) {
+        window.clearTimeout(persistSaveTimerRef.current);
+        persistSaveTimerRef.current = null;
+        savePersistedCode(persistedKey, view.state.doc.toString());
+      }
       view.destroy();
       editorRef.current = null;
     };
@@ -1104,6 +1119,13 @@ export default function SqlChallengeCard({
         changes: { from: 0, to: view.state.doc.length, insert: initialCode },
       });
     }
+    // Drop the persisted buffer and cancel the debounced save the
+    // dispatch above just scheduled.
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    clearPersistedCode(persistedKey);
     const oldEngine = enginePromiseRef.current;
     enginePromiseRef.current = null;
     engineSeededRef.current = false;
@@ -1125,7 +1147,7 @@ export default function SqlChallengeCard({
       });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, ensureEngine, tableViewerEnabled, toasts]);
+  }, [initialCode, persistedKey, ensureEngine, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -1189,10 +1211,6 @@ export default function SqlChallengeCard({
             <span className={styles.badgeDot} /> {badge}
           </div>
           <div className={styles.headerMeta}>
-            <span className={styles.headerBlockId}>
-              <Box size={12} aria-hidden /> {blockId}
-            </span>
-            <span className={styles.headerDivider} aria-hidden />
             <span className={styles.headerRuntimeLabel}>
               <DialectGlyph dialect={dialect} />
               {engineLabel}
@@ -1225,20 +1243,6 @@ export default function SqlChallengeCard({
             ) : null}
           </div>
         </div>
-        {(estimatedTime || category) && (
-          <div className={styles.meta}>
-            {estimatedTime && (
-              <span className={styles.metaPill}>
-                <Clock size={11} aria-hidden />
-                {estimatedTime}
-              </span>
-            )}
-            {estimatedTime && category && (
-              <span className={styles.metaSep}>·</span>
-            )}
-            {category && <span>{category}</span>}
-          </div>
-        )}
       </div>
 
       {/* ── Instructions ── */}

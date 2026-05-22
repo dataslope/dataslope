@@ -33,11 +33,12 @@
   --ch-purple: #7c3aed;
   --ch-purple-bg: #f5f3ff;
   --ch-purple-border: #ede9fe;
-  /* Badge accent — purple for non-SQL challenges, cyan for SQL, set
-     via the `dataDialect`-aware override below. */
-  --ch-badge-color: #7c3aed;
-  --ch-badge-bg: #f5f3ff;
-  --ch-badge-border: #ede9fe;
+  /* Badge accent — tracks --ch-accent so the pill matches the card's
+     primary accent everywhere it appears (badge, table-viewer active
+     tab, etc.). */
+  --ch-badge-color: var(--ch-accent);
+  --ch-badge-bg: #eff6ff;
+  --ch-badge-border: #dbeafe;
   --ch-scrollbar-thumb: #d1d5db;
   --ch-scrollbar-thumb-hover: #9ca3af;
   --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
@@ -61,14 +62,6 @@
   position: relative;
 }
 
-/* SQL challenge cards get a distinct cyan accent on the badge to match
-   the design — non-SQL cards keep the default purple. */
-.card[data-flavor="sql"] {
-  --ch-badge-color: #0891b2;
-  --ch-badge-bg: #ecfeff;
-  --ch-badge-border: #a5f3fc;
-}
-
 /* ─── Header ──────────────────────────────────────────────────────── */
 
 .header {
@@ -87,16 +80,9 @@
 .headerMeta {
   display: inline-flex;
   align-items: center;
-  gap: 0;
+  gap: 10px;
   flex-shrink: 0;
   flex-wrap: nowrap;
-}
-.headerDivider {
-  width: 1px;
-  height: 14px;
-  background: var(--ch-border);
-  margin: 0 10px;
-  flex-shrink: 0;
 }
 .titleRow {
   display: flex;
@@ -108,17 +94,6 @@
   align-items: center;
   flex-shrink: 0;
   margin-left: auto;
-}
-.headerBlockId {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: var(--ch-text-muted);
-  font-family: var(--ch-font-mono);
-}
-.headerBlockId svg {
-  opacity: 0.6;
 }
 .headerRuntimeLabel {
   display: inline-flex;
@@ -168,23 +143,6 @@
   flex: 1;
   min-width: 0;
 }
-.meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 11.5px;
-  color: var(--ch-text-muted);
-  flex-wrap: wrap;
-}
-.metaPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.metaSep {
-  color: var(--ch-text-muted);
-}
-
 .statusArea {
   display: flex;
   align-items: center;
@@ -1072,6 +1030,10 @@
   --ch-purple: #c4b5fd;
   --ch-purple-bg: rgba(139, 92, 246, 0.14);
   --ch-purple-border: rgba(139, 92, 246, 0.32);
+  /* Badge inherits the dark-mode accent (the var() declared above
+     auto-tracks --ch-accent), but bg/border need explicit dark tints. */
+  --ch-badge-bg: rgba(59, 130, 246, 0.14);
+  --ch-badge-border: rgba(59, 130, 246, 0.32);
   --ch-shadow:
     0 1px 2px rgba(0, 0, 0, 0.5),
     0 1px 3px rgba(0, 0, 0, 0.4);
@@ -1102,9 +1064,6 @@
 }
 :global(html.dark) .checkBtn:hover:not(:disabled) {
   background: rgba(59, 130, 246, 0.15);
-}
-:global(html.dark) .headerDivider {
-  background: var(--ch-border);
 }
 :global(html.dark) .kbd {
   background: #1f2937;

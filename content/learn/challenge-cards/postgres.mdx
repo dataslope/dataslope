@@ -11,8 +11,6 @@ compiled to WebAssembly that boots entirely in your browser.
 <SqlChallengeCard
   dialect="postgres"
   title="List orders with customer names"
-  category="JOIN · SELECT"
-  estimatedTime="~3 min"
   instructions={`Join \`orders\` and \`customers\` and return one row per order with the columns \`order_id\`, \`customer_name\`, and \`amount\`. Sort by \`order_id\` ascending.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
@@ -70,8 +68,6 @@ ORDER BY o.id ASC;`}
 <SqlChallengeCard
   dialect="postgres"
   title="List orders with customer names"
-  category="JOIN · SELECT"
-  estimatedTime="~3 min"
   instructions={`Join \`orders\` and \`customers\` and return one row per order with the columns \`order_id\`, \`customer_name\`, and \`amount\`. Sort by \`order_id\` ascending.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
@@ -131,8 +127,6 @@ ORDER BY o.id ASC;`}
 <SqlChallengeCard
   dialect="postgres"
   title="Top customer by total spend"
-  category="CTE · GROUP BY"
-  estimatedTime="~4 min"
   instructions={`Return the single customer who has spent the most across all their orders, with columns \`customer_name\` and \`total_spent\`.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
@@ -183,8 +177,6 @@ LIMIT 1;`}
 <SqlChallengeCard
   dialect="postgres"
   title="Top customer by total spend"
-  category="CTE · GROUP BY"
-  estimatedTime="~4 min"
   instructions={`Return the single customer who has spent the most across all their orders, with columns \`customer_name\` and \`total_spent\`.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
@@ -237,8 +229,6 @@ LIMIT 1;`}
 <SqlChallengeCard
   dialect="postgres"
   title="Apply a 10% discount to large orders"
-  category="UPDATE · DML"
-  estimatedTime="~2 min"
   instructions={`Reduce every \`orders.amount\` by 10% (multiply by \`0.9\`) for orders where \`amount > 100\`. Use a single \`UPDATE\` statement.`}
   initSql={`CREATE TABLE orders (
   id     SERIAL PRIMARY KEY,
@@ -271,8 +261,6 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
 <SqlChallengeCard
   dialect="postgres"
   title="Apply a 10% discount to large orders"
-  category="UPDATE · DML"
-  estimatedTime="~2 min"
   instructions={`Reduce every \`orders.amount\` by 10% (multiply by \`0.9\`) for orders where \`amount > 100\`. Use a single \`UPDATE\` statement.`}
   initSql={`CREATE TABLE orders (
   id     SERIAL PRIMARY KEY,

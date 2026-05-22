@@ -11,8 +11,6 @@ engine compiled to WebAssembly, served from jsDelivr at first use.
 <SqlChallengeCard
   dialect="duckdb"
   title="Find numbers divisible by 7"
-  category="generate_series · filter"
-  estimatedTime="~2 min"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
@@ -42,8 +40,6 @@ FROM range(1, 101) t(i)
 <SqlChallengeCard
   dialect="duckdb"
   title="Find numbers divisible by 7"
-  category="generate_series · filter"
-  estimatedTime="~2 min"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
@@ -75,8 +71,6 @@ FROM range(1, 101) t(i)
 <SqlChallengeCard
   dialect="duckdb"
   title="Running revenue per region"
-  category="window · sum over"
-  estimatedTime="~5 min"
   instructions={`Return one row per \`sale_date\` per \`region\` with columns \`sale_date\`, \`region\`, \`revenue\`, and a fourth column \`running_total\` containing the cumulative sum of \`revenue\` within each region, ordered by \`sale_date\`.`}
   initSql={`CREATE TABLE sales AS
 SELECT
@@ -127,8 +121,6 @@ ORDER BY region, sale_date;`}
 <SqlChallengeCard
   dialect="duckdb"
   title="Running revenue per region"
-  category="window · sum over"
-  estimatedTime="~5 min"
   instructions={`Return one row per \`sale_date\` per \`region\` with columns \`sale_date\`, \`region\`, \`revenue\`, and a fourth column \`running_total\` containing the cumulative sum of \`revenue\` within each region, ordered by \`sale_date\`.`}
   initSql={`CREATE TABLE sales AS
 SELECT
@@ -181,8 +173,6 @@ ORDER BY region, sale_date;`}
 <SqlChallengeCard
   dialect="duckdb"
   title="Average rating per genre"
-  category="aggregation · joins"
-  estimatedTime="~4 min"
   instructions={`Two tables are pre-loaded: \`movies\` (with \`id\`, \`title\`, \`genre_id\`, \`rating\`) and \`genres\` (with \`id\`, \`name\`). Return one row per genre with columns \`genre\` and \`avg_rating\` (rounded to one decimal place), sorted by \`avg_rating\` descending.`}
   initSql={`CREATE TABLE genres (id INTEGER, name VARCHAR);
 INSERT INTO genres VALUES (1, 'Drama'), (2, 'Sci-Fi'), (3, 'Comedy');
@@ -227,8 +217,6 @@ ORDER BY avg_rating DESC;`}
 <SqlChallengeCard
   dialect="duckdb"
   title="Average rating per genre"
-  category="aggregation · joins"
-  estimatedTime="~4 min"
   instructions={`Two tables are pre-loaded: \`movies\` (with \`id\`, \`title\`, \`genre_id\`, \`rating\`) and \`genres\` (with \`id\`, \`name\`). Return one row per genre with columns \`genre\` and \`avg_rating\` (rounded to one decimal place), sorted by \`avg_rating\` descending.`}
   initSql={`CREATE TABLE genres (id INTEGER, name VARCHAR);
 INSERT INTO genres VALUES (1, 'Drama'), (2, 'Sci-Fi'), (3, 'Comedy');

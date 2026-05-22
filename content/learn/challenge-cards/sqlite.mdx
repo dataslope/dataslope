@@ -11,8 +11,6 @@ WebAssembly build, in-process, in your browser.
 <SqlChallengeCard
   dialect="sqlite"
   title="List all books by year"
-  category="SELECT · ORDER BY"
-  estimatedTime="~2 min"
   instructions={`Write a query that returns every row from the \`books\` table, sorted by \`year\` ascending. The result should have the columns \`title\`, \`author\`, and \`year\` in that order.`}
   initSql={`CREATE TABLE books (
   id     INTEGER PRIMARY KEY,
@@ -66,8 +64,6 @@ SELECT * FROM books;
 <SqlChallengeCard
   dialect="sqlite"
   title="List all books by year"
-  category="SELECT · ORDER BY"
-  estimatedTime="~2 min"
   instructions={`Write a query that returns every row from the \`books\` table, sorted by \`year\` ascending. The result should have the columns \`title\`, \`author\`, and \`year\` in that order.`}
   initSql={`CREATE TABLE books (
   id     INTEGER PRIMARY KEY,
@@ -123,8 +119,6 @@ SELECT * FROM books;
 <SqlChallengeCard
   dialect="sqlite"
   title="Revenue per category"
-  category="GROUP BY · SUM"
-  estimatedTime="~3 min"
   instructions={`Return one row per \`category\` with the columns \`category\` and \`total_revenue\` (the sum of \`revenue\`). Sort by \`total_revenue\` descending.`}
   initSql={`CREATE TABLE sales (
   id       INTEGER PRIMARY KEY,
@@ -171,8 +165,6 @@ ORDER BY total_revenue DESC;`}
 <SqlChallengeCard
   dialect="sqlite"
   title="Revenue per category"
-  category="GROUP BY · SUM"
-  estimatedTime="~3 min"
   instructions={`Return one row per \`category\` with the columns \`category\` and \`total_revenue\` (the sum of \`revenue\`). Sort by \`total_revenue\` descending.`}
   initSql={`CREATE TABLE sales (
   id       INTEGER PRIMARY KEY,
@@ -221,8 +213,6 @@ ORDER BY total_revenue DESC;`}
 <SqlChallengeCard
   dialect="sqlite"
   title="Insert a new user"
-  category="INSERT · DML"
-  estimatedTime="~2 min"
   instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -257,8 +247,6 @@ INSERT INTO users (name, email) VALUES
 <SqlChallengeCard
   dialect="sqlite"
   title="Insert a new user"
-  category="INSERT · DML"
-  estimatedTime="~2 min"
   instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,

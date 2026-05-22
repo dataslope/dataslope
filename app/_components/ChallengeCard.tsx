@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box, RotateCcw, Check, X, ChevronDown, Clock, Eye } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye } from "lucide-react";
 import {
   CopyIcon,
   PlayIcon,
@@ -69,6 +69,12 @@ import type {
 } from "./types";
 import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
 import {
+  clearPersistedCode,
+  loadPersistedCode,
+  persistKey,
+  savePersistedCode,
+} from "./codePersistence";
+import {
   buildHarness,
   canRunTests,
   evaluateStdoutExpect,
@@ -99,11 +105,6 @@ export interface ChallengeCardProps {
   title: string;
   /** Optional uppercase badge label. Defaults to "Challenge". */
   badge?: string;
-  /** Optional category descriptor, rendered after the time pill.
-   *  Free-form — e.g. "pandas · groupby · agg". */
-  category?: string;
-  /** Optional estimated time, e.g. "~5 min". */
-  estimatedTime?: string;
   /** Rendered above the editor. Pass MDX content / React elements, or a
    *  markdown string for terser authoring. Strings support paragraphs,
    *  bullet lists, **bold**, *italic*, and `inline code`. */
@@ -173,8 +174,6 @@ export default function ChallengeCard({
   adapter,
   title,
   badge = "Challenge",
-  category,
-  estimatedTime,
   instructions,
   initCode,
   initialCode,
@@ -193,6 +192,20 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
+  // Debounce handle for the localStorage write that mirrors the editor
+  // buffer. See `persistedKey` below.
+  const persistSaveTimerRef = useRef<number | null>(null);
+
+  // Stable localStorage key for this challenge's editor buffer. The
+  // fingerprint includes the starter source so editing the MDX
+  // `initialCode` retires any saved attempts against the old prompt.
+  // `title` is in the fingerprint too so a challenge whose starter code
+  // happens to be identical to another's (e.g. both start with
+  // `// TODO`) doesn't collide.
+  const persistedKey = useMemo(
+    () => persistKey("challenge", `${adapter.id}|${title}|${initialCode}`),
+    [adapter.id, title, initialCode],
+  );
   // Shared per-adapter runtime, scoped to the fumadocs surface: every
   // `<CodeBlock>` / `<ChallengeCard>` rendered on the /learn route
   // (across pages, within the same SPA session) reuses one runtime
@@ -234,8 +247,13 @@ export default function ChallengeCard({
     const languageComp = new Compartment();
     const lineOffset = hasInit ? initLineCount : 0;
 
+    // Restore the user's previously-saved buffer for this challenge,
+    // falling back to the MDX starter when there isn't one.
+    const persisted = loadPersistedCode(persistedKey);
+    const initialDoc = persisted ?? initialCode;
+
     const view = new EditorView({
-      doc: initialCode,
+      doc: initialDoc,
       parent: editorHostRef.current,
       extensions: [
         history(),
@@ -269,6 +287,17 @@ export default function ChallengeCard({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(CM_EDITOR_THEME)),
+        // Debounced persist of the user's buffer so reloads /
+        // navigation away and back restore their in-progress attempt.
+        EditorView.updateListener.of((update) => {
+          if (!update.docChanged) return;
+          if (persistSaveTimerRef.current !== null)
+            window.clearTimeout(persistSaveTimerRef.current);
+          persistSaveTimerRef.current = window.setTimeout(() => {
+            persistSaveTimerRef.current = null;
+            savePersistedCode(persistedKey, update.state.doc.toString());
+          }, 400);
+        }),
       ],
     });
     editorRef.current = view;
@@ -279,6 +308,13 @@ export default function ChallengeCard({
       }
     });
     return () => {
+      // Flush any pending debounced save before tearing down, so the
+      // very last keystroke isn't lost on route changes.
+      if (persistSaveTimerRef.current !== null) {
+        window.clearTimeout(persistSaveTimerRef.current);
+        persistSaveTimerRef.current = null;
+        savePersistedCode(persistedKey, view.state.doc.toString());
+      }
       view.destroy();
       editorRef.current = null;
     };
@@ -566,6 +602,14 @@ export default function ChallengeCard({
         changes: { from: 0, to: view.state.doc.length, insert: initialCode },
       });
     }
+    // The dispatch above schedules a persist write of the starter; drop
+    // the debounce and the localStorage entry so the next mount picks up
+    // the MDX starter cleanly.
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    clearPersistedCode(persistedKey);
     setOutputs([]);
     setElapsed("");
     setStatus("idle");
@@ -573,7 +617,7 @@ export default function ChallengeCard({
     setTestResults([]);
     setBannerState(null);
     toasts.show("Reset to starter code.");
-  }, [initialCode, toasts]);
+  }, [initialCode, persistedKey, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -634,10 +678,6 @@ export default function ChallengeCard({
             <span className={styles.badgeDot} /> {badge}
           </div>
           <div className={styles.headerMeta}>
-            <span className={styles.headerBlockId}>
-              <Box size={12} aria-hidden /> {blockId}
-            </span>
-            <span className={styles.headerDivider} aria-hidden />
             <span className={styles.headerRuntimeLabel}>
               <LanguageGlyph adapter={adapter} />
               {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
@@ -670,20 +710,6 @@ export default function ChallengeCard({
             ) : null}
           </div>
         </div>
-        {(estimatedTime || category) && (
-          <div className={styles.meta}>
-            {estimatedTime && (
-              <span className={styles.metaPill}>
-                <Clock size={11} aria-hidden />
-                {estimatedTime}
-              </span>
-            )}
-            {estimatedTime && category && (
-              <span className={styles.metaSep}>·</span>
-            )}
-            {category && <span>{category}</span>}
-          </div>
-        )}
       </div>
 
       {/* ── Instructions ── */}
