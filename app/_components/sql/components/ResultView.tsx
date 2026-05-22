@@ -1989,7 +1989,12 @@ export function ResultTableBody({
                 onClick={() => {
                   const cell = rightClickedCellRef.current;
                   const text = cell !== null ? formatCellValue(cell.value) : "";
-                  navigator.clipboard.writeText(text).catch(() => undefined);
+                  navigator.clipboard
+                    .writeText(text)
+                    .then(() => {
+                      toastManager.add({ title: "Cell value copied", data: { kind: "info" } });
+                    })
+                    .catch(() => undefined);
                 }}
               >
                 <div className="ex-title">Copy cell value</div>
@@ -2038,7 +2043,12 @@ export function ResultTableBody({
                       .map((v) => formatCellAsSql(v))
                       .join(", ");
                     const sql = `INSERT INTO ${quoteIdentSql(sourceTable)} (${cols}) VALUES (${vals});`;
-                    navigator.clipboard.writeText(sql).catch(() => undefined);
+                    navigator.clipboard
+                      .writeText(sql)
+                      .then(() => {
+                        toastManager.add({ title: "Row copied as SQL", data: { kind: "info" } });
+                      })
+                      .catch(() => undefined);
                   }}
                 >
                   <div className="ex-title">Copy row as SQL</div>
