@@ -785,7 +785,7 @@ export const rAdapter: LanguageAdapter = {
   displayName: "R Playground",
   logoText: "R",
   documentTitle: "R Playground",
-  readyStatus: "R 4.5.1 ready",
+  readyStatus: "R 4.6.0 ready",
   runtimeInfo: {
     language: "R",
     version: "4.6.0",
