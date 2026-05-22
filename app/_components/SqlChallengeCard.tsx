@@ -35,7 +35,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
+import { Menu } from "@base-ui-components/react/menu";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
@@ -617,6 +618,9 @@ export default function SqlChallengeCard({
   const engineSeededRef = useRef(false);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
+  // Default action of the split button (Submit when canCheck,
+  // otherwise plain Run). Bound to Mod-Enter from the editor's keymap.
+  const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -678,7 +682,21 @@ export default function SqlChallengeCard({
         EditorView.lineWrapping,
         keymap.of([
           {
+            // Default keyboard action mirrors the split button:
+            // Submit (run + grade against tests). For challenges
+            // with no tests, the submit handler short-circuits to a
+            // plain Run so the keystroke isn't a dead key.
             key: "Mod-Enter",
+            run: () => {
+              submitRef.current();
+              return true;
+            },
+          },
+          {
+            // Dropdown action: run the query without grading it,
+            // matching the menu item visible from the Submit
+            // button's chevron.
+            key: "Mod-Shift-Enter",
             run: () => {
               runRef.current();
               return true;
@@ -1159,6 +1177,13 @@ export default function SqlChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // The split button's default action (and Mod-Enter) is "Submit"
+  // when the challenge actually has tests; otherwise it falls back
+  // to a plain Run so the keystroke still does something useful.
+  useEffect(() => {
+    submitRef.current = canCheck ? () => void check() : () => void run();
+  }, [canCheck, check, run]);
+
   // ─── Reset ──────────────────────────────────────────────────────────
   // Reset restores the starter code AND re-seeds the database so
   // INSERT/UPDATE/DELETE exercises can be retried from a clean slate.
@@ -1373,58 +1398,142 @@ export default function SqlChallengeCard({
       {/* ── Action bar ── */}
       <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
         <div className={styles.btnGroupPrimary}>
-          <button
-            type="button"
-            className={styles.runBtn}
-            onClick={() => void run()}
-            disabled={isBusy}
-          >
-            {isBusy ? (
-              <svg
-                viewBox="0 0 12 12"
-                className={styles.runBtnSpinner}
-                aria-hidden
+          {canCheck ? (
+            <>
+              <button
+                type="button"
+                className={styles.runBtn}
+                onClick={() => void check()}
+                disabled={isBusy}
               >
-                <circle
-                  cx="6"
-                  cy="6"
-                  r="4.5"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeDasharray="14 8"
-                />
-              </svg>
-            ) : (
-              <PlayIcon />
-            )}
-            <span>{isBusy ? "Running…" : "Run"}</span>
-            {!isBusy && (
-              <span
-                className={styles.btnKbd}
-                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-              >
-                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
-            )}
-          </button>
-          {canCheck && (
+                {isBusy ? (
+                  <svg
+                    viewBox="0 0 12 12"
+                    className={styles.runBtnSpinner}
+                    aria-hidden
+                  >
+                    <circle
+                      cx="6"
+                      cy="6"
+                      r="4.5"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeDasharray="14 8"
+                    />
+                  </svg>
+                ) : (
+                  <Check size={12} strokeWidth={2.6} aria-hidden />
+                )}
+                <span>{isBusy ? "Submitting…" : "Submit"}</span>
+                {!isBusy && (
+                  <span
+                    className={styles.btnKbd}
+                    title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                  >
+                    <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className={styles.kbdSep} aria-hidden>+</span>
+                    <kbd className={styles.kbd}>↵</kbd>
+                  </span>
+                )}
+              </button>
+              <Menu.Root>
+                <Menu.Trigger
+                  className={styles.runBtnChevron}
+                  disabled={isBusy}
+                  aria-label="More run options"
+                  title="More run options"
+                >
+                  <ChevronDown size={14} strokeWidth={2.4} aria-hidden />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner
+                    sideOffset={6}
+                    align="end"
+                    className={styles.runMenuPositioner}
+                  >
+                    <Menu.Popup className={styles.runMenuPopup}>
+                      <Menu.Item
+                        className={styles.runMenuItem}
+                        onClick={() => void run()}
+                      >
+                        <Play
+                          size={12}
+                          strokeWidth={2.4}
+                          fill="currentColor"
+                          aria-hidden
+                        />
+                        <span className={styles.runMenuLabel}>
+                          Run without Submitting
+                        </span>
+                        <span
+                          className={styles.runMenuKbd}
+                          title={
+                            isMac
+                              ? "Cmd + Shift + Enter"
+                              : "Ctrl + Shift + Enter"
+                          }
+                        >
+                          <kbd className={styles.kbd}>
+                            {isMac ? "⌘" : "Ctrl"}
+                          </kbd>
+                          <span className={styles.kbdSep} aria-hidden>
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>⇧</kbd>
+                          <span className={styles.kbdSep} aria-hidden>
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>↵</kbd>
+                        </span>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            </>
+          ) : (
+            // No tests on this challenge: render a plain Run pill,
+            // no menu. Mod-Enter falls back to `run` for the same
+            // reason.
             <button
               type="button"
-              className={styles.checkBtn}
-              onClick={() => void check()}
+              className={styles.runBtn}
+              onClick={() => void run()}
               disabled={isBusy}
             >
-              <Check size={12} strokeWidth={2.5} aria-hidden />
-              <span>Submit</span>
-              <span className={styles.btnKbd} title="Shift + Enter">
-                <kbd className={styles.kbd}>⇧</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
+              {isBusy ? (
+                <svg
+                  viewBox="0 0 12 12"
+                  className={styles.runBtnSpinner}
+                  aria-hidden
+                >
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeDasharray="14 8"
+                  />
+                </svg>
+              ) : (
+                <PlayIcon />
+              )}
+              <span>{isBusy ? "Running…" : "Run"}</span>
+              {!isBusy && (
+                <span
+                  className={styles.btnKbd}
+                  title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                >
+                  <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                  <span className={styles.kbdSep} aria-hidden>+</span>
+                  <kbd className={styles.kbd}>↵</kbd>
+                </span>
+              )}
             </button>
           )}
         </div>

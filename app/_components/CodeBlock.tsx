@@ -478,10 +478,11 @@ function CodeBlockInner({
 
   // Mount the read-only init editor lazily, the first time the panel is
   // expanded — keeps the cost zero for collapsed init blocks. The cleanup
-  // destroys the EditorView when the panel collapses so React can safely
-  // unmount the host element.
+  // mounts once when `hasInit` becomes true so the collapsed preview
+  // can show the first few lines through the gradient fade. The
+  // EditorView lives until the surrounding component unmounts.
   useEffect(() => {
-    if (!hasInit || !initExpanded) return;
+    if (!hasInit) return;
     if (!initEditorHostRef.current || initEditorRef.current) return;
 
     const themeComp = new Compartment();
@@ -518,7 +519,7 @@ function CodeBlockInner({
       initThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInit, initExpanded]);
+  }, [hasInit]);
 
   // ─── Run / Reset ───────────────────────────────────────────────────────
   const run = useCallback(async () => {
@@ -727,14 +728,29 @@ function CodeBlockInner({
               {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
             </span>
           </button>
-          {initExpanded && (
+          <div
+            className={`${styles.initEditorWrap} ${
+              initExpanded
+                ? styles.initEditorWrapOpen
+                : styles.initEditorWrapCollapsed
+            }`}
+          >
             <div
               id={initPanelId}
               className={styles.initEditor}
               aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
               ref={initEditorHostRef}
             />
-          )}
+            {!initExpanded && initLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initFade}
+                aria-label="Expand initialization code"
+                title="Expand initialization code"
+                onClick={() => setInitExpanded(true)}
+              />
+            )}
+          </div>
         </div>
       )}
 

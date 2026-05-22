@@ -30,7 +30,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
+import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
   PlayIcon,
@@ -396,6 +397,11 @@ export default function ChallengeCard({
   // Latest run handler — keeps the CodeMirror keymap closure
   // (registered once at mount) wired to the current function.
   const runRef = useRef<() => void>(() => {});
+  // Latest submit handler. Bound to Mod-Enter from the editor's
+  // keymap and to the split-button's default click. Falls back to
+  // `run` for challenges that don't supply tests, so Mod-Enter
+  // always does *something* sensible.
+  const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -497,7 +503,22 @@ export default function ChallengeCard({
         EditorView.lineWrapping,
         keymap.of([
           {
+            // Default keyboard action mirrors the split button's
+            // default button: Submit (i.e. run + check tests). For
+            // challenges with no tests (`canCheck` false), the
+            // submit handler short-circuits to run + display output
+            // without ever flipping the pass/fail banner.
             key: "Mod-Enter",
+            run: () => {
+              submitRef.current();
+              return true;
+            },
+          },
+          {
+            // Dropdown action: run the code without grading it.
+            // Matches the dropdown menu item visible from the
+            // chevron on the Submit button.
+            key: "Mod-Shift-Enter",
             run: () => {
               runRef.current();
               return true;
@@ -650,9 +671,13 @@ export default function ChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionOpen, activeSolutionFile, activeSolutionSource]);
 
-  // Mount the read-only init editor lazily when expanded.
+  // Mount the read-only init editor once whenever `hasInit` becomes
+  // true. We keep the editor mounted even in the collapsed state so
+  // the learner can see the first few lines of context through the
+  // gradient fade — clicking the fade or the toggle expands the
+  // panel to the full height.
   useEffect(() => {
-    if (!hasInit || !initExpanded) return;
+    if (!hasInit) return;
     if (!initEditorHostRef.current || initEditorRef.current) return;
     const languageComp = new Compartment();
     const view = new EditorView({
@@ -681,7 +706,7 @@ export default function ChallengeCard({
       initEditorRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInit, initExpanded]);
+  }, [hasInit]);
 
   // ─── Execution helpers ─────────────────────────────────────────────
 
@@ -990,6 +1015,13 @@ export default function ChallengeCard({
     checkRef.current = check;
   }, [check]);
 
+  // The split button's default action (and Mod-Enter) is "Submit"
+  // when the challenge actually has tests; otherwise it falls back
+  // to a plain Run so the keystroke isn't a dead key.
+  useEffect(() => {
+    submitRef.current = canCheck ? () => void check() : () => void run();
+  }, [canCheck, check, run]);
+
   // ─── Reset ─────────────────────────────────────────────────────────
   const reset = useCallback(() => {
     runSeqRef.current++;
@@ -1251,7 +1283,9 @@ export default function ChallengeCard({
         </div>
       </div>
 
-      {/* ── Init code (collapsed by default) ── */}
+      {/* ── Init code (collapsed by default — preview the first
+            ~3 lines under a gradient fade; click the fade or the
+            toggle to expand) ── */}
       {hasInit && (
         <div className={styles.initWrap}>
           <button
@@ -1276,14 +1310,29 @@ export default function ChallengeCard({
               {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
             </span>
           </button>
-          {initExpanded && (
+          <div
+            className={`${styles.initEditorWrap} ${
+              initExpanded
+                ? styles.initEditorWrapOpen
+                : styles.initEditorWrapCollapsed
+            }`}
+          >
             <div
               id={initPanelId}
               className={styles.initEditor}
               ref={initEditorHostRef}
               aria-label="Initialization code (read-only)"
             />
-          )}
+            {!initExpanded && initLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initFade}
+                aria-label="Expand initialization code"
+                title="Expand initialization code"
+                onClick={() => setInitExpanded(true)}
+              />
+            )}
+          </div>
         </div>
       )}
 
@@ -1331,59 +1380,150 @@ export default function ChallengeCard({
       {/* ── Action bar ── */}
       <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
         <div className={styles.btnGroupPrimary}>
-          <button
-            type="button"
-            className={styles.runBtn}
-            onClick={() => void run()}
-            disabled={isBusy}
-          >
-            {isBusy ? (
-              <svg
-                viewBox="0 0 12 12"
-                className={styles.runBtnSpinner}
-                aria-hidden
+          {canCheck ? (
+            <>
+              <button
+                type="button"
+                className={styles.runBtn}
+                onClick={() => void check()}
+                disabled={isBusy}
+                data-testid="challenge-submit"
               >
-                <circle
-                  cx="6"
-                  cy="6"
-                  r="4.5"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeDasharray="14 8"
-                />
-              </svg>
-            ) : (
-              <PlayIcon />
-            )}
-            <span>{isBusy ? "Running…" : "Run"}</span>
-            {!isBusy && (
-              <span
-                className={styles.btnKbd}
-                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-              >
-                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
-            )}
-          </button>
-          {canCheck && (
+                {isBusy ? (
+                  <svg
+                    viewBox="0 0 12 12"
+                    className={styles.runBtnSpinner}
+                    aria-hidden
+                  >
+                    <circle
+                      cx="6"
+                      cy="6"
+                      r="4.5"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeDasharray="14 8"
+                    />
+                  </svg>
+                ) : (
+                  <Check size={12} strokeWidth={2.6} aria-hidden />
+                )}
+                <span>{isBusy ? "Submitting…" : "Submit"}</span>
+                {!isBusy && (
+                  <span
+                    className={styles.btnKbd}
+                    title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                  >
+                    <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className={styles.kbdSep} aria-hidden>+</span>
+                    <kbd className={styles.kbd}>↵</kbd>
+                  </span>
+                )}
+              </button>
+              <Menu.Root>
+                <Menu.Trigger
+                  className={styles.runBtnChevron}
+                  disabled={isBusy}
+                  aria-label="More run options"
+                  title="More run options"
+                >
+                  <ChevronDown size={14} strokeWidth={2.4} aria-hidden />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner
+                    sideOffset={6}
+                    align="end"
+                    className={styles.runMenuPositioner}
+                  >
+                    <Menu.Popup className={styles.runMenuPopup}>
+                      <Menu.Item
+                        className={styles.runMenuItem}
+                        onClick={() => void run()}
+                      >
+                        <Play
+                          size={12}
+                          strokeWidth={2.4}
+                          fill="currentColor"
+                          aria-hidden
+                        />
+                        <span className={styles.runMenuLabel}>
+                          Run without Submitting
+                        </span>
+                        <span
+                          className={styles.runMenuKbd}
+                          title={
+                            isMac
+                              ? "Cmd + Shift + Enter"
+                              : "Ctrl + Shift + Enter"
+                          }
+                        >
+                          <kbd className={styles.kbd}>
+                            {isMac ? "⌘" : "Ctrl"}
+                          </kbd>
+                          <span
+                            className={styles.kbdSep}
+                            aria-hidden
+                          >
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>⇧</kbd>
+                          <span
+                            className={styles.kbdSep}
+                            aria-hidden
+                          >
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>↵</kbd>
+                        </span>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            </>
+          ) : (
+            // Challenges without tests still get a plain Run pill —
+            // no menu, no dropdown — since there's nothing to
+            // submit. The keymap above falls back to `run` for the
+            // same reason.
             <button
               type="button"
-              className={styles.checkBtn}
-              onClick={() => void check()}
+              className={styles.runBtn}
+              onClick={() => void run()}
               disabled={isBusy}
-              data-testid="challenge-submit"
             >
-              <Check size={12} strokeWidth={2.5} aria-hidden />
-              <span>Submit</span>
-              <span className={styles.btnKbd} title="Shift + Enter">
-                <kbd className={styles.kbd}>⇧</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
+              {isBusy ? (
+                <svg
+                  viewBox="0 0 12 12"
+                  className={styles.runBtnSpinner}
+                  aria-hidden
+                >
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeDasharray="14 8"
+                  />
+                </svg>
+              ) : (
+                <PlayIcon />
+              )}
+              <span>{isBusy ? "Running…" : "Run"}</span>
+              {!isBusy && (
+                <span
+                  className={styles.btnKbd}
+                  title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                >
+                  <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                  <span className={styles.kbdSep} aria-hidden>+</span>
+                  <kbd className={styles.kbd}>↵</kbd>
+                </span>
+              )}
             </button>
           )}
         </div>
