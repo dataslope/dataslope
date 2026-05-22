@@ -485,10 +485,57 @@
   font-size: 12.5px;
   line-height: 1.7;
   font-variant-ligatures: none;
-  cursor: not-allowed;
+  cursor: default;
 }
 .initEditor :global(.cm-editor .cm-cursor) {
   display: none !important;
+}
+
+/* ─── File tab bar (multi-file workspaces) ────────────────────────── */
+
+.fileTabBar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--ch-bg-subtle);
+  border-top: 1px solid var(--ch-border-light);
+  border-bottom: 1px solid var(--ch-border-light);
+  overflow-x: auto;
+  user-select: none;
+}
+.fileTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--ch-border-light);
+  font-family: var(--ch-font-mono);
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: background 0.12s, color 0.12s;
+}
+.fileTab:hover {
+  background: #f4f4f5;
+  color: var(--ch-text);
+}
+.fileTabActive {
+  background: var(--ch-bg);
+  color: var(--ch-text);
+  font-weight: 600;
+}
+.fileTabActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ch-accent);
 }
 
 /* ─── Toolbar ─────────────────────────────────────────────────────── */
@@ -671,6 +718,7 @@
 
 .outputPanel {
   background: var(--ch-bg);
+  position: relative;
 }
 .outputHeader {
   display: flex;
@@ -755,6 +803,90 @@
 }
 .outCellHtml :global(tr:hover td) {
   background: #f8fafc;
+}
+
+/* ─── Running overlay (sine-wave animation) ──────────────────────────
+   Mirrors `<CodeBlock>`'s `.runOverlay` so a busy state in a challenge
+   card shows the same blue-wave hint. The overlay sits at the bottom
+   of the output panel and fades in/out to avoid blinking. Uses
+   `--ch-accent` so the colour tracks the card's theme token. */
+
+.runOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+}
+.runOverlay.runOverlayActive {
+  opacity: 1;
+}
+.runWaves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.runWaveBack {
+  fill: color-mix(in oklab, var(--ch-accent) 22%, transparent);
+  animation: cc-waveBack 2.4s linear infinite;
+}
+.runWaveFront {
+  fill: color-mix(in oklab, var(--ch-accent) 45%, transparent);
+  animation: cc-waveFront 1.4s linear infinite;
+}
+.runGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 80% at 50% 110%,
+    color-mix(in oklab, var(--ch-accent) 40%, transparent) 0%,
+    transparent 70%
+  );
+  animation: cc-glowPulse 0.9s ease-in-out infinite alternate;
+}
+.runStream {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--ch-accent) 80%, white 20%) 50%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  transform: translateX(-100%);
+  animation: cc-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+@keyframes cc-waveBack {
+  from { transform: translateX(0); }
+  to { transform: translateX(-240px); }
+}
+@keyframes cc-waveFront {
+  from { transform: translateX(0); }
+  to { transform: translateX(-240px); }
+}
+@keyframes cc-glowPulse {
+  from { opacity: 0.45; }
+  to { opacity: 0.85; }
+}
+@keyframes cc-stream {
+  0% { transform: translateX(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
 }
 
 /* ─── Test panel ──────────────────────────────────────────────────── */
@@ -929,6 +1061,7 @@
 .sqlResultPanel {
   background: var(--ch-bg);
   border-top: 1px solid var(--ch-border-light);
+  position: relative;
 }
 .sqlResultHeader {
   display: flex;

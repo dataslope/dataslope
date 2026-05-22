@@ -41,6 +41,8 @@ interface MdxChallengeCardProps
   tests: ChallengeTest[];
 }
 
+export type { ChallengeFile } from "./ChallengeCard";
+
 export default function MdxChallengeCard({
   adapter,
   ...rest

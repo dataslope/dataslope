@@ -97,6 +97,18 @@ interface DisplayedTest {
   detail: string | null;
 }
 
+/** One file in a multi-file challenge workspace. Authors who only need
+ *  a single editable file should pass `initialCode` instead — `files`
+ *  is for cases where the learner edits more than one file (e.g. a
+ *  Java challenge with both `Main.java` and `Dog.java`). */
+export interface ChallengeFile {
+  /** Workspace-relative filename, e.g. `"Dog.java"`. */
+  filename: string;
+  /** Starter content shown in the editor for this file. Reset restores
+   *  this exact text. */
+  initialContent: string;
+}
+
 export interface ChallengeCardProps {
   /** Language adapter used for both running the code and building the
    *  test harness. Pass the same instance as a CodeBlock would. */
@@ -114,8 +126,19 @@ export interface ChallengeCardProps {
    *  panel above the editor, mirroring `<CodeBlock>`'s `initCode`. */
   initCode?: string;
   /** Starting source loaded into the editor. The Reset button restores
-   *  this exact text. */
-  initialCode: string;
+   *  this exact text. Ignored when `files` is supplied. */
+  initialCode?: string;
+  /** Multi-file workspace. When set, takes precedence over
+   *  `initialCode`. A non-sortable, non-closeable tab bar appears above
+   *  the editor so the learner can switch between files. Tests still
+   *  run against `entryFilename` (or the first file when omitted) —
+   *  every other file is staged into the runtime's virtual file system
+   *  via `prepareFileSystem` so multi-file `import`s / `include`s /
+   *  cross-class references resolve. */
+  files?: ChallengeFile[];
+  /** When `files` is set, the filename whose content is passed to
+   *  `runtime.run()` as the entry. Defaults to the first file. */
+  entryFilename?: string;
   /** Canonical reference solution. When provided, a "Show Solution"
    *  button appears in the toolbar that opens a read-only modal. */
   solutionCode?: string;
@@ -137,6 +160,34 @@ function detectIsMac(): boolean {
 // card rather than a console. We always render the IntelliJ IDEA
 // CodeMirror theme so the editor matches the card chrome.
 const CM_EDITOR_THEME = "idea";
+
+// Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
+// challenge card shows the same blue-wave hint while running/submitting.
+function RunOverlay({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
+      aria-hidden="true"
+    >
+      <div className={styles.runGlow} />
+      <svg
+        className={styles.runWaves}
+        viewBox="0 0 240 28"
+        preserveAspectRatio="none"
+      >
+        <path
+          className={styles.runWaveBack}
+          d="M0 18 C 20 14, 40 14, 60 18 S 100 22, 120 18 S 160 14, 180 18 S 220 22, 240 18 S 280 14, 300 18 S 340 22, 360 18 S 400 14, 420 18 S 460 22, 480 18 L 480 28 L 0 28 Z"
+        />
+        <path
+          className={styles.runWaveFront}
+          d="M0 21 C 20 17, 40 17, 60 21 S 100 25, 120 21 S 160 17, 180 21 S 220 25, 240 21 S 280 17, 300 21 S 340 25, 360 21 S 400 17, 420 21 S 460 25, 480 21 L 480 28 L 0 28 Z"
+        />
+      </svg>
+      <div className={styles.runStream} />
+    </div>
+  );
+}
 
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
@@ -177,6 +228,8 @@ export default function ChallengeCard({
   instructions,
   initCode,
   initialCode,
+  files,
+  entryFilename,
   solutionCode,
   tests,
 }: ChallengeCardProps) {
@@ -185,6 +238,21 @@ export default function ChallengeCard({
   const hasInit = trimmedInit.length > 0;
   const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
   const initPanelId = `${blockId}-init`;
+
+  // Normalize prop shape into a list of files. Single-file authors pass
+  // `initialCode`; multi-file authors pass `files`. We always work with
+  // the array internally so the rest of the component is uniform.
+  const workspaceFiles: ChallengeFile[] = useMemo(() => {
+    if (files && files.length > 0) return files;
+    const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
+    return [{ filename: defaultName, initialContent: initialCode ?? "" }];
+  }, [files, initialCode, adapter.defaultFileExtension]);
+
+  const isMultiFile = workspaceFiles.length > 1;
+  const resolvedEntryFilename =
+    (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
+      ? entryFilename
+      : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
 
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
@@ -196,14 +264,28 @@ export default function ChallengeCard({
   // buffer. See `persistedKey` below.
   const persistSaveTimerRef = useRef<number | null>(null);
 
-  // Stable localStorage key for this challenge's editor buffer. The
-  // fingerprint includes the starter source so editing the MDX
-  // `initialCode` retires any saved attempts against the old prompt.
-  // `title` is in the fingerprint too so a challenge whose starter code
-  // happens to be identical to another's (e.g. both start with
-  // `// TODO`) doesn't collide.
+  // Stable per-file localStorage keys. The workspace fingerprint
+  // includes every starter so editing the MDX retires saved attempts
+  // against the old prompt; the filename is appended per file so each
+  // tab persists independently.
+  const workspaceFingerprint = useMemo(
+    () =>
+      workspaceFiles.map((f) => `${f.filename}:${f.initialContent}`).join("|"),
+    [workspaceFiles],
+  );
+  const persistedKeyForFile = useCallback(
+    (filename: string) =>
+      persistKey(
+        "challenge",
+        `${adapter.id}|${title}|${workspaceFingerprint}|${filename}`,
+      ),
+    [adapter.id, title, workspaceFingerprint],
+  );
+  // Legacy single-file key retained so existing challenges don't lose
+  // their saved buffers when this multi-file support shipped.
   const persistedKey = useMemo(
-    () => persistKey("challenge", `${adapter.id}|${title}|${initialCode}`),
+    () =>
+      persistKey("challenge", `${adapter.id}|${title}|${initialCode ?? ""}`),
     [adapter.id, title, initialCode],
   );
   // Shared per-adapter runtime, scoped to the fumadocs surface: every
@@ -232,6 +314,35 @@ export default function ChallengeCard({
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
   const toasts = useChallengeToasts();
 
+  // ─── Multi-file workspace state ─────────────────────────────────────
+  // Each file has its own buffer + persisted copy. The single editor
+  // view shows the active file; swapping tabs rewrites the doc with the
+  // saved buffer for the newly-active file.
+  const [activeFilename, setActiveFilename] = useState<string>(
+    workspaceFiles[0].filename,
+  );
+  // Initialise once from props + persisted localStorage. Subsequent
+  // edits drive this via the editor's update listener; tab switches
+  // read it to repopulate the doc.
+  const fileBuffersRef = useRef<Map<string, string>>(
+    new Map(
+      workspaceFiles.map((f) => {
+        if (isMultiFile) {
+          const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
+          return [f.filename, persisted ?? f.initialContent];
+        }
+        // Single-file mode honours the legacy persistedKey so existing
+        // saved attempts survive.
+        const persisted = loadPersistedCode(persistedKey);
+        return [f.filename, persisted ?? f.initialContent];
+      }),
+    ),
+  );
+  const activeFilenameRef = useRef(activeFilename);
+  useEffect(() => {
+    activeFilenameRef.current = activeFilename;
+  }, [activeFilename]);
+
   const isMac = useSyncExternalStore(
     () => () => {},
     () => detectIsMac(),
@@ -240,6 +351,19 @@ export default function ChallengeCard({
 
   const canCheck = canRunTests(adapter.id, tests);
 
+  // Persist the active file's current doc content to its localStorage
+  // key. Used by both the debounced editor listener and tab-switch /
+  // unmount flushes.
+  const persistActiveFile = useCallback(
+    (filename: string, content: string) => {
+      const key = isMultiFile
+        ? persistedKeyForFile(filename)
+        : persistedKey;
+      savePersistedCode(key, content);
+    },
+    [isMultiFile, persistedKey, persistedKeyForFile],
+  );
+
   // ─── Editor mount ───────────────────────────────────────────────────
   useEffect(() => {
     if (!editorHostRef.current || editorRef.current) return;
@@ -247,10 +371,8 @@ export default function ChallengeCard({
     const languageComp = new Compartment();
     const lineOffset = hasInit ? initLineCount : 0;
 
-    // Restore the user's previously-saved buffer for this challenge,
-    // falling back to the MDX starter when there isn't one.
-    const persisted = loadPersistedCode(persistedKey);
-    const initialDoc = persisted ?? initialCode;
+    const initialDoc =
+      fileBuffersRef.current.get(activeFilenameRef.current) ?? "";
 
     const view = new EditorView({
       doc: initialDoc,
@@ -291,11 +413,14 @@ export default function ChallengeCard({
         // navigation away and back restore their in-progress attempt.
         EditorView.updateListener.of((update) => {
           if (!update.docChanged) return;
+          const filename = activeFilenameRef.current;
+          const content = update.state.doc.toString();
+          fileBuffersRef.current.set(filename, content);
           if (persistSaveTimerRef.current !== null)
             window.clearTimeout(persistSaveTimerRef.current);
           persistSaveTimerRef.current = window.setTimeout(() => {
             persistSaveTimerRef.current = null;
-            savePersistedCode(persistedKey, update.state.doc.toString());
+            persistActiveFile(filename, content);
           }, 400);
         }),
       ],
@@ -313,13 +438,42 @@ export default function ChallengeCard({
       if (persistSaveTimerRef.current !== null) {
         window.clearTimeout(persistSaveTimerRef.current);
         persistSaveTimerRef.current = null;
-        savePersistedCode(persistedKey, view.state.doc.toString());
+        const filename = activeFilenameRef.current;
+        persistActiveFile(filename, view.state.doc.toString());
       }
       view.destroy();
       editorRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Tab switch: flush any pending debounced save for the previously
+  // active file, snapshot the current editor doc into the file
+  // buffers Map, and load the newly-active file's buffer.
+  const previousActiveRef = useRef(activeFilename);
+  useEffect(() => {
+    const view = editorRef.current;
+    if (!view) {
+      previousActiveRef.current = activeFilename;
+      return;
+    }
+    const previousFilename = previousActiveRef.current;
+    if (previousFilename === activeFilename) return;
+    // Snapshot the outgoing file's buffer and flush its persisted copy.
+    const outgoingContent = view.state.doc.toString();
+    fileBuffersRef.current.set(previousFilename, outgoingContent);
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    persistActiveFile(previousFilename, outgoingContent);
+    // Load the incoming file's buffer into the editor.
+    const incoming = fileBuffersRef.current.get(activeFilename) ?? "";
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: incoming },
+    });
+    previousActiveRef.current = activeFilename;
+  }, [activeFilename, persistActiveFile]);
 
   // Mount the read-only solution editor lazily when the modal opens.
   useEffect(() => {
@@ -389,15 +543,38 @@ export default function ChallengeCard({
 
   // ─── Execution helpers ─────────────────────────────────────────────
 
-  /** Execute a single combined snippet against the shared runtime,
-   *  capturing output cells via the streaming emitter. Returns the
-   *  collected cells and total elapsed milliseconds.
+  /** Snapshot every file's current content. Reads the active file from
+   *  the live editor (so unsaved edits propagate) and the rest from the
+   *  in-memory buffers Map. */
+  const snapshotAllFiles = useCallback((): Map<string, string> => {
+    const out = new Map<string, string>();
+    const view = editorRef.current;
+    const active = activeFilenameRef.current;
+    for (const f of workspaceFiles) {
+      if (view && f.filename === active) {
+        out.set(f.filename, view.state.doc.toString());
+      } else {
+        out.set(f.filename, fileBuffersRef.current.get(f.filename) ?? "");
+      }
+    }
+    return out;
+  }, [workspaceFiles]);
+
+  /** Execute the entry file's code against the shared runtime. Before
+   *  invoking `run()`, stage every workspace file into the runtime's
+   *  virtual file system (so multi-file `import`s / `include`s /
+   *  cross-class references resolve) via `prepareFileSystem`. The
+   *  caller passes a precomputed entry source so it can prepend the
+   *  init/harness blocks without us having to know about either.
    *
    *  Sentinel-line filtering for the test harness is handled by the
    *  caller (so plain Run can stream raw output, but Check can post-
    *  process the stdout to peel off `__DSTEST__:…` lines). */
   const execute = useCallback(
-    async (code: string): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
+    async (
+      entrySource: string,
+      filesSnapshot: Map<string, string>,
+    ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
       const mySeq = ++runSeqRef.current;
       setOutputs([]);
       setStatus("loading");
@@ -430,25 +607,58 @@ export default function ChallengeCard({
       let nextOutputId = 0;
       const cells: OutputCell[] = [];
 
-      await runtime.run(code, (cell) => {
-        if (runSeqRef.current !== mySeq) return;
-        const elapsedMs = performance.now() - startedAt;
-        const fmt =
-          elapsedMs < 1000
-            ? `${elapsedMs.toFixed(0)}ms`
-            : `${(elapsedMs / 1000).toFixed(2)}s`;
-        const full: OutputCell = {
-          id: ++nextOutputId,
-          elapsed: fmt,
-          ...cell,
-        };
-        cells.push(full);
-      });
+      // Multi-file workspaces: stage every file into the runtime VFS so
+      // imports resolve. The entry file's bytes mirror what we pass to
+      // `run()` below, including any init prelude / harness suffix the
+      // caller bolted on. Adapters that don't support multi-file omit
+      // `prepareFileSystem` entirely — the call is a no-op there.
+      if (runtime.prepareFileSystem) {
+        const fileMap = new Map<string, Uint8Array>();
+        const encoder = new TextEncoder();
+        for (const [name, content] of filesSnapshot) {
+          fileMap.set(
+            name,
+            encoder.encode(
+              name === resolvedEntryFilename ? entrySource : content,
+            ),
+          );
+        }
+        try {
+          await runtime.prepareFileSystem(fileMap);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          cells.push({
+            id: ++nextOutputId,
+            type: "stderr",
+            content: `Failed to stage workspace files: ${message}`,
+            elapsed: "",
+          });
+        }
+      }
+
+      await runtime.run(
+        entrySource,
+        (cell) => {
+          if (runSeqRef.current !== mySeq) return;
+          const elapsedMs = performance.now() - startedAt;
+          const fmt =
+            elapsedMs < 1000
+              ? `${elapsedMs.toFixed(0)}ms`
+              : `${(elapsedMs / 1000).toFixed(2)}s`;
+          const full: OutputCell = {
+            id: ++nextOutputId,
+            elapsed: fmt,
+            ...cell,
+          };
+          cells.push(full);
+        },
+        isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+      );
 
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
     },
-    [adapter],
+    [adapter, isMultiFile, resolvedEntryFilename],
   );
 
   const formatElapsed = (ms: number) =>
@@ -456,10 +666,11 @@ export default function ChallengeCard({
 
   // ─── Run (no tests) ────────────────────────────────────────────────
   const run = useCallback(async () => {
-    const userCode = editorRef.current?.state.doc.toString() ?? "";
-    const combined = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
+    const snapshot = snapshotAllFiles();
+    const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
+    const combined = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
     try {
-      const { cells, elapsedMs } = await execute(combined);
+      const { cells, elapsedMs } = await execute(combined, snapshot);
       setOutputs(cells);
       setElapsed(formatElapsed(elapsedMs));
       const erred = cells.some((c) => c.type === "stderr");
@@ -478,13 +689,14 @@ export default function ChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     }
-  }, [execute, hasInit, trimmedInit]);
+  }, [execute, hasInit, resolvedEntryFilename, snapshotAllFiles, trimmedInit]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
-    const userCode = editorRef.current?.state.doc.toString() ?? "";
-    const userPart = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
+    const snapshot = snapshotAllFiles();
+    const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
+    const userPart = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
     // Build a native harness for the subset of tests that have a `code`
     // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);
@@ -505,7 +717,7 @@ export default function ChallengeCard({
     setTestListOpen(true);
 
     try {
-      const { cells, elapsedMs } = await execute(combined);
+      const { cells, elapsedMs } = await execute(combined, snapshot);
 
       // Split stdout cells into "user-visible" + parsed harness results.
       // Non-stdout cells (html / image / plot / stderr) pass through
@@ -586,7 +798,16 @@ export default function ChallengeCard({
       );
       setBannerState("fail");
     }
-  }, [adapter.id, canCheck, execute, hasInit, tests, trimmedInit]);
+  }, [
+    adapter.id,
+    canCheck,
+    execute,
+    hasInit,
+    resolvedEntryFilename,
+    snapshotAllFiles,
+    tests,
+    trimmedInit,
+  ]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
   useEffect(() => {
@@ -596,20 +817,28 @@ export default function ChallengeCard({
   // ─── Reset ─────────────────────────────────────────────────────────
   const reset = useCallback(() => {
     runSeqRef.current++;
+    // Restore every file's buffer to its MDX starter, drop the active
+    // file's saved copy from localStorage so the next mount picks up
+    // the starter cleanly, and reload the active doc into the editor.
+    for (const f of workspaceFiles) {
+      fileBuffersRef.current.set(f.filename, f.initialContent);
+      const key = isMultiFile
+        ? persistedKeyForFile(f.filename)
+        : persistedKey;
+      clearPersistedCode(key);
+    }
     const view = editorRef.current;
     if (view) {
+      const active = activeFilenameRef.current;
+      const incoming = fileBuffersRef.current.get(active) ?? "";
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: initialCode },
+        changes: { from: 0, to: view.state.doc.length, insert: incoming },
       });
     }
-    // The dispatch above schedules a persist write of the starter; drop
-    // the debounce and the localStorage entry so the next mount picks up
-    // the MDX starter cleanly.
     if (persistSaveTimerRef.current !== null) {
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
     }
-    clearPersistedCode(persistedKey);
     setOutputs([]);
     setElapsed("");
     setStatus("idle");
@@ -617,7 +846,13 @@ export default function ChallengeCard({
     setTestResults([]);
     setBannerState(null);
     toasts.show("Reset to starter code.");
-  }, [initialCode, persistedKey, toasts]);
+  }, [
+    isMultiFile,
+    persistedKey,
+    persistedKeyForFile,
+    toasts,
+    workspaceFiles,
+  ]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -752,6 +987,38 @@ export default function ChallengeCard({
               aria-label="Initialization code (read-only)"
             />
           )}
+        </div>
+      )}
+
+      {/* ── File tab bar (multi-file workspaces only) ── */}
+      {isMultiFile && (
+        <div
+          className={styles.fileTabBar}
+          role="tablist"
+          aria-label="Workspace files"
+        >
+          {workspaceFiles.map((f) => {
+            const isActive = f.filename === activeFilename;
+            return (
+              <button
+                key={f.filename}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`${styles.fileTab} ${
+                  isActive ? styles.fileTabActive : ""
+                }`}
+                onClick={() => setActiveFilename(f.filename)}
+                title={
+                  f.filename === resolvedEntryFilename
+                    ? `${f.filename} (entry)`
+                    : f.filename
+                }
+              >
+                {f.filename}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -892,6 +1159,7 @@ export default function ChallengeCard({
               ))}
             </div>
           )}
+          <RunOverlay active={isBusy} />
         </div>
       )}
 

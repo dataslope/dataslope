@@ -222,3 +222,35 @@ print(high)
   ]}
 />
 ```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Every file is staged into WebR's virtual filesystem
+before each run, so the entry script can `source()` sibling files.
+
+<ChallengeCard
+  adapter="r"
+  title="Implement greet() in utils.R"
+  instructions={`Open \`utils.R\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.R\` already sources your file and prints the result.`}
+  entryFilename="main.R"
+  files={[
+    {
+      filename: "main.R",
+      initialContent: `source("utils.R")\ncat(greet("World"))\n`,
+    },
+    {
+      filename: "utils.R",
+      initialContent: `greet <- function(name) {\n  # your code here\n  ""\n}\n`,
+    },
+  ]}
+  solutionCode={`greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      code: `stopifnot(greet("World") == "Hello, World!")`,
+    },
+  ]}
+/>

@@ -86,7 +86,7 @@ interface DuckDbModule {
 // and cached by the browser. The promise is memoized so navigating
 // away and back doesn't re-fetch the module.
 
-const DUCKDB_VERSION = "1.32.0";
+export const DUCKDB_VERSION = "1.32.0";
 const DUCKDB_CDN = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VERSION}/+esm`;
 
 let _duckdbModulePromise: Promise<DuckDbModule> | null = null;

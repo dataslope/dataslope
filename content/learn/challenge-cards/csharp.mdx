@@ -271,3 +271,36 @@ class Program {
   ]}
 />
 ```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Every `.cs` file is staged into Roslyn's
+compilation unit before each run, so the entry script can reference
+types defined in sibling files.
+
+<ChallengeCard
+  adapter="csharp"
+  title="Implement Greeter.Greet()"
+  instructions={`Open \`Greeter.cs\` and implement \`Greet()\` so that it returns the string \`"Hello, World!"\`. The entry script \`Main.cs\` already constructs a \`Greeter\` and prints the result.`}
+  entryFilename="Main.cs"
+  files={[
+    {
+      filename: "Main.cs",
+      initialContent: `var g = new Greeter();\nSystem.Console.WriteLine(g.Greet());\n`,
+    },
+    {
+      filename: "Greeter.cs",
+      initialContent: `public class Greeter\n{\n    public string Greet()\n    {\n        // your code here\n        return "";\n    }\n}\n`,
+    },
+  ]}
+  solutionCode={`public class Greeter\n{\n    public string Greet()\n    {\n        return "Hello, World!";\n    }\n}\n`}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>

@@ -67,6 +67,7 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { themeFor } from "./cmExtensions";
+import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -200,7 +201,7 @@ async function createSqliteChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "SQLite",
-    version: "3.x",
+    version: "3.53",
   };
 }
 
@@ -231,7 +232,7 @@ async function createPostgresChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "PostgreSQL",
-    version: "via PGlite",
+    version: "17",
   };
 }
 
@@ -518,6 +519,34 @@ function languageIconKeyForDialect(d: SqlDialect): string {
   return d;
 }
 
+// Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
+// SQL challenge card shows the same blue-wave hint while running/submitting.
+function RunOverlay({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
+      aria-hidden="true"
+    >
+      <div className={styles.runGlow} />
+      <svg
+        className={styles.runWaves}
+        viewBox="0 0 240 28"
+        preserveAspectRatio="none"
+      >
+        <path
+          className={styles.runWaveBack}
+          d="M0 18 C 20 14, 40 14, 60 18 S 100 22, 120 18 S 160 14, 180 18 S 220 22, 240 18 S 280 14, 300 18 S 340 22, 360 18 S 400 14, 420 18 S 460 22, 480 18 L 480 28 L 0 28 Z"
+        />
+        <path
+          className={styles.runWaveFront}
+          d="M0 21 C 20 17, 40 17, 60 21 S 100 25, 120 21 S 160 17, 180 21 S 220 25, 240 21 S 280 17, 300 21 S 340 25, 360 21 S 400 17, 420 21 S 460 25, 480 21 L 480 28 L 0 28 Z"
+        />
+      </svg>
+      <div className={styles.runStream} />
+    </div>
+  );
+}
+
 function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
   const key = languageIconKeyForDialect(dialect);
   const Icon = LANGUAGE_ICONS[key];
@@ -599,10 +628,10 @@ export default function SqlChallengeCard({
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
-      ? "SQLite"
+      ? "SQLite 3.53"
       : dialect === "duckdb"
-        ? "DuckDB"
-        : "PostgreSQL",
+        ? `DuckDB ${DUCKDB_VERSION}`
+        : "PostgreSQL 17",
   );
 
   const isMac = useSyncExternalStore(
@@ -1485,6 +1514,7 @@ export default function SqlChallengeCard({
           ) : (
             <div className={styles.sqlMessage}>Running…</div>
           )}
+          <RunOverlay active={isBusy} />
         </div>
       )}
 

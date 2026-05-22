@@ -278,3 +278,36 @@ delayed("done", 10).then((v) => console.log(v));
   ]}
 />
 ```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Click a filename to switch buffers. Every file is
+staged into almostnode's virtual filesystem before each run, so the
+entry module can `require()` sibling files.
+
+<ChallengeCard
+  adapter="javascript"
+  title="Implement greet() in utils.js"
+  instructions={`Open \`utils.js\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.js\` already requires your function and prints the result.`}
+  entryFilename="main.js"
+  files={[
+    {
+      filename: "main.js",
+      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+    },
+    {
+      filename: "utils.js",
+      initialContent: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+    },
+  ]}
+  solutionCode={`function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
