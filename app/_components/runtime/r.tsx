@@ -788,8 +788,8 @@ export const rAdapter: LanguageAdapter = {
   readyStatus: "R 4.5.1 ready",
   runtimeInfo: {
     language: "R",
-    version: "4.5.1",
-    engine: "WebR",
+    version: "4.6.0",
+    engine: "WebR 0.6.0",
     engineUrl: "https://docs.r-wasm.org/webr/latest/",
     notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
   },

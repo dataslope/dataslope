@@ -1,6 +1,6 @@
 "use client";
 
-// Browser-based SQLite playground. Boots sql.js, renders the schema in
+// Browser-based SQLite playground. Boots @sqlite.org/sqlite-wasm, renders the schema in
 // a left sidebar (Tables/Views), and gives the user a multi-tab SQL
 // editor whose results land in a top results panel.
 //
@@ -235,11 +235,11 @@ const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
-  version: "3.49",
-  engine: "sql.js 1.13",
-  engineUrl: "https://sql.js.org/",
+  version: "3.53",
+  engine: "@sqlite.org/sqlite-wasm 3.53.0",
+  engineUrl: "https://sqlite.org/wasm",
   notes:
-    "Pure-JS build of SQLite compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
+    "Official SQLite build compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
 };
 
 
@@ -334,7 +334,7 @@ function inferColumnType(
 }
 
 interface QueryRunResult {
-  /** The result sets returned by sql.js (one per SELECT-like statement). */
+  /** The result sets returned by sqlite-wasm (one per SELECT-like statement). */
   sets: QueryExecResult[];
   /** Time the run took in milliseconds. */
   elapsedMs: number;
