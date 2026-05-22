@@ -133,6 +133,7 @@ import {
   upsertDataFolder,
   writeDataFile,
 } from "./files/opfsDataStorage";
+import { getSharedRuntime } from "./runtimeRegistry";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -1305,7 +1306,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
     (async () => {
       try {
-        const rt = await adapter.init((m) => {
+        // Re-use the shared per-adapter runtime so navigating between
+        // /learn (CodeBlock / ChallengeCard) and the playground pages
+        // doesn't re-download Pyodide / WebR / CheerpJ / the
+        // almostnode worker. Each `run()` already wipes user globals,
+        // so the runtime swap is invisible to the user's code.
+        const rt = await getSharedRuntime(adapter, (m) => {
           if (!cancelled) setLoadingMessage(m);
         });
         if (cancelled) return;

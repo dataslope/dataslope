@@ -1,23 +1,28 @@
 // Per-adapter shared runtime registry.
 //
-// The full Playground component creates its own runtime instance via
-// `adapter.init()` because each playground page is dedicated to one
-// language. The new learning-page UX is different: a single page can
-// embed multiple `CodeBlock`s for the same language (e.g. five Python
-// snippets side-by-side), and we don't want to spin up five Pyodide
-// workers / CheerpJ instances / WebR runtimes on the same page.
+// Every surface that runs user code against a language adapter —
+// `<CodeBlock>`, `<ChallengeCard>`, and the full `<Playground>` — goes
+// through this registry. The first surface to need (say) the Python
+// adapter triggers `adapter.init()`; every subsequent surface for the
+// same adapter id, on the same page or on a later page during the same
+// SPA session, attaches to the cached promise and reuses the runtime
+// that already finished loading.
 //
-// This module memoises the `init()` promise per adapter id so all
-// `CodeBlock`s targeting the same adapter share one underlying runtime.
-// It also lets us reuse the in-flight init across blocks that mount
-// nearly simultaneously.
+// Concretely this means: spinning up Pyodide / CheerpJ / WebR / the
+// almostnode worker only happens once per session. Navigating between
+// the learn-route MDX pages and `/playground/<lang>` is essentially
+// free — the heavy WASM payload stays in memory.
 //
-// Sharing the runtime does NOT share state across blocks — every adapter
-// resets its global scope at the start of each `run()` (Python wipes
-// `globals()`, R wipes `.GlobalEnv`, JS/TS execute in a fresh function
-// scope, and the compiled languages recompile from scratch). So each
-// block always executes against a freshly-initialised state, even though
-// the underlying runtime instance is shared for performance.
+// Sharing the runtime does NOT share user state across surfaces —
+// every adapter resets its global scope at the start of each `run()`
+// (Python wipes `globals()`, R wipes `.GlobalEnv`, JS/TS execute in a
+// fresh function scope, the compiled languages recompile from scratch).
+// So each block always executes against freshly-initialised globals
+// even though the underlying runtime instance is shared. Side-effects
+// the language can't roll back (micropip installs, monkey-patched
+// modules, files staged into the in-memory FS) DO persist — which is
+// the right tradeoff for typical learn / playground use, and matches
+// how the playground already worked within its own session.
 
 import type { LanguageAdapter, LanguageRuntime } from "./types";
 
