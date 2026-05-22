@@ -67,7 +67,7 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
-import { getSharedRuntime } from "./runtimeRegistry";
+import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
 import {
   buildHarness,
   canRunTests,
@@ -193,13 +193,15 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Shared per-adapter runtime: every `<CodeBlock>` / `<ChallengeCard>`
-  // targeting the same language on the page (or across pages within the
-  // same SPA session) reuses one runtime instance via
-  // `getSharedRuntime`. State isolation is the adapter's responsibility
-  // — each `run()` wipes user globals before evaluating the next
-  // snippet — so cards can't accidentally observe each other's
-  // variables.
+  // Shared per-adapter runtime, scoped to the fumadocs surface: every
+  // `<CodeBlock>` / `<ChallengeCard>` rendered on the /learn route
+  // (across pages, within the same SPA session) reuses one runtime
+  // instance via `getSharedRuntime(RuntimeScope.Fumadocs, …)`. The
+  // `<Playground>` lives in a separate scope, so its installed
+  // packages / staged VFS files cannot bleed into challenge results.
+  // State isolation between cards in the same scope is the adapter's
+  // responsibility — each `run()` wipes user globals before evaluating
+  // the next snippet.
   const runtimeRef = useRef<LanguageRuntime | null>(null);
   const runSeqRef = useRef(0);
   // Latest run handler — keeps the CodeMirror keymap closure
@@ -373,9 +375,13 @@ export default function ChallengeCard({
       // every execution, so cards still can't observe each other's
       // variable state.
       if (!runtimeRef.current) {
-        runtimeRef.current = await getSharedRuntime(adapter, (msg) => {
-          if (runSeqRef.current === mySeq) setStatusMessage(msg);
-        });
+        runtimeRef.current = await getSharedRuntime(
+          RuntimeScope.Fumadocs,
+          adapter,
+          (msg) => {
+            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          },
+        );
       }
       const runtime = runtimeRef.current;
       if (runSeqRef.current !== mySeq)

@@ -42,7 +42,7 @@ import type {
   OutputCell,
   PlotlyFigure,
 } from "./types";
-import { getSharedRuntime } from "./runtimeRegistry";
+import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
 import styles from "./CodeBlock.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
@@ -487,9 +487,13 @@ function CodeBlockInner({
 
     try {
       if (!runtimeRef.current) {
-        runtimeRef.current = await getSharedRuntime(adapter, (msg) => {
-          if (runSeqRef.current === mySeq) setStatusMessage(msg);
-        });
+        runtimeRef.current = await getSharedRuntime(
+          RuntimeScope.Fumadocs,
+          adapter,
+          (msg) => {
+            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          },
+        );
       }
       if (runSeqRef.current !== mySeq) return;
 

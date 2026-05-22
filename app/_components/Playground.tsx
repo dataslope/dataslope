@@ -133,7 +133,7 @@ import {
   upsertDataFolder,
   writeDataFile,
 } from "./files/opfsDataStorage";
-import { getSharedRuntime } from "./runtimeRegistry";
+import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
@@ -1306,12 +1306,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
     (async () => {
       try {
-        // Re-use the shared per-adapter runtime so navigating between
-        // /learn (CodeBlock / ChallengeCard) and the playground pages
-        // doesn't re-download Pyodide / WebR / CheerpJ / the
-        // almostnode worker. Each `run()` already wipes user globals,
-        // so the runtime swap is invisible to the user's code.
-        const rt = await getSharedRuntime(adapter, (m) => {
+        // Re-use the playground-scoped runtime so navigating between
+        // playground sessions (or re-opening the drawer) doesn't
+        // re-instantiate Pyodide / WebR / CheerpJ / the almostnode
+        // worker. The /learn route uses a separate scope so side
+        // effects from the playground (pip installs, monkey-patched
+        // modules, files staged into the VFS) can't leak into the
+        // learn-page CodeBlocks/ChallengeCards.
+        const rt = await getSharedRuntime(RuntimeScope.Playground, adapter, (m) => {
           if (!cancelled) setLoadingMessage(m);
         });
         if (cancelled) return;
