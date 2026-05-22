@@ -272,9 +272,9 @@ filesystem before each run, so the entry translation unit can
     {
       filename: "utils.c",
       initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    // your code here\n}\n`,
+      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
     },
   ]}
-  solutionCode={`#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`}
   tests={[
     {
       id: "greets",

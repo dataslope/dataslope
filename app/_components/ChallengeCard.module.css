@@ -245,6 +245,43 @@
   color: var(--ch-text);
   border-color: var(--ch-border-light);
 }
+.modalTabBar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ch-border-light);
+  background: var(--ch-tab-bg, #fafafa);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.modalTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--ch-font-mono);
+  color: var(--ch-text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s;
+}
+.modalTab:hover {
+  color: var(--ch-text);
+}
+.modalTabActive {
+  color: var(--ch-text);
+  border-bottom-color: var(--ch-accent, #2563eb);
+}
+.modalTabHint {
+  color: var(--ch-text-muted);
+  font-size: 14px;
+  line-height: 1;
+}
 .modalEditor {
   flex: 1;
   overflow: auto;

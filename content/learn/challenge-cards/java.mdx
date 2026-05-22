@@ -164,14 +164,14 @@ so `Main` can reference `Dog` directly without any imports.
     }
 }
 `,
-    },
-  ]}
-  solutionCode={`public class Dog {
+      solutionContent: `public class Dog {
     public String bark() {
         return "Woof!";
     }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "barks",

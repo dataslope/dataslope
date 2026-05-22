@@ -59,7 +59,7 @@ import {
   drawSelection,
   dropCursor,
 } from "@codemirror/view";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import {
   bracketMatching,
   indentOnInput,
@@ -681,6 +681,7 @@ export default function SqlChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          indentWithTab,
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(CM_EDITOR_THEME)),

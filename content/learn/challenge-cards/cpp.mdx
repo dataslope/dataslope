@@ -276,9 +276,9 @@ filesystem before each run, so the entry translation unit can
     {
       filename: "greeter.cpp",
       initialContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    // your code here\n}\n`,
+      solutionContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    std::cout << "Hello, World!\\n";\n}\n`,
     },
   ]}
-  solutionCode={`#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    std::cout << "Hello, World!\\n";\n}\n`}
   tests={[
     {
       id: "greets",

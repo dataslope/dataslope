@@ -49,7 +49,7 @@ import {
   drawSelection,
   dropCursor,
 } from "@codemirror/view";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import {
   bracketMatching,
   indentOnInput,
@@ -107,6 +107,25 @@ export interface ChallengeFile {
   /** Starter content shown in the editor for this file. Reset restores
    *  this exact text. */
   initialContent: string;
+  /** Optional reference solution for this file. When at least one file
+   *  in a multi-file challenge supplies `solutionContent`, the
+   *  Solution modal renders the same file tab bar (non-sortable,
+   *  non-closeable) so the learner can flip between files; files that
+   *  omit `solutionContent` are shown with their `initialContent` (the
+   *  scaffold the learner does not need to modify). */
+  solutionContent?: string;
+}
+
+interface SolutionFile {
+  filename: string;
+  source: string;
+  /** True when the author supplied a real solution for this file
+   *  (single-file `solutionCode`, or multi-file `solutionContent`).
+   *  False when we are echoing back the file's `initialContent`
+   *  because the file is part of the scaffold the learner is not
+   *  expected to modify. The modal labels these "(unchanged)" so
+   *  the learner can tell the file apart from one they should edit. */
+  hasSolution: boolean;
 }
 
 export interface ChallengeCardProps {
@@ -153,6 +172,22 @@ function detectIsMac(): boolean {
   const platform = navigator.platform || "";
   const ua = navigator.userAgent || "";
   return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
+}
+
+// Pick a line-comment prefix for the language. Used only to prepend a
+// human-readable "init code runs first" notice at the top of solution
+// files — the comment must parse as a no-op in the target language so
+// the displayed solution still pastes back as valid source.
+function lineCommentFor(codeMirrorMode: string): string {
+  switch (codeMirrorMode) {
+    case "python":
+    case "r":
+      return "#";
+    case "sql":
+      return "--";
+    default:
+      return "//";
+  }
 }
 
 // The challenge card is intentionally light-themed even when the
@@ -254,6 +289,37 @@ export default function ChallengeCard({
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
 
+  // ─── Solution files ─────────────────────────────────────────────────
+  // Build the per-file solution view the modal renders. For single-file
+  // challenges the legacy `solutionCode` prop becomes the synthetic
+  // entry file's solution. For multi-file challenges, every file
+  // appears in the tab bar — files that supplied `solutionContent`
+  // show that text; files that did not are shown with their
+  // `initialContent` (the scaffold the learner is not expected to
+  // change). The modal opens iff at least one file actually has a
+  // solution.
+  const solutionFiles: SolutionFile[] = useMemo(() => {
+    const out: SolutionFile[] = [];
+    for (const file of workspaceFiles) {
+      const explicit = file.solutionContent;
+      if (isMultiFile) {
+        out.push({
+          filename: file.filename,
+          source: explicit ?? file.initialContent,
+          hasSolution: explicit !== undefined,
+        });
+      } else if (solutionCode !== undefined) {
+        out.push({
+          filename: file.filename,
+          source: solutionCode,
+          hasSolution: true,
+        });
+      }
+    }
+    return out;
+  }, [workspaceFiles, isMultiFile, solutionCode]);
+  const hasSolution = solutionFiles.some((f) => f.hasSolution);
+
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
@@ -309,6 +375,12 @@ export default function ChallengeCard({
   const [elapsed, setElapsed] = useState<string>("");
   const [initExpanded, setInitExpanded] = useState(false);
   const [solutionOpen, setSolutionOpen] = useState(false);
+  // Active file inside the solution modal. Independent of the
+  // workspace's active tab so opening the modal doesn't disturb where
+  // the learner was editing.
+  const [solutionActiveFilename, setSolutionActiveFilename] = useState<
+    string | null
+  >(null);
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
@@ -406,6 +478,7 @@ export default function ChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          indentWithTab,
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(CM_EDITOR_THEME)),
@@ -475,18 +548,52 @@ export default function ChallengeCard({
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
 
-  // Mount the read-only solution editor lazily when the modal opens.
-  // We keep the doc editable at the contenteditable level (relying on
-  // `readOnly` to block insertions) so the user can click into the
-  // editor, move the caret, and select text — including Mod-A
-  // select-all, which is wired explicitly below since `editable.of(false)`
-  // would otherwise drop keyboard focus and disable the default keymap.
+  // Resolve which file the modal should display. Prefer the user's
+  // explicit click; otherwise default to the first file that actually
+  // has a real `solutionContent` so the modal lands on something the
+  // learner is supposed to read. Derived rather than stored so we
+  // don't need a `useEffect` to keep the selection in sync with
+  // `solutionFiles` (which would trigger react-hooks/set-state-in-effect).
+  const activeSolutionFile = useMemo(() => {
+    if (solutionFiles.length === 0) return null;
+    if (solutionActiveFilename) {
+      const match = solutionFiles.find(
+        (f) => f.filename === solutionActiveFilename,
+      );
+      if (match) return match;
+    }
+    return solutionFiles.find((f) => f.hasSolution) ?? solutionFiles[0];
+  }, [solutionFiles, solutionActiveFilename]);
+
+  // What text the modal actually displays for the active file. When
+  // `initCode` is set we prepend a single-line comment header so the
+  // learner knows there's read-only setup that runs before this code.
+  const activeSolutionSource = useMemo(() => {
+    if (!activeSolutionFile) return "";
+    if (!hasInit) return activeSolutionFile.source;
+    const prefix = lineCommentFor(adapter.codeMirrorMode);
+    const header = `${prefix} Initialization code (read-only) runs before this file. Solution begins below.\n\n`;
+    return header + activeSolutionFile.source;
+  }, [activeSolutionFile, hasInit, adapter.codeMirrorMode]);
+
+  // Mount / re-mount the read-only solution editor whenever the modal
+  // opens or the active solution file changes. We keep the doc
+  // editable at the contenteditable level (relying on `readOnly` to
+  // block insertions) so the user can click into the editor, move the
+  // caret, and select text — including Mod-A select-all, which is
+  // wired explicitly below since `editable.of(false)` would otherwise
+  // drop keyboard focus and disable the default keymap.
   useEffect(() => {
-    if (!solutionOpen || !solutionCode) return;
-    if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
+    if (!solutionOpen || !activeSolutionFile) return;
+    if (!solutionEditorHostRef.current) return;
+    // Tear down a prior view so switching tabs rebuilds with the new doc.
+    if (solutionEditorRef.current) {
+      solutionEditorRef.current.destroy();
+      solutionEditorRef.current = null;
+    }
     const languageComp = new Compartment();
     const view = new EditorView({
-      doc: solutionCode,
+      doc: activeSolutionSource,
       parent: solutionEditorHostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
@@ -508,10 +615,12 @@ export default function ChallengeCard({
     });
     return () => {
       view.destroy();
-      solutionEditorRef.current = null;
+      if (solutionEditorRef.current === view) {
+        solutionEditorRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [solutionOpen]);
+  }, [solutionOpen, activeSolutionFile, activeSolutionSource]);
 
   // Mount the read-only init editor lazily when expanded.
   useEffect(() => {
@@ -1102,7 +1211,7 @@ export default function ChallengeCard({
             <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
             Reset
           </button>
-          {solutionCode && (
+          {hasSolution && (
             <>
               <div className={styles.btnGroupUtilSep} aria-hidden />
               <button
@@ -1268,11 +1377,15 @@ export default function ChallengeCard({
       )}
 
       {/* ── Solution modal ── */}
-      {solutionOpen && solutionCode && (
+      {solutionOpen && hasSolution && activeSolutionFile && (
         <SolutionModal
           onClose={() => setSolutionOpen(false)}
           editorHostRef={solutionEditorHostRef}
-          source={solutionCode}
+          source={activeSolutionSource}
+          files={solutionFiles}
+          activeFilename={activeSolutionFile.filename}
+          onSelectFile={setSolutionActiveFilename}
+          showTabs={isMultiFile}
         />
       )}
 
@@ -1290,10 +1403,18 @@ function SolutionModal({
   onClose,
   editorHostRef,
   source,
+  files,
+  activeFilename,
+  onSelectFile,
+  showTabs,
 }: {
   onClose: () => void;
   editorHostRef: React.RefObject<HTMLDivElement | null>;
   source: string;
+  files: SolutionFile[];
+  activeFilename: string;
+  onSelectFile: (filename: string) => void;
+  showTabs: boolean;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1356,6 +1477,43 @@ function SolutionModal({
             </button>
           </div>
         </div>
+        {showTabs && (
+          <div
+            className={styles.modalTabBar}
+            role="tablist"
+            aria-label="Solution files"
+          >
+            {files.map((f) => {
+              const isActive = f.filename === activeFilename;
+              return (
+                <button
+                  key={f.filename}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={
+                    isActive
+                      ? `${styles.modalTab} ${styles.modalTabActive}`
+                      : styles.modalTab
+                  }
+                  onClick={() => onSelectFile(f.filename)}
+                  title={
+                    f.hasSolution
+                      ? f.filename
+                      : `${f.filename} (unchanged from starter)`
+                  }
+                >
+                  {f.filename}
+                  {!f.hasSolution && (
+                    <span className={styles.modalTabHint} aria-hidden>
+                      ·
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
         <div
           ref={editorHostRef}
           className={styles.modalEditor}

@@ -116,19 +116,17 @@ console.log(area({ kind: "circle", radius: 1 }));
 console.log(area({ kind: "square", side: 4 }));
 console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
-  solutionCode={`type Shape =
-  | { kind: "circle"; radius: number }
-  | { kind: "rectangle"; width: number; height: number };
-
-function area(s: Shape): number {
-  switch (s.kind) {
-    case "circle":    return Math.PI * s.radius * s.radius;
-    case "rectangle": return s.width * s.height;
+  solutionCode={`function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle": return Math.PI * shape.radius * shape.radius;
+    case "square": return shape.side * shape.side;
+    case "rect":   return shape.width * shape.height;
   }
 }
 
-console.log(area({ kind: "rectangle", width: 3, height: 4 }));
-console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
+console.log(area({ kind: "circle", radius: 1 }));
+console.log(area({ kind: "square", side: 4 }));
+console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
   tests={[
     {
@@ -175,19 +173,17 @@ console.log(area({ kind: "circle", radius: 1 }));
 console.log(area({ kind: "square", side: 4 }));
 console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
-  solutionCode={`type Shape =
-  | { kind: "circle"; radius: number }
-  | { kind: "rectangle"; width: number; height: number };
-
-function area(s: Shape): number {
-  switch (s.kind) {
-    case "circle":    return Math.PI * s.radius * s.radius;
-    case "rectangle": return s.width * s.height;
+  solutionCode={`function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle": return Math.PI * shape.radius * shape.radius;
+    case "square": return shape.side * shape.side;
+    case "rect":   return shape.width * shape.height;
   }
 }
 
-console.log(area({ kind: "rectangle", width: 3, height: 4 }));
-console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
+console.log(area({ kind: "circle", radius: 1 }));
+console.log(area({ kind: "square", side: 4 }));
+console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
   tests={[
     {
@@ -274,9 +270,9 @@ sibling files.
     {
       filename: "utils.ts",
       initialContent: `export function greet(name: string): string {\n  // your code here\n  return "";\n}\n`,
+      solutionContent: `export function greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n`,
     },
   ]}
-  solutionCode={`export function greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n`}
   tests={[
     {
       id: "greets",

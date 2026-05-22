@@ -107,20 +107,12 @@ console.log(sumArray([1, 2, 3, 4, 5]));
 
 console.log(byCustomer);
 `}
-  solutionCode={`function groupByCustomer(orders) {
-  const out = {};
-  for (const o of orders) {
-    out[o.customer] = (out[o.customer] || 0) + o.amount;
-  }
-  return out;
+  solutionCode={`let byCustomer = {};
+for (const o of orders) {
+  byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
-const result = groupByCustomer([
-  { customer: "Ada",   amount: 100 },
-  { customer: "Linus", amount: 80 },
-  { customer: "Ada",   amount: 50 },
-]);
-console.log(result);
+console.log(byCustomer);
 `}
   tests={[
     {
@@ -167,20 +159,12 @@ console.log(result);
 
 console.log(byCustomer);
 `}
-  solutionCode={`function groupByCustomer(orders) {
-  const out = {};
-  for (const o of orders) {
-    out[o.customer] = (out[o.customer] || 0) + o.amount;
-  }
-  return out;
+  solutionCode={`let byCustomer = {};
+for (const o of orders) {
+  byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
-const result = groupByCustomer([
-  { customer: "Ada",   amount: 100 },
-  { customer: "Linus", amount: 80 },
-  { customer: "Ada",   amount: 50 },
-]);
-console.log(result);
+console.log(byCustomer);
 `}
   tests={[
     {
@@ -223,11 +207,11 @@ console.log(result);
 
 delay(10).then((v) => console.log(v));
 `}
-  solutionCode={`function delayed(value, ms) {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+  solutionCode={`function delay(ms) {
+  return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
-delayed("done", 10).then((v) => console.log(v));
+delay(10).then((v) => console.log(v));
 `}
   tests={[
     {
@@ -256,11 +240,11 @@ delayed("done", 10).then((v) => console.log(v));
 
 delay(10).then((v) => console.log(v));
 `}
-  solutionCode={`function delayed(value, ms) {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+  solutionCode={`function delay(ms) {
+  return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
-delayed("done", 10).then((v) => console.log(v));
+delay(10).then((v) => console.log(v));
 `}
   tests={[
     {
@@ -299,9 +283,9 @@ entry module can `require()` sibling files.
     {
       filename: "utils.js",
       initialContent: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
     },
   ]}
-  solutionCode={`function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`}
   tests={[
     {
       id: "greets",

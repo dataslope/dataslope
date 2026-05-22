@@ -20,10 +20,11 @@ s  <- NA
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
 `}
-  solutionCode={`x <- c(2, 4, 4, 4, 5, 5, 7, 9)
-cat("mean:",   mean(x),   "\\n")
-cat("median:", median(x), "\\n")
-cat("sd:",     sd(x),     "\\n")
+  solutionCode={`m  <- mean(x)
+md <- median(x)
+s  <- sd(x)
+
+cat("mean:", m, "median:", md, "sd:", s, "\\n")
 `}
   tests={[
     {
@@ -59,10 +60,11 @@ s  <- NA
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
 `}
-  solutionCode={`x <- c(2, 4, 4, 4, 5, 5, 7, 9)
-cat("mean:",   mean(x),   "\\n")
-cat("median:", median(x), "\\n")
-cat("sd:",     sd(x),     "\\n")
+  solutionCode={`m  <- mean(x)
+md <- median(x)
+s  <- sd(x)
+
+cat("mean:", m, "median:", md, "sd:", s, "\\n")
 `}
   tests={[
     {
@@ -102,12 +104,9 @@ cat("sd:",     sd(x),     "\\n")
 
 print(filtered)
 `}
-  solutionCode={`df <- data.frame(
-  name  = c("Ada", "Linus", "Grace", "Alan"),
-  score = c(95, 70, 88, 60)
-)
-high <- df[df$score >= 80, ]
-print(high)
+  solutionCode={`filtered <- df[df$score >= 80, ]
+
+print(filtered)
 `}
   tests={[
     {
@@ -145,12 +144,9 @@ print(high)
 
 print(filtered)
 `}
-  solutionCode={`df <- data.frame(
-  name  = c("Ada", "Linus", "Grace", "Alan"),
-  score = c(95, 70, 88, 60)
-)
-high <- df[df$score >= 80, ]
-print(high)
+  solutionCode={`filtered <- df[df$score >= 80, ]
+
+print(filtered)
 `}
   tests={[
     {
@@ -242,9 +238,9 @@ before each run, so the entry script can `source()` sibling files.
     {
       filename: "utils.R",
       initialContent: `greet <- function(name) {\n  # your code here\n  ""\n}\n`,
+      solutionContent: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
     },
   ]}
-  solutionCode={`greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`}
   tests={[
     {
       id: "greets",
