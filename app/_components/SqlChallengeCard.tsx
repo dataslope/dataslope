@@ -38,6 +38,13 @@ import {
 import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -1647,34 +1654,10 @@ export default function SqlChallengeCard({
                 Query returned no rows.
               </div>
             ) : (
-              <div className={styles.sqlResultScroll}>
-                <table className={styles.sqlResultTable}>
-                  <thead>
-                    <tr>
-                      {resultSet.columns.map((c, i) => (
-                        <th key={i}>{c}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {resultSet.values.map((row, ri) => (
-                      <tr key={ri}>
-                        {row.map((cell, ci) => (
-                          <td key={ci}>
-                            {cell === null || cell === undefined ? (
-                              <span className={styles.sqlNullValue}>NULL</span>
-                            ) : cell instanceof Uint8Array ? (
-                              `<${cell.byteLength} bytes>`
-                            ) : (
-                              String(cell)
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <VirtualizedResultTable
+                columns={resultSet.columns}
+                values={resultSet.values}
+              />
             )
           ) : resultMessage ? (
             <div className={styles.sqlMessage}>{resultMessage}</div>
@@ -1885,6 +1868,135 @@ function SolutionModal({
 }
 
 /** Renders a single table's contents inside the table viewer panel.
+/** Virtualised SQL result table — used both by the main result pane
+ *  and the per-table viewer at the bottom of the card. The result
+ *  set is in memory by the time we render (executeSql returns the
+ *  full Promise<SqlResult>), so there's no per-page load — we just
+ *  render only the rows currently in the viewport via
+ *  `@tanstack/react-virtual` + a TanStack table for the column
+ *  definitions. For very wide tables the inner row is still a
+ *  regular `<tr>` so column auto-widths just work. */
+function VirtualizedResultTable({
+  columns,
+  values,
+  maxHeight,
+}: {
+  columns: string[];
+  values: unknown[][];
+  /** CSS max-height of the scroll container. Defaults to 320px so a
+   *  giant result set doesn't push the whole page below the fold. */
+  maxHeight?: number;
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  // Stable row identity — TanStack Table keys rows by index when no
+  // explicit id is supplied, which is fine here since the result set
+  // never re-sorts in this component.
+  const data = useMemo(
+    () => values.map((row, i) => ({ __idx: i, row })),
+    [values],
+  );
+  const columnHelper = useMemo(
+    () => createColumnHelper<{ __idx: number; row: unknown[] }>(),
+    [],
+  );
+  const tableColumns = useMemo(
+    () =>
+      columns.map((c, i) =>
+        columnHelper.accessor((d) => d.row[i], {
+          id: `${i}`,
+          header: c,
+          cell: (info) => {
+            const v = info.getValue();
+            if (v === null || v === undefined) {
+              return <span className={styles.sqlNullValue}>NULL</span>;
+            }
+            if (v instanceof Uint8Array) {
+              return `<${v.byteLength} bytes>`;
+            }
+            return String(v);
+          },
+        }),
+      ),
+    [columns, columnHelper],
+  );
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for the column / cell model.
+  const table = useReactTable({
+    data,
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+  const tableRows = table.getRowModel().rows;
+  const rowVirtualizer = useVirtualizer({
+    count: tableRows.length,
+    getScrollElement: () => scrollRef.current,
+    // Matches the playground's VIRTUAL_ROW_HEIGHT_ESTIMATE so the
+    // table feels identical to the playground's result pane.
+    estimateSize: () => 30,
+    overscan: 20,
+  });
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualRows.length > 0 ? (virtualRows[0]?.start ?? 0) : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() -
+        (virtualRows[virtualRows.length - 1]?.end ?? 0)
+      : 0;
+  const colSpan = tableColumns.length;
+
+  return (
+    <div
+      ref={scrollRef}
+      className={styles.sqlResultScroll}
+      style={{ maxHeight: maxHeight ?? 320 }}
+    >
+      <table className={styles.sqlResultTable}>
+        <thead>
+          {table.getHeaderGroups().map((hg) => (
+            <tr key={hg.id}>
+              {hg.headers.map((h) => (
+                <th key={h.id}>
+                  {h.isPlaceholder
+                    ? null
+                    : flexRender(h.column.columnDef.header, h.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {paddingTop > 0 && (
+            <tr aria-hidden style={{ height: paddingTop }}>
+              <td colSpan={colSpan} />
+            </tr>
+          )}
+          {virtualRows.map((vr) => {
+            const row = tableRows[vr.index];
+            return (
+              <tr
+                key={row.id}
+                data-index={vr.index}
+                ref={rowVirtualizer.measureElement}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          {paddingBottom > 0 && (
+            <tr aria-hidden style={{ height: paddingBottom }}>
+              <td colSpan={colSpan} />
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Renders a single table's contents inside the table viewer panel.
  *  Errors and empty-table cases produce a contextual message rather
  *  than a blank pane. */
 function TableViewerPane({
@@ -1913,33 +2025,12 @@ function TableViewerPane({
     );
   }
   return (
-    <div className={styles.tableViewerScroll}>
-      <table className={styles.sqlResultTable}>
-        <thead>
-          <tr>
-            {r.columns.map((c, i) => (
-              <th key={i}>{c}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {r.values.map((row, ri) => (
-            <tr key={ri}>
-              {row.map((cell, ci) => (
-                <td key={ci}>
-                  {cell === null || cell === undefined ? (
-                    <span className={styles.sqlNullValue}>NULL</span>
-                  ) : cell instanceof Uint8Array ? (
-                    `<${cell.byteLength} bytes>`
-                  ) : (
-                    String(cell)
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <VirtualizedResultTable
+        columns={r.columns}
+        values={r.values}
+        maxHeight={220}
+      />
       {entry.truncated && (
         <div className={styles.tableViewerFootnote}>
           Showing first {limit} row{limit === 1 ? "" : "s"}.
