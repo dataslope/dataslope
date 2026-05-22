@@ -295,3 +295,31 @@ entry module can `require()` sibling files.
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="javascript"
+  title="Implement greet() in utils.js"
+  instructions={`Open utils.js and implement greet(name) ...`}
+  entryFilename="main.js"
+  files={[
+    {
+      filename: "main.js",
+      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+    },
+    {
+      filename: "utils.js",
+      initialContent: `function greet(name) {\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```

@@ -250,3 +250,31 @@ before each run, so the entry script can `source()` sibling files.
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="r"
+  title="Implement greet() in utils.R"
+  instructions={`Open utils.R and implement greet(name) ...`}
+  entryFilename="main.R"
+  files={[
+    {
+      filename: "main.R",
+      initialContent: `source("utils.R")\ncat(greet("World"))\n`,
+    },
+    {
+      filename: "utils.R",
+      initialContent: `greet <- function(name) {\n  ""\n}\n`,
+      solutionContent: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      code: `stopifnot(greet("World") == "Hello, World!")`,
+    },
+  ]}
+/>
+```

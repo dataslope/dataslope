@@ -206,11 +206,19 @@
 }
 
 /* ─── Action bar ──────────────────────────────────────────────────── */
+/* Visual styling mirrors `ChallengeCard.module.css`'s `.actionBar`
+   so the executable code block and the challenge card present the
+   same control row. Theme-sensitive colors come from `--cb-…`
+   variables so the dark (Dracula) theme still works — the
+   challenge-card variant is permanently light themed. */
 
 .actionBar {
-  padding: 8px 12px;
-  background: var(--cb-bg2);
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
   border-top: 1px solid var(--cb-border);
+  background: var(--cb-bg2);
+  gap: 0;
   flex-shrink: 0;
   position: relative;
 }
@@ -219,43 +227,51 @@
 .actionBarButtons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  width: 100%;
+  gap: 0;
   position: relative;
   z-index: 1;
 }
 
-.runBtn {
+/* Primary group: just Run here (the challenge card variant adds a
+   Submit button alongside; the code block doesn't have one). */
+.btnGroupPrimary {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 14px;
-  border-radius: 4px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--cb-accent);
+  flex-shrink: 0;
+}
+
+.runBtn {
   background: var(--cb-accent);
+  color: #fff;
   border: none;
-  color: white;
-  font-family: var(--cb-font-ui);
+  padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background 0.15s, filter 0.15s;
+  font-family: var(--cb-font-ui);
 }
 .runBtn:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 .runBtn:disabled {
-  opacity: 0.45;
+  opacity: 0.65;
   cursor: not-allowed;
   filter: none;
 }
 .runBtn svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
   fill: white;
   stroke: white;
 }
 .runBtnRunning {
-  opacity: 0.75;
   cursor: not-allowed;
 }
 .runBtnSpinner {
@@ -268,91 +284,94 @@
   }
 }
 
-.resetBtn {
+/* Inline kbd shortcut hint rendered inside the Run button — matches
+   the challenge card's `.btnKbd`. */
+.btnKbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+}
+.btnKbd .kbdSep {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.runBtn .btnKbd .kbd {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow: none;
+}
+.kbd {
+  background: var(--cb-bg);
+  border: 1px solid var(--cb-border);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 10.5px;
+  font-family: var(--cb-font-mono);
+  color: var(--cb-text-dim);
+  box-shadow: 0 1px 0 var(--cb-border);
+  line-height: 1;
+  font-weight: 500;
+}
+.kbdSep {
+  color: var(--cb-text-dim);
+  font-size: 11px;
+}
+
+/* Utility-button group on the right side of the action bar. Same
+   shape and treatment as the challenge card's `.btnGroupUtil`. */
+.btnGroupUtil {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.btnGroupUtilSep {
+  width: 1px;
+  height: 16px;
+  background: var(--cb-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.utilBtn {
+  background: transparent;
+  border: none;
+  color: var(--cb-text-dim);
+  font-size: 12.5px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 10px;
-  background: transparent;
-  border: 1px solid var(--cb-border);
-  border-radius: 4px;
-  color: var(--cb-text-dim);
+  padding: 5px 8px;
+  border-radius: 5px;
   font-family: var(--cb-font-ui);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s,
-    border-color 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
-.resetBtn:hover:not(:disabled) {
-  background: var(--cb-bg3);
+.utilBtn:hover:not(:disabled) {
   color: var(--cb-text);
+  background: var(--cb-bg3);
 }
-.resetBtn:disabled {
+.utilBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-/* Keyboard-shortcut hint — same look as the main playground's
-   `.kbd`/`.kbd-group`/`.kbd-plus` so the action bar reads as the
-   playground in miniature. */
-.kbdGroup {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.kbd {
-  font-family: var(--cb-font-mono);
-  font-size: 10px;
-  color: var(--cb-text-dim);
-  padding: 2px 6px;
-  border: 1px solid var(--cb-border);
-  border-radius: 4px;
-  background: var(--cb-bg);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  /* Reset browser UA stylesheet defaults for <kbd> — some browsers
-     (Firefox, Safari) render a raised/inset appearance with box-shadow
-     that looks out of place in the Dracula / IntelliJ IDEA chrome. */
-  box-shadow: none;
-  line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
-}
-
-.kbdPlus {
-  font-family: var(--cb-font-mono);
-  font-size: 10px;
-  color: var(--cb-text-dim);
-  font-weight: 600;
-}
-
 /* Icon-only buttons (copy code, copy output) — sized to match the
-   surrounding action-bar / cell-header text controls. Mirrors the main
-   playground's `.icon-btn`. */
+   surrounding action-bar / cell-header text controls. */
 .iconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--cb-radius);
+  border: none;
   color: var(--cb-text-dim);
   cursor: pointer;
-  padding: 0;
-  transition:
-    color 0.15s,
-    border-color 0.15s,
-    background 0.15s;
+  padding: 5px 7px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
 }
 .iconBtn:hover {
   color: var(--cb-text);
-  border-color: var(--cb-border);
   background: var(--cb-bg3);
 }
 .iconBtn:focus-visible {
@@ -363,8 +382,8 @@
   display: block;
 }
 
-.actionBarSpacer {
-  flex: 1 1 auto;
+@media (max-width: 480px) {
+  .btnKbd { display: none; }
 }
 
 .statusText {

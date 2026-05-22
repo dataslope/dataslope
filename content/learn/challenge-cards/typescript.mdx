@@ -282,3 +282,31 @@ sibling files.
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="typescript"
+  title="Implement greet() in utils.ts"
+  instructions={`Open utils.ts and implement greet(name) ...`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { greet } from "./utils";\nconsole.log(greet("World"));\n`,
+    },
+    {
+      filename: "utils.ts",
+      initialContent: `export function greet(name: string): string {\n  return "";\n}\n`,
+      solutionContent: `export function greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```

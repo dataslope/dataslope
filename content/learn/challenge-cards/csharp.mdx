@@ -304,3 +304,31 @@ types defined in sibling files.
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="csharp"
+  title="Implement Greeter.Greet()"
+  instructions={`Open Greeter.cs and implement Greet() ...`}
+  entryFilename="Main.cs"
+  files={[
+    {
+      filename: "Main.cs",
+      initialContent: `var g = new Greeter();\nSystem.Console.WriteLine(g.Greet());\n`,
+    },
+    {
+      filename: "Greeter.cs",
+      initialContent: `public class Greeter\n{\n    public string Greet()\n    {\n        return "";\n    }\n}\n`,
+      solutionContent: `public class Greeter\n{\n    public string Greet()\n    {\n        return "Hello, World!";\n    }\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```

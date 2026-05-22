@@ -284,3 +284,35 @@ filesystem before each run, so the entry translation unit can
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="Implement greet() in utils.c"
+  instructions={`Open utils.c and implement greet() ...`}
+  entryFilename="main.c"
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include "utils.h"\n\nint main(void) {\n    greet();\n    return 0;\n}\n`,
+    },
+    {
+      filename: "utils.h",
+      initialContent: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
+    },
+    {
+      filename: "utils.c",
+      initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n}\n`,
+      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```

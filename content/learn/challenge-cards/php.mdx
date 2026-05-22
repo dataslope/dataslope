@@ -267,3 +267,31 @@ sibling files.
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="php"
+  title="Implement greet() in utils.php"
+  instructions={`Open utils.php and implement greet($name) ...`}
+  entryFilename="main.php"
+  files={[
+    {
+      filename: "main.php",
+      initialContent: `<?php\nrequire_once "utils.php";\necho greet("World");\n`,
+    },
+    {
+      filename: "utils.php",
+      initialContent: `<?php\nfunction greet($name) {\n    return "";\n}\n`,
+      solutionContent: `<?php\nfunction greet($name) {\n    return "Hello, {$name}!";\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```

@@ -203,8 +203,13 @@ so `Main` can reference `Dog` directly without any imports.
       filename: "Dog.java",
       initialContent: `public class Dog {
     public String bark() {
-        // your code here
         return "";
+    }
+}
+`,
+      solutionContent: `public class Dog {
+    public String bark() {
+        return "Woof!";
     }
 }
 `,

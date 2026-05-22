@@ -218,6 +218,12 @@ function lineCommentFor(codeMirrorMode: string): string {
 // CodeMirror theme so the editor matches the card chrome.
 const CM_EDITOR_THEME = "idea";
 
+// Minimum time (ms) the "running" overlay is held visible after a run
+// completes. Matches the playground's MIN_ANIMATION_MS so a fast run
+// (e.g. a few-line JS challenge that finishes in 20ms) doesn't blink
+// the wave animation in and back out within a single frame.
+const MIN_RUN_OVERLAY_MS = 300;
+
 // Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
 // challenge card shows the same blue-wave hint while running/submitting.
 function RunOverlay({ active }: { active: boolean }) {
@@ -772,24 +778,53 @@ export default function ChallengeCard({
         }
       }
 
-      await runtime.run(
-        entrySource,
-        (cell) => {
-          if (runSeqRef.current !== mySeq) return;
-          const elapsedMs = performance.now() - startedAt;
-          const fmt =
-            elapsedMs < 1000
-              ? `${elapsedMs.toFixed(0)}ms`
-              : `${(elapsedMs / 1000).toFixed(2)}s`;
-          const full: OutputCell = {
-            id: ++nextOutputId,
-            elapsed: fmt,
-            ...cell,
-          };
-          cells.push(full);
-        },
-        isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
-      );
+      try {
+        await runtime.run(
+          entrySource,
+          (cell) => {
+            if (runSeqRef.current !== mySeq) return;
+            const elapsedMs = performance.now() - startedAt;
+            const fmt =
+              elapsedMs < 1000
+                ? `${elapsedMs.toFixed(0)}ms`
+                : `${(elapsedMs / 1000).toFixed(2)}s`;
+            // Collapse consecutive stdout cells into a single block
+            // (matches the JS/TS/PHP playground behaviour where one
+            // console.log per cell would otherwise produce a noisy
+            // stack of one-line cells).
+            const last = cells[cells.length - 1];
+            if (
+              cell.type === "stdout" &&
+              last &&
+              last.type === "stdout"
+            ) {
+              cells[cells.length - 1] = {
+                ...last,
+                content: last.content + "\n" + cell.content,
+                elapsed: fmt,
+              };
+            } else {
+              const full: OutputCell = {
+                id: ++nextOutputId,
+                elapsed: fmt,
+                ...cell,
+              };
+              cells.push(full);
+            }
+          },
+          isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+        );
+      } finally {
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
+        // the wave animation doesn't blink in/out on sub-frame runs.
+        // The `finally` covers the throw path so error states also
+        // get the same minimum visible duration; the thrown exception
+        // still propagates to the caller's catch.
+        const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
+        if (wait > 0) {
+          await new Promise<void>((resolve) => setTimeout(resolve, wait));
+        }
+      }
 
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
@@ -1293,8 +1328,8 @@ export default function ChallengeCard({
         aria-label={`${adapter.runtimeInfo.language} solution editor`}
       />
 
-      {/* ── Toolbar ── */}
-      <div className={styles.toolbar} role="toolbar" aria-label="Challenge controls">
+      {/* ── Action bar ── */}
+      <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
         <div className={styles.btnGroupPrimary}>
           <button
             type="button"

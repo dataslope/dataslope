@@ -664,9 +664,9 @@
   background: var(--ch-accent);
 }
 
-/* ─── Toolbar ─────────────────────────────────────────────────────── */
+/* ─── Action bar ──────────────────────────────────────────────────── */
 
-.toolbar {
+.actionBar {
   display: flex;
   align-items: center;
   padding: 8px 14px;

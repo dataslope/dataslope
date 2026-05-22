@@ -512,6 +512,12 @@ function detectIsMac(): boolean {
 
 const CM_EDITOR_THEME = "idea";
 
+// Minimum time (ms) the "running" overlay is held visible after a run
+// completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
+// query doesn't blink the wave animation in and back out within a
+// single frame.
+const MIN_RUN_OVERLAY_MS = 300;
+
 /** Map a SQL dialect to the corresponding key in the shared
  *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label
  *  uses the same brand glyph as the playground language switcher. */
@@ -912,7 +918,20 @@ export default function SqlChallengeCard({
       setStatus("running");
       setStatusMessage("Running…");
       const startedAt = performance.now();
-      const results = await engine.exec(sql);
+      let results: SqlResult[];
+      try {
+        results = await engine.exec(sql);
+      } finally {
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
+        // the wave animation doesn't blink in/out on sub-frame runs.
+        // The throw path is covered here too so error states get the
+        // same minimum visible duration before the caller's catch
+        // swaps status to "error".
+        const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
+        if (wait > 0) {
+          await new Promise<void>((resolve) => setTimeout(resolve, wait));
+        }
+      }
       const elapsedMs = performance.now() - startedAt;
       // The "last meaningful result" is the last result set with
       // columns. DML statements come back with empty columns so they
@@ -1351,8 +1370,8 @@ export default function SqlChallengeCard({
         aria-label="SQL solution editor"
       />
 
-      {/* ── Toolbar ── */}
-      <div className={styles.toolbar} role="toolbar" aria-label="Challenge controls">
+      {/* ── Action bar ── */}
+      <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
         <div className={styles.btnGroupPrimary}>
           <button
             type="button"

@@ -288,3 +288,35 @@ filesystem before each run, so the entry translation unit can
     },
   ]}
 />
+
+```jsx
+<ChallengeCard
+  adapter="cpp"
+  title="Implement Greeter::greet()"
+  instructions={`Open greeter.cpp and implement Greeter::greet() ...`}
+  entryFilename="main.cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initialContent: `#include "greeter.h"\n\nint main() {\n    Greeter g;\n    g.greet();\n    return 0;\n}\n`,
+    },
+    {
+      filename: "greeter.h",
+      initialContent: `#pragma once\nclass Greeter {\npublic:\n    void greet();\n};\n`,
+    },
+    {
+      filename: "greeter.cpp",
+      initialContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n}\n`,
+      solutionContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    std::cout << "Hello, World!\\n";\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```
