@@ -42,7 +42,13 @@ import type {
   OutputCell,
   PlotlyFigure,
 } from "./types";
-import { getSharedRuntime } from "./runtimeRegistry";
+import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
+import {
+  clearPersistedCode,
+  loadPersistedCode,
+  persistKey,
+  savePersistedCode,
+} from "./codePersistence";
 import styles from "./CodeBlock.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
@@ -318,6 +324,8 @@ function CodeBlockInner({
   // Stable ref to the latest run() so the CodeMirror keymap closure
   // (created once at mount) always invokes the current handler.
   const runRef = useRef<() => void>(() => {});
+  // Debounce handle for localStorage persistence (see editor mount).
+  const persistSaveTimerRef = useRef<number | null>(null);
 
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -328,6 +336,15 @@ function CodeBlockInner({
   const trimmedInit = initCode?.trimEnd() ?? "";
   const hasInit = trimmedInit.length > 0;
   const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
+
+  // Stable localStorage key for the user's editor buffer. Hashing
+  // `adapter.id + initialCode` means: same block across reloads → same
+  // key (state restored); author edits `initialCode` in MDX → new key
+  // (old buffer naturally retired, user sees the new starter).
+  const persistedKey = useMemo(
+    () => persistKey("codeblock", `${adapter.id}|${initialCode}`),
+    [adapter.id, initialCode],
+  );
 
   // Use the same SSR-safe pattern as Playground so the keyboard
   // shortcut hint matches what the freshly hydrated page would show.
@@ -355,8 +372,15 @@ function CodeBlockInner({
     // reads as a single contiguous program.
     const lineOffset = hasInit ? initLineCount : 0;
 
+    // Restore the persisted buffer if one exists for this block. Fall
+    // back to the MDX-provided starter when nothing is stored. This
+    // runs inside the mount effect so SSR markup stays canonical and
+    // the swap happens in the same paint as CodeMirror's initial draw.
+    const persisted = loadPersistedCode(persistedKey);
+    const initialDoc = persisted ?? initialCode;
+
     const view = new EditorView({
-      doc: initialCode,
+      doc: initialDoc,
       parent: editorHostRef.current,
       extensions: [
         history(),
@@ -390,6 +414,18 @@ function CodeBlockInner({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+        // Debounce-persist the editor buffer so reloads / navigation
+        // restore the user's in-progress code. The 400ms delay coalesces
+        // bursts of keystrokes into one localStorage write.
+        EditorView.updateListener.of((update) => {
+          if (!update.docChanged) return;
+          if (persistSaveTimerRef.current !== null)
+            window.clearTimeout(persistSaveTimerRef.current);
+          persistSaveTimerRef.current = window.setTimeout(() => {
+            persistSaveTimerRef.current = null;
+            savePersistedCode(persistedKey, update.state.doc.toString());
+          }, 400);
+        }),
       ],
     });
 
@@ -405,6 +441,13 @@ function CodeBlockInner({
     });
 
     return () => {
+      // Flush any pending debounced write before tearing down so the
+      // last keystroke doesn't get lost on navigation away.
+      if (persistSaveTimerRef.current !== null) {
+        window.clearTimeout(persistSaveTimerRef.current);
+        persistSaveTimerRef.current = null;
+        savePersistedCode(persistedKey, view.state.doc.toString());
+      }
       view.destroy();
       editorRef.current = null;
       themeCompRef.current = null;
@@ -487,9 +530,13 @@ function CodeBlockInner({
 
     try {
       if (!runtimeRef.current) {
-        runtimeRef.current = await getSharedRuntime(adapter, (msg) => {
-          if (runSeqRef.current === mySeq) setStatusMessage(msg);
-        });
+        runtimeRef.current = await getSharedRuntime(
+          RuntimeScope.Fumadocs,
+          adapter,
+          (msg) => {
+            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          },
+        );
       }
       if (runSeqRef.current !== mySeq) return;
 
@@ -546,10 +593,19 @@ function CodeBlockInner({
         changes: { from: 0, to: view.state.doc.length, insert: initialCode },
       });
     }
+    // The dispatch above re-fires the persist listener and schedules a
+    // write of `initialCode`. Cancel it AFTER dispatching so the
+    // localStorage entry stays gone instead of being recreated with
+    // the starter contents.
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    clearPersistedCode(persistedKey);
     setOutputs([]);
     setStatus("idle");
     setStatusMessage("");
-  }, [initialCode]);
+  }, [initialCode, persistedKey]);
 
   // Copy the current contents of the user-editable editor (not the init
   // block) to the clipboard. Mirrors the Playground's editor copy

@@ -11,16 +11,7 @@ before execution).
 <ChallengeCard
   adapter="typescript"
   title="Generic identity function"
-  category="generics · types"
-  estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Define a generic function <code>identity&lt;T&gt;(x: T): T</code> that
-      returns its argument unchanged. The test checks that it preserves
-      both the value and the type at runtime (TypeScript erases types,
-      so we only verify the value).
-    </p>
-  </>}
+  instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
   initialCode={`function identity<T>(x: T): T {
   // your code here
   return x;
@@ -62,16 +53,7 @@ console.log(identity<string>("hello"));
 <ChallengeCard
   adapter="typescript"
   title="Generic identity function"
-  category="generics · types"
-  estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Define a generic function <code>identity&lt;T&gt;(x: T): T</code> that
-      returns its argument unchanged. The test checks that it preserves
-      both the value and the type at runtime (TypeScript erases types,
-      so we only verify the value).
-    </p>
-  </>}
+  instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
   initialCode={`function identity<T>(x: T): T {
   // your code here
   return x;
@@ -115,20 +97,11 @@ console.log(identity<string>("hello"));
 <ChallengeCard
   adapter="typescript"
   title="Area of a Shape"
-  category="discriminated unions · pattern matching"
-  estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      Define a function <code>area(shape: Shape)</code> that returns the
-      area of the given shape, where <code>Shape</code> is the
-      discriminated union below.
-    </p>
-    <ul>
-      <li>Circle: π · r²</li>
-      <li>Square: side²</li>
-      <li>Rect: width · height</li>
-    </ul>
-  </>}
+  instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
+
+- Circle: π · r²
+- Square: side²
+- Rect: width · height`}
   initCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
@@ -183,20 +156,11 @@ console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
 <ChallengeCard
   adapter="typescript"
   title="Area of a Shape"
-  category="discriminated unions · pattern matching"
-  estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      Define a function <code>area(shape: Shape)</code> that returns the
-      area of the given shape, where <code>Shape</code> is the
-      discriminated union below.
-    </p>
-    <ul>
-      <li>Circle: π · r²</li>
-      <li>Square: side²</li>
-      <li>Rect: width · height</li>
-    </ul>
-  </>}
+  instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
+
+- Circle: π · r²
+- Square: side²
+- Rect: width · height`}
   initCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
@@ -255,9 +219,7 @@ console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
   title="Print Hello, TS!"
   initialCode={`// Print the exact greeting below.
 `}
-  instructions={<>
-    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
-  </>}
+  instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";
 console.log(message);
 `}
@@ -277,9 +239,7 @@ console.log(message);
   title="Print Hello, TS!"
   initialCode={`// Print the exact greeting below.
 `}
-  instructions={<>
-    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
-  </>}
+  instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";
 console.log(message);
 `}
