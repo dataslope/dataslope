@@ -103,18 +103,11 @@ console.log(identity<string>("hello"));
   title="Area of a Shape"
   category="discriminated unions · pattern matching"
   estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      Define a function <code>area(shape: Shape)</code> that returns the
-      area of the given shape, where <code>Shape</code> is the
-      discriminated union below.
-    </p>
-    <ul>
-      <li>Circle: π · r²</li>
-      <li>Square: side²</li>
-      <li>Rect: width · height</li>
-    </ul>
-  </>}
+  instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
+
+- Circle: π · r²
+- Square: side²
+- Rect: width · height`}
   initCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
@@ -171,18 +164,11 @@ console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
   title="Area of a Shape"
   category="discriminated unions · pattern matching"
   estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      Define a function <code>area(shape: Shape)</code> that returns the
-      area of the given shape, where <code>Shape</code> is the
-      discriminated union below.
-    </p>
-    <ul>
-      <li>Circle: π · r²</li>
-      <li>Square: side²</li>
-      <li>Rect: width · height</li>
-    </ul>
-  </>}
+  instructions={`Define a function \`area(shape: Shape)\` that returns the area of the given shape, where \`Shape\` is the discriminated union below.
+
+- Circle: π · r²
+- Square: side²
+- Rect: width · height`}
   initCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
@@ -241,9 +227,7 @@ console.log(area({ kind: "circle", radius: 1 }).toFixed(4));
   title="Print Hello, TS!"
   initialCode={`// Print the exact greeting below.
 `}
-  instructions={<>
-    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
-  </>}
+  instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";
 console.log(message);
 `}
@@ -263,9 +247,7 @@ console.log(message);
   title="Print Hello, TS!"
   initialCode={`// Print the exact greeting below.
 `}
-  instructions={<>
-    <p>Make the program print exactly <code>Hello, TS!</code>.</p>
-  </>}
+  instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";
 console.log(message);
 `}

@@ -4,7 +4,7 @@
  * Shared helpers used by both `<ChallengeCard>` and `<SqlChallengeCard>`:
  *
  *   - `renderInstructions(input)`  — accepts either a React node (used
- *     verbatim) or a markdown string (rendered via a tiny inline parser).
+ *     verbatim) or a markdown string (rendered via react-markdown + GFM).
  *   - `useChallengeToasts()`       — minimal in-card toast manager. Each
  *     card mounts its own viewport so toasts feel attached to the card
  *     even when many are on the page.
@@ -21,97 +21,23 @@ import {
   type ReactNode,
 } from "react";
 import { X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
-type InlineToken =
-  | { type: "text"; value: string }
-  | { type: "code"; value: string }
-  | { type: "bold"; value: string }
-  | { type: "italic"; value: string };
-
-/** Tokenise a single line of inline markdown. Supports inline `code`,
- *  **bold**, and *italic* / _italic_. Unknown sequences fall through as
- *  plain text. */
-function parseInline(line: string): InlineToken[] {
-  const tokens: InlineToken[] = [];
-  // Scan left-to-right; the first match wins so we don't try to nest.
-  const re =
-    /`([^`]+)`|\*\*([^*]+)\*\*|\*([^*\s][^*]*?)\*|_([^_\s][^_]*?)_/g;
-  let i = 0;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(line)) !== null) {
-    if (m.index > i) tokens.push({ type: "text", value: line.slice(i, m.index) });
-    if (m[1] !== undefined) tokens.push({ type: "code", value: m[1] });
-    else if (m[2] !== undefined) tokens.push({ type: "bold", value: m[2] });
-    else if (m[3] !== undefined) tokens.push({ type: "italic", value: m[3] });
-    else if (m[4] !== undefined) tokens.push({ type: "italic", value: m[4] });
-    i = m.index + m[0].length;
-  }
-  if (i < line.length) tokens.push({ type: "text", value: line.slice(i) });
-  return tokens;
-}
-
-function renderInline(line: string, keyBase: string): ReactNode[] {
-  return parseInline(line).map((tok, i) => {
-    const key = `${keyBase}-${i}`;
-    if (tok.type === "code") return <code key={key}>{tok.value}</code>;
-    if (tok.type === "bold") return <strong key={key}>{tok.value}</strong>;
-    if (tok.type === "italic") return <em key={key}>{tok.value}</em>;
-    return <span key={key}>{tok.value}</span>;
-  });
-}
-
-/** Parse a markdown string into a flat array of block elements. Handles
- *  paragraphs (blank-line-separated) and bullet lists (`-` / `*` lines).
- *  Aimed at "what an author would write for instructions" — not the full
- *  CommonMark spec. */
+/** Renders an instructions string as Markdown using react-markdown + GFM.
+ *  Supports the full CommonMark + GitHub-Flavored Markdown surface
+ *  (headings, lists, tables, code, autolinks, …) so authors can write
+ *  natural Markdown instead of nested JSX. */
 export function renderMarkdownInstructions(source: string): ReactNode {
-  const lines = source.replace(/\r\n/g, "\n").split("\n");
-  const blocks: ReactNode[] = [];
-  let i = 0;
-  let key = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    if (!line.trim()) {
-      i++;
-      continue;
-    }
-    if (/^\s*[-*]\s+/.test(line)) {
-      const items: string[] = [];
-      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\s*[-*]\s+/, ""));
-        i++;
-      }
-      blocks.push(
-        <ul key={`b-${key++}`}>
-          {items.map((it, idx) => (
-            <li key={idx}>{renderInline(it, `${key}-${idx}`)}</li>
-          ))}
-        </ul>,
-      );
-      continue;
-    }
-    // Gather a paragraph: until a blank line or the start of a list.
-    const para: string[] = [line];
-    i++;
-    while (
-      i < lines.length &&
-      lines[i].trim() &&
-      !/^\s*[-*]\s+/.test(lines[i])
-    ) {
-      para.push(lines[i]);
-      i++;
-    }
-    blocks.push(
-      <p key={`b-${key++}`}>{renderInline(para.join(" "), `p-${key}`)}</p>,
-    );
-  }
-  return <>{blocks}</>;
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+  );
 }
 
-/** Accepts either a React node or a markdown string. Strings are run
- *  through the tiny markdown renderer; nodes pass through unchanged so
+/** Accepts either a React node or a markdown string. Strings are
+ *  rendered with react-markdown; nodes pass through unchanged so
  *  existing JSX-based call sites are unaffected. */
 export function renderInstructions(input: ReactNode | string): ReactNode {
   if (typeof input === "string") return renderMarkdownInstructions(input);

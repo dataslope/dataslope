@@ -67,6 +67,7 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
+import { getSharedRuntime } from "./runtimeRegistry";
 import {
   buildHarness,
   canRunTests,
@@ -192,13 +193,14 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Per-card runtime. Each `<ChallengeCard>` gets its own instance —
-  // sharing across cards would let one challenge's state (Pyodide
-  // globals, micropip installs, monkey-patched modules) influence
-  // another's, which would make challenge results dependent on page
-  // history. The runtime is initialised lazily on first Run / Check
-  // and cached in this ref for subsequent runs of the same card.
-  const runtimePromiseRef = useRef<Promise<LanguageRuntime> | null>(null);
+  // Shared per-adapter runtime: every `<CodeBlock>` / `<ChallengeCard>`
+  // targeting the same language on the page (or across pages within the
+  // same SPA session) reuses one runtime instance via
+  // `getSharedRuntime`. State isolation is the adapter's responsibility
+  // — each `run()` wipes user globals before evaluating the next
+  // snippet — so cards can't accidentally observe each other's
+  // variables.
+  const runtimeRef = useRef<LanguageRuntime | null>(null);
   const runSeqRef = useRef(0);
   // Latest run handler — keeps the CodeMirror keymap closure
   // (registered once at mount) wired to the current function.
@@ -363,26 +365,19 @@ export default function ChallengeCard({
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
 
-      // Lazily spin up an isolated runtime for this card on first run.
-      // Cache the promise (not just the resolved runtime) so two near-
-      // simultaneous calls — e.g. clicking Run then Check in quick
-      // succession before the first init resolves — share the same init
-      // instead of racing to create two workers. Each subsequent
-      // `runtime.run(...)` call starts with fresh globals because every
-      // adapter resets its scope at the start of `run()`.
-      if (!runtimePromiseRef.current) {
-        runtimePromiseRef.current = adapter
-          .init((msg) => {
-            if (runSeqRef.current === mySeq) setStatusMessage(msg);
-          })
-          .catch((err) => {
-            // Don't poison the cache with a failed init — let the next
-            // attempt try again.
-            runtimePromiseRef.current = null;
-            throw err;
-          });
+      // Re-use the shared per-adapter runtime — see runtimeRegistry.ts.
+      // Once Pyodide / WebR / CheerpJ has loaded for any block on this
+      // page, every other `<CodeBlock>` and `<ChallengeCard>` for the
+      // same language attaches to that same worker instead of spinning
+      // up its own. The adapter's `run()` wipes user globals before
+      // every execution, so cards still can't observe each other's
+      // variable state.
+      if (!runtimeRef.current) {
+        runtimeRef.current = await getSharedRuntime(adapter, (msg) => {
+          if (runSeqRef.current === mySeq) setStatusMessage(msg);
+        });
       }
-      const runtime = await runtimePromiseRef.current;
+      const runtime = runtimeRef.current;
       if (runSeqRef.current !== mySeq)
         return { cells: [], elapsedMs: 0 };
 

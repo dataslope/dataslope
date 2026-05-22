@@ -125,14 +125,7 @@ SELECT * FROM books;
   title="Revenue per category"
   category="GROUP BY · SUM"
   estimatedTime="~3 min"
-  instructions={<>
-    <p>
-      Return one row per <code>category</code> with the columns{' '}
-      <code>category</code> and <code>total_revenue</code> (the sum of{' '}
-      <code>revenue</code>). Sort by{' '}
-      <code>total_revenue</code> descending.
-    </p>
-  </>}
+  instructions={`Return one row per \`category\` with the columns \`category\` and \`total_revenue\` (the sum of \`revenue\`). Sort by \`total_revenue\` descending.`}
   initSql={`CREATE TABLE sales (
   id       INTEGER PRIMARY KEY,
   category TEXT,
@@ -180,14 +173,7 @@ ORDER BY total_revenue DESC;`}
   title="Revenue per category"
   category="GROUP BY · SUM"
   estimatedTime="~3 min"
-  instructions={<>
-    <p>
-      Return one row per <code>category</code> with the columns{' '}
-      <code>category</code> and <code>total_revenue</code> (the sum of{' '}
-      <code>revenue</code>). Sort by{' '}
-      <code>total_revenue</code> descending.
-    </p>
-  </>}
+  instructions={`Return one row per \`category\` with the columns \`category\` and \`total_revenue\` (the sum of \`revenue\`). Sort by \`total_revenue\` descending.`}
   initSql={`CREATE TABLE sales (
   id       INTEGER PRIMARY KEY,
   category TEXT,
@@ -237,13 +223,7 @@ ORDER BY total_revenue DESC;`}
   title="Insert a new user"
   category="INSERT · DML"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Insert a single new row into <code>users</code> with{' '}
-      <code>name = 'Carol'</code> and <code>email = 'carol@example.com'</code>.
-      You do not need to specify the <code>id</code> — it auto-increments.
-    </p>
-  </>}
+  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,
   name  TEXT NOT NULL,
@@ -279,13 +259,7 @@ INSERT INTO users (name, email) VALUES
   title="Insert a new user"
   category="INSERT · DML"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Insert a single new row into <code>users</code> with{' '}
-      <code>name = 'Carol'</code> and <code>email = 'carol@example.com'</code>.
-      You do not need to specify the <code>id</code> — it auto-increments.
-    </p>
-  </>}
+  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,
   name  TEXT NOT NULL,

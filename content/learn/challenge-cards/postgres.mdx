@@ -133,13 +133,7 @@ ORDER BY o.id ASC;`}
   title="Top customer by total spend"
   category="CTE · GROUP BY"
   estimatedTime="~4 min"
-  instructions={<>
-    <p>
-      Return the single customer who has spent the most across all
-      their orders, with columns <code>customer_name</code> and{' '}
-      <code>total_spent</code>.
-    </p>
-  </>}
+  instructions={`Return the single customer who has spent the most across all their orders, with columns \`customer_name\` and \`total_spent\`.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL
@@ -191,13 +185,7 @@ LIMIT 1;`}
   title="Top customer by total spend"
   category="CTE · GROUP BY"
   estimatedTime="~4 min"
-  instructions={<>
-    <p>
-      Return the single customer who has spent the most across all
-      their orders, with columns <code>customer_name</code> and{' '}
-      <code>total_spent</code>.
-    </p>
-  </>}
+  instructions={`Return the single customer who has spent the most across all their orders, with columns \`customer_name\` and \`total_spent\`.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL
@@ -251,13 +239,7 @@ LIMIT 1;`}
   title="Apply a 10% discount to large orders"
   category="UPDATE · DML"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Reduce every <code>orders.amount</code> by 10% (multiply by{' '}
-      <code>0.9</code>) for orders where <code>amount &gt; 100</code>.
-      Use a single <code>UPDATE</code> statement.
-    </p>
-  </>}
+  instructions={`Reduce every \`orders.amount\` by 10% (multiply by \`0.9\`) for orders where \`amount > 100\`. Use a single \`UPDATE\` statement.`}
   initSql={`CREATE TABLE orders (
   id     SERIAL PRIMARY KEY,
   amount NUMERIC(10, 2)
@@ -291,13 +273,7 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
   title="Apply a 10% discount to large orders"
   category="UPDATE · DML"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Reduce every <code>orders.amount</code> by 10% (multiply by{' '}
-      <code>0.9</code>) for orders where <code>amount &gt; 100</code>.
-      Use a single <code>UPDATE</code> statement.
-    </p>
-  </>}
+  instructions={`Reduce every \`orders.amount\` by 10% (multiply by \`0.9\`) for orders where \`amount > 100\`. Use a single \`UPDATE\` statement.`}
   initSql={`CREATE TABLE orders (
   id     SERIAL PRIMARY KEY,
   amount NUMERIC(10, 2)
