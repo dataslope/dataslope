@@ -27,7 +27,7 @@ import {
   drawSelection,
   dropCursor,
 } from "@codemirror/view";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import {
   bracketMatching,
   indentOnInput,
@@ -255,6 +255,12 @@ function ToastList() {
   ));
 }
 
+// Minimum time (ms) the "running" overlay is held visible after a run
+// completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
+// snippet (a few-line JS expression that finishes in 20ms) doesn't
+// blink the wave animation in and back out within a single frame.
+const MIN_RUN_OVERLAY_MS = 300;
+
 // Sine-wave running overlay — anchored to the bottom of the code block
 // and shorter (28 px) than the full playground variant (44 px).
 function RunOverlay({ active }: { active: boolean }) {
@@ -411,6 +417,7 @@ function CodeBlockInner({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          indentWithTab,
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
@@ -471,10 +478,11 @@ function CodeBlockInner({
 
   // Mount the read-only init editor lazily, the first time the panel is
   // expanded — keeps the cost zero for collapsed init blocks. The cleanup
-  // destroys the EditorView when the panel collapses so React can safely
-  // unmount the host element.
+  // mounts once when `hasInit` becomes true so the collapsed preview
+  // can show the first few lines through the gradient fade. The
+  // EditorView lives until the surrounding component unmounts.
   useEffect(() => {
-    if (!hasInit || !initExpanded) return;
+    if (!hasInit) return;
     if (!initEditorHostRef.current || initEditorRef.current) return;
 
     const themeComp = new Compartment();
@@ -511,7 +519,7 @@ function CodeBlockInner({
       initThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInit, initExpanded]);
+  }, [hasInit]);
 
   // ─── Run / Reset ───────────────────────────────────────────────────────
   const run = useCallback(async () => {
@@ -545,20 +553,50 @@ function CodeBlockInner({
 
       let nextOutputId = 0;
       const startedAt = performance.now();
-      await runtimeRef.current.run(code, (cell) => {
-        if (runSeqRef.current !== mySeq) return;
-        const elapsedMs = performance.now() - startedAt;
-        const elapsed =
-          elapsedMs < 1000
-            ? `${elapsedMs.toFixed(0)}ms`
-            : `${(elapsedMs / 1000).toFixed(2)}s`;
-        const fullCell: OutputCell = {
-          id: ++nextOutputId,
-          elapsed,
-          ...cell,
-        };
-        setOutputs((prev) => [...prev, fullCell]);
-      });
+      try {
+        await runtimeRef.current.run(code, (cell) => {
+          if (runSeqRef.current !== mySeq) return;
+          const elapsedMs = performance.now() - startedAt;
+          const elapsed =
+            elapsedMs < 1000
+              ? `${elapsedMs.toFixed(0)}ms`
+              : `${(elapsedMs / 1000).toFixed(2)}s`;
+          setOutputs((prev) => {
+            // Collapse consecutive stdout cells into a single block
+            // (matches the JS/TS/PHP playground behaviour where one
+            // console.log per cell would otherwise produce a noisy
+            // stack of one-line cells).
+            const last = prev[prev.length - 1];
+            if (
+              cell.type === "stdout" &&
+              last &&
+              last.type === "stdout"
+            ) {
+              const merged: OutputCell = {
+                ...last,
+                content: last.content + "\n" + cell.content,
+                elapsed,
+              };
+              return [...prev.slice(0, -1), merged];
+            }
+            const fullCell: OutputCell = {
+              id: ++nextOutputId,
+              elapsed,
+              ...cell,
+            };
+            return [...prev, fullCell];
+          });
+        });
+      } finally {
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
+        // the wave animation doesn't blink in/out on sub-frame runs.
+        // Covers the throw path too so error states get the same
+        // minimum visible duration.
+        const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
+        if (wait > 0) {
+          await new Promise<void>((resolve) => setTimeout(resolve, wait));
+        }
+      }
       if (runSeqRef.current !== mySeq) return;
       setStatus("ready");
       setStatusMessage("Done");
@@ -690,14 +728,29 @@ function CodeBlockInner({
               {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
             </span>
           </button>
-          {initExpanded && (
+          <div
+            className={`${styles.initEditorWrap} ${
+              initExpanded
+                ? styles.initEditorWrapOpen
+                : styles.initEditorWrapCollapsed
+            }`}
+          >
             <div
               id={initPanelId}
               className={styles.initEditor}
               aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
               ref={initEditorHostRef}
             />
-          )}
+            {!initExpanded && initLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initFade}
+                aria-label="Expand initialization code"
+                title="Expand initialization code"
+                onClick={() => setInitExpanded(true)}
+              />
+            )}
+          </div>
         </div>
       )}
 
@@ -712,7 +765,7 @@ function CodeBlockInner({
         role="toolbar"
         aria-label="Code block actions"
       >
-        <div className={styles.actionBarButtons}>
+        <div className={styles.btnGroupPrimary}>
           <button
             type="button"
             className={`${styles.runBtn}${isBusy ? ` ${styles.runBtnRunning}` : ""}`}
@@ -740,27 +793,27 @@ function CodeBlockInner({
               <PlayIcon />
             )}
             <span>{isBusy ? "Running…" : "Run"}</span>
-          </button>
-          {!isBusy && (
-            <span
-              className={styles.kbdGroup}
-              title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-            >
-              <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-              <span className={styles.kbdPlus} aria-hidden="true">
-                +
+            {!isBusy && (
+              <span
+                className={styles.btnKbd}
+                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+              >
+                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                <span className={styles.kbdSep} aria-hidden>+</span>
+                <kbd className={styles.kbd}>↵</kbd>
               </span>
-              <kbd className={styles.kbd}>Enter</kbd>
-            </span>
-          )}
+            )}
+          </button>
+        </div>
+        <div className={styles.btnGroupUtil}>
           <button
             type="button"
-            className={styles.resetBtn}
+            className={styles.utilBtn}
             onClick={reset}
             disabled={isBusy}
           >
-            <RotateCcw size={13} strokeWidth={2.4} aria-hidden />
-            <span>Reset</span>
+            <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
+            Reset
           </button>
           <button
             type="button"
@@ -773,11 +826,13 @@ function CodeBlockInner({
           >
             <CopyIcon />
           </button>
-          <span className={styles.actionBarSpacer} />
           {statusMessage && (
-            <span className={styles.statusText} data-status={status}>
-              {statusMessage}
-            </span>
+            <>
+              <div className={styles.btnGroupUtilSep} aria-hidden />
+              <span className={styles.statusText} data-status={status}>
+                {statusMessage}
+              </span>
+            </>
           )}
         </div>
       </div>

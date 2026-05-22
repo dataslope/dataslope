@@ -107,20 +107,12 @@ console.log(sumArray([1, 2, 3, 4, 5]));
 
 console.log(byCustomer);
 `}
-  solutionCode={`function groupByCustomer(orders) {
-  const out = {};
-  for (const o of orders) {
-    out[o.customer] = (out[o.customer] || 0) + o.amount;
-  }
-  return out;
+  solutionCode={`let byCustomer = {};
+for (const o of orders) {
+  byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
-const result = groupByCustomer([
-  { customer: "Ada",   amount: 100 },
-  { customer: "Linus", amount: 80 },
-  { customer: "Ada",   amount: 50 },
-]);
-console.log(result);
+console.log(byCustomer);
 `}
   tests={[
     {
@@ -167,20 +159,12 @@ console.log(result);
 
 console.log(byCustomer);
 `}
-  solutionCode={`function groupByCustomer(orders) {
-  const out = {};
-  for (const o of orders) {
-    out[o.customer] = (out[o.customer] || 0) + o.amount;
-  }
-  return out;
+  solutionCode={`let byCustomer = {};
+for (const o of orders) {
+  byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
-const result = groupByCustomer([
-  { customer: "Ada",   amount: 100 },
-  { customer: "Linus", amount: 80 },
-  { customer: "Ada",   amount: 50 },
-]);
-console.log(result);
+console.log(byCustomer);
 `}
   tests={[
     {
@@ -223,11 +207,11 @@ console.log(result);
 
 delay(10).then((v) => console.log(v));
 `}
-  solutionCode={`function delayed(value, ms) {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+  solutionCode={`function delay(ms) {
+  return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
-delayed("done", 10).then((v) => console.log(v));
+delay(10).then((v) => console.log(v));
 `}
   tests={[
     {
@@ -256,11 +240,11 @@ delayed("done", 10).then((v) => console.log(v));
 
 delay(10).then((v) => console.log(v));
 `}
-  solutionCode={`function delayed(value, ms) {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+  solutionCode={`function delay(ms) {
+  return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
-delayed("done", 10).then((v) => console.log(v));
+delay(10).then((v) => console.log(v));
 `}
   tests={[
     {
@@ -274,6 +258,67 @@ delayed("done", 10).then((v) => console.log(v));
       name: "Resolves to `done`",
       description: "delay(5) eventually resolves to 'done'",
       code: `const v = await delay(5); if (v !== "done") throw new Error(\`Expected "done", got \${v}\`);`,
+    },
+  ]}
+/>
+```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Click a filename to switch buffers. Every file is
+staged into almostnode's virtual filesystem before each run, so the
+entry module can `require()` sibling files.
+
+<ChallengeCard
+  adapter="javascript"
+  title="Implement greet() in utils.js"
+  instructions={`Open \`utils.js\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.js\` already requires your function and prints the result.`}
+  entryFilename="main.js"
+  files={[
+    {
+      filename: "main.js",
+      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+    },
+    {
+      filename: "utils.js",
+      initialContent: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="javascript"
+  title="Implement greet() in utils.js"
+  instructions={`Open utils.js and implement greet(name) ...`}
+  entryFilename="main.js"
+  files={[
+    {
+      filename: "main.js",
+      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+    },
+    {
+      filename: "utils.js",
+      initialContent: `function greet(name) {\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
     },
   ]}
 />

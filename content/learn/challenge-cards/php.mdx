@@ -103,16 +103,11 @@ $total = 0; // TODO
 echo $total;
 `}
   solutionCode={`<?php
-$items = [
-    ["name" => "Apple",  "price" => 1.20, "in_stock" => true],
-    ["name" => "Bread",  "price" => 3.50, "in_stock" => false],
-    ["name" => "Cheese", "price" => 5.00, "in_stock" => true],
-];
-
 $total = 0.0;
 foreach ($items as $item) {
     if ($item["in_stock"]) $total += $item["price"];
 }
+
 echo $total;
 `}
   tests={[
@@ -150,16 +145,11 @@ $total = 0; // TODO
 echo $total;
 `}
   solutionCode={`<?php
-$items = [
-    ["name" => "Apple",  "price" => 1.20, "in_stock" => true],
-    ["name" => "Bread",  "price" => 3.50, "in_stock" => false],
-    ["name" => "Cheese", "price" => 5.00, "in_stock" => true],
-];
-
 $total = 0.0;
 foreach ($items as $item) {
     if ($item["in_stock"]) $total += $item["price"];
 }
+
 echo $total;
 `}
   tests={[
@@ -240,6 +230,67 @@ for ($i = 1; $i <= 10; $i++) {
         ],
         stdoutLinesExact: true,
       },
+    },
+  ]}
+/>
+```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Every file is staged into php-wasm's virtual
+filesystem before each run, so the entry script can `require_once`
+sibling files.
+
+<ChallengeCard
+  adapter="php"
+  title="Implement greet() in utils.php"
+  instructions={`Open \`utils.php\` and implement \`greet($name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.php\` already requires your file and echoes the result.`}
+  entryFilename="main.php"
+  files={[
+    {
+      filename: "main.php",
+      initialContent: `<?php\nrequire_once "utils.php";\necho greet("World");\n`,
+    },
+    {
+      filename: "utils.php",
+      initialContent: `<?php\nfunction greet($name) {\n    // your code here\n    return "";\n}\n`,
+      solutionContent: `<?php\nfunction greet($name) {\n    return "Hello, {$name}!";\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="php"
+  title="Implement greet() in utils.php"
+  instructions={`Open utils.php and implement greet($name) ...`}
+  entryFilename="main.php"
+  files={[
+    {
+      filename: "main.php",
+      initialContent: `<?php\nrequire_once "utils.php";\necho greet("World");\n`,
+    },
+    {
+      filename: "utils.php",
+      initialContent: `<?php\nfunction greet($name) {\n    return "";\n}\n`,
+      solutionContent: `<?php\nfunction greet($name) {\n    return "Hello, {$name}!";\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      expect: { stdoutEquals: "Hello, World!" },
     },
   ]}
 />

@@ -462,3 +462,64 @@ print(reverse_words("hello world"))
   ]}
 />
 ```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Click a filename to switch buffers. Every file is
+staged into Pyodide's virtual filesystem before each run, so the entry
+module can `import` from sibling files.
+
+<ChallengeCard
+  adapter="python"
+  title="Implement greet() in utils.py"
+  instructions={`Open \`utils.py\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.py\` already imports your function and prints the result.`}
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `from utils import greet\n\nprint(greet("World"))\n`,
+    },
+    {
+      filename: "utils.py",
+      initialContent: `def greet(name):\n    # your code here\n    return ""\n`,
+      solutionContent: `def greet(name):\n    return f"Hello, {name}!"\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      code: `from utils import greet\nassert greet("World") == "Hello, World!"`,
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="python"
+  title="Implement greet() in utils.py"
+  instructions={`Open utils.py and implement greet(name) ...`}
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `from utils import greet\n\nprint(greet("World"))\n`,
+    },
+    {
+      filename: "utils.py",
+      initialContent: `def greet(name):\n    return ""\n`,
+      solutionContent: `def greet(name):\n    return f"Hello, {name}!"\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "main runs and greet returns the expected value",
+      code: `from utils import greet\nassert greet("World") == "Hello, World!"`,
+    },
+  ]}
+/>
+```

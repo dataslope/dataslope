@@ -132,7 +132,101 @@ from it. Keep the class named `Main` for these exercises.
 />
 ```
 
-## 3. Loops and conditionals
+## 3. Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Click a filename to switch buffers. Every file in the
+workspace is staged into CheerpJ's virtual filesystem before each run,
+so `Main` can reference `Dog` directly without any imports.
+
+<ChallengeCard
+  adapter="java"
+  title="Implement Dog.bark()"
+  instructions={`Open \`Dog.java\` and implement the \`bark()\` method so that it returns the string \`"Woof!"\`. \`Main.java\` is provided — it constructs a \`Dog\` and prints the result of \`bark()\`.`}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        System.out.println(d.bark());
+    }
+}
+`,
+    },
+    {
+      filename: "Dog.java",
+      initialContent: `public class Dog {
+    public String bark() {
+        // your code here
+        return "";
+    }
+}
+`,
+      solutionContent: `public class Dog {
+    public String bark() {
+        return "Woof!";
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "barks",
+      name: "Prints `Woof!`",
+      description: "Main runs and bark() returns the expected value",
+      expect: { stdoutEquals: "Woof!" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="java"
+  title="Implement Dog.bark()"
+  instructions={`Open Dog.java and implement the bark() method ...`}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        System.out.println(d.bark());
+    }
+}
+`,
+    },
+    {
+      filename: "Dog.java",
+      initialContent: `public class Dog {
+    public String bark() {
+        return "";
+    }
+}
+`,
+      solutionContent: `public class Dog {
+    public String bark() {
+        return "Woof!";
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "barks",
+      name: "Prints `Woof!`",
+      description: "Main runs and bark() returns the expected value",
+      expect: { stdoutEquals: "Woof!" },
+    },
+  ]}
+/>
+```
+
+## 4. Loops and conditionals
 
 <ChallengeCard
   adapter="java"

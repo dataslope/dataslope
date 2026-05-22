@@ -366,11 +366,17 @@ const buildJsHarness: HarnessBuilder = (tests) => {
  * R harness — same shape as the Python one, using `tryCatch` for the
  * pass / fail framing. Test bodies should call `stop("…")` (or any
  * function that calls it, e.g. `stopifnot()`) to signal failure.
+ *
+ * Note: R identifiers cannot begin with `_`, so the helper names use
+ * a leading `.` (which is conventional for "hidden" R variables) —
+ * `.dstest_run`, `.dstest_t0`, etc. Using the `__dstest…` form the
+ * other harnesses share would cause R's parser to fail with
+ * "unexpected input" on line 1 of the snippet.
  */
 const buildRHarness: HarnessBuilder = (tests) => {
   const lines: string[] = [];
   lines.push(`cat("${HARNESS_BEGIN}\\n")`);
-  lines.push("__dstest_run <- function(tid, fn) {");
+  lines.push(".dstest_run <- function(tid, fn) {");
   lines.push("  tryCatch({ fn();");
   lines.push(
     `    cat(paste0("${HARNESS_RESULT_PREFIX}", tid, ":PASS\\n"))`,
@@ -384,13 +390,13 @@ const buildRHarness: HarnessBuilder = (tests) => {
   lines.push("}");
   lines.push("");
   tests.forEach((t, i) => {
-    const fnName = `__dstest_t${i}`;
+    const fnName = `.dstest_t${i}`;
     const body = t.code.trim() || "invisible(NULL)";
     lines.push(`${fnName} <- function() {`);
     for (const raw of body.split("\n")) lines.push("  " + raw);
     lines.push("}");
     lines.push(
-      `__dstest_run(${JSON.stringify(t.id)}, ${fnName})`,
+      `.dstest_run(${JSON.stringify(t.id)}, ${fnName})`,
     );
     lines.push("");
   });

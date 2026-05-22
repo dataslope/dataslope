@@ -115,7 +115,7 @@ import {
   writeDataFile as opfsWriteDataFile,
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
-import { type DuckDbEngine } from "../runtime/duckdb";
+import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
 const DUCKDB_BLANK_DATABASE = duckdbAdapter.blankSample!;
@@ -860,8 +860,8 @@ const DEFAULT_PAGE_SIZE = 50;
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "DuckDB",
-  version: "1.30",
-  engine: "duckdb-wasm 1.30",
+  version: DUCKDB_VERSION,
+  engine: `duckdb-wasm ${DUCKDB_VERSION}`,
   engineUrl: "https://duckdb.org/docs/api/wasm/overview",
   notes:
     "Pure-WASM build of DuckDB that runs entirely in your browser. Each sample database is rebuilt in memory on every page load. DuckDB does not support triggers or VIRTUAL generated columns; STORED generated columns are supported.",

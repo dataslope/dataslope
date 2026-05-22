@@ -35,7 +35,15 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
+import { Menu } from "@base-ui-components/react/menu";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
@@ -59,7 +67,7 @@ import {
   drawSelection,
   dropCursor,
 } from "@codemirror/view";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import {
   bracketMatching,
   indentOnInput,
@@ -67,6 +75,7 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { themeFor } from "./cmExtensions";
+import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -200,7 +209,7 @@ async function createSqliteChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "SQLite",
-    version: "3.x",
+    version: "3.53",
   };
 }
 
@@ -231,7 +240,7 @@ async function createPostgresChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "PostgreSQL",
-    version: "via PGlite",
+    version: "17",
   };
 }
 
@@ -511,11 +520,45 @@ function detectIsMac(): boolean {
 
 const CM_EDITOR_THEME = "idea";
 
+// Minimum time (ms) the "running" overlay is held visible after a run
+// completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
+// query doesn't blink the wave animation in and back out within a
+// single frame.
+const MIN_RUN_OVERLAY_MS = 300;
+
 /** Map a SQL dialect to the corresponding key in the shared
  *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label
  *  uses the same brand glyph as the playground language switcher. */
 function languageIconKeyForDialect(d: SqlDialect): string {
   return d;
+}
+
+// Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
+// SQL challenge card shows the same blue-wave hint while running/submitting.
+function RunOverlay({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
+      aria-hidden="true"
+    >
+      <div className={styles.runGlow} />
+      <svg
+        className={styles.runWaves}
+        viewBox="0 0 240 28"
+        preserveAspectRatio="none"
+      >
+        <path
+          className={styles.runWaveBack}
+          d="M0 18 C 20 14, 40 14, 60 18 S 100 22, 120 18 S 160 14, 180 18 S 220 22, 240 18 S 280 14, 300 18 S 340 22, 360 18 S 400 14, 420 18 S 460 22, 480 18 L 480 28 L 0 28 Z"
+        />
+        <path
+          className={styles.runWaveFront}
+          d="M0 21 C 20 17, 40 17, 60 21 S 100 25, 120 21 S 160 17, 180 21 S 220 25, 240 21 S 280 17, 300 21 S 340 25, 360 21 S 400 17, 420 21 S 460 25, 480 21 L 480 28 L 0 28 Z"
+        />
+      </svg>
+      <div className={styles.runStream} />
+    </div>
+  );
 }
 
 function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
@@ -582,8 +625,17 @@ export default function SqlChallengeCard({
   const engineSeededRef = useRef(false);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
+  // Default action of the split button (Submit when canCheck,
+  // otherwise plain Run). Bound to Mod-Enter from the editor's keymap.
+  const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
+  // Tracks which action triggered the in-flight run so the Submit
+  // pill can show "Submitting…" vs "Running…" correctly when the
+  // dropdown's "Run without Submitting" item is the trigger.
+  const [activeAction, setActiveAction] = useState<"submit" | "run" | null>(
+    null,
+  );
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [resultSet, setResultSet] = useState<SqlResult | null>(null);
   const [resultMessage, setResultMessage] = useState<string>("");
@@ -599,10 +651,10 @@ export default function SqlChallengeCard({
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
-      ? "SQLite"
+      ? "SQLite 3.53"
       : dialect === "duckdb"
-        ? "DuckDB"
-        : "PostgreSQL",
+        ? `DuckDB ${DUCKDB_VERSION}`
+        : "PostgreSQL 17",
   );
 
   const isMac = useSyncExternalStore(
@@ -643,7 +695,21 @@ export default function SqlChallengeCard({
         EditorView.lineWrapping,
         keymap.of([
           {
+            // Default keyboard action mirrors the split button:
+            // Submit (run + grade against tests). For challenges
+            // with no tests, the submit handler short-circuits to a
+            // plain Run so the keystroke isn't a dead key.
             key: "Mod-Enter",
+            run: () => {
+              submitRef.current();
+              return true;
+            },
+          },
+          {
+            // Dropdown action: run the query without grading it,
+            // matching the menu item visible from the Submit
+            // button's chevron.
+            key: "Mod-Shift-Enter",
             run: () => {
               runRef.current();
               return true;
@@ -652,6 +718,7 @@ export default function SqlChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          indentWithTab,
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(CM_EDITOR_THEME)),
@@ -696,6 +763,11 @@ export default function SqlChallengeCard({
   }, []);
 
   // Mount the read-only solution editor lazily when the modal opens.
+  // We keep the doc editable at the contenteditable level (relying on
+  // `readOnly` to block insertions) so the user can click into the
+  // editor and select text — including Mod-A select-all, wired via
+  // the default keymap below since `editable.of(false)` would
+  // otherwise disable keyboard focus and shortcuts.
   useEffect(() => {
     if (!solutionOpen || !solutionSql) return;
     if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
@@ -705,12 +777,12 @@ export default function SqlChallengeCard({
       parent: solutionEditorHostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
-        EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,
+        keymap.of(defaultKeymap),
         languageComp.of([]),
         themeFor(CM_EDITOR_THEME),
       ],
@@ -877,7 +949,20 @@ export default function SqlChallengeCard({
       setStatus("running");
       setStatusMessage("Running…");
       const startedAt = performance.now();
-      const results = await engine.exec(sql);
+      let results: SqlResult[];
+      try {
+        results = await engine.exec(sql);
+      } finally {
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
+        // the wave animation doesn't blink in/out on sub-frame runs.
+        // The throw path is covered here too so error states get the
+        // same minimum visible duration before the caller's catch
+        // swaps status to "error".
+        const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
+        if (wait > 0) {
+          await new Promise<void>((resolve) => setTimeout(resolve, wait));
+        }
+      }
       const elapsedMs = performance.now() - startedAt;
       // The "last meaningful result" is the last result set with
       // columns. DML statements come back with empty columns so they
@@ -898,6 +983,7 @@ export default function SqlChallengeCard({
 
   // ─── Run (no tests) ─────────────────────────────────────────────────
   const run = useCallback(async () => {
+    setActiveAction("run");
     const userSql = editorRef.current?.state.doc.toString() ?? "";
     setTestResults([]);
     setBannerState(null);
@@ -933,12 +1019,16 @@ export default function SqlChallengeCard({
       setResultError(message);
       setStatus("error");
       setStatusMessage(message);
+    } finally {
+      setActiveAction(null);
     }
   }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    setActiveAction("submit");
+    try {
     const userSql = editorRef.current?.state.doc.toString() ?? "";
 
     setTestResults(
@@ -1098,12 +1188,22 @@ export default function SqlChallengeCard({
         /* viewer refresh failure shouldn't mask the run's outcome */
       }
     }
+    } finally {
+      setActiveAction(null);
+    }
   }, [canCheck, ensureEngine, executeSql, refreshTableViewer, solutionSql, tableViewerEnabled, tests]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
   useEffect(() => {
     runRef.current = run;
   }, [run]);
+
+  // The split button's default action (and Mod-Enter) is "Submit"
+  // when the challenge actually has tests; otherwise it falls back
+  // to a plain Run so the keystroke still does something useful.
+  useEffect(() => {
+    submitRef.current = canCheck ? () => void check() : () => void run();
+  }, [canCheck, check, run]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
   // Reset restores the starter code AND re-seeds the database so
@@ -1316,65 +1416,168 @@ export default function SqlChallengeCard({
         aria-label="SQL solution editor"
       />
 
-      {/* ── Toolbar ── */}
-      <div className={styles.toolbar} role="toolbar" aria-label="Challenge controls">
+      {/* ── Action bar ── */}
+      <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
         <div className={styles.btnGroupPrimary}>
-          <button
-            type="button"
-            className={styles.runBtn}
-            onClick={() => void run()}
-            disabled={isBusy}
-          >
-            {isBusy ? (
-              <svg
-                viewBox="0 0 12 12"
-                className={styles.runBtnSpinner}
-                aria-hidden
+          {canCheck ? (
+            <>
+              <button
+                type="button"
+                className={styles.runBtn}
+                onClick={() => void check()}
+                disabled={isBusy}
               >
-                <circle
-                  cx="6"
-                  cy="6"
-                  r="4.5"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeDasharray="14 8"
-                />
-              </svg>
-            ) : (
-              <PlayIcon />
-            )}
-            <span>{isBusy ? "Running…" : "Run"}</span>
-            {!isBusy && (
-              <span
-                className={styles.btnKbd}
-                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-              >
-                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
-            )}
-          </button>
-          {canCheck && (
+                {isBusy ? (
+                  <svg
+                    viewBox="0 0 12 12"
+                    className={styles.runBtnSpinner}
+                    aria-hidden
+                  >
+                    <circle
+                      cx="6"
+                      cy="6"
+                      r="4.5"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeDasharray="14 8"
+                    />
+                  </svg>
+                ) : (
+                  <Check size={12} strokeWidth={2.6} aria-hidden />
+                )}
+                <span>
+                  {isBusy
+                    ? activeAction === "run"
+                      ? "Running…"
+                      : "Submitting…"
+                    : "Submit"}
+                </span>
+                {!isBusy && (
+                  <span
+                    className={styles.btnKbd}
+                    title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                  >
+                    <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className={styles.kbdSep} aria-hidden>+</span>
+                    <kbd className={styles.kbd}>↵</kbd>
+                  </span>
+                )}
+              </button>
+              <Menu.Root>
+                <Menu.Trigger
+                  className={styles.runBtnChevron}
+                  disabled={isBusy}
+                  aria-label="More run options"
+                  title="More run options"
+                >
+                  <ChevronDown size={14} strokeWidth={2.4} aria-hidden />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner
+                    sideOffset={6}
+                    align="end"
+                    className={styles.runMenuPositioner}
+                  >
+                    <Menu.Popup className={styles.runMenuPopup}>
+                      <Menu.Item
+                        className={styles.runMenuItem}
+                        onClick={() => void run()}
+                      >
+                        <Play
+                          size={12}
+                          strokeWidth={2.4}
+                          fill="currentColor"
+                          aria-hidden
+                        />
+                        <span className={styles.runMenuLabel}>
+                          Run without Submitting
+                        </span>
+                        <span
+                          className={styles.runMenuKbd}
+                          title={
+                            isMac
+                              ? "Cmd + Shift + Enter"
+                              : "Ctrl + Shift + Enter"
+                          }
+                        >
+                          <kbd className={styles.kbd}>
+                            {isMac ? "⌘" : "Ctrl"}
+                          </kbd>
+                          <span className={styles.kbdSep} aria-hidden>
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>⇧</kbd>
+                          <span className={styles.kbdSep} aria-hidden>
+                            +
+                          </span>
+                          <kbd className={styles.kbd}>↵</kbd>
+                        </span>
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            </>
+          ) : (
+            // No tests on this challenge: render a plain Run pill,
+            // no menu. Mod-Enter falls back to `run` for the same
+            // reason.
             <button
               type="button"
-              className={styles.checkBtn}
-              onClick={() => void check()}
+              className={styles.runBtn}
+              onClick={() => void run()}
               disabled={isBusy}
             >
-              <Check size={12} strokeWidth={2.5} aria-hidden />
-              <span>Submit</span>
-              <span className={styles.btnKbd} title="Shift + Enter">
-                <kbd className={styles.kbd}>⇧</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
-              </span>
+              {isBusy ? (
+                <svg
+                  viewBox="0 0 12 12"
+                  className={styles.runBtnSpinner}
+                  aria-hidden
+                >
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeDasharray="14 8"
+                  />
+                </svg>
+              ) : (
+                <PlayIcon />
+              )}
+              <span>{isBusy ? "Running…" : "Run"}</span>
+              {!isBusy && (
+                <span
+                  className={styles.btnKbd}
+                  title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                >
+                  <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                  <span className={styles.kbdSep} aria-hidden>+</span>
+                  <kbd className={styles.kbd}>↵</kbd>
+                </span>
+              )}
             </button>
           )}
         </div>
         <div className={styles.btnGroupUtil}>
+          {/* Runtime status — shows "Loading PGlite", "Loading
+              DuckDB-WASM", etc. while the SQL engine is fetching its
+              WASM bundle on first run. Once the engine is warm this
+              stays hidden. */}
+          {isBusy && statusMessage && (
+            <span
+              className={styles.actionBarStatus}
+              data-status={status}
+              title={statusMessage}
+            >
+              {statusMessage}
+            </span>
+          )}
           <button
             type="button"
             className={styles.utilBtn}
@@ -1451,40 +1654,17 @@ export default function SqlChallengeCard({
                 Query returned no rows.
               </div>
             ) : (
-              <div className={styles.sqlResultScroll}>
-                <table className={styles.sqlResultTable}>
-                  <thead>
-                    <tr>
-                      {resultSet.columns.map((c, i) => (
-                        <th key={i}>{c}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {resultSet.values.map((row, ri) => (
-                      <tr key={ri}>
-                        {row.map((cell, ci) => (
-                          <td key={ci}>
-                            {cell === null || cell === undefined ? (
-                              <span className={styles.sqlNullValue}>NULL</span>
-                            ) : cell instanceof Uint8Array ? (
-                              `<${cell.byteLength} bytes>`
-                            ) : (
-                              String(cell)
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <VirtualizedResultTable
+                columns={resultSet.columns}
+                values={resultSet.values}
+              />
             )
           ) : resultMessage ? (
             <div className={styles.sqlMessage}>{resultMessage}</div>
           ) : (
             <div className={styles.sqlMessage}>Running…</div>
           )}
+          <RunOverlay active={isBusy} />
         </div>
       )}
 
@@ -1640,65 +1820,178 @@ function SolutionModal({
       aria-modal="true"
       aria-label="Reference solution"
       onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(15, 23, 42, 0.55)",
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px",
-      }}
+      className={styles.modalBackdrop}
     >
       <div
-        className={styles.card}
+        className={`${styles.card} ${styles.modalCard}`}
         onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: "720px",
-          width: "100%",
-          maxHeight: "80vh",
-          margin: 0,
-          display: "flex",
-          flexDirection: "column",
-        }}
       >
-        <div className={styles.header} style={{ borderBottom: "1px solid var(--ch-border-light)" }}>
+        <div className={styles.modalHeader}>
           <div className={styles.badge}>
             <span className={styles.badgeDot} /> Solution
           </div>
-          <div className={styles.titleArea}>
-            <div className={styles.title}>Reference solution</div>
-            <div className={styles.meta}>
-              <span>One valid answer — there may be others.</span>
+          <div className={styles.modalTitleArea}>
+            <div className={styles.modalTitle}>Reference solution</div>
+            <div className={styles.modalSubtitle}>
+              One valid answer — there may be others.
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => void copySolution()}
-            aria-label="Copy solution"
-            title="Copy solution"
-            className={styles.copyBtn}
-            style={{ marginLeft: "auto" }}
-          >
-            <CopyIcon />
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className={styles.copyBtn}
-          >
-            <X size={14} strokeWidth={2.4} aria-hidden />
-          </button>
+          <div className={styles.modalActions}>
+            <button
+              type="button"
+              onClick={() => void copySolution()}
+              aria-label="Copy solution"
+              title="Copy solution"
+              className={styles.modalIconBtn}
+            >
+              <CopyIcon />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              title="Close"
+              className={styles.modalIconBtn}
+            >
+              <X size={14} strokeWidth={2.4} aria-hidden />
+            </button>
+          </div>
         </div>
         <div
           ref={editorHostRef}
-          className={styles.editor}
-          style={{ flex: 1, overflow: "auto" }}
+          className={styles.modalEditor}
           aria-label="Solution editor (read-only)"
         />
       </div>
+    </div>
+  );
+}
+
+/** Renders a single table's contents inside the table viewer panel.
+/** Virtualised SQL result table — used both by the main result pane
+ *  and the per-table viewer at the bottom of the card. The result
+ *  set is in memory by the time we render (executeSql returns the
+ *  full Promise<SqlResult>), so there's no per-page load — we just
+ *  render only the rows currently in the viewport via
+ *  `@tanstack/react-virtual` + a TanStack table for the column
+ *  definitions. For very wide tables the inner row is still a
+ *  regular `<tr>` so column auto-widths just work. */
+function VirtualizedResultTable({
+  columns,
+  values,
+  maxHeight,
+}: {
+  columns: string[];
+  values: unknown[][];
+  /** CSS max-height of the scroll container. Defaults to 320px so a
+   *  giant result set doesn't push the whole page below the fold. */
+  maxHeight?: number;
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  // Stable row identity — TanStack Table keys rows by index when no
+  // explicit id is supplied, which is fine here since the result set
+  // never re-sorts in this component.
+  const data = useMemo(
+    () => values.map((row, i) => ({ __idx: i, row })),
+    [values],
+  );
+  const columnHelper = useMemo(
+    () => createColumnHelper<{ __idx: number; row: unknown[] }>(),
+    [],
+  );
+  const tableColumns = useMemo(
+    () =>
+      columns.map((c, i) =>
+        columnHelper.accessor((d) => d.row[i], {
+          id: `${i}`,
+          header: c,
+          cell: (info) => {
+            const v = info.getValue();
+            if (v === null || v === undefined) {
+              return <span className={styles.sqlNullValue}>NULL</span>;
+            }
+            if (v instanceof Uint8Array) {
+              return `<${v.byteLength} bytes>`;
+            }
+            return String(v);
+          },
+        }),
+      ),
+    [columns, columnHelper],
+  );
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for the column / cell model.
+  const table = useReactTable({
+    data,
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+  const tableRows = table.getRowModel().rows;
+  const rowVirtualizer = useVirtualizer({
+    count: tableRows.length,
+    getScrollElement: () => scrollRef.current,
+    // Matches the playground's VIRTUAL_ROW_HEIGHT_ESTIMATE so the
+    // table feels identical to the playground's result pane.
+    estimateSize: () => 30,
+    overscan: 20,
+  });
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualRows.length > 0 ? (virtualRows[0]?.start ?? 0) : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() -
+        (virtualRows[virtualRows.length - 1]?.end ?? 0)
+      : 0;
+  const colSpan = tableColumns.length;
+
+  return (
+    <div
+      ref={scrollRef}
+      className={styles.sqlResultScroll}
+      style={{ maxHeight: maxHeight ?? 320 }}
+    >
+      <table className={styles.sqlResultTable}>
+        <thead>
+          {table.getHeaderGroups().map((hg) => (
+            <tr key={hg.id}>
+              {hg.headers.map((h) => (
+                <th key={h.id}>
+                  {h.isPlaceholder
+                    ? null
+                    : flexRender(h.column.columnDef.header, h.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {paddingTop > 0 && (
+            <tr aria-hidden style={{ height: paddingTop }}>
+              <td colSpan={colSpan} />
+            </tr>
+          )}
+          {virtualRows.map((vr) => {
+            const row = tableRows[vr.index];
+            return (
+              <tr
+                key={row.id}
+                data-index={vr.index}
+                ref={rowVirtualizer.measureElement}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          {paddingBottom > 0 && (
+            <tr aria-hidden style={{ height: paddingBottom }}>
+              <td colSpan={colSpan} />
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -1732,33 +2025,12 @@ function TableViewerPane({
     );
   }
   return (
-    <div className={styles.tableViewerScroll}>
-      <table className={styles.sqlResultTable}>
-        <thead>
-          <tr>
-            {r.columns.map((c, i) => (
-              <th key={i}>{c}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {r.values.map((row, ri) => (
-            <tr key={ri}>
-              {row.map((cell, ci) => (
-                <td key={ci}>
-                  {cell === null || cell === undefined ? (
-                    <span className={styles.sqlNullValue}>NULL</span>
-                  ) : cell instanceof Uint8Array ? (
-                    `<${cell.byteLength} bytes>`
-                  ) : (
-                    String(cell)
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <VirtualizedResultTable
+        columns={r.columns}
+        values={r.values}
+        maxHeight={220}
+      />
       {entry.truncated && (
         <div className={styles.tableViewerFootnote}>
           Showing first {limit} row{limit === 1 ? "" : "s"}.

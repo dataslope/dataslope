@@ -247,3 +247,72 @@ int main(void) {
   ]}
 />
 ```
+
+## Multi-file challenge
+
+Multi-file challenges open with a non-sortable, non-closeable tab bar
+above the editor. Every file is staged into browsercc's virtual
+filesystem before each run, so the entry translation unit can
+`#include` sibling headers.
+
+<ChallengeCard
+  adapter="c"
+  title="Implement greet() in utils.c"
+  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided — it calls \`greet()\` once.`}
+  entryFilename="main.c"
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include "utils.h"\n\nint main(void) {\n    greet();\n    return 0;\n}\n`,
+    },
+    {
+      filename: "utils.h",
+      initialContent: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
+    },
+    {
+      filename: "utils.c",
+      initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    // your code here\n}\n`,
+      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="Implement greet() in utils.c"
+  instructions={`Open utils.c and implement greet() ...`}
+  entryFilename="main.c"
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include "utils.h"\n\nint main(void) {\n    greet();\n    return 0;\n}\n`,
+    },
+    {
+      filename: "utils.h",
+      initialContent: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
+    },
+    {
+      filename: "utils.c",
+      initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n}\n`,
+      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
+    },
+  ]}
+  tests={[
+    {
+      id: "greets",
+      name: "Prints `Hello, World!`",
+      description: "Exact stdout match",
+      expect: { stdoutEquals: "Hello, World!" },
+    },
+  ]}
+/>
+```
