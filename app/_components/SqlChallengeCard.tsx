@@ -623,6 +623,12 @@ export default function SqlChallengeCard({
   const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
+  // Tracks which action triggered the in-flight run so the Submit
+  // pill can show "Submitting…" vs "Running…" correctly when the
+  // dropdown's "Run without Submitting" item is the trigger.
+  const [activeAction, setActiveAction] = useState<"submit" | "run" | null>(
+    null,
+  );
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [resultSet, setResultSet] = useState<SqlResult | null>(null);
   const [resultMessage, setResultMessage] = useState<string>("");
@@ -970,6 +976,7 @@ export default function SqlChallengeCard({
 
   // ─── Run (no tests) ─────────────────────────────────────────────────
   const run = useCallback(async () => {
+    setActiveAction("run");
     const userSql = editorRef.current?.state.doc.toString() ?? "";
     setTestResults([]);
     setBannerState(null);
@@ -1005,12 +1012,16 @@ export default function SqlChallengeCard({
       setResultError(message);
       setStatus("error");
       setStatusMessage(message);
+    } finally {
+      setActiveAction(null);
     }
   }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    setActiveAction("submit");
+    try {
     const userSql = editorRef.current?.state.doc.toString() ?? "";
 
     setTestResults(
@@ -1169,6 +1180,9 @@ export default function SqlChallengeCard({
       } catch {
         /* viewer refresh failure shouldn't mask the run's outcome */
       }
+    }
+    } finally {
+      setActiveAction(null);
     }
   }, [canCheck, ensureEngine, executeSql, refreshTableViewer, solutionSql, tableViewerEnabled, tests]);
 
@@ -1426,7 +1440,13 @@ export default function SqlChallengeCard({
                 ) : (
                   <Check size={12} strokeWidth={2.6} aria-hidden />
                 )}
-                <span>{isBusy ? "Submitting…" : "Submit"}</span>
+                <span>
+                  {isBusy
+                    ? activeAction === "run"
+                      ? "Running…"
+                      : "Submitting…"
+                    : "Submit"}
+                </span>
                 {!isBusy && (
                   <span
                     className={styles.btnKbd}
@@ -1538,6 +1558,19 @@ export default function SqlChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
+          {/* Runtime status — shows "Loading PGlite", "Loading
+              DuckDB-WASM", etc. while the SQL engine is fetching its
+              WASM bundle on first run. Once the engine is warm this
+              stays hidden. */}
+          {isBusy && statusMessage && (
+            <span
+              className={styles.actionBarStatus}
+              data-status={status}
+              title={statusMessage}
+            >
+              {statusMessage}
+            </span>
+          )}
           <button
             type="button"
             className={styles.utilBtn}

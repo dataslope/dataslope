@@ -839,16 +839,27 @@
   z-index: 1100;
   outline: none;
 }
+/* The menu lives in a portal outside `.card`, so the --ch-* tokens
+   defined on `.card` don't reach it via inheritance. Inline the few
+   Tailwind palette + semantic tokens the menu actually needs here so
+   the popup renders with the same blue chrome as the Submit button. */
 .runMenuPopup {
-  background: var(--ch-white);
-  border: 1px solid var(--ch-border);
+  --ch-white: #ffffff;
+  --ch-black: #000000;
+  --ch-blue-500: #3b82f6;
+  --ch-blue-600: #2563eb;
+  --ch-blue-700: #1d4ed8;
+  --ch-blue-900: #1e3a8a;
+
+  background: var(--ch-blue-600);
+  border: 1px solid var(--ch-blue-700);
   border-radius: 8px;
   box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ch-slate-900) 4%, transparent),
-    0 8px 24px color-mix(in srgb, var(--ch-slate-900) 10%, transparent);
+    0 1px 2px color-mix(in srgb, var(--ch-black) 12%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ch-black) 22%, transparent);
   padding: 4px;
   min-width: 240px;
-  font-family: var(--ch-font-ui);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   outline: none;
 }
 .runMenuItem {
@@ -860,7 +871,7 @@
   background: transparent;
   border: none;
   border-radius: 5px;
-  color: var(--ch-text);
+  color: var(--ch-white);
   font-size: 13px;
   cursor: pointer;
   text-align: left;
@@ -868,11 +879,12 @@
 }
 .runMenuItem:hover,
 .runMenuItem[data-highlighted] {
-  background: var(--ch-bg-subtle);
+  background: var(--ch-blue-700);
 }
 .runMenuItem svg {
   flex-shrink: 0;
-  color: var(--ch-accent);
+  width: 12px;
+  height: 12px;
 }
 .runMenuLabel {
   flex: 1;
@@ -883,6 +895,24 @@
   align-items: center;
   gap: 3px;
   flex-shrink: 0;
+}
+/* Kbd chips inside the menu mirror the embedded kbd inside the Run
+   button — semi-transparent white pill on the accent background. */
+.runMenuKbd .kbd {
+  background: color-mix(in srgb, var(--ch-white) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ch-white) 28%, transparent);
+  color: color-mix(in srgb, var(--ch-white) 88%, transparent);
+  box-shadow: none;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-size: 10.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1;
+  font-weight: 500;
+}
+.runMenuKbd .kbdSep {
+  color: color-mix(in srgb, var(--ch-white) 50%, transparent);
+  font-size: 11px;
 }
 .runBtn {
   background: var(--ch-accent);
@@ -906,10 +936,14 @@
   cursor: not-allowed;
 }
 .runBtn svg {
-  width: 11px;
-  height: 11px;
-  fill: white;
-  stroke: white;
+  /* Use the surrounding currentColor (white) for both fill and stroke
+     by default so the custom PlayIcon (filled triangle) renders
+     filled while Lucide icons (which set fill="none" on the root and
+     stroke="currentColor") still draw their strokes. Explicit
+     `fill: white` would paint the inside of Lucide stroke paths and
+     turn the Check tick into a blob. */
+  width: 12px;
+  height: 12px;
 }
 .runBtnSpinner {
   animation: ch-spin 0.75s linear infinite;
@@ -985,6 +1019,28 @@
   align-items: center;
   flex-shrink: 0;
   margin-left: auto;
+  gap: 0;
+  min-width: 0;
+}
+/* Runtime status text shown next to the utility buttons while a run
+   is in flight. Truncates rather than wrapping so long messages
+   ("Loading browsercc clang toolchain (this can take a moment)…")
+   don't push the Reset / Solution / Copy buttons off-screen. */
+.actionBarStatus {
+  font-family: var(--ch-font-mono);
+  font-size: 11px;
+  color: var(--ch-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  margin-right: 6px;
+  padding: 0 4px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.actionBarStatus[data-status="error"] {
+  color: var(--ch-red);
 }
 .btnGroupUtilSep {
   width: 1px;

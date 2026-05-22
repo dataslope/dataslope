@@ -404,6 +404,13 @@ export default function ChallengeCard({
   const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
+  // Tracks which action triggered the in-flight run so the Submit
+  // pill can show the correct "Submitting…" vs "Running…" label
+  // (the dropdown's "Run without Submitting" item should *not* read
+  // as "Submitting…" while it's executing).
+  const [activeAction, setActiveAction] = useState<"submit" | "run" | null>(
+    null,
+  );
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [elapsed, setElapsed] = useState<string>("");
@@ -862,6 +869,7 @@ export default function ChallengeCard({
 
   // ─── Run (no tests) ────────────────────────────────────────────────
   const run = useCallback(async () => {
+    setActiveAction("run");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
     const combined = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
@@ -884,12 +892,15 @@ export default function ChallengeCard({
       ]);
       setStatus("error");
       setStatusMessage(message);
+    } finally {
+      setActiveAction(null);
     }
   }, [execute, hasInit, resolvedEntryFilename, snapshotAllFiles, trimmedInit]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    setActiveAction("submit");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
     const userPart = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
@@ -993,6 +1004,8 @@ export default function ChallengeCard({
         })),
       );
       setBannerState("fail");
+    } finally {
+      setActiveAction(null);
     }
   }, [
     adapter.id,
@@ -1409,7 +1422,13 @@ export default function ChallengeCard({
                 ) : (
                   <Check size={12} strokeWidth={2.6} aria-hidden />
                 )}
-                <span>{isBusy ? "Submitting…" : "Submit"}</span>
+                <span>
+                  {isBusy
+                    ? activeAction === "run"
+                      ? "Running…"
+                      : "Submitting…"
+                    : "Submit"}
+                </span>
                 {!isBusy && (
                   <span
                     className={styles.btnKbd}
@@ -1528,6 +1547,21 @@ export default function ChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
+          {/* Runtime status / loading message — mirrors the executable
+              code block's status text. While the runtime is fetching
+              its WASM toolchain on first run, this surfaces "Loading
+              Pyodide", "Loading browsercc clang toolchain (this can
+              take a moment)…" etc. instead of leaving the user
+              staring at a spinning button with no context. */}
+          {isBusy && statusMessage && (
+            <span
+              className={styles.actionBarStatus}
+              data-status={status}
+              title={statusMessage}
+            >
+              {statusMessage}
+            </span>
+          )}
           <button
             type="button"
             className={styles.utilBtn}
