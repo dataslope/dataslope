@@ -41,6 +41,25 @@
   --color-fd-card: hsl(0, 0%, 100%);
 }
 
+/* Item 1: Light mode active sidebar item — subtler highlight than the default
+   bg-fd-primary/10 (10% of near-black). Non-layered rules beat @layer utilities. */
+:root:not(.dark) #nd-sidebar [data-active="true"] {
+  background-color: hsl(0, 0%, 95%);
+}
+
+/* Item 2: Sidebar footer bar (GitHub icon + theme toggle) — remove the
+   input-like border and secondary background so it looks like plain icons. */
+#nd-sidebar div.border.rounded-lg {
+  background-color: transparent;
+  border: none;
+}
+
+/* Item 3: Dark mode — make the sidebar use the same background as the content
+   area (#121212) instead of the default card color (#191919). */
+.dark {
+  --color-fd-card: var(--color-fd-background);
+}
+
 body {
   font-family:
     "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
