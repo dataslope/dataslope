@@ -13,13 +13,7 @@ engine compiled to WebAssembly, served from jsDelivr at first use.
   title="Find numbers divisible by 7"
   category="generate_series · filter"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Using DuckDB's <code>range</code> function, return every integer
-      from 1 to 100 that is divisible by 7. The single column should be
-      named <code>n</code>, sorted ascending.
-    </p>
-  </>}
+  instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
 FROM range(1, 101) t(i)
@@ -50,13 +44,7 @@ FROM range(1, 101) t(i)
   title="Find numbers divisible by 7"
   category="generate_series · filter"
   estimatedTime="~2 min"
-  instructions={<>
-    <p>
-      Using DuckDB's <code>range</code> function, return every integer
-      from 1 to 100 that is divisible by 7. The single column should be
-      named <code>n</code>, sorted ascending.
-    </p>
-  </>}
+  instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
 FROM range(1, 101) t(i)

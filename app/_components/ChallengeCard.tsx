@@ -30,7 +30,15 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box, RotateCcw, Check, X, ChevronDown, Clock } from "lucide-react";
+import { Box, RotateCcw, Check, X, ChevronDown, Clock, Eye } from "lucide-react";
+import {
+  CopyIcon,
+  PlayIcon,
+  FormatIcon,
+  renderInstructions,
+  useChallengeToasts,
+  ChallengeToastViewport,
+} from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -95,8 +103,10 @@ export interface ChallengeCardProps {
   category?: string;
   /** Optional estimated time, e.g. "~5 min". */
   estimatedTime?: string;
-  /** Rendered above the editor. Pass MDX content or React elements. */
-  instructions: React.ReactNode;
+  /** Rendered above the editor. Pass MDX content / React elements, or a
+   *  markdown string for terser authoring. Strings support paragraphs,
+   *  bullet lists, **bold**, *italic*, and `inline code`. */
+  instructions: React.ReactNode | string;
   /** Optional initialization code prepended verbatim to the user's
    *  code on every run. Rendered in a collapsed-by-default read-only
    *  panel above the editor, mirroring `<CodeBlock>`'s `initCode`. */
@@ -125,33 +135,6 @@ function detectIsMac(): boolean {
 // card rather than a console. We always render the IntelliJ IDEA
 // CodeMirror theme so the editor matches the card chrome.
 const CM_EDITOR_THEME = "idea";
-
-function CopyIcon() {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="9" y="9" width="13" height="13" rx="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden>
-      <path d="M2 1l9 5-9 5V1z" fill="currentColor" />
-    </svg>
-  );
-}
 
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
@@ -230,6 +213,7 @@ export default function ChallengeCard({
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
+  const toasts = useChallengeToasts();
 
   const isMac = useSyncExternalStore(
     () => () => {},
@@ -587,19 +571,43 @@ export default function ChallengeCard({
     setStatusMessage("");
     setTestResults([]);
     setBannerState(null);
-  }, [initialCode]);
+    toasts.show("Reset to starter code.");
+  }, [initialCode, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(code);
+        toasts.show("Code copied to clipboard.");
+      } else {
+        toasts.show("Clipboard unavailable in this browser.", "warn");
       }
     } catch {
-      // Non-fatal: clipboard permission may be unavailable in this
-      // context. Mirrors `<CodeBlock>`'s silent fallback.
+      toasts.show("Couldn't copy code — clipboard blocked.", "warn");
     }
-  }, []);
+  }, [toasts]);
+
+  const formatCode = useCallback(async () => {
+    if (!adapter.formatCode) return;
+    const view = editorRef.current;
+    if (!view) return;
+    const code = view.state.doc.toString();
+    if (!code.trim()) return;
+    try {
+      const formatted = await adapter.formatCode(code);
+      if (formatted === code) {
+        toasts.show("Already formatted — nothing to change.");
+        return;
+      }
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: formatted },
+      });
+      toasts.show("Code formatted.");
+    } catch {
+      toasts.show("Couldn't format — code may have a syntax error.", "warn");
+    }
+  }, [adapter, toasts]);
 
   const isBusy = status === "loading" || status === "running";
   const passedCount = testResults.filter((t) => t.state === "pass").length;
@@ -620,14 +628,15 @@ export default function ChallengeCard({
     >
       {/* ── Header ── */}
       <div className={styles.header}>
-        <div className={styles.headerMain}>
-          <div className={styles.headerTop}>
-            <div className={styles.badge}>
-              <span className={styles.badgeDot} /> {badge}
-            </div>
+        <div className={styles.headerRow}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} /> {badge}
+          </div>
+          <div className={styles.headerMeta}>
             <span className={styles.headerBlockId}>
               <Box size={12} aria-hidden /> {blockId}
             </span>
+            <span className={styles.headerDivider} aria-hidden />
             <span className={styles.headerRuntimeLabel}>
               <LanguageGlyph adapter={adapter} />
               {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
@@ -638,46 +647,49 @@ export default function ChallengeCard({
               title={statusMessage || status}
               aria-label={statusMessage || status}
             />
-            <div className={styles.headerStatus}>
-              {totalTests > 0 && bannerState !== null ? (
-                allPassed ? (
-                  <div className={styles.statusPass}>
-                    <Check size={14} strokeWidth={2.5} aria-hidden />
-                    Passed
-                  </div>
-                ) : (
-                  <div className={styles.statusPending}>
-                    <span className={styles.statusPendingCount}>
-                      {passedCount}/{totalTests}
-                    </span>
-                    <span className={styles.statusPendingLabel}>tests</span>
-                  </div>
-                )
-              ) : null}
-            </div>
           </div>
-          <div className={styles.title}>{title}</div>
-          {(estimatedTime || category) && (
-            <div className={styles.meta}>
-              {estimatedTime && (
-                <span className={styles.metaPill}>
-                  <Clock size={11} aria-hidden />
-                  {estimatedTime}
-                </span>
-              )}
-              {estimatedTime && category && (
-                <span className={styles.metaSep}>·</span>
-              )}
-              {category && <span>{category}</span>}
-            </div>
-          )}
         </div>
+        <div className={styles.titleRow}>
+          <div className={styles.title}>{title}</div>
+          <div className={styles.headerStatus}>
+            {totalTests > 0 && bannerState !== null ? (
+              allPassed ? (
+                <div className={styles.statusPass}>
+                  <Check size={14} strokeWidth={2.5} aria-hidden />
+                  Passed
+                </div>
+              ) : (
+                <div className={styles.statusPending}>
+                  <span className={styles.statusPendingCount}>
+                    {passedCount}/{totalTests}
+                  </span>
+                  <span className={styles.statusPendingLabel}>tests</span>
+                </div>
+              )
+            ) : null}
+          </div>
+        </div>
+        {(estimatedTime || category) && (
+          <div className={styles.meta}>
+            {estimatedTime && (
+              <span className={styles.metaPill}>
+                <Clock size={11} aria-hidden />
+                {estimatedTime}
+              </span>
+            )}
+            {estimatedTime && category && (
+              <span className={styles.metaSep}>·</span>
+            )}
+            {category && <span>{category}</span>}
+          </div>
+        )}
       </div>
 
       {/* ── Instructions ── */}
       <div className={styles.instructions}>
-        <div className={styles.instructionsLabel}>Instructions</div>
-        <div className={styles.instructionsBody}>{instructions}</div>
+        <div className={styles.instructionsBody}>
+          {renderInstructions(instructions)}
+        </div>
       </div>
 
       {/* ── Init code (collapsed by default) ── */}
@@ -725,84 +737,112 @@ export default function ChallengeCard({
 
       {/* ── Toolbar ── */}
       <div className={styles.toolbar} role="toolbar" aria-label="Challenge controls">
-        <button
-          type="button"
-          className={styles.runBtn}
-          onClick={() => void run()}
-          disabled={isBusy}
-        >
-          {isBusy ? (
-            <svg
-              viewBox="0 0 12 12"
-              className={styles.runBtnSpinner}
-              aria-hidden
+        <div className={styles.btnGroupPrimary}>
+          <button
+            type="button"
+            className={styles.runBtn}
+            onClick={() => void run()}
+            disabled={isBusy}
+          >
+            {isBusy ? (
+              <svg
+                viewBox="0 0 12 12"
+                className={styles.runBtnSpinner}
+                aria-hidden
+              >
+                <circle
+                  cx="6"
+                  cy="6"
+                  r="4.5"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="14 8"
+                />
+              </svg>
+            ) : (
+              <PlayIcon />
+            )}
+            <span>{isBusy ? "Running…" : "Run"}</span>
+            {!isBusy && (
+              <span
+                className={styles.btnKbd}
+                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+              >
+                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                <span className={styles.kbdSep} aria-hidden>+</span>
+                <kbd className={styles.kbd}>↵</kbd>
+              </span>
+            )}
+          </button>
+          {canCheck && (
+            <button
+              type="button"
+              className={styles.checkBtn}
+              onClick={() => void check()}
+              disabled={isBusy}
             >
-              <circle
-                cx="6"
-                cy="6"
-                r="4.5"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray="14 8"
-              />
-            </svg>
-          ) : (
-            <PlayIcon />
+              <Check size={12} strokeWidth={2.5} aria-hidden />
+              <span>Submit</span>
+              <span className={styles.btnKbd} title="Shift + Enter">
+                <kbd className={styles.kbd}>⇧</kbd>
+                <span className={styles.kbdSep} aria-hidden>+</span>
+                <kbd className={styles.kbd}>↵</kbd>
+              </span>
+            </button>
           )}
-          <span>{isBusy ? "Running…" : "Run"}</span>
-        </button>
-        {canCheck && (
+        </div>
+        <div className={styles.btnGroupUtil}>
           <button
             type="button"
-            className={styles.checkBtn}
-            onClick={() => void check()}
+            className={styles.utilBtn}
+            onClick={reset}
             disabled={isBusy}
           >
-            <Check size={12} strokeWidth={2.5} aria-hidden />
-            Check Answer
+            <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
+            Reset
           </button>
-        )}
-        {!isBusy && (
-          <span
-            className={styles.kbdHint}
-            title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-          >
-            <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-            <span className={styles.kbdPlus} aria-hidden>+</span>
-            <kbd className={styles.kbd}>Enter</kbd>
-          </span>
-        )}
-        <span className={styles.toolbarSpacer} />
-        {solutionCode && (
+          {solutionCode && (
+            <>
+              <div className={styles.btnGroupUtilSep} aria-hidden />
+              <button
+                type="button"
+                className={styles.utilBtn}
+                onClick={() => setSolutionOpen(true)}
+                disabled={isBusy}
+              >
+                <Eye size={12} strokeWidth={2} aria-hidden />
+                Solution
+              </button>
+            </>
+          )}
+          {adapter.formatCode && (
+            <>
+              <div className={styles.btnGroupUtilSep} aria-hidden />
+              <button
+                type="button"
+                className={styles.utilBtn}
+                onClick={() => void formatCode()}
+                disabled={isBusy}
+                title="Format code"
+              >
+                <FormatIcon />
+                Format
+              </button>
+            </>
+          )}
+          <div className={styles.btnGroupUtilSep} aria-hidden />
           <button
             type="button"
-            className={styles.resetBtn}
-            onClick={() => setSolutionOpen(true)}
-            disabled={isBusy}
+            className={styles.copyBtn}
+            onClick={() => void copyCode()}
+            title="Copy code"
+            aria-label="Copy code"
           >
-            Show Solution
+            <CopyIcon />
           </button>
-        )}
-        <button
-          type="button"
-          className={styles.resetBtn}
-          onClick={reset}
-          disabled={isBusy}
-        >
-          <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
-          Reset
-        </button>
-        <button
-          type="button"
-          className={styles.copyBtn}
-          onClick={() => void copyCode()}
-          title="Copy code"
-          aria-label="Copy code"
-        >
-          <CopyIcon />
-        </button>
+        </div>
       </div>
 
       {/* ── Output panel ── */}
@@ -935,6 +975,13 @@ export default function ChallengeCard({
           source={solutionCode}
         />
       )}
+
+      <ChallengeToastViewport
+        toasts={toasts.toasts}
+        onDismiss={toasts.dismiss}
+        className={styles.toastViewport}
+        itemClassName={styles.toast}
+      />
     </div>
   );
 }

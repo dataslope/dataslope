@@ -33,6 +33,13 @@
   --ch-purple: #7c3aed;
   --ch-purple-bg: #f5f3ff;
   --ch-purple-border: #ede9fe;
+  /* Badge accent — purple for non-SQL challenges, cyan for SQL, set
+     via the `dataDialect`-aware override below. */
+  --ch-badge-color: #7c3aed;
+  --ch-badge-bg: #f5f3ff;
+  --ch-badge-border: #ede9fe;
+  --ch-scrollbar-thumb: #d1d5db;
+  --ch-scrollbar-thumb-hover: #9ca3af;
   --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --ch-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
@@ -51,52 +58,73 @@
   font-size: 13px;
   line-height: 1.5;
   margin: 1rem 0;
+  position: relative;
+}
+
+/* SQL challenge cards get a distinct cyan accent on the badge to match
+   the design — non-SQL cards keep the default purple. */
+.card[data-flavor="sql"] {
+  --ch-badge-color: #0891b2;
+  --ch-badge-bg: #ecfeff;
+  --ch-badge-border: #a5f3fc;
 }
 
 /* ─── Header ──────────────────────────────────────────────────────── */
 
 .header {
-  padding: 14px 20px 12px;
-  border-bottom: 1px solid var(--ch-border-light);
+  padding: 16px 20px 12px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 14px;
 }
 
-.headerMain {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.headerTop {
+.headerRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.headerMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.headerDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--ch-border);
+  margin: 0 10px;
+  flex-shrink: 0;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .headerStatus {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   margin-left: auto;
 }
 .headerBlockId {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
 .headerBlockId svg {
-  opacity: 0.65;
+  opacity: 0.6;
 }
 .headerRuntimeLabel {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--ch-text-secondary);
 }
 .headerRuntimeLabel svg {
@@ -113,17 +141,18 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ch-purple);
-  background: var(--ch-purple-bg);
-  border: 1px solid var(--ch-purple-border);
+  color: var(--ch-badge-color);
+  background: var(--ch-badge-bg);
+  border: 1px solid var(--ch-badge-border);
   border-radius: 5px;
   padding: 2px 8px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 .badgeDot {
   width: 5px;
   height: 5px;
-  background: var(--ch-purple);
+  background: var(--ch-badge-color);
   border-radius: 50%;
 }
 
@@ -135,8 +164,9 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--ch-text);
-  margin-bottom: 2px;
   line-height: 1.4;
+  flex: 1;
+  min-width: 0;
 }
 .meta {
   display: flex;
@@ -186,9 +216,9 @@
 /* ─── Instructions ────────────────────────────────────────────────── */
 
 .instructions {
-  padding: 18px 20px;
+  padding: 4px 20px 18px;
   border-bottom: 1px solid var(--ch-border-light);
-  background: var(--ch-bg-muted);
+  background: var(--ch-bg);
 }
 .instructionsLabel {
   font-size: 10.5px;
@@ -440,12 +470,24 @@
   background: var(--ch-bg-subtle);
   gap: 0;
 }
+
+/* Primary group: Run + Submit attached, with a shared accent border. */
+.btnGroupPrimary {
+  display: inline-flex;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--ch-accent);
+  flex-shrink: 0;
+}
+/* Divider between Run and Submit, only when both are present. */
+.btnGroupPrimary .runBtn:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
+}
 .runBtn {
   background: var(--ch-accent);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -476,33 +518,82 @@
   to { transform: rotate(360deg); }
 }
 
-.kbdHint {
+.checkBtn {
+  background: transparent;
+  border: none;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ch-accent);
+  cursor: pointer;
+  font-family: var(--ch-font-ui);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 10px;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.checkBtn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.07);
+  color: var(--ch-accent-hover);
+}
+.checkBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Inline kbd shortcut hints rendered inside the primary buttons. */
+.btnKbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+}
+.btnKbd .kbdSep {
+  font-size: 11px;
   color: var(--ch-text-muted);
-  font-size: 12px;
+}
+.runBtn .btnKbd .kbd {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow: none;
+}
+.runBtn .btnKbd .kbdSep {
+  color: rgba(255, 255, 255, 0.5);
 }
 .kbd {
   background: #fff;
   border: 1px solid var(--ch-border);
   border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
+  padding: 2px 5px;
+  font-size: 10.5px;
   font-family: var(--ch-font-mono);
   color: var(--ch-text-muted);
   box-shadow: 0 1px 0 var(--ch-border);
+  line-height: 1;
   font-weight: 500;
 }
-.kbdPlus {
+.kbdSep {
   color: var(--ch-text-muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
-.resetBtn {
-  margin-left: 10px;
-  background: none;
+/* Utility-button group on the right side of the toolbar. */
+.btnGroupUtil {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.btnGroupUtilSep {
+  width: 1px;
+  height: 16px;
+  background: var(--ch-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.utilBtn {
+  background: transparent;
   border: none;
   color: var(--ch-text-muted);
   font-size: 12.5px;
@@ -515,21 +606,21 @@
   font-family: var(--ch-font-ui);
   transition: color 0.15s, background 0.15s;
 }
-.resetBtn:hover:not(:disabled) {
+.utilBtn:hover:not(:disabled) {
   color: var(--ch-text);
-  background: #f0f0f0;
+  background: #f0f1f3;
 }
-.resetBtn:disabled {
+.utilBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
 .copyBtn {
-  background: none;
+  background: transparent;
   border: none;
   color: var(--ch-text-muted);
   cursor: pointer;
-  padding: 5px;
+  padding: 5px 7px;
   border-radius: 5px;
   display: inline-flex;
   align-items: center;
@@ -537,36 +628,11 @@
 }
 .copyBtn:hover {
   color: var(--ch-text);
-  background: #f0f0f0;
+  background: #f0f1f3;
 }
 
-.toolbarSpacer {
-  flex: 1 1 auto;
-}
-
-.checkBtn {
-  background: none;
-  border: 1px solid var(--ch-border);
-  border-radius: 6px;
-  padding: 5px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ch-text-secondary);
-  cursor: pointer;
-  font-family: var(--ch-font-ui);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s;
-}
-.checkBtn:hover:not(:disabled) {
-  border-color: #9ca3af;
-  color: var(--ch-text);
-  background: #f9fafb;
-}
-.checkBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+@media (max-width: 480px) {
+  .btnKbd { display: none; }
 }
 
 /* ─── Output panel ────────────────────────────────────────────────── */
@@ -907,21 +973,6 @@
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
-.dialectBadge {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--ch-font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--ch-text-secondary);
-  background: var(--ch-bg-subtle);
-  border: 1px solid var(--ch-border-light);
-  border-radius: 4px;
-  padding: 1px 7px;
-  margin-right: 4px;
-}
-
 /* ─── Dark mode ───────────────────────────────────────────────────────
    Fumadocs toggles a `.dark` class on `<html>`. We rebind the card's
    CSS variables so the same selectors keep working — no extra rules
@@ -970,13 +1021,16 @@
 :global(html.dark) .initToggle:hover {
   background: #1a2433;
 }
-:global(html.dark) .resetBtn:hover:not(:disabled),
+:global(html.dark) .utilBtn:hover:not(:disabled),
 :global(html.dark) .copyBtn:hover {
   background: #1a2433;
+  color: var(--ch-text);
 }
 :global(html.dark) .checkBtn:hover:not(:disabled) {
-  background: #1a2433;
-  border-color: #475569;
+  background: rgba(59, 130, 246, 0.15);
+}
+:global(html.dark) .headerDivider {
+  background: var(--ch-border);
 }
 :global(html.dark) .kbd {
   background: #1f2937;
@@ -1074,9 +1128,9 @@
   color: var(--ch-text);
 }
 .tableViewerTabActive {
-  background: var(--ch-purple-bg);
-  border-color: var(--ch-purple-border);
-  color: var(--ch-purple);
+  background: var(--ch-badge-bg);
+  border-color: var(--ch-badge-border);
+  color: var(--ch-badge-color);
 }
 .tableViewerSchema {
   color: var(--ch-text-muted);
@@ -1118,4 +1172,94 @@
   color: var(--ch-text-muted);
   border-top: 1px solid var(--ch-border-light);
   background: var(--ch-bg-subtle);
+}
+
+/* ─── Toasts ──────────────────────────────────────────────────────────
+   Self-contained toast stack mounted inside each card. Positioned at
+   the bottom-right so it's anchored to the surface that produced it,
+   rather than floating at the page level. */
+.toastViewport {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 5;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 12px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 12px;
+  font-family: var(--ch-font-ui);
+  border-radius: 6px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.10);
+  animation: ch-toast-in 0.16s ease-out;
+  max-width: 320px;
+}
+.toast[data-kind="warn"] {
+  background: #7f1d1d;
+}
+.toast > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(249, 250, 251, 0.7);
+  padding: 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+.toast > button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+@keyframes ch-toast-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────────────
+   Scoped to elements inside the card so we don't restyle scrollbars
+   page-wide. Targets every nested overflow area (output panel, SQL
+   result table, table viewer, CodeMirror editor). */
+.card *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.card *::-webkit-scrollbar-track {
+  background: transparent;
+}
+.card *::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.card *::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+.card *::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* Firefox */
+.card * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+:global(html.dark) .card {
+  --ch-scrollbar-thumb: #334155;
+  --ch-scrollbar-thumb-hover: #475569;
 }

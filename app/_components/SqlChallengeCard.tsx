@@ -36,7 +36,20 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box, RotateCcw, Check, X, ChevronDown, Clock, Database } from "lucide-react";
+import { Box, RotateCcw, Check, X, ChevronDown, Clock, Eye } from "lucide-react";
+import {
+  LANGUAGE_ICONS,
+  LANGUAGE_ICON_COLORS,
+  LANGUAGE_ICON_SIZE_FACTOR,
+} from "./languageIcons";
+import {
+  CopyIcon,
+  PlayIcon,
+  FormatIcon,
+  renderInstructions,
+  useChallengeToasts,
+  ChallengeToastViewport,
+} from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -124,7 +137,10 @@ export interface SqlChallengeCardProps {
   badge?: string;
   category?: string;
   estimatedTime?: string;
-  instructions: React.ReactNode;
+  /** Rendered above the editor. Pass MDX content / React elements, or a
+   *  markdown string for terser authoring. Strings support paragraphs,
+   *  bullet lists, **bold**, *italic*, and `inline code`. */
+  instructions: React.ReactNode | string;
   /** Setup SQL run once before the learner's first execution. Creates
    *  tables, populates seed data, etc. Replaces DataCamp's
    *  `pre-exercise-code` block. */
@@ -510,31 +526,40 @@ function useBlockId(dialect: SqlDialect): string {
   }, [reactId, dialect]);
 }
 
-function CopyIcon() {
+/** Map a SQL dialect to the corresponding key in the shared
+ *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label
+ *  uses the same brand glyph as the playground language switcher. */
+function languageIconKeyForDialect(d: SqlDialect): string {
+  return d;
+}
+
+function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
+  const key = languageIconKeyForDialect(dialect);
+  const Icon = LANGUAGE_ICONS[key];
+  const color = LANGUAGE_ICON_COLORS[key];
+  const factor = LANGUAGE_ICON_SIZE_FACTOR[key] ?? 1;
+  if (!Icon) return null;
   return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <Icon
+      style={{
+        color,
+        width: `${Math.round(14 * factor)}px`,
+        height: `${Math.round(14 * factor)}px`,
+      }}
       aria-hidden
-    >
-      <rect x="9" y="9" width="13" height="13" rx="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
+    />
   );
 }
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden>
-      <path d="M2 1l9 5-9 5V1z" fill="currentColor" />
-    </svg>
-  );
+
+/** Map dialect → sql-formatter language identifier. PGlite is Postgres-
+ *  compatible; DuckDB's grammar is largely Postgres-derived too, so
+ *  reusing the postgres rules produces good results for both. */
+function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
+  if (d === "sqlite") return "sqlite";
+  if (d === "duckdb") return "duckdb";
+  return "postgresql";
 }
+
 export default function SqlChallengeCard({
   dialect,
   title,
@@ -578,6 +603,7 @@ export default function SqlChallengeCard({
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
+  const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
       ? "SQLite"
@@ -1098,18 +1124,45 @@ export default function SqlChallengeCard({
         /* see mount-time bootstrap */
       });
     }
-  }, [initialCode, ensureEngine, tableViewerEnabled]);
+    toasts.show("Reset to starter SQL.");
+  }, [initialCode, ensureEngine, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(code);
+        toasts.show("SQL copied to clipboard.");
+      } else {
+        toasts.show("Clipboard unavailable in this browser.", "warn");
       }
     } catch {
-      /* clipboard permission may be unavailable; silent fallback */
+      toasts.show("Couldn't copy SQL — clipboard blocked.", "warn");
     }
-  }, []);
+  }, [toasts]);
+
+  const formatCode = useCallback(async () => {
+    const view = editorRef.current;
+    if (!view) return;
+    const code = view.state.doc.toString();
+    if (!code.trim()) return;
+    try {
+      const { format: sqlFormat } = await import("sql-formatter");
+      const formatted = sqlFormat(code, {
+        language: sqlFormatterLanguage(dialect),
+      });
+      if (formatted === code) {
+        toasts.show("Already formatted — nothing to change.");
+        return;
+      }
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: formatted },
+      });
+      toasts.show("SQL formatted.");
+    } catch {
+      toasts.show("Couldn't format — SQL may have a syntax error.", "warn");
+    }
+  }, [dialect, toasts]);
 
   const isBusy = status === "loading" || status === "running";
   const passedCount = testResults.filter((t) => t.state === "pass").length;
@@ -1126,21 +1179,22 @@ export default function SqlChallengeCard({
   return (
     <div
       className={styles.card}
+      data-flavor="sql"
       aria-label={`SQL coding challenge: ${title}`}
     >
       {/* ── Header ── */}
       <div className={styles.header}>
-        <div className={styles.headerMain}>
-          <div className={styles.headerTop}>
-            <div className={styles.badge}>
-              <span className={styles.badgeDot} /> {badge}
-            </div>
+        <div className={styles.headerRow}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} /> {badge}
+          </div>
+          <div className={styles.headerMeta}>
             <span className={styles.headerBlockId}>
               <Box size={12} aria-hidden /> {blockId}
             </span>
-            <span className={styles.dialectBadge}>{dialect.toUpperCase()}</span>
+            <span className={styles.headerDivider} aria-hidden />
             <span className={styles.headerRuntimeLabel}>
-              <Database size={13} aria-hidden />
+              <DialectGlyph dialect={dialect} />
               {engineLabel}
             </span>
             <span
@@ -1149,46 +1203,49 @@ export default function SqlChallengeCard({
               title={statusMessage || status}
               aria-label={statusMessage || status}
             />
-            <div className={styles.headerStatus}>
-              {totalTests > 0 && bannerState !== null ? (
-                allPassed ? (
-                  <div className={styles.statusPass}>
-                    <Check size={14} strokeWidth={2.5} aria-hidden />
-                    Passed
-                  </div>
-                ) : (
-                  <div className={styles.statusPending}>
-                    <span className={styles.statusPendingCount}>
-                      {passedCount}/{totalTests}
-                    </span>
-                    <span className={styles.statusPendingLabel}>tests</span>
-                  </div>
-                )
-              ) : null}
-            </div>
           </div>
-          <div className={styles.title}>{title}</div>
-          {(estimatedTime || category) && (
-            <div className={styles.meta}>
-              {estimatedTime && (
-                <span className={styles.metaPill}>
-                  <Clock size={11} aria-hidden />
-                  {estimatedTime}
-                </span>
-              )}
-              {estimatedTime && category && (
-                <span className={styles.metaSep}>·</span>
-              )}
-              {category && <span>{category}</span>}
-            </div>
-          )}
         </div>
+        <div className={styles.titleRow}>
+          <div className={styles.title}>{title}</div>
+          <div className={styles.headerStatus}>
+            {totalTests > 0 && bannerState !== null ? (
+              allPassed ? (
+                <div className={styles.statusPass}>
+                  <Check size={14} strokeWidth={2.5} aria-hidden />
+                  Passed
+                </div>
+              ) : (
+                <div className={styles.statusPending}>
+                  <span className={styles.statusPendingCount}>
+                    {passedCount}/{totalTests}
+                  </span>
+                  <span className={styles.statusPendingLabel}>tests</span>
+                </div>
+              )
+            ) : null}
+          </div>
+        </div>
+        {(estimatedTime || category) && (
+          <div className={styles.meta}>
+            {estimatedTime && (
+              <span className={styles.metaPill}>
+                <Clock size={11} aria-hidden />
+                {estimatedTime}
+              </span>
+            )}
+            {estimatedTime && category && (
+              <span className={styles.metaSep}>·</span>
+            )}
+            {category && <span>{category}</span>}
+          </div>
+        )}
       </div>
 
       {/* ── Instructions ── */}
       <div className={styles.instructions}>
-        <div className={styles.instructionsLabel}>Instructions</div>
-        <div className={styles.instructionsBody}>{instructions}</div>
+        <div className={styles.instructionsBody}>
+          {renderInstructions(instructions)}
+        </div>
       </div>
 
       {/* ── Table viewer ── */}
@@ -1257,84 +1314,108 @@ export default function SqlChallengeCard({
 
       {/* ── Toolbar ── */}
       <div className={styles.toolbar} role="toolbar" aria-label="Challenge controls">
-        <button
-          type="button"
-          className={styles.runBtn}
-          onClick={() => void run()}
-          disabled={isBusy}
-        >
-          {isBusy ? (
-            <svg
-              viewBox="0 0 12 12"
-              className={styles.runBtnSpinner}
-              aria-hidden
+        <div className={styles.btnGroupPrimary}>
+          <button
+            type="button"
+            className={styles.runBtn}
+            onClick={() => void run()}
+            disabled={isBusy}
+          >
+            {isBusy ? (
+              <svg
+                viewBox="0 0 12 12"
+                className={styles.runBtnSpinner}
+                aria-hidden
+              >
+                <circle
+                  cx="6"
+                  cy="6"
+                  r="4.5"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="14 8"
+                />
+              </svg>
+            ) : (
+              <PlayIcon />
+            )}
+            <span>{isBusy ? "Running…" : "Run"}</span>
+            {!isBusy && (
+              <span
+                className={styles.btnKbd}
+                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+              >
+                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                <span className={styles.kbdSep} aria-hidden>+</span>
+                <kbd className={styles.kbd}>↵</kbd>
+              </span>
+            )}
+          </button>
+          {canCheck && (
+            <button
+              type="button"
+              className={styles.checkBtn}
+              onClick={() => void check()}
+              disabled={isBusy}
             >
-              <circle
-                cx="6"
-                cy="6"
-                r="4.5"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray="14 8"
-              />
-            </svg>
-          ) : (
-            <PlayIcon />
+              <Check size={12} strokeWidth={2.5} aria-hidden />
+              <span>Submit</span>
+              <span className={styles.btnKbd} title="Shift + Enter">
+                <kbd className={styles.kbd}>⇧</kbd>
+                <span className={styles.kbdSep} aria-hidden>+</span>
+                <kbd className={styles.kbd}>↵</kbd>
+              </span>
+            </button>
           )}
-          <span>{isBusy ? "Running…" : "Run"}</span>
-        </button>
-        {canCheck && (
+        </div>
+        <div className={styles.btnGroupUtil}>
           <button
             type="button"
-            className={styles.checkBtn}
-            onClick={() => void check()}
+            className={styles.utilBtn}
+            onClick={reset}
             disabled={isBusy}
           >
-            <Check size={12} strokeWidth={2.5} aria-hidden />
-            Check Answer
+            <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
+            Reset
           </button>
-        )}
-        {!isBusy && (
-          <span
-            className={styles.kbdHint}
-            title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-          >
-            <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-            <span className={styles.kbdPlus} aria-hidden>+</span>
-            <kbd className={styles.kbd}>Enter</kbd>
-          </span>
-        )}
-        <span className={styles.toolbarSpacer} />
-        {solutionSql && (
+          {solutionSql && (
+            <>
+              <div className={styles.btnGroupUtilSep} aria-hidden />
+              <button
+                type="button"
+                className={styles.utilBtn}
+                onClick={() => setSolutionOpen(true)}
+                disabled={isBusy}
+              >
+                <Eye size={12} strokeWidth={2} aria-hidden />
+                Solution
+              </button>
+            </>
+          )}
+          <div className={styles.btnGroupUtilSep} aria-hidden />
           <button
             type="button"
-            className={styles.resetBtn}
-            onClick={() => setSolutionOpen(true)}
+            className={styles.utilBtn}
+            onClick={() => void formatCode()}
             disabled={isBusy}
+            title="Format SQL"
           >
-            Show Solution
+            <FormatIcon />
+            Format
           </button>
-        )}
-        <button
-          type="button"
-          className={styles.resetBtn}
-          onClick={reset}
-          disabled={isBusy}
-        >
-          <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
-          Reset
-        </button>
-        <button
-          type="button"
-          className={styles.copyBtn}
-          onClick={() => void copyCode()}
-          title="Copy code"
-          aria-label="Copy code"
-        >
-          <CopyIcon />
-        </button>
+          <div className={styles.btnGroupUtilSep} aria-hidden />
+          <button
+            type="button"
+            className={styles.copyBtn}
+            onClick={() => void copyCode()}
+            title="Copy SQL"
+            aria-label="Copy SQL"
+          >
+            <CopyIcon />
+          </button>
+        </div>
       </div>
 
       {/* ── Result panel ── */}
@@ -1510,6 +1591,13 @@ export default function SqlChallengeCard({
           source={solutionSql}
         />
       )}
+
+      <ChallengeToastViewport
+        toasts={toasts.toasts}
+        onDismiss={toasts.dismiss}
+        className={styles.toastViewport}
+        itemClassName={styles.toast}
+      />
     </div>
   );
 }

@@ -30,27 +30,15 @@ challenge with init code, a hint, and six tests.
   title="Summarize Sales by Category"
   category="pandas · groupby · agg"
   estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      You have a DataFrame called <code>df</code> with sales data. It has
-      the following columns: <code>category</code>, <code>product</code>,{' '}
-      <code>units_sold</code>, and <code>revenue</code>.
-    </p>
-    <p>
-      Your task is to create a summary DataFrame called{' '}
-      <strong><code>summary</code></strong> that groups by{' '}
-      <code>category</code> and computes:
-    </p>
-    <ul>
-      <li>Total <code>units_sold</code> (sum)</li>
-      <li>Total <code>revenue</code> (sum)</li>
-      <li>Average <code>revenue</code> per transaction, named <code>avg_revenue</code></li>
-    </ul>
-    <p>
-      Round all numeric results to <strong>2 decimal places</strong> and
-      sort by <code>revenue</code> descending.
-    </p>
-  </>}
+  instructions={`You have a DataFrame called \`df\` with sales data. It has the following columns: \`category\`, \`product\`, \`units_sold\`, and \`revenue\`.
+
+Your task is to create a summary DataFrame called **\`summary\`** that groups by \`category\` and computes:
+
+- Total \`units_sold\` (sum)
+- Total \`revenue\` (sum)
+- Average \`revenue\` per transaction, named \`avg_revenue\`
+
+Round all numeric results to **2 decimal places** and sort by \`revenue\` descending.`}
   initCode={`import pandas as pd
 
 _data = {
@@ -137,27 +125,15 @@ assert all(round(v, 2) == v for v in avg_vals), \
   title="Summarize Sales by Category"
   category="pandas · groupby · agg"
   estimatedTime="~5 min"
-  instructions={<>
-    <p>
-      You have a DataFrame called <code>df</code> with sales data. It has
-      the following columns: <code>category</code>, <code>product</code>,{' '}
-      <code>units_sold</code>, and <code>revenue</code>.
-    </p>
-    <p>
-      Your task is to create a summary DataFrame called{' '}
-      <strong><code>summary</code></strong> that groups by{' '}
-      <code>category</code> and computes:
-    </p>
-    <ul>
-      <li>Total <code>units_sold</code> (sum)</li>
-      <li>Total <code>revenue</code> (sum)</li>
-      <li>Average <code>revenue</code> per transaction, named <code>avg_revenue</code></li>
-    </ul>
-    <p>
-      Round all numeric results to <strong>2 decimal places</strong> and
-      sort by <code>revenue</code> descending.
-    </p>
-  </>}
+  instructions={`You have a DataFrame called \`df\` with sales data. It has the following columns: \`category\`, \`product\`, \`units_sold\`, and \`revenue\`.
+
+Your task is to create a summary DataFrame called **\`summary\`** that groups by \`category\` and computes:
+
+- Total \`units_sold\` (sum)
+- Total \`revenue\` (sum)
+- Average \`revenue\` per transaction, named \`avg_revenue\`
+
+Round all numeric results to **2 decimal places** and sort by \`revenue\` descending.`}
   initCode={`import pandas as pd
 
 _data = {

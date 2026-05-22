@@ -13,14 +13,7 @@ compiled to WebAssembly that boots entirely in your browser.
   title="List orders with customer names"
   category="JOIN · SELECT"
   estimatedTime="~3 min"
-  instructions={<>
-    <p>
-      Join <code>orders</code> and <code>customers</code> and return
-      one row per order with the columns <code>order_id</code>,{' '}
-      <code>customer_name</code>, and <code>amount</code>. Sort by{' '}
-      <code>order_id</code> ascending.
-    </p>
-  </>}
+  instructions={`Join \`orders\` and \`customers\` and return one row per order with the columns \`order_id\`, \`customer_name\`, and \`amount\`. Sort by \`order_id\` ascending.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL
@@ -79,14 +72,7 @@ ORDER BY o.id ASC;`}
   title="List orders with customer names"
   category="JOIN · SELECT"
   estimatedTime="~3 min"
-  instructions={<>
-    <p>
-      Join <code>orders</code> and <code>customers</code> and return
-      one row per order with the columns <code>order_id</code>,{' '}
-      <code>customer_name</code>, and <code>amount</code>. Sort by{' '}
-      <code>order_id</code> ascending.
-    </p>
-  </>}
+  instructions={`Join \`orders\` and \`customers\` and return one row per order with the columns \`order_id\`, \`customer_name\`, and \`amount\`. Sort by \`order_id\` ascending.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL
