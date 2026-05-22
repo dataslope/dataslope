@@ -476,6 +476,11 @@ export default function ChallengeCard({
   }, [activeFilename, persistActiveFile]);
 
   // Mount the read-only solution editor lazily when the modal opens.
+  // We keep the doc editable at the contenteditable level (relying on
+  // `readOnly` to block insertions) so the user can click into the
+  // editor, move the caret, and select text — including Mod-A
+  // select-all, which is wired explicitly below since `editable.of(false)`
+  // would otherwise drop keyboard focus and disable the default keymap.
   useEffect(() => {
     if (!solutionOpen || !solutionCode) return;
     if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
@@ -485,12 +490,12 @@ export default function ChallengeCard({
       parent: solutionEditorHostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
-        EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
         EditorState.tabSize.of(4),
         indentUnit.of("    "),
         EditorView.lineWrapping,
+        keymap.of(defaultKeymap),
         languageComp.of([]),
         themeFor(CM_EDITOR_THEME),
       ],
@@ -1314,62 +1319,46 @@ function SolutionModal({
       aria-modal="true"
       aria-label="Reference solution"
       onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(15, 23, 42, 0.55)",
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px",
-      }}
+      className={styles.modalBackdrop}
     >
       <div
-        className={styles.card}
+        className={`${styles.card} ${styles.modalCard}`}
         onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: "720px",
-          width: "100%",
-          maxHeight: "80vh",
-          margin: 0,
-          display: "flex",
-          flexDirection: "column",
-        }}
       >
-        <div className={styles.header} style={{ borderBottom: "1px solid var(--ch-border-light)" }}>
+        <div className={styles.modalHeader}>
           <div className={styles.badge}>
             <span className={styles.badgeDot} /> Solution
           </div>
-          <div className={styles.titleArea}>
-            <div className={styles.title}>Reference solution</div>
-            <div className={styles.meta}>
-              <span>One valid answer — there may be others.</span>
+          <div className={styles.modalTitleArea}>
+            <div className={styles.modalTitle}>Reference solution</div>
+            <div className={styles.modalSubtitle}>
+              One valid answer — there may be others.
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => void copySolution()}
-            aria-label="Copy solution"
-            title="Copy solution"
-            className={styles.copyBtn}
-            style={{ marginLeft: "auto" }}
-          >
-            <CopyIcon />
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className={styles.copyBtn}
-          >
-            <X size={14} strokeWidth={2.4} aria-hidden />
-          </button>
+          <div className={styles.modalActions}>
+            <button
+              type="button"
+              onClick={() => void copySolution()}
+              aria-label="Copy solution"
+              title="Copy solution"
+              className={styles.modalIconBtn}
+            >
+              <CopyIcon />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              title="Close"
+              className={styles.modalIconBtn}
+            >
+              <X size={14} strokeWidth={2.4} aria-hidden />
+            </button>
+          </div>
         </div>
         <div
           ref={editorHostRef}
-          className={styles.editor}
-          style={{ flex: 1, overflow: "auto" }}
+          className={styles.modalEditor}
           aria-label="Solution editor (read-only)"
         />
       </div>
