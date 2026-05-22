@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:solutions": "playwright test e2e/challenge-solutions.spec.ts"
   },
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-rc.0",

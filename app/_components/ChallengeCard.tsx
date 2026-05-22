@@ -116,6 +116,28 @@ export interface ChallengeFile {
   solutionContent?: string;
 }
 
+/** Imperative driver exposed on `window.__dsChallenges[adapter::title]`
+ *  so the Playwright solution sweep can load a card's reference
+ *  solution and trigger the test run without driving every keystroke
+ *  through the DOM. Production code must not depend on this — it is
+ *  a test surface and may change shape across releases. */
+export interface ChallengeTestHandle {
+  adapterId: string;
+  title: string;
+  entryFilename: string;
+  filenames: string[];
+  setFileContent(filename: string, content: string): boolean;
+  submit(): Promise<void>;
+  getStatus(): Status;
+  getBannerState(): "pass" | "fail" | null;
+  getTestResults(): {
+    id: string;
+    name: string;
+    state: TestState;
+    detail: string | null;
+  }[];
+}
+
 interface SolutionFile {
   filename: string;
   source: string;
@@ -928,6 +950,11 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // Keep the test driver's submit hook pointing at the latest `check`.
+  useEffect(() => {
+    checkRef.current = check;
+  }, [check]);
+
   // ─── Reset ─────────────────────────────────────────────────────────
   const reset = useCallback(() => {
     runSeqRef.current++;
@@ -966,6 +993,108 @@ export default function ChallengeCard({
     persistedKeyForFile,
     toasts,
     workspaceFiles,
+  ]);
+
+  // ─── Test hook ─────────────────────────────────────────────────────
+  // Expose an imperative driver on `window.__dsChallenges` so the
+  // Playwright solution sweep (e2e/challenge-solutions.spec.ts) can
+  // load a card's reference solution into its buffers and run the
+  // tests without round-tripping every keystroke through the DOM.
+  // The registry key is a (adapter.id, title) tuple — stable across
+  // page reloads, so the test can lock onto a card via the same
+  // identifier the data attributes expose.
+  const checkRef = useRef<() => Promise<void>>(() => Promise.resolve());
+  const testResultsRef = useRef(testResults);
+  const bannerStateRef = useRef(bannerState);
+  const statusRef = useRef<Status>(status);
+  useEffect(() => {
+    testResultsRef.current = testResults;
+  }, [testResults]);
+  useEffect(() => {
+    bannerStateRef.current = bannerState;
+  }, [bannerState]);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const registry = (window as unknown as {
+      __dsChallenges?: Record<string, ChallengeTestHandle>;
+    }).__dsChallenges ?? {};
+    const key = `${adapter.id}::${title}`;
+    const handle: ChallengeTestHandle = {
+      adapterId: adapter.id,
+      title,
+      entryFilename: resolvedEntryFilename,
+      filenames: workspaceFiles.map((f) => f.filename),
+      setFileContent(filename, content) {
+        if (!fileBuffersRef.current.has(filename)) return false;
+        fileBuffersRef.current.set(filename, content);
+        if (activeFilenameRef.current === filename) {
+          const view = editorRef.current;
+          if (view) {
+            view.dispatch({
+              changes: {
+                from: 0,
+                to: view.state.doc.length,
+                insert: content,
+              },
+            });
+          }
+        } else {
+          // Persist so a later tab-switch picks up the new buffer.
+          const persisted = isMultiFile
+            ? persistedKeyForFile(filename)
+            : persistedKey;
+          try {
+            window.localStorage.setItem(persisted, content);
+          } catch {
+            /* quota / private mode — ignore, in-memory buffer still updated */
+          }
+        }
+        return true;
+      },
+      submit() {
+        return checkRef.current();
+      },
+      getStatus() {
+        return statusRef.current;
+      },
+      getBannerState() {
+        return bannerStateRef.current;
+      },
+      getTestResults() {
+        return testResultsRef.current.map((t) => ({
+          id: t.id,
+          name: t.name,
+          state: t.state,
+          detail: t.detail,
+        }));
+      },
+    };
+    (window as unknown as {
+      __dsChallenges: Record<string, ChallengeTestHandle>;
+    }).__dsChallenges = { ...registry, [key]: handle };
+    return () => {
+      const current = (window as unknown as {
+        __dsChallenges?: Record<string, ChallengeTestHandle>;
+      }).__dsChallenges;
+      if (current && current[key] === handle) {
+        const next = { ...current };
+        delete next[key];
+        (window as unknown as {
+          __dsChallenges: Record<string, ChallengeTestHandle>;
+        }).__dsChallenges = next;
+      }
+    };
+  }, [
+    adapter.id,
+    title,
+    resolvedEntryFilename,
+    workspaceFiles,
+    isMultiFile,
+    persistedKey,
+    persistedKeyForFile,
   ]);
 
   const copyCode = useCallback(async () => {
@@ -1015,10 +1144,29 @@ export default function ChallengeCard({
         ? "fail"
         : "pending";
 
+  // Test-only solution payload. Stamped onto the card as a JSON-encoded
+  // list of { filename, source } pairs so the Playwright solution
+  // runner (e2e/challenge-solutions.spec.ts) can drive each card
+  // without us having to parse MDX outside of next. Only files with
+  // an actual solution are included — scaffold files the learner is
+  // not expected to modify are omitted.
+  const solutionTestPayload = useMemo(() => {
+    const real = solutionFiles.filter((f) => f.hasSolution);
+    if (real.length === 0) return null;
+    return JSON.stringify(
+      real.map((f) => ({ filename: f.filename, source: f.source })),
+    );
+  }, [solutionFiles]);
+
   return (
     <div
       className={styles.card}
       aria-label={`${adapter.runtimeInfo.language} coding challenge: ${title}`}
+      data-testid="challenge-card"
+      data-adapter-id={adapter.id}
+      data-challenge-title={title}
+      data-entry-filename={resolvedEntryFilename}
+      data-solution-files={solutionTestPayload ?? undefined}
     >
       {/* ── Header ── */}
       <div className={styles.header}>
@@ -1128,6 +1276,8 @@ export default function ChallengeCard({
                     ? `${f.filename} (entry)`
                     : f.filename
                 }
+                data-testid="challenge-file-tab"
+                data-filename={f.filename}
               >
                 {f.filename}
               </button>
@@ -1190,6 +1340,7 @@ export default function ChallengeCard({
               className={styles.checkBtn}
               onClick={() => void check()}
               disabled={isBusy}
+              data-testid="challenge-submit"
             >
               <Check size={12} strokeWidth={2.5} aria-hidden />
               <span>Submit</span>
@@ -1349,7 +1500,11 @@ export default function ChallengeCard({
 
       {/* ── Banner ── */}
       {bannerState && (
-        <div className={styles.banner} data-state={bannerState}>
+        <div
+          className={styles.banner}
+          data-state={bannerState}
+          data-testid="challenge-banner"
+        >
           <div className={styles.bannerIcon}>
             {bannerState === "pass" ? (
               <Check size={14} strokeWidth={2.5} aria-hidden />
