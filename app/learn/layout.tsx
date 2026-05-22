@@ -15,7 +15,6 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { source } from "@/lib/source";
-import Link from "next/link";
 
 export default function LearnLayout({ children }: { children: ReactNode }) {
   return (
@@ -24,10 +23,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
         tree={source.pageTree}
         nav={{
           title: (
-            <Link
-              href="/"
-              style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", color: "inherit" }}
-            >
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/dataslope-logo-blue.svg"
@@ -35,8 +31,9 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
                 style={{ height: "10px", width: "auto" }}
               />
               Dataslope · Learn
-            </Link>
+            </span>
           ),
+          url: "/",
         }}
         githubUrl="https://github.com/dataslope/dataslope/"
       >
