@@ -533,6 +533,28 @@ function PackagesDrawer({
 
 
 
+/** Merge runs of consecutive `stdout` cells (emitted separately by the
+ *  JS/TS/PHP workers — one per console.log call) into a single grouped
+ *  cell so the output pane shows one block rather than many. */
+function mergeConsecutiveStdout<T extends { type: string; content: string }>(
+  cells: T[],
+): T[] {
+  const result: T[] = [];
+  for (const cell of cells) {
+    const lastIdx = result.length - 1;
+    const last = lastIdx >= 0 ? result[lastIdx] : undefined;
+    if (last && last.type === "stdout" && cell.type === "stdout") {
+      result[lastIdx] = {
+        ...last,
+        content: last.content + "\n" + cell.content,
+      };
+    } else {
+      result.push(cell);
+    }
+  }
+  return result;
+}
+
 // Small clipboard / "copy to clipboard" glyph reused by the editor and
 // output cell headers. Stroked rather than filled so it visually matches
 // the existing pane-bar icons.
@@ -1120,6 +1142,37 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [],
   );
 
+  const handleFilesCreateFile = useCallback(
+    (parentPath: string, name: string) => {
+      const path = parentPath ? `${parentPath}/${name}` : name;
+      void (async () => {
+        const wsId = workspaceIdRef.current;
+        const emptyBytes = new Uint8Array(0);
+        if (wsId) {
+          await writeDataFile(wsId, path, emptyBytes);
+        }
+        setVirtualFiles((prev) => {
+          if (prev.some((f) => f.path === path)) return prev;
+          return [...prev, { path, size: 0, isFolder: false }];
+        });
+        // Auto-expand ancestor folders so the new file is visible.
+        const segments = path.split("/").filter(Boolean);
+        if (segments.length > 1) {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            let cur = "";
+            for (let i = 0; i < segments.length - 1; i++) {
+              cur = cur ? `${cur}/${segments[i]}` : segments[i];
+              next.add(cur);
+            }
+            return next;
+          });
+        }
+      })();
+    },
+    [],
+  );
+
   const handleFilesToggleFolder = useCallback((path: string) => {
     setExpandedFolders((prev) => {
       const next = new Set(prev);
@@ -1651,9 +1704,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         entryFilename ? { entryFilename } : undefined,
       );
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      const merged = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
         ...prev,
-        ...collected.map((c) => ({
+        ...merged.map((c) => ({
           ...c,
           id: ++outputCounter.current,
           elapsed,
@@ -1670,9 +1724,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } catch (err) {
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const msg = err instanceof Error ? err.message : String(err);
+      const mergedOnErr = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
         ...prev,
-        ...collected.map((c) => ({
+        ...mergedOnErr.map((c) => ({
           ...c,
           id: ++outputCounter.current,
           elapsed,
@@ -3371,6 +3426,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onDelete={mergedHandleFilesDelete}
                 onRename={mergedHandleFilesRename}
                 onCreateFolder={handleFilesCreateFolder}
+                onCreateFile={handleFilesCreateFile}
                 onMove={mergedHandleFilesMove}
               />
             </div>

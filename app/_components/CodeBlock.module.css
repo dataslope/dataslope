@@ -195,6 +195,9 @@
   font-variant-ligatures: none;
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
 }
+.editor :global(.cm-editor.cm-focused) {
+  outline: none;
+}
 .editor :global(.cm-editor .cm-scroller) {
   min-height: 60px;
   font-family: inherit;

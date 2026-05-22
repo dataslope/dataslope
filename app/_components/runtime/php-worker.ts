@@ -83,7 +83,7 @@ interface PhpOutputEvent extends Event {
   detail: string[];
 }
 
-type OutputCellType = "stdout" | "stderr";
+type OutputCellType = "stdout" | "stderr" | "html";
 interface OutputCellMessage {
   type: OutputCellType;
   content: string;
@@ -205,7 +205,18 @@ async function runCode(id: number, code: string): Promise<void> {
     .join("\n")
     .replace(/\n+$/, "");
 
-  if (stdout) post({ kind: "output", id, cell: { type: "stdout", content: stdout } });
+  if (stdout) {
+    // PHP frequently produces HTML output (e.g. phpinfo(), header tags,
+    // templated pages). Render it as an "html" cell when it looks like a
+    // real HTML document or has multiple HTML elements, to avoid
+    // misclassifying incidental angle brackets (e.g. in error messages).
+    const looksLikeHtml =
+      /<!doctype\s+html/i.test(stdout) ||
+      /<html[\s>]/i.test(stdout) ||
+      (/<[a-z][a-z0-9]*[\s>/]/i.test(stdout) && /<\/[a-z][a-z0-9]*>/i.test(stdout));
+    const cellType: OutputCellType = looksLikeHtml ? "html" : "stdout";
+    post({ kind: "output", id, cell: { type: cellType, content: stdout } });
+  }
   if (stderr) post({ kind: "output", id, cell: { type: "stderr", content: stderr } });
 }
 

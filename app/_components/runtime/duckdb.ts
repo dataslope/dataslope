@@ -43,7 +43,8 @@ interface DuckDbBundles {
 
 interface DuckDbArrowField {
   name: string;
-  type: { toString(): string };
+  /** Arrow DataType — Decimal fields additionally expose `scale` (integer). */
+  type: { toString(): string; scale?: number };
 }
 interface DuckDbArrowSchema {
   fields: DuckDbArrowField[];
@@ -217,13 +218,38 @@ function arrowToQueryExecResult(
       return "";
     }
   });
+  // Extract decimal scales so BigInt values from DECIMAL columns are
+  // formatted as proper decimal strings (e.g. 999n with scale=2 → "9.99")
+  // instead of raw unscaled integers (which would cause "two extra zeros"
+  // when the user edits and re-saves a cell).
+  const columnScales: (number | null)[] = fields.map((f) => {
+    if (typeof f.type.scale === "number" && f.type.scale > 0) {
+      return f.type.scale;
+    }
+    return null;
+  });
   const vectors = fields.map((_f, i) => table.getChildAt(i));
   const values: SqlValue[][] = [];
   for (let r = 0; r < table.numRows; r++) {
     const row: SqlValue[] = new Array(fields.length);
     for (let c = 0; c < fields.length; c++) {
       const vec = vectors[c];
-      row[c] = vec ? toSqlValue(vec.get(r)) : null;
+      const raw = vec ? vec.get(r) : null;
+      const scale = columnScales[c];
+      if (scale !== null && typeof raw === "bigint") {
+        // Apply the decimal scale: Arrow stores DECIMAL(p,s) as a scaled
+        // BigInt (e.g. 9.99 → 999n when scale=2). Convert to a canonical
+        // decimal string so the cell edit input is correctly pre-filled.
+        const divisor = 10n ** BigInt(scale);
+        const neg = raw < 0n;
+        const abs = neg ? -raw : raw;
+        const intPart = abs / divisor;
+        const fracPart = abs % divisor;
+        const fracStr = fracPart.toString().padStart(scale, "0");
+        row[c] = `${neg ? "-" : ""}${intPart}.${fracStr}`;
+      } else {
+        row[c] = toSqlValue(raw);
+      }
     }
     values.push(row);
   }

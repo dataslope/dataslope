@@ -10,6 +10,7 @@ import {
   Trash2,
   Pencil,
   FolderPlus,
+  FilePlus,
   Folder,
   FolderOpen,
   FolderSymlink,
@@ -49,6 +50,7 @@ interface FilesPanelProps {
   onDelete: (path: string) => void;
   onRename: (path: string, newName: string) => void;
   onCreateFolder: (parentPath: string, name: string) => void;
+  onCreateFile?: (parentPath: string, name: string) => void;
   onMove: (sourcePath: string, destFolderPath: string) => void;
   /** Called when the user chooses to open/query a file. Only rendered when
    *  provided — use to surface a runtime-specific "open" action. */
@@ -406,6 +408,7 @@ export function FilesPanel({
   onDelete,
   onRename,
   onCreateFolder,
+  onCreateFile,
   onMove,
   onOpenQuery,
   openQueryLabel,
@@ -416,6 +419,8 @@ export function FilesPanel({
   const [renameValue, setRenameValue] = useState("");
   const [newFolderActive, setNewFolderActive] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFileActive, setNewFileActive] = useState(false);
+  const [newFileName, setNewFileName] = useState("");
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(
     null,
   );
@@ -445,6 +450,8 @@ export function FilesPanel({
     },
     [files],
   );
+
+  const isCreatingNewItem = newFolderActive || newFileActive;
 
   const handleStartRename = useCallback((path: string) => {
     const lastSlash = path.lastIndexOf("/");
@@ -482,6 +489,15 @@ export function FilesPanel({
     setNewFolderActive(false);
     setNewFolderName("");
   }, [newFolderName, parentPath, onCreateFolder]);
+
+  const handleCommitNewFile = useCallback(() => {
+    const trimmed = newFileName.trim();
+    if (trimmed && !trimmed.includes("/") && onCreateFile) {
+      onCreateFile(parentPath, trimmed);
+    }
+    setNewFileActive(false);
+    setNewFileName("");
+  }, [newFileName, parentPath, onCreateFile]);
 
   const handleRequestDelete = useCallback(
     (node: TreeNode) => {
@@ -664,79 +680,136 @@ export function FilesPanel({
           Adding to: <strong>{parentPath}/</strong>
         </div>
       )}
-      <div
-        className="pg-files-tree"
-        onDragOver={(e) => {
-          if (internalDragPath && !e.dataTransfer.types.includes("Files")) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-          }
-        }}
-        onDrop={handleRootDrop}
-      >
-        {newFolderActive && (
-          <div className="pg-files-row" style={{ paddingLeft: 8 }}>
-            <span className="pg-files-chevron-spacer" aria-hidden="true" />
-            <Folder size={12} aria-hidden="true" className="pg-files-icon" />
-            <input
-              type="text"
-              className="pg-files-rename-input"
-              value={newFolderName}
-              autoFocus
-              placeholder="folder name"
-              onChange={(e) => setNewFolderName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCommitNewFolder();
-                if (e.key === "Escape") {
-                  setNewFolderActive(false);
-                  setNewFolderName("");
+      <ContextMenu.Root>
+        <ContextMenu.Trigger
+          render={(triggerProps) => (
+            <div
+              {...triggerProps}
+              className="pg-files-tree"
+              onDragOver={(e) => {
+                if (internalDragPath && !e.dataTransfer.types.includes("Files")) {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
                 }
               }}
-              onBlur={handleCommitNewFolder}
-            />
-          </div>
-        )}
-        {tree.children.length === 0 && !newFolderActive ? (
-          <div className="pg-files-empty">
-            No files yet.
-            <br />
-            <span className="pg-files-empty-hint">
-              Drop files here or click Upload to add them.
-            </span>
-          </div>
-        ) : (
-          tree.children.map((child) => (
-            <TreeRow
-              key={child.fullPath}
-              node={child}
-              depth={0}
-              expandedFolders={expandedFolders}
-              selectedPath={selectedPath}
-              renamingPath={renamingPath}
-              renameValue={renameValue}
-              dropTargetPath={dropTargetPath}
-              onSelect={setSelectedPath}
-              onToggleFolder={onToggleFolder}
-              onStartRename={handleStartRename}
-              onRenameChange={setRenameValue}
-              onCommitRename={handleCommitRename}
-              onCancelRename={handleCancelRename}
-              onDownload={onDownload}
-              onRequestDelete={handleRequestDelete}
-              onRequestInfo={handleRequestInfo}
-              onOpenQuery={onOpenQuery}
-              openQueryLabel={openQueryLabel}
-              onCopyFileName={handleCopyFileName}
-              onCopyPath={handleCopyPath}
-              onDragStart={handleInternalDragStart}
-              onDragEnd={handleInternalDragEnd}
-              onDragOverFolder={handleDragOverFolder}
-              onDragLeaveFolder={handleDragLeaveFolder}
-              onDropOnFolder={handleDropOnFolder}
-            />
-          ))
-        )}
-      </div>
+              onDrop={handleRootDrop}
+            >
+              {newFileActive && (
+                <div className="pg-files-row" style={{ paddingLeft: 8 }}>
+                  <span className="pg-files-chevron-spacer" aria-hidden="true" />
+                  <FileText size={12} aria-hidden="true" className="pg-files-icon" />
+                  <input
+                    type="text"
+                    className="pg-files-rename-input"
+                    value={newFileName}
+                    autoFocus
+                    placeholder="file name"
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCommitNewFile();
+                      if (e.key === "Escape") {
+                        setNewFileActive(false);
+                        setNewFileName("");
+                      }
+                    }}
+                    onBlur={handleCommitNewFile}
+                  />
+                </div>
+              )}
+              {newFolderActive && (
+                <div className="pg-files-row" style={{ paddingLeft: 8 }}>
+                  <span className="pg-files-chevron-spacer" aria-hidden="true" />
+                  <Folder size={12} aria-hidden="true" className="pg-files-icon" />
+                  <input
+                    type="text"
+                    className="pg-files-rename-input"
+                    value={newFolderName}
+                    autoFocus
+                    placeholder="folder name"
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCommitNewFolder();
+                      if (e.key === "Escape") {
+                        setNewFolderActive(false);
+                        setNewFolderName("");
+                      }
+                    }}
+                    onBlur={handleCommitNewFolder}
+                  />
+                </div>
+              )}
+              {tree.children.length === 0 && !isCreatingNewItem ? (
+                <div className="pg-files-empty">
+                  No files yet.
+                  <br />
+                  <span className="pg-files-empty-hint">
+                    Drop files here or click Upload to add them.
+                  </span>
+                </div>
+              ) : (
+                tree.children.map((child) => (
+                  <TreeRow
+                    key={child.fullPath}
+                    node={child}
+                    depth={0}
+                    expandedFolders={expandedFolders}
+                    selectedPath={selectedPath}
+                    renamingPath={renamingPath}
+                    renameValue={renameValue}
+                    dropTargetPath={dropTargetPath}
+                    onSelect={setSelectedPath}
+                    onToggleFolder={onToggleFolder}
+                    onStartRename={handleStartRename}
+                    onRenameChange={setRenameValue}
+                    onCommitRename={handleCommitRename}
+                    onCancelRename={handleCancelRename}
+                    onDownload={onDownload}
+                    onRequestDelete={handleRequestDelete}
+                    onRequestInfo={handleRequestInfo}
+                    onOpenQuery={onOpenQuery}
+                    openQueryLabel={openQueryLabel}
+                    onCopyFileName={handleCopyFileName}
+                    onCopyPath={handleCopyPath}
+                    onDragStart={handleInternalDragStart}
+                    onDragEnd={handleInternalDragEnd}
+                    onDragOverFolder={handleDragOverFolder}
+                    onDragLeaveFolder={handleDragLeaveFolder}
+                    onDropOnFolder={handleDropOnFolder}
+                  />
+                ))
+              )}
+            </div>
+          )}
+        />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner sideOffset={4}>
+            <ContextMenu.Popup className="bui-popup examples-dropdown pg-files-ctx-menu">
+              {onCreateFile && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    setNewFileActive(true);
+                    setNewFileName("");
+                  }}
+                >
+                  <FilePlus size={12} aria-hidden="true" />
+                  <div className="ex-title">Create a File</div>
+                </ContextMenu.Item>
+              )}
+              <ContextMenu.Item
+                className="example-item"
+                onClick={() => {
+                  setNewFolderActive(true);
+                  setNewFolderName("");
+                }}
+              >
+                <FolderPlus size={12} aria-hidden="true" />
+                <div className="ex-title">Create a Folder</div>
+              </ContextMenu.Item>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
 
       <AlertDialog.Root
         open={pendingDelete !== null}
