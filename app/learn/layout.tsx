@@ -23,14 +23,14 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
         tree={source.pageTree}
         nav={{
           title: (
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "bold" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/dataslope-logo-blue.svg"
                 alt="Dataslope logo"
                 style={{ height: "10px", width: "auto" }}
               />
-              Dataslope · Learn
+              Dataslope
             </span>
           ),
           url: "/",
