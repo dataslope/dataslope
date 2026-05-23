@@ -229,11 +229,30 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
 
 const themeCache = new Map<string, Extension>();
 
+// GitHub Dark with editor/gutter backgrounds overridden to match the
+// Fumadocs page background (`--color-fd-background`). We apply this as
+// a secondary EditorView.theme after githubDark so it wins via ordering
+// (last theme wins when specificity ties). The fallback `#0d1117` is
+// GitHub's native dark background, used outside the /learn route where
+// the Fumadocs token isn't defined.
+const githubDarkPageBgOverride = EditorView.theme(
+  {
+    "&": {
+      backgroundColor: "var(--color-fd-background, #0d1117)",
+    },
+    ".cm-gutters": {
+      backgroundColor: "var(--color-fd-background, #0d1117)",
+    },
+  },
+  { dark: true },
+);
+const githubDarkCustom: Extension = [githubDark, githubDarkPageBgOverride];
+
 export function themeFor(name: string): Extension {
   // GitHub themes come directly from the @uiw package — bypass the
   // palette-based buildTheme so they use the package's own token
   // colors instead of our synthetic approximation.
-  if (name === "github-dark") return githubDark;
+  if (name === "github-dark") return githubDarkCustom;
   if (name === "github-light") return githubLight;
   const cached = themeCache.get(name);
   if (cached) return cached;
