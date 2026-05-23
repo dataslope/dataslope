@@ -39,6 +39,8 @@ import {
   renderInstructions,
   useChallengeToasts,
   ChallengeToastViewport,
+  useIsDark,
+  cmThemeNameFor,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -213,11 +215,10 @@ function lineCommentFor(codeMirrorMode: string): string {
   }
 }
 
-// The challenge card is intentionally light-themed even when the
-// surrounding docs are dark — the design treats it as a "worksheet"
-// card rather than a console. We always render the IntelliJ IDEA
-// CodeMirror theme so the editor matches the card chrome.
-const CM_EDITOR_THEME = "idea";
+// The challenge card adapts its CodeMirror theme to the surrounding
+// docs: dark docs → material-darker, light docs → IntelliJ IDEA.
+// The active theme name is derived from `useIsDark()` at render time
+// and reconfigured via compartments whenever the docs theme toggles.
 
 // Minimum time (ms) the "running" overlay is held visible after a run
 // completes. Matches the playground's MIN_ANIMATION_MS so a fast run
@@ -355,6 +356,11 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
+  // Theme compartments — stored so the dark/light sync effect can
+  // reconfigure the CM theme without remounting the editor.
+  const mainThemeCompRef = useRef<Compartment | null>(null);
+  const initThemeCompRef = useRef<Compartment | null>(null);
+  const solutionThemeCompRef = useRef<Compartment | null>(null);
   // Debounce handle for the localStorage write that mirrors the editor
   // buffer. See `persistedKey` below.
   const persistSaveTimerRef = useRef<number | null>(null);
@@ -462,6 +468,15 @@ export default function ChallengeCard({
     () => false,
   );
 
+  const isDark = useIsDark();
+  const cmThemeName = cmThemeNameFor(isDark);
+  // Ref so editor-mount effects (which have [] deps) can read the
+  // current theme name without becoming stale.
+  const cmThemeNameRef = useRef(cmThemeName);
+  useEffect(() => {
+    cmThemeNameRef.current = cmThemeName;
+  });
+
   const canCheck = canRunTests(adapter.id, tests);
 
   // Persist the active file's current doc content to its localStorage
@@ -537,7 +552,7 @@ export default function ChallengeCard({
           indentWithTab,
         ]),
         languageComp.of([]),
-        themeComp.of(themeFor(CM_EDITOR_THEME)),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
         // Debounced persist of the user's buffer so reloads /
         // navigation away and back restore their in-progress attempt.
         EditorView.updateListener.of((update) => {
@@ -555,6 +570,7 @@ export default function ChallengeCard({
       ],
     });
     editorRef.current = view;
+    mainThemeCompRef.current = themeComp;
 
     void loadLanguage(adapter.codeMirrorMode).then((ext) => {
       if (ext && editorRef.current === view) {
@@ -572,6 +588,7 @@ export default function ChallengeCard({
       }
       view.destroy();
       editorRef.current = null;
+      mainThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -603,6 +620,19 @@ export default function ChallengeCard({
     });
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
+
+  // Sync the CodeMirror theme across all active editors when the docs
+  // colour scheme toggles (Fumadocs dark/light toggle or OS preference).
+  useEffect(() => {
+    const reconfigure = (view: EditorView | null, comp: Compartment | null) => {
+      if (view && comp) {
+        view.dispatch({ effects: comp.reconfigure(themeFor(cmThemeName)) });
+      }
+    };
+    reconfigure(editorRef.current, mainThemeCompRef.current);
+    reconfigure(initEditorRef.current, initThemeCompRef.current);
+    reconfigure(solutionEditorRef.current, solutionThemeCompRef.current);
+  }, [cmThemeName]);
 
   // Resolve which file the modal should display. Prefer the user's
   // explicit click; otherwise default to the first file that actually
@@ -648,6 +678,7 @@ export default function ChallengeCard({
       solutionEditorRef.current = null;
     }
     const languageComp = new Compartment();
+    const themeComp = new Compartment();
     const view = new EditorView({
       doc: activeSolutionSource,
       parent: solutionEditorHostRef.current,
@@ -660,10 +691,11 @@ export default function ChallengeCard({
         EditorView.lineWrapping,
         keymap.of(defaultKeymap),
         languageComp.of([]),
-        themeFor(CM_EDITOR_THEME),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
       ],
     });
     solutionEditorRef.current = view;
+    solutionThemeCompRef.current = themeComp;
     void loadLanguage(adapter.codeMirrorMode).then((ext) => {
       if (ext && solutionEditorRef.current === view) {
         view.dispatch({ effects: languageComp.reconfigure(ext) });
@@ -673,6 +705,7 @@ export default function ChallengeCard({
       view.destroy();
       if (solutionEditorRef.current === view) {
         solutionEditorRef.current = null;
+        solutionThemeCompRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -687,6 +720,7 @@ export default function ChallengeCard({
     if (!hasInit) return;
     if (!initEditorHostRef.current || initEditorRef.current) return;
     const languageComp = new Compartment();
+    const themeComp = new Compartment();
     const view = new EditorView({
       doc: trimmedInit,
       parent: initEditorHostRef.current,
@@ -699,10 +733,11 @@ export default function ChallengeCard({
         indentUnit.of("    "),
         EditorView.lineWrapping,
         languageComp.of([]),
-        themeFor(CM_EDITOR_THEME),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
       ],
     });
     initEditorRef.current = view;
+    initThemeCompRef.current = themeComp;
     void loadLanguage(adapter.codeMirrorMode).then((ext) => {
       if (ext && initEditorRef.current === view) {
         view.dispatch({ effects: languageComp.reconfigure(ext) });
@@ -711,6 +746,7 @@ export default function ChallengeCard({
     return () => {
       view.destroy();
       initEditorRef.current = null;
+      initThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasInit]);
@@ -1422,7 +1458,7 @@ export default function ChallengeCard({
                 ) : (
                   <Check size={12} strokeWidth={2.6} aria-hidden />
                 )}
-                <span>
+                <span className={styles.runBtnLabel}>
                   {isBusy
                     ? activeAction === "run"
                       ? "Running…"
@@ -1532,7 +1568,7 @@ export default function ChallengeCard({
               ) : (
                 <PlayIcon />
               )}
-              <span>{isBusy ? "Running…" : "Run"}</span>
+              <span className={styles.runBtnLabel}>{isBusy ? "Running…" : "Run"}</span>
               {!isBusy && (
                 <span
                   className={styles.btnKbd}
@@ -1567,9 +1603,11 @@ export default function ChallengeCard({
             className={styles.utilBtn}
             onClick={reset}
             disabled={isBusy}
+            title="Reset"
+            aria-label="Reset"
           >
             <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
-            Reset
+            <span className={styles.utilBtnLabel}>Reset</span>
           </button>
           {hasSolution && (
             <>
@@ -1579,9 +1617,11 @@ export default function ChallengeCard({
                 className={styles.utilBtn}
                 onClick={() => setSolutionOpen(true)}
                 disabled={isBusy}
+                title="Solution"
+                aria-label="Solution"
               >
                 <Eye size={12} strokeWidth={2} aria-hidden />
-                Solution
+                <span className={styles.utilBtnLabel}>Solution</span>
               </button>
             </>
           )}
@@ -1594,9 +1634,10 @@ export default function ChallengeCard({
                 onClick={() => void formatCode()}
                 disabled={isBusy}
                 title="Format code"
+                aria-label="Format code"
               >
                 <FormatIcon />
-                Format
+                <span className={styles.utilBtnLabel}>Format</span>
               </button>
             </>
           )}

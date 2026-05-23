@@ -1088,8 +1088,14 @@
   background: var(--ch-border-light);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .btnKbd { display: none; }
+}
+@media (max-width: 480px) {
+  .runBtnLabel { display: none; }
+}
+@media (max-width: 400px) {
+  .utilBtnLabel { display: none; }
 }
 
 /* ─── Output panel ────────────────────────────────────────────────── */
@@ -1519,9 +1525,8 @@
 /* ─── Dark mode ───────────────────────────────────────────────────────
    Fumadocs toggles a `.dark` class on `<html>`. We rebind the card's
    CSS variables so the same selectors keep working — no extra rules
-   per element needed. Aim is "paper card in a dark theme": subtle
-   slate-tinted surface, soft borders, slightly desaturated semantic
-   colours so accents don't burn next to body text. */
+   per element needed. Background matches `var(--color-fd-background)`
+   so the card surface blends with the surrounding learn-page chrome. */
 :global(html.dark) .card {
   /* Dark-theme additions to the Tailwind palette (the light tokens
      above are still available). All values come from the Tailwind
@@ -1535,10 +1540,13 @@
   --ch-violet-300: #c4b5fd;
   --ch-violet-500: #8b5cf6;
 
-  /* Semantic aliases re-pointed at darker tones. */
-  --ch-bg: var(--ch-slate-900);
-  --ch-bg-muted: var(--ch-gray-900);
-  --ch-bg-subtle: var(--ch-slate-950);
+  /* Semantic aliases re-pointed at the Fumadocs background so the
+     card surface matches the surrounding learn-page chrome exactly.
+     The `var(--color-fd-background, …)` fallback keeps the component
+     usable when Fumadocs is not present (e.g. Storybook / unit tests). */
+  --ch-bg: var(--color-fd-background, var(--ch-slate-900));
+  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 70%, #1e293b);
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 50%, #020617);
   --ch-bg-hover: var(--ch-slate-800);
   --ch-border: var(--ch-gray-800);
   --ch-border-light: var(--ch-slate-800);
@@ -1822,4 +1830,31 @@
 :global(html.dark) .card {
   --ch-scrollbar-thumb: #334155;
   --ch-scrollbar-thumb-hover: #475569;
+}
+
+/* ─── Dark mode: CodeMirror editor backgrounds ────────────────────────
+   The material-darker CM theme sets a fixed #212121 background via JS.
+   Override it with the Fumadocs page background so the editor blends
+   seamlessly with the card surface (same approach as the playground).
+   Uses !important to win over CodeMirror's generated class selector. */
+:global(html.dark) .editor :global(.cm-editor),
+:global(html.dark) .initEditor :global(.cm-editor),
+:global(html.dark) .modalEditor :global(.cm-editor) {
+  background-color: var(--color-fd-background, var(--ch-slate-900)) !important;
+}
+:global(html.dark) .editor :global(.cm-gutters),
+:global(html.dark) .initEditor :global(.cm-gutters),
+:global(html.dark) .modalEditor :global(.cm-gutters) {
+  background-color: var(--color-fd-background, var(--ch-slate-900)) !important;
+  border-right-color: var(--ch-border) !important;
+}
+:global(html.dark) .editor :global(.cm-activeLine),
+:global(html.dark) .initEditor :global(.cm-activeLine),
+:global(html.dark) .modalEditor :global(.cm-activeLine) {
+  background-color: #2d2d2d !important;
+}
+:global(html.dark) .editor :global(.cm-activeLineGutter),
+:global(html.dark) .initEditor :global(.cm-activeLineGutter),
+:global(html.dark) .modalEditor :global(.cm-activeLineGutter) {
+  background-color: #2d2d2d !important;
 }
