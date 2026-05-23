@@ -59,7 +59,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
@@ -553,6 +553,7 @@ export default function ChallengeCard({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
         // Debounced persist of the user's buffer so reloads /
         // navigation away and back restore their in-progress attempt.
         EditorView.updateListener.of((update) => {
@@ -692,6 +693,7 @@ export default function ChallengeCard({
         keymap.of(defaultKeymap),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
       ],
     });
     solutionEditorRef.current = view;
@@ -734,6 +736,7 @@ export default function ChallengeCard({
         EditorView.lineWrapping,
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
       ],
     });
     initEditorRef.current = view;
@@ -1332,36 +1335,40 @@ export default function ChallengeCard({
         </div>
       </div>
 
-      {/* ── Init code (collapsed by default — preview the first
-            ~3 lines under a gradient fade; click the fade or the
-            toggle to expand) ── */}
+      {/* ── Init code ──
+            When ≤3 lines: always shown expanded, no toggle header.
+            When >3 lines: collapsed by default with a gradient fade
+            overlay and "Click to expand" prompt; the toggle header
+            lets the user also collapse it again after expanding. */}
       {hasInit && (
         <div className={styles.initWrap}>
-          <button
-            type="button"
-            className={styles.initToggle}
-            aria-expanded={initExpanded}
-            aria-controls={initPanelId}
-            onClick={() => setInitExpanded((v) => !v)}
-          >
-            <span
-              className={`${styles.initCaret} ${
-                initExpanded ? styles.initCaretOpen : ""
-              }`}
-              aria-hidden
+          {initLineCount > 3 && (
+            <button
+              type="button"
+              className={styles.initToggle}
+              aria-expanded={initExpanded}
+              aria-controls={initPanelId}
+              onClick={() => setInitExpanded((v) => !v)}
             >
-              ▶
-            </span>
-            <span className={styles.initLabel}>
-              Initialization code ({adapter.runtimeInfo.language})
-            </span>
-            <span className={styles.initMeta}>
-              {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
-            </span>
-          </button>
+              <span
+                className={`${styles.initCaret} ${
+                  initExpanded ? styles.initCaretOpen : ""
+                }`}
+                aria-hidden
+              >
+                ▶
+              </span>
+              <span className={styles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={styles.initMeta}>
+                {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
+              </span>
+            </button>
+          )}
           <div
             className={`${styles.initEditorWrap} ${
-              initExpanded
+              initLineCount <= 3 || initExpanded
                 ? styles.initEditorWrapOpen
                 : styles.initEditorWrapCollapsed
             }`}
@@ -1379,7 +1386,9 @@ export default function ChallengeCard({
                 aria-label="Expand initialization code"
                 title="Expand initialization code"
                 onClick={() => setInitExpanded(true)}
-              />
+              >
+                <span className={styles.initFadeLabel}>Click to expand</span>
+              </button>
             )}
           </div>
         </div>

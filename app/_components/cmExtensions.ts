@@ -16,6 +16,7 @@ import {
 } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import type { Extension } from "@codemirror/state";
+import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import {
   LIGHT_THEMES,
@@ -229,6 +230,11 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
 const themeCache = new Map<string, Extension>();
 
 export function themeFor(name: string): Extension {
+  // GitHub themes come directly from the @uiw package — bypass the
+  // palette-based buildTheme so they use the package's own token
+  // colors instead of our synthetic approximation.
+  if (name === "github-dark") return githubDark;
+  if (name === "github-light") return githubLight;
   const cached = themeCache.get(name);
   if (cached) return cached;
   const palette = THEME_PALETTES[name] ?? THEME_PALETTES.lucario;
@@ -236,3 +242,11 @@ export function themeFor(name: string): Extension {
   themeCache.set(name, ext);
   return ext;
 }
+
+/** An extension that suppresses active-line background highlighting.
+ *  Add to any editor where the current-line glow is distracting (e.g.
+ *  challenge-card read-only init editors and user code editors). */
+export const noActiveLine: Extension = EditorView.theme({
+  ".cm-activeLine": { backgroundColor: "transparent !important" },
+  ".cm-activeLineGutter": { backgroundColor: "transparent !important" },
+});

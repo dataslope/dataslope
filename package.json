@@ -40,6 +40,7 @@
     "@sqlite.org/sqlite-wasm": "3.53.0-build1",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.24",
+    "@uiw/codemirror-theme-github": "^4.25.10",
     "@wasm-fmt/clang-format": "^22.1.4",
     "@wasm-fmt/mago_fmt": "^0.10.3",
     "@wasm-fmt/ruff_fmt": "^0.15.12",

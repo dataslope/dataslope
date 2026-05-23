@@ -730,6 +730,23 @@
   outline: 2px solid var(--ch-accent);
   outline-offset: -2px;
 }
+/* "Click to expand" label centred at the bottom of the fade overlay. */
+.initFadeLabel {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--ch-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ch-text-muted);
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.initFade:hover .initFadeLabel {
+  color: var(--ch-text);
+}
 
 /* ─── File tab bar (multi-file workspaces) ────────────────────────── */
 
@@ -790,12 +807,11 @@
   gap: 0;
 }
 
-/* Primary group: Run + Submit attached, with a shared accent border. */
+/* Primary group: Run + Submit attached, borderless with overflow clip. */
 .btnGroupPrimary {
   display: inline-flex;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--ch-accent);
   flex-shrink: 0;
 }
 /* Hairline divider between the main Submit/Run pill and the chevron
@@ -1833,10 +1849,10 @@
 }
 
 /* ─── Dark mode: CodeMirror editor backgrounds ────────────────────────
-   The material-darker CM theme sets a fixed #212121 background via JS.
-   Override it with the Fumadocs page background so the editor blends
-   seamlessly with the card surface (same approach as the playground).
-   Uses !important to win over CodeMirror's generated class selector. */
+   The GitHub Dark CM theme sets a dark background via JS. Override it
+   with the Fumadocs page background so the editor blends seamlessly
+   with the card surface. Uses !important to win over CodeMirror's
+   generated class selector. */
 :global(html.dark) .editor :global(.cm-editor),
 :global(html.dark) .initEditor :global(.cm-editor),
 :global(html.dark) .modalEditor :global(.cm-editor) {
@@ -1847,14 +1863,4 @@
 :global(html.dark) .modalEditor :global(.cm-gutters) {
   background-color: var(--color-fd-background, var(--ch-slate-900)) !important;
   border-right-color: var(--ch-border) !important;
-}
-:global(html.dark) .editor :global(.cm-activeLine),
-:global(html.dark) .initEditor :global(.cm-activeLine),
-:global(html.dark) .modalEditor :global(.cm-activeLine) {
-  background-color: #2d2d2d !important;
-}
-:global(html.dark) .editor :global(.cm-activeLineGutter),
-:global(html.dark) .initEditor :global(.cm-activeLineGutter),
-:global(html.dark) .modalEditor :global(.cm-activeLineGutter) {
-  background-color: #2d2d2d !important;
 }

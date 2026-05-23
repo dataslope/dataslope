@@ -76,7 +76,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { themeFor } from "./cmExtensions";
+import { themeFor, noActiveLine } from "./cmExtensions";
 import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
@@ -737,6 +737,7 @@ export default function SqlChallengeCard({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
         // Debounced persist of the user's SQL so reloads / nav restore
         // their in-progress query.
         EditorView.updateListener.of((update) => {
@@ -815,6 +816,7 @@ export default function SqlChallengeCard({
         keymap.of(defaultKeymap),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
       ],
     });
     solutionEditorRef.current = view;

@@ -735,6 +735,23 @@
   outline: 2px solid var(--cb-accent);
   outline-offset: -2px;
 }
+/* "Click to expand" label centred at the bottom of the fade overlay. */
+.initFadeLabel {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--cb-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--cb-text-muted);
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.initFade:hover .initFadeLabel {
+  color: var(--cb-text);
+}
 .initEditor :global(.cm-editor .cm-scroller) {
   font-family: inherit;
   font-size: inherit;

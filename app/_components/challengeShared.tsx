@@ -69,9 +69,9 @@ export function useIsDark(): boolean {
 }
 
 /** Map dark/light to the matching CodeMirror theme name.
- *  Dark → material-darker, light → IntelliJ IDEA. */
+ *  Dark → GitHub Dark, light → GitHub Light. */
 export function cmThemeNameFor(isDark: boolean): string {
-  return isDark ? "material-darker" : "idea";
+  return isDark ? "github-dark" : "github-light";
 }
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
