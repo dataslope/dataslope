@@ -1,0 +1,552 @@
+/* `MultipleChoiceQuestion` — a Markdown-authored quiz card that lives
+   alongside `<ChallengeCard>` on Learn pages.
+
+   The visual language intentionally mirrors `ChallengeCard.module.css`
+   (paper card chrome, blue badge header, slate text, accent submit
+   button, green/red status banner) so the two embeddable components
+   feel like one product. Tokens are duplicated locally rather than
+   imported because CSS modules can't share custom properties across
+   files reliably, and the playground bundle doesn't load Tailwind's
+   preflight that defines the `--color-…` vars. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+.card {
+  /* Tailwind palette tokens — kept in sync with ChallengeCard.module.css */
+  --mc-white: #ffffff;
+  --mc-black: #000000;
+  --mc-slate-100: #f1f5f9;
+  --mc-slate-200: #e2e8f0;
+  --mc-slate-900: #0f172a;
+  --mc-gray-50: #f9fafb;
+  --mc-gray-100: #f3f4f6;
+  --mc-gray-200: #e5e7eb;
+  --mc-gray-300: #d1d5db;
+  --mc-gray-400: #9ca3af;
+  --mc-gray-500: #6b7280;
+  --mc-gray-700: #374151;
+  --mc-gray-900: #111827;
+  --mc-zinc-100: #f4f4f5;
+  --mc-neutral-50: #fafafa;
+  --mc-blue-50: #eff6ff;
+  --mc-blue-100: #dbeafe;
+  --mc-blue-200: #bfdbfe;
+  --mc-blue-300: #93c5fd;
+  --mc-blue-500: #3b82f6;
+  --mc-blue-600: #2563eb;
+  --mc-blue-700: #1d4ed8;
+  --mc-blue-800: #1e40af;
+  --mc-blue-900: #1e3a8a;
+  --mc-green-50: #f0fdf4;
+  --mc-green-100: #dcfce7;
+  --mc-green-200: #bbf7d0;
+  --mc-green-500: #22c55e;
+  --mc-green-600: #16a34a;
+  --mc-green-700: #15803d;
+  --mc-red-50: #fef2f2;
+  --mc-red-100: #fee2e2;
+  --mc-red-200: #fecaca;
+  --mc-red-600: #dc2626;
+  --mc-red-700: #b91c1c;
+  --mc-amber-50: #fffbeb;
+  --mc-amber-200: #fde68a;
+  --mc-amber-700: #b45309;
+
+  /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
+     reader who knows one stylesheet can read the other. */
+  --mc-bg: var(--mc-white);
+  --mc-bg-muted: var(--mc-neutral-50);
+  --mc-bg-subtle: var(--mc-gray-50);
+  --mc-bg-hover: var(--mc-zinc-100);
+  --mc-border: var(--mc-gray-200);
+  --mc-border-light: var(--mc-gray-100);
+  --mc-text: var(--mc-gray-900);
+  --mc-text-secondary: var(--mc-gray-500);
+  --mc-text-muted: var(--mc-gray-400);
+  --mc-accent: var(--mc-blue-600);
+  --mc-accent-hover: var(--mc-blue-700);
+  --mc-accent-disabled: var(--mc-blue-300);
+  --mc-badge-color: var(--mc-accent);
+  --mc-badge-bg: var(--mc-blue-50);
+  --mc-badge-border: var(--mc-blue-100);
+
+  --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  --mc-font-mono:
+    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --mc-radius: 8px;
+  --mc-shadow:
+    0 1px 3px color-mix(in srgb, var(--mc-black) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--mc-black) 5%, transparent);
+
+  background: var(--mc-bg);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
+  box-shadow: var(--mc-shadow);
+  overflow: hidden;
+  font-family: var(--mc-font-ui);
+  color: var(--mc-text);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 1rem 0;
+  position: relative;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────── */
+
+.header {
+  padding: 16px 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mc-badge-color);
+  background: var(--mc-badge-bg);
+  border: 1px solid var(--mc-badge-border);
+  border-radius: 5px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.badgeDot {
+  width: 5px;
+  height: 5px;
+  background: var(--mc-badge-color);
+  border-radius: 50%;
+}
+.modeLabel {
+  font-size: 11.5px;
+  color: var(--mc-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.modeLabel svg {
+  width: 12px;
+  height: 12px;
+}
+.headerStatus {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--mc-text-secondary);
+}
+.attemptCount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Question body (markdown-rendered) ───────────────────────────── */
+
+.body {
+  padding: 4px 20px 14px;
+  border-bottom: 1px solid var(--mc-border-light);
+}
+.bodyMd {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--mc-text);
+}
+.bodyMd p {
+  margin: 0 0 10px;
+}
+.bodyMd p:last-child {
+  margin-bottom: 0;
+}
+.bodyMd strong {
+  color: var(--mc-text);
+  font-weight: 600;
+}
+.bodyMd em {
+  font-style: italic;
+}
+.bodyMd code {
+  font-family: var(--mc-font-mono);
+  font-size: 12.5px;
+  background: var(--mc-slate-100);
+  border: 1px solid var(--mc-slate-200);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--mc-slate-900);
+}
+.bodyMd ul,
+.bodyMd ol {
+  padding-left: 22px;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bodyMd a {
+  color: var(--mc-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bodyMd pre {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: var(--mc-bg-subtle);
+  border: 1px solid var(--mc-border-light);
+  border-radius: 5px;
+  font-family: var(--mc-font-mono);
+  font-size: 12.5px;
+  overflow-x: auto;
+}
+.bodyMd pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ─── Choices ────────────────────────────────────────────────────── */
+
+.choiceList {
+  list-style: none;
+  margin: 0;
+  padding: 14px 20px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--mc-border);
+  border-radius: 6px;
+  background: var(--mc-bg);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  position: relative;
+}
+.choice:hover {
+  background: var(--mc-bg-hover);
+  border-color: var(--mc-gray-300);
+}
+.choice[data-selected="true"] {
+  border-color: var(--mc-accent);
+  background: var(--mc-blue-50);
+  box-shadow: 0 0 0 1px var(--mc-accent) inset;
+}
+.choice[data-locked="true"] {
+  cursor: default;
+}
+.choice[data-locked="true"]:hover {
+  background: var(--mc-bg);
+  border-color: var(--mc-border);
+}
+.choice[data-locked="true"][data-selected="true"]:hover {
+  background: var(--mc-blue-50);
+  border-color: var(--mc-accent);
+}
+/* Post-submit verdicts. */
+.choice[data-verdict="correct-selected"],
+.choice[data-verdict="correct-missed"] {
+  border-color: var(--mc-green-500);
+  background: var(--mc-green-50);
+  box-shadow: 0 0 0 1px var(--mc-green-500) inset;
+}
+.choice[data-verdict="wrong-selected"] {
+  border-color: var(--mc-red-600);
+  background: var(--mc-red-50);
+  box-shadow: 0 0 0 1px var(--mc-red-600) inset;
+}
+.choice[data-verdict="correct-missed"] {
+  /* Highlight unselected correct answers with a more subdued border so
+     the learner can distinguish "I missed this" from "I picked this and
+     it was correct". */
+  box-shadow: 0 0 0 1px var(--mc-green-500) inset;
+  background: var(--mc-green-50);
+  border-style: dashed;
+}
+
+/* Native input controls — we keep them visible (rather than hiding
+   them in favour of a fully custom radio glyph) because the browser's
+   focus ring + accent-color does most of the heavy lifting and looks
+   consistent with form controls elsewhere in fumadocs. */
+.choiceInput {
+  margin-top: 3px;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--mc-accent);
+  flex-shrink: 0;
+  cursor: inherit;
+}
+.choiceLabel {
+  flex: 1;
+  min-width: 0;
+  color: var(--mc-text);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.choiceLabel p {
+  margin: 0;
+}
+.choiceLabel code {
+  font-family: var(--mc-font-mono);
+  font-size: 12.5px;
+  background: var(--mc-slate-100);
+  border: 1px solid var(--mc-slate-200);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--mc-slate-900);
+}
+.choiceMark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-top: 1px;
+}
+.choice[data-verdict="correct-selected"] .choiceMark,
+.choice[data-verdict="correct-missed"] .choiceMark {
+  background: var(--mc-green-100);
+  color: var(--mc-green-700);
+}
+.choice[data-verdict="wrong-selected"] .choiceMark {
+  background: var(--mc-red-100);
+  color: var(--mc-red-700);
+}
+
+.choiceExplanation {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--mc-border);
+  background: var(--mc-bg-subtle);
+  border-radius: 4px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--mc-text-secondary);
+}
+.choiceExplanation p {
+  margin: 0 0 6px;
+}
+.choiceExplanation p:last-child {
+  margin-bottom: 0;
+}
+.choice[data-verdict="correct-selected"] .choiceExplanation,
+.choice[data-verdict="correct-missed"] .choiceExplanation {
+  border-left-color: var(--mc-green-500);
+  background: var(--mc-white);
+}
+.choice[data-verdict="wrong-selected"] .choiceExplanation {
+  border-left-color: var(--mc-red-600);
+  background: var(--mc-white);
+}
+
+/* The explanation block hangs off to the right of the input + glyph.
+   We render it inside the choice body, after the label, so when the
+   author writes a multi-line choice the explanation always lines up
+   below the label. */
+.choiceContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Action bar ──────────────────────────────────────────────────── */
+
+.actionBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--mc-border-light);
+  background: var(--mc-bg-subtle);
+}
+.submitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--mc-accent);
+  color: var(--mc-white);
+  border: 1px solid var(--mc-accent);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: var(--mc-font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.submitBtn:hover:not(:disabled) {
+  background: var(--mc-accent-hover);
+  border-color: var(--mc-accent-hover);
+}
+.submitBtn:disabled {
+  background: var(--mc-accent-disabled);
+  border-color: var(--mc-accent-disabled);
+  cursor: not-allowed;
+}
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--mc-white);
+  color: var(--mc-text);
+  border: 1px solid var(--mc-border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-family: var(--mc-font-ui);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.retryBtn:hover {
+  background: var(--mc-bg-hover);
+  border-color: var(--mc-gray-300);
+  color: var(--mc-text);
+}
+.actionHint {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--mc-text-muted);
+}
+
+/* ─── Status banner ───────────────────────────────────────────────── */
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--mc-border-light);
+  font-size: 13px;
+  font-weight: 500;
+}
+.banner[data-state="pass"] {
+  background: var(--mc-green-50);
+  color: var(--mc-green-700);
+  border-top-color: var(--mc-green-200);
+}
+.banner[data-state="fail"] {
+  background: var(--mc-red-50);
+  color: var(--mc-red-700);
+  border-top-color: var(--mc-red-200);
+}
+.banner[data-state="partial"] {
+  background: var(--mc-amber-50);
+  color: var(--mc-amber-700);
+  border-top-color: var(--mc-amber-200);
+}
+.bannerIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.banner[data-state="pass"] .bannerIcon { background: var(--mc-green-100); }
+.banner[data-state="fail"] .bannerIcon { background: var(--mc-red-100); }
+.banner[data-state="partial"] .bannerIcon { background: var(--mc-amber-200); }
+.bannerSub {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.85;
+  margin-left: 4px;
+}
+
+/* ─── Overall explanation ─────────────────────────────────────────── */
+
+.overall {
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--mc-border-light);
+  background: var(--mc-bg);
+}
+.overallLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--mc-text-muted);
+  margin-bottom: 8px;
+}
+.overallBody {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--mc-text-secondary);
+}
+.overallBody p {
+  margin: 0 0 8px;
+}
+.overallBody p:last-child {
+  margin-bottom: 0;
+}
+.overallBody code {
+  font-family: var(--mc-font-mono);
+  font-size: 12.5px;
+  background: var(--mc-slate-100);
+  border: 1px solid var(--mc-slate-200);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--mc-slate-900);
+}
+
+/* ─── Dark mode ───────────────────────────────────────────────────── */
+/* Mirror the existing ChallengeCard dark-mode strategy: re-bind the
+   semantic --mc-* tokens to darker palette values, leaving the
+   structural rules above untouched. The Fumadocs root toggles
+   `html.dark`, so we scope via :global(html.dark). */
+:global(html.dark) .card {
+  --mc-bg: #0f172a;
+  --mc-bg-muted: #111827;
+  --mc-bg-subtle: #1e293b;
+  --mc-bg-hover: #1f2937;
+  --mc-border: #334155;
+  --mc-border-light: #1e293b;
+  --mc-text: #e5e7eb;
+  --mc-text-secondary: #94a3b8;
+  --mc-text-muted: #64748b;
+  --mc-badge-bg: rgba(59, 130, 246, 0.15);
+  --mc-badge-border: rgba(59, 130, 246, 0.35);
+  --mc-badge-color: #93c5fd;
+}
+:global(html.dark) .choice[data-selected="true"] {
+  background: rgba(37, 99, 235, 0.18);
+}
+:global(html.dark) .choice[data-verdict="correct-selected"],
+:global(html.dark) .choice[data-verdict="correct-missed"] {
+  background: rgba(22, 163, 74, 0.15);
+}
+:global(html.dark) .choice[data-verdict="wrong-selected"] {
+  background: rgba(220, 38, 38, 0.15);
+}
+:global(html.dark) .banner[data-state="pass"] {
+  background: rgba(22, 163, 74, 0.12);
+  color: #86efac;
+  border-top-color: rgba(22, 163, 74, 0.35);
+}
+:global(html.dark) .banner[data-state="fail"] {
+  background: rgba(220, 38, 38, 0.12);
+  color: #fca5a5;
+  border-top-color: rgba(220, 38, 38, 0.35);
+}
+:global(html.dark) .banner[data-state="partial"] {
+  background: rgba(217, 119, 6, 0.12);
+  color: #fcd34d;
+  border-top-color: rgba(217, 119, 6, 0.35);
+}
+:global(html.dark) .choiceLabel code,
+:global(html.dark) .bodyMd code,
+:global(html.dark) .overallBody code {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}

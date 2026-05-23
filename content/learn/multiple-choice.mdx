@@ -1,0 +1,174 @@
+---
+title: Multiple Choice Questions
+description: Markdown-authored quiz cards that learners can submit, retry, and learn from.
+---
+
+The `<MultipleChoice>` component lets MDX authors embed quiz-style
+questions directly inside a Learn page. Each question is a single
+Markdown document — there are no JSON arrays of choices to keep in sync
+with the prose.
+
+## Syntax
+
+| Element | Syntax |
+| --- | --- |
+| Question body | Everything before the first `-`&nbsp;choice line |
+| Incorrect choice | `- Choice text` |
+| Correct choice | `- [o] Choice text` |
+| Per-choice explanation | `> Explanation` (indented blockquote under the choice) |
+| Multi-line choice | Indent continuation lines by 2+ spaces |
+| Overall explanation | Any text after the choices block (no marker needed) |
+
+### Notes
+
+- Mark multiple choices `[o]` to make it a multi-answer question
+  (checkbox preview).
+- Use `*` or `1.` for lists inside the question body — `-` is reserved
+  for choices.
+- Math works anywhere — `$x^2$` for inline and `$$\int_0^\infty$$` for
+  display equations.
+- Learners can submit, see per-choice feedback, and click **Try again**
+  to keep iterating — attempts are tracked in the header.
+
+## 1. Simple example
+
+<MultipleChoice
+  markdown={`Which tool is commonly used to create interactive business dashboards and data visualizations?
+
+- Microsoft Word
+  > Microsoft Word is primarily used for document creation, not interactive data visualization.
+- [o] Tableau
+  > Correct! Tableau is widely used for creating interactive dashboards and visual analytics.
+- Adobe Photoshop
+- Notepad
+
+Data visualization tools such as Tableau help analysts communicate insights
+effectively by transforming raw data into interactive charts, dashboards,
+and visual stories for decision-making.`}
+/>
+
+````markdown
+Which tool is commonly used to create interactive business dashboards and data visualizations?
+
+- Microsoft Word
+  > Microsoft Word is primarily used for document creation, not interactive data visualization.
+- [o] Tableau
+  > Correct! Tableau is widely used for creating interactive dashboards and visual analytics.
+- Adobe Photoshop
+- Notepad
+
+Data visualization tools such as Tableau help analysts communicate insights
+effectively by transforming raw data into interactive charts, dashboards,
+and visual stories for decision-making.
+````
+
+## 2. With math equations
+
+Inline math (`$…$`) and display math (`$$…$$`) render through KaTeX, so
+authors can drop equations into the body, choices, per-choice
+explanations, or the overall explanation.
+
+<MultipleChoice
+  markdown={`What is $\\frac{d}{dx}[x^2]$?
+
+- $x$
+- [o] $2x$
+  > Applying the power rule: bring down the exponent and reduce it by 1.
+- $x^2$
+- $2$
+
+The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`}
+/>
+
+````markdown
+What is $\frac{d}{dx}[x^2]$?
+
+- $x$
+- [o] $2x$
+  > Applying the power rule: bring down the exponent and reduce it by 1.
+- $x^2$
+- $2$
+
+The power rule states that $\frac{d}{dx}[x^n] = nx^{n-1}$.
+````
+
+## 3. Multi-answer (select all that apply)
+
+Flag two or more choices `[o]` and the component automatically switches
+to a checkbox preview. The status banner distinguishes a fully-correct
+answer from a *partial* one (some correct picks but not all) so
+learners get a useful nudge instead of a binary pass/fail.
+
+<MultipleChoice
+  markdown={`Which of the following are valid \`justify-content\` values? Select all that apply.
+
+- [o] flex-start
+- [o] center
+- column
+  > \`column\` is a \`flex-direction\` value, not \`justify-content\`.
+- [o] space-between
+- inline-flex
+  > \`inline-flex\` is a \`display\` value.`}
+/>
+
+````markdown
+Which of the following are valid `justify-content` values? Select all that apply.
+
+- [o] flex-start
+- [o] center
+- column
+  > `column` is a `flex-direction` value, not `justify-content`.
+- [o] space-between
+- inline-flex
+  > `inline-flex` is a `display` value.
+````
+
+## 4. Rich question body
+
+The question body is full Markdown — lists, inline code, **bold**, and
+fenced code blocks all work. Remember to use `*` or `1.` for any lists
+inside the body so the parser doesn't mistake them for choices.
+
+<MultipleChoice
+  markdown={`A Python function is defined as:
+
+\`\`\`python
+def total(prices, tax_rate=0.07):
+    return sum(prices) * (1 + tax_rate)
+\`\`\`
+
+What does \`total([10, 20, 30])\` return?
+
+- 60
+  > That's the pre-tax total — the function also applies a 7% tax.
+- [o] 64.2
+  > \`60 * 1.07 = 64.2\`.
+- 70.0
+- An error — \`tax_rate\` must be supplied.
+  > \`tax_rate\` has a default value of \`0.07\`, so it's optional.
+
+The function multiplies the sum of \`prices\` by \`1 + tax_rate\`. With the default
+tax rate of 7 %, the result is \`60 × 1.07 = 64.2\`.`}
+/>
+
+````markdown
+A Python function is defined as:
+
+```python
+def total(prices, tax_rate=0.07):
+    return sum(prices) * (1 + tax_rate)
+```
+
+What does `total([10, 20, 30])` return?
+
+- 60
+  > That's the pre-tax total — the function also applies a 7% tax.
+- [o] 64.2
+  > `60 * 1.07 = 64.2`.
+- 70.0
+- An error — `tax_rate` must be supplied.
+  > `tax_rate` has a default value of `0.07`, so it's optional.
+
+The function multiplies the sum of `prices` by `1 + tax_rate`. With the default
+tax rate of 7 %, the result is `60 × 1.07 = 64.2`.
+````
