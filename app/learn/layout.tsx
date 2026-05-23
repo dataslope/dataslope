@@ -21,6 +21,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
     <RootProvider>
       <DocsLayout
         tree={source.pageTree}
+        tabs={false}
         nav={{
           title: (
             <span style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "bold" }}>

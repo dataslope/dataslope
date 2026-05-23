@@ -21,10 +21,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
-  // The previous SQLite engine (sql.js) needed Node-only `fs`/`path`/
-  // `crypto` aliased to an empty stub in the client bundle. The current
-  // engine (@sqlite.org/sqlite-wasm) ships a clean browser build with
-  // no such gates, so no Turbopack aliases are required here.
   redirects: async () => [
     {
       source: "/_dotnet/:path*",
