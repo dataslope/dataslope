@@ -173,7 +173,6 @@ export function parseQuestion(source: string): ParsedQuestion {
 
     // phase === "explanation"
     explanationLines.push(line);
-    pendingBlanks = 0;
   }
 
   const correctIds = choices.filter((c) => c.correct).map((c) => c.id);

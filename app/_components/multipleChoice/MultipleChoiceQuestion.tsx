@@ -190,7 +190,11 @@ export default function MultipleChoiceQuestion({
         </div>
       ) : null}
 
-      <ul className={styles.choiceList} role={parsed.multiAnswer ? "group" : "radiogroup"}>
+      <ul
+        className={styles.choiceList}
+        role={parsed.multiAnswer ? "group" : "radiogroup"}
+        aria-label="Answer choices"
+      >
         {parsed.choices.map((choice) => {
           const isSelected = selected.has(choice.id);
           const verdict = computeVerdict(choice, isSelected, submitted);
