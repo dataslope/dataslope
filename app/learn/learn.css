@@ -22,6 +22,7 @@
 @source "../../node_modules/fumadocs-ui/dist/**/*.js";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+@import "katex/dist/katex.min.css";
 
 /* Override Fumadocs's default sans stack inside the /learn route with
    Inter and apply slightly tight letter-spacing for a more polished
