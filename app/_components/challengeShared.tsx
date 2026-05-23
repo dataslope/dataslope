@@ -18,11 +18,61 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+// ─── Dark mode detection ─────────────────────────────────────────────
+// Mirrors the logic in CodeBlock.tsx: Fumadocs toggles a `dark` class
+// on <html> when the user switches themes; we fall back to the OS
+// preference when outside the /learn route.
+
+function detectIsDark(): boolean {
+  if (typeof document === "undefined") return true;
+  const root = document.documentElement;
+  if (root.classList.contains("dark")) return true;
+  if (root.classList.contains("light")) return false;
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  return true;
+}
+
+/** Subscribe to the document's colour-scheme so components can react
+ *  to the Fumadocs theme toggle without polling. SSR-safe: the server
+ *  snapshot defaults to `true` (dark) to match the site's dark default. */
+export function useIsDark(): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      if (typeof document === "undefined") return () => {};
+      const observer = new MutationObserver(notify);
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+      const mql =
+        typeof window !== "undefined" && window.matchMedia
+          ? window.matchMedia("(prefers-color-scheme: dark)")
+          : null;
+      mql?.addEventListener?.("change", notify);
+      return () => {
+        observer.disconnect();
+        mql?.removeEventListener?.("change", notify);
+      };
+    },
+    () => detectIsDark(),
+    () => true,
+  );
+}
+
+/** Map dark/light to the matching CodeMirror theme name.
+ *  Dark → GitHub Dark, light → GitHub Light. */
+export function cmThemeNameFor(isDark: boolean): string {
+  return isDark ? "github-dark" : "github-light";
+}
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 

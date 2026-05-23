@@ -730,6 +730,23 @@
   outline: 2px solid var(--ch-accent);
   outline-offset: -2px;
 }
+/* "Click to expand" label centred at the bottom of the fade overlay. */
+.initFadeLabel {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--ch-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ch-text-muted);
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.initFade:hover .initFadeLabel {
+  color: var(--ch-text);
+}
 
 /* ─── File tab bar (multi-file workspaces) ────────────────────────── */
 
@@ -790,12 +807,11 @@
   gap: 0;
 }
 
-/* Primary group: Run + Submit attached, with a shared accent border. */
+/* Primary group: Run + Submit attached, borderless with overflow clip. */
 .btnGroupPrimary {
   display: inline-flex;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--ch-accent);
   flex-shrink: 0;
 }
 /* Hairline divider between the main Submit/Run pill and the chevron
@@ -1088,8 +1104,14 @@
   background: var(--ch-border-light);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .btnKbd { display: none; }
+}
+@media (max-width: 480px) {
+  .runBtnLabel { display: none; }
+}
+@media (max-width: 400px) {
+  .utilBtnLabel { display: none; }
 }
 
 /* ─── Output panel ────────────────────────────────────────────────── */
@@ -1519,9 +1541,8 @@
 /* ─── Dark mode ───────────────────────────────────────────────────────
    Fumadocs toggles a `.dark` class on `<html>`. We rebind the card's
    CSS variables so the same selectors keep working — no extra rules
-   per element needed. Aim is "paper card in a dark theme": subtle
-   slate-tinted surface, soft borders, slightly desaturated semantic
-   colours so accents don't burn next to body text. */
+   per element needed. Background matches `var(--color-fd-background)`
+   so the card surface blends with the surrounding learn-page chrome. */
 :global(html.dark) .card {
   /* Dark-theme additions to the Tailwind palette (the light tokens
      above are still available). All values come from the Tailwind
@@ -1535,10 +1556,13 @@
   --ch-violet-300: #c4b5fd;
   --ch-violet-500: #8b5cf6;
 
-  /* Semantic aliases re-pointed at darker tones. */
-  --ch-bg: var(--ch-slate-900);
-  --ch-bg-muted: var(--ch-gray-900);
-  --ch-bg-subtle: var(--ch-slate-950);
+  /* Semantic aliases re-pointed at the Fumadocs background so the
+     card surface matches the surrounding learn-page chrome exactly.
+     The `var(--color-fd-background, …)` fallback keeps the component
+     usable when Fumadocs is not present (e.g. Storybook / unit tests). */
+  --ch-bg: var(--color-fd-background, var(--ch-slate-900));
+  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 70%, #1e293b);
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 50%, #020617);
   --ch-bg-hover: var(--ch-slate-800);
   --ch-border: var(--ch-gray-800);
   --ch-border-light: var(--ch-slate-800);

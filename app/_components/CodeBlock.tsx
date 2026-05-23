@@ -138,9 +138,9 @@ function useIsDark(): boolean {
 }
 
 // Map the document's colour scheme to the matching CodeMirror theme name.
-// Light docs → IntelliJ IDEA, dark docs → Dracula.
+// Light docs → GitHub Light, dark docs → GitHub Dark.
 function cmThemeNameFor(isDark: boolean): string {
-  return isDark ? "dracula" : "idea";
+  return isDark ? "github-dark" : "github-light";
 }
 
 // Small clipboard / "copy to clipboard" glyph reused by the action bar
@@ -706,31 +706,33 @@ function CodeBlockInner({
 
       {hasInit && (
         <div className={styles.initWrap}>
-          <button
-            type="button"
-            className={styles.initToggle}
-            aria-expanded={initExpanded}
-            aria-controls={initPanelId}
-            onClick={() => setInitExpanded((v) => !v)}
-          >
-            <span
-              className={`${styles.initCaret} ${
-                initExpanded ? styles.initCaretOpen : ""
-              }`}
-              aria-hidden
+          {initLineCount > 3 && (
+            <button
+              type="button"
+              className={styles.initToggle}
+              aria-expanded={initExpanded}
+              aria-controls={initPanelId}
+              onClick={() => setInitExpanded((v) => !v)}
             >
-              ▶
-            </span>
-            <span className={styles.initLabel}>
-              Initialization code ({adapter.runtimeInfo.language})
-            </span>
-            <span className={styles.initMeta}>
-              {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
-            </span>
-          </button>
+              <span
+                className={`${styles.initCaret} ${
+                  initExpanded ? styles.initCaretOpen : ""
+                }`}
+                aria-hidden
+              >
+                ▶
+              </span>
+              <span className={styles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={styles.initMeta}>
+                {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
+              </span>
+            </button>
+          )}
           <div
             className={`${styles.initEditorWrap} ${
-              initExpanded
+              initLineCount <= 3 || initExpanded
                 ? styles.initEditorWrapOpen
                 : styles.initEditorWrapCollapsed
             }`}
@@ -748,7 +750,9 @@ function CodeBlockInner({
                 aria-label="Expand initialization code"
                 title="Expand initialization code"
                 onClick={() => setInitExpanded(true)}
-              />
+              >
+                <span className={styles.initFadeLabel}>Click to expand</span>
+              </button>
             )}
           </div>
         </div>

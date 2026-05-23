@@ -56,6 +56,8 @@ import {
   renderInstructions,
   useChallengeToasts,
   ChallengeToastViewport,
+  useIsDark,
+  cmThemeNameFor,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -74,7 +76,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { themeFor } from "./cmExtensions";
+import { themeFor, noActiveLine } from "./cmExtensions";
 import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
@@ -518,7 +520,7 @@ function detectIsMac(): boolean {
   return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
 }
 
-const CM_EDITOR_THEME = "idea";
+
 
 // Minimum time (ms) the "running" overlay is held visible after a run
 // completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
@@ -604,6 +606,10 @@ export default function SqlChallengeCard({
   const editorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
+  // Theme compartments — stored so the dark/light sync effect can
+  // reconfigure the CM theme without remounting the editor.
+  const mainThemeCompRef = useRef<Compartment | null>(null);
+  const solutionThemeCompRef = useRef<Compartment | null>(null);
   // Debounce handle for localStorage persistence (see editor mount).
   const persistSaveTimerRef = useRef<number | null>(null);
 
@@ -663,6 +669,15 @@ export default function SqlChallengeCard({
     () => false,
   );
 
+  const isDark = useIsDark();
+  const cmThemeName = cmThemeNameFor(isDark);
+  // Ref so editor-mount effects (which have [] deps) can read the
+  // current theme name without becoming stale.
+  const cmThemeNameRef = useRef(cmThemeName);
+  useEffect(() => {
+    cmThemeNameRef.current = cmThemeName;
+  });
+
   const canCheck = tests.length > 0;
 
   // ─── Editor mount ───────────────────────────────────────────────────
@@ -721,7 +736,8 @@ export default function SqlChallengeCard({
           indentWithTab,
         ]),
         languageComp.of([]),
-        themeComp.of(themeFor(CM_EDITOR_THEME)),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
         // Debounced persist of the user's SQL so reloads / nav restore
         // their in-progress query.
         EditorView.updateListener.of((update) => {
@@ -736,6 +752,7 @@ export default function SqlChallengeCard({
       ],
     });
     editorRef.current = view;
+    mainThemeCompRef.current = themeComp;
 
     void (async () => {
       try {
@@ -758,9 +775,22 @@ export default function SqlChallengeCard({
       }
       view.destroy();
       editorRef.current = null;
+      mainThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Sync the CodeMirror theme whenever the docs colour scheme toggles
+  // (Fumadocs dark/light toggle or OS preference change).
+  useEffect(() => {
+    const reconfigure = (view: EditorView | null, comp: Compartment | null) => {
+      if (view && comp) {
+        view.dispatch({ effects: comp.reconfigure(themeFor(cmThemeName)) });
+      }
+    };
+    reconfigure(editorRef.current, mainThemeCompRef.current);
+    reconfigure(solutionEditorRef.current, solutionThemeCompRef.current);
+  }, [cmThemeName]);
 
   // Mount the read-only solution editor lazily when the modal opens.
   // We keep the doc editable at the contenteditable level (relying on
@@ -772,6 +802,7 @@ export default function SqlChallengeCard({
     if (!solutionOpen || !solutionSql) return;
     if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
     const languageComp = new Compartment();
+    const themeComp = new Compartment();
     const view = new EditorView({
       doc: solutionSql,
       parent: solutionEditorHostRef.current,
@@ -784,10 +815,12 @@ export default function SqlChallengeCard({
         EditorView.lineWrapping,
         keymap.of(defaultKeymap),
         languageComp.of([]),
-        themeFor(CM_EDITOR_THEME),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
       ],
     });
     solutionEditorRef.current = view;
+    solutionThemeCompRef.current = themeComp;
     void (async () => {
       try {
         const { sql } = await import("@codemirror/lang-sql");
@@ -801,6 +834,7 @@ export default function SqlChallengeCard({
     return () => {
       view.destroy();
       solutionEditorRef.current = null;
+      solutionThemeCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionOpen]);
@@ -1447,7 +1481,7 @@ export default function SqlChallengeCard({
                 ) : (
                   <Check size={12} strokeWidth={2.6} aria-hidden />
                 )}
-                <span>
+                <span className={styles.runBtnLabel}>
                   {isBusy
                     ? activeAction === "run"
                       ? "Running…"
@@ -1550,7 +1584,7 @@ export default function SqlChallengeCard({
               ) : (
                 <PlayIcon />
               )}
-              <span>{isBusy ? "Running…" : "Run"}</span>
+              <span className={styles.runBtnLabel}>{isBusy ? "Running…" : "Run"}</span>
               {!isBusy && (
                 <span
                   className={styles.btnKbd}
@@ -1583,9 +1617,11 @@ export default function SqlChallengeCard({
             className={styles.utilBtn}
             onClick={reset}
             disabled={isBusy}
+            title="Reset"
+            aria-label="Reset"
           >
             <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
-            Reset
+            <span className={styles.utilBtnLabel}>Reset</span>
           </button>
           {solutionSql && (
             <>
@@ -1595,9 +1631,11 @@ export default function SqlChallengeCard({
                 className={styles.utilBtn}
                 onClick={() => setSolutionOpen(true)}
                 disabled={isBusy}
+                title="Solution"
+                aria-label="Solution"
               >
                 <Eye size={12} strokeWidth={2} aria-hidden />
-                Solution
+                <span className={styles.utilBtnLabel}>Solution</span>
               </button>
             </>
           )}
@@ -1608,9 +1646,10 @@ export default function SqlChallengeCard({
             onClick={() => void formatCode()}
             disabled={isBusy}
             title="Format SQL"
+            aria-label="Format SQL"
           >
             <FormatIcon />
-            Format
+            <span className={styles.utilBtnLabel}>Format</span>
           </button>
           <div className={styles.btnGroupUtilSep} aria-hidden />
           <button
