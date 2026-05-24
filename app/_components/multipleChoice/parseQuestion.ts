@@ -13,6 +13,12 @@
  *     > Optional per-choice explanation.
  *     continuation lines indented by 2+ spaces extend the choice text
  *
+ *   Fenced code blocks inside a choice are fully supported. The opening
+ *   fence (e.g. ```python) may appear right after `- ` or as an indented
+ *   continuation line. All lines — including blank lines — inside the
+ *   fence are captured verbatim as part of the choice text; the fence is
+ *   closed when an indented ``` or ~~~ line (matching 3+ chars) appears.
+ *
  *   Overall explanation paragraph(s) appear after the final choice and
  *   are written without any special marker.
  *
@@ -22,7 +28,8 @@
  *   - `*` and `1.` may be used for lists in the question body — they're
  *     never interpreted as choices.
  *   - Lines starting with `>` (optionally indented) immediately under a
- *     choice attach to that choice as its explanation.
+ *     choice attach to that choice as its explanation, unless the choice
+ *     is inside a fenced code block.
  *   - Lines indented by 2+ spaces that are not blockquotes are
  *     continuation text for the current choice.
  *   - The first unindented, non-blank, non-choice line after the choices
@@ -58,6 +65,10 @@ export interface ParsedQuestion {
 }
 
 const CHOICE_RE = /^-\s+(?:\[(o|O| |x|X)\]\s+)?(.*)$/;
+/** Matches the opening of a fenced code block (``` or ~~~, 3+ chars). */
+const FENCE_OPEN_RE = /^(`{3,}|~{3,})/;
+/** Matches a closing fence line — only the fence chars, nothing else. */
+const FENCE_CLOSE_RE = /^(`{3,}|~{3,})\s*$/;
 
 /** Parse a multiple-choice question authored in the syntax above.
  *  Returns a structured object; throws nothing — malformed input
@@ -79,6 +90,14 @@ export function parseQuestion(source: string): ParsedQuestion {
   // or to the overall explanation (outside).
   let pendingBlanks = 0;
 
+  // Fence tracking for code blocks inside choices.
+  // When true, blank lines and all indented lines are captured verbatim
+  // as part of the current choice until the closing fence is found.
+  let inChoiceFence = false;
+  // Blank lines buffered while inside a choice fence — flushed into the
+  // choice text before the next non-blank continuation line.
+  let pendingFenceBlanks = 0;
+
   const isChoiceLine = (line: string): RegExpMatchArray | null => {
     // Only unindented `- ` lines count as choices. Continuation text
     // for the question body's own `*` or `1.` lists is never confused
@@ -89,20 +108,42 @@ export function parseQuestion(source: string): ParsedQuestion {
   };
 
   const startChoice = (rawMarker: string | undefined, text: string) => {
+    // Reset any open fence from the previous choice (best-effort
+    // recovery for malformed input that never closed its fence).
+    inChoiceFence = false;
+    pendingFenceBlanks = 0;
     const marker = (rawMarker || "").toLowerCase();
     const correct = marker === "o" || marker === "x";
+    const trimmedText = text.trim();
     choices.push({
       id: String(choices.length),
-      text: text.trim(),
+      text: trimmedText,
       correct,
       explanation: "",
     });
+    // Detect a code fence that begins right on the choice line
+    // (e.g. `- ```python`).
+    if (FENCE_OPEN_RE.test(trimmedText)) {
+      inChoiceFence = true;
+    }
   };
 
+  // Append text to the current choice WITHOUT trimming so that blank
+  // lines inside fences are preserved. trimBlock() is applied to every
+  // choice's text in the final return.
   const appendToChoiceText = (text: string) => {
     const choice = choices[choices.length - 1];
     if (!choice) return;
-    choice.text = (choice.text + "\n" + text).trim();
+    choice.text = choice.text + "\n" + text;
+  };
+
+  // Flush accumulated blank lines inside a code fence into the choice
+  // text before appending the next content line.
+  const flushFenceBlanks = () => {
+    if (pendingFenceBlanks > 0 && choices.length > 0) {
+      choices[choices.length - 1].text += "\n".repeat(pendingFenceBlanks);
+      pendingFenceBlanks = 0;
+    }
   };
 
   const appendToChoiceExplanation = (text: string) => {
@@ -119,8 +160,14 @@ export function parseQuestion(source: string): ParsedQuestion {
     const trimmed = line.trim();
 
     if (trimmed === "") {
-      // Blank lines are buffered. They terminate a choice continuation
-      // block but don't immediately change phases.
+      // Blank lines inside a choice fence are buffered and flushed into
+      // the choice text when the next non-blank line arrives.
+      if (phase === "choices" && inChoiceFence) {
+        pendingFenceBlanks++;
+        continue;
+      }
+      // Outside a fence, blank lines are buffered. They terminate a
+      // choice continuation block but don't immediately change phases.
       if (phase === "body") bodyLines.push("");
       else if (phase === "explanation") explanationLines.push("");
       pendingBlanks++;
@@ -141,10 +188,28 @@ export function parseQuestion(source: string): ParsedQuestion {
     }
 
     if (phase === "choices") {
+      // A new choice at column 0 always starts a fresh choice, even
+      // if we're nominally inside a fence (fence was left unclosed).
       const match = isChoiceLine(line);
       if (match) {
         pendingBlanks = 0;
         startChoice(match[1], match[2]);
+        continue;
+      }
+
+      // Inside a code fence every non-blank line belongs to the current
+      // choice verbatim.  Indentation is NOT required — the MDX/Turbopack
+      // compiler strips the 2-space choice-level indent from template
+      // literals before the runtime string is evaluated, so fence content
+      // arrives at the parser with no leading whitespace.
+      if (inChoiceFence) {
+        flushFenceBlanks();
+        appendToChoiceText(trimmed);
+        // Detect the closing fence marker.
+        if (FENCE_CLOSE_RE.test(trimmed)) {
+          inChoiceFence = false;
+        }
+        pendingBlanks = 0;
         continue;
       }
 
@@ -158,8 +223,13 @@ export function parseQuestion(source: string): ParsedQuestion {
       }
 
       // Indented continuation line for the previous choice text.
-      if (/^ {2,}\S/.test(line) && choices.length > 0 && pendingBlanks === 0) {
+      if (/^ {2,}/.test(line) && choices.length > 0 && pendingBlanks === 0) {
         appendToChoiceText(trimmed);
+        // Detect if this continuation line opens a code fence.
+        if (!inChoiceFence && FENCE_OPEN_RE.test(trimmed)) {
+          inChoiceFence = true;
+          pendingFenceBlanks = 0;
+        }
         continue;
       }
 
@@ -181,7 +251,9 @@ export function parseQuestion(source: string): ParsedQuestion {
 
   return {
     body: trimBlock(bodyLines.join("\n")),
-    choices,
+    // Apply trimBlock to each choice text so leading/trailing newlines
+    // added during continuation-appending are stripped cleanly.
+    choices: choices.map((c) => ({ ...c, text: trimBlock(c.text) })),
     explanation: trimBlock(explanationLines.join("\n")),
     multiAnswer: correctIds.length > 1,
     correctIds,

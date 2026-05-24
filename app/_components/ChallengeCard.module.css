@@ -1818,11 +1818,11 @@
      The `var(--color-fd-background, …)` fallback keeps the component
      usable when Fumadocs is not present (e.g. Storybook / unit tests). */
   --ch-bg: var(--color-fd-background, var(--ch-slate-900));
-  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 70%, #1e293b);
-  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, var(--ch-slate-900)) 50%, #020617);
-  --ch-bg-hover: var(--ch-slate-800);
+  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
+  --ch-bg-hover: #1f2937;
   --ch-border: var(--ch-gray-800);
-  --ch-border-light: var(--ch-slate-800);
+  --ch-border-light: #1f2937;
   --ch-text: var(--ch-gray-200);
   --ch-text-secondary: var(--ch-slate-300);
   --ch-text-muted: var(--ch-slate-400);
@@ -1848,8 +1848,8 @@
 }
 
 :global(html.dark) .instructionsBody code {
-  background: var(--ch-slate-800);
-  border-color: var(--ch-slate-700);
+  background: #1f2937;
+  border-color: #374151;
   color: var(--ch-slate-200);
 }
 
@@ -1866,12 +1866,12 @@
 }
 
 :global(html.dark) .initToggle:hover {
-  background: var(--ch-slate-800);
+  background: #1f2937;
 }
 
 :global(html.dark) .utilBtn:hover:not(:disabled),
 :global(html.dark) .copyBtn:hover {
-  background: var(--ch-slate-800);
+  background: #1f2937;
   color: var(--ch-text);
 }
 

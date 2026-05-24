@@ -17,8 +17,9 @@
  *     `<ChallengeCard>` Check-Answer flow).
  *   - All learner-visible Markdown — body, choice labels, per-choice
  *     explanations, overall explanation — is rendered through
- *     react-markdown with GFM + KaTeX so authors can mix prose, lists,
- *     code, tables, and math equations.
+ *     react-markdown with GFM + KaTeX + rehype-highlight so authors
+ *     can mix prose, lists, code (with syntax colouring), tables, and
+ *     math equations.
  */
 
 import { useId, useMemo, useState } from "react";
@@ -26,7 +27,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { Check, X, RotateCcw, ListChecks, Circle } from "lucide-react";
+import rehypeHighlight from "rehype-highlight";
+import { Check, X, RotateCcw, ListChecks, CircleDot } from "lucide-react";
 import {
   parseQuestion,
   type ParsedChoice,
@@ -58,11 +60,11 @@ function MarkdownInline({ source }: { source: string }) {
   // The shared markdown pipeline used by every text surface inside the
   // card: question body, choice labels, per-choice explanations, and
   // the overall explanation. Centralising the plugin list here keeps
-  // math + GFM consistent across all four call sites.
+  // math, GFM, and syntax highlighting consistent across all call sites.
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
+      rehypePlugins={[rehypeKatex, rehypeHighlight]}
     >
       {source}
     </ReactMarkdown>
@@ -168,7 +170,7 @@ export default function MultipleChoiceQuestion({
             </>
           ) : (
             <>
-              <Circle aria-hidden />
+              <CircleDot aria-hidden />
               Select one
             </>
           )}
@@ -190,7 +192,10 @@ export default function MultipleChoiceQuestion({
         </div>
       ) : null}
 
-      <ul
+      {/* Choices are rendered as <div> block elements instead of <li>
+          items so that block-level content (e.g. fenced code blocks)
+          inside a choice label is valid HTML. */}
+      <div
         className={styles.choiceList}
         role={parsed.multiAnswer ? "group" : "radiogroup"}
         aria-label="Answer choices"
@@ -207,12 +212,19 @@ export default function MultipleChoiceQuestion({
             choice.explanation &&
             (isSelected || (choice.correct && !isSelected));
           return (
-            <li key={choice.id}>
-              <label
+            <div key={choice.id} className={styles.choiceItem}>
+              {/* Use <div> rather than <label> so that block-level
+                  content such as fenced code blocks is valid HTML.
+                  Click handling is wired up manually: the outer div
+                  handles mouse clicks on the non-input area, and
+                  stopPropagation on the input prevents a double-toggle
+                  when the input itself is clicked. */}
+              <div
                 className={styles.choice}
                 data-selected={isSelected ? "true" : "false"}
                 data-locked={submitted ? "true" : "false"}
                 data-verdict={verdict}
+                onClick={() => !submitted && toggle(choice.id)}
               >
                 <input
                   className={styles.choiceInput}
@@ -222,6 +234,7 @@ export default function MultipleChoiceQuestion({
                   checked={isSelected}
                   disabled={submitted}
                   onChange={() => toggle(choice.id)}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 <div className={styles.choiceContent}>
                   <div className={styles.choiceLabel}>
@@ -249,11 +262,11 @@ export default function MultipleChoiceQuestion({
                     )}
                   </span>
                 ) : null}
-              </label>
-            </li>
+              </div>
+            </div>
           );
         })}
-      </ul>
+      </div>
 
       <div className={styles.actionBar}>
         {!submitted ? (
