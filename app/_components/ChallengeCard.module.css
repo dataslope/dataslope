@@ -677,6 +677,7 @@
 .editor :global(.cm-editor) {
   height: auto;
   min-height: 120px;
+  max-height: 480px;
   font-family: var(--ch-font-mono);
   font-size: 13px;
   line-height: 1.7;
@@ -688,6 +689,27 @@
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 /* Suppress CodeMirror's default dotted focus outline — the surrounding
@@ -798,11 +820,36 @@
 .initEditor :global(.cm-editor) {
   height: auto;
   min-height: 30px;
+  max-height: 280px;
   font-family: var(--ch-font-mono);
   font-size: 12.5px;
   line-height: 1.7;
   font-variant-ligatures: none;
   cursor: default;
+}
+
+.initEditor :global(.cm-editor .cm-scroller) {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 .initEditor :global(.cm-editor .cm-cursor) {
@@ -855,9 +902,9 @@
   pointer-events: none;
   white-space: nowrap;
   display: inline-flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .initFadeLabel svg {
@@ -866,6 +913,31 @@
 
 .initFade:hover .initFadeLabel {
   color: var(--ch-text);
+}
+
+/* "Click to collapse" button shown at the bottom of the expanded init panel. */
+.initCollapseBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 5px 8px;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--ch-border-light);
+  font-family: var(--ch-font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ch-text-muted);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+
+.initCollapseBtn:hover {
+  color: var(--ch-text);
+  background: var(--ch-bg-hover);
 }
 
 /* ─── File tab bar (multi-file workspaces) ────────────────────────── */
@@ -1333,6 +1405,27 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.outputBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.outputBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.outputBody::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.outputBody::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 .outputEmpty {
@@ -1841,11 +1934,15 @@
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --ch-bg-hover: #222222;
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
+  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
   --ch-border: #2e2e2e;
   --ch-border-light: #232323;
-  --ch-text: var(--ch-gray-200);
-  --ch-text-secondary: var(--ch-slate-300);
-  --ch-text-muted: var(--ch-slate-400);
+  --ch-text: #e0e0e0;
+  --ch-text-secondary: #b0b0b0;
+  --ch-text-muted: #808080;
+  --ch-scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --ch-scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
   --ch-accent: var(--ch-blue-500);
   --ch-accent-hover: var(--ch-blue-400);
   --ch-accent-disabled: var(--ch-blue-700);
@@ -1877,8 +1974,8 @@
 }
 
 :global(html.dark) .instructionsBody code {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: #252525;
+  color: var(--ch-text);
 }
 
 :global(html.dark) .hintBox {
@@ -1894,12 +1991,12 @@
 }
 
 :global(html.dark) .initToggle:hover {
-  background: #1f2937;
+  background: var(--ch-bg-hover);
 }
 
 :global(html.dark) .utilBtn:hover:not(:disabled),
 :global(html.dark) .copyBtn:hover {
-  background: #1f2937;
+  background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 

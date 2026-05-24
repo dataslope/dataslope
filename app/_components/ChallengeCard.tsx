@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, Play } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -1391,6 +1391,17 @@ export default function ChallengeCard({
                   Click to expand
                   <ChevronDown size={13} strokeWidth={2} aria-hidden />
                 </span>
+              </button>
+            )}
+            {initExpanded && initLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initCollapseBtn}
+                aria-label="Collapse initialization code"
+                onClick={() => setInitExpanded(false)}
+              >
+                Click to collapse
+                <ChevronUp size={13} strokeWidth={2} aria-hidden />
               </button>
             )}
           </div>

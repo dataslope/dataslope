@@ -252,9 +252,8 @@
 }
 
 .choice[data-selected="true"] {
-  border-color: var(--mc-accent);
-  background: var(--mc-blue-50);
-  box-shadow: 0 0 0 1px var(--mc-accent) inset;
+  background: var(--mc-gray-100);
+  box-shadow: 0 0 0 1px var(--mc-gray-400) inset;
 }
 
 .choice[data-locked="true"] {
@@ -289,14 +288,40 @@
    focus ring + accent-color does most of the heavy lifting and looks
    consistent with form controls elsewhere in fumadocs. */
 .choiceInput {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  cursor: inherit;
+  background: transparent;
+  box-shadow: 0 0 0 1.5px var(--mc-gray-400);
+  transition: box-shadow 0.12s, background 0.12s;
+}
+
+.choiceInput[type="radio"] {
+  border-radius: 50%;
+}
+
+.choiceInput[type="checkbox"] {
+  border-radius: 3px;
+}
+
+.choiceInput:checked {
+  background: var(--mc-accent);
+  box-shadow: 0 0 0 1.5px var(--mc-accent);
+}
+
+.choiceInput[type="radio"]:checked {
+  background: radial-gradient(circle, #fff 35%, var(--mc-accent) 36%);
+}
+
+.choiceInput[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 9px;
 }
 
 .choiceLabel {
@@ -578,22 +603,23 @@
      are not present (e.g. isolated Storybook / unit-test environments).
      All surface tokens use black-based colour-mix so they stay neutral
      — no blue-tinted slate values. */
-  --mc-bg: var(--color-fd-background, #111827);
-  --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
-  --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
+  --mc-bg: var(--color-fd-background, #121212);
+  --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
+  --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
   --mc-bg-hover: #222222;
   --mc-border: #2e2e2e;
   --mc-border-light: #232323;
-  --mc-text: #e5e7eb;
-  --mc-text-secondary: #9ca3af;
-  --mc-text-muted: #6b7280;
+  --mc-text: #e0e0e0;
+  --mc-text-secondary: #b0b0b0;
+  --mc-text-muted: #808080;
   --mc-badge-bg: color-mix(in srgb, var(--mc-blue-500) 14%, transparent);
   --mc-badge-border: color-mix(in srgb, var(--mc-blue-500) 32%, transparent);
   --mc-badge-color: #93c5fd;
 }
 
 :global(html.dark) .choice[data-selected="true"] {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
 :global(html.dark) .choice[data-verdict="correct-selected"],
@@ -626,14 +652,13 @@
 :global(html.dark) .choiceLabel code,
 :global(html.dark) .bodyMd code,
 :global(html.dark) .overallBody code {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: #252525;
+  color: var(--mc-text);
 }
 
 :global(html.dark) .bodyMd pre,
 :global(html.dark) .choiceLabel pre {
-  background: #1f2937;
-  border-color: #374151;
+  background: #1a1a1a;
 }
 
 /* Choice explanation boxes inside verdict choices use explicit white in
