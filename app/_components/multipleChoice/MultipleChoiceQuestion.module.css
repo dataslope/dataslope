@@ -253,7 +253,6 @@
 
 .choice[data-selected="true"] {
   background: var(--mc-gray-100);
-  box-shadow: 0 0 0 1px var(--mc-gray-400) inset;
 }
 
 .choice[data-locked="true"] {
@@ -263,24 +262,13 @@
 /* Post-submit verdicts. */
 .choice[data-verdict="correct-selected"],
 .choice[data-verdict="correct-missed"] {
-  border-color: var(--mc-green-500);
   background: var(--mc-green-50);
-  box-shadow: 0 0 0 1px var(--mc-green-500) inset;
+  box-shadow: none;
 }
 
 .choice[data-verdict="wrong-selected"] {
-  border-color: var(--mc-red-600);
   background: var(--mc-red-50);
-  box-shadow: 0 0 0 1px var(--mc-red-600) inset;
-}
-
-.choice[data-verdict="correct-missed"] {
-  /* Highlight unselected correct answers with a more subdued border so
-     the learner can distinguish "I missed this" from "I picked this and
-     it was correct". */
-  box-shadow: 0 0 0 1px var(--mc-green-500) inset;
-  background: var(--mc-green-50);
-  border-style: dashed;
+  box-shadow: none;
 }
 
 /* Native input controls — we keep them visible (rather than hiding
@@ -309,12 +297,12 @@
 }
 
 .choiceInput:checked {
-  background: var(--mc-accent);
-  box-shadow: 0 0 0 1.5px var(--mc-accent);
+  background: var(--mc-gray-500);
+  box-shadow: 0 0 0 1.5px var(--mc-gray-400);
 }
 
 .choiceInput[type="radio"]:checked {
-  background: radial-gradient(circle, #fff 35%, var(--mc-accent) 36%);
+  background: radial-gradient(circle, #fff 35%, var(--mc-gray-500) 36%);
 }
 
 .choiceInput[type="checkbox"]:checked {
@@ -506,7 +494,6 @@
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  border-top: 1px solid var(--mc-border-light);
   font-size: 14px;
   font-weight: 500;
 }
@@ -514,19 +501,16 @@
 .banner[data-state="pass"] {
   background: var(--mc-green-50);
   color: var(--mc-green-700);
-  border-top-color: var(--mc-green-200);
 }
 
 .banner[data-state="fail"] {
   background: var(--mc-red-50);
   color: var(--mc-red-700);
-  border-top-color: var(--mc-red-200);
 }
 
 .banner[data-state="partial"] {
   background: var(--mc-amber-50);
   color: var(--mc-amber-700);
-  border-top-color: var(--mc-amber-200);
 }
 
 .bannerIcon {
@@ -562,7 +546,6 @@
 
 .overall {
   padding: 14px 20px 16px;
-  border-top: 1px solid var(--mc-border-light);
   background: var(--mc-bg);
 }
 
@@ -625,7 +608,6 @@
 
 :global(html.dark) .choice[data-selected="true"] {
   background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
 :global(html.dark) .choice[data-verdict="correct-selected"],
@@ -640,19 +622,16 @@
 :global(html.dark) .banner[data-state="pass"] {
   background: rgba(22, 163, 74, 0.12);
   color: #86efac;
-  border-top-color: rgba(22, 163, 74, 0.35);
 }
 
 :global(html.dark) .banner[data-state="fail"] {
   background: rgba(220, 38, 38, 0.12);
   color: #fca5a5;
-  border-top-color: rgba(220, 38, 38, 0.35);
 }
 
 :global(html.dark) .banner[data-state="partial"] {
   background: rgba(217, 119, 6, 0.12);
   color: #fcd34d;
-  border-top-color: rgba(217, 119, 6, 0.35);
 }
 
 :global(html.dark) .choiceLabel code,
@@ -741,5 +720,22 @@
   border-color: rgba(59, 130, 246, 0.22);
   color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
+}
+
+/* White explanation text on dark red/green verdict backgrounds. */
+:global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
+:global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation,
+:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
+  color: #ffffff;
+}
+
+/* Neutral (gray) checked state for radio/checkbox inputs in dark mode. */
+:global(html.dark) .choiceInput:checked {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25);
+}
+
+:global(html.dark) .choiceInput[type="radio"]:checked {
+  background: radial-gradient(circle, var(--mc-bg) 35%, rgba(255, 255, 255, 0.4) 36%);
 }
 

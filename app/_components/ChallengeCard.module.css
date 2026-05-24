@@ -1201,6 +1201,13 @@
   fill: none !important;
 }
 
+.utilSpinner {
+  width: 12px;
+  height: 12px;
+  animation: ch-spin 0.75s linear infinite;
+  fill: none !important;
+}
+
 @keyframes ch-spin {
   to {
     transform: rotate(360deg);
@@ -2032,6 +2039,16 @@
   background: #252525;
   color: #b8b8b8;
   box-shadow: 0 1px 0 #0d0d0d;
+}
+
+/* Keep the dropdown menu's kbd chips as semi-transparent white on blue
+   even in dark mode — the general .kbd dark rule would otherwise make them
+   gray (#252525) which clashes with the blue popup background. */
+:global(html.dark) .runMenuKbd .kbd {
+  background: color-mix(in srgb, #ffffff 16%, transparent);
+  border-color: color-mix(in srgb, #ffffff 28%, transparent);
+  color: color-mix(in srgb, #ffffff 88%, transparent);
+  box-shadow: none;
 }
 
 :global(html.dark) .testItem {

@@ -35,7 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   createColumnHelper,
@@ -654,6 +654,7 @@ export default function SqlChallengeCard({
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
+  const [isFormatting, setIsFormatting] = useState(false);
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
@@ -1297,26 +1298,36 @@ export default function SqlChallengeCard({
     }
   }, [toasts]);
 
+  const MIN_FORMAT_MS = 300;
+
   const formatCode = useCallback(async () => {
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
     if (!code.trim()) return;
+    setIsFormatting(true);
+    const startedAt = performance.now();
     try {
       const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, {
         language: sqlFormatterLanguage(dialect),
       });
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
         toasts.show("Already formatted — nothing to change.");
-        return;
+      } else {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        });
+        toasts.show("SQL formatted.");
       }
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: formatted },
-      });
-      toasts.show("SQL formatted.");
     } catch {
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       toasts.show("Couldn't format — SQL may have a syntax error.", "warn");
+    } finally {
+      setIsFormatting(false);
     }
   }, [dialect, toasts]);
 
@@ -1342,7 +1353,7 @@ export default function SqlChallengeCard({
       <div className={styles.header}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
-            <span className={styles.badgeDot} /> {badge}
+            <Database size={9} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
             <span className={styles.headerRuntimeLabel}>
@@ -1644,11 +1655,17 @@ export default function SqlChallengeCard({
             type="button"
             className={styles.utilBtn}
             onClick={() => void formatCode()}
-            disabled={isBusy}
+            disabled={isBusy || isFormatting}
             title="Format SQL"
             aria-label="Format SQL"
           >
-            <FormatIcon />
+            {isFormatting ? (
+              <svg viewBox="0 0 12 12" className={styles.utilSpinner} aria-hidden>
+                <circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
+              </svg>
+            ) : (
+              <FormatIcon />
+            )}
             <span className={styles.utilBtnLabel}>Format</span>
           </button>
           <div className={styles.btnGroupUtilSep} aria-hidden />
@@ -1867,7 +1884,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <span className={styles.badgeDot} /> Solution
+            <Database size={9} aria-hidden /> Solution
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
