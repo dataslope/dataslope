@@ -76,7 +76,7 @@
   --ch-bg: var(--ch-white);
   --ch-bg-muted: var(--ch-neutral-50);
   --ch-bg-subtle: var(--ch-gray-50);
-  --ch-bg-hover: var(--ch-zinc-100);
+  --ch-bg-hover: var(--ch-gray-100);
   --ch-border: var(--ch-gray-200);
   --ch-border-light: var(--ch-gray-100);
   --ch-text: var(--ch-gray-900);
@@ -329,36 +329,53 @@
   display: flex;
   align-items: stretch;
   gap: 0;
-  padding: 0 8px;
+  background: var(--ch-bg-subtle);
   border-bottom: 1px solid var(--ch-border-light);
-  background: var(--ch-tab-bg, var(--ch-neutral-50));
   overflow-x: auto;
+  scrollbar-width: none;
   flex-shrink: 0;
+  user-select: none;
+}
+
+.modalTabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .modalTab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 7px 14px;
   font-size: 12px;
   font-family: var(--ch-font-mono);
-  color: var(--ch-text-secondary);
+  color: var(--ch-text-muted);
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-right: 1px solid var(--ch-border-light);
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.12s, border-color 0.12s;
+  position: relative;
+  transition: background 0.12s, color 0.12s;
 }
 
 .modalTab:hover {
+  background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 
 .modalTabActive {
+  background: var(--ch-bg);
   color: var(--ch-text);
-  border-bottom-color: var(--ch-accent, var(--ch-blue-600));
+}
+
+.modalTabActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ch-accent);
 }
 
 .modalTabHint {
@@ -502,7 +519,6 @@
   margin: 6px 0 8px;
   padding: 8px 10px;
   background: var(--ch-bg-subtle);
-  border: 1px solid var(--ch-border-light);
   border-radius: 5px;
   font-family: var(--ch-font-mono);
   font-size: 12px;
@@ -678,6 +694,7 @@
 .editor :global(.cm-editor) {
   height: auto;
   min-height: 120px;
+  max-height: 480px;
   font-family: var(--ch-font-mono);
   font-size: 13px;
   line-height: 1.7;
@@ -689,6 +706,27 @@
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 /* Suppress CodeMirror's default dotted focus outline — the surrounding
@@ -738,7 +776,6 @@
   font-family: var(--ch-font-ui);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
   cursor: pointer;
   text-align: left;
 }
@@ -800,11 +837,36 @@
 .initEditor :global(.cm-editor) {
   height: auto;
   min-height: 30px;
+  max-height: 280px;
   font-family: var(--ch-font-mono);
   font-size: 12.5px;
   line-height: 1.7;
   font-variant-ligatures: none;
   cursor: default;
+}
+
+.initEditor :global(.cm-editor .cm-scroller) {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 .initEditor :global(.cm-editor .cm-cursor) {
@@ -854,23 +916,45 @@
   font-size: 11px;
   font-weight: 500;
   color: var(--ch-text-muted);
-  letter-spacing: 0.03em;
   pointer-events: none;
   white-space: nowrap;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
 }
 
-.initFadeLabel::after {
-  content: "⌄";
-  font-size: 13px;
-  line-height: 1;
+.initFadeLabel svg {
+  display: block;
 }
 
 .initFade:hover .initFadeLabel {
   color: var(--ch-text);
+}
+
+/* "Click to collapse" button shown at the bottom of the expanded init panel. */
+.initCollapseBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 5px 8px;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--ch-border-light);
+  font-family: var(--ch-font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ch-text-muted);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+
+.initCollapseBtn:hover {
+  color: var(--ch-text);
+  background: var(--ch-bg-hover);
 }
 
 /* ─── File tab bar (multi-file workspaces) ────────────────────────── */
@@ -883,7 +967,12 @@
   border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
+  scrollbar-width: none;
   user-select: none;
+}
+
+.fileTabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .fileTab {
@@ -911,7 +1000,6 @@
 .fileTabActive {
   background: var(--ch-bg);
   color: var(--ch-text);
-  font-weight: 600;
 }
 
 .fileTabActive::after {
@@ -934,6 +1022,7 @@
   border-bottom: 1px solid var(--ch-border-light);
   background: var(--ch-bg-subtle);
   gap: 0;
+  position: relative;
 }
 
 /* Primary group: Run + Submit attached, borderless with overflow clip. */
@@ -1008,7 +1097,6 @@
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--ch-black) 12%, transparent),
     0 8px 24px color-mix(in srgb, var(--ch-black) 22%, transparent);
-  padding: 4px;
   min-width: 240px;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   outline: none;
@@ -1339,6 +1427,27 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
+}
+
+.outputBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.outputBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.outputBody::-webkit-scrollbar-thumb {
+  background: var(--ch-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.outputBody::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-scrollbar-thumb-hover);
 }
 
 .outputEmpty {
@@ -1846,12 +1955,16 @@
   --ch-bg: var(--color-fd-background, var(--ch-slate-900));
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
-  --ch-bg-hover: #1f2937;
-  --ch-border: var(--ch-gray-800);
-  --ch-border-light: #1f2937;
-  --ch-text: var(--ch-gray-200);
-  --ch-text-secondary: var(--ch-slate-300);
-  --ch-text-muted: var(--ch-slate-400);
+  --ch-bg-hover: #222222;
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
+  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
+  --ch-border: #2e2e2e;
+  --ch-border-light: #232323;
+  --ch-text: #e0e0e0;
+  --ch-text-secondary: #b0b0b0;
+  --ch-text-muted: #808080;
+  --ch-scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --ch-scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
   --ch-accent: var(--ch-blue-500);
   --ch-accent-hover: var(--ch-blue-400);
   --ch-accent-disabled: var(--ch-blue-700);
@@ -1878,13 +1991,15 @@
 :global(html.dark) .editor :global(.cm-editor),
 :global(html.dark) .editor :global(.cm-scroller),
 :global(html.dark) .initEditor :global(.cm-editor),
-:global(html.dark) .initEditor :global(.cm-scroller) {
+:global(html.dark) .initEditor :global(.cm-scroller),
+:global(html.dark) .modalEditor :global(.cm-editor),
+:global(html.dark) .modalEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
 }
 
 :global(html.dark) .instructionsBody code {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: #252525;
+  color: var(--ch-text);
 }
 
 :global(html.dark) .hintBox {
@@ -1900,12 +2015,12 @@
 }
 
 :global(html.dark) .initToggle:hover {
-  background: #1f2937;
+  background: var(--ch-bg-hover);
 }
 
 :global(html.dark) .utilBtn:hover:not(:disabled),
 :global(html.dark) .copyBtn:hover {
-  background: #1f2937;
+  background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 
@@ -1914,23 +2029,23 @@
 }
 
 :global(html.dark) .kbd {
-  background: var(--ch-gray-800);
-  color: var(--ch-slate-300);
-  box-shadow: 0 1px 0 var(--ch-slate-950);
+  background: #252525;
+  color: #b8b8b8;
+  box-shadow: 0 1px 0 #0d0d0d;
 }
 
 :global(html.dark) .testItem {
-  background: var(--ch-slate-950);
-  border-color: var(--ch-slate-800);
+  background: #0d0d0d;
+  border-color: #2a2a2a;
 }
 
 :global(html.dark) .testPanelHeader:hover {
-  background: var(--ch-slate-800);
+  background: #222222;
 }
 
 :global(html.dark) .testPill[data-state="pending"] {
-  background: var(--ch-gray-800);
-  border-color: var(--ch-slate-700);
+  background: #252525;
+  border-color: #333333;
 }
 
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {
@@ -1942,18 +2057,18 @@
 }
 
 :global(html.dark) .outCellHtml :global(th) {
-  background: var(--ch-gray-900);
-  border-color: var(--ch-gray-800);
-  color: var(--ch-slate-400);
+  background: #1a1a1a;
+  border-color: #252525;
+  color: #909090;
 }
 
 :global(html.dark) .outCellHtml :global(td) {
-  border-color: var(--ch-slate-800);
+  border-color: #2a2a2a;
   color: var(--ch-text);
 }
 
 :global(html.dark) .outCellHtml :global(tr:hover td) {
-  background: var(--ch-gray-900);
+  background: #1a1a1a;
 }
 
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
@@ -1982,7 +2097,7 @@
 }
 
 :global(html.dark) .tableViewerHeader:hover {
-  background: var(--ch-slate-800);
+  background: #222222;
 }
 
 .tableViewerLabel {
@@ -2063,8 +2178,8 @@
 }
 
 :global(html.dark) .tableViewerEmpty code {
-  background: var(--ch-gray-800);
-  color: #e5e7eb;
+  background: #252525;
+  color: #e0e0e0;
 }
 
 .tableViewerFootnote {
@@ -2082,8 +2197,8 @@
    rather than floating at the page level. */
 .toastViewport {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 0;
+  bottom: calc(100% + 4px);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2097,8 +2212,8 @@
   align-items: center;
   gap: 10px;
   padding: 6px 8px 6px 12px;
-  background: var(--ch-gray-900);
-  color: var(--ch-gray-50);
+  background: #1e1e1e;
+  color: #e8e8e8;
   font-size: 12px;
   font-family: var(--ch-font-ui);
   border-radius: 6px;
@@ -2179,7 +2294,3 @@
   scrollbar-color: var(--ch-scrollbar-thumb) transparent;
 }
 
-:global(html.dark) .card {
-  --ch-scrollbar-thumb: #334155;
-  --ch-scrollbar-thumb-hover: #475569;
-}

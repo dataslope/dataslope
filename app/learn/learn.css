@@ -42,10 +42,30 @@
   --color-fd-card: hsl(0, 0%, 100%);
 }
 
-/* Item 1: Light mode active sidebar item — subtler highlight than the default
-   bg-fd-primary/10 (10% of near-black). Non-layered rules beat @layer utilities. */
+/* Sidebar active + hover overrides — fumadocs defaults use blue-tinted
+   accent tokens that stand out too much. Non-layered rules beat Tailwind's
+   @layer utilities so these reliably win without !important. */
+
+/* Light mode active */
 :root:not(.dark) #nd-sidebar [data-active="true"] {
-  background-color: hsl(0, 0%, 95%);
+  background-color: hsl(0, 0%, 94%);
+}
+
+/* Light mode hover (non-active items) */
+:root:not(.dark) #nd-sidebar a:hover:not([data-active="true"]),
+:root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]) {
+  background-color: hsl(0, 0%, 97%);
+}
+
+/* Dark mode active — very subtle white overlay on the #121212 background */
+.dark #nd-sidebar [data-active="true"] {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Dark mode hover (non-active items) */
+.dark #nd-sidebar a:hover:not([data-active="true"]),
+.dark #nd-sidebar button:hover:not([data-active="true"]) {
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 /* Item 2: Sidebar footer bar (GitHub icon + theme toggle) — remove the
@@ -240,6 +260,19 @@ h6 {
 .dark .hljs-deletion {
   color: #ffdcd7;
   background-color: #67060c;
+}
+
+/* Remove the default vertical margins Tailwind Typography adds to <li>
+   elements — the .5em top/bottom spacing is too loose for tightly-packed
+   instruction lists inside challenge and quiz cards. */
+.prose :where(li):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Remove the border Tailwind Typography adds to inline <code> elements. */
+.prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  border: none;
 }
 
 /* Suppress the default hljs padding/background — our <pre> handles both. */

@@ -28,7 +28,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
-import { Check, X, RotateCcw, ListChecks, CircleDot } from "lucide-react";
+import { Check, X, RotateCcw, ListChecks, Pen } from "lucide-react";
 import {
   parseQuestion,
   type ParsedChoice,
@@ -170,7 +170,7 @@ export default function MultipleChoiceQuestion({
             </>
           ) : (
             <>
-              <CircleDot aria-hidden />
+              <Pen aria-hidden />
               Select one
             </>
           )}
