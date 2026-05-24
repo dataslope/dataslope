@@ -182,11 +182,10 @@
 .bodyMd code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-slate-100);
-  border: 1px solid var(--mc-slate-200);
+  background: var(--mc-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-slate-900);
+  color: var(--mc-gray-900);
 }
 
 .bodyMd ul,
@@ -325,11 +324,10 @@
 .choiceLabel code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-slate-100);
-  border: 1px solid var(--mc-slate-200);
+  background: var(--mc-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-slate-900);
+  color: var(--mc-gray-900);
 }
 
 /* Code blocks inside choice labels (multi-line code answers). */
@@ -574,11 +572,10 @@
 .overallBody code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-slate-100);
-  border: 1px solid var(--mc-slate-200);
+  background: var(--mc-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-slate-900);
+  color: var(--mc-gray-900);
 }
 
 /* ─── Dark mode ───────────────────────────────────────────────────── */
@@ -641,12 +638,65 @@
 :global(html.dark) .bodyMd code,
 :global(html.dark) .overallBody code {
   background: #1f2937;
-  border-color: #374151;
-  color: #e2e8f0;
+  color: #e5e7eb;
 }
 
 :global(html.dark) .bodyMd pre,
 :global(html.dark) .choiceLabel pre {
   background: #1f2937;
   border-color: #374151;
+}
+
+/* Choice explanation boxes inside verdict choices use explicit white in
+   light mode — override to a translucent tinted dark surface. */
+:global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
+:global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation {
+  background: rgba(22, 163, 74, 0.08);
+}
+
+:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+/* Choice mark icons — replace light green/red fill with translucent dark tints. */
+:global(html.dark) .choice[data-verdict="correct-selected"] .choiceMark,
+:global(html.dark) .choice[data-verdict="correct-missed"] .choiceMark {
+  background: rgba(22, 163, 74, 0.2);
+  color: #86efac;
+}
+
+:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceMark {
+  background: rgba(220, 38, 38, 0.2);
+  color: #fca5a5;
+}
+
+/* Banner icon circles — light green/red fills need dark-mode tints. */
+:global(html.dark) .banner[data-state="pass"] .bannerIcon {
+  background: rgba(22, 163, 74, 0.2);
+}
+
+:global(html.dark) .banner[data-state="fail"] .bannerIcon {
+  background: rgba(220, 38, 38, 0.2);
+}
+
+:global(html.dark) .banner[data-state="partial"] .bannerIcon {
+  background: rgba(217, 119, 6, 0.2);
+}
+
+/* Retry button uses an explicit white background in light mode. */
+:global(html.dark) .retryBtn {
+  background: var(--mc-bg-subtle);
+  border-color: var(--mc-border);
+  color: var(--mc-text);
+}
+
+:global(html.dark) .retryBtn:hover {
+  background: var(--mc-bg-hover);
+  border-color: #4b5563;
+}
+
+/* Locked-selected choice hover should stay at the dark translucent blue,
+   not flash back to the light mc-blue-50. */
+:global(html.dark) .choice[data-locked="true"][data-selected="true"]:hover {
+  background: rgba(37, 99, 235, 0.18);
 }
