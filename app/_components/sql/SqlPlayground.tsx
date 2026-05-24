@@ -2402,13 +2402,21 @@ function SqlPlaygroundInner() {
             )}
             <Popover.Root>
               <Popover.Trigger
-                className="header-btn icon-only"
-                title="Query history"
-                aria-label="Query history"
-                onClick={openQueryHistoryTab}
-              >
-                <History size={14} aria-hidden="true" />
-              </Popover.Trigger>
+                openOnHover
+                delay={150}
+                closeDelay={400}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="header-btn icon-only"
+                    aria-label="Query history"
+                    onClick={openQueryHistoryTab}
+                  >
+                    <History size={14} aria-hidden="true" />
+                  </button>
+                )}
+              />
               <Popover.Portal>
                 <Popover.Positioner sideOffset={6} align="end">
                   <Popover.Popup className="bui-popup pane-btn-popover">
@@ -2419,13 +2427,21 @@ function SqlPlaygroundInner() {
             </Popover.Root>
             <Popover.Root>
               <Popover.Trigger
-                className="header-btn icon-only"
-                title="ER diagram"
-                aria-label="ER diagram"
-                onClick={openErDiagramTab}
-              >
-                <Network size={14} aria-hidden="true" />
-              </Popover.Trigger>
+                openOnHover
+                delay={150}
+                closeDelay={400}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="header-btn icon-only"
+                    aria-label="ER diagram"
+                    onClick={openErDiagramTab}
+                  >
+                    <Network size={14} aria-hidden="true" />
+                  </button>
+                )}
+              />
               <Popover.Portal>
                 <Popover.Positioner sideOffset={6} align="end">
                   <Popover.Popup className="bui-popup pane-btn-popover">
