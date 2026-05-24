@@ -331,7 +331,7 @@
   gap: 0;
   padding: 0 8px;
   border-bottom: 1px solid var(--ch-border-light);
-  background: var(--ch-tab-bg, var(--ch-neutral-50));
+  background: var(--ch-bg-subtle);
   overflow-x: auto;
   flex-shrink: 0;
 }
