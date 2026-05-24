@@ -95,7 +95,7 @@ type TestState = "pending" | "pass" | "fail";
 interface DisplayedTest {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   state: TestState;
   detail: string | null;
 }
@@ -1782,7 +1782,7 @@ export default function ChallengeCard({
                   </div>
                   <div className={styles.testItemBody}>
                     <div className={styles.testItemName}>{t.name}</div>
-                    <div className={styles.testItemDesc}>{t.description}</div>
+                    {t.description && <div className={styles.testItemDesc}>{t.description}</div>}
                     {t.state === "fail" && t.detail && (
                       <div className={styles.testItemDetail}>{t.detail}</div>
                     )}

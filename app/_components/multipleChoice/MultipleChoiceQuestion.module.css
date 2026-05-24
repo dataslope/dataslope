@@ -389,7 +389,7 @@
   border-radius: 4px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: var(--mc-text-secondary);
+  color: var(--mc-gray-700);
 }
 
 .choiceExplanation p {
