@@ -2736,6 +2736,7 @@ input[type="range"].fs-slider:disabled {
   box-shadow: 0 8px 32px #0008;
   overflow: hidden;
   z-index: 9999;
+  color: var(--text);
   transform-origin: var(--transform-origin, top center);
   transition:
     opacity 0.16s ease,
@@ -2770,7 +2771,6 @@ input[type="range"].fs-slider:disabled {
   padding: 4px 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--text-muted);
   white-space: nowrap;
   pointer-events: none;
 }
