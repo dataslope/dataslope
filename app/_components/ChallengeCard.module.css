@@ -423,11 +423,10 @@
 .instructionsBody code {
   font-family: var(--ch-font-mono);
   font-size: 12px;
-  background: var(--ch-slate-100);
-  border: 1px solid var(--ch-slate-200);
+  background: var(--ch-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--ch-slate-900);
+  color: var(--ch-gray-900);
 }
 
 .instructionsBody ul,
@@ -707,7 +706,24 @@
 /* Init code wrapper — collapsible read-only init panel. */
 .initWrap {
   background: var(--ch-bg-muted);
-  border-bottom: 1px solid var(--ch-border-light);
+  /* bottom edge is the striped divider rendered via ::after */
+}
+
+/* Diagonal-stripe separator between the read-only init panel and the
+   editable editor below. */
+.initWrap::after {
+  content: "";
+  display: block;
+  height: 8px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ch-border-light) 0,
+    var(--ch-border-light) 1px,
+    var(--ch-bg-muted) 1px,
+    var(--ch-bg-muted) 6px
+  );
+  border-top: 1px solid var(--ch-border);
+  border-bottom: 1px solid var(--ch-border);
 }
 
 .initToggle {
@@ -719,7 +735,7 @@
   background: transparent;
   border: none;
   color: var(--ch-text-muted);
-  font-family: var(--ch-font-mono);
+  font-family: var(--ch-font-ui);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -831,16 +847,26 @@
 /* "Click to expand" label centred at the bottom of the fade overlay. */
 .initFadeLabel {
   position: absolute;
-  bottom: 6px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: var(--ch-font-mono);
+  font-family: var(--ch-font-ui);
   font-size: 11px;
   font-weight: 500;
   color: var(--ch-text-muted);
   letter-spacing: 0.03em;
   pointer-events: none;
   white-space: nowrap;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.initFadeLabel::after {
+  content: "⌄";
+  font-size: 13px;
+  line-height: 1;
 }
 
 .initFade:hover .initFadeLabel {
@@ -1847,10 +1873,18 @@
     0 1px 3px color-mix(in srgb, var(--ch-black) 40%, transparent);
 }
 
+/* Match CodeMirror editor background to page background in dark mode —
+   the default dark theme sets #0d1117 which doesn't match #121212. */
+:global(html.dark) .editor :global(.cm-editor),
+:global(html.dark) .editor :global(.cm-scroller),
+:global(html.dark) .initEditor :global(.cm-editor),
+:global(html.dark) .initEditor :global(.cm-scroller) {
+  background-color: var(--ch-bg) !important;
+}
+
 :global(html.dark) .instructionsBody code {
   background: #1f2937;
-  border-color: #374151;
-  color: var(--ch-slate-200);
+  color: #e5e7eb;
 }
 
 :global(html.dark) .hintBox {
@@ -2022,17 +2056,15 @@
 }
 
 .tableViewerEmpty code {
-  background: var(--ch-slate-100);
-  border: 1px solid var(--ch-slate-200);
+  background: var(--ch-gray-100);
   border-radius: 3px;
   padding: 1px 5px;
-  color: var(--ch-slate-900);
+  color: var(--ch-gray-900);
 }
 
 :global(html.dark) .tableViewerEmpty code {
-  background: var(--ch-slate-800);
-  border-color: var(--ch-slate-700);
-  color: var(--ch-slate-200);
+  background: var(--ch-gray-800);
+  color: #e5e7eb;
 }
 
 .tableViewerFootnote {
