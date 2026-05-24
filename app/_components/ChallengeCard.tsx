@@ -1411,8 +1411,8 @@ export default function ChallengeCard({
                 aria-label="Collapse initialization code"
                 onClick={() => setInitExpanded(false)}
               >
-                Click to collapse
                 <ChevronUp size={13} strokeWidth={2} aria-hidden />
+                Click to collapse
               </button>
             )}
           </div>
