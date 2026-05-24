@@ -775,7 +775,7 @@
   color: var(--ch-text-muted);
   font-family: var(--ch-font-ui);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   text-align: left;
 }
@@ -798,6 +798,7 @@
 
 .initLabel {
   flex: 1;
+  letter-spacing: 0;
 }
 
 .initMeta {
