@@ -1662,6 +1662,12 @@ export default function SqlChallengeCard({
             <CopyIcon />
           </button>
         </div>
+        <ChallengeToastViewport
+          toasts={toasts.toasts}
+          onDismiss={toasts.dismiss}
+          className={styles.toastViewport}
+          itemClassName={styles.toast}
+        />
       </div>
 
       {/* ── Result panel ── */}
@@ -1815,12 +1821,6 @@ export default function SqlChallengeCard({
         />
       )}
 
-      <ChallengeToastViewport
-        toasts={toasts.toasts}
-        onDismiss={toasts.dismiss}
-        className={styles.toastViewport}
-        itemClassName={styles.toast}
-      />
     </div>
   );
 }

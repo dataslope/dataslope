@@ -706,7 +706,7 @@
 
 :global(html.dark) .retryBtn:hover {
   background: var(--mc-bg-hover);
-  border-color: #4b5563;
+  border-color: #3a3a3a;
 }
 
 /* Choice hover in dark mode — use the dark bg-hover token instead of the
