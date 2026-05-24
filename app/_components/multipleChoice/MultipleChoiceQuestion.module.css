@@ -295,8 +295,8 @@
   flex-shrink: 0;
   margin-top: 3px;
   cursor: inherit;
-  background: transparent;
-  box-shadow: 0 0 0 1.5px var(--mc-gray-400);
+  background: var(--mc-gray-100);
+  box-shadow: none;
   transition: box-shadow 0.12s, background 0.12s;
 }
 
@@ -354,6 +354,12 @@
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
   overflow-x: auto;
+}
+
+/* Remove top margin when the pre is the very first element in the choice
+   label — no preceding paragraph means no spacing is needed above it. */
+.choiceLabel pre:first-child {
+  margin-top: 0;
 }
 
 .choiceLabel pre code,
@@ -659,6 +665,19 @@
 :global(html.dark) .bodyMd pre,
 :global(html.dark) .choiceLabel pre {
   background: #1a1a1a;
+}
+
+/* Force code inside pre to be transparent so it doesn't show a lighter
+   background (#252525) on top of the pre's #1a1a1a — the higher specificity
+   here beats the general dark-mode code background rule. */
+:global(html.dark) .bodyMd pre code,
+:global(html.dark) .choiceLabel pre code {
+  background: transparent;
+}
+
+/* Unselected radio/checkbox: no ring, subtle fill close to the page bg. */
+:global(html.dark) .choiceInput:not(:checked) {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Choice explanation boxes inside verdict choices use explicit white in
