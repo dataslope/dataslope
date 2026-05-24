@@ -213,11 +213,18 @@ export default function MultipleChoiceQuestion({
             (isSelected || (choice.correct && !isSelected));
           return (
             <div key={choice.id} className={styles.choiceItem}>
-              <label
+              {/* Use <div> rather than <label> so that block-level
+                  content such as fenced code blocks is valid HTML.
+                  Click handling is wired up manually: the outer div
+                  handles mouse clicks on the non-input area, and
+                  stopPropagation on the input prevents a double-toggle
+                  when the input itself is clicked. */}
+              <div
                 className={styles.choice}
                 data-selected={isSelected ? "true" : "false"}
                 data-locked={submitted ? "true" : "false"}
                 data-verdict={verdict}
+                onClick={() => !submitted && toggle(choice.id)}
               >
                 <input
                   className={styles.choiceInput}
@@ -227,6 +234,7 @@ export default function MultipleChoiceQuestion({
                   checked={isSelected}
                   disabled={submitted}
                   onChange={() => toggle(choice.id)}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 <div className={styles.choiceContent}>
                   <div className={styles.choiceLabel}>
@@ -254,7 +262,7 @@ export default function MultipleChoiceQuestion({
                     )}
                   </span>
                 ) : null}
-              </label>
+              </div>
             </div>
           );
         })}

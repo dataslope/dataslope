@@ -197,9 +197,12 @@ export function parseQuestion(source: string): ParsedQuestion {
         continue;
       }
 
-      // Inside a code fence every indented line (including lines that
-      // look like blockquotes) belongs to the current choice verbatim.
-      if (inChoiceFence && /^ {2,}/.test(line)) {
+      // Inside a code fence every non-blank line belongs to the current
+      // choice verbatim.  Indentation is NOT required — the MDX/Turbopack
+      // compiler strips the 2-space choice-level indent from template
+      // literals before the runtime string is evaluated, so fence content
+      // arrives at the parser with no leading whitespace.
+      if (inChoiceFence) {
         flushFenceBlanks();
         appendToChoiceText(trimmed);
         // Detect the closing fence marker.

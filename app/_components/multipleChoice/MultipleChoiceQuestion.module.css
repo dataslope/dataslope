@@ -587,17 +587,22 @@
    structural rules above untouched. The Fumadocs root toggles
    `html.dark`, so we scope via :global(html.dark). */
 :global(html.dark) .card {
-  --mc-bg: #0f172a;
-  --mc-bg-muted: #111827;
-  --mc-bg-subtle: #1e293b;
+  /* Match the Fumadocs page background so the card surface blends with
+     the surrounding chrome. Falls back to gray-900 when Fumadocs vars
+     are not present (e.g. isolated Storybook / unit-test environments).
+     All surface tokens use black-based colour-mix so they stay neutral
+     — no blue-tinted slate values. */
+  --mc-bg: var(--color-fd-background, #111827);
+  --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
+  --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --mc-bg-hover: #1f2937;
-  --mc-border: #334155;
-  --mc-border-light: #1e293b;
+  --mc-border: #374151;
+  --mc-border-light: #1f2937;
   --mc-text: #e5e7eb;
-  --mc-text-secondary: #94a3b8;
-  --mc-text-muted: #64748b;
-  --mc-badge-bg: rgba(59, 130, 246, 0.15);
-  --mc-badge-border: rgba(59, 130, 246, 0.35);
+  --mc-text-secondary: #9ca3af;
+  --mc-text-muted: #6b7280;
+  --mc-badge-bg: color-mix(in srgb, var(--mc-blue-500) 14%, transparent);
+  --mc-badge-border: color-mix(in srgb, var(--mc-blue-500) 32%, transparent);
   --mc-badge-color: #93c5fd;
 }
 
@@ -635,13 +640,13 @@
 :global(html.dark) .choiceLabel code,
 :global(html.dark) .bodyMd code,
 :global(html.dark) .overallBody code {
-  background: #1e293b;
-  border-color: #334155;
+  background: #1f2937;
+  border-color: #374151;
   color: #e2e8f0;
 }
 
 :global(html.dark) .bodyMd pre,
 :global(html.dark) .choiceLabel pre {
-  background: #1e293b;
-  border-color: #334155;
+  background: #1f2937;
+  border-color: #374151;
 }
