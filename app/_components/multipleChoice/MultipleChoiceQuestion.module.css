@@ -419,7 +419,7 @@
   gap: 6px;
   background: var(--mc-accent);
   color: var(--mc-white);
-  border: 1px solid var(--mc-accent);
+  border: none;
   border-radius: 6px;
   padding: 7px 14px;
   font-family: var(--mc-font-ui);
@@ -582,8 +582,8 @@
   --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --mc-bg-hover: #1f2937;
-  --mc-border: #374151;
-  --mc-border-light: #1f2937;
+  --mc-border: #2e2e2e;
+  --mc-border-light: #232323;
   --mc-text: #e5e7eb;
   --mc-text-secondary: #9ca3af;
   --mc-text-muted: #6b7280;

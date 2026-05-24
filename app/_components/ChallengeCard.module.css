@@ -1003,7 +1003,6 @@
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--ch-black) 12%, transparent),
     0 8px 24px color-mix(in srgb, var(--ch-black) 22%, transparent);
-  padding: 4px;
   min-width: 240px;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   outline: none;
@@ -1842,8 +1841,8 @@
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --ch-bg-hover: #1f2937;
-  --ch-border: var(--ch-gray-800);
-  --ch-border-light: #1f2937;
+  --ch-border: #2e2e2e;
+  --ch-border-light: #232323;
   --ch-text: var(--ch-gray-200);
   --ch-text-secondary: var(--ch-slate-300);
   --ch-text-muted: var(--ch-slate-400);
