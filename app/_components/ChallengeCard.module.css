@@ -171,6 +171,7 @@
   width: 13px;
   height: 13px;
   flex-shrink: 0;
+  color: var(--ch-gray-900);
 }
 
 .badge {
@@ -2004,6 +2005,10 @@
 :global(html.dark) .modalEditor :global(.cm-editor),
 :global(html.dark) .modalEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
+}
+
+:global(html.dark) .headerRuntimeLabel svg {
+  color: #ffffff;
 }
 
 :global(html.dark) .instructionsBody code {
