@@ -207,7 +207,6 @@
   margin: 8px 0;
   padding: 12px 14px;
   background: var(--mc-bg-subtle);
-  border: 1px solid var(--mc-border-light);
   border-radius: 5px;
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
@@ -290,12 +289,14 @@
    focus ring + accent-color does most of the heavy lifting and looks
    consistent with form controls elsewhere in fumadocs. */
 .choiceInput {
-  margin-top: 3px;
-  width: 14px;
-  height: 14px;
-  accent-color: var(--mc-accent);
-  flex-shrink: 0;
-  cursor: inherit;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 .choiceLabel {
@@ -324,7 +325,6 @@
   margin: 8px 0 0;
   padding: 12px 14px;
   background: var(--mc-bg-subtle);
-  border: 1px solid var(--mc-border-light);
   border-radius: 5px;
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
@@ -682,5 +682,20 @@
 :global(html.dark) .retryBtn:hover {
   background: var(--mc-bg-hover);
   border-color: #4b5563;
+}
+
+/* Choice hover in dark mode — use the dark bg-hover token instead of the
+   light gray-50 that the base rule references directly. */
+:global(html.dark) .choice:not([data-locked="true"]):hover {
+  background: var(--mc-bg-hover);
+}
+
+/* Disabled submit button is too vivid (blue-300) in dark mode — tone it
+   down to a dim translucent blue so it reads as inactive. */
+:global(html.dark) .submitBtn:disabled {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.22);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
 }
 

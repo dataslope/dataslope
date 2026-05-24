@@ -250,6 +250,11 @@ h6 {
   margin-bottom: 0;
 }
 
+/* Remove the border Tailwind Typography adds to inline <code> elements. */
+.prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  border: none;
+}
+
 /* Suppress the default hljs padding/background — our <pre> handles both. */
 pre code.hljs {
   display: block;

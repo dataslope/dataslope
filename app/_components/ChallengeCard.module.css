@@ -502,7 +502,6 @@
   margin: 6px 0 8px;
   padding: 8px 10px;
   background: var(--ch-bg-subtle);
-  border: 1px solid var(--ch-border-light);
   border-radius: 5px;
   font-family: var(--ch-font-mono);
   font-size: 12px;
