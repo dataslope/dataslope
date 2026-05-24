@@ -120,4 +120,80 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
     expect(q.choices).toHaveLength(2);
     expect(q.choices[1].correct).toBe(true);
   });
+
+  it("parses a fenced code block that starts on the choice line", () => {
+    const src = `Which snippet correctly creates a pandas DataFrame?
+
+- \`\`\`python
+  import pandas
+  pd = pandas.DataFrame()
+  \`\`\`
+  > Missing the conventional pd alias import.
+- [o] \`\`\`python
+  import pandas as pd
+
+  df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
+  \`\`\`
+  > Correct — imports pandas as pd and creates the DataFrame properly.
+- \`\`\`python
+  import numpy as np
+  df = np.array([[1, 2], [3, 4]])
+  \`\`\`
+  > np.array creates an ndarray, not a DataFrame.`;
+
+    const q = parseQuestion(src);
+    expect(q.choices).toHaveLength(3);
+    // The correct choice contains the blank line inside the fence.
+    expect(q.choices[1].correct).toBe(true);
+    expect(q.choices[1].text).toContain("```python");
+    expect(q.choices[1].text).toContain('pd.DataFrame({"A"');
+    // Blank line inside the fence must be preserved.
+    expect(q.choices[1].text).toMatch(/import pandas as pd\n\n/);
+    // Closing fence is captured.
+    expect(q.choices[1].text).toMatch(/```\s*$/);
+    // Explanation is separate from the code block.
+    expect(q.choices[1].explanation).toContain("Correct");
+    expect(q.multiAnswer).toBe(false);
+    expect(q.correctIds).toEqual(["1"]);
+  });
+
+  it("parses a fenced code block opened as a continuation line", () => {
+    const src = `Pick one.
+
+- Consider this snippet:
+  \`\`\`python
+  x = 1 + 2
+  \`\`\`
+- [o] Correct`;
+
+    const q = parseQuestion(src);
+    expect(q.choices[0].text).toContain("Consider this snippet:");
+    expect(q.choices[0].text).toContain("```python");
+    expect(q.choices[0].text).toContain("x = 1 + 2");
+    expect(q.choices[1].text).toBe("Correct");
+  });
+
+  it("handles multiple fenced code-block choices followed by an explanation", () => {
+    const src = `Which of the following are valid ways to create a list in Python?
+
+- [o] \`\`\`python
+  my_list = [1, 2, 3]
+  \`\`\`
+- \`\`\`python
+  my_list = (1, 2, 3)
+  \`\`\`
+  > This creates a tuple, not a list.
+- [o] \`\`\`python
+  my_list = list(range(3))
+  \`\`\`
+
+Lists are ordered, mutable sequences in Python.`;
+
+    const q = parseQuestion(src);
+    expect(q.multiAnswer).toBe(true);
+    expect(q.correctIds).toEqual(["0", "2"]);
+    expect(q.choices[0].text).toContain("[1, 2, 3]");
+    expect(q.choices[1].explanation).toContain("tuple");
+    expect(q.explanation).toContain("mutable sequences");
+  });
 });

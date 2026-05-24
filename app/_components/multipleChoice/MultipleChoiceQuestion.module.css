@@ -85,7 +85,7 @@
   overflow: hidden;
   font-family: var(--mc-font-ui);
   color: var(--mc-text);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   margin: 1rem 0;
   position: relative;
@@ -104,7 +104,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -124,7 +124,7 @@
 }
 
 .modeLabel {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--mc-text-muted);
   display: inline-flex;
   align-items: center;
@@ -132,8 +132,8 @@
 }
 
 .modeLabel svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
 }
 
 .headerStatus {
@@ -141,7 +141,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--mc-text-secondary);
 }
 
@@ -157,7 +157,7 @@
 }
 
 .bodyMd {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.65;
   color: var(--mc-text);
 }
@@ -181,7 +181,7 @@
 
 .bodyMd code {
   font-family: var(--mc-font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   background: var(--mc-slate-100);
   border: 1px solid var(--mc-slate-200);
   border-radius: 4px;
@@ -206,16 +206,17 @@
 
 .bodyMd pre {
   margin: 8px 0;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--mc-bg-subtle);
   border: 1px solid var(--mc-border-light);
   border-radius: 5px;
   font-family: var(--mc-font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   overflow-x: auto;
 }
 
-.bodyMd pre code {
+.bodyMd pre code,
+.bodyMd pre code.hljs {
   background: transparent;
   border: none;
   padding: 0;
@@ -225,7 +226,6 @@
 /* ─── Choices ────────────────────────────────────────────────────── */
 
 .choiceList {
-  list-style: none;
   margin: 0;
   padding: 14px 20px 4px;
   display: flex;
@@ -233,7 +233,7 @@
   gap: 2px;
 }
 
-.choiceList li {
+.choiceItem {
   margin: 4px 0;
 }
 
@@ -314,7 +314,7 @@
   flex: 1;
   min-width: 0;
   color: var(--mc-text);
-  font-size: 13.5px;
+  font-size: 14.5px;
   line-height: 1.55;
 }
 
@@ -324,12 +324,32 @@
 
 .choiceLabel code {
   font-family: var(--mc-font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   background: var(--mc-slate-100);
   border: 1px solid var(--mc-slate-200);
   border-radius: 4px;
   padding: 1px 5px;
   color: var(--mc-slate-900);
+}
+
+/* Code blocks inside choice labels (multi-line code answers). */
+.choiceLabel pre {
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  background: var(--mc-bg-subtle);
+  border: 1px solid var(--mc-border-light);
+  border-radius: 5px;
+  font-family: var(--mc-font-mono);
+  font-size: 13.5px;
+  overflow-x: auto;
+}
+
+.choiceLabel pre code,
+.choiceLabel pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
 }
 
 .choiceMark {
@@ -360,7 +380,7 @@
   border-left: 3px solid var(--mc-border);
   background: var(--mc-bg-subtle);
   border-radius: 4px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   line-height: 1.6;
   color: var(--mc-text-secondary);
 }
@@ -416,7 +436,7 @@
   border-radius: 6px;
   padding: 7px 14px;
   font-family: var(--mc-font-ui);
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s;
@@ -443,7 +463,7 @@
   border-radius: 6px;
   padding: 7px 12px;
   font-family: var(--mc-font-ui);
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s, color 0.12s;
@@ -457,7 +477,7 @@
 
 .actionHint {
   margin-left: auto;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--mc-text-muted);
 }
 
@@ -469,7 +489,7 @@
   gap: 12px;
   padding: 12px 20px;
   border-top: 1px solid var(--mc-border-light);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -514,7 +534,7 @@
 }
 
 .bannerSub {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   opacity: 0.85;
   margin-left: 4px;
@@ -529,7 +549,7 @@
 }
 
 .overallLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -538,7 +558,7 @@
 }
 
 .overallBody {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
   color: var(--mc-text-secondary);
 }
@@ -553,7 +573,7 @@
 
 .overallBody code {
   font-family: var(--mc-font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   background: var(--mc-slate-100);
   border: 1px solid var(--mc-slate-200);
   border-radius: 4px;
@@ -618,4 +638,10 @@
   background: #1e293b;
   border-color: #334155;
   color: #e2e8f0;
+}
+
+:global(html.dark) .bodyMd pre,
+:global(html.dark) .choiceLabel pre {
+  background: #1e293b;
+  border-color: #334155;
 }
