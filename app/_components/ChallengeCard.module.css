@@ -329,36 +329,53 @@
   display: flex;
   align-items: stretch;
   gap: 0;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--ch-border-light);
   background: var(--ch-bg-subtle);
+  border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
+  scrollbar-width: none;
   flex-shrink: 0;
+  user-select: none;
+}
+
+.modalTabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .modalTab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 7px 14px;
   font-size: 12px;
   font-family: var(--ch-font-mono);
-  color: var(--ch-text-secondary);
+  color: var(--ch-text-muted);
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-right: 1px solid var(--ch-border-light);
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.12s, border-color 0.12s;
+  position: relative;
+  transition: background 0.12s, color 0.12s;
 }
 
 .modalTab:hover {
+  background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 
 .modalTabActive {
+  background: var(--ch-bg);
   color: var(--ch-text);
-  border-bottom-color: var(--ch-accent, var(--ch-blue-600));
+}
+
+.modalTabActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ch-accent);
 }
 
 .modalTabHint {
@@ -950,7 +967,12 @@
   border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
+  scrollbar-width: none;
   user-select: none;
+}
+
+.fileTabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .fileTab {
@@ -978,7 +1000,6 @@
 .fileTabActive {
   background: var(--ch-bg);
   color: var(--ch-text);
-  font-weight: 600;
 }
 
 .fileTabActive::after {
@@ -1969,7 +1990,9 @@
 :global(html.dark) .editor :global(.cm-editor),
 :global(html.dark) .editor :global(.cm-scroller),
 :global(html.dark) .initEditor :global(.cm-editor),
-:global(html.dark) .initEditor :global(.cm-scroller) {
+:global(html.dark) .initEditor :global(.cm-scroller),
+:global(html.dark) .modalEditor :global(.cm-editor),
+:global(html.dark) .modalEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
 }
 
