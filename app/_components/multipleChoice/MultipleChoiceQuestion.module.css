@@ -57,7 +57,7 @@
   --mc-bg: var(--mc-white);
   --mc-bg-muted: var(--mc-neutral-50);
   --mc-bg-subtle: var(--mc-gray-50);
-  --mc-bg-hover: var(--mc-zinc-100);
+  --mc-bg-hover: var(--mc-gray-100);
   --mc-border: var(--mc-gray-200);
   --mc-border-light: var(--mc-gray-100);
   --mc-text: var(--mc-gray-900);
@@ -581,7 +581,7 @@
   --mc-bg: var(--color-fd-background, #111827);
   --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
-  --mc-bg-hover: #1f2937;
+  --mc-bg-hover: #222222;
   --mc-border: #2e2e2e;
   --mc-border-light: #232323;
   --mc-text: #e5e7eb;

@@ -76,7 +76,7 @@
   --ch-bg: var(--ch-white);
   --ch-bg-muted: var(--ch-neutral-50);
   --ch-bg-subtle: var(--ch-gray-50);
-  --ch-bg-hover: var(--ch-zinc-100);
+  --ch-bg-hover: var(--ch-gray-100);
   --ch-border: var(--ch-gray-200);
   --ch-border-light: var(--ch-gray-100);
   --ch-text: var(--ch-gray-900);
@@ -1840,7 +1840,7 @@
   --ch-bg: var(--color-fd-background, var(--ch-slate-900));
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
-  --ch-bg-hover: #1f2937;
+  --ch-bg-hover: #222222;
   --ch-border: #2e2e2e;
   --ch-border-light: #232323;
   --ch-text: var(--ch-gray-200);
