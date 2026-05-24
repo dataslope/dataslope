@@ -1387,7 +1387,10 @@ export default function ChallengeCard({
                 title="Expand initialization code"
                 onClick={() => setInitExpanded(true)}
               >
-                <span className={styles.initFadeLabel}>Click to expand</span>
+                <span className={styles.initFadeLabel}>
+                  Click to expand
+                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                </span>
               </button>
             )}
           </div>

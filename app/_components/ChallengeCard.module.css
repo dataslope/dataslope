@@ -863,10 +863,8 @@
   gap: 1px;
 }
 
-.initFadeLabel::after {
-  content: "⌄";
-  font-size: 13px;
-  line-height: 1;
+.initFadeLabel svg {
+  display: block;
 }
 
 .initFade:hover .initFadeLabel {

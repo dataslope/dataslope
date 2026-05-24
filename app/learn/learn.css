@@ -242,6 +242,14 @@ h6 {
   background-color: #67060c;
 }
 
+/* Remove the default vertical margins Tailwind Typography adds to <li>
+   elements — the .5em top/bottom spacing is too loose for tightly-packed
+   instruction lists inside challenge and quiz cards. */
+.prose :where(li):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 /* Suppress the default hljs padding/background — our <pre> handles both. */
 pre code.hljs {
   display: block;

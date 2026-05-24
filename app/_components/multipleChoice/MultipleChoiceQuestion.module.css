@@ -248,9 +248,8 @@
   position: relative;
 }
 
-.choice:hover {
-  background: var(--mc-bg-hover);
-  border-color: var(--mc-gray-300);
+.choice:not([data-locked="true"]):hover {
+  background: var(--mc-gray-50);
 }
 
 .choice[data-selected="true"] {
@@ -261,16 +260,6 @@
 
 .choice[data-locked="true"] {
   cursor: default;
-}
-
-.choice[data-locked="true"]:hover {
-  background: var(--mc-bg);
-  border-color: var(--mc-border);
-}
-
-.choice[data-locked="true"][data-selected="true"]:hover {
-  background: var(--mc-blue-50);
-  border-color: var(--mc-accent);
 }
 
 /* Post-submit verdicts. */
@@ -695,8 +684,3 @@
   border-color: #4b5563;
 }
 
-/* Locked-selected choice hover should stay at the dark translucent blue,
-   not flash back to the light mc-blue-50. */
-:global(html.dark) .choice[data-locked="true"][data-selected="true"]:hover {
-  background: rgba(37, 99, 235, 0.18);
-}
