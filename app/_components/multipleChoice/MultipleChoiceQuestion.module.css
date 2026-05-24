@@ -153,7 +153,6 @@
 
 .body {
   padding: 4px 20px 14px;
-  border-bottom: 1px solid var(--mc-border-light);
 }
 
 .bodyMd {
@@ -225,7 +224,7 @@
 
 .choiceList {
   margin: 0;
-  padding: 14px 20px 4px;
+  padding: 14px 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -297,12 +296,13 @@
 }
 
 .choiceInput:checked {
-  background: var(--mc-gray-500);
+  background: var(--mc-gray-900);
   box-shadow: 0 0 0 1.5px var(--mc-gray-400);
 }
 
 .choiceInput[type="radio"]:checked {
-  background: radial-gradient(circle, #fff 35%, var(--mc-gray-500) 36%);
+  background: radial-gradient(circle, #fff 30%, var(--mc-gray-900) 31%);
+  box-shadow: none;
 }
 
 .choiceInput[type="checkbox"]:checked {
@@ -561,7 +561,7 @@
 .overallBody {
   font-size: 14px;
   line-height: 1.7;
-  color: var(--mc-text-secondary);
+  color: var(--mc-gray-700);
 }
 
 .overallBody p {
@@ -729,13 +729,21 @@
   color: #ffffff;
 }
 
-/* Neutral (gray) checked state for radio/checkbox inputs in dark mode. */
+/* Neutral checked state for radio/checkbox inputs in dark mode.
+   Use background-color (not the background shorthand) so it doesn't
+   reset background-image, which would hide the checkbox checkmark. */
 :global(html.dark) .choiceInput:checked {
-  background: rgba(255, 255, 255, 0.4);
+  background-color: var(--mc-gray-900);
   box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25);
 }
 
 :global(html.dark) .choiceInput[type="radio"]:checked {
-  background: radial-gradient(circle, var(--mc-bg) 35%, rgba(255, 255, 255, 0.4) 36%);
+  background: radial-gradient(circle, white 30%, #fff6 31%);
+  box-shadow: none;
+}
+
+/* Overall explanation paragraph text is white in dark mode. */
+:global(html.dark) .overallBody {
+  color: #ffffff;
 }
 
