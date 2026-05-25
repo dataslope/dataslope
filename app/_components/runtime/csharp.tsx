@@ -148,6 +148,21 @@ record Triangle(double Base, double Height)          : Shape;
 `,
   },
   {
+    key: "remote_http",
+    title: "Remote HTTP",
+    desc: "Fetch text with HttpClient",
+    code: `using System.Net.Http;
+
+using var client = new HttpClient();
+var csv = await client.GetStringAsync("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv");
+
+foreach (var line in csv.Split('\\n').Take(6))
+{
+    Console.WriteLine(line);
+}
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "Top-level Program.cs that uses a Greeter class from another file",
@@ -486,7 +501,7 @@ export const csharpAdapter: LanguageAdapter = {
     engine: "Roslyn (CSharpScript) on Mono / .NET WebAssembly",
     engineUrl: "https://learn.microsoft.com/dotnet/core/wasm/",
     notes:
-      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) and the resulting IL is executed by the .NET runtime compiled to WebAssembly — no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`).",
+      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) and the resulting IL is executed by the .NET runtime compiled to WebAssembly — no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`). HttpClient calls are routed through Dataslope's CORS proxy.",
   },
   // CodeMirror's clike mode handles C#. `text/x-csharp` is the
   // standard MIME alias for C# inside that mode.

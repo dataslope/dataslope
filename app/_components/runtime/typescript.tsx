@@ -219,6 +219,24 @@ console.log(JSON.stringify(safe[1], null, 2));
 `,
   },
   {
+    key: "remote_fetch",
+    title: "Remote Fetch",
+    desc: "Fetch typed JSON from a URL",
+    code: `interface Repo {
+  full_name: string;
+  stargazers_count: number;
+  default_branch: string;
+}
+
+const response = await fetch("https://api.github.com/repos/dataslope/dataslope");
+const repo = (await response.json()) as Repo;
+
+console.log("Repository:", repo.full_name);
+console.log("Stars:", repo.stargazers_count);
+console.log("Default branch:", repo.default_branch);
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "Import a typed helper module alongside index.ts",
@@ -327,7 +345,7 @@ export const typescriptAdapter: LanguageAdapter = {
     engine: "TypeScript 5.7 → almostnode (browser-native Node.js)",
     engineUrl: "https://almostnode.dev/",
     notes:
-      "Code is transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
+      "Code is transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser. External fetch/http calls are routed through Dataslope's CORS proxy.",
   },
   // CodeMirror v5 exposes TypeScript via the `text/typescript` MIME alias.
   codeMirrorMode: "text/typescript",

@@ -187,6 +187,29 @@ public class Main {
 `,
   },
   {
+    key: "remote_url",
+    title: "Remote URL",
+    desc: "Read text from a URL",
+    code: `import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        URL url = new URL("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+
+        for (int i = 0; i < 6; i++) {
+            String line = reader.readLine();
+            if (line == null) break;
+            System.out.println(line);
+        }
+        reader.close();
+    }
+}
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "Use a Greeter class defined in a separate Greeter.java",
@@ -666,7 +689,7 @@ export const javaAdapter: LanguageAdapter = {
     engine: "CheerpJ (OpenJDK + javac, WebAssembly)",
     engineUrl: "https://cheerpj.com/",
     notes:
-      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ — a full OpenJDK runtime in WebAssembly. No server roundtrip. Pure-AOT alternatives like TeaVM aren't a fit for an in-browser playground because they require a JVM at compile time.",
+      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ — a full OpenJDK runtime in WebAssembly. No server roundtrip. HTTP URL reads are routed through Dataslope's CORS proxy.",
   },
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.

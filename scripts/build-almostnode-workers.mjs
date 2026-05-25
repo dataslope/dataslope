@@ -45,6 +45,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const OUT_DIR = join(ROOT, "public", "_workers");
 const SRC_DIR = join(ROOT, "app", "_components", "runtime");
+const DEFAULT_CORS_PROXY_URL =
+  "https://dataslope-cors-proxy.subwaymatch.workers.dev";
 
 await rm(OUT_DIR, { recursive: true, force: true });
 await mkdir(OUT_DIR, { recursive: true });
@@ -99,6 +101,11 @@ const common = {
   // browser-vs-worker package exports pick the right entry.
   conditions: ["worker", "browser", "import", "default"],
   plugins: [stubNodeBuiltins],
+  define: {
+    "process.env.NEXT_PUBLIC_CORS_PROXY_URL": JSON.stringify(
+      process.env.NEXT_PUBLIC_CORS_PROXY_URL || DEFAULT_CORS_PROXY_URL,
+    ),
+  },
   // almostnode's bundle pulls in `comlink` which references
   // `MessageChannel` etc. — all worker-safe globals.
 };

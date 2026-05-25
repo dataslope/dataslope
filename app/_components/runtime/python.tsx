@@ -285,6 +285,20 @@ print(f"  Intercept  : {model.intercept_:+,.0f}")
 `,
   },
   {
+    key: "remote_csv",
+    title: "Remote CSV",
+    desc: "Load a CSV from a URL with pandas",
+    code: `import pandas as pd
+
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+df = pd.read_csv(url)
+
+print(df.head())
+print("\\nSpecies counts:")
+print(df["species"].value_counts())
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "Import a helper module defined alongside main.py",
@@ -748,7 +762,8 @@ export const pythonAdapter: LanguageAdapter = {
     version: "3.13.2",
     engine: "Pyodide 0.29.4",
     engineUrl: "https://pyodide.org",
-    notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
+    notes:
+      "Runs in a Web Worker so the UI stays responsive while your code executes. HTTP(S) data URLs are routed through Dataslope's CORS proxy.",
   },
   codeMirrorMode: "python",
   examples: EXAMPLES,

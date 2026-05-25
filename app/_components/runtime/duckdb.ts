@@ -23,6 +23,7 @@ import {
   DUCKDB_BLANK_DATABASE,
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
+import { CORS_PROXY_BASE, proxiedUrl } from "./corsProxy";
 
 // ─── Local type shim for @duckdb/duckdb-wasm ─────────────────────────
 // Only the small surface area we actually touch is typed. The shim
@@ -139,6 +140,17 @@ async function getDuckDbInstance(): Promise<{
 
 function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
+}
+
+function basenameFromUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const name = parsed.pathname.split("/").filter(Boolean).pop();
+    return name ? decodeURIComponent(name) : "remote_file";
+  } catch {
+    const name = url.split("/").filter(Boolean).pop();
+    return name || "remote_file";
+  }
 }
 
 const FK_ACTIONS = new Set([
@@ -480,6 +492,9 @@ export interface DuckDbEngine {
   /** Register a file's bytes with DuckDB's virtual filesystem so it
    *  can be queried via `read_csv_auto`, `read_parquet`, `read_json_auto`, … */
   registerFileBuffer: (name: string, buffer: Uint8Array) => Promise<void>;
+  /** Fetch a remote file through the CORS proxy and register it with
+   *  DuckDB's virtual filesystem. Returns the registered file name. */
+  registerRemoteFile: (url: string, name?: string) => Promise<string>;
   /** Read the bytes of a previously registered virtual-filesystem file
    *  (e.g. so the user can download it). Returns null if the file isn't
    *  registered or the WASM build lacks `copyFileToBuffer`. */
@@ -1438,6 +1453,21 @@ export async function createDuckDbEngine(
     async registerFileBuffer(name, buffer) {
       const { db } = await getDuckDbInstance();
       await db.registerFileBuffer(name, buffer);
+    },
+
+    async registerRemoteFile(url, name) {
+      const fetchUrl = CORS_PROXY_BASE ? proxiedUrl(url) : url;
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+        );
+      }
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      const fileName = name ?? basenameFromUrl(url);
+      const { db } = await getDuckDbInstance();
+      await db.registerFileBuffer(fileName, bytes);
+      return fileName;
     },
 
     async readFileBuffer(name) {

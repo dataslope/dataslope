@@ -14,6 +14,7 @@
 // origin sandbox) buys nothing here.
 
 import { VirtualFS, Runtime } from "almostnode";
+import { CORS_PROXY_BASE, proxiedUrl, shouldProxyUrl } from "./corsProxy";
 
 // ─── Console arg formatting ─────────────────────────────────────────
 //
@@ -104,6 +105,34 @@ export function wrapEntryAsAsyncIIFE(source: string): string {
 
 // ─── Runtime execution ──────────────────────────────────────────────
 
+const PROXY_FETCH_INSTALLED = Symbol.for("dataslope.corsProxyFetchInstalled");
+
+export function installProxyFetch(proxyBase = CORS_PROXY_BASE): void {
+  const global = self as unknown as {
+    fetch: typeof fetch;
+    [PROXY_FETCH_INSTALLED]?: boolean;
+  };
+  if (!proxyBase || global[PROXY_FETCH_INSTALLED]) return;
+
+  const originalFetch = global.fetch.bind(global);
+  global.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+    if (!shouldProxyUrl(url, proxyBase)) return originalFetch(input, init);
+
+    const proxyUrl = proxiedUrl(url, proxyBase);
+    if (typeof input === "string" || input instanceof URL) {
+      return originalFetch(proxyUrl, init);
+    }
+    return originalFetch(new Request(proxyUrl, input), init);
+  };
+  global[PROXY_FETCH_INSTALLED] = true;
+}
+
 export interface ConsoleSink {
   stdout(content: string): void;
   stderr(content: string): void;
@@ -117,6 +146,7 @@ export async function runEntry(
   entryVfsPath: string,
   sink: ConsoleSink,
 ): Promise<void> {
+  installProxyFetch();
   const runtime = new Runtime(vfs, {
     onConsole: (method, args) => {
       const text = args.map(formatArg).join(" ");

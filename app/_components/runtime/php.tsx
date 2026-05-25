@@ -153,6 +153,19 @@ foreach ($letters as $ch => $n) {
 `,
   },
   {
+    key: "remote_json",
+    title: "Remote JSON",
+    desc: "Fetch and decode JSON from a URL",
+    code: `<?php
+$json = file_get_contents("https://api.github.com/repos/dataslope/dataslope");
+$repo = json_decode($json, true);
+
+echo "Repository: " . $repo["full_name"] . "\\n";
+echo "Stars: " . $repo["stargazers_count"] . "\\n";
+echo "Default branch: " . $repo["default_branch"] . "\\n";
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "require a helper file alongside index.php",
@@ -259,7 +272,7 @@ export const phpAdapter: LanguageAdapter = {
     engine: "php-wasm",
     engineUrl: "https://github.com/seanmorris/php-wasm",
     notes:
-      "PHP compiled to WebAssembly — runs entirely in the browser, no server roundtrip.",
+      "PHP compiled to WebAssembly — runs entirely in the browser, no server roundtrip. Basic HTTP(S) reads are routed through Dataslope's CORS proxy; fetch_url() is available as a helper.",
   },
   codeMirrorMode: "php",
   examples: EXAMPLES,

@@ -177,6 +177,18 @@ console.log(\`\\nAverage score: \${avg.toFixed(1)}\`);
 `,
   },
   {
+    key: "remote_fetch",
+    title: "Remote Fetch",
+    desc: "Fetch JSON from a URL",
+    code: `const response = await fetch("https://api.github.com/repos/dataslope/dataslope");
+const repo = await response.json();
+
+console.log("Repository:", repo.full_name);
+console.log("Stars:", repo.stargazers_count);
+console.log("Default branch:", repo.default_branch);
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "require() a helper module alongside index.js",
@@ -288,7 +300,7 @@ export const javascriptAdapter: LanguageAdapter = {
     engine: "almostnode (browser-native Node.js)",
     engineUrl: "https://almostnode.dev/",
     notes:
-      "Runs in a Web Worker on top of almostnode — multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
+      "Runs in a Web Worker on top of almostnode — multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser. External fetch/http calls are routed through Dataslope's CORS proxy.",
   },
   codeMirrorMode: "javascript",
   examples: EXAMPLES,

@@ -197,6 +197,10 @@ SELECT * FROM (VALUES
 
 const PARQUET_DEMO_TABS: QueryTabSeed[] = [
   {
+    title: "Remote CSV URL",
+    code: `-- Remote HTTP(S) files are fetched through Dataslope's CORS proxy.\n-- You can query them directly with DuckDB's httpfs-backed readers:\nSELECT species,\n       COUNT(*) AS rows,\n       ROUND(AVG(sepal_length), 2) AS avg_sepal_length\nFROM read_csv_auto('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')\nGROUP BY species\nORDER BY species;`,
+  },
+  {
     title: "Read your own files",
     code: `-- Drag a Parquet, CSV, or JSON file onto the playground (Import\n-- → Parquet/CSV/JSON) and DuckDB will register it in the virtual\n-- filesystem. You can then query it directly with read_parquet,\n-- read_csv_auto, or read_json_auto without creating a table:\n--\n--   SELECT * FROM read_parquet('your_file.parquet');\n--   SELECT * FROM read_csv_auto('your_file.csv');\n--   SELECT * FROM read_json_auto('your_file.json');\n--\n-- For now, here is the inline measurements sample:\nSELECT station,\n       AVG(temp_c) AS avg_temp,\n       SUM(rain_mm) AS total_rain\nFROM measurements\nGROUP BY station\nORDER BY station;`,
   },

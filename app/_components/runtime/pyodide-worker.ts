@@ -15,6 +15,7 @@
 // thread (see message types below).
 
 import type { PyodideInterface } from "pyodide";
+import { CORS_PROXY_BASE } from "./corsProxy";
 
 // Dedicated workers expose `self` as a `DedicatedWorkerGlobalScope`. We
 // also rely on the global `loadPyodide` that `pyodide.js` adds when it's
@@ -122,6 +123,38 @@ async function initPyodide(): Promise<void> {
   // Set up display() and a matplotlib show() patch that captures figures
   // as base64 PNGs into _display_outputs.
   await pyodide.runPythonAsync(`
+import urllib.request as _ds_urllib_request
+from urllib.parse import quote as _ds_quote
+from pyodide.http import pyfetch as _ds_pyfetch
+
+_DS_PROXY_BASE = ${JSON.stringify(CORS_PROXY_BASE)}
+_ds_orig_urlopen = _ds_urllib_request.urlopen
+
+def _ds_should_proxy_url(url):
+    return (
+        bool(_DS_PROXY_BASE)
+        and isinstance(url, str)
+        and (url.startswith("http://") or url.startswith("https://"))
+        and not url.startswith(_DS_PROXY_BASE)
+    )
+
+def _ds_proxy_url(url):
+    return _DS_PROXY_BASE + "/?url=" + _ds_quote(url, safe="")
+
+def _ds_proxied_urlopen(url, *args, **kwargs):
+    if _ds_should_proxy_url(url):
+        url = _ds_proxy_url(url)
+    elif hasattr(url, "full_url") and _ds_should_proxy_url(url.full_url):
+        url.full_url = _ds_proxy_url(url.full_url)
+    return _ds_orig_urlopen(url, *args, **kwargs)
+
+async def fetch(url, **kwargs):
+    if _ds_should_proxy_url(url):
+        url = _ds_proxy_url(url)
+    return await _ds_pyfetch(url, **kwargs)
+
+_ds_urllib_request.urlopen = _ds_proxied_urlopen
+
 import sys, io, base64, json, ast as _ast
 import matplotlib
 matplotlib.use("Agg")

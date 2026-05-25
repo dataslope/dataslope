@@ -5,6 +5,7 @@ import type {
   LanguageRuntime,
   PackageInfo,
 } from "../types";
+import { CORS_PROXY_BASE } from "./corsProxy";
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -298,6 +299,18 @@ parsed |> count(level) |> print()
 `,
   },
   {
+    key: "remote_csv",
+    title: "Remote CSV",
+    desc: "Load a CSV from a URL",
+    code: `url <- "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+df <- read.csv(url)
+
+print(head(df))
+cat("\\nSpecies counts:\\n")
+print(table(df$species))
+`,
+  },
+  {
     key: "multifile",
     title: "Multi-file Project",
     desc: "Source a helper script alongside main.r",
@@ -555,6 +568,16 @@ const R_BUILTIN_PACKAGES = new Set([
   "tools", "utils", "translations",
 ]);
 
+const R_NETWORK_HELPERS = CORS_PROXY_BASE
+  ? `
+.ds_proxy_base <- ${JSON.stringify(CORS_PROXY_BASE)}
+.ds_proxy_url <- function(url) paste0(.ds_proxy_base, "/?url=", utils::URLencode(url, reserved = TRUE))
+proxy_read_csv <- function(url, ...) read.csv(.ds_proxy_url(url), ...)
+proxy_read_table <- function(url, ...) read.table(.ds_proxy_url(url), ...)
+proxy_download_file <- function(url, destfile, ...) download.file(.ds_proxy_url(url), destfile, ...)
+`
+  : "";
+
 function extractLibraryCalls(code: string): string[] {
   const stripped = code
     .split("\n")
@@ -736,6 +759,9 @@ class WebRRuntime implements LanguageRuntime {
     await this.webR.evalRVoid(
       `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
     );
+    if (R_NETWORK_HELPERS) {
+      await this.webR.evalRVoid(R_NETWORK_HELPERS);
+    }
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
     try {
@@ -791,7 +817,8 @@ export const rAdapter: LanguageAdapter = {
     version: "4.6.0",
     engine: "WebR 0.6.0",
     engineUrl: "https://docs.r-wasm.org/webr/latest/",
-    notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
+    notes:
+      "Runs entirely in the browser via WebAssembly — no server roundtrip. Use proxy_read_csv/proxy_download_file if a remote URL needs explicit proxying.",
   },
   codeMirrorMode: "r",
   examples: EXAMPLES,

@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 export {};
 
+import { CORS_PROXY_BASE } from "./corsProxy";
+
 // PhpWeb is an Emscripten build compiled for ENVIRONMENT=web. It reads
 // `document` and `window` during module evaluation — before any async code
 // runs. Stub them here at module-level, before any imports, so the checks
@@ -144,6 +146,31 @@ type PhpWebClass = typeof import("php-wasm/PhpWeb").PhpWeb;
 let php: InstanceType<PhpWebClass> | null = null;
 let initPromise: Promise<void> | null = null;
 
+const PHP_PROXY_HELPER = `if (!defined('_DS_PROXY_BASE')) {
+    define('_DS_PROXY_BASE', ${JSON.stringify(CORS_PROXY_BASE)});
+}
+if (!function_exists('fetch_url')) {
+    function fetch_url(string $url, array $opts = []): string|false {
+        $proxied = _DS_PROXY_BASE . '/?url=' . rawurlencode($url);
+        $ctx = stream_context_create(['http' => array_merge(['method' => 'GET'], $opts)]);
+        return file_get_contents($proxied, false, $ctx);
+    }
+}
+if (!function_exists('fetch_json')) {
+    function fetch_json(string $url, bool $assoc = true): mixed {
+        $body = fetch_url($url);
+        return $body === false ? null : json_decode($body, $assoc);
+    }
+}
+`;
+
+function withProxyHelper(code: string): string {
+  if (!CORS_PROXY_BASE) return code;
+  const match = /^(\s*<\?php\b)/i.exec(code);
+  if (!match) return `<?php\n${PHP_PROXY_HELPER}\n?>\n${code}`;
+  return `${match[1]}\n${PHP_PROXY_HELPER}${code.slice(match[1].length)}`;
+}
+
 async function initPhp(): Promise<void> {
   post({ kind: "loading", message: "Loading PHP runtime…" });
   const mod = (await import(
@@ -188,7 +215,7 @@ async function runCode(id: number, code: string): Promise<void> {
     } catch {
       /* refresh is best-effort */
     }
-    await php.run(code);
+    await php.run(withProxyHelper(code));
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     errorBuf += message + "\n";
