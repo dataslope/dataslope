@@ -1,0 +1,360 @@
+---
+title: Doubly Linked Lists and std::list
+description: Learn previous and next pointers, bidirectional traversal, std::list iterators, splicing use cases, and cycle detection patterns
+---
+
+A doubly linked list gives every node two links: `prev` and `next`. That extra pointer allows bidirectional traversal and O(1) deletion when you already have a pointer or iterator to the node.
+
+## The shape of a doubly linked list
+
+```mermaid
+flowchart LR
+    H["head"] <--> N1["n1 | 10"]
+    N1 <--> N2["n2 | 20"]
+    N2 <--> N3["n3 | 30"]
+    N3 <--> T["tail"]
+```
+
+A singly linked list can move forward only. A doubly linked list can walk backward from the tail.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+int main() {
+    Node a{10, nullptr, nullptr};
+    Node b{20, nullptr, nullptr};
+    a.next = &b;
+    b.prev = &a;
+
+    std::cout << a.next->data << "\\n";
+    std::cout << b.prev->data << "\\n";
+    return 0;
+}
+`}
+/>
+
+## A tiny implementation
+
+This class keeps both `head` and `tail`, so pushing at either end is O(1). It also frees nodes in the destructor.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+
+class DoublyLinkedList {
+    struct Node {
+        int data;
+        Node* prev;
+        Node* next;
+    };
+
+    Node* head = nullptr;
+    Node* tail = nullptr;
+
+public:
+    ~DoublyLinkedList() {
+        while (head != nullptr) {
+            Node* next = head->next;
+            delete head;
+            head = next;
+        }
+    }
+
+    void push_back(int value) {
+        Node* node = new Node{value, tail, nullptr};
+        if (tail != nullptr) tail->next = node;
+        else head = node;
+        tail = node;
+    }
+
+    void push_front(int value) {
+        Node* node = new Node{value, nullptr, head};
+        if (head != nullptr) head->prev = node;
+        else tail = node;
+        head = node;
+    }
+
+    void print_forward() const {
+        for (Node* cur = head; cur != nullptr; cur = cur->next) {
+            std::cout << cur->data << " ";
+        }
+        std::cout << "\\n";
+    }
+
+    void print_backward() const {
+        for (Node* cur = tail; cur != nullptr; cur = cur->prev) {
+            std::cout << cur->data << " ";
+        }
+        std::cout << "\\n";
+    }
+};
+
+int main() {
+    DoublyLinkedList list;
+    list.push_back(2);
+    list.push_back(3);
+    list.push_front(1);
+    list.print_forward();
+    list.print_backward();
+    return 0;
+}
+`}
+/>
+
+<Callout type="info" title="Deletion when you have the node">
+If you already have a pointer to a middle node, a doubly linked list can unlink it by changing the neighboring `prev` and `next` links. Finding that node by value is still O(n).
+</Callout>
+
+## `std::list`
+
+`std::list<T>` is the STL doubly linked list. It has stable iterators: inserting or erasing elsewhere does not invalidate iterators to other elements. It does **not** support random access with `list[i]`.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <list>
+
+int main() {
+    std::list<int> values = {10, 20, 40};
+    auto it = values.begin();
+    ++it;
+    ++it;
+    values.insert(it, 30);
+
+    for (int x : values) {
+        std::cout << x << "\\n";
+    }
+    return 0;
+}
+`}
+/>
+
+## When should you choose `std::list`?
+
+Almost never as a default. `std::vector` or `std::deque` usually wins because contiguous or block-based storage is much more cache-friendly. Choose `std::list` only when its special properties matter.
+
+| Good reason | Why it matters |
+| --- | --- |
+| `splice` | Move nodes between lists in O(1) without copying values |
+| stable iterators | Keep references to nodes while inserting elsewhere |
+| frequent known-position insert/erase | You already have the iterator, so no search cost |
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <list>
+
+int main() {
+    std::list<int> urgent = {1, 2};
+    std::list<int> backlog = {3, 4, 5};
+
+    auto first_backlog = backlog.begin();
+    urgent.splice(urgent.end(), backlog, first_backlog);
+
+    for (int x : urgent) std::cout << x << " ";
+    std::cout << "\\n";
+    for (int x : backlog) std::cout << x << " ";
+    std::cout << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Iterator-based erase
+
+With `std::list`, erasing through an iterator returns the next iterator, which is handy while filtering.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <list>
+
+int main() {
+    std::list<int> xs = {1, 2, 3, 4, 5, 6};
+    for (auto it = xs.begin(); it != xs.end(); ) {
+        if (*it % 2 == 0) it = xs.erase(it);
+        else ++it;
+    }
+
+    for (int x : xs) {
+        std::cout << x << "\\n";
+    }
+    return 0;
+}
+`}
+/>
+
+<Callout type="warn" title="Big-O can hide cache costs">
+A list may advertise O(1) insertion once you have an iterator, but walking to that iterator and chasing scattered nodes can dominate runtime.
+</Callout>
+
+## Practice: print backward
+
+<ChallengeCard
+  adapter="cpp"
+  title="Print a doubly linked list backward"
+  instructions={`Walk from \`tail\` to \`head\` using \`prev\` pointers and print each value on its own line.`}
+  initialCode={`#include <iostream>
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+void printBackward(Node* tail) {
+    // your code here
+}
+
+int main() {
+    Node n1{1, nullptr, nullptr};
+    Node n2{2, &n1, nullptr};
+    Node n3{3, &n2, nullptr};
+    Node n4{4, &n3, nullptr};
+    Node n5{5, &n4, nullptr};
+    n1.next = &n2;
+    n2.next = &n3;
+    n3.next = &n4;
+    n4.next = &n5;
+    printBackward(&n5);
+    return 0;
+}
+`}
+  solutionCode={`#include <iostream>
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+void printBackward(Node* tail) {
+    for (Node* cur = tail; cur != nullptr; cur = cur->prev) {
+        std::cout << cur->data << "\\n";
+    }
+}
+
+int main() {
+    Node n1{1, nullptr, nullptr};
+    Node n2{2, &n1, nullptr};
+    Node n3{3, &n2, nullptr};
+    Node n4{4, &n3, nullptr};
+    Node n5{5, &n4, nullptr};
+    n1.next = &n2;
+    n2.next = &n3;
+    n3.next = &n4;
+    n4.next = &n5;
+    printBackward(&n5);
+    return 0;
+}
+`}
+  tests={[{ id: "backward", name: "Prints tail to head", expect: { stdoutLines: ["5", "4", "3", "2", "1"], stdoutLinesExact: true } }]}
+/>
+
+## Practice: detect a cycle
+
+<ChallengeCard
+  adapter="cpp"
+  title="Detect a cycle in a singly linked list"
+  instructions={`Implement Floyd's slow/fast pointer algorithm in \`hasCycle\`. The driver builds a small cycled list and prints the result.`}
+  initialCode={`#include <iostream>
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+bool hasCycle(Node* head) {
+    // your code here
+}
+
+int main() {
+    Node a{1, nullptr};
+    Node b{2, nullptr};
+    Node c{3, nullptr};
+    a.next = &b;
+    b.next = &c;
+    c.next = &b;
+    std::cout << (hasCycle(&a) ? "true" : "false") << "\\n";
+    return 0;
+}
+`}
+  solutionCode={`#include <iostream>
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+bool hasCycle(Node* head) {
+    Node* slow = head;
+    Node* fast = head;
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+
+int main() {
+    Node a{1, nullptr};
+    Node b{2, nullptr};
+    Node c{3, nullptr};
+    a.next = &b;
+    b.next = &c;
+    c.next = &b;
+    std::cout << (hasCycle(&a) ? "true" : "false") << "\\n";
+    return 0;
+}
+`}
+  tests={[{ id: "cycle", name: "Detects a cycle", expect: { stdoutEquals: "true" } }]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What extra link does a doubly linked list node store compared with a singly linked list node?
+
+- A pointer to the head of the whole program
+  > Nodes do not point to the whole program.
+- [o] A pointer to the previous node
+  > Correct. The previous pointer enables backward traversal.
+- A copy of every earlier value
+  > That would be wasteful and is not how lists work.
+- A random-access index table
+  > Standard doubly linked lists do not have index tables.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement about \`std::list\` is true?
+
+- [o] It has stable iterators for elements not erased, but it does not support random access.
+  > Correct. You can insert without invalidating other iterators, but you cannot use \`list[i]\`.
+- It is always faster than \`std::vector\` for iteration.
+  > Usually the opposite is true because of cache locality.
+- It stores all values contiguously.
+  > That describes vector-like storage, not a linked list.
+- It can only store integers.
+  > It is templated and can store many types.`}
+/>
+
+<MultipleChoice
+  markdown={`When is \`std::list\` most defensible?
+
+- When you need millions of random index lookups
+  > Use a vector-like structure for random access.
+- When you want the best cache locality for scanning
+  > Vector is usually better for scanning.
+- [o] When you rely on splice operations or stable iterators.
+  > Correct. These are the list's distinctive strengths.
+- When values must be sorted automatically
+  > A list does not automatically keep itself sorted.`}
+/>
