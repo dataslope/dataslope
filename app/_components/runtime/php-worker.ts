@@ -303,15 +303,15 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   // See PhpBase.mjs: `this.binary = phpBinLoader.then(...).then(async php => { ... return php; })`
   // and PhpWeb.mjs refresh(): `const php = await this.binary; php.FS.syncfs(...)`
   const emscriptenModule = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
-  const FS = emscriptenModule.FS;
+  const fs = emscriptenModule.FS;
 
   const nextPaths = new Set<string>();
   for (const [relPath, bytes] of files) {
     const abs = joinStagedPath(relPath);
     nextPaths.add(abs);
-    ensureDirs(FS, abs);
+    ensureDirs(fs, abs);
     try {
-      FS.writeFile(abs, bytes);
+      fs.writeFile(abs, bytes);
     } catch (err) {
       throw new Error(
         `Failed to write ${relPath}: ${err instanceof Error ? err.message : String(err)}`,
@@ -323,7 +323,7 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   for (const prev of stagedPaths) {
     if (!nextPaths.has(prev)) {
       try {
-        FS.unlink(prev);
+        fs.unlink(prev);
       } catch {
         /* file may already be gone -- ignore */
       }

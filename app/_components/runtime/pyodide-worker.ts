@@ -155,7 +155,7 @@ def _ds_proxied_urlopen(url, *args, **kwargs):
         )
     return _ds_orig_urlopen(url, *args, **kwargs)
 
-async def fetch(url, **kwargs):
+async def proxied_fetch(url, **kwargs):
     if _ds_should_proxy_url(url):
         url = _ds_proxy_url(url)
     return await _ds_pyfetch(url, **kwargs)

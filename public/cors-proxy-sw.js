@@ -51,18 +51,19 @@ self.addEventListener("fetch", (event) => {
 
   const method = event.request.method;
   const proxyUrl = `${PROXY_BASE}/?url=${encodeURIComponent(event.request.url)}`;
+  const init = {
+    method,
+    headers,
+    body: ["GET", "HEAD"].includes(method) ? undefined : event.request.body,
+    redirect: "follow",
+    mode: "cors",
+    credentials: "omit",
+  };
+  if (event.request.body) {
+    // Required by Chromium when forwarding a ReadableStream body.
+    init.duplex = "half";
+  }
   event.respondWith(
-    fetch(
-      new Request(proxyUrl, {
-        method,
-        headers,
-        body: ["GET", "HEAD"].includes(method) ? undefined : event.request.body,
-        redirect: "follow",
-        mode: "cors",
-        credentials: "omit",
-        // Required by Chromium when forwarding a ReadableStream body.
-        duplex: "half",
-      }),
-    ),
+    fetch(new Request(proxyUrl, init)),
   );
 });
