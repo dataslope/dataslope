@@ -203,7 +203,7 @@
 }
 
 .title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--ch-text);
   line-height: 1.4;
@@ -420,7 +420,7 @@
 }
 
 .instructionsBody {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.65;
   color: var(--ch-text-secondary);
 }
