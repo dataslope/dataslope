@@ -52,6 +52,16 @@ export default function Home() {
             GitHub
           </a>
         </div>
+
+        <section className={styles.courses}>
+          <h2 className={styles.coursesHeading}>Courses</h2>
+          <div className={styles.courseList}>
+            <Link href="/learn/python-basics" className={styles.courseCard}>
+              <span className={styles.courseTitle}>Python Basics</span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </section>
       </div>
     </main>
   );

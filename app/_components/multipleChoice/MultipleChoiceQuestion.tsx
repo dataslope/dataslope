@@ -200,14 +200,9 @@ export default function MultipleChoiceQuestion({
         {parsed.choices.map((choice) => {
           const isSelected = selected.has(choice.id);
           const verdict = computeVerdict(choice, isSelected, submitted);
-          // Whether to surface this choice's authored explanation.
-          // Authors typically put the explanation on the wrong/correct
-          // pivot — show it for any choice that was selected and any
-          // correct choice the learner missed.
-          const showExplanation =
-            submitted &&
-            choice.explanation &&
-            (isSelected || (choice.correct && !isSelected));
+          // Show explanations for all choices after submit so learners
+          // can understand why each option is right or wrong.
+          const showExplanation = submitted && choice.explanation;
           return (
             <div key={choice.id} className={styles.choiceItem}>
               {/* Use <div> rather than <label> so that block-level

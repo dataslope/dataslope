@@ -397,6 +397,31 @@
   background: var(--mc-white);
 }
 
+/* In light mode, `code` elements inside green/red choice rows need
+   a tinted background so they don't look out of place on the coloured
+   surface. */
+.choice[data-verdict="correct-selected"] .choiceLabel code,
+.choice[data-verdict="correct-missed"] .choiceLabel code {
+  background: var(--mc-green-200);
+  color: var(--mc-green-700);
+}
+
+.choice[data-verdict="wrong-selected"] .choiceLabel code {
+  background: var(--mc-red-200);
+  color: var(--mc-red-700);
+}
+
+.choice[data-verdict="correct-selected"] .choiceExplanation code,
+.choice[data-verdict="correct-missed"] .choiceExplanation code {
+  background: var(--mc-green-100);
+  color: var(--mc-green-700);
+}
+
+.choice[data-verdict="wrong-selected"] .choiceExplanation code {
+  background: var(--mc-red-100);
+  color: var(--mc-red-700);
+}
+
 /* The explanation block hangs off to the right of the input + glyph.
    We render it inside the choice body, after the label, so when the
    author writes a multi-line choice the explanation always lines up

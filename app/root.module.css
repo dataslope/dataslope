@@ -84,3 +84,57 @@
   color: #e2e8f0;
   background: #1b2230;
 }
+
+/* ─── Courses section ─────────────────────────────────────────────── */
+
+.courses {
+  margin-top: 2.5rem;
+  text-align: left;
+}
+
+.coursesHeading {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f8ef7;
+  margin: 0 0 0.75rem;
+}
+
+.courseList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.courseCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border: 1px solid #2a3347;
+  border-radius: 8px;
+  background: #161b27;
+  color: #e2e8f0;
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.courseCard:hover {
+  border-color: #4f8ef7;
+  background: #1b2230;
+}
+
+.courseTitle {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.courseArrow {
+  color: #4f8ef7;
+  transition: transform 0.15s;
+}
+
+.courseCard:hover .courseArrow {
+  transform: translateX(3px);
+}

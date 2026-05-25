@@ -424,6 +424,7 @@
 
 .instructionsBody p {
   margin: 0 0 8px;
+  color: var(--tw-prose-body);
 }
 
 .instructionsBody p:last-child {
@@ -454,7 +455,7 @@
 }
 
 .instructionsBody li {
-  color: var(--ch-text-secondary);
+  color: var(--tw-prose-body);
 }
 
 .instructionsBody em {
@@ -694,7 +695,7 @@
   min-height: 120px;
   max-height: 480px;
   font-family: var(--ch-font-mono);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
   font-variant-ligatures: none;
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
@@ -838,13 +839,16 @@
   min-height: 30px;
   max-height: 280px;
   font-family: var(--ch-font-mono);
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.7;
   font-variant-ligatures: none;
   cursor: default;
 }
 
 .initEditor :global(.cm-editor .cm-scroller) {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--ch-scrollbar-thumb) transparent;

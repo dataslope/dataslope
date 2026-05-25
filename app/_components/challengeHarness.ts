@@ -384,7 +384,7 @@ const buildRHarness: HarnessBuilder = (tests) => {
   lines.push("  }, error = function(e) {");
   lines.push("    msg <- conditionMessage(e)");
   lines.push(
-    `    cat(paste0("${HARNESS_RESULT_PREFIX}", tid, ":FAIL:", jsonlite::toJSON(msg, auto_unbox = TRUE), "\\n"))`,
+    `    cat(paste0("${HARNESS_RESULT_PREFIX}", tid, ":FAIL:", deparse(as.character(msg)), "\\n"))`,
   );
   lines.push("  })");
   lines.push("}");
