@@ -60,6 +60,12 @@ export default function Home() {
               <span className={styles.courseTitle}>Python Basics</span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/mastering-dsa-cpp" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Mastering Data Structures and Algorithms with C++
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
