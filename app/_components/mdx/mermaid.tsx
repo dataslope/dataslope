@@ -1,6 +1,14 @@
 "use client";
 
-import { use, useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  use,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTheme } from "next-themes";
 import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
 import styles from "./mermaid.module.css";
@@ -146,7 +154,7 @@ function MermaidFullscreen({
       const vw = viewport.clientWidth - pad;
       const vh = viewport.clientHeight - pad;
       const next = clamp(
-        Math.min(vw / naturalW, vh / naturalH, 1),
+        Math.min(vw / naturalW, vh / naturalH),
         ZOOM_MIN,
         ZOOM_MAX,
       );
@@ -156,6 +164,25 @@ function MermaidFullscreen({
     });
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  // Apply zoom by resizing the SVG's intrinsic dimensions rather than a
+  // CSS `transform: scale()`. A scaled transform on a composited layer
+  // gets rasterized once at 1× and GPU-upscaled, which blurs text and
+  // shapes; setting width/height re-renders the vector crisply at every
+  // zoom level. The transform is left to pure translation for panning.
+  //
+  // Runs after every commit (not just on scale change) and via a layout
+  // effect so the size is reasserted before paint — pan re-renders must
+  // never leave the SVG at its natural size while `scale` says otherwise.
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const natural = naturalSizeRef.current;
+    if (!stage || !natural) return;
+    const svgEl = stage.querySelector("svg");
+    if (!svgEl) return;
+    svgEl.style.width = `${natural.w * scale}px`;
+    svgEl.style.height = `${natural.h * scale}px`;
+  });
 
   // Lock background scroll while the modal is open, and wire Esc-close.
   useEffect(() => {
@@ -304,13 +331,13 @@ function MermaidFullscreen({
           onPointerCancel={onPointerUp}
         >
           <div
-            ref={stageRef}
             className={styles.stage}
             style={{
-              transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+              transform: `translate(${tx}px, ${ty}px)`,
             }}
-            dangerouslySetInnerHTML={{ __html: svg }}
-          />
+          >
+            <div ref={stageRef} dangerouslySetInnerHTML={{ __html: svg }} />
+          </div>
         </div>
       </div>
     </div>
