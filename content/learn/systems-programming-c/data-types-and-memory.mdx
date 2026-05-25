@@ -1,0 +1,358 @@
+---
+title: Data Types and Memory
+description: Integer widths, signedness, fixed-width types, alignment, and endianness in C
+---
+
+In Python an `int` can grow forever; in C every integer fits in a
+fixed number of bytes. That fixed size is both C's greatest strength
+(predictable, no boxing, no allocations) and its most common source
+of overflow bugs. This page builds the mental model you need to
+reason about *what is actually in memory*.
+
+## The fundamental types
+
+| Type | Typical size | Range (signed) |
+| --- | --- | --- |
+| `char` | 1 byte | −128 .. 127 (or 0 .. 255 if `unsigned`) |
+| `short` | 2 bytes | −32 768 .. 32 767 |
+| `int` | 4 bytes | ≈ ±2.1 × 10⁹ |
+| `long` | 4 or 8 bytes (platform dependent) | varies |
+| `long long` | 8 bytes | ≈ ±9.2 × 10¹⁸ |
+| `float` | 4 bytes | IEEE 754 single |
+| `double` | 8 bytes | IEEE 754 double |
+| `void *` | 4 or 8 bytes (32- or 64-bit target) | address |
+
+The C standard only guarantees *minimum* sizes (e.g. `int` is at
+least 16 bits). The actual sizes depend on the target. The WASI
+target used by this sandbox is 32-bit: `int` is 4 bytes and `void *`
+is 4 bytes.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <limits.h>
+#include <float.h>
+
+int main(void) {
+    printf("CHAR_BIT    = %d (bits per byte)\\n", CHAR_BIT);
+    printf("INT_MIN     = %d\\n", INT_MIN);
+    printf("INT_MAX     = %d\\n", INT_MAX);
+    printf("UINT_MAX    = %u\\n", UINT_MAX);
+    printf("LLONG_MAX   = %lld\\n", LLONG_MAX);
+    printf("FLT_MAX     = %g\\n", (double)FLT_MAX);
+    printf("DBL_MAX     = %g\\n", DBL_MAX);
+    return 0;
+}
+`}
+/>
+
+## When "fixed size" turns into a bug
+
+Because every C integer wraps at its boundary, arithmetic that would
+silently grow a Python `int` can silently *truncate* in C.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <limits.h>
+
+int main(void) {
+    int a = INT_MAX;
+    int b = a + 1;          // signed overflow: undefined behavior!
+    unsigned int u = 0;
+    unsigned int v = u - 1; // unsigned wraps cleanly: well-defined
+
+    printf("INT_MAX     = %d\\n", a);
+    printf("INT_MAX + 1 = %d  (undefined behavior, may differ)\\n", b);
+    printf("0u - 1      = %u  (wraps to UINT_MAX, well-defined)\\n", v);
+    return 0;
+}
+`}
+/>
+
+<Callout type="warn" title="Signed overflow is UB, unsigned overflow is not">
+For *signed* integers, overflow is undefined behavior — the compiler
+is allowed to assume it never happens. For *unsigned*, overflow is
+well-defined modular arithmetic (it wraps). When you actually *want*
+wrap-around (e.g. a hash function), use unsigned.
+</Callout>
+
+## Fixed-width types: `<stdint.h>`
+
+Because `int`, `long`, etc. vary across platforms, anything you write
+to disk, send over a network, or talk to hardware with should use the
+fixed-width types from `<stdint.h>`.
+
+| Type | Width | Use case |
+| --- | --- | --- |
+| `int8_t`, `uint8_t` | 8 bits | bytes |
+| `int16_t`, `uint16_t` | 16 bits | small counters, audio samples |
+| `int32_t`, `uint32_t` | 32 bits | colors, network ints |
+| `int64_t`, `uint64_t` | 64 bits | timestamps, large counters |
+| `size_t` | platform pointer-sized unsigned | array sizes |
+| `ssize_t` | platform pointer-sized signed | byte counts that can be negative |
+| `intptr_t`, `uintptr_t` | exactly pointer-sized | pointer arithmetic |
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
+
+int main(void) {
+    uint8_t  byte    = 200;
+    int16_t  sample  = -1500;
+    uint32_t color   = 0xFF8800FF;
+    int64_t  big     = 9000000000LL;
+
+    printf("byte   = %"   PRIu8  "\\n", byte);
+    printf("sample = %"   PRId16 "\\n", sample);
+    printf("color  = 0x%" PRIx32 "\\n", color);
+    printf("big    = %"   PRId64 "\\n", big);
+    return 0;
+}
+`}
+/>
+
+The `PRI…` macros from `<inttypes.h>` give you portable `printf`
+format specifiers no matter what size `int32_t` happens to be.
+
+## Signedness pitfalls
+
+Mixing signed and unsigned values is one of the most popular C bugs.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int s = -1;
+    unsigned int u = 1;
+
+    // When signed and unsigned meet, signed gets promoted to unsigned.
+    // -1 reinterpreted as unsigned is UINT_MAX, which is huge.
+    if (s < u) {
+        printf("Math says -1 < 1\\n");
+    } else {
+        printf("C says -1 is NOT less than 1u! (UB-adjacent surprise)\\n");
+    }
+    return 0;
+}
+`}
+/>
+
+The fix is to keep types consistent: do not mix `int i` with
+`size_t n = vec.size`, for example.
+
+## Endianness: which byte comes first?
+
+A 32-bit integer like `0x12345678` is four bytes: `12`, `34`, `56`,
+`78`. Different CPUs disagree on the order in which to store them in
+memory:
+
+- **Little-endian** (x86, ARM in normal mode, RISC-V, WASI): the *least*
+  significant byte first — `78 56 34 12` at increasing addresses.
+- **Big-endian** (older PowerPC, network byte order): the *most*
+  significant byte first — `12 34 56 78`.
+
+```mermaid
+flowchart LR
+    subgraph LE["Little-endian (x86, WASI)"]
+        A0["addr 0<br/>0x78"] --> A1["addr 1<br/>0x56"] --> A2["addr 2<br/>0x34"] --> A3["addr 3<br/>0x12"]
+    end
+    subgraph BE["Big-endian"]
+        B0["addr 0<br/>0x12"] --> B1["addr 1<br/>0x34"] --> B2["addr 2<br/>0x56"] --> B3["addr 3<br/>0x78"]
+    end
+```
+
+You can *see* the byte order at runtime by reading the bytes of an
+integer through a `char *`:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdint.h>
+
+int main(void) {
+    uint32_t x = 0x12345678;
+    unsigned char *p = (unsigned char *)&x;
+
+    printf("Bytes of 0x12345678 in memory order:\\n");
+    for (int i = 0; i < 4; i++) {
+        printf("  byte[%d] = 0x%02X\\n", i, p[i]);
+    }
+    return 0;
+}
+`}
+/>
+
+On the little-endian WASI target you should see `78 56 34 12` — the
+"low" byte first. That order matters when you serialize integers to
+disk or send them over a network; protocols like TCP/IP standardize
+on big-endian ("network byte order") and provide `htonl` / `ntohl` to
+convert.
+
+## Alignment
+
+Most CPUs read memory most efficiently when an `N`-byte type lives at
+an address that is a multiple of `N`. A `uint32_t` at address `0x1004`
+is fine; the same value at `0x1001` may be slow or, on some CPUs,
+crash.
+
+The compiler enforces alignment automatically: local variables and
+struct members are placed at aligned addresses, sometimes with unused
+padding bytes in between. We will see padding clearly when we cover
+structs.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdalign.h>
+#include <stdint.h>
+
+int main(void) {
+    printf("alignof(char)     = %zu\\n", alignof(char));
+    printf("alignof(short)    = %zu\\n", alignof(short));
+    printf("alignof(int)      = %zu\\n", alignof(int));
+    printf("alignof(double)   = %zu\\n", alignof(double));
+    printf("alignof(void *)   = %zu\\n", alignof(void *));
+    return 0;
+}
+`}
+/>
+
+## Practice: count set bits
+
+<ChallengeCard
+  adapter="c"
+  title="Count the number of 1 bits in a uint32_t"
+  instructions={`Implement \`int popcount(uint32_t x)\` that returns how many bits of \`x\` are set to 1. Do not call any library popcount intrinsic — write the loop yourself. The provided \`main\` calls it for several values and prints the results, one per line.`}
+  initialCode={`#include <stdio.h>
+#include <stdint.h>
+
+int popcount(uint32_t x) {
+    // your code here
+    return 0;
+}
+
+int main(void) {
+    printf("%d\\n", popcount(0));
+    printf("%d\\n", popcount(1));
+    printf("%d\\n", popcount(0xFu));
+    printf("%d\\n", popcount(0xFFFFFFFFu));
+    printf("%d\\n", popcount(0xA5A5A5A5u));
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+#include <stdint.h>
+
+int popcount(uint32_t x) {
+    int n = 0;
+    while (x) {
+        n += (int)(x & 1u);
+        x >>= 1;
+    }
+    return n;
+}
+
+int main(void) {
+    printf("%d\\n", popcount(0));
+    printf("%d\\n", popcount(1));
+    printf("%d\\n", popcount(0xFu));
+    printf("%d\\n", popcount(0xFFFFFFFFu));
+    printf("%d\\n", popcount(0xA5A5A5A5u));
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "popcount",
+      name: "Counts bits correctly",
+      expect: { stdoutLines: ["0", "1", "4", "32", "16"], stdoutLinesExact: true },
+    },
+  ]}
+/>
+
+## Practice: detect endianness at runtime
+
+<ChallengeCard
+  adapter="c"
+  title="Print 'little' or 'big'"
+  instructions={`Print \`little\` if this machine is little-endian and \`big\` otherwise. Hint: place a known multi-byte integer at a known address and read its first byte through a \`char *\`.`}
+  initialCode={`#include <stdio.h>
+#include <stdint.h>
+
+int main(void) {
+    uint16_t x = 0x0001;
+    // your code here
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+#include <stdint.h>
+
+int main(void) {
+    uint16_t x = 0x0001;
+    unsigned char *p = (unsigned char *)&x;
+    if (p[0] == 0x01) {
+        printf("little\\n");
+    } else {
+        printf("big\\n");
+    }
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "wasi_is_little",
+      name: "WASI is little-endian",
+      expect: { stdoutEquals: "little" },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What does the C standard say about the size of \`int\`?
+
+- It is always exactly 32 bits.
+  > That is a common configuration, but not required.
+- It is always exactly 16 bits.
+  > 16 bits is the standard's *minimum*, not a requirement.
+- [o] It is at least 16 bits; the actual size depends on the target platform.
+  > Correct. Use the fixed-width types in \`<stdint.h>\` when you need exact widths.
+- It is whatever the operating system kernel decides at runtime.
+  > Sizes are baked in at compile time, not selected at runtime.`}
+/>
+
+<MultipleChoice
+  markdown={`Which type should you use when you need a guaranteed 32-bit unsigned integer for a binary file format?
+
+- \`int\`
+  > \`int\` may be 16 or 64 bits on some targets.
+- \`unsigned int\`
+  > Same problem — not guaranteed to be exactly 32 bits.
+- \`size_t\`
+  > \`size_t\` is pointer-sized (32 or 64 bits depending on the platform).
+- [o] \`uint32_t\` (from \`<stdint.h>\`)
+  > Correct. The \`<stdint.h>\` fixed-width types are how you commit to an exact size.`}
+/>
+
+<MultipleChoice
+  markdown={`A 32-bit integer \`0xAABBCCDD\` is stored in memory on a little-endian machine. What byte will you find at the integer's lowest address?
+
+- \`0xAA\`
+  > That would be the big-endian order.
+- [o] \`0xDD\`
+  > Correct. Little-endian places the *least* significant byte first.
+- \`0xCC\`
+  > \`0xCC\` is one of the middle bytes.
+- It is unpredictable.
+  > It is fully predictable once you know the endianness.`}
+/>
+
+<Callout type="success" title="On to pointers">
+You now know what numbers look like in memory. Next we look at the second pillar of C: pointers — values whose contents *are* memory addresses.
+</Callout>

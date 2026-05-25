@@ -1,0 +1,211 @@
+---
+title: Why C for Systems Programming?
+description: Why C is still the dominant language for operating systems, runtimes, databases, and embedded software
+---
+
+C was designed in 1972 by Dennis Ritchie at Bell Labs as a portable
+language for rewriting the Unix kernel. More than fifty years later,
+it is still the language that the world's most important systems are
+written in. Knowing why will help you understand what to expect from
+the language — and what *not* to expect.
+
+## C runs the world
+
+| Software | Written in |
+| --- | --- |
+| Linux, BSD, XNU (macOS), Windows NT kernels | C (with bits of C++ / assembly) |
+| Python's reference interpreter (CPython) | C |
+| Node.js (V8, libuv) | C / C++ |
+| SQLite, Redis, PostgreSQL | C |
+| nginx, OpenSSH, OpenSSL, curl, FFmpeg, Git | C |
+| Most embedded firmware (microcontrollers, routers, cars) | C |
+
+When you `pip install` a wheel, `apt-get` a package, or open a TLS
+connection, you are almost certainly running C code that someone
+compiled years ago.
+
+## A small language, close to the machine
+
+The C language itself is *tiny*. The whole grammar fits in a thin
+book. There are no classes, no exceptions, no garbage collector, no
+generics, no built-in dictionaries, no string type — just integers,
+floats, pointers, arrays, structs, functions, and a preprocessor for
+text substitution.
+
+That smallness is a feature. It means a compiler is small enough to
+exist for any chip you can name, and the runtime overhead of a C
+program can be measured in *kilobytes*.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    printf("Hello, systems world!\\n");
+    return 0;
+}
+`}
+/>
+
+That program, once compiled for a real CPU, is a few kilobytes of
+machine code and a handful of `printf` calls in libc. There is no
+virtual machine. There is no interpreter. The operating system
+loads it and jumps to `main`.
+
+## "Portable assembly"
+
+People sometimes call C *portable assembly* because the language
+exposes the same model of computation that the underlying hardware
+does:
+
+- Memory is a flat array of bytes addressed by integers.
+- Every value has a fixed size in bytes.
+- You can take the address of almost anything with `&`.
+- You can ask "what is at this address?" with `*`.
+- Function calls push a frame on the stack and `return` pops it.
+
+```mermaid
+flowchart LR
+    A[C source] -->|clang / gcc| B[Machine code]
+    B -->|loads into| C[Process address space]
+    C --> D[CPU executes<br/>one instruction<br/>at a time]
+```
+
+Compare to Python, where `a + b` may involve attribute lookups, type
+coercions, reference counts, and a method dispatch through a hash
+table. In C, `a + b` for two `int`s usually compiles to a single CPU
+instruction.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a = 7;
+    int b = 35;
+    int c = a + b;
+    printf("%d + %d = %d\\n", a, b, c);
+    return 0;
+}
+`}
+/>
+
+## What C gives you that other languages do not
+
+| Capability | C | Python / JS / Java |
+| --- | --- | --- |
+| Take the address of a variable | yes (`&x`) | no |
+| Lay out memory exactly as you want | yes (`struct`, `union`) | no |
+| Talk to hardware registers | yes (volatile pointers, MMIO) | no |
+| Run with no operating system | yes (freestanding mode) | no |
+| Predictable, jitter-free latency | yes (no GC) | no |
+| Compile to almost any chip | yes | usually no |
+
+## What C *doesn't* give you
+
+A pragmatic course must be honest about C's costs:
+
+- **No memory safety.** Out-of-bounds writes are undefined behavior.
+- **No bounds-checked strings or arrays.** You manage lengths yourself.
+- **No built-in containers.** You write or import a vector / hash map.
+- **No namespaces / modules.** Just `#include` and the linker.
+- **No exceptions.** Errors are usually returned as `int` codes.
+- **Very little type safety for void pointers.** `void*` casts are easy.
+- **Undefined behavior is everywhere.** Signed overflow, reading
+  uninitialized memory, strict aliasing violations — the compiler is
+  allowed to do *anything* in response.
+
+<Callout type="warn" title="Undefined behavior is not just &quot;crashes&quot;">
+"Undefined behavior" (UB) means the C standard imposes no
+requirements. The program might crash, print garbage, behave
+correctly on one machine and wrong on another, or — most dangerously —
+*appear to work in testing and fail in production*. A serious chunk
+of this course is teaching you to recognize and avoid UB.
+</Callout>
+
+## Where C shines today
+
+You should reach for C (or a C-compatible language) when you need:
+
+1. **Predictable performance.** No GC pauses, no JIT warm-up.
+2. **Tiny binaries.** Embedded systems with kilobytes of flash.
+3. **Direct hardware access.** Drivers, firmware, OS kernels.
+4. **A stable ABI.** Almost every language can call C, so C is the
+   universal glue for FFI (`ctypes`, JNI, P/Invoke, Node addons).
+5. **Long-lived infrastructure.** Code written in C in 1990 still
+   compiles and runs today.
+
+## A taste of "systems thinking" in C
+
+The program below prints the size of every fundamental type *on this
+machine*. The answers are not standardized — they depend on the
+target architecture. On the WASI target you are about to run, ints
+are 32 bits and pointers are 32 bits.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    printf("char       : %zu byte(s)\\n", sizeof(char));
+    printf("short      : %zu byte(s)\\n", sizeof(short));
+    printf("int        : %zu byte(s)\\n", sizeof(int));
+    printf("long       : %zu byte(s)\\n", sizeof(long));
+    printf("long long  : %zu byte(s)\\n", sizeof(long long));
+    printf("float      : %zu byte(s)\\n", sizeof(float));
+    printf("double     : %zu byte(s)\\n", sizeof(double));
+    printf("void *     : %zu byte(s)\\n", sizeof(void *));
+    return 0;
+}
+`}
+/>
+
+That single program tells you a great deal about the target: integer
+widths, pointer width (and therefore the size of the address space),
+and floating-point representation. We will return to these numbers
+constantly.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Which of the following is **not** a typical reason to choose C over a higher-level language like Python or Java?
+
+- Predictable execution with no garbage collector pauses
+  > That is a real C advantage, especially for embedded and real-time work.
+- Ability to run on a microcontroller with kilobytes of memory
+  > That is also a real C advantage; C is the dominant embedded language.
+- Direct access to hardware addresses and registers
+  > That is a real C advantage; volatile pointers map to MMIO.
+- [o] Built-in safety against out-of-bounds memory access
+  > Correct. C deliberately does **not** check array bounds; that's why memory bugs are such a recurring theme in this course.`}
+/>
+
+<MultipleChoice
+  markdown={`What does "undefined behavior" (UB) mean in the C standard?
+
+- The behavior is platform-specific but always well defined per platform.
+  > That describes *implementation-defined* behavior, not undefined behavior.
+- The program will reliably crash with a clear error message.
+  > UB has no required behavior; "appears to work" is a frequent and dangerous outcome.
+- [o] The standard imposes no requirements: the compiler may produce any code at all, including code that appears to work in testing.
+  > Correct. UB is the root cause of many silent C bugs.
+- It is only a problem in debug builds; optimizers ignore it.
+  > Optimizers actively assume UB never happens, which can make the symptoms worse, not better.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is C often called "portable assembly"?
+
+- Because every C compiler emits the same assembly language.
+  > Different targets emit completely different assembly.
+- [o] Because C exposes the underlying machine model — flat addressable memory, fixed-size values, and direct pointer arithmetic — while still letting you retarget the compiler to many CPUs.
+  > Correct. C is high enough to be portable but low enough to map closely to hardware.
+- Because C programs are written in mnemonics like \`MOV\` and \`ADD\`.
+  > Those are assembly mnemonics; C is a higher-level language than assembly.
+- Because every C statement maps to exactly one CPU instruction.
+  > Many C statements compile to several instructions, and the optimizer can collapse or reorder them.`}
+/>
+
+<Callout type="success" title="Ready to compile">
+Next we will follow a C program through the four-stage build pipeline: preprocessing, compilation, assembly, and linking.
+</Callout>
