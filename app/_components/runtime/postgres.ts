@@ -1,7 +1,12 @@
 "use client";
 
-import { PGlite } from "@electric-sql/pglite";
-import { PGliteWorker } from "@electric-sql/pglite/worker";
+// PGlite and PGliteWorker are loaded from the jsDelivr CDN at runtime
+// (same pattern as SQLite, DuckDB, Pyodide) to keep the large WASM payload
+// off Vercel's bandwidth budget and avoid Turbopack build-time issues.
+// CDN URLs and version are defined in cdn.ts.
+
+import type { PGlite } from "@electric-sql/pglite";
+import type { PGliteWorker as PGliteWorkerType } from "@electric-sql/pglite/worker";
 import type { QueryExecResult, SqlValue } from "./sqlite-wasm";
 import type {
   ColumnSpec,
@@ -15,6 +20,18 @@ import {
   POSTGRES_BLANK_DATABASE,
   type PostgresSampleDatabase,
 } from "./postgresSamples";
+import { PGLITE_WORKER_CDN } from "./cdn";
+
+let _pgliteWorkerModulePromise: Promise<{ PGliteWorker: typeof PGliteWorkerType }> | null = null;
+
+function loadPGliteWorkerModule(): Promise<{ PGliteWorker: typeof PGliteWorkerType }> {
+  if (!_pgliteWorkerModulePromise) {
+    _pgliteWorkerModulePromise = import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ PGLITE_WORKER_CDN
+    ) as Promise<{ PGliteWorker: typeof PGliteWorkerType }>;
+  }
+  return _pgliteWorkerModulePromise;
+}
 
 type PgliteResult = Awaited<ReturnType<PGlite["exec"]>>[number];
 
@@ -203,7 +220,7 @@ export interface PostgresEngine {
   close: () => Promise<void>;
 }
 
-function createFreshWorker(opts: { dataDir?: string } = {}): PGlite {
+async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlite> {
   // Pass a unique `id` so this PGliteWorker instance gets its own leader-
   // election lock and BroadcastChannel. Without a unique id every instance
   // with the same worker URL shares the same lock, meaning an unclosed
@@ -215,6 +232,7 @@ function createFreshWorker(opts: { dataDir?: string } = {}): PGlite {
   // to the worker's `init` callback which passes it to `new PGlite(opts)`.
   // PGlite recognises the `opfs-ahp://` scheme and uses the OPFS Access
   // Handle Pool VFS to persist data across reloads.
+  const { PGliteWorker } = await loadPGliteWorkerModule();
   return new PGliteWorker(
     new Worker(new URL("./postgres-worker.ts", import.meta.url)),
     {
@@ -252,7 +270,7 @@ async function createFreshDatabase(
   sample: PostgresSampleDatabase,
   opts: CreateDbOptions = {},
 ): Promise<PGlite> {
-  const db = createFreshWorker({ dataDir: opts.dataDir });
+  const db = await createFreshWorker({ dataDir: opts.dataDir });
   await db.waitReady;
   // First-open detection for OPFS-backed databases: skip the sample
   // seed when the cluster already has user tables, so a returning user
@@ -323,7 +341,7 @@ export async function createPostgresEngine(
         }
         return sample;
       }
-      const next = createFreshWorker();
+      const next = await createFreshWorker();
       await next.waitReady;
       await db.close();
       db = next;
@@ -812,7 +830,7 @@ export async function createPostgresEngine(
     },
 
     async importSqlDump(sql) {
-      const next = createFreshWorker();
+      const next = await createFreshWorker();
       await next.waitReady;
       try {
         await next.exec(sql);

@@ -4,7 +4,9 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 
 // The C# .NET runtime bundle (cdn-assets/_dotnet/) is served from
 // jsDelivr CDN (see app/_components/runtime/cdn.ts) so Vercel never
-// handles those large files. Java's tools.jar lives in public/ since
+// handles those large files. PGlite (@electric-sql/pglite) is also
+// served from jsDelivr CDN via dynamic imports (see postgres.ts and
+// postgres-worker.ts). Java's tools.jar lives in public/ since
 // jsDelivr does not support .jar files.
 //
 // The /_dotnet/ redirect below is no longer required for the C#
