@@ -3,12 +3,22 @@ title: Comprehensions
 description: List, dict, set, and generator comprehensions
 ---
 
-A **comprehension** is a compact way to build a list, dict, set, or
-generator by transforming and filtering an iterable. They are arguably
-the most Pythonic feature in the language and once you internalize the
-shape, you will reach for them constantly.
+A **comprehension** is a compact way to build a list, dict, set, or generator by transforming and filtering an iterable. Comprehensions are arguably the most Pythonic feature in the language. They turn "loop over this, filter that, transform these" into a single readable expression. Once you internalize the pattern, you will reach for them constantly in data pipelines, API response shaping, config munging, and anywhere you transform collections.
 
-## List comprehensions
+Every snippet on this page runs in your browser — no setup required.
+
+## Real-world impact
+
+Comprehensions are everywhere in production Python. Every data pipeline maps and filters rows with comprehensions. Every web API shapes JSON responses with dict comprehensions. Every script that processes files uses comprehensions to filter and transform lines. Mastering comprehensions means writing clearer, faster, more maintainable code.
+
+```mermaid
+flowchart LR
+    A["Input: [1, 2, 3, 4, 5]"] --> B["Filter: x % 2 == 0"]
+    B --> C["Transform: x * x"]
+    C --> D["Output: [4, 16]"]
+```
+
+## List comprehensions: basics
 
 The general form:
 
@@ -20,11 +30,19 @@ The general form:
   adapter="python"
   initialCode={`squares = [x * x for x in range(1, 6)]
 print(squares)
+`}
+/>
 
-evens = [x for x in range(20) if x % 2 == 0]
+<CodeBlock
+  adapter="python"
+  initialCode={`evens = [x for x in range(20) if x % 2 == 0]
 print(evens)
+`}
+/>
 
-upper = [w.upper() for w in ["a", "b", "c"]]
+<CodeBlock
+  adapter="python"
+  initialCode={`upper = [w.upper() for w in ["a", "b", "c"]]
 print(upper)
 `}
 />
@@ -38,42 +56,113 @@ for x in iterable:
         result.append(expression)
 ```
 
-The comprehension is usually preferable because it states *what* you
-want rather than *how*. But if your transformation has more than one
-filter or grows beyond a single line, fall back to an explicit loop.
+The comprehension is usually preferable because it states *what* you want rather than *how*. It is also often faster because the loop is optimized at the C level.
 
-## Nested loops in comprehensions
+## List comprehensions: with filter
+
+The `if` clause is optional.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+evens = [x for x in nums if x % 2 == 0]
+print(evens)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`words = ["apple", "banana", "cherry", "date"]
+long_words = [w for w in words if len(w) > 5]
+print(long_words)
+`}
+/>
+
+You can combine transformation and filtering.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`nums = [1, 2, 3, 4, 5]
+doubled_evens = [x * 2 for x in nums if x % 2 == 0]
+print(doubled_evens)
+`}
+/>
+
+## List comprehensions: nested loops
 
 Multiple `for` clauses behave like nested loops, left to right.
 
 <CodeBlock
   adapter="python"
+  initialCode={`pairs = [(x, y) for x in range(3) for y in range(3)]
+print(pairs)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
   initialCode={`pairs = [(x, y) for x in range(3) for y in range(3) if x != y]
 print(pairs)
+`}
+/>
 
-flat = [n for row in [[1, 2], [3, 4], [5, 6]] for n in row]
+Nested comprehensions are useful for flattening lists.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`nested = [[1, 2], [3, 4], [5, 6]]
+flat = [n for row in nested for n in row]
 print(flat)
 `}
 />
 
+<Callout type="warn" title="Readability ceiling">
+Comprehensions are powerful, but stacking too much logic into one makes for unreadable code. Rule of thumb: up to one `for` and one `if` is usually fine. More than that, or a complex expression, and you should write a loop. Comprehensions are for clarity, not cleverness.
+</Callout>
+
 ## Dict comprehensions
+
+Use `{key: value for ...}` to build a dict.
 
 <CodeBlock
   adapter="python"
   initialCode={`squares_map = {x: x * x for x in range(1, 6)}
 print(squares_map)
+`}
+/>
 
-prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+<CodeBlock
+  adapter="python"
+  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 expensive = {fruit: price for fruit, price in prices.items() if price >= 1.0}
 print(expensive)
+`}
+/>
 
-# Inverting a dict.
+Inverting a dict is a one-liner.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 inverted = {v: k for k, v in prices.items()}
 print(inverted)
 `}
 />
 
+Dict comprehensions are especially useful when reshaping API responses or config files.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Normalize keys to lowercase
+raw = {"Name": "Ada", "Year": 1815}
+normalized = {k.lower(): v for k, v in raw.items()}
+print(normalized)
+`}
+/>
+
 ## Set comprehensions
+
+Use `{expression for ...}` to build a set.
 
 <CodeBlock
   adapter="python"
@@ -82,38 +171,61 @@ print(vowels)
 `}
 />
 
+<CodeBlock
+  adapter="python"
+  initialCode={`nums = [1, 2, 2, 3, 3, 3]
+unique = {x for x in nums}
+print(unique)
+`}
+/>
+
+Set comprehensions automatically deduplicate, just like constructing `set([...])` would.
+
 ## Generator expressions
 
-Drop the brackets and you get a **generator expression** instead.
-It produces items lazily, one at a time, which is great for memory.
+Drop the brackets and you get a **generator expression** instead. It produces items lazily, one at a time, which is great for memory efficiency.
 
 <CodeBlock
   adapter="python"
   initialCode={`# List comprehension allocates the full list up front.
 list_total = sum([x * x for x in range(1_000_000)])
-
-# Generator expression streams one square at a time.
-gen_total = sum(x * x for x in range(1_000_000))
-
-print(list_total, gen_total, list_total == gen_total)
+print("list total:", list_total)
 `}
 />
 
-When a generator expression is the only argument to a function, the
-inner parentheses can be dropped:
+<CodeBlock
+  adapter="python"
+  initialCode={`# Generator expression streams one square at a time.
+gen_total = sum(x * x for x in range(1_000_000))
+print("gen total:", gen_total)
+`}
+/>
 
-```python
-sum(x * x for x in xs)        # nice
-sum((x * x for x in xs))      # also fine, just noisier
-```
+The results are identical, but the generator uses O(1) memory while the list uses O(n).
 
-## A note on readability
+<Callout type="info" title="Generator vs list memory">
+A list comprehension builds the entire list in memory before you can use it. A generator expression produces values on demand, one at a time. If you only need to iterate once (e.g., in `sum`, `max`, `any`, `all`), use a generator. If you need to iterate multiple times or slice the result, use a list.
+</Callout>
 
-Comprehensions are powerful, but stacking too much logic into one
-makes for unreadable code. Rule of thumb:
+When a generator expression is the only argument to a function, the inner parentheses can be dropped:
 
-- Up to one `for` and one `if`: prefer the comprehension.
-- More than that, or a complex expression: write a loop.
+<CodeBlock
+  adapter="python"
+  initialCode={`total = sum(x * x for x in range(10))
+print(total)
+`}
+/>
+
+This is equivalent to `sum((x * x for x in range(10)))` but cleaner.
+
+## When to use each form
+
+| Form | Use when |
+| --- | --- |
+| List comprehension `[...]` | You need the full list, or will iterate multiple times |
+| Dict comprehension `{k: v ...}` | Building or transforming dicts |
+| Set comprehension `{...}` | Building a set, deduplication is important |
+| Generator expression `(...)` | One-time iteration, memory efficiency matters |
 
 ## Challenges
 
@@ -184,6 +296,38 @@ A regular loop is fine here; you do not have to use a single comprehension.`}
   ]}
 />
 
+<ChallengeCard
+  adapter="python"
+  title="Cartesian product pairs"
+  instructions={`Define \`cartesian(a, b)\` that returns a list of all \`(x, y)\` pairs where \`x\` is from list \`a\` and \`y\` is from list \`b\`, in the order produced by nested loops. Use a single list comprehension with two \`for\` clauses.
+
+For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2, "a"), (2, "b")]\`.`}
+  initialCode={`def cartesian(a, b):
+    # your code here
+    return []
+`}
+  solutionCode={`def cartesian(a, b):
+    return [(x, y) for x in a for y in b]
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic case",
+      code: `assert cartesian([1, 2], ["a", "b"]) == [(1, "a"), (1, "b"), (2, "a"), (2, "b")]`,
+    },
+    {
+      id: "empty_a",
+      name: "Empty first list",
+      code: `assert cartesian([], ["a"]) == []`,
+    },
+    {
+      id: "empty_b",
+      name: "Empty second list",
+      code: `assert cartesian([1], []) == []`,
+    },
+  ]}
+/>
+
 <MultipleChoice
   markdown={`What does \`[x * 2 for x in range(4) if x % 2]\` evaluate to?
 
@@ -192,18 +336,52 @@ A regular loop is fine here; you do not have to use a single comprehension.`}
 - [o] \`[2, 6]\`
   > Correct. \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
 - \`[1, 3]\`
-- \`[0, 4]\``}
+  > The expression is \`x * 2\`, not \`x\`.
+- \`[0, 4]\`
+  > The \`if x % 2\` filters for odd numbers, not even.`}
 />
 
 <MultipleChoice
-  markdown={`Which of the following are the **same** at the level of computed values? Select all that apply.
+  markdown={`Which of the following produces the same result as \`[x*x for x in range(5)]\`?
 
-- [o] \`sum([x*x for x in range(10)])\` and \`sum(x*x for x in range(10))\`
-- [o] \`list(x*x for x in range(5))\` and \`[x*x for x in range(5)]\`
-- \`{x for x in [1, 1, 2]}\` and \`{x: x for x in [1, 1, 2]}\`
-  > One is a set comprehension, the other is a dict comprehension. They produce different types.
-- [o] \`{x*x for x in range(3)}\` and \`set(x*x for x in range(3))\``}
+- \`(x*x for x in range(5))\`
+  > That is a generator expression, not a list.
+- \`{x*x for x in range(5)}\`
+  > That is a set comprehension, not a list.
+- [o] \`list(x*x for x in range(5))\`
+  > Correct. Converting the generator to a list gives the same result.
+- \`{x: x*x for x in range(5)}\`
+  > That is a dict comprehension, not a list.`}
 />
 
-You can now turn raw iterables into shaped data in one line. Functions
-are next.
+<MultipleChoice
+  markdown={`What is the key advantage of a generator expression over a list comprehension?
+
+- Generators are always faster.
+  > Not always — list access is O(1), generator iteration has per-item overhead.
+- [o] Generators use O(1) memory regardless of input size.
+  > Correct. Generators produce items lazily, one at a time.
+- Generators support slicing.
+  > Generators do **not** support slicing; lists do.
+- Generators automatically deduplicate.
+  > Generators do not deduplicate; that is what sets do.`}
+/>
+
+<MultipleChoice
+  markdown={`What does this nested comprehension produce?
+
+\`\`\`python
+[x + y for x in [1, 2] for y in [10, 20]]
+\`\`\`
+
+- \`[11, 21, 12, 22]\`
+  > That is the correct order.
+- [o] \`[11, 21, 12, 22]\`
+  > Correct. The outer loop is \`x\`, the inner loop is \`y\`.
+- \`[11, 12, 21, 22]\`
+  > That would be if \`y\` were the outer loop.
+- \`[30, 40]\`
+  > That would be summing the lists, not the Cartesian product.`}
+/>
+
+You can now turn raw iterables into shaped data in one line. Functions are next.

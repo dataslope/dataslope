@@ -5,7 +5,27 @@ description: How Python uses whitespace, PEP 8 style, and the tabs vs spaces con
 
 The previous page noted that Python uses indentation to delimit blocks
 of code. This page goes into detail: what counts as a block, what
-PEP 8 has to say about style, and how to keep your editor honest.
+PEP 8 has to say about style, how to keep your editor honest, and why
+this choice sparked one of programming's most famous debates.
+
+## Why Python chose significant whitespace
+
+Most languages in the 1980s and 1990s used braces (`{ ... }`) or
+keywords (`begin ... end`) to mark blocks. Python took a different
+path: Guido van Rossum observed that **programmers already indent code
+to show structure to humans**, so why not make the compiler trust that
+indentation? The result is that:
+
+1. **Badly indented code will not run.** A misaligned line is a syntax
+   error, not a silent bug.
+2. **Every Python codebase looks consistent.** There is no "my braces
+   on the same line" vs "my braces on the next line" religious war.
+3. **Beginner-friendly.** New programmers do not have to learn a
+   special punctuation syntax; they just indent naturally.
+
+This design choice is polarizing. Some find it liberating; others miss
+the explicit delimiters of C-like languages. Either way, it is
+non-negotiable in Python.
 
 ## Blocks are indentation
 
@@ -27,26 +47,42 @@ print(shout(""))
 The colon (`:`) at the end of `def`, `if`, `for`, `while`, `try`,
 `class`, and so on signals "the next indented block belongs to me".
 
+<Callout type="info">
+Think of the colon as Python's way of saying "here comes a block". It
+replaces the opening brace `{` in C-like languages. The dedent
+(returning to the previous indentation level) implicitly closes the
+block.
+</Callout>
+
 ## What happens when indentation is wrong
 
 If indentation is missing where Python expects it, you get an
 `IndentationError`. If it is inconsistent, you get a `TabError` or a
-silently broken program.
+silently broken program (in older Python 2 codebases).
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Try editing this so the 'return' is indented under the 'def',
-# then run again to see the difference.
+  initialCode={`# Try un-indenting the 'return' line (remove the leading spaces)
+# then run again to see the IndentationError.
 def square(x):
-return x * x
+    return x * x
 
 print(square(5))
 `}
 />
 
+<Callout type="warn" title="Mixing tabs and spaces">
+Python 3 will raise a **TabError** if a single block mixes tabs and
+spaces. Python 2 allowed it and silently treated a tab as "however many
+spaces it takes to reach the next multiple of 8", which caused famously
+confusing bugs. Configure your editor to insert spaces when you press
+the Tab key, and you will never see this error.
+</Callout>
+
 ## The four-space rule (PEP 8)
 
-PEP 8, Python's official style guide, says:
+[PEP 8](https://peps.python.org/pep-0008/), Python's official style
+guide, says:
 
 - Use **four spaces** per indentation level.
 - Do **not** mix tabs and spaces inside the same block. Python 3
@@ -61,28 +97,66 @@ PEP 8, Python's official style guide, says:
 Tools that enforce this for you:
 
 - [`black`](https://black.readthedocs.io/) reformats your code in one
-  consistent style with almost no configuration.
+  consistent style with almost no configuration. It is the most popular
+  Python formatter.
 - [`ruff`](https://docs.astral.sh/ruff/) is a very fast linter that
   rolls up most of the older tools (`flake8`, `isort`, `pyupgrade`).
-- Most editors can run these on save.
+- Most editors (VS Code, PyCharm, Vim, Emacs) can run these on save.
 
-## The tabs vs spaces debate, revisited
+## The tabs vs spaces debate
 
-We touched on this on the *Python History* page. The very short
-version, with a bit more nuance:
+We touched on this on the *Python History* page. The debate is older
+than Python itself and predates programming languages: it started with
+typewriters and word processors. The arguments in favor of each:
 
 | Argument | Tabs | Spaces |
 | --- | --- | --- |
-| Each developer picks their own width | Yes | No |
-| Renders identically everywhere | No | Yes |
-| Easier to align continuation lines | No | Yes |
-| Default in PEP 8, `black`, `ruff` | No | Yes |
-| Allowed in Python 3 source | Yes (alone) | Yes (alone) |
+| Each developer picks their own width | ✅ Yes | ❌ No |
+| Renders identically everywhere | ❌ No | ✅ Yes |
+| Easier to align continuation lines | ❌ No | ✅ Yes |
+| Default in PEP 8, `black`, `ruff` | ❌ No | ✅ Yes |
+| Allowed in Python 3 source | ✅ Yes (alone) | ✅ Yes (alone) |
+| Accessibility: screen readers / low vision | ✅ Better | ❌ Worse |
+
+### The strongest argument for tabs
+
+The accessibility argument is real: a developer with low vision can
+configure their editor to display a tab as 8 spaces for easier reading,
+while a sighted colleague can set it to 2 spaces to fit more code on
+screen. With spaces, everyone is locked into the same visual width.
+
+### The strongest argument for spaces
+
+Tabs break alignment of continuation lines. Consider:
+
+```python
+result = some_function(arg1, arg2,
+                       arg3, arg4)
+```
+
+If the file uses tabs, the alignment of `arg3` depends on the tab width
+of your editor. On one machine it looks perfect; on another it is
+misaligned. Spaces render identically everywhere.
+
+### The community consensus
+
+The community has effectively settled on **four spaces**. PEP 8 states:
+
+> **Spaces are the preferred indentation method. Tabs should be used
+> solely to remain consistent with code that is already indented with
+> tabs.**
 
 For brand-new code, **use four spaces**. If you join a project that
 already uses tabs, stay consistent with what is there. Either way,
 configure your editor to insert *one or the other* automatically so
 you never produce mixed indentation.
+
+<Callout type="error" title="The Silicon Valley incident">
+In the TV show *Silicon Valley*, an engineer quits over a tabs-vs-spaces
+argument. The scene is a joke, but it is rooted in reality: this debate
+has genuinely derailed code reviews and project contributions. Do not
+let it derail yours. Pick four spaces and move on.
+</Callout>
 
 ## Continuation lines
 
@@ -91,7 +165,7 @@ ways to span multiple lines:
 
 1. **Implicit continuation** inside `()`, `[]`, or `{}`. This is the
    preferred style.
-2. **Explicit continuation** with a backslash `\\` at end of line.
+2. **Explicit continuation** with a backslash `\` at end of line.
 
 <CodeBlock
   adapter="python"
@@ -99,18 +173,29 @@ ways to span multiple lines:
 total = (1 + 2 + 3
          + 4 + 5 + 6)
 
-# Works but ugly: explicit backslash continuation.
+print("Total:", total)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Works but ugly: explicit backslash continuation.
 total2 = 1 + 2 + 3 \\
        + 4 + 5 + 6
 
-print(total, total2)
+print("Total2:", total2)
 `}
 />
+
+PEP 8 recommends avoiding backslash continuation where possible. Modern
+code wraps long lines in parentheses even when they are not strictly
+needed (e.g. for a long `if` condition).
 
 ## Semicolons (please do not)
 
 Python technically allows `;` to separate statements on one line. The
-community consensus is **do not use it**.
+community consensus is **do not use it**. PEP 8 says "avoid it" in
+polite language; the real sentiment is "never do this".
 
 <CodeBlock
   adapter="python"
@@ -119,12 +204,39 @@ a = 1; b = 2; print(a + b)
 `}
 />
 
-## A formatting challenge
+The only exception is in one-liners passed to `python -c`:
+
+```bash
+python -c "import sys; print(sys.version)"
+```
+
+Even there, most people avoid `;` and use newlines instead.
+
+## Real-world comparison: Python vs other languages
+
+Here is how other popular languages handle indentation:
+
+| Language | Block delimiter | Indentation | Community standard |
+| --- | --- | --- | --- |
+| Python | Indentation | Required | 4 spaces (PEP 8) |
+| JavaScript | `{ ... }` | Optional | 2 spaces (Prettier default) |
+| Java | `{ ... }` | Optional | 4 spaces |
+| C / C++ | `{ ... }` | Optional | Varies (Google: 2, Linux kernel: tabs) |
+| Go | `{ ... }` | Optional | Tabs (`gofmt` enforces this) |
+| Ruby | `do ... end` or `{ ... }` | Optional | 2 spaces |
+| Rust | `{ ... }` | Optional | 4 spaces (`rustfmt` default) |
+| Haskell | Indentation or `{ ; }` | Optional but idiomatic | 2 spaces |
+
+Python is unique in making indentation **mandatory**. Haskell has
+optional significant whitespace, but most Haskellers use braces to
+avoid the complexity. Python goes all-in.
+
+## Challenges
 
 <ChallengeCard
   adapter="python"
   title="Fix the broken indentation"
-  instructions={`The function \`average\` below has at least one indentation problem and may also have a stray semicolon. Rewrite the body so that:
+  instructions={`The function \`average\` below has indentation problems and a stray semicolon. Rewrite the body so that:
 
 - It uses four-space indentation throughout.
 - It has no semicolons.
@@ -165,17 +277,93 @@ print(average([1, 2, 3, 4]))
   ]}
 />
 
-<MultipleChoice
-  markdown={`Which statements about Python whitespace are correct? Select all that apply.
+<ChallengeCard
+  adapter="python"
+  title="Rewrite with continuation lines"
+  instructions={`Rewrite the function \`long_sum\` below to use implicit continuation inside parentheses instead of backslash continuation. The function should return the sum of all its arguments.
 
-- [o] Blocks are delimited by indentation, not by braces.
-- [o] PEP 8 recommends four spaces per indentation level.
-- [o] Python 3 will raise an error if a single block mixes tabs and spaces.
-- Indentation in Python is purely cosmetic and the parser ignores it.
-  > Indentation is part of the grammar. Misindented code will not parse.
-- A backslash at the end of a line continues the statement onto the next line.
-  > True, but unparenthesized lines are usually rewritten to use \`( ... )\`.`}
+Do not change the function's behavior, just improve its style.`}
+  initialCode={`def long_sum(a, b, c, d, e):
+    result = a + b + c \\
+           + d + e
+    return result
+
+print(long_sum(1, 2, 3, 4, 5))
+`}
+  solutionCode={`def long_sum(a, b, c, d, e):
+    result = (a + b + c
+              + d + e)
+    return result
+
+print(long_sum(1, 2, 3, 4, 5))
+`}
+  tests={[
+    {
+      id: "sum_five",
+      name: "sum of 1, 2, 3, 4, 5 is 15",
+      code: `assert long_sum(1, 2, 3, 4, 5) == 15`,
+    },
+    {
+      id: "sum_ten",
+      name: "sum of 10, 20, 30, 40, 50 is 150",
+      code: `assert long_sum(10, 20, 30, 40, 50) == 150`,
+    },
+  ]}
+/>
+
+## Test your knowledge
+
+<MultipleChoice
+  markdown={`What delimiter does Python use to mark code blocks?
+
+- Curly braces \`{ ... }\`
+  > That is the C/JavaScript/Java style. Python does not use braces.
+- Keywords \`begin ... end\`
+  > That is the Pascal/Ruby style. Python does not use those keywords.
+- [o] Indentation
+  > Correct. A colon starts a block, and indentation defines its scope.
+- Parentheses \`( ... )\`
+  > Parentheses group expressions, not blocks.`}
+/>
+
+<MultipleChoice
+  markdown={`What does PEP 8 recommend for indentation?
+
+- A single tab character
+  > Tabs are permitted only for compatibility with already-tab-indented code.
+- Two spaces
+  > Two-space indentation is common in JavaScript and Ruby, but PEP 8 prefers four for Python.
+- [o] Four spaces
+  > Correct. PEP 8 mandates four spaces per indentation level.
+- Eight spaces
+  > Eight is what a tab expanded to in Python 2 and is considered too wide for nested code.`}
+/>
+
+<MultipleChoice
+  markdown={`What error does Python 3 raise if you mix tabs and spaces in the same block?
+
+- SyntaxError
+  > Syntax errors are for invalid Python code. Mixing tabs and spaces is a specific case.
+- IndentationError
+  > This is raised when indentation is missing or inconsistent, but mixing tabs and spaces has its own error.
+- [o] TabError
+  > Correct. Python 3 raises a \`TabError\` if a single block mixes tabs and spaces.
+- RuntimeError
+  > Runtime errors occur during execution, not parsing.`}
+/>
+
+<MultipleChoice
+  markdown={`Which tool is the most popular Python code formatter?
+
+- pylint
+  > pylint is a linter (it finds bugs and style issues) but does not reformat code.
+- flake8
+  > flake8 is also a linter, not a formatter.
+- [o] black
+  > Correct. black is the most popular Python formatter and enforces a consistent style with almost no configuration.
+- mypy
+  > mypy is a type checker, not a formatter.`}
 />
 
 Now that the rules of the road are clear, we will start using them to
-build real programs, starting with variables.
+build real programs, starting with variables and data types.

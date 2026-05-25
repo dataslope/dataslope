@@ -3,82 +3,185 @@ title: Dictionaries
 description: Key-value mappings, the most-used data structure in Python
 ---
 
-A `dict` maps **keys** to **values**. Lookups, insertions, and
-deletions are all average-case O(1). Dictionaries are everywhere in
-Python: JSON, function keyword arguments, object attributes, and many
-config formats are all dict-shaped.
+A `dict` maps **keys** to **values**. Lookups, insertions, and deletions are all average-case O(1). Dictionaries are everywhere in Python: JSON decoding produces dicts, function `**kwargs` are dicts, object `__dict__` attributes are dicts, module globals live in a dict, configuration files parse to dicts. **Dictionaries _are_ Python.** Understanding them deeply is not optional.
+
+Every snippet on this page runs in your browser — no setup required.
+
+## How dictionaries work
+
+Under the hood, a dict is a **hash table**: Python computes a hash of your key, uses that to find a bucket, and stores the key-value pair there. Hash collisions are handled with open addressing. This gives O(1) average-case access.
+
+```mermaid
+flowchart LR
+    A["Key: 'apple'"] --> B["hash('apple')"]
+    B --> C["Bucket index"]
+    C --> D["Value: 1.0"]
+```
+
+<Callout type="info" title="Dicts are Python's superpower">
+Python's dict implementation is one of the fastest in any dynamic language. The entire language runtime is built on dicts: every module's namespace, every object's attributes, every function's keyword arguments. When you write `obj.attr`, Python is doing `obj.__dict__['attr']` behind the scenes. Dicts are the engine of Python.
+</Callout>
 
 ## Creating dicts
+
+The simplest dict is written with curly braces, separating `key: value` pairs with commas.
 
 <CodeBlock
   adapter="python"
   initialCode={`empty = {}
-person = {"name": "Ada", "year": 1815}
-also_person = dict(name="Ada", year=1815)
-from_pairs = dict([("a", 1), ("b", 2)])
+print(empty)
+`}
+/>
 
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
 print(person)
+`}
+/>
+
+The `dict()` constructor accepts keyword arguments or an iterable of `(key, value)` pairs.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`also_person = dict(name="Ada", year=1815)
 print(also_person)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from_pairs = dict([("a", 1), ("b", 2), ("c", 3)])
 print(from_pairs)
 `}
 />
 
 ## Accessing values
 
+Use `[]` to access a value by key.
+
 <CodeBlock
   adapter="python"
   initialCode={`person = {"name": "Ada", "year": 1815}
-
 print(person["name"])
+`}
+/>
 
-# Missing key with [] raises KeyError.
+Missing keys raise a `KeyError`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
 try:
     print(person["email"])
 except KeyError as e:
-    print("missing:", e)
+    print("KeyError:", e)
+`}
+/>
 
-# .get returns None (or your default) instead of raising.
+`.get` returns `None` (or a default you provide) instead of raising.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
 print(person.get("email"))
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
 print(person.get("email", "no email on file"))
 `}
 />
 
+<Callout type="info" title="get vs []">
+Use `d[key]` when the key must exist (and you want to crash if it doesn't). Use `d.get(key, default)` when the key might be missing and you have a sensible fallback. Both are idiomatic; pick the one that matches your intent.
+</Callout>
+
 ## Updating
+
+Assign through `[]` to add or overwrite a key.
 
 <CodeBlock
   adapter="python"
   initialCode={`person = {"name": "Ada"}
-person["year"] = 1815          # add or overwrite
-person.update({"role": "mathematician"})
+person["year"] = 1815
+print(person)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
+person["year"] = 1816
+print(person)
+`}
+/>
+
+`.update` merges in another dict or iterable of pairs.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada"}
+person.update({"role": "mathematician", "year": 1815})
+print(person)
+`}
+/>
+
+Delete a key with `del` or `.pop`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
 del person["year"]
+print(person)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815, "role": "mathematician"}
 removed = person.pop("role")
-print(person, "removed:", removed)
+print("removed:", removed)
+print("person:", person)
 `}
 />
 
 ## Iterating
 
+By default, iteration yields keys.
+
 <CodeBlock
   adapter="python"
   initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
-
-# By default, iteration yields keys.
 for fruit in prices:
     print(fruit)
+`}
+/>
 
-# Items gives (key, value) pairs.
+`.items()` gives `(key, value)` pairs.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 for fruit, price in prices.items():
     print(f"{fruit}: \${price:.2f}")
+`}
+/>
 
-# Values alone.
+`.values()` gives just the values.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 print(list(prices.values()))
 `}
 />
 
-## Insertion order is preserved
-
-Since Python 3.7, `dict` officially preserves insertion order. The
-first item you put in is the first one you see when iterating.
+<Callout type="info" title="Insertion order is preserved">
+Since Python 3.7, dicts officially preserve insertion order. The first item you put in is the first one you see when iterating. Before 3.7, dict order was undefined (though CPython 3.6 had ordered dicts as an implementation detail). This change was a huge quality-of-life improvement.
+</Callout>
 
 <CodeBlock
   adapter="python"
@@ -91,52 +194,81 @@ print(d)
 
 ## Keys must be hashable
 
-Strings, numbers, booleans, frozensets, and tuples-of-hashables work.
-Lists, sets, and dicts do not.
+Keys can be any **hashable** type: strings, numbers, booleans, tuples-of-hashables, frozensets. Lists, sets, and dicts are mutable and therefore not hashable.
 
 <CodeBlock
   adapter="python"
-  initialCode={`good = {("x", 1): "ok"}
+  initialCode={`good = {("x", 1): "ok", 42: "also ok", "hi": "yep"}
 print(good)
+`}
+/>
 
-try:
+<CodeBlock
+  adapter="python"
+  initialCode={`try:
     bad = {[1, 2]: "nope"}
 except TypeError as e:
     print("TypeError:", e)
 `}
 />
 
+<Callout type="warn">
+The requirement is **hashability**, not immutability. A custom class can be mutable yet hashable if it defines `__hash__` and `__eq__` (though that is rarely a good idea). Conversely, not all immutable types are hashable (e.g., `tuple` containing a list is immutable but not hashable).
+</Callout>
+
 ## Merging dicts (Python 3.9+)
+
+The `|` operator creates a new dict; the right operand wins on conflicts.
 
 <CodeBlock
   adapter="python"
   initialCode={`a = {"x": 1, "y": 2}
 b = {"y": 99, "z": 3}
-
-# | creates a new dict, right operand wins on conflicts.
 print(a | b)
+`}
+/>
 
-# |= mutates in place.
+`|=` mutates in place.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = {"x": 1, "y": 2}
+b = {"y": 99, "z": 3}
 a |= b
 print(a)
 `}
 />
 
-## Counting and grouping
-
-`collections.Counter` and `collections.defaultdict` cover two of the
-most common dict patterns.
+Before Python 3.9, use `.update()` or `{**a, **b}`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from collections import Counter, defaultdict
+  initialCode={`a = {"x": 1, "y": 2}
+b = {"y": 99, "z": 3}
+merged = {**a, **b}
+print(merged)
+`}
+/>
 
-# Count word frequencies.
+## Counting and grouping
+
+`collections.Counter` and `collections.defaultdict` cover two of the most common dict patterns.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from collections import Counter
+
 text = "to be or not to be that is the question to be"
-print(Counter(text.split()))
-print(Counter(text.split()).most_common(3))
+freq = Counter(text.split())
+print(freq)
+print(freq.most_common(3))
+`}
+/>
 
-# Group items by first letter.
+<CodeBlock
+  adapter="python"
+  initialCode={`from collections import defaultdict
+
 words = ["apple", "ant", "banana", "berry", "cherry"]
 groups = defaultdict(list)
 for w in words:
@@ -145,10 +277,9 @@ print(dict(groups))
 `}
 />
 
-## JSON
+## JSON interop
 
-Dicts and JSON objects share a syntax for a reason. The `json` module
-converts both ways:
+Dicts and JSON objects share syntax for a reason. The `json` module converts both ways.
 
 <CodeBlock
   adapter="python"
@@ -157,11 +288,23 @@ converts both ways:
 person = {"name": "Ada", "year": 1815, "skills": ["math", "logic"]}
 text = json.dumps(person, indent=2)
 print(text)
-
-restored = json.loads(text)
-print(restored, restored == person)
 `}
 />
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import json
+
+text = '{"name": "Ada", "year": 1815}'
+restored = json.loads(text)
+print(restored)
+print(type(restored))
+`}
+/>
+
+<Callout type="info">
+Every web API you call returns JSON, which Python decodes into dicts and lists. Every config file format (JSON, YAML, TOML) parses to nested dicts. Learning dicts is learning how to work with structured data in Python.
+</Callout>
 
 ## Challenges
 
@@ -228,18 +371,57 @@ print(restored, restored == person)
   ]}
 />
 
-<MultipleChoice
-  markdown={`Which of these can be used as dictionary keys? Select all that apply.
+<ChallengeCard
+  adapter="python"
+  title="Merge overlapping keys"
+  instructions={`Define a function \`merge_sum(d1, d2)\` that returns a new dict containing all keys from \`d1\` and \`d2\`. For keys that appear in both, sum the values. For example:
 
-- [o] \`"hello"\`
-- [o] \`42\`
-- [o] \`(1, 2, 3)\`
+\`\`\`python
+merge_sum({"a": 1, "b": 2}, {"b": 3, "c": 4})
+# returns {"a": 1, "b": 5, "c": 4}
+\`\`\`
+
+Assume all values are numbers.`}
+  initialCode={`def merge_sum(d1, d2):
+    # your code here
+    return {}
+`}
+  solutionCode={`def merge_sum(d1, d2):
+    result = d1.copy()
+    for k, v in d2.items():
+        result[k] = result.get(k, 0) + v
+    return result
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Merges and sums overlaps",
+      code: `assert merge_sum({"a": 1, "b": 2}, {"b": 3, "c": 4}) == {"a": 1, "b": 5, "c": 4}`,
+    },
+    {
+      id: "no_overlap",
+      name: "No overlap is just union",
+      code: `assert merge_sum({"a": 1}, {"b": 2}) == {"a": 1, "b": 2}`,
+    },
+    {
+      id: "empty",
+      name: "Empty dicts",
+      code: `assert merge_sum({}, {"x": 5}) == {"x": 5}`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of these can be used as dictionary keys?
+
+- \`"hello"\`
+  > Strings are hashable, so yes.
 - \`[1, 2, 3]\`
-  > Lists are mutable and not hashable, so they cannot be keys.
+  > Lists are mutable and not hashable, so no.
+- [o] \`(1, 2, 3)\`
+  > Correct. Tuples of hashables are hashable.
 - \`{"a": 1}\`
-  > Dicts are mutable and not hashable.
-- [o] \`frozenset({1, 2})\`
-  > Frozensets are immutable and hashable.`}
+  > Dicts are mutable and not hashable, so no.`}
 />
 
 <MultipleChoice
@@ -257,7 +439,35 @@ print(d)
 - [o] \`{"a": 1, "b": 2, "c": 3}\`
   > Correct. \`a\` already exists so it is untouched; \`c\` is added.
 - \`{"a": 1, "b": 2}\`
-- A \`KeyError\``}
+  > \`c\` is missing, so it is added.
+- A \`KeyError\`
+  > \`setdefault\` never raises KeyError.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the time complexity of \`key in d\` where \`d\` is a dict?
+
+- [o] O(1) average case
+  > Correct. Dicts use hash tables, giving O(1) average-case lookup.
+- O(n)
+  > That would be true for a list, not a dict.
+- O(log n)
+  > Dicts are not sorted; they use hashing, not binary search.
+- O(n²)
+  > Dict lookup is much faster than quadratic.`}
+/>
+
+<MultipleChoice
+  markdown={`Since Python 3.7, what is guaranteed about dict iteration order?
+
+- It is undefined and can change between runs.
+  > That was true before 3.7, but not anymore.
+- Sorted by key alphabetically.
+  > Dicts preserve insertion order, not sorted order.
+- [o] Insertion order is preserved.
+  > Correct. The first item inserted is the first one you see when iterating.
+- Sorted by value.
+  > Dicts do not sort by value automatically.`}
 />
 
 Next up: sets, the close cousin of dictionaries.

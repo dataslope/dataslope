@@ -3,10 +3,31 @@ title: Loops
 description: for, while, range, break, continue, and the for-else surprise
 ---
 
-Python has two looping constructs: `for` and `while`. `for` iterates
-over any iterable; `while` repeats while a condition holds true.
+Iteration is the engine of automation. Every batch job, every data pipeline, every web scraper, every game loop, every file processor — they all loop. Python has two looping constructs: `for` iterates over any iterable; `while` repeats while a condition holds true. Mastering loops means writing efficient, readable code that processes data at scale.
+
+Every snippet on this page runs in your browser — no setup required.
+
+## Real-world impact
+
+Loops are everywhere in real code. A web server loops over incoming requests. A machine learning library loops over training batches. A file processor loops over lines. A game engine loops 60 times per second. Understanding loops deeply — including when to `break`, when to `continue`, and how to avoid common pitfalls — is essential.
+
+```mermaid
+flowchart TD
+    A[Start] --> B[for item in items]
+    B --> C{continue?}
+    C -- Yes --> B
+    C -- No --> D{break?}
+    D -- Yes --> E[Exit loop]
+    D -- No --> F[Process item]
+    F --> B
+    B --> G{More items?}
+    G -- Yes --> C
+    G -- No --> E
+```
 
 ## The `for` loop
+
+The simplest form: iterate over a sequence.
 
 <CodeBlock
   adapter="python"
@@ -15,58 +36,134 @@ over any iterable; `while` repeats while a condition holds true.
 `}
 />
 
-`for` works on any iterable: lists, tuples, strings, sets, dicts,
-files, generators, and your own custom classes (covered later under
-*Iterators and Generators*).
+`for` works on **any iterable**: lists, tuples, strings, sets, dicts, files, generators, and your own custom classes (covered later under *Iterators and Generators*).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for char in "hello":
+    print(char)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for key in {"a": 1, "b": 2, "c": 3}:
+    print(key)
+`}
+/>
+
+<Callout type="info">
+Iterating a dict yields **keys** by default. Use `.items()` for key-value pairs, `.values()` for just values. This is a common source of confusion for newcomers.
+</Callout>
 
 ## `range`
 
-`range(stop)`, `range(start, stop)`, and `range(start, stop, step)` produce
-arithmetic progressions lazily. They are the canonical way to loop
-"N times".
+`range(stop)`, `range(start, stop)`, and `range(start, stop, step)` produce arithmetic progressions lazily. They are the canonical way to loop "N times".
 
 <CodeBlock
   adapter="python"
   initialCode={`for i in range(5):
     print(i, end=" ")
 print()
+`}
+/>
 
-for i in range(1, 6):
-    print(i, end=" ")
-print()
-
-for i in range(0, 20, 5):
-    print(i, end=" ")
-print()
-
-for i in range(10, 0, -2):
+<CodeBlock
+  adapter="python"
+  initialCode={`for i in range(1, 6):
     print(i, end=" ")
 print()
 `}
 />
 
-## `enumerate`, `zip`, `reversed`
+<CodeBlock
+  adapter="python"
+  initialCode={`for i in range(0, 20, 5):
+    print(i, end=" ")
+print()
+`}
+/>
 
-If your loop needs the index, do **not** write `range(len(xs))`. Use
-`enumerate`.
+<CodeBlock
+  adapter="python"
+  initialCode={`for i in range(10, 0, -2):
+    print(i, end=" ")
+print()
+`}
+/>
+
+<Callout type="warn">
+The `stop` parameter is **exclusive**. `range(5)` yields `0, 1, 2, 3, 4` — not 5. This is Python's universal convention for ranges and slices, and it prevents off-by-one errors most of the time. But you still need to watch for them when converting between 0-indexed and 1-indexed logic.
+</Callout>
+
+## `enumerate`
+
+If your loop needs the index, **do not write `range(len(xs))`**. Use `enumerate`.
 
 <CodeBlock
   adapter="python"
   initialCode={`fruits = ["apple", "banana", "cherry"]
+for i, fruit in enumerate(fruits):
+    print(i, fruit)
+`}
+/>
 
+<CodeBlock
+  adapter="python"
+  initialCode={`fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits, start=1):
     print(i, fruit)
+`}
+/>
 
+`enumerate` is clearer, more Pythonic, and less error-prone than manual indexing.
+
+## `zip`
+
+`zip` iterates multiple sequences in parallel, stopping at the shortest one.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`fruits = ["apple", "banana", "cherry"]
 prices = [1.0, 0.5, 3.0]
 for fruit, price in zip(fruits, prices):
-    print(f"{fruit}: \${price}")
+    print(f"{fruit}: \${price:.2f}")
+`}
+/>
 
-for fruit in reversed(fruits):
+<CodeBlock
+  adapter="python"
+  initialCode={`a = [1, 2, 3]
+b = ["a", "b", "c"]
+c = [10, 20, 30]
+for x, y, z in zip(a, b, c):
+    print(x, y, z)
+`}
+/>
+
+If the sequences have different lengths, `zip` stops at the shortest.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for x, y in zip([1, 2, 3], ["a", "b"]):
+    print(x, y)
+`}
+/>
+
+## `reversed`
+
+Iterate a sequence backwards without mutating it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for fruit in reversed(["apple", "banana", "cherry"]):
     print(fruit)
 `}
 />
 
 ## The `while` loop
+
+`while` repeats as long as a condition is true.
 
 <CodeBlock
   adapter="python"
@@ -79,25 +176,46 @@ print("steps:", steps)
 `}
 />
 
-Use `while True` plus `break` for "loop until something happens" code
-where the loop body is what knows when to stop.
+Use `while True` plus `break` for "loop until something happens" code where the loop body knows when to stop.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from itertools import count
-
-for n in count(1):
-    if n * n > 100:
-        print("first square over 100 is", n * n)
+  initialCode={`count = 0
+while True:
+    count += 1
+    if count > 5:
         break
+    print(count)
 `}
 />
+
+<Callout type="warn" title="Infinite loops">
+`while True:` without a `break` is an infinite loop. This is useful for servers ("run forever") and event loops ("keep processing"), but deadly in scripts. Always ensure your `while` loop has a way to exit.
+</Callout>
 
 ## `break` and `continue`
 
 - `break` exits the *innermost* loop immediately.
-- `continue` skips the rest of the current iteration and goes back to
-  the top.
+- `continue` skips the rest of the current iteration and goes back to the top.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for n in range(1, 11):
+    if n == 7:
+        print("found 7, stopping")
+        break
+    print(n)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for n in range(1, 11):
+    if n % 2 == 0:
+        continue
+    print("odd:", n)
+`}
+/>
 
 <CodeBlock
   adapter="python"
@@ -111,11 +229,9 @@ for n in count(1):
 `}
 />
 
-## `else` on a loop (the weird one)
+## `for ... else` (the weird one)
 
-Both `for` and `while` accept an `else:` block, which runs **only if
-the loop completed normally** (no `break`). It is most useful for
-search loops:
+Both `for` and `while` accept an `else:` block, which runs **only if the loop completed normally** (no `break`). It is most useful for search loops.
 
 <CodeBlock
   adapter="python"
@@ -132,24 +248,81 @@ for n in [12, 13, 21, 29]:
 `}
 />
 
-This pattern is rare but worth recognizing when you see it.
+The `else` block runs **only if we never hit `break`**, which is exactly what we want for "searched but found nothing" logic.
 
-## Avoiding common pitfalls
-
-- **Modifying a list while iterating over it** invalidates the
-  iterator. Iterate over a copy or build a new list.
-- **Off-by-one errors** are common with `range`. Remember the upper
-  bound is exclusive: `range(5)` yields 0, 1, 2, 3, 4.
-- **`for else` does not fire if you `break`.** That is the whole
-  point, but it surprises people.
+<Callout type="warn" title="for...else is rare and confusing">
+The `for...else` pattern is Pythonic, but it confuses many readers because "else" suggests "if the loop didn't run," when it actually means "if the loop ran to completion without breaking." Use it sparingly and add a comment explaining why, or rewrite with a flag variable if clarity demands it.
+</Callout>
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Removing items while iterating: BAD.
-xs = [1, 2, 3, 4, 5]
-for x in xs[:]:               # iterate over a copy
+  initialCode={`# Alternative without for...else
+def first_factor_alt(n):
+    found = False
+    for i in range(2, n):
+        if n % i == 0:
+            print(f"{n} = {i} * {n // i}")
+            found = True
+            break
+    if not found:
+        print(f"{n} is prime")
+
+for n in [12, 13]:
+    first_factor_alt(n)
+`}
+/>
+
+## `while ... else`
+
+The same `else` logic applies to `while` loops.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`count = 0
+while count < 3:
+    print(count)
+    count += 1
+else:
+    print("loop finished normally")
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`count = 0
+while count < 5:
+    if count == 3:
+        break
+    print(count)
+    count += 1
+else:
+    print("this won't print because we broke")
+`}
+/>
+
+## Avoiding common pitfalls
+
+<Callout type="error" title="Modifying a list while iterating over it">
+Changing a list's length during iteration invalidates the iterator and leads to skipped items or infinite loops. If you must remove items, iterate over a **copy**: `for x in xs[:]` or build a new list with a comprehension.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [1, 2, 3, 4, 5]
+# Iterate over a copy so we can safely mutate the original
+for x in xs[:]:
     if x % 2 == 0:
         xs.remove(x)
+print(xs)
+`}
+/>
+
+Better: use a list comprehension to build a new list.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [1, 2, 3, 4, 5]
+xs = [x for x in xs if x % 2 != 0]
 print(xs)
 `}
 />
@@ -232,6 +405,45 @@ print(xs)
   ]}
 />
 
+<ChallengeCard
+  adapter="python"
+  title="Count vowels"
+  instructions={`Define a function \`count_vowels(text)\` that returns the number of vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`, case-insensitive) in \`text\`. Use a \`for\` loop.`}
+  initialCode={`def count_vowels(text):
+    # your code here
+    return 0
+`}
+  solutionCode={`def count_vowels(text):
+    count = 0
+    for c in text.lower():
+        if c in "aeiou":
+            count += 1
+    return count
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic case",
+      code: `assert count_vowels("Hello World") == 3`,
+    },
+    {
+      id: "no_vowels",
+      name: "No vowels",
+      code: `assert count_vowels("rhythm") == 0`,
+    },
+    {
+      id: "all_vowels",
+      name: "All vowels",
+      code: `assert count_vowels("aeiou") == 5`,
+    },
+    {
+      id: "case",
+      name: "Case-insensitive",
+      code: `assert count_vowels("AEIOU") == 5`,
+    },
+  ]}
+/>
+
 <MultipleChoice
   markdown={`What does this code print?
 
@@ -243,20 +455,59 @@ for i in range(3):
 \`\`\`
 
 - \`0\\n1\\n2\`
+  > \`continue\` skips the rest of the iteration, so 1 is never printed.
 - [o] \`0\\n2\`
-  > \`continue\` skips the rest of the iteration when \`i == 1\`, so \`1\` is never printed.
+  > Correct. \`continue\` skips the \`print\` when \`i == 1\`, so only 0 and 2 print.
 - \`0\\n1\`
-- \`2\``}
+  > The loop does not break; it continues to \`i == 2\`.
+- \`2\`
+  > The loop starts at 0, not 2.`}
 />
 
 <MultipleChoice
   markdown={`When does a \`for ... else\` clause execute?
 
 - Always, after the loop body finishes
+  > No — it only runs if the loop **completes** without a break.
 - When the loop body raises an exception
+  > No — exceptions skip the else clause.
 - [o] Only when the loop finishes without hitting \`break\`
   > Correct. That is what makes it useful for search loops.
-- Only when the iterable is empty`}
+- Only when the iterable is empty
+  > No — it runs after a **successful** completion, not an empty iterable.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the output of this code?
+
+\`\`\`python
+for i in range(5):
+    if i == 3:
+        break
+print(i)
+\`\`\`
+
+- \`0\`
+  > The loop runs multiple times before breaking.
+- \`3\`
+  > \`i\` retains its last value after the loop exits.
+- [o] \`3\`
+  > Correct. The loop breaks when \`i == 3\`, and \`i\` retains that value.
+- A \`NameError\`
+  > \`i\` is still in scope after the loop.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`enumerate(["a", "b", "c"], start=1)\` yield?
+
+- \`(0, "a"), (1, "b"), (2, "c")\`
+  > That would be the default \`start=0\`.
+- [o] \`(1, "a"), (2, "b"), (3, "c")\`
+  > Correct. \`start=1\` shifts the index to 1-based.
+- \`("a", 1), ("b", 2), ("c", 3)\`
+  > The order is (index, value), not (value, index).
+- \`["a", "b", "c"]\`
+  > \`enumerate\` returns tuples, not the original list.`}
 />
 
 Loops naturally lead into a tighter syntactic form: comprehensions.

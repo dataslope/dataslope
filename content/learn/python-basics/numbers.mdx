@@ -3,13 +3,24 @@ title: Numbers
 description: Integers, floats, complex numbers, arithmetic, and the math module
 ---
 
-Python ships with three numeric types and a comfortable set of
-operators. Integers are arbitrary-precision, floats are IEEE 754
-doubles, and complex numbers use a `j` suffix.
+Python ships with three numeric types: arbitrary-precision integers, IEEE 754 floats, and complex numbers. The operators are familiar, but there are a few surprises—especially around floating-point precision.
+
+Every snippet on this page runs in your browser—no setup required.
+
+## Real-world context: Where numbers matter
+
+Numbers are everywhere in code:
+- **Web apps:** user IDs, timestamps, request counts, pagination offsets.
+- **Data pipelines:** row counts, byte sizes, elapsed time, statistical aggregates.
+- **Finance:** prices, quantities, tax rates (and where floats will bite you).
+- **Machine learning:** weights, gradients, loss values, learning rates.
+- **Games:** positions, velocities, health points, scores.
+
+Understanding the quirks of Python's numeric types—especially the precision limits of floats—will save you from subtle bugs.
 
 ## Integers
 
-`int` has no fixed size: it grows to fit whatever value you give it.
+`int` has **no fixed size**: it grows to fit whatever value you give it. No overflow, no wraparound. This is one of Python's nicest features.
 
 <CodeBlock
   adapter="python"
@@ -19,6 +30,10 @@ print("digits:", len(str(big)))
 `}
 />
 
+<Callout type="info" title="No integer overflow in Python">
+In languages like C or Java, integer types have fixed sizes (e.g., 32 or 64 bits), so `2 ** 100` would overflow. Python's `int` is limited only by available memory. This makes arithmetic safer and more predictable.
+</Callout>
+
 Integer literals support several bases:
 
 <CodeBlock
@@ -26,44 +41,114 @@ Integer literals support several bases:
   initialCode={`print(0b1010)   # binary -> 10
 print(0o17)     # octal  -> 15
 print(0xff)     # hex    -> 255
+`}
+/>
 
-# Underscores are allowed for readability (Python 3.6+).
+<CodeBlock
+  adapter="python"
+  initialCode={`# Underscores for readability (Python 3.6+)
 print(1_000_000)
+print(0b1111_0000)
 `}
 />
 
 ## Floats
 
-`float` is a 64-bit IEEE 754 double. That means it has the usual
-precision quirks:
+`float` is a 64-bit IEEE 754 double-precision floating-point number. That's the same representation used by C, Java, JavaScript, and most other languages. It's fast and space-efficient, but it has precision quirks.
+
+### The 0.1 + 0.2 surprise
 
 <CodeBlock
   adapter="python"
   initialCode={`print(0.1 + 0.2)
 print(0.1 + 0.2 == 0.3)
-
-# Use math.isclose for safe float equality.
-import math
-print(math.isclose(0.1 + 0.2, 0.3))
 `}
 />
 
-For exact decimal arithmetic (money!), use `decimal.Decimal`:
+<Callout type="warn" title="Why does 0.1 + 0.2 ≠ 0.3?">
+In binary, `0.1` is an infinitely repeating fraction (like `1/3` is `0.333...` in decimal). A 64-bit float can only store a finite approximation. When you add two approximations, the error compounds. This is not a Python bug—it's how all IEEE 754 floating-point arithmetic works.
+
+**For safe float comparisons, use `math.isclose`:**
+
+```python
+import math
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+```
+</Callout>
+
+<Callout type="info" title="IEEE 754: The standard">
+IEEE 754 is the industry-standard specification for floating-point arithmetic, dating back to 1985. It defines how numbers are stored in binary, how operations are rounded, and how special values like `inf` and `NaN` work. Almost every modern CPU has hardware support for it.
+</Callout>
+
+### When to avoid floats: finance
+
+For exact decimal arithmetic—like money—use `decimal.Decimal`:
 
 <CodeBlock
   adapter="python"
   initialCode={`from decimal import Decimal
-print(Decimal("0.1") + Decimal("0.2"))
+
+price = Decimal("19.99")
+quantity = Decimal("3")
+total = price * quantity
+print(total)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from decimal import Decimal
+
+# Float precision fails for currency
+print(0.1 + 0.1 + 0.1 == 0.3)
+
+# Decimal is exact
+print(Decimal("0.1") + Decimal("0.1") + Decimal("0.1") == Decimal("0.3"))
+`}
+/>
+
+<Callout type="warn" title="Always construct Decimal from strings">
+If you pass a float to `Decimal`, you inherit the float's precision error:
+
+```python
+Decimal(0.1)  # Decimal('0.1000000000000000055511151231257827021181583404541015625')
+```
+
+Always pass a string: `Decimal("0.1")`.
+</Callout>
+
+### Fractions for exact rationals
+
+For exact rational arithmetic (fractions), use `fractions.Fraction`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from fractions import Fraction
+
+x = Fraction(1, 3)
+y = Fraction(1, 6)
+print(x + y)  # 1/2
 `}
 />
 
 ## Complex numbers
 
+Python has built-in support for complex numbers using `j` (not `i`) for the imaginary unit.
+
 <CodeBlock
   adapter="python"
   initialCode={`z = 3 + 4j
-print(z.real, z.imag, abs(z))
-print(z * (1 + 2j))
+print(z.real, z.imag)
+print(abs(z))  # magnitude
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`z = 3 + 4j
+w = 1 + 2j
+print(z * w)
+print(z / w)
 `}
 />
 
@@ -79,22 +164,41 @@ print(z * (1 + 2j))
 | `%` | modulo | `7 % 2 == 1` |
 | `**` | exponentiation | `2 ** 10 == 1024` |
 
-A common surprise: `/` always returns a float in Python 3, even when
-both operands are integers. Use `//` if you want integer division.
+A common surprise: `/` **always** returns a float in Python 3, even when both operands are integers.
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(7 / 2)
-print(7 // 2)
-print(-7 // 2)   # floor division rounds toward negative infinity
-print(7 % 2)
-print(2 ** 0.5) # square root via exponentiation
+  initialCode={`print(7 / 2)   # 3.5 (float)
+print(7 // 2)  # 3 (int)
 `}
 />
 
-## Augmented assignment
+Floor division rounds toward negative infinity, which can surprise C programmers:
 
-`x += 1`, `x *= 2`, `x //= 3`, and so on are all available.
+<CodeBlock
+  adapter="python"
+  initialCode={`print(7 // 2)    # 3
+print(-7 // 2)   # -4, not -3
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(7 % 2)
+print(2 ** 0.5)  # square root via exponentiation
+`}
+/>
+
+Augmented assignment operators work as expected:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`x = 10
+x += 5
+x *= 2
+print(x)
+`}
+/>
 
 ## The `math` module
 
@@ -106,29 +210,44 @@ print(2 ** 0.5) # square root via exponentiation
 
 print(math.pi, math.e)
 print(math.sqrt(2))
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math
+
 print(math.sin(math.pi / 2))
 print(math.log(100, 10))
 print(math.factorial(6))
 print(math.gcd(24, 36))
-print(math.floor(3.7), math.ceil(3.2), round(3.5))
 `}
 />
-
-Note that `round` uses *banker's rounding* (round half to even), which
-sometimes surprises people:
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(round(0.5))   # 0, not 1
-print(round(1.5))   # 2
-print(round(2.5))   # 2, not 3
+  initialCode={`import math
+
+print(math.floor(3.7), math.ceil(3.2))
+print(round(3.5))
 `}
 />
 
+<Callout type="info" title="Banker's rounding">
+Python's `round()` uses "round half to even" (banker's rounding): when a number is exactly halfway between two integers, round to the nearest **even** number. This reduces bias in repeated rounding operations.
+
+```python
+print(round(0.5))  # 0
+print(round(1.5))  # 2
+print(round(2.5))  # 2
+```
+
+If you need different rounding behavior, use `math.floor` or `math.ceil`.
+</Callout>
+
 ## Random numbers
 
-For non-cryptographic randomness, use `random`. For cryptography use
-`secrets` instead.
+For non-cryptographic randomness, use `random`. For cryptography, use `secrets`.
 
 <CodeBlock
   adapter="python"
@@ -138,7 +257,15 @@ random.seed(42)  # makes output reproducible
 print(random.random())            # float in [0.0, 1.0)
 print(random.randint(1, 6))       # inclusive on both ends
 print(random.choice(["a", "b", "c"]))
-print(random.sample(range(100), 5))
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import random
+random.seed(42)
+
+print(random.sample(range(100), 5))  # 5 unique items
 `}
 />
 
@@ -146,102 +273,170 @@ print(random.sample(range(100), 5))
 
 <ChallengeCard
   adapter="python"
-  title="Convert seconds to H:M:S"
-  instructions={`Define a function \`hms(total_seconds)\` that takes a non-negative integer number of seconds and returns a tuple \`(hours, minutes, seconds)\`. All three values should be integers, and \`minutes\` and \`seconds\` should each be in the range 0 to 59.`}
-  initialCode={`def hms(total_seconds):
-    # your code here
-    return (0, 0, 0)
+  title="Round to cents using Decimal"
+  instructions={`Write a function \`round_to_cents(amount)\` that takes a string representing a dollar amount (e.g., \`"19.996"\`) and returns a \`Decimal\` rounded to two decimal places. Use \`Decimal\` and its \`.quantize()\` method with \`ROUND_HALF_UP\`.`}
+  initialCode={`from decimal import Decimal, ROUND_HALF_UP
 
-print(hms(3661))
+def round_to_cents(amount):
+    # Your code here
+    return Decimal("0.00")
+
+print(round_to_cents("19.996"))
+print(round_to_cents("0.004"))
 `}
-  solutionCode={`def hms(total_seconds):
-    hours, remainder = divmod(total_seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return (hours, minutes, seconds)
+  solutionCode={`from decimal import Decimal, ROUND_HALF_UP
 
-print(hms(3661))
+def round_to_cents(amount):
+    d = Decimal(amount)
+    return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+print(round_to_cents("19.996"))
+print(round_to_cents("0.004"))
 `}
   tests={[
     {
-      id: "zero",
-      name: "0 seconds",
-      code: `assert hms(0) == (0, 0, 0)`,
+      id: "round_up",
+      name: "Rounds up correctly",
+      code: `from decimal import Decimal; assert round_to_cents("19.996") == Decimal("20.00")`,
     },
     {
-      id: "minute",
-      name: "61 seconds is 0:1:1",
-      code: `assert hms(61) == (0, 1, 1)`,
+      id: "round_down",
+      name: "Rounds down correctly",
+      code: `from decimal import Decimal; assert round_to_cents("0.004") == Decimal("0.00")`,
     },
     {
-      id: "hour_plus",
-      name: "3661 seconds is 1:1:1",
-      code: `assert hms(3661) == (1, 1, 1)`,
-    },
-    {
-      id: "big",
-      name: "90061 seconds is 25:1:1",
-      code: `assert hms(90061) == (25, 1, 1)`,
+      id: "exact",
+      name: "Preserves exact values",
+      code: `from decimal import Decimal; assert round_to_cents("1.50") == Decimal("1.50")`,
     },
   ]}
 />
 
 <ChallengeCard
   adapter="python"
-  title="Is it close to pi?"
-  instructions={`Define a function \`near_pi(x, tol=1e-6)\` that returns \`True\` if \`x\` is within \`tol\` of \`math.pi\` and \`False\` otherwise. Use \`math.isclose\` rather than \`==\`.`}
-  initialCode={`import math
-def near_pi(x, tol=1e-6):
-    # your code here
-    return False
+  title="Greatest common divisor"
+  instructions={`Define a function \`gcd(a, b)\` that returns the greatest common divisor of two positive integers using the Euclidean algorithm. Do **not** use \`math.gcd\`—implement it yourself using a loop or recursion.`}
+  initialCode={`def gcd(a, b):
+    # Your code here
+    return 1
 
-print(near_pi(3.1415927))
+print(gcd(48, 18))
+print(gcd(100, 25))
 `}
-  solutionCode={`import math
-def near_pi(x, tol=1e-6):
-    return math.isclose(x, math.pi, abs_tol=tol)
+  solutionCode={`def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+print(gcd(48, 18))
+print(gcd(100, 25))
 `}
   tests={[
     {
-      id: "exact",
-      name: "math.pi is close to itself",
-      code: `import math; assert near_pi(math.pi)`,
+      id: "basic",
+      name: "gcd(48, 18) is 6",
+      code: `assert gcd(48, 18) == 6`,
     },
     {
-      id: "within_tol",
-      name: "Slightly off but within tolerance",
-      code: `import math; assert near_pi(math.pi + 1e-9)`,
+      id: "coprime",
+      name: "gcd(17, 19) is 1",
+      code: `assert gcd(17, 19) == 1`,
     },
     {
-      id: "outside_tol",
-      name: "Outside tolerance returns False",
-      code: `assert not near_pi(3.14)`,
+      id: "multiple",
+      name: "gcd(100, 25) is 25",
+      code: `assert gcd(100, 25) == 25`,
     },
   ]}
 />
 
+<ChallengeCard
+  adapter="python"
+  title="Compound interest"
+  instructions={`Write a function \`compound_interest(principal, rate, years)\` that calculates the final amount using the formula \`A = P * (1 + r)^t\`. \`rate\` is a decimal (e.g., \`0.05\` for 5%). Return a float rounded to 2 decimal places.`}
+  initialCode={`def compound_interest(principal, rate, years):
+    # Your code here
+    return 0.0
+
+print(compound_interest(1000, 0.05, 10))
+`}
+  solutionCode={`def compound_interest(principal, rate, years):
+    amount = principal * (1 + rate) ** years
+    return round(amount, 2)
+
+print(compound_interest(1000, 0.05, 10))
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "$1000 at 5% for 10 years",
+      code: `assert compound_interest(1000, 0.05, 10) == 1628.89`,
+    },
+    {
+      id: "zero_years",
+      name: "Zero years returns principal",
+      code: `assert compound_interest(1000, 0.05, 0) == 1000.0`,
+    },
+    {
+      id: "high_rate",
+      name: "$500 at 10% for 5 years",
+      code: `assert compound_interest(500, 0.10, 5) == 805.26`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
 <MultipleChoice
-  markdown={`What does \`7 // -2\` evaluate to in Python?
+  markdown={`What does \`7 // -2\` evaluate to?
 
 - \`-3\`
   > C-style integer division would truncate toward zero, giving \`-3\`. Python does not do that.
 - [o] \`-4\`
-  > Correct. Floor division rounds toward negative infinity.
+  > Correct. Floor division rounds toward negative infinity, so \`7 // -2\` is \`-4\`.
 - \`3\`
+  > That's the absolute value of \`7 // 2\`, but we're dividing by a negative number.
 - An error
   > Floor division with a negative divisor is perfectly legal.`}
 />
 
 <MultipleChoice
-  markdown={`Why does \`0.1 + 0.2 == 0.3\` evaluate to \`False\` in Python?
+  markdown={`Why does \`0.1 + 0.2 == 0.3\` evaluate to \`False\`?
 
 - It is a bug in Python that has not been fixed yet.
-  > It is not a bug; it is how all IEEE 754 floating-point arithmetic works.
+  > It is not a bug; it is how all IEEE 754 floating-point arithmetic works across all languages.
 - [o] Floats are stored in binary and cannot represent these decimals exactly.
   > Correct. \`0.1\` and \`0.2\` are infinitely repeating in binary, so their sum is very slightly off from \`0.3\`.
 - The \`==\` operator does not work for floats.
+  > \`==\` works fine; the issue is that the values are not exactly equal due to precision limits.
 - Python rounds floats to two decimal places.
-
-For safe float comparisons, use \`math.isclose\` or the \`decimal\` module.`}
+  > Python does not automatically round floats.`}
 />
 
-Numbers are simple. Strings are deceptively rich; that is next.
+<MultipleChoice
+  markdown={`Which module should you use for exact decimal arithmetic in financial applications?
+
+- \`math\`
+  > \`math\` provides functions but still uses \`float\` types.
+- \`fractions\`
+  > \`fractions\` is for exact rational numbers, but \`decimal\` is more commonly used for currency.
+- [o] \`decimal\`
+  > Correct. \`decimal.Decimal\` provides exact decimal arithmetic suitable for financial calculations.
+- \`random\`
+  > \`random\` is for generating random numbers, not exact arithmetic.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the result of \`2 ** 1000\` in Python?
+
+- A very large integer
+  > Yes, but more specifically, Python computes it without overflow.
+- [o] A very large integer with no overflow
+  > Correct. Python's \`int\` has arbitrary precision—no overflow, no wraparound.
+- \`OverflowError\`
+  > Python's integers never overflow (limited only by memory).
+- \`inf\` (infinity)
+  > \`inf\` is for floats; integer exponentiation produces an exact integer.`}
+/>
+
+Numbers are straightforward once you know the precision gotchas. Strings are deceptively rich; that's next.

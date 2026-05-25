@@ -3,39 +3,93 @@ title: Tuples
 description: Immutable sequences, unpacking, and named tuples
 ---
 
-A `tuple` is an ordered, **immutable** sequence. Tuples are typically
-used for fixed-size, heterogeneous records ("a point is an `(x, y)`")
-where a list would be the wrong choice.
+A `tuple` is an ordered, **immutable** sequence. Tuples are typically used for fixed-size, heterogeneous records — "a point is an `(x, y)`" or "a database row is `(id, name, email)`" — where a list would be the wrong semantic choice. Tuples also serve as dictionary keys, multiple return values, and anywhere you need an immutable, hashable sequence.
+
+Every snippet on this page runs in your browser — no setup required.
+
+<Callout type="info" title="Etymology: why 'tuple'?">
+The name comes from mathematics: **single, double, triple, quadruple, quintuple, ... n-tuple**. In math, an n-tuple is an ordered list of n elements. Python's `tuple` is the programming language version of that concept. The trailing letters are often dropped (dupl**e**, tripl**e**, ...), leaving just "tuple."
+</Callout>
 
 ## Creating tuples
+
+The simplest tuple is written with parentheses, separating items with commas.
 
 <CodeBlock
   adapter="python"
   initialCode={`empty = ()
-one = (1,)          # note the trailing comma!
-not_a_tuple = (1)   # this is just 1 with parentheses
-two = (1, 2)
-also_two = 1, 2     # parens are usually optional
-
-print(empty, one, two, also_two)
-print(type(one), type(not_a_tuple))
+print(empty)
 `}
 />
 
-The trailing comma is what makes a one-element tuple, not the
-parentheses.
+<CodeBlock
+  adapter="python"
+  initialCode={`two = (1, 2)
+print(two)
+`}
+/>
+
+Parentheses are often optional when the context is unambiguous.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`also_two = 1, 2
+print(also_two)
+print(type(also_two))
+`}
+/>
+
+**The trailing comma is what makes a one-element tuple**, not the parentheses.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`one = (1,)
+not_a_tuple = (1)
+print("one:", one, type(one))
+print("not_a_tuple:", not_a_tuple, type(not_a_tuple))
+`}
+/>
+
+<Callout type="warn" title="One-element tuple syntax">
+`(1,)` is a tuple. `(1)` is just the integer `1` in parentheses. The trailing comma is mandatory for single-element tuples. This catches newcomers off guard, but the rule is simple: **the comma, not the parens, makes the tuple**.
+</Callout>
+
+The `tuple()` constructor converts any iterable into a tuple.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from_list = tuple([1, 2, 3])
+from_str = tuple("hello")
+print(from_list)
+print(from_str)
+`}
+/>
 
 ## Indexing, slicing, iteration
 
-Same as lists, just without mutation methods.
+Tuples support the same `[i]` and `[start:stop:step]` syntax as lists.
 
 <CodeBlock
   adapter="python"
   initialCode={`t = (10, 20, 30, 40)
-print(t[0], t[-1])
+print(t[0])
+print(t[-1])
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`t = (10, 20, 30, 40)
 print(t[1:3])
 print(len(t))
+`}
+/>
 
+Tuples are **immutable**: you cannot change them after creation.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`t = (10, 20, 30, 40)
 try:
     t[0] = 99
 except TypeError as e:
@@ -43,50 +97,114 @@ except TypeError as e:
 `}
 />
 
+Iteration works just like lists.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for x in (10, 20, 30):
+    print(x)
+`}
+/>
+
 ## Why immutability is useful
 
 Two big wins:
 
-1. **Hashability.** Tuples of hashable items are hashable, which means
-   you can use them as dict keys or set members. Lists cannot.
-2. **Safety.** A function that returns a tuple is signaling that the
-   shape will not change underneath you.
+1. **Hashability.** Tuples of hashable items are hashable, which means you can use them as dict keys or set members. Lists cannot.
+2. **Safety.** A function that returns a tuple is signaling that the shape will not change underneath you. Immutability prevents accidental modification and makes code easier to reason about.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# (lat, lon) as a dict key for city lookups.
-locations = {
+  initialCode={`locations = {
     (40.7128, -74.0060): "New York",
     (51.5074, -0.1278): "London",
+    (35.6762, 139.6503): "Tokyo",
 }
 print(locations[(51.5074, -0.1278)])
 `}
 />
 
+<Callout type="warn" title="Immutability is not deep">
+A tuple is immutable, but that **does not** mean its contents are. If a tuple contains a mutable object like a list, that list can still be modified. Immutability only applies to the tuple's structure (you cannot change which objects it points to), not to the objects themselves.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`t = (1, [2, 3])
+# t[0] = 99  # would fail
+t[1].append(4)  # but this works!
+print(t)
+`}
+/>
+
+## Real-world uses
+
+Tuples appear constantly in real code:
+
+- **Coordinates and points**: `(x, y)`, `(lat, lon, alt)`
+- **Database rows**: `(id, name, email, created_at)`
+- **Multiple return values**: `return (status, data, error)`
+- **Dictionary keys**: `cache[(user_id, timestamp)] = result`
+- **Color values**: `rgb = (255, 128, 0)`
+- **Function argument records**: `args = (10, "hello", True); func(*args)`
+
+Anytime you have a small, fixed-size record, a tuple is often clearer than a list.
+
 ## Tuple unpacking
 
-This is the Python-iest feature of all. The number of names on the
-left must match the length of the tuple on the right.
+This is one of Python's most elegant features. The number of names on the left must match the length of the tuple on the right.
 
 <CodeBlock
   adapter="python"
   initialCode={`point = (3, 4)
 x, y = point
-print(x, y)
+print("x:", x, "y:", y)
+`}
+/>
 
-# Works with any iterable, not just tuples.
-a, b, c = "abc"
+Unpacking works with **any iterable**, not just tuples.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a, b, c = "abc"
 print(a, b, c)
 
-# Star (*) catches the leftover items as a list.
-first, *middle, last = [1, 2, 3, 4, 5]
-print(first, middle, last)
+d, e = [10, 20]
+print(d, e)
+`}
+/>
+
+Star (`*`) catches the leftover items as a list.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`first, *middle, last = [1, 2, 3, 4, 5]
+print("first:", first)
+print("middle:", middle)
+print("last:", last)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`head, *tail = [1, 2, 3]
+print("head:", head)
+print("tail:", tail)
+`}
+/>
+
+You can use `*_` to discard the middle items.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a, *_, z = [1, 2, 3, 4, 5]
+print("a:", a, "z:", z)
 `}
 />
 
 ## Returning multiple values
 
-Functions "return multiple values" by returning a tuple.
+Functions "return multiple values" by returning a tuple, which the caller can unpack.
 
 <CodeBlock
   adapter="python"
@@ -98,10 +216,19 @@ print("min:", lo, "max:", hi)
 `}
 />
 
+<CodeBlock
+  adapter="python"
+  initialCode={`def divmod_manual(a, b):
+    return (a // b, a % b)
+
+quotient, remainder = divmod_manual(17, 5)
+print("quotient:", quotient, "remainder:", remainder)
+`}
+/>
+
 ## Named tuples
 
-`collections.namedtuple` and `typing.NamedTuple` give you a tuple with
-named fields, perfect for lightweight record types.
+`collections.namedtuple` and `typing.NamedTuple` give you a tuple with named fields, perfect for lightweight record types. Named tuples are immutable, just like regular tuples, but you can access fields by name instead of only by index.
 
 <CodeBlock
   adapter="python"
@@ -110,23 +237,30 @@ named fields, perfect for lightweight record types.
 Point = namedtuple("Point", ["x", "y"])
 p = Point(3, 4)
 print(p)
-print(p.x, p.y)
-print(p[0], p[1])    # still indexable like a tuple
+print("x:", p.x, "y:", p.y)
+print("via index:", p[0], p[1])
+`}
+/>
 
-# Newer typing-style version.
-from typing import NamedTuple
+The newer `typing.NamedTuple` version lets you add type hints.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from typing import NamedTuple
+
 class Color(NamedTuple):
     r: int
     g: int
     b: int
 
 c = Color(255, 128, 0)
-print(c, c.r, c[1])
+print(c)
+print("red:", c.r, "green:", c.g, "blue:", c.b)
+print("via index:", c[0])
 `}
 />
 
-For mutable record types, reach for `@dataclass` instead, which is
-covered in the *Classes* page.
+Named tuples are immutable. For mutable record types with methods, reach for `@dataclass`, which is covered in the *Classes* page.
 
 ## Challenges
 
@@ -167,8 +301,6 @@ covered in the *Classes* page.
   initialCode={`def stats_of(record):
     # your code here
     return ("", 0.0)
-
-print(stats_of(("Ada", [80, 90, 100], 3, 100)))
 `}
   solutionCode={`def stats_of(record):
     name, scores, *_ = record
@@ -189,17 +321,16 @@ print(stats_of(("Ada", [80, 90, 100], 3, 100)))
 />
 
 <MultipleChoice
-  markdown={`Which of the following are valid Python tuples? Select all that apply.
+  markdown={`Which of the following creates a valid one-element tuple?
 
-- [o] \`(1, 2, 3)\`
-- [o] \`1, 2, 3\`
-  > Parentheses are usually optional around a tuple.
 - \`(1)\`
-  > This is just the integer \`1\` in parentheses, not a one-element tuple.
+  > This is just the integer \`1\` in parentheses, not a tuple.
 - [o] \`(1,)\`
-  > The trailing comma is what makes it a tuple.
-- [o] \`()\`
-  > The empty tuple.`}
+  > Correct. The trailing comma is what makes it a tuple.
+- \`[1]\`
+  > This is a list, not a tuple.
+- \`{1}\`
+  > This is a set, not a tuple.`}
 />
 
 <MultipleChoice
@@ -212,7 +343,24 @@ print(stats_of(("Ada", [80, 90, 100], 3, 100)))
 - Lists cannot contain floats.
   > Lists can absolutely contain floats.
 - Tuples support more methods than lists.
-  > It is the other way around; tuples have very few methods.`}
+  > It is the other way around; tuples have very few methods because they are immutable.`}
+/>
+
+<MultipleChoice
+  markdown={`What does this code print?
+
+\`\`\`python
+first, *rest = (1, 2, 3, 4)
+print(rest)
+\`\`\`
+
+- \`(2, 3, 4)\`
+  > The \`*rest\` catches items as a **list**, not a tuple.
+- [o] \`[2, 3, 4]\`
+  > Correct. The star unpacking always produces a list.
+- \`2\`
+  > \`*rest\` catches **all** remaining items, not just one.
+- A \`ValueError\``}
 />
 
 Next: dictionaries, Python's most-used data structure.

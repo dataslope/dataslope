@@ -3,50 +3,132 @@ title: Sets
 description: Unordered collections of unique, hashable items
 ---
 
-A `set` is an unordered collection of unique, hashable items. Membership
-testing is O(1) on average, which makes sets the right tool for
-deduplication and fast lookups.
+A `set` is an unordered collection of unique, hashable items. Membership testing is O(1) on average, which makes sets the right tool for deduplication, fast lookups, and mathematical set operations. In data work, sets are everywhere: removing duplicate IDs, checking if a user is in an allowed list, finding the intersection of two tag lists, filtering out stop words, and more.
+
+Every snippet on this page runs in your browser — no setup required.
+
+## How sets work
+
+Like dicts, sets are implemented as **hash tables**. A set is essentially a dict with only keys (no values). This gives O(1) average-case membership testing, insertion, and deletion.
+
+```mermaid
+flowchart LR
+    A["Set: {1, 2, 3}"] --> B["hash(1) → bucket"]
+    A --> C["hash(2) → bucket"]
+    A --> D["hash(3) → bucket"]
+```
+
+<Callout type="info">
+Sets and dicts share the same underlying implementation: hash tables. A set is like a dict where you only care about the keys. This is why both require hashable elements/keys and both give O(1) average-case lookups.
+</Callout>
 
 ## Creating sets
 
+The literal syntax uses curly braces, but **without** colons.
+
 <CodeBlock
   adapter="python"
-  initialCode={`empty = set()           # {} would be a dict, not a set
-nums = {1, 2, 3}
-unique = set([1, 2, 2, 3, 3, 3])
-chars = set("banana")
-
-print(empty, nums, unique, chars)
+  initialCode={`nums = {1, 2, 3}
+print(nums)
 `}
 />
 
-The literal for an empty set is **not** `{}`; that gives you an empty
-dict. Use `set()`.
+<Callout type="warn" title="Empty set syntax">
+`{}` is an **empty dict**, not an empty set. For an empty set, use `set()`.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`empty = set()
+print(empty)
+print(type(empty))
+
+not_empty = {}
+print(type(not_empty))
+`}
+/>
+
+The `set()` constructor converts any iterable into a set, automatically deduplicating.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`unique = set([1, 2, 2, 3, 3, 3])
+print(unique)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`chars = set("banana")
+print(chars)
+`}
+/>
 
 ## Adding and removing
+
+`.add` inserts a single item.
 
 <CodeBlock
   adapter="python"
   initialCode={`s = {1, 2, 3}
 s.add(4)
-s.discard(99)            # no error if missing
+print(s)
+`}
+/>
+
+Adding an item that already exists does nothing (sets are unique by definition).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = {1, 2, 3}
+s.add(2)
+print(s)
+`}
+/>
+
+`.discard` removes an item without raising an error if it is missing.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = {1, 2, 3}
+s.discard(2)
+s.discard(99)
+print(s)
+`}
+/>
+
+`.remove` removes an item but **raises** `KeyError` if it is missing.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = {1, 2, 3}
+s.remove(2)
 try:
-    s.remove(99)         # error if missing
+    s.remove(99)
 except KeyError as e:
     print("KeyError:", e)
-popped = s.pop()         # arbitrary element
-print("s:", s, "popped:", popped)
+print(s)
+`}
+/>
+
+`.pop` removes and returns an arbitrary element. The choice is unpredictable because sets are unordered.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = {1, 2, 3}
+popped = s.pop()
+print("popped:", popped)
+print("remaining:", s)
 `}
 />
 
 ## Set algebra
 
-This is the killer feature: classic mathematical set operations are
-built in with both methods and operators.
+This is the killer feature: classic mathematical set operations are built in with both methods and operators.
 
 | Operation | Operator | Method |
 | --- | --- | --- |
-| Union | `a \\| b` | `a.union(b)` |
+| Union | `a \| b` | `a.union(b)` |
 | Intersection | `a & b` | `a.intersection(b)` |
 | Difference | `a - b` | `a.difference(b)` |
 | Symmetric difference | `a ^ b` | `a.symmetric_difference(b)` |
@@ -64,15 +146,43 @@ print("intersection: ", a & b)
 print("a - b:        ", a - b)
 print("b - a:        ", b - a)
 print("symmetric:    ", a ^ b)
-print("subset?       ", {1, 2}.issubset(a))
-print("disjoint?     ", a.isdisjoint({99}))
 `}
 />
 
+<CodeBlock
+  adapter="python"
+  initialCode={`a = {1, 2, 3, 4}
+print("subset?  ", {1, 2}.issubset(a))
+print("superset?", a.issuperset({1, 2}))
+print("disjoint?", a.isdisjoint({99}))
+`}
+/>
+
+```mermaid
+graph TD
+    A["Set A: {1, 2, 3, 4}"]
+    B["Set B: {3, 4, 5, 6}"]
+    C["Union: {1, 2, 3, 4, 5, 6}"]
+    D["Intersection: {3, 4}"]
+    E["Difference A-B: {1, 2}"]
+    F["Symmetric: {1, 2, 5, 6}"]
+    
+    A --> C
+    B --> C
+    A --> D
+    B --> D
+    A --> E
+    A --> F
+    B --> F
+```
+
+<Callout type="info" title="Real-world set operations">
+In data analysis, you constantly ask questions like "which users visited both pages?" (intersection), "which tags are in dataset A but not B?" (difference), "which emails appear in any of these lists?" (union). Sets make these queries one-liners.
+</Callout>
+
 ## Sets vs lists for lookup
 
-This is where sets shine. Membership testing in a list is O(n);
-in a set it is O(1).
+This is where sets shine. Membership testing in a list is O(n); in a set it is O(1).
 
 <CodeBlock
   adapter="python"
@@ -82,9 +192,9 @@ big_list = list(range(1_000_000))
 big_set = set(big_list)
 
 t0 = time.perf_counter()
-print(999_999 in big_list)
+result1 = 999_999 in big_list
 t1 = time.perf_counter()
-print(999_999 in big_set)
+result2 = 999_999 in big_set
 t2 = time.perf_counter()
 
 print(f"list: {(t1 - t0)*1000:.2f} ms")
@@ -92,18 +202,36 @@ print(f"set:  {(t2 - t1)*1000:.4f} ms")
 `}
 />
 
+Rule of thumb: if you are checking membership more than once or twice, convert to a set first.
+
 ## Items must be hashable
 
-Same rule as dict keys: ints, strings, tuples of hashables, and
-frozensets are fine; lists and dicts are not.
+Same rule as dict keys: ints, strings, tuples of hashables, and frozensets are fine; lists and dicts are not.
 
 <CodeBlock
   adapter="python"
-  initialCode={`good = {(1, 2), "hi", 42}
+  initialCode={`good = {(1, 2), "hi", 42, frozenset({1, 2})}
 print(good)
+`}
+/>
 
-try:
+<CodeBlock
+  adapter="python"
+  initialCode={`try:
     bad = {[1, 2]}
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+<Callout type="warn">
+The requirement is **hashability**, not immutability. A tuple containing a mutable object (like a list) is itself unhashable, even though tuples are normally immutable.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`try:
+    bad = {(1, [2, 3])}
 except TypeError as e:
     print("TypeError:", e)
 `}
@@ -111,14 +239,20 @@ except TypeError as e:
 
 ## `frozenset`
 
-If you need an immutable, hashable set (for example to use as a dict
-key or another set's element), use `frozenset`.
+If you need an immutable, hashable set (for example to use as a dict key or another set's element), use `frozenset`.
 
 <CodeBlock
   adapter="python"
   initialCode={`tags = frozenset({"python", "tutorial"})
 lookup = {tags: "course-1"}
 print(lookup[frozenset({"tutorial", "python"})])
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`set_of_sets = {frozenset({1, 2}), frozenset({3, 4})}
+print(set_of_sets)
 `}
 />
 
@@ -131,8 +265,6 @@ print(lookup[frozenset({"tutorial", "python"})])
   initialCode={`def common_interests(a, b):
     # your code here
     return set()
-
-print(common_interests(["Music", "Hiking"], ["hiking", "Travel"]))
 `}
   solutionCode={`def common_interests(a, b):
     return {x.lower() for x in a} & {x.lower() for x in b}
@@ -192,7 +324,7 @@ print(common_interests(["Music", "Hiking"], ["hiking", "Travel"]))
 - \`{1, 2, 3, 4}\`
   > That would be the union (\`|\`), not intersection.
 - [o] \`{2, 3}\`
-  > Correct. \`&\` is set intersection.
+  > Correct. \`&\` is set intersection, returning items in both.
 - \`{1, 4}\`
   > That would be symmetric difference (\`^\`).
 - \`{1}\`
@@ -205,12 +337,24 @@ print(common_interests(["Music", "Hiking"], ["hiking", "Travel"]))
 - \`{}\`
   > That is an empty **dict**.
 - [o] \`set()\`
-  > Correct.
+  > Correct. \`set()\` is the only way to create an empty set.
 - \`[]\`
   > That is an empty list.
 - \`()\`
   > That is an empty tuple.`}
 />
 
-We have now seen every major collection. Next: how to direct flow
-through them with conditionals and loops.
+<MultipleChoice
+  markdown={`What is the time complexity of \`item in s\` where \`s\` is a set?
+
+- [o] O(1) average case
+  > Correct. Sets use hash tables, giving O(1) average-case lookup.
+- O(n)
+  > That would be true for a list, not a set.
+- O(log n)
+  > Sets use hashing, not binary search.
+- O(n²)
+  > Set lookup is much faster than quadratic.`}
+/>
+
+We have now seen every major collection. Next: how to direct flow through them with conditionals and loops.
