@@ -16,7 +16,7 @@
    must precede the tailwind/fumadocs imports below — `@import` rules
    are required to come before any non-`@import`/`@layer`/`@charset`
    at-rule, including the inlined CSS pulled in by tailwindcss. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @import "tailwindcss";
 @source "../../node_modules/fumadocs-ui/dist/**/*.js";
@@ -32,6 +32,18 @@
 :root {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
+    monospace;
+}
+
+/* Ensure inline and block <code> elements pick up the JetBrains Mono
+   stack regardless of whether they're inside a .prose block or not. */
+code,
+pre,
+kbd,
+samp {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
+    monospace;
 }
 
 /* Use pure white for the body and sidebar backgrounds in light mode only.
