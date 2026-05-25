@@ -1,0 +1,429 @@
+---
+title: Aggregation and Dependency
+description: The weaker "has-a" and "uses-a" relationships — borrowed parts and temporary collaborators
+---
+
+Not every relationship between two objects is the strong ownership we
+saw with composition. Often one object simply *uses* another, or
+*holds a reference to* another that exists independently. UML and the
+OOP tradition give these weaker relationships names: **aggregation**
+and **dependency**.
+
+Knowing the difference is not pedantry — it changes *how you draw
+your model*, *which object's constructor takes which*, and *what
+happens when one object goes away*.
+
+## A spectrum of relationships
+
+```mermaid
+flowchart LR
+    A["Dependency<br/>(uses-a)<br/>method-scope"] --> B["Aggregation<br/>(weak has-a)<br/>references something<br/>that lives independently"]
+    B --> C["Composition<br/>(strong has-a)<br/>owns lifetime"]
+    style A fill:#eef
+    style B fill:#dfe
+    style C fill:#fdd
+```
+
+| Relationship | Lifetime | UML arrow | Java shape |
+| --- | --- | --- | --- |
+| **Dependency** | The collaborator is borrowed for one method call | dashed arrow `..>` | Method parameter or local |
+| **Aggregation** | The whole holds a reference, but the part lives independently | open diamond `o--` | Field, but constructed *outside* and passed in |
+| **Composition** | The whole owns the part; both live and die together | filled diamond `*--` | Field, usually constructed *inside* the whole |
+
+## Aggregation: a Library has Members (who exist on their own)
+
+A `Library` keeps a list of its `Member`s. But each `Member` is a
+person who exists in the world whether or not the library does. If
+the library closed tomorrow, the members would not vanish — they
+would just stop being members. That is **aggregation**.
+
+```mermaid
+classDiagram
+    class Library {
+      -members : List~Member~
+      +register(m)
+      +memberCount() int
+    }
+    class Member {
+      -name : String
+      +name() String
+    }
+    Library o-- Member : has registered
+```
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        // Members exist on their own:
+        Member ada = new Member("Ada");
+        Member ken = new Member("Ken");
+
+        // The library aggregates them — it holds references, but didn't make them:
+        Library lib = new Library();
+        lib.register(ada);
+        lib.register(ken);
+
+        System.out.println("members: " + lib.memberCount());
+        System.out.println("ada still exists: " + (ada != null));   // yes, of course
+    }
+}
+`,
+    },
+    {
+      filename: "Member.java",
+      initialContent: `public class Member {
+    private final String name;
+    public Member(String name) { this.name = name; }
+    public String name() { return name; }
+}
+`,
+    },
+    {
+      filename: "Library.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Library {
+    // The list is owned by the Library (composition), but the Members
+    // inside it are aggregated — they were created elsewhere.
+    private final List<Member> members = new ArrayList<>();
+
+    public void register(Member m) {
+        members.add(m);
+    }
+
+    public int memberCount() {
+        return members.size();
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Two signals in the code reveal that this is aggregation rather than
+composition:
+
+1. `Library` did not call `new Member(...)`. It received the members
+   from the outside.
+2. The same `Member` object could be registered with two different
+   libraries simultaneously — the membership relationship is not
+   exclusive.
+
+## Composition vs. aggregation, side by side
+
+To make the difference vivid, here are two models of a `House`. In
+one, the `Room`s are part of the house (composition). In the other,
+the `Tenant`s are people who happen to live in the house this year
+(aggregation).
+
+```mermaid
+classDiagram
+    class House
+    class Room
+    class Tenant
+
+    House *-- Room   : composition (rooms vanish if house is demolished)
+    House o-- Tenant : aggregation (tenants move on with their lives)
+```
+
+You can usually decide which one applies by asking: **"If the whole
+disappears, does the part disappear too?"** If yes → composition. If
+the part keeps existing → aggregation.
+
+## Dependency: a method that *uses* another object briefly
+
+A **dependency** is the briefest relationship of all. One class
+doesn't *hold* a reference to another, but does briefly *touch* it
+to do its job. In the code, this usually looks like a method
+parameter or a local variable.
+
+```mermaid
+classDiagram
+    class OrderPrinter {
+      +print(order, printer)
+    }
+    class Order
+    class Printer
+
+    OrderPrinter ..> Order   : uses
+    OrderPrinter ..> Printer : uses
+```
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Order o = new Order("ORD-42", 19.95);
+        Printer console = new Printer();
+
+        OrderPrinter op = new OrderPrinter();
+        op.print(o, console);   // OrderPrinter doesn't *own* either of these
+    }
+}
+`,
+    },
+    {
+      filename: "Order.java",
+      initialContent: `public class Order {
+    private final String id;
+    private final double total;
+    public Order(String id, double total) {
+        this.id = id; this.total = total;
+    }
+    public String id()    { return id;    }
+    public double total() { return total; }
+}
+`,
+    },
+    {
+      filename: "Printer.java",
+      initialContent: `public class Printer {
+    public void write(String line) {
+        System.out.println("[printer] " + line);
+    }
+}
+`,
+    },
+    {
+      filename: "OrderPrinter.java",
+      initialContent: `public class OrderPrinter {
+    public void print(Order o, Printer printer) {
+        printer.write("Order " + o.id() + " total = " + o.total());
+    }
+}
+`,
+    },
+  ]}
+/>
+
+`OrderPrinter` has *no* fields. It needs an `Order` and a `Printer`
+only for the duration of `print`. That is a dependency. It's the
+loosest possible coupling: as soon as `print` returns, the two
+references go away.
+
+## Why these distinctions matter in practice
+
+The category you choose changes *who is responsible for what*:
+
+| Question | Composition | Aggregation | Dependency |
+| --- | --- | --- | --- |
+| Who creates the part? | The whole | Someone else | Someone else (per call) |
+| Where is the reference held? | A field in the whole | A field in the whole | A parameter / local |
+| What if the part is shared? | It shouldn't be | Fine | Fine |
+| Lifetime of the part? | Tied to the whole | Independent | Independent |
+| Mental model | "made of" | "knows about" | "uses for a moment" |
+
+In a real design, the same class often participates in all three
+kinds of relationships with different collaborators. A `Library` is
+*composed of* its `Catalog`, *aggregates* `Member`s, and may *depend
+on* a `Clock` passed in just to stamp due dates.
+
+## Passing dependencies in: a tiny taste of injection
+
+The healthy pattern is to *pass collaborators in* (via constructor or
+method parameter) rather than to construct them inside. This is
+sometimes called **dependency injection** when done systematically,
+but the simple version is just good Java.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Logger console = new Logger();
+        Greeter g = new Greeter(console);   // Greeter aggregates the logger
+        g.greet("world");
+    }
+}
+`,
+    },
+    {
+      filename: "Logger.java",
+      initialContent: `public class Logger {
+    public void log(String message) {
+        System.out.println("[LOG] " + message);
+    }
+}
+`,
+    },
+    {
+      filename: "Greeter.java",
+      initialContent: `public class Greeter {
+    private final Logger logger;          // aggregated, not owned
+
+    public Greeter(Logger logger) {
+        this.logger = logger;
+    }
+
+    public void greet(String name) {
+        logger.log("Hello, " + name + "!");
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Because the logger is *handed in*, the same `Greeter` can be wired
+up with a different logger (a file logger, a silent logger, a
+test-spy logger) without changing a single line of `Greeter`'s code.
+That is the deepest benefit of aggregation and dependency: they keep
+your classes loosely coupled and easy to recombine.
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Classroom aggregates Students"
+  instructions={`Implement two classes:
+
+- \`Student\` with a private final \`name\` and a \`name()\` accessor.
+- \`Classroom\` with:
+  - a \`private final List<Student> students = new ArrayList<>();\`
+  - \`enroll(Student s)\` adds the student.
+  - \`size()\` returns the number enrolled.
+  - \`names()\` returns the enrolled students' names joined by \`", "\`. If the classroom is empty, return the empty string \`""\`.
+
+The students are created in \`Main\` and *handed in* — \`Classroom\`
+must not call \`new Student(...)\`.
+
+Expected output:
+
+\`\`\`
+size=0
+size=3
+names=Ada, Bob, Cleo
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Classroom room = new Classroom();
+        System.out.println("size=" + room.size());
+
+        room.enroll(new Student("Ada"));
+        room.enroll(new Student("Bob"));
+        room.enroll(new Student("Cleo"));
+
+        System.out.println("size=" + room.size());
+        System.out.println("names=" + room.names());
+    }
+}
+`,
+    },
+    {
+      filename: "Student.java",
+      initialContent: `public class Student {
+    // TODO
+}
+`,
+      solutionContent: `public class Student {
+    private final String name;
+    public Student(String name) { this.name = name; }
+    public String name() { return name; }
+}
+`,
+    },
+    {
+      filename: "Classroom.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Classroom {
+    // TODO
+}
+`,
+      solutionContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Classroom {
+    private final List<Student> students = new ArrayList<>();
+
+    public void enroll(Student s) { students.add(s); }
+    public int  size()            { return students.size(); }
+
+    public String names() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < students.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(students.get(i).name());
+        }
+        return sb.toString();
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "classroom-aggregation",
+      name: "Aggregates students and reports them",
+      expect: {
+        stdoutLines: ["size=0", "size=3", "names=Ada, Bob, Cleo"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`A \`Library\` has a list of \`Member\` objects. Each \`Member\` exists as a person regardless of the library. Which relationship is this?
+
+- Composition
+  > That implies the members would cease to exist with the library.
+- [o] Aggregation
+  > Correct. The library holds references to things that live independently.
+- Dependency
+  > Dependency is briefer — a method-scope collaborator.
+- Inheritance
+  > No "is-a" relationship is implied between Library and Member.`}
+/>
+
+<MultipleChoice
+  markdown={`A method \`OrderPrinter.print(Order o, Printer p)\` takes its collaborators as parameters and doesn't hold them as fields. What kind of relationship is this?
+
+- Composition
+  > No ownership, no field.
+- Aggregation
+  > Aggregation implies a held reference (a field).
+- [o] Dependency (uses-a)
+  > Correct. The collaborators are only used for the duration of the call.
+- Inheritance
+  > No subclassing involved.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is "passing collaborators in" (rather than constructing them inside the class) usually a better design?
+
+- It runs faster because there are fewer \`new\` calls
+  > Speed isn't the point.
+- It saves typing
+  > Often it adds typing, not removes it.
+- [o] It keeps the class loosely coupled — the same class can work with different implementations or test stand-ins
+  > Correct. This is the heart of dependency injection and a major source of OOP flexibility.
+- It is required for the class to compile
+  > It is not required by the compiler.`}
+/>
+
+<Callout type="success">
+You now have three of the four basic relationships. Next is the
+fourth — the one that ties classes together as families:
+**inheritance**.
+</Callout>

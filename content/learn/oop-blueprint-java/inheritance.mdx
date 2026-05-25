@@ -1,0 +1,407 @@
+---
+title: Inheritance
+description: The "is-a" relationship — extending classes, calling `super`, and the trade-offs of building tall class trees
+---
+
+**Inheritance** is the relationship that says one class *is a kind
+of* another. A `Dog` *is a* `Mammal`. A `SavingsAccount` *is a*
+`BankAccount`. A `Square` *is a* `Rectangle` — well, *maybe* — we'll
+come back to that.
+
+Inheritance is the most famous OOP feature and also the most
+overused. This page will teach you how it works in Java and *when* it
+is the right tool — not just how to type `extends`.
+
+## A first family
+
+```mermaid
+classDiagram
+    class Animal {
+      -name : String
+      +Animal(String)
+      +name() String
+      +speak() String
+    }
+    class Dog
+    class Cat
+
+    Animal <|-- Dog
+    Animal <|-- Cat
+```
+
+The hollow arrow `<|--` in UML means **inheritance** — *Dog
+is-an Animal*. In Java, the keyword is `extends`.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Animal a = new Animal("Generic");
+        Dog    d = new Dog("Rex");
+        Cat    c = new Cat("Mochi");
+
+        System.out.println(a.name() + ": " + a.speak());
+        System.out.println(d.name() + ": " + d.speak());
+        System.out.println(c.name() + ": " + c.speak());
+    }
+}
+`,
+    },
+    {
+      filename: "Animal.java",
+      initialContent: `public class Animal {
+    private final String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public String name()  { return name; }
+    public String speak() { return "(some sound)"; }
+}
+`,
+    },
+    {
+      filename: "Dog.java",
+      initialContent: `public class Dog extends Animal {
+    public Dog(String name) {
+        super(name);                 // call Animal's constructor
+    }
+    @Override
+    public String speak() {           // override the inherited behavior
+        return "Woof!";
+    }
+}
+`,
+    },
+    {
+      filename: "Cat.java",
+      initialContent: `public class Cat extends Animal {
+    public Cat(String name) {
+        super(name);
+    }
+    @Override
+    public String speak() {
+        return "Meow!";
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Three new pieces of Java vocabulary appear:
+
+| Word | What it does |
+| --- | --- |
+| `extends` | Declares "this class inherits from..." |
+| `super(...)` | Inside a subclass constructor: calls the parent constructor |
+| `@Override` | Annotation that says "I'm replacing an inherited method" (the compiler checks this) |
+
+A subclass automatically inherits all `public` and `protected`
+members from its parent. It can *add* new fields and methods, and it
+can *override* inherited methods to change their behavior.
+
+## What `super` actually does
+
+When you build a `Dog`, you build an `Animal` first, then add the
+`Dog`-specific bits on top. In memory, every `Dog` instance includes
+*the state of an `Animal`*.
+
+```mermaid
+flowchart LR
+    subgraph Heap
+        Obj["Dog object<br/>(inherits Animal's name field)<br/>name = 'Rex'"]
+    end
+```
+
+`super(name)` in the `Dog` constructor is what runs the `Animal`
+constructor on the `Dog`-being-built to set up `name`. It must be
+the *first statement* in the subclass constructor.
+
+If you omit `super(...)`, Java silently inserts `super()` — a call to
+the parent's *no-arg* constructor. If the parent doesn't have a
+no-arg constructor, that silent insertion fails and you must call
+the right one explicitly.
+
+## Overriding: replacing inherited behavior
+
+When a subclass declares a method with the *same signature* as one
+inherited from the parent, the subclass version *replaces* the
+parent's version for instances of the subclass.
+
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant Rex as rex : Dog
+    Caller->>Rex: speak()
+    Note over Rex: Rex is a Dog so Dog.speak() runs<br/>not Animal.speak()
+    Rex-->>Caller: "Woof!"
+```
+
+The `@Override` annotation isn't strictly required, but it's free
+help: if you misspell the method name or get the parameter types
+wrong, the compiler refuses to compile. *Always* write it.
+
+## Calling the parent's version from the override
+
+Sometimes the subclass wants to **add** to the parent's behavior
+rather than completely replace it. You can call the parent's version
+explicitly with `super.methodName(...)`.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Employee e  = new Employee("Ada", 5_000);
+        Manager  m  = new Manager("Bob", 5_000, 2_000);
+        System.out.println("Ada earns " + e.monthlyPay());
+        System.out.println("Bob earns " + m.monthlyPay());
+    }
+}
+`,
+    },
+    {
+      filename: "Employee.java",
+      initialContent: `public class Employee {
+    private final String name;
+    private final double baseSalary;
+
+    public Employee(String name, double baseSalary) {
+        this.name = name;
+        this.baseSalary = baseSalary;
+    }
+
+    public String name() { return name; }
+
+    public double monthlyPay() {
+        return baseSalary;
+    }
+}
+`,
+    },
+    {
+      filename: "Manager.java",
+      initialContent: `public class Manager extends Employee {
+    private final double bonus;
+
+    public Manager(String name, double baseSalary, double bonus) {
+        super(name, baseSalary);
+        this.bonus = bonus;
+    }
+
+    @Override
+    public double monthlyPay() {
+        return super.monthlyPay() + bonus;       // extends, doesn't replace
+    }
+}
+`,
+    },
+  ]}
+/>
+
+`Manager.monthlyPay()` reuses everything `Employee` knows about pay
+and adds a bonus on top. If the salary formula in `Employee` changes
+(say, to add overtime), `Manager` automatically benefits.
+
+## `final` classes and methods: closing the door
+
+You can opt *out* of being extended:
+
+- `final class Foo { ... }` — no class may `extends Foo`.
+- `final` on a method — subclasses may not override it.
+
+```mermaid
+flowchart LR
+    A["public class Animal<br/>(open to extension)"] --> B["public class Dog extends Animal<br/>OK"]
+    C["public final class Money<br/>(closed)"] --x D["class Coin extends Money<br/>compile error"]
+```
+
+`final` is a useful design tool. Java's `String` is `final` — for
+good reason; if anyone could subclass `String` and break its rules,
+the entire JVM's security model would collapse.
+
+## The trap: inheritance is *strong* coupling
+
+The reason the GoF say *"favor composition over inheritance"* is not
+that inheritance is bad. It's that inheritance is *very strong*. A
+subclass depends on its parent's internal design. If the parent
+changes how it stores its data or which methods it calls internally,
+subclasses can break in surprising ways. This is sometimes called the
+**fragile base class problem**.
+
+```mermaid
+flowchart TB
+    P["Parent class<br/>(changes one private<br/>method's call pattern)"] -->|silently breaks| S1[Sub1]
+    P -->|silently breaks| S2[Sub2]
+    P -->|silently breaks| S3[Sub3]
+```
+
+Use inheritance when you genuinely have an **is-a** relationship and
+the parent class was *designed for extension*. For everything else,
+reach for composition first.
+
+A famous cautionary example: a `Square` *is a* `Rectangle`
+mathematically, but if you make `Square extends Rectangle`, you
+quickly discover that setting a square's width to a value different
+from its height violates the square's invariant. The "is-a"
+relationship in mathematics does not always translate cleanly into
+behavioral substitutability in software.
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Shape hierarchy with a subclass override"
+  instructions={`Build a small \`Shape\` hierarchy:
+
+- \`Shape\` has a method \`area()\` that returns \`0.0\` and a method \`describe()\` that returns \`"Shape with area " + area()\`.
+- \`Circle\` extends \`Shape\` with a private final \`double radius\` and overrides \`area()\` to return \`Math.PI * radius * radius\`.
+- \`Square\` extends \`Shape\` with a private final \`double side\` and overrides \`area()\` to return \`side * side\`.
+
+The provided \`Main\` builds a small list of shapes and prints each one. Expected output (the radius-1 area uses Java's \`Math.PI\`):
+
+\`\`\`
+Shape with area 0.0
+Shape with area 3.141592653589793
+Shape with area 16.0
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Shape> shapes = Arrays.asList(
+            new Shape(),
+            new Circle(1.0),
+            new Square(4.0)
+        );
+        for (Shape s : shapes) {
+            System.out.println(s.describe());
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Shape.java",
+      initialContent: `public class Shape {
+    public double area() {
+        return 0.0;
+    }
+    public String describe() {
+        return "Shape with area " + area();
+    }
+}
+`,
+    },
+    {
+      filename: "Circle.java",
+      initialContent: `public class Circle extends Shape {
+    // TODO
+}
+`,
+      solutionContent: `public class Circle extends Shape {
+    private final double radius;
+    public Circle(double radius) {
+        this.radius = radius;
+    }
+    @Override
+    public double area() {
+        return Math.PI * radius * radius;
+    }
+}
+`,
+    },
+    {
+      filename: "Square.java",
+      initialContent: `public class Square extends Shape {
+    // TODO
+}
+`,
+      solutionContent: `public class Square extends Shape {
+    private final double side;
+    public Square(double side) {
+        this.side = side;
+    }
+    @Override
+    public double area() {
+        return side * side;
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape-override",
+      name: "Subclasses override area() correctly",
+      expect: {
+        stdoutLines: [
+          "Shape with area 0.0",
+          "Shape with area 3.141592653589793",
+          "Shape with area 16.0",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What does \`super(name)\` do inside a subclass constructor?
+
+- Calls a static method on the parent class
+  > It calls the parent's *constructor*, not a static method.
+- [o] Invokes the parent class's constructor with the given arguments to initialize the parent part of the new object
+  > Correct. It must be the first statement of the subclass constructor.
+- Creates an entirely separate parent object
+  > No second object is created — the subclass instance *is* also an instance of the parent.
+- Marks the constructor as overriding
+  > Constructors aren't overridden; \`@Override\` is for methods.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is the \`@Override\` annotation a good habit?
+
+- It is required for the override to take effect at runtime
+  > It is not required for the override to work; the compiler does still call the subclass version without it.
+- It tells the JVM to skip the parent method entirely
+  > That is what overriding does in general, regardless of the annotation.
+- [o] It asks the compiler to verify that you really are overriding an inherited method, catching typos and signature mismatches at compile time
+  > Correct. It's a cheap, valuable form of static checking.
+- It improves runtime performance of the method
+  > It has no effect on performance.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the *best* reason to choose inheritance over composition?
+
+- You want to reuse code from another class
+  > Composition can do that too — and usually more safely.
+- The other class has many methods
+  > Method count is not a design criterion.
+- [o] The new class is genuinely a *kind of* the other class, and the parent was designed for extension
+  > Correct. True "is-a" relationships with extension-ready base classes are where inheritance shines.
+- You want to avoid creating new files
+  > File hygiene is not a design criterion.`}
+/>
+
+<Callout type="success">
+You can build is-a relationships. Next we'll see how to design parent
+classes that are *deliberately incomplete* — **abstract classes**.
+</Callout>

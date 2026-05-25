@@ -66,6 +66,12 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/oop-blueprint-java" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Object-Oriented Programming Blueprint with Java
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
