@@ -424,6 +424,7 @@
 
 .instructionsBody p {
   margin: 0 0 8px;
+  color: var(--tw-prose-body);
 }
 
 .instructionsBody p:last-child {
@@ -454,7 +455,7 @@
 }
 
 .instructionsBody li {
-  color: var(--ch-text-secondary);
+  color: var(--tw-prose-body);
 }
 
 .instructionsBody em {
