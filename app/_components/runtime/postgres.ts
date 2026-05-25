@@ -3,10 +3,7 @@
 // PGlite and PGliteWorker are loaded from the jsDelivr CDN at runtime
 // (same pattern as SQLite, DuckDB, Pyodide) to keep the large WASM payload
 // off Vercel's bandwidth budget and avoid Turbopack build-time issues.
-//
-// IMPORTANT: keep PGLITE_VERSION in sync with the @electric-sql/pglite
-// version pinned in package.json. The npm install only ships the TypeScript
-// declarations; the actual runtime is fetched from jsDelivr.
+// CDN URLs and version are defined in cdn.ts.
 
 import type { PGlite } from "@electric-sql/pglite";
 import type { PGliteWorker as PGliteWorkerType } from "@electric-sql/pglite/worker";
@@ -23,9 +20,7 @@ import {
   POSTGRES_BLANK_DATABASE,
   type PostgresSampleDatabase,
 } from "./postgresSamples";
-
-const PGLITE_VERSION = "0.4.5";
-const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
+import { PGLITE_WORKER_CDN } from "./cdn";
 
 let _pgliteWorkerModulePromise: Promise<{ PGliteWorker: typeof PGliteWorkerType }> | null = null;
 

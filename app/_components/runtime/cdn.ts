@@ -14,3 +14,13 @@
 export const CDN_ASSETS_TAG = "v1.0.3-cdn-assets";
 
 export const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/dataslope/dataslope@${CDN_ASSETS_TAG}/cdn-assets`;
+
+// PGlite CDN configuration.
+//
+// IMPORTANT: keep PGLITE_VERSION in sync with the @electric-sql/pglite
+// version pinned in package.json. The npm install only ships the TypeScript
+// declarations; the actual runtime is fetched from jsDelivr at runtime by
+// both postgres.ts (main thread) and postgres-worker.ts (web worker).
+export const PGLITE_VERSION = "0.4.5";
+export const PGLITE_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/index.js`;
+export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
