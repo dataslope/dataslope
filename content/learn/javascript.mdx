@@ -43,3 +43,67 @@ const total = sales.reduce((s, r) => s + r.revenue, 0);
 console.log("Total revenue:", total.toLocaleString());
 `}
 />
+
+## Multiple files
+
+Use CommonJS `require("./module")` to pull in helpers defined in sibling files. The almostnode runtime mounts every workspace file at the project root so relative paths resolve as they would under Node.js.
+
+<CodeBlock
+  adapter="javascript"
+  entryFilename="index.js"
+  files={[
+    {
+      filename: "index.js",
+      initialContent: `const { hello, bye } = require("./greetings");
+
+console.log(hello("JavaScript Playground"));
+console.log(bye("JavaScript Playground"));
+`,
+    },
+    {
+      filename: "greetings.js",
+      initialContent: `function hello(name) {
+  return \`Hello, \${name}!\`;
+}
+
+function bye(name) {
+  return \`Goodbye, \${name}!\`;
+}
+
+module.exports = { hello, bye };
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="javascript"
+  entryFilename="index.js"
+  files={[
+    {
+      filename: "index.js",
+      initialContent: `const { hello, bye } = require("./greetings");
+
+console.log(hello("JavaScript Playground"));
+console.log(bye("JavaScript Playground"));
+`,
+    },
+    {
+      filename: "greetings.js",
+      initialContent: `function hello(name) {
+  return \`Hello, \${name}!\`;
+}
+
+function bye(name) {
+  return \`Goodbye, \${name}!\`;
+}
+
+module.exports = { hello, bye };
+`,
+    },
+  ]}
+/>
+```

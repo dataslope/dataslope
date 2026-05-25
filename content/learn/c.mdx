@@ -39,3 +39,89 @@ int main(void) {
 }
 `}
 />
+
+## Multiple files
+
+Pass a `files` array alongside an `entryFilename` to compile a multi-translation-unit program. Header files in the workspace are visible to `#include "…"` directives and any other `.c` files are linked into the build.
+
+<CodeBlock
+  adapter="c"
+  entryFilename="main.c"
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include <stdio.h>
+#include "mathx.h"
+
+int main(void) {
+    int a = 6, b = 7;
+    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+    return 0;
+}
+`,
+    },
+    {
+      filename: "mathx.h",
+      initialContent: `#ifndef MATHX_H
+#define MATHX_H
+
+int add(int a, int b);
+int mul(int a, int b);
+
+#endif
+`,
+    },
+    {
+      filename: "mathx.c",
+      initialContent: `#include "mathx.h"
+
+int add(int a, int b) { return a + b; }
+int mul(int a, int b) { return a * b; }
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="c"
+  entryFilename="main.c"
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include <stdio.h>
+#include "mathx.h"
+
+int main(void) {
+    int a = 6, b = 7;
+    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+    return 0;
+}
+`,
+    },
+    {
+      filename: "mathx.h",
+      initialContent: `#ifndef MATHX_H
+#define MATHX_H
+
+int add(int a, int b);
+int mul(int a, int b);
+
+#endif
+`,
+    },
+    {
+      filename: "mathx.c",
+      initialContent: `#include "mathx.h"
+
+int add(int a, int b) { return a + b; }
+int mul(int a, int b) { return a * b; }
+`,
+    },
+  ]}
+/>
+```

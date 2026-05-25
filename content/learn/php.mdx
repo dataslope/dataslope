@@ -35,3 +35,67 @@ usort($people, fn($a, $b) => $b["score"] - $a["score"]);
 echo json_encode($people, JSON_PRETTY_PRINT);
 `}
 />
+
+## Multiple files
+
+`require_once` a sibling file just like a regular PHP project. Every workspace file lives in the same directory inside the runtime so `__DIR__` resolves correctly.
+
+<CodeBlock
+  adapter="php"
+  entryFilename="index.php"
+  files={[
+    {
+      filename: "index.php",
+      initialContent: `<?php
+require_once __DIR__ . "/greetings.php";
+
+echo hello("PHP Playground") . "\\n";
+echo bye("PHP Playground") . "\\n";
+`,
+    },
+    {
+      filename: "greetings.php",
+      initialContent: `<?php
+function hello(string $name): string {
+    return "Hello, {$name}!";
+}
+
+function bye(string $name): string {
+    return "Goodbye, {$name}!";
+}
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="php"
+  entryFilename="index.php"
+  files={[
+    {
+      filename: "index.php",
+      initialContent: `<?php
+require_once __DIR__ . "/greetings.php";
+
+echo hello("PHP Playground") . "\\n";
+echo bye("PHP Playground") . "\\n";
+`,
+    },
+    {
+      filename: "greetings.php",
+      initialContent: `<?php
+function hello(string $name): string {
+    return "Hello, {$name}!";
+}
+
+function bye(string $name): string {
+    return "Goodbye, {$name}!";
+}
+`,
+    },
+  ]}
+/>
+```

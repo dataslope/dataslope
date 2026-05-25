@@ -34,3 +34,63 @@ const users = [
 console.log(pluck(users, "name"));
 `}
 />
+
+## Multiple files
+
+Import a typed helper module from a sibling file. The TypeScript runtime transpiles every workspace file before execution, so types from imported modules are checked just like a regular project.
+
+<CodeBlock
+  adapter="typescript"
+  entryFilename="index.ts"
+  files={[
+    {
+      filename: "index.ts",
+      initialContent: `import { hello, bye } from "./greetings";
+
+console.log(hello("TypeScript Playground"));
+console.log(bye("TypeScript Playground"));
+`,
+    },
+    {
+      filename: "greetings.ts",
+      initialContent: `export function hello(name: string): string {
+  return \`Hello, \${name}!\`;
+}
+
+export function bye(name: string): string {
+  return \`Goodbye, \${name}!\`;
+}
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="typescript"
+  entryFilename="index.ts"
+  files={[
+    {
+      filename: "index.ts",
+      initialContent: `import { hello, bye } from "./greetings";
+
+console.log(hello("TypeScript Playground"));
+console.log(bye("TypeScript Playground"));
+`,
+    },
+    {
+      filename: "greetings.ts",
+      initialContent: `export function hello(name: string): string {
+  return \`Hello, \${name}!\`;
+}
+
+export function bye(name: string): string {
+  return \`Goodbye, \${name}!\`;
+}
+`,
+    },
+  ]}
+/>
+```

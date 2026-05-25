@@ -19,12 +19,14 @@
  * ```
  */
 
-import CodeBlock from "./CodeBlock";
+import CodeBlock, { type CodeBlockFile } from "./CodeBlock";
 import { getAdapterById, type AdapterId } from "./runtime/adapters";
 
 interface MdxCodeBlockProps {
   adapter: AdapterId;
-  initialCode: string;
+  initialCode?: string;
+  files?: CodeBlockFile[];
+  entryFilename?: string;
   initCode?: string;
   label?: string;
 }
@@ -32,6 +34,8 @@ interface MdxCodeBlockProps {
 export default function MdxCodeBlock({
   adapter,
   initialCode,
+  files,
+  entryFilename,
   initCode,
   label,
 }: MdxCodeBlockProps) {
@@ -47,6 +51,8 @@ export default function MdxCodeBlock({
     <CodeBlock
       adapter={resolved}
       initialCode={initialCode}
+      files={files}
+      entryFilename={entryFilename}
       initCode={initCode}
       label={label}
     />

@@ -155,7 +155,6 @@ function MermaidFullscreen({
       setTy((viewport.clientHeight - naturalH * next) / 2);
     });
     return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock background scroll while the modal is open, and wire Esc-close.
