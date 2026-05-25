@@ -1,0 +1,247 @@
+---
+title: Numbers
+description: Integers, floats, complex numbers, arithmetic, and the math module
+---
+
+Python ships with three numeric types and a comfortable set of
+operators. Integers are arbitrary-precision, floats are IEEE 754
+doubles, and complex numbers use a `j` suffix.
+
+## Integers
+
+`int` has no fixed size: it grows to fit whatever value you give it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`big = 2 ** 200
+print(big)
+print("digits:", len(str(big)))
+`}
+/>
+
+Integer literals support several bases:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(0b1010)   # binary -> 10
+print(0o17)     # octal  -> 15
+print(0xff)     # hex    -> 255
+
+# Underscores are allowed for readability (Python 3.6+).
+print(1_000_000)
+`}
+/>
+
+## Floats
+
+`float` is a 64-bit IEEE 754 double. That means it has the usual
+precision quirks:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(0.1 + 0.2)
+print(0.1 + 0.2 == 0.3)
+
+# Use math.isclose for safe float equality.
+import math
+print(math.isclose(0.1 + 0.2, 0.3))
+`}
+/>
+
+For exact decimal arithmetic (money!), use `decimal.Decimal`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from decimal import Decimal
+print(Decimal("0.1") + Decimal("0.2"))
+`}
+/>
+
+## Complex numbers
+
+<CodeBlock
+  adapter="python"
+  initialCode={`z = 3 + 4j
+print(z.real, z.imag, abs(z))
+print(z * (1 + 2j))
+`}
+/>
+
+## Arithmetic operators
+
+| Operator | Meaning | Example |
+| --- | --- | --- |
+| `+` | addition | `2 + 3 == 5` |
+| `-` | subtraction | `5 - 2 == 3` |
+| `*` | multiplication | `2 * 3 == 6` |
+| `/` | true division | `7 / 2 == 3.5` |
+| `//` | floor division | `7 // 2 == 3` |
+| `%` | modulo | `7 % 2 == 1` |
+| `**` | exponentiation | `2 ** 10 == 1024` |
+
+A common surprise: `/` always returns a float in Python 3, even when
+both operands are integers. Use `//` if you want integer division.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(7 / 2)
+print(7 // 2)
+print(-7 // 2)   # floor division rounds toward negative infinity
+print(7 % 2)
+print(2 ** 0.5) # square root via exponentiation
+`}
+/>
+
+## Augmented assignment
+
+`x += 1`, `x *= 2`, `x //= 3`, and so on are all available.
+
+## The `math` module
+
+`math` is in the standard library. It covers the usual suspects:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math
+
+print(math.pi, math.e)
+print(math.sqrt(2))
+print(math.sin(math.pi / 2))
+print(math.log(100, 10))
+print(math.factorial(6))
+print(math.gcd(24, 36))
+print(math.floor(3.7), math.ceil(3.2), round(3.5))
+`}
+/>
+
+Note that `round` uses *banker's rounding* (round half to even), which
+sometimes surprises people:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(round(0.5))   # 0, not 1
+print(round(1.5))   # 2
+print(round(2.5))   # 2, not 3
+`}
+/>
+
+## Random numbers
+
+For non-cryptographic randomness, use `random`. For cryptography use
+`secrets` instead.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import random
+random.seed(42)  # makes output reproducible
+
+print(random.random())            # float in [0.0, 1.0)
+print(random.randint(1, 6))       # inclusive on both ends
+print(random.choice(["a", "b", "c"]))
+print(random.sample(range(100), 5))
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Convert seconds to H:M:S"
+  instructions={`Define a function \`hms(total_seconds)\` that takes a non-negative integer number of seconds and returns a tuple \`(hours, minutes, seconds)\`. All three values should be integers, and \`minutes\` and \`seconds\` should each be in the range 0 to 59.`}
+  initialCode={`def hms(total_seconds):
+    # your code here
+    return (0, 0, 0)
+
+print(hms(3661))
+`}
+  solutionCode={`def hms(total_seconds):
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return (hours, minutes, seconds)
+
+print(hms(3661))
+`}
+  tests={[
+    {
+      id: "zero",
+      name: "0 seconds",
+      code: `assert hms(0) == (0, 0, 0)`,
+    },
+    {
+      id: "minute",
+      name: "61 seconds is 0:1:1",
+      code: `assert hms(61) == (0, 1, 1)`,
+    },
+    {
+      id: "hour_plus",
+      name: "3661 seconds is 1:1:1",
+      code: `assert hms(3661) == (1, 1, 1)`,
+    },
+    {
+      id: "big",
+      name: "90061 seconds is 25:1:1",
+      code: `assert hms(90061) == (25, 1, 1)`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Is it close to pi?"
+  instructions={`Define a function \`near_pi(x, tol=1e-6)\` that returns \`True\` if \`x\` is within \`tol\` of \`math.pi\` and \`False\` otherwise. Use \`math.isclose\` rather than \`==\`.`}
+  initialCode={`import math
+def near_pi(x, tol=1e-6):
+    # your code here
+    return False
+
+print(near_pi(3.1415927))
+`}
+  solutionCode={`import math
+def near_pi(x, tol=1e-6):
+    return math.isclose(x, math.pi, abs_tol=tol)
+`}
+  tests={[
+    {
+      id: "exact",
+      name: "math.pi is close to itself",
+      code: `import math; assert near_pi(math.pi)`,
+    },
+    {
+      id: "within_tol",
+      name: "Slightly off but within tolerance",
+      code: `import math; assert near_pi(math.pi + 1e-9)`,
+    },
+    {
+      id: "outside_tol",
+      name: "Outside tolerance returns False",
+      code: `assert not near_pi(3.14)`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does \`7 // -2\` evaluate to in Python?
+
+- \`-3\`
+  > C-style integer division would truncate toward zero, giving \`-3\`. Python does not do that.
+- [o] \`-4\`
+  > Correct. Floor division rounds toward negative infinity.
+- \`3\`
+- An error
+  > Floor division with a negative divisor is perfectly legal.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`0.1 + 0.2 == 0.3\` evaluate to \`False\` in Python?
+
+- It is a bug in Python that has not been fixed yet.
+  > It is not a bug; it is how all IEEE 754 floating-point arithmetic works.
+- [o] Floats are stored in binary and cannot represent these decimals exactly.
+  > Correct. \`0.1\` and \`0.2\` are infinitely repeating in binary, so their sum is very slightly off from \`0.3\`.
+- The \`==\` operator does not work for floats.
+- Python rounds floats to two decimal places.
+
+For safe float comparisons, use \`math.isclose\` or the \`decimal\` module.`}
+/>
+
+Numbers are simple. Strings are deceptively rich; that is next.

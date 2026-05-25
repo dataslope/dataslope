@@ -1,0 +1,249 @@
+---
+title: Control Flow
+description: if, elif, else, the conditional expression, and structural pattern matching
+---
+
+Python's control flow is straightforward: `if`, `elif`, `else`,
+and a `match` statement for pattern matching (Python 3.10+).
+
+## `if` / `elif` / `else`
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def classify(score):
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    else:
+        return "F"
+
+for s in [95, 82, 73, 60, 50]:
+    print(s, "->", classify(s))
+`}
+/>
+
+There can be any number of `elif` branches; `else` is optional. Each
+branch needs its own indented body (no braces).
+
+## Truthiness in conditions
+
+The `if` condition is evaluated for truthiness, not strict equality
+with `True`. See the *Booleans* page for the rules.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`items = []
+if items:
+    print("non-empty")
+else:
+    print("empty")
+
+# Idiomatic None check.
+result = None
+if result is None:
+    print("no result yet")
+`}
+/>
+
+## Conditional expression (ternary)
+
+When you need a value, not a statement, use the inline form:
+
+```text
+<value_if_true> if <condition> else <value_if_false>
+```
+
+<CodeBlock
+  adapter="python"
+  initialCode={`age = 17
+status = "adult" if age >= 18 else "minor"
+print(status)
+
+# Combine with f-strings nicely.
+score = 85
+print(f"Grade: {'pass' if score >= 60 else 'fail'}")
+`}
+/>
+
+## Chained comparisons
+
+Python lets you chain comparison operators, which usually reads more
+naturally than `a > 0 and a < 10`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`x = 5
+if 0 < x < 10:
+    print("in range")
+`}
+/>
+
+## `match` statement (Python 3.10+)
+
+`match` is **structural pattern matching**, not just a `switch`. It
+matches the *shape* of data and can bind values from inside it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def describe(point):
+    match point:
+        case (0, 0):
+            return "origin"
+        case (0, y):
+            return f"on the y-axis at y={y}"
+        case (x, 0):
+            return f"on the x-axis at x={x}"
+        case (x, y) if x == y:
+            return f"on the diagonal at ({x}, {y})"
+        case (x, y):
+            return f"at ({x}, {y})"
+        case _:
+            return "not a point"
+
+for p in [(0, 0), (0, 5), (3, 0), (4, 4), (2, 7), "nope"]:
+    print(p, "->", describe(p))
+`}
+/>
+
+Patterns can also match class instances and dict shapes; see
+[PEP 634](https://peps.python.org/pep-0634/) for the full reference.
+
+## Why no `switch`?
+
+Before 3.10, Python deliberately had no `switch`. The community
+preferred chained `if`/`elif` or, for value-to-value mappings, a dict:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def http_label(code):
+    return {
+        200: "OK",
+        301: "Moved Permanently",
+        404: "Not Found",
+        500: "Server Error",
+    }.get(code, "Unknown")
+
+print(http_label(200))
+print(http_label(404))
+print(http_label(999))
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="FizzBuzz, the classic"
+  instructions={`Define a function \`fizzbuzz(n)\` that returns a list of length \`n\` where the i-th element (1-indexed) is:
+
+- \`"FizzBuzz"\` if i is divisible by both 3 and 5
+- \`"Fizz"\` if i is divisible by 3 only
+- \`"Buzz"\` if i is divisible by 5 only
+- The string form of i otherwise`}
+  initialCode={`def fizzbuzz(n):
+    # your code here
+    return []
+`}
+  solutionCode={`def fizzbuzz(n):
+    out = []
+    for i in range(1, n + 1):
+        if i % 15 == 0:
+            out.append("FizzBuzz")
+        elif i % 3 == 0:
+            out.append("Fizz")
+        elif i % 5 == 0:
+            out.append("Buzz")
+        else:
+            out.append(str(i))
+    return out
+`}
+  tests={[
+    {
+      id: "first_15",
+      name: "First 15 are the canonical sequence",
+      code: `assert fizzbuzz(15) == ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"]`,
+    },
+    {
+      id: "zero",
+      name: "fizzbuzz(0) is empty",
+      code: `assert fizzbuzz(0) == []`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Leap year"
+  instructions={`A year is a leap year if it is divisible by 4, **except** century years (divisible by 100), which must also be divisible by 400. Define \`is_leap(year)\` returning \`True\` or \`False\`.`}
+  initialCode={`def is_leap(year):
+    # your code here
+    return False
+`}
+  solutionCode={`def is_leap(year):
+    if year % 400 == 0:
+        return True
+    if year % 100 == 0:
+        return False
+    return year % 4 == 0
+`}
+  tests={[
+    {
+      id: "divisible_by_4",
+      name: "2024 is a leap year",
+      code: `assert is_leap(2024) is True`,
+    },
+    {
+      id: "century_non_leap",
+      name: "1900 is NOT a leap year",
+      code: `assert is_leap(1900) is False`,
+    },
+    {
+      id: "div_400",
+      name: "2000 IS a leap year",
+      code: `assert is_leap(2000) is True`,
+    },
+    {
+      id: "ordinary",
+      name: "2023 is not a leap year",
+      code: `assert is_leap(2023) is False`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does this print?
+
+\`\`\`python
+x = 7
+if x > 0:
+    print("a")
+elif x > 5:
+    print("b")
+else:
+    print("c")
+\`\`\`
+
+- [o] \`a\`
+  > Only the **first** matching branch runs.
+- \`b\`
+- \`a\` then \`b\`
+- \`c\``}
+/>
+
+<MultipleChoice
+  markdown={`Which of these are valid in Python 3.10+ \`match\` patterns? Select all that apply.
+
+- [o] \`case (x, y):\` - bind two positional items
+- [o] \`case (0, _):\` - match anything where the first item is 0
+- [o] \`case (x, y) if x == y:\` - guard clause
+- \`case x | y:\` at the start
+  > \`|\` works for alternatives inside a pattern, e.g. \`case 1 | 2 | 3:\`, but not as a standalone subject.
+- [o] \`case _:\` - wildcard / default`}
+/>
+
+Next: looping.

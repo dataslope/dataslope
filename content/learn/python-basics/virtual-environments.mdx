@@ -1,0 +1,166 @@
+---
+title: Virtual Environments and pip
+description: Isolating dependencies with venv, installing packages with pip, and locking versions
+---
+
+A Python install ships with a small standard library. Anything beyond
+that (NumPy, requests, Flask, ...) comes from **PyPI**, the Python
+Package Index. You install packages with **`pip`** and you keep
+projects from stepping on each other's toes with **virtual
+environments**.
+
+This page is reference material; the commands below are intended to be
+run in your terminal, not in the in-browser Pyodide blocks.
+
+## Why virtual environments?
+
+Without one, every `pip install` adds packages to the same global
+location. Two projects that need different versions of the same
+package cannot both be satisfied. Worse, you can break system tools
+that depend on a specific version.
+
+A virtual environment is a self-contained directory with its own
+Python and its own `site-packages`. Activating it puts that Python
+first on your `PATH`.
+
+## Creating one with `venv`
+
+`venv` ships with Python 3. From any project directory:
+
+```bash
+# Create the environment in a folder called .venv
+python3 -m venv .venv
+
+# Activate it
+source .venv/bin/activate         # macOS / Linux
+.venv\\Scripts\\activate            # Windows (PowerShell)
+
+# Confirm
+python --version
+which python                       # should point inside .venv
+
+# Leave when you are done
+deactivate
+```
+
+You will see your shell prompt change while the environment is active.
+Add `.venv/` to `.gitignore`; you do not commit virtual envs.
+
+## Installing packages
+
+Inside the activated env:
+
+```bash
+pip install requests
+pip install "numpy>=2.0,<3"
+pip install -U requests              # upgrade
+pip uninstall requests
+pip list                              # what is installed
+pip show requests                     # details for one package
+```
+
+## Pinning versions
+
+`requirements.txt` is the simplest way to record what your project
+needs. Generate it from the active env:
+
+```bash
+pip freeze > requirements.txt
+```
+
+Reproduce later:
+
+```bash
+pip install -r requirements.txt
+```
+
+`pip freeze` lists every package with an exact version, which is great
+for deployment but verbose for development. Many teams hand-maintain a
+shorter `requirements.in` and use [`pip-tools`](https://github.com/jazzband/pip-tools)
+or `uv pip compile` to generate the locked file.
+
+## Modern alternatives
+
+The Python packaging story keeps improving. As of 2026, the most
+common modern tools are:
+
+- **`uv`** ([astral.sh/uv](https://docs.astral.sh/uv/)) is a very fast
+  Rust-based replacement for `pip` and `pip-tools`. It also manages
+  Python interpreters.
+- **`poetry`** combines dependency management, virtual envs, and
+  packaging into one tool driven by a `pyproject.toml`.
+- **`hatch`** and **`pdm`** are similar `pyproject.toml`-based
+  workflows.
+
+All of them speak `pyproject.toml`, the standard project metadata file
+defined in [PEP 621](https://peps.python.org/pep-0621/).
+
+## `pyproject.toml` at a glance
+
+```toml
+[project]
+name = "my-app"
+version = "0.1.0"
+description = "A small Python app"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+```
+
+`pyproject.toml` replaces the older `setup.py` for the vast majority
+of projects.
+
+## `pip` and `venv` cheat sheet
+
+| Task | Command |
+| --- | --- |
+| Create env | `python3 -m venv .venv` |
+| Activate (Unix) | `source .venv/bin/activate` |
+| Activate (Win) | `.venv\\Scripts\\activate` |
+| Deactivate | `deactivate` |
+| Install one package | `pip install requests` |
+| Install from file | `pip install -r requirements.txt` |
+| Freeze versions | `pip freeze > requirements.txt` |
+| Upgrade pip itself | `python -m pip install -U pip` |
+| List installed | `pip list` |
+| Show one package | `pip show requests` |
+| Uninstall | `pip uninstall requests` |
+
+## A note on `--user` and global installs
+
+You may see advice to run `pip install --user`. **Skip it.** Always
+work inside a virtual environment. It is the cleanest, most portable
+way to manage Python dependencies.
+
+<MultipleChoice
+  markdown={`Why should you use a virtual environment for each Python project?
+
+- It makes \`import\` statements run faster.
+- [o] It isolates each project's dependencies so they do not conflict with each other or with the system Python.
+  > Correct. Different projects can pin different versions of the same library safely.
+- It is the only way to use \`pip\`.
+- It compiles your code to a single executable.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are good practices around dependency management? Select all that apply.
+
+- [o] Add \`.venv/\` to \`.gitignore\`.
+- [o] Pin versions in a \`requirements.txt\` or lockfile for reproducibility.
+- [o] Prefer a \`pyproject.toml\` for new projects.
+- Commit your virtual environment directory so everyone has the same packages.
+  > Virtual envs are not portable across machines/OSes; commit a lockfile instead.
+- [o] Use a modern tool such as \`uv\`, \`poetry\`, or \`hatch\` for a smoother workflow.`}
+/>
+
+You now have everything you need to start writing real Python projects.
+The final page surveys what to learn next.

@@ -1,0 +1,263 @@
+---
+title: Dictionaries
+description: Key-value mappings, the most-used data structure in Python
+---
+
+A `dict` maps **keys** to **values**. Lookups, insertions, and
+deletions are all average-case O(1). Dictionaries are everywhere in
+Python: JSON, function keyword arguments, object attributes, and many
+config formats are all dict-shaped.
+
+## Creating dicts
+
+<CodeBlock
+  adapter="python"
+  initialCode={`empty = {}
+person = {"name": "Ada", "year": 1815}
+also_person = dict(name="Ada", year=1815)
+from_pairs = dict([("a", 1), ("b", 2)])
+
+print(person)
+print(also_person)
+print(from_pairs)
+`}
+/>
+
+## Accessing values
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada", "year": 1815}
+
+print(person["name"])
+
+# Missing key with [] raises KeyError.
+try:
+    print(person["email"])
+except KeyError as e:
+    print("missing:", e)
+
+# .get returns None (or your default) instead of raising.
+print(person.get("email"))
+print(person.get("email", "no email on file"))
+`}
+/>
+
+## Updating
+
+<CodeBlock
+  adapter="python"
+  initialCode={`person = {"name": "Ada"}
+person["year"] = 1815          # add or overwrite
+person.update({"role": "mathematician"})
+del person["year"]
+removed = person.pop("role")
+print(person, "removed:", removed)
+`}
+/>
+
+## Iterating
+
+<CodeBlock
+  adapter="python"
+  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+
+# By default, iteration yields keys.
+for fruit in prices:
+    print(fruit)
+
+# Items gives (key, value) pairs.
+for fruit, price in prices.items():
+    print(f"{fruit}: \${price:.2f}")
+
+# Values alone.
+print(list(prices.values()))
+`}
+/>
+
+## Insertion order is preserved
+
+Since Python 3.7, `dict` officially preserves insertion order. The
+first item you put in is the first one you see when iterating.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`d = {}
+for k in "python":
+    d[k] = k.upper()
+print(d)
+`}
+/>
+
+## Keys must be hashable
+
+Strings, numbers, booleans, frozensets, and tuples-of-hashables work.
+Lists, sets, and dicts do not.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`good = {("x", 1): "ok"}
+print(good)
+
+try:
+    bad = {[1, 2]: "nope"}
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+## Merging dicts (Python 3.9+)
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = {"x": 1, "y": 2}
+b = {"y": 99, "z": 3}
+
+# | creates a new dict, right operand wins on conflicts.
+print(a | b)
+
+# |= mutates in place.
+a |= b
+print(a)
+`}
+/>
+
+## Counting and grouping
+
+`collections.Counter` and `collections.defaultdict` cover two of the
+most common dict patterns.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from collections import Counter, defaultdict
+
+# Count word frequencies.
+text = "to be or not to be that is the question to be"
+print(Counter(text.split()))
+print(Counter(text.split()).most_common(3))
+
+# Group items by first letter.
+words = ["apple", "ant", "banana", "berry", "cherry"]
+groups = defaultdict(list)
+for w in words:
+    groups[w[0]].append(w)
+print(dict(groups))
+`}
+/>
+
+## JSON
+
+Dicts and JSON objects share a syntax for a reason. The `json` module
+converts both ways:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import json
+
+person = {"name": "Ada", "year": 1815, "skills": ["math", "logic"]}
+text = json.dumps(person, indent=2)
+print(text)
+
+restored = json.loads(text)
+print(restored, restored == person)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Word frequency"
+  instructions={`Define a function \`word_freq(sentence)\` that returns a dict mapping each lowercase word in \`sentence\` to its frequency. Split on whitespace and treat words case-insensitively. For example, \`word_freq("To be or not to be")\` returns \`{"to": 2, "be": 2, "or": 1, "not": 1}\`.`}
+  initialCode={`def word_freq(sentence):
+    # your code here
+    return {}
+`}
+  solutionCode={`def word_freq(sentence):
+    freq = {}
+    for word in sentence.lower().split():
+        freq[word] = freq.get(word, 0) + 1
+    return freq
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Counts 'to be or not to be'",
+      code: `assert word_freq("To be or not to be") == {"to": 2, "be": 2, "or": 1, "not": 1}`,
+    },
+    {
+      id: "empty",
+      name: "Empty string returns empty dict",
+      code: `assert word_freq("") == {}`,
+    },
+    {
+      id: "case",
+      name: "Case-insensitive",
+      code: `assert word_freq("A a A") == {"a": 3}`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Invert a dict"
+  instructions={`Define \`invert(d)\` that swaps keys and values of \`d\`. You may assume all values are unique and hashable. For example, \`invert({"a": 1, "b": 2})\` returns \`{1: "a", 2: "b"}\`.`}
+  initialCode={`def invert(d):
+    # your code here
+    return {}
+`}
+  solutionCode={`def invert(d):
+    return {v: k for k, v in d.items()}
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic swap",
+      code: `assert invert({"a": 1, "b": 2}) == {1: "a", 2: "b"}`,
+    },
+    {
+      id: "empty",
+      name: "Empty dict",
+      code: `assert invert({}) == {}`,
+    },
+    {
+      id: "preserves_pairs",
+      name: "Round trip recovers original",
+      code: `d = {"x": 10, "y": 20}; assert invert(invert(d)) == d`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of these can be used as dictionary keys? Select all that apply.
+
+- [o] \`"hello"\`
+- [o] \`42\`
+- [o] \`(1, 2, 3)\`
+- \`[1, 2, 3]\`
+  > Lists are mutable and not hashable, so they cannot be keys.
+- \`{"a": 1}\`
+  > Dicts are mutable and not hashable.
+- [o] \`frozenset({1, 2})\`
+  > Frozensets are immutable and hashable.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the following code print?
+
+\`\`\`python
+d = {"a": 1, "b": 2}
+d.setdefault("a", 99)
+d.setdefault("c", 3)
+print(d)
+\`\`\`
+
+- \`{"a": 99, "b": 2, "c": 3}\`
+  > \`setdefault\` only writes when the key is missing.
+- [o] \`{"a": 1, "b": 2, "c": 3}\`
+  > Correct. \`a\` already exists so it is untouched; \`c\` is added.
+- \`{"a": 1, "b": 2}\`
+- A \`KeyError\``}
+/>
+
+Next up: sets, the close cousin of dictionaries.

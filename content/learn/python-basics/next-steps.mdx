@@ -1,0 +1,140 @@
+---
+title: Next Steps
+description: Where to go after you have the basics down
+---
+
+You now know enough Python to write real programs: variables and
+collections, control flow, functions and modules, files, classes, and
+the iterator/generator/decorator trio that powers a lot of idiomatic
+code. That is a solid foundation. Here is a map of the next layer.
+
+## Topics worth learning next
+
+### Typing and type checkers
+
+Type hints are optional but increasingly standard. Run a checker like
+[mypy](https://mypy.readthedocs.io/) or [pyright](https://microsoft.github.io/pyright/)
+over your code to catch bugs before runtime.
+
+```python
+from typing import Iterable
+
+def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
+    return sum(prices) * (1 + tax_rate)
+```
+
+Worth exploring: `typing.Protocol`, `typing.TypedDict`, `Generic`,
+`Literal`, `Final`, and the [PEP 695](https://peps.python.org/pep-0695/)
+generic syntax.
+
+### Testing with `pytest`
+
+Built-in `unittest` works, but most Python projects use
+[pytest](https://docs.pytest.org/) for its friendlier API,
+parameterization, fixtures, and rich plugin ecosystem.
+
+```python
+# test_total.py
+from app import total
+
+def test_total_without_tax():
+    assert total([10, 20], tax_rate=0) == 30
+```
+
+Run with `pytest`.
+
+### Async programming with `asyncio`
+
+`async def`, `await`, and the `asyncio` library let one thread juggle
+thousands of network connections. Essential for web servers, scrapers,
+and anything I/O-bound.
+
+```python
+import asyncio
+
+async def fetch(url):
+    ...
+
+async def main():
+    results = await asyncio.gather(fetch("a"), fetch("b"), fetch("c"))
+
+asyncio.run(main())
+```
+
+### Web frameworks
+
+- **FastAPI** for modern, typed HTTP APIs.
+- **Flask** for tiny, minimal services.
+- **Django** for full-stack apps with batteries included.
+
+### Scientific Python
+
+Pandas, NumPy, SciPy, scikit-learn, Matplotlib, Plotly, and PyTorch
+are all installable with `pip` and cover most data work.
+
+### Concurrency models
+
+- **Threads** (`threading`) for I/O-bound concurrency where GIL is
+  fine.
+- **Processes** (`multiprocessing`, `concurrent.futures`) for
+  CPU-bound work.
+- **Async** for high-concurrency I/O.
+- The Python 3.13+ **free-threaded build** (PEP 703) removes the GIL
+  entirely and is a topic to watch.
+
+### Packaging and distribution
+
+- Write a `pyproject.toml`.
+- Build a wheel with `python -m build`.
+- Publish to PyPI with `twine` or `uv publish`.
+- For self-contained executables, look at `PyInstaller`, `shiv`, or
+  `pex`.
+
+### Tooling worth installing once and never thinking about
+
+- [`ruff`](https://docs.astral.sh/ruff/) for linting and import
+  sorting.
+- [`black`](https://black.readthedocs.io/) (or `ruff format`) for
+  formatting.
+- [`pre-commit`](https://pre-commit.com/) to run them automatically
+  before every commit.
+- [`uv`](https://docs.astral.sh/uv/) to replace `pip`, `pip-tools`,
+  and `venv` with one fast Rust binary.
+
+## Further reading
+
+| Resource | Why |
+| --- | --- |
+| [docs.python.org](https://docs.python.org/3/) | The reference. Read the *Library Reference* in particular. |
+| [Real Python](https://realpython.com/) | High-quality tutorials on most topics. |
+| [PEP index](https://peps.python.org/) | Where new language features are designed. Skim PEPs 8, 20, 257, 484, 621. |
+| [Fluent Python by Luciano Ramalho](https://www.fluentpython.com/) | The book that takes you from "I know Python" to "I really know Python". |
+
+## Practice ideas
+
+If you want to cement what you have learned, try building:
+
+1. A CLI tool: parse arguments with `argparse`, read a config from
+   YAML/TOML, print colored output with `rich`.
+2. A small HTTP API with FastAPI: define a few endpoints, validate
+   input with `pydantic`, write tests with `pytest`.
+3. A data pipeline: read CSVs into Pandas, clean them, write the
+   result to SQLite or DuckDB.
+4. A small library you publish to PyPI: write tests, set up
+   `pyproject.toml`, push to GitHub with a CI workflow.
+
+## One last multiple-choice question
+
+<MultipleChoice
+  markdown={`Which of the following are true after finishing this course? Select all that apply.
+
+- [o] You know how Python's collections (list, tuple, dict, set) differ and when to use each.
+- [o] You can write functions with defaults, \`*args\`, \`**kwargs\`, and type hints.
+- [o] You can define classes, override dunder methods, and use \`@dataclass\`.
+- [o] You understand iterators, generators, and decorators well enough to read most Python codebases.
+- You have learned everything there is to know about Python.
+  > Nobody has. Python is huge, and the ecosystem keeps moving.`}
+/>
+
+Thank you for reading. Happy hacking, and good luck with whatever you
+build next.

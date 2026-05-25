@@ -1,0 +1,209 @@
+---
+title: Comprehensions
+description: List, dict, set, and generator comprehensions
+---
+
+A **comprehension** is a compact way to build a list, dict, set, or
+generator by transforming and filtering an iterable. They are arguably
+the most Pythonic feature in the language and once you internalize the
+shape, you will reach for them constantly.
+
+## List comprehensions
+
+The general form:
+
+```text
+[expression for item in iterable if condition]
+```
+
+<CodeBlock
+  adapter="python"
+  initialCode={`squares = [x * x for x in range(1, 6)]
+print(squares)
+
+evens = [x for x in range(20) if x % 2 == 0]
+print(evens)
+
+upper = [w.upper() for w in ["a", "b", "c"]]
+print(upper)
+`}
+/>
+
+A list comprehension is equivalent to:
+
+```python
+result = []
+for x in iterable:
+    if condition:
+        result.append(expression)
+```
+
+The comprehension is usually preferable because it states *what* you
+want rather than *how*. But if your transformation has more than one
+filter or grows beyond a single line, fall back to an explicit loop.
+
+## Nested loops in comprehensions
+
+Multiple `for` clauses behave like nested loops, left to right.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`pairs = [(x, y) for x in range(3) for y in range(3) if x != y]
+print(pairs)
+
+flat = [n for row in [[1, 2], [3, 4], [5, 6]] for n in row]
+print(flat)
+`}
+/>
+
+## Dict comprehensions
+
+<CodeBlock
+  adapter="python"
+  initialCode={`squares_map = {x: x * x for x in range(1, 6)}
+print(squares_map)
+
+prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+expensive = {fruit: price for fruit, price in prices.items() if price >= 1.0}
+print(expensive)
+
+# Inverting a dict.
+inverted = {v: k for k, v in prices.items()}
+print(inverted)
+`}
+/>
+
+## Set comprehensions
+
+<CodeBlock
+  adapter="python"
+  initialCode={`vowels = {c for c in "hello world" if c in "aeiou"}
+print(vowels)
+`}
+/>
+
+## Generator expressions
+
+Drop the brackets and you get a **generator expression** instead.
+It produces items lazily, one at a time, which is great for memory.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# List comprehension allocates the full list up front.
+list_total = sum([x * x for x in range(1_000_000)])
+
+# Generator expression streams one square at a time.
+gen_total = sum(x * x for x in range(1_000_000))
+
+print(list_total, gen_total, list_total == gen_total)
+`}
+/>
+
+When a generator expression is the only argument to a function, the
+inner parentheses can be dropped:
+
+```python
+sum(x * x for x in xs)        # nice
+sum((x * x for x in xs))      # also fine, just noisier
+```
+
+## A note on readability
+
+Comprehensions are powerful, but stacking too much logic into one
+makes for unreadable code. Rule of thumb:
+
+- Up to one `for` and one `if`: prefer the comprehension.
+- More than that, or a complex expression: write a loop.
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Squares of even numbers"
+  instructions={`Define \`even_squares(n)\` that returns a list of the squares of every even number from 0 to \`n-1\`, in order. Use a single list comprehension.`}
+  initialCode={`def even_squares(n):
+    # your code here
+    return []
+`}
+  solutionCode={`def even_squares(n):
+    return [x * x for x in range(n) if x % 2 == 0]
+`}
+  tests={[
+    {
+      id: "ten",
+      name: "even_squares(10)",
+      code: `assert even_squares(10) == [0, 4, 16, 36, 64]`,
+    },
+    {
+      id: "zero",
+      name: "even_squares(0)",
+      code: `assert even_squares(0) == []`,
+    },
+    {
+      id: "one",
+      name: "even_squares(1)",
+      code: `assert even_squares(1) == [0]`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Group words by length"
+  instructions={`Define \`group_by_length(words)\` that returns a dict mapping each word length to a list of words with that length, preserving the input order within each group.
+
+For example, \`group_by_length(["a", "bb", "cc", "d"])\` returns \`{1: ["a", "d"], 2: ["bb", "cc"]}\`.
+
+A regular loop is fine here; you do not have to use a single comprehension.`}
+  initialCode={`def group_by_length(words):
+    # your code here
+    return {}
+`}
+  solutionCode={`def group_by_length(words):
+    out = {}
+    for w in words:
+        out.setdefault(len(w), []).append(w)
+    return out
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic case",
+      code: `assert group_by_length(["a", "bb", "cc", "d"]) == {1: ["a", "d"], 2: ["bb", "cc"]}`,
+    },
+    {
+      id: "empty",
+      name: "Empty input",
+      code: `assert group_by_length([]) == {}`,
+    },
+    {
+      id: "single_group",
+      name: "All same length",
+      code: `assert group_by_length(["ab", "cd", "ef"]) == {2: ["ab", "cd", "ef"]}`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does \`[x * 2 for x in range(4) if x % 2]\` evaluate to?
+
+- \`[0, 2, 4, 6]\`
+  > That would be without the \`if\`.
+- [o] \`[2, 6]\`
+  > Correct. \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
+- \`[1, 3]\`
+- \`[0, 4]\``}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are the **same** at the level of computed values? Select all that apply.
+
+- [o] \`sum([x*x for x in range(10)])\` and \`sum(x*x for x in range(10))\`
+- [o] \`list(x*x for x in range(5))\` and \`[x*x for x in range(5)]\`
+- \`{x for x in [1, 1, 2]}\` and \`{x: x for x in [1, 1, 2]}\`
+  > One is a set comprehension, the other is a dict comprehension. They produce different types.
+- [o] \`{x*x for x in range(3)}\` and \`set(x*x for x in range(3))\``}
+/>
+
+You can now turn raw iterables into shaped data in one line. Functions
+are next.

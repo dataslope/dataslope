@@ -1,6 +1,153 @@
 ---
 title: Python History
-description: A brief history of the Python programming language
+description: Where Python came from, why it looks the way it does, and the debates that shaped it
 ---
 
-Python is a high-level, interpreted programming language that was created by Guido van Rossum and first released in 1991. The language was designed with an emphasis on code readability and simplicity, making it an ideal choice for beginners and experienced programmers alike.
+Python is a high-level, interpreted programming language created by
+Guido van Rossum and first released in **February 1991**. Guido was
+working at CWI in the Netherlands at the time and started Python as a
+hobby project over the 1989 Christmas holidays. The name has nothing
+to do with snakes: Guido was a fan of *Monty Python's Flying Circus*.
+
+## A short timeline
+
+| Year | Milestone |
+| --- | --- |
+| 1989 | Guido van Rossum begins the project at CWI |
+| 1991 | Python 0.9.0 released on `alt.sources` |
+| 1994 | Python 1.0 with `lambda`, `map`, `filter`, `reduce` |
+| 2000 | Python 2.0 with list comprehensions and garbage collection |
+| 2008 | Python 3.0 released, breaking backward compatibility |
+| 2020 | Python 2 officially retired (sunset on January 1, 2020) |
+| 2023 | Python 3.12 ships per-interpreter GIL groundwork |
+| 2024 | Python 3.13 ships an experimental free-threaded build |
+
+## Design philosophy
+
+Python's design is deeply influenced by **ABC**, an earlier teaching
+language Guido helped build. The guiding ideas are captured in *The
+Zen of Python* (PEP 20), which you can read at any time by running
+`import this`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import this`}
+/>
+
+The Zen prizes **readability**, **explicitness**, and **one obvious
+way** to do something. These values explain a lot of Python's choices,
+including its most famous one: significant whitespace.
+
+## Why indentation is part of the syntax
+
+Most languages use braces or `begin`/`end` keywords for blocks; Python
+uses indentation. Guido's reasoning was that programmers indent code
+to communicate structure to humans anyway, so the compiler may as well
+trust that indentation rather than ignore it. The result is that
+**badly indented code simply will not run**, which keeps every Python
+codebase visually consistent.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Try changing the indentation below and re-run.
+for i in range(3):
+    if i % 2 == 0:
+        print(i, "is even")
+    else:
+        print(i, "is odd")
+`}
+/>
+
+## Tabs vs spaces: the never-ending debate
+
+If you read PEP 8 (the official style guide) you will find a clear
+answer:
+
+> **Spaces are the preferred indentation method. Tabs should be used
+> solely to remain consistent with code that is already indented with
+> tabs.**
+
+PEP 8 also recommends **four spaces per indentation level**. Why four?
+It is wide enough to make nested blocks visually obvious but narrow
+enough that deeply nested code still fits on screen.
+
+A few practical points behind the debate:
+
+1. **Python 3 forbids mixing tabs and spaces** for indentation inside
+   the same block. Python 2 allowed it and silently treated a tab as
+   "however many spaces it takes to reach the next multiple of 8",
+   which caused famously confusing bugs.
+2. **Editors differ on tab width.** A file indented with tabs can look
+   2-space-wide in one editor and 8-space-wide in another. Spaces
+   render identically everywhere.
+3. **Accessibility argument for tabs.** Tabs let each developer
+   configure their preferred visual width without changing the source.
+   This is the strongest argument in favor of tabs.
+4. **Tooling.** Almost every Python formatter (`black`, `autopep8`,
+   `yapf`) defaults to four spaces. Going against the grain costs
+   you time.
+
+The community has effectively settled on **four spaces**, and that is
+what we will use throughout this course.
+
+<MultipleChoice
+  markdown={`According to PEP 8, what is the recommended indentation in Python source code?
+
+- A single tab character
+  > Tabs are permitted only for compatibility with already-tab-indented code.
+- Two spaces
+  > Two-space indentation is common in JavaScript and Ruby, but PEP 8 prefers four for Python.
+- [o] Four spaces
+  > Correct. PEP 8 mandates four spaces per indentation level.
+- Eight spaces
+  > Eight is what \`tab\` expanded to in Python 2 and is considered too wide for nested code.
+
+PEP 8 ([python.org/dev/peps/pep-0008](https://peps.python.org/pep-0008/))
+calls four spaces "the preferred indentation method", and it is the default
+in every major Python formatter.`}
+/>
+
+## CPython, PyPy, and friends
+
+The reference implementation of Python is **CPython**, written in C.
+When people say "Python", they almost always mean CPython. A few
+alternative implementations exist:
+
+- **PyPy** uses a just-in-time compiler and can be much faster on
+  pure-Python workloads.
+- **Jython** runs on the JVM and can call Java libraries directly.
+- **IronPython** targets the .NET runtime.
+- **MicroPython** is a slim implementation for microcontrollers.
+- **Pyodide** is CPython compiled to WebAssembly, which is what is
+  running every code block on this page.
+
+## The Python 2 to 3 transition
+
+Python 3 was released in December 2008 and intentionally broke
+backward compatibility to fix long-standing language warts. The
+biggest changes were:
+
+- `print` became a function: `print("hi")` instead of `print "hi"`.
+- All strings are Unicode by default; `bytes` is a separate type.
+- Integer division uses `//`; `/` always returns a float.
+- `dict.keys()`, `range()`, `map()`, and friends return views/
+  iterators instead of lists.
+
+The transition took over a decade. Python 2 was officially sunset on
+January 1, 2020. **In 2026 there is no reason to write new code in
+Python 2.** Every example in this course assumes Python 3.
+
+<MultipleChoice
+  markdown={`Which of the following statements about Python are true? Select all that apply.
+
+- [o] Python was first released in 1991.
+- [o] Indentation is part of Python's syntax, not just style.
+- Python 2 and Python 3 share full backward compatibility.
+  > Python 3 intentionally broke compatibility to fix language warts (print, division, Unicode, and more).
+- [o] CPython is the reference implementation of the language.
+- Python is named after the snake.
+  > Guido named it after *Monty Python's Flying Circus*.`}
+/>
+
+In the next page we will look at how to install Python locally and
+get a REPL up and running.

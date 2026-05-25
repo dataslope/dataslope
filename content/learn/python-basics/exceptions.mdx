@@ -1,0 +1,294 @@
+---
+title: Exceptions
+description: try, except, else, finally, raising, and writing your own exception classes
+---
+
+When something goes wrong, Python raises an **exception**. If nothing
+catches it, the program prints a traceback and exits. Catching is done
+with `try` / `except`.
+
+## The simplest form
+
+<CodeBlock
+  adapter="python"
+  initialCode={`try:
+    n = int("not a number")
+except ValueError as e:
+    print("could not parse:", e)
+`}
+/>
+
+`as e` binds the exception instance so you can inspect it.
+
+## Catching multiple types
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def safe_div(a, b):
+    try:
+        return a / b
+    except (TypeError, ZeroDivisionError) as e:
+        return f"error: {type(e).__name__}: {e}"
+
+print(safe_div(10, 2))
+print(safe_div(10, 0))
+print(safe_div("10", 2))
+`}
+/>
+
+## `else` and `finally`
+
+The full shape of the statement is:
+
+```text
+try:
+    ...                    # the risky operation
+except SomeError as e:
+    ...                    # runs if SomeError is raised
+else:
+    ...                    # runs only if NO exception was raised
+finally:
+    ...                    # always runs, error or not
+```
+
+`else` is useful when you only want code to run when the `try` block
+succeeded. `finally` is for cleanup that must happen either way
+(closing files, releasing locks, restoring state).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def parse_int(text):
+    try:
+        n = int(text)
+    except ValueError:
+        print("not an int:", text)
+    else:
+        print("parsed:", n)
+    finally:
+        print("done with", repr(text))
+    print()
+
+parse_int("42")
+parse_int("oops")
+`}
+/>
+
+## Raising exceptions
+
+Use `raise` to signal an error from your own code. Use a specific
+built-in type when one fits; otherwise create your own.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def withdraw(balance, amount):
+    if amount < 0:
+        raise ValueError("amount must be non-negative")
+    if amount > balance:
+        raise ValueError(f"insufficient funds: balance={balance}, amount={amount}")
+    return balance - amount
+
+print(withdraw(100, 30))
+try:
+    print(withdraw(100, 200))
+except ValueError as e:
+    print("caught:", e)
+`}
+/>
+
+### `raise ... from ...` to preserve cause
+
+When you wrap a lower-level error in a higher-level one, use `from` to
+keep the chain visible in the traceback.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class ConfigError(Exception):
+    pass
+
+def load_config(text):
+    try:
+        return int(text)
+    except ValueError as e:
+        raise ConfigError("bad config value") from e
+
+try:
+    load_config("not a number")
+except ConfigError as e:
+    print("ConfigError:", e)
+    print("cause:", e.__cause__)
+`}
+/>
+
+## Custom exception classes
+
+Make your own exception types by subclassing `Exception` (or a more
+specific built-in). This lets callers catch your errors precisely.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class InsufficientFundsError(Exception):
+    """Raised when a withdrawal exceeds the available balance."""
+
+class Account:
+    def __init__(self, balance):
+        self.balance = balance
+
+    def withdraw(self, amount):
+        if amount > self.balance:
+            raise InsufficientFundsError(
+                f"requested {amount}, have {self.balance}"
+            )
+        self.balance -= amount
+
+acct = Account(50)
+try:
+    acct.withdraw(100)
+except InsufficientFundsError as e:
+    print("nope:", e)
+`}
+/>
+
+## Exception hierarchy
+
+Every exception inherits from `BaseException`. The ones you usually
+care about inherit from `Exception` (which itself inherits from
+`BaseException`). A few useful built-ins:
+
+- `ValueError` – right type, wrong value (`int("oops")`)
+- `TypeError` – wrong type entirely (`len(5)`)
+- `KeyError` / `IndexError` – missing dict key / list index
+- `AttributeError` – missing attribute
+- `FileNotFoundError` / `OSError` – filesystem trouble
+- `RuntimeError` – generic, "something else went wrong"
+- `StopIteration` – an iterator is exhausted
+
+`Exception` catches "every normal error". **Do not** catch
+`BaseException` casually; it includes `KeyboardInterrupt` and
+`SystemExit`, which you usually want to let through.
+
+## Bare `except:` is almost always a bug
+
+```python
+try:
+    ...
+except:        # catches everything, including KeyboardInterrupt
+    pass
+```
+
+This silences errors you did not intend to handle and makes debugging
+miserable. Always be specific.
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Safer integer parsing"
+  instructions={`Define a function \`to_int(text, default=0)\` that returns \`int(text)\` if possible, otherwise \`default\`. It should not propagate any exception to the caller.`}
+  initialCode={`def to_int(text, default=0):
+    # your code here
+    return default
+`}
+  solutionCode={`def to_int(text, default=0):
+    try:
+        return int(text)
+    except (ValueError, TypeError):
+        return default
+`}
+  tests={[
+    {
+      id: "ok",
+      name: "Valid int string",
+      code: `assert to_int("42") == 42`,
+    },
+    {
+      id: "bad",
+      name: "Bad string returns default",
+      code: `assert to_int("hello", default=-1) == -1`,
+    },
+    {
+      id: "none",
+      name: "None returns default (no TypeError)",
+      code: `assert to_int(None, default=99) == 99`,
+    },
+    {
+      id: "default_zero",
+      name: "Default is zero",
+      code: `assert to_int("oops") == 0`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Withdraw with a custom exception"
+  instructions={`Define a class \`InsufficientFundsError\` that inherits from \`Exception\`, then define a function \`withdraw(balance, amount)\` that returns the new balance after withdrawing \`amount\`, or raises \`InsufficientFundsError\` if \`amount > balance\`. \`amount\` must be non-negative; raise \`ValueError\` otherwise.`}
+  initialCode={`class InsufficientFundsError(Exception):
+    pass
+
+def withdraw(balance, amount):
+    # your code here
+    return balance
+`}
+  solutionCode={`class InsufficientFundsError(Exception):
+    pass
+
+def withdraw(balance, amount):
+    if amount < 0:
+        raise ValueError("amount must be non-negative")
+    if amount > balance:
+        raise InsufficientFundsError(f"requested {amount}, have {balance}")
+    return balance - amount
+`}
+  tests={[
+    {
+      id: "ok",
+      name: "Normal withdrawal",
+      code: `assert withdraw(100, 30) == 70`,
+    },
+    {
+      id: "too_much",
+      name: "InsufficientFundsError when amount > balance",
+      code: `import builtins
+try:
+    withdraw(50, 100)
+except InsufficientFundsError:
+    pass
+else:
+    raise AssertionError("expected InsufficientFundsError")`,
+    },
+    {
+      id: "negative",
+      name: "ValueError when amount is negative",
+      code: `try:
+    withdraw(100, -5)
+except ValueError:
+    pass
+else:
+    raise AssertionError("expected ValueError")`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which block runs **only** when the \`try\` block raises no exception?
+
+- \`except\`
+- [o] \`else\`
+  > Correct. \`else\` is for code that should run on success.
+- \`finally\`
+- The block after the \`try\` statement entirely`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these exception-handling practices are recommended? Select all that apply.
+
+- [o] Catch the most specific exception type you can.
+- [o] Use \`raise ... from e\` when wrapping a lower-level exception.
+- [o] Define a custom exception class for domain errors.
+- Catch \`BaseException\` so nothing ever escapes.
+  > That would also swallow \`KeyboardInterrupt\` and \`SystemExit\`; rarely what you want.
+- Use a bare \`except:\` to keep the code short.
+  > A bare \`except:\` hides bugs. Always be specific.`}
+/>
+
+Many exceptions come from I/O. Files are next.

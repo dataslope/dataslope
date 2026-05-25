@@ -1,0 +1,216 @@
+---
+title: Sets
+description: Unordered collections of unique, hashable items
+---
+
+A `set` is an unordered collection of unique, hashable items. Membership
+testing is O(1) on average, which makes sets the right tool for
+deduplication and fast lookups.
+
+## Creating sets
+
+<CodeBlock
+  adapter="python"
+  initialCode={`empty = set()           # {} would be a dict, not a set
+nums = {1, 2, 3}
+unique = set([1, 2, 2, 3, 3, 3])
+chars = set("banana")
+
+print(empty, nums, unique, chars)
+`}
+/>
+
+The literal for an empty set is **not** `{}`; that gives you an empty
+dict. Use `set()`.
+
+## Adding and removing
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = {1, 2, 3}
+s.add(4)
+s.discard(99)            # no error if missing
+try:
+    s.remove(99)         # error if missing
+except KeyError as e:
+    print("KeyError:", e)
+popped = s.pop()         # arbitrary element
+print("s:", s, "popped:", popped)
+`}
+/>
+
+## Set algebra
+
+This is the killer feature: classic mathematical set operations are
+built in with both methods and operators.
+
+| Operation | Operator | Method |
+| --- | --- | --- |
+| Union | `a \\| b` | `a.union(b)` |
+| Intersection | `a & b` | `a.intersection(b)` |
+| Difference | `a - b` | `a.difference(b)` |
+| Symmetric difference | `a ^ b` | `a.symmetric_difference(b)` |
+| Subset | `a <= b` | `a.issubset(b)` |
+| Superset | `a >= b` | `a.issuperset(b)` |
+| Disjoint | n/a | `a.isdisjoint(b)` |
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+
+print("union:        ", a | b)
+print("intersection: ", a & b)
+print("a - b:        ", a - b)
+print("b - a:        ", b - a)
+print("symmetric:    ", a ^ b)
+print("subset?       ", {1, 2}.issubset(a))
+print("disjoint?     ", a.isdisjoint({99}))
+`}
+/>
+
+## Sets vs lists for lookup
+
+This is where sets shine. Membership testing in a list is O(n);
+in a set it is O(1).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import time
+
+big_list = list(range(1_000_000))
+big_set = set(big_list)
+
+t0 = time.perf_counter()
+print(999_999 in big_list)
+t1 = time.perf_counter()
+print(999_999 in big_set)
+t2 = time.perf_counter()
+
+print(f"list: {(t1 - t0)*1000:.2f} ms")
+print(f"set:  {(t2 - t1)*1000:.4f} ms")
+`}
+/>
+
+## Items must be hashable
+
+Same rule as dict keys: ints, strings, tuples of hashables, and
+frozensets are fine; lists and dicts are not.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`good = {(1, 2), "hi", 42}
+print(good)
+
+try:
+    bad = {[1, 2]}
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+## `frozenset`
+
+If you need an immutable, hashable set (for example to use as a dict
+key or another set's element), use `frozenset`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`tags = frozenset({"python", "tutorial"})
+lookup = {tags: "course-1"}
+print(lookup[frozenset({"tutorial", "python"})])
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Common interests"
+  instructions={`Define \`common_interests(a, b)\` that takes two lists of interest strings and returns a **set** of the interests that appear in both, case-insensitive.`}
+  initialCode={`def common_interests(a, b):
+    # your code here
+    return set()
+
+print(common_interests(["Music", "Hiking"], ["hiking", "Travel"]))
+`}
+  solutionCode={`def common_interests(a, b):
+    return {x.lower() for x in a} & {x.lower() for x in b}
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic intersection",
+      code: `assert common_interests(["Music", "Hiking"], ["hiking", "Travel"]) == {"hiking"}`,
+    },
+    {
+      id: "none",
+      name: "No overlap returns empty set",
+      code: `assert common_interests(["a"], ["b"]) == set()`,
+    },
+    {
+      id: "all",
+      name: "All overlap",
+      code: `assert common_interests(["A", "B"], ["a", "B"]) == {"a", "b"}`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Unique vowels"
+  instructions={`Define \`unique_vowels(text)\` that returns the set of lowercase vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`) that appear in \`text\`, ignoring case.`}
+  initialCode={`def unique_vowels(text):
+    # your code here
+    return set()
+`}
+  solutionCode={`def unique_vowels(text):
+    return {c for c in text.lower() if c in "aeiou"}
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic vowels",
+      code: `assert unique_vowels("Hello World") == {"e", "o"}`,
+    },
+    {
+      id: "all",
+      name: "All vowels",
+      code: `assert unique_vowels("AEIOUaeiou") == {"a", "e", "i", "o", "u"}`,
+    },
+    {
+      id: "none",
+      name: "Consonants only",
+      code: `assert unique_vowels("rhythm") == set()`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does \`{1, 2, 3} & {2, 3, 4}\` evaluate to?
+
+- \`{1, 2, 3, 4}\`
+  > That would be the union (\`|\`), not intersection.
+- [o] \`{2, 3}\`
+  > Correct. \`&\` is set intersection.
+- \`{1, 4}\`
+  > That would be symmetric difference (\`^\`).
+- \`{1}\`
+  > That would be \`{1, 2, 3} - {2, 3, 4}\`.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these creates an **empty set**?
+
+- \`{}\`
+  > That is an empty **dict**.
+- [o] \`set()\`
+  > Correct.
+- \`[]\`
+  > That is an empty list.
+- \`()\`
+  > That is an empty tuple.`}
+/>
+
+We have now seen every major collection. Next: how to direct flow
+through them with conditionals and loops.

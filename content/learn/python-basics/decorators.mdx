@@ -1,0 +1,296 @@
+---
+title: Decorators
+description: Functions that wrap other functions, and the @ syntax
+---
+
+A **decorator** is just a function that takes another function and
+returns a new one. The `@decorator` syntax is sugar for that pattern.
+
+## The minimal decorator
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def shout(fn):
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs).upper()
+    return wrapper
+
+@shout
+def greet(name):
+    return f"hello, {name}"
+
+print(greet("Ada"))
+`}
+/>
+
+`@shout` is equivalent to writing:
+
+```python
+def greet(name):
+    return f"hello, {name}"
+
+greet = shout(greet)
+```
+
+The decorator wraps `greet` so that every call goes through `wrapper`,
+which uppercases the result.
+
+## Preserve metadata with `functools.wraps`
+
+Without `wraps`, the wrapped function loses its name, docstring, and
+signature. **Always** use `functools.wraps` in real decorators.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from functools import wraps
+
+def shout(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs).upper()
+    return wrapper
+
+@shout
+def greet(name):
+    "Return a greeting."
+    return f"hello, {name}"
+
+print(greet.__name__)
+print(greet.__doc__)
+`}
+/>
+
+## A useful example: timing
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import time
+from functools import wraps
+
+def timed(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = fn(*args, **kwargs)
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        print(f"{fn.__name__} took {elapsed_ms:.2f} ms")
+        return result
+    return wrapper
+
+@timed
+def slow_square(n):
+    total = 0
+    for i in range(n):
+        total += i * i
+    return total
+
+print(slow_square(100_000))
+`}
+/>
+
+## Decorators with arguments
+
+If your decorator itself takes parameters, you need three levels of
+nesting: outer call returns the real decorator, which returns the
+wrapper.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from functools import wraps
+
+def repeat(times):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                result = fn(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+@repeat(times=3)
+def hi():
+    print("hi")
+
+hi()
+`}
+/>
+
+## Stacking decorators
+
+You can apply more than one. They are applied bottom-up: the closest
+to the function runs first.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from functools import wraps
+
+def bracketed(fn):
+    @wraps(fn)
+    def wrapper(*a, **kw):
+        return f"[{fn(*a, **kw)}]"
+    return wrapper
+
+def excited(fn):
+    @wraps(fn)
+    def wrapper(*a, **kw):
+        return f"{fn(*a, **kw)}!"
+    return wrapper
+
+@bracketed
+@excited
+def greet(name):
+    return f"hello {name}"
+
+# Equivalent to: greet = bracketed(excited(greet))
+print(greet("Ada"))
+`}
+/>
+
+## Built-in decorators worth knowing
+
+- `@staticmethod`, `@classmethod`, `@property` (in classes)
+- `@functools.cache` and `@functools.lru_cache` for memoization
+- `@functools.wraps` (inside your own decorators)
+- `@dataclass` (covered in *Classes*)
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from functools import cache
+
+@cache
+def fib(n):
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
+
+print(fib(100))
+`}
+/>
+
+Without `@cache`, computing `fib(100)` recursively would take longer
+than the heat death of the universe. With it, the answer is instant
+because each call is memoized.
+
+## `@property`
+
+`@property` turns a method into a read-only attribute. Pair it with a
+setter to control writes.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        if value < -273.15:
+            raise ValueError("below absolute zero")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        return self._celsius * 9 / 5 + 32
+
+t = Temperature(20)
+print(t.celsius, t.fahrenheit)
+t.celsius = 100
+print(t.fahrenheit)
+try:
+    t.celsius = -500
+except ValueError as e:
+    print("ValueError:", e)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Counting calls"
+  instructions={`Define a decorator \`count_calls\` that wraps a function so that, after each call, the wrapped function has an attribute \`calls\` equal to the number of times it has been called. Preserve the function's name with \`functools.wraps\`.
+
+Example:
+
+\`\`\`python
+@count_calls
+def hi(): pass
+hi(); hi(); hi()
+hi.calls  # -> 3
+\`\`\``}
+  initialCode={`from functools import wraps
+
+def count_calls(fn):
+    # your code here
+    return fn
+`}
+  solutionCode={`from functools import wraps
+
+def count_calls(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return fn(*args, **kwargs)
+    wrapper.calls = 0
+    return wrapper
+`}
+  tests={[
+    {
+      id: "starts_zero",
+      name: "Starts at zero",
+      code: `@count_calls
+def f(): pass
+assert f.calls == 0`,
+    },
+    {
+      id: "increments",
+      name: "Increments on each call",
+      code: `@count_calls
+def f(): pass
+f(); f(); f()
+assert f.calls == 3`,
+    },
+    {
+      id: "preserves_name",
+      name: "Preserves the function name",
+      code: `@count_calls
+def named_function(): pass
+assert named_function.__name__ == "named_function"`,
+    },
+    {
+      id: "passes_args",
+      name: "Passes through args and return value",
+      code: `@count_calls
+def add(a, b): return a + b
+assert add(2, 3) == 5
+assert add.calls == 1`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What is the effect of \`@functools.wraps(fn)\` on a wrapper function?
+
+- It makes the wrapper run faster.
+- [o] It copies metadata (name, docstring, signature) from \`fn\` onto the wrapper.
+  > Correct. Without it, tools and tracebacks see the wrapper's name instead of the real function's.
+- It prevents the wrapper from accepting \`*args\` and \`**kwargs\`.
+- It is required syntax for the \`@\` decorator notation to work.`}
+/>
+
+<MultipleChoice
+  markdown={`Given \`@a\\n@b\\ndef f(): ...\`, which is equivalent?
+
+- \`f = a(b)(f)\`
+- [o] \`f = a(b(f))\`
+  > Correct. Decorators apply bottom-up; \`b\` wraps \`f\` first, then \`a\` wraps the result.
+- \`f = b(a(f))\`
+- \`f = a(f) + b(f)\``}
+/>
+
+You can now write any function you can imagine and bolt extra behavior
+onto it. Time to talk about how to ship that code: virtual
+environments and pip.

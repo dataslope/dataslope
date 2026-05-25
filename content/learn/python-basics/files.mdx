@@ -1,0 +1,248 @@
+---
+title: Files and I/O
+description: Reading and writing files, the with statement, and pathlib
+---
+
+Python's file API is small and consistent. The two ideas to internalize
+are **`open` returns a file object** and **the `with` statement closes
+it for you**.
+
+## Reading a file
+
+In this browser sandbox, Pyodide gives you a virtual filesystem. We
+will write a file first so we have something to read.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Write a small text file.
+with open("/tmp/poem.txt", "w") as f:
+    f.write("Beautiful is better than ugly.\\n")
+    f.write("Explicit is better than implicit.\\n")
+    f.write("Simple is better than complex.\\n")
+
+# Read it back.
+with open("/tmp/poem.txt", "r") as f:
+    contents = f.read()
+print(contents)
+`}
+/>
+
+## The `with` statement
+
+`with` is the *context manager* protocol. For files it guarantees the
+file is closed even if your code raises an exception. **Always** open
+files in a `with` block.
+
+```python
+# DON'T do this:
+f = open("data.txt")
+data = f.read()
+f.close()   # never runs if read() raises
+
+# DO this instead:
+with open("data.txt") as f:
+    data = f.read()
+# f is now closed, no matter what
+```
+
+## Reading modes
+
+| Mode | Meaning |
+| --- | --- |
+| `"r"` | text read (default) |
+| `"w"` | text write, truncates existing file |
+| `"a"` | text append |
+| `"x"` | text write, fails if file exists |
+| `"rb"`, `"wb"`, `"ab"` | binary versions of the above |
+| `"r+"` | read and write |
+
+Always pass `encoding="utf-8"` for text files unless you have a reason
+not to. The platform-default encoding (UTF-8 on macOS/Linux, often
+CP1252 on Windows) is a common source of cross-platform bugs.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`with open("/tmp/data.txt", "w", encoding="utf-8") as f:
+    f.write("café\\n")
+
+with open("/tmp/data.txt", "r", encoding="utf-8") as f:
+    print(repr(f.read()))
+`}
+/>
+
+## Reading line by line
+
+Iterating over a file object yields one line at a time, with the
+trailing `\n` included. This is memory-friendly for big files.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`with open("/tmp/poem.txt", "w") as f:
+    f.write("alpha\\nbeta\\ngamma\\n")
+
+with open("/tmp/poem.txt") as f:
+    for i, line in enumerate(f, start=1):
+        print(f"{i}: {line.rstrip()}")
+`}
+/>
+
+Other reading methods:
+
+- `f.read()` reads the whole file as one string.
+- `f.read(n)` reads up to `n` characters.
+- `f.readline()` reads one line.
+- `f.readlines()` returns a list of all lines (avoid for huge files).
+
+## Writing
+
+`f.write` returns the number of characters written. Use `print(...,
+file=f)` if you want auto-newline behavior:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`with open("/tmp/numbers.txt", "w") as f:
+    for n in range(5):
+        print(n, n * n, file=f, sep=" -> ")
+
+with open("/tmp/numbers.txt") as f:
+    print(f.read())
+`}
+/>
+
+## `pathlib`: the modern way to handle paths
+
+`pathlib.Path` wraps filesystem paths with helpful methods, so you
+rarely need to fall back to string manipulation or the older `os.path`
+functions.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from pathlib import Path
+
+p = Path("/tmp/note.txt")
+p.write_text("hello from pathlib\\n", encoding="utf-8")
+
+print(p.exists())
+print(p.suffix)
+print(p.parent)
+print(p.name)
+print(p.read_text(encoding="utf-8"))
+`}
+/>
+
+`Path` supports `/` as a join operator, which is unusually elegant:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from pathlib import Path
+
+base = Path("/tmp")
+nested = base / "logs" / "today.log"
+print(nested)
+`}
+/>
+
+## JSON and CSV
+
+Two of the most common formats have first-class support in the
+standard library.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import json
+from pathlib import Path
+
+people = [
+    {"name": "Ada", "year": 1815},
+    {"name": "Grace", "year": 1906},
+]
+
+Path("/tmp/people.json").write_text(json.dumps(people, indent=2))
+print(Path("/tmp/people.json").read_text())
+
+restored = json.loads(Path("/tmp/people.json").read_text())
+print("first name:", restored[0]["name"])
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import csv
+
+with open("/tmp/data.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "year"])
+    writer.writerow(["Ada", 1815])
+    writer.writerow(["Grace", 1906])
+
+with open("/tmp/data.csv") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Count lines in a file"
+  instructions={`Define a function \`count_lines(path)\` that opens the text file at \`path\` and returns the number of lines in it. Use a \`with\` block. Empty files should return 0.`}
+  initialCode={`def count_lines(path):
+    # your code here
+    return 0
+`}
+  solutionCode={`def count_lines(path):
+    with open(path) as f:
+        return sum(1 for _ in f)
+`}
+  tests={[
+    {
+      id: "three_lines",
+      name: "Three-line file",
+      code: `with open("/tmp/cl3.txt", "w") as f:
+    f.write("a\\nb\\nc\\n")
+assert count_lines("/tmp/cl3.txt") == 3`,
+    },
+    {
+      id: "empty",
+      name: "Empty file is 0",
+      code: `with open("/tmp/cl0.txt", "w") as f:
+    pass
+assert count_lines("/tmp/cl0.txt") == 0`,
+    },
+    {
+      id: "one_line",
+      name: "Single line without trailing newline",
+      code: `with open("/tmp/cl1.txt", "w") as f:
+    f.write("only")
+assert count_lines("/tmp/cl1.txt") == 1`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of these are good reasons to use a \`with\` block when opening files? Select all that apply.
+
+- [o] It calls \`f.close()\` automatically when the block exits.
+- [o] It closes the file even if your code raises an exception.
+- [o] It signals to the reader that this is a resource with a limited lifetime.
+- It is required syntax in Python 3 to open a file.
+  > It is best practice, but \`open(...)\` without \`with\` is still legal.
+- [o] It makes it harder to accidentally leak file descriptors.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`Path("/tmp") / "logs" / "x.log"\` evaluate to?
+
+- The string \`"/tmp/logs/x.log"\`
+  > Close, but it is a \`Path\` object, not a plain string.
+- [o] A \`Path\` object representing \`/tmp/logs/x.log\`
+  > Correct. \`Path\` overloads \`/\` for path joining.
+- A \`TypeError\` because you cannot divide a path
+- A list of three path components`}
+/>
+
+We have collections, control flow, functions, modules, and I/O. The
+next chunk is about packaging *behavior with data*, which means
+classes.

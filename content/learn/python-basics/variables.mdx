@@ -1,0 +1,199 @@
+---
+title: Variables
+description: Names, assignment, and Python's dynamic typing
+---
+
+A **variable** in Python is just a name bound to an object. There is
+no `let`, `var`, or type declaration; assignment with `=` is enough.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`age = 30
+name = "Ada"
+pi = 3.14159
+
+print(name, "is", age, "years old. Pi is approximately", pi)
+`}
+/>
+
+## Names are references, not boxes
+
+This is the single most important idea to internalize.
+
+```text
+x = [1, 2, 3]
+y = x
+y.append(4)
+print(x)   # [1, 2, 3, 4]
+```
+
+`x` and `y` are two names for the **same** list. Mutating through one
+name is visible through the other. To make an independent copy, use
+`x.copy()` or `list(x)`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`x = [1, 2, 3]
+y = x
+y.append(4)
+print("x:", x)
+print("y:", y)
+print("Same object?", x is y)
+
+z = x.copy()
+z.append(99)
+print("x:", x)
+print("z:", z)
+print("Same object?", x is z)
+`}
+/>
+
+## Dynamic typing
+
+A name in Python has no fixed type. It can be rebound to any value
+at any time.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`value = 42
+print(type(value))
+
+value = "now I'm a string"
+print(type(value))
+
+value = [1, 2, 3]
+print(type(value))
+`}
+/>
+
+This is convenient but also a footgun: rebinding `value` does not
+change the original object, it just points the name at a new one. It
+also means typos in variable names are not caught until runtime.
+
+## Naming rules
+
+A valid Python identifier:
+
+- Starts with a letter (Unicode allowed) or underscore.
+- Continues with letters, digits, or underscores.
+- Is **case-sensitive**: `Score` and `score` are different names.
+- Must not be a [reserved keyword](https://docs.python.org/3/reference/lexical_analysis.html#keywords)
+  like `if`, `class`, `lambda`, `pass`.
+
+PEP 8 conventions:
+
+| Kind | Convention | Example |
+| --- | --- | --- |
+| Variable, function | `snake_case` | `user_count` |
+| Constant | `UPPER_SNAKE_CASE` | `MAX_RETRIES` |
+| Class | `PascalCase` | `HttpClient` |
+| Module file | `snake_case.py` | `data_loader.py` |
+| Private (by convention) | leading `_` | `_internal_cache` |
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Inspect Python's reserved keywords.
+import keyword
+print(keyword.kwlist)
+`}
+/>
+
+## Multiple assignment
+
+Python supports a few useful shorthand forms.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Same value to several names.
+a = b = c = 0
+print(a, b, c)
+
+# Unpacking from a tuple/list.
+x, y, z = 1, 2, 3
+print(x, y, z)
+
+# The Pythonic swap, no temporary needed.
+x, y = y, x
+print(x, y)
+`}
+/>
+
+## Constants?
+
+Python has no real `const`. The convention is to use an
+`ALL_CAPS_NAME` and rely on humans to leave it alone. As of Python
+3.8, the `typing.Final` annotation lets type checkers enforce it:
+
+```python
+from typing import Final
+MAX_RETRIES: Final[int] = 3
+```
+
+But at runtime, nothing stops a determined programmer from rebinding
+it.
+
+## A swap challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Swap two variables"
+  instructions={`Without using a temporary variable and without using \`tuple()\` or \`list\` literals on a separate line, swap the values of \`a\` and \`b\` so that \`a\` ends as \`"banana"\` and \`b\` ends as \`"apple"\`.`}
+  initialCode={`a = "apple"
+b = "banana"
+
+# your single line of code here
+
+print("a =", a)
+print("b =", b)
+`}
+  solutionCode={`a = "apple"
+b = "banana"
+a, b = b, a
+print("a =", a)
+print("b =", b)
+`}
+  tests={[
+    {
+      id: "swap_correct",
+      name: "Values are swapped",
+      code: `assert a == "banana" and b == "apple"`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does this code print?
+
+\`\`\`python
+nums = [1, 2, 3]
+also_nums = nums
+also_nums.append(4)
+print(nums)
+\`\`\`
+
+- \`[1, 2, 3]\`
+  > \`nums\` and \`also_nums\` refer to the same list object, so mutation is visible through both names.
+- [o] \`[1, 2, 3, 4]\`
+  > Correct. Assignment binds the name to the existing list; it does not copy.
+- A \`NameError\`
+- \`[4]\`
+
+To get an independent copy you need \`also_nums = nums.copy()\` or
+\`also_nums = list(nums)\`.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these are valid Python identifiers? Select all that apply.
+
+- [o] \`user_count\`
+- [o] \`_private\`
+- \`2nd_place\`
+  > Identifiers may not start with a digit.
+- [o] \`HTTPClient\`
+- \`class\`
+  > \`class\` is a reserved keyword.
+- [o] \`café\`
+  > Python 3 allows Unicode letters in identifiers.`}
+/>
+
+Next: a tour of Python's built-in data types.

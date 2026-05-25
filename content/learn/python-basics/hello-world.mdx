@@ -1,0 +1,137 @@
+---
+title: Hello, World!
+description: Your first Python program, the print function, and comments
+---
+
+Tradition demands that the first program in any language print the
+words "Hello, World!". Python makes that exactly as short as you would
+hope.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print("Hello, World!")
+`}
+/>
+
+That is the entire program. No `main`, no semicolons, no header
+files, no compilation step.
+
+## The `print` function
+
+`print` is a built-in function that writes its arguments to standard
+output. It is more flexible than it might look at first:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Multiple arguments are joined with spaces.
+print("Hello,", "World!")
+
+# 'sep' changes the separator.
+print("2025", "11", "30", sep="-")
+
+# 'end' changes what is appended (default is "\\n").
+print("loading", end="...")
+print("done")
+`}
+/>
+
+You can print numbers, lists, dictionaries, and most other objects
+directly. Python will call `str(obj)` on each argument:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(42)
+print([1, 2, 3])
+print({"name": "Ada", "year": 1815})
+print(3.14, type(3.14))
+`}
+/>
+
+## Comments
+
+Comments start with `#` and run to the end of the line. Python has no
+native multi-line comment syntax; people sometimes use triple-quoted
+string literals for that, but a string is not the same as a comment.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# This is a comment. The interpreter skips it.
+x = 1 + 2  # Comments can sit at the end of a line, too.
+
+"""
+This is a string literal, not a comment.
+Python does evaluate it, then immediately throws it away
+because nothing keeps a reference. It is fine for short
+notes at the top of a file, but '#' is the real comment.
+"""
+
+print(x)
+`}
+/>
+
+## Docstrings
+
+A string at the very top of a module, function, or class is called a
+**docstring**. Tools like `help()`, IDEs, and the `pydoc` command read
+these to show documentation.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def add(a, b):
+    """Return the sum of two numbers."""
+    return a + b
+
+help(add)
+`}
+/>
+
+## A first challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Greet a name"
+  instructions={`Write a single \`print\` call that outputs exactly:
+
+\`\`\`
+Hello, Grace!
+\`\`\`
+
+Do not hardcode the literal string \`"Hello, Grace!"\`; instead, define a
+variable \`name = "Grace"\` and use it.`}
+  initialCode={`name = "Grace"
+# your code here
+`}
+  solutionCode={`name = "Grace"
+print(f"Hello, {name}!")
+`}
+  tests={[
+    {
+      id: "exact_output",
+      name: "Prints the right greeting",
+      expect: {
+        stdoutLines: ["Hello, Grace!"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does the following snippet print?
+
+\`\`\`python
+print("a", "b", "c", sep="-", end="!")
+\`\`\`
+
+- \`a b c\`
+  > The default \`sep\` is a single space, but here it has been overridden.
+- \`a-b-c\\n\`
+  > \`end\` was overridden too, so there is no trailing newline.
+- [o] \`a-b-c!\`
+  > Correct. Items are joined by \`sep\` and \`end\` is appended after them.
+- \`a-b-c!\\n\`
+  > The default \`end\` is \`"\\n"\`, but it was overridden to \`"!"\`.`}
+/>
+
+You have run code, written a comment, and added a docstring. Next we
+will look at why those four spaces of indentation matter so much.

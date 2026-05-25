@@ -1,0 +1,212 @@
+---
+title: Booleans
+description: True and False, truthiness, comparison, and the and / or / not operators
+---
+
+`bool` has exactly two values: `True` and `False`. Both are written
+capitalized, and both are singleton objects.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(type(True))
+print(True == 1, False == 0)        # bool is a subclass of int
+print(True + True + True)           # 3
+`}
+/>
+
+## Comparison operators
+
+| Operator | Meaning |
+| --- | --- |
+| `==`, `!=` | value equality / inequality |
+| `<`, `<=`, `>`, `>=` | ordering |
+| `is`, `is not` | identity (same object?) |
+| `in`, `not in` | membership in a sequence/container |
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(3 < 5 <= 5)            # chained comparisons! Same as 3 < 5 and 5 <= 5
+print("a" in "banana")
+print(2 in [1, 2, 3])
+print(None is None)
+`}
+/>
+
+### `==` vs `is`
+
+`==` asks "are these equal?". `is` asks "are these the *same* object?".
+For singletons like `None`, `True`, `False`, always use `is`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = [1, 2, 3]
+b = [1, 2, 3]
+print(a == b)   # True, same contents
+print(a is b)   # False, different list objects
+
+x = None
+print(x is None)   # the idiomatic check
+`}
+/>
+
+## Truthiness
+
+Any object can be tested in a boolean context. The rules:
+
+- **Falsy:** `False`, `None`, any zero (`0`, `0.0`, `0j`), any empty
+  container (`""`, `[]`, `()`, `{}`, `set()`), and instances of
+  classes that define `__bool__` to return `False`.
+- **Truthy:** everything else.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for value in [0, 1, "", "hi", [], [0], None, {0: 0}, {}]:
+    print(f"{value!r:>10} -> {bool(value)}")
+`}
+/>
+
+This is why idiomatic Python writes `if items:` rather than
+`if len(items) > 0:`.
+
+## Logical operators
+
+`and`, `or`, `not` are written as English words, not symbols. They
+**short-circuit**, returning one of the operands rather than a
+strict `True`/`False`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(True and "hello")   # 'hello' (and returns the last truthy / first falsy)
+print(False or "default") # 'default'
+print(None or 0 or "first truthy")
+print(not 0)
+`}
+/>
+
+A common idiom uses `or` to supply a default:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`name = ""
+print(name or "Anonymous")    # "Anonymous"
+
+# Careful: 0 is falsy, so 'or' replaces it. Use a None check instead.
+count = 0
+print(count or 10)            # 10, probably not what you want!
+print(count if count is not None else 10)  # 0
+`}
+/>
+
+## Conditional expressions
+
+The ternary form puts the condition in the middle:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`age = 17
+status = "adult" if age >= 18 else "minor"
+print(status)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Voting eligibility"
+  instructions={`Define a function \`can_vote(age, is_citizen)\` that returns \`True\` if the person is 18 or older **and** is a citizen, and \`False\` otherwise.`}
+  initialCode={`def can_vote(age, is_citizen):
+    # your code here
+    return False
+`}
+  solutionCode={`def can_vote(age, is_citizen):
+    return age >= 18 and is_citizen
+`}
+  tests={[
+    {
+      id: "adult_citizen",
+      name: "Adult citizen can vote",
+      code: `assert can_vote(20, True) is True`,
+    },
+    {
+      id: "minor_citizen",
+      name: "Minor citizen cannot vote",
+      code: `assert can_vote(17, True) is False`,
+    },
+    {
+      id: "adult_noncitizen",
+      name: "Adult non-citizen cannot vote",
+      code: `assert can_vote(40, False) is False`,
+    },
+    {
+      id: "boundary",
+      name: "18-year-old citizen can vote",
+      code: `assert can_vote(18, True) is True`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Safe default for empty input"
+  instructions={`Define a function \`first_or(items, default)\` that returns the first item of \`items\` if there is one, otherwise \`default\`. Use truthiness rather than checking the length explicitly.`}
+  initialCode={`def first_or(items, default):
+    # your code here
+    return None
+`}
+  solutionCode={`def first_or(items, default):
+    return items[0] if items else default
+`}
+  tests={[
+    {
+      id: "has_items",
+      name: "Returns first item when present",
+      code: `assert first_or([10, 20, 30], 0) == 10`,
+    },
+    {
+      id: "empty_list",
+      name: "Returns default on empty list",
+      code: `assert first_or([], 99) == 99`,
+    },
+    {
+      id: "empty_string",
+      name: "Returns default on empty string",
+      code: `assert first_or("", "X") == "X"`,
+    },
+    {
+      id: "string_first",
+      name: "Returns first char of a string",
+      code: `assert first_or("abc", "X") == "a"`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of these expressions evaluate to a **truthy** value? Select all that apply.
+
+- [o] \`"False"\`
+  > Any non-empty string is truthy, even the word "False".
+- [o] \`[0]\`
+  > A list containing the number 0 is non-empty, so it is truthy.
+- \`0\`
+  > Zero is falsy.
+- \`{}\`
+  > An empty dict is falsy.
+- [o] \`(False,)\`
+  > A tuple of length 1 is non-empty, so it is truthy.
+- \`None\``}
+/>
+
+<MultipleChoice
+  markdown={`What does \`None or 0 or "" or "x"\` evaluate to?
+
+- \`None\`
+  > \`or\` returns the first truthy value (or the last value if none are truthy).
+- \`0\`
+- \`""\`
+- [o] \`"x"\`
+  > Correct. The first three operands are falsy, so \`or\` keeps looking and lands on \`"x"\`.`}
+/>
+
+Booleans tie directly into control flow. Before we get there, let us
+look at Python's main sequence type: the list.

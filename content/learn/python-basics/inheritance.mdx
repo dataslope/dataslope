@@ -1,0 +1,288 @@
+---
+title: Inheritance and Polymorphism
+description: Subclassing, super(), method overriding, and duck typing
+---
+
+A class can inherit from another, getting all its attributes and
+methods for free. The new class can add behavior, override behavior,
+or both.
+
+## Subclassing
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        return f"{self.name} makes a sound"
+
+class Dog(Animal):
+    def speak(self):
+        return f"{self.name} says woof!"
+
+class Cat(Animal):
+    def speak(self):
+        return f"{self.name} says meow!"
+
+for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
+    print(animal.speak())
+`}
+/>
+
+`Dog(Animal)` reads as "Dog inherits from Animal". Calling
+`Dog("Rex")` runs `Animal.__init__` because `Dog` did not define its
+own.
+
+## `super()`
+
+`super()` gives you access to the parent class's methods. The
+canonical use is to extend, not replace, an inherited method.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Animal:
+    def __init__(self, name):
+        self.name = name
+
+class Dog(Animal):
+    def __init__(self, name, breed):
+        super().__init__(name)
+        self.breed = breed
+
+    def describe(self):
+        return f"{self.name} is a {self.breed}"
+
+print(Dog("Rex", "Labrador").describe())
+`}
+/>
+
+## Polymorphism and duck typing
+
+Python does not require a shared base class for polymorphism. If two
+objects implement the same method, code that calls that method works
+on both. This is called **duck typing**: "if it walks like a duck and
+quacks like a duck, it is a duck".
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class File:
+    def read(self):
+        return "file contents"
+
+class Network:
+    def read(self):
+        return "network response"
+
+def show(source):
+    print(source.read())
+
+show(File())
+show(Network())
+`}
+/>
+
+Neither `File` nor `Network` inherits from anything special. They are
+substitutable because they expose the same `read()` method.
+
+## `isinstance` and `issubclass`
+
+Use these instead of `type(x) is SomeClass` when you want to allow
+subclasses.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Animal: pass
+class Dog(Animal): pass
+
+d = Dog()
+print(isinstance(d, Dog))
+print(isinstance(d, Animal))
+print(type(d) is Animal)
+print(issubclass(Dog, Animal))
+`}
+/>
+
+## Multiple inheritance and MRO
+
+Python allows multiple inheritance. Method lookup uses the **Method
+Resolution Order** (MRO), computed with the C3 linearization. You can
+inspect it with `Class.__mro__`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class A:
+    def hello(self):
+        return "A"
+
+class B(A):
+    def hello(self):
+        return "B -> " + super().hello()
+
+class C(A):
+    def hello(self):
+        return "C -> " + super().hello()
+
+class D(B, C):
+    def hello(self):
+        return "D -> " + super().hello()
+
+print(D().hello())
+print([cls.__name__ for cls in D.__mro__])
+`}
+/>
+
+Multiple inheritance is powerful but easy to misuse. Most well-designed
+codebases either avoid it or restrict it to "mixin" classes that add
+small bits of behavior.
+
+## Abstract base classes
+
+`abc.ABC` lets you declare that a base class is abstract: it cannot be
+instantiated directly, and subclasses must implement the methods marked
+`@abstractmethod`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        ...
+
+class Square(Shape):
+    def __init__(self, side):
+        self.side = side
+
+    def area(self):
+        return self.side ** 2
+
+print(Square(3).area())
+
+try:
+    Shape()
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+## Composition over inheritance
+
+A general design principle: prefer **composition** (a class holds
+another as an attribute) over deep inheritance hierarchies. It is
+easier to reason about and easier to change later.
+
+```python
+# Composition: an Engine is part of a Car.
+class Engine: ...
+class Car:
+    def __init__(self):
+        self.engine = Engine()
+
+# vs. inheritance: a Car IS an Engine?  That makes no sense.
+```
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Shape hierarchy"
+  instructions={`Define an abstract base class \`Shape\` with an \`area()\` method, then two concrete subclasses:
+
+- \`Rectangle(width, height)\` with the usual rectangle area.
+- \`Circle(radius)\` using \`math.pi * r ** 2\`.
+
+Each subclass should accept its parameters in \`__init__\` and implement \`area\` so the hidden tests pass.`}
+  initialCode={`from abc import ABC, abstractmethod
+import math
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        ...
+
+class Rectangle(Shape):
+    pass
+
+class Circle(Shape):
+    pass
+`}
+  solutionCode={`from abc import ABC, abstractmethod
+import math
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        ...
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return math.pi * self.radius ** 2
+`}
+  tests={[
+    {
+      id: "rect",
+      name: "Rectangle area",
+      code: `assert Rectangle(3, 4).area() == 12`,
+    },
+    {
+      id: "circle",
+      name: "Circle area",
+      code: `import math
+assert math.isclose(Circle(2).area(), math.pi * 4)`,
+    },
+    {
+      id: "isinstance",
+      name: "Both are Shape instances",
+      code: `assert isinstance(Rectangle(1, 1), Shape)
+assert isinstance(Circle(1), Shape)`,
+    },
+    {
+      id: "abstract",
+      name: "Shape itself is not instantiable",
+      code: `try:
+    Shape()
+except TypeError:
+    pass
+else:
+    raise AssertionError("Shape should be abstract")`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does \`super().__init__(name)\` do inside a subclass?
+
+- Skips the parent class's constructor.
+- [o] Calls the parent class's \`__init__\` with \`name\`.
+  > Correct. \`super()\` walks up the MRO so you can extend parent behavior.
+- Replaces the parent class's constructor entirely.
+- Creates a new instance of the parent class.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following statements are true about duck typing in Python? Select all that apply.
+
+- [o] Two unrelated classes can be used interchangeably if they expose the same methods.
+- [o] You do not need a common base class for polymorphism.
+- You must always check \`isinstance\` before calling a method.
+  > In duck-typed code you usually do not; you just call the method and let it raise if missing.
+- [o] It often pairs with \`try / except\` ("EAFP": easier to ask forgiveness than permission).
+- Duck typing requires Python 3.10 or later.`}
+/>
+
+Next we will look at how `for` loops actually iterate, and how `yield`
+turns a function into a generator.
