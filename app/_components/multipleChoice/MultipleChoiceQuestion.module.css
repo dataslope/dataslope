@@ -717,8 +717,8 @@
 /* Disabled submit button is too vivid (blue-300) in dark mode — tone it
    down to a dim translucent blue so it reads as inactive. */
 :global(html.dark) .submitBtn:disabled {
-  background: rgba(59, 130, 246, 0.28);
-  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.5);
+  border-color: rgba(59, 130, 246, 0.55);
   color: rgba(255, 255, 255, 0.5);
   cursor: not-allowed;
 }
