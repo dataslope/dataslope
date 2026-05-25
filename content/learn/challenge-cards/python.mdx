@@ -219,15 +219,14 @@ optional elements are omitted.
 <ChallengeCard
   adapter="python"
   title="Compute the mean of a list"
-  initialCode={`# Compute the average of the values below.
-values = [12, 7, 4, 21, 9, 18, 3]
-
+  initCode={`values = [12, 7, 4, 21, 9, 18, 3]
+`}
+  initialCode={`# values is already loaded.
 mean = None  # your code here
 print("mean =", mean)
 `}
   instructions={`Assign the arithmetic mean of \`values\` to a variable called \`mean\`.`}
-  solutionCode={`values = [12, 7, 4, 21, 9, 18, 3]
-mean = sum(values) / len(values)
+  solutionCode={`mean = sum(values) / len(values)
 print("mean =", mean)
 `}
   tests={[
@@ -252,15 +251,14 @@ assert math.isclose(mean, 74/7, rel_tol=1e-9), f"Expected {74/7}, got {mean}"`,
 <ChallengeCard
   adapter="python"
   title="Compute the mean of a list"
-  initialCode={`# Compute the average of the values below.
-values = [12, 7, 4, 21, 9, 18, 3]
-
+  initCode={`values = [12, 7, 4, 21, 9, 18, 3]
+`}
+  initialCode={`# values is already loaded.
 mean = None  # your code here
 print("mean =", mean)
 `}
   instructions={`Assign the arithmetic mean of \`values\` to a variable called \`mean\`.`}
-  solutionCode={`values = [12, 7, 4, 21, 9, 18, 3]
-mean = sum(values) / len(values)
+  solutionCode={`mean = sum(values) / len(values)
 print("mean =", mean)
 `}
   tests={[
@@ -295,11 +293,14 @@ common case for compiled languages. Works for Python too, of course.
 - If divisible by 3, print \`Fizz\`
 - If divisible by 5, print \`Buzz\`
 - If divisible by both, print \`FizzBuzz\``}
-  initialCode={`for i in range(1, 16):
+  initCode={`start = 1
+end = 15
+`}
+  initialCode={`for i in range(start, end + 1):
     # your code here
     print(i)
 `}
-  solutionCode={`for i in range(1, 16):
+  solutionCode={`for i in range(start, end + 1):
     if i % 15 == 0:
         print("FizzBuzz")
     elif i % 3 == 0:
@@ -335,11 +336,14 @@ common case for compiled languages. Works for Python too, of course.
 - If divisible by 3, print \`Fizz\`
 - If divisible by 5, print \`Buzz\`
 - If divisible by both, print \`FizzBuzz\``}
-  initialCode={`for i in range(1, 16):
+  initCode={`start = 1
+end = 15
+`}
+  initialCode={`for i in range(start, end + 1):
     # your code here
     print(i)
 `}
-  solutionCode={`for i in range(1, 16):
+  solutionCode={`for i in range(start, end + 1):
     if i % 15 == 0:
         print("FizzBuzz")
     elif i % 3 == 0:
@@ -377,16 +381,18 @@ A simple string-oriented challenge exercising native test assertions.
   instructions={`Define a function \`reverse_words(s)\` that returns the same sentence with the order of its words reversed. Word separators are single spaces.
 
 Example: \`"hello world"\` → \`"world hello"\`.`}
+  initCode={`sample_sentence = "hello world"
+`}
   initialCode={`def reverse_words(s):
     # your code here
     return s
 
-print(reverse_words("hello world"))
+print(reverse_words(sample_sentence))
 `}
   solutionCode={`def reverse_words(s):
     return " ".join(reversed(s.split(" ")))
 
-print(reverse_words("hello world"))
+print(reverse_words(sample_sentence))
 `}
   tests={[
     {
@@ -423,16 +429,18 @@ print(reverse_words("hello world"))
   instructions={`Define a function \`reverse_words(s)\` that returns the same sentence with the order of its words reversed. Word separators are single spaces.
 
 Example: \`"hello world"\` → \`"world hello"\`.`}
+  initCode={`sample_sentence = "hello world"
+`}
   initialCode={`def reverse_words(s):
     # your code here
     return s
 
-print(reverse_words("hello world"))
+print(reverse_words(sample_sentence))
 `}
   solutionCode={`def reverse_words(s):
     return " ".join(reversed(s.split(" ")))
 
-print(reverse_words("hello world"))
+print(reverse_words(sample_sentence))
 `}
   tests={[
     {
@@ -475,10 +483,12 @@ module can `import` from sibling files.
   title="Implement greet() in utils.py"
   instructions={`Open \`utils.py\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.py\` already imports your function and prints the result.`}
   entryFilename="main.py"
+  initCode={`target_name = "World"
+`}
   files={[
     {
       filename: "main.py",
-      initialContent: `from utils import greet\n\nprint(greet("World"))\n`,
+      initialContent: `from utils import greet\n\nprint(greet(target_name))\n`,
     },
     {
       filename: "utils.py",
@@ -502,10 +512,12 @@ module can `import` from sibling files.
   title="Implement greet() in utils.py"
   instructions={`Open utils.py and implement greet(name) ...`}
   entryFilename="main.py"
+  initCode={`target_name = "World"
+`}
   files={[
     {
       filename: "main.py",
-      initialContent: `from utils import greet\n\nprint(greet("World"))\n`,
+      initialContent: `from utils import greet\n\nprint(greet(target_name))\n`,
     },
     {
       filename: "utils.py",
