@@ -1,0 +1,218 @@
+---
+title: Tuples
+description: Immutable sequences, unpacking, and named tuples
+---
+
+A `tuple` is an ordered, **immutable** sequence. Tuples are typically
+used for fixed-size, heterogeneous records ("a point is an `(x, y)`")
+where a list would be the wrong choice.
+
+## Creating tuples
+
+<CodeBlock
+  adapter="python"
+  initialCode={`empty = ()
+one = (1,)          # note the trailing comma!
+not_a_tuple = (1)   # this is just 1 with parentheses
+two = (1, 2)
+also_two = 1, 2     # parens are usually optional
+
+print(empty, one, two, also_two)
+print(type(one), type(not_a_tuple))
+`}
+/>
+
+The trailing comma is what makes a one-element tuple, not the
+parentheses.
+
+## Indexing, slicing, iteration
+
+Same as lists, just without mutation methods.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`t = (10, 20, 30, 40)
+print(t[0], t[-1])
+print(t[1:3])
+print(len(t))
+
+try:
+    t[0] = 99
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+## Why immutability is useful
+
+Two big wins:
+
+1. **Hashability.** Tuples of hashable items are hashable, which means
+   you can use them as dict keys or set members. Lists cannot.
+2. **Safety.** A function that returns a tuple is signaling that the
+   shape will not change underneath you.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# (lat, lon) as a dict key for city lookups.
+locations = {
+    (40.7128, -74.0060): "New York",
+    (51.5074, -0.1278): "London",
+}
+print(locations[(51.5074, -0.1278)])
+`}
+/>
+
+## Tuple unpacking
+
+This is the Python-iest feature of all. The number of names on the
+left must match the length of the tuple on the right.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`point = (3, 4)
+x, y = point
+print(x, y)
+
+# Works with any iterable, not just tuples.
+a, b, c = "abc"
+print(a, b, c)
+
+# Star (*) catches the leftover items as a list.
+first, *middle, last = [1, 2, 3, 4, 5]
+print(first, middle, last)
+`}
+/>
+
+## Returning multiple values
+
+Functions "return multiple values" by returning a tuple.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def minmax(values):
+    return min(values), max(values)
+
+lo, hi = minmax([3, 1, 4, 1, 5, 9, 2, 6])
+print("min:", lo, "max:", hi)
+`}
+/>
+
+## Named tuples
+
+`collections.namedtuple` and `typing.NamedTuple` give you a tuple with
+named fields, perfect for lightweight record types.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from collections import namedtuple
+
+Point = namedtuple("Point", ["x", "y"])
+p = Point(3, 4)
+print(p)
+print(p.x, p.y)
+print(p[0], p[1])    # still indexable like a tuple
+
+# Newer typing-style version.
+from typing import NamedTuple
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+c = Color(255, 128, 0)
+print(c, c.r, c[1])
+`}
+/>
+
+For mutable record types, reach for `@dataclass` instead, which is
+covered in the *Classes* page.
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Split min and max"
+  instructions={`Define a function \`split_minmax(values)\` that returns a tuple \`(minimum, maximum)\` of \`values\`. Assume \`values\` always has at least one item.`}
+  initialCode={`def split_minmax(values):
+    # your code here
+    return (0, 0)
+`}
+  solutionCode={`def split_minmax(values):
+    return min(values), max(values)
+`}
+  tests={[
+    {
+      id: "returns_tuple",
+      name: "Returns a tuple",
+      code: `assert isinstance(split_minmax([1, 2, 3]), tuple)`,
+    },
+    {
+      id: "basic",
+      name: "Basic case",
+      code: `assert split_minmax([3, 1, 4, 1, 5]) == (1, 5)`,
+    },
+    {
+      id: "single",
+      name: "Single value",
+      code: `assert split_minmax([42]) == (42, 42)`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Unpack a record"
+  instructions={`A function \`stats_of(record)\` is given a 4-tuple \`(name, scores, attempts, best)\` where \`scores\` is a list. Return a new tuple \`(name, average_score)\` where \`average_score\` is the mean of \`scores\` rounded to one decimal place. Use tuple unpacking to extract \`name\` and \`scores\` from the record.`}
+  initialCode={`def stats_of(record):
+    # your code here
+    return ("", 0.0)
+
+print(stats_of(("Ada", [80, 90, 100], 3, 100)))
+`}
+  solutionCode={`def stats_of(record):
+    name, scores, *_ = record
+    return (name, round(sum(scores) / len(scores), 1))
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Average of [80, 90, 100] is 90.0",
+      code: `assert stats_of(("Ada", [80, 90, 100], 3, 100)) == ("Ada", 90.0)`,
+    },
+    {
+      id: "round",
+      name: "Rounds to one decimal",
+      code: `assert stats_of(("X", [1, 2], 2, 2)) == ("X", 1.5)`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are valid Python tuples? Select all that apply.
+
+- [o] \`(1, 2, 3)\`
+- [o] \`1, 2, 3\`
+  > Parentheses are usually optional around a tuple.
+- \`(1)\`
+  > This is just the integer \`1\` in parentheses, not a one-element tuple.
+- [o] \`(1,)\`
+  > The trailing comma is what makes it a tuple.
+- [o] \`()\`
+  > The empty tuple.`}
+/>
+
+<MultipleChoice
+  markdown={`Why would you choose a tuple over a list for \`(latitude, longitude)\`?
+
+- Tuples are faster to iterate than lists.
+  > The performance difference is negligible and not the right reason.
+- [o] Tuples are immutable and hashable, so they can be used as dict keys.
+  > Correct. Immutability also signals that the pair is a fixed-size record.
+- Lists cannot contain floats.
+  > Lists can absolutely contain floats.
+- Tuples support more methods than lists.
+  > It is the other way around; tuples have very few methods.`}
+/>
+
+Next: dictionaries, Python's most-used data structure.

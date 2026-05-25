@@ -1,0 +1,278 @@
+---
+title: Strings
+description: Literals, indexing, slicing, methods, and f-strings
+---
+
+A `str` in Python 3 is an immutable sequence of Unicode code points.
+It is one of the most-used types in the language and has a rich
+toolkit attached to it.
+
+## String literals
+
+There are four ways to write a string literal, and they are all
+equivalent at the value level.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = 'single quotes'
+b = "double quotes"
+c = """triple-quoted
+spans multiple
+lines"""
+d = '''also triple-quoted'''
+
+print(a, b, c, d, sep="\\n---\\n")
+`}
+/>
+
+Python is happy to use either quote style. Pick whichever lets you
+avoid backslash escapes for the quote character itself.
+
+### Escape sequences
+
+| Sequence | Meaning |
+| --- | --- |
+| `\\n` | newline |
+| `\\t` | tab |
+| `\\\\` | backslash |
+| `\\'`, `\\"` | quote of that kind |
+| `\\u00e9` | Unicode code point (here, `é`) |
+| `\\xff` | hex byte |
+
+### Raw strings
+
+Prefix a literal with `r` to disable escape processing. Useful for
+regex patterns and Windows paths.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print("C:\\nope")     # \\n is a newline
+print(r"C:\\nope")    # raw, the backslash is literal
+`}
+/>
+
+## Indexing and slicing
+
+Strings are sequences, so they support indexing (`s[i]`) and slicing
+(`s[start:stop:step]`). Indices are zero-based; negative indices count
+from the end.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = "Python"
+print(s[0])     # 'P'
+print(s[-1])    # 'n'
+print(s[1:4])   # 'yth'
+print(s[:2])    # 'Py'
+print(s[2:])    # 'thon'
+print(s[::-1])  # 'nohtyP'
+`}
+/>
+
+Slicing **never raises `IndexError`**, even with out-of-range bounds.
+It just returns whatever overlaps.
+
+## Strings are immutable
+
+You cannot mutate a string in place. Methods like `upper`, `replace`,
+and `strip` return new strings.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = "hello"
+try:
+    s[0] = "H"
+except TypeError as e:
+    print("TypeError:", e)
+
+print(s.upper())
+print(s)   # unchanged
+`}
+/>
+
+## Common methods
+
+A small selection of methods you will use constantly:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = "  Hello, World!  "
+
+print(s.strip())
+print(s.lower())
+print(s.upper())
+print(s.replace("World", "Python"))
+print(s.split(","))
+print("-".join(["a", "b", "c"]))
+print("hello".startswith("he"))
+print("hello".endswith("lo"))
+print("hello".find("l"))    # 2 (first index) or -1 if not found
+print("hello".count("l"))   # 2
+print("42".isdigit())
+print("Hello".isalpha())
+`}
+/>
+
+## Formatting: f-strings (3.6+)
+
+The modern, recommended way to build a string. Put any expression
+inside `{ ... }`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`name = "Ada"
+score = 87.4321
+
+print(f"{name} scored {score}")
+print(f"{name} scored {score:.1f}")          # one decimal place
+print(f"{name:>10} | {score:>6.2f}")         # right-aligned, widths
+print(f"{score:,.2f}")                       # thousands separator
+print(f"{score=}")                           # debug form (3.8+)
+
+# Expressions are fine inside the braces.
+print(f"double = {score * 2:.2f}")
+`}
+/>
+
+Other formatting styles you will see in older code:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`name = "Ada"
+score = 87.4
+
+# str.format (Python 3.0+)
+print("{} scored {:.1f}".format(name, score))
+
+# Old % formatting (still works, ported from C printf)
+print("%s scored %.1f" % (name, score))
+`}
+/>
+
+## Concatenation and repetition
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print("foo" + "bar")
+print("ab" * 3)
+print("-" * 20)
+
+# Building a string by repeated +=ing is O(n^2). For loops, use ''.join.
+parts = []
+for i in range(5):
+    parts.append(str(i))
+print("".join(parts))
+`}
+/>
+
+## Bytes vs strings
+
+`str` holds Unicode code points; `bytes` holds raw 8-bit values. Use
+`.encode()` to go from `str` to `bytes` and `.decode()` to go back.
+The default codec is UTF-8.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = "café"
+b = s.encode("utf-8")
+print(b, len(b), len(s))
+print(b.decode("utf-8"))
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Title-case a name"
+  instructions={`Define a function \`format_name(first, last)\` that returns the name in the form \`"Last, First"\`, with both names title-cased and any surrounding whitespace stripped. For example, \`format_name("  ada", "LOVELACE ")\` should return \`"Lovelace, Ada"\`.`}
+  initialCode={`def format_name(first, last):
+    # your code here
+    return ""
+
+print(format_name("  ada", "LOVELACE "))
+`}
+  solutionCode={`def format_name(first, last):
+    return f"{last.strip().title()}, {first.strip().title()}"
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic case",
+      code: `assert format_name("ada", "lovelace") == "Lovelace, Ada"`,
+    },
+    {
+      id: "whitespace",
+      name: "Strips whitespace",
+      code: `assert format_name("  ada", "LOVELACE ") == "Lovelace, Ada"`,
+    },
+    {
+      id: "case",
+      name: "Title-cases input",
+      code: `assert format_name("GRACE", "hopper") == "Hopper, Grace"`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Is it a palindrome?"
+  instructions={`Write a function \`is_palindrome(s)\` that returns \`True\` if \`s\` reads the same forward and backward, ignoring case and any non-alphanumeric characters. For example, \`"A man, a plan, a canal: Panama"\` is a palindrome.`}
+  initialCode={`def is_palindrome(s):
+    # your code here
+    return False
+
+print(is_palindrome("A man, a plan, a canal: Panama"))
+`}
+  solutionCode={`def is_palindrome(s):
+    clean = "".join(c.lower() for c in s if c.isalnum())
+    return clean == clean[::-1]
+`}
+  tests={[
+    {
+      id: "classic",
+      name: "Classic Panama palindrome",
+      code: `assert is_palindrome("A man, a plan, a canal: Panama")`,
+    },
+    {
+      id: "empty",
+      name: "Empty string is a palindrome",
+      code: `assert is_palindrome("")`,
+    },
+    {
+      id: "not_palindrome",
+      name: "Plain word that is not",
+      code: `assert not is_palindrome("python")`,
+    },
+    {
+      id: "racecar",
+      name: "racecar",
+      code: `assert is_palindrome("RaceCar")`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does \`"abcdef"[1:5:2]\` evaluate to?
+
+- \`"bcd"\`
+  > The third number is the step, not the stop.
+- [o] \`"bd"\`
+  > Correct. Start at index 1, stop before index 5, step by 2: characters at indices 1 and 3.
+- \`"ace"\`
+- An \`IndexError\``}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are valid f-string format specifiers? Select all that apply.
+
+- [o] \`f"{x:.2f}"\` - two decimal places
+- [o] \`f"{x:>10}"\` - right-align in width 10
+- [o] \`f"{x:,}"\` - thousands separators
+- \`f"{x:percent}"\` - render as a percentage
+  > The correct specifier is \`f"{x:.0%}"\` (note the percent sign).
+- [o] \`f"{x=}"\` - debug form (Python 3.8+)`}
+/>
+
+Next: booleans, comparisons, and Python's short-circuiting logical
+operators.

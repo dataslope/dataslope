@@ -1,0 +1,265 @@
+---
+title: Lists
+description: Python's general-purpose ordered, mutable sequence
+---
+
+A `list` is an ordered, mutable sequence that can hold values of any
+type. Lists are the workhorse collection in Python.
+
+## Creating a list
+
+<CodeBlock
+  adapter="python"
+  initialCode={`empty = []
+nums = [1, 2, 3]
+mixed = [1, "two", 3.0, [4, 5]]
+from_range = list(range(5))
+print(empty, nums, mixed, from_range, sep="\\n")
+`}
+/>
+
+## Indexing and slicing
+
+Lists support the same `[i]` and `[start:stop:step]` syntax as
+strings. Unlike strings, you can assign through them.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [10, 20, 30, 40, 50]
+print(xs[0], xs[-1])
+print(xs[1:4])
+print(xs[::-1])
+
+xs[0] = 99
+xs[1:3] = ["a", "b", "c"]   # slice assignment can resize the list
+print(xs)
+`}
+/>
+
+## Common methods
+
+| Method | What it does |
+| --- | --- |
+| `append(x)` | add x to the end |
+| `extend(iterable)` | append every item from another iterable |
+| `insert(i, x)` | insert x at index i |
+| `remove(x)` | remove first occurrence of x, raises if missing |
+| `pop([i])` | remove and return item at index i (default last) |
+| `clear()` | empty the list |
+| `index(x)` | first index of x |
+| `count(x)` | how many times x appears |
+| `sort(key=, reverse=)` | sort in place |
+| `reverse()` | reverse in place |
+| `copy()` | shallow copy |
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+xs.append(99)
+xs.extend([7, 8])
+xs.insert(0, "start")
+xs.remove(1)        # removes the first 1
+last = xs.pop()
+print("xs:", xs)
+print("popped:", last)
+
+# Sorting
+nums = [3, 1, 4, 1, 5, 9, 2, 6]
+nums.sort()
+print("sorted in place:", nums)
+
+words = ["banana", "Apple", "cherry"]
+words.sort(key=str.lower)
+print("sorted case-insensitive:", words)
+
+# sorted() returns a new list and leaves the original alone.
+print(sorted([3, 1, 2]))
+`}
+/>
+
+## Iteration
+
+<CodeBlock
+  adapter="python"
+  initialCode={`fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(fruit)
+
+# When you also need the index, use enumerate.
+for i, fruit in enumerate(fruits, start=1):
+    print(i, fruit)
+
+# Iterate two lists in lockstep with zip.
+prices = [1.0, 0.5, 2.0]
+for fruit, price in zip(fruits, prices):
+    print(f"{fruit}: \${price:.2f}")
+`}
+/>
+
+## Membership and aggregates
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+print(3 in xs)
+print(99 in xs)
+print(len(xs), sum(xs), min(xs), max(xs))
+`}
+/>
+
+## Copying gotcha
+
+`b = a` does **not** copy. Use one of these instead:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`a = [1, [2, 3]]
+b = a.copy()          # shallow copy
+b[0] = 99
+print(a, b)
+
+# Shallow means the inner list is shared!
+b[1].append(4)
+print(a, b)
+
+# For independent nested data, use copy.deepcopy
+import copy
+c = copy.deepcopy(a)
+c[1].append(99)
+print(a, c)
+`}
+/>
+
+## Stacks and queues
+
+Python lists make excellent stacks (`append`/`pop` are O(1) at the
+end). For queues, prefer `collections.deque`, which is O(1) at both
+ends.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`stack = []
+stack.append("a")
+stack.append("b")
+stack.append("c")
+print(stack.pop())   # 'c'
+print(stack)
+
+from collections import deque
+q = deque(["a", "b", "c"])
+q.append("d")        # enqueue right
+print(q.popleft())   # dequeue left -> 'a'
+print(q)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Top three scores"
+  instructions={`Define a function \`top_three(scores)\` that returns a new list with the three highest values in \`scores\`, sorted descending. If \`scores\` has fewer than three items, return them all sorted descending.`}
+  initialCode={`def top_three(scores):
+    # your code here
+    return []
+`}
+  solutionCode={`def top_three(scores):
+    return sorted(scores, reverse=True)[:3]
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Picks the top three",
+      code: `assert top_three([5, 2, 8, 1, 7, 3]) == [8, 7, 5]`,
+    },
+    {
+      id: "few",
+      name: "Returns everything if list is short",
+      code: `assert top_three([4, 1]) == [4, 1]`,
+    },
+    {
+      id: "empty",
+      name: "Empty list returns empty list",
+      code: `assert top_three([]) == []`,
+    },
+    {
+      id: "ties",
+      name: "Handles ties",
+      code: `assert top_three([5, 5, 5, 5]) == [5, 5, 5]`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Remove duplicates, preserving order"
+  instructions={`Define \`dedupe(items)\` that returns a list of the items in \`items\` with duplicates removed, keeping the **first** occurrence of each. For example, \`dedupe([3, 1, 3, 2, 1, 4])\` returns \`[3, 1, 2, 4]\`.
+
+Hint: a \`set\` of "already seen" items is a great fit.`}
+  initialCode={`def dedupe(items):
+    # your code here
+    return []
+`}
+  solutionCode={`def dedupe(items):
+    seen = set()
+    out = []
+    for x in items:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Removes duplicates and preserves order",
+      code: `assert dedupe([3, 1, 3, 2, 1, 4]) == [3, 1, 2, 4]`,
+    },
+    {
+      id: "no_dupes",
+      name: "Already unique passes through",
+      code: `assert dedupe([1, 2, 3]) == [1, 2, 3]`,
+    },
+    {
+      id: "all_same",
+      name: "All same -> one item",
+      code: `assert dedupe(["a", "a", "a"]) == ["a"]`,
+    },
+    {
+      id: "empty",
+      name: "Empty list",
+      code: `assert dedupe([]) == []`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What is the value of \`xs\` after this code runs?
+
+\`\`\`python
+xs = [1, 2, 3, 4, 5]
+xs[1:4] = [9]
+\`\`\`
+
+- \`[1, 9, 4, 5]\`
+  > Slice assignment replaces the entire slice, not item-by-item.
+- [o] \`[1, 9, 5]\`
+  > Correct. The slice \`xs[1:4]\` (items 2, 3, 4) is replaced by the single element \`9\`.
+- \`[1, 9, 2, 3, 4, 5]\`
+- A \`ValueError\` because lengths differ`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following operations modify the list in place? Select all that apply.
+
+- [o] \`xs.append(7)\`
+- [o] \`xs.sort()\`
+- \`sorted(xs)\`
+  > \`sorted\` returns a new list and leaves \`xs\` untouched.
+- [o] \`xs.reverse()\`
+- \`xs + [9]\`
+  > \`+\` returns a new list; it does not modify either operand.
+- [o] \`xs[0] = 0\``}
+/>
+
+Lists are mutable. Their immutable cousin, the tuple, is next.

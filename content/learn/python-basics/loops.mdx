@@ -1,0 +1,262 @@
+---
+title: Loops
+description: for, while, range, break, continue, and the for-else surprise
+---
+
+Python has two looping constructs: `for` and `while`. `for` iterates
+over any iterable; `while` repeats while a condition holds true.
+
+## The `for` loop
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for fruit in ["apple", "banana", "cherry"]:
+    print(fruit)
+`}
+/>
+
+`for` works on any iterable: lists, tuples, strings, sets, dicts,
+files, generators, and your own custom classes (covered later under
+*Iterators and Generators*).
+
+## `range`
+
+`range(stop)`, `range(start, stop)`, and `range(start, stop, step)` produce
+arithmetic progressions lazily. They are the canonical way to loop
+"N times".
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for i in range(5):
+    print(i, end=" ")
+print()
+
+for i in range(1, 6):
+    print(i, end=" ")
+print()
+
+for i in range(0, 20, 5):
+    print(i, end=" ")
+print()
+
+for i in range(10, 0, -2):
+    print(i, end=" ")
+print()
+`}
+/>
+
+## `enumerate`, `zip`, `reversed`
+
+If your loop needs the index, do **not** write `range(len(xs))`. Use
+`enumerate`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`fruits = ["apple", "banana", "cherry"]
+
+for i, fruit in enumerate(fruits, start=1):
+    print(i, fruit)
+
+prices = [1.0, 0.5, 3.0]
+for fruit, price in zip(fruits, prices):
+    print(f"{fruit}: \${price}")
+
+for fruit in reversed(fruits):
+    print(fruit)
+`}
+/>
+
+## The `while` loop
+
+<CodeBlock
+  adapter="python"
+  initialCode={`n = 16
+steps = 0
+while n != 1:
+    n = n // 2 if n % 2 == 0 else 3 * n + 1
+    steps += 1
+print("steps:", steps)
+`}
+/>
+
+Use `while True` plus `break` for "loop until something happens" code
+where the loop body is what knows when to stop.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from itertools import count
+
+for n in count(1):
+    if n * n > 100:
+        print("first square over 100 is", n * n)
+        break
+`}
+/>
+
+## `break` and `continue`
+
+- `break` exits the *innermost* loop immediately.
+- `continue` skips the rest of the current iteration and goes back to
+  the top.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`for n in range(1, 11):
+    if n == 7:
+        print("found 7, stopping")
+        break
+    if n % 2 == 0:
+        continue
+    print("odd:", n)
+`}
+/>
+
+## `else` on a loop (the weird one)
+
+Both `for` and `while` accept an `else:` block, which runs **only if
+the loop completed normally** (no `break`). It is most useful for
+search loops:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def first_factor(n):
+    for i in range(2, n):
+        if n % i == 0:
+            print(f"{n} = {i} * {n // i}")
+            break
+    else:
+        print(f"{n} is prime")
+
+for n in [12, 13, 21, 29]:
+    first_factor(n)
+`}
+/>
+
+This pattern is rare but worth recognizing when you see it.
+
+## Avoiding common pitfalls
+
+- **Modifying a list while iterating over it** invalidates the
+  iterator. Iterate over a copy or build a new list.
+- **Off-by-one errors** are common with `range`. Remember the upper
+  bound is exclusive: `range(5)` yields 0, 1, 2, 3, 4.
+- **`for else` does not fire if you `break`.** That is the whole
+  point, but it surprises people.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Removing items while iterating: BAD.
+xs = [1, 2, 3, 4, 5]
+for x in xs[:]:               # iterate over a copy
+    if x % 2 == 0:
+        xs.remove(x)
+print(xs)
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Sum of digits"
+  instructions={`Define a function \`digit_sum(n)\` that takes a non-negative integer \`n\` and returns the sum of its decimal digits. Use a \`while\` loop. For example, \`digit_sum(1234)\` returns \`10\`.`}
+  initialCode={`def digit_sum(n):
+    # your code here
+    return 0
+`}
+  solutionCode={`def digit_sum(n):
+    total = 0
+    while n > 0:
+        total += n % 10
+        n //= 10
+    return total
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "1234 -> 10",
+      code: `assert digit_sum(1234) == 10`,
+    },
+    {
+      id: "zero",
+      name: "0 -> 0",
+      code: `assert digit_sum(0) == 0`,
+    },
+    {
+      id: "big",
+      name: "999999 -> 54",
+      code: `assert digit_sum(999_999) == 54`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="First prime over N"
+  instructions={`Define a function \`first_prime_over(n)\` that returns the smallest prime number strictly greater than \`n\`. Use the \`for ... else\` pattern from above for the inner primality test.`}
+  initialCode={`def first_prime_over(n):
+    # your code here
+    return 2
+`}
+  solutionCode={`def first_prime_over(n):
+    candidate = max(n + 1, 2)
+    while True:
+        for i in range(2, int(candidate ** 0.5) + 1):
+            if candidate % i == 0:
+                break
+        else:
+            return candidate
+        candidate += 1
+`}
+  tests={[
+    {
+      id: "after_10",
+      name: "First prime > 10 is 11",
+      code: `assert first_prime_over(10) == 11`,
+    },
+    {
+      id: "after_11",
+      name: "First prime > 11 is 13",
+      code: `assert first_prime_over(11) == 13`,
+    },
+    {
+      id: "after_0",
+      name: "First prime > 0 is 2",
+      code: `assert first_prime_over(0) == 2`,
+    },
+    {
+      id: "after_100",
+      name: "First prime > 100 is 101",
+      code: `assert first_prime_over(100) == 101`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does this code print?
+
+\`\`\`python
+for i in range(3):
+    if i == 1:
+        continue
+    print(i)
+\`\`\`
+
+- \`0\\n1\\n2\`
+- [o] \`0\\n2\`
+  > \`continue\` skips the rest of the iteration when \`i == 1\`, so \`1\` is never printed.
+- \`0\\n1\`
+- \`2\``}
+/>
+
+<MultipleChoice
+  markdown={`When does a \`for ... else\` clause execute?
+
+- Always, after the loop body finishes
+- When the loop body raises an exception
+- [o] Only when the loop finishes without hitting \`break\`
+  > Correct. That is what makes it useful for search loops.
+- Only when the iterable is empty`}
+/>
+
+Loops naturally lead into a tighter syntactic form: comprehensions.

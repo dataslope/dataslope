@@ -1,0 +1,181 @@
+---
+title: Syntax and Indentation
+description: How Python uses whitespace, PEP 8 style, and the tabs vs spaces convention
+---
+
+The previous page noted that Python uses indentation to delimit blocks
+of code. This page goes into detail: what counts as a block, what
+PEP 8 has to say about style, and how to keep your editor honest.
+
+## Blocks are indentation
+
+In C, JavaScript, or Java, code inside a function or `if` is wrapped
+in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def shout(message):
+    if message:
+        return message.upper() + "!"
+    return ""
+
+print(shout("hello"))
+print(shout(""))
+`}
+/>
+
+The colon (`:`) at the end of `def`, `if`, `for`, `while`, `try`,
+`class`, and so on signals "the next indented block belongs to me".
+
+## What happens when indentation is wrong
+
+If indentation is missing where Python expects it, you get an
+`IndentationError`. If it is inconsistent, you get a `TabError` or a
+silently broken program.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Try editing this so the 'return' is indented under the 'def',
+# then run again to see the difference.
+def square(x):
+return x * x
+
+print(square(5))
+`}
+/>
+
+## The four-space rule (PEP 8)
+
+PEP 8, Python's official style guide, says:
+
+- Use **four spaces** per indentation level.
+- Do **not** mix tabs and spaces inside the same block. Python 3
+  raises a `TabError` if you try.
+- Limit lines to **79 characters** (or 99 in modern codebases that
+  follow `black`'s default of 88).
+- Two blank lines between top-level functions and classes; one blank
+  line between methods inside a class.
+- One statement per line. `if x: do(); other()` is legal but frowned
+  upon.
+
+Tools that enforce this for you:
+
+- [`black`](https://black.readthedocs.io/) reformats your code in one
+  consistent style with almost no configuration.
+- [`ruff`](https://docs.astral.sh/ruff/) is a very fast linter that
+  rolls up most of the older tools (`flake8`, `isort`, `pyupgrade`).
+- Most editors can run these on save.
+
+## The tabs vs spaces debate, revisited
+
+We touched on this on the *Python History* page. The very short
+version, with a bit more nuance:
+
+| Argument | Tabs | Spaces |
+| --- | --- | --- |
+| Each developer picks their own width | Yes | No |
+| Renders identically everywhere | No | Yes |
+| Easier to align continuation lines | No | Yes |
+| Default in PEP 8, `black`, `ruff` | No | Yes |
+| Allowed in Python 3 source | Yes (alone) | Yes (alone) |
+
+For brand-new code, **use four spaces**. If you join a project that
+already uses tabs, stay consistent with what is there. Either way,
+configure your editor to insert *one or the other* automatically so
+you never produce mixed indentation.
+
+## Continuation lines
+
+Python statements normally end at the end of a line. There are two
+ways to span multiple lines:
+
+1. **Implicit continuation** inside `()`, `[]`, or `{}`. This is the
+   preferred style.
+2. **Explicit continuation** with a backslash `\\` at end of line.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Preferred: implicit continuation inside parentheses.
+total = (1 + 2 + 3
+         + 4 + 5 + 6)
+
+# Works but ugly: explicit backslash continuation.
+total2 = 1 + 2 + 3 \\
+       + 4 + 5 + 6
+
+print(total, total2)
+`}
+/>
+
+## Semicolons (please do not)
+
+Python technically allows `;` to separate statements on one line. The
+community consensus is **do not use it**.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Legal Python, but PEP 8 says no.
+a = 1; b = 2; print(a + b)
+`}
+/>
+
+## A formatting challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Fix the broken indentation"
+  instructions={`The function \`average\` below has at least one indentation problem and may also have a stray semicolon. Rewrite the body so that:
+
+- It uses four-space indentation throughout.
+- It has no semicolons.
+- It returns the arithmetic mean of \`numbers\`, or \`0\` if the list is empty.
+
+The hidden tests will call \`average\` with several inputs.`}
+  initialCode={`def average(numbers):
+  if not numbers:
+        return 0;
+   total = sum(numbers);return total / len(numbers)
+
+print(average([1, 2, 3, 4]))
+`}
+  solutionCode={`def average(numbers):
+    if not numbers:
+        return 0
+    total = sum(numbers)
+    return total / len(numbers)
+
+print(average([1, 2, 3, 4]))
+`}
+  tests={[
+    {
+      id: "basic_mean",
+      name: "average of [1, 2, 3, 4] is 2.5",
+      code: `assert average([1, 2, 3, 4]) == 2.5`,
+    },
+    {
+      id: "empty_list",
+      name: "empty list returns 0",
+      code: `assert average([]) == 0`,
+    },
+    {
+      id: "single_item",
+      name: "single-item list returns that item",
+      code: `assert average([42]) == 42`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which statements about Python whitespace are correct? Select all that apply.
+
+- [o] Blocks are delimited by indentation, not by braces.
+- [o] PEP 8 recommends four spaces per indentation level.
+- [o] Python 3 will raise an error if a single block mixes tabs and spaces.
+- Indentation in Python is purely cosmetic and the parser ignores it.
+  > Indentation is part of the grammar. Misindented code will not parse.
+- A backslash at the end of a line continues the statement onto the next line.
+  > True, but unparenthesized lines are usually rewritten to use \`( ... )\`.`}
+/>
+
+Now that the rules of the road are clear, we will start using them to
+build real programs, starting with variables.

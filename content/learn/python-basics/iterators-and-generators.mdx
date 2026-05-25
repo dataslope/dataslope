@@ -1,0 +1,301 @@
+---
+title: Iterators and Generators
+description: The iterator protocol, yield, and lazy evaluation
+---
+
+Every `for` loop in Python is powered by the **iterator protocol**.
+Understanding it unlocks generators, infinite sequences, and
+memory-efficient pipelines.
+
+## Iterables vs iterators
+
+- An **iterable** is anything `for` can loop over: lists, tuples,
+  strings, dicts, sets, files, generators, your own classes that
+  define `__iter__`.
+- An **iterator** is the thing that actually produces items, one at a
+  time. It has `__next__()`.
+
+Calling `iter(iterable)` returns an iterator. Calling
+`next(iterator)` advances it. When there are no more items, `next`
+raises `StopIteration`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`xs = [10, 20, 30]
+it = iter(xs)
+
+print(next(it))
+print(next(it))
+print(next(it))
+
+try:
+    print(next(it))
+except StopIteration:
+    print("exhausted")
+`}
+/>
+
+## Generators with `yield`
+
+Writing `__iter__` and `__next__` by hand is tedious. A function that
+uses `yield` becomes a **generator** automatically.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+
+for x in countdown(5):
+    print(x)
+`}
+/>
+
+Key idea: each `yield` *pauses* the function and hands a value to the
+caller. The next `next()` resumes the function right after that
+`yield`, with all local state intact.
+
+## Why bother?
+
+Generators are lazy. They compute the next value only when asked.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Infinite sequence -- only safe because we take a slice.
+def naturals():
+    n = 1
+    while True:
+        yield n
+        n += 1
+
+from itertools import islice
+print(list(islice(naturals(), 10)))
+`}
+/>
+
+You could not write `list(naturals())` because that list would never
+finish being built. Generators let you describe an infinite sequence
+and then consume just as much of it as you need.
+
+## Generator expressions
+
+You have already met these in the *Comprehensions* page. The same shape
+as a list comprehension, with `(` instead of `[`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`squares = (x * x for x in range(1_000_000))
+print(sum(squares))    # streams, no million-item list
+`}
+/>
+
+When a generator expression is the sole argument to a function, the
+inner parens are optional: `sum(x*x for x in xs)`.
+
+## Pipelines
+
+Generators chain naturally. Each stage processes one item at a time.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def lines():
+    for line in ["alpha", "  beta  ", "", "gamma", "  ", "delta"]:
+        yield line
+
+def clean(stream):
+    for line in stream:
+        cleaned = line.strip()
+        if cleaned:
+            yield cleaned
+
+def upper(stream):
+    for line in stream:
+        yield line.upper()
+
+for item in upper(clean(lines())):
+    print(item)
+`}
+/>
+
+The whole pipeline runs item-by-item. Memory use stays constant no
+matter how many lines flow through.
+
+## `yield from`
+
+`yield from another_iterable` is a shortcut for "yield every item of
+that iterable". Useful for delegating to sub-generators.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def chain(*iterables):
+    for it in iterables:
+        yield from it
+
+for x in chain([1, 2], (3, 4), "ab"):
+    print(x)
+`}
+/>
+
+## Building your own iterator class
+
+If you need state more complex than `yield` makes easy, write your
+own `__iter__` and `__next__`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Counter:
+    def __init__(self, start=0, step=1):
+        self.value = start
+        self.step = step
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        result = self.value
+        self.value += self.step
+        return result
+
+from itertools import islice
+c = Counter(10, 5)
+print(list(islice(c, 4)))
+`}
+/>
+
+The class returns `self` from `__iter__` because it both *is* an
+iterable and *is* its own iterator.
+
+## `itertools`
+
+The `itertools` module in the standard library is a treasure chest of
+generator-based building blocks. A small sample:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from itertools import count, cycle, repeat, chain, islice, takewhile, accumulate, combinations, product
+
+print(list(islice(count(10), 5)))
+print(list(islice(cycle("abc"), 7)))
+print(list(repeat("hi", 3)))
+print(list(chain([1, 2], [3, 4])))
+print(list(takewhile(lambda x: x < 5, count())))
+print(list(accumulate([1, 2, 3, 4])))
+print(list(combinations("abcd", 2)))
+print(list(product("ab", "12")))
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Generate Fibonacci numbers"
+  instructions={`Define a generator function \`fib()\` that yields the Fibonacci sequence indefinitely, starting with \`0, 1, 1, 2, 3, 5, ...\`. The hidden tests will take a finite slice.`}
+  initialCode={`def fib():
+    # your code here
+    yield 0
+`}
+  solutionCode={`def fib():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+`}
+  tests={[
+    {
+      id: "is_generator",
+      name: "fib() is a generator",
+      code: `import types
+assert isinstance(fib(), types.GeneratorType)`,
+    },
+    {
+      id: "first_ten",
+      name: "First 10 Fibonacci numbers",
+      code: `from itertools import islice
+assert list(islice(fib(), 10)) == [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]`,
+    },
+    {
+      id: "lazy",
+      name: "Producing the 30th value is fast",
+      code: `from itertools import islice
+import time
+start = time.perf_counter()
+list(islice(fib(), 30))
+assert time.perf_counter() - start < 0.1`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Sliding window"
+  instructions={`Define a generator function \`window(iterable, size)\` that yields successive tuples of \`size\` consecutive items from \`iterable\`. If \`iterable\` has fewer than \`size\` items, yield nothing.
+
+Example: \`list(window([1, 2, 3, 4], 2))\` returns \`[(1, 2), (2, 3), (3, 4)]\`.`}
+  initialCode={`def window(iterable, size):
+    # your code here
+    if False:
+        yield ()
+`}
+  solutionCode={`from collections import deque
+
+def window(iterable, size):
+    it = iter(iterable)
+    buf = deque(maxlen=size)
+    for _ in range(size):
+        try:
+            buf.append(next(it))
+        except StopIteration:
+            return
+    yield tuple(buf)
+    for item in it:
+        buf.append(item)
+        yield tuple(buf)
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Basic window",
+      code: `assert list(window([1, 2, 3, 4], 2)) == [(1, 2), (2, 3), (3, 4)]`,
+    },
+    {
+      id: "size_three",
+      name: "Size 3",
+      code: `assert list(window([1, 2, 3, 4, 5], 3)) == [(1, 2, 3), (2, 3, 4), (3, 4, 5)]`,
+    },
+    {
+      id: "too_short",
+      name: "Iterable shorter than size",
+      code: `assert list(window([1, 2], 3)) == []`,
+    },
+    {
+      id: "exact_length",
+      name: "Length equals size",
+      code: `assert list(window([1, 2, 3], 3)) == [(1, 2, 3)]`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What happens when a generator function is called?
+
+- The body runs immediately and returns the first value.
+- [o] No code in the body runs; you get back a generator object, and the body runs lazily as you iterate.
+  > Correct. \`yield\` is what makes the function lazy.
+- It raises \`StopIteration\` if the body is empty.
+- It returns a list of every value the function yields.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are valid reasons to prefer a generator over building a list? Select all that apply.
+
+- [o] Constant memory usage for arbitrarily long input.
+- [o] You can model infinite sequences.
+- [o] Pipelines compose naturally: each stage processes one item at a time.
+- Generators are always faster than lists.
+  > For small finite collections, building a list and indexing into it is often faster.
+- [o] You can stop consuming early without paying for the rest.`}
+/>
+
+Functions that decorate other functions are next.

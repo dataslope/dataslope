@@ -1,0 +1,146 @@
+---
+title: Installation
+description: Install Python locally and start the REPL
+---
+
+You do not strictly need to install anything to work through this
+course: every code block on every page runs in your browser via
+Pyodide. That said, sooner or later you will want a local Python so
+you can run scripts, install third-party libraries, and integrate with
+your editor.
+
+## Picking a version
+
+Always install the **latest stable Python 3** (3.13 at the time of
+writing) unless a specific project pins you to an older version.
+Avoid Python 2: it has been end-of-life since January 1, 2020.
+
+## Installing Python
+
+Pick the option that matches your operating system.
+
+### macOS
+
+The Python that ships with macOS is for the system, not for you. Use
+one of:
+
+- **python.org installer.** Download from
+  [python.org/downloads](https://www.python.org/downloads/) and run
+  the `.pkg`.
+- **Homebrew.** `brew install python` installs the latest 3.x and adds
+  `python3` and `pip3` to your `PATH`.
+- **pyenv.** `brew install pyenv` then `pyenv install 3.13.2`. This
+  lets you switch versions per project.
+
+### Windows
+
+- Download the installer from
+  [python.org/downloads](https://www.python.org/downloads/).
+- **Check "Add python.exe to PATH"** on the first screen of the
+  installer. This is the single most common gotcha.
+- Alternatively, install from the Microsoft Store, which keeps Python
+  updated automatically.
+
+### Linux
+
+Most distributions ship a recent Python in their package manager:
+
+```bash
+# Debian/Ubuntu
+sudo apt install python3 python3-pip python3-venv
+
+# Fedora
+sudo dnf install python3 python3-pip
+
+# Arch
+sudo pacman -S python python-pip
+```
+
+For full version control, install `pyenv` and let it manage multiple
+side-by-side interpreters.
+
+## Verifying the install
+
+Open a terminal and run:
+
+```bash
+python3 --version
+pip3 --version
+```
+
+You should see something like `Python 3.13.2` and a matching `pip`
+version. On Windows the commands are `python` and `pip`.
+
+## The REPL
+
+Running `python3` with no arguments drops you into the **REPL** (read,
+eval, print, loop), an interactive interpreter:
+
+```text
+$ python3
+Python 3.13.2 (main, ...) on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 2 + 2
+4
+>>> name = "Ada"
+>>> f"Hello, {name}!"
+'Hello, Ada!'
+>>> exit()
+```
+
+The REPL is perfect for exploring a library or testing one-liners. For
+longer experiments, save your code to a file like `script.py` and run
+it with `python3 script.py`.
+
+## Running code in the browser
+
+Every executable block in this course uses Pyodide, which is CPython
+compiled to WebAssembly. It is real Python 3.13 with NumPy, Pandas,
+Matplotlib, and Plotly preinstalled. Try it:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import sys
+print("Python version:", sys.version)
+print("Platform:", sys.platform)
+`}
+/>
+
+## A small first challenge
+
+Verify the REPL feel by computing something small.
+
+<ChallengeCard
+  adapter="python"
+  title="Print the Python version"
+  instructions={`Import the \`sys\` module and assign \`sys.version_info.major\` to a variable named \`major\`. The hidden tests will check that \`major\` equals \`3\`.`}
+  initialCode={`# your code here
+major = None
+print("Major version:", major)
+`}
+  solutionCode={`import sys
+major = sys.version_info.major
+print("Major version:", major)
+`}
+  tests={[
+    {
+      id: "major_three",
+      name: "major equals 3",
+      description: "We should be running Python 3.x",
+      code: `assert major == 3, f"Expected 3, got {major}"`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are reasonable ways to install Python? Select all that apply.
+
+- [o] The official installer from python.org
+- [o] Homebrew (\`brew install python\`) on macOS
+- [o] \`pyenv\` for managing multiple versions per project
+- Copying \`python.exe\` into your project folder
+  > Python is more than a single executable; it needs its standard library and a proper install layout.
+- [o] The system package manager on Linux (\`apt\`, \`dnf\`, \`pacman\`)`}
+/>
+
+Next: write your first program.

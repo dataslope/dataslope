@@ -1,0 +1,182 @@
+---
+title: Data Types
+description: A tour of Python's built-in types and how to convert between them
+---
+
+Python comes with a small, focused set of built-in types. You will
+spend 99% of your time juggling these. Each one gets its own page
+later; this is the map.
+
+## The cheat sheet
+
+| Category | Type | Example | Mutable? |
+| --- | --- | --- | --- |
+| Numeric | `int` | `42`, `-7`, `0b1010` | No |
+| Numeric | `float` | `3.14`, `1e-3` | No |
+| Numeric | `complex` | `3+2j` | No |
+| Text | `str` | `"hello"`, `'a'` | No |
+| Boolean | `bool` | `True`, `False` | No |
+| Sequence | `list` | `[1, 2, 3]` | Yes |
+| Sequence | `tuple` | `(1, 2, 3)` | No |
+| Sequence | `range` | `range(10)` | No |
+| Mapping | `dict` | `{"a": 1}` | Yes |
+| Set | `set` | `{1, 2, 3}` | Yes |
+| Set | `frozenset` | `frozenset({1, 2})` | No |
+| Binary | `bytes` | `b"\\x00\\x01"` | No |
+| Binary | `bytearray` | `bytearray(b"...")` | Yes |
+| Nothing | `NoneType` | `None` | No |
+
+## Checking the type
+
+`type(obj)` returns the exact class; `isinstance(obj, T)` checks
+inheritance and is what you should prefer in real code.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`values = [1, 1.0, True, "1", [1], (1,), {1}, {"1": 1}, None]
+
+for v in values:
+    print(f"{v!r:>15}  type={type(v).__name__}")
+`}
+/>
+
+Notice that `bool` is a subclass of `int`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(isinstance(True, int))   # True
+print(True + True)             # 2
+print(isinstance(1, bool))     # False
+`}
+/>
+
+## Converting between types
+
+Every built-in type doubles as a converter when you call it as a
+function:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# String to int / float
+print(int("42"))
+print(float("3.14"))
+
+# int to string
+print(str(255))
+print(hex(255), bin(255), oct(255))
+
+# float to int (truncates toward zero)
+print(int(3.9))
+print(int(-3.9))
+
+# list / tuple / set are interchangeable in many cases
+items = [1, 2, 2, 3]
+print(tuple(items))
+print(set(items))
+print(list("abc"))
+`}
+/>
+
+## Mutability matters
+
+Two patterns to remember:
+
+1. You cannot change an `int`, `float`, `str`, `tuple`, or
+   `frozenset`. Operations like `s.upper()` return a **new** string.
+2. You *can* change a `list`, `dict`, `set`, or `bytearray` in place.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`s = "hello"
+s.upper()       # returns "HELLO" but does not change s
+print("s is still", s)
+s = s.upper()   # rebinding is how you "change" a string
+print("now s is", s)
+
+nums = [1, 2, 3]
+nums.append(4)  # changes the list in place
+print("nums is now", nums)
+`}
+/>
+
+## `None`
+
+`None` is the unique value of type `NoneType`. It is Python's way of
+saying "no value". Use `is None` or `is not None` to check for it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`result = None
+if result is None:
+    print("nothing yet")
+
+# A function with no return statement returns None.
+def shout(msg):
+    print(msg.upper())
+
+ret = shout("hello")
+print("shout returned:", ret)
+`}
+/>
+
+## A conversion challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Parse a CSV-ish line"
+  instructions={`A variable \`line\` holds the string \`"42,3.14,hello,True"\`. Split it on commas and produce a list called \`parsed\` containing, in order:
+
+1. The integer \`42\`
+2. The float \`3.14\`
+3. The string \`"hello"\`
+4. The boolean \`True\`
+
+Hard-code the types (you do not need to detect them automatically).`}
+  initialCode={`line = "42,3.14,hello,True"
+parts = line.split(",")
+print(parts)
+
+parsed = None  # your code here
+print(parsed)
+`}
+  solutionCode={`line = "42,3.14,hello,True"
+parts = line.split(",")
+parsed = [int(parts[0]), float(parts[1]), parts[2], parts[3] == "True"]
+print(parsed)
+`}
+  tests={[
+    {
+      id: "is_list",
+      name: "parsed is a list of length 4",
+      code: `assert isinstance(parsed, list) and len(parsed) == 4`,
+    },
+    {
+      id: "types_right",
+      name: "Each item has the right type",
+      code: `assert type(parsed[0]) is int
+assert type(parsed[1]) is float
+assert type(parsed[2]) is str
+assert type(parsed[3]) is bool`,
+    },
+    {
+      id: "values_right",
+      name: "Each item has the right value",
+      code: `assert parsed == [42, 3.14, "hello", True]`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following Python types are **immutable**? Select all that apply.
+
+- [o] \`int\`
+- [o] \`str\`
+- \`list\`
+  > Lists are mutable: \`l.append(x)\` changes them in place.
+- [o] \`tuple\`
+- \`dict\`
+  > Dicts are mutable.
+- [o] \`frozenset\``}
+/>
+
+The next pages drill into each type, starting with numbers.

@@ -1,0 +1,285 @@
+---
+title: Classes
+description: Defining your own types with attributes, methods, and dataclasses
+---
+
+A **class** bundles data and behavior. Every value in Python is an
+instance of some class, and you can define your own to model the
+problem you are solving.
+
+## A first class
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Dog:
+    """A very simple dog."""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        return f"{self.name} says woof!"
+
+d = Dog("Rex", 4)
+print(d.name, d.age)
+print(d.bark())
+print(isinstance(d, Dog))
+`}
+/>
+
+A few pieces to call out:
+
+- `class Dog:` starts a class definition. Convention is PascalCase.
+- `__init__` is the **initializer**. It runs when you call
+  `Dog("Rex", 4)` and sets up the new instance.
+- `self` is the conventional name for the instance argument; it is
+  always the first parameter of a method.
+- `d.name` and `d.age` are **instance attributes**.
+
+## Class attributes vs instance attributes
+
+A class attribute is shared by every instance. An instance attribute
+belongs to a single object.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Dog:
+    species = "Canis familiaris"   # class attribute
+
+    def __init__(self, name):
+        self.name = name           # instance attribute
+
+a = Dog("Rex")
+b = Dog("Luna")
+print(a.species, b.species)        # both share Canis familiaris
+
+Dog.species = "Canis lupus familiaris"
+print(a.species, b.species)        # both reflect the change
+`}
+/>
+
+Be cautious putting *mutable* values (lists, dicts) on the class
+itself unless you really want them shared.
+
+## Methods
+
+Anything `def`-ed inside a class is a method. The first argument is
+the instance; Python passes it automatically when you call
+`instance.method()`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Counter:
+    def __init__(self, start=0):
+        self.value = start
+
+    def inc(self, step=1):
+        self.value += step
+        return self.value
+
+c = Counter()
+c.inc(); c.inc(); c.inc(5)
+print(c.value)
+`}
+/>
+
+## `@classmethod` and `@staticmethod`
+
+- `@classmethod` receives the **class** as the first argument
+  (`cls`). Useful for alternative constructors.
+- `@staticmethod` receives nothing automatic. It is just a function
+  that lives inside the class for organizational reasons.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Temperature:
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    @classmethod
+    def from_fahrenheit(cls, f):
+        return cls((f - 32) * 5 / 9)
+
+    @staticmethod
+    def is_freezing(celsius):
+        return celsius <= 0
+
+t = Temperature.from_fahrenheit(32)
+print(t.celsius)
+print(Temperature.is_freezing(-1))
+`}
+/>
+
+## Dunder methods
+
+Names that start and end with double underscores ("dunder") are
+special to Python. The most common:
+
+| Dunder | Purpose | Triggered by |
+| --- | --- | --- |
+| `__init__` | initialize | `MyClass(...)` |
+| `__repr__` | unambiguous string | `repr(obj)`, REPL display |
+| `__str__` | friendly string | `str(obj)`, `print(obj)` |
+| `__eq__`, `__lt__`, ... | comparisons | `a == b`, `a < b` |
+| `__len__` | length | `len(obj)` |
+| `__iter__` | iteration | `for x in obj` |
+| `__getitem__` | indexing | `obj[key]` |
+| `__call__` | make instance callable | `obj()` |
+
+<CodeBlock
+  adapter="python"
+  initialCode={`class Money:
+    def __init__(self, amount, currency="USD"):
+        self.amount = amount
+        self.currency = currency
+
+    def __repr__(self):
+        return f"Money({self.amount!r}, {self.currency!r})"
+
+    def __str__(self):
+        return f"{self.amount:.2f} {self.currency}"
+
+    def __eq__(self, other):
+        return (isinstance(other, Money)
+                and self.amount == other.amount
+                and self.currency == other.currency)
+
+    def __add__(self, other):
+        if self.currency != other.currency:
+            raise ValueError("currency mismatch")
+        return Money(self.amount + other.amount, self.currency)
+
+a = Money(10)
+b = Money(2.5)
+print(a)            # uses __str__
+print(repr(a))      # uses __repr__
+print(a == Money(10))
+print(a + b)
+`}
+/>
+
+## `@dataclass`: the easy mode
+
+When all you want is a class that holds data, the boilerplate of
+writing `__init__`, `__repr__`, and `__eq__` adds up. `@dataclass`
+generates them for you from type-annotated class attributes.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from dataclasses import dataclass
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+p = Point(3, 4)
+print(p)              # auto __repr__
+print(p == Point(3, 4))  # auto __eq__
+`}
+/>
+
+`@dataclass(frozen=True)` makes instances immutable and hashable, so
+they can be used as dict keys or set elements.
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="A simple bank account"
+  instructions={`Define a class \`Account\` with:
+
+- An \`__init__(self, owner, balance=0)\` constructor that stores both attributes.
+- A method \`deposit(amount)\` that adds to the balance and returns the new balance. Raise \`ValueError\` if \`amount\` is negative.
+- A method \`withdraw(amount)\` that subtracts from the balance and returns the new balance. Raise \`ValueError\` if \`amount\` is negative or greater than \`self.balance\`.
+- A \`__repr__\` that returns the string \`f"Account({owner!r}, {balance})"\`.`}
+  initialCode={`class Account:
+    pass
+`}
+  solutionCode={`class Account:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        if amount < 0:
+            raise ValueError("amount must be non-negative")
+        self.balance += amount
+        return self.balance
+
+    def withdraw(self, amount):
+        if amount < 0:
+            raise ValueError("amount must be non-negative")
+        if amount > self.balance:
+            raise ValueError("insufficient funds")
+        self.balance -= amount
+        return self.balance
+
+    def __repr__(self):
+        return f"Account({self.owner!r}, {self.balance})"
+`}
+  tests={[
+    {
+      id: "init",
+      name: "Constructor stores owner and balance",
+      code: `a = Account("Ada", 100)
+assert a.owner == "Ada" and a.balance == 100`,
+    },
+    {
+      id: "deposit",
+      name: "Deposit increases balance",
+      code: `a = Account("Ada")
+assert a.deposit(50) == 50
+assert a.balance == 50`,
+    },
+    {
+      id: "withdraw",
+      name: "Withdraw decreases balance",
+      code: `a = Account("Ada", 100)
+assert a.withdraw(40) == 60`,
+    },
+    {
+      id: "errors",
+      name: "Errors for bad amounts",
+      code: `a = Account("Ada", 50)
+import builtins
+for bad in [(-1, "deposit"), (-1, "withdraw"), (100, "withdraw")]:
+    amount, method = bad
+    try:
+        getattr(a, method)(amount)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f"expected ValueError for {method}({amount})")`,
+    },
+    {
+      id: "repr",
+      name: "repr is informative",
+      code: `assert repr(Account("Ada", 10)) == "Account('Ada', 10)"`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between \`__repr__\` and \`__str__\`?
+
+- They are the same; \`__str__\` was renamed in Python 3.
+- [o] \`__repr__\` should be an unambiguous representation for developers; \`__str__\` is a friendly representation for end users.
+  > Correct. A good \`__repr__\` ideally lets you reconstruct the object; \`__str__\` is what \`print\` and \`str()\` call.
+- \`__repr__\` is automatically generated; \`__str__\` must be written by hand.
+- \`__str__\` is for built-in types; \`__repr__\` is for user classes.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`@dataclass\` do for you? Select all that apply.
+
+- [o] Generates \`__init__\` from the annotated attributes.
+- [o] Generates \`__repr__\` and \`__eq__\`.
+- [o] When \`frozen=True\`, makes instances immutable and hashable.
+- Validates types at runtime.
+  > \`@dataclass\` does not enforce types; that is \`pydantic\` or similar.
+- Forces every attribute to be private.`}
+/>
+
+Inheritance lets one class build on another. That is next.

@@ -1,0 +1,278 @@
+---
+title: Functions
+description: def, parameters, defaults, *args, **kwargs, return values, and type hints
+---
+
+Functions package code so it can be reused, named, and tested. The
+keyword is `def`, the body is indented, and a function ends as soon as
+its indentation does.
+
+## Defining a function
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def greet(name):
+    """Return a friendly greeting."""
+    return f"Hello, {name}!"
+
+print(greet("Ada"))
+`}
+/>
+
+A function that does not explicitly `return` returns `None`.
+
+## Parameters
+
+Python distinguishes between **positional** and **keyword** arguments.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def deposit(account, amount, currency="USD"):
+    return f"Deposited {amount} {currency} into {account}"
+
+print(deposit("acct-1", 100))
+print(deposit("acct-1", 100, currency="EUR"))
+print(deposit(account="acct-2", amount=50))
+`}
+/>
+
+### Default values
+
+Defaults are evaluated **once**, when the function is defined. A
+mutable default value is a classic footgun:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Wrong: the same list is reused across calls!
+def add_item_bad(item, items=[]):
+    items.append(item)
+    return items
+
+print(add_item_bad("a"))
+print(add_item_bad("b"))
+print(add_item_bad("c"))
+
+# Right: use None as the sentinel.
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+
+print(add_item("a"))
+print(add_item("b"))
+print(add_item("c"))
+`}
+/>
+
+### `*args` and `**kwargs`
+
+`*args` captures any extra positional arguments as a tuple;
+`**kwargs` captures any extra keyword arguments as a dict.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def log_event(name, *tags, **metadata):
+    print("event:", name)
+    print("tags:", tags)
+    print("metadata:", metadata)
+
+log_event("login", "web", "production", user_id=42, latency_ms=120)
+`}
+/>
+
+When *calling* a function, `*` and `**` unpack iterables/dicts back
+into arguments:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def add3(a, b, c):
+    return a + b + c
+
+nums = [1, 2, 3]
+print(add3(*nums))
+
+opts = {"a": 10, "b": 20, "c": 30}
+print(add3(**opts))
+`}
+/>
+
+### Positional-only and keyword-only parameters
+
+Modern Python lets you control how callers may pass each argument.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def divide(a, b, /, *, rounded=False):
+    # 'a' and 'b' are positional-only (left of /).
+    # 'rounded' is keyword-only (right of *).
+    result = a / b
+    return round(result) if rounded else result
+
+print(divide(7, 2))
+print(divide(7, 2, rounded=True))
+
+try:
+    print(divide(a=7, b=2))
+except TypeError as e:
+    print("TypeError:", e)
+`}
+/>
+
+## Type hints
+
+Type hints (PEP 484+) are optional annotations. Python itself does not
+enforce them; tools like `mypy`, `pyright`, and editors use them to
+catch bugs and power autocompletion.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def total(prices: list[float], tax_rate: float = 0.07) -> float:
+    return sum(prices) * (1 + tax_rate)
+
+print(total([10.0, 20.0, 30.0]))
+`}
+/>
+
+You can put them on plain variables too:
+
+```python
+count: int = 0
+names: list[str] = []
+```
+
+## Lambdas
+
+A `lambda` is an anonymous, single-expression function. They are
+useful as `key=` arguments to `sorted`, `min`, `max`, and similar.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`words = ["banana", "apple", "cherry"]
+print(sorted(words, key=lambda w: w[-1]))   # sort by last letter
+
+doubler = lambda x: x * 2
+print(doubler(7))
+`}
+/>
+
+For anything beyond a one-liner, prefer `def`. Named functions show up
+in tracebacks; lambdas do not.
+
+## Higher-order helpers: `map`, `filter`, `sorted`
+
+These take a function and an iterable.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`nums = [1, 2, 3, 4, 5]
+
+print(list(map(lambda x: x * x, nums)))
+print(list(filter(lambda x: x % 2 == 0, nums)))
+print(sorted(nums, reverse=True))
+
+# Most Pythonistas prefer comprehensions over map/filter:
+print([x * x for x in nums])
+print([x for x in nums if x % 2 == 0])
+`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Compose two functions"
+  instructions={`Define a function \`compose(f, g)\` that takes two single-argument functions and returns a new function \`h\` such that \`h(x) == f(g(x))\` for any \`x\`.`}
+  initialCode={`def compose(f, g):
+    # your code here
+    return lambda x: x
+`}
+  solutionCode={`def compose(f, g):
+    return lambda x: f(g(x))
+`}
+  tests={[
+    {
+      id: "math",
+      name: "compose with simple math",
+      code: `f = lambda x: x + 1
+g = lambda x: x * 2
+assert compose(f, g)(3) == 7`,
+    },
+    {
+      id: "string",
+      name: "compose with strings",
+      code: `assert compose(str.upper, str.strip)("  hi  ") == "HI"`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Flexible greeter"
+  instructions={`Define \`greet_all(*names, greeting="Hello")\` that returns a single string greeting each name on its own line, in the form \`"<greeting>, <name>!"\`. If no names are passed, return the empty string.
+
+Example:
+
+\`\`\`
+greet_all("Ada", "Grace", greeting="Hi")
+# -> "Hi, Ada!\\nHi, Grace!"
+\`\`\``}
+  initialCode={`def greet_all(*names, greeting="Hello"):
+    # your code here
+    return ""
+`}
+  solutionCode={`def greet_all(*names, greeting="Hello"):
+    return "\\n".join(f"{greeting}, {name}!" for name in names)
+`}
+  tests={[
+    {
+      id: "two_names",
+      name: "Two names, custom greeting",
+      code: `assert greet_all("Ada", "Grace", greeting="Hi") == "Hi, Ada!\\nHi, Grace!"`,
+    },
+    {
+      id: "no_names",
+      name: "No names returns empty string",
+      code: `assert greet_all() == ""`,
+    },
+    {
+      id: "default_greeting",
+      name: "Default greeting is Hello",
+      code: `assert greet_all("Ada") == "Hello, Ada!"`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What does this print?
+
+\`\`\`python
+def f(x, items=[]):
+    items.append(x)
+    return items
+
+print(f(1))
+print(f(2))
+\`\`\`
+
+- \`[1]\\n[2]\`
+  > A new \`[]\` is **not** created on each call when the default is a literal.
+- [o] \`[1]\\n[1, 2]\`
+  > The default list is evaluated once at \`def\` time and shared across calls. This is the classic mutable-default footgun.
+- \`[1, 2]\\n[1, 2]\`
+- A \`TypeError\``}
+/>
+
+<MultipleChoice
+  markdown={`Given \`def f(a, b, /, c, *, d): ...\`, which calls are valid? Select all that apply.
+
+- [o] \`f(1, 2, 3, d=4)\`
+- [o] \`f(1, 2, c=3, d=4)\`
+- \`f(a=1, b=2, c=3, d=4)\`
+  > \`a\` and \`b\` are positional-only (left of \`/\`).
+- \`f(1, 2, 3, 4)\`
+  > \`d\` is keyword-only (right of \`*\`).
+- [o] \`f(1, 2, 3, d=4)\``}
+/>
+
+Next: where Python looks for names when you use them.

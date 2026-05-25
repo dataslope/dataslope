@@ -1,0 +1,224 @@
+---
+title: Modules and Packages
+description: Splitting code across files with import, packages, and __main__
+---
+
+A **module** is just a `.py` file. A **package** is a directory of
+modules (usually marked by an `__init__.py`). `import` is how you pull
+them in.
+
+## Importing
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math
+print(math.pi)
+print(math.sqrt(2))
+
+# Import a specific name.
+from math import pi, sqrt
+print(pi, sqrt(2))
+
+# Rename on import.
+import math as m
+print(m.cos(0))
+`}
+/>
+
+## The standard library
+
+Python comes with a famously rich standard library. A small tour:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import json
+import datetime
+import random
+import collections
+import itertools
+import pathlib
+import statistics
+
+print(json.dumps({"a": 1, "b": [1, 2]}))
+print(datetime.date.today())
+print(random.choice("abcde"))
+print(collections.Counter("banana"))
+print(list(itertools.combinations("abc", 2)))
+print(statistics.mean([1, 2, 3, 4, 5]))
+`}
+/>
+
+## What `import` actually does
+
+When you write `import foo`:
+
+1. Python looks for `foo` in `sys.modules` (already-imported cache).
+2. If it is not there, it searches every directory in `sys.path` for a
+   `foo.py` file, a `foo/` package directory, or a built-in module.
+3. The module is executed top to bottom, and its namespace is bound to
+   the name `foo`.
+
+`sys.path` includes the directory of the running script, the
+`PYTHONPATH` env var, and the install's `site-packages`. You can
+inspect it:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import sys
+for p in sys.path:
+    print(p)
+`}
+/>
+
+## Avoid `from module import *`
+
+It pulls every public name into the current namespace, which makes it
+impossible to tell where a name came from. Stick to explicit imports.
+
+## The `if __name__ == "__main__":` idiom
+
+When you run a file directly, `__name__` is set to `"__main__"`. When
+it is imported by something else, `__name__` is the module's name.
+This lets a single file serve as both a library and a script:
+
+```python
+# greet.py
+def greet(name):
+    return f"Hello, {name}!"
+
+if __name__ == "__main__":
+    print(greet("World"))
+```
+
+Running `python greet.py` prints `Hello, World!`; doing
+`from greet import greet` in another file does not.
+
+## Packages
+
+A directory containing an `__init__.py` is a package. The
+`__init__.py` runs when the package is first imported and typically
+re-exports the package's public API.
+
+```text
+myapp/
+    __init__.py
+    cli.py
+    db/
+        __init__.py
+        connection.py
+        queries.py
+```
+
+Then:
+
+```python
+from myapp.db.queries import top_users
+from myapp.db import connection
+```
+
+`__init__.py` can be empty; just having it makes the directory a
+package.
+
+### Relative imports inside packages
+
+```python
+# inside myapp/db/queries.py
+from .connection import open_db        # sibling module
+from ..cli import parse_args            # one level up
+```
+
+Relative imports only work when the file is being imported as part of
+a package, not when run directly with `python myapp/db/queries.py`.
+
+## Multi-file challenge
+
+This challenge uses two files. Open the `utils.py` tab and implement
+the function; `main.py` already imports and uses it.
+
+<ChallengeCard
+  adapter="python"
+  title="Implement a stats helper across files"
+  instructions={`Open \`utils.py\` and implement two functions:
+
+- \`mean(values)\` returns the arithmetic mean of \`values\`. Assume the list is non-empty.
+- \`variance(values)\` returns the population variance (mean of squared deviations from the mean). Assume the list is non-empty.
+
+\`main.py\` already imports both and prints their results. Do not edit \`main.py\`.`}
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `from utils import mean, variance
+
+values = [2, 4, 4, 4, 5, 5, 7, 9]
+print("mean =", mean(values))
+print("variance =", variance(values))
+`,
+    },
+    {
+      filename: "utils.py",
+      initialContent: `def mean(values):
+    # your code here
+    return 0
+
+def variance(values):
+    # your code here
+    return 0
+`,
+      solutionContent: `def mean(values):
+    return sum(values) / len(values)
+
+def variance(values):
+    mu = mean(values)
+    return sum((x - mu) ** 2 for x in values) / len(values)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "mean_basic",
+      name: "mean of [1, 2, 3] is 2",
+      code: `from utils import mean
+assert mean([1, 2, 3]) == 2`,
+    },
+    {
+      id: "variance_basic",
+      name: "variance of [2, 4, 4, 4, 5, 5, 7, 9] is 4.0",
+      code: `from utils import variance
+import math
+assert math.isclose(variance([2, 4, 4, 4, 5, 5, 7, 9]), 4.0)`,
+    },
+    {
+      id: "variance_const",
+      name: "variance of [3, 3, 3] is 0",
+      code: `from utils import variance
+assert variance([3, 3, 3]) == 0`,
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What is the purpose of \`if __name__ == "__main__":\` at the bottom of a module?
+
+- It prevents the file from being imported at all.
+  > It is the opposite: it lets the file be safely imported.
+- [o] It runs the indented block only when the file is executed directly, not when it is imported.
+  > Correct. When imported, \`__name__\` is the module name, not \`"__main__"\`.
+- It is required syntax in every Python script.
+  > It is a convention, not a requirement.
+- It is the entry point recognized by Python's package installer.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following are good practice when organizing imports? Select all that apply.
+
+- [o] Group standard library, third-party, and local imports separately.
+- [o] Prefer \`from foo import bar\` over \`from foo import *\`.
+- [o] Use \`import numpy as np\` for very common third-party libraries with established aliases.
+- Put imports inside functions to make the file load faster.
+  > Module-level imports are clearer and only cost once per process. Move them inside a function only to avoid a circular import.
+- [o] Run a tool like \`isort\` or \`ruff\` to sort imports automatically.`}
+/>
+
+When something goes wrong inside that imported module, you need a way
+to handle the failure. That is what exceptions are for.
