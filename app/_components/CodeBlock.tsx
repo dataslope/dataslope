@@ -10,13 +10,14 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Box, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, Play, RotateCcw } from "lucide-react";
 import { Toast } from "@base-ui-components/react/toast";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
+import { PlayIcon } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -34,7 +35,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
 
 import type {
   LanguageAdapter,
@@ -50,6 +51,7 @@ import {
   savePersistedCode,
 } from "./codePersistence";
 import styles from "./CodeBlock.module.css";
+import challengeStyles from "./ChallengeCard.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
 
@@ -161,22 +163,6 @@ function CopyIcon() {
     >
       <rect x="5" y="5" width="9" height="9" rx="1.5" />
       <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
-    </svg>
-  );
-}
-
-// Solid Play triangle, sized to match the lucide `Play` icon used in the
-// main playground's Run button.
-function PlayIcon() {
-  return (
-    <svg
-      viewBox="0 0 12 12"
-      width="10"
-      height="10"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M2.5 1.5 L10 6 L2.5 10.5 Z" />
     </svg>
   );
 }
@@ -309,11 +295,9 @@ export default function CodeBlock(props: CodeBlockProps) {
 function CodeBlockInner({
   adapter,
   initialCode,
-  label,
   initCode,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
-  const headerLabel = label ?? blockId;
 
   const toastManager = Toast.useToastManager();
 
@@ -403,8 +387,8 @@ function CodeBlockInner({
         }),
         highlightActiveLineGutter(),
         highlightActiveLine(),
-        EditorState.tabSize.of(2),
-        indentUnit.of("  "),
+        EditorState.tabSize.of(4),
+        indentUnit.of("    "),
         EditorView.lineWrapping,
         keymap.of([
           {
@@ -421,6 +405,7 @@ function CodeBlockInner({
         ]),
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+        noActiveLine,
         // Debounce-persist the editor buffer so reloads / navigation
         // restore the user's in-progress code. The 400ms delay coalesces
         // bursts of keystrokes into one localStorage write.
@@ -496,11 +481,12 @@ function CodeBlockInner({
         EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
-        EditorState.tabSize.of(2),
-        indentUnit.of("  "),
+        EditorState.tabSize.of(4),
+        indentUnit.of("    "),
         EditorView.lineWrapping,
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+        noActiveLine,
       ],
     });
 
@@ -679,79 +665,92 @@ function CodeBlockInner({
   // ─── Render ────────────────────────────────────────────────────────────
   return (
     <div
-      className={styles.codeBlock}
+      className={`${challengeStyles.card} ${styles.outputScope}`}
       data-cb-theme={isDark ? "dark" : "light"}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
     >
-      <div className={styles.header}>
-        <span className={styles.headerId}>
-          <Box className={styles.headerIdIcon} aria-hidden />
-          {headerLabel}
-        </span>
-        <span className={styles.headerLine} aria-hidden />
-        <span className={styles.headerLang}>
-          <LanguageGlyph adapter={adapter} />
-          <span className={styles.headerLangText}>
-            {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
-          </span>
-        </span>
-        <span className={styles.headerSpacer} />
-        <span
-          className={styles.statusDot}
-          data-status={status}
-          title={statusMessage || status}
-          aria-label={statusMessage || status}
-        />
+      <div className={challengeStyles.header}>
+        <div className={challengeStyles.headerRow}>
+          <div className={challengeStyles.badge}>
+            <Play size={9} aria-hidden /> Code Block
+          </div>
+          <div className={challengeStyles.headerMeta}>
+            <span className={challengeStyles.headerRuntimeLabel}>
+              <LanguageGlyph adapter={adapter} />
+              {adapter.runtimeInfo.language} {adapter.runtimeInfo.version}
+            </span>
+            <span
+              className={challengeStyles.statusDot}
+              data-status={status}
+              title={statusMessage || status}
+              aria-label={statusMessage || status}
+            />
+          </div>
+        </div>
       </div>
 
       {hasInit && (
-        <div className={styles.initWrap}>
+        <div className={challengeStyles.initWrap}>
           {initLineCount > 3 && (
             <button
               type="button"
-              className={styles.initToggle}
+              className={challengeStyles.initToggle}
               aria-expanded={initExpanded}
               aria-controls={initPanelId}
               onClick={() => setInitExpanded((v) => !v)}
             >
               <span
-                className={`${styles.initCaret} ${
-                  initExpanded ? styles.initCaretOpen : ""
+                className={`${challengeStyles.initCaret} ${
+                  initExpanded ? challengeStyles.initCaretOpen : ""
                 }`}
                 aria-hidden
               >
                 ▶
               </span>
-              <span className={styles.initLabel}>
+              <span className={challengeStyles.initLabel}>
                 Initialization code ({adapter.runtimeInfo.language})
               </span>
-              <span className={styles.initMeta}>
+              <span className={challengeStyles.initMeta}>
                 {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
               </span>
             </button>
           )}
           <div
-            className={`${styles.initEditorWrap} ${
+            className={`${challengeStyles.initEditorWrap} ${
               initLineCount <= 3 || initExpanded
-                ? styles.initEditorWrapOpen
-                : styles.initEditorWrapCollapsed
+                ? challengeStyles.initEditorWrapOpen
+                : challengeStyles.initEditorWrapCollapsed
             }`}
           >
             <div
               id={initPanelId}
-              className={styles.initEditor}
+              className={challengeStyles.initEditor}
               aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
               ref={initEditorHostRef}
             />
             {!initExpanded && initLineCount > 3 && (
               <button
                 type="button"
-                className={styles.initFade}
+                className={challengeStyles.initFade}
                 aria-label="Expand initialization code"
                 title="Expand initialization code"
                 onClick={() => setInitExpanded(true)}
               >
-                <span className={styles.initFadeLabel}>Click to expand</span>
+                <span className={challengeStyles.initFadeLabel}>
+                  Click to expand
+                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                </span>
+              </button>
+            )}
+            {initExpanded && initLineCount > 3 && (
+              <button
+                type="button"
+                className={challengeStyles.initCollapseBtn}
+                aria-label="Collapse initialization code"
+                onClick={() => setInitExpanded(false)}
+              >
+                <ChevronUp size={13} strokeWidth={2} aria-hidden />
+                Click to collapse
               </button>
             )}
           </div>
@@ -759,27 +758,27 @@ function CodeBlockInner({
       )}
 
       <div
-        className={styles.editor}
+        className={challengeStyles.editor}
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} source code`}
       />
 
       <div
-        className={styles.actionBar}
+        className={challengeStyles.actionBar}
         role="toolbar"
         aria-label="Code block actions"
       >
-        <div className={styles.btnGroupPrimary}>
+        <div className={challengeStyles.btnGroupPrimary}>
           <button
             type="button"
-            className={`${styles.runBtn}${isBusy ? ` ${styles.runBtnRunning}` : ""}`}
+            className={challengeStyles.runBtn}
             onClick={() => run()}
             disabled={isBusy}
           >
             {isBusy ? (
               <svg
                 viewBox="0 0 12 12"
-                className={styles.runBtnSpinner}
+                className={challengeStyles.runBtnSpinner}
                 aria-hidden
               >
                 <circle
@@ -796,48 +795,54 @@ function CodeBlockInner({
             ) : (
               <PlayIcon />
             )}
-            <span>{isBusy ? "Running…" : "Run"}</span>
+            <span className={challengeStyles.runBtnLabel}>
+              {isBusy ? "Running…" : "Run"}
+            </span>
             {!isBusy && (
               <span
-                className={styles.btnKbd}
+                className={challengeStyles.btnKbd}
                 title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
               >
-                <kbd className={styles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
-                <span className={styles.kbdSep} aria-hidden>+</span>
-                <kbd className={styles.kbd}>↵</kbd>
+                <kbd className={challengeStyles.kbd}>{isMac ? "⌘" : "Ctrl"}</kbd>
+                <span className={challengeStyles.kbdSep} aria-hidden>+</span>
+                <kbd className={challengeStyles.kbd}>↵</kbd>
               </span>
             )}
           </button>
         </div>
-        <div className={styles.btnGroupUtil}>
+        <div className={challengeStyles.btnGroupUtil}>
+          {isBusy && statusMessage && (
+            <span
+              className={challengeStyles.actionBarStatus}
+              data-status={status}
+              title={statusMessage}
+            >
+              {statusMessage}
+            </span>
+          )}
           <button
             type="button"
-            className={styles.utilBtn}
+            className={challengeStyles.utilBtn}
             onClick={reset}
             disabled={isBusy}
+            title="Reset"
+            aria-label="Reset"
           >
             <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
-            Reset
+            <span className={challengeStyles.utilBtnLabel}>Reset</span>
           </button>
+          <div className={challengeStyles.btnGroupUtilSep} aria-hidden />
           <button
             type="button"
-            className={styles.iconBtn}
-            title="Copy code to clipboard"
-            aria-label="Copy code to clipboard"
+            className={challengeStyles.copyBtn}
+            title="Copy code"
+            aria-label="Copy code"
             onClick={() => {
               void copyEditor();
             }}
           >
             <CopyIcon />
           </button>
-          {statusMessage && (
-            <>
-              <div className={styles.btnGroupUtilSep} aria-hidden />
-              <span className={styles.statusText} data-status={status}>
-                {statusMessage}
-              </span>
-            </>
-          )}
         </div>
       </div>
 
