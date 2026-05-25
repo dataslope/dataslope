@@ -45,6 +45,24 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (!shouldProxy(event.request.url)) return;
 
+  const headers = new Headers(event.request.headers);
+  headers.delete("host");
+  headers.delete("cookie");
+
+  const method = event.request.method;
   const proxyUrl = `${PROXY_BASE}/?url=${encodeURIComponent(event.request.url)}`;
-  event.respondWith(fetch(new Request(proxyUrl, event.request)));
+  event.respondWith(
+    fetch(
+      new Request(proxyUrl, {
+        method,
+        headers,
+        body: ["GET", "HEAD"].includes(method) ? undefined : event.request.body,
+        redirect: "follow",
+        mode: "cors",
+        credentials: "omit",
+        // Required by Chromium when forwarding a ReadableStream body.
+        duplex: "half",
+      }),
+    ),
+  );
 });

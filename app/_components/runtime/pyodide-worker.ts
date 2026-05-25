@@ -145,7 +145,14 @@ def _ds_proxied_urlopen(url, *args, **kwargs):
     if _ds_should_proxy_url(url):
         url = _ds_proxy_url(url)
     elif hasattr(url, "full_url") and _ds_should_proxy_url(url.full_url):
-        url.full_url = _ds_proxy_url(url.full_url)
+        url = _ds_urllib_request.Request(
+            _ds_proxy_url(url.full_url),
+            data=getattr(url, "data", None),
+            headers=dict(url.header_items()),
+            origin_req_host=getattr(url, "origin_req_host", None),
+            unverifiable=getattr(url, "unverifiable", False),
+            method=url.get_method(),
+        )
     return _ds_orig_urlopen(url, *args, **kwargs)
 
 async def fetch(url, **kwargs):
