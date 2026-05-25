@@ -108,7 +108,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--mc-badge-color);
+  color: var(--mc-blue-500);
   flex-shrink: 0;
   white-space: nowrap;
 }
