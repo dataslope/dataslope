@@ -3,138 +3,291 @@ title: Next Steps
 description: Where to go after you have the basics down
 ---
 
-You now know enough Python to write real programs: variables and
-collections, control flow, functions and modules, files, classes, and
-the iterator/generator/decorator trio that powers a lot of idiomatic
-code. That is a solid foundation. Here is a map of the next layer.
+You now know enough Python to write real programs: variables and collections, control flow, functions and modules, files, classes, and the iterator/generator/decorator trio that powers a lot of idiomatic code. That's a solid foundation. Here's a map of the next layer.
+
+<Callout type="success" title="You are ready">
+After this course, you can read most Python codebases, contribute to open-source projects, build CLI tools, automate tasks, write tests, and start learning frameworks. The fundamentals you've learned here will serve you for years. Now it's time to specialize.
+</Callout>
 
 ## Topics worth learning next
 
-### Typing and type checkers
+### Type hints and static type checkers
 
-Type hints are optional but increasingly standard. Run a checker like
-[mypy](https://mypy.readthedocs.io/) or [pyright](https://microsoft.github.io/pyright/)
-over your code to catch bugs before runtime.
+Type hints are optional but increasingly standard in professional Python. They catch bugs before runtime and make your code self-documenting.
 
-```python
-from typing import Iterable
+<CodeBlock
+  adapter="python"
+  initialCode={`from typing import Iterable
 
 def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
+    """Compute total with tax."""
     return sum(prices) * (1 + tax_rate)
+
+print(total([10.0, 20.0, 30.0]))
+`}
+/>
+
+Run a checker like [**mypy**](https://mypy.readthedocs.io/) or [**pyright**](https://microsoft.github.io/pyright/) over your code to catch type mismatches:
+
+```bash
+pip install mypy
+mypy myfile.py
 ```
 
-Worth exploring: `typing.Protocol`, `typing.TypedDict`, `Generic`,
-`Literal`, `Final`, and the [PEP 695](https://peps.python.org/pep-0695/)
-generic syntax.
+<Callout type="info" title="Modern typing features">
+Python 3.9+ added \`list[int]\` instead of \`List[int]\`, 3.10 added \`X | Y\` union syntax, and 3.12 added [PEP 695 generic syntax](https://peps.python.org/pep-0695/). Type hints keep evolving. Worth exploring: \`typing.Protocol\`, \`typing.TypedDict\`, \`Generic\`, \`Literal\`, \`Final\`, and structural subtyping.
+</Callout>
 
 ### Testing with `pytest`
 
-Built-in `unittest` works, but most Python projects use
-[pytest](https://docs.pytest.org/) for its friendlier API,
-parameterization, fixtures, and rich plugin ecosystem.
+Built-in `unittest` works, but most Python projects use [**pytest**](https://docs.pytest.org/) for its friendlier API, fixtures, parameterization, and rich plugin ecosystem.
 
-```python
-# test_total.py
-from app import total
+<CodeBlock
+  adapter="python"
+  initialCode={`# test_total.py
+def total(prices, tax_rate=0.07):
+    return sum(prices) * (1 + tax_rate)
 
 def test_total_without_tax():
     assert total([10, 20], tax_rate=0) == 30
+
+def test_total_with_tax():
+    result = total([100], tax_rate=0.1)
+    assert result == 110.0
+`}
+/>
+
+Run with:
+
+```bash
+pip install pytest
+pytest
 ```
 
-Run with `pytest`.
+`pytest` auto-discovers files named `test_*.py` and runs all functions named `test_*`.
 
 ### Async programming with `asyncio`
 
-`async def`, `await`, and the `asyncio` library let one thread juggle
-thousands of network connections. Essential for web servers, scrapers,
-and anything I/O-bound.
+`async def`, `await`, and the `asyncio` library let one thread juggle thousands of network connections. Essential for web servers, scrapers, and anything I/O-bound.
 
-```python
-import asyncio
+<CodeBlock
+  adapter="python"
+  initialCode={`import asyncio
 
 async def fetch(url):
-    ...
+    await asyncio.sleep(0.1)  # simulate network delay
+    return f"Data from {url}"
 
 async def main():
-    results = await asyncio.gather(fetch("a"), fetch("b"), fetch("c"))
+    results = await asyncio.gather(
+        fetch("https://a.com"),
+        fetch("https://b.com"),
+        fetch("https://c.com"),
+    )
+    for r in results:
+        print(r)
 
 asyncio.run(main())
-```
+`}
+/>
+
+`await asyncio.gather()` runs the three `fetch` calls concurrently, so the total time is ~0.1s, not 0.3s. This pattern scales to thousands of requests.
+
+<Callout type="info" title="Async vs threads vs processes">
+- **Threads** (\`threading\`): Good for I/O-bound concurrency where the GIL (Global Interpreter Lock) is fine. Simple but limited.
+- **Processes** (\`multiprocessing\`, \`concurrent.futures\`): For CPU-bound work. Each process has its own Python interpreter and memory.
+- **Async** (\`asyncio\`): For high-concurrency I/O. One thread, thousands of tasks. Lowest overhead, highest scalability for network-bound work.
+- **Free-threaded Python (PEP 703)**: Python 3.13+ offers an experimental build without the GIL, enabling true multi-threaded parallelism. This is a space to watch as it matures.
+</Callout>
 
 ### Web frameworks
 
-- **FastAPI** for modern, typed HTTP APIs.
-- **Flask** for tiny, minimal services.
-- **Django** for full-stack apps with batteries included.
+Python dominates backend web development. The big three:
 
-### Scientific Python
+- **[FastAPI](https://fastapi.tiangolo.com/)** — Modern, typed HTTP APIs with automatic OpenAPI docs. Uses async under the hood. The current favorite for new API projects.
+- **[Flask](https://flask.palletsprojects.com/)** — Tiny, minimal, flexible. Great for small services and learning.
+- **[Django](https://www.djangoproject.com/)** — Full-stack framework with batteries included: ORM, admin panel, auth, forms, migrations. Powers Instagram, Spotify, and countless others.
 
-Pandas, NumPy, SciPy, scikit-learn, Matplotlib, Plotly, and PyTorch
-are all installable with `pip` and cover most data work.
+<CodeBlock
+  adapter="python"
+  initialCode={`# FastAPI example (install with: pip install fastapi uvicorn)
+from fastapi import FastAPI
 
-### Concurrency models
+app = FastAPI()
 
-- **Threads** (`threading`) for I/O-bound concurrency where GIL is
-  fine.
-- **Processes** (`multiprocessing`, `concurrent.futures`) for
-  CPU-bound work.
-- **Async** for high-concurrency I/O.
-- The Python 3.13+ **free-threaded build** (PEP 703) removes the GIL
-  entirely and is a topic to watch.
+@app.get("/")
+def read_root():
+    return {"message": "Hello, world!"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+
+# Run with: uvicorn main:app --reload
+`}
+/>
+
+### Data science and machine learning
+
+Python's killer app. The ecosystem is massive:
+
+- **[pandas](https://pandas.pydata.org/)** / **[polars](https://pola.rs/)** — DataFrames for tabular data.
+- **[NumPy](https://numpy.org/)** — Numerical arrays, the foundation of scientific Python.
+- **[Matplotlib](https://matplotlib.org/)** / **[Plotly](https://plotly.com/)** / **[Seaborn](https://seaborn.pydata.org/)** — Visualization.
+- **[scikit-learn](https://scikit-learn.org/)** — Classical machine learning (regression, classification, clustering, etc.).
+- **[PyTorch](https://pytorch.org/)** / **[TensorFlow](https://www.tensorflow.org/)** — Deep learning.
+- **[Jupyter](https://jupyter.org/)** — Interactive notebooks for exploration and prototyping.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Example: pandas DataFrame
+import pandas as pd
+
+data = {
+    "name": ["Alice", "Bob", "Charlie"],
+    "age": [25, 30, 35],
+    "city": ["NYC", "SF", "LA"],
+}
+df = pd.DataFrame(data)
+print(df)
+print(df[df["age"] > 28])
+`}
+/>
+
+<Callout type="success" title="Python owns data">
+If you work with data — analysis, visualization, modeling, ETL pipelines — Python is the lingua franca. pandas, NumPy, and scikit-learn are the most-used libraries on PyPI. Learning them opens doors to data science, ML engineering, and analytics roles.
+</Callout>
+
+### Automation and scripting
+
+Python excels at gluing systems together:
+
+- **[requests](https://requests.readthedocs.io/)** — HTTP requests (APIs, scraping).
+- **[BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)** / **[lxml](https://lxml.de/)** — HTML/XML parsing.
+- **[Selenium](https://www.selenium.dev/documentation/)** / **[Playwright](https://playwright.dev/python/)** — Browser automation.
+- **[Click](https://click.palletsprojects.com/)** / **[Typer](https://typer.tiangolo.com/)** — Building CLI tools.
+- **[schedule](https://schedule.readthedocs.io/)** / **[APScheduler](https://apscheduler.readthedocs.io/)** — Task scheduling.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Example: fetch JSON from an API
+import requests
+
+response = requests.get("https://api.github.com/users/github")
+data = response.json()
+print(f"GitHub user: {data['login']}")
+print(f"Public repos: {data['public_repos']}")
+`}
+/>
 
 ### Packaging and distribution
 
-- Write a `pyproject.toml`.
-- Build a wheel with `python -m build`.
-- Publish to PyPI with `twine` or `uv publish`.
-- For self-contained executables, look at `PyInstaller`, `shiv`, or
-  `pex`.
+If you want to share your code or publish a library:
 
-### Tooling worth installing once and never thinking about
+1. Write a `pyproject.toml` (see the *Virtual Environments* page).
+2. Build a wheel: `python -m build` (requires `pip install build`).
+3. Publish to PyPI: `twine upload dist/*` (requires `pip install twine`).
 
-- [`ruff`](https://docs.astral.sh/ruff/) for linting and import
-  sorting.
-- [`black`](https://black.readthedocs.io/) (or `ruff format`) for
-  formatting.
-- [`pre-commit`](https://pre-commit.com/) to run them automatically
-  before every commit.
-- [`uv`](https://docs.astral.sh/uv/) to replace `pip`, `pip-tools`,
-  and `venv` with one fast Rust binary.
+For self-contained executables (to share with non-Python users), look at:
+
+- **[PyInstaller](https://pyinstaller.org/)** — Bundles Python + your code + dependencies into a single executable.
+- **[shiv](https://shiv.readthedocs.io/)** / **[pex](https://pex.readthedocs.io/)** — Python-based executable zip archives.
+
+<Callout type="info" title="uv makes publishing easy">
+\`uv\` (from Astral) supports \`uv publish\` to push packages to PyPI in one command. As the Python tooling ecosystem modernizes, workflows that used to require multiple tools are converging into single, fast commands.
+</Callout>
+
+### Tooling worth installing once
+
+Modern Python projects use a suite of automated tools to enforce code quality:
+
+- **[ruff](https://docs.astral.sh/ruff/)** — Linting, import sorting, and (as of 2024) formatting. Replaces `flake8`, `isort`, `black`, and more. Rust-based, instant.
+- **[mypy](https://mypy.readthedocs.io/)** / **[pyright](https://microsoft.github.io/pyright/)** — Static type checking.
+- **[pre-commit](https://pre-commit.com/)** — Runs linters/formatters automatically before every commit.
+- **[uv](https://docs.astral.sh/uv/)** — Replaces `pip`, `pip-tools`, and `venv` with one fast Rust binary.
+
+Example `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.8
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+```
+
+Install once:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Now every `git commit` auto-runs ruff. Code stays clean without thinking about it.
+
+## Concurrency models compared
+
+| Model | Best for | Example |
+| --- | --- | --- |
+| **Async (`asyncio`)** | High-concurrency I/O (web servers, scrapers, APIs) | `async def` + `await` |
+| **Threads (`threading`)** | Modest I/O concurrency where GIL is fine | `threading.Thread` |
+| **Processes (`multiprocessing`)** | CPU-bound work (data crunching, image processing) | `multiprocessing.Pool` |
+| **Free-threaded (PEP 703)** | CPU-bound parallelism without GIL (experimental in 3.13+) | `python -X gil=0` |
 
 ## Further reading
 
 | Resource | Why |
 | --- | --- |
-| [docs.python.org](https://docs.python.org/3/) | The reference. Read the *Library Reference* in particular. |
-| [Real Python](https://realpython.com/) | High-quality tutorials on most topics. |
-| [PEP index](https://peps.python.org/) | Where new language features are designed. Skim PEPs 8, 20, 257, 484, 621. |
-| [Fluent Python by Luciano Ramalho](https://www.fluentpython.com/) | The book that takes you from "I know Python" to "I really know Python". |
+| [**docs.python.org**](https://docs.python.org/3/) | The reference. Read the *Library Reference* in particular. |
+| [**Real Python**](https://realpython.com/) | High-quality tutorials on most topics. |
+| [**PEP index**](https://peps.python.org/) | Where new language features are designed. Skim PEPs 8 (style), 20 (Zen of Python), 257 (docstrings), 484 (type hints), 621 (pyproject.toml). |
+| [**Fluent Python by Luciano Ramalho**](https://www.fluentpython.com/) | The book that takes you from "I know Python" to "I *really* know Python". Covers iterators, descriptors, metaclasses, async, and more. |
+| [**Effective Python by Brett Slatkin**](https://effectivepython.com/) | 90 specific ways to write better Python. Great for intermediate learners. |
 
 ## Practice ideas
 
-If you want to cement what you have learned, try building:
+If you want to cement what you've learned, try building:
 
-1. A CLI tool: parse arguments with `argparse`, read a config from
-   YAML/TOML, print colored output with `rich`.
-2. A small HTTP API with FastAPI: define a few endpoints, validate
-   input with `pydantic`, write tests with `pytest`.
-3. A data pipeline: read CSVs into Pandas, clean them, write the
-   result to SQLite or DuckDB.
-4. A small library you publish to PyPI: write tests, set up
-   `pyproject.toml`, push to GitHub with a CI workflow.
+1. **A CLI tool**: Parse arguments with `argparse` or `click`, read a config from YAML/TOML (`pyyaml`, `tomli`), print colored output with `rich`.
+2. **A small HTTP API**: Use FastAPI to define a few endpoints, validate input with `pydantic`, write tests with `pytest`.
+3. **A data pipeline**: Read CSVs into pandas, clean them, aggregate, and write the result to SQLite or DuckDB.
+4. **A web scraper**: Use `requests` and `BeautifulSoup` to extract data from a website, then store it in a database or CSV.
+5. **A library you publish to PyPI**: Write tests, set up `pyproject.toml`, push to GitHub with a CI workflow (GitHub Actions), and publish with `twine` or `uv publish`.
+
+<Callout type="success" title="Build to learn">
+The fastest way to internalize Python is to build something that matters to you. Pick a small, concrete project — a tool you'd actually use — and build it. You'll learn more from one real project than from ten tutorials.
+</Callout>
+
+## Roadmap by interest
+
+Depending on where you want to go:
+
+- **Web backend**: FastAPI + SQLAlchemy + pytest + Docker.
+- **Data analysis**: pandas + Jupyter + Matplotlib + SQL.
+- **Machine learning**: NumPy + pandas + scikit-learn → PyTorch or TensorFlow.
+- **Automation**: requests + BeautifulSoup + schedule + Click.
+- **DevOps/tooling**: subprocess + pathlib + Click + Docker + CI/CD.
+- **Scientific computing**: NumPy + SciPy + Matplotlib + Jupyter.
 
 ## One last multiple-choice question
 
 <MultipleChoice
-  markdown={`Which of the following are true after finishing this course? Select all that apply.
+  markdown={`Which of these statements about what you've learned is most accurate?
 
-- [o] You know how Python's collections (list, tuple, dict, set) differ and when to use each.
-- [o] You can write functions with defaults, \`*args\`, \`**kwargs\`, and type hints.
-- [o] You can define classes, override dunder methods, and use \`@dataclass\`.
-- [o] You understand iterators, generators, and decorators well enough to read most Python codebases.
-- You have learned everything there is to know about Python.
-  > Nobody has. Python is huge, and the ecosystem keeps moving.`}
+- You now know everything there is to know about Python.
+  > Nobody does. Python is huge, the ecosystem keeps moving, and there are always new frameworks and techniques to explore.
+- [o] You have a solid foundation — core syntax, collections, functions, classes, generators, decorators — and you're ready to start building real projects.
+  > Correct. That's exactly what a "basics" course is for. The fundamentals you've learned here apply to every Python project you'll touch.
+- You should keep reading tutorials before writing any real code.
+  > The opposite is true. The best way to consolidate what you've learned is to build something, even something small.
+- The standard library and PyPI are too unstable to rely on for production work.
+  > Both are extraordinarily stable. CPython and most major libraries are battle-tested in production at every scale.`}
 />
 
-Thank you for reading. Happy hacking, and good luck with whatever you
-build next.
+<Callout type="info" title="Keep going">
+You've finished Python Basics. The next step is to pick a direction — web, data, ML, automation, whatever excites you — and start building. The fundamentals you've learned here will serve you everywhere. Good luck, and happy hacking.
+</Callout>
+
+Thank you for reading. Whatever you build next, make it count.

@@ -14,9 +14,8 @@ typing system, web frameworks, or scientific computing.
 The course is organized into short, focused pages. Each page mixes
 explanation with three kinds of interactive widgets:
 
-1. **Executable code blocks.** Every snippet runs in your browser via
-   Pyodide (Python 3.13). Edit any block and click *Run* to see the
-   result. There is no setup required.
+1. **Executable code blocks.** Every snippet runs in your browser — no
+   setup required. Edit any block and click *Run* to see the result.
 2. **Challenge cards.** Small coding problems with hidden test cases.
    Some are single-file; a few use multiple files so you can practice
    importing across modules.
@@ -24,32 +23,56 @@ explanation with three kinds of interactive widgets:
    pages. They give you per-choice feedback so a wrong answer is still
    a learning opportunity.
 
-## Course outline
-
-The pages are designed to be read in order, but each one stands on its
-own if you want to jump around.
-
-1. **Foundations.** History, installation, your first program,
-   indentation rules, and the famous tabs vs spaces debate.
-2. **Values and types.** Variables, numbers, strings, booleans, and
-   how Python's dynamic typing works.
-3. **Collections.** Lists, tuples, dictionaries, and sets, plus when
-   to reach for each one.
-4. **Control flow.** Conditionals, loops, and the comprehension
-   shortcuts that make Python so concise.
-5. **Functions and modules.** Defining your own functions, organizing
-   code into modules, and handling errors gracefully.
-6. **Object-oriented Python.** Classes, inheritance, dunder methods,
-   and a first taste of iterators, generators, and decorators.
-7. **Going further.** Virtual environments, pip, and a roadmap of
-   intermediate and advanced topics worth exploring next.
-
-## A note on the code blocks
-
+<Callout type="info" title="How to use the interactive widgets">
 Each code block runs in a fresh Python scope, so a variable defined in
 one block is not visible in the next unless the block has its own
 initialization code. This keeps examples isolated and easy to reason
 about. If you want a persistent, longer-lived workspace, open the
 [Python Playground](/playground/python) in a new tab.
+</Callout>
 
-Ready? Click **Python History** in the sidebar to begin.
+## Course outline
+
+The pages are designed to be read in order, but each one stands on its
+own if you want to jump around.
+
+### 1. Foundations
+History, installation, your first program, and indentation rules. You will
+learn why Python chose significant whitespace and why the tabs-vs-spaces
+debate still sparks arguments at conferences.
+
+### 2. Values and types
+Variables, numbers, strings, booleans, and how Python's dynamic typing
+works. We will explore what happens under the hood when you write `x = 42`
+and why `a = []; b = a` creates shared state.
+
+### 3. Collections
+Lists, tuples, dictionaries, and sets, plus when to reach for each one.
+You will learn the difference between mutable and immutable, what a hash
+table is, and why `key in my_dict` is so fast.
+
+### 4. Control flow
+Conditionals, loops, and the comprehension shortcuts that make Python so
+concise. By the end of this section you will be writing nested list
+comprehensions and understanding when to unpack them back into loops.
+
+### 5. Functions and modules
+Defining your own functions, organizing code into modules, and handling
+errors gracefully. We will cover scope, closures, `*args` and `**kwargs`,
+and the import system.
+
+### 6. Object-oriented Python
+Classes, inheritance, dunder methods, and a first taste of iterators,
+generators, and decorators. This is where Python's flexibility really
+shines — and where beginners often get lost, so we take it slow.
+
+### 7. Going further
+Virtual environments, pip, and a roadmap of intermediate and advanced
+topics worth exploring next: async/await, type hints, context managers,
+metaclasses, and the rich ecosystem of data science, web, and DevOps
+libraries.
+
+<Callout type="success">
+Ready to begin? Click **Python History** in the sidebar to start your
+journey.
+</Callout>

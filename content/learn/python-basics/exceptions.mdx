@@ -3,9 +3,88 @@ title: Exceptions
 description: try, except, else, finally, raising, and writing your own exception classes
 ---
 
-When something goes wrong, Python raises an **exception**. If nothing
-catches it, the program prints a traceback and exits. Catching is done
-with `try` / `except`.
+When something goes wrong, Python raises an **exception**. If nothing catches it, the program prints a traceback and exits. Catching is done with `try` / `except`.
+
+Exceptions are Python's way of encoding **expected failure paths**: file not found, network down, invalid input, permission denied. They let you separate "happy path" logic from error handling.
+
+## What happens when exceptions are not handled?
+
+If an exception is raised and **no** `try`/`except` catches it, Python does three things:
+
+1. **Prints a traceback** showing the call stack (which function called which).
+2. **Exits the program** with a non-zero exit code (signals failure to the shell).
+3. (In a web context) Returns a **500 Internal Server Error** to the client (or crashes the worker process, depending on the framework).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def divide(a, b):
+    return a / b
+
+def main():
+    result = divide(10, 0)
+    print("result:", result)
+
+try:
+    main()
+except ZeroDivisionError as e:
+    print("Unhandled exception propagated up:")
+    print(f"  {type(e).__name__}: {e}")
+`}
+/>
+
+The traceback shows the **exception propagation** up the call stack: `main()` called `divide()`, which raised `ZeroDivisionError`. Since `main()` didn't catch it, it propagated up to the caller (in this case, our outer `try` block).
+
+In production, **unhandled exceptions are bugs**. Your job is to anticipate failure modes (`try` opening a file; it might not exist) and handle them gracefully.
+
+## Real-world: exceptions encode expected failures
+
+Exceptions are **not** like Java checked exceptions (which force you to declare every possible error). They are Python's way of saying "this can fail, and you should decide what to do."
+
+Common patterns:
+
+- **File I/O**: `FileNotFoundError`, `PermissionError`, `OSError`
+- **Network**: `requests.ConnectionError`, `requests.Timeout`, `socket.timeout`
+- **Parsing**: `json.JSONDecodeError`, `ValueError` (from `int("oops")`)
+- **APIs**: Custom exceptions like `stripe.error.RateLimitError`
+
+You **choose** which to catch. If you catch `FileNotFoundError`, you're saying "I expect this file might not exist, and I know what to do." If you don't catch it, you're saying "if the file doesn't exist, the program should crash."
+
+This is the **EAFP** philosophy: **Easier to Ask for Forgiveness than Permission**.
+
+```python
+# LBYL (Look Before You Leap) — Pythonic but verbose
+if os.path.exists(path):
+    with open(path) as f:
+        data = f.read()
+else:
+    data = None
+
+# EAFP (Easier to Ask for Forgiveness than Permission) — Pythonic
+try:
+    with open(path) as f:
+        data = f.read()
+except FileNotFoundError:
+    data = None
+```
+
+The second is more concise and handles race conditions (file deleted between `exists` check and `open` call).
+
+## Exception propagation up the call stack
+
+When an exception is raised, Python **unwinds the stack**, looking for a `try`/`except` that handles it.
+
+```mermaid
+flowchart TD
+    A["function_c() raises ValueError"] --> B["Is function_c inside a try block?"]
+    B -->|no| C["Propagate to function_b (caller)"]
+    C --> D["Is function_b inside a try block?"]
+    D -->|no| E["Propagate to function_a (caller)"]
+    E --> F["Is function_a inside a try block?"]
+    F -->|yes| G["Caught! Execute except block."]
+    F -->|no| H["Unhandled: print traceback, exit."]
+```
+
+Each frame in the traceback is one step in this unwinding.
 
 ## The simplest form
 
@@ -18,7 +97,11 @@ except ValueError as e:
 `}
 />
 
-`as e` binds the exception instance so you can inspect it.
+`as e` binds the exception instance so you can inspect it (type, message, attributes).
+
+<Callout type="info" title="Exception objects have attributes">
+Every exception is an object. You can inspect its type (`type(e)`), its message (`str(e)`), and sometimes custom attributes (like `e.errno` for `OSError`).
+</Callout>
 
 ## Catching multiple types
 
@@ -36,6 +119,12 @@ print(safe_div("10", 2))
 `}
 />
 
+Parentheses group multiple exception types. The first matching `except` block wins.
+
+<Callout type="tip" title="Order matters">
+If you have multiple `except` blocks, **put the most specific first**. `except Exception` will catch everything, so if you put it first, more specific blocks below are unreachable.
+</Callout>
+
 ## `else` and `finally`
 
 The full shape of the statement is:
@@ -51,9 +140,7 @@ finally:
     ...                    # always runs, error or not
 ```
 
-`else` is useful when you only want code to run when the `try` block
-succeeded. `finally` is for cleanup that must happen either way
-(closing files, releasing locks, restoring state).
+`else` is useful when you only want code to run when the `try` block **succeeded**. `finally` is for cleanup that must happen either way (closing files, releasing locks, restoring state).
 
 <CodeBlock
   adapter="python"
@@ -73,10 +160,13 @@ parse_int("oops")
 `}
 />
 
+<Callout type="info" title="finally always runs">
+**`finally` runs no matter what**: success, exception, `return`, `break`, `continue`, even `sys.exit()`. It is the only way to guarantee cleanup. Use it for closing files, releasing locks, restoring state, etc.
+</Callout>
+
 ## Raising exceptions
 
-Use `raise` to signal an error from your own code. Use a specific
-built-in type when one fits; otherwise create your own.
+Use `raise` to signal an error from your own code. Use a specific built-in type when one fits; otherwise create your own.
 
 <CodeBlock
   adapter="python"
@@ -95,10 +185,19 @@ except ValueError as e:
 `}
 />
 
-### `raise ... from ...` to preserve cause
+<Callout type="tip" title="Which exception type to raise?">
+- `ValueError` — Right type, wrong value (`int("oops")`, `math.sqrt(-1)`)
+- `TypeError` — Wrong type entirely (`len(5)`)
+- `KeyError` / `IndexError` — Missing dict key / list index
+- `AttributeError` — Missing attribute
+- `FileNotFoundError` / `PermissionError` — Filesystem trouble
+- `RuntimeError` — Generic "something else went wrong"
+- Custom exception — Domain-specific error (`InsufficientFundsError`, `RateLimitExceeded`)
+</Callout>
 
-When you wrap a lower-level error in a higher-level one, use `from` to
-keep the chain visible in the traceback.
+## `raise ... from ...` to preserve cause
+
+When you wrap a lower-level error in a higher-level one, use `from` to keep the chain visible in the traceback.
 
 <CodeBlock
   adapter="python"
@@ -119,10 +218,17 @@ except ConfigError as e:
 `}
 />
 
+Without `from`, the original `ValueError` is hidden. With `from`, the traceback shows both exceptions and their relationship.
+
+<Callout type="tip" title="raise from vs bare raise">
+- `raise NewError(...) from e` — Wraps `e` in a higher-level error. Both appear in the traceback, with `from` marking the causal relationship.
+- `raise NewError(...)` — Replaces `e` with a new error. The original is lost (unless you manually include its message).
+- `raise` (no arguments) — Re-raises the current exception. Useful in `except` blocks when you want to log and re-raise.
+</Callout>
+
 ## Custom exception classes
 
-Make your own exception types by subclassing `Exception` (or a more
-specific built-in). This lets callers catch your errors precisely.
+Make your own exception types by subclassing `Exception` (or a more specific built-in). This lets callers catch your errors precisely.
 
 <CodeBlock
   adapter="python"
@@ -148,11 +254,11 @@ except InsufficientFundsError as e:
 `}
 />
 
+Custom exceptions make your code **self-documenting**: `except InsufficientFundsError` is clearer than `except ValueError` (which could mean anything).
+
 ## Exception hierarchy
 
-Every exception inherits from `BaseException`. The ones you usually
-care about inherit from `Exception` (which itself inherits from
-`BaseException`). A few useful built-ins:
+Every exception inherits from `BaseException`. The ones you usually care about inherit from `Exception` (which itself inherits from `BaseException`). A few useful built-ins:
 
 - `ValueError` – right type, wrong value (`int("oops")`)
 - `TypeError` – wrong type entirely (`len(5)`)
@@ -162,9 +268,33 @@ care about inherit from `Exception` (which itself inherits from
 - `RuntimeError` – generic, "something else went wrong"
 - `StopIteration` – an iterator is exhausted
 
-`Exception` catches "every normal error". **Do not** catch
-`BaseException` casually; it includes `KeyboardInterrupt` and
-`SystemExit`, which you usually want to let through.
+`Exception` catches "every normal error". **Do not** catch `BaseException` casually; it includes `KeyboardInterrupt` and `SystemExit`, which you usually want to let through.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import sys
+
+# Built-in exception hierarchy (simplified)
+hierarchy = """
+BaseException
+├── KeyboardInterrupt (Ctrl+C)
+├── SystemExit (sys.exit())
+└── Exception
+    ├── ValueError
+    ├── TypeError
+    ├── KeyError
+    ├── IndexError
+    ├── AttributeError
+    ├── FileNotFoundError
+    └── ... (many more)
+"""
+print(hierarchy)
+`}
+/>
+
+<Callout type="danger" title="Never catch BaseException casually">
+`except BaseException` will catch `KeyboardInterrupt` (Ctrl+C) and `SystemExit` (from `sys.exit()`), making your program impossible to kill. **Always catch `Exception` or more specific types.**
+</Callout>
 
 ## Bare `except:` is almost always a bug
 
@@ -175,8 +305,38 @@ except:        # catches everything, including KeyboardInterrupt
     pass
 ```
 
-This silences errors you did not intend to handle and makes debugging
-miserable. Always be specific.
+This silences errors you did not intend to handle and makes debugging miserable. Always be specific.
+
+<Callout type="danger" title="Bare except: antipattern">
+**Never write `except:` without a type.** It catches **everything**, including `KeyboardInterrupt`, `SystemExit`, and `MemoryError`. If you truly want to catch all normal errors, use `except Exception:`. But even that is usually too broad; prefer specific types.
+</Callout>
+
+## EAFP vs LBYL philosophy
+
+Python culture strongly prefers **EAFP** (Easier to Ask for Forgiveness than Permission) over **LBYL** (Look Before You Leap):
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# LBYL: check first
+data = {"key": "value"}
+if "key" in data:
+    print(data["key"])
+else:
+    print("key not found")
+
+# EAFP: just try it
+try:
+    print(data["key"])
+except KeyError:
+    print("key not found")
+`}
+/>
+
+EAFP is often faster (one operation instead of two) and handles race conditions (state can change between check and use).
+
+<Callout type="tip" title="When to use LBYL">
+Use **LBYL** when the check is cheap and the exception is expensive (rare). Use **EAFP** when the happy path is common and exceptions are the exception. For most Python code, EAFP is idiomatic.
+</Callout>
 
 ## Challenges
 
@@ -248,8 +408,7 @@ def withdraw(balance, amount):
     {
       id: "too_much",
       name: "InsufficientFundsError when amount > balance",
-      code: `import builtins
-try:
+      code: `try:
     withdraw(50, 100)
 except InsufficientFundsError:
     pass
@@ -269,26 +428,193 @@ else:
   ]}
 />
 
+<ChallengeCard
+  adapter="python"
+  title="Safe divide with default"
+  instructions={`Define a function \`safe_divide(a, b, default=None)\` that returns \`a / b\` if possible, otherwise \`default\`. Catch both \`ZeroDivisionError\` and \`TypeError\`.`}
+  initialCode={`def safe_divide(a, b, default=None):
+    # your code here
+    return default
+`}
+  solutionCode={`def safe_divide(a, b, default=None):
+    try:
+        return a / b
+    except (ZeroDivisionError, TypeError):
+        return default
+`}
+  tests={[
+    {
+      id: "ok",
+      name: "Normal division",
+      code: `assert safe_divide(10, 2) == 5`,
+    },
+    {
+      id: "zero",
+      name: "Divide by zero returns default",
+      code: `assert safe_divide(10, 0, default=-1) == -1`,
+    },
+    {
+      id: "type",
+      name: "Type error returns default",
+      code: `assert safe_divide("10", 2, default=0) == 0`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Rate-limit retry decorator"
+  instructions={`Define a decorator \`retry_on_rate_limit(max_retries=3)\` that catches a custom \`RateLimitError\` exception and retries the function up to \`max_retries\` times. If all retries fail, re-raise the exception.
+
+Define \`RateLimitError\` as a custom exception class.
+
+For testing, assume a function that raises \`RateLimitError\` on the first \`n-1\` calls and succeeds on the \`n\`th call.`}
+  initialCode={`class RateLimitError(Exception):
+    pass
+
+def retry_on_rate_limit(max_retries=3):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # your code here
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+`}
+  solutionCode={`class RateLimitError(Exception):
+    pass
+
+def retry_on_rate_limit(max_retries=3):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except RateLimitError:
+                    if attempt == max_retries - 1:
+                        raise
+            # unreachable, but for clarity
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+`}
+  tests={[
+    {
+      id: "succeeds_on_first",
+      name: "Function that succeeds immediately",
+      code: `@retry_on_rate_limit(max_retries=3)
+def f():
+    return "ok"
+assert f() == "ok"`,
+    },
+    {
+      id: "succeeds_on_second",
+      name: "Function that succeeds on second try",
+      code: `call_count = 0
+@retry_on_rate_limit(max_retries=3)
+def f():
+    global call_count
+    call_count += 1
+    if call_count < 2:
+        raise RateLimitError("rate limited")
+    return "ok"
+call_count = 0
+assert f() == "ok"
+assert call_count == 2`,
+    },
+    {
+      id: "fails_after_max",
+      name: "Exhausts retries and raises",
+      code: `@retry_on_rate_limit(max_retries=2)
+def f():
+    raise RateLimitError("always fails")
+try:
+    f()
+except RateLimitError:
+    pass
+else:
+    raise AssertionError("expected RateLimitError")`,
+    },
+  ]}
+/>
+
+## Multiple choice questions
+
 <MultipleChoice
   markdown={`Which block runs **only** when the \`try\` block raises no exception?
 
 - \`except\`
+  > No, \`except\` runs when an exception **is** raised.
 - [o] \`else\`
-  > Correct. \`else\` is for code that should run on success.
+  > **Correct.** \`else\` is for code that should run on success (no exception).
 - \`finally\`
-- The block after the \`try\` statement entirely`}
+  > No, \`finally\` **always** runs, whether there's an exception or not.
+- The block after the \`try\` statement entirely
+  > No, code after the entire \`try/except/else/finally\` runs regardless, but \`else\` is specifically for success.`}
 />
 
 <MultipleChoice
-  markdown={`Which of these exception-handling practices are recommended? Select all that apply.
+  markdown={`What is wrong with \`except:\` (bare except)?
 
-- [o] Catch the most specific exception type you can.
-- [o] Use \`raise ... from e\` when wrapping a lower-level exception.
-- [o] Define a custom exception class for domain errors.
-- Catch \`BaseException\` so nothing ever escapes.
-  > That would also swallow \`KeyboardInterrupt\` and \`SystemExit\`; rarely what you want.
-- Use a bare \`except:\` to keep the code short.
-  > A bare \`except:\` hides bugs. Always be specific.`}
+- It is invalid syntax.
+  > No, it is valid Python, but it is an anti-pattern.
+- [o] It catches \`KeyboardInterrupt\` and \`SystemExit\`, making the program hard to kill.
+  > **Correct.** Bare \`except:\` catches **everything**, including signals you want to let through.
+- It only catches \`Exception\`, which is too broad.
+  > No, it catches **BaseException**, which is even broader than \`Exception\`.
+- It requires an \`as e\` clause.
+  > No, \`as e\` is optional.`}
+/>
+
+<MultipleChoice
+  markdown={`When should you use \`raise ... from e\`?
+
+- When you want to suppress the original exception.
+  > No, \`raise ... from None\` suppresses context, not \`raise ... from e\`.
+- [o] When wrapping a lower-level exception in a higher-level one, to preserve the cause.
+  > **Correct.** \`raise ConfigError(...) from e\` shows both the \`ConfigError\` and the underlying \`ValueError\`, with a causal link.
+- When re-raising the same exception.
+  > No, just write \`raise\` with no arguments to re-raise.
+- When you want to catch multiple exception types.
+  > No, that is done with \`except (TypeError, ValueError):\`.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`finally\` do?
+
+- Runs only if an exception is raised.
+  > No, that is what \`except\` does.
+- Runs only if no exception is raised.
+  > No, that is what \`else\` does.
+- [o] Runs no matter what: success, exception, return, or even sys.exit().
+  > **Correct.** \`finally\` is guaranteed cleanup. Use it for closing files, releasing locks, etc.
+- Suppresses the exception.
+  > No, \`finally\` does not suppress exceptions; it just runs before the exception propagates.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the EAFP philosophy?
+
+- Always check if a file exists before opening it.
+  > No, that is LBYL (Look Before You Leap). EAFP is the opposite.
+- [o] Try the operation and catch the exception if it fails.
+  > **Correct.** EAFP stands for "Easier to Ask for Forgiveness than Permission." It is idiomatic Python.
+- Never use exceptions; they are expensive.
+  > No, exceptions are cheap in Python (when not raised), and EAFP is the Pythonic way.
+- Use assertions instead of exceptions.
+  > No, assertions are for invariants (bugs), not expected failures.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens if an exception is raised and not caught?
+
+- The exception is silently ignored.
+  > No, unhandled exceptions are never ignored.
+- [o] Python prints a traceback and exits with a non-zero exit code.
+  > **Correct.** Unhandled exceptions terminate the program (or return 500 in a web context).
+- The exception is logged but the program continues.
+  > No, the program exits unless the exception is caught.
+- The exception is converted to a warning.
+  > No, exceptions and warnings are separate systems.`}
 />
 
 Many exceptions come from I/O. Files are next.

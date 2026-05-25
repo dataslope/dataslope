@@ -4,29 +4,41 @@ description: Where Python came from, why it looks the way it does, and the debat
 ---
 
 Python is a high-level, interpreted programming language created by
-Guido van Rossum and first released in **February 1991**. Guido was
-working at CWI in the Netherlands at the time and started Python as a
-hobby project over the 1989 Christmas holidays. The name has nothing
-to do with snakes: Guido was a fan of *Monty Python's Flying Circus*.
+**Guido van Rossum** and first released in **February 1991**. Guido was
+working at CWI (Centrum Wiskunde & Informatica) in the Netherlands and
+started Python as a hobby project over the 1989 Christmas holidays,
+aiming to create a successor to the ABC teaching language he had helped
+develop.
 
-## A short timeline
+<Callout type="info" title="Why 'Python'?">
+The name has nothing to do with snakes. Guido was reading scripts from
+*Monty Python's Flying Circus* at the time and wanted a name that was
+"short, unique, and slightly mysterious." The community has run with the
+snake imagery ever since.
+</Callout>
 
-| Year | Milestone |
-| --- | --- |
-| 1989 | Guido van Rossum begins the project at CWI |
-| 1991 | Python 0.9.0 released on `alt.sources` |
-| 1994 | Python 1.0 with `lambda`, `map`, `filter`, `reduce` |
-| 2000 | Python 2.0 with list comprehensions and garbage collection |
-| 2008 | Python 3.0 released, breaking backward compatibility |
-| 2020 | Python 2 officially retired (sunset on January 1, 2020) |
-| 2023 | Python 3.12 ships per-interpreter GIL groundwork |
-| 2024 | Python 3.13 ships an experimental free-threaded build |
+## A visual timeline
+
+```mermaid
+timeline
+    title Key Milestones in Python History
+    1989 : Guido starts Python project at CWI
+    1991 : Python 0.9.0 released on alt.sources
+    1994 : Python 1.0 ships lambda, map, filter, reduce
+    2000 : Python 2.0 adds list comprehensions and GC
+    2008 : Python 3.0 breaks backward compatibility
+    2018 : Guido steps down as BDFL
+    2019 : Steering Council governance begins
+    2020 : Python 2 officially end-of-life
+    2023 : Python 3.12 ships per-interpreter GIL groundwork
+    2024 : Python 3.13 experimental free-threaded build
+```
 
 ## Design philosophy
 
 Python's design is deeply influenced by **ABC**, an earlier teaching
-language Guido helped build. The guiding ideas are captured in *The
-Zen of Python* (PEP 20), which you can read at any time by running
+language Guido helped build at CWI. The guiding ideas are captured in
+*The Zen of Python* (PEP 20), which you can read at any time by running
 `import this`.
 
 <CodeBlock
@@ -58,69 +70,6 @@ for i in range(3):
 `}
 />
 
-## Tabs vs spaces: the never-ending debate
-
-If you read PEP 8 (the official style guide) you will find a clear
-answer:
-
-> **Spaces are the preferred indentation method. Tabs should be used
-> solely to remain consistent with code that is already indented with
-> tabs.**
-
-PEP 8 also recommends **four spaces per indentation level**. Why four?
-It is wide enough to make nested blocks visually obvious but narrow
-enough that deeply nested code still fits on screen.
-
-A few practical points behind the debate:
-
-1. **Python 3 forbids mixing tabs and spaces** for indentation inside
-   the same block. Python 2 allowed it and silently treated a tab as
-   "however many spaces it takes to reach the next multiple of 8",
-   which caused famously confusing bugs.
-2. **Editors differ on tab width.** A file indented with tabs can look
-   2-space-wide in one editor and 8-space-wide in another. Spaces
-   render identically everywhere.
-3. **Accessibility argument for tabs.** Tabs let each developer
-   configure their preferred visual width without changing the source.
-   This is the strongest argument in favor of tabs.
-4. **Tooling.** Almost every Python formatter (`black`, `autopep8`,
-   `yapf`) defaults to four spaces. Going against the grain costs
-   you time.
-
-The community has effectively settled on **four spaces**, and that is
-what we will use throughout this course.
-
-<MultipleChoice
-  markdown={`According to PEP 8, what is the recommended indentation in Python source code?
-
-- A single tab character
-  > Tabs are permitted only for compatibility with already-tab-indented code.
-- Two spaces
-  > Two-space indentation is common in JavaScript and Ruby, but PEP 8 prefers four for Python.
-- [o] Four spaces
-  > Correct. PEP 8 mandates four spaces per indentation level.
-- Eight spaces
-  > Eight is what \`tab\` expanded to in Python 2 and is considered too wide for nested code.
-
-PEP 8 ([python.org/dev/peps/pep-0008](https://peps.python.org/pep-0008/))
-calls four spaces "the preferred indentation method", and it is the default
-in every major Python formatter.`}
-/>
-
-## CPython, PyPy, and friends
-
-The reference implementation of Python is **CPython**, written in C.
-When people say "Python", they almost always mean CPython. A few
-alternative implementations exist:
-
-- **PyPy** uses a just-in-time compiler and can be much faster on
-  pure-Python workloads.
-- **Jython** runs on the JVM and can call Java libraries directly.
-- **IronPython** targets the .NET runtime.
-- **MicroPython** is a slim implementation for microcontrollers.
-- **Pyodide** is CPython compiled to WebAssembly, which is what is
-  running every code block on this page.
-
 ## The Python 2 to 3 transition
 
 Python 3 was released in December 2008 and intentionally broke
@@ -133,20 +82,121 @@ biggest changes were:
 - `dict.keys()`, `range()`, `map()`, and friends return views/
   iterators instead of lists.
 
-The transition took over a decade. Python 2 was officially sunset on
-January 1, 2020. **In 2026 there is no reason to write new code in
-Python 2.** Every example in this course assumes Python 3.
+<Callout type="warn" title="The decade-long migration">
+The transition took over a decade. Many libraries maintained dual
+Python 2/3 codebases using the `six` compatibility library or `2to3`
+converter. Python 2 was officially sunset on January 1, 2020. **In 2025
+there is no reason to write new code in Python 2.** Every example in
+this course assumes Python 3.
+</Callout>
+
+## From BDFL to Steering Council
+
+Guido held the title of **BDFL** (Benevolent Dictator For Life) from
+Python's inception until July 2018, when he stepped down after a
+contentious debate over PEP 572 (the walrus operator `:=`). The
+community then adopted a governance model with a five-person **Steering
+Council**, elected annually by core developers. The council makes final
+decisions on Python Enhancement Proposals (PEPs) and oversees the
+direction of the language.
+
+<Callout type="info">
+You can see the current Steering Council and all past members at
+[python.org/dev/steering-council](https://www.python.org/dev/steering-council/).
+</Callout>
+
+## CPython and alternative implementations
+
+The reference implementation of Python is **CPython**, written in C.
+When people say "Python", they almost always mean CPython. A few
+alternative implementations exist:
+
+- **PyPy** uses a just-in-time compiler and can be much faster on
+  pure-Python workloads.
+- **Jython** runs on the JVM and can call Java libraries directly.
+- **IronPython** targets the .NET runtime.
+- **MicroPython** is a slim implementation for microcontrollers.
+- **WebAssembly builds** let CPython run directly in the browser, which
+  is how the interactive code blocks on this site work — no install
+  required.
+
+## The GIL and free-threading work
+
+Python's **Global Interpreter Lock (GIL)** prevents multiple threads
+from executing Python bytecode simultaneously, which simplifies
+memory management but limits multi-core parallelism. Python 3.13
+introduced an experimental **free-threaded build** (compile-time flag
+`--disable-gil`) that removes the GIL, allowing true parallel
+execution. This is groundbreaking work led by Sam Gross and will evolve
+over several releases.
+
+## Test your knowledge
 
 <MultipleChoice
-  markdown={`Which of the following statements about Python are true? Select all that apply.
+  markdown={`Who created Python?
 
-- [o] Python was first released in 1991.
-- [o] Indentation is part of Python's syntax, not just style.
-- Python 2 and Python 3 share full backward compatibility.
-  > Python 3 intentionally broke compatibility to fix language warts (print, division, Unicode, and more).
-- [o] CPython is the reference implementation of the language.
-- Python is named after the snake.
-  > Guido named it after *Monty Python's Flying Circus*.`}
+- Linus Torvalds
+  > Linus created Linux and git, not Python.
+- [o] Guido van Rossum
+  > Correct. Guido started Python as a hobby project in December 1989.
+- Dennis Ritchie
+  > Dennis created the C programming language in the 1970s.
+- James Gosling
+  > James created Java in the 1990s.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the origin of the name "Python"?
+
+- Named after the snake species
+  > A common misconception! Guido was reading comedy scripts, not reptile books.
+- Named after the Greek oracle at Delphi
+  > That would be a different story entirely.
+- [o] Named after *Monty Python's Flying Circus*
+  > Correct. Guido was a fan of the British comedy troupe and wanted a "short, unique, and slightly mysterious" name.
+- It stands for "Portable Interpreted Typed High-level Object Notation"
+  > Python is not an acronym.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following is a breaking change introduced in Python 3?
+
+- List comprehensions were added
+  > List comprehensions appeared in Python 2.0 (year 2000).
+- [o] \`print\` became a function instead of a statement
+  > Correct. Python 2 used \`print "hi"\` while Python 3 requires \`print("hi")\`.
+- The \`def\` keyword was introduced
+  > \`def\` has been part of Python since version 0.9.0 in 1991.
+- Indentation became significant
+  > Significant indentation has been a core feature of Python from the very beginning.`}
+/>
+
+## A small Python 3 challenge
+
+One of the defining changes in Python 3 is that division `/` always
+returns a float, even when both operands are integers. In Python 2,
+`5 / 2` would return `2` (integer division). Let's verify the Python 3
+behavior.
+
+<ChallengeCard
+  adapter="python"
+  title="Verify Python 3 division"
+  instructions={`Compute \`5 / 2\` and assign the result to a variable named \`result\`. The hidden test will check that \`result\` is \`2.5\` (a float).`}
+  initialCode={`# your code here
+result = None
+print("5 / 2 =", result)
+`}
+  solutionCode={`result = 5 / 2
+print("5 / 2 =", result)
+`}
+  tests={[
+    {
+      id: "division_returns_float",
+      name: "5 / 2 equals 2.5",
+      description: "Python 3 division always returns a float",
+      code: `assert result == 2.5, f"Expected 2.5, got {result}"`,
+    },
+  ]}
 />
 
 In the next page we will look at how to install Python locally and

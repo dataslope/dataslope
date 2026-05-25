@@ -3,16 +3,64 @@ title: Booleans
 description: True and False, truthiness, comparison, and the and / or / not operators
 ---
 
-`bool` has exactly two values: `True` and `False`. Both are written
-capitalized, and both are singleton objects.
+`bool` has exactly two values: `True` and `False`. Both are written capitalized, and both are singleton objects. Understanding how Python evaluates truthiness—what counts as true or false in a boolean context—is key to writing idiomatic code.
+
+Every snippet on this page runs in your browser—no setup required.
+
+## Real-world context: Truthiness everywhere
+
+Booleans and boolean logic are fundamental to control flow. In real-world code, you'll see:
+- **Conditional checks:** `if user.is_authenticated:`, `if response.ok:`, `if items:`
+- **Filtering:** `[x for x in data if x > 0]`
+- **Short-circuit evaluation:** `value = user_input or default`
+- **Guard clauses:** `if not ready: return`
+
+Python's truthiness rules make code concise and readable. Instead of `if len(items) > 0:`, you write `if items:`.
+
+## The two boolean values
 
 <CodeBlock
   adapter="python"
   initialCode={`print(type(True))
-print(True == 1, False == 0)        # bool is a subclass of int
-print(True + True + True)           # 3
+print(type(False))
 `}
 />
+
+<Callout type="info" title="The origin of 'boolean'">
+The term "boolean" comes from **George Boole** (1815–1864), an English mathematician who developed Boolean algebra—a system of logic with just two values: true and false. His work laid the foundation for digital circuit design and all of computer science.
+</Callout>
+
+### bool is a subclass of int
+
+`bool` inherits from `int`, so `True` and `False` behave as `1` and `0` in arithmetic contexts.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(True == 1, False == 0)
+print(isinstance(True, int))
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(True + True + True)  # 3
+print(False * 100)          # 0
+`}
+/>
+
+<Callout type="warn" title="The 'is True' antipattern">
+**Never write `if x is True:`**—it checks whether `x` is the exact `True` object, not whether `x` is truthy. This breaks with values like `1`, `"hello"`, or `[1, 2, 3]` that are truthy but not `True`.
+
+**Bad:**
+```python
+if len(items) > 0 is True:  # convoluted and wrong
+```
+
+**Good:**
+```python
+if items:  # Pythonic truthiness check
+```
+</Callout>
 
 ## Comparison operators
 
@@ -25,17 +73,27 @@ print(True + True + True)           # 3
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(3 < 5 <= 5)            # chained comparisons! Same as 3 < 5 and 5 <= 5
-print("a" in "banana")
+  initialCode={`print(3 < 5 <= 5)  # chained comparisons! Same as (3 < 5) and (5 <= 5)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print("a" in "banana")
 print(2 in [1, 2, 3])
-print(None is None)
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(None is None)
+print(True is True)
 `}
 />
 
 ### `==` vs `is`
 
-`==` asks "are these equal?". `is` asks "are these the *same* object?".
-For singletons like `None`, `True`, `False`, always use `is`.
+`==` asks "are these **equal** in value?". `is` asks "are these the **same object** in memory?".
 
 <CodeBlock
   adapter="python"
@@ -43,63 +101,173 @@ For singletons like `None`, `True`, `False`, always use `is`.
 b = [1, 2, 3]
 print(a == b)   # True, same contents
 print(a is b)   # False, different list objects
+`}
+/>
 
-x = None
+<CodeBlock
+  adapter="python"
+  initialCode={`x = None
 print(x is None)   # the idiomatic check
 `}
 />
 
+For singletons like `None`, `True`, `False`, always use `is`.
+
 ## Truthiness
 
-Any object can be tested in a boolean context. The rules:
+Any object can be tested in a boolean context (e.g., `if`, `while`, `and`, `or`). Python's rules:
 
-- **Falsy:** `False`, `None`, any zero (`0`, `0.0`, `0j`), any empty
-  container (`""`, `[]`, `()`, `{}`, `set()`), and instances of
-  classes that define `__bool__` to return `False`.
+- **Falsy:** `False`, `None`, any zero (`0`, `0.0`, `0j`), any empty container (`""`, `[]`, `()`, `{}`, `set()`), and instances of classes that define `__bool__` to return `False` or `__len__` to return `0`.
 - **Truthy:** everything else.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for value in [0, 1, "", "hi", [], [0], None, {0: 0}, {}]:
+  initialCode={`for value in [0, 1, "", "hi", [], [0], None, {}, {0: 0}]:
     print(f"{value!r:>10} -> {bool(value)}")
 `}
 />
 
-This is why idiomatic Python writes `if items:` rather than
-`if len(items) > 0:`.
-
-## Logical operators
-
-`and`, `or`, `not` are written as English words, not symbols. They
-**short-circuit**, returning one of the operands rather than a
-strict `True`/`False`.
+This is why idiomatic Python writes `if items:` instead of `if len(items) > 0:`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(True and "hello")   # 'hello' (and returns the last truthy / first falsy)
-print(False or "default") # 'default'
-print(None or 0 or "first truthy")
-print(not 0)
+  initialCode={`items = [1, 2, 3]
+if items:
+    print("We have items!")
 `}
 />
 
-A common idiom uses `or` to supply a default:
+<CodeBlock
+  adapter="python"
+  initialCode={`items = []
+if not items:
+    print("Empty list!")
+`}
+/>
+
+<Callout type="warn" title="The 0 == False surprise">
+Because `False` equals `0`, you can get unexpected behavior if you're not careful:
+
+```python
+count = 0
+if count == False:  # True! (but don't write this)
+    print("count is zero")
+```
+
+**Better:** use truthiness or an explicit comparison:
+```python
+if not count:       # Pythonic
+if count == 0:      # explicit
+```
+</Callout>
+
+## Logical operators: `and`, `or`, `not`
+
+Python's logical operators are written as English words, not symbols (`&&`, `||`, `!` like in C or JavaScript).
+
+### Pure boolean logic
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(True and False)
+print(True or False)
+print(not True)
+`}
+/>
+
+### Short-circuit evaluation
+
+`and` and `or` **short-circuit**: they stop evaluating as soon as the result is determined.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def expensive():
+    print("expensive() called")
+    return True
+
+print(False and expensive())  # expensive() is never called
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def expensive():
+    print("expensive() called")
+    return True
+
+print(True or expensive())  # expensive() is never called
+`}
+/>
+
+### Operators return operands, not just True/False
+
+**Key insight:** `and` and `or` don't always return `True` or `False`. They return one of the operands.
+
+- `x and y` returns `x` if `x` is falsy, otherwise `y`.
+- `x or y` returns `x` if `x` is truthy, otherwise `y`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(True and "hello")   # 'hello'
+print(False or "default") # 'default'
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`print(None or 0 or "first truthy")  # 'first truthy'
+print("a" and "b" and "c")           # 'c'
+`}
+/>
+
+<Callout type="info" title="Why operators return operands">
+This design enables a common idiom: using `or` to supply a default value.
+
+```python
+name = user_input or "Anonymous"
+```
+
+If `user_input` is an empty string (falsy), `name` becomes `"Anonymous"`. If it's a non-empty string (truthy), `name` becomes `user_input`.
+
+**Gotcha:** This breaks if `0` is a valid input, because `0` is falsy:
+```python
+count = user_count or 10  # if user_count is 0, this gives 10!
+```
+
+For such cases, use an explicit `None` check:
+```python
+count = user_count if user_count is not None else 10
+```
+</Callout>
+
+### Common idiom: default values
 
 <CodeBlock
   adapter="python"
   initialCode={`name = ""
-print(name or "Anonymous")    # "Anonymous"
+print(name or "Anonymous")  # "Anonymous"
+`}
+/>
 
-# Careful: 0 is falsy, so 'or' replaces it. Use a None check instead.
+<CodeBlock
+  adapter="python"
+  initialCode={`# Careful: 0 is falsy, so 'or' replaces it
 count = 0
-print(count or 10)            # 10, probably not what you want!
+print(count or 10)  # 10, probably not what you want!
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Use a None check for cases where 0 is valid
+count = 0
 print(count if count is not None else 10)  # 0
 `}
 />
 
-## Conditional expressions
+## Conditional expressions (ternary operator)
 
-The ternary form puts the condition in the middle:
+Python's ternary form puts the condition in the **middle**:
 
 <CodeBlock
   adapter="python"
@@ -109,104 +277,158 @@ print(status)
 `}
 />
 
+<CodeBlock
+  adapter="python"
+  initialCode={`x = 10
+abs_x = x if x >= 0 else -x
+print(abs_x)
+`}
+/>
+
 ## Challenges
 
 <ChallengeCard
   adapter="python"
-  title="Voting eligibility"
-  instructions={`Define a function \`can_vote(age, is_citizen)\` that returns \`True\` if the person is 18 or older **and** is a citizen, and \`False\` otherwise.`}
-  initialCode={`def can_vote(age, is_citizen):
-    # your code here
+  title="XOR without ^"
+  instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator—use \`and\`, \`or\`, and \`not\`.`}
+  initialCode={`def xor(a, b):
+    # Your code here
     return False
+
+print(xor(True, False))
+print(xor(True, True))
+print(xor(False, False))
 `}
-  solutionCode={`def can_vote(age, is_citizen):
-    return age >= 18 and is_citizen
+  solutionCode={`def xor(a, b):
+    return (a or b) and not (a and b)
+
+print(xor(True, False))
+print(xor(True, True))
+print(xor(False, False))
 `}
   tests={[
     {
-      id: "adult_citizen",
-      name: "Adult citizen can vote",
-      code: `assert can_vote(20, True) is True`,
+      id: "true_false",
+      name: "xor(True, False) is True",
+      code: `assert xor(True, False) is True`,
     },
     {
-      id: "minor_citizen",
-      name: "Minor citizen cannot vote",
-      code: `assert can_vote(17, True) is False`,
+      id: "false_true",
+      name: "xor(False, True) is True",
+      code: `assert xor(False, True) is True`,
     },
     {
-      id: "adult_noncitizen",
-      name: "Adult non-citizen cannot vote",
-      code: `assert can_vote(40, False) is False`,
+      id: "both_true",
+      name: "xor(True, True) is False",
+      code: `assert xor(True, True) is False`,
     },
     {
-      id: "boundary",
-      name: "18-year-old citizen can vote",
-      code: `assert can_vote(18, True) is True`,
+      id: "both_false",
+      name: "xor(False, False) is False",
+      code: `assert xor(False, False) is False`,
     },
   ]}
 />
 
 <ChallengeCard
   adapter="python"
-  title="Safe default for empty input"
-  instructions={`Define a function \`first_or(items, default)\` that returns the first item of \`items\` if there is one, otherwise \`default\`. Use truthiness rather than checking the length explicitly.`}
-  initialCode={`def first_or(items, default):
-    # your code here
-    return None
+  title="All-truthy detector"
+  instructions={`Write a function \`all_truthy(items)\` that returns \`True\` if **all** items in the list are truthy, and \`False\` otherwise. Do not use the built-in \`all()\`—implement it yourself with a loop or comprehension.`}
+  initialCode={`def all_truthy(items):
+    # Your code here
+    return False
+
+print(all_truthy([1, 2, 3]))
+print(all_truthy([1, 0, 3]))
+print(all_truthy([]))
 `}
-  solutionCode={`def first_or(items, default):
-    return items[0] if items else default
+  solutionCode={`def all_truthy(items):
+    for item in items:
+        if not item:
+            return False
+    return True
+
+print(all_truthy([1, 2, 3]))
+print(all_truthy([1, 0, 3]))
+print(all_truthy([]))
 `}
   tests={[
     {
-      id: "has_items",
-      name: "Returns first item when present",
-      code: `assert first_or([10, 20, 30], 0) == 10`,
+      id: "all_true",
+      name: "All truthy returns True",
+      code: `assert all_truthy([1, 2, 3]) is True`,
+    },
+    {
+      id: "has_falsy",
+      name: "Contains falsy returns False",
+      code: `assert all_truthy([1, 0, 3]) is False`,
     },
     {
       id: "empty_list",
-      name: "Returns default on empty list",
-      code: `assert first_or([], 99) == 99`,
+      name: "Empty list returns True",
+      code: `assert all_truthy([]) is True`,
     },
     {
-      id: "empty_string",
-      name: "Returns default on empty string",
-      code: `assert first_or("", "X") == "X"`,
-    },
-    {
-      id: "string_first",
-      name: "Returns first char of a string",
-      code: `assert first_or("abc", "X") == "a"`,
+      id: "strings",
+      name: "Works with strings",
+      code: `assert all_truthy(["a", "b", "c"]) is True
+assert all_truthy(["a", "", "c"]) is False`,
     },
   ]}
 />
 
-<MultipleChoice
-  markdown={`Which of these expressions evaluate to a **truthy** value? Select all that apply.
+## Check your understanding
 
-- [o] \`"False"\`
-  > Any non-empty string is truthy, even the word "False".
-- [o] \`[0]\`
-  > A list containing the number 0 is non-empty, so it is truthy.
+<MultipleChoice
+  markdown={`Which of these expressions is **truthy**?
+
 - \`0\`
   > Zero is falsy.
 - \`{}\`
   > An empty dict is falsy.
-- [o] \`(False,)\`
-  > A tuple of length 1 is non-empty, so it is truthy.
-- \`None\``}
+- \`None\`
+  > \`None\` is falsy.
+- [o] \`[0]\`
+  > Correct. A list containing the number 0 is **non-empty**, so it is truthy. Only the empty list \`[]\` is falsy.`}
 />
 
 <MultipleChoice
   markdown={`What does \`None or 0 or "" or "x"\` evaluate to?
 
 - \`None\`
-  > \`or\` returns the first truthy value (or the last value if none are truthy).
+  > \`or\` returns the first truthy value, or the last value if none are truthy. \`None\` is falsy.
 - \`0\`
+  > \`0\` is falsy, so \`or\` keeps looking.
 - \`""\`
+  > Empty string is falsy, so \`or\` keeps looking.
 - [o] \`"x"\`
-  > Correct. The first three operands are falsy, so \`or\` keeps looking and lands on \`"x"\`.`}
+  > Correct. The first three operands are falsy, so \`or\` keeps evaluating and lands on \`"x"\`, which is truthy.`}
 />
 
-Booleans tie directly into control flow. Before we get there, let us
-look at Python's main sequence type: the list.
+<MultipleChoice
+  markdown={`What does \`[] and "hello"\` evaluate to?
+
+- \`True\`
+  > \`and\` returns an operand, not necessarily \`True\` or \`False\`.
+- \`False\`
+  > Close, but \`and\` returns the first falsy operand or the last operand, not necessarily \`False\`.
+- [o] \`[]\`
+  > Correct. \`and\` returns the first falsy operand. \`[]\` is falsy, so that's what it returns.
+- \`"hello"\`
+  > \`and\` would return \`"hello"\` only if the first operand were truthy.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the idiomatic way to check if a list is non-empty?
+
+- \`if len(items) > 0:\`
+  > This works, but it's verbose. Pythonic code uses truthiness.
+- [o] \`if items:\`
+  > Correct. This is the idiomatic Pythonic way—concise and readable.
+- \`if items is not None:\`
+  > This checks whether \`items\` is \`None\`, not whether it's empty. An empty list \`[]\` would pass this check.
+- \`if items == True:\`
+  > This is almost never what you want. A non-empty list doesn't equal \`True\`.`}
+/>
+
+Booleans tie directly into control flow. Before we get there, let's look at Python's main sequence type: the list.
