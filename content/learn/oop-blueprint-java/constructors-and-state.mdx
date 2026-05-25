@@ -24,7 +24,7 @@ sequenceDiagram
     participant Caller
     participant JVM
     participant Heap
-    participant Constructor as Person(...)
+    participant Constructor as "Person(...)"
 
     Caller->>JVM: new Person("Ada", 30)
     JVM->>Heap: allocate Person

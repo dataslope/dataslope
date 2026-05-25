@@ -76,6 +76,7 @@ function buildCorsHeaders(origin: string): HeadersInit {
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Expose-Headers": "*",
     "Access-Control-Max-Age": "86400",
+    "Cross-Origin-Resource-Policy": "cross-origin",
   };
 }
 
