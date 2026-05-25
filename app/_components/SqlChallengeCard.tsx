@@ -566,13 +566,11 @@ function RunOverlay({ active }: { active: boolean }) {
 function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
   const key = languageIconKeyForDialect(dialect);
   const Icon = LANGUAGE_ICONS[key];
-  const color = LANGUAGE_ICON_COLORS[key];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[key] ?? 1;
   if (!Icon) return null;
   return (
     <Icon
       style={{
-        color,
         width: `${Math.round(14 * factor)}px`,
         height: `${Math.round(14 * factor)}px`,
       }}

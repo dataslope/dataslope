@@ -256,13 +256,11 @@ function RunOverlay({ active }: { active: boolean }) {
 
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
-  const color = LANGUAGE_ICON_COLORS[adapter.id];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
   if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
   return (
     <Icon
       style={{
-        color,
         width: `${Math.round(14 * factor)}px`,
         height: `${Math.round(14 * factor)}px`,
       }}
