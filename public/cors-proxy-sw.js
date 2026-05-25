@@ -60,7 +60,7 @@ self.addEventListener("fetch", (event) => {
     credentials: "omit",
   };
   if (event.request.body) {
-    // Required by Chromium when forwarding a ReadableStream body.
+    // Required by the Fetch API when forwarding a ReadableStream body.
     init.duplex = "half";
   }
   event.respondWith(

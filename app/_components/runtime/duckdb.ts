@@ -142,16 +142,16 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
-function lastPathSegment(path: string): string {
+function extractFilename(path: string): string {
   return path.split("/").filter(Boolean).pop() || "remote_file";
 }
 
 function basenameFromUrl(url: string): string {
   try {
     const parsed = new URL(url);
-    return decodeURIComponent(lastPathSegment(parsed.pathname));
+    return decodeURIComponent(extractFilename(parsed.pathname));
   } catch {
-    return lastPathSegment(url);
+    return extractFilename(url);
   }
 }
 
