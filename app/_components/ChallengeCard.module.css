@@ -2079,9 +2079,27 @@
   background: #222222;
 }
 
+:global(html.dark) .testPill[data-state="pass"] {
+  background: color-mix(in srgb, var(--ch-green-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+}
+
+:global(html.dark) .testPill[data-state="fail"] {
+  background: color-mix(in srgb, var(--ch-red-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
+}
+
 :global(html.dark) .testPill[data-state="pending"] {
   background: #252525;
   border-color: #333333;
+}
+
+:global(html.dark) .banner[data-state="pass"] {
+  border-top-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+}
+
+:global(html.dark) .banner[data-state="fail"] {
+  border-top-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
 }
 
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {

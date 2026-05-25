@@ -179,7 +179,6 @@ export default function MultipleChoiceQuestion({
             </>
           )}
         </span>
-        <span className={styles.headerStatus} />
       </header>
 
       {parsed.body ? (
