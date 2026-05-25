@@ -100,21 +100,18 @@ function MermaidFullscreen({
   const [ty, setTy] = useState(0);
   const [dragging, setDragging] = useState(false);
 
+  const naturalSizeRef = useRef<{ w: number; h: number } | null>(null);
+
   // Fit the rendered SVG inside the viewport. Called on open and on
-  // reset, and from a ResizeObserver so the diagram re-fits if the
-  // window resizes while the modal is open.
+  // reset, and from the toolbar reset button. Uses the cached natural
+  // dimensions captured on first mount so the function is independent
+  // of the current scale (and therefore doesn't get invalidated every
+  // time we zoom).
   const fit = useCallback(() => {
     const viewport = viewportRef.current;
-    const stage = stageRef.current;
-    if (!viewport || !stage) return;
-    const svgEl = stage.querySelector("svg");
-    if (!svgEl) return;
-    // Read intrinsic dimensions from the SVG itself so the fit is
-    // independent of any prior transform on the stage.
-    const bbox = svgEl.getBoundingClientRect();
-    // Undo current scale to recover natural pixel size.
-    const naturalW = bbox.width / scale;
-    const naturalH = bbox.height / scale;
+    const natural = naturalSizeRef.current;
+    if (!viewport || !natural) return;
+    const { w: naturalW, h: naturalH } = natural;
     if (naturalW <= 0 || naturalH <= 0) return;
     const pad = 64;
     const vw = viewport.clientWidth - pad;
@@ -127,10 +124,12 @@ function MermaidFullscreen({
     setScale(next);
     setTx((viewport.clientWidth - naturalW * next) / 2);
     setTy((viewport.clientHeight - naturalH * next) / 2);
-  }, [scale]);
+  }, []);
 
-  // One-shot initial fit. Use a layout effect via rAF so the SVG is in
-  // the DOM with measurable dimensions before we compute the transform.
+  // One-shot initial fit. Use a rAF so the SVG is in the DOM with
+  // measurable dimensions before we compute the transform. Captures
+  // the SVG's natural pixel dimensions while scale is still 1 so any
+  // later `fit()` calls can divide cleanly.
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
       const viewport = viewportRef.current;
@@ -142,6 +141,7 @@ function MermaidFullscreen({
       const naturalW = bbox.width;
       const naturalH = bbox.height;
       if (naturalW <= 0 || naturalH <= 0) return;
+      naturalSizeRef.current = { w: naturalW, h: naturalH };
       const pad = 64;
       const vw = viewport.clientWidth - pad;
       const vh = viewport.clientHeight - pad;

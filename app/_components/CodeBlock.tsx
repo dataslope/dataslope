@@ -834,6 +834,8 @@ function CodeBlockInner({
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
+    // Skip the spinner / round-trip entirely on empty buffers — same
+    // short-circuit ChallengeCard's Format uses.
     if (!code.trim()) return;
     setIsFormatting(true);
     const startedAt = performance.now();
