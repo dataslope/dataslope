@@ -302,8 +302,8 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   // FS lives on the resolved Emscripten module, not on the PhpWeb instance.
   // See PhpBase.mjs: `this.binary = phpBinLoader.then(...).then(async php => { ... return php; })`
   // and PhpWeb.mjs refresh(): `const php = await this.binary; php.FS.syncfs(...)`
-  const module = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
-  const FS = module.FS;
+  const phpModule = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
+  const FS = phpModule.FS;
 
   const nextPaths = new Set<string>();
   for (const [relPath, bytes] of files) {

@@ -4,7 +4,15 @@ import nextTypescript from "eslint-config-next/typescript";
 const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
-  { ignores: [".next/**", "node_modules/**", "cdn-assets/_dotnet/**", ".source/**"] },
+  {
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "cdn-assets/_dotnet/**",
+      ".source/**",
+      "public/_workers/**",
+    ],
+  },
 ];
 
 export default eslintConfig;
