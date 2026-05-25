@@ -183,9 +183,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ch-badge-color);
-  background: var(--ch-badge-bg);
-  border-radius: 5px;
-  padding: 4px 8px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -771,9 +768,9 @@
   gap: 8px;
   width: 100%;
   padding: 6px 14px;
-  background: transparent;
+  background: var(--ch-bg);
   border: none;
-  color: var(--ch-text-muted);
+  color: var(--ch-gray-700);
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 400;
@@ -782,7 +779,7 @@
 }
 
 .initToggle:hover {
-  color: var(--ch-text);
+  color: var(--ch-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -800,6 +797,7 @@
 .initLabel {
   flex: 1;
   letter-spacing: 0;
+  color: var(--ch-gray-700);
 }
 
 .initMeta {
@@ -811,7 +809,6 @@
 
 .initEditorWrap {
   position: relative;
-  border-top: 1px solid var(--ch-border-light);
   background: var(--ch-bg);
   /* Animate the height change so collapse/expand isn't a snap. The
      wrapper has `overflow: hidden` while collapsed, so the gradient
@@ -944,19 +941,18 @@
   width: 100%;
   padding: 5px 8px;
   gap: 4px;
-  background: transparent;
+  background: var(--ch-bg);
   border: none;
-  border-top: 1px solid var(--ch-border-light);
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 500;
-  color: var(--ch-text-muted);
+  color: var(--ch-gray-700);
   cursor: pointer;
   transition: color 0.12s, background 0.12s;
 }
 
 .initCollapseBtn:hover {
-  color: var(--ch-text);
+  color: var(--ch-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -1021,9 +1017,7 @@
   display: flex;
   align-items: center;
   padding: 8px 14px;
-  border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
-  background: var(--ch-bg-subtle);
   gap: 0;
   position: relative;
 }
@@ -2028,7 +2022,25 @@
   color: var(--ch-blue-100);
 }
 
+:global(html.dark) .initToggle {
+  color: var(--ch-gray-300);
+}
+
 :global(html.dark) .initToggle:hover {
+  color: #ffffff;
+  background: var(--ch-bg-hover);
+}
+
+:global(html.dark) .initLabel {
+  color: var(--ch-gray-300);
+}
+
+:global(html.dark) .initCollapseBtn {
+  color: var(--ch-gray-300);
+}
+
+:global(html.dark) .initCollapseBtn:hover {
+  color: #ffffff;
   background: var(--ch-bg-hover);
 }
 
