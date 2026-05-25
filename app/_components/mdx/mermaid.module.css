@@ -122,14 +122,12 @@
 }
 
 .viewport {
+  position: relative;
   flex: 1;
   overflow: hidden;
   cursor: grab;
   touch-action: none;
   user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .viewport.dragging {
@@ -137,6 +135,9 @@
 }
 
 .stage {
+  position: absolute;
+  top: 0;
+  left: 0;
   transform-origin: 0 0;
   will-change: transform;
 }

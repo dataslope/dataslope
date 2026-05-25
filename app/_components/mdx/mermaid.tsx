@@ -157,6 +157,21 @@ function MermaidFullscreen({
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Apply zoom by resizing the SVG's intrinsic dimensions rather than a
+  // CSS `transform: scale()`. A scaled transform on a composited layer
+  // gets rasterized once at 1× and GPU-upscaled, which blurs text and
+  // shapes; setting width/height re-renders the vector crisply at every
+  // zoom level. The transform is left to pure translation for panning.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const natural = naturalSizeRef.current;
+    if (!stage || !natural) return;
+    const svgEl = stage.querySelector("svg");
+    if (!svgEl) return;
+    svgEl.style.width = `${natural.w * scale}px`;
+    svgEl.style.height = `${natural.h * scale}px`;
+  }, [scale]);
+
   // Lock background scroll while the modal is open, and wire Esc-close.
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
@@ -307,7 +322,7 @@ function MermaidFullscreen({
             ref={stageRef}
             className={styles.stage}
             style={{
-              transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+              transform: `translate(${tx}px, ${ty}px)`,
             }}
             dangerouslySetInnerHTML={{ __html: svg }}
           />
