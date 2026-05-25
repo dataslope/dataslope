@@ -27,7 +27,7 @@ They all live in `<stdlib.h>`.
 flowchart LR
     A[Program] -->|"malloc(n)"| B[Allocator]
     B -->|"void *"| A
-    A -->|"writes / reads"| C[Heap block<br/>(n bytes)]
+    A -->|"writes / reads"| C["Heap block<br/>(n bytes)"]
     A -->|"free(p)"| B
     B -->|"block reclaimed"| D[Free list / arena]
 ```
