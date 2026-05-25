@@ -68,7 +68,7 @@ export interface StdoutExpect {
 export interface ChallengeTestBase {
   id: string;
   name: string;
-  description: string;
+  description?: string;
 }
 
 /** A test that injects code into the runtime alongside the learner's

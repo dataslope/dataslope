@@ -28,7 +28,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
-import { Check, X, RotateCcw, ListChecks, Pen } from "lucide-react";
+import { Check, X, RotateCcw, ListChecks, MousePointerClick, ScrollText } from "lucide-react";
 import {
   parseQuestion,
   type ParsedChoice,
@@ -133,6 +133,10 @@ export default function MultipleChoiceQuestion({
       }
       return next;
     });
+    if (!parsed.multiAnswer) {
+      setSubmitted(true);
+      setAttempts((n) => n + 1);
+    }
   };
 
   const onSubmit = () => {
@@ -159,7 +163,7 @@ export default function MultipleChoiceQuestion({
     <section className={styles.card} aria-label="Multiple choice question">
       <header className={styles.header}>
         <span className={styles.badge}>
-          <span className={styles.badgeDot} aria-hidden />
+          <ScrollText size={10} aria-hidden />
           {badge}
         </span>
         <span className={styles.modeLabel}>
@@ -170,17 +174,10 @@ export default function MultipleChoiceQuestion({
             </>
           ) : (
             <>
-              <Pen aria-hidden />
+              <MousePointerClick aria-hidden />
               Select one
             </>
           )}
-        </span>
-        <span className={styles.headerStatus}>
-          {attempts > 0 ? (
-            <span className={styles.attemptCount}>
-              {attempts} {attempts === 1 ? "attempt" : "attempts"}
-            </span>
-          ) : null}
         </span>
       </header>
 
@@ -268,28 +265,30 @@ export default function MultipleChoiceQuestion({
         })}
       </div>
 
-      <div className={styles.actionBar}>
-        {!submitted ? (
-          <button
-            type="button"
-            className={styles.submitBtn}
-            onClick={onSubmit}
-            disabled={selected.size === 0}
-          >
-            Submit
-          </button>
-        ) : (
-          <button type="button" className={styles.retryBtn} onClick={onRetry}>
-            <RotateCcw size={13} aria-hidden />
-            Try again
-          </button>
-        )}
-        {!submitted && parsed.multiAnswer ? (
-          <span className={styles.actionHint}>
-            Pick every option that applies, then submit.
-          </span>
-        ) : null}
-      </div>
+      {((!submitted && parsed.multiAnswer) || submitted) ? (
+        <div className={styles.actionBar}>
+          {!submitted ? (
+            <button
+              type="button"
+              className={styles.submitBtn}
+              onClick={onSubmit}
+              disabled={selected.size === 0}
+            >
+              Submit
+            </button>
+          ) : (
+            <button type="button" className={styles.retryBtn} onClick={onRetry}>
+              <RotateCcw size={13} aria-hidden />
+              Try again
+            </button>
+          )}
+          {!submitted && parsed.multiAnswer ? (
+            <span className={styles.actionHint}>
+              Pick every option that applies, then submit.
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       {result ? (
         <div className={styles.banner} data-state={result}>

@@ -116,7 +116,7 @@
   overflow: hidden;
   font-family: var(--ch-font-ui);
   color: var(--ch-text);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   margin: 1rem 0;
   position: relative;
@@ -163,7 +163,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-secondary);
 }
 
@@ -171,20 +171,18 @@
   width: 13px;
   height: 13px;
   flex-shrink: 0;
+  color: var(--ch-gray-900);
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ch-badge-color);
-  background: var(--ch-badge-bg);
-  border-radius: 5px;
-  padding: 4px 8px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -202,7 +200,7 @@
 }
 
 .title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--ch-text);
   line-height: 1.4;
@@ -221,7 +219,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--ch-green);
 }
@@ -230,7 +228,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-secondary);
 }
 
@@ -281,7 +279,7 @@
 }
 
 .modalTitle {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--ch-text);
   line-height: 1.3;
@@ -291,7 +289,7 @@
 }
 
 .modalSubtitle {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -346,7 +344,7 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  font-size: 12px;
+  font-size: 13px;
   font-family: var(--ch-font-mono);
   color: var(--ch-text-muted);
   background: transparent;
@@ -380,7 +378,7 @@
 
 .modalTabHint {
   color: var(--ch-text-muted);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
 }
 
@@ -419,7 +417,7 @@
 }
 
 .instructionsBody {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.65;
   color: var(--ch-text-secondary);
 }
@@ -565,7 +563,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-accent);
   cursor: pointer;
   background: none;
@@ -589,7 +587,7 @@
   border: 1px solid var(--ch-blue-200);
   border-radius: 6px;
   padding: 10px 12px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--ch-blue-800);
   line-height: 1.6;
 }
@@ -599,7 +597,7 @@
   border: 1px solid var(--ch-blue-200);
   color: var(--ch-blue-900);
   font-family: var(--ch-font-mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   border-radius: 3px;
   padding: 1px 5px;
 }
@@ -619,7 +617,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
@@ -639,7 +637,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-secondary);
 }
 
@@ -770,18 +768,18 @@
   gap: 8px;
   width: 100%;
   padding: 6px 14px;
-  background: transparent;
+  background: var(--ch-bg);
   border: none;
-  color: var(--ch-text-muted);
+  color: var(--ch-gray-700);
   font-family: var(--ch-font-ui);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
   cursor: pointer;
   text-align: left;
 }
 
 .initToggle:hover {
-  color: var(--ch-text);
+  color: var(--ch-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -798,6 +796,8 @@
 
 .initLabel {
   flex: 1;
+  letter-spacing: 0;
+  color: var(--ch-gray-700);
 }
 
 .initMeta {
@@ -809,7 +809,6 @@
 
 .initEditorWrap {
   position: relative;
-  border-top: 1px solid var(--ch-border-light);
   background: var(--ch-bg);
   /* Animate the height change so collapse/expand isn't a snap. The
      wrapper has `overflow: hidden` while collapsed, so the gradient
@@ -913,7 +912,7 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--ch-font-ui);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--ch-text-muted);
   pointer-events: none;
@@ -921,7 +920,8 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
+  padding-bottom: 3px;
 }
 
 .initFadeLabel svg {
@@ -935,25 +935,24 @@
 /* "Click to collapse" button shown at the bottom of the expanded init panel. */
 .initCollapseBtn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   width: 100%;
   padding: 5px 8px;
-  gap: 2px;
-  background: transparent;
+  gap: 4px;
+  background: var(--ch-bg);
   border: none;
-  border-top: 1px solid var(--ch-border-light);
   font-family: var(--ch-font-ui);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--ch-text-muted);
+  color: var(--ch-gray-700);
   cursor: pointer;
   transition: color 0.12s, background 0.12s;
 }
 
 .initCollapseBtn:hover {
-  color: var(--ch-text);
+  color: var(--ch-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -984,7 +983,7 @@
   border: none;
   border-right: 1px solid var(--ch-border-light);
   font-family: var(--ch-font-mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   cursor: pointer;
   white-space: nowrap;
@@ -1018,9 +1017,7 @@
   display: flex;
   align-items: center;
   padding: 8px 14px;
-  border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
-  background: var(--ch-bg-subtle);
   gap: 0;
   position: relative;
 }
@@ -1112,7 +1109,7 @@
   border: none;
   border-radius: 5px;
   color: var(--ch-white);
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -1149,7 +1146,7 @@
   color: color-mix(in srgb, var(--ch-white) 88%, transparent);
   box-shadow: none;
   font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-  font-size: 10.5px;
+  font-size: 11.5px;
   padding: 2px 5px;
   border-radius: 4px;
   line-height: 1;
@@ -1158,7 +1155,7 @@
 
 .runMenuKbd .kbdSep {
   color: color-mix(in srgb, var(--ch-white) 50%, transparent);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .runBtn {
@@ -1166,7 +1163,7 @@
   color: var(--ch-white);
   border: none;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
@@ -1201,6 +1198,13 @@
   fill: none !important;
 }
 
+.utilSpinner {
+  width: 12px;
+  height: 12px;
+  animation: ch-spin 0.75s linear infinite;
+  fill: none !important;
+}
+
 @keyframes ch-spin {
   to {
     transform: rotate(360deg);
@@ -1211,7 +1215,7 @@
   background: transparent;
   border: none;
   padding: 6px 11px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--ch-accent);
   cursor: pointer;
@@ -1241,7 +1245,7 @@
 }
 
 .btnKbd .kbdSep {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ch-text-muted);
 }
 
@@ -1261,7 +1265,7 @@
   border: 1px solid var(--ch-border);
   border-radius: 4px;
   padding: 2px 5px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-family: var(--ch-font-mono);
   color: var(--ch-text-muted);
   box-shadow: 0 1px 0 var(--ch-border);
@@ -1271,7 +1275,7 @@
 
 .kbdSep {
   color: var(--ch-text-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* Utility-button group on the right side of the toolbar. */
@@ -1290,7 +1294,7 @@
    don't push the Reset / Solution / Copy buttons off-screen. */
 .actionBarStatus {
   font-family: var(--ch-font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ch-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -1318,7 +1322,7 @@
   background: transparent;
   border: none;
   color: var(--ch-text-muted);
-  font-size: 12.5px;
+  font-size: 13.5px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1402,7 +1406,7 @@
 }
 
 .outputLabel {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1411,7 +1415,7 @@
 
 .outputTime {
   margin-left: auto;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
@@ -1419,7 +1423,7 @@
 .outputBody {
   padding: 10px 14px 14px 27px;
   font-family: var(--ch-font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   line-height: 1.8;
   color: var(--ch-text);
   white-space: pre-wrap;
@@ -1453,7 +1457,7 @@
 .outputEmpty {
   padding: 4px 14px 14px 27px;
   color: var(--ch-text-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-style: italic;
 }
 
@@ -1477,7 +1481,7 @@
 .outCellHtml :global(table) {
   border-collapse: collapse;
   font-family: var(--ch-font-mono);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .outCellHtml :global(th) {
@@ -1485,7 +1489,7 @@
   border: 1px solid var(--ch-slate-200);
   padding: 5px 12px;
   text-align: right;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text-muted);
   font-weight: 600;
   white-space: nowrap;
@@ -1647,7 +1651,7 @@
 }
 
 .testLabel {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1662,7 +1666,7 @@
 }
 
 .testPill {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   border-radius: 4px;
   padding: 2px 8px;
@@ -1748,21 +1752,21 @@
 
 .testItemName {
   font-family: var(--ch-font-mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text);
   font-weight: 500;
   line-height: 1.4;
 }
 
 .testItemDesc {
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text-muted);
   margin-top: 2px;
 }
 
 .testItemDetail {
   margin-top: 4px;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-family: var(--ch-font-mono);
   color: var(--ch-red);
   background: var(--ch-red-bg);
@@ -1780,7 +1784,7 @@
   gap: 12px;
   padding: 12px 20px;
   border-top: 1px solid var(--ch-border-light);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -1815,7 +1819,7 @@
 }
 
 .bannerSub {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   opacity: 0.8;
   margin-left: 2px;
@@ -1841,7 +1845,7 @@
 }
 
 .sqlResultLabel {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1850,7 +1854,7 @@
 
 .sqlResultCount {
   margin-left: auto;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
@@ -1866,7 +1870,7 @@
 .sqlResultTable {
   border-collapse: collapse;
   font-family: var(--ch-font-mono);
-  font-size: 12px;
+  font-size: 13px;
   width: 100%;
 }
 
@@ -1876,7 +1880,7 @@
   border-right: 1px solid var(--ch-border-light);
   padding: 6px 12px;
   text-align: left;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ch-text-muted);
   font-weight: 600;
   white-space: nowrap;
@@ -1917,7 +1921,7 @@
 
 .sqlEmptyResult {
   padding: 14px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   font-style: italic;
   text-align: center;
@@ -1925,7 +1929,7 @@
 
 .sqlMessage {
   padding: 10px 14px 14px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
@@ -1997,6 +2001,10 @@
   background-color: var(--ch-bg) !important;
 }
 
+:global(html.dark) .headerRuntimeLabel svg {
+  color: #ffffff;
+}
+
 :global(html.dark) .instructionsBody code {
   background: #252525;
   color: var(--ch-text);
@@ -2014,7 +2022,25 @@
   color: var(--ch-blue-100);
 }
 
+:global(html.dark) .initToggle {
+  color: var(--ch-gray-300);
+}
+
 :global(html.dark) .initToggle:hover {
+  color: #ffffff;
+  background: var(--ch-bg-hover);
+}
+
+:global(html.dark) .initLabel {
+  color: var(--ch-gray-300);
+}
+
+:global(html.dark) .initCollapseBtn {
+  color: var(--ch-gray-300);
+}
+
+:global(html.dark) .initCollapseBtn:hover {
+  color: #ffffff;
   background: var(--ch-bg-hover);
 }
 
@@ -2034,6 +2060,16 @@
   box-shadow: 0 1px 0 #0d0d0d;
 }
 
+/* Keep the dropdown menu's kbd chips as semi-transparent white on blue
+   even in dark mode — the general .kbd dark rule would otherwise make them
+   gray (#252525) which clashes with the blue popup background. */
+:global(html.dark) .runMenuKbd .kbd {
+  background: color-mix(in srgb, #ffffff 16%, transparent);
+  border-color: color-mix(in srgb, #ffffff 28%, transparent);
+  color: color-mix(in srgb, #ffffff 88%, transparent);
+  box-shadow: none;
+}
+
 :global(html.dark) .testItem {
   background: #0d0d0d;
   border-color: #2a2a2a;
@@ -2043,9 +2079,27 @@
   background: #222222;
 }
 
+:global(html.dark) .testPill[data-state="pass"] {
+  background: color-mix(in srgb, var(--ch-green-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+}
+
+:global(html.dark) .testPill[data-state="fail"] {
+  background: color-mix(in srgb, var(--ch-red-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
+}
+
 :global(html.dark) .testPill[data-state="pending"] {
   background: #252525;
   border-color: #333333;
+}
+
+:global(html.dark) .banner[data-state="pass"] {
+  border-top-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+}
+
+:global(html.dark) .banner[data-state="fail"] {
+  border-top-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
 }
 
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {
@@ -2101,7 +2155,7 @@
 }
 
 .tableViewerLabel {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2111,7 +2165,7 @@
 .tableViewerCount {
   margin-left: auto;
   font-family: var(--ch-font-mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--ch-text-muted);
 }
 
@@ -2125,7 +2179,7 @@
 
 .tableViewerTab {
   font-family: var(--ch-font-mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   padding: 3px 9px;
   border-radius: 4px;
   border: 1px solid var(--ch-border-light);
@@ -2165,7 +2219,7 @@
   background: var(--ch-bg);
   border: 1px solid var(--ch-border-light);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
 }
@@ -2185,7 +2239,7 @@
 .tableViewerFootnote {
   padding: 4px 10px;
   font-family: var(--ch-font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ch-text-muted);
   border-top: 1px solid var(--ch-border-light);
   background: var(--ch-bg-subtle);
@@ -2214,7 +2268,7 @@
   padding: 6px 8px 6px 12px;
   background: #1e1e1e;
   color: #e8e8e8;
-  font-size: 12px;
+  font-size: 13px;
   font-family: var(--ch-font-ui);
   border-radius: 6px;
   box-shadow:

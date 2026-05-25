@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, Play } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -95,7 +95,7 @@ type TestState = "pending" | "pass" | "fail";
 interface DisplayedTest {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   state: TestState;
   detail: string | null;
 }
@@ -256,13 +256,11 @@ function RunOverlay({ active }: { active: boolean }) {
 
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
-  const color = LANGUAGE_ICON_COLORS[adapter.id];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
   if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
   return (
     <Icon
       style={{
-        color,
         width: `${Math.round(14 * factor)}px`,
         height: `${Math.round(14 * factor)}px`,
       }}
@@ -431,6 +429,7 @@ export default function ChallengeCard({
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
+  const [isFormatting, setIsFormatting] = useState(false);
   const toasts = useChallengeToasts();
 
   // ─── Multi-file workspace state ─────────────────────────────────────
@@ -1230,24 +1229,34 @@ export default function ChallengeCard({
     }
   }, [toasts]);
 
+  const MIN_FORMAT_MS = 300;
+
   const formatCode = useCallback(async () => {
     if (!adapter.formatCode) return;
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
     if (!code.trim()) return;
+    setIsFormatting(true);
+    const startedAt = performance.now();
     try {
       const formatted = await adapter.formatCode(code);
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
         toasts.show("Already formatted — nothing to change.");
-        return;
+      } else {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        });
+        toasts.show("Code formatted.");
       }
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: formatted },
-      });
-      toasts.show("Code formatted.");
     } catch {
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       toasts.show("Couldn't format — code may have a syntax error.", "warn");
+    } finally {
+      setIsFormatting(false);
     }
   }, [adapter, toasts]);
 
@@ -1291,7 +1300,7 @@ export default function ChallengeCard({
       <div className={styles.header}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
-            <span className={styles.badgeDot} /> {badge}
+            <Terminal size={9} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
             <span className={styles.headerRuntimeLabel}>
@@ -1400,8 +1409,8 @@ export default function ChallengeCard({
                 aria-label="Collapse initialization code"
                 onClick={() => setInitExpanded(false)}
               >
-                Click to collapse
                 <ChevronUp size={13} strokeWidth={2} aria-hidden />
+                Click to collapse
               </button>
             )}
           </div>
@@ -1655,11 +1664,17 @@ export default function ChallengeCard({
                 type="button"
                 className={styles.utilBtn}
                 onClick={() => void formatCode()}
-                disabled={isBusy}
+                disabled={isBusy || isFormatting}
                 title="Format code"
                 aria-label="Format code"
               >
-                <FormatIcon />
+                {isFormatting ? (
+                  <svg viewBox="0 0 12 12" className={styles.utilSpinner} aria-hidden>
+                    <circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
+                  </svg>
+                ) : (
+                  <FormatIcon />
+                )}
                 <span className={styles.utilBtnLabel}>Format</span>
               </button>
             </>
@@ -1765,7 +1780,7 @@ export default function ChallengeCard({
                   </div>
                   <div className={styles.testItemBody}>
                     <div className={styles.testItemName}>{t.name}</div>
-                    <div className={styles.testItemDesc}>{t.description}</div>
+                    {t.description && <div className={styles.testItemDesc}>{t.description}</div>}
                     {t.state === "fail" && t.detail && (
                       <div className={styles.testItemDetail}>{t.detail}</div>
                     )}
@@ -1876,7 +1891,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <span className={styles.badgeDot} /> Solution
+            <Terminal size={9} aria-hidden /> Solution
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
