@@ -1,0 +1,481 @@
+---
+title: Memory Bugs
+description: A field guide to leaks, use-after-free, double-free, buffer overflows, off-by-one, and uninitialized reads — and how to avoid them
+---
+
+C gives you control of every byte, and with it the freedom to break
+things in spectacular ways. This page is a tour of the bug classes
+that every C programmer eventually meets, with runnable examples that
+*reproduce the bug* in the sandbox where possible.
+
+```mermaid
+flowchart TB
+    A[Common memory bugs] --> B[Use after free]
+    A --> C[Double free]
+    A --> D[Memory leak]
+    A --> E[Buffer overflow]
+    A --> F[Off-by-one]
+    A --> G[Uninitialized read]
+    A --> H[Dangling stack pointer]
+    A --> I[Type confusion / strict aliasing]
+```
+
+These are not "exotic" bugs — they are the source of an enormous
+share of real-world security vulnerabilities (CVEs). Recognizing the
+patterns is half the battle.
+
+## 1. Use-after-free
+
+After `free(p)` the memory is returned to the allocator and may be
+handed out by the next `malloc`. Reading or writing through `p` is
+undefined behavior — sometimes it "works", sometimes it returns
+someone else's bytes, sometimes it crashes.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(void) {
+    char *s = malloc(16);
+    if (!s) return 1;
+    strcpy(s, "hello");
+
+    free(s);
+
+    // ↓ Undefined behavior: s no longer points to memory we own.
+    printf("%s\\n", s);
+
+    // Probably "fresh" allocation may reuse s's old block.
+    char *t = malloc(16);
+    strcpy(t, "WORLD");
+
+    // Reading through s again might now print "WORLD" or anything.
+    printf("after second malloc: %s\\n", s);
+
+    free(t);
+    return 0;
+}
+`}
+/>
+
+**Cure:** the moment you `free(p)`, stop using `p`. Many codebases
+adopt `free(p); p = NULL;` so any later use becomes an immediate
+NULL-deref instead of silent corruption.
+
+```c
+free(s);
+s = NULL;       // turns silent UAF into loud NULL-deref
+```
+
+## 2. Double-free
+
+Calling `free` twice on the same pointer corrupts the allocator's
+internal bookkeeping. On modern systems it often aborts the program
+immediately ("double free or corruption"); on older or simpler
+allocators it can silently corrupt the heap.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int *p = malloc(sizeof *p);
+    if (!p) return 1;
+    *p = 7;
+
+    free(p);
+    printf("freed once\\n");
+
+    // ↓ Undefined behavior. Some allocators detect and abort here.
+    free(p);
+    printf("freed twice — if you see this, the allocator silently accepted it\\n");
+    return 0;
+}
+`}
+/>
+
+**Cure:** same as above — `free(p); p = NULL;`. `free(NULL)` is
+guaranteed by the standard to be a no-op, so the second call becomes
+harmless.
+
+## 3. Memory leak
+
+A leak is the *opposite* of double-free: every `malloc` *should* be
+matched by exactly one `free`, but isn't. The block lives on,
+unreachable, until the process exits.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+
+void leaky(int times) {
+    for (int i = 0; i < times; i++) {
+        int *p = malloc(1024 * sizeof *p);   // 4 KB each
+        if (!p) return;
+        p[0] = i;
+        // ...use p briefly...
+        // (we forgot to free(p))
+    }
+}
+
+int main(void) {
+    leaky(1000);
+    printf("leaked ~4 MB; in a server this would grow forever\\n");
+    return 0;
+}
+`}
+/>
+
+**Cure:** treat every successful allocation as a *promise to free
+later*. Tools like Valgrind and AddressSanitizer can report exactly
+which `malloc` site was never matched by a `free`. Modern C++ uses
+RAII (smart pointers) to make this automatic; C requires discipline
+and clear ownership documentation.
+
+## 4. Buffer overflow
+
+Writing past the end of an allocation (stack or heap) is the canonical
+C bug. Depending on the layout it may corrupt neighboring variables,
+allocator metadata, or — historically, before stack protections — the
+function's return address, leading to remote code execution.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char name[8];
+    int  age = 30;
+
+    printf("Before: age = %d\\n", age);
+
+    // strcpy writes 13 bytes ("Christopher" + '\\0') into an 8-byte buffer.
+    strcpy(name, "Christopher");
+
+    printf("name = %s\\n", name);
+    printf("After:  age = %d   (may be corrupted!)\\n", age);
+    return 0;
+}
+`}
+/>
+
+Depending on the layout the compiler chose, `age` may now contain
+the bytes of "ph\\0" or something else entirely. On a real machine,
+this same pattern with a return address instead of `age` is how
+stack-smashing exploits work.
+
+**Cure:** prefer length-aware APIs.
+
+```c
+char name[8];
+snprintf(name, sizeof name, "%s", input);    // always fits, always terminates
+```
+
+## 5. Off-by-one
+
+A subtle cousin of buffer overflow: you compute the right length but
+forget to account for the null terminator (or you iterate `<=` when
+you meant `<`).
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    const char *src = "abcde";   // 5 visible chars + '\\0'
+    char dst[5];                  // forgot one byte for '\\0'
+
+    // Copies 5 chars but leaves dst un-terminated.
+    memcpy(dst, src, 5);
+
+    // printf walks until it finds '\\0' — wherever that happens to be.
+    printf("dst = %s   (probably garbage at the end)\\n", dst);
+    return 0;
+}
+`}
+/>
+
+**Cure:** when sizing a string buffer, always remember the `+ 1` for
+the terminator. Or use length-aware functions like `snprintf`.
+
+## 6. Uninitialized read
+
+`malloc` does *not* zero memory. Stack variables are *not*
+zero-initialized either (unlike Python/Java). Reading them before
+writing returns whatever bytes happen to be there — often the
+previous user's data.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int local;             // uninitialized stack int
+    int *heap = malloc(sizeof *heap);   // uninitialized heap int
+
+    // Reading either is undefined behavior.
+    printf("local = %d\\n", local);
+    printf("*heap = %d\\n", *heap);
+
+    free(heap);
+    return 0;
+}
+`}
+/>
+
+**Cure:**
+
+- Initialize every variable at declaration: `int local = 0;`.
+- Use `calloc` instead of `malloc` when you want zeros.
+- Compile with `-Wall -Wextra` — modern compilers warn about many
+  uninitialized reads.
+
+## 7. Dangling stack pointer
+
+A pointer to a local variable becomes dangling the moment the
+function returns. We saw this in the stack chapter; it deserves
+another mention here because the failure mode is so quiet.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int *make(void) {
+    int x = 42;
+    return &x;          // x dies here
+}
+
+void noise(void) {
+    int filler[64];
+    for (int i = 0; i < 64; i++) filler[i] = -1;   // overwrite the stack region
+    (void)filler;
+}
+
+int main(void) {
+    int *p = make();
+    noise();             // overwrite the area where x used to live
+    printf("*p = %d  (probably -1 now, definitely UB)\\n", *p);
+    return 0;
+}
+`}
+/>
+
+The pattern "returned a pointer to a local, then called another
+function" is the most common way a dangling stack pointer corrupts
+data without crashing.
+
+**Cure:** return values (which are copied), have the caller pass a
+buffer, or `malloc` and let the caller `free`.
+
+## 8. Type confusion via casts
+
+C is happy to let you cast almost any pointer to any other pointer
+type. The compiler trusts you to know what you are doing.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    long x = 0x4142434445464748L;     // 'ABCDEFGH' as bytes on a little-endian box
+    char *p = (char *)&x;              // re-interpret as bytes
+
+    for (int i = 0; i < 8; i++) {
+        printf("byte %d = '%c' (0x%02X)\\n", i, p[i], (unsigned char)p[i]);
+    }
+    return 0;
+}
+`}
+/>
+
+Reading bytes through a `char *` is *legal* (the standard
+specifically allows it). Reading an `int` through a `float *` —
+without going via a `union` or `memcpy` — is generally a strict
+aliasing violation, another form of undefined behavior.
+
+**Cure:** when you really need to reinterpret bytes, use `memcpy` or
+a `union`. Do not cast unrelated pointer types and dereference them.
+
+## Defenses in depth
+
+C cannot give you safety, but you can build habits and tooling around
+the language:
+
+| Defense | What it catches |
+| --- | --- |
+| `-Wall -Wextra -Wpedantic` | Many UB-prone patterns at compile time |
+| `-fsanitize=address` (ASan) | UAF, double-free, OOB read/write at run time |
+| `-fsanitize=undefined` (UBSan) | Signed overflow, alignment violations |
+| `-fsanitize=memory` (MSan) | Uninitialized reads (clang only) |
+| Valgrind | UAF, leaks, uninit, double-free (no recompile needed) |
+| Static analyzers (clang-tidy, cppcheck, Coverity) | Patterns the compiler misses |
+| Always initialize at declaration | Eliminates a whole class of UB |
+| Pair every `malloc` with a matching `free`, document the owner | Eliminates leaks and double-frees |
+| `free(p); p = NULL;` | Turns UAF/double-free into NULL deref |
+| Prefer `snprintf` / `fgets` over `strcpy` / `gets` | Eliminates trivial overflows |
+
+`gets` is so dangerous it was *removed* from C11. Never use it.
+
+## Practice: write a leak-free echo
+
+<ChallengeCard
+  adapter="c"
+  title="Allocate, use, and free correctly"
+  instructions={`Implement \`char *make_greeting(const char *name)\` so that it returns a heap-allocated string of the form \`Hello, NAME!\` (without the literal word "NAME" — substitute the parameter). The provided \`main\` calls it, prints the result, and frees it. Make sure not to leak and not to overflow.`}
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *make_greeting(const char *name) {
+    // your code here
+    return NULL;
+}
+
+int main(void) {
+    char *g = make_greeting("Ada");
+    if (!g) return 1;
+    printf("%s\\n", g);
+    free(g);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *make_greeting(const char *name) {
+    if (!name) return NULL;
+    size_t need = strlen("Hello, ") + strlen(name) + strlen("!") + 1;
+    char *out = malloc(need);
+    if (!out) return NULL;
+    snprintf(out, need, "Hello, %s!", name);
+    return out;
+}
+
+int main(void) {
+    char *g = make_greeting("Ada");
+    if (!g) return 1;
+    printf("%s\\n", g);
+    free(g);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "greeted",
+      name: "Prints 'Hello, Ada!'",
+      expect: { stdoutEquals: "Hello, Ada!" },
+    },
+  ]}
+/>
+
+## Practice: safe append with realloc
+
+<ChallengeCard
+  adapter="c"
+  title="Build a string by repeated append"
+  instructions={`Implement \`char *repeat(const char *s, int times)\` that returns a fresh heap string containing \`s\` repeated \`times\` times. Use a single \`malloc\` (no \`realloc\` needed). Do not leak; do not overflow. \`repeat("ab", 3)\` must produce \`ababab\`. The provided \`main\` prints and frees the result.`}
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *repeat(const char *s, int times) {
+    // your code here
+    return NULL;
+}
+
+int main(void) {
+    char *r = repeat("ab", 3);
+    if (!r) return 1;
+    printf("%s\\n", r);
+    free(r);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *repeat(const char *s, int times) {
+    if (!s || times < 0) return NULL;
+    size_t one = strlen(s);
+    size_t total = one * (size_t)times;
+    char *out = malloc(total + 1);
+    if (!out) return NULL;
+    for (int i = 0; i < times; i++) {
+        memcpy(out + (size_t)i * one, s, one);
+    }
+    out[total] = '\\0';
+    return out;
+}
+
+int main(void) {
+    char *r = repeat("ab", 3);
+    if (!r) return 1;
+    printf("%s\\n", r);
+    free(r);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "ababab",
+      name: "Produces 'ababab'",
+      expect: { stdoutEquals: "ababab" },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Which defensive pattern turns a use-after-free or double-free into a much louder, easier-to-debug NULL-pointer dereference?
+
+- Always cast the pointer to \`void *\` before freeing.
+  > Casts do not change the runtime behavior of free.
+- Wrap every \`free\` in a \`try / catch\`.
+  > C has no \`try / catch\`.
+- [o] After \`free(p);\`, immediately set \`p = NULL;\`. Future \`free(NULL)\` is a no-op and \`*p\` immediately crashes instead of silently corrupting memory.
+  > Correct. This is one of the most common C defensive idioms.
+- Call \`free\` twice in a row to be certain.
+  > That is the bug, not the defense.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`strcpy(buf, user_input)\` considered unsafe?
+
+- \`strcpy\` is not part of the C standard.
+  > It is part of \`<string.h>\` in every C standard.
+- It always allocates extra memory you forget to free.
+  > It does not allocate at all.
+- [o] It has no way to know how big \`buf\` is and will keep copying until it finds a \`'\\0'\` in \`user_input\`, overflowing the buffer if the input is too long.
+  > Correct. Use \`snprintf\` or another length-aware API.
+- It corrupts the file descriptor table.
+  > It does not touch file descriptors.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is reading an uninitialized stack \`int\` undefined behavior even when "it just contains some number"?
+
+- The CPU refuses to execute the read.
+  > The CPU executes it without complaint; the *language* says the result is undefined.
+- [o] The C standard explicitly declares the read undefined behavior; the compiler is allowed to assume it never happens and may optimize accordingly, producing surprising results.
+  > Correct. UB is about what the language guarantees, not just about runtime values.
+- It always reads the value zero.
+  > It does not — stack memory contains whatever the previous use left there.
+- The OS will trap and terminate the program.
+  > The OS rarely traps this; the bug is silent until something goes wrong.`}
+/>
+
+<Callout type="success" title="You can now read C with open eyes">
+You know the bug classes. Tools like AddressSanitizer and Valgrind
+will be your best friends in real codebases. The final page maps out
+where to go next.
+</Callout>
