@@ -1,0 +1,299 @@
+---
+title: C++ Essentials for DSA
+description: A fast refresher on the C++ features used throughout data structures and algorithms
+---
+
+You do not need all of C++ to start solving DSA problems. You need a reliable slice: types, references, `const`, vectors, functions, templates, lambdas, and a handful of headers.
+
+## The compilation model
+
+C++ source files are compiled into object files, then linked with libraries to produce an executable.
+
+```mermaid
+flowchart LR
+    A["source .cpp"] --> B["compile"]
+    B --> C["object .o"]
+    C --> D["link"]
+    D --> E["executable"]
+```
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+
+int main() {
+    std::cout << "C++ code starts in main()\\n";
+    return 0;
+}
+`}
+/>
+
+## Variables, types, and `auto`
+
+For DSA, use `int` for ordinary counts, `long long` for large integer answers, `size_t` for container sizes, `bool` for flags, `char` for characters, and `double` for floating-point values. `auto steps = path.size();` asks the compiler to deduce the type from the initializer.
+
+<Callout type="warn" title="Signed and unsigned indices">
+`size_t` is unsigned. Be careful when counting backward or comparing it with `int`; many bugs come from values wrapping below zero.
+</Callout>
+
+## References vs pointers
+
+A **reference** is another name for an existing object. A **pointer** stores an address and can be reassigned or be null. Prefer references when a parameter must refer to a valid object; use pointers when null is meaningful.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+
+void add_one_by_reference(int& x) {
+    x += 1;
+}
+
+void add_one_by_pointer(int* p) {
+    if (p != nullptr) {
+        *p += 1;
+    }
+}
+
+int main() {
+    int a = 10;
+    int b = 20;
+    add_one_by_reference(a);
+    add_one_by_pointer(&b);
+    std::cout << "a: " << a << "\\n";
+    std::cout << "b: " << b << "\\n";
+    return 0;
+}
+`}
+/>
+
+## `const` and `const&` parameter passing
+
+Use `const` when a value should not change. Pass large objects as `const&` to avoid copying while promising not to modify them.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <string>
+#include <vector>
+
+int total_length(const std::vector<std::string>& words) {
+    int total = 0;
+    for (const std::string& word : words) {
+        total += static_cast<int>(word.size());
+    }
+    return total;
+}
+
+int main() {
+    const std::vector<std::string> words = {"red", "black", "tree"};
+    std::cout << total_length(words) << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Headers used throughout this course
+
+| Header | Gives you |
+| --- | --- |
+| `<iostream>` | `std::cin`, `std::cout` |
+| `<vector>` | `std::vector` |
+| `<string>` | `std::string` |
+| `<algorithm>` | `sort`, `min`, `max`, `reverse`, `binary_search` |
+| `<unordered_map>` | Hash maps |
+| `<queue>` | `queue`, `priority_queue` |
+| `<stack>` | `stack` |
+| `<numeric>` | `accumulate`, `iota`, `gcd` |
+
+## A quick tour of `std::vector`
+
+`std::vector` is the default sequence container for DSA: fast indexing, compact storage, and amortized O(1) appends. Iterators mark ranges; STL algorithms often use `[begin, end)`.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <algorithm>
+#include <iostream>
+#include <numeric>
+#include <vector>
+
+int main() {
+    std::vector<int> nums;
+    nums.push_back(3);
+    nums.push_back(1);
+    nums.push_back(4);
+    std::sort(nums.begin(), nums.end());
+
+    std::cout << "size: " << nums.size() << "\\n";
+    std::cout << "values:";
+    for (auto it = nums.begin(); it != nums.end(); ++it) {
+        std::cout << " " << *it;
+    }
+    std::cout << "\\nsum: " << std::accumulate(nums.begin(), nums.end(), 0) << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Function templates
+
+Templates let one function work for many types while still being checked and optimized at compile time.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+template <typename T>
+T twice(T x) { return x + x; }
+int main() {
+    std::cout << twice(21) << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Lambda expressions
+
+A lambda is an inline function object. Lambdas are used heavily with algorithms such as `std::sort`.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> xs = {3, 10, 4};
+    std::sort(xs.begin(), xs.end(), [](int a, int b) { return a > b; });
+    for (int x : xs) std::cout << x << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Practice: functions and templates
+
+<ChallengeCard
+  adapter="cpp"
+  title="Sum a vector"
+  instructions={`Implement \`int sum(const std::vector<int>& v)\` so it returns the total of all values in the vector. Do not print inside the function; the provided \`main\` will print the result.`}
+  initialCode={`#include <iostream>
+#include <vector>
+
+int sum(const std::vector<int>& v) {
+    // your code here
+}
+
+int main() {
+    std::vector<int> values = {4, 8, 15, 16, 23, 42};
+    std::cout << sum(values) << "\\n";
+    return 0;
+}
+`}
+  solutionCode={`#include <iostream>
+#include <vector>
+
+int sum(const std::vector<int>& v) {
+    int total = 0;
+    for (int x : v) {
+        total += x;
+    }
+    return total;
+}
+
+int main() {
+    std::vector<int> values = {4, 8, 15, 16, 23, 42};
+    std::cout << sum(values) << "\\n";
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "sum_values",
+      name: "Returns the vector sum",
+      expect: { stdoutEquals: "108" },
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="cpp"
+  title="Generic max of three"
+  instructions={`Implement a templated function \`max3<T>\` that returns the largest of three values. The same function should work for both \`int\` and \`double\`.`}
+  initialCode={`#include <iostream>
+
+template <typename T>
+T max3(T a, T b, T c) {
+    // your code here
+}
+
+int main() {
+    std::cout << max3<int>(7, 2, 9) << "\\n";
+    std::cout << max3<double>(2.5, 8.25, 4.0) << "\\n";
+    return 0;
+}
+`}
+  solutionCode={`#include <iostream>
+
+template <typename T>
+T max3(T a, T b, T c) {
+    T best = a;
+    if (best < b) best = b;
+    if (best < c) best = c;
+    return best;
+}
+
+int main() {
+    std::cout << max3<int>(7, 2, 9) << "\\n";
+    std::cout << max3<double>(2.5, 8.25, 4.0) << "\\n";
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "max3_outputs",
+      name: "Works for int and double",
+      expect: { stdoutLines: ["9", "8.25"], stdoutLinesExact: true },
+    },
+  ]}
+/>
+
+## Test your knowledge
+
+<MultipleChoice
+  markdown={`When should you prefer a reference parameter like \`int& x\` over a pointer parameter like \`int* x\`?
+
+- When the argument may be missing and represented as null
+  > That is a reason to use a pointer or another optional type.
+- [o] When the function requires a valid object and may modify it
+  > Correct. A non-const reference clearly means a valid object is required and can be changed.
+- When you need to allocate memory manually
+  > References do not allocate memory.
+- When you want to store an address in a container
+  > Pointers, iterators, or smart pointers are better suited for storing address-like values.`}
+/>
+
+<MultipleChoice
+  markdown={`Why pass \`const std::vector<int>& v\` instead of \`std::vector<int> v\` for a read-only helper function?
+
+- It makes the vector sorted automatically
+  > Passing by const reference does not change the data.
+- It allows the function to delete elements faster
+  > \`const\` prevents modification.
+- [o] It avoids copying the whole vector while preventing modification
+  > Correct. This is the standard pattern for read-only access to large objects.
+- It converts the vector into an array
+  > No conversion happens.`}
+/>
+
+<MultipleChoice
+  markdown={`Which header provides \`std::sort\`?
+
+- \`<iostream>\`
+  > This provides standard input and output streams.
+- \`<vector>\`
+  > This provides \`std::vector\`, not sorting algorithms.
+- [o] \`<algorithm>\`
+  > Correct. Many general-purpose STL algorithms live in \`<algorithm>\`.
+- \`<queue>\`
+  > This provides queue adapters such as \`std::queue\` and \`std::priority_queue\`.`}
+/>
+<Callout type="success" title="Ready for analysis">With this C++ toolkit in place, you can focus on the most important DSA question: how does an algorithm scale as the input grows?</Callout>

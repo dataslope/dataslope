@@ -1,0 +1,299 @@
+---
+title: Why C++ for DSA?
+description: Why C++ is a powerful language for data structures, algorithms, interviews, and performance-critical systems
+---
+
+C++ is not the easiest first language, but it is one of the best languages for learning **data structures and algorithms** deeply. It gives you fast primitives, predictable execution, mature standard containers, and enough access to memory layout that the cost of each design choice becomes visible.
+
+In this course, C++ is both a practical tool and a microscope: you will solve problems efficiently while seeing how arrays, linked structures, heaps, hash tables, trees, and graphs really behave.
+
+## Speed and predictability
+
+C++ is compiled ahead of time to machine code. There is no interpreter in the hot path and no garbage collector pausing the program at surprising moments. That predictability matters in places where latency and throughput are not optional:
+
+| Area | Why C++ fits |
+| --- | --- |
+| Competitive programming | Tight time limits reward fast I/O, low overhead, and strong libraries. |
+| Game engines | Frame time budgets are strict, often about 16 ms for 60 FPS. |
+| High-frequency trading | Microseconds matter, and pauses are unacceptable. |
+| Embedded systems | Memory and CPU budgets are small, sometimes with no operating system. |
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <vector>
+#include <numeric>
+
+int main() {
+    std::vector<int> values(1000, 1);
+    int total = std::accumulate(values.begin(), values.end(), 0);
+
+    std::cout << "sum: " << total << "\\n";
+    return 0;
+}
+`}
+/>
+
+<Callout type="info" title="Fast does not mean careless">
+C++ lets you write very fast code, but speed comes from clear choices: good data structures, cache-friendly layout, avoiding unnecessary copies, and measuring when performance matters.
+</Callout>
+
+## The STL is your algorithm toolbox
+
+The **Standard Template Library (STL)** gives you production-quality containers and algorithms that are available in every standard C++ environment. Instead of hand-writing a heap or hash table for every problem, you can focus on choosing the right abstraction.
+
+| STL type | Typical use | Key operations |
+| --- | --- | --- |
+| `std::vector` | Dynamic array | index O(1), push back O(1) amortized |
+| `std::list` | Doubly linked list | insert/erase with iterator O(1), search O(n) |
+| `std::deque` | Double-ended queue | push/pop front/back O(1) amortized |
+| `std::map` | Ordered key-value tree | find/insert/erase O(log n) |
+| `std::unordered_map` | Hash table | find/insert/erase O(1) average |
+| `std::set` | Ordered unique values | find/insert/erase O(log n) |
+| `std::priority_queue` | Heap-backed max queue | top O(1), push/pop O(log n) |
+| `std::stack` | LIFO adapter | push/pop/top O(1) |
+| `std::queue` | FIFO adapter | push/pop/front O(1) |
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <queue>
+#include <vector>
+
+int main() {
+    std::priority_queue<int> urgent;
+    for (int score : std::vector<int>{17, 42, 5, 99, 23}) {
+        urgent.push(score);
+    }
+
+    std::cout << "highest: " << urgent.top() << "\\n";
+    urgent.pop();
+    std::cout << "next: " << urgent.top() << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Closeness to memory makes DSA visible
+
+Many data structure tradeoffs are really memory-layout tradeoffs. A `std::vector<int>` stores integers contiguously, so walking through it usually benefits from CPU cache locality. A `std::list<int>` stores nodes separately, so traversal follows pointers from one allocation to the next.
+
+```mermaid
+flowchart LR
+    V["std::vector<int>"] --> C["contiguous memory"]
+    C --> F["fast iteration and random access"]
+    L["std::list<int>"] --> N["separate heap nodes"]
+    N --> P["cheap splicing, slower traversal"]
+```
+
+That is why a vector can beat a list even when both have O(n) traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> xs = {10, 20, 30, 40};
+
+    std::cout << "values: ";
+    for (int x : xs) {
+        std::cout << x << " ";
+    }
+    std::cout << "\\n";
+
+    std::cout << "first address: " << &xs[0] << "\\n";
+    std::cout << "second address: " << &xs[1] << "\\n";
+    return 0;
+}
+`}
+/>
+
+## Templates: generic without giving up speed
+
+Templates let you write algorithms once and let the compiler generate type-specific code. You can sort `int`, `double`, `std::string`, or your own types without runtime boxing or reflection.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <iostream>
+#include <string>
+
+template <typename T>
+T bigger(T a, T b) {
+    return a < b ? b : a;
+}
+
+int main() {
+    std::cout << bigger(10, 42) << "\\n";
+    std::cout << bigger(std::string("heap"), std::string("graph")) << "\\n";
+    return 0;
+}
+`}
+/>
+
+## A small end-to-end example
+
+Here is a tiny program that builds a vector, sorts it with `std::sort`, prints the result, and times the sort with `<chrono>`.
+
+<CodeBlock
+  adapter="cpp"
+  initialCode={`#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> scores = {41, 12, 99, 12, 73, 5, 88, 30};
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::sort(scores.begin(), scores.end());
+    auto stop = std::chrono::high_resolution_clock::now();
+
+    std::cout << "sorted:";
+    for (int x : scores) {
+        std::cout << " " << x;
+    }
+    std::cout << "\\n";
+
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
+    std::cout << "sort took about " << micros << " microseconds\\n";
+    return 0;
+}
+`}
+/>
+
+## Language landscape
+
+No language is best at everything. C++ is popular for DSA because it sits near the performance end while still providing a rich standard library.
+
+```mermaid
+flowchart TD
+    A["Language choice for DSA"] --> B["C++"]
+    A --> C["Python"]
+    A --> D["Java"]
+    B --> B1["Raw speed: very high"]
+    B --> B2["Ease: medium"]
+    B --> B3["STL quality: excellent"]
+    B --> B4["Interview prevalence: high"]
+    C --> C1["Raw speed: lower"]
+    C --> C2["Ease: very high"]
+    C --> C3["Libraries: excellent"]
+    C --> C4["Interview prevalence: high"]
+    D --> D1["Raw speed: high"]
+    D --> D2["Ease: medium-high"]
+    D --> D3["Collections: strong"]
+    D --> D4["Interview prevalence: high"]
+```
+
+## Practice: use the STL
+
+<ChallengeCard
+  adapter="cpp"
+  title="Sort exam scores"
+  instructions={`Given the vector of scores, sort it in ascending order and print all scores on one line separated by spaces.
+
+Expected output:
+
+\`\`\`
+55 61 72 88 90
+\`\`\``}
+  initialCode={`#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> scores = {88, 55, 90, 61, 72};
+    // your code here
+    return 0;
+}
+`}
+  solutionCode={`#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> scores = {88, 55, 90, 61, 72};
+    std::sort(scores.begin(), scores.end());
+    for (std::size_t i = 0; i < scores.size(); ++i) {
+        if (i) std::cout << " ";
+        std::cout << scores[i];
+    }
+    std::cout << "\\n";
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "sorted_scores",
+      name: "Prints sorted scores",
+      expect: { stdoutEquals: "55 61 72 88 90" },
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="cpp"
+  title="Find the most urgent task"
+  instructions={`Use a \`std::priority_queue<int>\` to print the largest task priority from the vector. Print exactly \`top priority: 9\`.`}
+  initialCode={`#include <iostream>
+#include <queue>
+#include <vector>
+
+int main() {
+    std::vector<int> priorities = {3, 9, 4, 1, 7};
+    // your code here
+    return 0;
+}
+`}
+  solutionCode={`#include <iostream>
+#include <queue>
+#include <vector>
+
+int main() {
+    std::vector<int> priorities = {3, 9, 4, 1, 7};
+    std::priority_queue<int> pq;
+    for (int p : priorities) {
+        pq.push(p);
+    }
+    std::cout << "top priority: " << pq.top() << "\\n";
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "top_priority",
+      name: "Prints the maximum priority",
+      expect: { stdoutEquals: "top priority: 9" },
+    },
+  ]}
+/>
+
+## Test your knowledge
+
+<MultipleChoice
+  markdown={`Why is C++ often chosen for competitive programming?
+
+- It automatically proves algorithms correct
+  > C++ gives speed and libraries, but correctness is still your job.
+- [o] It combines high performance with strong standard containers and algorithms
+  > Correct. The combination of compiled speed and the STL is extremely useful under time limits.
+- It has no pointers or memory model to learn
+  > C++ exposes pointers, references, and value semantics; that is part of its power and complexity.
+- It is the only language accepted by online judges
+  > Most judges accept several languages, but C++ is commonly one of the fastest choices.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can a \`std::vector<int>\` be faster to iterate than a \`std::list<int>\`, even though both traversals are O(n)?
+
+- [o] Vector stores elements contiguously, which is usually cache-friendly
+  > Correct. Contiguous memory helps the CPU fetch nearby elements efficiently.
+- List traversal is O(log n)
+  > List traversal is O(n), not O(log n).
+- Vector always uses less memory than every other container
+  > Vector is compact, but \"always\" is too strong and not the key reason here.
+- List nodes are sorted automatically
+  > A list does not sort itself automatically.`}
+/>
+
+<Callout type="success" title="Next up">Now that you know why C++ is worth using for DSA, the next page gives you the compact C++ refresher you need for the rest of the course.</Callout>
