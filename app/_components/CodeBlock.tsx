@@ -17,7 +17,7 @@ import {
   LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
-import { PlayIcon } from "./challengeShared";
+import { FormatIcon, PlayIcon } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -55,6 +55,17 @@ import challengeStyles from "./ChallengeCard.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
 
+/** One file in a multi-file `<CodeBlock>` workspace. Mirrors the
+ *  `ChallengeFile` shape from `ChallengeCard` so authors can use the
+ *  same mental model — the layout / styles are identical too. */
+export interface CodeBlockFile {
+  /** Workspace-relative filename, e.g. `"greeter.hpp"`. */
+  filename: string;
+  /** Starter content shown in the editor for this file. Reset restores
+   *  this exact text. */
+  initialContent: string;
+}
+
 interface CodeBlockProps {
   /** Language adapter that describes the runtime to use. The same
    *  adapter instance can be passed to multiple `CodeBlock`s on the
@@ -63,8 +74,19 @@ interface CodeBlockProps {
    *  in one block are never visible to another. */
   adapter: LanguageAdapter;
   /** Initial source the editor is populated with. The Reset button
-   *  restores the editor to this value. */
-  initialCode: string;
+   *  restores the editor to this value. Ignored when `files` is set. */
+  initialCode?: string;
+  /** Multi-file workspace. When set, takes precedence over
+   *  `initialCode`. A non-sortable, non-closeable tab bar appears above
+   *  the editor so the learner can switch between files. Code is run
+   *  against `entryFilename` (or the first file when omitted); every
+   *  other file is staged into the runtime's virtual file system via
+   *  `prepareFileSystem` so multi-file `import`s / `include`s /
+   *  cross-class references resolve. */
+  files?: CodeBlockFile[];
+  /** When `files` is set, the filename whose content is passed to
+   *  `runtime.run()` as the entry. Defaults to the first file. */
+  entryFilename?: string;
   /** Optional human-readable label shown in the header. Defaults to
    *  an auto-generated one like "PyBlock-49b7". */
   label?: string;
@@ -296,6 +318,8 @@ function CodeBlockInner({
   adapter,
   initialCode,
   initCode,
+  files,
+  entryFilename,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -321,20 +345,89 @@ function CodeBlockInner({
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [initExpanded, setInitExpanded] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
 
   const initPanelId = `${blockId}-init`;
   const trimmedInit = initCode?.trimEnd() ?? "";
   const hasInit = trimmedInit.length > 0;
   const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
 
-  // Stable localStorage key for the user's editor buffer. Hashing
+  // ─── Multi-file workspace ───────────────────────────────────────────
+  // Normalise into a list of files: single-file authors pass
+  // `initialCode`; multi-file authors pass `files`. The rest of the
+  // component always works with the array form, matching how
+  // ChallengeCard manages its workspace.
+  const workspaceFiles: CodeBlockFile[] = useMemo(() => {
+    if (files && files.length > 0) return files;
+    const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
+    return [{ filename: defaultName, initialContent: initialCode ?? "" }];
+  }, [files, initialCode, adapter.defaultFileExtension]);
+  const isMultiFile = workspaceFiles.length > 1;
+  const resolvedEntryFilename =
+    (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
+      ? entryFilename
+      : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // Per-file workspace fingerprint so editing the MDX retires saved
+  // attempts against the previous starter. Mirrors the ChallengeCard
+  // approach so multi-file code blocks persist independently per tab.
+  const workspaceFingerprint = useMemo(
+    () =>
+      workspaceFiles
+        .map((f) => `${f.filename}:${f.initialContent}`)
+        .join("|"),
+    [workspaceFiles],
+  );
+  const persistedKeyForFile = useCallback(
+    (filename: string) =>
+      persistKey(
+        "codeblock",
+        `${adapter.id}|${workspaceFingerprint}|${filename}`,
+      ),
+    [adapter.id, workspaceFingerprint],
+  );
+
+  // Stable localStorage key for single-file mode. Hashing
   // `adapter.id + initialCode` means: same block across reloads → same
   // key (state restored); author edits `initialCode` in MDX → new key
   // (old buffer naturally retired, user sees the new starter).
   const persistedKey = useMemo(
-    () => persistKey("codeblock", `${adapter.id}|${initialCode}`),
+    () => persistKey("codeblock", `${adapter.id}|${initialCode ?? ""}`),
     [adapter.id, initialCode],
   );
+
+  const persistActiveFile = useCallback(
+    (filename: string, content: string) => {
+      const key = isMultiFile
+        ? persistedKeyForFile(filename)
+        : persistedKey;
+      savePersistedCode(key, content);
+    },
+    [isMultiFile, persistedKey, persistedKeyForFile],
+  );
+
+  // Active filename + per-file buffer map. The single editor view shows
+  // the active file; swapping tabs rewrites the doc with the saved
+  // buffer for the newly-active file.
+  const [activeFilename, setActiveFilename] = useState<string>(
+    workspaceFiles[0].filename,
+  );
+  const fileBuffersRef = useRef<Map<string, string>>(
+    new Map(
+      workspaceFiles.map((f) => {
+        if (isMultiFile) {
+          const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
+          return [f.filename, persisted ?? f.initialContent];
+        }
+        const persisted = loadPersistedCode(persistedKey);
+        return [f.filename, persisted ?? f.initialContent];
+      }),
+    ),
+  );
+  const activeFilenameRef = useRef(activeFilename);
+  useEffect(() => {
+    activeFilenameRef.current = activeFilename;
+  }, [activeFilename]);
 
   // Use the same SSR-safe pattern as Playground so the keyboard
   // shortcut hint matches what the freshly hydrated page would show.
@@ -362,12 +455,10 @@ function CodeBlockInner({
     // reads as a single contiguous program.
     const lineOffset = hasInit ? initLineCount : 0;
 
-    // Restore the persisted buffer if one exists for this block. Fall
-    // back to the MDX-provided starter when nothing is stored. This
-    // runs inside the mount effect so SSR markup stays canonical and
-    // the swap happens in the same paint as CodeMirror's initial draw.
-    const persisted = loadPersistedCode(persistedKey);
-    const initialDoc = persisted ?? initialCode;
+    // Initial doc = active file's buffer (already includes any restored
+    // persisted content from the workspace bootstrap above).
+    const initialDoc =
+      fileBuffersRef.current.get(activeFilenameRef.current) ?? "";
 
     const view = new EditorView({
       doc: initialDoc,
@@ -406,16 +497,20 @@ function CodeBlockInner({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
         noActiveLine,
-        // Debounce-persist the editor buffer so reloads / navigation
-        // restore the user's in-progress code. The 400ms delay coalesces
-        // bursts of keystrokes into one localStorage write.
+        // Debounce-persist the *active* file's buffer so reloads /
+        // navigation restore in-progress code. We always look up the
+        // active filename through the ref so the listener — registered
+        // once at mount — stays correct after tab switches.
         EditorView.updateListener.of((update) => {
           if (!update.docChanged) return;
+          const current = update.state.doc.toString();
+          const activeName = activeFilenameRef.current;
+          fileBuffersRef.current.set(activeName, current);
           if (persistSaveTimerRef.current !== null)
             window.clearTimeout(persistSaveTimerRef.current);
           persistSaveTimerRef.current = window.setTimeout(() => {
             persistSaveTimerRef.current = null;
-            savePersistedCode(persistedKey, update.state.doc.toString());
+            persistActiveFile(activeName, current);
           }, 400);
         }),
       ],
@@ -438,7 +533,8 @@ function CodeBlockInner({
       if (persistSaveTimerRef.current !== null) {
         window.clearTimeout(persistSaveTimerRef.current);
         persistSaveTimerRef.current = null;
-        savePersistedCode(persistedKey, view.state.doc.toString());
+        const activeName = activeFilenameRef.current;
+        persistActiveFile(activeName, view.state.doc.toString());
       }
       view.destroy();
       editorRef.current = null;
@@ -507,15 +603,61 @@ function CodeBlockInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasInit]);
 
-  // ─── Run / Reset ───────────────────────────────────────────────────────
+  // ─── Multi-file tab switching ───────────────────────────────────────
+  // When the active tab changes, snapshot the outgoing file's buffer
+  // (so unsaved edits aren't lost), persist it, and load the incoming
+  // file's saved buffer into the single editor view. Mirrors
+  // ChallengeCard's previousActiveRef pattern.
+  const previousActiveRef = useRef<string>(activeFilename);
+  useEffect(() => {
+    const view = editorRef.current;
+    if (!view) {
+      previousActiveRef.current = activeFilename;
+      return;
+    }
+    const previousFilename = previousActiveRef.current;
+    if (previousFilename === activeFilename) return;
+    const outgoingContent = view.state.doc.toString();
+    fileBuffersRef.current.set(previousFilename, outgoingContent);
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    persistActiveFile(previousFilename, outgoingContent);
+    const incoming = fileBuffersRef.current.get(activeFilename) ?? "";
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: incoming },
+    });
+    previousActiveRef.current = activeFilename;
+  }, [activeFilename, persistActiveFile]);
+
+  // ─── Run / Reset / Format ──────────────────────────────────────────
+  // Snapshot every file's current content. Reads the active file from
+  // the live editor (so unsaved edits propagate) and the rest from the
+  // in-memory buffers Map.
+  const snapshotAllFiles = useCallback((): Map<string, string> => {
+    const out = new Map<string, string>();
+    const view = editorRef.current;
+    const active = activeFilenameRef.current;
+    for (const f of workspaceFiles) {
+      if (view && f.filename === active) {
+        out.set(f.filename, view.state.doc.toString());
+      } else {
+        out.set(f.filename, fileBuffersRef.current.get(f.filename) ?? "");
+      }
+    }
+    return out;
+  }, [workspaceFiles]);
+
   const run = useCallback(async () => {
-    const userCode = editorRef.current?.state.doc.toString() ?? "";
+    const filesSnapshot = snapshotAllFiles();
+    const entrySource = filesSnapshot.get(resolvedEntryFilename) ?? "";
     // Init code is prepended verbatim — every adapter resets state at the
     // start of run(), so init effectively executes inside the same fresh
     // scope as the user code. Authors are responsible for providing
     // syntactically-compatible init (e.g. top-level `using`/`#include`
     // for compiled languages).
-    const code = hasInit ? `${trimmedInit}\n${userCode}` : userCode;
+    const code = hasInit ? `${trimmedInit}\n${entrySource}` : entrySource;
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
@@ -537,42 +679,74 @@ function CodeBlockInner({
       setStatus("running");
       setStatusMessage("Running…");
 
+      // Multi-file workspaces: stage every file into the runtime VFS so
+      // imports / #includes / cross-class references resolve. The entry
+      // file's bytes mirror what we pass to `run()` below.
+      if (isMultiFile && runtimeRef.current.prepareFileSystem) {
+        const fileMap = new Map<string, Uint8Array>();
+        const encoder = new TextEncoder();
+        for (const [name, content] of filesSnapshot) {
+          fileMap.set(
+            name,
+            encoder.encode(name === resolvedEntryFilename ? code : content),
+          );
+        }
+        try {
+          await runtimeRef.current.prepareFileSystem(fileMap);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          setOutputs((prev) => [
+            ...prev,
+            {
+              id: prev.length + 1,
+              type: "stderr",
+              content: `Failed to stage workspace files: ${message}`,
+              elapsed: "",
+            },
+          ]);
+        }
+      }
+
       let nextOutputId = 0;
       const startedAt = performance.now();
       try {
-        await runtimeRef.current.run(code, (cell) => {
-          if (runSeqRef.current !== mySeq) return;
-          const elapsedMs = performance.now() - startedAt;
-          const elapsed =
-            elapsedMs < 1000
-              ? `${elapsedMs.toFixed(0)}ms`
-              : `${(elapsedMs / 1000).toFixed(2)}s`;
-          setOutputs((prev) => {
-            // Collapse consecutive stdout cells into a single block
-            // (matches the JS/TS/PHP playground behaviour where one
-            // console.log per cell would otherwise produce a noisy
-            // stack of one-line cells).
-            const last = prev[prev.length - 1];
-            if (
-              cell.type === "stdout" &&
-              last &&
-              last.type === "stdout"
-            ) {
-              const merged: OutputCell = {
-                ...last,
-                content: last.content + "\n" + cell.content,
+        await runtimeRef.current.run(
+          code,
+          (cell) => {
+            if (runSeqRef.current !== mySeq) return;
+            const elapsedMs = performance.now() - startedAt;
+            const elapsed =
+              elapsedMs < 1000
+                ? `${elapsedMs.toFixed(0)}ms`
+                : `${(elapsedMs / 1000).toFixed(2)}s`;
+            setOutputs((prev) => {
+              // Collapse consecutive stdout cells into a single block
+              // (matches the JS/TS/PHP playground behaviour where one
+              // console.log per cell would otherwise produce a noisy
+              // stack of one-line cells).
+              const last = prev[prev.length - 1];
+              if (
+                cell.type === "stdout" &&
+                last &&
+                last.type === "stdout"
+              ) {
+                const merged: OutputCell = {
+                  ...last,
+                  content: last.content + "\n" + cell.content,
+                  elapsed,
+                };
+                return [...prev.slice(0, -1), merged];
+              }
+              const fullCell: OutputCell = {
+                id: ++nextOutputId,
                 elapsed,
+                ...cell,
               };
-              return [...prev.slice(0, -1), merged];
-            }
-            const fullCell: OutputCell = {
-              id: ++nextOutputId,
-              elapsed,
-              ...cell,
-            };
-            return [...prev, fullCell];
-          });
-        });
+              return [...prev, fullCell];
+            });
+          },
+          isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+        );
       } finally {
         // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
         // the wave animation doesn't blink in/out on sub-frame runs.
@@ -601,7 +775,14 @@ function CodeBlockInner({
       setStatus("error");
       setStatusMessage(message);
     }
-  }, [adapter, hasInit, trimmedInit]);
+  }, [
+    adapter,
+    hasInit,
+    trimmedInit,
+    isMultiFile,
+    resolvedEntryFilename,
+    snapshotAllFiles,
+  ]);
 
   // Keep the ref pointing at the latest handler so the editor's keymap
   // (registered once at mount) always invokes the current closure.
@@ -611,25 +792,81 @@ function CodeBlockInner({
 
   const reset = useCallback(() => {
     runSeqRef.current++;
+    // Restore every file's buffer to its starter and wipe persisted
+    // copies. Then push the active file's starter into the editor so
+    // the user sees the reset immediately.
+    for (const f of workspaceFiles) {
+      fileBuffersRef.current.set(f.filename, f.initialContent);
+      const key = isMultiFile
+        ? persistedKeyForFile(f.filename)
+        : persistedKey;
+      clearPersistedCode(key);
+    }
     const view = editorRef.current;
     if (view) {
+      const activeStarter =
+        workspaceFiles.find((f) => f.filename === activeFilenameRef.current)
+          ?.initialContent ?? "";
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: initialCode },
+        changes: { from: 0, to: view.state.doc.length, insert: activeStarter },
       });
     }
     // The dispatch above re-fires the persist listener and schedules a
-    // write of `initialCode`. Cancel it AFTER dispatching so the
-    // localStorage entry stays gone instead of being recreated with
-    // the starter contents.
+    // write of the starter contents. Cancel it AFTER dispatching so
+    // the localStorage entries stay gone.
     if (persistSaveTimerRef.current !== null) {
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
     }
-    clearPersistedCode(persistedKey);
     setOutputs([]);
     setStatus("idle");
     setStatusMessage("");
-  }, [initialCode, persistedKey]);
+  }, [
+    workspaceFiles,
+    isMultiFile,
+    persistedKey,
+    persistedKeyForFile,
+  ]);
+
+  const MIN_FORMAT_MS = 300;
+  const formatCode = useCallback(async () => {
+    if (!adapter.formatCode) return;
+    const view = editorRef.current;
+    if (!view) return;
+    const code = view.state.doc.toString();
+    // Skip the spinner / round-trip entirely on empty buffers — same
+    // short-circuit ChallengeCard's Format uses.
+    if (!code.trim()) return;
+    setIsFormatting(true);
+    const startedAt = performance.now();
+    try {
+      const formatted = await adapter.formatCode(code);
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
+      if (formatted === code) {
+        startTransition(() => {
+          toastManager.add({ title: "Already formatted — nothing to change." });
+        });
+      } else {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        });
+        startTransition(() => {
+          toastManager.add({ title: "Code formatted." });
+        });
+      }
+    } catch {
+      const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
+      if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
+      startTransition(() => {
+        toastManager.add({
+          title: "Couldn't format — code may have a syntax error.",
+        });
+      });
+    } finally {
+      setIsFormatting(false);
+    }
+  }, [adapter, toastManager]);
 
   // Copy the current contents of the user-editable editor (not the init
   // block) to the clipboard. Mirrors the Playground's editor copy
@@ -757,6 +994,38 @@ function CodeBlockInner({
         </div>
       )}
 
+      {/* ── File tab bar (multi-file workspaces only) ── */}
+      {isMultiFile && (
+        <div
+          className={challengeStyles.fileTabBar}
+          role="tablist"
+          aria-label="Workspace files"
+        >
+          {workspaceFiles.map((f) => {
+            const isActive = f.filename === activeFilename;
+            return (
+              <button
+                key={f.filename}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`${challengeStyles.fileTab} ${
+                  isActive ? challengeStyles.fileTabActive : ""
+                }`}
+                onClick={() => setActiveFilename(f.filename)}
+                title={
+                  f.filename === resolvedEntryFilename
+                    ? `${f.filename} (entry)`
+                    : f.filename
+                }
+              >
+                {f.filename}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div
         className={challengeStyles.editor}
         ref={editorHostRef}
@@ -831,6 +1100,41 @@ function CodeBlockInner({
             <RotateCcw size={12} strokeWidth={2.4} aria-hidden />
             <span className={challengeStyles.utilBtnLabel}>Reset</span>
           </button>
+          {adapter.formatCode && (
+            <>
+              <div className={challengeStyles.btnGroupUtilSep} aria-hidden />
+              <button
+                type="button"
+                className={challengeStyles.utilBtn}
+                onClick={() => void formatCode()}
+                disabled={isBusy || isFormatting}
+                title="Format code"
+                aria-label="Format code"
+              >
+                {isFormatting ? (
+                  <svg
+                    viewBox="0 0 12 12"
+                    className={challengeStyles.utilSpinner}
+                    aria-hidden
+                  >
+                    <circle
+                      cx="6"
+                      cy="6"
+                      r="4.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeDasharray="14 8"
+                    />
+                  </svg>
+                ) : (
+                  <FormatIcon />
+                )}
+                <span className={challengeStyles.utilBtnLabel}>Format</span>
+              </button>
+            </>
+          )}
           <div className={challengeStyles.btnGroupUtilSep} aria-hidden />
           <button
             type="button"

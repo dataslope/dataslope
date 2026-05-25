@@ -34,3 +34,71 @@ Console.WriteLine($"sum:    {xs.Sum()}");
 Console.WriteLine($"mean:   {xs.Average():F2}");
 `}
 />
+
+## Multiple files
+
+A top-level `Program.cs` can reference types defined in sibling files. Every workspace file is fed to the compiler so additional `.cs` files participate in the build.
+
+<CodeBlock
+  adapter="csharp"
+  entryFilename="Program.cs"
+  files={[
+    {
+      filename: "Program.cs",
+      initialContent: `var g = new Greeter("C# Playground");
+Console.WriteLine(g.Hello());
+Console.WriteLine(g.Bye());
+`,
+    },
+    {
+      filename: "Greeter.cs",
+      initialContent: `public class Greeter
+{
+    private readonly string _name;
+
+    public Greeter(string name)
+    {
+        _name = name;
+    }
+
+    public string Hello() => $"Hello, {_name}!";
+    public string Bye()   => $"Goodbye, {_name}!";
+}
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="csharp"
+  entryFilename="Program.cs"
+  files={[
+    {
+      filename: "Program.cs",
+      initialContent: `var g = new Greeter("C# Playground");
+Console.WriteLine(g.Hello());
+Console.WriteLine(g.Bye());
+`,
+    },
+    {
+      filename: "Greeter.cs",
+      initialContent: `public class Greeter
+{
+    private readonly string _name;
+
+    public Greeter(string name)
+    {
+        _name = name;
+    }
+
+    public string Hello() => $"Hello, {_name}!";
+    public string Bye()   => $"Goodbye, {_name}!";
+}
+`,
+    },
+  ]}
+/>
+```

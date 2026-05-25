@@ -7,9 +7,14 @@
  * the docs site coexists with the existing `/playground` routes.
  */
 import { loader } from "fumadocs-core/source";
+import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 import { docs } from "@/.source/server";
 
 export const source = loader({
   baseUrl: "/learn",
   source: docs.toFumadocsSource(),
+  // Convert `icon: "Cpu"` (frontmatter) and `---[Layers]Section---`
+  // (meta.json separator) icon names into Lucide React elements at
+  // build time, per https://www.fumadocs.dev/docs/page-conventions.
+  plugins: [lucideIconsPlugin()],
 });

@@ -557,18 +557,34 @@ class CppWorkerRuntime implements LanguageRuntime {
   ): Promise<void> {
     const id = ++this.nextId;
     // Pick the entry translation unit. The Playground passes the chosen
-    // entry filename via `options.entryFilename` (defaults to
-    // "main.cpp"). If the user is running a non-active entry, prefer
-    // the staged copy so we always compile the latest workspace
-    // contents.
-    const entry = options?.entryFilename ?? "main.cpp";
-    const source = this.stagedFiles.get(entry) ?? code;
+    // entry filename via `options.entryFilename` (e.g. "main2.cpp") when
+    // the user clicks "Run" on a non-active tab; in that case we must
+    // compile the staged copy of that file because `code` (the active
+    // editor's doc) belongs to a different translation unit.
+    //
+    // When `options.entryFilename` is not provided (CodeBlock, single-
+    // file ChallengeCard runs) we ALWAYS use `code` as the authoritative
+    // entry source. Reading from `stagedFiles` here would pick up stale
+    // content from a previous ChallengeCard/Playground run on the same
+    // shared per-page runtime, which is why C++ CodeBlocks were silently
+    // running the wrong source instead of the user's `main()`.
+    const explicitEntry = options?.entryFilename;
+    const entry = explicitEntry ?? "main.cpp";
+    const source = explicitEntry
+      ? (this.stagedFiles.get(entry) ?? code)
+      : code;
     // All other staged files (non-entry-point) are provided as extra
     // files so the compiler can resolve #include "..." directives and
-    // compile additional translation units.
+    // compile additional translation units. Only forward staged files
+    // when the caller explicitly opted into multi-file mode by passing
+    // an entry filename — otherwise stale staged files from a prior
+    // ChallengeCard/Playground run on the same shared runtime could
+    // pollute the build.
     const files: Array<[string, string]> = [];
-    for (const [path, content] of this.stagedFiles) {
-      if (path !== entry) files.push([path, content]);
+    if (explicitEntry) {
+      for (const [path, content] of this.stagedFiles) {
+        if (path !== entry) files.push([path, content]);
+      }
     }
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {

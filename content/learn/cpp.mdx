@@ -41,3 +41,111 @@ int main() {
 }
 `}
 />
+
+## Multiple files
+
+Split a class into a header and an implementation file. Every workspace file is staged into the compiler's virtual file system so `#include "…"` directives resolve and additional `.cpp` files are linked into the final binary.
+
+<CodeBlock
+  adapter="cpp"
+  entryFilename="main.cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initialContent: `#include <iostream>
+#include "greeter.hpp"
+
+int main() {
+    Greeter g("C++ Playground");
+    std::cout << g.hello() << "\\n";
+    std::cout << g.bye() << "\\n";
+    return 0;
+}
+`,
+    },
+    {
+      filename: "greeter.hpp",
+      initialContent: `#ifndef GREETER_HPP
+#define GREETER_HPP
+
+#include <string>
+
+class Greeter {
+public:
+    explicit Greeter(std::string name);
+    std::string hello() const;
+    std::string bye() const;
+
+private:
+    std::string name_;
+};
+
+#endif
+`,
+    },
+    {
+      filename: "greeter.cpp",
+      initialContent: `#include "greeter.hpp"
+
+Greeter::Greeter(std::string name) : name_(std::move(name)) {}
+
+std::string Greeter::hello() const { return "Hello, " + name_ + "!"; }
+std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="cpp"
+  entryFilename="main.cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initialContent: `#include <iostream>
+#include "greeter.hpp"
+
+int main() {
+    Greeter g("C++ Playground");
+    std::cout << g.hello() << "\\n";
+    std::cout << g.bye() << "\\n";
+    return 0;
+}
+`,
+    },
+    {
+      filename: "greeter.hpp",
+      initialContent: `#ifndef GREETER_HPP
+#define GREETER_HPP
+
+#include <string>
+
+class Greeter {
+public:
+    explicit Greeter(std::string name);
+    std::string hello() const;
+    std::string bye() const;
+
+private:
+    std::string name_;
+};
+
+#endif
+`,
+    },
+    {
+      filename: "greeter.cpp",
+      initialContent: `#include "greeter.hpp"
+
+Greeter::Greeter(std::string name) : name_(std::move(name)) {}
+
+std::string Greeter::hello() const { return "Hello, " + name_ + "!"; }
+std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
+`,
+    },
+  ]}
+/>
+```

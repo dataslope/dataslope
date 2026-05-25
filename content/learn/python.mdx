@@ -78,3 +78,61 @@ fig.update_layout(title="Hover, zoom, and pan")
 fig.show()
 `}
 />
+
+## Multiple files
+
+Import from a sibling module just like a regular Python package. Every workspace file is written into Pyodide's virtual file system before `main.py` runs, so `from greetings import hello` works out of the box.
+
+<CodeBlock
+  adapter="python"
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `from greetings import hello, bye
+
+print(hello("Python Playground"))
+print(bye("Python Playground"))
+`,
+    },
+    {
+      filename: "greetings.py",
+      initialContent: `def hello(name: str) -> str:
+    return f"Hello, {name}!"
+
+
+def bye(name: str) -> str:
+    return f"Goodbye, {name}!"
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="python"
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `from greetings import hello, bye
+
+print(hello("Python Playground"))
+print(bye("Python Playground"))
+`,
+    },
+    {
+      filename: "greetings.py",
+      initialContent: `def hello(name: str) -> str:
+    return f"Hello, {name}!"
+
+
+def bye(name: str) -> str:
+    return f"Goodbye, {name}!"
+`,
+    },
+  ]}
+/>
+```

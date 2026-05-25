@@ -49,3 +49,63 @@ hist(x, breaks = 30, col = "steelblue", border = "white",
      main = "1000 draws from N(0, 1)")
 `}
 />
+
+## Multiple files
+
+`source()` a sibling script to pull its function definitions into the current session. Every workspace file is staged in WebR's virtual file system at the working directory.
+
+<CodeBlock
+  adapter="r"
+  entryFilename="main.r"
+  files={[
+    {
+      filename: "main.r",
+      initialContent: `source("greetings.r")
+
+cat(hello("R Playground"), "\\n")
+cat(bye("R Playground"), "\\n")
+`,
+    },
+    {
+      filename: "greetings.r",
+      initialContent: `hello <- function(name) {
+  paste0("Hello, ", name, "!")
+}
+
+bye <- function(name) {
+  paste0("Goodbye, ", name, "!")
+}
+`,
+    },
+  ]}
+/>
+
+The MDX source for the example above:
+
+```jsx
+<CodeBlock
+  adapter="r"
+  entryFilename="main.r"
+  files={[
+    {
+      filename: "main.r",
+      initialContent: `source("greetings.r")
+
+cat(hello("R Playground"), "\\n")
+cat(bye("R Playground"), "\\n")
+`,
+    },
+    {
+      filename: "greetings.r",
+      initialContent: `hello <- function(name) {
+  paste0("Hello, ", name, "!")
+}
+
+bye <- function(name) {
+  paste0("Goodbye, ", name, "!")
+}
+`,
+    },
+  ]}
+/>
+```
