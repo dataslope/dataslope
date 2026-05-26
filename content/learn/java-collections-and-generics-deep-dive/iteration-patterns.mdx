@@ -1,0 +1,406 @@
+---
+title: Iteration Patterns
+description: For-each, explicit iterators, ListIterator, streams, and the unwritten rules about modifying a collection while iterating it
+---
+
+There is more than one way to walk a collection in Java, and the
+*right* one depends on what you actually need: just read each
+element? remove some as you go? insert new ones? walk backwards?
+process the whole thing as a pipeline?
+
+This chapter is a tour of the five iteration patterns you'll use
+every week, plus the single most common bug each one introduces.
+
+## 1. Enhanced for-each
+
+The for-each loop is sugar over an `Iterator`. It is the right tool
+for *"do something with each element, in order"*:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> xs = List.of("a", "b", "c");
+        for (String x : xs) {
+            System.out.println(x);
+        }
+    }
+}
+`}
+/>
+
+The compiler rewrites `for (E x : c)` into roughly:
+
+```java
+Iterator<E> it = c.iterator();
+while (it.hasNext()) {
+    E x = it.next();
+    /* body */
+}
+```
+
+That has one immediate consequence: **you cannot remove elements
+from the collection inside a for-each loop.** Doing so triggers
+`ConcurrentModificationException` on the next `it.hasNext()`.
+
+## 2. Explicit Iterator and Iterator.remove()
+
+When you need to remove while iterating, use the explicit `Iterator`
+form so you can call `it.remove()` — the only safe way to mutate
+during iteration:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
+        Iterator<Integer> it = xs.iterator();
+        while (it.hasNext()) {
+            int n = it.next();
+            if (n % 2 == 0) it.remove();      // safe
+        }
+        System.out.println(xs);
+    }
+}
+`}
+/>
+
+Even better, Java 8 added `removeIf` on every `Collection`, which is
+the modern one-liner:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
+        xs.removeIf(n -> n % 2 == 0);
+        System.out.println(xs);
+    }
+}
+`}
+/>
+
+## 3. ListIterator: bidirectional, plus add()
+
+`List`s support `listIterator()`, which is `Iterator` with
+superpowers: you can walk backwards (`hasPrevious`, `previous`),
+*replace* the current element (`set`), and *insert* a new element at
+the cursor (`add`):
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> xs = new ArrayList<>(List.of("a", "c", "e"));
+        ListIterator<String> it = xs.listIterator();
+        while (it.hasNext()) {
+            String s = it.next();
+            // insert a marker after every element
+            it.add(s + "!");
+        }
+        System.out.println(xs);
+    }
+}
+`}
+/>
+
+`ListIterator` is what makes "edit in place" patterns possible on
+list-backed structures.
+
+## 4. forEach with a Consumer
+
+Every `Iterable` has a default `forEach(Consumer<? super E>)`. It
+reads naturally when the action is a simple, terminal side effect:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> xs = List.of("a", "b", "c");
+        xs.forEach(System.out::println);
+    }
+}
+`}
+/>
+
+`forEach` does not let you stop early — that's a `for` with a
+`break`'s job. And, as with the enhanced for, you cannot modify the
+collection from inside the action.
+
+## 5. Streams: iteration as a pipeline
+
+Streams are the *declarative* form of iteration. You describe **what**
+should happen to each element (`filter`, `map`, `sorted`,
+`distinct`, `flatMap`, ...) and end with a terminal operation
+(`toList`, `count`, `reduce`, `forEach`, ...). The library decides
+*how*.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = List.of("Ada", "Linus", "Grace", "Bjarne", "Edsger");
+
+        List<String> shortLower = names.stream()
+            .filter(n -> n.length() <= 5)
+            .map(String::toLowerCase)
+            .sorted()
+            .toList();
+
+        System.out.println(shortLower);
+    }
+}
+`}
+/>
+
+The same logic with a manual loop is twice as long and twice as
+mistake-prone:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = List.of("Ada", "Linus", "Grace", "Bjarne", "Edsger");
+
+        List<String> shortLower = new ArrayList<>();
+        for (String n : names) {
+            if (n.length() <= 5) shortLower.add(n.toLowerCase());
+        }
+        Collections.sort(shortLower);
+        System.out.println(shortLower);
+    }
+}
+`}
+/>
+
+Use a stream when the loop body is a clear pipeline of **filter →
+transform → collect**. Use an explicit loop when the body has real
+control flow (early returns, complex branching, state across
+iterations).
+
+## ConcurrentModificationException: the real villain
+
+The exception's name is misleading: it has nothing to do with
+threads. It is raised by `Iterator` when it notices the *structural
+modification count* of the collection changed since the iterator was
+created — i.e. you added or removed something behind its back.
+
+```mermaid
+sequenceDiagram
+    participant Code
+    participant List
+    participant Iter as Iterator
+    Code->>List: iterator()
+    Iter->>List: record modCount = 5
+    Code->>Iter: next()
+    Code->>List: add("x")        # modCount = 6
+    Code->>Iter: next()
+    Iter-->>Code: ConcurrentModificationException
+```
+
+The fix is always one of:
+
+1. Use the iterator's own `remove()` (or `removeIf` for whole-collection deletes).
+2. Collect what you want to remove during iteration, then remove afterwards.
+3. Iterate a *copy*: `for (E x : new ArrayList<>(xs)) { xs.remove(...); }`.
+
+## Multi-file example: filter a feed with three techniques
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Post> posts = List.of(
+            new Post("Ada",   "hello",          true),
+            new Post("Linus","kernel rant",     false),
+            new Post("Grace", "compiler talk",  true),
+            new Post("Edsger","goto considered",true)
+        );
+
+        System.out.println("imperative: " + FeedFilters.imperative(posts));
+        System.out.println("iterator:   " + FeedFilters.viaIterator(new ArrayList<>(posts)));
+        System.out.println("stream:     " + FeedFilters.viaStream(posts));
+    }
+}
+`,
+    },
+    {
+      filename: "Post.java",
+      initialContent: `public record Post(String author, String text, boolean published) {}
+`,
+    },
+    {
+      filename: "FeedFilters.java",
+      initialContent: `import java.util.*;
+
+public final class FeedFilters {
+    private FeedFilters() {}
+
+    /** Loop + ArrayList accumulator. */
+    public static List<String> imperative(List<Post> posts) {
+        List<String> out = new ArrayList<>();
+        for (Post p : posts) if (p.published()) out.add(p.author());
+        return out;
+    }
+
+    /** Iterator.remove on a mutable copy. */
+    public static List<String> viaIterator(List<Post> mutable) {
+        Iterator<Post> it = mutable.iterator();
+        while (it.hasNext()) if (!it.next().published()) it.remove();
+        List<String> out = new ArrayList<>();
+        for (Post p : mutable) out.add(p.author());
+        return out;
+    }
+
+    /** Declarative pipeline. */
+    public static List<String> viaStream(List<Post> posts) {
+        return posts.stream()
+                    .filter(Post::published)
+                    .map(Post::author)
+                    .toList();
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Three idioms, same output — and the stream version is the easiest to
+read in five months' time.
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Safe removal during iteration"
+  instructions={`Complete \`Pruner.removeShorterThan(List<String> words, int minLen)\` so it removes every word shorter than \`minLen\` **without** triggering \`ConcurrentModificationException\`. Use either \`Iterator.remove()\` or \`removeIf\`.
+
+Expected output:
+
+\`\`\`
+[alpha, gamma, delta]
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> ws = new ArrayList<>(List.of("hi", "alpha", "ok", "gamma", "delta"));
+        Pruner.removeShorterThan(ws, 4);
+        System.out.println(ws);
+    }
+}
+`,
+    },
+    {
+      filename: "Pruner.java",
+      initialContent: `import java.util.List;
+
+public final class Pruner {
+    private Pruner() {}
+
+    public static void removeShorterThan(List<String> words, int minLen) {
+        // TODO
+    }
+}
+`,
+      solutionContent: `import java.util.List;
+
+public final class Pruner {
+    private Pruner() {}
+
+    public static void removeShorterThan(List<String> words, int minLen) {
+        words.removeIf(w -> w.length() < minLen);
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "pruner-remove-short",
+      name: "Pruner removes short words without ConcurrentModificationException",
+      expect: { stdoutEquals: "[alpha, gamma, delta]" },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Why does this loop throw \`ConcurrentModificationException\`?
+
+\`\`\`java
+for (Integer n : list) if (n % 2 == 0) list.remove(n);
+\`\`\`
+
+- Because \`list.remove(Object)\` is \`O(n)\`
+  > That's a performance issue, not a correctness one.
+- [o] Because the enhanced-for uses an \`Iterator\`, and modifying the underlying list via \`list.remove\` invalidates the iterator's internal modCount
+  > Correct. Either use \`Iterator.remove()\` directly or call \`list.removeIf(...)\`.
+- Because \`list\` is unmodifiable
+  > It need not be; the exception fires on a mutable list too.
+- Because integers are autoboxed
+  > Autoboxing is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`Which iteration form lets you **insert** new elements at the cursor while walking a \`List\`?
+
+- Enhanced for-each
+  > Cannot mutate.
+- \`forEach(Consumer)\`
+  > Cannot mutate.
+- Plain \`Iterator\`
+  > Plain \`Iterator\` only supports \`remove\`, not \`add\`.
+- [o] \`ListIterator\`
+  > Correct. \`ListIterator.add(e)\` inserts at the current cursor position.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a stream pipeline the better choice over an explicit loop?
+
+- Always, because streams are faster
+  > They are often comparable, sometimes slower.
+- When the body needs \`break\` or \`return\`
+  > Streams don't have \`break\`; a \`for\` loop is cleaner there.
+- [o] When the body is a straightforward pipeline of filter / transform / collect with no early exit
+  > Correct. Streams trade flexibility for declarative clarity in exactly that case.
+- When you need to mutate the source collection
+  > Streams must not mutate their source.`}
+/>
+
+<Callout type="success" title="Next up">
+We've seen *how* to iterate. Next, we'll look at *how much it
+costs* — the performance characteristics that make you reach for one
+container over another.
+</Callout>

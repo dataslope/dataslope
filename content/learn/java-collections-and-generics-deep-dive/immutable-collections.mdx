@@ -1,0 +1,379 @@
+---
+title: Immutable Collections
+description: Why "no one can change it" is one of the most powerful properties a collection can have — and how Java gives it to you
+---
+
+A *mutable* collection is the default in Java, and most days that is
+exactly what you want. But when a collection crosses a trust
+boundary — returned from a library, stored in a cache, shared
+between threads, used as a map key, exposed to "the rest of the
+codebase" — mutability becomes a liability.
+
+This chapter is about three intertwined ideas:
+
+- **Truly immutable** collections, created with `List.of`, `Set.of`,
+  `Map.of`.
+- **Unmodifiable views** over a mutable collection
+  (`Collections.unmodifiableList`).
+- **Defensive copies** — what you do at the boundaries of your code
+  to keep your invariants safe.
+
+## Why immutability matters
+
+Mutable shared state is the source of more bugs than almost any
+other software-engineering vice:
+
+- Someone you didn't expect mutates a list you handed out, and your
+  internal invariant breaks much later, in unrelated code.
+- A `HashSet` element is mutated *after* being added, and now its
+  hash points to the wrong bucket — silently lost forever.
+- A second thread sees your collection halfway through a mutation
+  and reads garbage.
+
+Immutable collections make every one of those bugs impossible by
+construction.
+
+## Immutable factories: List.of, Set.of, Map.of
+
+Java 9 introduced concise factories that return *truly immutable*
+collections:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = List.of(1, 2, 3);
+        Set<String>   ys = Set.of("a", "b", "c");
+        Map<String,Integer> zs = Map.of("one", 1, "two", 2);
+
+        System.out.println(xs);
+        System.out.println(ys);
+        System.out.println(zs);
+
+        try {
+            xs.add(4);
+        } catch (UnsupportedOperationException e) {
+            System.out.println("xs.add threw: " + e.getClass().getSimpleName());
+        }
+    }
+}
+`}
+/>
+
+These factories return purpose-built, compact implementations — not
+just a wrapper. Mutator methods throw `UnsupportedOperationException`.
+
+### A few rules to know
+
+- They reject `null` keys, values, and elements. (If you need
+  nulls, you almost always have a modeling bug to fix anyway.)
+- `Set.of(...)` and `Map.of(...)` reject duplicates *at
+  construction*, throwing `IllegalArgumentException`.
+- They are unmodifiable, including through any iterator you obtain.
+
+### What about more than 10 entries?
+
+`Map.of` has overloads up to 10 entries. For arbitrary numbers, use
+`Map.ofEntries(...)` or `Map.copyOf(existingMap)`:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.Map;
+import static java.util.Map.entry;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> m = Map.ofEntries(
+            entry("a", 1),
+            entry("b", 2),
+            entry("c", 3),
+            entry("d", 4)
+        );
+        System.out.println(m);
+    }
+}
+`}
+/>
+
+## Unmodifiable views: Collections.unmodifiableX
+
+Before Java 9, the idiomatic way to publish a "read-only" collection
+was `Collections.unmodifiableList(list)`. It is still common, and
+still useful — but it is a **view**, not a copy:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> backing = new ArrayList<>(List.of("a", "b"));
+        List<String> view    = Collections.unmodifiableList(backing);
+
+        System.out.println(view);
+        backing.add("c");          // mutating the backing list...
+        System.out.println(view);   // ...is visible through the view!
+
+        try {
+            view.add("d");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("view.add threw " + e.getClass().getSimpleName());
+        }
+    }
+}
+`}
+/>
+
+The view forbids *callers* from mutating, but the *owner* of
+`backing` can still mutate. That is sometimes exactly right (a
+controller publishes a live read-only view), and sometimes very wrong
+(you wanted nobody to mutate it ever).
+
+When you want a snapshot that genuinely cannot change, copy first:
+
+```java
+return List.copyOf(backing);  // returns an immutable copy
+```
+
+`List.copyOf`, `Set.copyOf`, and `Map.copyOf` are no-ops if the
+argument is already immutable, and return a fresh immutable copy
+otherwise.
+
+## Defensive copies at the boundary
+
+Defensive copying is a discipline:
+
+- **In:** when a constructor or setter accepts a collection,
+  immediately copy it. Otherwise the caller can keep their reference
+  and mutate "your" data later.
+- **Out:** when a getter returns a collection, return either an
+  immutable copy or an unmodifiable view. Otherwise the caller can
+  mutate your internal state.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    static final class Schedule {
+        private final List<String> tasks;
+
+        // copy on the way in
+        Schedule(List<String> tasks) {
+            this.tasks = List.copyOf(tasks);  // snapshot + immutable
+        }
+
+        // return a safe view on the way out
+        List<String> tasks() { return tasks; } // already immutable
+    }
+
+    public static void main(String[] args) {
+        List<String> mutable = new ArrayList<>(List.of("write", "review", "ship"));
+        Schedule s = new Schedule(mutable);
+
+        mutable.add("oops");                // caller's mutation does NOT affect Schedule
+        System.out.println(s.tasks());
+
+        try {
+            s.tasks().add("hack");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("tasks() returns an unmodifiable list");
+        }
+    }
+}
+`}
+/>
+
+That's a 12-line class with no bugs.
+
+## Mermaid: the three states a published collection can be in
+
+```mermaid
+flowchart LR
+    A[Mutable original] -->|publish raw| B[Mutable, shared - dangerous]
+    A -->|Collections.unmodifiableList| C[Unmodifiable view - still backed by mutable]
+    A -->|List.copyOf| D[Immutable snapshot - safe forever]
+```
+
+The further right you go, the safer your API.
+
+## Multi-file example: a safe `Catalog`
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> initial = new ArrayList<>(List.of("apple", "bread", "cheese"));
+        Catalog c = new Catalog(initial);
+
+        // External mutation does not leak into the catalog
+        initial.add("steal-me");
+        System.out.println(c.items());
+
+        // Caller cannot mutate what they got back
+        try {
+            c.items().add("hack");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("safe: " + e.getClass().getSimpleName());
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Catalog.java",
+      initialContent: `import java.util.List;
+
+public final class Catalog {
+    private final List<String> items;
+
+    public Catalog(List<String> items) {
+        this.items = List.copyOf(items);   // snapshot in
+    }
+
+    public List<String> items() { return items; }  // already immutable
+}
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Make `Roster` leak-proof"
+  instructions={`The class \`Roster\` is currently leaky in two ways: the constructor stores the caller's list reference, and the getter exposes the internal list directly. Fix both: take a defensive copy in the constructor, and return an immutable view from \`names()\`.
+
+Expected output:
+
+\`\`\`
+[Ada, Grace]
+external mutation didn't leak
+caller mutation was blocked
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = new ArrayList<>(List.of("Ada", "Grace"));
+        Roster r = new Roster(names);
+        System.out.println(r.names());
+
+        names.add("Linus");
+        if (!r.names().contains("Linus")) System.out.println("external mutation didn't leak");
+
+        try {
+            r.names().add("Edsger");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("caller mutation was blocked");
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Roster.java",
+      initialContent: `import java.util.List;
+
+public final class Roster {
+    private final List<String> names;
+
+    public Roster(List<String> names) {
+        this.names = names;          // TODO: defensive copy
+    }
+
+    public List<String> names() {
+        return names;                // TODO: unmodifiable
+    }
+}
+`,
+      solutionContent: `import java.util.List;
+
+public final class Roster {
+    private final List<String> names;
+
+    public Roster(List<String> names) {
+        this.names = List.copyOf(names);
+    }
+
+    public List<String> names() {
+        return names;
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "roster-immutable",
+      name: "Roster takes a defensive copy and returns an unmodifiable list",
+      expect: {
+        stdoutEquals:
+          "[Ada, Grace]\nexternal mutation didn't leak\ncaller mutation was blocked",
+      },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What is the key difference between \`List.of(...)\` and \`Collections.unmodifiableList(backing)\`?
+
+- They are the same
+  > They are not.
+- [o] \`List.of\` is truly immutable (no backing to mutate); \`Collections.unmodifiableList\` is an unmodifiable **view** over a list whose owner can still mutate it
+  > Correct. For a snapshot that nobody can change, use \`List.copyOf\` or \`List.of\`.
+- \`Collections.unmodifiableList\` is faster
+  > It's a thin wrapper, but mutability semantics are the issue.
+- \`List.of\` allows nulls
+  > It explicitly does not.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is it a good habit to take a *defensive copy* of a collection passed into a constructor?
+
+- To save memory
+  > It actually uses more.
+- [o] Because otherwise the caller still holds a reference to the same list and can mutate "your" state after construction
+  > Correct. Defensive copy at the boundary is what protects your invariants.
+- Because Java requires it
+  > It does not.
+- Because lists are not serializable otherwise
+  > Serializability is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens if you call \`Set.of("a", "b", "a")\`?
+
+- It silently dedups to \`{a, b}\`
+  > That's how \`HashSet\` behaves, not \`Set.of\`.
+- It returns \`{a, b, a}\`
+  > Sets cannot contain duplicates.
+- [o] It throws \`IllegalArgumentException\` at construction
+  > Correct. \`Set.of\` and \`Map.of\` are strict about duplicates.
+- It throws \`NullPointerException\`
+  > That's for null elements/keys/values.`}
+/>
+
+<Callout type="success" title="Next up">
+With safe data structures in hand, we move from "which container?"
+to "what *shape* of data should I model with collections?" — the
+heart of **data modeling**.
+</Callout>

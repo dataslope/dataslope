@@ -78,6 +78,15 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link
+              href="/learn/java-collections-and-generics-deep-dive"
+              className={styles.courseCard}
+            >
+              <span className={styles.courseTitle}>
+                Java Collections and Generics Deep Dive
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
