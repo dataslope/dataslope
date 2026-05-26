@@ -17,7 +17,6 @@
  * 5. The browser's ambient Cookie header is stripped before forwarding — it is
  *    never relevant to third-party upstream APIs. Explicitly-set Authorization
  *    headers are kept so authenticated API calls work.
- * 6. Requests are rate-limited per client IP (RATE_LIMITER binding).
  */
 
 export interface Env {
@@ -29,15 +28,7 @@ export interface Env {
    * `wrangler secret put ALLOWED_ORIGINS` / Cloudflare dashboard for production.
    */
   ALLOWED_ORIGINS: string;
-  /**
-   * Cloudflare Rate Limiting binding (Workers Paid plan required).
-   * Configure via [[unsafe.bindings]] in wrangler.toml.
-   * When absent (e.g. during `wrangler dev` without the binding), rate limiting
-   * is silently skipped so local development works without a paid plan.
-   */
-  RATE_LIMITER?: {
-    limit(options: { key: string }): Promise<{ success: boolean }>;
-  };
+
 }
 
 // ---------------------------------------------------------------------------
@@ -238,31 +229,7 @@ export default {
     }
 
     // ------------------------------------------------------------------
-    // 4. Rate limit per client IP
-    //    Preflights (handled above) are intentionally excluded so browsers
-    //    are not penalised for the automatic preflight they send.
-    //    Falls through silently when RATE_LIMITER is not bound (local dev).
-    // ------------------------------------------------------------------
-    if (env.RATE_LIMITER) {
-      const clientIp = request.headers.get("CF-Connecting-IP") ?? "unknown";
-      const { success } = await env.RATE_LIMITER.limit({ key: clientIp });
-      if (!success) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded — please try again shortly" }),
-          {
-            status: 429,
-            headers: {
-              "Content-Type": "application/json",
-              "Retry-After": "60",
-              ...corsHeaders,
-            },
-          },
-        );
-      }
-    }
-
-    // ------------------------------------------------------------------
-    // 5. Parse and validate the target URL
+    // 4. Parse and validate the target URL
     // ------------------------------------------------------------------
     const { searchParams } = new URL(request.url);
     const targetUrlRaw = searchParams.get("url");
@@ -301,7 +268,7 @@ export default {
     }
 
     // ------------------------------------------------------------------
-    // 6. Forward the request to the upstream server, following redirects
+    // 5. Forward the request to the upstream server, following redirects
     //    manually so that each hop is re-validated against the private-IP
     //    list. Using redirect: "follow" would skip that check for hops
     //    after the first.
@@ -393,7 +360,7 @@ export default {
     }
 
     // ------------------------------------------------------------------
-    // 7. Build and return the proxied response
+    // 6. Build and return the proxied response
     // ------------------------------------------------------------------
     const responseHeaders = new Headers(
       stripHopByHopHeaders(upstreamResponse.headers),

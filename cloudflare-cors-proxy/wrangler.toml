@@ -9,22 +9,3 @@ compatibility_flags = ["nodejs_compat"]
 # for production secrets, or set them here for non-sensitive defaults.
 ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app"
 
-# ---------------------------------------------------------------------------
-# Rate limiting — Workers Paid plan required.
-#
-# namespace_id is an arbitrary integer that scopes the rate-limit counters for
-# this worker. Any stable integer works; just keep it the same across deploys.
-#
-# Current limits (adjust to taste):
-#   60 requests per 60 seconds per client IP
-#   ≈ 1 req/s average with burst tolerance — fits a learning/playground
-#   session without throttling a student running code actively.
-#
-# The binding is declared optional in TypeScript (RATE_LIMITER?), so the
-# worker falls back gracefully to no rate limiting during `wrangler dev`.
-# ---------------------------------------------------------------------------
-[[unsafe.bindings]]
-name = "RATE_LIMITER"
-type = "ratelimit"
-namespace_id = "1001"
-simple = { limit = 60, period = 60 }
