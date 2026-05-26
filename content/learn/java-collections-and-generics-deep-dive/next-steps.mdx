@@ -1,0 +1,127 @@
+---
+title: Where to Go Next
+description: Streams, concurrent collections, persistent data structures, and the wider world of Java collections
+---
+
+You've finished a deep tour of the Java Collections Framework and
+Generics. You can now pick the right container for a query, design
+APIs that don't leak mutable state, reason about hashing and
+ordering, and use generics with confidence (including the
+once-mysterious `? extends` and `? super`).
+
+This closing chapter is a brief map of where you can go from here.
+
+## 1. Streams in depth
+
+You met streams in the iteration chapter. They reward deeper study:
+
+- **Collectors**: `Collectors.groupingBy`, `partitioningBy`,
+  `toMap`, `joining`, `counting`, `averagingInt`. These collapse the
+  most common "for-loop + accumulator" patterns into one line.
+- **`flatMap`**: flatten nested collections (`List<List<T>>` →
+  `Stream<T>`).
+- **Primitive streams**: `IntStream`, `LongStream`, `DoubleStream`
+  avoid boxing for numeric pipelines.
+- **Parallel streams**: `stream.parallel()` distributes a pipeline
+  across cores. Beware shared state and ordering.
+- **Gatherers** (Java 22+): user-defined intermediate operations.
+
+## 2. Concurrent collections
+
+Everything in this course assumed single-threaded access. For shared
+state across threads, `java.util.concurrent` provides
+purpose-built containers:
+
+- **`ConcurrentHashMap`** — high-throughput, scalable hash map. Use
+  `computeIfAbsent`, `compute`, and `merge` for atomic updates.
+- **`CopyOnWriteArrayList` / `CopyOnWriteArraySet`** — for
+  read-mostly data with rare writes (listeners, observers).
+- **`BlockingQueue`** family — `ArrayBlockingQueue`,
+  `LinkedBlockingQueue`, `PriorityBlockingQueue`, used as the heart
+  of producer/consumer designs.
+
+Reach for these *only when you've established you actually share
+state across threads*. Synchronizing a `HashMap` with locks is
+almost always a mistake compared to using `ConcurrentHashMap`
+directly.
+
+## 3. Persistent (functional) collections
+
+Java's "immutable" collections (`List.of`, etc.) are immutable but
+not *persistent* in the functional-programming sense: you can't
+cheaply derive `list.add(x)` returning a new list that shares
+structure with the old one.
+
+If you want persistent collections — the kind Clojure, Scala, and
+Haskell use — third-party libraries provide them on the JVM:
+
+- **Eclipse Collections** — primitive specializations, immutable
+  variants, rich combinators.
+- **Vavr** — `List`, `Set`, `Map`, `Option`, `Try` with
+  functional-style APIs.
+- **PCollections** — persistent vectors, maps, sets.
+
+## 4. Specialized data structures
+
+The JDK is intentionally focused on a small set of general-purpose
+structures. The wider ecosystem has specialized ones:
+
+- **Tries** (prefix trees) — for autocomplete and prefix matches.
+- **Bloom filters** — probabilistic membership tests in tiny memory.
+- **HyperLogLog** — cardinality estimation for huge streams.
+- **Roaring bitmaps** — fast set operations on integer sets.
+- **B-trees / skip lists** — when you outgrow the JDK's sorted
+  structures.
+
+Libraries: Guava, Apache Commons Collections, Eclipse Collections,
+Caffeine (for caching).
+
+## 5. Beyond JVM: the algorithmic foundation
+
+Most of what's in this course generalizes beyond Java:
+
+- Hash tables, balanced trees, heaps, deques, and tries are
+  language-agnostic ideas. Once you've internalized them you'll
+  recognize them in Python's `dict`, JavaScript's `Map`, C++'s
+  `unordered_map`, Rust's `HashMap`.
+- Big-O analysis, cache locality, and amortized cost apply
+  everywhere there's memory.
+- The discipline of "pick the shape that matches the query" is the
+  single most underrated skill in everyday programming.
+
+## A short reading list
+
+- *Effective Java*, Joshua Bloch — Items on collections, generics,
+  `equals`/`hashCode`, immutability. The book the JDK collections
+  designer wrote.
+- *Java Generics and Collections*, Naftalin & Wadler — Deeper on
+  generics and wildcards than anything else in print.
+- *Introduction to Algorithms*, Cormen, Leiserson, Rivest, Stein —
+  The reference for the data structures underneath.
+- The official **Java tutorials** on
+  [Collections](https://docs.oracle.com/javase/tutorial/collections/index.html)
+  and the API docs for `java.util.stream` and
+  `java.util.concurrent`.
+
+## A final exercise: keep using these ideas
+
+The Collections Framework is one of those things you only really
+master by *using*. The next time you write a function:
+
+1. Ask "what is the **shape** of my data?" before you write a loop.
+2. Ask "could a `Map` index away this loop?"
+3. Ask "what should my function **accept**, and what should it
+   **return**?"
+4. Ask "if a caller shares this collection with someone else, can
+   they hurt me?"
+
+Those four questions — *shape, index, interface, immutability* —
+will pay back the time you put into this course many times over.
+
+<Callout type="info" title="Thanks for finishing the course">
+You now have a working mental model of the Java Collections
+Framework and Generics. From here, every "data shape" question you
+encounter has a vocabulary to discuss it in.
+
+Happy modeling.
+</Callout>

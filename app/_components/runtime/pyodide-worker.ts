@@ -118,11 +118,22 @@ async function initPyodide(): Promise<void> {
   await pyodide.loadPackage("micropip", pkgCallbacks);
   const micropip = pyodide.pyimport("micropip");
   await micropip.install("plotly");
+  // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
+  // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
+  // It does NOT bypass CORS — cross-origin hosts still need the CORS proxy.
+  await micropip.install("pyodide_http");
 
   // Set up display() and a matplotlib show() patch that captures figures
   // as base64 PNGs into _display_outputs.
   await pyodide.runPythonAsync(`
 import sys, io, base64, json, ast as _ast, re as _re
+
+# Patch urllib/requests once so user code can make HTTP(S) calls (subject to
+# CORS — cross-origin hosts still need the CORS proxy). Called a single time
+# at init; re-patching already-patched modules is unnecessary.
+import pyodide_http
+pyodide_http.patch_all()
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -187,22 +198,31 @@ def _patched_show(*args, **kwargs):
     plt.close("all")
 plt.show = _patched_show
 
-def _execute_with_last_display(code):
+import asyncio as _asyncio
+
+async def _execute_with_last_display(code):
     """Execute user code, auto-displaying the last expression like Jupyter."""
     _globals = globals()
+    _flags = _ast.PyCF_ALLOW_TOP_LEVEL_AWAIT
     tree = _ast.parse(code)
     if tree.body and isinstance(tree.body[-1], _ast.Expr):
         last_expr = tree.body.pop()
         if tree.body:
             _ast.fix_missing_locations(tree)
-            exec(compile(tree, "<string>", "exec"), _globals)
+            result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+            if _asyncio.iscoroutine(result):
+                await result
         expr_tree = _ast.Expression(body=last_expr.value)
         _ast.fix_missing_locations(expr_tree)
-        result = eval(compile(expr_tree, "<string>", "eval"), _globals)
+        result = eval(compile(expr_tree, "<string>", "eval", flags=_flags), _globals)
+        if _asyncio.iscoroutine(result):
+            result = await result
         if result is not None:
             display(result)
     else:
-        exec(compile(tree, "<string>", "exec"), _globals)
+        result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+        if _asyncio.iscoroutine(result):
+            await result
 
 # ─── Autocomplete via stdlib rlcompleter ─────────────────────────────
 import re as _re
@@ -331,7 +351,7 @@ try:
     _go.Figure.show = _patched_go_show
 except: pass
 
-_execute_with_last_display(_user_code_str)
+await _execute_with_last_display(_user_code_str)
 
 # Auto-flush any matplotlib figures that the user did not explicitly show.
 # This handles patterns like df.x.plot.density() which create a figure

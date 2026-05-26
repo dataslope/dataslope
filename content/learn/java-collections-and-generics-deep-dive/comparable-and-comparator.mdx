@@ -1,0 +1,372 @@
+---
+title: Comparable and Comparator
+description: Natural order vs. external order — how Java models "what does it mean for two values to be in order?"
+---
+
+A collection cannot sort what it cannot compare. So before any
+`sort`, `TreeSet`, `TreeMap`, or `PriorityQueue` works, *something*
+has to tell Java how two elements relate.
+
+There are two ways to provide that ordering:
+
+- **`Comparable<T>`** — the type *itself* defines a natural order.
+- **`Comparator<T>`** — an *external* object defines an order on the
+  type, often one of many possible orderings.
+
+## Comparable: the natural order
+
+`Comparable<T>` has a single method, `int compareTo(T other)`, which
+returns a negative number, zero, or a positive number depending on
+whether `this` is less than, equal to, or greater than `other`.
+
+Many built-in types implement it: `Integer`, `Double`, `String`
+(lexicographic), `LocalDate`, etc.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        String[] names = { "Charlie", "Alice", "Bob" };
+        Arrays.sort(names);                         // uses String.compareTo
+        System.out.println(Arrays.toString(names)); // [Alice, Bob, Charlie]
+    }
+}
+`}
+/>
+
+Define it for your own types when there is **one obvious order** that
+makes sense most of the time:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.Arrays;
+
+public class Main {
+    record Version(int major, int minor, int patch) implements Comparable<Version> {
+        public int compareTo(Version o) {
+            if (this.major != o.major) return Integer.compare(this.major, o.major);
+            if (this.minor != o.minor) return Integer.compare(this.minor, o.minor);
+            return Integer.compare(this.patch, o.patch);
+        }
+    }
+
+    public static void main(String[] args) {
+        Version[] vs = {
+            new Version(1, 10, 0),
+            new Version(1,  2, 5),
+            new Version(2,  0, 0),
+            new Version(1,  2, 4),
+        };
+        Arrays.sort(vs);
+        for (Version v : vs) System.out.println(v);
+    }
+}
+`}
+/>
+
+Notice the use of `Integer.compare(a, b)` — never write `a - b`,
+which silently overflows for very large or very negative values.
+
+## The equals-consistency advisory
+
+Whenever practical, `compareTo` should be **consistent with
+`equals`**: `a.compareTo(b) == 0` iff `a.equals(b)`.
+
+When it is *not* consistent, sorted collections quietly do
+surprising things. For example, a `TreeSet<BigDecimal>` treats
+`new BigDecimal("1.0")` and `new BigDecimal("1.00")` as **the same
+element** (because `compareTo` returns 0 even though `equals`
+returns false). The Javadoc explicitly warns about this.
+
+If your "natural order" is by, say, a single field, but two objects
+with the same field value should not be treated as equal, prefer a
+`Comparator` and leave `Comparable` out of it.
+
+## Comparator: an external order
+
+A `Comparator<T>` is a small object that knows how to compare two
+`T`s. Because it is external, you can have many of them for the same
+type:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    record Person(String name, int age) {}
+
+    public static void main(String[] args) {
+        List<Person> ps = new ArrayList<>(List.of(
+            new Person("Ada",   36),
+            new Person("Linus", 54),
+            new Person("Grace", 85),
+            new Person("Bjarne",73)
+        ));
+
+        ps.sort(Comparator.comparing(Person::name));
+        System.out.println("by name:  " + ps);
+
+        ps.sort(Comparator.comparingInt(Person::age));
+        System.out.println("by age:   " + ps);
+
+        ps.sort(Comparator.comparingInt(Person::age).reversed());
+        System.out.println("by age v: " + ps);
+    }
+}
+`}
+/>
+
+`Comparator.comparing` and `comparingInt` are *key extractor*
+factories: pass a function from `T` to a sortable key, get a
+`Comparator<T>` back.
+
+## Composing comparators
+
+The real elegance of `Comparator` is composition. You can chain
+`thenComparing` to break ties:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    record Employee(String dept, String name, int salary) {}
+
+    public static void main(String[] args) {
+        List<Employee> es = new ArrayList<>(List.of(
+            new Employee("eng",  "Ada",   120),
+            new Employee("eng",  "Linus", 150),
+            new Employee("sales","Grace",  90),
+            new Employee("eng",  "Brian", 150),
+            new Employee("sales","Edsger", 90)
+        ));
+
+        // department asc, salary desc, then name asc
+        Comparator<Employee> order = Comparator
+            .comparing(Employee::dept)
+            .thenComparing(Comparator.comparingInt(Employee::salary).reversed())
+            .thenComparing(Employee::name);
+
+        es.sort(order);
+        es.forEach(System.out::println);
+    }
+}
+`}
+/>
+
+This is far more readable than a 10-line `compareTo` method that
+mixes three fields, and you can construct different orderings for
+different views without touching the entity class.
+
+## null-safe comparators
+
+By default, comparators throw `NullPointerException` on `null` keys.
+`Comparator.nullsFirst` and `nullsLast` wrap any comparator into a
+null-tolerant one:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> xs = new ArrayList<>(Arrays.asList("b", null, "a", null, "c"));
+        xs.sort(Comparator.nullsLast(Comparator.naturalOrder()));
+        System.out.println(xs);
+    }
+}
+`}
+/>
+
+## Sorting in place vs. producing a sorted copy
+
+| Need | Use |
+| --- | --- |
+| Sort an existing `List` in place | `list.sort(cmp)` or `Collections.sort(list, cmp)` |
+| Get a sorted **copy** of any `Collection` | `list.stream().sorted(cmp).toList()` |
+| Sort an array | `Arrays.sort(arr, cmp)` |
+| Keep a continuously sorted view | `TreeSet` / `TreeMap`, or `PriorityQueue` for partial order |
+
+## Multi-file example: sorting library users
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<User> us = new ArrayList<>(List.of(
+            new User("ada",    36, false),
+            new User("linus",  54, true),
+            new User("grace",  85, true),
+            new User("bjarne", 73, false)
+        ));
+
+        // active users first, then by age descending, then by name
+        us.sort(UserOrders.activeFirstThenOldestThenName());
+        us.forEach(System.out::println);
+    }
+}
+`,
+    },
+    {
+      filename: "User.java",
+      initialContent: `public record User(String name, int age, boolean active) {}
+`,
+    },
+    {
+      filename: "UserOrders.java",
+      initialContent: `import java.util.Comparator;
+
+public final class UserOrders {
+    private UserOrders() {}
+
+    public static Comparator<User> activeFirstThenOldestThenName() {
+        // Boolean.compare(false, true) is negative, so reversed() puts true first
+        return Comparator
+            .comparing(User::active, Comparator.reverseOrder())
+            .thenComparing(Comparator.comparingInt(User::age).reversed())
+            .thenComparing(User::name);
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Naming each ordering as a method gives it intent — `activeFirstThenOldestThenName()`
+reads like the requirement. The class that owns the data does not
+have to know any of this.
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Top-3 by score"
+  instructions={`Implement \`Leaderboard.top3(List<Player>)\` returning the three players with the highest \`score\`, breaking ties by \`name\` ascending.
+
+Expected output:
+
+\`\`\`
+Bjarne 95
+Linus 95
+Grace 90
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Player> ps = List.of(
+            new Player("Ada",    80),
+            new Player("Linus",  95),
+            new Player("Grace",  90),
+            new Player("Bjarne", 95),
+            new Player("Edsger", 85)
+        );
+        for (Player p : Leaderboard.top3(ps)) {
+            System.out.println(p.name() + " " + p.score());
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Player.java",
+      initialContent: `public record Player(String name, int score) {}
+`,
+    },
+    {
+      filename: "Leaderboard.java",
+      initialContent: `import java.util.*;
+
+public final class Leaderboard {
+    private Leaderboard() {}
+
+    public static List<Player> top3(List<Player> players) {
+        // TODO: sort by score desc, then name asc, return first 3
+        return List.of();
+    }
+}
+`,
+      solutionContent: `import java.util.*;
+
+public final class Leaderboard {
+    private Leaderboard() {}
+
+    public static List<Player> top3(List<Player> players) {
+        List<Player> sorted = new ArrayList<>(players);
+        sorted.sort(
+            Comparator.comparingInt(Player::score).reversed()
+                      .thenComparing(Player::name)
+        );
+        return sorted.subList(0, Math.min(3, sorted.size()));
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "leaderboard-top3",
+      name: "Leaderboard.top3 returns the right players in the right order",
+      expect: { stdoutEquals: "Bjarne 95\nLinus 95\nGrace 90" },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`When should a class implement \`Comparable<T>\`?
+
+- Always, just in case
+  > Many types have no single meaningful order.
+- [o] When there is **one** obvious natural order that is consistent with \`equals\` and serves most callers
+  > Correct. Otherwise prefer a \`Comparator\`, which can have many flavors.
+- Only when the class will be stored in a \`TreeSet\`
+  > That's one consumer; \`Comparator\` works there too.
+- Whenever the class has numeric fields
+  > Numeric fields don't imply a single canonical ordering.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`return a - b;\` a bad implementation of \`compareTo\` for \`int\` values?
+
+- It is slower than \`Integer.compare\`
+  > Performance is not the concern; correctness is.
+- [o] It can **overflow** when \`a\` and \`b\` are far apart in sign or magnitude, returning a wrong sign
+  > Correct. Always use \`Integer.compare(a, b)\` for \`int\` and \`Long.compare\` for \`long\`.
+- It does not compile
+  > It compiles.
+- It returns a value outside \`{-1, 0, 1}\`
+  > Returning any negative or positive value is allowed by the contract.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`Comparator.comparing(X::getA).thenComparing(X::getB)\` do?
+
+- Sorts by \`b\` and then by \`a\`
+  > Reversed.
+- [o] Sorts by \`a\` ascending; uses \`b\` to break ties
+  > Correct. \`thenComparing\` only kicks in when the primary comparison returns 0.
+- Sums the two comparison results
+  > Comparators are not added.
+- Sorts only by \`a\`
+  > It also breaks ties by \`b\`.`}
+/>
+
+<Callout type="success" title="Next up">
+With ordering settled, we'll look at *iteration* — the many ways
+collections can be traversed, including streams and the much-loved
+`Iterator.remove()`.
+</Callout>

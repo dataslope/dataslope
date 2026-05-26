@@ -8,3 +8,4 @@ compatibility_flags = ["nodejs_compat"]
 # Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
 # for production secrets, or set them here for non-sensitive defaults.
 ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app"
+

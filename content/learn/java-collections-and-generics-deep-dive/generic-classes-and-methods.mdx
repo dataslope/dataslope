@@ -1,0 +1,406 @@
+---
+title: Generic Classes and Methods
+description: How to declare your own generic types and methods, and the small-but-deep set of design choices that come with them
+---
+
+We have used the standard generic types (`List<E>`, `Map<K,V>`,
+`Set<E>`). It is time to *write our own*. Designing a generic class
+is one of the most underrated skills in Java — it is what separates
+a library you can use anywhere from one you have to copy-paste and
+edit.
+
+## A first generic class: a typed box
+
+The traditional "hello world" of generics is a `Box<T>` — a container
+of exactly one element of some type `T`. Compare the untyped and
+typed versions.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        // Without generics — Object, cast everywhere
+        UntypedBox a = new UntypedBox();
+        a.put("hello");
+        String s = (String) a.get();    // cast required
+        System.out.println(s.toUpperCase());
+
+        // With generics — no cast, type checked
+        Box<String> b = new Box<>();
+        b.put("world");
+        System.out.println(b.get().toUpperCase());   // no cast
+    }
+}
+
+class UntypedBox {
+    private Object value;
+    public void   put(Object v) { value = v; }
+    public Object get()         { return value; }
+}
+
+class Box<T> {
+    private T value;
+    public void put(T v) { value = v; }
+    public T    get()    { return value; }
+}
+`}
+/>
+
+Three things to notice in the typed `Box`:
+
+- The type parameter `<T>` appears immediately after the class name.
+  From inside the class, `T` is just a *placeholder type* — wherever
+  you would write `String` or `Customer`, you can write `T`.
+- `put` and `get` use `T`. The compiler now enforces that whatever
+  `put` accepts is whatever `get` returns.
+- The diamond `<>` on `new Box<>()` lets the compiler infer `String`
+  from the variable's declared type.
+
+## Naming conventions
+
+By convention, single uppercase letters name type parameters:
+
+| Letter | Meaning |
+| --- | --- |
+| `E` | An *element* of a collection |
+| `T` | A general *type* — the only or main type parameter |
+| `K`, `V` | A *key* and a *value* in a map |
+| `R` | A *return* type, especially in functional interfaces |
+| `N` | A *numeric* type |
+| `S`, `U` | Secondary type parameters when more than one is needed |
+
+These are conventions, not rules — the compiler will accept any
+identifier — but every Java reader is wired to expect them, so
+straying is gratuitous noise.
+
+## Multiple type parameters
+
+A generic class can take more than one type parameter. The classic
+example is `Pair<A, B>`:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
+        System.out.println(nameAge.first() + " is " + nameAge.second());
+
+        // The two parameters are independent — they can be the same type:
+        Pair<String, String> fullName = new Pair<>("Ada", "Lovelace");
+        System.out.println(fullName.first() + " " + fullName.second());
+    }
+}
+
+class Pair<A, B> {
+    private final A first;
+    private final B second;
+    public Pair(A first, B second) {
+        this.first  = first;
+        this.second = second;
+    }
+    public A first()  { return first;  }
+    public B second() { return second; }
+}
+`}
+/>
+
+Each occurrence is checked independently — putting a `String` where
+a `B` is expected only works if `B = String` for that particular
+instance.
+
+## Generic methods (independent of the class)
+
+A method can have its *own* type parameters, independent of the
+enclosing class. The type parameter declaration goes *before* the
+return type:
+
+```
+public static <T> T identity(T x) { return x; }
+```
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    // Generic method — works on any element type T
+    public static <T> T firstOf(List<T> list) {
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    // Another generic method — uses two parameters
+    public static <K, V> boolean keyMatchesValue(K k, V v) {
+        return k.toString().equals(v.toString());
+    }
+
+    public static void main(String[] args) {
+        List<String>  words = new ArrayList<>();
+        words.add("alpha"); words.add("beta");
+        List<Integer> nums  = new ArrayList<>();
+        nums.add(10); nums.add(20);
+
+        // Type parameter is inferred from the argument:
+        String s = firstOf(words);
+        Integer n = firstOf(nums);
+        System.out.println(s + ", " + n);
+
+        System.out.println(keyMatchesValue("42", 42));   // true
+    }
+}
+`}
+/>
+
+Generic methods are how the standard library writes things like
+`Collections.emptyList()` or `Map.of(k, v)`. You usually do not have
+to specify the type parameter at the call site — the compiler infers
+it.
+
+## A multi-file generic class: a stack
+
+This is the classic generic class to write next. `Stack<E>` is a
+typed LIFO container — `push`, `pop`, `peek`, `size`.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Stack<String> s = new Stack<>();
+        s.push("first");
+        s.push("second");
+        s.push("third");
+
+        System.out.println("size = "    + s.size());
+        System.out.println("peek = "    + s.peek());
+        System.out.println("pop  = "    + s.pop());
+        System.out.println("pop  = "    + s.pop());
+        System.out.println("size = "    + s.size());
+
+        // A different element type — entirely independent:
+        Stack<Integer> ns = new Stack<>();
+        ns.push(1); ns.push(2); ns.push(3);
+        System.out.println("ns pop = " + ns.pop());
+    }
+}
+`,
+    },
+    {
+      filename: "Stack.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+public class Stack<E> {
+    private final List<E> data = new ArrayList<>();
+
+    public void push(E e) { data.add(e); }
+
+    public E pop() {
+        if (data.isEmpty()) throw new NoSuchElementException();
+        return data.remove(data.size() - 1);
+    }
+
+    public E peek() {
+        if (data.isEmpty()) throw new NoSuchElementException();
+        return data.get(data.size() - 1);
+    }
+
+    public int     size()    { return data.size();    }
+    public boolean isEmpty() { return data.isEmpty(); }
+}
+`,
+    },
+  ]}
+/>
+
+Compare this to the JDK's legacy `Stack`: ours is generic from line
+one, has no thread-safety penalty, and does not leak random `Vector`
+methods into its public API. *This* is what programming to interfaces
++ generics buys you.
+
+## A generic class with a *constraint*: numeric averages
+
+Sometimes a type parameter must support some operation. For example,
+a generic `average` method needs the elements to be `Number`s. That
+is what **bounded type parameters** are for, in their simplest form:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    // T must extend Number — we may call doubleValue() on it.
+    public static <T extends Number> double average(List<T> xs) {
+        double total = 0;
+        for (T x : xs) total += x.doubleValue();
+        return total / xs.size();
+    }
+
+    public static void main(String[] args) {
+        List<Integer> ints = new ArrayList<>();
+        ints.add(1); ints.add(2); ints.add(3); ints.add(4);
+
+        List<Double> dbls = new ArrayList<>();
+        dbls.add(1.5); dbls.add(2.5);
+
+        System.out.println("avg ints = " + average(ints));
+        System.out.println("avg dbls = " + average(dbls));
+
+        // List<String> would not compile — String is not a Number.
+    }
+}
+`}
+/>
+
+We will go far deeper into bounds and wildcards in the next chapter.
+For now, the syntax `<T extends Number>` says "any `T` that is a
+`Number`."
+
+## Constraints can also be on interfaces
+
+`extends` works for interfaces too. A common case is requiring the
+type to be `Comparable`:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static <T extends Comparable<T>> T maxOf(List<T> xs) {
+        T best = xs.get(0);
+        for (T x : xs) {
+            if (x.compareTo(best) > 0) best = x;
+        }
+        return best;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> ns = new ArrayList<>();
+        ns.add(3); ns.add(1); ns.add(9); ns.add(2);
+        System.out.println("max int = " + maxOf(ns));
+
+        List<String> ws = new ArrayList<>();
+        ws.add("alpha"); ws.add("zeta"); ws.add("kappa");
+        System.out.println("max str = " + maxOf(ws));   // "zeta" — lex order
+    }
+}
+`}
+/>
+
+You can also combine constraints with `&`:
+`<T extends Number & Comparable<T>>` means "any `T` that is *both* a
+`Number` and `Comparable<T>`."
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="A generic Pair with swap()"
+  instructions={`Write a class \`Pair<A, B>\` with:
+
+- A constructor that takes \`A first\` and \`B second\`.
+- Accessors \`first()\` and \`second()\`.
+- A method \`Pair<B, A> swap()\` that returns a new pair with the components reversed (note the type change!).
+
+Expected output:
+
+\`\`\`
+ada / 36
+36 / ada
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Pair<String, Integer> p  = new Pair<>("ada", 36);
+        Pair<Integer, String> sp = p.swap();
+        System.out.println(p.first() + " / " + p.second());
+        System.out.println(sp.first() + " / " + sp.second());
+    }
+}
+`,
+    },
+    {
+      filename: "Pair.java",
+      initialContent: `public class Pair<A, B> {
+    // TODO
+}
+`,
+      solutionContent: `public class Pair<A, B> {
+    private final A first;
+    private final B second;
+    public Pair(A first, B second) {
+        this.first = first; this.second = second;
+    }
+    public A first()  { return first;  }
+    public B second() { return second; }
+    public Pair<B, A> swap() {
+        return new Pair<>(second, first);
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "pair-swap",
+      name: "Pair.swap reverses components and types",
+      expect: { stdoutEquals: "ada / 36\n36 / ada" },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Where does a generic *method* declare its own type parameters?
+
+- After the method name
+  > That's where regular parameters go.
+- In the class header
+  > That introduces type parameters scoped to the entire class, not just one method.
+- [o] Immediately before the return type, e.g. \`public static <T> T identity(T x)\`
+  > Correct. A method-scoped type parameter list goes right before the return type.
+- In the calling code only
+  > The declaration must appear on the method itself.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the bound \`<T extends Number>\` allow the method body to do that \`<T>\` would not?
+
+- Call any method of \`Object\` on \`T\`
+  > Both forms allow that — every type is an \`Object\`.
+- [o] Call methods defined on \`Number\` (such as \`intValue()\`, \`doubleValue()\`) on any value of type \`T\`
+  > Correct. The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.
+- Compare \`T\` values with \`<\` and \`>\`
+  > Java does not overload \`<\` for objects, regardless of generics.
+- Construct new instances of \`T\`
+  > Generic type parameters cannot be directly instantiated.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`class Stack<E> { private final List<E> data = new ArrayList<>(); … }\` a better design than the legacy \`java.util.Stack\`?
+
+- It uses less memory
+  > Memory use is similar.
+- [o] It composes a \`List\` instead of extending \`Vector\`, so its public API contains only the stack operations — not random list methods
+  > Correct. Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.
+- It is faster on every operation
+  > Performance is comparable; the win is API hygiene.
+- The legacy \`Stack\` does not compile in modern Java
+  > It still compiles; it is just considered legacy.`}
+/>
+
+<Callout type="success" title="Next up">
+Generics get genuinely subtle when one type "contains" another:
+`List<Dog>` vs `List<Animal>`, `List<? extends Number>` vs
+`List<? super Integer>`. That is the next page.
+</Callout>
