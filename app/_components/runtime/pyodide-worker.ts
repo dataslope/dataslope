@@ -175,22 +175,31 @@ def _patched_show(*args, **kwargs):
     plt.close("all")
 plt.show = _patched_show
 
-def _execute_with_last_display(code):
+import asyncio as _asyncio
+
+async def _execute_with_last_display(code):
     """Execute user code, auto-displaying the last expression like Jupyter."""
     _globals = globals()
+    _flags = _ast.PyCF_ALLOW_TOP_LEVEL_AWAIT
     tree = _ast.parse(code)
     if tree.body and isinstance(tree.body[-1], _ast.Expr):
         last_expr = tree.body.pop()
         if tree.body:
             _ast.fix_missing_locations(tree)
-            exec(compile(tree, "<string>", "exec"), _globals)
+            result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+            if _asyncio.iscoroutine(result):
+                await result
         expr_tree = _ast.Expression(body=last_expr.value)
         _ast.fix_missing_locations(expr_tree)
-        result = eval(compile(expr_tree, "<string>", "eval"), _globals)
+        result = eval(compile(expr_tree, "<string>", "eval", flags=_flags), _globals)
+        if _asyncio.iscoroutine(result):
+            result = await result
         if result is not None:
             display(result)
     else:
-        exec(compile(tree, "<string>", "exec"), _globals)
+        result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+        if _asyncio.iscoroutine(result):
+            await result
 
 # ─── Autocomplete via stdlib rlcompleter ─────────────────────────────
 import re as _re
@@ -319,7 +328,7 @@ try:
     _go.Figure.show = _patched_go_show
 except: pass
 
-_execute_with_last_display(_user_code_str)
+await _execute_with_last_display(_user_code_str)
 
 # Auto-flush any matplotlib figures that the user did not explicitly show.
 # This handles patterns like df.x.plot.density() which create a figure
