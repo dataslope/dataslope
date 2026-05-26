@@ -122,7 +122,7 @@ scattered all over the heap, costing a cache miss on every step.
 
 The cases where `LinkedList` still wins:
 
-- You are doing many `addFirst` / `removeFirst` and need an *eqaure*
+- You are doing many `addFirst` / `removeFirst` and need an *equal*
   guarantee — but `ArrayDeque` is almost always better for this.
 - You have an explicit reference to a node and need `O(1)`
   removal — but Java's `LinkedList` API doesn't expose nodes.
