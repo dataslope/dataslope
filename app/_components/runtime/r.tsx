@@ -593,6 +593,14 @@ async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
   return btoa(binary);
 }
 
+// Row-display limits that mirror R notebook behaviour (tibble print defaults).
+// When a data frame has more than MAX rows, only the first HEAD rows and the
+// last TAIL rows are shown, separated by an ellipsis row and followed by a
+// footer that states the total row count.
+const R_MAX_DISPLAY_ROWS = 20;
+const R_HEAD_ROWS = 10;
+const R_TAIL_ROWS = 5;
+
 function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
   if (rows.length === 0) return null;
   const cols = Object.keys(rows[0] ?? {});
@@ -605,13 +613,38 @@ function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
       .replace(/>/g, "&gt;");
   };
   const head = cols.map((c) => `<th>${escape(c)}</th>`).join("");
-  const body = rows
-    .map(
-      (r) =>
-        `<tr>${cols.map((c) => `<td>${escape(r[c])}</td>`).join("")}</tr>`,
-    )
+
+  const totalRows = rows.length;
+  const truncated = totalRows > R_MAX_DISPLAY_ROWS;
+
+  // Build the list of rows to render: real rows or null (= ellipsis row).
+  type DisplayRow = Record<string, unknown> | null;
+  const displayRows: DisplayRow[] = truncated
+    ? [
+        ...rows.slice(0, R_HEAD_ROWS),
+        null,
+        ...rows.slice(totalRows - R_TAIL_ROWS),
+      ]
+    : rows;
+
+  const body = displayRows
+    .map((r) => {
+      if (r === null) {
+        return `<tr class="dataframe-ellipsis-row">${cols
+          .map(() => "<td>&#x22EF;</td>")
+          .join("")}</tr>`;
+      }
+      return `<tr>${cols.map((c) => `<td>${escape(r[c])}</td>`).join("")}</tr>`;
+    })
     .join("");
-  return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+
+  const footer = truncated
+    ? `<tfoot><tr><td colspan="${cols.length}" class="dataframe-rows-footer">` +
+      `Showing ${R_HEAD_ROWS + R_TAIL_ROWS} of ${totalRows} rows` +
+      `</td></tr></tfoot>`
+    : "";
+
+  return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${footer}</table>`;
 }
 
 function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
