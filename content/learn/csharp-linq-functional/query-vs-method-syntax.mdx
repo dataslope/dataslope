@@ -325,18 +325,15 @@ public static class MethodStyle
       name: "Both styles produce identical, correct output",
       description: "Author totals over 1500, ordered by author name",
       expect: {
-        stdoutEquals: "-- query --\nCormen: 1300\nKnuth: 2150\n-- method --\nCormen: 1300\nKnuth: 2150\n",
+        stdoutEquals: "-- query --\nKnuth: 2150\n-- method --\nKnuth: 2150\n",
       },
     },
   ]}
 />
 
-(Wait — `Cormen: 1300` is listed even though 1300 ≤ 1500. That's
-intentional: the expected output is what you'd get if `>1500` was a
-typo for `>=1300`. Try fixing both implementations to match the
-*actual* `>1500` rule and re-run — Cormen should disappear and only
-Knuth (2150) should remain. The lesson: predicates must match, and
-*both* styles must be equally precise.)
+Both pipelines should now produce the same single line — `Knuth: 2150` —
+because Knuth's three volumes (650 + 700 + 800 = 2150) are the only
+author group whose total page count exceeds the `1500` threshold.
 
 ## A guiding heuristic
 
