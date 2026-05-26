@@ -146,11 +146,11 @@ existed. Every module rolled its own.
 ```mermaid
 flowchart TB
     subgraph App["A medium-sized application"]
-        UI[UI module<br/>String[] names<br/>+ size counter] --> RAW[(raw arrays)]
-        ORD[Order module<br/>Order[] orders<br/>+ grow() helper] --> RAW
-        IDX[Lookup module<br/>String[] keys<br/>+ Order[] values<br/>+ linear search] --> RAW
-        AUD[Audit module<br/>Event[] log<br/>+ ring-buffer math] --> RAW
-        UNI[Uniqueness module<br/>String[] seen<br/>+ contains() loop] --> RAW
+        UI["UI module<br/>String[] names<br/>+ size counter"] --> RAW[(raw arrays)]
+        ORD["Order module<br/>Order[] orders<br/>+ grow() helper"] --> RAW
+        IDX["Lookup module<br/>String[] keys<br/>+ Order[] values<br/>+ linear search"] --> RAW
+        AUD["Audit module<br/>Event[] log<br/>+ ring-buffer math"] --> RAW
+        UNI["Uniqueness module<br/>String[] seen<br/>+ contains() loop"] --> RAW
     end
 ```
 

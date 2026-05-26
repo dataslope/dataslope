@@ -26,10 +26,10 @@ sequenceDiagram
     participant Heap
     participant Constructor as "Person(...)"
 
-    Caller->>JVM: new Person("Ada", 30)
+    Caller->>JVM: new Person(Ada, 30)
     JVM->>Heap: allocate Person
     JVM->>Constructor: run with this = newly-allocated Person
-    Constructor->>Heap: this.name = "Ada"; this.age = 30
+    Constructor->>Heap: this.name = Ada, this.age = 30
     Constructor-->>JVM: done
     JVM-->>Caller: reference to the initialized Person
 ```
