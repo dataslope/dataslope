@@ -93,6 +93,12 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/csharp-linq-functional" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                C# LINQ and Functional Patterns
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
