@@ -1,0 +1,150 @@
+---
+title: Where to Go Next
+description: A roadmap of FP topics, communities, and ecosystems you can explore now that you've internalized the fundamentals.
+---
+
+You've finished the course. The patterns and instincts you've
+built — pure functions, immutable data, discriminated unions,
+`Option`/`Result`, composition, type-driven design, reducers,
+effect-as-value, functional core / imperative shell — are the
+genuinely durable parts of FP. They are not tied to any library,
+framework, or language, and they will serve you for the rest of
+your career.
+
+This last chapter is a roadmap of *what's next*, in roughly the
+order I'd recommend learning them.
+
+## 1. Practice the basics until they feel boring
+
+It sounds anticlimactic but it's the most important step. Find a
+small TypeScript codebase you maintain and *consistently* apply
+what you learned:
+
+- replace nullable returns with `Option`,
+- replace thrown exceptions in your own code with `Result`,
+- make every domain type a discriminated union with exhaustive
+  matching,
+- model state with reducers,
+- separate the pure core from the I/O shell.
+
+Do it until you can write it without thinking, and until you start
+*missing* these patterns in code that lacks them. That tells you
+the intuition has landed.
+
+## 2. Pick one FP library and learn it well
+
+Libraries don't teach FP — but once you know FP, libraries make
+you much more productive. The most influential ones in the
+TypeScript world:
+
+- **[fp-ts](https://github.com/gcanti/fp-ts)** — the classic.
+  Faithfully ports Haskell-style abstractions to TypeScript:
+  `Option`, `Either`, `IO`, `Task`, `TaskEither`, type classes,
+  pipeline-style composition. The mental model maps almost
+  one-to-one to what you've learned.
+- **[Effect](https://effect.website/)** — fp-ts's spiritual
+  successor by largely the same authors. A more modern, ergonomic
+  effect system that bundles errors, dependencies, async, and
+  resource safety into a single `Effect<R, E, A>` type with
+  fantastic tooling.
+- **[Ramda](https://ramdajs.com/)** — older, lighter, more
+  utility-focused. Great for incremental adoption: drop a few
+  `R.pipe`/`R.curry`/`R.lens` calls into existing code without
+  buying into a whole system.
+- **[Immer](https://immerjs.github.io/immer/)** — a different
+  approach to immutability: write code that *looks* mutable and
+  Immer produces an immutable update. Used heavily in Redux
+  Toolkit. A pragmatic stepping stone.
+
+Pick one, ship something with it, then come back and pick another.
+
+## 3. Explore "real" functional languages
+
+Spending time in a language *built* on these ideas will sharpen
+your TypeScript instincts dramatically. In order of how close they
+feel to TypeScript:
+
+- **F#** — ML on .NET. Discriminated unions and pattern matching
+  as first-class syntax; same JavaScript-flavored feel.
+- **OCaml / ReScript / ReasonML** — the lineage TypeScript's
+  inference and structural types owe a great deal to.
+- **Elm** — a tiny pure-functional language for the browser. The
+  best way to *feel* what "the compiler eliminates runtime
+  errors" really means.
+- **Scala 3** — FP and OO in one place, with a powerful type
+  system; useful if you work on the JVM.
+- **Haskell** — the place where most of these abstractions were
+  refined. Worth at least a few weekends; you'll never see code
+  the same way again.
+- **Rust** — not "functional" by lineage, but borrows enormously
+  from ML (sum types, pattern matching, `Option`, `Result`,
+  traits = type classes). The patterns you've just learned will
+  make Rust *much* more approachable.
+
+## 4. Deeper theory (when you're curious)
+
+Optional, but illuminating:
+
+- **Category theory** — there are friendly introductions like
+  Bartosz Milewski's *Category Theory for Programmers* and Brent
+  Yorgey's *Typeclassopedia*. The math behind Functor /
+  Applicative / Monad is genuinely beautiful.
+- **Type theory** — Pierce's *Types and Programming Languages*
+  is the standard text; readable, deep.
+- **Domain modeling** — Scott Wlaschin's *Domain Modeling Made
+  Functional* shows how to apply type-driven design to real
+  business problems (F#, but the lessons transfer cleanly).
+- **Parser combinators, optics, free monads** — natural next steps
+  once `Option`/`Result`/`Task` feel routine.
+
+## 5. Bring it into your team
+
+The single most valuable thing you can do with this knowledge is
+*share it*:
+
+- Add a `Result<E, A>` type to a shared library and refactor *one*
+  service to use it. Show the diff. Show the deleted try/catches.
+- Replace a "god-object" state with a discriminated union and a
+  reducer. Show the bugs the new model rules out.
+- Move business logic out of a class with injected dependencies
+  into a pure function with passed-in data. Show how the tests
+  shrunk.
+
+People learn FP from examples that *make their week easier*, not
+from articles about monads. Be that example.
+
+## A parting thought
+
+Functional programming isn't a religion or a tribe. It's a small
+set of *very* old, *very* well-thought-out ideas about how to
+keep complexity from eating your codebase alive:
+
+- **Don't mutate; transform.**
+- **Don't hide effects; surface them in the type.**
+- **Don't let illegal states be representable.**
+- **Don't sprinkle business logic everywhere; centralize it in a
+  pure core.**
+- **Don't write code that the compiler could check for you.**
+
+The libraries will come and go. The languages will come and go.
+These ideas have survived seventy years of computing precisely
+because they keep paying off. Now they're part of how you think.
+
+Welcome to the club.
+
+---
+
+<MultipleChoice
+  markdown={`What's the single most important "next step" if you want to keep growing as a functional TypeScript developer?
+
+- Memorize the names of every type class in fp-ts
+  > Names without intuitions are noise. Build intuition first.
+- Switch immediately to Haskell
+  > Haskell is a great teacher, but you'll learn far more by *applying* what you already know.
+- [o] Consistently apply the patterns you've learned in real code you maintain, until they become reflexive — and only then layer libraries on top
+  > Correct. The patterns are the durable part; libraries are conveniences. Internalize the patterns first, ship code with them, then adopt a library to remove the boilerplate.
+- Read every paper on category theory
+  > Wonderful when you're curious, but not the limiting factor.
+
+The fastest path to mastery is daily practice on real code, not more reading.`}
+/>

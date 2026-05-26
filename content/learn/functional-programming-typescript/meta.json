@@ -24,7 +24,7 @@
         "---[Compass]Generic Abstractions---",
         "generic-abstractions-and-type-classes",
         "category-theory-intuitions",
-        "---[Waves]Effects, Errors and Async---",
+        "---[Zap]Effects, Errors and Async---",
         "effect-management",
         "functional-async-workflows",
         "functional-state-management",

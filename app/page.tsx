@@ -99,6 +99,15 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link
+              href="/learn/functional-programming-typescript"
+              className={styles.courseCard}
+            >
+              <span className={styles.courseTitle}>
+                Functional Programming with TypeScript
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>

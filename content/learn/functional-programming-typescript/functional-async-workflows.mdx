@@ -1,0 +1,331 @@
+---
+title: Functional Async Workflows
+description: Tasks, lazy promises, and composing asynchronous computations with `map`, `chain`, and `Result`.
+---
+
+JavaScript's `Promise` is a good citizen of the FP world — *almost*.
+`Promise<A>` represents "an `A` that will arrive later". Its
+`.then` is roughly `map` (when the callback returns a value) and
+`flatMap` (when the callback returns another `Promise`). Once you
+see that pattern, everything you learned in the [Category Theory
+chapter](./category-theory-intuitions) applies.
+
+But promises have one small awkwardness: **they start running the
+moment you construct them**. That makes them less composable than
+they could be. In FP we often prefer a *lazy* variant called
+`Task<A>`:
+
+```ts
+type Task<A> = () => Promise<A>;
+```
+
+A `Task` is a *recipe* for an async computation. Building one does
+nothing; calling it (`task()`) actually kicks off the work. This
+is the same trick as [`IO<A>`](./effect-management) from the last
+chapter — laziness for composability.
+
+## Tasks and their three operators
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Task<A> = () => Promise<A>;
+
+const of  = <A,>(a: A): Task<A> => () => Promise.resolve(a);
+
+const map = <A, B>(t: Task<A>, f: (a: A) => B): Task<B> =>
+  () => t().then(f);
+
+const chain = <A, B>(t: Task<A>, f: (a: A) => Task<B>): Task<B> =>
+  () => t().then((a) => f(a)());
+
+// A tiny "sleep" effect, lazy
+const sleep = (ms: number): Task<void> =>
+  () => new Promise((res) => setTimeout(res, ms));
+
+// Compose a sequence
+const program: Task<string> = chain(of(1), (n) =>
+  chain(sleep(50), () =>
+    chain(of(n + 1), (n2) =>
+      map(of(n2 * 10), (n3) => \`final = \${n3}\`))));
+
+(async () => {
+  console.log("nothing has run yet");
+  console.log(await program());     // single, controlled execution
+})();
+`}
+/>
+
+The familiar trio appears again: `of`, `map`, `chain`. The exact
+same patterns you used for `Option` and `Result` apply to `Task`.
+
+## Running tasks in parallel vs sequence
+
+For independent tasks, you want **applicative** behavior: run them
+in parallel, combine their results.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Task<A> = () => Promise<A>;
+
+const of    = <A,>(a: A): Task<A> => () => Promise.resolve(a);
+const sleep = (ms: number, label: string): Task<string> =>
+  () => new Promise((res) => setTimeout(() => res(label), ms));
+
+// Sequential: total time = sum of all
+function sequence<A>(ts: ReadonlyArray<Task<A>>): Task<ReadonlyArray<A>> {
+  return async () => {
+    const out: A[] = [];
+    for (const t of ts) out.push(await t());
+    return out;
+  };
+}
+
+// Parallel: total time = max of all
+function parallel<A>(ts: ReadonlyArray<Task<A>>): Task<ReadonlyArray<A>> {
+  return () => Promise.all(ts.map((t) => t()));
+}
+
+(async () => {
+  const tasks = [sleep(100, "A"), sleep(100, "B"), sleep(100, "C")];
+
+  const t0 = Date.now();
+  console.log("seq:", await sequence(tasks)(), "ms ≈", Date.now() - t0);
+
+  const t1 = Date.now();
+  console.log("par:", await parallel(tasks)(), "ms ≈", Date.now() - t1);
+})();
+`}
+/>
+
+This is the exact same Functor / Applicative / Monad split you
+saw before, applied to asynchrony. `sequence` corresponds to
+*monadic* chaining (each step waits for the previous);
+`parallel` corresponds to *applicative* combining (independent
+steps in parallel).
+
+## Tasks that can fail: `TaskResult<E, A>`
+
+Promises model "an A that will arrive". `Result` models "an A or
+an error". Combining them gives **`TaskResult`** — the type that
+shows up in most real applications:
+
+```ts
+type TaskResult<E, A> = () => Promise<Result<E, A>>;
+```
+
+A `TaskResult` is a recipe for an async computation that *either*
+succeeds with an `A` or fails with an `E` — and rejections from
+the underlying promise are *not* part of the success channel.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
+
+type TaskResult<E, A> = () => Promise<Result<E, A>>;
+
+const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? ok(f(r.value)) : r;
+  };
+
+const chainTR = <E, A, B>(
+  t: TaskResult<E, A>,
+  f: (a: A) => TaskResult<E, B>,
+): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? f(r.value)() : r;
+  };
+
+// --- A fake API ---
+const fetchUser = (id: string): TaskResult<string, { id: string; name: string }> =>
+  () => new Promise((res) =>
+    setTimeout(() =>
+      res(id === "ok" ? ok({ id, name: "Ada" }) : err("not found")), 20));
+
+const greet = (u: { name: string }) => \`Hello, \${u.name}!\`;
+
+// --- Compose without any try/catch ---
+const program = mapTR(fetchUser("ok"),    greet);
+const program2 = mapTR(fetchUser("missing"), greet);
+
+(async () => {
+  console.log(await program());     // { kind: 'ok', value: 'Hello, Ada!' }
+  console.log(await program2());    // { kind: 'err', error: 'not found' }
+})();
+`}
+/>
+
+The chain doesn't blow up on failure — it short-circuits as a
+*value*. You decide what to do with the `err` at the very end,
+where the result is rendered.
+
+## Comparing imperative and functional async
+
+```ts
+// Imperative async — control flow tangled with happy/sad paths
+async function loadDashboard(uid: string) {
+  let user, settings, projects;
+  try { user = await fetchUser(uid); }     catch (e) { handle(e); return; }
+  try { settings = await fetchSettings(uid); } catch (e) { handle(e); return; }
+  try { projects = await fetchProjects(uid); } catch (e) { handle(e); return; }
+  return { user, settings, projects };
+}
+
+// Functional async — happy path reads top-to-bottom
+const loadDashboard = (uid: string) =>
+  chainTR(fetchUser(uid),     (user) =>
+  chainTR(fetchSettings(uid), (settings) =>
+  mapTR  (fetchProjects(uid), (projects) => ({ user, settings, projects }))));
+```
+
+The functional version reads as one long sequence of "and then" —
+the error handling has been *moved out of the code's body* into
+the structure of the type itself.
+
+## A small multi-file challenge
+
+<ChallengeCard
+  adapter="typescript"
+  title="Compose two async lookups with TaskResult"
+  instructions={`In \`workflow.ts\`, implement \`run(userId)\`:
+
+1. Look up the user via \`fetchUser\`.
+2. If found, look up their preferred language via \`fetchLang\`.
+3. Return a \`Result<string, string>\` whose ok value is
+   \`\`\`
+   Hello, <name>! Preferred language: <lang>.
+   \`\`\`
+
+Use \`chainTR\` and \`mapTR\` — **no try/catch, no if/else for
+errors**. Errors must propagate via the Result channel.
+
+**Expected output**
+
+\`\`\`
+{ kind: 'ok', value: 'Hello, Ada! Preferred language: TypeScript.' }
+{ kind: 'err', error: 'no such user' }
+{ kind: 'err', error: 'no language set' }
+\`\`\``}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { run } from "./workflow";
+
+(async () => {
+  console.log(await run("u1")());
+  console.log(await run("u-missing")());
+  console.log(await run("u2")());
+})();
+`,
+    },
+    {
+      filename: "workflow.ts",
+      initialContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
+
+export type TaskResult<E, A> = () => Promise<Result<E, A>>;
+
+export const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? ok(f(r.value)) : r;
+  };
+
+export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E, B>): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? f(r.value)() : r;
+  };
+
+// --- Fake APIs ---
+type User = { id: string; name: string };
+
+export const fetchUser = (id: string): TaskResult<string, User> =>
+  () => Promise.resolve(
+    id === "u1" ? ok({ id, name: "Ada" }) :
+    id === "u2" ? ok({ id, name: "Linus" }) :
+    err("no such user"),
+  );
+
+export const fetchLang = (u: User): TaskResult<string, string> =>
+  () => Promise.resolve(
+    u.id === "u1" ? ok("TypeScript") : err("no language set"),
+  );
+
+// TODO: implement
+export function run(userId: string): TaskResult<string, string> {
+  return () => Promise.resolve(err("not implemented"));
+}
+`,
+      solutionContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
+
+export type TaskResult<E, A> = () => Promise<Result<E, A>>;
+
+export const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? ok(f(r.value)) : r;
+  };
+
+export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E, B>): TaskResult<E, B> =>
+  async () => {
+    const r = await t();
+    return r.kind === "ok" ? f(r.value)() : r;
+  };
+
+type User = { id: string; name: string };
+
+export const fetchUser = (id: string): TaskResult<string, User> =>
+  () => Promise.resolve(
+    id === "u1" ? ok({ id, name: "Ada" }) :
+    id === "u2" ? ok({ id, name: "Linus" }) :
+    err("no such user"),
+  );
+
+export const fetchLang = (u: User): TaskResult<string, string> =>
+  () => Promise.resolve(
+    u.id === "u1" ? ok("TypeScript") : err("no language set"),
+  );
+
+export function run(userId: string): TaskResult<string, string> {
+  return chainTR(fetchUser(userId), (user) =>
+    mapTR(fetchLang(user), (lang) =>
+      \`Hello, \${user.name}! Preferred language: \${lang}.\`));
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "async-workflow",
+      name: "TaskResult composition",
+      description: "Errors propagate via Result; the happy path produces a greeting.",
+      expect: { stdoutEquals: "{ kind: 'ok', value: 'Hello, Ada! Preferred language: TypeScript.' }\n{ kind: 'err', error: 'no such user' }\n{ kind: 'err', error: 'no language set' }" },
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`Why might you prefer \`Task<A> = () => Promise<A>\` over a bare \`Promise<A>\` in functional code?
+
+- Tasks are faster than Promises at runtime
+  > They wrap the same primitive — performance is essentially identical.
+- Tasks can hold synchronous values, Promises can't
+  > Both can hold synchronous values; \`Promise.resolve(x)\` is fine.
+- [o] A \`Task\` is *lazy* — building one does no work, so you can compose, retry, parallelize, or substitute it without accidentally kicking off the computation
+  > Correct. A \`Promise\` starts running the moment it's created; that's not always what you want when composing. A \`Task\` is a recipe you choose when to run.
+- Tasks cannot fail
+  > They certainly can; you usually pair them with \`Result\` (as \`TaskResult<E, A>\`) for typed failure.
+
+Laziness is the small structural difference that makes async values fit the rest of FP nicely.`}
+/>
