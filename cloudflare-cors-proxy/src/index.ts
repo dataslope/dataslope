@@ -59,6 +59,10 @@ const PRIVATE_IP_PATTERNS = [
   /^10\./,
   /^192\.168\./,
   /^172\.(1[6-9]|2\d|3[01])\./,
+  // IPv4 link-local (169.254.0.0/16) — also covers the cloud metadata
+  // endpoint 169.254.169.254. The IPv6 link-local equivalent (fe80:) is
+  // already blocked below.
+  /^169\.254\./,
   /^::1$/,
   /^fc00:/i,
   /^fe80:/i,
@@ -278,6 +282,15 @@ export default {
     for (const [key, value] of Object.entries(corsHeaders)) {
       responseHeaders.set(key, value);
     }
+
+    // The Workers runtime transparently decompresses gzip/brotli upstream
+    // bodies, so `upstreamResponse.body` is already decoded. The upstream
+    // Content-Encoding/Content-Length no longer describe the bytes we return —
+    // leaving them in place makes clients (e.g. pandas read_csv, which trusts
+    // Content-Encoding over its own `compression=` argument) try to gunzip
+    // already-decompressed data, or truncate on a stale length. Drop them.
+    responseHeaders.delete("content-encoding");
+    responseHeaders.delete("content-length");
 
     return new Response(upstreamResponse.body, {
       status: upstreamResponse.status,
