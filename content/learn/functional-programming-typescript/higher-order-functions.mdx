@@ -1,0 +1,411 @@
+---
+title: Higher-Order Functions
+description: Functions that take functions, return functions, or both — the universal mechanism for abstraction in FP.
+---
+
+A **higher-order function** is a function that does at least one of
+two things:
+
+1. **Takes a function** as one of its arguments.
+2. **Returns a function** as its result.
+
+That's the entire definition. The reason it's such a central
+concept is that *passing behavior as a value* is the most powerful
+form of abstraction a language can offer. Once you have it, you can
+replace whole categories of boilerplate with one-line calls.
+
+## Functions as values: the prerequisite
+
+For higher-order functions to make sense, the language has to treat
+functions as **first-class values** — things you can store in
+variables, pass to other functions, return, and put in data
+structures. TypeScript inherited this from JavaScript, which
+inherited it from Scheme.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Functions are values
+const double = (x: number) => x * 2;
+
+// Store them in arrays
+const ops = [(x: number) => x + 1, (x: number) => x * 2, (x: number) => x - 3];
+
+// Look them up by name
+const dispatch: Record<string, (x: number) => number> = {
+  inc:    (x) => x + 1,
+  double: (x) => x * 2,
+  square: (x) => x * x,
+};
+
+console.log(double(10));
+console.log(ops.map((f) => f(5)));   // apply each op to 5
+console.log(dispatch["square"](6));
+`}
+/>
+
+The fact that `(x: number) => number` is a *type* you can use
+anywhere — as an array element, a record value, a parameter — is
+what makes everything else in this chapter possible.
+
+## Functions that take functions: the classic combinators
+
+The three you already know:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const xs = [1, 2, 3, 4, 5];
+
+// map: apply a function to each element
+const doubled = xs.map((x) => x * 2);
+
+// filter: keep elements that satisfy a predicate
+const evens = xs.filter((x) => x % 2 === 0);
+
+// reduce: collapse the list into a single value
+const sum = xs.reduce((acc, x) => acc + x, 0);
+
+console.log(doubled);
+console.log(evens);
+console.log(sum);
+`}
+/>
+
+The key insight: `map`, `filter`, and `reduce` are *one
+implementation* each. They work for any element type, any
+transformation, any predicate, any accumulator. The behavior comes
+from the *function you pass in*. The combinator provides the
+plumbing.
+
+Look at how much code you *aren't* writing:
+
+- `map` replaces "make a new array, loop, push transformed elements"
+- `filter` replaces "make a new array, loop, push elements that pass"
+- `reduce` replaces "init an accumulator, loop, update accumulator"
+
+This is the abstraction higher-order functions provide: **the
+control flow is generic; the behavior is the parameter**.
+
+## Building your own higher-order function
+
+Whenever you find yourself writing the same plumbing twice with a
+different inner action, factor out a higher-order function.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Before: two functions that share 95% of their code
+function logTimings(label: string, work: () => void): void {
+  const start = Date.now();
+  work();
+  const end = Date.now();
+  console.log(\`[\${label}] took \${end - start}ms\`);
+}
+
+function logTimingsResult<T>(label: string, work: () => T): T {
+  const start = Date.now();
+  const result = work();
+  const end = Date.now();
+  console.log(\`[\${label}] took \${end - start}ms\`);
+  return result;
+}
+
+logTimings("noop", () => {
+  for (let i = 0; i < 1_000_000; i++);
+});
+
+const n = logTimingsResult("sum", () => {
+  let s = 0;
+  for (let i = 0; i < 1_000_000; i++) s += i;
+  return s;
+});
+
+console.log("n:", n);
+`}
+/>
+
+The two functions share the same "wrap with timing" logic. The
+generic version is a *single* higher-order function:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function timed<T>(label: string, work: () => T): T {
+  const start = Date.now();
+  const result = work();
+  const end = Date.now();
+  console.log(\`[\${label}] took \${end - start}ms\`);
+  return result;
+}
+
+const n = timed("sum", () => {
+  let s = 0;
+  for (let i = 0; i < 1_000_000; i++) s += i;
+  return s;
+});
+
+console.log("n:", n);
+timed("noop", () => { for (let i = 0; i < 1_000_000; i++); });
+`}
+/>
+
+`timed` is a higher-order function in both directions: it *takes* a
+function (`work`) and runs it. We could equally well write a
+"timing decorator" that *returns* a wrapped function.
+
+## Functions that return functions: factories
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A factory: returns a function configured with 'amount'
+function adder(amount: number): (n: number) => number {
+  return (n) => n + amount;
+}
+
+const addTen     = adder(10);
+const addHundred = adder(100);
+
+console.log(addTen(5));        // 15
+console.log(addHundred(5));    // 105
+
+// Another factory: validator generator
+type Validator<T> = (value: T) => string | null;
+
+function minLen(n: number): Validator<string> {
+  return (s) => s.length >= n ? null : \`must be at least \${n} characters\`;
+}
+
+function matches(re: RegExp, message: string): Validator<string> {
+  return (s) => re.test(s) ? null : message;
+}
+
+const v1 = minLen(8);
+const v2 = matches(/@/, "must contain @");
+
+console.log(v1("abc"));            // "must be at least 8 characters"
+console.log(v1("abcdefghi"));      // null
+console.log(v2("nope"));           // "must contain @"
+console.log(v2("hi@there"));       // null
+`}
+/>
+
+These returned functions are **closures** — they capture variables
+from the enclosing scope (`amount`, `n`, `re`, `message`). Closures
+are the technical mechanism that makes "function-returning-function"
+useful.
+
+## Decorating: wrapping behavior
+
+Returning a function that wraps another function is called a
+**decorator** (the FP sense, unrelated to TypeScript's `@decorator`
+syntax). It lets you add cross-cutting concerns — logging, timing,
+retries, memoization, throttling — without modifying the inner
+function.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A "log calls" decorator
+function withLogging<A extends readonly unknown[], R>(
+  name: string,
+  f: (...args: A) => R,
+): (...args: A) => R {
+  return (...args: A): R => {
+    console.log(\`-> \${name}(\${args.map((a) => JSON.stringify(a)).join(", ")})\`);
+    const r = f(...args);
+    console.log(\`<- \${name} = \${JSON.stringify(r)}\`);
+    return r;
+  };
+}
+
+const add  = (x: number, y: number): number => x + y;
+const loggedAdd = withLogging("add", add);
+
+loggedAdd(2, 3);
+loggedAdd(10, -4);
+`}
+/>
+
+The original `add` is unchanged and still usable. `loggedAdd` is a
+*new* function with the same signature, plus the wrapper behavior.
+That's the power of returning a function: you can layer new
+behaviors on top of existing ones without rewriting them.
+
+## A library of useful higher-order functions
+
+These come up so often they're worth memorizing.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// identity: the function that returns its argument unchanged
+const identity = <A,>(a: A): A => a;
+
+// constant: a function that ignores its argument and always returns x
+const constant = <A,>(a: A) => <B,>(_b: B): A => a;
+
+// flip: swap the order of a binary function's arguments
+const flip = <A, B, C>(f: (a: A, b: B) => C) => (b: B, a: A): C => f(a, b);
+
+// not: negate a predicate
+const not = <A,>(p: (a: A) => boolean) => (a: A): boolean => !p(a);
+
+// tap: run a side effect, return the value unchanged (great for debugging)
+const tap = <A,>(action: (a: A) => void) => (a: A): A => { action(a); return a; };
+
+console.log(identity(42));
+console.log(constant("X")<number>(123));
+console.log(flip((a: number, b: number) => \`\${a},\${b}\`)(1, 2));
+
+const isOdd = (n: number) => n % 2 === 1;
+const isEven = not(isOdd);
+console.log([1, 2, 3, 4].filter(isEven));
+
+const trace = tap<number>((n) => console.log("seen:", n));
+const total = [1, 2, 3].map(trace).reduce((a, b) => a + b, 0);
+console.log("total:", total);
+`}
+/>
+
+Most "FP libraries" are, at their core, a curated collection of
+small higher-order functions like these. None of them are
+mysterious. All of them are six-line implementations.
+
+## Higher-order types: callbacks in signatures
+
+When you write the *type* of a higher-order function in TypeScript,
+the function-as-value pattern shows up directly in the signature:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A generic "apply twice"
+function twice<A>(f: (a: A) => A, a: A): A {
+  return f(f(a));
+}
+
+console.log(twice((x: number) => x + 1, 0));   // 2
+console.log(twice((s: string) => s + "!", "hi")); // "hi!!"
+
+// A generic "until": keep applying f to a until pred is true
+function until<A>(pred: (a: A) => boolean, f: (a: A) => A, a: A): A {
+  let x = a;
+  while (!pred(x)) x = f(x);
+  return x;
+}
+
+console.log(until((n: number) => n >= 100, (n: number) => n * 2, 1));
+`}
+/>
+
+The type `(a: A) => A` *describes* what the function expects. The
+compiler will reject any value that doesn't fit. That's how you get
+both flexibility *and* safety: behavior is a parameter, but it's a
+*typed* parameter.
+
+## A multi-file challenge
+
+<ChallengeCard
+  adapter="typescript"
+  title="Build a tiny validator library"
+  instructions={`In \`validators.ts\`, implement three higher-order helpers:
+
+- \`every(...vs)\` — combine validators; returns the first error or \`null\`.
+- \`when(pred, v)\` — run validator \`v\` only when \`pred(value)\` is true.
+- \`mapInput(f, v)\` — adapt a validator from one type to another (e.g. validate \`s.length\` with a number validator).
+
+Then validate the sample data in \`main.ts\`.
+
+**Expected output**
+
+\`\`\`
+error: too short
+error: missing @
+ok
+\`\`\``}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { every, when, mapInput, type Validator } from "./validators";
+
+const minLen = (n: number): Validator<number> =>
+  (x) => (x >= n ? null : "too short");
+const hasAt: Validator<string> = (s) => (s.includes("@") ? null : "missing @");
+
+const isEmail: Validator<string> = every(
+  mapInput((s: string) => s.length, minLen(3)),
+  when((s: string) => s.length > 0, hasAt),
+);
+
+function check(value: string): void {
+  const err = isEmail(value);
+  console.log(err === null ? "ok" : \`error: \${err}\`);
+}
+
+check("a");
+check("abcd");
+check("a@b");
+`,
+    },
+    {
+      filename: "validators.ts",
+      initialContent: `export type Validator<A> = (a: A) => string | null;
+
+export function every<A>(...vs: Validator<A>[]): Validator<A> {
+  // your code here
+  return () => null;
+}
+
+export function when<A>(pred: (a: A) => boolean, v: Validator<A>): Validator<A> {
+  // your code here
+  return () => null;
+}
+
+export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
+  // your code here
+  return () => null;
+}
+`,
+      solutionContent: `export type Validator<A> = (a: A) => string | null;
+
+export function every<A>(...vs: Validator<A>[]): Validator<A> {
+  return (a) => {
+    for (const v of vs) {
+      const err = v(a);
+      if (err !== null) return err;
+    }
+    return null;
+  };
+}
+
+export function when<A>(pred: (a: A) => boolean, v: Validator<A>): Validator<A> {
+  return (a) => (pred(a) ? v(a) : null);
+}
+
+export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
+  return (a) => v(f(a));
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "validators",
+      name: "Composable validators",
+      description: "Each helper composes pure validator functions correctly.",
+      expect: { stdoutEquals: "error: too short\nerror: missing @\nok" },
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`Which of the following best describes a *higher-order function*?
+
+- A function that runs faster than other functions
+  > Performance has nothing to do with the definition.
+- A function defined at the top level of a module
+  > "Top-level" refers to scope, not behavior.
+- [o] A function that takes another function as an argument, returns a function, or both
+  > Correct. This is the literal definition. It is what makes \`map\`, \`filter\`, \`reduce\`, decorators, factories, and most FP abstractions possible.
+- A function annotated with TypeScript generics
+  > Generic and higher-order are different concepts. A function can be one without the other (though they often appear together).
+
+The defining feature is that *functions themselves flow through the function* — as inputs, outputs, or both.`}
+/>

@@ -1,0 +1,314 @@
+---
+title: Generic Abstractions and Type Classes
+description: Parametric polymorphism, ad-hoc polymorphism, and the type-class-as-record pattern that fits TypeScript.
+---
+
+Functional programmers love **generic** code — code that works
+for *every* shape of data, not just one. That's not laziness or
+showing-off; it's a real engineering discipline: when a function
+is generic, it has *fewer ways to misbehave*, because it knows
+less about its arguments.
+
+## Parametric polymorphism: "I don't know, and I don't care"
+
+The simplest generic function: identity.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const id = <A,>(a: A): A => a;
+
+console.log(id(42));
+console.log(id("hello"));
+console.log(id({ x: 1 }));
+`}
+/>
+
+`id` is *fully* generic — its type `<A>(a: A) => A` doesn't
+constrain `A` at all. Because it knows nothing about `A`, the
+*only* thing it can do is return its argument. That's a powerful
+property: from the type alone, you can prove what the function
+does.
+
+This is a deep idea from category theory called *parametricity*:
+the more polymorphic a function is, the fewer behaviors are
+compatible with its type. A function `<A>(xs: A[]) => A[]` might
+reverse, sort by some external order, dedupe, or do nothing — but
+it cannot invent new `A` values, because it doesn't know how. The
+types tell you a great deal before you've read any code.
+
+### A library of generic helpers
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// All of these are fully parametric: they make no assumptions
+// about A or B, so they can only do what the types literally allow.
+
+const head = <A,>(xs: ReadonlyArray<A>): A | undefined => xs[0];
+
+const last = <A,>(xs: ReadonlyArray<A>): A | undefined =>
+  xs.length === 0 ? undefined : xs[xs.length - 1];
+
+const pair = <A, B>(a: A, b: B): readonly [A, B] => [a, b];
+
+const swap = <A, B>([a, b]: readonly [A, B]): readonly [B, A] => [b, a];
+
+const reverse = <A,>(xs: ReadonlyArray<A>): ReadonlyArray<A> => [...xs].reverse();
+
+console.log(head([1, 2, 3]));
+console.log(last(["a", "b", "c"]));
+console.log(pair(1, "x"));
+console.log(swap(pair(1, "x")));
+console.log(reverse([1, 2, 3]));
+`}
+/>
+
+Nothing in these functions cares whether `A` is a number, a string,
+or a complex object. That's parametric polymorphism. The compiler
+guarantees they all work for *every* `A`.
+
+## Ad-hoc polymorphism: "different behavior per type"
+
+Sometimes a function *does* need to know something extra about its
+type — for example, "I know how to compare two values for
+equality". In Haskell that's called a **type class**:
+
+```haskell
+class Eq a where
+  eq :: a -> a -> Bool
+```
+
+TypeScript doesn't have type classes, but you can simulate them
+with one of the simplest tricks in FP: **a type class is a
+record of functions**. You pass the record as an argument; the
+generic function uses it.
+
+### `Eq` as a record
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// "Type-class-as-record"
+type Eq<A> = { equals: (x: A, y: A) => boolean };
+
+// Some instances
+const eqNumber: Eq<number> = { equals: (x, y) => x === y };
+const eqString: Eq<string> = { equals: (x, y) => x === y };
+const eqCI:     Eq<string> = { equals: (x, y) => x.toLowerCase() === y.toLowerCase() };
+
+// Derive: an Eq for arrays, given an Eq for the element
+function eqArray<A>(e: Eq<A>): Eq<ReadonlyArray<A>> {
+  return {
+    equals: (xs, ys) => xs.length === ys.length && xs.every((x, i) => e.equals(x, ys[i])),
+  };
+}
+
+// A generic helper that uses an Eq
+function contains<A>(eq: Eq<A>, xs: ReadonlyArray<A>, target: A): boolean {
+  return xs.some((x) => eq.equals(x, target));
+}
+
+console.log(contains(eqString, ["Ada", "Linus"], "ada"));      // false
+console.log(contains(eqCI,     ["Ada", "Linus"], "ada"));      // true
+console.log(eqArray(eqNumber).equals([1, 2, 3], [1, 2, 3]));   // true
+`}
+/>
+
+The pattern is profound: an *instance* of a type class is just a
+**value**. You can:
+
+- have multiple instances for the same type (case-sensitive vs
+  case-insensitive `Eq<string>`),
+- *derive* instances from other instances (`eqArray` from any
+  `Eq<A>`),
+- pass instances around explicitly, log them, swap them in tests.
+
+In Haskell the instance is chosen automatically by the compiler.
+In TypeScript it's chosen by the caller. Same idea, slightly more
+ceremony, more flexibility.
+
+### `Ord` as a record
+
+A more useful example: ordering, with `Ord` derived to compare
+tuples lexicographically.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Ordering = -1 | 0 | 1;
+type Ord<A> = { compare: (x: A, y: A) => Ordering };
+
+const ordNumber: Ord<number> = {
+  compare: (x, y) => (x < y ? -1 : x > y ? 1 : 0),
+};
+
+const ordString: Ord<string> = {
+  compare: (x, y) => (x < y ? -1 : x > y ? 1 : 0),
+};
+
+// Sort by Ord
+const sortBy = <A,>(ord: Ord<A>, xs: ReadonlyArray<A>): ReadonlyArray<A> =>
+  [...xs].sort(ord.compare);
+
+// Reverse an Ord — a "derived instance"
+const reverseOrd = <A,>(o: Ord<A>): Ord<A> => ({
+  compare: (x, y) => -o.compare(x, y) as Ordering,
+});
+
+// Combine two Ords lexicographically: "by first; if tied, by second"
+const ordPair = <A, B>(oa: Ord<A>, ob: Ord<B>): Ord<readonly [A, B]> => ({
+  compare: ([a1, b1], [a2, b2]) => {
+    const c = oa.compare(a1, a2);
+    return (c !== 0 ? c : ob.compare(b1, b2)) as Ordering;
+  },
+});
+
+const people: ReadonlyArray<readonly [string, number]> = [
+  ["Ada", 36], ["Linus", 36], ["Grace", 85], ["Ada", 30],
+];
+
+const ord = ordPair(ordString, ordNumber);
+console.log(sortBy(ord, people));
+
+const ordDesc = ordPair(ordString, reverseOrd(ordNumber));
+console.log(sortBy(ordDesc, people));
+`}
+/>
+
+`ordPair` and `reverseOrd` are *combinators* on instances. Instead
+of writing one specific comparator per task, you build sort
+orderings algebraically.
+
+## Type-class hierarchies (briefly)
+
+Some classes extend others. The classical hierarchy from FP looks
+like:
+
+```mermaid
+flowchart TD
+    Functor --> Applicative --> Monad
+    Semigroup --> Monoid
+    Eq --> Ord
+```
+
+The arrows mean "extends" — every `Ord` instance is also an `Eq`
+(it can decide equality from "neither less nor greater"). Every
+`Monad` is an `Applicative`, etc.
+
+We'll meet `Functor`, `Applicative`, and `Monad` in the next
+chapter as **patterns** rather than required code structure. For
+now, what matters is: *typical FP abstractions are just bundles of
+operations*, and TypeScript can model them as records of functions
+plus generic functions that consume those records.
+
+## Why bother?
+
+A `Set<string>` that uses case-sensitive equality is, in a real
+sense, a *different data structure* from one that uses
+case-insensitive equality — even though the values are the same.
+Type classes let you write **one** set implementation that works
+with either, by parameterizing it on `Eq<string>`.
+
+The same pattern shows up everywhere:
+
+- a JSON encoder parameterized by `Show<A>`,
+- a hash table parameterized by `Hash<A>`,
+- a sort parameterized by `Ord<A>`,
+- a merge parameterized by `Semigroup<A>` ("how do I combine two
+  `A` values?"),
+- a sum parameterized by `Monoid<A>` ("how do I combine, and what's
+  the empty?").
+
+You write the algorithm once; you pass the *behavior* in.
+
+## A Semigroup challenge
+
+A **Semigroup** is the simplest possible algebraic abstraction: an
+associative binary operation. Numbers under addition, strings
+under concatenation, arrays under concatenation, and "last wins"
+on objects are all semigroups.
+
+<ChallengeCard
+  adapter="typescript"
+  title="Build a generic 'reduce' from a Semigroup"
+  instructions={`In \`semigroup.ts\`, implement \`combineAll(s, xs)\`
+that combines a non-empty list of \`A\` values using a
+\`Semigroup<A>\` (one operation: \`concat(x, y) => A\`).
+
+For an empty list, return \`undefined\`.
+
+The provided instances are:
+
+- \`sumSG\`     — numbers under \`+\`
+- \`prodSG\`    — numbers under \`*\`
+- \`stringSG\`  — strings under \`+\`
+
+**Expected output**
+
+\`\`\`
+10
+24
+abc
+undefined
+\`\`\``}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { combineAll, sumSG, prodSG, stringSG } from "./semigroup";
+
+console.log(combineAll(sumSG,    [1, 2, 3, 4]));
+console.log(combineAll(prodSG,   [1, 2, 3, 4]));
+console.log(combineAll(stringSG, ["a", "b", "c"]));
+console.log(combineAll(sumSG,    []));
+`,
+    },
+    {
+      filename: "semigroup.ts",
+      initialContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
+
+export const sumSG:    Semigroup<number> = { concat: (x, y) => x + y };
+export const prodSG:   Semigroup<number> = { concat: (x, y) => x * y };
+export const stringSG: Semigroup<string> = { concat: (x, y) => x + y };
+
+export function combineAll<A>(s: Semigroup<A>, xs: ReadonlyArray<A>): A | undefined {
+  // TODO: fold the list using s.concat.
+  return undefined;
+}
+`,
+      solutionContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
+
+export const sumSG:    Semigroup<number> = { concat: (x, y) => x + y };
+export const prodSG:   Semigroup<number> = { concat: (x, y) => x * y };
+export const stringSG: Semigroup<string> = { concat: (x, y) => x + y };
+
+export function combineAll<A>(s: Semigroup<A>, xs: ReadonlyArray<A>): A | undefined {
+  if (xs.length === 0) return undefined;
+  return xs.slice(1).reduce((acc, x) => s.concat(acc, x), xs[0]);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "combine-all",
+      name: "Generic semigroup fold",
+      description: "Fold a list using the supplied Semigroup instance.",
+      expect: { stdoutEquals: "10\n24\nabc\nundefined" },
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`What does it mean for a TypeScript function to be *parametrically polymorphic* over type \`A\`?
+
+- It accepts any argument and uses \`typeof\` to dispatch
+  > That's the opposite — that's *runtime* dispatch on a single, untyped argument.
+- It must work for some specific union of concrete types
+  > Closer, but parametric means *every* type, not a chosen list.
+- [o] It works uniformly for every choice of \`A\` and makes no assumptions about \`A\`'s structure
+  > Correct. Parametric polymorphism gives the strongest guarantees: because the function knows *nothing* about \`A\`, very few behaviors are compatible with its type.
+- It uses \`unknown\` everywhere and casts at the boundary
+  > That defeats the purpose — \`unknown\` erases the polymorphism.
+
+Parametric polymorphism is the source of "from the type, I can predict the behavior" — one of FP's most underrated benefits.`}
+/>
