@@ -126,7 +126,7 @@ async function initPyodide(): Promise<void> {
   // Set up display() and a matplotlib show() patch that captures figures
   // as base64 PNGs into _display_outputs.
   await pyodide.runPythonAsync(`
-import sys, io, base64, json, ast as _ast
+import sys, io, base64, json, ast as _ast, re as _re
 
 # Patch urllib/requests once so user code can make HTTP(S) calls (subject to
 # CORS — cross-origin hosts still need the CORS proxy). Called a single time
@@ -139,6 +139,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 _display_outputs = []
+
+def _strip_html_styles(h):
+    """Remove <style> blocks from HTML to prevent them from overriding playground CSS."""
+    return _re.sub(r'<style[^>]*>.*?</style>', '', h, flags=_re.DOTALL)
 
 def display(*objs):
     import pandas as pd
@@ -153,10 +157,29 @@ def display(*objs):
         if isinstance(obj, (matplotlib.axes.Axes, matplotlib.figure.Figure)):
             continue
         if isinstance(obj, pd.DataFrame):
-            _display_outputs.append({"type": "dataframe", "html": obj.to_html(classes="dataframe", border=0)})
+            # Use _repr_html_() so pandas respects display.max_rows,
+            # display.min_rows, display.max_columns and other options,
+            # producing head+ellipsis+tail output just like a Jupyter notebook.
+            h = obj._repr_html_()
+            if h is None:
+                # notebook_repr_html option is disabled — fall back with limits.
+                h = obj.to_html(
+                    classes="dataframe", border=0,
+                    max_rows=pd.get_option("display.max_rows"),
+                    max_cols=pd.get_option("display.max_columns"),
+                    show_dimensions=True,
+                )
+            else:
+                # Strip the <style> block pandas injects so it does not
+                # override the playground's own table/th/td styles.
+                h = _strip_html_styles(h)
+            _display_outputs.append({"type": "dataframe", "html": h})
         elif hasattr(obj, "_repr_html_"):
             h = obj._repr_html_()
             if h:
+                # Strip injected <style> blocks (e.g. from polars) so they
+                # do not override the playground's own table styles.
+                h = _strip_html_styles(h)
                 _display_outputs.append({"type": "html", "html": h})
         else:
             _display_outputs.append({"type": "stdout", "text": repr(obj)})
