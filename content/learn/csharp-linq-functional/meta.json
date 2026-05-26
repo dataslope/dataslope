@@ -15,7 +15,7 @@
         "immutability",
         "higher-order-functions",
         "lambdas-and-delegates",
-        "---[Filter]Core LINQ---",
+        "---[Funnel]Core LINQ---",
         "ienumerable-and-iteration",
         "filtering-and-projection",
         "selectmany-and-flattening",
