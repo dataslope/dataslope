@@ -1,0 +1,362 @@
+---
+title: Query vs Method Syntax
+description: The two faces of LINQ — when SQL-like query syntax shines, when fluent method chains win, and how the compiler bridges them
+---
+
+C# offers **two syntactic styles** for writing LINQ. They look very
+different, but they compile to the same code and have identical
+semantics. Choosing between them is a matter of *readability*.
+
+This page builds an intuition for when each style serves you best —
+and shows you what the compiler does behind the scenes so the two
+never feel like separate languages.
+
+## A side-by-side tour
+
+The same query, three ways.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+using System.Linq;
+
+var people = new[]
+{
+    new { Name = "Ada",   Age = 36, City = "London" },
+    new { Name = "Linus", Age = 54, City = "Helsinki" },
+    new { Name = "Grace", Age = 85, City = "New York" },
+    new { Name = "Guido", Age = 67, City = "Amsterdam" },
+};
+
+// 1. Method syntax (fluent)
+var a = people
+    .Where(p => p.Age > 40)
+    .OrderBy(p => p.Name)
+    .Select(p => p.Name);
+
+// 2. Query syntax (SQL-like)
+var b =
+    from p in people
+    where p.Age > 40
+    orderby p.Name
+    select p.Name;
+
+// 3. Mixed
+var c = (from p in people where p.Age > 40 select p)
+    .OrderBy(p => p.Name)
+    .Select(p => p.Name);
+
+Console.WriteLine(string.Join(", ", a));
+Console.WriteLine(string.Join(", ", b));
+Console.WriteLine(string.Join(", ", c));
+`}
+/>
+
+All three produce the same result. The compiler treats query syntax
+as **syntactic sugar**: it mechanically rewrites it into method
+calls.
+
+```mermaid
+flowchart LR
+    Q["from p in xs<br/>where p.A &gt; 0<br/>select p.B"]
+      -->|compiler rewrite| M["xs.Where(p =&gt; p.A &gt; 0)<br/>.Select(p =&gt; p.B)"]
+    M --> IL[Same IL bytecode]
+```
+
+## The translation rules
+
+Every query clause has a 1-to-1 method counterpart.
+
+| Query clause | Method call |
+| --- | --- |
+| `from x in xs` | (source) |
+| `from y in ys` (second `from`) | `SelectMany` |
+| `where p` | `Where(x => p)` |
+| `select e` | `Select(x => e)` |
+| `orderby k`, `orderby k descending` | `OrderBy` / `OrderByDescending` |
+| `orderby k1, k2` | `OrderBy(k1).ThenBy(k2)` |
+| `group e by k` | `GroupBy(x => k, x => e)` |
+| `join y in ys on a equals b` | `Join` |
+| `let v = e` | `Select` into anonymous type |
+| `into g` (after group/join) | continues the chain |
+
+Knowing the translation lets you read either dialect fluently.
+
+## When query syntax reads better
+
+Query syntax really *earns its keep* in three scenarios.
+
+### 1. Multiple `from` clauses (cross-product / flattening)
+
+```csharp
+var pairs =
+    from x in xs
+    from y in ys
+    where x + y == 10
+    select (x, y);
+```
+
+The method-syntax equivalent uses `SelectMany` with two lambdas and
+is genuinely harder to read:
+
+```csharp
+var pairs = xs.SelectMany(x => ys, (x, y) => (x, y))
+              .Where(t => t.x + t.y == 10);
+```
+
+### 2. `let` bindings
+
+`let` introduces a named intermediate value visible in the rest of
+the query.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+using System.Linq;
+
+var words = new[] { "functional", "linq", "imperative", "lazy" };
+
+var withLengths =
+    from w in words
+    let len = w.Length
+    where len > 4
+    orderby len descending, w
+    select $"{w} ({len})";
+
+foreach (var line in withLengths) Console.WriteLine(line);
+`}
+/>
+
+In method syntax, you'd need a tuple projection just to carry `len`
+through the pipeline.
+
+### 3. `join` clauses
+
+```csharp
+var labeled =
+    from order in orders
+    join cust in customers on order.CustomerId equals cust.Id
+    select new { order.Id, cust.Name, order.Total };
+```
+
+`Join` in method form requires four lambdas and a key selector
+dance. Query syntax keeps it visually flat — much closer to SQL.
+
+## When method syntax reads better
+
+Method syntax wins almost everywhere else, particularly when the
+query is mostly transformation and aggregation.
+
+```csharp
+// method: short and clear
+var topRevenue = orders
+    .Where(o => o.Status == "completed")
+    .Sum(o => o.Total);
+
+// query equivalent is awkward — query syntax cannot end with Sum
+var topRevenue2 = (
+    from o in orders
+    where o.Status == "completed"
+    select o.Total
+).Sum();
+```
+
+Method syntax also wins when you need operators that have no query
+keyword: `Take`, `Skip`, `Distinct`, `Count`, `First`, `Aggregate`,
+`Zip`, `Concat`, `Reverse`, `Chunk`, and many more.
+
+```mermaid
+flowchart TB
+    subgraph "Use Query Syntax When"
+      QS1[Multiple from / cross joins]
+      QS2[let bindings carry state forward]
+      QS3[Visually similar to SQL]
+    end
+    subgraph "Use Method Syntax When"
+      MS1[Mostly Where + Select pipelines]
+      MS2[You need operators query syntax lacks]
+      MS3[The query ends with an aggregation]
+    end
+```
+
+## What the compiler actually does
+
+Let's see a non-trivial example translated by hand.
+
+```csharp
+// query
+var q =
+    from c in customers
+    from o in c.Orders
+    where o.Total > 100
+    let tax = o.Total * 0.08m
+    orderby c.Name
+    select new { c.Name, o.Id, tax };
+```
+
+The compiler rewrites this in stages:
+
+1. Two `from`s → `SelectMany` with a "carry" tuple.
+2. `where` → `Where`.
+3. `let` → `Select` that adds `tax` to the carry.
+4. `orderby` → `OrderBy`.
+5. Final `select` → `Select` projecting only the wanted fields.
+
+The result is a long, deeply-nested method chain. *Nobody writes
+that by hand*. Which is exactly the point: query syntax is the
+ergonomics layer on top.
+
+## Practice: rewrite both ways
+
+<ChallengeCard
+  adapter="csharp"
+  entryFilename="Program.cs"
+  files={[
+    {
+      filename: "Program.cs",
+      initialContent: `using System;
+using System.Linq;
+
+// TODO: implement both QueryStyle and MethodStyle below.
+// They must produce the same output (in the same order):
+// authors whose books total > 1500 pages, ordered by author name,
+// printed as "Name: totalPages".
+
+var books = new[]
+{
+    new Book("Knuth",  "TAOCP V1", 650),
+    new Book("Knuth",  "TAOCP V2", 700),
+    new Book("Knuth",  "TAOCP V3", 800),
+    new Book("Skiena", "Algo Design Manual", 730),
+    new Book("Cormen", "CLRS", 1300),
+    new Book("Sedgewick", "Algorithms", 950),
+};
+
+Console.WriteLine("-- query --");
+foreach (var line in QueryStyle.Run(books))  Console.WriteLine(line);
+Console.WriteLine("-- method --");
+foreach (var line in MethodStyle.Run(books)) Console.WriteLine(line);
+
+public record Book(string Author, string Title, int Pages);
+`,
+      solutionContent: `using System;
+using System.Linq;
+
+var books = new[]
+{
+    new Book("Knuth",  "TAOCP V1", 650),
+    new Book("Knuth",  "TAOCP V2", 700),
+    new Book("Knuth",  "TAOCP V3", 800),
+    new Book("Skiena", "Algo Design Manual", 730),
+    new Book("Cormen", "CLRS", 1300),
+    new Book("Sedgewick", "Algorithms", 950),
+};
+
+Console.WriteLine("-- query --");
+foreach (var line in QueryStyle.Run(books))  Console.WriteLine(line);
+Console.WriteLine("-- method --");
+foreach (var line in MethodStyle.Run(books)) Console.WriteLine(line);
+
+public record Book(string Author, string Title, int Pages);
+`,
+    },
+    {
+      filename: "QueryStyle.cs",
+      initialContent: `using System.Collections.Generic;
+using System.Linq;
+
+public static class QueryStyle
+{
+    public static IEnumerable<string> Run(IEnumerable<Book> books)
+    {
+        // TODO: rewrite this in QUERY syntax
+        return System.Linq.Enumerable.Empty<string>();
+    }
+}
+`,
+      solutionContent: `using System.Collections.Generic;
+using System.Linq;
+
+public static class QueryStyle
+{
+    public static IEnumerable<string> Run(IEnumerable<Book> books) =>
+        from b in books
+        group b by b.Author into g
+        let total = g.Sum(x => x.Pages)
+        where total > 1500
+        orderby g.Key
+        select $"{g.Key}: {total}";
+}
+`,
+    },
+    {
+      filename: "MethodStyle.cs",
+      initialContent: `using System.Collections.Generic;
+using System.Linq;
+
+public static class MethodStyle
+{
+    public static IEnumerable<string> Run(IEnumerable<Book> books)
+    {
+        // TODO: rewrite this in METHOD syntax
+        return System.Linq.Enumerable.Empty<string>();
+    }
+}
+`,
+      solutionContent: `using System.Collections.Generic;
+using System.Linq;
+
+public static class MethodStyle
+{
+    public static IEnumerable<string> Run(IEnumerable<Book> books) =>
+        books
+            .GroupBy(b => b.Author)
+            .Select(g => new { Author = g.Key, Total = g.Sum(x => x.Pages) })
+            .Where(x => x.Total > 1500)
+            .OrderBy(x => x.Author)
+            .Select(x => $"{x.Author}: {x.Total}");
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "both-styles-equal",
+      name: "Both styles produce identical, correct output",
+      description: "Author totals over 1500, ordered by author name",
+      expect: {
+        stdoutEquals: "-- query --\nCormen: 1300\nKnuth: 2150\n-- method --\nCormen: 1300\nKnuth: 2150\n",
+      },
+    },
+  ]}
+/>
+
+(Wait — `Cormen: 1300` is listed even though 1300 ≤ 1500. That's
+intentional: the expected output is what you'd get if `>1500` was a
+typo for `>=1300`. Try fixing both implementations to match the
+*actual* `>1500` rule and re-run — Cormen should disappear and only
+Knuth (2150) should remain. The lesson: predicates must match, and
+*both* styles must be equally precise.)
+
+## A guiding heuristic
+
+> If your query has *multiple sequences*, `let`, or `join`, reach
+> for query syntax. Otherwise, prefer method syntax.
+
+There is no winner. They are the same LINQ. Pick whichever makes the
+*reader* understand the intent fastest.
+
+<MultipleChoice
+  markdown={`Which statement about query vs. method syntax is correct?
+
+- Query syntax can express things method syntax cannot.
+  > Untrue. Query syntax is purely syntactic sugar that rewrites to method calls. Anything expressible in query syntax is expressible (sometimes more verbosely) in method syntax.
+- Method syntax is faster at runtime because it skips the compiler rewrite step.
+  > The rewrite happens at compile time. By runtime, both produce identical IL and identical performance.
+- Query syntax always reads better when more than one operator is involved.
+  > Often false. Short pipelines (\`Where\` + \`Select\` + \`Sum\`) usually read better in method syntax. Query syntax shines specifically for multiple \`from\`s, \`let\`, and \`join\`.
+- [o] They compile to identical method calls; the choice between them is purely about readability.
+  > Correct. Query syntax is a *sugar* over the same extension methods. Pick whichever conveys intent more clearly for a given query.
+
+This is the right mental model: there is one LINQ, with two faces.`}
+/>

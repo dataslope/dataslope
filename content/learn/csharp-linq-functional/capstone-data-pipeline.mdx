@@ -1,0 +1,359 @@
+---
+title: "Capstone: A Functional Data Pipeline"
+description: Synthesize every technique in this course into one realistic, multi-file, multi-stage LINQ pipeline that produces a report from raw records
+---
+
+This page is the *real test* of the course. You'll build an
+end-to-end pipeline that:
+
+- parses raw CSV-style records into typed values,
+- filters and groups them,
+- computes per-group aggregates,
+- produces a sorted, formatted report.
+
+Every step is a pure LINQ pipeline. The whole thing is composable,
+deferred, and trivially testable. By the end you should feel that
+LINQ is *the* idiomatic way to do this kind of work in C#.
+
+## The scenario
+
+A small SaaS sells two products. Each transaction is a line of CSV:
+
+```
+2026-05-01,A,2,19.99,paid
+2026-05-01,B,1,49.00,paid
+2026-05-02,A,1,19.99,refund
+...
+```
+
+Columns: `date, productCode, quantity, unitPrice, status`.
+
+The desired report:
+
+```
+=== Product A ===
+  units sold:   17
+  gross:        339.83
+  net (paid - refund): 299.85
+=== Product B ===
+  units sold:   12
+  gross:        588.00
+  net (paid - refund): 539.00
+=== TOTAL ===
+  units sold:   29
+  gross:        927.83
+  net:          838.85
+```
+
+## The architecture
+
+```mermaid
+flowchart LR
+    R[Raw CSV lines] --> P[Parse]
+    P --> V[Valid rows]
+    V --> G[Group by product]
+    G --> S[Summarize per product]
+    S --> RPT[Render report]
+```
+
+Each stage is a pure function from one shape of data to another.
+Each stage uses LINQ. Each stage is independently testable.
+
+## The data model
+
+We'll model rows as records and the per-product summary as another
+record. *Data first, behavior second* — the functional move.
+
+## Your turn
+
+<ChallengeCard
+  adapter="csharp"
+  entryFilename="Program.cs"
+  files={[
+    {
+      filename: "Program.cs",
+      initialContent: `using System;
+using System.Linq;
+
+var lines = new[]
+{
+    "2026-05-01,A,2,19.99,paid",
+    "2026-05-01,B,1,49.00,paid",
+    "2026-05-02,A,1,19.99,refund",
+    "2026-05-02,A,5,19.99,paid",
+    "2026-05-03,B,3,49.00,paid",
+    "garbage line should be skipped",
+    "2026-05-04,A,10,19.99,paid",
+    "2026-05-04,B,8,49.00,paid",
+    "2026-05-05,A,1,19.99,refund",
+    "",
+};
+
+Console.Write(Pipeline.BuildReport(lines));
+`,
+      solutionContent: `using System;
+using System.Linq;
+
+var lines = new[]
+{
+    "2026-05-01,A,2,19.99,paid",
+    "2026-05-01,B,1,49.00,paid",
+    "2026-05-02,A,1,19.99,refund",
+    "2026-05-02,A,5,19.99,paid",
+    "2026-05-03,B,3,49.00,paid",
+    "garbage line should be skipped",
+    "2026-05-04,A,10,19.99,paid",
+    "2026-05-04,B,8,49.00,paid",
+    "2026-05-05,A,1,19.99,refund",
+    "",
+};
+
+Console.Write(Pipeline.BuildReport(lines));
+`,
+    },
+    {
+      filename: "Records.cs",
+      initialContent: `using System;
+
+public record Txn(DateTime Date, string Product, int Quantity, decimal UnitPrice, string Status);
+
+public record ProductSummary(string Product, int UnitsSold, decimal Gross, decimal Net);
+`,
+      solutionContent: `using System;
+
+public record Txn(DateTime Date, string Product, int Quantity, decimal UnitPrice, string Status);
+
+public record ProductSummary(string Product, int UnitsSold, decimal Gross, decimal Net);
+`,
+    },
+    {
+      filename: "Parsing.cs",
+      initialContent: `using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+public static class Parsing
+{
+    // TODO: parse one line into a Txn or null on failure.
+    // Format: "yyyy-MM-dd,product,quantity,unitPrice,status".
+    public static Txn? ParseLine(string line)
+    {
+        throw new NotImplementedException();
+    }
+
+    // TODO: parse all lines, dropping nulls.
+    public static IEnumerable<Txn> ParseAll(IEnumerable<string> lines)
+    {
+        throw new NotImplementedException();
+    }
+}
+`,
+      solutionContent: `using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+public static class Parsing
+{
+    public static Txn? ParseLine(string line)
+    {
+        if (string.IsNullOrWhiteSpace(line)) return null;
+        var parts = line.Split(',');
+        if (parts.Length != 5) return null;
+
+        if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)) return null;
+        var product = parts[1];
+        if (!int.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var qty)) return null;
+        if (!decimal.TryParse(parts[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var price)) return null;
+        var status = parts[4];
+
+        return new Txn(date, product, qty, price, status);
+    }
+
+    public static IEnumerable<Txn> ParseAll(IEnumerable<string> lines) =>
+        lines.Select(ParseLine).Where(t => t is not null).Select(t => t!);
+}
+`,
+    },
+    {
+      filename: "Summarize.cs",
+      initialContent: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public static class Summarize
+{
+    // TODO: group txns by product; for each group compute:
+    //   UnitsSold = sum of Quantity for paid txns only,
+    //   Gross     = sum of Quantity * UnitPrice for paid txns only,
+    //   Net       = paid total minus refund total (refund total uses Quantity*UnitPrice).
+    // Return summaries ordered by Product ascending.
+    public static IEnumerable<ProductSummary> ByProduct(IEnumerable<Txn> txns)
+    {
+        throw new NotImplementedException();
+    }
+}
+`,
+      solutionContent: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public static class Summarize
+{
+    public static IEnumerable<ProductSummary> ByProduct(IEnumerable<Txn> txns) =>
+        txns
+            .GroupBy(t => t.Product)
+            .OrderBy(g => g.Key)
+            .Select(g =>
+            {
+                var paid    = g.Where(t => t.Status == "paid");
+                var refund  = g.Where(t => t.Status == "refund");
+                var units   = paid.Sum(t => t.Quantity);
+                var gross   = paid.Sum(t => t.Quantity * t.UnitPrice);
+                var refunds = refund.Sum(t => t.Quantity * t.UnitPrice);
+                return new ProductSummary(g.Key, units, gross, gross - refunds);
+            });
+}
+`,
+    },
+    {
+      filename: "Pipeline.cs",
+      initialContent: `using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+
+public static class Pipeline
+{
+    // TODO: assemble the full pipeline and produce the report string.
+    // Format EXACTLY:
+    //   === Product {key} ===
+    //     units sold:   {units}
+    //     gross:        {gross:0.00}
+    //     net:          {net:0.00}
+    //   ...repeat...
+    //   === TOTAL ===
+    //     units sold:   {sumUnits}
+    //     gross:        {sumGross:0.00}
+    //     net:          {sumNet:0.00}
+    public static string BuildReport(IEnumerable<string> lines)
+    {
+        throw new NotImplementedException();
+    }
+}
+`,
+      solutionContent: `using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+
+public static class Pipeline
+{
+    public static string BuildReport(IEnumerable<string> lines)
+    {
+        var summaries = Summarize.ByProduct(Parsing.ParseAll(lines)).ToList();
+        var sb = new StringBuilder();
+        foreach (var s in summaries)
+        {
+            sb.AppendLine($"=== Product {s.Product} ===");
+            sb.AppendLine($"  units sold:   {s.UnitsSold}");
+            sb.AppendLine($"  gross:        {s.Gross.ToString("0.00", CultureInfo.InvariantCulture)}");
+            sb.AppendLine($"  net:          {s.Net.ToString("0.00", CultureInfo.InvariantCulture)}");
+        }
+        var totUnits = summaries.Sum(x => x.UnitsSold);
+        var totGross = summaries.Sum(x => x.Gross);
+        var totNet   = summaries.Sum(x => x.Net);
+        sb.AppendLine("=== TOTAL ===");
+        sb.AppendLine($"  units sold:   {totUnits}");
+        sb.AppendLine($"  gross:        {totGross.ToString("0.00", CultureInfo.InvariantCulture)}");
+        sb.AppendLine($"  net:          {totNet.ToString("0.00", CultureInfo.InvariantCulture)}");
+        return sb.ToString();
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "capstone-report",
+      name: "Full pipeline produces correct multi-product report",
+      description: "Parse + group + summarize + total over the sample dataset",
+      expect: {
+        stdoutEquals: "=== Product A ===\n  units sold:   17\n  gross:        339.83\n  net:          299.85\n=== Product B ===\n  units sold:   12\n  gross:        588.00\n  net:          539.00\n=== TOTAL ===\n  units sold:   29\n  gross:        927.83\n  net:          838.85\n",
+      },
+    },
+  ]}
+/>
+
+## Things to notice in your solution
+
+If you completed the challenge, look back over your code and notice:
+
+1. **No loops.** Every transformation uses LINQ. Each pipeline reads
+   top-to-bottom like a *description* of the work, not a sequence of
+   instructions.
+
+2. **No mutation.** No `for (i...)`, no `if`-then-`add`. Each stage
+   returns a new sequence; nothing is patched in place.
+
+3. **Pure stages.** `Parsing`, `Summarize`, and `Pipeline` are all
+   testable in isolation. Feed them an `IEnumerable<string>`,
+   `IEnumerable<Txn>`, etc. — get deterministic output. The "world"
+   never appears.
+
+4. **One pure function per file.** Each file is small. Each function
+   does one thing. The *composition* lives in `Pipeline.BuildReport`.
+
+5. **The shell is one `Console.Write`.** All the IO of the program
+   is a single line at the bottom of `Program.cs`.
+
+## How this generalizes
+
+```mermaid
+flowchart LR
+    Raw[Raw input] --> Parse --> Validate --> Transform --> Summarize --> Render
+    style Parse     fill:#e0f2fe,stroke:#0284c7
+    style Validate  fill:#e0f2fe,stroke:#0284c7
+    style Transform fill:#e0f2fe,stroke:#0284c7
+    style Summarize fill:#e0f2fe,stroke:#0284c7
+```
+
+Almost every batch data program — analytics, ETL, report
+generation, log processing, billing, search indexing — fits this
+shape. The same pure-functional, LINQ-driven pattern scales from
+six lines of CSV to gigabytes of input (with `IEnumerable` streaming
+all the way through). What changes is the *source* and the *sink*;
+the core is the same shape.
+
+## A self-assessment
+
+Tick the boxes for yourself:
+
+- [ ] I built each stage as a pure function returning a sequence
+- [ ] Every filter, projection, and grouping was a LINQ operator
+- [ ] The pipeline composed cleanly across multiple files
+- [ ] My test (the `stdoutEquals` block) passed exactly on the first
+      correct run, with no special cases
+- [ ] I felt the *whole program* fit in my head at once
+
+If most of those are ticks, you've internalized the course. If
+not — re-read the relevant chapter and rebuild the broken stage.
+This is the kind of muscle that needs reps.
+
+<MultipleChoice
+  markdown={`In the capstone solution, what makes \`Summarize.ByProduct\` so easy to test?
+
+- It uses \`async\` so the test runner can await it.
+  > \`Summarize.ByProduct\` is fully synchronous — there's nothing to await.
+- It writes test logs internally that the test framework reads.
+  > It has no logging or IO. That's the *point*.
+- [o] It is a pure function: it takes an \`IEnumerable<Txn>\` and returns \`IEnumerable<ProductSummary>\` with no IO or hidden state.
+  > Correct. Pure functions are trivially testable: hand-craft a few \`Txn\` records, call the function, assert on the returned values. No mocks, no fakes, no setup, no teardown — and the same input always produces the same output.
+- It uses inheritance to be mocked.
+  > It is a plain \`static\` method. No mocking required *because* it is pure.
+
+The pure-core / imperative-shell discipline pays off most visibly at test time.`}
+/>
