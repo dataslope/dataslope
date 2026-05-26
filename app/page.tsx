@@ -56,6 +56,12 @@ export default function Home() {
         <section className={styles.courses}>
           <h2 className={styles.coursesHeading}>Courses</h2>
           <div className={styles.courseList}>
+            <Link href="/learn/typescript-from-scratch" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                TypeScript from Scratch
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/python-basics" className={styles.courseCard}>
               <span className={styles.courseTitle}>Python Basics</span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>

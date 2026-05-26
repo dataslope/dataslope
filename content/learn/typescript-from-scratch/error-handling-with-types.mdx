@@ -1,0 +1,531 @@
+---
+title: Error Handling with Types
+description: Model errors as values with Result<T, E> for explicit, composable error handling.
+---
+
+# Error Handling with Types
+
+Traditional error handling in JavaScript relies on `throw` and `catch`. But exceptions have a fatal flaw: they're **invisible in types**. A function's signature doesn't tell you what errors it might throw, so you either handle every possible exception defensively (slow, verbose) or forget to handle them at all (bugs).
+
+TypeScript inherits this problem. But there's a better way, borrowed from functional languages like Rust, Haskell, and OCaml: **model errors as values**. Instead of throwing, return a discriminated union that explicitly represents success or failure. The compiler then forces you to handle both cases.
+
+In this chapter, you'll learn the **`Result<T, E>` pattern**, a type-safe alternative to exceptions. You'll build combinators that compose error-prone operations, and you'll see when to use `Result` vs. when to still throw.
+
+---
+
+## The Problem with Exceptions
+
+Consider a parser that might fail:
+
+```ts
+function parseJSON(input: string): any {
+  return JSON.parse(input); // Throws SyntaxError if invalid
+}
+```
+
+The signature says it returns `any`, but it doesn't mention that it can *throw*. Callers have no way to know:
+- What exception types might be thrown?
+- When should I catch?
+- Did the maintainer forget to document this?
+
+This leads to two failure modes:
+1. **Over-catching**: Wrap everything in `try/catch`, slowing code and hiding real bugs.
+2. **Under-catching**: Forget to catch, and the exception propagates to production.
+
+Exceptions also break composition. You can't easily chain operations, collect multiple errors, or defer error handling. You must handle them *right now*, or let them bubble.
+
+---
+
+## The Solution: `Result<T, E>`
+
+A **`Result<T, E>`** is a discriminated union representing either success (with a value of type `T`) or failure (with an error of type `E`):
+
+```ts
+type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+```
+
+Functions return `Result` instead of throwing. Callers must check `.ok` to access the value or error, and TypeScript enforces this at compile time.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  if (isNaN(n)) {
+    return { ok: false, error: \`Invalid number: "\${input}"\` };
+  }
+  return { ok: true, value: n };
+}
+
+const result1 = parseNumber("42");
+if (result1.ok) {
+  console.log(\`Parsed: \${result1.value}\`);
+} else {
+  console.log(\`Error: \${result1.error}\`);
+}
+
+const result2 = parseNumber("abc");
+if (result2.ok) {
+  console.log(\`Parsed: \${result2.value}\`);
+} else {
+  console.log(\`Error: \${result2.error}\`);
+}
+`}
+/>
+
+Now the signature **documents** that parsing might fail, and the compiler **enforces** that you handle both cases. No silent failures, no forgotten catches.
+
+---
+
+## Building Helper Functions
+
+Raw `if (result.ok)` checks get verbose. Let's build combinators to make `Result` ergonomic.
+
+### `map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E>`
+
+Transforms the success value if present, otherwise propagates the error:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+function map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
+  if (result.ok) {
+    return { ok: true, value: fn(result.value) };
+  }
+  return result;
+}
+
+function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  if (isNaN(n)) {
+    return { ok: false, error: \`Invalid number: "\${input}"\` };
+  }
+  return { ok: true, value: n };
+}
+
+const result = parseNumber("42");
+const doubled = map(result, (n) => n * 2);
+
+if (doubled.ok) {
+  console.log(\`Doubled: \${doubled.value}\`);
+} else {
+  console.log(\`Error: \${doubled.error}\`);
+}
+`}
+/>
+
+`map` lets you transform success values without manually unpacking and repacking the `Result`.
+
+---
+
+### `andThen<T, E, U>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E>`
+
+Chains operations that also return `Result`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+function andThen<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => Result<U, E>
+): Result<U, E> {
+  if (result.ok) {
+    return fn(result.value);
+  }
+  return result;
+}
+
+function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  if (isNaN(n)) {
+    return { ok: false, error: \`Invalid number: "\${input}"\` };
+  }
+  return { ok: true, value: n };
+}
+
+function sqrt(n: number): Result<number, string> {
+  if (n < 0) {
+    return { ok: false, error: "Cannot take square root of negative number" };
+  }
+  return { ok: true, value: Math.sqrt(n) };
+}
+
+const result = parseNumber("16");
+const sqrtResult = andThen(result, sqrt);
+
+if (sqrtResult.ok) {
+  console.log(\`Square root: \${sqrtResult.value}\`);
+} else {
+  console.log(\`Error: \${sqrtResult.error}\`);
+}
+`}
+/>
+
+`andThen` (also called `flatMap` or `bind` in other languages) flattens nested `Result`s, letting you chain operations cleanly.
+
+---
+
+### `unwrapOr<T, E>(result: Result<T, E>, defaultValue: T): T`
+
+Extracts the value or returns a default:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+function unwrapOr<T, E>(result: Result<T, E>, defaultValue: T): T {
+  if (result.ok) {
+    return result.value;
+  }
+  return defaultValue;
+}
+
+function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  if (isNaN(n)) {
+    return { ok: false, error: \`Invalid number: "\${input}"\` };
+  }
+  return { ok: true, value: n };
+}
+
+const result = parseNumber("abc");
+const value = unwrapOr(result, 0);
+console.log(\`Value: \${value}\`); // 0
+`}
+/>
+
+Useful when you want a fallback without explicitly checking `.ok`.
+
+---
+
+## Composing Operations with `Result`
+
+Let's build a pipeline that parses input, validates it, and computes a result:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+function map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
+  return result.ok ? { ok: true, value: fn(result.value) } : result;
+}
+
+function andThen<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => Result<U, E>
+): Result<U, E> {
+  return result.ok ? fn(result.value) : result;
+}
+
+function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  return isNaN(n)
+    ? { ok: false, error: \`Invalid number: "\${input}"\` }
+    : { ok: true, value: n };
+}
+
+function validatePositive(n: number): Result<number, string> {
+  return n > 0
+    ? { ok: true, value: n }
+    : { ok: false, error: "Number must be positive" };
+}
+
+function computeSquare(input: string): Result<number, string> {
+  const parsed = parseNumber(input);
+  const validated = andThen(parsed, validatePositive);
+  return map(validated, (n) => n * n);
+}
+
+const result1 = computeSquare("5");
+console.log(result1); // { ok: true, value: 25 }
+
+const result2 = computeSquare("-5");
+console.log(result2); // { ok: false, error: "Number must be positive" }
+
+const result3 = computeSquare("abc");
+console.log(result3); // { ok: false, error: 'Invalid number: "abc"' }
+`}
+/>
+
+Notice:
+1. Each step is a separate function that returns `Result`.
+2. `andThen` chains steps that might fail.
+3. `map` transforms the final success value.
+4. Errors propagate automatically — no manual `if` checks at every step.
+
+```mermaid
+graph LR
+    A[Input: '5'] --> B[parseNumber]
+    B --> C{ok?}
+    C -->|yes| D[validatePositive]
+    C -->|no| E[Error: Invalid number]
+    D --> F{ok?}
+    F -->|yes| G[map: square]
+    F -->|no| H[Error: Must be positive]
+    G --> I[Result: 25]
+    style I fill:#d4edda
+    style E fill:#f8d7da
+    style H fill:#f8d7da
+```
+
+---
+
+## Multi-File Example: Parser with `Result`
+
+Let's organize a parser into modules:
+
+<CodeBlock
+  adapter="typescript"
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { parseConfig } from "./parser";
+
+const input1 = '{"port":3000,"host":"localhost"}';
+const result1 = parseConfig(input1);
+
+if (result1.ok) {
+  console.log(\`Config: port=\${result1.value.port}, host=\${result1.value.host}\`);
+} else {
+  console.log(\`Error: \${result1.error}\`);
+}
+
+const input2 = "invalid json";
+const result2 = parseConfig(input2);
+
+if (result2.ok) {
+  console.log(\`Config: port=\${result2.value.port}, host=\${result2.value.host}\`);
+} else {
+  console.log(\`Error: \${result2.error}\`);
+}
+`,
+    },
+    {
+      filename: "parser.ts",
+      initialContent: `import { Result } from "./result";
+
+export type Config = {
+  port: number;
+  host: string;
+};
+
+export function parseConfig(input: string): Result<Config, string> {
+  try {
+    const obj = JSON.parse(input);
+    if (typeof obj.port === "number" && typeof obj.host === "string") {
+      return { ok: true, value: { port: obj.port, host: obj.host } };
+    }
+    return { ok: false, error: "Missing or invalid fields" };
+  } catch (e) {
+    return { ok: false, error: "Invalid JSON" };
+  }
+}
+`,
+    },
+    {
+      filename: "result.ts",
+      initialContent: `export type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+export function map<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => U
+): Result<U, E> {
+  return result.ok ? { ok: true, value: fn(result.value) } : result;
+}
+
+export function andThen<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => Result<U, E>
+): Result<U, E> {
+  return result.ok ? fn(result.value) : result;
+}
+`,
+    },
+  ]}
+/>
+
+Here:
+- `result.ts` defines `Result` and its helpers.
+- `parser.ts` uses `Result` to return success or error.
+- `main.ts` handles the result explicitly.
+
+This structure scales: any module can return `Result`, and consumers can compose with `map`/`andThen`.
+
+---
+
+## Challenge: Implement `Result.map` and Use It
+
+<ChallengeCard
+  adapter="typescript"
+  title="Result.map"
+  instructions={`Complete the implementation of \`map\` in \`result.ts\`, then use it in \`main.ts\` to transform a parsed number by doubling it.
+
+**Hint**: If \`result.ok\`, apply \`fn\` to \`result.value\` and return a new success \`Result\`. Otherwise, return the error unchanged.`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { Result, map } from "./result";
+import { parseNumber } from "./parser";
+
+const result = parseNumber("21");
+const doubled = map(result, (n) => n * 2);
+
+if (doubled.ok) {
+  console.log(doubled.value); // Should print 42
+} else {
+  console.log(\`Error: \${doubled.error}\`);
+}
+`,
+    },
+    {
+      filename: "parser.ts",
+      initialContent: `import { Result } from "./result";
+
+export function parseNumber(input: string): Result<number, string> {
+  const n = Number(input);
+  return isNaN(n)
+    ? { ok: false, error: \`Invalid number: "\${input}"\` }
+    : { ok: true, value: n };
+}
+`,
+    },
+    {
+      filename: "result.ts",
+      initialContent: `export type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+export function map<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => U
+): Result<U, E> {
+  // Implement
+  return { ok: false, error: "Not implemented" as any };
+}
+`,
+      solutionContent: `export type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+export function map<T, E, U>(
+  result: Result<T, E>,
+  fn: (value: T) => U
+): Result<U, E> {
+  if (result.ok) {
+    return { ok: true, value: fn(result.value) };
+  }
+  return result;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "out",
+      name: "Outputs 42",
+      description: "stdout equals 42",
+      expect: { stdoutEquals: "42" },
+    },
+  ]}
+/>
+
+---
+
+## When to Still Use Exceptions
+
+`Result` isn't always the answer. Use exceptions for:
+- **Programmer errors**: Bugs that should never happen in correct code (e.g., `assert`, null dereference). These should crash during development, not be handled gracefully.
+- **Unrecoverable failures**: Out-of-memory, stack overflow, or critical infrastructure failures that you can't reasonably handle.
+- **Third-party code**: If a library throws, you might catch at the boundary and convert to `Result`.
+
+Use `Result` for:
+- **Expected failures**: Validation errors, missing files, network timeouts, user input errors — anything that's part of normal operation.
+- **Composable operations**: When you want to chain multiple steps and handle errors uniformly.
+- **Explicit contracts**: When the caller *must* know a function can fail.
+
+---
+
+## Comparison to Other Languages
+
+This pattern isn't new:
+- **Rust**: `Result<T, E>` is built into the language, with `?` syntax for early returns.
+- **Haskell**: `Either` represents `Left` (error) or `Right` (success).
+- **OCaml**: `result` is a standard library type.
+- **Go**: Multiple return values `(value, error)` force explicit checks (though not type-safe).
+
+TypeScript doesn't have special syntax, but discriminated unions and type narrowing give you the same guarantees.
+
+---
+
+## Multiple Choice: `Result` vs. Exceptions
+
+<MultipleChoice
+  markdown={`What's the main advantage of \`Result<T, E>\` over exceptions?
+
+- Faster runtime performance
+  > \`Result\` has similar performance to exceptions; the benefit is static safety, not speed.
+- [o] Errors are visible in the type signature and must be handled
+  > Correct. The return type \`Result<T, E>\` documents that the function can fail, and the compiler forces you to check \`.ok\` before accessing the value.
+- Easier to write
+  > \`Result\` requires more boilerplate (but combinators help). The payoff is correctness.
+
+Exceptions are invisible in types; \`Result\` makes errors explicit and unignorable.`}
+/>
+
+---
+
+## Multiple Choice: Chaining with `andThen`
+
+<MultipleChoice
+  markdown={`Given:
+\`\`\`ts
+const result = parseNumber("4");
+const sqrtResult = andThen(result, sqrt);
+\`\`\`
+What happens if \`parseNumber\` returns an error?
+
+- \`sqrt\` is called with the error
+  > \`andThen\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
+- [o] \`sqrt\` is not called; the error propagates
+  > Correct. \`andThen\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
+- The program throws an exception
+  > \`Result\` doesn't throw. Errors are returned as values.
+
+\`andThen\` provides automatic error propagation, similar to \`await\` for promises.`}
+/>
+
+---
+
+## Summary
+
+You've learned how to:
+- Model errors as **values** with `Result<T, E>`.
+- Build **combinators** (`map`, `andThen`, `unwrapOr`) for composable error handling.
+- **Chain operations** without manual error checks at every step.
+- Organize `Result`-based code across modules.
+- Decide when to use `Result` vs. exceptions.
+
+`Result` shifts error handling from runtime guesswork to compile-time guarantees. Errors become part of your contract, visible in types and enforced by the compiler. This is a cornerstone of type-driven design: **make illegal states unrepresentable**.
+
+---
+
+**Next**: [Scalable Architecture](./scalable-architecture) — structuring large TypeScript systems with layered architecture and dependency inversion.

@@ -1,0 +1,108 @@
+---
+title: Welcome
+description: A type-driven, computer-science-flavored journey into TypeScript for JavaScript developers
+---
+
+Welcome to **TypeScript from Scratch**, a deep, hands-on course that
+treats TypeScript not as a syntax bolted onto JavaScript, but as a
+serious **type system**, a **design language**, and a **static
+analysis platform** for building software that scales.
+
+This course assumes you already know basic JavaScript — variables,
+functions, arrays, objects, `if`/`for`, `Promise`s, and the rough
+shape of modules. From there, we build up the *why* and *how* of
+TypeScript layer by layer, all the way to advanced type modeling and
+type-driven architecture.
+
+<Callout type="info" title="Who this course is for">
+You should be comfortable writing small JavaScript programs and reading
+modern ES syntax. You do **not** need any prior experience with
+TypeScript, React, Node, or any framework. We focus on the language
+and its type system, not the surrounding ecosystem.
+</Callout>
+
+## What you will learn
+
+Each page mixes narrative, diagrams, runnable code, and short
+challenges. Three interactive widgets appear throughout:
+
+1. **Executable TypeScript code blocks.** Every snippet is
+   type-checked and transpiled in your browser, then executed by
+   [almostnode](https://almostnode.dev/) — no setup required. Edit
+   any block and click *Run*.
+2. **Multi-file code blocks and challenge cards.** Real software is
+   spread across files. Many examples use multiple modules so you can
+   practice cross-module typing and imports.
+3. **Multiple choice questions.** Quick checks at the end of most
+   pages with per-answer explanations.
+
+<Callout type="info" title="How to use the interactive widgets">
+Each code block runs in a fresh TypeScript workspace, so a value
+defined in one block is not visible in the next. If you want a
+longer-lived sandbox, open the
+[TypeScript Playground](/playground/typescript) in a new tab.
+</Callout>
+
+## What this course is — and is not
+
+This is, at heart, a **computer science and software engineering**
+course that happens to use TypeScript as its medium. We care about:
+
+- **Type systems** and how they shape program design
+- **Static analysis** and what a compiler can prove about your code
+- **Type-driven design**: making illegal states unrepresentable
+- **API and module boundaries**: contracts as types
+- **Generic abstractions** that compose without losing precision
+- **Maintainability and readability** at scale
+
+This course is intentionally **not**:
+
+- A React, Angular, or Vue tutorial
+- A Node, Express, or backend bootcamp
+- A DevOps / CI / deployment guide
+- A frontend framework comparison
+- A whirlwind syntax reference
+
+We use plain TypeScript everywhere. The lessons transfer to any
+framework you adopt later.
+
+## Course outline
+
+The pages are designed to be read in order. Each one stands on its
+own, but later chapters lean on earlier ideas.
+
+### 1. The story of TypeScript
+How JavaScript outgrew its scripting roots, the maintainability
+crisis that followed, and why Microsoft built a static type system on
+top of it. We also peek inside the compiler.
+
+### 2. The core type system
+Primitives, objects, arrays and tuples, functions, type aliases,
+unions, intersections, narrowing, and the `any` / `unknown` / `never`
+trio. The vocabulary you will use every day.
+
+### 3. Type-driven design
+Inference, structural typing, discriminated unions, and how to model
+a real domain with types so the compiler stops bugs before they ever
+run.
+
+### 4. Generics and abstractions
+Reusable functions, data structures, and APIs that preserve type
+information instead of throwing it away.
+
+### 5. Advanced type modeling
+Mapped types, conditional types, `keyof`, `typeof`, template literal
+types, branded types, and a tour of the standard utility types.
+
+### 6. Architecture and maintainability
+Designing typed APIs and module contracts, modeling errors as values,
+and patterns for keeping a growing codebase coherent.
+
+### 7. Compiler and tooling
+A look at what `tsc` is actually doing for you, how editors use the
+language service, and where to go next.
+
+<Callout type="success">
+Ready? Open **Evolution of JavaScript** in the sidebar to start the
+story.
+</Callout>

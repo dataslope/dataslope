@@ -1,0 +1,606 @@
+---
+title: Utility Types
+description: Master TypeScript's built-in utility types and learn how they're implemented.
+---
+
+# Utility Types
+
+TypeScript ships with a rich set of **utility types** — pre-built generic types that perform common transformations. You've already glimpsed a few (like `Partial` and `Pick`). Now that you understand [mapped and conditional types](./mapped-and-conditional-types), we'll tour the full lineup and demystify how each is implemented.
+
+These utilities aren't magic. They're all built from the primitives you've learned: mapped types, conditional types, `keyof`, indexed access, and `infer`. By the end of this chapter, you'll see that you could write them yourself — and you'll know when to reach for them in real code.
+
+---
+
+## Object Transformation Utilities
+
+These types reshape object types by adding, removing, or filtering properties.
+
+### `Partial<T>`
+
+Makes all properties of `T` optional.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string };
+
+type PartialUser = Partial<User>;
+
+const u1: PartialUser = { id: 1 }; // OK: other fields optional
+const u2: PartialUser = {}; // OK: all fields optional
+console.log(u1, u2);
+`}
+/>
+
+**Use case**: Update functions where you only want to specify changed fields:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string };
+
+function updateUser(id: number, changes: Partial<User>): User {
+  // In real code, merge with existing user from database
+  return { id, name: "Alice", email: "alice@example.com", ...changes };
+}
+
+const updated = updateUser(1, { name: "Bob" });
+console.log(updated);
+`}
+/>
+
+**Implementation**:
+```ts
+type Partial<T> = { [K in keyof T]?: T[K] };
+```
+A simple mapped type that adds the `?` modifier to each property.
+
+---
+
+### `Required<T>`
+
+Makes all properties of `T` required (removes optionality).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id?: number; name?: string };
+
+type RequiredUser = Required<User>;
+
+const u: RequiredUser = { id: 1, name: "Alice" }; // Both required
+console.log(u);
+`}
+/>
+
+**Use case**: Enforcing complete objects after optional construction or partial validation.
+
+**Implementation**:
+```ts
+type Required<T> = { [K in keyof T]-?: T[K] };
+```
+The `-?` modifier removes optionality.
+
+---
+
+### `Readonly<T>`
+
+Makes all properties of `T` readonly.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string };
+
+type ReadonlyUser = Readonly<User>;
+
+const u: ReadonlyUser = { id: 1, name: "Alice" };
+// u.name = "Bob"; // Error: Cannot assign to 'name' because it is a read-only property
+console.log(u);
+`}
+/>
+
+**Use case**: Immutable data structures, preventing accidental mutations in pure functions.
+
+**Implementation**:
+```ts
+type Readonly<T> = { readonly [K in keyof T]: T[K] };
+```
+Adds `readonly` to each property.
+
+---
+
+### `Pick<T, K>`
+
+Constructs a type by picking a set of properties `K` from `T`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string; age: number };
+
+type UserPreview = Pick<User, "id" | "name">;
+
+const preview: UserPreview = { id: 1, name: "Alice" };
+console.log(preview);
+`}
+/>
+
+**Use case**: Creating focused view types or API responses that expose only a subset of fields.
+
+**Implementation**:
+```ts
+type Pick<T, K extends keyof T> = { [P in K]: T[P] };
+```
+Maps over the chosen keys `K` (which must be valid keys of `T`) and includes only those.
+
+---
+
+### `Omit<T, K>`
+
+Constructs a type by omitting a set of properties `K` from `T`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string; password: string };
+
+type PublicUser = Omit<User, "password">;
+
+const publicUser: PublicUser = { id: 1, name: "Alice", email: "alice@example.com" };
+console.log(publicUser);
+`}
+/>
+
+**Use case**: Removing sensitive or internal fields before sending data to clients.
+
+**Implementation**:
+```ts
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+```
+First, `Exclude<keyof T, K>` produces the keys *not* in `K`. Then `Pick` selects those. We'll cover `Exclude` next.
+
+---
+
+### `Record<K, T>`
+
+Constructs an object type with keys `K` and values of type `T`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Role = "admin" | "user" | "guest";
+
+type Permissions = Record<Role, string[]>;
+
+const perms: Permissions = {
+  admin: ["read", "write", "delete"],
+  user: ["read", "write"],
+  guest: ["read"],
+};
+console.log(perms);
+`}
+/>
+
+**Use case**: Building lookup maps or dictionaries with known keys.
+
+**Implementation**:
+```ts
+type Record<K extends keyof any, T> = { [P in K]: T };
+```
+A mapped type that iterates over `K` (a union of keys) and assigns type `T` to each.
+
+---
+
+## Union Filtering Utilities
+
+These types filter or extract members from unions.
+
+### `Exclude<UnionType, ExcludedMembers>`
+
+Removes types from `UnionType` that are assignable to `ExcludedMembers`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type All = "a" | "b" | "c" | "d";
+
+type Result = Exclude<All, "a" | "c">;
+
+const x: Result = "b"; // OK
+const y: Result = "d"; // OK
+// const z: Result = "a"; // Error
+console.log(x, y);
+`}
+/>
+
+**Use case**: Removing unwanted cases from a union, such as filtering out `null` or `undefined`.
+
+**Implementation**:
+```ts
+type Exclude<T, U> = T extends U ? never : T;
+```
+A distributive conditional type: for each member of `T`, if it extends `U`, return `never` (which vanishes from the union); otherwise, keep it.
+
+---
+
+### `Extract<UnionType, Union>`
+
+Extracts from `UnionType` those types that are assignable to `Union`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type All = "a" | "b" | "c" | 1 | 2;
+
+type Strings = Extract<All, string>;
+
+const x: Strings = "a"; // OK
+const y: Strings = "b"; // OK
+// const z: Strings = 1; // Error
+console.log(x, y);
+`}
+/>
+
+**Use case**: Selecting a subset of a union that matches a constraint, like "all string literals" or "all object types."
+
+**Implementation**:
+```ts
+type Extract<T, U> = T extends U ? T : never;
+```
+The opposite of `Exclude`: keep members of `T` that *do* extend `U`.
+
+---
+
+### `NonNullable<T>`
+
+Removes `null` and `undefined` from `T`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type MaybeString = string | null | undefined;
+
+type DefiniteString = NonNullable<MaybeString>;
+
+const x: DefiniteString = "hello"; // OK
+// const y: DefiniteString = null; // Error
+console.log(x);
+`}
+/>
+
+**Use case**: Narrowing types after you've checked for null/undefined, or enforcing non-null guarantees.
+
+**Implementation**:
+```ts
+type NonNullable<T> = T extends null | undefined ? never : T;
+```
+Filters out `null` and `undefined` using a distributive conditional.
+
+---
+
+## Function Utilities
+
+These types extract information from function types.
+
+### `ReturnType<T>`
+
+Extracts the return type of a function type `T`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function greet(name: string): string {
+  return \`Hello, \${name}!\`;
+}
+
+type GreetReturn = ReturnType<typeof greet>;
+
+const msg: GreetReturn = "Hello, Alice!";
+console.log(msg);
+`}
+/>
+
+**Use case**: Deriving the return type of a function without duplicating the annotation, especially useful with complex inferred returns.
+
+**Implementation**:
+```ts
+type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any;
+```
+Uses `infer` to capture the return type from the function signature.
+
+---
+
+### `Parameters<T>`
+
+Extracts the parameter types of a function type `T` as a tuple.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function add(a: number, b: number): number {
+  return a + b;
+}
+
+type AddParams = Parameters<typeof add>;
+
+const params: AddParams = [1, 2];
+console.log(params);
+`}
+/>
+
+**Use case**: Capturing the argument list for wrapper functions or generic higher-order functions.
+
+**Implementation**:
+```ts
+type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
+```
+Uses `infer` to capture the parameter tuple.
+
+---
+
+### `ConstructorParameters<T>`
+
+Extracts the parameter types of a constructor function type.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`class User {
+  constructor(public id: number, public name: string) {}
+}
+
+type UserCtorParams = ConstructorParameters<typeof User>;
+
+const params: UserCtorParams = [1, "Alice"];
+console.log(params);
+`}
+/>
+
+**Use case**: Factory functions or dependency injection where you need to mirror constructor signatures.
+
+**Implementation**:
+```ts
+type ConstructorParameters<T extends abstract new (...args: any) => any> = T extends abstract new (...args: infer P) => any ? P : never;
+```
+Similar to `Parameters`, but for constructor signatures.
+
+---
+
+### `InstanceType<T>`
+
+Extracts the instance type of a constructor function type.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`class User {
+  constructor(public id: number, public name: string) {}
+}
+
+type UserInstance = InstanceType<typeof User>;
+
+const u: UserInstance = new User(1, "Alice");
+console.log(u);
+`}
+/>
+
+**Use case**: Referring to the instance type when you only have the constructor (e.g., in factory patterns).
+
+**Implementation**:
+```ts
+type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
+```
+Uses `infer` to capture the return type of the constructor (the instance).
+
+---
+
+### `ThisParameterType<T>`
+
+Extracts the type of the `this` parameter from a function type (or `unknown` if there is none).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function greet(this: { name: string }, message: string): string {
+  return \`\${message}, \${this.name}!\`;
+}
+
+type GreetThis = ThisParameterType<typeof greet>;
+
+const ctx: GreetThis = { name: "Alice" };
+console.log(greet.call(ctx, "Hello"));
+`}
+/>
+
+**Use case**: Working with functions that rely on a specific `this` context (common in OOP or event handlers).
+
+**Implementation**:
+```ts
+type ThisParameterType<T> = T extends (this: infer U, ...args: any[]) => any ? U : unknown;
+```
+Uses `infer` to capture the `this` parameter.
+
+---
+
+## Promise and Async Utilities
+
+### `Awaited<T>`
+
+Recursively unwraps a `Promise` (or nested promises) to get the final resolved type.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Nested = Promise<Promise<string>>;
+
+type Unwrapped = Awaited<Nested>;
+
+const x: Unwrapped = "hello"; // string
+console.log(x);
+`}
+/>
+
+**Use case**: Getting the resolved type of async functions or deeply nested promises.
+
+**Implementation** (simplified):
+```ts
+type Awaited<T> = T extends Promise<infer U> ? Awaited<U> : T;
+```
+Recursively unwraps `Promise` layers using `infer`.
+
+---
+
+## Putting It All Together
+
+Let's combine several utilities to build a type-safe API response handler:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string; password: string };
+
+// 1. Omit sensitive fields
+type PublicUser = Omit<User, "password">;
+
+// 2. Make all fields optional for partial updates
+type UserUpdate = Partial<PublicUser>;
+
+// 3. Pick only the fields we want in a preview
+type UserPreview = Pick<PublicUser, "id" | "name">;
+
+// 4. A record mapping user IDs to previews
+type UserDirectory = Record<number, UserPreview>;
+
+const directory: UserDirectory = {
+  1: { id: 1, name: "Alice" },
+  2: { id: 2, name: "Bob" },
+};
+
+console.log(directory);
+`}
+/>
+
+---
+
+## Challenge: Implement `MyPick<T, K>`
+
+<ChallengeCard
+  adapter="typescript"
+  title="MyPick<T, K>"
+  instructions={`The standard library provides \`Pick<T, K>\`, which constructs a type by selecting only properties \`K\` from \`T\`. Implement your own version, \`MyPick<T, K>\`, using a mapped type.
+
+**Hint**: Map over \`K\` (not \`keyof T\`) and use indexed access \`T[P]\` to get each property's type.`}
+  initCode={`type MyPick<T, K extends keyof T> = any; // Replace 'any'
+`}
+  initialCode={`type MyPick<T, K extends keyof T> = any;
+
+type User = { id: number; name: string; email: string };
+type UserPreview = MyPick<User, "id" | "name">;
+
+const preview: UserPreview = { id: 1, name: "Alice" };
+console.log(preview);
+`}
+  solutionCode={`type MyPick<T, K extends keyof T> = { [P in K]: T[P] };
+
+type User = { id: number; name: string; email: string };
+type UserPreview = MyPick<User, "id" | "name">;
+
+const preview: UserPreview = { id: 1, name: "Alice" };
+console.log(preview);
+`}
+  tests={[
+    {
+      id: "t1",
+      name: "Picks correct properties",
+      description: "UserPreview has id and name",
+      code: `type User = { id: number; name: string; email: string };
+type UserPreview = MyPick<User, "id" | "name">;
+const p: UserPreview = { id: 1, name: "Alice" };
+if (p.id !== 1 || p.name !== "Alice") throw new Error("Pick failed");`,
+    },
+  ]}
+/>
+
+---
+
+## Challenge: Implement `MyExclude<T, U>`
+
+<ChallengeCard
+  adapter="typescript"
+  title="MyExclude<T, U>"
+  instructions={`Implement \`MyExclude<T, U>\`, which removes members of \`T\` that are assignable to \`U\`.
+
+**Hint**: Use a distributive conditional type that returns \`never\` for excluded members.`}
+  initCode={`type MyExclude<T, U> = any; // Replace 'any'
+`}
+  initialCode={`type MyExclude<T, U> = any;
+
+type All = "a" | "b" | "c";
+type Result = MyExclude<All, "a" | "c">;
+
+const x: Result = "b"; // Should compile
+console.log(x);
+`}
+  solutionCode={`type MyExclude<T, U> = T extends U ? never : T;
+
+type All = "a" | "b" | "c";
+type Result = MyExclude<All, "a" | "c">;
+
+const x: Result = "b";
+console.log(x);
+`}
+  tests={[
+    {
+      id: "t1",
+      name: "Excludes correct types",
+      description: "Result is 'b' only",
+      code: `type Result = MyExclude<"a" | "b" | "c", "a" | "c">;
+const x: Result = "b";
+if (x !== "b") throw new Error("Exclude failed");`,
+    },
+  ]}
+/>
+
+---
+
+## Multiple Choice: Utility Type Implementation
+
+<MultipleChoice
+  markdown={`Which utility type is implemented with this code?
+\`\`\`ts
+type Mystery<T> = { [K in keyof T]-?: T[K] };
+\`\`\`
+
+- \`Partial<T>\`
+  > \`Partial\` adds \`?\`, not removes it.
+- [o] \`Required<T>\`
+  > Correct. The \`-?\` modifier removes optionality, making all properties required.
+- \`Readonly<T>\`
+  > \`Readonly\` uses \`readonly\`, not \`-?\`.
+
+The \`-?\` modifier is the key: it removes the optional modifier from each property.`}
+/>
+
+---
+
+## Multiple Choice: `ReturnType` Inference
+
+<MultipleChoice
+  markdown={`Given:
+\`\`\`ts
+function fetchUser(): Promise<{ id: number; name: string }> {
+  return Promise.resolve({ id: 1, name: "Alice" });
+}
+type Result = ReturnType<typeof fetchUser>;
+\`\`\`
+What is \`Result\`?
+
+- \`{ id: number; name: string }\`
+  > \`ReturnType\` extracts the return type *as-is*, which is the Promise, not the resolved value.
+- [o] \`Promise<{ id: number; name: string }>\`
+  > Correct. \`ReturnType\` captures the function's return type exactly.
+- \`string\`
+  > The function doesn't return a string.
+
+If you want the resolved value, use \`Awaited<ReturnType<typeof fetchUser>>\`.`}
+/>
+
+---
+
+## Summary
+
+TypeScript's utility types are powerful shortcuts for common type transformations:
+- **Object transformers**: `Partial`, `Required`, `Readonly`, `Pick`, `Omit`, `Record`
+- **Union filters**: `Exclude`, `Extract`, `NonNullable`
+- **Function introspection**: `ReturnType`, `Parameters`, `ConstructorParameters`, `InstanceType`, `ThisParameterType`
+- **Async unwrapping**: `Awaited`
+
+None of these are magic. They're all built from mapped types, conditional types, and `infer`. Now that you've seen their implementations, you can write your own utilities tailored to your domain.
+
+---
+
+**Next**: [keyof, typeof & Template Literals](./keyof-typeof-template-literals) — lifting values into types and building string-based type systems.

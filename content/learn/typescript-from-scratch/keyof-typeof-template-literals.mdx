@@ -1,0 +1,407 @@
+---
+title: keyof, typeof & Template Literals
+description: Lift values into types and build string-based type systems with keyof, typeof, and template literals.
+---
+
+# keyof, typeof & Template Literals
+
+You've learned how to transform and filter types with [mapped and conditional types](./mapped-and-conditional-types). But where do types come from in the first place? Often, they come from *values* — runtime constants, configuration objects, or string literals. TypeScript gives you three powerful operators to bridge the gap between values and types:
+
+1. **`keyof T`** — produces a union of an object type's keys.
+2. **`typeof value`** — lifts a runtime value into the type world.
+3. **Template literal types** — builds new string literal types from existing ones, with full string manipulation.
+
+Together, these tools let you derive types from your code's structure, ensuring that types and values stay in sync automatically. You'll build event systems, configuration validators, and API contracts where the types are generated from your data, not manually duplicated.
+
+---
+
+## `keyof T`: The Keys of a Type
+
+The **`keyof`** operator takes an object type and produces a union of its keys (as string or number literal types).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string };
+
+type UserKeys = keyof User;
+
+const key1: UserKeys = "id"; // OK
+const key2: UserKeys = "name"; // OK
+// const key3: UserKeys = "age"; // Error: not a key of User
+console.log(key1, key2);
+`}
+/>
+
+`keyof User` resolves to `"id" | "name" | "email"`. This is useful when you want to accept any valid key of an object, but reject invalid ones:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = { id: number; name: string; email: string };
+
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user: User = { id: 1, name: "Alice", email: "alice@example.com" };
+const name = getProperty(user, "name"); // Type: string
+const id = getProperty(user, "id"); // Type: number
+console.log(name, id);
+`}
+/>
+
+Notice that `T[K]` is an **indexed access type**: the type of property `K` in `T`. Since `K extends keyof T`, TypeScript knows `K` is a valid key, and can look up its type.
+
+---
+
+## `typeof value`: From Values to Types
+
+The **`typeof`** operator (in a type context) takes a runtime value and produces its type. This lets you derive types from constants, configuration objects, or function declarations.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const config = {
+  apiUrl: "https://api.example.com",
+  timeout: 5000,
+  retries: 3,
+};
+
+type Config = typeof config;
+
+const newConfig: Config = {
+  apiUrl: "https://api2.example.com",
+  timeout: 10000,
+  retries: 5,
+};
+
+console.log(newConfig);
+`}
+/>
+
+`typeof config` produces `{ apiUrl: string; timeout: number; retries: number }`. If you add or remove properties from `config`, the type automatically reflects the change.
+
+You can also use `typeof` with functions:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function greet(name: string): string {
+  return \`Hello, \${name}!\`;
+}
+
+type GreetType = typeof greet;
+
+const anotherGreet: GreetType = (name) => \`Hi, \${name}!\`;
+console.log(anotherGreet("Alice"));
+`}
+/>
+
+---
+
+## Combining `keyof` and `typeof`
+
+When you have a *value* (not a type), you can combine `typeof` and `keyof` to get its keys:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const routes = {
+  home: "/",
+  about: "/about",
+  contact: "/contact",
+};
+
+type RouteKey = keyof typeof routes;
+
+const key: RouteKey = "home"; // OK
+// const invalid: RouteKey = "profile"; // Error
+console.log(key);
+`}
+/>
+
+Here, `typeof routes` lifts the object into a type, and `keyof` extracts `"home" | "about" | "contact"`. This pattern is common for configuration objects, enums, and lookup tables.
+
+---
+
+## Template Literal Types
+
+TypeScript 4.1 introduced **template literal types**, which let you construct new string literal types by interpolating existing types. The syntax mirrors JavaScript template literals:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Greeting = "Hello" | "Hi";
+type Name = "Alice" | "Bob";
+
+type Message = \`\${Greeting}, \${Name}!\`;
+
+const msg1: Message = "Hello, Alice!"; // OK
+const msg2: Message = "Hi, Bob!"; // OK
+// const msg3: Message = "Hey, Alice!"; // Error: "Hey" is not in Greeting
+console.log(msg1, msg2);
+`}
+/>
+
+When you interpolate a union, TypeScript distributes over it, producing all combinations:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Event = "click" | "focus" | "blur";
+
+type EventHandler = \`on\${Event}\`;
+
+const handler1: EventHandler = "onclick"; // OK
+const handler2: EventHandler = "onfocus"; // OK
+// const handler3: EventHandler = "onhover"; // Error
+console.log(handler1, handler2);
+`}
+/>
+
+---
+
+## Intrinsic String Manipulation Types
+
+TypeScript provides four built-in utility types for manipulating string literals:
+
+- **`Uppercase<S>`** — converts `S` to uppercase.
+- **`Lowercase<S>`** — converts `S` to lowercase.
+- **`Capitalize<S>`** — capitalizes the first character.
+- **`Uncapitalize<S>`** — lowercases the first character.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type LoudGreeting = Uppercase<"hello">;
+type QuietGreeting = Lowercase<"HELLO">;
+type Capitalized = Capitalize<"typescript">;
+type Uncapitalized = Uncapitalize<"TypeScript">;
+
+const loud: LoudGreeting = "HELLO";
+const quiet: QuietGreeting = "hello";
+const cap: Capitalized = "Typescript";
+const uncap: Uncapitalized = "typeScript";
+
+console.log(loud, quiet, cap, uncap);
+`}
+/>
+
+These are especially useful in template literals:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Event = "click" | "focus";
+
+type EventHandler = \`on\${Capitalize<Event>}\`;
+
+const handler1: EventHandler = "onClick"; // OK
+const handler2: EventHandler = "onFocus"; // OK
+console.log(handler1, handler2);
+`}
+/>
+
+---
+
+## Practical Example: Type-Safe Event Handlers
+
+Let's build a type-safe event system where handler names are derived from event names:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type EventMap = {
+  click: { x: number; y: number };
+  keypress: { key: string };
+  focus: { elementId: string };
+};
+
+type EventName = keyof EventMap;
+
+type HandlerName<E extends EventName> = \`on\${Capitalize<E>}\`;
+
+type Handlers = {
+  [E in EventName as HandlerName<E>]: (payload: EventMap[E]) => void;
+};
+
+const handlers: Handlers = {
+  onClick: (payload) => console.log("Clicked at", payload.x, payload.y),
+  onKeypress: (payload) => console.log("Key pressed:", payload.key),
+  onFocus: (payload) => console.log("Focused element:", payload.elementId),
+};
+
+handlers.onClick({ x: 10, y: 20 });
+handlers.onKeypress({ key: "Enter" });
+handlers.onFocus({ elementId: "input-1" });
+`}
+/>
+
+Notice how:
+1. `EventMap` defines the payload types for each event.
+2. `HandlerName<E>` transforms event names (`"click"`) into handler names (`"onClick"`).
+3. The mapped type `Handlers` iterates over event names and remaps them to handler names, assigning each a function type that accepts the correct payload.
+
+This pattern ensures that if you add a new event to `EventMap`, the corresponding handler is automatically required in `Handlers`, with the correct payload type. No manual duplication.
+
+```mermaid
+graph TD
+    A["Value: EventMap<br/>{click: ..., keypress: ..., focus: ...}"] --> B["keyof EventMap<br/>'click' | 'keypress' | 'focus'"]
+    B --> C["Template Literal<br/>'onClick' | 'onKeypress' | 'onFocus'"]
+    C --> D["Mapped Type<br/>{onClick: ..., onKeypress: ..., onFocus: ...}"]
+    style A fill:#e1f5ff
+    style D fill:#d4edda
+```
+
+---
+
+## Filtering Keys by Value Type
+
+You can combine `keyof`, template literals, and conditional types to filter keys based on their value types. For example, extracting only the string properties:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type User = {
+  id: number;
+  name: string;
+  email: string;
+  active: boolean;
+};
+
+type StringKeys<T> = {
+  [K in keyof T]: T[K] extends string ? K : never;
+}[keyof T];
+
+type UserStringKeys = StringKeys<User>;
+
+const key1: UserStringKeys = "name"; // OK
+const key2: UserStringKeys = "email"; // OK
+// const key3: UserStringKeys = "id"; // Error
+console.log(key1, key2);
+`}
+/>
+
+Here's how it works:
+1. The mapped type produces `{ id: never; name: "name"; email: "email"; active: never }`.
+2. Indexing with `[keyof T]` extracts the values: `never | "name" | "email" | never`.
+3. `never` vanishes from the union, leaving `"name" | "email"`.
+
+---
+
+## Challenge: Build `EventHandlerMap<T>`
+
+<ChallengeCard
+  adapter="typescript"
+  title="EventHandlerMap<T>"
+  instructions={`Given an event map like \`{ click: {...}, focus: {...} }\`, build a type that maps each event name to a handler function name (prefixed with \`on\` and capitalized), with the correct payload type.
+
+For example:
+\`\`\`ts
+type Events = { click: { x: number }; focus: { id: string } };
+type Handlers = EventHandlerMap<Events>;
+// Result: { onClick: (payload: { x: number }) => void; onFocus: (payload: { id: string }) => void }
+\`\`\`
+
+**Hints**:
+- Use a mapped type with key remapping: \`[E in keyof T as ...]\`.
+- Use a template literal to build the handler name: \`\`on\${Capitalize<E>}\`\`.
+- The value type should be a function \`(payload: T[E]) => void\`.`}
+  initCode={`type EventHandlerMap<T> = any; // Replace 'any'
+`}
+  initialCode={`type EventHandlerMap<T> = any;
+
+type Events = { click: { x: number }; focus: { id: string } };
+type Handlers = EventHandlerMap<Events>;
+
+const handlers: Handlers = {
+  onClick: (payload) => console.log("Clicked at", payload.x),
+  onFocus: (payload) => console.log("Focused:", payload.id),
+};
+
+handlers.onClick({ x: 10 });
+handlers.onFocus({ id: "input-1" });
+`}
+  solutionCode={`type EventHandlerMap<T> = {
+  [E in keyof T as \`on\${Capitalize<string & E>}\`]: (payload: T[E]) => void;
+};
+
+type Events = { click: { x: number }; focus: { id: string } };
+type Handlers = EventHandlerMap<Events>;
+
+const handlers: Handlers = {
+  onClick: (payload) => console.log("Clicked at", payload.x),
+  onFocus: (payload) => console.log("Focused:", payload.id),
+};
+
+handlers.onClick({ x: 10 });
+handlers.onFocus({ id: "input-1" });
+`}
+  tests={[
+    {
+      id: "t1",
+      name: "Generates correct handler names",
+      description: "onClick and onFocus exist",
+      code: `type Events = { click: { x: number }; focus: { id: string } };
+type Handlers = EventHandlerMap<Events>;
+const h: Handlers = {
+  onClick: (p) => {},
+  onFocus: (p) => {},
+};
+if (!h.onClick || !h.onFocus) throw new Error("Handler names incorrect");`,
+    },
+  ]}
+/>
+
+---
+
+## Multiple Choice: `keyof typeof`
+
+<MultipleChoice
+  markdown={`Given:
+\`\`\`ts
+const colors = { red: "#f00", green: "#0f0", blue: "#00f" };
+type ColorName = keyof typeof colors;
+\`\`\`
+What is \`ColorName\`?
+
+- \`string\`
+  > \`keyof\` produces a union of literal types, not the broad \`string\` type.
+- [o] \`"red" | "green" | "blue"\`
+  > Correct. \`typeof colors\` lifts the object to a type, and \`keyof\` extracts its keys as a union.
+- \`"#f00" | "#0f0" | "#00f"\`
+  > Those are the *values*, not the keys.
+
+This pattern is essential for deriving types from configuration objects.`}
+/>
+
+---
+
+## Multiple Choice: Template Literal Distribution
+
+<MultipleChoice
+  markdown={`Given:
+\`\`\`ts
+type Prefix = "get" | "set";
+type Prop = "Name" | "Age";
+type Combined = \`\${Prefix}\${Prop}\`;
+\`\`\`
+How many string literal types does \`Combined\` contain?
+
+- 2
+  > Template literals distribute over unions, producing the Cartesian product.
+- [o] 4
+  > Correct: \`"getName" | "getAge" | "setName" | "setAge"\`. Each \`Prefix\` is combined with each \`Prop\`.
+- 8
+  > There are only 2 prefixes and 2 props, so 2 × 2 = 4 combinations.
+
+Template literals distribute over unions, creating all possible combinations.`}
+/>
+
+---
+
+## Summary
+
+You've learned how to:
+- Use **`keyof T`** to extract a union of object keys.
+- Use **`typeof value`** to lift runtime values into the type world.
+- Combine `keyof` and `typeof` to derive types from configuration objects.
+- Build new string literal types with **template literals**.
+- Manipulate strings with **`Uppercase`, `Lowercase`, `Capitalize`, `Uncapitalize`**.
+- Create type-safe mappings between related string-based concepts (events → handlers).
+
+These tools let you write types that are *computed* from your code's structure, rather than manually maintained in parallel. When you change a configuration object or add a new event, the types update automatically — the compiler becomes your co-maintainer.
+
+---
+
+**Next**: [Branded Types](./branded-types) — adding nominal typing to TypeScript's structural system to prevent mixing semantically distinct values.

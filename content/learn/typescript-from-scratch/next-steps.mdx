@@ -1,0 +1,270 @@
+---
+title: Next Steps
+description: Where to go from here on your TypeScript journey.
+---
+
+# Next Steps
+
+You've completed the TypeScript from Scratch course. You started with the story of why types matter, learned the core type system, explored type-driven design, mastered generics, and dove into advanced modeling, architecture, and static analysis. You now have the foundation to write type-safe, maintainable, and scalable TypeScript code.
+
+But this is just the beginning. TypeScript is a vast ecosystem, and there's always more to learn. This chapter outlines the natural next steps: frameworks, runtimes, ecosystem-specific patterns, and resources for continued learning.
+
+---
+
+## What You've Learned
+
+Let's recap the journey:
+
+1. **The Story**: Why types exist, the history of JavaScript and TypeScript, and the problems types solve.
+2. **Core Type System**: Primitives, arrays, tuples, objects, functions, unions, intersections, `any`, `unknown`, `never`, and type narrowing.
+3. **Type-Driven Design**: Inference, structural typing, discriminated unions, modeling domains, and making impossible states unrepresentable.
+4. **Generics**: Writing reusable, type-safe abstractions with type parameters and constraints.
+5. **Advanced Modeling**: Mapped types, conditional types, utility types, `keyof`, `typeof`, template literals, and branded types.
+6. **Architecture**: API contracts, error handling with `Result`, and layered architecture with dependency inversion.
+7. **Static Analysis**: What the compiler proves, exhaustiveness, refactor safety, and the language service.
+
+You've moved from "types are annotations" to "types are a design tool." You understand that types aren't just documentation — they're guarantees, enforced by the compiler.
+
+---
+
+## Choosing a Framework (If You're Building UIs)
+
+TypeScript shines in UI development, where the shape of data and component props matters. If you want to build web applications, pick a framework:
+
+### React
+
+**React** is the most popular UI library. It's component-based, uses JSX (a syntax extension that looks like HTML), and has first-class TypeScript support.
+
+- **Types**: React components accept typed props. You define `interface MyComponentProps` and get autocomplete and type checking for every prop.
+- **Hooks**: React's hooks (`useState`, `useEffect`, etc.) are fully typed, inferring state types from initial values.
+- **When to use**: If you want a huge ecosystem (libraries, jobs, tutorials) and prefer flexibility (React is "just JavaScript" with a thin rendering layer).
+
+**Resources**:
+- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+- Official React docs with TypeScript examples: [react.dev](https://react.dev/)
+
+### Vue
+
+**Vue** is a progressive framework with a gentle learning curve. It supports TypeScript via the Composition API and `<script setup lang="ts">`.
+
+- **Types**: Vue 3 + TypeScript gives you typed props, emits, and refs. The Composition API is fully typed.
+- **When to use**: If you want a batteries-included framework with great docs and a gentler learning curve than React.
+
+**Resources**:
+- [Vue TypeScript Guide](https://vuejs.org/guide/typescript/overview.html)
+
+### Angular
+
+**Angular** is a full-featured, opinionated framework built *in* TypeScript. Everything is typed by default: components, services, dependency injection.
+
+- **Types**: Angular's CLI generates TypeScript projects. Services, components, and modules are classes with decorators, all fully typed.
+- **When to use**: If you want a complete solution (router, HTTP client, forms, etc.) with strong opinions and enterprise backing.
+
+**Resources**:
+- [Angular docs](https://angular.io/)
+
+### Svelte
+
+**Svelte** compiles components to vanilla JavaScript at build time (no runtime library). It has excellent TypeScript support via `<script lang="ts">`.
+
+- **Types**: Props, events, and stores are typed. Svelte's compiler infers types from your code.
+- **When to use**: If you want minimal boilerplate and fast, lean output.
+
+**Resources**:
+- [Svelte TypeScript Guide](https://svelte.dev/docs/typescript)
+
+**Recommendation**: Start with **React** if you want the broadest ecosystem and job market. Try **Svelte** if you want simplicity and elegance. Explore **Vue** or **Angular** if their philosophies resonate.
+
+---
+
+## Choosing a Runtime (If You're Building Backends or CLI Tools)
+
+TypeScript runs on JavaScript runtimes. The most common are:
+
+### Node.js
+
+**Node.js** is the standard server-side JavaScript runtime. It's mature, has a massive ecosystem (`npm`), and is the default choice for most backend TypeScript projects.
+
+- **Tooling**: Use `ts-node` or `tsx` to run TypeScript directly, or compile to JavaScript and run with `node`.
+- **When to use**: Default choice for backends, APIs, and CLI tools.
+
+**Resources**:
+- [Node.js docs](https://nodejs.org/)
+- [Node.js TypeScript Best Practices](https://github.com/goldbergyoni/nodebestpractices#typescript)
+
+### Deno
+
+**Deno** is a modern runtime built by Node.js's creator, Ryan Dahl. It has built-in TypeScript support (no build step), secure by default permissions, and a standard library.
+
+- **TypeScript first**: You can run `.ts` files directly: `deno run app.ts`.
+- **When to use**: If you want a fresh start with modern defaults and built-in tooling.
+
+**Resources**:
+- [Deno docs](https://deno.land/)
+
+### Bun
+
+**Bun** is a fast, all-in-one toolkit: runtime, bundler, package manager, and test runner. It has native TypeScript support and is *fast* (written in Zig, not C++).
+
+- **Speed**: Bun starts up and runs code faster than Node.js or Deno.
+- **When to use**: If you want cutting-edge performance and an integrated toolchain.
+
+**Resources**:
+- [Bun docs](https://bun.sh/)
+
+**Recommendation**: Start with **Node.js** for its maturity and ecosystem. Try **Deno** if you want TypeScript-first tooling. Explore **Bun** if you care about speed and simplicity.
+
+---
+
+## Ecosystem-Specific Patterns
+
+Once you've chosen a framework or runtime, you'll encounter ecosystem-specific patterns:
+
+### Typed ORMs (Database Layers)
+
+**Prisma**, **TypeORM**, and **Drizzle** are ORMs (Object-Relational Mappers) that generate TypeScript types from your database schema. Query results are fully typed.
+
+- **Prisma**: Schema-first. You define a schema, and Prisma generates TypeScript types and a query client.
+- **TypeORM**: Code-first. You define entities as TypeScript classes with decorators.
+- **Drizzle**: Lightweight, SQL-like API with full type safety.
+
+**Example** (conceptual):
+```ts
+const user = await prisma.user.findUnique({ where: { id: 1 } });
+// `user` is typed: { id: number; name: string; email: string } | null
+```
+
+### Typed API Clients and Routers
+
+**tRPC** and **GraphQL with code generation** let you build type-safe APIs where the client and server share types.
+
+- **tRPC**: End-to-end type safety for TypeScript APIs. The client infers request/response types from the server.
+- **GraphQL + Codegen**: Generate TypeScript types from GraphQL schemas and queries.
+
+**Example** (tRPC, conceptual):
+```ts
+// Server
+const router = t.router({
+  getUser: t.procedure.input(z.string()).query(({ input }) => db.getUser(input)),
+});
+
+// Client (types inferred automatically)
+const user = await client.getUser.query("user-1");
+```
+
+### Validation Libraries
+
+**Zod**, **Yup**, and **io-ts** let you define schemas that double as runtime validators and TypeScript types.
+
+- **Zod**: Simple, composable schemas. Infer TypeScript types from schemas.
+
+**Example**:
+```ts
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+});
+
+type User = z.infer<typeof UserSchema>; // { id: number; name: string; email: string }
+
+const user = UserSchema.parse({ id: 1, name: "Alice", email: "alice@example.com" });
+```
+
+**Recommendation**: Learn **Prisma** (if using SQL databases), **tRPC** (if building TypeScript-only APIs), and **Zod** (for runtime validation). These tools leverage TypeScript's type system to eliminate boilerplate and bugs.
+
+---
+
+## Continued Learning
+
+TypeScript is vast. Here are resources for deepening your knowledge:
+
+### Official TypeScript Handbook
+
+The [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html) is the definitive reference. It covers everything from basics to advanced topics.
+
+### "Effective TypeScript" by Dan Vanderkam
+
+**Effective TypeScript** (O'Reilly) is a collection of 62 concrete tips for writing better TypeScript. It covers common pitfalls, best practices, and advanced patterns.
+
+### "Type-Level TypeScript" by Gabriel Vergnaud
+
+An online book exploring advanced type-level programming: building complex utilities, type-level parsers, and more. Great if you want to push the boundaries of what's possible with types.
+
+- [type-level-typescript.com](https://type-level-typescript.com/)
+
+### TypeScript Playground
+
+The [TypeScript Playground](https://www.typescriptlang.org/play) is an in-browser editor where you can experiment with TypeScript, see the emitted JavaScript, and share snippets.
+
+- Use it to test type transformations, explore compiler behavior, or prototype ideas.
+
+### This Site's Playground
+
+You can also practice interactively right here on this site: [TypeScript Playground](/playground/typescript). It's a fully featured TypeScript environment in your browser, with instant feedback.
+
+### Community and Ecosystem
+
+- **Twitter/X**: Follow [@typescript](https://twitter.com/typescript) and TypeScript community members for updates and tips.
+- **Discord/Reddit**: Join the [TypeScript Community Discord](https://discord.gg/typescript) or [r/typescript](https://www.reddit.com/r/typescript/) for discussions and help.
+- **GitHub**: Explore [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped), the repository of type definitions for JavaScript libraries.
+
+---
+
+## Practice, Practice, Practice
+
+The best way to learn TypeScript is to *use* it. Build projects:
+- A CLI tool that parses config files and validates them with Zod.
+- A REST API with typed request/response contracts.
+- A web app with React or Vue, using typed props and state.
+- A layered architecture backend with domain, application, and infrastructure layers.
+
+Each project will teach you new patterns, expose you to real-world tradeoffs, and deepen your intuition.
+
+---
+
+<Callout type="success" title="You're Ready">
+You've built a strong foundation. You understand types as a design tool, not just annotations. You know how to model domains, enforce contracts, and leverage the compiler to catch bugs early. The rest is practice and exploration. Go build something, and enjoy the confidence that comes from a type-safe codebase.
+</Callout>
+
+---
+
+## Multiple Choice: What's Next?
+
+<MultipleChoice
+  markdown={`You've finished the course. What's the best next step?
+
+- Memorize every utility type
+  > Utility types are useful, but the best next step is *building* something to apply what you've learned.
+- [o] Build a project using TypeScript
+  > Correct. The best way to solidify your knowledge is to apply it to a real project. Pick a framework or runtime, and start building.
+- Read the TypeScript compiler source code
+  > That's advanced and not necessary for most developers. Focus on practical projects first.
+
+Learning is doing. Build something, make mistakes, debug them, and iterate. That's how you master TypeScript.`}
+/>
+
+---
+
+## Summary
+
+You've completed **TypeScript from Scratch**. You've learned:
+- The core type system and type-driven design principles.
+- Advanced modeling with mapped types, conditional types, and branded types.
+- Architectural patterns for scalable systems.
+- How the compiler proves correctness and powers your editor.
+
+**Where to go next**:
+- **Pick a framework** (React, Vue, Angular, Svelte) if building UIs.
+- **Pick a runtime** (Node.js, Deno, Bun) if building backends or tools.
+- **Learn ecosystem patterns** (Prisma, tRPC, Zod) to leverage type safety across your stack.
+- **Read books and docs** (TypeScript Handbook, Effective TypeScript, Type-Level TypeScript).
+- **Practice** by building projects and exploring the ecosystem.
+
+The TypeScript community is vibrant, the ecosystem is rich, and the language is constantly evolving. You're well-equipped to join in. Go forth and build something amazing.
+
+---
+
+**Explore more**: Check out other courses on this site, experiment in the [TypeScript Playground](/playground/typescript), and keep learning. The journey doesn't end — it's just beginning.
