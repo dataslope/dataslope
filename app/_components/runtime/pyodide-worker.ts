@@ -118,11 +118,22 @@ async function initPyodide(): Promise<void> {
   await pyodide.loadPackage("micropip", pkgCallbacks);
   const micropip = pyodide.pyimport("micropip");
   await micropip.install("plotly");
+  // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
+  // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
+  // It does NOT bypass CORS — cross-origin hosts still need the CORS proxy.
+  await micropip.install("pyodide_http");
 
   // Set up display() and a matplotlib show() patch that captures figures
   // as base64 PNGs into _display_outputs.
   await pyodide.runPythonAsync(`
 import sys, io, base64, json, ast as _ast
+
+# Patch urllib/requests once so user code can make HTTP(S) calls (subject to
+# CORS — cross-origin hosts still need the CORS proxy). Called a single time
+# at init; re-patching already-patched modules is unnecessary.
+import pyodide_http
+pyodide_http.patch_all()
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
