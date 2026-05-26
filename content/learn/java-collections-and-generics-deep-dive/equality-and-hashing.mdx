@@ -1,0 +1,428 @@
+---
+title: Equality and Hashing
+description: The equals / hashCode contract — what every Set, Map, and contains() check secretly depends on, and the bugs that lurk when you get it wrong
+---
+
+Almost every interesting method on a `Set` or `Map` answers the same
+question: **"have I seen this before?"** That question is answered by
+two methods that every Java object inherits from `Object`:
+
+```java
+public boolean equals(Object other);
+public int     hashCode();
+```
+
+They are tiny. They are also the single most-bugged corner of the
+whole framework. This page is about why, and how to get them right
+once and for all.
+
+## What collections actually do with equals
+
+`List.contains(x)`, `List.indexOf(x)`, `List.remove(x)`,
+`Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`
+— all of them, under the hood, call `equals` to compare candidates.
+
+`==` compares **identity** (same object in memory). `.equals` compares
+**value** (logically the same thing). For a sane container,
+*equality has to mean value*.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        String a = "hello";
+        String b = new String("hello");   // different object, same value
+
+        System.out.println("a == b      : " + (a == b));        // false
+        System.out.println("a.equals(b) : " + a.equals(b));     // true
+    }
+}
+`}
+/>
+
+If `String` only implemented `==`, `List<String>.contains("hello")`
+would essentially never work.
+
+## What hashCode is for
+
+Hashing turns an arbitrary object into an `int` "fingerprint." A
+`HashSet` or `HashMap` uses that fingerprint to jump *directly* to
+the bucket where the element should live — instead of scanning all
+buckets.
+
+```mermaid
+flowchart LR
+    A["new Customer('ada@…')"] --> H["hashCode()<br/>= 8132917"]
+    H --> M["bucket = 8132917 mod N<br/>= 5"]
+    M --> B5["bucket #5<br/>1–2 candidates"]
+    B5 --> EQ["walk candidates,<br/>call equals(x)"]
+    EQ --> R[hit or miss<br/>in O(1) average]
+```
+
+So a hash collection's lookup is two steps:
+
+1. `hashCode()` → which bucket to look in
+2. `equals()` → which candidate in that bucket is *actually* the
+   target
+
+If `hashCode` lies — say, returns a different value for two objects
+that are `.equals` — the second step never even runs, because the
+collection looks in the wrong bucket and concludes "not present."
+
+## The contract
+
+This is the contract every override must satisfy. It's worth
+internalizing.
+
+| Rule | What it says |
+| --- | --- |
+| **Reflexive** | `x.equals(x)` is `true` |
+| **Symmetric** | `x.equals(y)` iff `y.equals(x)` |
+| **Transitive** | If `x.equals(y)` and `y.equals(z)`, then `x.equals(z)` |
+| **Consistent** | Repeated calls return the same answer if neither object changes |
+| **`x.equals(null)` is false** | Never throw, just return `false` |
+| **`equals` implies same `hashCode`** | If `x.equals(y)`, then `x.hashCode() == y.hashCode()` |
+
+That last rule is the one people get wrong, with painful consequences
+inside hash-based collections.
+
+## A class that breaks the contract
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.HashSet;
+import java.util.Set;
+
+public class Main {
+    public static void main(String[] args) {
+        Set<Point> seen = new HashSet<>();
+        seen.add(new Point(1, 2));
+
+        // Should be true — but the set will say "no."
+        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+    }
+}
+`,
+    },
+    {
+      filename: "Point.java",
+      initialContent: `public class Point {
+    private final int x;
+    private final int y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Point)) return false;
+        Point p = (Point) o;
+        return p.x == this.x && p.y == this.y;
+    }
+    // NOTE: no hashCode() override!
+}
+`,
+    },
+  ]}
+/>
+
+Run that. The set says `false`. Why? Because `Point` inherited
+`Object.hashCode`, which is essentially the object's memory address.
+Two `Point(1,2)`s are equal by `.equals`, but their `hashCode`s are
+different — so the second one lands in a different bucket, and the
+set never even reaches the `.equals` step.
+
+**Whenever you override `equals`, override `hashCode`.** Always.
+
+## The fix
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.HashSet;
+import java.util.Set;
+
+public class Main {
+    public static void main(String[] args) {
+        Set<Point> seen = new HashSet<>();
+        seen.add(new Point(1, 2));
+        seen.add(new Point(1, 2));   // duplicate — should be ignored
+        seen.add(new Point(3, 4));
+
+        System.out.println("size = " + seen.size());
+        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+        System.out.println("contains (5,6)? " + seen.contains(new Point(5, 6)));
+    }
+}
+`,
+    },
+    {
+      filename: "Point.java",
+      initialContent: `import java.util.Objects;
+
+public class Point {
+    private final int x;
+    private final int y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point)) return false;
+        Point p = (Point) o;
+        return p.x == this.x && p.y == this.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+}
+`,
+    },
+  ]}
+/>
+
+`Objects.hash(...)` is the standard way to combine fields into a
+hashcode. It is not the fastest hash in the world, but it is correct
+and clear, which is what almost every domain class needs.
+
+## Records: the modern shortcut
+
+Java 16+ has **records**, which generate a correct `equals`,
+`hashCode`, and `toString` for you. For value-like data, prefer them:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.HashSet;
+import java.util.Set;
+
+public class Main {
+    record Point(int x, int y) {}        // equals/hashCode auto-generated
+
+    public static void main(String[] args) {
+        Set<Point> seen = new HashSet<>();
+        seen.add(new Point(1, 2));
+        seen.add(new Point(1, 2));
+        seen.add(new Point(3, 4));
+        System.out.println("size = " + seen.size());
+        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+    }
+}
+`}
+/>
+
+Records were added partly *because* getting `equals`/`hashCode` right
+by hand is such a constant source of bugs.
+
+## Mutable keys: the other classic disaster
+
+A hash-based collection assumes that its keys' hashcodes do not
+change while they are in the collection. If you mutate a field that
+participates in `hashCode`, the element becomes "lost" — it is still
+there, but the collection looks for it in the wrong bucket.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.HashSet;
+import java.util.Set;
+import java.util.Objects;
+
+public class Main {
+    static class Name {
+        String first;
+        Name(String f) { first = f; }
+        @Override public boolean equals(Object o) {
+            return o instanceof Name n && n.first.equals(first);
+        }
+        @Override public int hashCode() { return Objects.hash(first); }
+    }
+
+    public static void main(String[] args) {
+        Set<Name> set = new HashSet<>();
+        Name n = new Name("Ada");
+        set.add(n);
+
+        System.out.println("contains? " + set.contains(n));   // true
+        n.first = "Linus";                                    // mutated key!
+        System.out.println("contains? " + set.contains(n));   // false — lost
+    }
+}
+`}
+/>
+
+**Rule:** anything you put in a `HashSet` or use as a `HashMap` key
+should be **immutable** (or at least, you must not change the fields
+that contribute to `equals` / `hashCode`).
+
+## The other contract: equals consistency with Comparable
+
+Hash-based collections care about `equals`/`hashCode`. *Sorted*
+collections (`TreeSet`, `TreeMap`) care about `compareTo`. The
+strongly recommended rule is:
+
+> If `x.compareTo(y) == 0`, then `x.equals(y)` should be true.
+
+If this is violated, a `TreeSet` will silently behave differently from
+a `HashSet` for the same data — almost always a bug. We'll meet
+`Comparable` in detail in its own chapter.
+
+## A multi-file challenge: a uniqueness service
+
+This is one of the most common real uses of `equals`/`hashCode`: a
+"have I seen this before?" service.
+
+<ChallengeCard
+  adapter="java"
+  title="Implement Email value equality"
+  instructions={`Write a class \`Email\` that wraps a \`String\` address and a \`UniquenessTracker\` that uses a \`Set<Email>\` to detect duplicates.
+
+- \`Email\` is constructed from one \`String\`. Two \`Email\`s are equal if their addresses are equal **case-insensitively** ("Ada@x.com" equals "ada@x.com").
+- The \`hashCode\` must agree — use the *lowercased* address.
+- \`UniquenessTracker\` has \`boolean register(Email e)\` returning \`true\` on the first time the email is seen and \`false\` afterward.
+
+Expected output:
+
+\`\`\`
+first  Ada@x.com? true
+again  Ada@x.com? false
+again  ada@x.com? false
+new    bob@x.com? true
+total unique = 2
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        UniquenessTracker t = new UniquenessTracker();
+        System.out.println("first  Ada@x.com? " + t.register(new Email("Ada@x.com")));
+        System.out.println("again  Ada@x.com? " + t.register(new Email("Ada@x.com")));
+        System.out.println("again  ada@x.com? " + t.register(new Email("ada@x.com")));
+        System.out.println("new    bob@x.com? " + t.register(new Email("bob@x.com")));
+        System.out.println("total unique = " + t.size());
+    }
+}
+`,
+    },
+    {
+      filename: "Email.java",
+      initialContent: `public class Email {
+    private final String address;
+    public Email(String address) { this.address = address; }
+    public String address() { return address; }
+    // TODO: equals / hashCode that ignore case
+}
+`,
+      solutionContent: `import java.util.Objects;
+import java.util.Locale;
+
+public class Email {
+    private final String address;
+    public Email(String address) { this.address = address; }
+    public String address() { return address; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Email e)) return false;
+        return e.address.equalsIgnoreCase(this.address);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(address.toLowerCase(Locale.ROOT));
+    }
+}
+`,
+    },
+    {
+      filename: "UniquenessTracker.java",
+      initialContent: `import java.util.HashSet;
+import java.util.Set;
+
+public class UniquenessTracker {
+    private final Set<Email> seen = new HashSet<>();
+    public boolean register(Email e) {
+        // TODO: return true if this is the first time we have seen e
+        return false;
+    }
+    public int size() { return seen.size(); }
+}
+`,
+      solutionContent: `import java.util.HashSet;
+import java.util.Set;
+
+public class UniquenessTracker {
+    private final Set<Email> seen = new HashSet<>();
+    public boolean register(Email e) {
+        return seen.add(e);   // Set.add returns true iff the element was new
+    }
+    public int size() { return seen.size(); }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "case-insensitive-email-uniqueness",
+      name: "Email equality is case-insensitive end to end",
+      expect: {
+        stdoutEquals:
+          "first  Ada@x.com? true\nagain  Ada@x.com? false\nagain  ada@x.com? false\nnew    bob@x.com? true\ntotal unique = 2",
+      },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What goes wrong if you override \`equals\` but not \`hashCode\`?
+
+- The code fails to compile
+  > It compiles fine.
+- All collections stop working
+  > Most things still work; the bug is specific to hash-based collections.
+- [o] Hash-based collections (\`HashSet\`, \`HashMap\`) can fail to find equal objects because they look in the wrong bucket
+  > Correct. The lookup uses \`hashCode\` to choose a bucket, so unequal hashcodes for equal values mean the element is invisible to lookup.
+- \`equals\` calls go into infinite recursion
+  > They don't.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is it dangerous to use a mutable object as a \`HashMap\` key?
+
+- Mutable objects can't be stored at all
+  > They can.
+- They double the memory cost
+  > They don't.
+- [o] If a field that participates in \`hashCode\` changes while the object is a key, the entry becomes unreachable
+  > Correct. The map indexed it in a bucket computed from the old hash; after mutation, it looks in a different bucket and reports "not present."
+- \`HashMap\` deep-copies keys, so the cost is performance
+  > \`HashMap\` does not deep-copy.`}
+/>
+
+<MultipleChoice
+  markdown={`What's the cleanest modern way to get a correct \`equals\` / \`hashCode\` for a small immutable value type?
+
+- Hand-write both methods using \`Objects.hash\`
+  > It works, but it's error-prone and verbose.
+- Inherit them from \`Object\`
+  > That gives identity equality, which is rarely what you want.
+- [o] Declare the class as a \`record\`
+  > Correct. Records automatically generate \`equals\`, \`hashCode\`, and \`toString\` from the components.
+- Implement \`Comparable\`
+  > \`Comparable\` is about ordering, not value equality.`}
+/>
+
+<Callout type="success" title="Foundations, complete">
+We have iteration, equality, and hashing — the three contracts every
+container depends on. Now we turn to generics in depth: how to
+*declare* parameterized types and methods of our own.
+</Callout>

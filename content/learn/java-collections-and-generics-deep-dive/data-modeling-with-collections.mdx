@@ -1,0 +1,362 @@
+---
+title: Data Modeling with Collections
+description: Picking the right shape — list, set, map, map-of-list, map-of-set — for real-world domains
+---
+
+Most code, in the end, is some collection nested inside some other
+collection. The shape you choose is a modeling decision, not a
+performance one — pick wrongly and your code will be full of awkward
+loops and edge cases; pick well and most queries become one method
+call.
+
+This chapter is about the **shape** of your data.
+
+## The "shape" mental model
+
+Every modeling problem has three questions:
+
+1. **Are duplicates allowed?** If no, you want a `Set`.
+2. **Is order meaningful?** If yes, you want a `List` (or an ordered set/map).
+3. **Is there a key by which we look things up?** If yes, you want a `Map`.
+
+Combine these and you get the four canonical shapes:
+
+| Question | Shape |
+| --- | --- |
+| "Ordered bag of things" | `List<T>` |
+| "Unique things, lookup by identity" | `Set<T>` |
+| "Lookup by key" | `Map<K, V>` |
+| "Each key maps to many values" | `Map<K, List<V>>` or `Map<K, Set<V>>` |
+
+```mermaid
+flowchart TD
+    Q[What am I modeling?] --> A{duplicates?}
+    A -- "no" --> B[Set]
+    A -- "yes" --> C{lookup key?}
+    C -- "no" --> D[List]
+    C -- "yes" --> E{one or many values per key?}
+    E -- "one" --> F[Map K V]
+    E -- "many, ordered" --> G[Map of K to List of V]
+    E -- "many, unique" --> H[Map of K to Set of V]
+```
+
+## Worked example: a music library
+
+Let's design the data of a tiny music library. Domain:
+
+- A library has many **tracks**.
+- Each track belongs to one **album** and one **artist**.
+- A track has a list of **genres**.
+- Listeners can **like** any track.
+- We need to be able to:
+  - List all tracks by a given artist.
+  - List all unique genres in the library.
+  - Show the top-N most liked tracks.
+
+### First pass: lists everywhere
+
+A naive design might use lists for everything:
+
+```java
+record Track(String title, String artist, String album, List<String> genres, int likes) {}
+
+class Library {
+    private final List<Track> tracks = new ArrayList<>();
+    // tracksByArtist(name): for-loop over tracks, filtering by artist
+    // allGenres(): for-loop with a duplicate-checking inner loop
+    // topLiked(n): sort and take
+}
+```
+
+This works, but every query is `O(n)`, every "is this duplicate?"
+check is hand-written, and the *intent* — "lookup by artist", "set
+of unique genres" — is hidden inside loop bodies.
+
+### Second pass: shape per query
+
+If we let the **questions** drive the **shape**, we get:
+
+- "List all tracks by a given artist" → `Map<String, List<Track>> tracksByArtist`
+- "List all unique genres in the library" → `Set<String> allGenres`
+- "Top-N most liked tracks" → keep a `List<Track>` and sort on demand
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Library lib = new Library();
+        lib.add(new Track("Clair de Lune",  "Debussy",   "Suite Bergamasque", List.of("classical", "impressionist"), 1200));
+        lib.add(new Track("Gymnopedie No.1","Satie",     "Gymnopedies",       List.of("classical"),                  900));
+        lib.add(new Track("Reverie",        "Debussy",   "Reveries",          List.of("classical"),                  450));
+        lib.add(new Track("Liebestraum",    "Liszt",     "Liebestraume",      List.of("classical", "romantic"),      700));
+
+        System.out.println("Debussy tracks:");
+        for (Track t : lib.tracksByArtist("Debussy")) {
+            System.out.println("  " + t.title());
+        }
+
+        System.out.println("All genres: " + new TreeSet<>(lib.allGenres()));
+
+        System.out.println("Top 2:");
+        for (Track t : lib.topLiked(2)) {
+            System.out.println("  " + t.title() + " (" + t.likes() + ")");
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Track.java",
+      initialContent: `import java.util.List;
+
+public record Track(
+    String title,
+    String artist,
+    String album,
+    List<String> genres,
+    int likes
+) {}
+`,
+    },
+    {
+      filename: "Library.java",
+      initialContent: `import java.util.*;
+
+public class Library {
+    // shape: ordered list of tracks
+    private final List<Track> tracks = new ArrayList<>();
+
+    // shape: lookup by artist -> list of tracks
+    private final Map<String, List<Track>> byArtist = new HashMap<>();
+
+    // shape: set of all unique genres seen
+    private final Set<String> genres = new HashSet<>();
+
+    public void add(Track t) {
+        tracks.add(t);
+        byArtist.computeIfAbsent(t.artist(), k -> new ArrayList<>()).add(t);
+        genres.addAll(t.genres());
+    }
+
+    public List<Track> tracksByArtist(String artist) {
+        return Collections.unmodifiableList(byArtist.getOrDefault(artist, List.of()));
+    }
+
+    public Set<String> allGenres() {
+        return Collections.unmodifiableSet(genres);
+    }
+
+    public List<Track> topLiked(int n) {
+        List<Track> copy = new ArrayList<>(tracks);
+        copy.sort(Comparator.comparingInt(Track::likes).reversed());
+        return copy.subList(0, Math.min(n, copy.size()));
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Notice what happened: `tracksByArtist(name)` went from an `O(n)`
+scan to an `O(1)` map lookup, *not* because we changed any
+algorithm, but because we **stored the data in the shape we needed
+to query it**.
+
+## Modeling relationships
+
+Most "real" data is graph-shaped. You'll mainly model two flavors of
+relationship with collections:
+
+### 1:N — one parent, many children
+
+`Map<ParentKey, List<Child>>` (ordered) or
+`Map<ParentKey, Set<Child>>` (unique).
+
+Example: orders per customer.
+
+```java
+Map<CustomerId, List<Order>> ordersByCustomer = new HashMap<>();
+```
+
+### N:M — many on both sides
+
+Two complementary maps form a bidirectional index:
+
+```java
+Map<UserId,    Set<TagId>>  tagsOfUser  = new HashMap<>();
+Map<TagId,     Set<UserId>> usersOfTag  = new HashMap<>();
+```
+
+Whenever you tag a user, update both. The cost is a tiny bit of
+discipline on every write; the benefit is that *both* questions
+("what tags does this user have?" and "which users have this tag?")
+become `O(1)`.
+
+## Typed value objects beat strings
+
+A subtle but huge win: don't let your maps and lists be keyed by
+loose primitives. `Map<String, Order>` is fine — until you also have
+`Map<String, Customer>` and accidentally pass a customer's email
+where an order id was expected.
+
+`record CustomerId(String value) {}` solves it: the compiler now
+catches the mix-up, and you can attach validation to the record's
+constructor.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    record CustomerId(String value) {}
+    record OrderId(String value)    {}
+    record Order(OrderId id, CustomerId customer, int cents) {}
+
+    public static void main(String[] args) {
+        Map<OrderId, Order> orders = new HashMap<>();
+        orders.put(new OrderId("o-1"), new Order(new OrderId("o-1"), new CustomerId("c-1"), 999));
+
+        // This would not even compile:
+        // orders.get(new CustomerId("c-1"));
+        System.out.println(orders.get(new OrderId("o-1")));
+    }
+}
+`}
+/>
+
+This is *type-driven data modeling* — letting the type system carry
+information that comments and convention used to carry.
+
+## Practice
+
+<ChallengeCard
+  adapter="java"
+  title="Group orders by customer"
+  instructions={`Implement \`OrderIndex.byCustomer(List<Order>)\` returning a \`Map<String, List<Order>>\` keyed by \`customerId\`, with each customer's orders **in input order**.
+
+Expected output:
+
+\`\`\`
+alice: [Order[id=1, total=100], Order[id=3, total=70]]
+bob: [Order[id=2, total=40]]
+carol: [Order[id=4, total=200]]
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Order> orders = List.of(
+            new Order(1, "alice", 100),
+            new Order(2, "bob",    40),
+            new Order(3, "alice",  70),
+            new Order(4, "carol", 200)
+        );
+        Map<String, List<Order>> idx = new TreeMap<>(OrderIndex.byCustomer(orders));
+        idx.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+}
+`,
+    },
+    {
+      filename: "Order.java",
+      initialContent: `public record Order(int id, String customerId, int total) {}
+`,
+    },
+    {
+      filename: "OrderIndex.java",
+      initialContent: `import java.util.*;
+
+public final class OrderIndex {
+    private OrderIndex() {}
+
+    public static Map<String, List<Order>> byCustomer(List<Order> orders) {
+        // TODO: use computeIfAbsent + ArrayList
+        return new HashMap<>();
+    }
+}
+`,
+      solutionContent: `import java.util.*;
+
+public final class OrderIndex {
+    private OrderIndex() {}
+
+    public static Map<String, List<Order>> byCustomer(List<Order> orders) {
+        Map<String, List<Order>> out = new HashMap<>();
+        for (Order o : orders) {
+            out.computeIfAbsent(o.customerId(), k -> new ArrayList<>()).add(o);
+        }
+        return out;
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "order-index",
+      name: "OrderIndex groups orders by customerId in input order",
+      expect: {
+        stdoutEquals:
+          "alice: [Order[id=1, customerId=alice, total=100], Order[id=3, customerId=alice, total=70]]\nbob: [Order[id=2, customerId=bob, total=40]]\ncarol: [Order[id=4, customerId=carol, total=200]]",
+      },
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`You need to answer "all messages from a given user" instantly, where messages arrive over time and the per-user list grows. What is the natural shape?
+
+- A flat \`List<Message>\` that you scan each time
+  > Works, but every query is \`O(n)\`. Fine for small data, wrong shape for the question.
+- A \`Set<Message>\`
+  > Loses order; doesn't index by user.
+- [o] A \`Map<UserId, List<Message>>\` updated on every arrival
+  > Correct. Lookup becomes \`O(1)\` and per-user order is preserved.
+- A \`Map<UserId, Set<Message>>\`
+  > Wrong if order matters; messages aren't naturally unique either.`}
+/>
+
+<MultipleChoice
+  markdown={`You're modeling a tagging system: each post has many tags, each tag belongs to many posts. Which is a *good* design?
+
+- One \`Map<PostId, List<TagId>>\`
+  > Fine for "tags of a post"; "posts of a tag" becomes \`O(n)\`.
+- One \`Map<TagId, List<PostId>>\`
+  > Symmetric problem.
+- [o] Two indices: \`Map<PostId, Set<TagId>>\` and \`Map<TagId, Set<PostId>>\`, kept in sync on every change
+  > Correct. Each direction is \`O(1)\`; updates do a tiny bit more work.
+- A \`List<Pair<PostId, TagId>>\`
+  > Both queries become \`O(n)\`.`}
+/>
+
+<MultipleChoice
+  markdown={`Why prefer \`record CustomerId(String value) {}\` over a bare \`String\` for keys?
+
+- It uses less memory
+  > It uses slightly *more* memory.
+- It's faster
+  > It is comparable.
+- [o] The compiler now refuses to mix up customer ids with other strings (order ids, emails, etc.), and you can put validation in the record's constructor
+  > Correct. Type-driven modeling shifts entire categories of bugs from runtime to compile time.
+- It's required by the Collections API
+  > It is not.`}
+/>
+
+<Callout type="success" title="Next up">
+Modeling decisions made, we'll zoom out one more level and look at
+**collection architecture** — how to keep your APIs clean as
+collections cross layers of an application.
+</Callout>
