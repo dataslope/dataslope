@@ -1,0 +1,481 @@
+---
+title: Branded Types
+description: Add nominal typing to TypeScript's structural system to prevent mixing semantically distinct values.
+---
+
+# Branded Types
+
+TypeScript's type system is **structural** — two types are compatible if they have the same shape, regardless of their names. This is powerful and flexible, but it has a downside: values that *mean* different things can be used interchangeably if they have the same structure.
+
+Consider:
+```ts
+type UserId = string;
+type OrderId = string;
+
+function getUser(id: UserId): void {}
+function getOrder(id: OrderId): void {}
+
+const userId: UserId = "user-123";
+const orderId: OrderId = "order-456";
+
+getUser(orderId); // Oops! No error — both are just strings.
+```
+
+TypeScript can't tell them apart because they're structurally identical. This chapter introduces **branded types** (also called **opaque types** or **nominal types**) — a technique to tag values with phantom properties that make them incompatible at compile time, even though they're the same at runtime.
+
+---
+
+## The Problem: Structural Typing's Blind Spot
+
+Let's say you're building a financial application. You have `Cents` (integer amounts, e.g., $12.34 = 1234 cents) and `Dollars` (floating-point amounts). Both are `number` at runtime, but mixing them is a bug:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Cents = number;
+type Dollars = number;
+
+function displayPrice(cents: Cents): string {
+  return \`$\${(cents / 100).toFixed(2)}\`;
+}
+
+const price: Dollars = 12.34;
+console.log(displayPrice(price)); // Bug! Expected cents, got dollars
+`}
+/>
+
+The code compiles, but `displayPrice` expects cents (1234), not dollars (12.34). The output is nonsense.
+
+---
+
+## Solution: Branding with a Phantom Property
+
+A **brand** is a property that exists only in the type system, never at runtime. We add it by intersecting with a unique tag:
+
+```ts
+type Cents = number & { readonly __brand: "Cents" };
+type Dollars = number & { readonly __brand: "Dollars" };
+```
+
+Now `Cents` and `Dollars` are no longer compatible, even though they're both `number` at runtime. The `__brand` property is a **phantom** — it doesn't exist on the value, but TypeScript sees it in the type.
+
+Here's how to create branded values:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Cents = number & { readonly __brand: "Cents" };
+type Dollars = number & { readonly __brand: "Dollars" };
+
+function toCents(dollars: number): Cents {
+  return Math.round(dollars * 100) as Cents;
+}
+
+function toDollars(cents: Cents): Dollars {
+  return (cents / 100) as Dollars;
+}
+
+function displayPrice(cents: Cents): string {
+  return \`$\${(cents / 100).toFixed(2)}\`;
+}
+
+const price = toCents(12.34);
+console.log(displayPrice(price)); // OK: Cents
+// console.log(displayPrice(12.34)); // Error: number is not Cents
+`}
+/>
+
+We use **smart constructors** (`toCents`, `toDollars`) to produce branded values. Inside the constructor, we cast the plain `number` to the branded type with `as`. Outside, users can't accidentally pass a plain `number` — they must go through the constructor.
+
+---
+
+## Using `unique symbol` for Extra Safety
+
+String brands like `"Cents"` work, but they're not truly unique. If two libraries use the same brand name, they collide. For maximum safety, use `unique symbol`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`declare const CentsBrand: unique symbol;
+declare const DollarsBrand: unique symbol;
+
+type Cents = number & { readonly [CentsBrand]: true };
+type Dollars = number & { readonly [DollarsBrand]: true };
+
+function toCents(dollars: number): Cents {
+  return Math.round(dollars * 100) as Cents;
+}
+
+function displayPrice(cents: Cents): string {
+  return \`$\${(cents / 100).toFixed(2)}\`;
+}
+
+const price = toCents(12.34);
+console.log(displayPrice(price));
+`}
+/>
+
+A `unique symbol` is a type that's distinct from all others — even if two modules declare the same name, their symbols are different. This prevents accidental collisions.
+
+The `declare const` trick defines the symbol's *type* without creating a runtime value. The brand exists only in the type system.
+
+---
+
+## Practical Example: User IDs and Order IDs
+
+Let's apply branding to IDs in a typical application:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`declare const UserIdBrand: unique symbol;
+declare const OrderIdBrand: unique symbol;
+
+type UserId = string & { readonly [UserIdBrand]: true };
+type OrderId = string & { readonly [OrderIdBrand]: true };
+
+function createUserId(id: string): UserId {
+  return id as UserId;
+}
+
+function createOrderId(id: string): OrderId {
+  return id as OrderId;
+}
+
+function getUser(id: UserId): string {
+  return \`Fetching user \${id}\`;
+}
+
+function getOrder(id: OrderId): string {
+  return \`Fetching order \${id}\`;
+}
+
+const userId = createUserId("user-123");
+const orderId = createOrderId("order-456");
+
+console.log(getUser(userId)); // OK
+console.log(getOrder(orderId)); // OK
+// console.log(getUser(orderId)); // Error: OrderId is not assignable to UserId
+`}
+/>
+
+Now, if you accidentally pass an `OrderId` to `getUser`, the compiler catches it. The brand forces you to use the right ID type.
+
+---
+
+## Combining Brands with Validation
+
+Smart constructors are also the perfect place to validate input. You can ensure that branded values are always valid:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`declare const EmailBrand: unique symbol;
+type Email = string & { readonly [EmailBrand]: true };
+
+function createEmail(input: string): Email | null {
+  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+  if (!emailRegex.test(input)) {
+    return null;
+  }
+  return input as Email;
+}
+
+function sendEmail(to: Email, message: string): string {
+  return \`Sending "\${message}" to \${to}\`;
+}
+
+const email = createEmail("alice@example.com");
+if (email) {
+  console.log(sendEmail(email, "Hello!"));
+} else {
+  console.log("Invalid email");
+}
+
+// const badEmail = "not-an-email";
+// sendEmail(badEmail, "Hello!"); // Error: string is not Email
+`}
+/>
+
+Because `Email` can only be created through `createEmail`, you know that any `Email` value has passed validation. This is a powerful pattern: **make illegal states unrepresentable**.
+
+---
+
+## Multi-File Example: Branded Types Across Modules
+
+Let's organize branded types and their constructors across multiple files for better maintainability.
+
+<CodeBlock
+  adapter="typescript"
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { UserId, createUserId } from "./user-id";
+import { OrderId, createOrderId } from "./order-id";
+
+function processUser(id: UserId): string {
+  return \`Processing user \${id}\`;
+}
+
+function processOrder(id: OrderId): string {
+  return \`Processing order \${id}\`;
+}
+
+const userId = createUserId("user-123");
+const orderId = createOrderId("order-456");
+
+console.log(processUser(userId));
+console.log(processOrder(orderId));
+// console.log(processUser(orderId)); // Error: can't mix IDs
+`,
+    },
+    {
+      filename: "user-id.ts",
+      initialContent: `declare const UserIdBrand: unique symbol;
+export type UserId = string & { readonly [UserIdBrand]: true };
+
+export function createUserId(id: string): UserId {
+  return id as UserId;
+}
+`,
+    },
+    {
+      filename: "order-id.ts",
+      initialContent: `declare const OrderIdBrand: unique symbol;
+export type OrderId = string & { readonly [OrderIdBrand]: true };
+
+export function createOrderId(id: string): OrderId {
+  return id as OrderId;
+}
+`,
+    },
+  ]}
+/>
+
+Each module exports:
+1. The branded type (e.g., `UserId`).
+2. The smart constructor (e.g., `createUserId`).
+
+Consumers import both and can't accidentally mix IDs. The brand symbols are declared with `declare const`, so they exist only in the type system — no runtime overhead.
+
+---
+
+## When to Use Branded Types
+
+Brands are most valuable when:
+- **Semantically distinct values share the same primitive type**: user IDs vs. order IDs, cents vs. dollars, validated vs. unvalidated strings.
+- **Accidental mixing is easy and costly**: in large codebases, passing the wrong ID or unit can cause silent bugs.
+- **You want to enforce validation**: by making the brand the only way to construct the value, you guarantee validity.
+
+Brands are *not* necessary for:
+- Types that are structurally distinct already (e.g., `{ id: string }` vs. `{ name: string }`).
+- Simple scripts or prototypes where the overhead isn't worth it.
+
+---
+
+## Challenge: Implement Branded Temperature Units
+
+<ChallengeCard
+  adapter="typescript"
+  title="Branded Temperature Units"
+  instructions={`Create two branded types, \`Celsius\` and \`Fahrenheit\`, both based on \`number\`. Implement smart constructors \`toCelsius\` and \`toFahrenheit\`, and a conversion function \`celsiusToFahrenheit\` that accepts \`Celsius\` and returns \`Fahrenheit\`.
+
+**Conversion formula**: \`F = C × 9/5 + 32\`
+
+The compiler should prevent passing \`Fahrenheit\` where \`Celsius\` is expected, and vice versa.`}
+  initCode={`declare const CelsiusBrand: unique symbol;
+declare const FahrenheitBrand: unique symbol;
+
+type Celsius = number & { readonly [CelsiusBrand]: true };
+type Fahrenheit = number & { readonly [FahrenheitBrand]: true };
+
+function toCelsius(value: number): Celsius {
+  return value as Celsius;
+}
+
+function toFahrenheit(value: number): Fahrenheit {
+  return value as Fahrenheit;
+}
+
+function celsiusToFahrenheit(c: Celsius): Fahrenheit {
+  // Implement conversion
+  return 0 as Fahrenheit;
+}
+`}
+  initialCode={`declare const CelsiusBrand: unique symbol;
+declare const FahrenheitBrand: unique symbol;
+
+type Celsius = number & { readonly [CelsiusBrand]: true };
+type Fahrenheit = number & { readonly [FahrenheitBrand]: true };
+
+function toCelsius(value: number): Celsius {
+  return value as Celsius;
+}
+
+function toFahrenheit(value: number): Fahrenheit {
+  return value as Fahrenheit;
+}
+
+function celsiusToFahrenheit(c: Celsius): Fahrenheit {
+  return 0 as Fahrenheit;
+}
+
+const temp = toCelsius(0);
+const converted = celsiusToFahrenheit(temp);
+console.log(converted); // Should be 32
+`}
+  solutionCode={`declare const CelsiusBrand: unique symbol;
+declare const FahrenheitBrand: unique symbol;
+
+type Celsius = number & { readonly [CelsiusBrand]: true };
+type Fahrenheit = number & { readonly [FahrenheitBrand]: true };
+
+function toCelsius(value: number): Celsius {
+  return value as Celsius;
+}
+
+function toFahrenheit(value: number): Fahrenheit {
+  return value as Fahrenheit;
+}
+
+function celsiusToFahrenheit(c: Celsius): Fahrenheit {
+  return ((c * 9) / 5 + 32) as Fahrenheit;
+}
+
+const temp = toCelsius(0);
+const converted = celsiusToFahrenheit(temp);
+console.log(converted);
+`}
+  tests={[
+    {
+      id: "t1",
+      name: "Converts 0°C to 32°F",
+      description: "celsiusToFahrenheit(toCelsius(0)) === 32",
+      code: `const c = toCelsius(0);
+const f = celsiusToFahrenheit(c);
+if (f !== 32) throw new Error(\`Expected 32, got \${f}\`);`,
+    },
+    {
+      id: "t2",
+      name: "Converts 100°C to 212°F",
+      description: "celsiusToFahrenheit(toCelsius(100)) === 212",
+      code: `const c = toCelsius(100);
+const f = celsiusToFahrenheit(c);
+if (f !== 212) throw new Error(\`Expected 212, got \${f}\`);`,
+    },
+  ]}
+/>
+
+---
+
+## Challenge: Multi-File Branded Email
+
+<ChallengeCard
+  adapter="typescript"
+  title="Multi-File Branded Email"
+  instructions={`Split the branded \`Email\` type and its validation into separate files. In \`email.ts\`, define the branded type and a \`createEmail\` function that validates the input (must contain \`@\`). In \`mailer.ts\`, define a \`sendEmail\` function that accepts \`Email\`. In \`main.ts\`, create an email and send it.
+
+The compiler should prevent passing a plain \`string\` to \`sendEmail\`.`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { createEmail } from "./email";
+import { sendEmail } from "./mailer";
+
+const email = createEmail("alice@example.com");
+if (email) {
+  console.log(sendEmail(email, "Hello!"));
+} else {
+  console.log("Invalid email");
+}
+`,
+    },
+    {
+      filename: "email.ts",
+      initialContent: `declare const EmailBrand: unique symbol;
+export type Email = string & { readonly [EmailBrand]: true };
+
+export function createEmail(input: string): Email | null {
+  // Implement validation
+  return null;
+}
+`,
+      solutionContent: `declare const EmailBrand: unique symbol;
+export type Email = string & { readonly [EmailBrand]: true };
+
+export function createEmail(input: string): Email | null {
+  if (input.includes("@")) {
+    return input as Email;
+  }
+  return null;
+}
+`,
+    },
+    {
+      filename: "mailer.ts",
+      initialContent: `import { Email } from "./email";
+
+export function sendEmail(to: Email, message: string): string {
+  return \`Sending "\${message}" to \${to}\`;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "out",
+      name: "Sends valid email",
+      description: "Output contains 'Sending'",
+      expect: { stdoutIncludes: "Sending" },
+    },
+  ]}
+/>
+
+---
+
+## Multiple Choice: Branding Mechanism
+
+<MultipleChoice
+  markdown={`What makes branded types incompatible with their underlying primitives?
+
+- The smart constructor function
+  > The smart constructor creates the brand, but it's the intersection type that enforces incompatibility.
+- [o] The intersection with a phantom property
+  > Correct. The intersection \`T & { readonly __brand: ... }\` adds a type-level property that makes the branded type structurally distinct from the base type.
+- The \`as\` cast inside the constructor
+  > The cast is necessary to create the value, but it doesn't enforce safety. The type itself does.
+
+The phantom property exists only in the type system, adding a "tag" that prevents structural compatibility.`}
+/>
+
+---
+
+## Multiple Choice: `unique symbol` vs. String Brands
+
+<MultipleChoice
+  markdown={`Why prefer \`unique symbol\` over string literals for brands?
+
+- String brands are less type-safe
+  > Both are equally type-safe. The difference is in collision risk.
+- [o] \`unique symbol\` prevents accidental collisions across modules
+  > Correct. Each \`unique symbol\` declaration creates a distinct type, even if named the same. String literals can collide.
+- \`unique symbol\` has better runtime performance
+  > Brands are purely compile-time constructs; there's no runtime difference.
+
+Use \`unique symbol\` when building libraries or working in large codebases where naming collisions are a risk.`}
+/>
+
+---
+
+## Summary
+
+You've learned how to:
+- Recognize the **limitations of structural typing** for semantically distinct values.
+- Create **branded types** with phantom properties (intersection types).
+- Use **smart constructors** to enforce that branded values are created correctly.
+- Prefer **`unique symbol`** for collision-proof brands.
+- **Validate inputs** at construction time, ensuring all branded values are valid.
+- Organize branded types across modules for maintainability.
+
+Brands add a thin layer of nominal typing to TypeScript's structural world. They prevent entire classes of bugs (mixing IDs, units, or invalid data) at zero runtime cost. In the next chapter, we'll scale up to **API modeling**, where brands and other type-level contracts ensure correctness across module and service boundaries.
+
+---
+
+**Next**: [API Modeling & Contracts](./api-modeling-and-contracts) — treating types as contracts between modules and services.

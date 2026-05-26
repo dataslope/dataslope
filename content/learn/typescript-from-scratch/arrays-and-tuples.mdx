@@ -1,0 +1,431 @@
+---
+title: Arrays and Tuples
+description: Homogeneous collections and fixed-length sequences with precise type tracking
+---
+
+JavaScript arrays are wonderfully flexible — you can mix numbers,
+strings, objects, even other arrays in a single list. But this
+flexibility is also a liability: if you expect an array of numbers and
+accidentally receive an array of strings, JavaScript won't complain until
+you try to do math and get `NaN`.
+
+TypeScript introduces **typed arrays** and **tuples** to bring order to
+the chaos. An array type says "this is a list of things, all of the same
+type." A tuple type says "this is a sequence of a fixed length, where
+each position has its own type." Together, they let the compiler verify
+that you're not accidentally mixing incompatible data or indexing beyond
+the bounds of a known-length sequence.
+
+This chapter answers: **How do you type arrays?** **What's the difference
+between arrays and tuples?** **What bugs does this prevent?**
+
+## Array types: homogeneous collections
+
+The simplest array type is `T[]`, meaning "an array whose elements are
+all of type `T`." For example, `number[]` is an array of numbers,
+`string[]` is an array of strings:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const numbers: number[] = [1, 2, 3, 4, 5];
+const names: string[] = ["Alice", "Bob", "Charlie"];
+
+console.log("numbers:", numbers);
+console.log("names:", names);
+console.log("First number:", numbers[0]);
+console.log("First name:", names[0]);
+`}
+/>
+
+**What the compiler now knows:** Every element of `numbers` is a
+`number`. If you write `numbers.push("six")`, the compiler rejects it —
+`"six"` is not a `number`. The type annotation acts as a contract: "this
+array holds only numbers."
+
+TypeScript also provides a generic `Array<T>` syntax, which is
+functionally identical to `T[]`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const numbers: Array<number> = [10, 20, 30];
+const words: Array<string> = ["hello", "world"];
+
+console.log("numbers:", numbers);
+console.log("words:", words);
+`}
+/>
+
+The two syntaxes are interchangeable. Most codebases prefer `T[]` for
+simple types (it's more concise), but `Array<T>` can be clearer when `T`
+itself is complex (e.g., `Array<Promise<User>>`).
+
+## Type inference for arrays
+
+If you initialize an array with values, TypeScript infers the element
+type:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Inferred as number[]
+const scores = [95, 87, 92];
+
+// Inferred as string[]
+const colors = ["red", "green", "blue"];
+
+// Inferred as (number | string)[] — a mixed array
+const mixed = [1, "two", 3];
+
+console.log("scores:", scores);
+console.log("colors:", colors);
+console.log("mixed:", mixed);
+`}
+/>
+
+Notice the last case: `mixed` is inferred as `(number | string)[]`,
+meaning each element is *either* a number or a string. This is correct —
+the array holds both — but it also means you lose precision. If you index
+into `mixed`, TypeScript knows the result is `number | string`, not
+specifically `number`. You'll need to narrow the type before you can do
+math with it (we'll cover narrowing in [Type
+Narrowing](./type-narrowing)).
+
+## Readonly arrays
+
+By default, TypeScript arrays are mutable: you can `push`, `pop`,
+`splice`, etc. But sometimes you want to express that an array should not
+be modified. Enter `readonly`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const fixed: readonly number[] = [1, 2, 3];
+
+console.log("fixed:", fixed);
+console.log("First element:", fixed[0]);
+
+// Mutation is a compile-time error:
+// fixed.push(4);  // ❌ Property 'push' does not exist on type 'readonly number[]'
+// fixed[0] = 99;  // ❌ Index signature in type 'readonly number[]' only permits reading
+
+// But you can still read and iterate:
+for (const num of fixed) {
+  console.log("Element:", num);
+}
+`}
+/>
+
+**What bugs does this prevent?** If you pass an array to a function that
+you expect *not* to modify it, declaring the parameter as `readonly T[]`
+makes that contract explicit. The compiler ensures that the function
+doesn't accidentally call a mutating method. This is especially valuable
+in large codebases where function signatures act as machine-checked
+documentation.
+
+Alternatively, you can use the `ReadonlyArray<T>` generic:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const immutable: ReadonlyArray<string> = ["a", "b", "c"];
+
+console.log("immutable:", immutable);
+console.log("Length:", immutable.length);
+
+// Mutations are blocked:
+// immutable.push("d");  // ❌ Property 'push' does not exist
+`}
+/>
+
+`readonly T[]` and `ReadonlyArray<T>` are equivalent; choose whichever
+reads better to you.
+
+## Tuples: fixed-length, heterogeneous sequences
+
+An array type says "a list of some length, all elements of type `T`." A
+**tuple** type says "a sequence of *exactly* N elements, where each
+position has its own type." For example, `[string, number]` is a
+two-element tuple: the first element is a `string`, the second is a
+`number`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A tuple: [name, age]
+const person: [string, number] = ["Alice", 30];
+
+console.log("Name:", person[0]);  // string
+console.log("Age:", person[1]);   // number
+
+// Destructuring works beautifully:
+const [name, age] = person;
+console.log(\`\${name} is \${age} years old.\`);
+`}
+/>
+
+**What the compiler now knows:** `person[0]` is *specifically* a `string`,
+not `string | number`. `person[1]` is *specifically* a `number`. If you
+try to assign `person = [30, "Alice"]`, the compiler rejects it — the
+order matters.
+
+Tuples shine when a function returns multiple values:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function divmod(a: number, b: number): [number, number] {
+  const quotient = Math.floor(a / b);
+  const remainder = a % b;
+  return [quotient, remainder];
+}
+
+const [q, r] = divmod(17, 5);
+console.log(\`17 ÷ 5 = \${q} remainder \${r}\`);
+`}
+/>
+
+Without tuples, you'd have to return an object with named properties
+(`{ quotient, remainder }`). Tuples are lighter-weight when the structure
+is simple and the positions are self-explanatory.
+
+## Named tuple elements
+
+TypeScript 4.0+ allows you to label tuple elements, which improves
+readability without changing the runtime behavior:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Named tuple: [name, age]
+type Person = [name: string, age: number];
+
+const alice: Person = ["Alice", 30];
+const bob: Person = ["Bob", 25];
+
+console.log("alice:", alice);
+console.log("bob:", bob);
+
+// The labels are purely for documentation; they don't affect access:
+console.log("alice[0]:", alice[0]);
+console.log("alice[1]:", alice[1]);
+`}
+/>
+
+The labels appear in editor tooltips and error messages, making the code
+self-documenting. But you still access elements by index, not by name.
+
+## Optional tuple elements
+
+You can mark tuple elements as optional with `?`:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A tuple with an optional third element
+type Point = [x: number, y: number, z?: number];
+
+const point2D: Point = [10, 20];
+const point3D: Point = [10, 20, 30];
+
+console.log("2D point:", point2D);
+console.log("3D point:", point3D);
+
+// Accessing the optional element gives number | undefined
+console.log("Z coordinate of 2D:", point2D[2]); // undefined
+console.log("Z coordinate of 3D:", point3D[2]); // 30
+`}
+/>
+
+Optional elements must come *after* required elements (just like optional
+function parameters). The type of an optional element is `T | undefined`.
+
+## Rest elements in tuples
+
+A tuple can have a **rest element** (`...T[]`) to represent a variable
+number of trailing elements:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A tuple: [name, ...scores]
+type StudentRecord = [name: string, ...scores: number[]];
+
+const alice: StudentRecord = ["Alice", 95, 87, 92];
+const bob: StudentRecord = ["Bob", 88];
+
+console.log("alice:", alice);
+console.log("bob:", bob);
+
+const [aliceName, ...aliceScores] = alice;
+console.log(\`\${aliceName}'s scores:\`, aliceScores);
+`}
+/>
+
+The rest element must be last. It behaves like a normal array, so you can
+iterate over it, `push` to it (if the tuple is mutable), etc.
+
+## Variadic tuple types (a glimpse)
+
+TypeScript 4.0+ supports **variadic tuple types**, which let you
+parameterize the length and element types of a tuple. This is an advanced
+feature (we'll revisit it when we cover generics), but here's a taste:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A function that prepends an element to a tuple
+function prepend<T, U extends any[]>(head: T, tail: U): [T, ...U] {
+  return [head, ...tail];
+}
+
+const result = prepend("Name", [30, true]);
+console.log("result:", result);
+
+// result has type [string, number, boolean]
+const [name, age, active] = result;
+console.log(\`\${name}, age \${age}, active \${active}\`);
+`}
+/>
+
+The return type `[T, ...U]` says "a tuple that starts with a `T`, then
+includes all the elements of `U`." The compiler tracks the entire
+structure. This level of precision is what makes TypeScript's tuple types
+so powerful.
+
+## Tuples vs arrays: when to use which
+
+**Use arrays (`T[]`) when:**
+- The collection can grow or shrink at runtime
+- All elements have the same type and role
+- You'll iterate over the entire collection
+
+**Use tuples when:**
+- The length is fixed and known at compile time
+- Each position has a distinct type or meaning
+- You want destructuring to give precise types
+
+A common pattern: a function returns a tuple (e.g., `[error, data]` or
+`[status, response]`), and the caller destructures it to get strongly
+typed pieces.
+
+## Practice: a multi-file coordinate system
+
+Let's solidify these concepts with a challenge that spans two files.
+You'll define a tuple type for 3D coordinates in one file and use it in
+another.
+
+<ChallengeCard
+  adapter="typescript"
+  title="3D Distance Calculator"
+  instructions={`You have two files: \`types.ts\` defines a \`Point3D\` tuple type (a 3-element tuple of numbers representing x, y, z). In \`main.ts\`, implement the function \`distance(a: Point3D, b: Point3D): number\` that returns the Euclidean distance between two points. The formula is \`sqrt((x2-x1)² + (y2-y1)² + (z2-z1)²)\`. The test checks the distance between [0,0,0] and [3,4,0] (which is 5).`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "types.ts",
+      initialContent: `// Define the Point3D tuple type here
+export type Point3D = [number, number, number];
+`,
+    },
+    {
+      filename: "main.ts",
+      initialContent: `import { Point3D } from "./types";
+
+export function distance(a: Point3D, b: Point3D): number {
+  // Your code here
+  return 0;
+}
+
+const origin: Point3D = [0, 0, 0];
+const point: Point3D = [3, 4, 0];
+console.log("Distance:", distance(origin, point));
+`,
+      solutionContent: `import { Point3D } from "./types";
+
+export function distance(a: Point3D, b: Point3D): number {
+  const [x1, y1, z1] = a;
+  const [x2, y2, z2] = b;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dz = z2 - z1;
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+const origin: Point3D = [0, 0, 0];
+const point: Point3D = [3, 4, 0];
+console.log("Distance:", distance(origin, point));
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "distance",
+      name: "Correct distance",
+      description: "distance([0,0,0], [3,4,0]) === 5",
+      code: `
+import { distance } from "./main";
+const result = distance([0, 0, 0], [3, 4, 0]);
+if (result !== 5) throw new Error("Expected 5, got " + result);
+`,
+    },
+  ]}
+/>
+
+## Common pitfalls: array vs tuple length
+
+TypeScript's array type does *not* track length. If you declare `numbers:
+number[]`, the compiler doesn't know if the array has 0, 1, or 100
+elements. Indexing `numbers[0]` gives `number | undefined` (in strict
+mode), because the array might be empty. Tuples, by contrast, *do* track
+length: if you declare `pair: [number, number]`, the compiler knows
+`pair[0]` and `pair[1]` exist and are `number`s (no `| undefined`).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const arr: number[] = [1, 2, 3];
+const tuple: [number, number] = [1, 2];
+
+// Array indexing gives number (but could be undefined at runtime)
+const firstArr = arr[0];
+console.log("firstArr:", firstArr);
+
+// Tuple indexing gives exactly number (guaranteed to exist)
+const firstTuple = tuple[0];
+console.log("firstTuple:", firstTuple);
+
+// Tuple bounds are checked:
+// const third = tuple[2];  // ❌ Tuple type '[number, number]' of length '2' has no element at index '2'
+`}
+/>
+
+This is a subtle but important distinction: **tuples encode length in the
+type, arrays do not.**
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the type of the variable \`x\` after this declaration: \`const x = [1, "two", true];\`?
+
+- \`any[]\`
+- \`Array<number | string | boolean>\`
+- [o] \`(number | string | boolean)[]\`
+  > Correct! TypeScript infers a union array type because the elements have different types.
+- \`[number, string, boolean]\` (tuple)
+
+TypeScript infers an array type, not a tuple, because the length is not encoded. If you want a tuple, you must annotate explicitly: \`const x: [number, string, boolean] = [1, "two", true];\``}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following correctly represents a tuple of a string and a number, in that order?
+
+- \`[number, string]\`
+- [o] \`[string, number]\`
+  > Correct! The order in a tuple type corresponds to the order of the elements.
+- \`{ 0: string, 1: number }\`
+- \`string | number\`
+
+Tuples are written as comma-separated types in square brackets, and order matters.`}
+/>
+
+## Summary
+
+Arrays and tuples give you two ways to type collections. Arrays (`T[]`)
+represent homogeneous lists of any length; tuples (`[T, U, ...]`)
+represent heterogeneous sequences of fixed length. Both can be made
+`readonly` to prevent mutation. The compiler uses these types to catch
+bugs: indexing beyond tuple bounds, pushing the wrong type into an array,
+accidentally mutating a collection you meant to keep immutable.
+
+In the next chapter, [Objects and Interfaces](./objects-and-interfaces),
+we'll see how to type structured data — objects with named properties,
+each with its own type.

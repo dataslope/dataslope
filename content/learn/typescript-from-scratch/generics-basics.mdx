@@ -1,0 +1,480 @@
+---
+title: Generics Basics
+description: Write reusable code without losing type information
+---
+
+Imagine you want to write a function that returns whatever you pass to it — an **identity** function. You could write:
+
+```ts
+function identity(x: any): any {
+  return x;
+}
+```
+
+This works at runtime, but you've lost all type information. If you call `identity(42)`, the return type is `any`, so the compiler won't catch mistakes like `identity(42).toUpperCase()`. You've traded type safety for reusability.
+
+**Generics** solve this problem. They let you write code that works with *any* type while preserving precise type information. The identity function becomes:
+
+```ts
+function identity<T>(x: T): T {
+  return x;
+}
+```
+
+Now `identity(42)` returns `number`, `identity("hello")` returns `string`, and the compiler tracks the exact type through the function. This is the power of generics: **abstraction without information loss**.
+
+## Why generics matter
+
+Without generics, you face a painful trade-off:
+
+1. **Concrete types:** Write `identityNumber(x: number): number` and `identityString(x: string): string`. This is type-safe but not reusable — you need a separate function for every type.
+2. **`any` escape hatch:** Write `identity(x: any): any`. This is reusable but not type-safe — the compiler can't help you anymore.
+
+Generics give you the best of both worlds: one function, full type safety, and the compiler **infers** the type parameter based on what you pass in.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Without generics: lose type information
+function identityAny(x: any): any {
+  return x;
+}
+
+const numAny = identityAny(42); // type: any
+// numAny.toUpperCase(); // ❌ Would compile but crash at runtime!
+
+// With generics: preserve type information
+function identity<T>(x: T): T {
+  return x;
+}
+
+const num = identity(42); // type: number
+const str = identity("hello"); // type: string
+const obj = identity({ x: 10 }); // type: { x: number }
+
+console.log(\`num: \${num} (type: number)\`);
+console.log(\`str: \${str} (type: string)\`);
+console.log(\`obj: \${JSON.stringify(obj)} (type: { x: number })\`);
+`}
+/>
+
+The `<T>` is a **type parameter** (also called a **type variable**). It's a placeholder for "whatever type you pass in." When you call `identity(42)`, TypeScript infers `T = number` and the return type becomes `number`. When you call `identity("hello")`, it infers `T = string` and the return type becomes `string`.
+
+<Callout type="info" title="Type parameter naming">
+By convention, single-letter names like `T`, `U`, `V` are used for generic type parameters. If the parameter has a more specific role, use a descriptive name like `TKey` or `TValue`. Avoid overly generic names like `Type` or `GenericType`.
+</Callout>
+
+```mermaid
+graph LR
+    A[identity call with 42] --> B[Compiler infers T = number]
+    B --> C[Return type: number]
+    D[identity call with "hello"] --> E[Compiler infers T = string]
+    E --> F[Return type: string]
+```
+
+## Generic functions
+
+Let's look at more realistic examples. Suppose you want a function that wraps a value in an array:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function wrap<T>(value: T): T[] {
+  return [value];
+}
+
+const numbers = wrap(42); // type: number[]
+const strings = wrap("hello"); // type: string[]
+const objects = wrap({ id: 1, name: "Alice" }); // type: { id: number; name: string }[]
+
+console.log(numbers); // [42]
+console.log(strings); // ["hello"]
+console.log(objects); // [{ id: 1, name: "Alice" }]
+`}
+/>
+
+The type parameter `T` flows through the signature: the input is `T`, the output is `T[]`. The compiler infers `T` from the argument you pass, so you get precise types at every call site.
+
+### Multiple type parameters
+
+You can have more than one type parameter:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function pair<A, B>(first: A, second: B): [A, B] {
+  return [first, second];
+}
+
+const p1 = pair(42, "hello"); // type: [number, string]
+const p2 = pair(true, { x: 10 }); // type: [boolean, { x: number }]
+
+console.log(p1); // [42, "hello"]
+console.log(p2); // [true, { x: 10 }]
+`}
+/>
+
+Here, `A` and `B` are independent type parameters. The compiler infers both from the arguments you pass. This is useful for functions that relate two different types (like a key-value pair, a tuple, or a mapping function).
+
+### Explicit type arguments
+
+Usually, TypeScript infers type parameters from the arguments. But you can also provide them explicitly:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function createArray<T>(): T[] {
+  return [];
+}
+
+// Inference fails here — no arguments to infer from!
+// const arr = createArray(); // ❌ Error: Type parameter 'T' has no default and cannot be inferred
+
+// Solution: provide the type argument explicitly
+const numbers = createArray<number>();
+const strings = createArray<string>();
+
+numbers.push(1, 2, 3);
+strings.push("a", "b", "c");
+
+console.log(numbers); // [1, 2, 3]
+console.log(strings); // ["a", "b", "c"]
+`}
+/>
+
+When a generic function has no parameters (or the parameters don't help inference), you must supply the type argument explicitly in angle brackets: `createArray<number>()`.
+
+## Generic interfaces and type aliases
+
+Generics aren't limited to functions. You can parameterize interfaces and type aliases too.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Generic interface
+interface Box<T> {
+  value: T;
+}
+
+const numberBox: Box<number> = { value: 42 };
+const stringBox: Box<string> = { value: "hello" };
+
+console.log(\`Number box: \${numberBox.value}\`);
+console.log(\`String box: \${stringBox.value}\`);
+
+// Generic type alias
+type Result<T, E> =
+  | { success: true; value: T }
+  | { success: false; error: E };
+
+function divide(a: number, b: number): Result<number, string> {
+  if (b === 0) {
+    return { success: false, error: "Division by zero" };
+  }
+  return { success: true, value: a / b };
+}
+
+const okResult = divide(10, 2);
+const errResult = divide(10, 0);
+
+if (okResult.success) {
+  console.log(\`Result: \${okResult.value}\`);
+} else {
+  console.log(\`Error: \${okResult.error}\`);
+}
+
+if (errResult.success) {
+  console.log(\`Result: \${errResult.value}\`);
+} else {
+  console.log(\`Error: \${errResult.error}\`);
+}
+`}
+/>
+
+The `Box<T>` interface is parameterized by `T`. When you create a `Box<number>`, `T` is `number`. When you create a `Box<string>`, `T` is `string`. The same interface works for any type.
+
+The `Result<T, E>` type alias is even more interesting: it's a discriminated union parameterized by *two* types — the success value type (`T`) and the error type (`E`). This is a common pattern for modeling operations that can succeed or fail.
+
+<Callout type="success" title="Reusable abstractions">
+Generic interfaces and type aliases let you define reusable abstractions — containers, results, events, state machines — that work with any payload type. You write the logic once and reuse it everywhere.
+</Callout>
+
+## Generic classes
+
+Classes can also be generic. Here's a simple generic stack:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`class Stack<T> {
+  private items: T[] = [];
+
+  push(item: T): void {
+    this.items.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.items.pop();
+  }
+
+  peek(): T | undefined {
+    return this.items[this.items.length - 1];
+  }
+
+  size(): number {
+    return this.items.length;
+  }
+}
+
+const numberStack = new Stack<number>();
+numberStack.push(10);
+numberStack.push(20);
+console.log(\`Top: \${numberStack.peek()}\`); // 20
+console.log(\`Pop: \${numberStack.pop()}\`); // 20
+console.log(\`Size: \${numberStack.size()}\`); // 1
+
+const stringStack = new Stack<string>();
+stringStack.push("hello");
+stringStack.push("world");
+console.log(\`Top: \${stringStack.peek()}\`); // "world"
+`}
+/>
+
+The `Stack<T>` class holds items of type `T`. When you instantiate `new Stack<number>()`, all the methods operate on `number`s. When you instantiate `new Stack<string>()`, all the methods operate on `string`s. One class, many types.
+
+## A practical example: `map`
+
+Let's build a generic `map` function (like `Array.prototype.map`). It takes an array of type `T[]` and a function `(T) => U`, and returns an array of type `U[]`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function map<T, U>(array: T[], fn: (item: T) => U): U[] {
+  const result: U[] = [];
+  for (const item of array) {
+    result.push(fn(item));
+  }
+  return result;
+}
+
+const numbers = [1, 2, 3, 4, 5];
+const doubled = map(numbers, n => n * 2); // type: number[]
+const strings = map(numbers, n => \`Number \${n}\`); // type: string[]
+
+console.log(doubled); // [2, 4, 6, 8, 10]
+console.log(strings); // ["Number 1", "Number 2", ...]
+
+// The compiler infers T = number and U = string from the callback
+const lengths = map(["hello", "world"], s => s.length); // type: number[]
+console.log(lengths); // [5, 5]
+`}
+/>
+
+Notice how the compiler infers both `T` and `U`:
+
+- From `numbers` (a `number[]`), it infers `T = number`.
+- From the callback `n => n * 2` (which returns a `number`), it infers `U = number`.
+- So the return type is `number[]`.
+
+For the second call, it infers `T = number` and `U = string` (from the callback returning a string), so the return type is `string[]`.
+
+```mermaid
+graph TD
+    A[map array, fn] --> B{Infer T from array}
+    B --> C[T = element type]
+    C --> D{Infer U from fn return}
+    D --> E[U = return type of fn]
+    E --> F[Return type: U array]
+```
+
+This is the power of generics: you write one function, and the compiler figures out the specific types for every call site.
+
+## Type parameter flow
+
+Understanding how type parameters flow through a function is key to using generics effectively. Let's trace through an example:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function firstElement<T>(array: T[]): T | undefined {
+  return array[0];
+}
+
+const nums = [10, 20, 30];
+const first = firstElement(nums); // inferred as number | undefined
+
+if (first !== undefined) {
+  console.log(\`First element: \${first}\`);
+}
+
+const empty: number[] = [];
+const nope = firstElement(empty); // still number | undefined
+console.log(\`Empty array first: \${nope}\`); // undefined
+`}
+/>
+
+The type parameter `T` is inferred from the input array. If you pass `number[]`, `T = number`, so the return type is `number | undefined`. The `| undefined` is there because the array might be empty.
+
+## Challenge: Generic container
+
+Now it's your turn. You'll implement a generic `Container` class that holds a value and provides methods to transform it.
+
+<ChallengeCard
+  adapter="typescript"
+  title="Generic Container"
+  instructions={`Implement a generic \`Container<T>\` class with:
+- A constructor that takes an initial value of type \`T\`.
+- A \`get()\` method that returns the current value.
+- A \`map<U>(fn: (value: T) => U)\` method that applies \`fn\` to the value and returns a **new** \`Container<U>\` (do not mutate the original).
+
+The tests will verify that \`map\` transforms the value and returns a new container with the correct type.`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { Container } from "./container";
+
+const numContainer = new Container(42);
+console.log(\`Original: \${numContainer.get()}\`);
+
+const doubled = numContainer.map(n => n * 2);
+console.log(\`Doubled: \${doubled.get()}\`);
+
+const stringContainer = numContainer.map(n => \`Number: \${n}\`);
+console.log(\`String: \${stringContainer.get()}\`);
+`,
+      solutionContent: `import { Container } from "./container";
+
+const numContainer = new Container(42);
+console.log(\`Original: \${numContainer.get()}\`);
+
+const doubled = numContainer.map(n => n * 2);
+console.log(\`Doubled: \${doubled.get()}\`);
+
+const stringContainer = numContainer.map(n => \`Number: \${n}\`);
+console.log(\`String: \${stringContainer.get()}\`);
+`,
+    },
+    {
+      filename: "container.ts",
+      initialContent: `export class Container<T> {
+  // TODO: Add a private field to store the value
+  // TODO: Add a constructor that takes an initial value
+  // TODO: Implement get() to return the current value
+  // TODO: Implement map<U>(fn: (value: T) => U): Container<U>
+}
+`,
+      solutionContent: `export class Container<T> {
+  private value: T;
+
+  constructor(initialValue: T) {
+    this.value = initialValue;
+  }
+
+  get(): T {
+    return this.value;
+  }
+
+  map<U>(fn: (value: T) => U): Container<U> {
+    return new Container(fn(this.value));
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "get",
+      name: "Returns the stored value",
+      description: "new Container(42).get() === 42",
+      code: `
+        const { Container } = require("./container");
+        const c = new Container(42);
+        if (c.get() !== 42) throw new Error("Expected 42");
+      `,
+    },
+    {
+      id: "map-number",
+      name: "Maps number to number",
+      description: "container.map(n => n * 2) doubles the value",
+      code: `
+        const { Container } = require("./container");
+        const c = new Container(10);
+        const doubled = c.map(n => n * 2);
+        if (doubled.get() !== 20) throw new Error("Expected 20");
+      `,
+    },
+    {
+      id: "map-string",
+      name: "Maps number to string",
+      description: "container.map(n => String(n)) converts to string",
+      code: `
+        const { Container } = require("./container");
+        const c = new Container(42);
+        const str = c.map(n => String(n));
+        if (str.get() !== "42") throw new Error("Expected '42'");
+      `,
+    },
+    {
+      id: "immutable",
+      name: "Does not mutate original",
+      description: "Original container is unchanged after map",
+      code: `
+        const { Container } = require("./container");
+        const c = new Container(5);
+        c.map(n => n + 10);
+        if (c.get() !== 5) throw new Error("Original should still be 5");
+      `,
+    },
+  ]}
+/>
+
+## Multiple choice check
+
+<MultipleChoice
+  markdown={`Given this generic function:
+
+\`\`\`ts
+function getFirst<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+\`\`\`
+
+What is the return type of \`getFirst([1, 2, 3])\`?
+
+- \`T\`
+  > No. \`T\` is inferred as \`number\`, but the return type is \`T | undefined\` to account for empty arrays. The answer is \`number | undefined\`.
+- [o] \`number | undefined\`
+  > Correct! The compiler infers \`T = number\` from the array \`[1, 2, 3]\`, so the return type is \`number | undefined\`.
+- \`number\`
+  > No. The function returns \`T | undefined\` because \`arr[0]\` could be \`undefined\` if the array is empty. The return type is \`number | undefined\`, not just \`number\`.
+
+The \`| undefined\` is necessary because accessing \`arr[0]\` might return \`undefined\` if the array is empty. The function signature correctly reflects this possibility.`}
+/>
+
+## When to use generics
+
+Generics are the right choice when:
+
+1. **You're writing a utility that works with any type.** Functions like `identity`, `wrap`, `first`, `last`, `map`, `filter`, etc.
+2. **You're defining a container or collection.** `Box<T>`, `Array<T>`, `Set<T>`, `Map<K, V>`, etc.
+3. **You're modeling results, events, or state machines with variable payloads.** `Result<T, E>`, `Event<TPayload>`, `State<TData>`, etc.
+4. **You want to preserve type information through a transformation.** A function that takes `T[]` and returns `U[]` (like `map`), or a class that takes `T` and exposes `T` (like `Promise<T>`).
+
+Don't use generics when:
+
+- The type is genuinely `any` or `unknown` and you don't care about precision.
+- You're only ever going to use it with one concrete type. (Though making it generic anyway can be fine for future-proofing.)
+
+<Callout type="info" title="Start concrete, refactor to generic">
+If you're unsure whether you need generics, start with a concrete type (e.g., `Box` that holds `number`). If you later need it for other types, refactor to `Box<T>`. Don't prematurely genericize — but don't be afraid to add type parameters when the need arises.
+</Callout>
+
+## Recap
+
+Generics let you write reusable code that works with any type while preserving full type information. Instead of choosing between concrete types (verbose, not reusable) and `any` (reusable, not type-safe), you use **type parameters** to abstract over types.
+
+**Key takeaways:**
+
+- **Type parameters** (like `<T>`) are placeholders for "whatever type you pass in."
+- **Inference:** The compiler usually infers type parameters from the arguments you pass. You rarely need to write them explicitly.
+- **Generic functions:** `function identity<T>(x: T): T { return x; }` — the parameter and return type are both `T`.
+- **Generic interfaces and type aliases:** `interface Box<T> { value: T }` — parameterize data structures.
+- **Generic classes:** `class Stack<T> { /*...*/ }` — one class, many types.
+- **Multiple type parameters:** `function pair<A, B>(a: A, b: B): [A, B]` — relate different types.
+
+Generics are everywhere in TypeScript: `Array<T>`, `Promise<T>`, `Map<K, V>`, `Set<T>`, and countless libraries. Once you understand how they work, you'll start seeing opportunities to write more reusable, type-safe code everywhere.
+
+Next: [Generic Constraints](./generic-constraints), where we go beyond unconstrained type parameters and explore how to restrict `T` to types that have certain properties — unlocking even more powerful abstractions like `keyof`, `extends`, and conditional types.

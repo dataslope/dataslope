@@ -1,0 +1,332 @@
+---
+title: Type Inference
+description: How TypeScript deduces types automatically from your code
+---
+
+TypeScript's compiler doesn't just check types — it can **infer** them. When you write `const x = 42`, you don't need to write `const x: number = 42` because the compiler sees the initializer and deduces the type on its own. This is **type inference**: the compiler walks your code and figures out what the types must be based on how values are used, returned, and passed around.
+
+Good inference means you write fewer annotations while keeping full type safety. The trick is knowing when the compiler can figure it out on its own and when you should step in with an explicit type.
+
+## Variable initializer inference
+
+The simplest case: when you declare a variable with an initial value, TypeScript looks at that value and assigns a type.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const message = "Hello, TypeScript!";
+const count = 42;
+const isActive = true;
+
+console.log(typeof message); // type is string
+console.log(typeof count);   // type is number
+console.log(typeof isActive); // type is boolean
+`}
+/>
+
+The compiler doesn't need you to write `const message: string = "Hello"`. It sees the string literal and infers `string` automatically. This works for all primitive types, objects, arrays, and more complex structures.
+
+<Callout type="info" title="Hover in your editor">
+If you're following along in VS Code or another TypeScript-aware editor, hover over `message`, `count`, or `isActive` to see the inferred type displayed in a tooltip. This is one of the best ways to understand what the compiler is thinking.
+</Callout>
+
+## `const` vs. `let` widening
+
+Here's where inference gets interesting. TypeScript infers **different types** depending on whether you use `const` or `let`.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const literal = "hello";
+let mutableString = "hello";
+
+// Hover over these in your editor:
+// literal has type "hello" (a literal type)
+// mutableString has type string (a wider type)
+
+console.log(\`literal is inferred as the literal type: "\${literal}"\`);
+console.log(\`mutableString is inferred as: string\`);
+`}
+/>
+
+Why the difference? A `const` binding can never be reassigned, so the compiler can lock down the type to the exact value: the **literal type** `"hello"`. But a `let` binding can be reassigned to any other string later, so the compiler **widens** the type to `string` to allow future assignments like `mutableString = "world"`.
+
+This is called **widening**: the compiler expands a narrow literal type into a broader one when the variable is mutable. It's a practical trade-off between precision and flexibility.
+
+```mermaid
+graph TD
+    A[const x = "hello"] --> B[Type: "hello" literal]
+    C[let y = "hello"] --> D[Type: string widened]
+    B --> E[Cannot reassign]
+    D --> F[Can reassign to any string]
+```
+
+## Contextual typing
+
+Sometimes the compiler infers types by looking at **context** — where a value is being used. This is especially common with callbacks.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const numbers = [1, 2, 3, 4, 5];
+
+// The callback parameter 'n' is inferred as number
+// because .map is defined as: map<U>(fn: (value: number) => U)
+const doubled = numbers.map(n => n * 2);
+
+console.log(doubled); // [2, 4, 6, 8, 10]
+
+// The compiler knows addEventListener expects (event: Event) => void
+// so 'event' is inferred as Event (in a DOM environment)
+// We'll simulate with a custom listener:
+type ClickEvent = { x: number; y: number };
+function onClick(handler: (e: ClickEvent) => void) {
+  handler({ x: 100, y: 200 });
+}
+
+onClick(e => {
+  console.log(\`Clicked at (\${e.x}, \${e.y})\`);
+  // 'e' is inferred as ClickEvent — no annotation needed!
+});
+`}
+/>
+
+You didn't write `(n: number)` or `(e: ClickEvent)` — the compiler figured it out from the **signature** of `map` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
+
+<Callout type="success" title="Less noise, same safety">
+Contextual typing is one of the reasons TypeScript code stays readable. You get full type checking on callback parameters without cluttering every arrow function with explicit annotations.
+</Callout>
+
+## Return type inference
+
+Functions infer their return type from the `return` statements inside.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function add(a: number, b: number) {
+  return a + b; // return type inferred as number
+}
+
+function greet(name: string) {
+  return \`Hello, \${name}!\`; // return type inferred as string
+}
+
+const sum = add(10, 32);
+const greeting = greet("Ada");
+
+console.log(sum);      // 42
+console.log(greeting); // Hello, Ada!
+`}
+/>
+
+The compiler looks at `return a + b` and knows that adding two `number`s yields a `number`, so the return type is `number`. You can hover over the function name in your editor to see the full inferred signature: `add(a: number, b: number): number`.
+
+### When to annotate return types anyway
+
+Even though the compiler can infer return types, many teams **annotate them explicitly** on public functions and module boundaries. Why?
+
+1. **Intentionality.** You declare what you *intend* to return, and the compiler verifies your implementation matches. If you accidentally return `null` when you meant to return a string, the annotation catches the mistake.
+2. **Documentation.** The return type is part of the function's contract. Readers don't have to trace through the implementation to see what comes back.
+3. **Error locality.** If the return type is inferred and you make a mistake, the error appears at the *call site* (often far away). If you annotate it, the error appears at the *function body* (where the bug actually is).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Explicit return type for a public API
+function divide(a: number, b: number): number | null {
+  if (b === 0) {
+    return null; // signal error
+  }
+  return a / b;
+}
+
+const result = divide(10, 2);
+if (result !== null) {
+  console.log(\`Result: \${result}\`);
+} else {
+  console.log("Cannot divide by zero");
+}
+`}
+/>
+
+**Rule of thumb:** Let the compiler infer types inside function bodies (local variables, intermediate results). Annotate types at **module boundaries** — function parameters, return types, and exported values — so your API is explicit and self-documenting.
+
+## Best-common-type inference for arrays
+
+When you initialize an array with mixed values, the compiler tries to find a **best common type** that accommodates all elements.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// All numbers → inferred as number[]
+const nums = [1, 2, 3];
+console.log(\`nums: number[] = [\${nums.join(", ")}]\`);
+
+// Mixed strings and numbers → inferred as (string | number)[]
+const mixed = [1, "two", 3, "four"];
+console.log(\`mixed: (string | number)[] = [\${mixed.join(", ")}]\`);
+
+// All the same shape → inferred as an array of that shape
+const points = [{ x: 0, y: 0 }, { x: 10, y: 20 }];
+console.log(\`points: { x: number; y: number }[] =\`, JSON.stringify(points));
+`}
+/>
+
+If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose. You can add an explicit type annotation to narrow it:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Without annotation: inferred as (string | number)[]
+const loose = [42];
+loose.push("hello"); // allowed
+console.log(loose); // [42, "hello"]
+
+// With annotation: restricted to number[]
+const strict: number[] = [42];
+// strict.push("hello"); // ❌ Error: Argument of type 'string' is not assignable to parameter of type 'number'
+strict.push(100); // ✅ OK
+console.log(strict); // [42, 100]
+`}
+/>
+
+## How inference walks expressions
+
+Let's see inference in action across a more complex expression. The compiler builds up types step by step:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function getConfig() {
+  return {
+    host: "localhost",
+    port: 3000,
+    features: ["auth", "logging", "metrics"],
+  };
+}
+
+// config is inferred as:
+// {
+//   host: string;
+//   port: number;
+//   features: string[];
+// }
+const config = getConfig();
+
+// firstFeature is inferred as string (from features[0])
+const firstFeature = config.features[0];
+
+console.log(\`Config: \${config.host}:\${config.port}\`);
+console.log(\`First feature: \${firstFeature}\`);
+`}
+/>
+
+Here's the inference chain:
+
+```mermaid
+graph LR
+    A[getConfig return literal] --> B[Inferred object type]
+    B --> C[config: inferred type]
+    C --> D[config.features: string array]
+    D --> E[features zero-index: string]
+    E --> F[firstFeature: string]
+```
+
+Each expression's type is deduced from the types of its subexpressions. The compiler starts at the leaves (literal values) and propagates types upward through property accesses, function calls, and assignments.
+
+## When to let TypeScript infer vs. when to annotate
+
+There's no absolute rule, but here's a practical guideline:
+
+| Context                          | Recommendation                     | Reason                                                                 |
+|----------------------------------|------------------------------------|------------------------------------------------------------------------|
+| Local variables                  | Let infer                          | The initializer is right there; annotation adds noise                  |
+| Function parameters              | Always annotate                    | Callers need to know what to pass                                      |
+| Function return types (public)   | Annotate                           | Documents intent; catches errors at definition site                    |
+| Function return types (private)  | Optional (infer is fine)           | If it's internal, inference keeps code concise                         |
+| Class properties                 | Annotate if no initializer         | Compiler can't infer from nothing                                      |
+| Exported constants/types         | Annotate                           | Part of your public API                                                |
+
+<Callout type="warning" title="Inference failures">
+If the compiler can't figure out a type, you'll see the dreaded `any`. This usually means there's no initializer and no annotation. Always provide one or the other at module boundaries.
+</Callout>
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// ❌ Bad: No initializer, no annotation → inferred as any
+// let data; // Uncomment to see implicit any error
+
+// ✅ Good: Explicit annotation
+let data: number[] = [];
+data.push(1, 2, 3);
+console.log(data); // [1, 2, 3]
+
+// ✅ Also good: Initializer provides the type
+let items = [10, 20, 30]; // inferred as number[]
+console.log(items); // [10, 20, 30]
+`}
+/>
+
+## Challenge: Inference in practice
+
+Now it's your turn. The compiler has inferred types throughout this example, but one of them is too loose. Fix it with an explicit annotation.
+
+<ChallengeCard
+  adapter="typescript"
+  title="Narrowing an inferred union"
+  instructions={`The \`process\` function should only accept \`number\` values, but the \`values\` array is currently inferred as \`(string | number)[]\`, allowing strings to sneak in.
+
+**Your task:**
+1. Add an explicit type annotation to \`values\` to restrict it to \`number[]\`.
+2. Remove the string element \`"oops"\` so the code compiles.
+3. The test will verify that the sum is computed correctly.`}
+  initialCode={`function process(nums: number[]): number {
+  return nums.reduce((sum, n) => sum + n, 0);
+}
+
+// Fix this line: add a type annotation and remove the invalid element
+const values = [10, 20, "oops", 30];
+
+const total = process(values);
+console.log(total);
+`}
+  solutionCode={`function process(nums: number[]): number {
+  return nums.reduce((sum, n) => sum + n, 0);
+}
+
+// Solution: annotate as number[] and remove "oops"
+const values: number[] = [10, 20, 30];
+
+const total = process(values);
+console.log(total);
+`}
+  tests={[
+    {
+      id: "sum",
+      name: "Computes the correct sum",
+      description: "process([10, 20, 30]) === 60",
+      code: `if (total !== 60) throw new Error(\`Expected 60, got \${total}\`);`,
+    },
+  ]}
+/>
+
+## Multiple choice check
+
+<MultipleChoice
+  markdown={`Which of the following declarations will TypeScript infer as the **literal type** \`42\` (not \`number\`)?
+
+- \`let x = 42;\`
+  > No. Because \`let\` allows reassignment, the compiler widens the type to \`number\`.
+- [o] \`const x = 42;\`
+  > Correct! \`const\` prevents reassignment, so TypeScript locks the type to the literal \`42\`.
+- \`const x: number = 42;\`
+  > No. You've explicitly annotated it as \`number\`, overriding the literal inference.
+
+Literal types are inferred for \`const\` bindings unless you provide an explicit wider annotation. This precision is useful when building discriminated unions and modeling state with exact values.`}
+/>
+
+## Recap
+
+Type inference is what makes TypeScript feel lightweight. The compiler deduces types from initializers, context, return statements, and array contents, so you don't have to annotate every single variable. But inference isn't magic — it follows clear rules:
+
+- **Variables:** Inferred from the initializer. `const` narrows to literal types; `let` widens to the general type.
+- **Callbacks:** Inferred from the function signature that expects them (contextual typing).
+- **Return types:** Inferred from `return` statements, but often annotated explicitly for clarity.
+- **Arrays:** Inferred as the best common type of all elements, or a union if they differ.
+
+The best practice is to **annotate at module boundaries** (function parameters, return types, exported values) and **let the compiler infer inside implementations** (local variables, intermediate results). This keeps your code concise and maintainable while preserving full type safety.
+
+Next up: [Structural Typing](./structural-typing), where we explore how TypeScript compares types by their *shape*, not their name — and why that matters for reusability and flexibility.

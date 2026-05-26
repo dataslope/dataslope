@@ -1,0 +1,474 @@
+---
+title: Setup and tsconfig.json
+description: Installing TypeScript, understanding the compiler, and configuring tsconfig.json for maximum type safety.
+---
+
+Now that you understand *why* TypeScript exists and *how* it works, let's get practical. This page covers the essentials: installing TypeScript, running the compiler, and — most importantly — configuring `tsconfig.json` to catch as many bugs as possible.
+
+We'll keep it minimal. You don't need a complex build pipeline, a framework, or a bundler to learn TypeScript. The in-browser playground on this site is enough for most lessons. But if you want to experiment locally, this page shows you how.
+
+## Installing TypeScript
+
+TypeScript is distributed as an npm package. You can install it globally (available everywhere) or per-project (recommended for real applications).
+
+### Global installation
+
+```bash
+npm install -g typescript
+```
+
+This installs the `tsc` command globally. You can now compile any `.ts` file from anywhere on your system:
+
+```bash
+tsc myfile.ts
+```
+
+This produces `myfile.js` in the same directory.
+
+### Per-project installation (recommended)
+
+For real projects, install TypeScript as a dev dependency:
+
+```bash
+npm init -y              # Create package.json if you don't have one
+npm install --save-dev typescript
+```
+
+Now `tsc` is available via npm scripts or `npx`:
+
+```bash
+npx tsc myfile.ts
+```
+
+Why per-project? Different projects may use different TypeScript versions. Locking the version in `package.json` ensures consistency across your team and CI/CD pipeline.
+
+<Callout type="info" title="You don't need local installation for this course">
+Every code block on this site runs TypeScript in your browser using a WebAssembly-based compiler and the [almostnode](https://almostnode.dev/) runtime. You can complete the entire course without installing anything. But having `tsc` locally is useful for real projects and experimentation.
+</Callout>
+
+## The `tsc` command
+
+The TypeScript compiler, `tsc`, has dozens of options. Here are the most common:
+
+```bash
+tsc file.ts                  # Compile one file
+tsc file1.ts file2.ts        # Compile multiple files
+tsc --project tsconfig.json  # Compile using a config file (default behavior)
+tsc --watch                  # Watch mode: recompile on file changes
+tsc --noEmit                 # Type-check only, don't emit JS
+```
+
+**Most of the time, you'll use `tsc` with no arguments.** It looks for a `tsconfig.json` file in the current directory (or parent directories) and compiles the project according to that config.
+
+## The `tsconfig.json` file
+
+`tsconfig.json` is the heart of a TypeScript project. It tells the compiler:
+
+- Which files to include (and exclude)
+- What JavaScript version to target
+- What module system to use
+- How strict the type checking should be
+- Where to put the output files
+
+Here's a sample `tsconfig.json` for a modern, strict TypeScript project:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+Let's break down the most important options.
+
+## Essential compiler options
+
+### `target` — What JavaScript version to emit
+
+The `target` option controls which JavaScript version TypeScript compiles to. Modern options:
+
+- **`ES2020`, `ES2021`, `ES2022`**: Modern JavaScript with classes, async/await, optional chaining, etc. Use these for Node.js 14+ or modern browsers.
+- **`ES6` / `ES2015`**: Classes, arrow functions, `let`/`const`, modules. Supported in all modern browsers.
+- **`ES5`**: The old standard. Use this only if you need to support IE11.
+
+Example:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020"
+  }
+}
+```
+
+TypeScript will *downlevel* modern syntax to your target. If you use `async`/`await` but target ES5, TypeScript emits generator-based polyfills.
+
+<Callout type="info">
+The `target` setting *only* affects syntax transpilation, not APIs. If you use `Promise` or `Map` but target ES5, you'll need a polyfill like `core-js` at runtime.
+</Callout>
+
+### `module` — What module system to use
+
+The `module` option controls how `import`/`export` statements are compiled:
+
+- **`ESNext`**: Keep ES modules (`import`/`export`) as-is. Use this for modern Node.js (with `"type": "module"` in `package.json`) or bundlers like Vite or esbuild.
+- **`CommonJS`**: Convert to `require()` and `module.exports`. Use this for older Node.js or if your tooling expects CommonJS.
+- **`UMD`, `AMD`, `System`**: Rare; ignore unless you have specific needs.
+
+Example:
+
+```json
+{
+  "compilerOptions": {
+    "module": "ESNext"
+  }
+}
+```
+
+Most modern projects use `ESNext` modules. If you're working with Node.js and not using `"type": "module"`, use `CommonJS`.
+
+### `lib` — What built-in APIs are available
+
+The `lib` option tells TypeScript which JavaScript APIs and DOM types exist in your runtime. Common values:
+
+- **`ES2020`, `ES2021`, etc.**: JavaScript built-ins (Array, Promise, Map, etc.) for that ES version.
+- **`DOM`**: Browser APIs (document, window, fetch, etc.). Include this for frontend code.
+- **`DOM.Iterable`**: Makes DOM collections (like `NodeList`) iterable. Usually paired with `DOM`.
+
+Example for a browser app:
+
+```json
+{
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"]
+  }
+}
+```
+
+Example for a Node.js server (no DOM):
+
+```json
+{
+  "compilerOptions": {
+    "lib": ["ES2020"]
+  }
+}
+```
+
+If you omit `lib`, TypeScript infers a default based on `target`. But being explicit is clearer.
+
+### `outDir` and `rootDir` — Where files go
+
+- **`outDir`**: Where TypeScript puts compiled `.js` files. Common values: `./dist`, `./build`, `./out`.
+- **`rootDir`**: The root of your source files. TypeScript mirrors the directory structure from `rootDir` into `outDir`.
+
+Example:
+
+```json
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist"
+  }
+}
+```
+
+If you have `src/utils/helpers.ts`, the output will be `dist/utils/helpers.js`.
+
+### `strict` — The master strictness flag
+
+The `strict` option is a meta-flag that enables *all* of TypeScript's strictness checks:
+
+- `strictNullChecks` (disallow `null`/`undefined` unless explicitly allowed)
+- `strictFunctionTypes` (stricter function parameter checking)
+- `strictBindCallApply` (type-check `.bind()`, `.call()`, `.apply()`)
+- `strictPropertyInitialization` (class properties must be initialized)
+- `noImplicitAny` (variables must have explicit or inferred types)
+- `noImplicitThis` (disallow untyped `this`)
+- `alwaysStrict` (emit `"use strict"` in JS output)
+
+**Always set `"strict": true`** unless you're migrating a legacy JavaScript codebase and need to opt into strictness gradually.
+
+```json
+{
+  "compilerOptions": {
+    "strict": true
+  }
+}
+```
+
+With `strict: true`, TypeScript becomes a powerful bug-catching tool. Without it, you're typing with one hand tied behind your back.
+
+### `noImplicitAny` — No untyped variables
+
+If you don't annotate a variable and TypeScript can't infer its type, the default is `any` — which disables type checking for that value.
+
+```typescript
+// Without noImplicitAny:
+function add(a, b) {  // 'a' and 'b' are implicitly 'any'
+  return a + b;
+}
+
+add(5, "10"); // No error! But you probably didn't mean this.
+```
+
+With `"noImplicitAny": true` (enabled by `strict`), TypeScript forces you to add types or let inference handle it:
+
+```typescript
+// You must write:
+function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+This catches typos, missing parameters, and logic errors early.
+
+### `strictNullChecks` — Prevent null/undefined bugs
+
+In JavaScript, `null` and `undefined` are *everywhere*. You can call a function that returns an object, but it might return `null` instead. Without `strictNullChecks`, TypeScript treats `null` and `undefined` as valid values for *every* type:
+
+```typescript
+let name: string = null; // Allowed without strictNullChecks
+console.log(name.toUpperCase()); // Runtime error: Cannot read property 'toUpperCase' of null
+```
+
+With `"strictNullChecks": true` (enabled by `strict`), `null` and `undefined` are *separate types*. You must explicitly allow them:
+
+```typescript
+let name: string | null = null;  // Explicit: name can be string OR null
+
+// TypeScript forces you to check for null before using 'name':
+if (name !== null) {
+  console.log(name.toUpperCase()); // Safe — TypeScript narrows the type
+}
+```
+
+This eliminates the "billion-dollar mistake" — `TypeError: Cannot read property 'x' of null/undefined` — which plagues JavaScript.
+
+### `noUncheckedIndexedAccess` — Safer array/object indexing
+
+When you access an array element or object property via an index, JavaScript returns `undefined` if the key doesn't exist. TypeScript, by default, *assumes* the element exists:
+
+```typescript
+const arr: string[] = ["a", "b", "c"];
+const item = arr[10];  // TypeScript infers type 'string'
+console.log(item.toUpperCase()); // Runtime error: arr[10] is undefined!
+```
+
+With `"noUncheckedIndexedAccess": true`, TypeScript infers `string | undefined`:
+
+```typescript
+const arr: string[] = ["a", "b", "c"];
+const item = arr[10];  // Type: string | undefined
+
+if (item !== undefined) {
+  console.log(item.toUpperCase()); // Safe
+}
+```
+
+This prevents a common class of bugs. It's not enabled by `strict`, so you must add it explicitly:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true
+  }
+}
+```
+
+### `exactOptionalPropertyTypes` — Distinguish missing from undefined
+
+In TypeScript, an optional property (`name?: string`) can be:
+
+1. Present with a value: `{ name: "Alice" }`
+2. Present with `undefined`: `{ name: undefined }`
+3. Missing: `{}`
+
+By default, TypeScript treats cases 2 and 3 as identical. With `"exactOptionalPropertyTypes": true`, they're distinct:
+
+```typescript
+interface User {
+  name?: string;
+}
+
+const user1: User = { name: "Alice" };      // OK
+const user2: User = {};                     // OK (missing)
+const user3: User = { name: undefined };    // Error with exactOptionalPropertyTypes!
+```
+
+This is a niche setting, but useful when APIs distinguish between "field not provided" and "field explicitly set to undefined." It's not enabled by `strict`, so add it manually:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true
+  }
+}
+```
+
+### `esModuleInterop` — Better CommonJS/ES module compatibility
+
+If you're importing CommonJS modules (like most npm packages) into an ES module project, you'll want:
+
+```json
+{
+  "compilerOptions": {
+    "esModuleInterop": true
+  }
+}
+```
+
+This allows you to write:
+
+```typescript
+import express from "express"; // Natural ES syntax
+```
+
+instead of:
+
+```typescript
+import * as express from "express"; // Awkward
+```
+
+It's a quality-of-life feature with no downside. Always enable it.
+
+### `skipLibCheck` — Faster compilation
+
+TypeScript normally type-checks the `.d.ts` declaration files in `node_modules`. This can be slow (thousands of files) and usually isn't necessary — you trust that React, Lodash, etc. have correct types.
+
+```json
+{
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}
+```
+
+This skips type-checking third-party declarations, speeding up compilation. The tradeoff is that you won't catch errors in poorly-typed libraries. In practice, this is fine.
+
+### `forceConsistentCasingInFileNames` — Cross-platform safety
+
+On macOS and Windows, file systems are case-insensitive: `myFile.ts` and `myfile.ts` are the same file. On Linux, they're different. If you import `./MyFile` on Mac (but the file is `myfile.ts`), your code works locally but breaks on Linux CI.
+
+```json
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+This makes TypeScript error if you import a file with inconsistent casing. It prevents cross-platform bugs.
+
+## Recommended `tsconfig.json` for new projects
+
+Here's a battle-tested config for a Node.js or browser project in 2024:
+
+```json
+{
+  "compilerOptions": {
+    // Output settings
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    
+    // Strictness (enable all of these!)
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    
+    // Interop and compatibility
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Additional strictness (optional but recommended)
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+If you're building a browser app, add `"DOM"` and `"DOM.Iterable"` to `lib`. If you're targeting older Node.js (pre-v14), use `"module": "CommonJS"`.
+
+## Running TypeScript in the browser (this course)
+
+Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser (via WebAssembly), type-checks your code, transpiles it to JavaScript, and executes it using [almostnode](https://almostnode.dev/) — a browser-based Node.js runtime.
+
+Try it:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// This is real TypeScript, running in your browser
+function greet(name: string): string {
+  return \`Hello, \${name}! Welcome to TypeScript.\`;
+}
+
+console.log(greet("Ada"));
+console.log(greet("Grace"));
+
+// Uncomment the next line to see a type error:
+// console.log(greet(42));  // Argument of type 'number' is not assignable to parameter of type 'string'.
+`}
+/>
+
+Edit the code, click *Run*, and see the output instantly. No installation, no build step, no setup. This is the fastest way to learn TypeScript.
+
+<Callout type="success" title="You can also use the TypeScript Playground">
+If you want a longer-lived scratchpad, open the [TypeScript Playground](/playground/typescript) in a new tab. It persists your code across sessions and supports multi-file projects (just like the `<CodeBlock>` multi-file examples you'll see in later pages).
+</Callout>
+
+## When to use strict mode (always)
+
+If there's one piece of advice to take from this page, it's this: **Always use `"strict": true`** (and add `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` on top).
+
+Without strictness, TypeScript is a glorified linter. With strictness, it becomes a powerful static analysis tool that catches real bugs.
+
+Yes, strict mode requires more annotations. Yes, you'll have to check for `null` and `undefined` explicitly. But that's the point: you're making implicit assumptions *explicit*, and the compiler is verifying them.
+
+As your project grows, strict types pay dividends:
+
+- **Refactoring is safe.** Rename a function, and TypeScript updates all call sites — or tells you which ones don't match.
+- **Bugs are caught early.** Typos, type mismatches, and null-pointer dereferences fail at compile time, not in production.
+- **Onboarding is faster.** New developers can navigate the codebase with autocomplete and go-to-definition, without reading tribal knowledge docs.
+
+## What's next
+
+You now know how to install TypeScript, run the compiler, and configure `tsconfig.json` for safety. But you haven't written much TypeScript yet — just seen snippets.
+
+In the next section, we'll dive into the **core type system**: primitives, objects, arrays, functions, and the building blocks you'll use every day. That's where TypeScript's real power emerges.
+
+---
+
+<MultipleChoice
+  markdown={`Which \`tsconfig.json\` option is most important for catching null and undefined errors?
+
+- \`noImplicitAny\`
+- \`esModuleInterop\`
+- [o] \`strictNullChecks\` (enabled by \`strict: true\`)
+  > Correct! \`strictNullChecks\` makes \`null\` and \`undefined\` separate types, so you must explicitly handle them. This eliminates the most common source of runtime errors in JavaScript: \`Cannot read property 'x' of null/undefined\`. It's enabled by \`"strict": true\`.
+- \`skipLibCheck\`
+
+While \`noImplicitAny\` prevents untyped variables and \`esModuleInterop\` improves module syntax, \`strictNullChecks\` directly prevents the "billion-dollar mistake" of null-pointer dereferences.`}
+/>

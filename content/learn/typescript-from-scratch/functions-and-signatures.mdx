@@ -1,0 +1,482 @@
+---
+title: Functions and Signatures
+description: Typing function parameters, return values, and function types for machine-checked documentation
+---
+
+Functions are the atoms of computation. In JavaScript, they're
+wonderfully flexible: parameters can have any type, return values can
+vary, functions are first-class values passed around like data.
+TypeScript brings **structure** to this flexibility by letting you
+declare the *signature* of a function — what types it accepts, what type
+it returns, whether parameters are optional or have defaults. The
+compiler then enforces these signatures at every call site, turning
+argument mismatches into compile-time errors, not runtime surprises.
+
+This chapter covers: **parameter and return types**, **optional and
+default parameters**, **rest parameters**, **function type expressions**,
+**call signatures**, **overloads**, and **contextual typing**.
+
+## Parameter and return types
+
+The simplest function signature specifies the type of each parameter and
+the return type:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function add(a: number, b: number): number {
+  return a + b;
+}
+
+console.log("add(10, 20):", add(10, 20));
+console.log("add(5, 7):", add(5, 7));
+
+// add("10", 20);  // ❌ Argument of type '"10"' is not assignable to parameter of type 'number'
+`}
+/>
+
+**What the compiler now knows:** `add` requires two `number`s and returns
+a `number`. If you call `add("10", 20)`, the compiler halts compilation.
+The type annotation acts as a contract between the function and its
+callers.
+
+You can also omit the return type annotation — TypeScript infers it from
+the `return` statements:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function multiply(a: number, b: number) {
+  return a * b;  // inferred return type: number
+}
+
+console.log("multiply(3, 4):", multiply(3, 4));
+`}
+/>
+
+But for public APIs, **explicit return types** are recommended. They make
+the function's contract clear to callers (and to your future self), and
+they prevent accidental changes to the inferred type.
+
+## Optional parameters
+
+A parameter marked with `?` is **optional** — callers can omit it:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function greet(name: string, greeting?: string): string {
+  if (greeting === undefined) {
+    return \`Hello, \${name}!\`;
+  }
+  return \`\${greeting}, \${name}!\`;
+}
+
+console.log(greet("Alice"));
+console.log(greet("Bob", "Hi"));
+`}
+/>
+
+Inside the function, `greeting` has type `string | undefined`, so you
+must handle both cases. This forces you to think about the "parameter not
+provided" scenario — no more `undefined is not a function` errors at
+runtime.
+
+## Default parameters
+
+A **default parameter** provides a fallback value if the caller omits the
+argument:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function greet(name: string, greeting: string = "Hello"): string {
+  return \`\${greeting}, \${name}!\`;
+}
+
+console.log(greet("Alice"));           // uses default "Hello"
+console.log(greet("Bob", "Hi"));       // overrides default
+`}
+/>
+
+With a default, the parameter is still optional at the call site, but
+inside the function it's *always* a `string` (never `undefined`). This is
+cleaner than `?` when you have a sensible fallback.
+
+## Rest parameters
+
+A **rest parameter** (`...args`) collects a variable number of arguments
+into an array:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function sum(...numbers: number[]): number {
+  let total = 0;
+  for (const num of numbers) {
+    total += num;
+  }
+  return total;
+}
+
+console.log("sum():", sum());
+console.log("sum(1, 2, 3):", sum(1, 2, 3));
+console.log("sum(10, 20, 30, 40):", sum(10, 20, 30, 40));
+`}
+/>
+
+The type `...numbers: number[]` means "zero or more `number`s, collected
+into an array." Inside the function, `numbers` is a plain `number[]`, so
+you can iterate, map, reduce, etc.
+
+## Function type expressions
+
+So far, we've annotated function *declarations*. But functions are
+first-class values in JavaScript — you can assign them to variables, pass
+them as arguments, return them from other functions. To annotate a
+*function value*, you use a **function type expression**:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type BinaryOp = (a: number, b: number) => number;
+
+const add: BinaryOp = (a, b) => a + b;
+const multiply: BinaryOp = (a, b) => a * b;
+
+console.log("add(10, 20):", add(10, 20));
+console.log("multiply(3, 4):", multiply(3, 4));
+`}
+/>
+
+The syntax `(a: number, b: number) => number` is a **function type** — it
+describes the shape of a function. You can use it anywhere you'd use a
+type: in `type` aliases, in parameter positions, in return positions.
+
+Here's a higher-order function that accepts a callback:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function applyTwice(
+  fn: (x: number) => number,
+  value: number
+): number {
+  return fn(fn(value));
+}
+
+const double = (x: number) => x * 2;
+const square = (x: number) => x * x;
+
+console.log("applyTwice(double, 5):", applyTwice(double, 5));  // 5 * 2 * 2 = 20
+console.log("applyTwice(square, 3):", applyTwice(square, 3));  // 3² = 9, 9² = 81
+`}
+/>
+
+**What bugs does this prevent?** If you pass a function with the wrong
+signature — say, `(x: string) => string` — the compiler rejects it. The
+type annotation on `fn` acts as a compile-time guarantee.
+
+## Call signatures in interfaces
+
+An alternative to function type expressions is a **call signature** in an
+interface or type literal:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`interface MathOp {
+  (a: number, b: number): number;
+}
+
+const add: MathOp = (a, b) => a + b;
+const subtract: MathOp = (a, b) => a - b;
+
+console.log("add(10, 5):", add(10, 5));
+console.log("subtract(10, 5):", subtract(10, 5));
+`}
+/>
+
+The syntax `(a: number, b: number): number;` inside an interface is a
+call signature. It's functionally equivalent to `(a: number, b: number)
+=> number`, but it allows you to combine the function signature with other
+properties (e.g., a function with a `.version` property).
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`interface CallableWithVersion {
+  (x: number): number;
+  version: string;
+}
+
+const increment: CallableWithVersion = ((x: number) => x + 1) as any;
+increment.version = "1.0.0";
+
+console.log("increment(5):", increment(5));
+console.log("version:", increment.version);
+`}
+/>
+
+This pattern is less common in modern TypeScript (object methods are
+usually preferred), but it's useful when wrapping legacy code or modeling
+JavaScript APIs that mix functions and properties.
+
+## `void` return type
+
+A function that doesn't return a value has return type **`void`**:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function logMessage(message: string): void {
+  console.log("LOG:", message);
+}
+
+logMessage("Hello, TypeScript!");
+
+// The function doesn't return anything useful:
+const result = logMessage("Another message");
+console.log("result is:", result);  // undefined
+`}
+/>
+
+`void` means "this function is called for its side effects, not its
+return value." The compiler allows the function to `return;` (with no
+value) or to fall off the end. If you try to use the return value in a
+meaningful way, the compiler warns you (though `void` technically
+*allows* returning `undefined`, it signals "don't rely on this").
+
+## `void` vs `undefined`
+
+There's a subtle difference between `void` and `undefined`. `void` means
+"I don't care about the return value," while `undefined` means "the
+function explicitly returns `undefined`":
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`function doNothing(): void {
+  // No return statement
+}
+
+function returnUndefined(): undefined {
+  return undefined;
+}
+
+const a = doNothing();         // type: void
+const b = returnUndefined();   // type: undefined
+
+console.log("a:", a);
+console.log("b:", b);
+`}
+/>
+
+In practice, `void` is more common for side-effect functions. Use
+`undefined` when the return type matters (e.g., a function that might
+return `T | undefined` to signal absence).
+
+## Function overloads
+
+TypeScript supports **function overloads** — multiple signatures for the
+same function. This is useful when a function has several distinct call
+patterns:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// Overload signatures
+function format(value: number): string;
+function format(value: string): string;
+
+// Implementation signature (must be compatible with all overloads)
+function format(value: number | string): string {
+  if (typeof value === "number") {
+    return value.toFixed(2);
+  }
+  return value.toUpperCase();
+}
+
+console.log("format(42):", format(42));
+console.log("format('hello'):", format("hello"));
+`}
+/>
+
+The **overload signatures** (the first two lines) describe the public
+API. The **implementation signature** (the third line) handles all cases.
+Callers see only the overloads; the implementation is hidden.
+
+**When to use overloads:** When a function has *distinct* parameter
+patterns that can't be expressed with a single union type. Overloads make
+the types more precise at call sites. But if a union works, prefer it —
+overloads add complexity.
+
+## Contextual typing of callbacks
+
+When you pass a function as an argument, TypeScript often infers the
+parameter types from the expected signature. This is called **contextual
+typing**:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`const numbers = [1, 2, 3, 4, 5];
+
+// The callback's parameter type is inferred from Array.map's signature
+const doubled = numbers.map((n) => n * 2);
+console.log("doubled:", doubled);
+
+const asStrings = numbers.map((n) => n.toString());
+console.log("asStrings:", asStrings);
+`}
+/>
+
+You didn't annotate `n` with `: number`, but TypeScript knows `n` is a
+`number` because `numbers.map` expects a callback of type `(value:
+number, index: number, array: number[]) => U`. This is one of
+TypeScript's most powerful inference features — callbacks "just work"
+without manual annotations.
+
+## Practice: multi-file function composition
+
+Let's solidify these concepts with a challenge that spans two files.
+You'll define utility functions in one file and compose them in another.
+
+<ChallengeCard
+  adapter="typescript"
+  title="Function Composition Pipeline"
+  instructions={`In \`utils.ts\`, implement two functions: \`double(x: number): number\` (returns x * 2) and \`addTen(x: number): number\` (returns x + 10). In \`main.ts\`, implement \`compose(f: (x: number) => number, g: (x: number) => number): (x: number) => number\` that returns a new function representing \`f(g(x))\`. Test that \`compose(double, addTen)(5)\` returns 30 (5 + 10 = 15, then 15 * 2 = 30).`}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "utils.ts",
+      initialContent: `export function double(x: number): number {
+  // Your code here
+  return 0;
+}
+
+export function addTen(x: number): number {
+  // Your code here
+  return 0;
+}
+`,
+      solutionContent: `export function double(x: number): number {
+  return x * 2;
+}
+
+export function addTen(x: number): number {
+  return x + 10;
+}
+`,
+    },
+    {
+      filename: "main.ts",
+      initialContent: `import { double, addTen } from "./utils";
+
+export function compose(
+  f: (x: number) => number,
+  g: (x: number) => number
+): (x: number) => number {
+  // Your code here
+  return (x) => 0;
+}
+
+const pipeline = compose(double, addTen);
+console.log("compose(double, addTen)(5):", pipeline(5));
+`,
+      solutionContent: `import { double, addTen } from "./utils";
+
+export function compose(
+  f: (x: number) => number,
+  g: (x: number) => number
+): (x: number) => number {
+  return (x) => f(g(x));
+}
+
+const pipeline = compose(double, addTen);
+console.log("compose(double, addTen)(5):", pipeline(5));
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "compose",
+      name: "Correct composition",
+      description: "compose(double, addTen)(5) === 30",
+      code: `
+import { compose } from "./main";
+import { double, addTen } from "./utils";
+const result = compose(double, addTen)(5);
+if (result !== 30) throw new Error("Expected 30, got " + result);
+`,
+    },
+  ]}
+/>
+
+## Type annotations as documentation
+
+One of the most underrated benefits of typed functions is
+**self-documentation**. Consider this JavaScript function:
+
+```js
+function fetchUser(id, options) {
+  // ...
+}
+```
+
+What type is `id`? A string? A number? What's in `options`? You have to
+read the implementation (or the docs, if they exist) to find out. Now
+compare to TypeScript:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`interface FetchOptions {
+  timeout?: number;
+  retries?: number;
+}
+
+function fetchUser(id: number, options: FetchOptions = {}): Promise<string> {
+  console.log(\`Fetching user \${id} with options\`, options);
+  return Promise.resolve("User data");
+}
+
+fetchUser(123, { timeout: 5000 }).then((data) => console.log(data));
+`}
+/>
+
+The signature tells you everything: `id` is a `number`, `options` is a
+`FetchOptions` object (with optional `timeout` and `retries`), and the
+function returns a `Promise<string>`. The compiler enforces this
+documentation — if you pass a string `id`, it's a compile error. **Typed
+signatures are machine-checked documentation.**
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between \`void\` and \`undefined\` as a return type?
+
+- They are identical
+- \`void\` is for async functions, \`undefined\` is for sync functions
+- [o] \`void\` means "don't care about the return value," \`undefined\` means "explicitly returns undefined"
+  > Correct! \`void\` is for side-effect functions; \`undefined\` is for functions that explicitly return \`undefined\`.
+- \`void\` is deprecated
+
+\`void\` is the conventional return type for side-effect functions like event handlers.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the \`...\` syntax mean in a function parameter like \`sum(...numbers: number[]): number\`?
+
+- It's a spread operator for objects
+- [o] It's a rest parameter that collects arguments into an array
+  > Correct! The rest parameter collects all remaining arguments into a single array.
+- It's optional parameter syntax
+- It's an error
+
+Rest parameters let you accept a variable number of arguments without requiring an explicit array at the call site.`}
+/>
+
+## Summary
+
+Functions are the building blocks of computation. By annotating
+parameters and return types, you tell the compiler what data flows in and
+out. The compiler then enforces these signatures at every call,
+preventing type mismatches, missing arguments, and other errors.
+
+Optional parameters (`?`), default parameters, and rest parameters
+(`...`) make signatures flexible. Function type expressions (`(a: T) =>
+U`) and call signatures let you treat functions as first-class values.
+Overloads let you model multiple call patterns. Contextual typing infers
+callback parameter types automatically.
+
+In the next chapter, [Unions and
+Intersections](./unions-and-intersections), we'll see how to combine
+types — "this type *or* that type" (unions) and "this type *and* that
+type" (intersections) — to model complex APIs.

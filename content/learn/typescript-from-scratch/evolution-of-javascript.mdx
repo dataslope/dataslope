@@ -1,0 +1,144 @@
+---
+title: The Evolution of JavaScript
+description: How a 10-day prototype became the world's most popular programming language — and outgrew its scripting roots.
+---
+
+In 1995, the web was young. Websites were static documents — text, images, and hyperlinks. Netscape Communications, riding high on the success of its Navigator browser, saw an opportunity: what if pages could *respond* to the user? What if forms could validate themselves before submission? What if you could build interactive experiences without waiting for a server round-trip?
+
+Netscape hired a programmer named **Brendan Eich** and gave him ten days to create a scripting language that would run inside the browser. The constraints were tight: it had to be easy to learn, forgiving, and fast to prototype. It had to appeal to amateur programmers, not just systems engineers. It had to complement Java, Netscape's bet for "serious" programming on the web.
+
+In May 1995, Eich delivered **Mocha** (soon renamed JavaScript), a small, dynamic language inspired by Scheme, Self, and Java. It was never meant to scale beyond a few hundred lines of form validation. It was a *prototype*, and it showed.
+
+## The first decade: scripting toy to DOM workhorse
+
+JavaScript's initial decade was marked by chaos. The language had quirks — `==` vs `===`, automatic semicolon insertion, the infamous `this` binding rules, a prototype chain that confused most programmers. But it had one killer advantage: it was *the only* language that ran in every browser.
+
+By the early 2000s, JavaScript had evolved from a form-validation toy into the **DOM scripting** language. Developers used it to manipulate web pages dynamically, create dropdown menus, and animate elements. But the code was still small — a few script tags, maybe a thousand lines for a large site.
+
+Then came the **AJAX revolution**. In 2004–2005, Google launched Gmail and Google Maps — web applications that felt like desktop software. They loaded once, then used `XMLHttpRequest` to fetch data in the background and update the UI without page reloads. Suddenly, JavaScript wasn't just a scripting language; it was the engine of single-page applications.
+
+The **jQuery era** followed. jQuery, released in 2006, smoothed over browser inconsistencies and made DOM manipulation pleasant. Sites that once had 500 lines of JS now had 5,000. But they were still manageable. You could fit the whole codebase in your head.
+
+```mermaid
+timeline
+    title JavaScript's Journey (1995–2020)
+    1995 : Brendan Eich creates JavaScript in 10 days
+         : Netscape Navigator ships Mocha (later JavaScript)
+    1996 : Microsoft reverse-engineers JScript for IE3
+    1997 : ECMAScript 1 standardized
+    2000s : DOM scripting and DHTML era
+    2004 : Gmail and Google Maps launch (AJAX revolution)
+    2006 : jQuery released (browser abstraction)
+    2009 : Node.js released (JavaScript on the server)
+         : ES5 brings strict mode, JSON, Array methods
+    2010 : Backbone.js (early SPA framework)
+    2012 : TypeScript 0.8 announced
+    2013 : React released
+    2015 : ES6/ES2015 (classes, modules, promises, arrow functions)
+         : Babel brings ES6 to older browsers
+    2016 : Angular 2 adopts TypeScript by default
+    2020s : TypeScript as default for serious projects
+          : JavaScript everywhere (web, mobile, desktop, cloud, IoT)
+```
+
+## Node.js and the explosion
+
+In 2009, **Ryan Dahl** unveiled **Node.js** at JSConf EU. JavaScript could now run *outside* the browser, on the server, in build tools, in command-line utilities. Suddenly, JavaScript was a general-purpose language. npm (Node Package Manager) became the largest package ecosystem in the world. Developers built REST APIs, real-time chat servers, build pipelines, and desktop apps (Electron) in JavaScript.
+
+Codebases exploded. A modern web application might have:
+
+- 50,000+ lines of frontend code (React, Vue, or Angular)
+- 30,000+ lines of backend code (Express, Fastify, Nest)
+- 200+ npm dependencies
+- A dozen microservices
+- Multiple teams across time zones
+
+JavaScript went from a toy to the **lingua franca** of software development. It powered mobile apps (React Native), desktop apps (VS Code, Slack), IoT devices, and cloud functions. The language designed for form validation in 1995 was now the foundation of mission-critical systems processing billions of dollars in transactions.
+
+## The maintainability crisis
+
+As codebases grew, the cracks began to show. JavaScript's permissive nature — the same flexibility that made it easy to learn — became a liability at scale.
+
+Consider this snippet:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// JavaScript's quirks can surprise you
+console.log("5" + 3);    // "53" (string concatenation)
+console.log("5" - 3);    // 2 (numeric subtraction!)
+console.log(5 + null);   // 5 (null coerces to 0)
+console.log(5 + undefined); // NaN (undefined coerces to NaN)
+
+// Accessing non-existent properties silently returns undefined
+const user = { name: "Alice", age: 30 };
+console.log(user.emial); // undefined — typo goes unnoticed!
+`}
+/>
+
+Run that code. The output is *legal* JavaScript, but most of it is probably not what you wanted. The `"5" + 3` vs `"5" - 3` asymmetry trips up beginners and veterans alike. The `user.emial` typo doesn't throw an error — it just returns `undefined`, and your bug propagates through the system until some distant function calls `.toLowerCase()` on `undefined` and crashes at 3am.
+
+These problems are manageable in a 1,000-line script. But in a 100,000-line application, split across dozens of modules, maintained by a rotating cast of developers, they become **catastrophic**.
+
+Imagine refactoring a function signature:
+
+```typescript
+// Before:
+function getUserDetails(id) {
+  return database.query("SELECT * FROM users WHERE id = ?", id);
+}
+
+// After: you add a second parameter
+function getUserDetails(id, includeOrders) {
+  const user = database.query("SELECT * FROM users WHERE id = ?", id);
+  if (includeOrders) {
+    user.orders = database.query("SELECT * FROM orders WHERE user_id = ?", id);
+  }
+  return user;
+}
+```
+
+In JavaScript, the **50 call sites** scattered across your codebase still compile and run. They just pass `undefined` for the second argument. Some code paths work. Some don't. You won't know until a user reports a bug — or worse, until data gets corrupted silently.
+
+## The search for safety
+
+By the early 2010s, large JavaScript projects were drowning in runtime errors that should have been caught at compile time:
+
+- **Typos in property names** (`user.emial` instead of `user.email`)
+- **Wrong number of arguments** to functions
+- **Type mismatches** (passing a string to a function expecting a number)
+- **Refactoring nightmares** (rename a function, miss a call site, ship a bug)
+
+Teams tried workarounds:
+
+- **JSDoc comments** (`/** @param {number} x */`) — but they weren't checked by anything
+- **Unit tests** — but you can't test every code path
+- **Linters** (JSHint, ESLint) — but they couldn't reason about types
+- **Runtime assertions** (`if (typeof x !== 'number') throw new Error(...)`) — defensive and verbose
+
+None of these solved the core problem: **JavaScript had no static type system**. The language couldn't tell you, before you ran the code, whether a variable was a string or a number, whether a function expected two arguments or three, whether an object had a `save()` method or not.
+
+Developers craved the **autocomplete**, **refactoring safety**, and **early error detection** they'd seen in Java, C#, and other statically typed languages. They wanted the **flexibility** of JavaScript with the **rigor** of a compiler.
+
+The stage was set for a new tool — one that would bring static types to JavaScript without breaking the millions of lines of JS already written. One that would let you adopt types gradually, module by module, file by file. One that would treat JavaScript as a first-class citizen, not a compilation target to be abandoned.
+
+## The turning point
+
+By 2012, JavaScript had conquered the world. But the codebases built on it were fragile. Refactoring was terrifying. Onboarding new developers took weeks because the implicit contracts — "this function expects a number, that one expects an object with `name` and `email` fields" — existed only in comments, wikis, and tribal knowledge.
+
+The industry needed a way to make JavaScript **safe** without making it **different**. The solution would have to be *optional*, *gradual*, and *pragmatic*. It would have to compile to readable JavaScript so existing tooling still worked. It would have to integrate with editors so developers got instant feedback.
+
+That solution was **TypeScript**. And its story begins at Microsoft, with a language designer who had spent decades thinking about types.
+
+---
+
+<MultipleChoice
+  markdown={`Why did JavaScript's maintainability problems worsen as codebases grew larger?
+
+- JavaScript became slower over time
+- [o] The lack of static type checking made it hard to catch errors across many modules
+  > Correct! In large codebases, typos, refactoring mistakes, and type mismatches that JavaScript can't catch at compile time lead to runtime bugs. The bigger the project, the harder it is to track these issues manually.
+- Browsers stopped supporting older JavaScript features
+- JavaScript doesn't support asynchronous programming
+
+As projects scale from 1,000 to 100,000+ lines of code, the inability to verify types, function signatures, and property names *before* running the code becomes a major source of bugs and fragility.`}
+/>
