@@ -3,8 +3,6 @@ title: Error Handling with Types
 description: Model errors as values with Result<T, E> for explicit, composable error handling.
 ---
 
-# Error Handling with Types
-
 Traditional error handling in JavaScript relies on `throw` and `catch`. But exceptions have a fatal flaw: they're **invisible in types**. A function's signature doesn't tell you what errors it might throw, so you either handle every possible exception defensively (slow, verbose) or forget to handle them at all (bugs).
 
 TypeScript inherits this problem. But there's a better way, borrowed from functional languages like Rust, Haskell, and OCaml: **model errors as values**. Instead of throwing, return a discriminated union that explicitly represents success or failure. The compiler then forces you to handle both cases.
