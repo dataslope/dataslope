@@ -772,10 +772,23 @@ class WebRRuntime implements LanguageRuntime {
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
     try {
-      const result = await shelter.captureR(code, {
-        withAutoprint: true,
-        captureGraphics: { width: 720, height: 432 },
-      });
+      // Write user code to a VFS temp file so we don't need to escape it when
+      // embedding it inside our withVisible() wrapper string.
+      const tmpPath = `${WEB_USER_HOME}/.pg_run_code.R`;
+      await this.webR.FS.writeFile(tmpPath, new TextEncoder().encode(code));
+
+      // Wrap user code with withVisible() so we can determine whether the last
+      // expression should produce output (visible=TRUE) without letting R
+      // auto-print it (which would dump every row of a large data frame).
+      // .pg_last_result and .pg_last_visible are stored in .GlobalEnv for use
+      // in subsequent captureR calls below.
+      const result = await shelter.captureR(
+        `.pg_vr <- withVisible(eval(parse(file = "${tmpPath}"), envir = .GlobalEnv))
+.pg_last_visible <- .pg_vr$visible
+.pg_last_result  <- .pg_vr$value
+.pg_vr$value`,
+        { withAutoprint: false, captureGraphics: { width: 720, height: 432 } },
+      );
 
       let stdoutBuf = "";
       let stderrBuf = installWarnings;
@@ -794,18 +807,70 @@ class WebRRuntime implements LanguageRuntime {
         bmp.close();
       }
 
+      // Determine whether the last expression would have auto-printed.
+      let visible = false;
       try {
-        const t = await result.result.type();
-        if (t === "list") {
-          const js = (await result.result.toJs()) as unknown;
-          const rows = rowsFromDataFrame(js);
-          if (rows) {
-            const html = dataFrameToHtml(rows);
-            if (html) emit({ type: "html", content: html });
+        const visCapture = await shelter.captureR(
+          `cat(as.character(.pg_last_visible), "\n")`,
+          { withAutoprint: false, captureGraphics: { width: 720, height: 432 } },
+        );
+        const visText = visCapture.output
+          .filter((o) => o.type === "stdout")
+          .map((o) => String(o.data))
+          .join("")
+          .trim();
+        visible = visText === "TRUE";
+      } catch {
+        /* default: invisible */
+      }
+
+      if (visible) {
+        // Try to render a data frame as a truncated HTML table.
+        let emittedHtml = false;
+        try {
+          const t = await result.result.type();
+          if (t === "list") {
+            const js = (await result.result.toJs()) as unknown;
+            const rows = rowsFromDataFrame(js);
+            if (rows) {
+              const html = dataFrameToHtml(rows);
+              if (html) {
+                emit({ type: "html", content: html });
+                emittedHtml = true;
+              }
+            }
+          }
+        } catch {
+          /* not a data frame — fall through to text print */
+        }
+
+        if (!emittedHtml) {
+          // Non-data-frame visible result (vector, list, ggplot, …): print via R
+          // so that print methods such as print.ggplot fire correctly.
+          try {
+            const printCapture = await shelter.captureR(`print(.pg_last_result)`, {
+              withAutoprint: false,
+              captureGraphics: { width: 720, height: 432 },
+            });
+            let printStdout = "";
+            let printStderr = "";
+            for (const o of printCapture.output) {
+              if (o.type === "stdout") printStdout += String(o.data) + "\n";
+              else if (o.type === "stderr") printStderr += String(o.data) + "\n";
+            }
+            if (printStdout.trim())
+              emit({ type: "stdout", content: printStdout.trim() });
+            if (printStderr.trim())
+              emit({ type: "stderr", content: printStderr.trim() });
+            for (const bmp of printCapture.images) {
+              const b64 = await imageBitmapToPngBase64(bmp);
+              emit({ type: "image", content: b64 });
+              bmp.close();
+            }
+          } catch {
+            /* print failed — ignore */
           }
         }
-      } catch {
-        /* not convertible — ignore */
       }
     } finally {
       await shelter.purge();
