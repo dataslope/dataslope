@@ -78,6 +78,15 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link
+              href="/learn/java-programming-for-beginners"
+              className={styles.courseCard}
+            >
+              <span className={styles.courseTitle}>
+                Java Programming for Beginners
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/systems-programming-c" className={styles.courseCard}>
               <span className={styles.courseTitle}>
                 Systems Programming with C

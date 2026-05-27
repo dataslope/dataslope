@@ -1,0 +1,286 @@
+---
+title: Writing Maintainable Software
+description: Code is read far more often than it is written — the practices that make programs survive contact with humans (including future you)
+---
+
+A working program is the start of the job, not the end. Real
+software lives for years and is read, modified, and extended by
+many people — often including a future version of yourself who has
+forgotten how it works. **Maintainability** is the property of code
+that survives this reality gracefully.
+
+This page is a tour of the habits that produce maintainable Java.
+None of them require any new language features. They are entirely
+about *taste*.
+
+## Small methods
+
+The single most reliable maintainability rule is: **each method
+should do one thing, and have a name that says what.**
+
+A method that fits on your screen is easier to understand than one
+that doesn't. A method whose name reads like a sentence ("calculate
+discount," "load orders," "validate email") tells the reader what to
+expect before they read the body.
+
+Compare two versions of the same logic.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        double[] prices = { 12.0, 8.5, 5.0, 20.0 };
+
+        // Version A: one long blob
+        double total = 0;
+        for (double p : prices) total += p;
+        if (total > 30) total = total * 0.9;
+        total = Math.round(total * 100.0) / 100.0;
+        System.out.println("A: " + total);
+
+        // Version B: small named methods
+        double sum = sum(prices);
+        double discounted = applyBulkDiscount(sum);
+        double rounded = roundCents(discounted);
+        System.out.println("B: " + rounded);
+    }
+
+    static double sum(double[] xs) {
+        double s = 0;
+        for (double x : xs) s += x;
+        return s;
+    }
+
+    static double applyBulkDiscount(double total) {
+        return total > 30 ? total * 0.9 : total;
+    }
+
+    static double roundCents(double v) {
+        return Math.round(v * 100.0) / 100.0;
+    }
+}
+`}
+/>
+
+Version B is longer. It is also *much* easier to:
+
+- Read — each line says what it does.
+- Test — each helper can be tested in isolation.
+- Change — moving from a 10% discount to a 15% discount is a
+  one-line change in a method named for that exact rule.
+
+## Names tell the story
+
+Compare:
+
+```java
+double t = c * 0.07;       // what is t? what is c? what is 0.07?
+double tax = price * TAX_RATE;
+```
+
+Both lines compile to the same bytecode. Only one survives a code
+review. **A good name is a tiny piece of documentation that can
+never be out of date** (as long as you keep it accurate).
+
+Habits:
+
+- Variables and methods: `camelCase`.
+- Classes: `UpperCamelCase`.
+- Constants: `SCREAMING_SNAKE_CASE`.
+- Booleans read as questions: `isReady`, `hasNext`, `canPay`.
+- Avoid abbreviations except for very well-known ones (`id`, `url`,
+  `http`).
+
+## Single Responsibility
+
+A class with a clear purpose is reusable. A class that "does
+everything" is impossible to test, change, or understand.
+
+A useful sanity check: can you describe what a class does in one
+sentence *without using the word "and"*? If you need "and," the
+class probably has more than one responsibility and wants to be
+two classes.
+
+```mermaid
+flowchart LR
+    subgraph Bad["OrderManager (does too much)"]
+        B1[parse orders]
+        B2[validate orders]
+        B3[save to DB]
+        B4[send email]
+        B5[render PDF]
+    end
+    subgraph Good["Separate, focused classes"]
+        G1[OrderParser]
+        G2[OrderValidator]
+        G3[OrderRepository]
+        G4[OrderEmailer]
+        G5[InvoicePdfRenderer]
+    end
+    Bad --> Good
+```
+
+You don't have to split early. But when you notice the "and" in
+your description, refactor toward focused classes.
+
+## DRY — but not over-DRY
+
+"Don't Repeat Yourself." If the *same logic* appears in three
+places, a bug-fix has to be made three times. Extract it.
+
+But: do not deduplicate things that merely *look* the same right
+now. Two functions might both compute `x * 0.07` for completely
+different reasons; they will evolve independently. Premature
+deduplication couples them and bites you later. The right
+question is: *would a change in one place always require an
+identical change in the other?*
+
+## Magic numbers
+
+```java
+if (age >= 18) { ... }                // 18 = what?
+if (age >= LEGAL_AGE) { ... }         // self-explanatory
+```
+
+Replace literal numbers (other than 0, 1, occasionally 2) with
+named constants. The constant says *why*, the number says only
+*what*.
+
+## Comment the *why*, not the *what*
+
+```java
+// Bad: comment restates the code
+i++;     // increment i
+
+// Good: comment explains intent the code can't show
+// We start from index 1 because index 0 is the header row.
+for (int i = 1; i < rows.length; i++) { ... }
+```
+
+A good rule: **if your reader can understand the *what* from the
+code, comment the *why*. If they can't understand the what, rename
+something.**
+
+## Errors at the right layer
+
+We saw in the exceptions chapter that broad `catch (Exception e)`
+hides bugs. The maintainability angle is: each layer of your
+program should handle exceptions *it understands*, and let the
+rest bubble up.
+
+A web controller might convert a `BadInputException` into a 400
+response. A database layer might wrap `SQLException` into a
+domain-specific `RepositoryException`. A general utility method
+probably shouldn't catch *anything*.
+
+## A maintainability mini-checklist
+
+- [ ] Methods are small and named for what they do.
+- [ ] Classes have a single, describable responsibility.
+- [ ] Names are pronounceable and meaningful.
+- [ ] No magic numbers.
+- [ ] No empty `catch` blocks.
+- [ ] No dead code or commented-out blocks "in case we need them."
+- [ ] Tests exist for behavior anyone could break (we'll cover
+  testing in a follow-up course).
+
+## A worked refactor
+
+The following code works. It's also a maintenance nightmare. Read
+it; then read the cleaned-up version below.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        // Compute final price with tax and shipping
+        double a = 49.99;
+        int b = 3;
+        double c = a * b;
+        if (c < 50) c = c + 5.99;
+        c = c + (c * 0.07);
+        System.out.println("$" + c);
+    }
+}
+`}
+/>
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    private static final double SHIPPING_FEE = 5.99;
+    private static final double FREE_SHIPPING_THRESHOLD = 50.0;
+    private static final double TAX_RATE = 0.07;
+
+    public static void main(String[] args) {
+        double unitPrice = 49.99;
+        int quantity = 3;
+
+        double subtotal = unitPrice * quantity;
+        double withShipping = applyShipping(subtotal);
+        double total = applyTax(withShipping);
+
+        System.out.println("$" + total);
+    }
+
+    static double applyShipping(double subtotal) {
+        return subtotal >= FREE_SHIPPING_THRESHOLD
+            ? subtotal
+            : subtotal + SHIPPING_FEE;
+    }
+
+    static double applyTax(double amount) {
+        return amount + (amount * TAX_RATE);
+    }
+}
+`}
+/>
+
+Same behavior. Same arithmetic. Vastly easier to change when next
+month the marketing team says "make shipping free above $40" or
+"tax is now 7.5%."
+
+<MultipleChoice
+  markdown={`Why are small, well-named methods generally easier to maintain than large ones?
+
+- They use less memory
+  > Method size has no meaningful memory impact.
+- The compiler inlines them automatically
+  > It may, but that's not the maintainability reason.
+- [o] Each method reads like a sentence, can be understood in isolation, and can be changed without affecting unrelated logic
+  > Correct.
+- The JIT runs faster on small methods
+  > That's a tiny detail at best, not the point.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following is the *best* candidate to be replaced with a named constant?
+
+- The literal \`0\` used to start a loop
+  > Usually fine as a literal.
+- The literal \`1\` used to add one to a counter
+  > Usually fine.
+- [o] The literal \`0.07\` used to multiply a price for tax
+  > Correct — its meaning ("tax rate") is not obvious from the digits.
+- The literal \`"\\n"\` used in a print statement
+  > Often fine inline.`}
+/>
+
+<MultipleChoice
+  markdown={`A class describes itself as "the OrderManager: it parses orders, validates them, saves them, and emails the customer." What's the most accurate critique?
+
+- The name should be longer
+  > Naming is a side effect.
+- It needs more methods
+  > It needs fewer responsibilities, not more methods.
+- [o] It is doing too many unrelated things — the word "and" in its description hints that it should be split into several focused classes
+  > Correct.
+- It should be made \`abstract\`
+  > Abstractness doesn't address the responsibility problem.`}
+/>
+
+Writing software that other people (including yourself in six
+months) can change happily is a slow-built skill. The exercises in
+the rest of this course quietly practice it. Next we move from
+*how to write* code to *what code* — the classic **algorithms and
+data structures** that every programmer should at least recognize.
