@@ -1,0 +1,357 @@
+---
+title: Missing Values
+description: NaN, NaT, None — what they are, where they come from, how Pandas treats them, and the four strategies for dealing with them.
+---
+
+Missing data is the single most universal property of real-world
+datasets. This chapter is the playbook for handling it.
+
+## What "missing" looks like in Pandas
+
+Pandas uses two sentinel values:
+
+- **`NaN`** (Not a Number) — for missing floats and, by
+  extension, most "missing" cells.
+- **`NaT`** (Not a Time) — for missing datetimes.
+
+Plus Python's **`None`** which Pandas often converts to NaN.
+
+Newer Pandas (1.x+) also offers **nullable integer**, **nullable
+boolean**, and **nullable string** dtypes (with capital-letter
+names — `Int64`, `boolean`, `string`) that use a richer sentinel
+called `pd.NA`. For this course we stick with the classic
+NaN/NaT.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+s = pd.Series([1.0, np.nan, 3.0, None, 5.0])
+print(s)
+print()
+print("dtype:", s.dtype)
+print("NaN positions:", s.isna().tolist())
+`}
+/>
+
+## Detecting missing values
+
+The basics:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "x": [1, 2, np.nan, 4, np.nan],
+    "y": ["a", None, "c", "d", "e"],
+})
+
+print("isna (boolean DataFrame):")
+print(df.isna())
+print()
+print("Counts per column:")
+print(df.isna().sum())
+print()
+print("Any NaN at all?", df.isna().any().any())
+`}
+/>
+
+A useful one-liner for a dataset-wide audit:
+
+```python
+df.isna().mean().sort_values(ascending=False)
+```
+
+That gives you the fraction of missing values per column, sorted
+worst-first.
+
+## Where do NaNs come from?
+
+Knowing the source guides the fix:
+
+- **Original data was incomplete.** Survey skip, optional form
+  field, sensor dropout.
+- **Sentinel values** that were not declared. CSV uses `"N/A"`
+  or `-1`; the column got coerced anyway.
+- **Coercion failures.** `pd.to_numeric(..., errors="coerce")`
+  turns unparseable strings into NaN.
+- **Join misses.** Left-joining on a key not present in the
+  right table fills the right's columns with NaN.
+- **Reshape artifacts.** Pivoting a long table to wide creates
+  NaN wherever the combination did not occur.
+
+The remediation differs for each.
+
+## Strategy 1 — drop rows
+
+`dropna()` removes rows with any missing value:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "a": [1, 2, np.nan, 4],
+    "b": [10, np.nan, 30, 40],
+})
+
+print("Drop any-NaN rows:")
+print(df.dropna())
+print()
+print("Drop only rows where 'a' is NaN:")
+print(df.dropna(subset=["a"]))
+print()
+print("Drop rows where ALL values are NaN:")
+print(df.dropna(how="all"))
+`}
+/>
+
+`subset` and `how` give you the fine control you need.
+
+**When to drop rows:** when missingness is rare (a few percent),
+random, and the columns are central to your analysis.
+
+**When *not* to:** when missingness is high or correlated with
+something interesting (e.g., income is missing more often for
+unemployed respondents — dropping them changes the population).
+
+## Strategy 2 — drop columns
+
+If a column is mostly NaN, it usually does not help your
+analysis and may be noise.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "a": [1, 2, 3, 4, 5],
+    "b": [np.nan, np.nan, np.nan, np.nan, 10],
+    "c": [1, np.nan, 3, np.nan, 5],
+})
+
+# Drop columns more than 50% missing
+threshold = 0.5
+keep = df.columns[df.isna().mean() <= threshold]
+print(df[keep])
+`}
+/>
+
+## Strategy 3 — impute
+
+Fill in a plausible value. The simplest options:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+s = pd.Series([10, 20, np.nan, 40, np.nan])
+
+print("Fill with 0:")
+print(s.fillna(0).tolist())
+print()
+print("Fill with mean:")
+print(s.fillna(s.mean()).tolist())
+print()
+print("Fill with median:")
+print(s.fillna(s.median()).tolist())
+print()
+print("Forward-fill (copy previous):")
+print(s.ffill().tolist())
+print()
+print("Back-fill:")
+print(s.bfill().tolist())
+`}
+/>
+
+For categorical columns, common choices are:
+
+- The mode (most common value).
+- A literal `"missing"` or `"unknown"` label.
+
+For numeric columns:
+
+- The mean (sensitive to outliers).
+- The median (robust).
+- 0 — only if 0 is a meaningful "no contribution" value.
+- A group-based mean (e.g. department's average) for sophisticated
+  cases.
+
+<Callout type="info" title="Imputation hides information">
+Filling NaNs with the mean lets downstream code run, but it also
+silently *removes evidence of missingness*. For most analyses
+this is fine; for some (where the *fact* of being missing
+matters), it is bad. Always ask whether the missingness itself
+is meaningful before imputing it away.
+</Callout>
+
+## Strategy 4 — keep it explicit
+
+Sometimes the right move is to leave the NaNs and design
+downstream code to handle them.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "user": ["a","b","c","d"],
+    "score": [10, 20, np.nan, 40],
+})
+
+# Pandas aggregations skip NaN, so this just averages the 3 non-null values:
+print("Mean:", df["score"].mean())
+
+# A 'has score' flag can be useful downstream:
+df["has_score"] = df["score"].notna()
+print(df)
+`}
+/>
+
+## Combining strategies
+
+A real-world cleaning step often mixes:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5],
+    "age":         [25, np.nan, 35, np.nan, 45],
+    "city":        ["NY", "LA", None, "SF", "NY"],
+    "score":       [88, np.nan, 75, 92, np.nan],
+    "notes":       [np.nan]*5,  # entirely empty column
+})
+
+clean = (
+    df
+    # Drop entirely-empty columns
+    .dropna(axis=1, how="all")
+    # Fill age with the median age
+    .assign(age=lambda x: x["age"].fillna(x["age"].median()))
+    # Fill city with "unknown"
+    .assign(city=lambda x: x["city"].fillna("unknown"))
+    # Keep score's NaNs but add a flag
+    .assign(score_missing=lambda x: x["score"].isna())
+)
+print(clean)
+`}
+/>
+
+## Detecting "fake" missing values
+
+Some datasets use sentinel values that *look* like real data
+but mean "missing." Common offenders:
+
+- `0`, `-1`, `9999`, `-9999` for numbers.
+- `"N/A"`, `"unknown"`, `"-"`, `""` for strings.
+- `1900-01-01` or `9999-12-31` for dates.
+
+You catch these by looking at the data. Once spotted, convert
+them to true NaN at load time:
+
+```python
+df = pd.read_csv(path, na_values=["N/A", "-", "9999"])
+```
+
+Or convert after:
+
+```python
+df["age"] = df["age"].replace([-1, 999], np.nan)
+```
+
+## Mid-page check
+
+<MultipleChoice
+  markdown={`A column \`age\` contains the values \`[25, -1, 30, 999, 35]\`. The values \`-1\` and \`999\` are sentinel codes from the original system meaning "refused to answer" and "data error." What is the cleanest first step?
+
+- Take the mean
+- Drop the column
+- [o] Replace the sentinels with NaN (\`df["age"].replace([-1, 999], np.nan)\`) so downstream operations treat them as missing
+  > Right. Convert sentinels to NaN as early as possible so the rest of your code does not have to remember the sentinel codes.
+- Round them to zero
+
+Documenting the conversion is just as important as performing it.`}
+/>
+
+## Validate after cleaning
+
+Whichever strategy you use, end with a quick sanity check:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+import numpy as np
+df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5],
+    "age":         [25, 30, 35, 40, 45],
+    "city":        ["NY", "LA", "unknown", "SF", "NY"],
+})`}
+  initialCode={`print("Any NaN remaining?", df.isna().any().any())
+print()
+print("Per-column counts:")
+print(df.isna().sum())
+`}
+/>
+
+If the count is not what you expected, fix it. The mistake is
+almost always a missed column or a sentinel you forgot about.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`When is **dropping rows with NaN** a poor strategy?
+
+- When the dataset is small
+- Always
+- [o] When missingness is high or correlated with something interesting (e.g., income is missing more often for certain groups), because dropping changes the effective population
+  > Yes. Dropping is fine for rare, random missingness. It is dangerous when the missing rows differ systematically from the kept ones.
+- Never
+
+Understanding *why* values are missing is essential before deciding how to handle them.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`s.fillna(s.median())\` do?
+
+- Replaces NaNs with 0
+- Removes NaNs from \`s\`
+- [o] Replaces NaNs with the median of the non-null values in \`s\`
+  > Correct. Median imputation is a robust default — it does not get pulled by outliers like the mean does.
+- Computes the median while ignoring NaNs
+
+For numeric columns where missingness is moderate and random, median imputation is a sensible default.`}
+/>
+
+<MultipleChoice
+  markdown={`A categorical column \`payment_method\` has 8% missing values. You decide to fill them in. Which is **most appropriate**?
+
+- Fill with 0
+- Fill with the column's mean
+- [o] Fill with the mode (most common value) or with a literal label like \`"unknown"\`
+  > Yes. Categorical data has no mean; fill either with the most common value or with an explicit "unknown" label so downstream code can still group on it.
+- Fill with NaN
+
+Pick the option that matches what you want downstream code to *do* with these rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Why might you add a column like \`score_missing\` instead of (or in addition to) filling \`score\`?
+
+- It looks fancy
+- Pandas requires it
+- [o] Because the *fact* that a value was missing can itself be informative — sometimes more informative than any imputed value
+  > Right. In churn analysis, "users who did not answer this question" can behave very differently from users who answered. The flag preserves that information.
+- It saves memory
+
+Preserving the signal of missingness alongside the cleaned value is a quietly powerful pattern.`}
+/>

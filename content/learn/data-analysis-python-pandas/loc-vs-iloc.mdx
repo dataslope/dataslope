@@ -1,0 +1,215 @@
+---
+title: loc vs iloc
+description: The single most asked Pandas question on the internet, finally settled with side-by-side examples.
+---
+
+`loc` and `iloc` are the two great selectors. Once you understand
+their split, much of Pandas's apparent quirkiness goes away.
+
+## The headline
+
+| Selector | Picks by      | Slice endpoint |
+| -------- | ------------- | -------------- |
+| `loc`    | **labels**    | **inclusive**  |
+| `iloc`   | **positions** | **exclusive**  |
+
+That is the whole rule. Everything else is examples.
+
+## Side by side
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "salary": [120, 95, 140, 80, 128],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])
+
+print(df)
+print()
+print(">>> df.loc['Bilal']")        # label
+print(df.loc["Bilal"])
+print()
+print(">>> df.iloc[1]")              # position
+print(df.iloc[1])
+`}
+/>
+
+Both fetch the same row (because Bilal is at position 1), but
+the *intent* is different. `loc` expresses "I know the label";
+`iloc` expresses "I know the row number."
+
+## Slicing comparison
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140, 80, 128],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
+  initialCode={`print(">>> df.loc['Aiko':'Chen']     # 3 rows — INCLUSIVE of Chen")
+print(df.loc["Aiko":"Chen"])
+print()
+print(">>> df.iloc[0:3]              # 3 rows — EXCLUSIVE of position 3")
+print(df.iloc[0:3])
+`}
+/>
+
+Same rows in this case (positions 0..2). But notice how
+counter-intuitive label slicing feels at first: `"Aiko":"Chen"`
+*includes* Chen. The reason is that labels do not have an
+obvious "one past the end" — Pandas chose to be inclusive.
+
+## Selecting rows *and* columns
+
+Both take a two-element form `[rows, columns]`:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140, 80, 128],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "tenure": [3, 6, 7, 2, 4],
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
+  initialCode={`# loc: labels for rows AND columns
+print(df.loc[["Aiko","Chen"], ["salary","tenure"]])
+print()
+
+# iloc: positions for both
+print(df.iloc[[0, 2], [0, 2]])
+print()
+
+# All rows, some columns
+print(df.loc[:, ["salary"]])
+print()
+
+# Some rows, all columns
+print(df.iloc[1:4, :])
+`}
+/>
+
+## Boolean masks live in `loc`
+
+When you filter by a condition, the cleanest form is `loc[mask]`
+or `loc[mask, cols]`:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140, 80, 128],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "tenure": [3, 6, 7, 2, 4],
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
+  initialCode={`mask = df["dept"] == "Eng"
+
+print(">>> df.loc[mask]")
+print(df.loc[mask])
+print()
+
+print(">>> df.loc[mask, ['salary','tenure']]")
+print(df.loc[mask, ["salary","tenure"]])
+`}
+/>
+
+`df[mask]` works too but is a less expressive habit than
+`df.loc[mask, ...]`.
+
+## Assignment with `loc`
+
+A subtle but important reason to use `loc` is **safe assignment**.
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140, 80, 128],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
+  initialCode={`# Give every Engineer a 10% raise. Use loc — never chained []:
+df.loc[df["dept"] == "Eng", "salary"] *= 1.10
+print(df)
+`}
+/>
+
+The "chained" alternative — `df[df["dept"] == "Eng"]["salary"]
+*= 1.10` — sometimes works and sometimes silently does nothing,
+because the first `[]` may have returned a *copy* of the data.
+Pandas will warn you about this (the famous
+*SettingWithCopyWarning*). The fix is always: use `loc`.
+
+## When to use which?
+
+A practical rule of thumb:
+
+- **Use `loc`** as the default. Most analytical work is
+  label-driven (column names, dates, identifiers, boolean masks).
+- **Use `iloc`** when you genuinely want a row or column by
+  *position* — e.g., "give me the first 5 rows of a previewed
+  file," or "show me the last column."
+
+If you find yourself constantly counting positions, you may want
+to give your DataFrame a more meaningful index.
+
+## A common confusion: integer labels
+
+If your index happens to be `[10, 20, 30]`, then `df.loc[10]`
+returns the row labeled 10 (the *first* row), while `df.iloc[10]`
+would be an out-of-bounds error. The difference between label
+and position becomes very obvious in this case.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"x": [100, 200, 300]}, index=[10, 20, 30])
+print(df)
+print()
+print("df.loc[10] (label):")
+print(df.loc[10])
+print()
+print("df.iloc[0] (position):")
+print(df.iloc[0])
+`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which of these slices is **inclusive** of the right endpoint?
+
+- \`df.iloc[0:5]\`
+- \`mylist[0:5]\` in plain Python
+- [o] \`df.loc["a":"e"]\`
+  > Yes. Label-based slicing in Pandas is inclusive of both ends — different from \`iloc\` and from regular Python slicing.
+- \`range(0, 5)\`
+
+This asymmetry surprises everyone the first time. Lock it in.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does Pandas recommend \`df.loc[mask, "col"] = value\` instead of \`df[mask]["col"] = value\`?
+
+- The first is shorter
+- They are equivalent
+- [o] The chained version may operate on a copy of the data and silently fail to update the original DataFrame (the *SettingWithCopyWarning*); \`loc\` guarantees in-place update on the original
+  > Correct. This is the single most common Pandas footgun. Always use \`loc\` for assignment.
+- Pandas does not support boolean masks
+
+Train your fingers to write \`df.loc[mask, "col"] = ...\` and you will save yourself many hours of debugging.`}
+/>
+
+<MultipleChoice
+  markdown={`Your DataFrame has integer index \`[10, 20, 30]\`. What does \`df.loc[10]\` return?
+
+- An error
+- [o] The row whose **label** is 10 — i.e., the first row
+  > Right. When the index contains integers, the distinction between label and position becomes very visible: \`df.iloc[10]\` would be out of bounds here.
+- The row at position 10
+- The integer 10
+
+This is the cleanest demonstration of why "label vs position" matters.`}
+/>

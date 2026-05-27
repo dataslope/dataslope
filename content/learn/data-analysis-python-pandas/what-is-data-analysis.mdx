@@ -1,0 +1,311 @@
+---
+title: What Data Analysis Is
+description: A plain-language definition of data analysis, the questions it tries to answer, and the four basic kinds of analytical work.
+---
+
+People throw the phrase "data analysis" around as if everyone
+knows what it means. In practice, ask ten analysts and you will
+get ten subtly different answers. Let us pin it down.
+
+## A working definition
+
+> **Data analysis** is the disciplined process of turning raw
+> recorded observations into useful, defensible answers to
+> questions humans care about.
+
+Three words in that sentence are doing all the work:
+
+- **Disciplined.** It is not "looking at numbers until something
+  feels right." It is a structured workflow with checkpoints,
+  validation, and (often) peer review.
+- **Useful.** The output is supposed to influence a decision —
+  buy or sell, hire or fire, launch or kill, treat or wait.
+- **Defensible.** If someone challenges your number, you can
+  walk them through every step that produced it. Reproducibility
+  again.
+
+Notice what is *not* in the definition: nothing about Python,
+nothing about Pandas, nothing about machine learning. Those are
+tools. The definition is about the work, which existed centuries
+before any of those tools did.
+
+## The four kinds of analysis
+
+A common framework — adapted from the consulting world — divides
+analytical work into four kinds, in order of increasing
+ambition.
+
+```mermaid
+flowchart LR
+    D[Descriptive:<br/>What happened?] --> Di[Diagnostic:<br/>Why did it happen?]
+    Di --> P[Predictive:<br/>What will happen?]
+    P --> Pr[Prescriptive:<br/>What should we do?]
+    style D fill:#dbeafe
+    style Di fill:#fef3c7
+    style P fill:#fce7f3
+    style Pr fill:#dcfce7
+```
+
+### Descriptive — *What happened?*
+
+You count, you sum, you average, you slice. "Revenue last
+quarter was $12.4M, up 6% year over year." "We onboarded 312
+new users in March." "The median time to resolve a support
+ticket is 4 hours." This is the bread and butter of every
+analyst's day and the focus of most of this course.
+
+### Diagnostic — *Why did it happen?*
+
+You drill in. "Revenue grew because the West region grew 18%,
+while every other region was flat." "Support tickets are slower
+because two senior engineers left." Diagnostic analysis is
+still mostly Pandas — slicing, grouping, comparing — but it
+demands more domain knowledge and skepticism.
+
+### Predictive — *What will happen?*
+
+You build a model. "If marketing spend stays flat, we expect
+4,200 new users next month." This is where statistics and
+machine learning come in. We touch this lightly in the *Hypothesis
+Intuition* chapter; it is the subject of its own course.
+
+### Prescriptive — *What should we do?*
+
+You recommend an action and quantify its expected impact. "We
+should reduce churn by improving onboarding; based on a 3% lift
+estimate that is worth $400k/year." This requires combining all
+the previous layers with business judgment.
+
+This course lives almost entirely in the **descriptive** and
+**diagnostic** layers. Those are by far the most common kinds of
+data work and the foundation for everything above them.
+
+## What analysts actually *do*
+
+Strip away the buzzwords and a working analyst spends their day
+doing some mix of:
+
+1. **Asking** — translating a vague business question into a
+   specific, answerable analytical question.
+2. **Acquiring** — getting the right data into a tool you can
+   work with.
+3. **Cleaning** — fixing types, missing values, inconsistencies,
+   bad rows.
+4. **Exploring** — summary statistics, group breakdowns,
+   visualizations.
+5. **Interpreting** — what does the pattern mean? Could it be a
+   data artifact? Could it be noise?
+6. **Communicating** — distilling the result for a decision
+   maker, in words, charts, and (sometimes) a recommendation.
+
+```mermaid
+flowchart LR
+    A[Ask] --> B[Acquire]
+    B --> C[Clean]
+    C --> D[Explore]
+    D --> E[Interpret]
+    E --> F[Communicate]
+    F -.->|new question| A
+```
+
+Notice the dashed feedback arrow. Real analyses almost always
+generate new questions, sending you back to "Ask." A good
+analyst is comfortable with the loop and resists the temptation
+to stop at the first plausible answer.
+
+## The question-asking skill
+
+The single most under-rated skill in data analysis is **asking
+the right question**.
+
+A bad analytical question is vague:
+
+> "How is the marketing campaign doing?"
+
+A *good* analytical question is specific:
+
+> "Of users who saw the new banner ad between March 1 and March
+> 15, what fraction made a purchase within 7 days, and how does
+> that compare with users who saw the old banner during the same
+> window?"
+
+The second question has a single, computable, defensible answer.
+The first does not.
+
+<Callout type="info" title="A practical tip">
+Before writing any code, write the question down in one sentence
+and circle the words that have to be defined precisely. *"Users
+who saw"* — saw the page or the ad? *"Within 7 days"* — 7 days
+of what? *"Compare with"* — on what metric? Every imprecise word
+is a fork in the road that you (not the data) will have to pick.
+</Callout>
+
+## An end-to-end example, slowly
+
+Let us run the loop once at a relaxed pace. Question:
+
+> Among employees in our HR dataset, does **monthly income**
+> differ between people who stayed versus people who left the
+> company?
+
+Here is the full process explicitly.
+
+### Step 1: Ask precisely
+
+Define the comparison:
+
+- "Monthly income" = the `MonthlyIncome` column.
+- "Stayed" = `Attrition == "No"`.
+- "Left" = `Attrition == "Yes"`.
+- "Differ" = compare the *median* (less sensitive to outliers
+  than the mean), and the *25th and 75th percentile* (to see
+  spread).
+
+### Step 2: Acquire
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+print("Rows:", len(df))
+print("Has MonthlyIncome?", "MonthlyIncome" in df.columns)
+print("Has Attrition?", "Attrition" in df.columns)
+print()
+print(df[["MonthlyIncome", "Attrition"]].head())
+`}
+/>
+
+### Step 3: Clean
+
+Quick check: are there any missing values in the two columns we
+need?
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
+  initialCode={`print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
+print("Missing Attrition:    ", df["Attrition"].isna().sum())
+print("Unique Attrition values:", df["Attrition"].unique())
+`}
+/>
+
+If both are zero and `Attrition` only contains `Yes`/`No`, we
+are in good shape.
+
+### Step 4: Explore
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
+  initialCode={`summary = (
+    df.groupby("Attrition")["MonthlyIncome"]
+      .describe()[["count", "25%", "50%", "75%"]]
+      .round(0)
+)
+print(summary)
+`}
+/>
+
+You can see the quartiles for each group at a glance.
+
+### Step 5: Interpret
+
+You will probably notice that the median income of people who
+stayed is *higher* than those who left. Does that mean low pay
+causes attrition? Not necessarily. It could mean:
+
+- Lower-paid employees are also younger and more mobile.
+- Lower-paid roles are in departments with higher turnover for
+  *other* reasons.
+- The company is shedding underperformers who happened to be
+  lower-paid.
+
+A descriptive comparison is a *starting point*, not a conclusion.
+This is why diagnostic analysis usually follows.
+
+### Step 6: Communicate
+
+You would summarize this to a stakeholder as a short note:
+
+> *Among the 1,470 employees in our dataset, the median monthly
+> income of those who left was about $4,500, versus $5,300 for
+> those who stayed — a ~15% gap. This is a correlation, not a
+> proven cause; further analysis by department and job level is
+> needed before recommending a pay-based retention program.*
+
+Notice how the language is hedged. Good analysts are honest
+about what their numbers can and cannot prove.
+
+## What data analysis is *not*
+
+- It is not memorizing every method on the DataFrame.
+- It is not the same as data engineering (building pipelines).
+- It is not the same as machine learning (training models).
+- It is not the same as business intelligence (building
+  dashboards), though there is heavy overlap.
+- It is not a substitute for domain expertise — it *amplifies* it.
+
+## A short pause for skepticism
+
+Every dataset is a *measurement of reality*, not reality itself.
+Two analysts can look at the same dataset and reach different
+conclusions because they made different (and equally defensible)
+choices about cleaning, grouping, or comparison. This is
+uncomfortable, but it is fundamental to the work. We will keep
+coming back to it.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which of the following best matches the chapter's working definition of data analysis?
+
+- Producing as many charts as possible
+- Memorizing Pandas function names
+- [o] A disciplined process of turning raw recorded observations into useful, defensible answers to questions humans care about
+  > Correct. Notice the three load-bearing words: *disciplined*, *useful*, *defensible*. None of them mentions a specific tool.
+- Building machine-learning models
+
+A useful definition is tool-independent.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is a **descriptive** analytical question (as opposed to diagnostic, predictive, or prescriptive)?
+
+- Why did revenue drop last quarter?
+- What should we do to reduce churn?
+- What will revenue be next quarter?
+- [o] What was our revenue last quarter?
+  > Right. Descriptive analysis answers "what happened" — counts, sums, averages, breakdowns. It is the foundation everything else is built on.
+
+Most analyst work falls in the descriptive and diagnostic layers, which is exactly what this course focuses on.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the chapter say "asking the right question" is an under-rated skill?
+
+- It saves keystrokes
+- It avoids using Pandas
+- [o] Vague questions ("how is the campaign doing?") have many plausible answers, while specific questions ("of users who saw banner X between dates A and B, what fraction purchased within 7 days?") have one computable answer
+  > Yes. Precision in the question is what makes the answer defensible. Most arguments about analysis results trace back to ambiguity in the original question.
+- It impresses your manager
+
+Spending time sharpening the question before writing code is almost always a good investment.`}
+/>
+
+<MultipleChoice
+  markdown={`In the income-vs-attrition example, the chapter cautioned that the observed gap is "a correlation, not a proven cause." What is the closest reason given?
+
+- The dataset is too small
+- Pandas cannot compute causes
+- [o] The income gap could be explained by many other factors (age, department, role), so a simple comparison cannot prove that pay drives attrition
+  > Exactly. This is the classic "correlation is not causation" warning, applied carefully. Honest analysts state the limits of their evidence.
+- Attrition is a categorical variable
+
+Hedging language ("appears to be associated with") is the analyst's friend; overstated causal claims are a frequent source of bad decisions.`}
+/>

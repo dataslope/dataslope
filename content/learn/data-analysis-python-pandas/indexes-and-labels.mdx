@@ -1,0 +1,237 @@
+---
+title: Indexes and Labels
+description: The index is Pandas's quiet superpower. Understand it once and half of the library makes sense at once.
+---
+
+Every Series has an index. Every DataFrame has two — one for
+rows, one for columns. Indexes look decorative ("0, 1, 2, 3 ...")
+until you realize they are doing real work behind the scenes.
+
+## What an index *is*
+
+An index is a *labeled axis*. Each entry on the axis has a
+label, and you can ask Pandas to fetch values *by label* rather
+than *by position*.
+
+By default, when you create a DataFrame, the row index is a
+boring `RangeIndex` of integers — 0, 1, 2, 3 — and the column
+index is the list of column names.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "salary":  [120, 95, 140],
+    "tenure":  [3, 6, 7],
+})
+print(df)
+print()
+print("Row index:   ", df.index)
+print("Column index:", df.columns)
+`}
+/>
+
+You can replace the default index with something meaningful —
+typically a real identifier:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "salary":  [120, 95, 140],
+    "tenure":  [3, 6, 7],
+}, index=["Aiko","Bilal","Chen"])
+
+# Or, equivalently, set it from a column:
+df2 = pd.DataFrame({
+    "name":    ["Aiko","Bilal","Chen"],
+    "salary":  [120, 95, 140],
+    "tenure":  [3, 6, 7],
+}).set_index("name")
+
+print(df)
+print()
+print(df2)
+`}
+/>
+
+`set_index("name")` takes the `name` column and promotes it to
+be the index. The original column disappears from the data and
+becomes the row label.
+
+## Why bother with a labeled index?
+
+Three big reasons.
+
+### 1. Alignment
+
+We saw this in the last chapter. When you add two Series or
+DataFrames, Pandas aligns them by index label. Without labels,
+that alignment would be impossible.
+
+### 2. Label-based lookup
+
+You can fetch a row by its label directly:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140],
+    "tenure": [3, 6, 7],
+}, index=["Aiko","Bilal","Chen"])
+
+print(df.loc["Bilal"])     # one row, by label
+print()
+print(df.loc[["Aiko","Chen"], "salary"])   # subset of rows × columns
+`}
+/>
+
+We will see `loc` in depth in the *loc vs iloc* chapter.
+
+### 3. Joins
+
+Many `merge` and `join` operations use the index as the key.
+A well-designed index makes joins trivial.
+
+## Time series indexes — the killer use case
+
+The index really earns its keep when it represents a *time
+series*. A DatetimeIndex unlocks a whole subspace of Pandas
+features.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+dates = pd.date_range("2024-01-01", periods=10, freq="D")
+prices = pd.Series([100, 102, 101, 105, 108, 107, 110, 112, 111, 115], index=dates)
+
+print(prices)
+print()
+print("Just one day:")
+print(prices.loc["2024-01-05"])
+print()
+print("Slice a range:")
+print(prices.loc["2024-01-03":"2024-01-07"])
+print()
+print("3-day rolling average:")
+print(prices.rolling(3).mean())
+`}
+/>
+
+Slicing a date range like this, computing rolling windows,
+resampling to weekly/monthly — all of these become trivial with
+a DatetimeIndex, and all of them are awkward without one.
+
+## Resetting the index
+
+Sometimes you want to demote the index back to a regular column.
+`reset_index()` does it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+df = pd.DataFrame({
+    "salary": [120, 95, 140],
+}, index=["Aiko","Bilal","Chen"])
+
+print("Before:")
+print(df)
+print()
+
+flat = df.reset_index()
+print("After reset_index():")
+print(flat)
+print()
+print("Columns are now:", list(flat.columns))
+`}
+/>
+
+You will reach for `reset_index()` constantly after a `groupby`,
+because group-by results have the grouping column promoted into
+the index.
+
+## MultiIndex — labels with multiple levels
+
+An index can have multiple levels. This is how Pandas
+represents grouped results when you group by more than one
+column.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
+    "level":  ["jr","sr","jr","sr","jr","jr"],
+    "salary": [110, 160, 80, 120, 95, 75],
+})
+
+grouped = df.groupby(["dept","level"])["salary"].mean()
+print(grouped)
+print()
+print("Type of index:", type(grouped.index).__name__)
+print("Levels:       ", grouped.index.names)
+print()
+print("Pull one slice with a tuple:")
+print(grouped.loc[("Eng","sr")])
+`}
+/>
+
+MultiIndexes are powerful but get confusing fast. A common
+pattern is to do the heavy lifting with a MultiIndex and then
+`reset_index()` back to a flat DataFrame for further work.
+
+## Index vs column — which should it be?
+
+A useful rule of thumb:
+
+- Make it an **index** if you will frequently look up or align
+  data by it (a date, a primary key, an ID).
+- Keep it as a **column** if you will treat it as just another
+  attribute to filter, group, or aggregate on.
+
+The right answer often changes throughout an analysis. Promoting
+and demoting via `set_index` / `reset_index` is cheap.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the *default* row index of a DataFrame you create from a dict?
+
+- A copy of the first column
+- All NaN
+- [o] A \`RangeIndex\` — integers 0, 1, 2, ... corresponding to row positions
+  > Correct. Unless you specify \`index=\`, Pandas gives you boring sequential integers.
+- A timestamp
+
+You can replace the default later with anything meaningful.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is having a \`DatetimeIndex\` so valuable for time-series work?
+
+- It looks pretty
+- It is required by Pandas
+- [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups — operations that are awkward with plain integer indexes
+  > Yes. A DatetimeIndex is the gateway to most of Pandas's time-series features.
+- It makes the data sorted automatically
+
+Time-series indexing is a great example of the value of *labeled* axes.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`reset_index()\` do?
+
+- Sorts the index
+- Removes all rows
+- [o] Promotes the current index back to one or more regular columns and replaces the index with a default RangeIndex
+  > Right. It is the inverse of \`set_index\`. You will use it constantly after groupby.
+- Renames the columns
+
+Knowing both directions — promote and demote — keeps you in control of where your labels live.`}
+/>

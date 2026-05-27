@@ -1,0 +1,249 @@
+---
+title: Sorting and Ranking
+description: Ordering rows by one or more columns, and assigning ranks within groups.
+---
+
+After filtering, ordering is the second most common manipulation
+you will perform on a DataFrame. Pandas keeps it simple.
+
+## `sort_values`
+
+Sort by a single column:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+    "tenure": [3, 6, 7, 2, 4],
+})
+
+print("By salary, descending:")
+print(df.sort_values("salary", ascending=False))
+`}
+/>
+
+Sort by multiple columns — earlier columns take priority:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+    "tenure": [3, 6, 7, 2, 4],
+})`}
+  initialCode={`# By department ascending, then by salary descending within department
+print(df.sort_values(["dept", "salary"], ascending=[True, False]))
+`}
+/>
+
+`sort_values` returns a *new* DataFrame — it does not modify the
+original. If you want to overwrite, reassign:
+
+```python
+df = df.sort_values("salary", ascending=False)
+```
+
+## `sort_index`
+
+Sort by the index instead of a column:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen","Aiko","Bilal"])
+print(df.sort_index())
+`}
+/>
+
+This is especially common with time-series data — `df
+.sort_index()` on a DatetimeIndex gives you chronological order.
+
+## Stable sorts and ties
+
+By default Pandas uses a *stable* sort: rows with equal values
+keep their original relative order. This matters when you want
+to "sort by A, breaking ties by B":
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "team": ["A","A","B","B"],
+    "score": [10, 20, 10, 20],
+})
+
+# Two stable sorts in reverse priority order = ties broken predictably
+result = df.sort_values("score").sort_values("team")
+print(result)
+print()
+
+# Or do it in one call:
+print(df.sort_values(["team","score"]))
+`}
+/>
+
+The two-call form is occasionally useful, but the single
+multi-column call is usually clearer.
+
+## `nlargest` / `nsmallest`
+
+A common task: find the top (or bottom) *N* rows by some column.
+These are equivalent to `sort_values(...).head(N)` but more
+direct and slightly faster.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+# Top 5 by monthly income
+print(df.nlargest(5, "MonthlyIncome")[["Age","JobRole","Department","MonthlyIncome"]])
+print()
+
+# Bottom 5 by income
+print(df.nsmallest(5, "MonthlyIncome")[["Age","JobRole","Department","MonthlyIncome"]])
+`}
+/>
+
+## Handling missing values in sorts
+
+By default, NaN values go to the *bottom* of an ascending sort.
+You can change this:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"x": [3, 1, np.nan, 2, np.nan, 4]})
+
+print("na_position='last' (default):")
+print(df.sort_values("x"))
+print()
+print("na_position='first':")
+print(df.sort_values("x", na_position="first"))
+`}
+/>
+
+## Ranking
+
+Sorting reorders rows. **Ranking** assigns each row a number
+representing its position in the sort, leaving row order alone.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "salary": [120, 95, 140, 80, 128],
+})
+
+df["rank"] = df["salary"].rank(ascending=False)
+print(df)
+`}
+/>
+
+The `rank` method has a `method` argument controlling how ties
+are broken:
+
+- `"average"` (default) — tied rows get the average of their
+  ranks.
+- `"min"` — tied rows all get the lowest rank.
+- `"dense"` — like `"min"` but no gaps between ranks.
+- `"first"` — break ties by original order.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series([100, 80, 100, 60, 80])
+
+for method in ["average", "min", "dense", "first"]:
+    print(f"{method:8s}: {list(s.rank(method=method).astype(float))}")
+`}
+/>
+
+## Rank within groups
+
+A common business question: *"Within each department, who are
+the top 3 earners?"* That is a sort + group + head problem.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+top3 = (
+    df.sort_values("MonthlyIncome", ascending=False)
+      .groupby("Department")
+      .head(3)
+      [["Department","JobRole","MonthlyIncome"]]
+)
+print(top3.sort_values("Department"))
+`}
+/>
+
+Reading this line by line:
+
+1. Sort everyone by income, descending.
+2. Group by department.
+3. From each group, take the first 3 rows (which are now the
+   top 3 because of the sort).
+4. Project to the columns we care about.
+5. Sort by department for a tidy display.
+
+This is a great example of how a few Pandas building blocks
+compose into something powerful.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`df.sort_values(["dept", "salary"], ascending=[True, False])\` do?
+
+- Sorts by salary first
+- Sorts only by department
+- [o] Sorts by department ascending; within each department, sorts by salary descending
+  > Right. The two lists are positional — the *n*-th element of \`ascending\` controls the *n*-th sort key.
+- Throws an error
+
+Multi-column sorts give you fine-grained control of tie-breaking.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical difference between \`df.sort_values("x").head(3)\` and \`df.nlargest(3, "x")\`?
+
+- They give different rows
+- One returns a Series, one a DataFrame
+- [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
+  > Yes. For a top-N query, prefer \`nlargest\`/\`nsmallest\` — the intent is clearer than sort-then-head.
+- \`nlargest\` requires the data to be pre-sorted
+
+Either works; \`nlargest\` is the idiomatic choice.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`rank(method="dense")\`, two tied rows are followed by a third rank value. What does "dense" mean?
+
+- It produces unique floating-point ranks
+- It removes ties
+- [o] Tied rows share a rank, and the *next distinct* rank value is one higher (no gaps), unlike \`"min"\` which leaves gaps
+  > Correct. With values \`[100, 80, 100, 60]\` sorted descending: \`"min"\` gives \`[1, 3, 1, 4]\`; \`"dense"\` gives \`[1, 2, 1, 3]\`.
+- The result type is dense
+
+Choose the tie-breaking method that matches your business rule (Olympic-style, leaderboard, etc.).`}
+/>

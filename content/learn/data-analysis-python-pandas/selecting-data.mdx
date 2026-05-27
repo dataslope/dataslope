@@ -1,0 +1,293 @@
+---
+title: Selecting Data
+description: The many ways to grab the rows and columns you want — and why Pandas has so many of them.
+---
+
+There are at least five distinct syntaxes in Pandas for "give me
+some of the data." That sounds like too many until you realize
+each one solves a slightly different problem.
+
+This chapter is the overview; the next one (*loc vs iloc*)
+zooms in on the two most important.
+
+## The five access methods
+
+| Syntax           | Picks by   | Returns   | Use when                        |
+| ---------------- | ---------- | --------- | ------------------------------- |
+| `df["col"]`      | Column name | Series    | Grab one column                 |
+| `df[["a","b"]]`  | Column names | DataFrame | Grab several columns            |
+| `df.loc[...]`    | Labels     | depends   | Label-based row & column select |
+| `df.iloc[...]`   | Positions  | depends   | Position-based select           |
+| `df[mask]`       | Boolean Series | DataFrame | Filter rows by a condition  |
+
+Let us see each in action on the same little DataFrame.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")
+
+print(df)
+`}
+/>
+
+## 1. Pick one column → Series
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")`}
+  initialCode={`s = df["salary"]
+print(s)
+print()
+print("Type:", type(s).__name__)
+`}
+/>
+
+## 2. Pick several columns → DataFrame
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")`}
+  initialCode={`sub = df[["salary", "tenure_yrs"]]
+print(sub)
+print("Type:", type(sub).__name__)
+`}
+/>
+
+## 3. `loc` — by label
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")`}
+  initialCode={`# One row by label
+print(df.loc["Bilal"])
+print()
+
+# A subset of rows × columns
+print(df.loc[["Aiko","Chen","Eve"], ["salary", "department"]])
+print()
+
+# A label-based slice (INCLUSIVE on both ends)
+print(df.loc["Aiko":"Chen"])
+`}
+/>
+
+Important: `loc` slices are **inclusive** of both endpoints,
+unlike Python lists.
+
+## 4. `iloc` — by position
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")`}
+  initialCode={`# Row at position 0
+print(df.iloc[0])
+print()
+
+# Rows 0..2 (exclusive end), columns 0..1 (exclusive end)
+print(df.iloc[0:3, 0:2])
+print()
+
+# Last row
+print(df.iloc[-1])
+`}
+/>
+
+`iloc` follows normal Python slicing rules: end is **exclusive**.
+
+## 5. Boolean masks → filter rows
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
+    "department": ["Eng","Sales","Eng","Ops","Eng"],
+    "salary":     [120, 95, 140, 80, 128],
+    "tenure_yrs": [3, 6, 7, 2, 4],
+}).set_index("name")`}
+  initialCode={`mask = df["salary"] > 100
+print("Mask:")
+print(mask)
+print()
+
+print("Filtered:")
+print(df[mask])
+`}
+/>
+
+This is the standard way to filter. We will spend more time on it
+in the *Filtering Data* chapter.
+
+## Why `loc` and `iloc` exist
+
+You might wonder: why bother with two? The answer is that an
+**integer** is ambiguous when an index can hold any kind of
+label.
+
+Imagine the index is `[10, 20, 30]`. What does `df[1]` mean?
+The row *labeled* 1 (which doesn't exist) or the row at
+*position* 1 (which is the 20-labeled row)?
+
+`loc` and `iloc` remove the ambiguity:
+
+- `df.loc[1]` always means "the row with label 1."
+- `df.iloc[1]` always means "the row at position 1."
+
+Use them. The plain `df[1]` form is reserved for column-name
+selection on DataFrames and tends to produce confusing errors.
+
+## Putting it together
+
+A typical Pandas line you will see often:
+
+```python
+df.loc[df["status"] == "active", ["customer_id", "revenue"]]
+```
+
+Parse it from outside in:
+
+1. **Outer `loc[...]`** — label-based selection.
+2. **Row selector** (`df["status"] == "active"`) — a boolean
+   mask.
+3. **Column selector** (`["customer_id", "revenue"]`) — list of
+   column labels.
+
+The whole expression reads as: *"From df, the rows where status
+is active, keeping only the customer_id and revenue columns."*
+
+This is the canonical shape of an analyst's daily code.
+
+## Quick exercise
+
+<ChallengeCard
+  adapter="python"
+  title="Practice selecting on the HR data"
+  instructions={`Load:
+
+\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
+
+Then produce three results:
+
+1. \`income_series\` — the \`MonthlyIncome\` column as a Series.
+2. \`age_income\` — a DataFrame with just \`Age\` and \`MonthlyIncome\`.
+3. \`first_ten\` — the first 10 rows of the original DataFrame using \`iloc\`.`}
+  initialCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+income_series = None
+age_income = None
+first_ten = None
+
+print(type(income_series).__name__, type(age_income).__name__, type(first_ten).__name__)
+`}
+  solutionCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+income_series = df["MonthlyIncome"]
+age_income = df[["Age", "MonthlyIncome"]]
+first_ten = df.iloc[:10]
+
+print(type(income_series).__name__, type(age_income).__name__, type(first_ten).__name__)
+`}
+  tests={[
+    {
+      id: "income_series_type",
+      name: "income_series is a Series of MonthlyIncome",
+      description: "Use df['MonthlyIncome']",
+      code: `import pandas as pd
+assert isinstance(income_series, pd.Series)
+assert income_series.name == "MonthlyIncome"
+assert len(income_series) == 1470`,
+    },
+    {
+      id: "age_income_type",
+      name: "age_income is a 2-col DataFrame",
+      description: "Use df[['Age','MonthlyIncome']]",
+      code: `import pandas as pd
+assert isinstance(age_income, pd.DataFrame)
+assert list(age_income.columns) == ["Age", "MonthlyIncome"]
+assert age_income.shape == (1470, 2)`,
+    },
+    {
+      id: "first_ten",
+      name: "first_ten has the first 10 rows",
+      description: "Use df.iloc[:10]",
+      code: `import pandas as pd
+assert isinstance(first_ten, pd.DataFrame)
+assert first_ten.shape == (10, 35)`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which of these selects the *single column* \`age\` from \`df\`?
+
+- \`df.age\` (attribute access — works but discouraged)
+- \`df[["age"]]\` (returns a DataFrame)
+- [o] \`df["age"]\` (returns a Series)
+  > Right. Single bracket → single column → Series.
+- \`df.loc[:, "age":"age"]\` (a label slice)
+
+The first option *works* but breaks for columns with spaces, dots, or names matching methods — prefer brackets.`}
+/>
+
+<MultipleChoice
+  markdown={`In Pandas, \`df.loc["Aiko":"Chen"]\` versus \`df.iloc[0:3]\` — what is the key difference?
+
+- \`loc\` is faster
+- They are identical
+- [o] \`loc\` slicing is *inclusive* of both endpoints, while \`iloc\` (like normal Python) is *exclusive* of the end
+  > Yes. This often-surprising difference is one of the most common bugs in label-based slicing.
+- \`iloc\` accepts strings
+
+Memorize: label-slice is inclusive; position-slice is exclusive.`}
+/>
+
+<MultipleChoice
+  markdown={`Reading \`df.loc[df["status"] == "active", ["id", "rev"]]\` out loud, what does it return?
+
+- An error
+- All rows of df
+- [o] The rows of df where status equals "active", keeping only the columns id and rev
+  > Correct. This is the canonical "filter rows AND project columns" pattern.
+- The first row
+
+This pattern shows up many times per day in real analyst code.`}
+/>

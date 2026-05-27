@@ -1,0 +1,344 @@
+---
+title: Dates and Times
+description: Parsing, formatting, slicing, resampling, and reasoning about timestamps and time series in Pandas.
+---
+
+Time-aware columns are everywhere — order dates, login
+timestamps, sensor readings, log lines. Pandas's time-handling is
+one of its strongest features and was, historically, the very
+reason the library was built.
+
+## Parsing dates
+
+By default, a date column from a CSV is just text. Convert it:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["2024-01-15", "2024-02-03", "2024-03-30"])
+parsed = pd.to_datetime(s)
+print(parsed)
+print()
+print("dtype:", parsed.dtype)
+print()
+print("Year of each:", parsed.dt.year.tolist())
+`}
+/>
+
+If a string cannot be parsed, you can choose to fail loudly or
+silently coerce to NaT:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+bad = pd.Series(["2024-01-15", "not-a-date", "2024-03-30"])
+
+# Default: raise an error
+# Use errors="coerce" to turn unparseable values into NaT
+parsed = pd.to_datetime(bad, errors="coerce")
+print(parsed)
+`}
+/>
+
+For ambiguous formats — most famously `04/05/2024` (April 5 in
+the US, May 4 in much of the world) — be explicit:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["04/05/2024", "06/12/2024"])
+
+print("Default (US-style M/D/Y):")
+print(pd.to_datetime(s))
+print()
+print("Day-first (European):")
+print(pd.to_datetime(s, dayfirst=True))
+`}
+/>
+
+## Parsing at load time
+
+You can convert directly inside `read_csv`:
+
+```python
+df = pd.read_csv(path, parse_dates=["order_date", "ship_date"])
+```
+
+This is the cleanest pattern when you know your date columns
+upfront.
+
+## The `.dt` accessor
+
+Once a column is a datetime, the `.dt` namespace gives you
+date-component extraction:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.to_datetime(pd.Series([
+    "2024-01-15 10:30:00",
+    "2024-02-29 14:45:00",
+    "2024-12-25 23:59:59",
+]))
+
+print("year:    ", s.dt.year.tolist())
+print("month:   ", s.dt.month.tolist())
+print("day:     ", s.dt.day.tolist())
+print("weekday: ", s.dt.day_name().tolist())
+print("hour:    ", s.dt.hour.tolist())
+print("quarter: ", s.dt.quarter.tolist())
+`}
+/>
+
+These let you derive useful grouping columns:
+
+```python
+df["month"]   = df["date"].dt.to_period("M")
+df["weekday"] = df["date"].dt.day_name()
+df["is_weekend"] = df["date"].dt.weekday >= 5
+```
+
+## Date arithmetic
+
+Subtracting two datetimes gives a **Timedelta**:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+orders = pd.DataFrame({
+    "order_date": pd.to_datetime(["2024-01-15","2024-02-01","2024-03-10"]),
+    "ship_date":  pd.to_datetime(["2024-01-18","2024-02-04","2024-03-15"]),
+})
+
+orders["fulfilment_days"] = (orders["ship_date"] - orders["order_date"]).dt.days
+print(orders)
+`}
+/>
+
+You can also add a Timedelta to a datetime:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+today = pd.Timestamp("2024-03-18")
+print(today + pd.Timedelta(days=7))
+print(today + pd.DateOffset(months=1))
+`}
+/>
+
+`Timedelta` is a fixed amount of time (`days=7`). `DateOffset`
+respects calendar irregularities (`months=1` adds a month even
+across month boundaries).
+
+## DatetimeIndex superpowers
+
+When the index is a DatetimeIndex, you unlock string-based
+slicing and resampling.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+dates = pd.date_range("2024-01-01", periods=90, freq="D")
+visits = pd.Series(np.random.RandomState(0).poisson(50, size=90), index=dates)
+
+# Slice by date string
+print("Mid-January:")
+print(visits.loc["2024-01-10":"2024-01-15"])
+print()
+
+# Slice a whole month
+print("February total:", visits.loc["2024-02"].sum())
+print()
+
+# Resample to weekly totals
+print("Weekly totals:")
+print(visits.resample("W").sum().head())
+`}
+/>
+
+`resample` is the time-aware cousin of `groupby` — it splits the
+index into time buckets (`"D"` daily, `"W"` weekly, `"M"`
+monthly, `"Q"` quarterly, `"Y"` yearly).
+
+## Rolling windows
+
+For moving averages and other windowed statistics:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+dates = pd.date_range("2024-01-01", periods=30, freq="D")
+prices = pd.Series(100 + np.random.RandomState(42).randn(30).cumsum(), index=dates)
+
+# 7-day moving average
+ma7 = prices.rolling(7).mean()
+print(ma7.tail(10).round(2))
+`}
+/>
+
+`rolling(N)` produces an object you can call aggregations on
+(`.mean()`, `.sum()`, `.std()`, `.max()`...).
+
+## Time zones
+
+Time-zone handling is its own world. The short version:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Naive — no time zone
+naive = pd.Timestamp("2024-03-18 12:00:00")
+print(naive)
+
+# Localize to a time zone
+ny = naive.tz_localize("America/New_York")
+print(ny)
+
+# Convert to another zone
+tokyo = ny.tz_convert("Asia/Tokyo")
+print(tokyo)
+`}
+/>
+
+A *naive* timestamp has no time zone; a *tz-aware* timestamp
+does. Mixing the two often produces errors — pick a convention
+(usually UTC for storage) and stick with it.
+
+## Common gotchas
+
+- **Mixing parsed and unparsed dates** in a column → the column
+  becomes `object`. Always re-check `dtypes` after a date
+  cleanup.
+- **Excel's serial-number dates** (e.g. `45369` meaning
+  `2024-03-18`) require `pd.to_datetime(s, unit="D", origin=
+  "1899-12-30")`.
+- **String comparisons** like `"2024-01-15" > "2024-01-14"` work
+  by accident *only* when dates are in ISO 8601 format. Parse
+  to real datetimes for safety.
+- **Time zone naivete** — assuming local time matches the
+  reader's local time. Always store with an explicit zone or
+  pick UTC.
+
+## Mini challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Daily visit totals"
+  instructions={`Given the DataFrame \`raw\` (initially provided), build a DataFrame called \`daily\` that:
+
+1. Parses \`raw["timestamp"]\` into proper datetimes.
+2. Groups the resulting visits by **day**.
+3. Has columns \`date\` and \`visits\` (total visits per day).
+4. Is sorted by \`date\` ascending.`}
+  initCode={`import pandas as pd
+
+raw = pd.DataFrame({
+    "timestamp": [
+        "2024-03-01 09:15", "2024-03-01 14:42", "2024-03-01 23:01",
+        "2024-03-02 08:00", "2024-03-02 12:30",
+        "2024-03-03 17:11", "2024-03-03 18:45", "2024-03-03 22:00", "2024-03-03 22:30",
+    ],
+    "visits":  [1, 1, 1, 1, 1, 1, 1, 1, 1],
+})`}
+  initialCode={`daily = None   # TODO
+
+print(daily)
+`}
+  solutionCode={`import pandas as pd
+
+ts = pd.to_datetime(raw["timestamp"])
+
+daily = (
+    raw.assign(date=ts.dt.date)
+       .groupby("date", as_index=False)["visits"]
+       .sum()
+       .sort_values("date")
+)
+
+print(daily)
+`}
+  tests={[
+    {
+      id: "type",
+      name: "daily is a DataFrame",
+      description: "Type check",
+      code: `import pandas as pd
+assert isinstance(daily, pd.DataFrame)`,
+    },
+    {
+      id: "columns",
+      name: "Has columns date and visits",
+      description: "Two columns",
+      code: `assert set(daily.columns) == {"date", "visits"}`,
+    },
+    {
+      id: "rows",
+      name: "3 distinct days",
+      description: "March 1, 2, 3",
+      code: `assert len(daily) == 3`,
+    },
+    {
+      id: "totals",
+      name: "Correct daily totals",
+      description: "3, 2, 4",
+      code: `vals = sorted(daily["visits"].tolist())
+assert vals == [2, 3, 4], f"Got {vals}"`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted ascending by date",
+      description: "Date order",
+      code: `dates = list(daily["date"])
+assert dates == sorted(dates)`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`When parsing a date column where some values are unparseable, what is the safe option?
+
+- Drop the whole column
+- Convert to integer
+- [o] Use \`pd.to_datetime(s, errors="coerce")\` so bad values become NaT and the column still has datetime dtype
+  > Right. \`errors="coerce"\` is the cleanest way to keep your column typed correctly while tolerating bad rows.
+- Use \`errors="ignore"\`
+
+The \`coerce\` flag is to dates what \`pd.to_numeric(..., errors="coerce")\` is to numbers.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical advantage of having your DataFrame indexed by a \`DatetimeIndex\`?
+
+- It looks prettier
+- It auto-removes weekends
+- [o] It unlocks string-based date slicing (\`df.loc["2024-02"]\`), resampling (\`df.resample("W").sum()\`), and rolling windows — none of which work on a plain RangeIndex
+  > Yes. A DatetimeIndex is the gateway to most of Pandas's time-series features.
+- It speeds up CSV parsing
+
+When you have time-series data, almost always promote the timestamp to the index.`}
+/>
+
+<MultipleChoice
+  markdown={`Subtracting two datetime columns produces what kind of value?
+
+- A datetime
+- A float (days)
+- [o] A \`Timedelta\` — a duration value that you can convert to days, seconds, etc. via \`.dt.days\`, \`.dt.total_seconds()\`, etc.
+  > Correct. Always be explicit about the unit when converting Timedeltas to floats.
+- An integer
+
+The Timedelta type keeps you safe — it would be much worse if Pandas guessed at days vs hours vs seconds.`}
+/>

@@ -129,6 +129,15 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link
+              href="/learn/data-analysis-python-pandas"
+              className={styles.courseCard}
+            >
+              <span className={styles.courseTitle}>
+                Data Analysis with Python Pandas
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/scientific-computing-python" className={styles.courseCard}>
               <span className={styles.courseTitle}>
                 Scientific Computing with Python
