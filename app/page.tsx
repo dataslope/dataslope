@@ -150,6 +150,12 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/intro-data-viz-plotly" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Introduction to Data Visualization with Plotly
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/c-programming-for-beginners" className={styles.courseCard}>
               <span className={styles.courseTitle}>
                 C Programming for Beginners
