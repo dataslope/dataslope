@@ -1,0 +1,178 @@
+---
+title: Size and Shape Encodings
+description: Two extra channels you can use carefully to enrich a chart
+---
+
+We've spent a chapter on color, the heaviest extra channel. Two
+others deserve their own short page: **size** and **shape** (or
+*symbol*). Each adds an additional variable to a chart, but each
+has narrow rules for when it's worth using.
+
+## Size: a continuous third (or fourth) variable
+
+We met `size=` in the chapter on bubble charts. The summary:
+
+- Use `size` for a **continuous** variable.
+- Use it when **rough magnitude** is informative, not when
+  *precise* comparison matters.
+- Combine with `color` and `size_max` to keep huge values from
+  swallowing the chart.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(
+    df, x="sepal_width", y="sepal_length",
+    color="species",
+    size="petal_length",  # the extra variable
+    size_max=22,
+    template="simple_white",
+    title="Iris: size encodes petal length",
+    labels={"sepal_width": "Sepal width (cm)",
+            "sepal_length": "Sepal length (cm)"},
+)
+fig.show()
+`}
+/>
+
+The reader instantly sees that *setosa* (purple) has the smallest
+petals — without needing to read any individual value.
+
+### When `size` goes wrong
+
+- **Negative values** can't be areas. Filter or transform first.
+- **A tiny range** of values produces visually indistinguishable
+  bubbles. Use color instead.
+- **Huge range** (millions to billions) makes a few bubbles
+  enormous and the rest invisible. Take `np.log()` first, or
+  filter the extremes.
+
+## Shape (symbol): a categorical third variable
+
+`symbol="..."` gives each value of a categorical column its own
+marker shape: circle, square, triangle, diamond, cross, etc.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(
+    df, x="sepal_width", y="sepal_length",
+    color="species",
+    symbol="species",
+    template="simple_white",
+    title="Iris: redundant color and shape (helpful for B&W or colorblind)",
+    labels={"sepal_width": "Sepal width (cm)",
+            "sepal_length": "Sepal length (cm)"},
+)
+fig.show()
+`}
+/>
+
+We've encoded `species` *twice*: as both color and shape. That
+sounds wasteful, but it's a legitimate **accessibility move**: the
+chart still works in grayscale and for colorblind viewers.
+
+### When shape is the better choice than color
+
+- **Print-only context.** Colors may not print well; shapes always
+  do.
+- **Colorblind accessibility** as the *primary* encoding.
+- **Very small markers**, where color hue is hard to perceive.
+
+### When shape fails
+
+Shape is a *weak* perceptual channel. Past about **6 categories**,
+the eye can no longer reliably distinguish ●  ■  ▲  ▼  ◆  ★  ✦
+✚ in a crowded plot. Stick to a handful.
+
+## Combining size, color, and shape: just because you can…
+
+Plotly Express makes it easy to map four columns onto color, size,
+shape, *and* faceting. But the more channels you use, the more the
+reader has to *decode*. A 6-channel chart is a puzzle, not a
+visualization.
+
+A working rule:
+
+- **1 variable** → x or y; you're done.
+- **2 variables** → x and y; you're done.
+- **3 variables** → add color.
+- **4 variables** → add size (if continuous) or facet.
+- **5+ variables** → start asking whether the *chart* is the right
+  format or whether you need a *dashboard*.
+
+## A worked example
+
+Try this. Read out loud what each `=` is encoding:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    color="continent",
+    size="pop",
+    symbol="continent",   # redundant with color
+    log_x=True,
+    size_max=55,
+    template="simple_white",
+    title="Gapminder 2007 — 4 encodings (color & symbol redundant)",
+    labels={"gdpPercap": "GDP per capita (USD, log)",
+            "lifeExp": "Life expectancy"},
+)
+fig.show()
+`}
+/>
+
+You should say: "x = GDP, y = life expectancy, color = continent
+(also shape), size = population." Reading the call aloud is the
+best way to make sure the chart matches your intention.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which encoding is **strongest** for **precise quantitative comparison**?
+
+- Color.
+- Size (area).
+- [o] Position along an axis.
+  > Yes. Position is the most accurate visual encoding (Cleveland-McGill ranking). Reserve x and y for the variables you want the reader to compare carefully. Use color and size for variables where "roughly bigger / smaller" is enough.
+- Shape.
+
+Always start your design by asking *which variable matters most*, and give it position.`}
+/>
+
+<MultipleChoice
+  markdown={`When is using **`symbol`** as a redundant encoding with **`color`** for the same column **legitimate**?
+
+- Never; it's always wasteful.
+- Always; redundancy is good.
+- [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers** — the shape carries the categorical info even if color fails.
+  > Right. Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
+- Only when you have exactly two categories.
+
+Use redundancy as a tool, not a habit.`}
+/>
+
+<MultipleChoice
+  markdown={`Roughly how many distinct **shapes** can the eye reliably distinguish in a crowded scatter plot?
+
+- 20+
+- 12-15
+- [o] About 6 or fewer.
+  > Yes. Past about 6 shapes, viewers start confusing similar ones (●  ●  ■  ▲ ▼ ◆ ★ ✦). For more than a handful of categories, shape becomes ineffective. Use facets or filter the data instead.
+- 2 only.
+
+Shape is a *weak* perceptual channel — keep it small or skip it.`}
+/>

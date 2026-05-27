@@ -1,0 +1,239 @@
+---
+title: Geographic Visualization
+description: Putting data on a map — choropleths, scatter geos, and the things to watch out for
+---
+
+When your data has a **location** column — country, state, city,
+zip code, or latitude/longitude — a map is often the right chart.
+Maps have an enormous advantage: the audience already knows the
+geography, so you can spend your visual encoding entirely on the
+*data* rather than on the layout.
+
+Plotly Express offers three main map families:
+
+- **Choropleths** — colored *regions* (country, state, county).
+- **Scatter geos** — *points* on a world map (one dot per
+  location).
+- **Mapbox / Density mapbox** — tile-based maps with finer
+  geographic detail (cities, addresses).
+
+## Choropleths: data per region
+
+A **choropleth** colors each region (country, state, county) by a
+data value. It's the standard for "data by country" or "data by
+state."
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.choropleth(
+    df,
+    locations="iso_alpha",            # ISO-3 country codes
+    color="lifeExp",
+    hover_name="country",
+    color_continuous_scale="Viridis",
+    template="simple_white",
+    title="Life expectancy by country, 2007",
+    labels={"lifeExp": "Life expectancy (years)"},
+)
+fig.show()
+`}
+/>
+
+Hover over countries to read values; zoom and pan to focus on
+regions. The chart uses about *one* line of Python plus a built-in
+country atlas.
+
+`locations` must contain values Plotly knows how to look up.
+Common identifier types:
+
+- `"iso_alpha"` — three-letter ISO country codes (USA, FRA, JPN).
+- `"USA-states"` — two-letter US state codes.
+- `"country names"` — full English names.
+
+For other geographies (counties, custom regions), you supply a
+**GeoJSON** file via `geojson=...`.
+
+## Scatter geos: data per point
+
+When your data is *point-based* (cities, observations, individual
+events), use `px.scatter_geo`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter_geo(
+    df,
+    locations="iso_alpha",
+    size="pop",
+    color="continent",
+    hover_name="country",
+    projection="natural earth",
+    template="simple_white",
+    title="Country populations in 2007",
+)
+fig.show()
+`}
+/>
+
+Each country is a *dot* (centroid) sized by population. Try
+different projections: `"orthographic"`, `"natural earth"`,
+`"mercator"`, `"equirectangular"`.
+
+## Map projections — they all lie a little
+
+A **map projection** is the mathematical rule for flattening a
+sphere onto a flat page. *Every* projection distorts *something*
+— area, shape, distance, or direction. There is no neutral choice.
+
+- `"natural earth"` — Good general-purpose default. Decent
+  balance of shape and area.
+- `"orthographic"` — Shows the Earth as if from space. Beautiful
+  but only half the globe visible at a time.
+- `"equirectangular"` (default) — Rectangular grid. Easy to read
+  but stretches polar regions enormously.
+- `"mercator"` — Made famous by Google Maps. Massively
+  exaggerates the size of regions near the poles (Greenland looks
+  the same size as Africa, but Africa is 14× bigger).
+
+```mermaid
+flowchart TB
+    G[3-D globe] --> P[Project to 2-D]
+    P --> A[Equirectangular<br/>simple, distorted poles]
+    P --> B[Mercator<br/>preserves angles, lies about size]
+    P --> C[Natural Earth<br/>compromise, nice default]
+    P --> D[Orthographic<br/>realistic, half a globe]
+```
+
+<Callout type="warn" title="Mercator distortion is a real visualization problem">
+The Mercator projection famously makes Greenland look as large as
+Africa, even though Africa is ~14× larger by area. If your map's
+*story* depends on **area** comparisons across latitudes, do not
+use Mercator. Use `"equal-earth"` or `"natural earth"` instead.
+</Callout>
+
+## Tile-based maps with Mapbox
+
+For *cities*, *addresses*, or *fine geographic detail*, use
+`px.scatter_mapbox` or `px.density_mapbox`. These use map tiles
+(satellite imagery, OpenStreetMap, etc.) underneath:
+
+```python
+fig = px.scatter_mapbox(
+    df, lat="latitude", lon="longitude", color="...", size="...",
+    mapbox_style="open-street-map",
+    zoom=10, height=600,
+    template="simple_white",
+)
+```
+
+The `"open-street-map"` style is free; other styles need a Mapbox
+access token. (For browser-based learning we'll stop here; the
+choropleth and scatter_geo cover most beginner needs.)
+
+## Pitfalls of map visualizations
+
+- **Population bias.** A choropleth of "raw counts" almost always
+  just looks like a population map. Normalize to *per capita* or
+  *per area*.
+- **Visual area dominance.** Russia and Canada take up enormous
+  visual space; tiny countries like Singapore disappear. Consider
+  **cartograms** or a *table-augmented* map when small regions
+  matter.
+- **Color scale matters.** Sequential for one-sided data;
+  diverging for two-sided (e.g., year-over-year change).
+- **Missing data.** Countries you don't have data for will appear
+  *uncolored* or with a default fill — make sure that doesn't
+  read as "value = 0."
+
+## A diverging-color choropleth
+
+A great use case: showing *change* (positive vs negative) across
+regions.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+# Compute % change in life expectancy from 1952 to 2007
+e2007 = df.query("year == 2007").set_index("iso_alpha")["lifeExp"]
+e1952 = df.query("year == 1952").set_index("iso_alpha")["lifeExp"]
+change = ((e2007 - e1952) / e1952 * 100).rename("pct_change").reset_index()
+change["country"] = df.drop_duplicates("iso_alpha").set_index("iso_alpha")["country"].reindex(change["iso_alpha"]).values
+
+fig = px.choropleth(
+    change,
+    locations="iso_alpha",
+    color="pct_change",
+    hover_name="country",
+    color_continuous_scale="RdBu",
+    color_continuous_midpoint=0,
+    template="simple_white",
+    title="% change in life expectancy, 1952 → 2007",
+    labels={"pct_change": "Change (%)"},
+)
+fig.show()
+`}
+/>
+
+Every country with declining life expectancy will be red; every
+gain will be blue. The diverging palette centered at zero makes
+the story instant.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A **choropleth** is best for visualizing:
+
+- Trends over time.
+- Two-variable correlation.
+- [o] A numeric value per **region** (country, state, county), encoded as the region's fill color.
+  > Yes. Choropleths shine when you have one row per region and a numeric value to color them by. The reader's existing knowledge of geography does the layout work, so all your visual encoding can focus on the data.
+- A part-of-a-whole composition.
+
+For points (cities, lat/lon observations) use `scatter_geo` or `scatter_mapbox` instead.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a **choropleth of raw counts** (e.g., "total COVID cases by country") often misleading?
+
+- It uses too much color.
+- It compresses the data.
+- [o] The map ends up looking like a population map — big, populous countries always look "darkest" regardless of the per-capita reality.
+  > Right. Raw counts confound population with the phenomenon you're trying to show. Almost always, you want to normalize: cases *per 100,000*, or *per capita*, or *per square kilometer*. This is one of the most common mistakes in journalism dataviz.
+- Choropleths don't support hover.
+
+Normalize before you map. Almost always.`}
+/>
+
+<MultipleChoice
+  markdown={`The **Mercator** projection famously makes which continent appear roughly the same size as Africa, even though Africa is ~14× larger?
+
+- Antarctica.
+- South America.
+- [o] Greenland.
+  > Yes. Mercator preserves angles (useful for navigation) but massively inflates regions near the poles. Greenland is the canonical example because it sits very far north. If your map's story depends on *area comparison across latitudes*, avoid Mercator — use "natural earth" or "equal-earth" instead.
+- Australia.
+
+Every projection distorts something. Choose the projection that distorts what doesn't matter for your story.`}
+/>
+
+<MultipleChoice
+  markdown={`For a choropleth showing **year-over-year change** (which can be positive or negative), which color scale is most appropriate?
+
+- A qualitative palette like `Plotly`.
+- A sequential palette like `Viridis`.
+- [o] A **diverging** palette centered at 0, such as `RdBu` with `color_continuous_midpoint=0`.
+  > Yes. Two-sided data (positive vs negative change) deserves a two-sided color palette, anchored at the meaningful midpoint (0 = no change). Without centering, "neutral" colors drift and the map's coloring misleads.
+- A grayscale ramp.
+
+Diverging palette + meaningful midpoint = honest visualization of change data.`}
+/>

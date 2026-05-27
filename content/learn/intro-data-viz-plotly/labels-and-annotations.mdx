@@ -1,0 +1,230 @@
+---
+title: Labels and Annotations
+description: How a few sentences of text turn a chart into a self-explaining story
+---
+
+A chart can be technically perfect — right type, right encoding,
+right colors — and still fail because the reader doesn't know
+*what they're looking at*. Labels and annotations are the small,
+unglamorous step that turns a chart into something a colleague or
+client can understand without you in the room.
+
+This page is about three pieces of text:
+
+1. **Titles, subtitles, and axis labels** — the chart's name tag.
+2. **Annotations** — text placed *on* the chart pointing at
+   something specific.
+3. **Captions and notes** — the small print explaining caveats.
+
+## Titles, subtitles, axis labels
+
+The bare minimum on any chart:
+
+- A **title** that states what the chart shows.
+- **Axis labels** with units.
+- A **legend title** (if the chart has a legend).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
+
+fig = px.bar(
+    df.sort_values("lifeExp"),
+    x="lifeExp", y="country", orientation="h",
+    template="simple_white",
+    title="Life expectancy in Europe — 2007",
+    labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
+)
+fig.show()
+`}
+/>
+
+The single most common mistake on beginner charts: a title like
+"chart" and axis labels of `lifeExp`. Take 30 seconds — write
+*words a stranger could read*.
+
+### Titles with a takeaway
+
+A *good* title doesn't just describe — it *summarizes the story*:
+
+- Weak: "Sales by month."
+- Strong: "Sales grew 23% in Q4, the steepest jump since 2019."
+
+A descriptive title says *what the data is*. A narrative title says
+*what the chart means*. Both are valid; narrative is better when
+the chart is intended to *make a point*.
+
+## Annotations on the chart
+
+For points you want to call out specifically — the peak, the
+outlier, the day something happened — use `fig.add_annotation(...)`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("country == 'Japan'")
+
+fig = px.line(
+    df, x="year", y="lifeExp",
+    markers=True,
+    template="simple_white",
+    title="Japan: life expectancy, 1952-2007",
+    labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
+)
+
+# Annotate the latest value
+fig.add_annotation(
+    x=2007, y=82.6,
+    text="82.6 years (2007)<br>highest in the dataset",
+    showarrow=True,
+    arrowhead=2,
+    ax=-60, ay=-30,
+)
+
+fig.show()
+`}
+/>
+
+The annotation:
+
+- `text=` is what to write (HTML `<br>` for line breaks).
+- `showarrow=True` draws an arrow from the text to (`x`, `y`).
+- `ax`, `ay` are pixel offsets from the point to the text.
+
+Annotations are how you *direct attention*. A chart with thoughtful
+annotations reads itself.
+
+## Adding reference lines
+
+Often the *interesting* thing in a chart is a value crossing some
+threshold. Use `fig.add_hline` or `fig.add_vline`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    color="continent", log_x=True, size="pop", size_max=40,
+    template="simple_white",
+    title="Gapminder 2007 with reference lines",
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
+)
+
+fig.add_hline(y=70, line_dash="dash", line_color="gray",
+              annotation_text="70 years", annotation_position="top right")
+fig.add_vline(x=10000, line_dash="dash", line_color="gray",
+              annotation_text="$10k GDP", annotation_position="top")
+
+fig.show()
+`}
+/>
+
+Reference lines split the chart into *meaningful regions* — in this
+case, four quadrants of "rich/poor × high/low life expectancy."
+The eye instantly reads which quadrant each country falls in.
+
+## Captions: the fine print
+
+Plotly Express doesn't have a built-in "caption" argument, but you
+can add one via a layout annotation at the bottom:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    color="continent", log_x=True, size="pop", size_max=40,
+    template="simple_white",
+    title="Life expectancy vs GDP per capita (2007)",
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
+)
+
+fig.add_annotation(
+    text=("Source: Gapminder dataset (built into Plotly Express). "
+          "Bubble size encodes population."),
+    xref="paper", yref="paper", x=0, y=-0.18,
+    showarrow=False,
+    align="left",
+    font=dict(size=10, color="gray"),
+)
+
+fig.update_layout(margin=dict(b=80))
+
+fig.show()
+`}
+/>
+
+The trick: `xref="paper"` and `yref="paper"` place the text in
+*chart-relative* coordinates (0=left, 1=right) instead of data
+coordinates. Combined with negative y, the text sits below the
+plot area.
+
+Captions are where you note:
+
+- **Source**: "Source: WHO Global Health Estimates, 2024"
+- **Method**: "Smoothed with 7-day moving average."
+- **Caveats**: "2020 data is partial."
+
+A chart without these is one step away from misinformation.
+
+## A summary checklist
+
+Every chart you ship should have:
+
+- [ ] A clear **title** (descriptive *or* narrative — your choice).
+- [ ] **Axis labels** with units.
+- [ ] A **legend title** if there's a legend.
+- [ ] Any necessary **annotations** pointing at key moments.
+- [ ] **Reference lines** for important thresholds.
+- [ ] A **caption** with source and method.
+- [ ] A **hover** that fills in details for any data point.
+
+Skip any of these and the reader has to work harder. Some of that
+work, they won't bother to do.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between a **descriptive title** and a **narrative title** for a chart?
+
+- Descriptive titles are shorter than narrative titles.
+- They are the same thing.
+- [o] A descriptive title states what the chart shows ("Sales by month"); a narrative title summarizes the *takeaway* the chart is intended to convey ("Sales grew 23% in Q4").
+  > Yes. Both are legitimate. Descriptive titles are appropriate for exploratory or reference charts. Narrative titles are better when the chart is making a *point* in a report, dashboard, or article. Choose deliberately.
+- Narrative titles are required by Plotly.
+
+A common upgrade for a beginner: rewriting "Tip vs total bill" as "Tips scale roughly linearly with bill size, regardless of smoker status."`}
+/>
+
+<MultipleChoice
+  markdown={`Which Plotly Express / Plotly function lets you add a **horizontal reference line** at a specific y-value, with optional label?
+
+- `fig.add_text(...)`
+- `px.hline(...)`
+- [o] `fig.add_hline(y=..., annotation_text=...)`
+  > Right. `fig.add_hline()` and `fig.add_vline()` add reference lines with optional text. They're invaluable for marking thresholds: a target value, a regulatory limit, "average," "today," and so on.
+- `fig.draw_line(...)`
+
+Reference lines split a chart into meaningful regions, often dramatically improving readability.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is adding a **caption with the data source** important even for an internal chart?
+
+- It is required by GDPR.
+- It triples the chart's resolution.
+- [o] It lets future readers (including your future self) trust, verify, and reproduce the chart — and it makes the chart safer to share outside its original context.
+  > Yes. Charts get screenshotted, pasted into decks, and forwarded by email — quickly losing the surrounding context. A caption with source and method travels with the image. Future readers can verify the data; future you doesn't have to re-derive it.
+- It makes the chart load faster.
+
+A 12-word caption can save hours of "wait, where did this number come from?" later.`}
+/>

@@ -1,0 +1,223 @@
+---
+title: Ethics and Accessibility
+description: Charts can mislead and exclude. Both are avoidable.
+---
+
+A chart is a public act. It shapes what people believe and what
+they decide to do. With that power comes a small set of
+responsibilities — to be honest, and to be inclusive. This page is
+about those two responsibilities.
+
+## Why visualization ethics is its own topic
+
+A misleading chart can spread further and stick longer than a
+misleading paragraph. Charts feel *evidential* — "the data says
+so" — even when the chart is showing only a slice, or using an
+encoding designed to inflate a difference.
+
+Most misleading charts are not the work of malicious actors. They
+are the result of *honest people not noticing* what their chart is
+doing. The fix is awareness.
+
+## The classic ways charts mislead
+
+### 1. Truncated y-axis on bar charts
+
+Bar length encodes magnitude *relative to zero*. Cutting the axis
+turns a 5% difference into a 10× visual gap.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({"product": ["A", "B"], "score": [98, 100]})
+
+# Honest: starts at 0
+fig1 = px.bar(df, x="product", y="score",
+              template="simple_white",
+              title="Honest baseline at 0")
+fig1.show()
+
+# Misleading: truncated y-axis
+fig2 = px.bar(df, x="product", y="score",
+              template="simple_white",
+              title="Misleading: y truncated to make 2% look like 100%",
+              range_y=[97, 101])
+fig2.show()
+`}
+/>
+
+The data is identical. The second chart screams "B is *twice* A" —
+which it manifestly isn't.
+
+### 2. Cherry-picked time ranges
+
+Show only the months that support your story; omit the months that
+don't. The chart looks technically correct; the conclusion is
+wrong.
+
+The fix: **always show enough history** to put a trend in context.
+If a series has been wandering up and down for 10 years, a
+3-month "uptrend" is noise.
+
+### 3. Dual y-axes
+
+Two unrelated series on the same chart with two y-axes can be
+*scaled* to look correlated — even when they aren't. Most
+visualization style guides discourage dual axes entirely.
+
+### 4. Misleading color choices
+
+- Using red-vs-green for "good vs bad" excludes color-blind
+  viewers (and culturally varies).
+- Using rainbow color scales creates false structure.
+- Inverting an intuitive color direction (red for "good"?) makes
+  the chart read backwards.
+
+### 5. Inappropriate aggregation
+
+Showing an average can hide a bimodal distribution. Showing a
+median can hide the magnitude of outliers. Always ask whether
+your chosen summary is honest about the variation.
+
+### 6. Map projections that distort area
+
+We covered this in the geographic chapter. Mercator's
+exaggeration of polar regions has shaped centuries of cultural
+geography. Choose your projection deliberately.
+
+## The Tufte "data-ink" principle
+
+Edward Tufte's famous principle:
+
+> Above all else, show the data.
+
+He coined the **data-ink ratio**: the proportion of a chart's ink
+that actually encodes data, versus the ink used for decoration
+(heavy gridlines, 3-D shading, borders, logos). Maximize the
+ratio. Strip away chart junk.
+
+The `simple_white` template this course uses is essentially a
+Tufte-style design choice: minimal gridlines, no background fill,
+no decorative borders. The data carries the chart.
+
+## Accessibility: who can read your chart?
+
+A great chart can fail *not because it's wrong* but because parts
+of the audience cannot perceive it.
+
+### Color blindness
+
+About **8% of men** have some form of color vision deficiency.
+Red-green confusion is the most common. Mitigations:
+
+- Use a **colorblind-safe palette** (`Viridis`, `Cividis`,
+  `Plasma`, `Plotly`'s default qualitative).
+- **Double-encode** important categories with shape and/or label,
+  not just color.
+- For sequential scales, prefer **luminance-varying** palettes
+  that survive grayscale.
+
+### Low contrast
+
+Light gray text on a white background may look elegant but is
+hard to read for low-vision users. Default to dark text on light
+backgrounds (or vice versa) with high contrast.
+
+### Screen readers
+
+A chart embedded in a webpage should have a meaningful **alt
+text** — a 1-3 sentence summary of the chart's *takeaway*, not
+just "bar chart." Most chart-export workflows make this easy if
+you remember to do it.
+
+### Font size
+
+Chart text that's readable on your 27" monitor may be illegible on
+a phone or in a slide. Default to ~12-14pt for axis labels and
+~16-18pt for titles. Plotly templates already do this reasonably.
+
+### Interactivity for keyboard users
+
+A purely click-and-drag chart can be unreachable for keyboard-only
+users. For dashboards and public-facing charts, ensure the
+critical information is also in *static labels*, not only in hover
+tooltips.
+
+## A simple ethics checklist
+
+Before publishing any chart, ask:
+
+- [ ] Does my y-axis start at zero (for bars)? If not, do I have
+  a good reason and a clear label?
+- [ ] Is my chosen time range *long enough* to put any trend in
+  context?
+- [ ] Could my color choices fail for colorblind viewers?
+- [ ] Am I summarizing in a way that hides real variation?
+- [ ] Does the title fairly summarize the takeaway?
+- [ ] Have I added a data source and any necessary caveats?
+- [ ] Would a knowledgeable reader, given the underlying data,
+  agree with the conclusion my chart implies?
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is **truncating the y-axis** on a bar chart usually misleading?
+
+- Plotly disallows it.
+- It makes the chart harder to render.
+- [o] Bar length encodes magnitude relative to zero — truncating the axis exaggerates small differences and produces a visual cue that does not match the underlying data.
+  > Yes. A bar that "looks twice as long" should mean "twice as much." Cutting the axis breaks that contract. For trend lines, a non-zero baseline is *sometimes* acceptable (with a clear label); for bars, almost never.
+- It uses more colors.
+
+This is one of the most common — and most reliably criticized — ways charts lie.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these does **NOT** improve a chart's **accessibility**?
+
+- Using a colorblind-safe palette.
+- Adding meaningful alt text.
+- Using high-contrast text.
+- [o] Adding a 3-D effect to the bars.
+  > Correct — this is the odd one out. 3-D effects make charts *harder* to read for everyone, including users with vision impairments. The other three (colorblind palettes, alt text, contrast) all expand who can read your chart.
+
+Accessibility is not "extra polish" — it's basic competence. ~8% of men can't reliably distinguish red from green.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the **data-ink ratio**, from Edward Tufte, refer to?
+
+- The cost of printer ink to publish a chart.
+- The amount of color in a chart.
+- [o] The proportion of a chart's visual elements that actually encode data, versus those used for decoration (heavy gridlines, 3-D shading, borders).
+  > Yes. Tufte's principle is *maximize the data-ink ratio* — strip away anything that doesn't encode data. The `simple_white` template in this course is essentially this principle made into a default: minimal gridlines, no background fill, no decorative chart junk.
+- The amount of black ink in a chart.
+
+"Above all else, show the data." Make every visual element earn its place.`}
+/>
+
+<MultipleChoice
+  markdown={`A trend chart shows 3 months of "uptrend" but the underlying series wanders up and down for 10 years. What is the **most ethical** way to present this?
+
+- Show only the 3 months — it's the most recent.
+- Show only the 10-year average.
+- [o] Show enough history (e.g., the full 10 years) so the reader can judge whether the 3-month trend is meaningful or just noise.
+  > Yes. Cherry-picking a short range to fit a story is a classic misleading move. Showing enough context lets the reader assess the claim. This is what "focus, don't mislead" means in practice: include the context a reasonable reader would need to evaluate the chart.
+- Show the chart without axis labels.
+
+When in doubt, give the reader the context they need to come to their own conclusion.`}
+/>
+
+<MultipleChoice
+  markdown={`The simplest "is my chart honest?" test is:
+
+- "Does it look pretty?"
+- "Did Plotly render it without errors?"
+- [o] "If a knowledgeable reader saw the underlying data, would they reach a different conclusion than my chart implies?"
+  > Right. This single test catches most ethical lapses. If the answer is *yes* — the chart's framing leads the reader away from what the data actually says — you're misleading, even if every individual number is correct. The remedy is usually a more honest title, a wider time range, or a different axis.
+- "Is the chart interactive?"
+
+Apply this test before publishing every chart. It takes 30 seconds.`}
+/>

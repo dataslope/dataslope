@@ -1,0 +1,168 @@
+---
+title: Best Practices
+description: A consolidated checklist of habits that produce clear, honest, useful charts.
+---
+
+You've now seen enough chart types, encodings, and pitfalls to
+have working intuition. This page consolidates the principles
+into a single reference you can return to.
+
+## The "one chart, one message" principle
+
+A chart should answer **one question**. If you find yourself
+adding a third color encoding, a second y-axis, and a faceted
+grid all to one figure, you're probably trying to fit two charts
+into one. Split it.
+
+A reader should be able to look at a chart for 5 seconds and
+state its takeaway. If they can't, the chart is overloaded.
+
+## The hierarchy of clarity
+
+When designing any chart, prioritize in this order:
+
+1. **Correctness.** The chart accurately represents the data.
+2. **Honesty.** The framing (axes, range, title) doesn't mislead.
+3. **Clarity.** The takeaway is immediately readable.
+4. **Aesthetics.** It looks good.
+
+Skipping any of the earlier levels for the sake of a later one is
+a mistake.
+
+## A pre-publication checklist
+
+Before you ship any chart:
+
+- [ ] **Title** says what the chart shows (a sentence, not a label).
+- [ ] **Axis labels** are human-readable (not `qty_units_norm`).
+- [ ] **Units** are stated (dollars? percent? thousands?).
+- [ ] **Y-axis** starts at zero for bar charts.
+- [ ] **X-axis** is sorted (especially for lines).
+- [ ] **Color** is meaningful, not decorative.
+- [ ] **Legend** isn't crowded — under ~7 categories.
+- [ ] **Source** of data is cited.
+- [ ] **A colorblind viewer** can read it.
+- [ ] **One question** is being answered.
+
+Run through this in 60 seconds. It catches most problems.
+
+## Chart-type quick reference
+
+| You want to show... | Use... |
+|---|---|
+| Comparison across categories | Bar chart |
+| Trend over time | Line chart |
+| Relationship between two numeric variables | Scatter plot |
+| Distribution of one variable | Histogram or box plot |
+| Composition (parts of a whole, ≤4 parts) | Bar chart (or pie, reluctantly) |
+| Matrix of two categories vs one number | Heatmap |
+| Three numeric variables at once | Bubble chart |
+| The same chart across subgroups | Facet grid |
+| Geographic data | Choropleth or scatter map |
+
+When in doubt, **start with a bar or a scatter**. They are the
+two most reliably readable chart types ever invented.
+
+## Style defaults this course recommends
+
+For everyday work:
+
+- **Template:** `simple_white`
+- **Categorical color:** Plotly's default qualitative palette (it
+  is colorblind-aware).
+- **Sequential color:** `Viridis` or `Cividis`.
+- **Bar charts:** sorted by value unless the categories have a
+  natural order (time, age groups).
+- **Line charts:** sorted by x; `markers=True` when there are
+  fewer than ~30 points.
+- **Titles:** sentence-style, not "Plot of X vs Y."
+
+Consistency matters more than perfection. Pick defaults and
+re-use them.
+
+## The "explain it to a stranger" test
+
+Imagine a colleague who has never seen this data walks past your
+screen. Can they, in 10 seconds, tell you:
+
+1. What is being measured?
+2. Across what dimension?
+3. What is the main pattern?
+
+If any of these is unclear, the chart needs work — usually a
+better title and clearer labels.
+
+## Iterate, don't perfect
+
+Beginners often try to make their first chart perfect. Experts
+make 10 ugly charts in 10 minutes, learn from each one, and then
+polish the one that turned out to matter. **Volume of iteration
+beats per-chart polish**, especially during exploration.
+
+Save polish for the chart that will be published or presented.
+
+## When to break the rules
+
+Every rule on this page has exceptions:
+
+- A truncated y-axis is acceptable on a *line* chart when the
+  variation matters and you label clearly.
+- Pie charts work fine for 2-3 categories that genuinely sum to a
+  whole.
+- A dual y-axis is occasionally the right call for a very
+  specific economic or scientific story (with heavy labeling).
+- A complex multi-encoding chart is the right tool for an
+  exploratory data analysis session you're conducting alone.
+
+The rules exist because they are right *most of the time*. Know
+them well enough to break them deliberately.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the "one chart, one message" principle?
+
+- Every chart should have exactly one color.
+- Every chart should fit on one slide.
+- [o] A chart should answer a single, clear question; if you're trying to convey multiple ideas, split them into multiple charts.
+  > Yes. Overloaded charts — with three color encodings, faceting, and a second y-axis all at once — usually hide their message. A reader should be able to state the takeaway in one sentence after 5 seconds.
+- Every chart should have one data point.
+
+Clear communication usually means doing less, not more.`}
+/>
+
+<MultipleChoice
+  markdown={`According to the chart-type quick reference, the safest default for showing **the relationship between two numeric variables** is:
+
+- A pie chart.
+- A heatmap.
+- [o] A scatter plot.
+  > Right. Scatter plots are the canonical tool for relationships between two numeric variables — they reveal correlation, clusters, outliers, and the shape of the relationship without making assumptions.
+- A bar chart.
+
+When in doubt about a "X vs Y" question with both numeric, reach for a scatter.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is **least** important in a pre-publication checklist?
+
+- A clear, sentence-style title.
+- Human-readable axis labels with units.
+- Y-axis starts at zero for bars.
+- [o] The chart uses at least three colors.
+  > Correct — this is the odd one out. Color count has nothing to do with chart quality; many of the best charts use a single color or grayscale. The other three (title, labels, honest axis) are essential.
+
+Use color only when it encodes meaningful information.`}
+/>
+
+<MultipleChoice
+  markdown={`What does "iterate, don't perfect" mean in visualization practice?
+
+- Always polish your first chart before moving on.
+- Never look at a chart twice.
+- [o] Make many quick, imperfect charts during exploration; polish only the ones that turn out to communicate something important.
+  > Yes. During exploration, you don't know yet which chart will matter. Iterating rapidly through many ugly charts is faster than perfecting each one. Save polish for the publishable few. This is one of the most important habits of experienced analysts.
+- Use only one chart type forever.
+
+Volume of iteration beats per-chart polish during exploration.`}
+/>
