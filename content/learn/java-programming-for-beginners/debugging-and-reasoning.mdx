@@ -1,0 +1,275 @@
+---
+title: Debugging and Reasoning About Programs
+description: The skills that separate frustrated beginners from professional engineers — reading stack traces, forming hypotheses, and using invariants
+---
+
+Every program you ever write will, at some point, do something you
+didn't expect. **Debugging is not a special skill reserved for
+experts** — it is one of the most ordinary parts of being a
+programmer. What separates beginners from professionals is not how
+*much* their code breaks, but how *quickly and confidently* they
+diagnose what went wrong.
+
+This page is about that confidence. It is the most important
+non-syntax skill on the entire course.
+
+## The right mindset
+
+Before any technique, this:
+
+> *When my program does something I didn't expect, it is not
+> "broken" — it is doing exactly what I told it to do. The bug is in
+> my understanding of the code, not in the code itself.*
+
+A computer does not have moods. It does not get tired. If your
+function returned `-1` when you expected `7`, there is a *reason* —
+a deterministic chain of cause and effect that you can, in
+principle, trace.
+
+Debugging is the disciplined process of finding that chain.
+
+## A four-step debugging loop
+
+```mermaid
+flowchart LR
+    A[1. Observe<br/>what actually happened] --> B[2. Hypothesize<br/>why that could happen]
+    B --> C[3. Test<br/>add a print, set a breakpoint, write a tiny example]
+    C --> D[4. Update<br/>your mental model]
+    D --> A
+```
+
+This loop is so simple it sounds trivial. It is also the *only*
+loop. Whenever you find yourself "guessing harder," step back to
+step 1.
+
+## Reading a stack trace
+
+When an exception escapes, the JVM prints a **stack trace** —
+the chain of method calls that was active at the moment of the
+crash. Read it from **top to bottom**.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        printLength(null);
+    }
+
+    static void printLength(String s) {
+        System.out.println("length is " + s.length());
+    }
+}
+`}
+/>
+
+You'll see something like:
+
+```
+Exception in thread "main" java.lang.NullPointerException ...
+    at Main.printLength(Main.java:7)
+    at Main.main(Main.java:3)
+```
+
+Three precise pieces of information:
+
+- **The exception type:** `NullPointerException` — a reference was
+  null and we dereferenced it.
+- **The top frame:** `Main.printLength(Main.java:7)` — the
+  *actual* line that crashed.
+- **The chain below:** how we got there — `main` called
+  `printLength`.
+
+Don't be intimidated. The top line *almost always* tells you the
+file and line number to look at first.
+
+## The most useful technique: print debugging
+
+You can attach professional debuggers, set breakpoints, watch
+variables — and you should learn how, eventually. But the single
+most-used debugging technique in the world is **printing values**.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int[] xs = { 4, 9, 1, 7, 2 };
+        int max = findMax(xs);
+        System.out.println("max = " + max);
+    }
+
+    static int findMax(int[] xs) {
+        int max = xs[0];
+        for (int i = 0; i < xs.length; i++) {
+            System.out.println("DBG i=" + i + " xs[i]=" + xs[i] + " max=" + max);
+            if (xs[i] > max) {
+                max = xs[i];
+            }
+        }
+        return max;
+    }
+}
+`}
+/>
+
+The `DBG ...` lines let you *see the computation happen*. You stop
+guessing what `max` was on iteration 3 — you can read it. Almost
+every bug in a small program gives itself up to two well-placed
+prints.
+
+Discipline tips:
+
+- Tag debug prints with a prefix (`DBG`, `>>>`) so they are easy to
+  grep for and easy to remove.
+- Print *both the value and what it's supposed to mean*:
+  `System.out.println("after sort: xs = " + Arrays.toString(xs));`
+- Remove them before committing — or convert them into proper log
+  statements.
+
+## Rubber-duck debugging
+
+A startling fraction of bugs reveal themselves the moment you try
+to **explain the code to someone else**, line by line. Famously,
+the "someone else" can be a small rubber duck on your desk. The
+act of *describing what each line is supposed to do* forces you to
+notice the line that *doesn't* do what you thought.
+
+If you have no duck, write it out as a comment on paper. Same
+effect.
+
+## Invariants: the secret weapon
+
+An **invariant** is something that is supposed to be true *at a
+given point in the program*. Spotting bugs becomes much easier when
+you make invariants explicit.
+
+For example, in a sorted-insertion algorithm, you might write:
+
+```java
+// invariant: xs[0..i) is sorted
+for (int i = 1; i < xs.length; i++) {
+    // ...
+}
+```
+
+Now when the program goes wrong, you can *check the invariant*. If
+the invariant doesn't hold halfway through, you know the bug is
+*above* that point. If it does hold but the answer is still wrong,
+the bug is *below*. This is bisection thinking, and it is wildly
+faster than poking at random.
+
+```mermaid
+flowchart LR
+    A[Bug suspected] --> B{Check invariant<br/>at midpoint}
+    B -->|broken| C[Bug is in first half]
+    B -->|holds| D[Bug is in second half]
+    C --> E[Narrow further]
+    D --> E
+```
+
+A useful Java tool for invariants is **`assert`**, though in
+production code many teams prefer simple `if (!cond) throw new
+IllegalStateException(...)` checks because they are always on.
+
+## The "five whys" of debugging
+
+When you find what *caused* a bug, don't stop. Ask "why?" four
+more times.
+
+> The output is wrong because `total` was 0.
+>
+> *Why?* Because `total` was never updated.
+>
+> *Why?* Because the loop never ran.
+>
+> *Why?* Because the list was empty.
+>
+> *Why?* Because we filtered out everything in `loadData()`.
+>
+> *Why?* Because the filter condition was inverted.
+
+The deepest "why" is often the real fix. Fixing only the symptom
+("just set `total = -1` when empty") leaves the underlying bug in
+place to come back later.
+
+## A debugging walkthrough
+
+The code below is supposed to compute the sum of all *even*
+numbers in a list. It is wrong. Read it, then read the prints to
+see what really happens.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> data = List.of(1, 2, 3, 4, 5, 6);
+        int s = sumEvens(data);
+        System.out.println("sum = " + s);
+    }
+
+    static int sumEvens(List<Integer> xs) {
+        int total = 0;
+        for (int x : xs) {
+            System.out.println("DBG x=" + x + " x%2=" + (x % 2));
+            if (x % 2 == 1) {           // ← BUG: this is odd, not even
+                total += x;
+            }
+        }
+        return total;
+    }
+}
+`}
+/>
+
+The `DBG` output shows clearly that we are summing `1, 3, 5`, not
+`2, 4, 6`. Once you *see* the wrong values flowing past, the fix
+(`== 0` instead of `== 1`) is obvious.
+
+This is the entire job: make the program show you what it is
+*really doing*, then compare to what it is *supposed to do*. The
+difference is the bug.
+
+<MultipleChoice
+  markdown={`When you read a Java stack trace, which line is generally the most useful place to start?
+
+- The bottom-most line
+  > That's usually \`main\` — too far up.
+- A middle line, picked at random
+  > Not useful.
+- [o] The top-most line — it points to the actual statement that threw the exception
+  > Correct.
+- The line that mentions \`Thread.run\`
+  > That's framework plumbing, not your code.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the **central** premise behind invariants as a debugging tool?
+
+- The compiler verifies them automatically
+  > It does not.
+- Invariants make code faster
+  > That's not the point.
+- [o] By stating "X must be true at this point," you can bisect a long computation into parts that obey the invariant and parts that violate it, narrowing the bug
+  > Correct.
+- Invariants prevent all bugs by themselves
+  > They help find bugs; they do not prevent them.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is "rubber-duck debugging" effective even when the duck has no answers?
+
+- The duck has special insight
+  > It does not.
+- It slows the programmer down enough for a coffee break
+  > Funny but not the reason.
+- [o] Explaining the code line by line forces the programmer to articulate *what each step is supposed to do*, which often surfaces the line that doesn't match the explanation
+  > Correct.
+- It causes the compiler to recheck the code
+  > It does not.`}
+/>
+
+Debugging is the daily craft of programming. The next page lifts
+the lens further: how do you *write* code so that it is easier to
+debug, change, and live with for years? That is the discipline of
+**writing maintainable software.**

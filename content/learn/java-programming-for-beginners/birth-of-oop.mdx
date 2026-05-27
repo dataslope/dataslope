@@ -1,0 +1,159 @@
+---
+title: The Birth of Object-Oriented Programming
+description: How Simula and Smalltalk reframed programs as societies of collaborating objects, and why this idea stuck
+---
+
+The deepest answer to the software crisis did not come from
+re-arranging procedures. It came from a totally different way of
+thinking about what a program *is*.
+
+The new idea: a program is not a recipe. A program is a **society of
+objects** that talk to each other by sending messages.
+
+## Simula: the first OOP language
+
+In the 1960s, two Norwegian researchers, **Ole-Johan Dahl** and
+**Kristen Nygaard**, were building software to simulate physical
+systems — ships in a harbor, customers at a bank, particles in a
+fluid. They noticed something. The most natural way to write a
+simulation is to model each *thing in the real world* as a *thing in
+the program*: a ship in the harbor *is* a `Ship` in the code, with
+its own position, speed, and behaviors.
+
+They built a language called **Simula 67** around this idea. Simula
+introduced two words that we still use every single day:
+
+- **Class** — the description, the template, the blueprint of a kind
+  of thing.
+- **Object** — an actual *instance* of that thing, with its own data.
+
+```mermaid
+flowchart LR
+    C["class Ship<br/>(template)"]
+    C -->|new| O1["Ship 'Nautilus'"]
+    C -->|new| O2["Ship 'Titanic'"]
+    C -->|new| O3["Ship 'Endurance'"]
+```
+
+This was a quiet revolution. Programs were no longer just "code that
+manipulates data." Programs were *populations of small things*, each
+holding their own data and offering their own behavior.
+
+## Smalltalk: the radical version
+
+In the 1970s, at Xerox PARC in California, **Alan Kay** and his team
+took Simula's idea to the extreme and built **Smalltalk**. Smalltalk
+said:
+
+> **Everything is an object. Objects communicate only by sending
+> messages.**
+
+In Smalltalk, even a number was an object. Even `true` and `false`
+were objects. There was no other way to do anything — if you wanted
+something to happen, you sent a message to an object.
+
+Smalltalk also introduced the modern graphical user interface, the
+window-and-mouse environment, and the idea of *live* programming
+where you could change a running program while it was still running.
+A staggering amount of what we now take for granted in computing came
+out of this one research group.
+
+```mermaid
+flowchart LR
+    A[Object A] -- send msg --> B[Object B]
+    B -- reply --> A
+    A -- send msg --> C[Object C]
+    C -- send msg --> D[Object D]
+```
+
+## Why "objects" tamed complexity
+
+Recall the central pain of the procedural era: global data that any
+procedure could change. OOP solved this in a beautifully simple way.
+
+> **Each object owns its own data, and only its own methods can touch
+> that data.**
+
+That single rule — later called **encapsulation** — meant that when a
+piece of data was wrong, you only had to look at *one* object's
+methods to find out who was responsible. It scoped the search. It put
+the data behind a door, and the door had a label saying *who* could
+open it.
+
+```mermaid
+flowchart TB
+    subgraph A[Account #1001]
+        D1[(balance = 100)]
+        M1[deposit / withdraw]
+        M1 --- D1
+    end
+    subgraph B[Account #1002]
+        D2[(balance = 50)]
+        M2[deposit / withdraw]
+        M2 --- D2
+    end
+    User[Outside code] -- "deposit(20)" --> M1
+    User -- "withdraw(10)" --> M2
+```
+
+Outside code can ask an account to deposit or withdraw, but it
+cannot reach in and just rewrite the balance. The rules of the
+account live *with* the account.
+
+## The four big ideas you will keep meeting
+
+Object-oriented programming, as it stabilized over the 1970s and 80s,
+is built on four ideas. Don't try to memorize them yet — we will
+spend many pages on each of them later. Just notice the shape of the
+list:
+
+| Idea | One-sentence summary |
+| --- | --- |
+| **Encapsulation** | Each object hides its data and exposes only behavior. |
+| **Abstraction** | Callers see *what* an object does, not *how* it does it. |
+| **Inheritance** | A new class can be defined as "a kind of" an existing class. |
+| **Polymorphism** | The same message can mean different things to different objects. |
+
+These four ideas, together, are the toolkit that lets us build
+programs in the millions of lines without our heads exploding.
+
+<MultipleChoice
+  markdown={`Which language introduced the concepts of *class* and *object*?
+
+- C
+  > C is procedural; classes and objects came later.
+- Smalltalk
+  > Smalltalk popularized them, but they were invented earlier.
+- [o] Simula 67
+  > Correct. Simula, built for simulations, introduced classes and objects.
+- Java
+  > Java is a major adopter, not the inventor.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the *single biggest problem* that encapsulation was invented to solve?
+
+- Programs were too slow
+  > Encapsulation is about correctness and maintainability, not speed.
+- [o] In large procedural programs, any code could change any data, making bugs nearly impossible to localize
+  > Correct. Encapsulation gives each piece of data a single owner.
+- Programmers wanted to type less
+  > OOP usually adds typing, not removes it.
+- Computers did not have enough memory for procedures
+  > Memory was not the issue.`}
+/>
+
+## From research to industry
+
+Simula and Smalltalk were brilliant, but they were also rare. Most
+real software was still written in C, COBOL, and Pascal. The ideas
+were powerful; they had not yet escaped the research labs.
+
+Three things had to happen for OOP to take over the world:
+
+1. A practical, *production-grade* language had to absorb the ideas.
+2. That language had to work on every kind of computer — not just one
+   research workstation.
+3. The industry had to be in enough pain to *try something new*.
+
+In the 1980s and 90s, the planets aligned. We will look at that next.

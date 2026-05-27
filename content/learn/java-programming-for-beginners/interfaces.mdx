@@ -1,0 +1,385 @@
+---
+title: Interfaces
+description: '"Can-do" relationships — describing capabilities a class promises to provide, independent of any class hierarchy'
+---
+
+Inheritance models **is-a** ("a Circle *is a* Shape"). But many
+relationships in real code are more like **can-do** ("this thing
+*can be* compared," "this thing *can be* printed nicely," "this thing
+*can be* iterated over"). Java captures *can-do* with **interfaces**.
+
+## What is an interface?
+
+An interface is a *contract*. It says: "any class that implements me
+promises to provide these methods." It does not say *how* — only
+*what*.
+
+```java
+public interface Greeter {
+    String greet(String name);
+}
+```
+
+Any class that says `implements Greeter` must provide a method with
+exactly that signature. The interface itself has no fields, no
+constructor, and (traditionally) no method bodies.
+
+## Implementing an interface
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Greeter formal = new FormalGreeter();
+        Greeter casual = new CasualGreeter();
+
+        say(formal, "Ada");
+        say(casual, "Ada");
+    }
+
+    static void say(Greeter g, String name) {
+        System.out.println(g.greet(name));
+    }
+}
+`,
+    },
+    {
+      filename: "Greeter.java",
+      initialContent: `public interface Greeter {
+    String greet(String name);
+}
+`,
+    },
+    {
+      filename: "FormalGreeter.java",
+      initialContent: `public class FormalGreeter implements Greeter {
+    @Override
+    public String greet(String name) {
+        return "Good day, " + name + ".";
+    }
+}
+`,
+    },
+    {
+      filename: "CasualGreeter.java",
+      initialContent: `public class CasualGreeter implements Greeter {
+    @Override
+    public String greet(String name) {
+        return "hey " + name + "!";
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Notice that `say` takes a `Greeter` — not a `FormalGreeter` or a
+`CasualGreeter`. The method works with any current *or future* class
+that implements `Greeter`. This is the same polymorphism we saw with
+inheritance, but achieved without `extends`.
+
+## Interfaces vs abstract classes
+
+You may be thinking: "this sounds like an abstract class." There is
+overlap, but the differences matter.
+
+| | abstract class | interface |
+| --- | --- | --- |
+| Models | **is-a** (identity) | **can-do** (capability) |
+| Fields | Yes, any kind | Only `public static final` constants |
+| Constructors | Yes | No |
+| State | Yes (instance fields) | No |
+| How many can a class have? | Extends *one* | Implements *many* |
+| Code reuse | Strong — shared fields + methods | Limited (default methods only) |
+
+**The single most important difference:** a class can `implements`
+**many** interfaces but `extends` **only one** class.
+
+That is why interfaces are perfect for capabilities: a `BankAccount`
+can be `Comparable`, `Serializable`, and `Loggable` all at once,
+without trying to inherit from three different parents.
+
+```mermaid
+classDiagram
+    class Comparable {
+      <<interface>>
+      +compareTo(other) int
+    }
+    class Printable {
+      <<interface>>
+      +toReport() String
+    }
+    class BankAccount {
+      +compareTo(BankAccount) int
+      +toReport() String
+    }
+    Comparable <|.. BankAccount
+    Printable <|.. BankAccount
+```
+
+The dashed arrows mean "implements."
+
+## A more realistic example: sorting anything
+
+The Java standard library defines:
+
+```java
+public interface Comparable<T> {
+    int compareTo(T other);
+}
+```
+
+Any class that implements `Comparable` can be sorted by
+`Collections.sort` or `Arrays.sort`. The library has no idea what
+your class is — it just trusts the contract.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        Book[] shelf = {
+            new Book("Java", 320),
+            new Book("Go",   180),
+            new Book("Rust", 450),
+        };
+
+        Arrays.sort(shelf);
+
+        for (Book b : shelf) {
+            System.out.println(b);
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Book.java",
+      initialContent: `public class Book implements Comparable<Book> {
+    private final String title;
+    private final int    pages;
+
+    public Book(String title, int pages) {
+        this.title = title;
+        this.pages = pages;
+    }
+
+    @Override
+    public int compareTo(Book other) {
+        return Integer.compare(this.pages, other.pages);
+    }
+
+    @Override
+    public String toString() {
+        return title + " (" + pages + " pages)";
+    }
+}
+`,
+    },
+  ]}
+/>
+
+`Arrays.sort` was written years before your `Book` class existed.
+It works because `Book` honors the `Comparable` contract.
+
+## Default methods
+
+Since Java 8, interfaces may carry **default methods** — methods
+with a body that subclasses inherit unless they override. This lets
+interfaces evolve over time without breaking existing
+implementations.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        Greeter g = new Plain();
+        System.out.println(g.greet("Ada"));
+        System.out.println(g.greetLoudly("Ada"));
+    }
+}
+
+interface Greeter {
+    String greet(String name);
+
+    // default method — implementers get this for free
+    default String greetLoudly(String name) {
+        return greet(name).toUpperCase();
+    }
+}
+
+class Plain implements Greeter {
+    public String greet(String name) {
+        return "hello, " + name;
+    }
+}
+`}
+/>
+
+Use default methods sparingly. Their main job is *backwards
+compatibility*, not "everyone gets free behavior."
+
+## Designing with interfaces: depend on capabilities, not classes
+
+A subtle but vital design rule: **prefer interface types in method
+parameters and return types.** Saying `void process(List<Order>
+orders)` is better than `void process(ArrayList<Order> orders)`.
+Why? Because callers may have an `ArrayList`, a `LinkedList`, or
+anything else that `implements List`. Asking only for the
+*capability* you actually need gives callers freedom and gives you
+the right to change your storage later.
+
+```mermaid
+flowchart LR
+    A[ArrayList] -. implements .-> L[List]
+    B[LinkedList] -. implements .-> L
+    C[Stack] -. implements .-> L
+    L --> M["process(List orders)"]
+```
+
+The method `process` doesn't care which arrow the data came down. It
+only cares that it can call `List` methods on the parameter.
+
+<MultipleChoice
+  markdown={`What is the most fundamental difference between an abstract class and an interface?
+
+- Abstract classes are faster
+  > Speed is unrelated.
+- [o] A class can implement many interfaces but extend only one class, so interfaces are the right way to mix in multiple independent capabilities
+  > Correct.
+- Interfaces support fields, abstract classes don't
+  > It's the other way around.
+- Interfaces don't allow \`@Override\`
+  > They do.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is it good practice to declare a parameter type as \`List<T>\` rather than \`ArrayList<T>\`?
+
+- It's shorter to type
+  > Not the real reason.
+- ArrayList is deprecated
+  > It is not.
+- [o] You ask only for the capability you actually need, so callers can pass any List implementation and you can change your own storage later
+  > Correct.
+- The compiler refuses concrete types in parameters
+  > It accepts them just fine.`}
+/>
+
+## A small challenge
+
+<ChallengeCard
+  adapter="java"
+  title="A printable hierarchy"
+  instructions={`Define an interface \`Printable\` with one method \`String toReport()\`.
+
+Then define two classes that both implement \`Printable\`:
+
+- \`Invoice\` with a constructor \`Invoice(int id, int totalCents)\` and \`toReport()\` returning \`"Invoice #" + id + ": " + totalCents + "c"\`.
+- \`Greeting\` with a constructor \`Greeting(String who)\` and \`toReport()\` returning \`"Hi, " + who + "!"\`.
+
+\`Main.java\` is provided. Expected output (exact):
+
+\`\`\`
+Invoice #7: 1299c
+Hi, Ada!
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        Printable[] items = {
+            new Invoice(7, 1299),
+            new Greeting("Ada"),
+        };
+        for (Printable p : items) {
+            System.out.println(p.toReport());
+        }
+    }
+}
+`,
+    },
+    {
+      filename: "Printable.java",
+      initialContent: `public interface Printable {
+    // TODO
+}
+`,
+      solutionContent: `public interface Printable {
+    String toReport();
+}
+`,
+    },
+    {
+      filename: "Invoice.java",
+      initialContent: `public class Invoice implements Printable {
+    // TODO
+}
+`,
+      solutionContent: `public class Invoice implements Printable {
+    private final int id;
+    private final int totalCents;
+
+    public Invoice(int id, int totalCents) {
+        this.id = id;
+        this.totalCents = totalCents;
+    }
+
+    @Override
+    public String toReport() {
+        return "Invoice #" + id + ": " + totalCents + "c";
+    }
+}
+`,
+    },
+    {
+      filename: "Greeting.java",
+      initialContent: `public class Greeting implements Printable {
+    // TODO
+}
+`,
+      solutionContent: `public class Greeting implements Printable {
+    private final String who;
+
+    public Greeting(String who) {
+        this.who = who;
+    }
+
+    @Override
+    public String toReport() {
+        return "Hi, " + who + "!";
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "printable",
+      name: "Interface implemented by two classes",
+      expect: {
+        stdoutLines: [
+          "Invoice #7: 1299c",
+          "Hi, Ada!",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+Interfaces are how grown-up Java programs are organized. They draw
+clean lines between *what* a piece of code needs and *what concrete
+class happens to provide it.* The next chapter zooms out from
+classes to ask: **how does a Java program actually execute?**

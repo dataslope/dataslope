@@ -1,0 +1,171 @@
+---
+title: James Gosling and the Creation of Java
+description: How a frustrated team at Sun Microsystems set out to build a language for smart appliances — and accidentally built the language that would run the modern internet
+---
+
+In 1991, a small team inside **Sun Microsystems** set up a secret
+project, code-named **Green**. The goal had nothing to do with
+enterprise software or the web. The goal was to build software for
+**consumer electronics** — TVs, set-top boxes, smart toasters, the
+"interactive devices" that everybody in Silicon Valley thought were
+about to take over the living room.
+
+The team was led by a Canadian computer scientist named
+**James Gosling**.
+
+## The toaster problem
+
+Consumer electronics had a peculiar property. Every device used a
+different microchip. One year a TV would ship with one CPU; the next
+year, with a different one, because the manufacturer found a cheaper
+chip. If you wrote your TV software in C++ for the first chip, you
+would have to recompile, retest, and frequently rewrite it for the
+second one. For a company that wanted to ship millions of devices,
+this was unacceptable.
+
+Gosling's team needed a language whose programs would **outlive the
+chip** they were written for.
+
+```mermaid
+flowchart LR
+    Code[Same program] --> Chip1[CPU model A: 1992]
+    Code --> Chip2[CPU model B: 1993]
+    Code --> Chip3[CPU model C: 1994]
+    Code --> ChipN[CPU model N: future]
+    style Code fill:#efe
+```
+
+They also needed the language to be:
+
+- **Reliable** — if your toaster crashes you can't ship the user a
+  debugger.
+- **Small** — embedded chips have little memory.
+- **Safe** — a bug must not allow the toaster to set itself on fire,
+  or download malware.
+
+## Why not C++?
+
+The team genuinely tried to use C++ at first. Gosling has told the
+story in interviews: he kept patching C++ to make it more portable
+and more memory-safe, and eventually concluded he had been *building
+a new language by accident*. So he embraced the inevitable and built
+one from scratch.
+
+The language was first called **Oak**, after a tree outside Gosling's
+office window. They later renamed it **Java**, supposedly after a
+coffee shop the team frequented. (The lawyers had also found that
+"Oak" was already trademarked.)
+
+## What Gosling kept, what he removed
+
+Gosling was deeply familiar with C and C++, and many design decisions
+in Java are best understood as a direct reaction to them.
+
+| Idea | C++ | Java |
+| --- | --- | --- |
+| Manual memory management | Yes — `new`/`delete` | **No** — automatic garbage collection |
+| Pointer arithmetic | Yes | **Removed** — too dangerous |
+| Multiple inheritance | Yes | **Removed** — too confusing; replaced by interfaces |
+| Operator overloading | Yes | **Removed** — too easy to abuse |
+| Compiled to machine code? | Yes | **No** — compiled to *bytecode* |
+| Same program runs everywhere? | Theoretically | **Yes**, by design |
+| Strong typing | Mostly | **Strict**, enforced |
+| Classes | Optional (you can write C-style) | **Mandatory** — every value lives inside a class |
+
+The pattern is clear. Gosling kept the *shape* of C-family syntax so
+existing programmers would feel at home, but he ripped out every
+feature that, in his experience, had been the source of catastrophic
+production bugs.
+
+This conservatism is the reason Java looks "boring" to fans of
+exotic languages. It is also exactly why Java still runs banks,
+airlines, and stock exchanges thirty years later.
+
+```mermaid
+flowchart LR
+    subgraph in[Kept]
+        S1[C-style syntax]
+        S2[Classes / OOP]
+        S3[Strong typing]
+        S4[Threads]
+    end
+    subgraph out[Removed]
+        R1[Pointer arithmetic]
+        R2[Manual memory]
+        R3[Multiple inheritance]
+        R4[Operator overloading]
+    end
+```
+
+<MultipleChoice
+  markdown={`What was Java originally designed for?
+
+- Building web pages
+  > Web use came later, by happy accident.
+- Scientific computing
+  > That was FORTRAN's strength.
+- [o] Programming consumer electronics devices like TVs and set-top boxes
+  > Correct. The Green project's original target was embedded devices.
+- Database servers
+  > Java would later dominate this space, but it was not the original target.`}
+/>
+
+## The pivot to the web
+
+The consumer electronics market did not take off the way Sun
+expected. The smart TV revolution would take another twenty years.
+But around 1994 the team noticed something interesting: the *exact
+same* properties that made Java good for toasters — small,
+portable, sandboxed, safe — were *exactly* what was needed for the
+brand-new World Wide Web.
+
+In 1995, Sun released Java publicly and built a special browser
+called **HotJava** that could run little Java programs called
+**applets** embedded in web pages. Netscape, the dominant browser of
+the day, quickly added support too.
+
+For the first time in history, you could click a link and run a
+*program* — not just see a static page. People had never seen
+anything like it.
+
+## The marketing slogan that mattered
+
+Sun promoted Java with a single slogan that captured the entire
+ambition of the project:
+
+> **Write once, run anywhere.**
+
+It was, of course, a simplification. (Programmers later joked it was
+"write once, debug everywhere.") But it captured a real technical
+achievement: for the first time, a serious mainstream language
+genuinely *did* let you compile your code once and run the same
+binary on dramatically different machines.
+
+The next page is about how that worked. It is the single most
+important idea in the rest of this course.
+
+<MultipleChoice
+  markdown={`Which of these C++ features did Gosling deliberately remove from Java?
+
+- Classes
+  > Java *kept* classes — and made them mandatory.
+- Functions
+  > Java has methods, which are essentially functions inside classes.
+- [o] Manual memory management with explicit \`new\` and \`delete\`
+  > Correct. Java introduced automatic garbage collection.
+- Strong typing
+  > Java has *stricter* typing than C++, not weaker.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does Java look superficially similar to C and C++?
+
+- Because they all run on the JVM
+  > C and C++ do not run on the JVM.
+- Because they are all interpreted languages
+  > C and C++ are compiled to machine code, not interpreted.
+- [o] Because Gosling kept C-family syntax on purpose so existing C/C++ programmers would feel at home
+  > Correct. Surface familiarity was a deliberate adoption strategy.
+- Because all programming languages look the same
+  > They very much do not.`}
+/>

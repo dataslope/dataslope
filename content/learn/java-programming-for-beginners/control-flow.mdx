@@ -1,0 +1,336 @@
+---
+title: Control Flow
+description: How programs make decisions and repeat themselves — if/else, switch, while, do-while, for, and the loops that quietly run the world
+---
+
+A program made only of straight-line statements is uninteresting. The
+moment a program needs to *decide* or *repeat*, you reach for
+**control flow**: the constructs that change which line runs next.
+
+```mermaid
+flowchart TB
+    Start --> D{condition?}
+    D -- yes --> A[run block A]
+    D -- no --> B[run block B]
+    A --> End
+    B --> End
+```
+
+## `if` and `else`
+
+`if` runs a block of code only when a condition is true. `else` runs
+when the condition is false. `else if` chains additional conditions.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int score = 72;
+
+        if (score >= 90) {
+            System.out.println("A");
+        } else if (score >= 80) {
+            System.out.println("B");
+        } else if (score >= 70) {
+            System.out.println("C");
+        } else {
+            System.out.println("F");
+        }
+    }
+}
+`}
+/>
+
+Conditions are expressions of type `boolean`. The comparison
+operators that produce booleans are `==`, `!=`, `<`, `<=`, `>`,
+`>=`. Combine booleans with `&&` (and), `||` (or), `!` (not).
+
+> Remember: `==` on objects compares *references*, not contents. For
+> strings, use `.equals(...)`. For primitives, `==` does the obvious
+> thing.
+
+## `switch`
+
+When you want to branch on a *value*, `switch` is often clearer than
+a long `if/else` chain.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int day = 3;
+        String name;
+
+        switch (day) {
+            case 1: name = "Monday";    break;
+            case 2: name = "Tuesday";   break;
+            case 3: name = "Wednesday"; break;
+            case 4: name = "Thursday";  break;
+            case 5: name = "Friday";    break;
+            case 6: name = "Saturday";  break;
+            case 7: name = "Sunday";    break;
+            default: name = "?";
+        }
+
+        System.out.println("Day " + day + " is " + name);
+    }
+}
+`}
+/>
+
+A few things to remember about `switch`:
+
+- Without `break`, execution **falls through** to the next case.
+  That is occasionally useful and frequently a bug.
+- Modern Java has a much nicer `switch` expression with `->` arrows
+  and no fall-through. We use the classic form here because it is
+  the one you will see most in existing code.
+
+## `while` and `do-while`
+
+`while` repeats a block *as long as* a condition is true. The
+condition is checked **before** each pass.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int n = 10;
+        while (n > 0) {
+            System.out.println(n);
+            n = n - 1;
+        }
+        System.out.println("Lift off!");
+    }
+}
+`}
+/>
+
+`do-while` is the same, except the condition is checked **after**
+each pass — so the block always runs at least once.
+
+```mermaid
+flowchart TB
+    subgraph w[while]
+        W1{cond?}
+        W1 -- yes --> W2[block] --> W1
+        W1 -- no --> Wend((exit))
+    end
+    subgraph dw[do-while]
+        D1[block] --> D2{cond?}
+        D2 -- yes --> D1
+        D2 -- no --> Dend((exit))
+    end
+```
+
+## `for`
+
+`for` is the workhorse of loops. It packages three things on one line:
+
+1. **Initialization** — runs once at the start.
+2. **Condition** — checked before each pass.
+3. **Update** — runs at the end of each pass.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("i = " + i);
+        }
+    }
+}
+`}
+/>
+
+`i++` is shorthand for `i = i + 1`. Likewise `i--`, `i += 2`, `i *=
+3`, etc.
+
+## The enhanced `for` (for-each)
+
+For going through *every element* of an array or collection, Java
+has a cleaner form:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int[] primes = {2, 3, 5, 7, 11, 13};
+        int total = 0;
+
+        for (int p : primes) {
+            total += p;
+            System.out.println("saw " + p);
+        }
+
+        System.out.println("total = " + total);
+    }
+}
+`}
+/>
+
+Read `for (int p : primes)` as *"for each int p in primes."*
+
+## `break` and `continue`
+
+- `break` exits the innermost loop immediately.
+- `continue` jumps to the next iteration of the innermost loop.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        for (int i = 1; i <= 10; i++) {
+            if (i == 5) continue;   // skip 5
+            if (i == 8) break;      // stop entirely at 8
+            System.out.println(i);
+        }
+    }
+}
+`}
+/>
+
+Use these sparingly. Loops are easier to reason about when the
+condition itself expresses why they end.
+
+## A tracing exercise
+
+Try to predict the output of this program *before* you run it. Then
+run it and check.
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int sum = 0;
+        for (int i = 1; i <= 5; i++) {
+            for (int j = 1; j <= i; j++) {
+                sum += j;
+                System.out.println("i=" + i + " j=" + j + " sum=" + sum);
+            }
+        }
+        System.out.println("final sum = " + sum);
+    }
+}
+`}
+/>
+
+This is a *nested loop* — a loop inside a loop. Each value of the
+outer `i` triggers a full inner sweep over `j`. Read it slowly. The
+ability to mentally execute a nested loop is one of the major
+beginner milestones.
+
+<MultipleChoice
+  markdown={`What's the difference between \`while\` and \`do-while\`?
+
+- They are the same
+  > They are not.
+- \`while\` is faster than \`do-while\`
+  > Speed is not the distinction.
+- [o] \`while\` checks the condition before the first iteration; \`do-while\` checks after, so its body always runs at least once
+  > Correct.
+- \`do-while\` cannot have a condition
+  > It must have one — it's the trailing condition.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`for (int x : arr)\` do?
+
+- Loops the index from \`x\` to \`arr.length\`
+  > That's a classic indexed \`for\`, not the enhanced form.
+- Creates a new array \`x\` with the same contents as \`arr\`
+  > It does not create an array.
+- [o] Iterates over each element of \`arr\` in order, binding the current element to \`x\`
+  > Correct. \`x\` is the *element*, not the index.
+- Sorts the array
+  > It does not sort.`}
+/>
+
+## A small challenge: FizzBuzz
+
+A classic. Print the numbers 1 through 15, but: replace multiples of
+3 with `Fizz`, multiples of 5 with `Buzz`, and multiples of both with
+`FizzBuzz`.
+
+<ChallengeCard
+  adapter="java"
+  title="FizzBuzz"
+  instructions={`Print the numbers from 1 to 15, one per line. But:
+
+- If a number is divisible by both 3 and 5, print \`FizzBuzz\` instead.
+- If divisible only by 3, print \`Fizz\`.
+- If divisible only by 5, print \`Buzz\`.
+- Otherwise, print the number itself.
+
+The first lines of correct output are:
+
+\`\`\`
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+\`\`\``}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        // TODO: print FizzBuzz from 1 to 15
+    }
+}
+`,
+      solutionContent: `public class Main {
+    public static void main(String[] args) {
+        for (int i = 1; i <= 15; i++) {
+            if (i % 15 == 0) {
+                System.out.println("FizzBuzz");
+            } else if (i % 3 == 0) {
+                System.out.println("Fizz");
+            } else if (i % 5 == 0) {
+                System.out.println("Buzz");
+            } else {
+                System.out.println(i);
+            }
+        }
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "fizzbuzz",
+      name: "Prints correct FizzBuzz output",
+      expect: {
+        stdoutLines: [
+          "1",
+          "2",
+          "Fizz",
+          "4",
+          "Buzz",
+          "Fizz",
+          "7",
+          "8",
+          "Fizz",
+          "Buzz",
+          "11",
+          "Fizz",
+          "13",
+          "14",
+          "FizzBuzz",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+Loops and conditions are the *machinery*. Methods are the way we
+package that machinery into reusable, named units. That is next.
