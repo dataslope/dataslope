@@ -1,0 +1,369 @@
+---
+title: Numbers and Arithmetic
+description: How JavaScript represents numbers, the operators you use on them, and the surprising things floating-point arithmetic does.
+---
+
+Numbers are the most universal kind of value. We will spend this
+page learning what JavaScript means by "a number", what you can
+do with them, and the small set of gotchas worth knowing in
+advance.
+
+## All numbers are floating-point
+
+Most programming languages have **two** numeric types: integers
+(`int`) and decimals (`float`). JavaScript, for historical
+simplicity, has just **one**:
+
+> Every JavaScript number is a 64-bit *floating-point* value
+> (specifically, IEEE 754 double precision).
+
+That means `7`, `7.0`, and `7.0000` are all the *same* value, the
+same type, stored the same way. There is no distinction between
+"integer" and "decimal" at the type level.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(typeof 7);     // "number"
+console.log(typeof 7.0);   // "number"
+console.log(typeof -3.14); // "number"
+console.log(7 === 7.0);    // true — they are the same value.
+`}
+/>
+
+(There is a separate, very advanced type called `bigint` for
+arbitrarily large integers, written like `42n`. You can safely
+ignore it for now.)
+
+## Basic arithmetic
+
+The familiar operators all work as expected:
+
+| Operator | Meaning | Example | Result |
+| :---: | --- | --- | :---: |
+| `+` | Add | `2 + 3` | `5` |
+| `-` | Subtract | `2 - 3` | `-1` |
+| `*` | Multiply | `2 * 3` | `6` |
+| `/` | Divide | `7 / 2` | `3.5` |
+| `%` | Remainder (modulo) | `7 % 3` | `1` |
+| `**` | Exponent | `2 ** 10` | `1024` |
+
+Unary operators:
+
+- `-x` — negate.
+- `+x` — coerce to number (mostly useful when `x` is a string).
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(7 / 2);       // 3.5  — NOT 3, because there is no integer division.
+console.log(7 % 2);       // 1
+console.log(2 ** 10);     // 1024
+console.log(-5 + 8);      // 3
+console.log(+"42");       // 42  — string coerced to number
+console.log(+"hello");    // NaN — cannot be coerced
+`}
+/>
+
+## Order of operations
+
+JavaScript uses ordinary mathematical precedence. `*`, `/`, `%`,
+`**` bind more tightly than `+` and `-`. Use parentheses to make
+intent obvious.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(2 + 3 * 4);     // 14, not 20
+console.log((2 + 3) * 4);   // 20
+console.log(2 ** 3 ** 2);   // 512  (exponent is right-associative: 2 ** (3 ** 2))
+console.log((2 ** 3) ** 2); // 64
+`}
+/>
+
+When in doubt, parenthesise. There is no prize for the shortest
+expression.
+
+## Compound assignment
+
+When you want to update a variable based on its current value, you
+can use the compact compound-assignment operators:
+
+| Operator | Equivalent to | Example |
+| :---: | --- | --- |
+| `+=` | `x = x + ...` | `x += 5` |
+| `-=` | `x = x - ...` | `x -= 5` |
+| `*=` | `x = x * ...` | `x *= 5` |
+| `/=` | `x = x / ...` | `x /= 5` |
+| `%=` | `x = x % ...` | `x %= 5` |
+| `**=` | `x = x ** ...` | `x **= 2` |
+
+Also: `x++` is `x = x + 1` (and returns the *old* value), `x--`
+is `x = x - 1`. These are common in loops; we will see them often.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`let n = 10;
+n += 5;   console.log(n); // 15
+n *= 2;   console.log(n); // 30
+n -= 100; console.log(n); // -70
+n /= 7;   console.log(n); // -10
+
+let i = 0;
+i++; console.log(i); // 1
+i++; console.log(i); // 2
+i++; console.log(i); // 3
+`}
+/>
+
+## Special numeric values
+
+JavaScript has three special numeric values you will eventually
+encounter:
+
+- **`Infinity`** — what you get when you divide a positive number
+  by zero, or when a number gets too large to represent.
+- **`-Infinity`** — same, the negative side.
+- **`NaN`** — "Not a Number". The result of mathematically
+  undefined operations like `0 / 0` or `Math.sqrt(-1)`, or of
+  trying to convert a non-numeric string to a number.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(1 / 0);          // Infinity
+console.log(-1 / 0);         // -Infinity
+console.log(0 / 0);          // NaN
+console.log(Math.sqrt(-1));  // NaN
+console.log(Number("hello"));// NaN
+
+// NaN is famously NOT equal to itself:
+console.log(NaN === NaN);    // false  (!)
+console.log(Number.isNaN(NaN)); // true — the right way to test for NaN
+`}
+/>
+
+The `NaN === NaN` trap is one of the most famous quirks in
+JavaScript. To check for `NaN`, use `Number.isNaN(value)`. Never
+use `value === NaN`.
+
+## Floating-point surprises
+
+Because all JavaScript numbers are stored as 64-bit floating-point,
+some calculations that look exact actually have tiny rounding
+errors. The classic example:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(0.1 + 0.2);                   // 0.30000000000000004
+console.log(0.1 + 0.2 === 0.3);           // false  (!)
+console.log(Math.abs((0.1 + 0.2) - 0.3) < 1e-9); // true  — the safe way to compare
+`}
+/>
+
+This is not a JavaScript bug — it is how floating-point arithmetic
+works in essentially every language (C, Java, Python, Rust, …).
+The number `0.1` cannot be represented exactly in binary, any more
+than `1/3` can be represented exactly in decimal.
+
+What to do about it:
+
+- For everyday code, this rarely matters. Display rounded values
+  (`(0.1 + 0.2).toFixed(2)` → `"0.30"`).
+- When comparing decimals, compare with a small tolerance:
+  `Math.abs(a - b) < 1e-9`.
+- For **money**, never use floating point if you can help it. Store
+  amounts as integer cents (a $1.23 price becomes `123`), do all
+  arithmetic on integers, and only convert to dollars-with-decimals
+  for display. This is what real e-commerce systems do.
+
+## Useful number tools
+
+A few built-ins you will use constantly:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Rounding
+console.log(Math.round(2.4));    // 2
+console.log(Math.round(2.5));    // 3
+console.log(Math.floor(2.9));    // 2  (round down)
+console.log(Math.ceil(2.1));     // 3  (round up)
+console.log(Math.trunc(2.9));    // 2  (chop off the decimal)
+console.log(Math.trunc(-2.9));   // -2
+
+// Min, max, absolute value
+console.log(Math.max(3, 7, 1, 9, 4));  // 9
+console.log(Math.min(3, 7, 1, 9, 4));  // 1
+console.log(Math.abs(-42));            // 42
+
+// Powers, roots, logs
+console.log(Math.sqrt(16));      // 4
+console.log(Math.pow(2, 10));    // 1024 — same as 2 ** 10
+console.log(Math.log2(1024));    // 10
+
+// Random in [0, 1)
+console.log(Math.random());      // e.g. 0.7283193847...
+// Random integer in [min, max] inclusive:
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+console.log("d6 roll:", randInt(1, 6));
+
+// Parsing strings
+console.log(parseInt("42"));       // 42
+console.log(parseInt("42 things")); // 42  — stops at the first non-digit
+console.log(parseFloat("3.14"));   // 3.14
+console.log(Number("3.14"));       // 3.14 — stricter than parseFloat
+console.log(Number("3.14 things"));// NaN  — strict, the whole string must parse
+
+// Formatting
+const x = 1234.5678;
+console.log(x.toFixed(2));         // "1234.57"  — note: returns a string!
+console.log(x.toString());         // "1234.5678"
+console.log(x.toLocaleString());   // e.g. "1,234.568"  (locale-dependent)
+`}
+/>
+
+Notice the very important detail: `toFixed` returns a **string**,
+not a number. This is a recurring beginner trap. If you write
+`x.toFixed(2) + 1`, you get the string `"1234.571"`, not the
+number `1235.57`. When you want to *display* a value, use
+`toFixed`. When you want to *compute* with a value, keep it as a
+number.
+
+## Integer-safe range
+
+Because of floating point, JavaScript can represent integers
+exactly only up to `2 ** 53 - 1` (`9007199254740991`). Beyond
+that, you lose precision.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(Number.MAX_SAFE_INTEGER);          // 9007199254740991
+console.log(Number.MAX_SAFE_INTEGER + 1);      // 9007199254740992  (fine)
+console.log(Number.MAX_SAFE_INTEGER + 2);      // 9007199254740992  (!! same as +1)
+
+// Beyond MAX_SAFE_INTEGER, neighbouring numbers may collide.
+// For huge integers (cryptography, very large IDs), use BigInt:
+console.log(9007199254740993n + 1n);           // 9007199254740994n
+`}
+/>
+
+This rarely matters for everyday code. It does matter if you
+handle truly large numeric IDs (some databases produce them) or do
+heavy mathematics.
+
+## Putting it together: a small calculator
+
+Below is a tiny "calculator" that exercises most of what we have
+learned. Try changing the inputs and see what happens.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function format(amount) {
+  // 2 decimals + thousands separators, locale-dependent.
+  return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function compoundInterest(principal, annualRate, years) {
+  // Final amount = P * (1 + r) ** t
+  return principal * (1 + annualRate) ** years;
+}
+
+const principal = 1000;
+const rate = 0.05;     // 5% per year
+const years = 30;
+
+const final = compoundInterest(principal, rate, years);
+const gain  = final - principal;
+
+console.log("Starting:", format(principal));
+console.log("After " + years + " years at " + (rate * 100).toFixed(1) + "%:");
+console.log("  Final:", format(final));
+console.log("  Gain: ", format(gain));
+`}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="javascript"
+  title="Temperature conversion"
+  instructions={`Write two functions:
+
+- \`toCelsius(f)\` — converts Fahrenheit to Celsius using \`(f - 32) * 5 / 9\`.
+- \`toFahrenheit(c)\` — converts Celsius to Fahrenheit using \`c * 9 / 5 + 32\`.
+
+Both should return a *number*, not a string. The tests use a small tolerance to allow for floating-point rounding.`}
+  initialCode={`function toCelsius(f) {
+  // your code here
+  return 0;
+}
+
+function toFahrenheit(c) {
+  // your code here
+  return 0;
+}
+
+console.log(toCelsius(32));    // 0
+console.log(toCelsius(212));   // 100
+console.log(toFahrenheit(0));  // 32
+console.log(toFahrenheit(100));// 212
+`}
+  solutionCode={`function toCelsius(f) {
+  return (f - 32) * 5 / 9;
+}
+
+function toFahrenheit(c) {
+  return c * 9 / 5 + 32;
+}
+
+console.log(toCelsius(32));
+console.log(toCelsius(212));
+console.log(toFahrenheit(0));
+console.log(toFahrenheit(100));
+`}
+  tests={[
+    {
+      id: "freezing_c",
+      name: "32°F → 0°C",
+      description: "Water freezes",
+      code: `if (Math.abs(toCelsius(32)) > 1e-9) throw new Error("expected 0");`,
+    },
+    {
+      id: "boiling_c",
+      name: "212°F → 100°C",
+      description: "Water boils",
+      code: `if (Math.abs(toCelsius(212) - 100) > 1e-9) throw new Error("expected 100");`,
+    },
+    {
+      id: "freezing_f",
+      name: "0°C → 32°F",
+      description: "Water freezes (reverse)",
+      code: `if (Math.abs(toFahrenheit(0) - 32) > 1e-9) throw new Error("expected 32");`,
+    },
+    {
+      id: "boiling_f",
+      name: "100°C → 212°F",
+      description: "Water boils (reverse)",
+      code: `if (Math.abs(toFahrenheit(100) - 212) > 1e-9) throw new Error("expected 212");`,
+    },
+    {
+      id: "returns_number",
+      name: "Returns a number, not a string",
+      description: "typeof must be 'number'",
+      code: `if (typeof toCelsius(50) !== "number") throw new Error("toCelsius must return a number");
+if (typeof toFahrenheit(50) !== "number") throw new Error("toFahrenheit must return a number");`,
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`Why does \`0.1 + 0.2 === 0.3\` evaluate to \`false\` in JavaScript?
+
+- Because JavaScript has a bug in its addition operator
+- [o] Because JavaScript numbers are 64-bit floating-point, and decimals like 0.1 cannot be represented exactly in binary — tiny rounding errors are unavoidable
+  > Correct. This behaviour is built into the IEEE 754 floating-point standard used by almost every modern language. When you need to compare decimals, compare with a small tolerance (\`Math.abs(a - b) < 1e-9\`), or for money, work in integer cents and only format for display.
+- Because \`0.3\` is actually \`null\` under the hood
+- Because \`===\` always returns false for decimals
+
+This is one of the most surprising things in early programming, and it's universal — Python, Java, C, and Rust all produce essentially the same result. It's a property of floating-point arithmetic, not of any specific language.`}
+/>

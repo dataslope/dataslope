@@ -1,0 +1,362 @@
+---
+title: Strings and Text
+description: Representing, building, slicing, and inspecting text — JavaScript's `string` type, in depth.
+---
+
+After numbers, the next universal kind of value is **text**.
+JavaScript's text type is called `string`. Strings are how a program
+holds names, messages, file contents, JSON, code, anything you can
+read.
+
+## Writing a string
+
+A string is *any* sequence of characters between matching quote
+marks. JavaScript accepts three styles:
+
+- **Single quotes**: `'hello'`
+- **Double quotes**: `"hello"`
+- **Backticks** (template literals): `` `hello` ``
+
+Single and double quotes are interchangeable; pick one and stay
+consistent. Backticks are special — they enable interpolation and
+multi-line strings (more on that in a moment).
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const a = 'single quotes';
+const b = "double quotes";
+const c = \`backticks\`;
+console.log(a, b, c);
+console.log(typeof a, typeof b, typeof c); // all "string"
+`}
+/>
+
+### Escape sequences
+
+If a string needs a character that would otherwise end the string
+(like a quote of the same kind), or special characters like a
+newline or a tab, you escape it with a backslash:
+
+| Escape | Meaning |
+| :---: | --- |
+| `\\n` | newline |
+| `\\t` | tab |
+| `\\\\` | a literal backslash |
+| `\\'` | a literal `'` |
+| `\\"` | a literal `"` |
+| `\\\`` | a literal backtick |
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log("She said \\"hi\\".");
+console.log('It\\'s fine.');
+console.log("first line\\nsecond line");
+console.log("col1\\tcol2\\tcol3");
+`}
+/>
+
+## Template literals: the modern default
+
+Backtick strings — called **template literals** — let you do two
+things that ordinary strings cannot:
+
+1. **Interpolate** values directly with `${ ... }`.
+2. **Span multiple lines** with no escape characters.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const name = "Ada";
+const age = 28;
+
+// Old-school: concatenation with +
+const old = "Hello, " + name + "! You are " + age + " years old.";
+console.log(old);
+
+// Modern: template literal
+const fresh = \`Hello, \${name}! You are \${age} years old.\`;
+console.log(fresh);
+
+// Multi-line:
+const message = \`Dear \${name},
+
+Welcome aboard. You are member #\${42}.
+
+Best,
+The team\`;
+console.log(message);
+`}
+/>
+
+Template literals are the modern default for any non-trivial
+string. Use them.
+
+## Strings are immutable
+
+A string, once created, **cannot be modified in place**. Every
+operation that "changes" a string actually *produces a new one* and
+leaves the original alone.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`let s = "hello";
+const louder = s.toUpperCase();
+console.log(s);       // "hello"  — unchanged
+console.log(louder);  // "HELLO"  — a new string
+
+// You can reassign the variable to point at a new string:
+s = s + " world";
+console.log(s);       // "hello world"
+`}
+/>
+
+This is the same point we made about primitives in general:
+**variables can be reassigned, but the values themselves are
+immutable**. Reading and rereading this slowly until it clicks
+will save you grief later.
+
+## Length and indexing
+
+A string has a `.length` property — the number of characters in
+it. You can read an individual character with bracket notation:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const word = "javascript";
+
+console.log(word.length);  // 10
+console.log(word[0]);      // "j"   (the first character)
+console.log(word[1]);      // "a"
+console.log(word[word.length - 1]); // "t"   (the last)
+console.log(word[100]);    // undefined  (out of range)
+`}
+/>
+
+Indexes start at **0**, not 1. The last character is at index
+`length - 1`. (Programmers and elevator designers disagree on
+where to start counting; programmers chose 0 long ago and won't
+change.)
+
+## The most useful string methods
+
+JavaScript's string type comes with a long list of built-in
+methods. The ones below are the bread and butter — you will reach
+for these constantly.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const s = "  Hello, JavaScript World!  ";
+
+// Case
+console.log(s.toUpperCase());
+console.log(s.toLowerCase());
+
+// Whitespace
+console.log("[" + s.trim() + "]");        // strip leading/trailing whitespace
+console.log("[" + s.trimStart() + "]");
+console.log("[" + s.trimEnd() + "]");
+
+// Inspect content
+console.log(s.includes("Java"));    // true
+console.log(s.startsWith("  Hello")); // true
+console.log(s.endsWith("!  "));     // true
+console.log(s.indexOf("World"));    // position of first match, or -1
+
+// Slicing — like cutting out a part
+console.log(s.slice(2, 7));         // "Hello"
+console.log(s.slice(-3));           // "!  "   (last 3 chars)
+
+// Replacing
+console.log(s.replace("JavaScript", "JS"));
+console.log(s.replaceAll("l", "L"));
+
+// Splitting and joining
+const csv = "apple,banana,cherry";
+const parts = csv.split(",");
+console.log(parts);            // ["apple","banana","cherry"]
+console.log(parts.join(" | "));// "apple | banana | cherry"
+
+// Repeating and padding
+console.log("-".repeat(20));
+console.log("7".padStart(4, "0"));  // "0007"
+console.log("7".padEnd(4, "."));    // "7..."
+`}
+/>
+
+Notice how *none* of those methods modified `s`. They all returned
+*new* strings. `s` is still its original value.
+
+## Converting between strings and numbers
+
+You will move back and forth between numbers and strings often —
+reading user input (always a string), formatting a number for
+display, parsing a piece of text into a value to compute with.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// String -> Number
+console.log(Number("42"));        // 42
+console.log(Number("3.14"));      // 3.14
+console.log(Number(""));          // 0    (!)
+console.log(Number("hello"));     // NaN
+console.log(parseInt("42 apples"));   // 42  (lenient)
+console.log(parseFloat("3.14 pies")); // 3.14
+
+// Number -> String
+const n = 42;
+console.log(String(n));           // "42"
+console.log(n.toString());        // "42"
+console.log(\`Value: \${n}\`);       // "Value: 42"  — implicit, via template
+console.log("Value: " + n);       // "Value: 42"  — implicit, via concatenation
+`}
+/>
+
+Be **deliberate** about conversions. `"5" + 3` is `"53"`. `"5" - 3`
+is `2`. The arithmetic operators (except `+`) coerce strings to
+numbers. `+` does the opposite — if either side is a string, it
+concatenates. This is JavaScript's most infamous source of
+beginner confusion.
+
+## Counting characters: an important caveat
+
+For all "normal" characters (English letters, digits, basic
+punctuation), `string.length` gives you the count of characters
+the way you'd expect. But:
+
+- Many emojis are *more than one* "code unit" long.
+- Letters with accents can be one character that's stored as one
+  or two units depending on form.
+
+This is rarely a problem for beginner programs. Just be aware:
+`"😀".length` is `2` in JavaScript, not `1`, because the smiley
+emoji is encoded as a pair of code units. For accurate
+human-character counts in the presence of emoji, use
+`Array.from(s).length` or a Unicode-aware library.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log("abc".length);          // 3 — easy
+console.log("café".length);         // 4 — easy (if é is precomposed)
+console.log("😀".length);            // 2 — surprising!
+console.log(Array.from("😀").length); // 1 — better
+`}
+/>
+
+## A multi-file string example
+
+Let's split a small text-processing program across two files: one
+helper module, one driver.
+
+<CodeBlock
+  adapter="javascript"
+  entryFilename="index.js"
+  files={[
+    {
+      filename: "index.js",
+      initialContent: `const { wordCount, sentenceCount, summarize } = require("./text");
+
+const article = \`JavaScript is a strange and wonderful language.
+It was created in ten days. It became the language of the web.
+Today it runs on servers, phones, and your toaster.\`;
+
+console.log(summarize(article));
+`,
+    },
+    {
+      filename: "text.js",
+      initialContent: `function wordCount(text) {
+  return text.trim().split(/\\s+/).filter(Boolean).length;
+}
+
+function sentenceCount(text) {
+  // Very rough — split on punctuation that ends sentences.
+  return text.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean).length;
+}
+
+function summarize(text) {
+  const words = wordCount(text);
+  const sentences = sentenceCount(text);
+  const avg = sentences === 0 ? 0 : (words / sentences).toFixed(1);
+  return [
+    \`\${words} words, \${sentences} sentences.\`,
+    \`Average sentence length: \${avg} words.\`,
+  ].join("\\n");
+}
+
+module.exports = { wordCount, sentenceCount, summarize };
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="javascript"
+  title="Title case"
+  instructions={`Write a function \`titleCase(text)\` that capitalises the first letter of every word and lowercases the rest. Words are separated by single spaces.
+
+Examples:
+- \`titleCase("hello world")\` → \`"Hello World"\`
+- \`titleCase("javaScript is GREAT")\` → \`"Javascript Is Great"\`
+- \`titleCase("")\` → \`""\``}
+  initialCode={`function titleCase(text) {
+  // your code here
+  return text;
+}
+
+console.log(titleCase("hello world"));
+console.log(titleCase("javaScript is GREAT"));
+console.log(titleCase(""));
+`}
+  solutionCode={`function titleCase(text) {
+  return text
+    .split(" ")
+    .map((w) => w.length === 0 ? w : w[0].toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+console.log(titleCase("hello world"));
+console.log(titleCase("javaScript is GREAT"));
+console.log(titleCase(""));
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Two lowercase words",
+      description: `"hello world" → "Hello World"`,
+      code: `if (titleCase("hello world") !== "Hello World") throw new Error("expected 'Hello World'");`,
+    },
+    {
+      id: "mixed",
+      name: "Mixed case input",
+      description: `"javaScript is GREAT" → "Javascript Is Great"`,
+      code: `if (titleCase("javaScript is GREAT") !== "Javascript Is Great") throw new Error("expected 'Javascript Is Great'");`,
+    },
+    {
+      id: "empty",
+      name: "Empty string",
+      description: `"" → ""`,
+      code: `if (titleCase("") !== "") throw new Error("expected ''");`,
+    },
+    {
+      id: "single",
+      name: "Single word",
+      description: `"javascript" → "Javascript"`,
+      code: `if (titleCase("javascript") !== "Javascript") throw new Error("expected 'Javascript'");`,
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`Which string syntax should you reach for when you need to embed a variable inside a piece of text?
+
+- Single quotes with string concatenation: \`'Hello, ' + name + '!'\`
+- Double quotes with string concatenation: \`"Hello, " + name + "!"\`
+- [o] Backticks (template literals): \`\` \`Hello, \${name}!\` \`\`
+  > Correct. Template literals (\`\`backticks\`\`) let you interpolate variables directly with \`\${...}\`, and also span multiple lines without escape characters. They're the modern default for any non-trivial string.
+- Triple quotes: \`'''Hello, name!'''\`
+
+Template literals are clearer to read, easier to maintain, and avoid the visual noise of multiple \`+\` operators.`}
+/>
