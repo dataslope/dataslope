@@ -1,0 +1,361 @@
+---
+title: Loading Datasets
+description: Reading real CSV, Excel, JSON, and Parquet data into Pandas — including from URLs — and the most common pitfalls that hit you in the first five seconds.
+---
+
+This is where the hands-on work begins. Almost every analysis
+starts with the same gesture: read a dataset into a DataFrame.
+Pandas makes that easy in the happy path and adds knobs for the
+unhappy paths.
+
+## The two functions you will use most
+
+- `pd.read_csv(path_or_url)` — the workhorse. CSV is the
+  universal data format.
+- `pd.read_excel(path_or_url)` — for `.xlsx` files.
+
+Honorable mentions:
+
+- `pd.read_json` — JSON, often after some flattening.
+- `pd.read_parquet` — Parquet files (a fast columnar format).
+- `pd.read_sql` — query results from a SQL database.
+
+For the rest of the course we will lean on `read_csv` because
+the data we will use lives on the public internet as CSVs.
+
+## Reading from a URL
+
+`pd.read_csv` accepts a URL exactly like a file path. The bytes
+are fetched over HTTPS in the background and parsed.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Direct URL — works because raw.githubusercontent.com supports CORS
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+print("Shape:", df.shape)
+print("First 3 rows:")
+df.head(3)
+`}
+/>
+
+Two notes:
+
+1. **Use the raw URL.** Browsers will show GitHub HTML pages at
+   `github.com/.../file.csv` — that is not the file itself. The
+   raw version starts with `raw.githubusercontent.com` and
+   returns the actual bytes.
+2. **Some hosts don't allow direct browser fetches.** For those
+   you can route through Dataslope's CORS proxy. We will see
+   that further down.
+
+## Common `read_csv` options
+
+`pd.read_csv` has dozens of parameters, but you will use only a
+handful in real life:
+
+| Parameter        | What it does                                          |
+| ---------------- | ----------------------------------------------------- |
+| `sep`            | Custom delimiter (default `,`). Use `"\t"` for TSV.   |
+| `header`         | Which row contains the header (default `0`).          |
+| `names`          | Use these column names (skip header).                 |
+| `usecols`        | Only load these columns.                              |
+| `dtype`          | Force types (`{"zip": "string"}`).                    |
+| `parse_dates`    | Parse these columns as dates.                         |
+| `na_values`      | Treat these strings as missing (`["NA", "-"]`).       |
+| `skiprows`       | Skip N rows at the top (or specific rows).            |
+| `nrows`          | Only read N rows (for sampling huge files).           |
+| `encoding`       | Text encoding (`"utf-8"`, `"latin-1"`, ...).          |
+
+Let us try a real example with several of these.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv",
+    usecols=["Age", "Department", "MonthlyIncome", "JobRole", "Attrition"],
+    dtype={"Department": "category", "JobRole": "category", "Attrition": "category"},
+)
+
+print(df.dtypes)
+print()
+print(df.head())
+`}
+/>
+
+Two things to notice:
+
+- `usecols` saves memory by skipping columns we do not need.
+- `dtype` with `"category"` for repeated string columns saves
+  significant memory and speeds up groupings.
+
+## The first three things to do after `read_csv`
+
+Whenever you load a new dataset, run these three commands
+*before* you do anything else.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+# 1. Shape — do you have the rows you expected?
+print("Shape:", df.shape)
+print()
+
+# 2. Head — does each column look sensible?
+print(df.head())
+print()
+
+# 3. Dtypes — are the types right?
+print(df.dtypes)
+`}
+/>
+
+If any of those three looks wrong — surprising row count,
+garbled values, wrong types — fix it now. The cost of fixing a
+loading bug is much lower at this moment than three steps later.
+
+## Loading from a non-CORS-friendly URL
+
+Some hosts (including GitHub itself outside `raw.githubusercontent
+.com`, plus many private servers) do not include the HTTP
+headers that allow a browser to fetch them. Dataslope provides a
+CORS proxy you can route through:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Going through the proxy. The original URL is URL-encoded into ?url=...
+url = "https://dataslope-cors-proxy.subwaymatch.workers.dev/?url=https%3A%2F%2Fgithub.com%2Fbdi475%2Fdatasets%2Fraw%2Frefs%2Fheads%2Fmain%2FHR-dataset-v14.csv"
+
+df = pd.read_csv(url)
+print("Shape:", df.shape)
+df.head()
+`}
+/>
+
+When you have a choice, **prefer the direct `raw.githubuser
+content.com` URL**. The proxy is for cases where you do not.
+
+## Reading Excel files
+
+`.xlsx` files often have multiple sheets and mixed content
+(headers offset by a few rows, merged cells, etc.). The basic
+call:
+
+```python
+df = pd.read_excel("file.xlsx", sheet_name="Sales")
+```
+
+`sheet_name` accepts:
+
+- A string (sheet name).
+- An integer (sheet index, 0 = first).
+- A list of sheet names → returns a dict of DataFrames.
+- `None` → returns *all* sheets as a dict.
+
+A note on reality: Excel files frequently have a row or two of
+title text at the top before the actual header row. Use the
+`skiprows` parameter to jump over them.
+
+## Reading JSON
+
+JSON often comes from APIs and is *hierarchical*, not tabular.
+Pandas can flatten simple cases:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import io
+
+json_text = """
+[
+  {"name": "Aiko",  "age": 29, "city": "Tokyo"},
+  {"name": "Bilal", "age": 42, "city": "Karachi"},
+  {"name": "Chen",  "age": 35, "city": "Shanghai"}
+]
+"""
+
+df = pd.read_json(io.StringIO(json_text))
+print(df)
+print(df.dtypes)
+`}
+/>
+
+For deeply nested JSON, use `pd.json_normalize(...)` — it
+recursively flattens nested objects into columns with
+dot-separated names.
+
+## Defensive reading patterns
+
+A few habits worth building from day one.
+
+### Always pin the types you care about
+
+```python
+df = pd.read_csv(
+    path,
+    dtype={"zip": "string", "phone": "string"},
+)
+```
+
+This protects you from the leading-zero / scientific-notation
+problems we saw earlier.
+
+### Parse dates explicitly
+
+```python
+df = pd.read_csv(path, parse_dates=["order_date", "ship_date"])
+```
+
+Strings that look like dates are still strings until you parse
+them. Date arithmetic on strings does nothing useful.
+
+### Mark known missing-value sentinels
+
+Many CSVs use `"N/A"`, `"-"`, `"unknown"` to mean missing.
+Tell Pandas:
+
+```python
+df = pd.read_csv(path, na_values=["N/A", "-", "unknown"])
+```
+
+### Sample huge files first
+
+If a file is 5 GB, do not load it all to see what is in it.
+Load the first 1000 rows:
+
+```python
+preview = pd.read_csv(path, nrows=1000)
+```
+
+Inspect, design your real load, then run it.
+
+## A loading challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Load and trim an HR dataset"
+  instructions={`Load the HR dataset from this URL:
+
+\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
+
+But:
+
+- Only load the columns: \`Age\`, \`Department\`, \`MonthlyIncome\`, \`JobSatisfaction\`, \`Attrition\`.
+- Convert \`Department\` and \`Attrition\` to the \`category\` dtype as you load.
+
+Store the result in a DataFrame called \`df\`.`}
+  initialCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+
+df = None   # TODO
+
+print(df.head() if df is not None else "df is still None")
+`}
+  solutionCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+
+df = pd.read_csv(
+    URL,
+    usecols=["Age", "Department", "MonthlyIncome", "JobSatisfaction", "Attrition"],
+    dtype={"Department": "category", "Attrition": "category"},
+)
+
+print(df.head())
+`}
+  tests={[
+    {
+      id: "is_dataframe",
+      name: "df is a DataFrame",
+      description: "The variable df is a pandas DataFrame",
+      code: `import pandas as pd
+assert isinstance(df, pd.DataFrame), "df should be a DataFrame"`,
+    },
+    {
+      id: "correct_columns",
+      name: "Has exactly the requested columns",
+      description: "Age, Department, MonthlyIncome, JobSatisfaction, Attrition",
+      code: `expected = {"Age", "Department", "MonthlyIncome", "JobSatisfaction", "Attrition"}
+actual = set(df.columns)
+assert actual == expected, f"Got {sorted(actual)}, expected {sorted(expected)}"`,
+    },
+    {
+      id: "row_count",
+      name: "Loaded all 1470 rows",
+      description: "The full HR dataset has 1470 rows",
+      code: `assert len(df) == 1470, f"Expected 1470 rows, got {len(df)}"`,
+    },
+    {
+      id: "category_dtypes",
+      name: "Department and Attrition are categorical",
+      description: "Both columns should have dtype 'category'",
+      code: `import pandas as pd
+assert isinstance(df["Department"].dtype, pd.CategoricalDtype)
+assert isinstance(df["Attrition"].dtype, pd.CategoricalDtype)`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between \`https://github.com/.../file.csv\` and \`https://raw.githubusercontent.com/.../file.csv\`?
+
+- They are identical
+- The first is faster
+- [o] The first returns the GitHub HTML page that *displays* the file; the second returns the file's raw bytes
+  > Right. Always use the raw URL for \`pd.read_csv\` so you get the data and not the HTML.
+- The second requires authentication
+
+You will hit this distinction the very first time you try to load data from a GitHub link.`}
+/>
+
+<MultipleChoice
+  markdown={`Why use the \`category\` dtype on a column like \`Department\`?
+
+- It looks prettier
+- [o] Repeated string values are stored once with integer codes, which saves memory and speeds up grouping
+  > Yes. \`category\` is essentially an interned-string column, ideal for low-cardinality repeated values.
+- It allows the column to hold any type
+- It is required by Pandas
+
+For columns with millions of rows and only a handful of distinct values, the savings can be 10x or more.`}
+/>
+
+<MultipleChoice
+  markdown={`A CSV column \`phone\` contains values like \`5551234567\`. After \`pd.read_csv\` you see it has dtype \`int64\`. What is the safest fix?
+
+- Restart your computer
+- Convert to float
+- [o] Pass \`dtype={"phone": "string"}\` to \`pd.read_csv\` so the values are read as strings from the start
+  > Correct. Once a leading-zero phone or ZIP code has been parsed as int, the leading zeros are gone. Force the string type at read time.
+- Use \`.astype("int64")\` afterwards
+
+Specifying \`dtype\` at read time is much safer than trying to recover later.`}
+/>
+
+<MultipleChoice
+  markdown={`When loading a 5 GB CSV that you have never seen before, what is the recommended first move?
+
+- Load the whole thing and wait
+- Open it in Excel
+- [o] Use \`pd.read_csv(path, nrows=1000)\` to load a preview, then plan the real load (dtypes, usecols) based on what you see
+  > Yes. A small preview is the cheapest way to design a defensible full load.
+- Convert it to JSON first
+
+Cheap previews save expensive loads.`}
+/>

@@ -1,0 +1,252 @@
+---
+title: Project Organization
+description: How to lay out files, folders, and notebooks so an analysis stays understandable months after you wrote it.
+---
+
+A six-month-old analysis is, for practical purposes, somebody
+else's code — even if you wrote it. A small amount of structure
+goes a long way toward making it survivable.
+
+## A starter layout
+
+```text
+my-analysis/
+├── README.md
+├── requirements.txt
+├── data/
+│   ├── raw/                ← original files, immutable
+│   ├── interim/            ← intermediate output
+│   └── processed/          ← analysis-ready
+├── notebooks/
+│   ├── 01-explore.ipynb
+│   ├── 02-clean.ipynb
+│   └── 03-analysis.ipynb
+├── src/
+│   ├── load.py
+│   ├── clean.py
+│   └── plot.py
+├── outputs/
+│   ├── figures/
+│   └── reports/
+└── tests/
+    └── test_clean.py
+```
+
+You don't need *all* of this on day one. But knowing where
+things would go means you'll add them when needed.
+
+## What goes where
+
+- **`data/raw/`** — exactly what you received. Never touched
+  again.
+- **`data/interim/`** — after parsing, type-fixing, removing
+  obviously-wrong rows.
+- **`data/processed/`** — the analysis-ready dataset.
+- **`notebooks/`** — exploration and narrative. Numbered so
+  the reading order is obvious.
+- **`src/`** — reusable functions imported from notebooks.
+  When a notebook cell grows past ~30 lines or you copy-paste
+  it, promote it to `src/`.
+- **`outputs/`** — generated charts and final reports.
+- **`tests/`** — assertions about your data and helper
+  functions.
+
+## The notebook-naming trick
+
+Prefix notebooks with numbers:
+
+```text
+01-explore.ipynb
+02-clean.ipynb
+03-eda.ipynb
+04-models.ipynb
+```
+
+This guarantees the reading order. It also makes inserting a
+new step easy — `02.5-fix-encoding.ipynb` if you must.
+
+## When to graduate to scripts
+
+```mermaid
+flowchart LR
+  N["Exploratory notebook<br/>(one-off, narrative)"] --> P{"Is it<br/>re-run regularly?"}
+  P -- "No" --> N
+  P -- "Yes" --> S["Promote to .py script<br/>or import shared logic from src/"]
+```
+
+The crossover happens when:
+
+- You re-run the same analysis weekly.
+- Multiple notebooks need the same cleaning step.
+- An engineer needs to call your logic from production code.
+
+## Imports across notebooks and src
+
+When you move helpers into `src/clean.py`:
+
+```python
+# src/clean.py
+import pandas as pd
+
+def standardize_names(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df.columns = df.columns.str.lower().str.replace(" ", "_")
+    return df
+```
+
+You can import them from any notebook:
+
+```python
+# in a notebook
+import sys
+sys.path.insert(0, "..")   # or use a proper package install
+from src.clean import standardize_names
+
+df = standardize_names(df)
+```
+
+This refactor pays dividends as soon as you need the same logic
+in two places.
+
+## A minimal `README.md`
+
+Every project deserves a README, even a small one:
+
+```markdown
+# Q1 Sales Analysis
+
+## What this is
+An exploratory analysis of Q1 2024 sales by region and product
+line.
+
+## How to run
+1. Put raw sales export in `data/raw/sales_q1_2024.csv`
+2. Install: `pip install -r requirements.txt`
+3. Run notebooks in order: 01 → 02 → 03.
+4. Final figures land in `outputs/figures/`.
+
+## Key contacts
+- Data source: revops@example.com
+- Analyst: aiko@example.com
+```
+
+Anyone (including future-you) can rerun the project in 60
+seconds.
+
+## Naming conventions
+
+- **Files**: `lowercase_with_underscores.csv`
+- **Variables**: `lowercase_with_underscores`
+- **Functions**: `lowercase_with_underscores`
+- **DataFrames**: descriptive (`employees`, `orders`,
+  `cleaned_orders`), not `df`, `df2`, `df_final`.
+
+A name like `df_v3_final_REAL_FIXED` is a smell. If you need
+versions, use git.
+
+## Git — the missing tool
+
+Use version control for analysis projects, just like
+engineers do:
+
+- `git init` at the project root.
+- `.gitignore` excludes `data/raw/` and `data/processed/`
+  (data should not be in git for size/PII reasons).
+- Commit frequently, with descriptive messages.
+
+Even a one-person analysis benefits — you can roll back when
+you break something.
+
+## A small `.gitignore`
+
+```text
+# Don't commit data
+data/raw/
+data/interim/
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Notebooks output (optional, divisive — pick a side)
+# *.ipynb_checkpoints
+```
+
+## Tests for analysis
+
+You don't need 100% test coverage — but a few critical
+assertions are gold.
+
+```python
+# tests/test_clean.py
+import pandas as pd
+from src.clean import standardize_names
+
+def test_standardize_names_lowercases():
+    df = pd.DataFrame({"First Name": [1], "Last Name": [2]})
+    out = standardize_names(df)
+    assert list(out.columns) == ["first_name", "last_name"]
+```
+
+If `clean.py` changes, this test will catch the regression.
+
+## Documentation lives with the code
+
+Update the README, update notebook markdown cells, update
+function docstrings — whenever you change the logic, update the
+words that describe it.
+
+The single greatest cause of "this codebase is a nightmare" is
+documentation that *used* to be true.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why number your notebooks (\`01-load\`, \`02-clean\`, ...)?
+
+- It is required by Jupyter
+- It makes them faster
+- [o] It makes the reading and execution order obvious — important when a future reader (or you, in six months) needs to retrace the analysis
+  > Right. Folder listings are alphabetical; numbering forces a meaningful order.
+- It saves memory
+
+A tiny convention with disproportionate payoff.`}
+/>
+
+<MultipleChoice
+  markdown={`When should logic move out of a notebook and into a \`.py\` file in \`src/\`?
+
+- Never — notebooks are the deliverable
+- Immediately, always
+- [o] When the same logic is needed in multiple notebooks, or when a cell grows large enough to be its own well-named function
+  > Right. Notebooks are for narrative; reusable logic belongs in importable modules.
+- When the cell crashes
+
+The promotion-when-reused rule is a healthy default.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is committing raw data to git generally a bad idea?
+
+- Git cannot handle CSV
+- It is illegal
+- [o] Data files are often large, change frequently, and may contain PII or confidential information — git is for code, data belongs in dedicated storage
+  > Right. \`.gitignore\` should exclude \`data/\` in most projects.
+- It slows down notebooks
+
+Code in git; data in storage. A clean separation pays off.`}
+/>
+
+<MultipleChoice
+  markdown={`Which name for a DataFrame is best?
+
+- \`df_FINAL_v3_real\`
+- \`df2\`
+- [o] \`cleaned_orders\` — a descriptive name that says what is in it
+  > Right. Names describe *content*, not history. Use git for history.
+- \`final\`
+
+Good names eliminate whole categories of confusion.`}
+/>

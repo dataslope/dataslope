@@ -1,0 +1,346 @@
+---
+title: String Operations
+description: The .str accessor — vectorized string methods that operate on whole columns of text without writing a loop.
+---
+
+Real-world data is full of text: names, addresses, product
+codes, comments, log messages. Pandas exposes nearly all of
+Python's string methods on whole columns via the `.str`
+accessor.
+
+## The basic shape
+
+Any text column has a `.str` namespace. Methods you call on it
+behave element-wise.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["  Aiko  ", "BILAL", "chen", "Diego "])
+
+print(s.str.strip())
+print()
+print(s.str.upper())
+print()
+print(s.str.lower())
+print()
+print(s.str.title())
+print()
+print(s.str.len())
+`}
+/>
+
+## Chaining string methods
+
+These compose naturally:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["  Sales-Engineer ", "Marketing Lead", "  DevOps "])
+
+normalized = s.str.strip().str.replace("-", " ").str.title()
+print(normalized)
+`}
+/>
+
+## Search and contains
+
+`.contains` returns a boolean mask — perfect for filters:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "title": ["Senior Data Engineer", "Marketing Lead", "Data Scientist", "Sales Rep"],
+})
+
+# Anyone with "Data" in their title (case-insensitive)
+print(df[df["title"].str.contains("Data", case=False)])
+print()
+
+# Anyone with "Lead" OR "Senior"
+print(df[df["title"].str.contains("Lead|Senior", regex=True)])
+`}
+/>
+
+By default, `.contains` uses regex. Use `regex=False` for
+literal substring matching (faster and safer when the pattern
+contains special chars).
+
+## Split, slice, and extract
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+emails = pd.Series(["aiko@example.com", "bilal@work.io", "chen@uni.edu"])
+
+# Split by '@' → returns lists
+print(emails.str.split("@").head())
+print()
+
+# Get the first element after split
+print(emails.str.split("@").str.get(0))
+print()
+
+# Get with expand=True returns a DataFrame
+parts = emails.str.split("@", expand=True)
+parts.columns = ["user", "domain"]
+print(parts)
+print()
+
+# Or slice characters by position
+print(emails.str[:5])   # first 5 chars
+`}
+/>
+
+`.split(..., expand=True)` is one of the most useful patterns —
+it lets you turn one column into many in a single call.
+
+## Extract with regex
+
+When the pattern is more structured, `str.extract` pulls out
+named groups.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+logs = pd.Series([
+    "2024-03-18 14:23:01 INFO  User logged in",
+    "2024-03-18 14:24:55 ERROR Database timeout",
+    "2024-03-18 14:25:10 WARN  Slow query: 1.4s",
+])
+
+parsed = logs.str.extract(r"(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}:\d{2}) (?P<level>\w+)\s+(?P<msg>.*)")
+print(parsed)
+`}
+/>
+
+Named groups become column names. This is hugely useful for
+turning log files into a real DataFrame.
+
+## Replace — substrings and regex
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["(555) 123-4567", "(555) 987-6543", "(212) 555-0100"])
+
+# Strip non-digits to get a clean phone number
+clean = s.str.replace(r"\D", "", regex=True)
+print(clean)
+`}
+/>
+
+## Padding, justifying, and case
+
+A grab bag of useful methods:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["5", "42", "123"])
+print(s.str.zfill(4))           # pad with leading zeros to length 4
+print()
+
+names = pd.Series(["aiko", "BiLaL"])
+print(names.str.capitalize())   # First char upper, rest lower
+print(names.str.swapcase())     # Invert case
+`}
+/>
+
+## Length, count, and matches
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+comments = pd.Series([
+    "Loved it!",
+    "Could be better.",
+    "Five stars five stars five stars",
+])
+
+print("Length:")
+print(comments.str.len())
+print()
+print("Count of 'stars':")
+print(comments.str.count("stars"))
+print()
+print("Number of whitespace-separated tokens (rough word count):")
+print(comments.str.split().str.len())
+`}
+/>
+
+## A small cleaning example
+
+Bringing several pieces together — normalizing employee names:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+raw = pd.Series([
+    " aiko TANAKA ",
+    "Bilal  Khan",        # double space
+    "chen ZHANG",
+    "DIEGO  ramirez",
+    "",
+    None,
+])
+
+clean = (
+    raw
+      .str.strip()                              # outer spaces
+      .str.replace(r"\s+", " ", regex=True)    # collapse internal whitespace
+      .str.title()                              # nice casing
+      .replace("", pd.NA)                       # empties → missing
+)
+print(clean)
+`}
+/>
+
+## Working with NaN in string columns
+
+By default, string methods *propagate* NaN — a NaN input yields
+a NaN output. Boolean methods (`contains`, `startswith`) can
+optionally fill NaN with True/False using `na=`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+s = pd.Series(["Engineer", None, "Sales", "Lead Engineer"])
+
+print(s.str.contains("Engineer"))
+print()
+print(s.str.contains("Engineer", na=False))   # NaN → False
+`}
+/>
+
+This `na=False` is *essential* when using `.contains` inside a
+boolean filter — otherwise you get cryptic errors about NaN in
+boolean indexers.
+
+## Cleaning a messy column end-to-end
+
+<ChallengeCard
+  adapter="python"
+  title="Normalize a messy job title column"
+  instructions={`Given a Series \`titles\` with messy values, produce a Series \`clean\` where:
+
+1. Leading/trailing whitespace is removed.
+2. Multiple internal spaces are collapsed to a single space.
+3. The result is title-cased.
+4. Empty strings become \`pd.NA\`.
+5. The strings \`"data scientist"\` and \`"data scientists"\` (any casing) both become \`"Data Scientist"\`.
+
+Use vectorized \`.str\` methods.`}
+  initCode={`import pandas as pd
+
+titles = pd.Series([
+    " data scientist ",
+    "DATA SCIENTISTS",
+    "Software   engineer",
+    "  Product Manager",
+    "data  scientist",
+    "",
+    None,
+])`}
+  initialCode={`clean = None   # TODO
+
+print(clean)
+`}
+  solutionCode={`import pandas as pd
+
+clean = (
+    titles
+      .str.strip()
+      .str.replace(r"\s+", " ", regex=True)
+      .str.title()
+      .replace({"Data Scientists": "Data Scientist"})
+      .replace("", pd.NA)
+)
+
+print(clean)
+`}
+  tests={[
+    {
+      id: "is_series",
+      name: "clean is a Series",
+      description: "Type check",
+      code: `import pandas as pd
+assert isinstance(clean, pd.Series)`,
+    },
+    {
+      id: "first_normalized",
+      name: "Leading whitespace and casing normalized",
+      description: "' data scientist ' → 'Data Scientist'",
+      code: `assert clean.iloc[0] == "Data Scientist"`,
+    },
+    {
+      id: "plural_normalized",
+      name: "'DATA SCIENTISTS' becomes 'Data Scientist'",
+      description: "Map plural to singular",
+      code: `assert clean.iloc[1] == "Data Scientist"`,
+    },
+    {
+      id: "spaces_collapsed",
+      name: "Internal multi-spaces collapsed",
+      description: "'Software   engineer' → 'Software Engineer'",
+      code: `assert clean.iloc[2] == "Software Engineer"`,
+    },
+    {
+      id: "empty_to_na",
+      name: "Empty string becomes missing",
+      description: "'' → NaN/NA",
+      code: `import pandas as pd
+assert pd.isna(clean.iloc[5])`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why use the \`.str\` accessor at all?
+
+- Pandas requires it
+- It is faster than Python loops
+- [o] It provides vectorized string operations on whole columns of text — clean syntax and far faster than writing a Python for-loop over each value
+  > Right. \`.str.upper()\` on a million-row column is one call, not a million.
+- It works only on integers
+
+The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
+/>
+
+<MultipleChoice
+  markdown={`Calling \`s.str.contains("foo")\` on a column with a NaN value will:
+
+- Return True everywhere
+- Return False everywhere
+- [o] Propagate the NaN — the result has NaN at that position by default
+  > Yes. Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean — required if you want to use the result as a filter mask.
+- Throw an error
+
+Forgetting \`na=False\` is a classic gotcha when filtering string columns that contain nulls.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical advantage of \`str.split("@", expand=True)\`?
+
+- It is faster than not expanding
+- It returns a Series of lists
+- [o] It returns a DataFrame, one column per split piece — perfect for splitting one column into many
+  > Correct. Useful for emails, names, addresses, anything with predictable delimiters.
+- It removes the @ sign
+
+The \`expand=True\` flag is the difference between a hard-to-use Series-of-lists and a friendly DataFrame.`}
+/>

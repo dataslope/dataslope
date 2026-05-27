@@ -1,0 +1,338 @@
+---
+title: Merging and Joining
+description: Inner, left, right, and outer joins — what they mean, when to use each, and how to debug surprises.
+---
+
+A *join* asks: given two tables and a shared key, what should
+happen to rows that don't match? Pandas's `merge` answers this
+with the `how` parameter.
+
+## The four join types
+
+```mermaid
+flowchart TB
+  subgraph Inner
+    I["Only rows whose key<br/>appears in BOTH tables"]
+  end
+  subgraph Left
+    L["All rows from LEFT table.<br/>Right columns filled with NaN<br/>where no match exists."]
+  end
+  subgraph Right
+    R["All rows from RIGHT table.<br/>Left columns filled with NaN<br/>where no match exists."]
+  end
+  subgraph Outer
+    O["Every row from EITHER table.<br/>NaN wherever the other side<br/>has no match."]
+  end
+```
+
+## Setting the stage
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+employees = pd.DataFrame({
+    "emp_id":  [1, 2, 3, 4, 5],
+    "name":    ["Aiko","Bilal","Chen","Diego","Esra"],
+    "dept_id": [10, 20, 10, 30, 99],   # 99 has no matching department
+})
+
+departments = pd.DataFrame({
+    "dept_id":   [10, 20, 30, 40],     # 40 has no employees
+    "dept_name": ["Engineering","Sales","Marketing","HR"],
+})
+
+print(employees)
+print()
+print(departments)
+`}
+/>
+
+## Inner join
+
+Only rows where the key is present in both. This is the
+default.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`inner = employees.merge(departments, on="dept_id", how="inner")
+print(inner)
+`}
+/>
+
+Esra (dept 99) and HR (dept 40) both vanish. **Inner = strict
+intersection.**
+
+## Left join
+
+Keep all rows from the left side; fill missing right-side
+columns with NaN.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`left = employees.merge(departments, on="dept_id", how="left")
+print(left)
+`}
+/>
+
+Esra is preserved with `dept_name = NaN`. Left joins are by far
+the most common in everyday analytics — "I have my entities,
+enrich them with extra info if available."
+
+## Right join
+
+The mirror image. Rarely used in practice — most analysts
+prefer to swap the arguments and use a left join, which reads
+more naturally.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`right = employees.merge(departments, on="dept_id", how="right")
+print(right)
+`}
+/>
+
+HR appears with NaN employee columns.
+
+## Outer join
+
+Keep everything from both sides.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`outer = employees.merge(departments, on="dept_id", how="outer")
+print(outer)
+`}
+/>
+
+Both Esra (no department) and HR (no employees) are present.
+Great for spotting *what doesn't match*.
+
+## The indicator trick — diagnose join coverage
+
+<CodeBlock
+  adapter="python"
+  initialCode={`check = employees.merge(departments, on="dept_id", how="outer", indicator=True)
+print(check)
+print()
+print(check["_merge"].value_counts())
+`}
+/>
+
+`indicator=True` adds a `_merge` column showing where each row
+came from (`left_only`, `right_only`, `both`). This is one of
+the most valuable debugging tools in Pandas — always reach for
+it when a join produces surprising row counts.
+
+## Different column names
+
+When the join key is named differently in each table:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+orders = pd.DataFrame({"order_id":[1,2,3], "cust":[10,11,12], "amount":[50,80,30]})
+customers = pd.DataFrame({"customer_id":[10,11,12], "name":["Aiko","Bilal","Chen"]})
+
+joined = orders.merge(customers, left_on="cust", right_on="customer_id")
+print(joined)
+`}
+/>
+
+## Many-to-many — the row-count surprise
+
+If the key is **not unique on one side**, the join multiplies
+rows. If it's not unique on **both** sides, you get the Cartesian
+product per key value — often a disaster.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+a = pd.DataFrame({"k":[1,1,2], "x":["a1","a2","a3"]})
+b = pd.DataFrame({"k":[1,1,3], "y":["b1","b2","b3"]})
+
+# Each key=1 row in a matches both key=1 rows in b → 2 × 2 = 4 rows
+print(a.merge(b, on="k", how="inner"))
+`}
+/>
+
+Pandas can warn you about unexpected cardinalities:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+a = pd.DataFrame({"k":[1,2,3], "x":["a","b","c"]})
+b = pd.DataFrame({"k":[1,2,3], "y":["X","Y","Z"]})
+
+# Assert that the join is one-to-one
+result = a.merge(b, on="k", validate="one_to_one")
+print(result)
+`}
+/>
+
+`validate=` accepts `"one_to_one"`, `"one_to_many"`,
+`"many_to_one"`, or `"many_to_many"` and raises if the actual
+data doesn't match.
+
+## Suffixes when column names collide
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+a = pd.DataFrame({"id":[1,2], "value":[10,20]})
+b = pd.DataFrame({"id":[1,2], "value":[100,200]})
+
+print(a.merge(b, on="id"))                          # default suffixes _x / _y
+print()
+print(a.merge(b, on="id", suffixes=("_yr1","_yr2")))
+`}
+/>
+
+Always give meaningful suffixes — `_x` and `_y` are a recipe for
+confusion six months later.
+
+## A bigger walkthrough
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+
+orders = pd.DataFrame({
+    "order_id":   [101,102,103,104,105],
+    "customer":   [1,1,2,3,99],
+    "amount":     [50, 30, 80, 25, 60],
+})
+
+customers = pd.DataFrame({
+    "customer":   [1,2,3,4],
+    "name":       ["Aiko","Bilal","Chen","Diego"],
+    "country":    ["JP","PK","CN","MX"],
+})`}
+  initialCode={`# How many orders have no matching customer record?
+check = orders.merge(customers, on="customer", how="left", indicator=True)
+print(check)
+print()
+print("Orders missing a customer:", (check["_merge"] == "left_only").sum())
+print()
+print("Customers with no orders:")
+all_check = orders.merge(customers, on="customer", how="outer", indicator=True)
+print(all_check[all_check["_merge"] == "right_only"])
+`}
+/>
+
+This is the everyday detective work of joining real datasets:
+first check coverage, then narrow down what's missing and why.
+
+## Mini challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Find unmatched orders"
+  instructions={`Given \`orders\` and \`customers\` (provided), create a DataFrame \`orphans\` containing only the orders whose \`customer_id\` does not appear in the \`customers\` table.
+
+Use a left-merge + indicator-based filter.`}
+  initCode={`import pandas as pd
+
+orders = pd.DataFrame({
+    "order_id":    [1,2,3,4,5,6],
+    "customer_id": [10,11,12,10,99,77],
+    "amount":      [50,80,30,40,60,90],
+})
+
+customers = pd.DataFrame({
+    "customer_id": [10,11,12,13],
+    "name":        ["Aiko","Bilal","Chen","Diego"],
+})`}
+  initialCode={`orphans = None   # TODO
+
+print(orphans)
+`}
+  solutionCode={`import pandas as pd
+
+merged = orders.merge(customers, on="customer_id", how="left", indicator=True)
+orphans = merged.loc[merged["_merge"] == "left_only", orders.columns]
+
+print(orphans)
+`}
+  tests={[
+    {
+      id: "type",
+      name: "orphans is a DataFrame",
+      description: "Type check",
+      code: `import pandas as pd
+assert isinstance(orphans, pd.DataFrame)`,
+    },
+    {
+      id: "count",
+      name: "Exactly 2 unmatched orders",
+      description: "customer_id 99 and 77",
+      code: `assert len(orphans) == 2`,
+    },
+    {
+      id: "ids",
+      name: "Right order_ids identified",
+      description: "5 and 6",
+      code: `assert sorted(orphans["order_id"].tolist()) == [5, 6]`,
+    },
+    {
+      id: "cols",
+      name: "Has the original order columns",
+      description: "Did not leave _merge or duplicate columns",
+      code: `assert set(orphans.columns) == {"order_id","customer_id","amount"}`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Your join produces 3× more rows than the left table. The most likely cause is:
+
+- A bug in pandas
+- A network issue
+- [o] The join key is duplicated in the right-hand table — each left row matches multiple right rows
+  > Right. Always check key uniqueness with \`.duplicated()\` or \`validate="one_to_many"\` before joining.
+- The dtypes are different
+
+Cardinality blow-ups are by far the most common merge bug.`}
+/>
+
+<MultipleChoice
+  markdown={`Which join is best for "every employee row, with department info attached if available, but I don't want to lose any employees"?
+
+- inner
+- [o] left (employees on the left)
+  > Yes. Left join keeps all employees and adds dept info where it matches.
+- outer
+- right
+
+Left joins are the workhorse of enrichment workflows.`}
+/>
+
+<MultipleChoice
+  markdown={`The most useful diagnostic flag for understanding a merge is:
+
+- copy=False
+- sort=True
+- [o] indicator=True — adds a \`_merge\` column showing which rows are left-only, right-only, or matched in both
+  > Correct. Always reach for this when row counts surprise you.
+- on="*"
+
+\`indicator=True\` should be in every data analyst's debugging toolbox.`}
+/>
+
+<MultipleChoice
+  markdown={`What's the safest way to **guarantee** your merge is one-to-one before producing results?
+
+- Manually count rows after the merge
+- Hope for the best
+- [o] Pass \`validate="one_to_one"\` to \`merge\` — Pandas raises an error if the data violates that assumption
+  > Right. Encoding your assumptions in the code catches problems immediately, instead of letting silent bugs propagate.
+- Use a SQL database instead
+
+The \`validate=\` parameter turns implicit assumptions into explicit, testable contracts.`}
+/>

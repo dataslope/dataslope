@@ -1,0 +1,180 @@
+---
+title: Concat vs Merge
+description: Two ways to combine datasets — stacking and joining — and how to choose between them.
+---
+
+Two datasets rarely live alone. You'll often need to combine
+them. Pandas offers two core tools, and beginners often confuse
+them.
+
+## The mental model
+
+```mermaid
+flowchart LR
+  A["concat<br/>Stack rows or columns<br/>(same shape)"] --> B["Result has more rows<br/>(or more columns)"]
+  C["merge<br/>Join on a key column<br/>(like SQL JOIN)"] --> D["Result combines columns<br/>matched row-by-row"]
+```
+
+- **concat** = glue tables together by position. No matching
+  happens. "Here are three months of sales — stack them into
+  one DataFrame."
+- **merge** = bring columns from another table by matching a
+  key. "For each employee, look up their department from the
+  departments table."
+
+## Concat — when shapes match
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+jan = pd.DataFrame({"date": ["2024-01-15","2024-01-20"], "sales": [100, 150]})
+feb = pd.DataFrame({"date": ["2024-02-05","2024-02-18"], "sales": [200, 175]})
+mar = pd.DataFrame({"date": ["2024-03-02","2024-03-25"], "sales": [225, 300]})
+
+q1 = pd.concat([jan, feb, mar], ignore_index=True)
+print(q1)
+`}
+/>
+
+`ignore_index=True` resets the integer index so it runs 0, 1, 2,
+... instead of repeating each month's 0, 1.
+
+You can also concat horizontally:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+ids   = pd.DataFrame({"id": [1, 2, 3]})
+names = pd.DataFrame({"name": ["Aiko","Bilal","Chen"]})
+
+side_by_side = pd.concat([ids, names], axis=1)
+print(side_by_side)
+`}
+/>
+
+Horizontal concat is fast but **fragile** — it lines rows up by
+*position*, not by any key. If the two frames were sorted
+differently, you'd silently mis-pair people with names. Prefer
+`merge` whenever a real key exists.
+
+## Merge — joining on a key
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+employees = pd.DataFrame({
+    "emp_id":  [1, 2, 3, 4],
+    "name":    ["Aiko","Bilal","Chen","Diego"],
+    "dept_id": [10, 20, 10, 30],
+})
+
+departments = pd.DataFrame({
+    "dept_id":   [10, 20, 30],
+    "dept_name": ["Engineering","Sales","Marketing"],
+})
+
+joined = employees.merge(departments, on="dept_id")
+print(joined)
+`}
+/>
+
+The result has every employee's row, with `dept_name` filled in
+from the other table by matching `dept_id`.
+
+## A side-by-side example
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Two months of orders — concat them
+m1 = pd.DataFrame({"order_id": [1,2], "customer_id": [10, 11], "amount": [50, 75]})
+m2 = pd.DataFrame({"order_id": [3,4], "customer_id": [10, 12], "amount": [40, 90]})
+
+all_orders = pd.concat([m1, m2], ignore_index=True)
+print("After concat:")
+print(all_orders)
+print()
+
+# A customer lookup table — merge it in
+customers = pd.DataFrame({
+    "customer_id": [10, 11, 12],
+    "name":        ["Aiko","Bilal","Chen"],
+})
+
+enriched = all_orders.merge(customers, on="customer_id")
+print("After merge:")
+print(enriched)
+`}
+/>
+
+Notice the natural workflow: **concat** first (stack the raw
+data sources), then **merge** in lookup tables to enrich.
+
+## When to use which
+
+| Situation | Tool |
+| --- | --- |
+| Same columns, different time periods | concat (axis=0) |
+| Same rows in same order, more columns to add | concat (axis=1) — but prefer merge if there's a key |
+| Same row entities, columns from another table by key | **merge** |
+| Combining 12 monthly files into one yearly file | concat |
+| Adding customer details to each order | merge |
+
+## A common trap: misaligned indexes in concat
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+a = pd.DataFrame({"x": [1,2,3]}, index=[0,1,2])
+b = pd.DataFrame({"y": [10,20,30]}, index=[5,6,7])   # different index!
+
+print("axis=1 concat (aligns by INDEX):")
+print(pd.concat([a, b], axis=1))
+`}
+/>
+
+You get NaNs because the indexes don't overlap. Either reset
+indexes first or use `merge` with an explicit key.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`You have twelve CSV files, one per month, each with the same columns. What's the right tool to combine them into one DataFrame?
+
+- merge
+- [o] concat with \`axis=0\` (stack rows) and \`ignore_index=True\`
+  > Right. Same shape, no key — stacking is the right operation.
+- pivot
+- join
+
+This is the canonical concat use case.`}
+/>
+
+<MultipleChoice
+  markdown={`You have an \`orders\` table with a \`customer_id\` column, and a separate \`customers\` table you want to look up the customer's name from. Which is correct?
+
+- concat axis=0
+- concat axis=1
+- [o] \`orders.merge(customers, on="customer_id")\`
+  > Yes. Merge matches rows by the shared key — exactly what's needed for lookups.
+- groupby
+
+Whenever a *key* relates the two tables, merge.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is horizontal \`pd.concat([a, b], axis=1)\` considered risky?
+
+- It is slow
+- It does not work with strings
+- [o] It pairs rows by index/position rather than by a key — easy to silently mis-align rows if the two frames are in different orders
+  > Correct. Even if it works today, a future sort or reset on one frame breaks the pairing. Use merge when you have an ID.
+- It is deprecated
+
+Position-based joins are dangerous in any data tool, not just Pandas.`}
+/>

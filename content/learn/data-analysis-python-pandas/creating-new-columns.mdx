@@ -1,0 +1,284 @@
+---
+title: Creating New Columns
+description: Computed columns, conditional columns, mapped columns, and the in-place vs. assign trade-off.
+---
+
+Most analyses involve creating new columns: ratios, flags,
+buckets, formatted strings. Pandas gives you several ways. Each
+fits a different situation.
+
+## The simplest case — arithmetic
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen"],
+    "salary": [120, 95, 140],
+    "bonus":  [12, 8, 20],
+})
+
+df["total_comp"] = df["salary"] + df["bonus"]
+df["bonus_pct"] = (df["bonus"] / df["salary"] * 100).round(1)
+
+print(df)
+`}
+/>
+
+The whole column appears on both sides of `=`. That is the
+*vectorized* style: no for-loop, just whole-column arithmetic.
+
+## `.assign()` — chainable column creation
+
+`.assign()` produces a *new* DataFrame with the added columns,
+which makes it perfect for method chains.
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen"],
+    "salary": [120, 95, 140],
+    "bonus":  [12, 8, 20],
+})`}
+  initialCode={`new_df = (
+    df
+    .assign(total_comp=lambda x: x["salary"] + x["bonus"])
+    .assign(bonus_pct=lambda x: (x["bonus"] / x["salary"] * 100).round(1))
+)
+print(new_df)
+print()
+print("Original is unchanged:")
+print(df)
+`}
+/>
+
+The `lambda x: ...` lets `.assign` see the *current* state of the
+DataFrame (including columns added earlier in the chain). This
+matters when you want one new column to reference another.
+
+## Mutate-in-place vs. assign
+
+The same logical operation can be expressed two ways:
+
+```python
+# In place — modifies df
+df["total_comp"] = df["salary"] + df["bonus"]
+
+# Functional — returns a new DataFrame
+df2 = df.assign(total_comp=df["salary"] + df["bonus"])
+```
+
+Both are widely used. A modern convention: use `.assign()` inside
+long method chains; use direct assignment for one-off tweaks.
+Either way, **immutability is the analyst's friend** — keeping
+the original `df` untouched makes it easier to reason about
+later cells.
+
+<Callout type="info" title="Mutable vs immutable thinking">
+*Mutable* operations change the DataFrame in place; *immutable*
+operations return a new one. Pandas supports both. Beginners
+tend to overuse mutable (and lose track of state); experienced
+analysts often prefer immutable, even at the cost of an extra
+variable.
+</Callout>
+
+## Conditional columns with `np.where`
+
+`np.where(condition, value_if_true, value_if_false)` is a vector
+ized ternary.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"salary": [120, 95, 140, 80, 128]})
+df["band"] = np.where(df["salary"] >= 130, "high", "standard")
+print(df)
+`}
+/>
+
+## Multi-condition: `np.select`
+
+For more than two branches, `np.select` is cleaner than nested
+`np.where`s.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
+
+conditions = [
+    df["score"] >= 90,
+    df["score"] >= 80,
+    df["score"] >= 70,
+    df["score"] >= 60,
+]
+choices = ["A", "B", "C", "D"]
+
+df["grade"] = np.select(conditions, choices, default="F")
+print(df)
+`}
+/>
+
+## Mapping with dictionaries: `.map`
+
+When the new column is a lookup from old values:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "currency": ["USD","EUR","GBP","USD","JPY"],
+    "amount":   [100, 200, 150, 80, 12000],
+})
+
+rates = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27, "JPY": 0.0067}
+df["amount_usd"] = (df["amount"] * df["currency"].map(rates)).round(2)
+print(df)
+`}
+/>
+
+`.map(dict)` is the quintessential dictionary-as-lookup pattern.
+Values not in the dict become NaN.
+
+## `.apply` — when you really need a function
+
+When a column's value depends on more complex logic, fall back
+to `.apply`. It is slower than vectorized operations, but
+flexible.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+def grade(score):
+    if score >= 90: return "A"
+    if score >= 80: return "B"
+    if score >= 70: return "C"
+    if score >= 60: return "D"
+    return "F"
+
+df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
+df["grade"] = df["score"].apply(grade)
+print(df)
+`}
+/>
+
+For *one column* → use `Series.apply(func)`. For *multiple
+columns* per row → use `DataFrame.apply(func, axis=1)`, but
+expect it to be slow on big data; prefer vectorized expressions
+when you can.
+
+## Binning continuous values
+
+`pd.cut` slices a continuous column into named buckets:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"age": [22, 35, 47, 61, 18, 29, 71, 45]})
+df["age_group"] = pd.cut(df["age"],
+    bins=[0, 25, 40, 60, 200],
+    labels=["young","mid","senior","veteran"],
+)
+print(df)
+`}
+/>
+
+For equal-frequency buckets (quartiles, quintiles) use
+`pd.qcut`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"income": [25, 35, 45, 60, 80, 110, 150, 200, 400]})
+df["quartile"] = pd.qcut(df["income"], q=4, labels=["Q1","Q2","Q3","Q4"])
+print(df)
+`}
+/>
+
+## A composite example
+
+Put several techniques together — an HR dataset with derived
+fields.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+# Annual income from monthly
+df["AnnualIncome"] = df["MonthlyIncome"] * 12
+
+# Tenure buckets
+df["TenureBand"] = pd.cut(df["YearsAtCompany"],
+    bins=[-1, 1, 3, 7, 100],
+    labels=["new","early","mid","veteran"],
+)
+
+# Job-satisfaction label
+df["SatLabel"] = df["JobSatisfaction"].map({
+    1: "low", 2: "med-low", 3: "med-high", 4: "high",
+})
+
+# Composite flag: at-risk = high tenure but low satisfaction
+df["AtRisk"] = np.where(
+    (df["TenureBand"].isin(["mid","veteran"])) & (df["JobSatisfaction"] <= 2),
+    True, False
+)
+
+print(df[["Age","YearsAtCompany","JobSatisfaction","TenureBand","SatLabel","AtRisk"]].head(10))
+print()
+print("At-risk fraction:", df["AtRisk"].mean().round(3))
+`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between \`df["x"] = ...\` and \`df.assign(x=...)\`?
+
+- Nothing
+- The first is faster
+- [o] Direct assignment modifies \`df\` in place; \`.assign\` returns a *new* DataFrame and leaves the original untouched
+  > Right. \`.assign\` is the immutable alternative and chains nicely in pipelines.
+- \`.assign\` is a method on Series
+
+Choose based on whether you want to preserve the original DataFrame.`}
+/>
+
+<MultipleChoice
+  markdown={`When would you reach for \`np.select\` instead of \`np.where\`?
+
+- When you want to filter
+- When you want to drop columns
+- [o] When you need to assign one of *more than two* values depending on multiple conditions
+  > Yes. \`np.where\` is binary (if/else). \`np.select\` extends to many branches without nesting.
+- When you want to sort
+
+For grade letters, salary bands, customer tiers, etc., \`np.select\` keeps the logic readable.`}
+/>
+
+<MultipleChoice
+  markdown={`\`df["currency"].map({"USD": 1.00, "EUR": 1.08})\` returns NaN for rows whose currency is "GBP". Why?
+
+- Pandas does not support strings in maps
+- The map is corrupted
+- [o] \`.map\` returns NaN for any value not found in the mapping dict; "GBP" is missing so the result is NaN
+  > Correct. You can supply a default with \`.map(dict).fillna(...)\` or by using \`.replace\` instead.
+- The dict is read-only
+
+Always confirm your mapping is exhaustive (or explicitly handle the misses).`}
+/>

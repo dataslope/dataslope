@@ -1,0 +1,250 @@
+---
+title: Duplicates and Inconsistencies
+description: Detecting and resolving the same logical thing recorded twice, three times, or under inconsistent names.
+---
+
+After missing values, the next universal mess is **duplication**
+— the same logical record appearing more than once. Closely
+related: **inconsistency**, where the same thing wears different
+labels.
+
+## What counts as a duplicate?
+
+It depends on the **grain**. In a customers table, the same
+customer ID appearing twice is a duplicate. In an orders table,
+the same customer ID appearing twice is just a returning
+customer — not a duplicate.
+
+So the question is always: *what columns, taken together, should
+uniquely identify a row?*
+
+## Detecting duplicates
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 2, 4, 1],
+    "name":        ["Aiko","Bilal","Chen","Bilal","Diego","Aiko"],
+    "spend":       [100, 200, 300, 200, 50, 100],
+})
+
+# True wherever a row is a duplicate of an earlier row
+print("Is duplicate?")
+print(df.duplicated())
+print()
+
+# Just the duplicates
+print("Duplicate rows:")
+print(df[df.duplicated()])
+print()
+
+# Duplicates based ONLY on customer_id
+print("Duplicate customer_ids:")
+print(df[df.duplicated(subset=["customer_id"])])
+`}
+/>
+
+By default, `duplicated()` marks the **second and later** copies
+as duplicates and leaves the first untouched. `keep="last"`
+reverses that; `keep=False` marks *all* duplicates.
+
+## Removing duplicates
+
+`drop_duplicates()` is the corresponding action:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 2, 4, 1],
+    "name":        ["Aiko","Bilal","Chen","Bilal","Diego","Aiko"],
+    "spend":       [100, 200, 300, 200, 50, 100],
+})`}
+  initialCode={`# Drop full-row duplicates
+print(df.drop_duplicates())
+print()
+
+# Drop duplicates based on customer_id only — keeps the first
+print(df.drop_duplicates(subset=["customer_id"]))
+`}
+/>
+
+When you have *almost* duplicates that disagree on some columns
+(same customer, different spend in two rows), you have to make a
+business decision: keep the first, keep the last, sum the spend,
+average it? Pandas will not decide for you.
+
+<Callout type="info" title="A safer pattern">
+When in doubt, *aggregate* instead of *dropping*:
+
+`df.groupby("customer_id").agg({"spend": "sum", "name": "first"})`
+
+This collapses duplicates while preserving the information you
+care about.
+</Callout>
+
+## Inconsistencies in categorical text
+
+Here is where most of the work happens. The same logical
+category can appear under many syntactic forms.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
+})
+
+# Naive count — every variant is its own group
+print("Before cleanup:")
+print(df["country"].value_counts())
+`}
+/>
+
+A canonical-mapping cleanup:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
+})
+
+# 1. Strip whitespace, 2. uppercase, 3. replace known variants
+df["country_clean"] = (
+    df["country"]
+      .str.strip()
+      .str.upper()
+      .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
+)
+print(df)
+print()
+print(df["country_clean"].value_counts())
+`}
+/>
+
+The pattern — strip → case-normalize → map known variants —
+covers most categorical cleanup.
+
+## Useful string helpers
+
+`Series.str` exposes vectorized string methods (we will cover
+them in detail in the next chapter):
+
+| Method            | Does                                  |
+| ----------------- | ------------------------------------- |
+| `.str.strip()`    | Removes leading/trailing whitespace   |
+| `.str.lower()`    | Lowercases                            |
+| `.str.upper()`    | Uppercases                            |
+| `.str.title()`    | Title-cases                           |
+| `.str.replace`    | Replaces substrings (or regex)        |
+| `.str.contains`   | Boolean mask of substring matches     |
+| `.str.startswith` | Boolean mask                          |
+
+## Fuzzy duplicates (a peek)
+
+Sometimes records are *almost* duplicates with subtle
+differences — `"John Smith"` vs `"Jon Smith"`. Fully solving
+this needs string-similarity tools (Levenshtein distance, the
+`rapidfuzz` library, record-linkage techniques). For most
+beginner work, exact-match deduplication is enough; just be
+aware that fuzzy duplicates exist.
+
+## Inconsistent units
+
+A column called `price` that holds USD in some rows, cents in
+others, and EUR in still others is a silent disaster. The fix is
+always: convert to one unit early, document the source unit,
+keep a column for the original currency if useful.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "price":    [10.00, 1500,    9.50, 1200],
+    "currency": ["USD", "cents", "EUR", "cents"],
+})
+
+def normalize(row):
+    if row["currency"] == "cents":
+        return row["price"] / 100  # to USD
+    if row["currency"] == "EUR":
+        return row["price"] * 1.08
+    return row["price"]
+
+df["price_usd"] = df.apply(normalize, axis=1).round(2)
+print(df)
+`}
+/>
+
+You will write code like this every time you receive data from a
+third party.
+
+## Duplicate index labels
+
+A subtle one: a duplicated *index* can break alignment and
+joins. Check with:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"x": [1, 2, 3]}, index=["a", "b", "a"])  # duplicate "a"
+print("Index unique?", df.index.is_unique)
+print()
+# Lookup returns multiple rows (no longer a single Series)
+print(df.loc["a"])
+`}
+/>
+
+If your index is supposed to be a unique identifier, assert it:
+
+```python
+assert df.index.is_unique, "expected unique index"
+```
+
+A failed assertion at the top of a notebook is much friendlier
+than a baffling alignment bug forty cells later.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In a table where each row should represent one customer, two rows have the same \`customer_id\` but slightly different \`name\` and \`spend\`. What is the most defensible response?
+
+- Always drop the second copy
+- Always sum the spend
+- [o] Decide based on the business rules (keep first? keep latest? aggregate?) and document the choice; do not blindly drop or sum
+  > Right. Duplicate resolution is a business judgement. Whatever you pick, make it visible in your code so future readers know.
+- Ignore them
+
+Casual de-duplication is a frequent source of quiet data loss.`}
+/>
+
+<MultipleChoice
+  markdown={`Which sequence is the chapter's recommended general approach to cleaning inconsistent categorical labels?
+
+- Drop the column, recreate, paste back
+- One-hot encode everything
+- [o] Strip whitespace → normalize case → replace known variants with a canonical form
+  > Yes. That three-step recipe covers the great majority of category-label cleanup.
+- Convert to numeric
+
+The order matters: stripping and case-normalizing before replacement gives the replacement a clean target to match.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a column with inconsistent units (\`"USD"\`, \`"cents"\`, \`"EUR"\` all in one \`price\` field) cause silent bugs?
+
+- It causes the file to fail to open
+- It is too small
+- [o] Aggregations like \`mean\`, \`sum\`, comparisons, and rankings will mix incompatible numbers, producing meaningless results without any error
+  > Correct. There is no syntactic clue that 1500 cents and 10 USD are the same amount; convert to one unit early.
+- It uses too much memory
+
+Unit-normalize before any numeric operation. Always.`}
+/>

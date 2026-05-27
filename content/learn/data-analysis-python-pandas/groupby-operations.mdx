@@ -1,0 +1,390 @@
+---
+title: GroupBy Operations
+description: Split-apply-combine — the most powerful pattern in Pandas, and arguably in all of data analysis.
+---
+
+If there is one operation that earns Pandas its keep, it is
+`groupby`. Every "by department," "by month," "by user," "by
+category" question in data analysis ends up here.
+
+## Split-apply-combine
+
+The mental model is three steps:
+
+```mermaid
+flowchart LR
+    A[(One DataFrame)] -->|1. Split| B[(Group 1)]
+    A --> C[(Group 2)]
+    A --> D[(Group 3)]
+    B -->|2. Apply mean| B2[number]
+    C --> C2[number]
+    D --> D2[number]
+    B2 -->|3. Combine| R[(Result Series<br/>or DataFrame)]
+    C2 --> R
+    D2 --> R
+```
+
+- **Split** — partition rows into groups based on a column's
+  values.
+- **Apply** — compute something on each group (a mean, a sum, a
+  custom function).
+- **Combine** — stitch the per-group results back into one
+  result.
+
+Hadley Wickham named this pattern *split-apply-combine* in 2011,
+and it has been the conceptual backbone of tabular data analysis
+ever since.
+
+## The basic shape
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+})
+
+# Group by dept, take the mean of salary
+print(df.groupby("dept")["salary"].mean())
+`}
+/>
+
+Read it as: *"From df, group by dept, pull out salary, take the
+mean of each group."*
+
+## Multiple aggregations at once
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+})`}
+  initialCode={`print(df.groupby("dept")["salary"].agg(["mean","median","min","max","count"]))
+`}
+/>
+
+Or apply different aggregations to different columns:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+    "tenure": [3, 6, 7, 2, 4, 5, 6],
+})
+
+result = df.groupby("dept").agg({
+    "salary": ["mean", "max"],
+    "tenure": ["mean", "min"],
+})
+print(result)
+`}
+/>
+
+## Named aggregations — much cleaner
+
+The `(column, function)` tuple syntax produces flat, well-named
+columns. This is the modern recommended style.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+    "tenure": [3, 6, 7, 2, 4, 5, 6],
+})
+
+result = df.groupby("dept").agg(
+    avg_salary=("salary", "mean"),
+    max_salary=("salary", "max"),
+    head_count=("salary", "count"),
+    avg_tenure=("tenure", "mean"),
+).round(1)
+
+print(result)
+`}
+/>
+
+This pattern — `result_name=(column, function)` — produces flat
+column names and self-documents the analysis. Use it.
+
+## Grouping by multiple columns
+
+Pass a list of column names:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
+    "level":  ["jr","sr","jr","sr","jr","jr"],
+    "salary": [110, 160, 80, 120, 95, 75],
+})
+
+print(df.groupby(["dept","level"])["salary"].mean())
+`}
+/>
+
+The result has a *MultiIndex*. To flatten back to a regular
+DataFrame, call `.reset_index()`:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
+    "level":  ["jr","sr","jr","sr","jr","jr"],
+    "salary": [110, 160, 80, 120, 95, 75],
+})`}
+  initialCode={`flat = df.groupby(["dept","level"])["salary"].mean().reset_index()
+print(flat)
+`}
+/>
+
+## `transform` — broadcast a group statistic back to rows
+
+Sometimes you do not want a smaller summary table — you want to
+add a column to the *original* rows containing a group statistic.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+})
+
+df["dept_avg"] = df.groupby("dept")["salary"].transform("mean")
+df["vs_dept_avg"] = (df["salary"] - df["dept_avg"]).round(1)
+print(df)
+`}
+/>
+
+Each row now knows the average of its department, and how far it
+sits from that average. This is a hugely useful pattern for
+flagging outliers within groups.
+
+## `filter` — keep groups, not rows
+
+A different kind of group operation: keep entire groups that
+satisfy a condition.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+})
+
+# Keep only departments with average salary > 100
+big = df.groupby("dept").filter(lambda g: g["salary"].mean() > 100)
+print(big)
+`}
+/>
+
+Note: `filter` here takes a function that receives the whole
+group as a DataFrame and returns True/False. Different from
+boolean-mask filtering of rows.
+
+## `apply` — for anything else
+
+`apply` runs an arbitrary function on each group. Slower than
+the named aggregations, but flexible.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
+    "salary": [120, 95, 140, 80, 128, 110, 92],
+})
+
+def top_two(g):
+    return g.sort_values("salary", ascending=False).head(2)
+
+print(df.groupby("dept").apply(top_two, include_groups=False))
+`}
+/>
+
+Reach for `apply` only when neither `agg` nor `transform` will
+do.
+
+## A realistic example
+
+Compute, for the HR dataset, average monthly income and attrition
+rate by department.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+# Turn Attrition (Yes/No) into 1/0 so we can take its mean
+df["left"] = (df["Attrition"] == "Yes").astype(int)
+
+summary = df.groupby("Department").agg(
+    headcount     = ("EmployeeNumber", "count"),
+    avg_income    = ("MonthlyIncome", "mean"),
+    median_income = ("MonthlyIncome", "median"),
+    attrition_pct = ("left", "mean"),
+).round({"avg_income": 0, "median_income": 0, "attrition_pct": 3})
+
+summary["attrition_pct"] = (summary["attrition_pct"] * 100).round(1)
+print(summary)
+`}
+/>
+
+This single chained call answers four business questions at
+once, per department. That economy is what makes `groupby` so
+beloved.
+
+## A multi-step challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Department attrition summary"
+  instructions={`Load:
+
+\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
+
+Build a DataFrame called \`summary\` indexed by \`Department\` with **exactly** these columns (in this order):
+
+1. \`headcount\` — number of employees in the department
+2. \`avg_income\` — mean of \`MonthlyIncome\`, rounded to nearest integer
+3. \`attrition_pct\` — percentage of employees with \`Attrition == "Yes"\`, rounded to 1 decimal place
+
+Sort the result by \`attrition_pct\` descending.`}
+  initialCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+summary = None   # TODO
+
+print(summary)
+`}
+  solutionCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+df["left"] = (df["Attrition"] == "Yes").astype(int)
+
+summary = (
+    df.groupby("Department")
+      .agg(
+          headcount=("EmployeeNumber", "count"),
+          avg_income=("MonthlyIncome", "mean"),
+          attrition_pct=("left", "mean"),
+      )
+      .assign(
+          avg_income=lambda x: x["avg_income"].round(0),
+          attrition_pct=lambda x: (x["attrition_pct"] * 100).round(1),
+      )
+      .sort_values("attrition_pct", ascending=False)
+)
+
+print(summary)
+`}
+  tests={[
+    {
+      id: "is_df",
+      name: "summary is a DataFrame",
+      description: "Type check",
+      code: `import pandas as pd
+assert isinstance(summary, pd.DataFrame)`,
+    },
+    {
+      id: "index",
+      name: "Indexed by Department",
+      description: "Index name should be 'Department'",
+      code: `assert summary.index.name == "Department"`,
+    },
+    {
+      id: "columns",
+      name: "Has the right columns in the right order",
+      description: "headcount, avg_income, attrition_pct",
+      code: `expected = ["headcount", "avg_income", "attrition_pct"]
+assert list(summary.columns) == expected, f"Got {list(summary.columns)}"`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted descending by attrition_pct",
+      description: "Highest attrition department first",
+      code: `vals = summary["attrition_pct"].tolist()
+assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
+    },
+    {
+      id: "shape",
+      name: "Has 3 departments",
+      description: "Expect 3 rows",
+      code: `assert len(summary) == 3`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`The split-apply-combine pattern describes:
+
+- A coding style for indentation
+- A way to import data
+- [o] The three steps of a groupby: partition rows into groups, compute something per group, stitch the results together
+  > Right. Once you see groupby through this lens, it stops feeling magical.
+- A method of sorting
+
+The phrase was popularized by Hadley Wickham in 2011 and applies in every tabular-data tool.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical advantage of \`agg(my_name=("col", "mean"))\` over \`agg({"col": ["mean"]})\`?
+
+- It is faster
+- It supports more functions
+- [o] It produces flat, well-named output columns instead of a MultiIndex of columns — far easier to use downstream
+  > Yes. Named aggregations are the modern recommended style. The output looks like a normal table.
+- It works on Series only
+
+If you have ever been confused by MultiIndex columns coming out of groupby, switch to named aggregations.`}
+/>
+
+<MultipleChoice
+  markdown={`When would you use \`groupby(...).transform(...)\` instead of \`.agg(...)\`?
+
+- When you want fewer rows
+- They are equivalent
+- [o] When you want a column added back to every original row containing its group's statistic — the result has the same shape as the input
+  > Right. \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
+- When sorting
+
+\`transform\` is the right hammer for "show me each value alongside its group average."`}
+/>
+
+<MultipleChoice
+  markdown={`In a \`groupby(["a","b"])\` result, what kind of index does the output usually have?
+
+- A flat RangeIndex
+- A column index
+- [o] A MultiIndex — one level for column \`a\`, one level for column \`b\`
+  > Correct. Multi-column groupbys naturally produce hierarchical indexes. Call \`.reset_index()\` if you want a flat DataFrame.
+- A DatetimeIndex
+
+The MultiIndex is powerful but adds a learning curve. \`reset_index()\` is your friend.`}
+/>

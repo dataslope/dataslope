@@ -1,0 +1,197 @@
+---
+title: Choosing the Right Chart
+description: A decision-oriented guide to picking a chart that answers your question — without misleading the reader.
+---
+
+The right chart depends on *the question you're answering*.
+This page is a practical decision flow plus a tour of common
+charts and their failure modes.
+
+## The decision flow
+
+```mermaid
+flowchart TB
+  Q["What do I want<br/>to show?"]
+  Q --> D1{"Distribution<br/>of one variable?"}
+  D1 -- "Numeric" --> H["Histogram<br/>or box plot"]
+  D1 -- "Categorical" --> B1["Bar chart of counts"]
+
+  Q --> D2{"Comparing categories<br/>by a numeric metric?"}
+  D2 --> B2["Bar chart<br/>(sorted)"]
+
+  Q --> D3{"Relationship between<br/>two numerics?"}
+  D3 --> S["Scatter plot"]
+  D3 -- "+ a third numeric" --> SS["Scatter + color or size"]
+
+  Q --> D4{"Change over time?"}
+  D4 --> L["Line chart"]
+
+  Q --> D5{"Composition<br/>(parts of whole)?"}
+  D5 --> ST["Stacked bar<br/>(avoid pies)"]
+
+  Q --> D6{"Many small charts<br/>by category?"}
+  D6 --> FA["Facet / small multiples"]
+```
+
+Print it. Reference it. Internalize it.
+
+## The chart families
+
+### Bar charts
+Best for: comparing a numeric metric across distinct categories.
+
+**Do:**
+- Sort bars by value, not alphabetically.
+- Start the y-axis at 0.
+- Label units.
+
+**Don't:**
+- Use 3D bars.
+- Compare too many categories — top-N + "Other" is often
+  better.
+
+### Histograms
+Best for: showing the distribution of a single numeric column.
+
+**Do:**
+- Try several bin counts (10, 30, 100) — different bin choices
+  reveal different patterns.
+- Annotate the median or mean if it adds context.
+
+**Don't:**
+- Confuse histograms with bar charts. Histogram x-axis is
+  continuous; bar chart x-axis is categorical.
+
+### Box plots
+Best for: comparing distributions across several groups.
+
+**Do:**
+- Show all points (`points="all"` in Plotly) when sample sizes
+  are small — boxes alone can be misleading.
+
+**Don't:**
+- Use box plots for fewer than ~10 points per group.
+
+### Scatter plots
+Best for: relationships between two numeric variables.
+
+**Do:**
+- Use transparency for dense plots.
+- Add a trend line if you're showing a relationship.
+
+**Don't:**
+- Read causation from a scatter — only correlation.
+
+### Line charts
+Best for: change over time, with continuous x-axis.
+
+**Do:**
+- Sort by x.
+- Use color to distinguish multiple series.
+- Always include a 0 baseline unless the value can't reach 0.
+
+**Don't:**
+- Use lines for categorical x-axes (use bars).
+
+### Pie and donut charts
+Best for: almost nothing. Bar charts almost always do the job
+better.
+
+**If you must:**
+- Use only 2–3 slices.
+- Show percentages.
+
+## Bad choices and their consequences
+
+```mermaid
+flowchart LR
+  X1["Pie chart with 12 slices"] --> Y1["Eye cannot rank<br/>angles accurately"]
+  X2["3D bar chart"] --> Y2["Perspective distorts<br/>true heights"]
+  X3["Line on categorical axis"] --> Y3["Suggests false trend<br/>between unordered items"]
+  X4["Truncated y-axis"] --> Y4["Tiny changes<br/>look enormous"]
+  X5["Rainbow color scale"] --> Y5["Non-uniform perception<br/>creates false features"]
+```
+
+## A practical anti-checklist
+
+Before you ship a chart, ask:
+
+- Can a reader misread the axis range and reach the wrong
+  conclusion?
+- Are the bars / lines / points doing the work, or is the
+  decoration?
+- Would a less-fancy chart be more honest?
+- Is the title a *statement* of what the reader should take
+  away, not just a description of what the axes are?
+
+A great title — "Sales grew 18% in Q4 despite flat units" —
+does more for understanding than a beautiful chart with the
+title "Sales over time".
+
+## Communicating uncertainty
+
+When you show an average, also show how much it varies:
+
+- **Error bars** on bar charts
+- **Confidence bands** on line charts
+- **All points** beside box plots
+- **Sample size** in the caption
+
+Hiding uncertainty makes patterns look stronger than they are.
+
+## When in doubt — show the data
+
+If you can't decide between two charts, pick the one that shows
+*more* of the underlying data. Strip plots, jittered scatter,
+overlaid points on top of boxes — when in doubt, **show the
+points**.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`You want to show how monthly active users changed over the last 12 months. Best chart?
+
+- Pie chart
+- Stacked bar
+- [o] Line chart — time is continuous and a line emphasizes the trend
+  > Right. Lines are the default for time-series.
+- Box plot
+
+Lines and time go together.`}
+/>
+
+<MultipleChoice
+  markdown={`Top 5 product categories by revenue. Best chart?
+
+- Pie chart
+- 3D bar chart
+- [o] Horizontal bar chart sorted by value
+  > Yes. Bars rank cleanly by length; horizontal accommodates long category names.
+- Histogram
+
+Bars and categories go together.`}
+/>
+
+<MultipleChoice
+  markdown={`A scatter plot of 100,000 points looks like a black blob. Best fix?
+
+- Increase the figure size
+- Plot fewer columns
+- [o] Lower the opacity (or use a 2D density / hexbin plot) so the structure becomes visible
+  > Right. Overplotting is a perceptual problem — transparency and density plots are the standard fixes.
+- Change the color palette
+
+Density is information; "ink" alone is not.`}
+/>
+
+<MultipleChoice
+  markdown={`A reporter shows two bar charts. The first starts the y-axis at 80; the second starts at 0. Both use the same data. Which is more *honest*?
+
+- The y=80 chart — it shows detail
+- Both are equally honest
+- [o] The y=0 chart, in most cases — starting at zero preserves correct visual proportions, especially for additive quantities. A truncated axis can dramatically exaggerate small changes.
+  > Right. There are rare cases (e.g., temperature with a meaningful baseline) where truncation is fine, but the *default* is to start at zero.
+- The y=80 chart — it is more zoomed in
+
+Axis choices are editorial choices.`}
+/>

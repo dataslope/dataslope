@@ -1,0 +1,380 @@
+---
+title: Python for Analysis
+description: The slice of Python you actually need to be productive in Pandas — and the slices you can safely skip until later.
+---
+
+You do not need to be a "Python programmer" to use Pandas. You
+need a small, well-chosen subset of Python — enough to read the
+code you write, enough to recognize errors, and enough to glue
+together the Pandas calls that do the real work.
+
+This chapter is that subset. If you already know Python, skim.
+If you do not, read carefully — every concept here will appear
+in later chapters.
+
+## Variables and assignment
+
+A variable is a name that points to a value. The `=` sign
+**assigns** a value to a name.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`name = "Aiko"
+age = 29
+is_active = True
+
+print(name, age, is_active)
+print(type(name), type(age), type(is_active))
+`}
+/>
+
+In Pandas you will mostly assign DataFrames to variables:
+
+```python
+df = pd.read_csv("orders.csv")
+clean = df.dropna()
+```
+
+The names are short on purpose — they appear a lot. Common
+conventions:
+
+- `df` — the current DataFrame.
+- `df_a`, `df_b` — when you have multiple.
+- `s` — a Series (one column).
+- `g` — a GroupBy object.
+- `idx` — an Index.
+
+## The basic data types
+
+Pandas wraps these, but you will sometimes pass them around
+directly:
+
+| Type     | Example         | Used in Pandas for                  |
+| -------- | --------------- | ----------------------------------- |
+| `int`    | `42`            | Counts, IDs, integer columns        |
+| `float`  | `3.14`          | Continuous measurements, NaN-able   |
+| `str`    | `"hello"`       | Text columns, labels, column names  |
+| `bool`   | `True`/`False`  | Filters, boolean columns            |
+| `None`   | `None`          | Missing values (often becomes NaN)  |
+| `list`   | `[1, 2, 3]`     | Multiple column names, multi-select |
+| `dict`   | `{"a": 1}`      | Column-to-value mappings, renames   |
+| `tuple`  | `(1, 2)`        | Shape, fixed-size groups            |
+
+A few examples:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# A list of column names
+cols = ["name", "salary", "department"]
+
+# A dict mapping old column names to new ones
+renames = {"empname": "name", "sal": "salary"}
+
+# A tuple representing a shape
+shape = (1470, 35)
+
+print(cols)
+print(renames)
+print(shape)
+print("First column:", cols[0])
+print("Renamed 'sal' becomes:", renames["sal"])
+`}
+/>
+
+## f-strings — formatted text
+
+You will use f-strings constantly to assemble report-ready
+messages.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`name = "Aiko"
+salary = 120000
+rate = 0.075
+
+# Old way (you do not need this):
+# print("Hi " + name + ", your raise is " + str(salary * rate))
+
+# Modern way: f-strings
+print(f"Hi {name}, your raise is \${salary * rate:,.2f}")
+print(f"That is {rate:.1%} of your current salary of \${salary:,}")
+`}
+/>
+
+The format specifiers (`:,.2f`, `:.1%`, `:,`) are worth
+memorizing because they show up everywhere in analyst code.
+
+## Comparisons and booleans
+
+Pandas filtering is built entirely on boolean comparisons.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`x = 5
+
+print(x == 5)   # equal
+print(x != 5)   # not equal
+print(x > 3)
+print(x >= 5)
+print(x < 10)
+
+# Logical combinations
+print(x > 3 and x < 10)
+print(x == 5 or x == 6)
+print(not (x == 5))
+`}
+/>
+
+Pandas uses *vectorized* versions of these on whole columns —
+`df["age"] > 30` returns a column of booleans, one per row.
+We will see this constantly.
+
+## Lists and indexing
+
+Lists hold an ordered sequence of items. You index them with
+integers, starting at 0.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`names = ["Aiko", "Bilal", "Chen", "Diego"]
+
+print(names[0])    # first
+print(names[-1])   # last
+print(names[1:3])  # slice: items at index 1 and 2 (exclusive end)
+print(len(names))
+
+# Adding items
+names.append("Eve")
+print(names)
+`}
+/>
+
+The slice syntax `start:stop` will reappear in Pandas's `iloc`
+selector, with the same exclusive-end behavior.
+
+## Dictionaries
+
+A dictionary maps keys to values. You will use them most often
+as small lookup tables and for column renames.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`exchange = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27}
+
+print(exchange["EUR"])
+print("JPY" in exchange)
+
+# Iterate
+for currency, rate in exchange.items():
+    print(f"  1 {currency} = \${rate:.2f}")
+`}
+/>
+
+In Pandas: `df["currency"].map(exchange)` looks up the rate for
+every row in one shot. We will see `.map()` later.
+
+## Functions
+
+A function bundles up reusable logic. The classic shape:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`def years_until_retirement(age, retire_at=65):
+    """Return how many years until retirement."""
+    return retire_at - age
+
+print(years_until_retirement(29))
+print(years_until_retirement(60, retire_at=67))
+`}
+/>
+
+Two Python features that matter for Pandas:
+
+- **Default arguments** (`retire_at=65`) make functions easier
+  to call.
+- **Docstrings** (the triple-quoted line) document intent. Get in
+  the habit early.
+
+You will write functions that operate on whole columns:
+
+```python
+def grade(score):
+    if score >= 90:
+        return "A"
+    if score >= 80:
+        return "B"
+    return "C"
+
+df["letter"] = df["score"].apply(grade)
+```
+
+We will see `.apply()` in detail later.
+
+## Lambdas — small inline functions
+
+A `lambda` is a one-line anonymous function. Useful for short
+column transformations.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`square = lambda x: x * x
+print(square(7))
+
+# Equivalent to:
+def square2(x):
+    return x * x
+
+# Lambdas shine when passed to other functions:
+nums = [1, 2, 3, 4, 5]
+print(list(map(lambda n: n * 10, nums)))
+`}
+/>
+
+In Pandas: `df["price"].apply(lambda p: p * 1.08)` is a common
+pattern.
+
+## Importing libraries
+
+Every analytical script starts with imports. The two essentials:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+# The aliases pd and np are universal conventions.
+print(pd.__version__)
+print(np.__version__)
+`}
+/>
+
+You will eventually add `matplotlib.pyplot as plt`,
+`plotly.express as px`, and others as the chapters call for
+them.
+
+## What you do *not* need to know yet
+
+It is a long list. Don't worry about:
+
+- Classes and `self`.
+- Decorators.
+- Generators and `yield`.
+- Context managers and `with`.
+- Type hints beyond very simple ones.
+- Async / `await`.
+
+You will pick these up gradually if you need them. Pandas is
+forgiving — the surface area you need to be productive is small.
+
+<Callout type="info" title="Pandas is mostly chained calls">
+A typical line of analyst code looks like:
+
+`df.groupby("department")["salary"].mean().round(0).sort_values()`
+
+Reading right to left through the chain — *take df, group by
+department, pull out salary, average it, round, sort* — is
+exactly how you should read it. Each step transforms the
+result of the previous step.
+</Callout>
+
+## Try a small workout
+
+<ChallengeCard
+  adapter="python"
+  title="Compute take-home pay"
+  instructions={`Write a function called \`take_home(salary, tax_rate)\` that returns the take-home pay (after tax). Then apply it to a list of three salaries with three different tax rates and store the results in a list called \`results\`.
+
+For example, \`take_home(100000, 0.30)\` should return \`70000.0\`.
+
+Use it on:
+- salary 100000, tax rate 0.30
+- salary 80000, tax rate 0.22
+- salary 50000, tax rate 0.18
+
+Store the three take-home values in a list called \`results\` in that order.`}
+  initialCode={`def take_home(salary, tax_rate):
+    # TODO
+    pass
+
+results = []   # TODO: fill with three numbers
+
+print(results)
+`}
+  solutionCode={`def take_home(salary, tax_rate):
+    return salary * (1 - tax_rate)
+
+results = [
+    take_home(100000, 0.30),
+    take_home(80000, 0.22),
+    take_home(50000, 0.18),
+]
+
+print(results)
+`}
+  tests={[
+    {
+      id: "function_exists",
+      name: "`take_home` is a function",
+      description: "A callable named `take_home`",
+      code: `assert callable(take_home), "take_home must be callable"`,
+    },
+    {
+      id: "function_works",
+      name: "`take_home(100000, 0.3) == 70000`",
+      description: "Computes salary * (1 - rate)",
+      code: `assert abs(take_home(100000, 0.3) - 70000) < 1e-6`,
+    },
+    {
+      id: "results_length",
+      name: "`results` has 3 entries",
+      description: "Length check",
+      code: `assert len(results) == 3, f"Expected 3 results, got {len(results)}"`,
+    },
+    {
+      id: "results_correct",
+      name: "Results match the expected take-home amounts",
+      description: "Within 0.01",
+      code: `expected = [70000.0, 62400.0, 41000.0]
+for r, e in zip(results, expected):
+    assert abs(r - e) < 0.01, f"Got {results}, expected {expected}"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`f"{rate:.1%}"\` print when \`rate = 0.075\`?
+
+- \`0.075\`
+- \`7.5\`
+- [o] \`7.5%\`
+  > Correct. The \`.1%\` format multiplies by 100 and adds a percent sign, with one decimal place. Memorizing this format is worth the five seconds.
+- \`75.0%\`
+
+Format specifiers like this make report-ready output trivial.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are list slices like \`names[1:3]\` "exclusive at the end"?
+
+- It is a Python bug
+- [o] By convention; \`names[1:3]\` returns items at index 1 and 2, so that \`len(names[1:3]) == 3 - 1 == 2\` — the slice length equals the difference of the indices
+  > Yes. The exclusive end-index makes slice arithmetic clean: \`a[i:j]\` has length \`j - i\`. Pandas' \`iloc\` uses the same convention.
+- It is a NumPy convention only
+- Slices always exclude the first item
+
+Same rule as Pandas' \`iloc\` — useful to remember.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these Python features can you safely **skip** when starting with Pandas?
+
+- f-strings
+- Functions
+- Lists and dictionaries
+- [o] Decorators and \`async\`/\`await\`
+  > Right. Pandas needs very little of Python's "advanced" surface area. Start with the basics; pick up the rest only if a specific problem forces you to.
+
+Don't drown in Python before getting to the data work.`}
+/>

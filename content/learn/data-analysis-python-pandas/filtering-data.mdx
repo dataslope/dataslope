@@ -1,0 +1,347 @@
+---
+title: Filtering Data
+description: Boolean masks — the single most important pattern in Pandas, used dozens of times per analysis.
+---
+
+If there is one Pandas pattern you will use more than any other,
+it is the **boolean mask**. Almost every interesting question
+you ask of a dataset starts with "first, give me the rows
+where..."
+
+## The basic shape
+
+A boolean mask is a Series of `True`/`False` values, one per row.
+Apply it to a DataFrame and you get back only the rows where the
+mask is `True`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+    "tenure": [3, 6, 7, 2, 4],
+})
+
+mask = df["salary"] > 100
+print("Mask:")
+print(mask)
+print()
+
+print("Filtered:")
+print(df[mask])
+`}
+/>
+
+Two-step or one-step — pick your style:
+
+```python
+# Two-step (more readable for complex conditions)
+high_earners = df["salary"] > 100
+df[high_earners]
+
+# One-step (more compact)
+df[df["salary"] > 100]
+```
+
+## Comparison operators
+
+All the comparisons return a boolean mask:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+    "tenure": [3, 6, 7, 2, 4],
+})`}
+  initialCode={`print(df[df["salary"] >= 100])
+print()
+print(df[df["dept"] == "Eng"])
+print()
+print(df[df["dept"] != "Eng"])
+`}
+/>
+
+## Combining conditions with `&`, `|`, `~`
+
+You must use `&` (and), `|` (or), `~` (not) — **not** the Python
+keywords `and`, `or`, `not`. And **always** wrap each condition
+in parentheses, because `&` has higher precedence than `>`.
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+    "tenure": [3, 6, 7, 2, 4],
+})`}
+  initialCode={`# Engineers AND high earners
+print(df[(df["dept"] == "Eng") & (df["salary"] > 120)])
+print()
+
+# Engineers OR Sales
+print(df[(df["dept"] == "Eng") | (df["dept"] == "Sales")])
+print()
+
+# NOT in Engineering
+print(df[~(df["dept"] == "Eng")])
+`}
+/>
+
+If you forget the parentheses you will get a cryptic error
+about ambiguous truth values. The fix is always the same: add
+parentheses.
+
+## Useful helpers
+
+A handful of methods produce boolean masks directly:
+
+### `isin` — membership
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+})`}
+  initialCode={`# Cleaner than chaining many "or" clauses
+print(df[df["dept"].isin(["Eng","Sales"])])
+`}
+/>
+
+### `between` — ranges
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+})`}
+  initialCode={`print(df[df["salary"].between(90, 130)])
+`}
+/>
+
+### `str.contains` — substring matching
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+})`}
+  initialCode={`print(df[df["name"].str.contains("e", case=False)])
+`}
+/>
+
+### `isna` / `notna` — missing checks
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"x": [1, 2, np.nan, 4, np.nan]})
+
+print("Missing rows:")
+print(df[df["x"].isna()])
+print()
+print("Non-missing rows:")
+print(df[df["x"].notna()])
+`}
+/>
+
+## `query` — a string-based DSL
+
+Pandas has an alternative filter syntax that some people find
+more readable, especially for multi-condition filters:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+})`}
+  initialCode={`print(df.query("dept == 'Eng' and salary > 120"))
+print()
+print(df.query("dept in ['Eng','Sales']"))
+`}
+/>
+
+Whether you prefer `query` or boolean masks is mostly a style
+choice. Most codebases use masks; `query` shows up in notebooks.
+
+## A real-world filter
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+)
+
+# Recent hires (less than 3 years) in Sales who have left
+mask = (
+    (df["YearsAtCompany"] < 3) &
+    (df["Department"] == "Sales") &
+    (df["Attrition"] == "Yes")
+)
+
+leavers = df[mask]
+print(f"{len(leavers)} early-tenure Sales leavers")
+print(leavers[["Age","YearsAtCompany","MonthlyIncome","JobRole"]].head())
+`}
+/>
+
+You will write filters like this all day, every day, as an
+analyst. Cosmetic note: breaking each condition onto its own
+line and aligning the `&`s makes complex filters readable.
+
+## Filter, then assign
+
+A common pattern: filter to a subset, then add or modify a
+column on just that subset. Use `.loc` for the assignment:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
+    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
+    "salary": [120, 95, 140, 80, 128],
+})
+
+# Flag high-earning engineers
+df["flag"] = ""
+df.loc[(df["dept"] == "Eng") & (df["salary"] > 120), "flag"] = "high_eng"
+
+print(df)
+`}
+/>
+
+## A filter challenge
+
+<ChallengeCard
+  adapter="python"
+  title="Filter the HR dataset"
+  instructions={`Load:
+
+\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
+
+Then build a DataFrame called \`young_low_pay\` containing **only** employees who:
+
+- Are younger than 30 (\`Age < 30\`), AND
+- Earn less than \`MonthlyIncome\` of 3000, AND
+- Did **not** leave the company (\`Attrition == "No"\`).
+
+Keep all columns.`}
+  initialCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+young_low_pay = None    # TODO
+
+print(len(young_low_pay) if young_low_pay is not None else "still None")
+`}
+  solutionCode={`import pandas as pd
+
+URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+df = pd.read_csv(URL)
+
+young_low_pay = df[
+    (df["Age"] < 30) &
+    (df["MonthlyIncome"] < 3000) &
+    (df["Attrition"] == "No")
+]
+
+print(len(young_low_pay))
+`}
+  tests={[
+    {
+      id: "is_df",
+      name: "young_low_pay is a DataFrame",
+      description: "Result type check",
+      code: `import pandas as pd
+assert isinstance(young_low_pay, pd.DataFrame)`,
+    },
+    {
+      id: "age",
+      name: "All ages < 30",
+      description: "No one 30 or older",
+      code: `assert (young_low_pay["Age"] < 30).all()`,
+    },
+    {
+      id: "income",
+      name: "All MonthlyIncome < 3000",
+      description: "No one earning >= 3000",
+      code: `assert (young_low_pay["MonthlyIncome"] < 3000).all()`,
+    },
+    {
+      id: "attrition",
+      name: "All Attrition == 'No'",
+      description: "Everyone stayed",
+      code: `assert (young_low_pay["Attrition"] == "No").all()`,
+    },
+    {
+      id: "count",
+      name: "Reasonable row count",
+      description: "Should be > 0 and < total",
+      code: `assert 0 < len(young_low_pay) < 1470`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why must you use \`&\` instead of \`and\` when combining two boolean Series?
+
+- \`and\` does not exist in Python
+- It is shorter
+- [o] \`and\` operates on single boolean values and tries to coerce a whole Series into one — which is ambiguous — while \`&\` is element-wise on Series
+  > Right. \`a and b\` requires \`a\` to be a single True/False, but a Series of length > 1 cannot be reduced to one. Pandas raises the "ambiguous truth value" error.
+- \`&\` is faster
+- Pandas hates English
+
+Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is the cleanest way to filter for rows whose \`dept\` column is one of "Eng", "Sales", or "Ops"?
+
+- \`df[df["dept"] == "Eng" or df["dept"] == "Sales" or df["dept"] == "Ops"]\`
+- \`df[df["dept"] == ["Eng", "Sales", "Ops"]]\`
+- [o] \`df[df["dept"].isin(["Eng", "Sales", "Ops"])]\`
+  > Yes. \`isin\` is the idiomatic Pandas way to express set membership across many values.
+- \`df.dept = "Eng" | "Sales" | "Ops"\`
+
+\`isin\` scales cleanly to long lists and is faster than chaining ORs.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`df.loc[mask, "col"] = value\` preferred over \`df[mask]["col"] = value\` when modifying data?
+
+- The two are equivalent
+- The second is shorter
+- [o] The chained form may silently operate on a *copy* and fail to update the original (the SettingWithCopyWarning); \`loc\` guarantees in-place update
+  > Correct. This is one of the most common silent bugs in Pandas. \`loc\` is the safe way.
+- The second is faster
+
+When in doubt, use \`loc\` for assignments.`}
+/>

@@ -1,0 +1,270 @@
+---
+title: Debugging Analysis Code
+description: Why analysts spend half their time debugging — and the systematic habits that make it less painful.
+---
+
+Most analysis bugs are not crashes. They're **silent
+mistakes** — numbers that look fine but are subtly wrong. Real
+analysts are not "people who never write bugs". They're "people
+who catch their own bugs early."
+
+## The taxonomy of analysis bugs
+
+```mermaid
+flowchart TB
+  B["Bug"] --> B1["Loud<br/>Code crashes,<br/>error printed"]
+  B --> B2["Quiet<br/>Code runs,<br/>output is wrong"]
+  B2 --> B2a["Wrong rows<br/>(bad filter)"]
+  B2 --> B2b["Wrong shape<br/>(unexpected join)"]
+  B2 --> B2c["Wrong dtype<br/>(string vs number)"]
+  B2 --> B2d["Wrong aggregation<br/>(mean of strings)"]
+```
+
+Loud bugs are *easy* — you see the traceback. The quiet ones
+are what bite you.
+
+## Habit 1 — Look at the data after every step
+
+After any non-trivial line, print and check.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "id":    [1, 2, 3, 4, 5],
+    "value": [10, 20, 30, 40, 50],
+})
+
+# After every step, inspect shape and a few rows
+print("Before filter:", df.shape)
+filtered = df[df["value"] > 25]
+print("After filter:", filtered.shape)
+print(filtered)
+`}
+/>
+
+Knowing the row count *before and after* every transformation
+is the cheapest bug-detector in Pandas.
+
+## Habit 2 — Trust nothing about dtypes
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"price": ["10", "20", "30"]})   # strings!
+
+# Looks like it works...
+print(df["price"].sum())
+# ...but gives '102030' (string concat), not 60.
+`}
+/>
+
+Always check `df.dtypes` after loading. Strings that look like
+numbers are one of the most common silent failures.
+
+## Habit 3 — Read the assumption, not just the code
+
+When you write:
+
+```python
+result = orders.merge(customers, on="customer_id")
+```
+
+what you *mean* is:
+
+> "Each order has exactly one customer; the result should have
+> the same number of rows as `orders`."
+
+Encode that assumption:
+
+```python
+before = len(orders)
+result = orders.merge(customers, on="customer_id", validate="many_to_one")
+assert len(result) == before, f"Row count changed: {before} -> {len(result)}"
+```
+
+If reality contradicts the assumption, you find out *now*, not
+after the chart is in your boss's deck.
+
+## Habit 4 — Use `.shape` and `.info()` as constants
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
+  initialCode={`print("Shape:", df.shape)
+print()
+df.info()
+`}
+/>
+
+A 30-second `.info()` after loading catches almost every "wait,
+that column is the wrong type" bug.
+
+## Habit 5 — Pin down weird rows
+
+When something looks off, **find the actual rows** rather than
+guessing.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({
+    "age": [25, 30, 28, 200, 35, -5, 40],
+})
+
+print(df[df["age"] > 100])
+print(df[df["age"] < 0])
+`}
+/>
+
+Don't reason abstractly — pull up the actual problem rows. Often
+they reveal the root cause immediately.
+
+## Habit 6 — Bisect the pipeline
+
+When a 30-step pipeline produces the wrong answer, *don't*
+re-read all 30 steps. Print the intermediate output halfway.
+If it's right at step 15, the bug is in 16–30. If it's wrong at
+step 15, the bug is in 1–15. Bisect again.
+
+```mermaid
+flowchart LR
+  S["Step 1"] --> M["Step 15<br/>(check here)"] --> E["Step 30"]
+  M -- "Right" --> R1["Bug is in 16–30"]
+  M -- "Wrong" --> R2["Bug is in 1–15"]
+```
+
+This O(log n) approach beats O(n) re-reading every time.
+
+## Habit 7 — Reproduce in a minimal example
+
+When stuck, recreate the problem with a tiny DataFrame.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Real data has 1M rows — too big to inspect.
+# Construct a 4-row mini that triggers the same bug:
+mini = pd.DataFrame({
+    "k": [1, 1, 2, 2],
+    "x": [10, 20, 30, 40],
+})
+
+# Now you can step through the buggy operation by hand.
+print(mini.groupby("k")["x"].sum())
+`}
+/>
+
+If you can reproduce the bug in a 4-row example, you can
+*solve* it in a 4-row example. And when you ask a colleague
+for help, the 4-row example is what they need.
+
+## Habit 8 — Suspect chained indexing warnings
+
+`SettingWithCopyWarning` is a real warning, not noise.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
+
+# This MIGHT modify a copy, not df. Don't do this.
+sub = df[df["x"] > 1]
+sub["y"] = 0   # Risky — may warn or fail silently
+
+# Safer:
+df.loc[df["x"] > 1, "y"] = 0
+print(df)
+`}
+/>
+
+Use `.loc[..., col] = value` when you really mean to modify the
+original.
+
+## Habit 9 — Confirm with a different method
+
+If your aggregation says revenue is $1.2M, double-check with a
+crude calculation — `df["revenue"].sum()` — to ensure the
+groupby didn't drop or duplicate rows.
+
+The act of computing the same number two ways catches an
+astonishing number of bugs.
+
+## Habit 10 — Slow down
+
+When the result looks wrong:
+
+1. Re-read the question.
+2. Re-look at the data shape, dtypes, sample rows.
+3. Print the intermediate steps.
+4. Reproduce in a mini example.
+5. *Then* edit code.
+
+Most bugs come from skipping step 1.
+
+## A debugging checklist
+
+```mermaid
+flowchart TB
+  C1["Did you check .shape before & after?"] --> C2
+  C2["Are dtypes what you expect?"] --> C3
+  C3["Did the row count change unexpectedly?"] --> C4
+  C4["Are there NaNs you didn't account for?"] --> C5
+  C5["Can you reproduce in 5 rows?"] --> R["Now fix it"]
+```
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Your sum of "price" is 6 digits long even though only a handful of rows exist. Most likely cause:
+
+- A floating-point bug
+- The data is corrupt
+- [o] The column is a string, and \`.sum()\` concatenated the values instead of adding them — check \`df.dtypes\`
+  > Right. String-vs-number is the most common silent bug in Pandas.
+- Pandas needs an upgrade
+
+Always check dtypes after loading.`}
+/>
+
+<MultipleChoice
+  markdown={`A merge unexpectedly multiplied your row count by 3. Best diagnostic step?
+
+- Add more print statements throughout
+- Re-run with a different package version
+- [o] Check whether the join key is duplicated on the right-hand table (\`df.duplicated(subset=...).sum()\`), and/or re-run the merge with \`validate="one_to_many"\` or similar
+  > Right. Cardinality blow-ups have a clear root cause that the \`validate\` flag would have caught.
+- Drop duplicates blindly
+
+Encode assumptions; let Pandas tell you when reality breaks them.`}
+/>
+
+<MultipleChoice
+  markdown={`A 30-step pipeline produces a wrong answer. What's the most efficient debugging approach?
+
+- Re-read every step
+- Rewrite the pipeline
+- [o] Bisect — check the intermediate output halfway through; whichever half is wrong, bisect again
+  > Right. Logarithmic search through your pipeline beats linear search.
+- Add more comments
+
+Bisection is one of the most powerful debugging habits, period.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is reproducing a bug in a 5-row "mini" DataFrame so valuable?
+
+- It is faster than running on big data
+- It avoids print spam
+- [o] Both of those, AND a mini-example forces you to truly understand the bug — and is the perfect format to ask someone for help
+  > Right. "Can you reproduce it minimally?" is a question that often answers itself in the act of trying.
+- It uses less memory
+
+Minimal reproductions are universal currency in software debugging.`}
+/>
