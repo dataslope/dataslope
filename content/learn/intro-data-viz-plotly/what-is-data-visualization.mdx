@@ -1,0 +1,218 @@
+---
+title: What Is Data Visualization, Really?
+description: A careful definition, with examples, of what counts as a "data visualization" and what doesn't
+---
+
+You have read several chapters of this course already and you have
+seen many charts. We have not yet asked the most basic question:
+**what *is* data visualization?**
+
+It sounds like a silly question. Everyone "knows" what a chart is.
+But spending five minutes on a careful definition will save you
+months of confused work later. Many of the worst visualizations in
+the world were made by people who never paused to ask what they
+were actually building.
+
+## A working definition
+
+Here is the definition we will use for the rest of this course:
+
+> **Data visualization** is the practice of *encoding* information
+> into a *visual representation* so that a *human visual system* can
+> recognize patterns and answer questions that would be difficult
+> to answer from the raw data alone.
+
+Three words in that sentence are doing all the work: **encoding**,
+**visual**, and **questions**.
+
+### Encoding
+
+A visualization is a *mapping* from data to visual properties.
+Numbers become positions. Categories become colors. Time becomes a
+horizontal axis. The map is called an **encoding**.
+
+```mermaid
+flowchart LR
+    D["Data<br/>(rows + columns)"] --> E["Encoding<br/>(rules)"]
+    E --> P["Picture<br/>(positions, colors, sizes)"]
+    P --> H["Human eye"]
+    H --> I["Insight"]
+```
+
+The encoding is the *design decision*. There is no "neutral" or
+"default" encoding. Every chart you make is the result of choices
+about how to translate columns of data into ink (or pixels).
+
+### Visual
+
+Visualization is specifically about the **visual** system — the
+parts of the brain that process light, edges, motion, color, and
+shape. We are using this *biological hardware* because it is
+extraordinarily fast and parallel. A human can detect that one bar
+is taller than another in roughly **200 milliseconds**, without
+conscious thought. Compare that to reading two numbers and doing a
+mental subtraction, which takes several seconds.
+
+This means we are taking advantage of *built-in* capabilities. A
+good chart works *with* the visual system; a bad chart works
+against it.
+
+### Questions
+
+A visualization exists to answer a question. The question may be
+vague ("what's going on in this dataset?") or precise ("did sales
+increase last quarter compared to the same quarter last year?"),
+but there *is* a question. A chart without a question is decoration.
+
+This is the cleanest test for a visualization:
+
+> *What question does this chart answer?*
+
+If you can't say in one sentence, the chart probably doesn't earn
+its space.
+
+## What is *not* a data visualization?
+
+Sharpening the definition helps. Here are some things that look
+like visualization but aren't, or aren't quite:
+
+- **A photograph** is not a data visualization. It is a visual
+  *recording*, but it doesn't encode abstract data — it captures
+  what was there.
+- **A logo or an icon** is not a data visualization. It is a
+  pictogram or branding element.
+- **A formatted table** with colored cells is *barely* a data
+  visualization. Cell color is an encoding, but the underlying
+  structure is still rows of numbers, not a visual representation.
+  It's a useful borderline case.
+- **A diagram explaining a process** (like a flowchart or a
+  network diagram) is a visualization, but a different kind —
+  it visualizes *relationships*, not *data values*. We sometimes
+  call these "diagrammatic" or "schematic" visualizations.
+- **A 3-D rendering of a building** is a visualization of the
+  *building*, not of data about the building. The distinction is
+  whether the visual is abstracting numerical information or
+  representing a physical thing.
+
+For this course, we mean **statistical / analytic visualization**:
+encoding *measurements* into *visual properties* of a 2-D picture.
+
+## A live example: same data, different visualizations
+
+Watch what changes when the same five numbers are shown in three
+different ways. Each is a legitimate visualization — and each
+answers slightly different questions.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "fruit":  ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+    "sales":  [120, 85, 60, 30, 18],
+})
+
+# Bar chart: easy to compare exact heights.
+fig1 = px.bar(df, x="fruit", y="sales",
+              template="simple_white",
+              title="Bar — compare exact values")
+fig1.show()
+
+# Pie chart: shows parts-of-a-whole, harder to compare slices.
+fig2 = px.pie(df, names="fruit", values="sales",
+              template="simple_white",
+              title="Pie — show parts of total")
+fig2.show()
+
+# Lollipop-style scatter: minimal ink, also good for comparison.
+fig3 = px.scatter(df, x="fruit", y="sales",
+                  template="simple_white",
+                  title="Dot — minimalist comparison")
+fig3.update_traces(marker_size=15)
+fig3.show()
+`}
+/>
+
+The data is identical in all three charts. But:
+
+- The **bar chart** invites you to compare *heights*. Apple is
+  ~4× Date.
+- The **pie chart** invites you to compare *shares of the whole*.
+  Apple is "about a third" of total sales.
+- The **dot chart** is the same idea as the bar but with less
+  visual weight per data point — useful when you have many
+  categories.
+
+The data does not change. The *encoding* changes, and so the
+*question being answered* changes. **This is the whole game.**
+
+## Why this is worth dwelling on
+
+If you take only one thing from this page, take this:
+
+> **A visualization is a deliberately-designed encoding of data
+> into a visual representation, made to answer a specific question
+> for a specific audience.**
+
+That sentence — boring as it is — will protect you from most of the
+mistakes beginners make. Whenever you find yourself making a chart,
+stop and ask:
+
+1. **What is the data?** (What are the rows and columns?)
+2. **What is the question?** (What am I trying to answer?)
+3. **What is the audience?** (Who will read this?)
+4. **What is the encoding?** (Which columns become which visual
+   properties?)
+
+When all four are clear, the chart almost makes itself.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`According to the definition used in this course, which of these is the **clearest example of a data visualization**?
+
+- A photograph of a sunset.
+- A company logo.
+- [o] A bar chart of monthly revenue for a small business.
+  > Yes. The bar chart **encodes** numerical data (revenue) into a visual property (bar height) to help a viewer **answer questions** ("which month was best?", "is there a trend?"). All three pieces of the definition — encoding, visual representation, answering a question — are present.
+- A 3-D rendering of a planned building.
+
+The bar chart is a textbook statistical visualization. The other three are visual artifacts, but not visualizations of *data* in the analytic sense.`}
+/>
+
+<MultipleChoice
+  markdown={`What does it mean to say a chart **"encodes"** data?
+
+- It applies a password to the chart file.
+- It uses statistical formulas internally.
+- [o] It maps columns of data to visual properties such as position, length, color, size, or shape.
+  > Correct. "Encoding" is the term for the *rules* of the map between data and image. **x="year"** is an encoding: it maps the **year** column to horizontal position. Every choice you make in **px.bar(...)** or **px.scatter(...)** is an encoding decision.
+- It compresses the data.
+
+Encoding is the central design act of visualization. We'll devote a whole chapter to it shortly.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague hands you a beautifully styled chart with no clear takeaway. You ask "what question does this answer?" and they shrug. What is the *most likely* problem?
+
+- The chart is technically broken.
+- The data is wrong.
+- [o] The chart was created without a clear question in mind — so even if it's pretty, it isn't really *doing* anything as a visualization.
+  > Yes. A chart without a question is decoration. Beauty is not enough — the chart has to *help someone reason*. This is one of the most common mistakes in business dashboards, where chart count goes up but information goes down.
+- The chart needs more colors.
+
+"What question does this chart answer?" is the single best diagnostic question to ask of any visualization, your own or someone else's.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is it important that data visualization works *with* the human visual system?
+
+- Because computers can't draw without humans.
+- Because charts are required to be pretty.
+- [o] Because the visual system can recognize patterns (relative size, position, color) in milliseconds — much faster than reading raw numbers.
+  > Right. Vision is built-in, parallel, pre-conscious hardware. A chart that aligns with how the visual system works (e.g., uses length for quantity) lets the reader perceive structure almost instantly. A chart that fights it (e.g., uses 3-D angles) forces slow, conscious effort.
+- Because eyes are the only sensors humans have.
+
+We will go deep into this in the next chapter, "How Humans Perceive Visuals."`}
+/>

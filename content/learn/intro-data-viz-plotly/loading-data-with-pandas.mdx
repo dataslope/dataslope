@@ -1,0 +1,385 @@
+---
+title: Loading Data with Pandas
+description: The minimum pandas you need to feed Plotly Express — DataFrames, columns, and basic filtering
+---
+
+Plotly Express expects its data in a **pandas DataFrame**. If you've
+never used pandas before, that sentence might sound intimidating —
+but a DataFrame is just a table, and you only need to know a handful
+of operations before you can make every chart in this course.
+
+This page is the *just-enough* pandas tutorial. We will not turn you
+into a pandas expert; we will get you fluent enough to *feed Plotly
+Express*.
+
+## What is a DataFrame?
+
+A **DataFrame** is a table in memory. It has:
+
+- **Rows** — usually one per observation (one country, one
+  transaction, one student).
+- **Columns** — named, typed fields (e.g., `country`, `year`,
+  `gdpPercap`).
+- **An index** — row labels, usually just `0, 1, 2, ...` by default.
+
+If you've used Excel, a DataFrame is roughly "one worksheet, with
+named column headers."
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+
+# Build a tiny DataFrame from a Python dictionary:
+df = pd.DataFrame({
+    "name":   ["Ana", "Ben", "Cal", "Dee"],
+    "age":    [27, 41, 18, 33],
+    "income": [52000, 78000, 0, 64000],
+})
+
+print(df)
+print()
+print("Columns:", list(df.columns))
+print("Number of rows:", len(df))
+`}
+/>
+
+That prints a nicely formatted table. `df.columns` lists the column
+names. `len(df)` gives the number of rows.
+
+## Three ways data gets into a DataFrame
+
+For this course, you'll see data arrive in three ways:
+
+1. **Built-in dataset.** Plotly Express ships with several
+   classic datasets:
+
+   ```python
+   df = px.data.gapminder()    # life-expectancy & GDP
+   df = px.data.iris()         # flower measurements
+   df = px.data.tips()         # restaurant tipping
+   df = px.data.stocks()       # daily stock prices
+   ```
+
+2. **Hand-built dictionary.** Useful for tiny illustrative
+   examples:
+
+   ```python
+   df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+   ```
+
+3. **A CSV (or Excel) file.** The real-world case:
+
+   ```python
+   df = pd.read_csv("sales.csv")
+   ```
+
+   In your own work this is the most common pattern.
+
+For *this course*, we'll mostly use options 1 and 2, because no
+file uploads are needed in the browser runtime.
+
+## Peeking at a DataFrame
+
+When you receive a DataFrame, your first instinct should be to
+*look at it*. Pandas provides a few essential methods:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+# First 5 rows:
+print("HEAD")
+print(df.head())
+print()
+
+# Last 3 rows:
+print("TAIL")
+print(df.tail(3))
+print()
+
+# Shape: (rows, columns)
+print("SHAPE:", df.shape)
+print()
+
+# Column names:
+print("COLUMNS:", list(df.columns))
+print()
+
+# Quick statistical summary of numeric columns:
+print("DESCRIBE")
+print(df.describe())
+`}
+/>
+
+Every analyst, every time they load a new dataset, runs some
+combination of `df.head()`, `df.shape`, `df.columns`, and
+`df.describe()`. Build the habit.
+
+## Selecting a column
+
+To work with a single column, use square brackets:
+
+```python
+df["lifeExp"]   # the lifeExp column, as a Series
+```
+
+You can also use *dot notation* if the column name is a valid
+Python identifier: `df.lifeExp`. Bracket notation is more
+universal — use it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+life = df["lifeExp"]
+print("Mean life expectancy:", life.mean())
+print("Min:", life.min(), "Max:", life.max())
+print("Median:", life.median())
+`}
+/>
+
+## Filtering rows
+
+Plotly Express works on whatever you pass it, so filtering *before*
+plotting is a common pattern. There are two ways to filter:
+
+### Boolean indexing
+
+```python
+df_2007 = df[df["year"] == 2007]
+df_rich = df[df["gdpPercap"] > 30000]
+df_both = df[(df["year"] == 2007) & (df["gdpPercap"] > 30000)]
+```
+
+The `&` (and) and `|` (or) operators combine conditions. You **must**
+wrap each condition in parentheses — that's a Python operator-
+precedence quirk that trips up everyone exactly once.
+
+### The `.query()` method
+
+A more readable alternative for simple filters:
+
+```python
+df.query("year == 2007")
+df.query("year == 2007 and gdpPercap > 30000")
+```
+
+You will see both styles in the wild. Pick whichever reads better
+to you in context.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+# Boolean indexing:
+asia_2007 = df[(df["continent"] == "Asia") & (df["year"] == 2007)]
+print("Boolean indexing:", asia_2007.shape)
+print(asia_2007.head())
+print()
+
+# Same result via .query():
+asia_2007_q = df.query("continent == 'Asia' and year == 2007")
+print(".query():", asia_2007_q.shape)
+`}
+/>
+
+## Sorting
+
+Sort by a column with `sort_values`:
+
+```python
+df.sort_values("gdpPercap", ascending=False)
+```
+
+This is *invaluable* before charting. A bar chart sorted by value
+is almost always more readable than the same chart in alphabetical
+order.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
+
+top = df.sort_values("lifeExp", ascending=False).head(10)
+
+fig = px.bar(
+    top,
+    x="lifeExp",
+    y="country",
+    orientation="h",
+    template="simple_white",
+    title="Top 10 European countries by life expectancy (2007)",
+    labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
+)
+fig.show()
+`}
+/>
+
+Notice how much more useful the bar chart is when sorted by value —
+the eye reads "ranking" instantly.
+
+## Group + aggregate (just a peek)
+
+A common pattern is to *summarize* a DataFrame before plotting:
+"average GDP per continent," "total sales per region," etc. The
+pandas pattern is `groupby` + an aggregation:
+
+```python
+avg_by_continent = (
+    df.query("year == 2007")
+      .groupby("continent")["lifeExp"]
+      .mean()
+      .reset_index()
+)
+```
+
+`reset_index()` is the magic that turns the grouped result back
+into a normal DataFrame so Plotly Express can consume it.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+avg = (
+    df.groupby("continent", as_index=False)["lifeExp"]
+      .mean()
+      .sort_values("lifeExp", ascending=False)
+)
+
+print(avg)
+
+fig = px.bar(
+    avg, x="continent", y="lifeExp",
+    template="simple_white",
+    title="Average life expectancy by continent (2007)",
+    labels={"lifeExp": "Mean life expectancy (years)", "continent": "Continent"},
+)
+fig.show()
+`}
+/>
+
+## "Tidy" data: the secret to easy plotting
+
+There's one big principle that will save you endless frustration:
+**Plotly Express prefers *tidy* (long) data.**
+
+Tidy data follows three rules:
+
+1. Each **variable** is a column.
+2. Each **observation** is a row.
+3. Each **cell** is a single value.
+
+A common *non-tidy* layout looks like:
+
+| city   | 2020 | 2021 | 2022 |
+| ------ | ---: | ---: | ---: |
+| Boston |  100 |  120 |  150 |
+| Tokyo  |  200 |  220 |  240 |
+
+This is "wide" — years are columns. To plot it with Plotly Express,
+you almost always want to reshape it to **long**:
+
+| city   | year | value |
+| ------ | ---: | ---: |
+| Boston | 2020 | 100   |
+| Boston | 2021 | 120   |
+| Boston | 2022 | 150   |
+| Tokyo  | 2020 | 200   |
+| Tokyo  | 2021 | 220   |
+| Tokyo  | 2022 | 240   |
+
+The tool to do that is `df.melt(...)`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+wide = pd.DataFrame({
+    "city": ["Boston", "Tokyo"],
+    "2020": [100, 200],
+    "2021": [120, 220],
+    "2022": [150, 240],
+})
+
+print("WIDE:")
+print(wide)
+
+# Reshape to long / tidy
+long = wide.melt(id_vars="city", var_name="year", value_name="visitors")
+
+print("\\nLONG:")
+print(long)
+
+fig = px.line(
+    long, x="year", y="visitors", color="city", markers=True,
+    template="simple_white",
+    title="Visitors by city (long format)",
+    labels={"visitors": "Visitors", "year": "Year"},
+)
+fig.show()
+`}
+/>
+
+This `wide → long` reshape pattern is one of the most common moves
+in real visualization work. Don't worry about memorizing
+`melt()` — when you need it, you'll look it up. Just **recognize**
+when your data is wide and Plotly Express is complaining.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does **df.head()** do?
+
+- It removes the first row of the DataFrame.
+- It deletes the column headers.
+- [o] It returns the first 5 rows of the DataFrame (or **n** rows if you pass **df.head(n)**).
+  > Yes. **df.head()** is the canonical "let me peek at this dataset" command. Combined with **df.shape** (dimensions) and **df.describe()** (numeric summary), it's most analysts' first 30 seconds with any new DataFrame.
+- It downloads the DataFrame.
+
+Build the habit: load a DataFrame → **df.head()** → **df.shape** → **df.describe()**. Always.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following filters a DataFrame **df** to keep only rows where **year** equals 2007?
+
+- **df.filter(year == 2007)**
+- **df.where(year == 2007)**
+- [o] **df[df["year"] == 2007]** (or **df.query("year == 2007")**)
+  > Right. Boolean indexing (**df[boolean_series]**) is the most common filtering idiom in pandas. The **.query("...")** method does the same thing with a slightly more readable string syntax. Both produce a new DataFrame containing only the matching rows.
+- **df.select("year == 2007")**
+
+You will type one of these two patterns dozens of times in any real analysis. Pick whichever reads better to you.`}
+/>
+
+<MultipleChoice
+  markdown={`What does it mean for data to be in **tidy (long)** format?
+
+- The data has been spell-checked.
+- All numbers are integers.
+- [o] Each variable is one column, each observation is one row, each cell holds a single value — making it easy to map columns to chart encodings.
+  > Yes. Tidy data is the "preferred shape" for Plotly Express (and ggplot2, Seaborn, and most modern viz tools). When a column maps cleanly to an encoding (**x="year"**, **color="country"**), the chart almost writes itself. Wide data — with years spread across columns — usually needs to be reshaped first.
+- The data has fewer than 100 rows.
+
+If you find yourself fighting Plotly Express, ask yourself: *is my data tidy?* If not, use **.melt()** to reshape it.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is **sorting by value** important before drawing a bar chart of categories?
+
+- Sorting is required by the matplotlib library.
+- Sorted data is faster to plot.
+- [o] The eye reads a ranked / sorted bar chart almost instantly — alphabetical order obscures the actual ranking of values.
+  > Right. A bar chart's *point* is usually to compare values. Sorting by value lets the reader see "biggest, then next biggest, then..." in zero conscious time. Alphabetical order is essentially random for the reader and adds an extra cognitive step.
+
+Always sort categorical bar charts by value, unless the order itself carries meaning (e.g., months of the year).`}
+/>

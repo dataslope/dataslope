@@ -1,0 +1,126 @@
+---
+title: Next Steps
+description: Where to go from here — libraries, books, and habits worth building.
+---
+
+You've reached the end of the course. By now, you can load a
+DataFrame, choose an appropriate chart, build it with Plotly
+Express, and reason critically about whether it tells the truth.
+That's the foundation. Everything from here is depth.
+
+## Where to go in Plotly
+
+Plotly Express is the gentle front door to a much larger
+ecosystem.
+
+- **Plotly Graph Objects** (`plotly.graph_objects`) — the
+  lower-level interface. More verbose, but lets you customize
+  anything. When Plotly Express *can't quite* do what you want,
+  this is where you go.
+- **Plotly subplots** (`make_subplots`) — compose multiple charts
+  into a single figure with full control over layout.
+- **Plotly Dash** — Plotly's framework for building interactive
+  web dashboards in Python, without writing HTML or JavaScript.
+
+## Other visualization libraries worth knowing
+
+You will eventually meet these. Each has a different philosophy:
+
+- **Matplotlib** — the granddaddy of Python plotting. Verbose,
+  but produces publication-quality static figures. Most
+  scientific papers still use it.
+- **Seaborn** — built on Matplotlib, with cleaner defaults and a
+  statistical bent. Great for distribution and relationship
+  plots in a notebook.
+- **Altair** — declarative grammar-of-graphics style, inspired by
+  ggplot2 (R). Beautiful and concise.
+- **Bokeh** — interactive web visualization, similar audience to
+  Plotly.
+- **Vega-Lite** — the visualization grammar that Altair compiles
+  to. Worth understanding conceptually.
+
+You don't need to learn all of them. Pick one beyond Plotly
+Express once you have a real reason.
+
+## Dashboarding frameworks
+
+When your charts need to live somewhere other than a notebook:
+
+- **Streamlit** — the fastest way to turn a Python script into a
+  web app. Great for internal tools.
+- **Dash** — Plotly's own framework. More flexible, steeper
+  learning curve.
+- **Panel / Voila** — alternatives if you live in the Jupyter
+  ecosystem.
+
+For most beginners, **Streamlit is the right next step** for
+building a small interactive app.
+
+## Books worth your time
+
+These are the canonical reads. Each one will permanently change
+how you see charts.
+
+- **Edward Tufte — *The Visual Display of Quantitative Information***
+  The foundational text. Strong opinions, beautiful examples,
+  enduring principles (data-ink, chart junk, small multiples).
+- **Alberto Cairo — *The Truthful Art* / *How Charts Lie***
+  Modern, accessible, ethics-forward. The best entry point for
+  visualization criticism.
+- **Cole Nussbaumer Knaflic — *Storytelling with Data***
+  Practical, business-oriented. Excellent for anyone presenting
+  charts to non-technical audiences.
+- **Stephen Few — *Show Me the Numbers***
+  Deep, careful, dashboard-focused. The book to read once you're
+  building dashboards regularly.
+
+## Habits worth building
+
+Skills compound. These small habits, practiced over months, are
+what separate competent users from confident ones.
+
+- **Look at one chart in the wild each day** and ask: is it
+  honest? Is it clear? Could it be better?
+- **Re-create one chart you admire each week.** You will learn
+  faster from imitation than from theory.
+- **Keep a "patterns library"** — your own notebook of code
+  snippets for charts you make often.
+- **Read the data first, plot second.** Always.
+- **When stuck, simplify.** Strip encodings until the chart
+  works, then add back.
+
+## A short reflection on what you've learned
+
+You started this course with questions about why charts exist and
+how humans make sense of them. You learned about Florence
+Nightingale, about the Mercator projection, about the difference
+between exploration and presentation. You built bar charts, line
+charts, scatter plots, histograms, box plots, heatmaps, bubble
+charts, maps. You learned to facet, to filter, to annotate, to
+debug.
+
+More importantly, you built a *vocabulary*. You now have words
+for things you previously only had instincts about — "graphical
+encoding," "small multiples," "data-ink ratio." That vocabulary
+will let you read other people's charts more critically and
+collaborate with other analysts more precisely.
+
+Visualization is a craft. It rewards iteration. Keep making
+charts. Keep questioning them. The next thousand you make will
+teach you more than any course can.
+
+Good luck.
+
+## A final question
+
+<MultipleChoice
+  markdown={`Which of the following is the **single best next step** after finishing this course, for most learners?
+
+- Memorize the entire Plotly API reference.
+- Switch immediately to D3.js and write everything from scratch.
+- [o] Apply what you've learned by visualizing a dataset you actually care about — a hobby, a side project, your own tracked data — and iterate on it for a few weeks.
+  > Yes. The fastest way to consolidate everything in this course is to *use it* on data that matters to you. Personal motivation beats curriculum. Whether it's your running times, your spending, your reading list, or a public dataset on a topic you love — the chart you'll learn the most from is the one you actually want to look at.
+- Read every book listed on this page back-to-back before touching another chart.
+
+Theory plus practice beats either alone. Go make some charts.`}
+/>

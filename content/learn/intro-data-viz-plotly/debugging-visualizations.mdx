@@ -1,0 +1,250 @@
+---
+title: Debugging Visualizations
+description: When charts go wrong, the data is usually trying to tell you something.
+---
+
+A blank chart, a jumbled line, an empty legend — these are the
+everyday frustrations of visualization. The good news: most
+visualization bugs fall into a small number of recognizable
+patterns. Learn the patterns and you'll stop being stuck.
+
+## The mindset: "the chart is honest about the data"
+
+If your chart looks wrong, the chart is *probably* showing the
+data correctly — but the data isn't what you thought it was. The
+first move is rarely "fix the chart code." It's usually
+**inspect the DataFrame**.
+
+A debugging session almost always starts like this:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "month": ["Jan", "Feb", "Mar", "Jan", "Feb", "Mar"],
+    "region": ["N", "N", "N", "S", "S", "S"],
+    "sales": [100, 120, 140, 80, 90, 110],
+})
+
+# When in doubt: look at the data first
+print(df.head())
+print(df.dtypes)
+print(df.shape)
+print(df.isna().sum())
+`}
+/>
+
+Those four lines of inspection solve half of all visualization
+bugs.
+
+## Common failure modes
+
+### 1. Wrong dtype on the axis
+
+You expected a line chart of dates, but your "date" column is a
+string. Plotly will treat each value as a category and order them
+alphabetically. Fix:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "date": ["2024-01-15", "2024-03-01", "2024-02-10"],
+    "value": [10, 30, 20],
+})
+
+# Before: alphabetical, weird order
+fig_bad = px.line(df, x="date", y="value",
+                  template="simple_white",
+                  title="Before: x is string")
+fig_bad.show()
+
+# After: parse to datetime
+df["date"] = pd.to_datetime(df["date"])
+fig_good = px.line(df.sort_values("date"), x="date", y="value",
+                   template="simple_white",
+                   title="After: x is datetime, sorted")
+fig_good.show()
+`}
+/>
+
+### 2. Unsorted x in a line chart
+
+Lines connect points *in the order the DataFrame gives them*. If
+the data isn't sorted by x, you get a "scribble." Always
+`sort_values()` before a line chart.
+
+### 3. Long-vs-wide format confusion
+
+Plotly Express expects **long format**: one row per observation,
+columns for category/value/time. If you have a wide table
+(columns are months, say), reshape with `df.melt(...)` first.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+wide = pd.DataFrame({
+    "product": ["A", "B", "C"],
+    "Jan": [10, 20, 30],
+    "Feb": [12, 25, 28],
+    "Mar": [14, 22, 35],
+})
+
+# Reshape wide → long
+long = wide.melt(id_vars="product",
+                 var_name="month",
+                 value_name="sales")
+
+fig = px.bar(long, x="month", y="sales", color="product",
+             barmode="group", template="simple_white",
+             title="Long format works with Plotly Express")
+fig.show()
+`}
+/>
+
+### 4. Empty chart after filtering
+
+You filter the DataFrame and Plotly renders an empty canvas. Two
+likely causes:
+
+- Your filter condition matches **zero rows** (typo? wrong
+  comparison?).
+- You filtered on a column that has `NaN` values, which silently
+  drop out of comparisons.
+
+Check `len(df_filtered)` *before* plotting.
+
+### 5. Missing values warping the chart
+
+A single `NaN` in a line chart creates a gap. A single huge
+outlier compresses every other point against the floor. Two
+fixes:
+
+- `df.dropna(subset=["y"])` — drop missing rows for the columns
+  you're plotting.
+- Inspect the y-range with `df["y"].describe()` to spot outliers.
+
+### 6. Log of zero or negative
+
+`px.scatter(..., log_y=True)` will silently drop zero and negative
+values (you can't take log of them). If your chart suddenly has
+fewer points than your DataFrame, this is a likely culprit.
+
+### 7. Too many categories crowding the legend
+
+If `color="city"` has 200 cities, the legend becomes useless and
+the colors become indistinguishable. Two fixes:
+
+- Aggregate / group small categories into "Other."
+- Use **faceting** instead of color when categories are many.
+
+### 8. Mismatched data and figure types
+
+Trying to make a line chart from a categorical x-axis usually
+indicates you meant a bar chart. Trying to make a scatter from
+two categorical columns usually indicates you meant a heatmap or
+grouped bar.
+
+## The debugging loop
+
+When a chart looks wrong:
+
+1. **Inspect the DataFrame.** `head()`, `dtypes`, `shape`,
+   `isna().sum()`, `describe()`.
+2. **Check the column types.** Numeric where you expect numeric?
+   Datetime where you expect datetime?
+3. **Sort the data** if you're plotting a line.
+4. **Filter and re-inspect** before plotting.
+5. **Simplify the chart** — drop `color`, `facet`, `size` and see
+   if the basic shape is right.
+6. **Add encodings back one at a time.**
+
+This loop will resolve nearly every "my chart looks wrong" moment
+you'll encounter as a beginner.
+
+## A worked example
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+# Buggy scenario: weird line chart
+df = pd.DataFrame({
+    "month": ["2024-03", "2024-01", "2024-02", "2024-04"],
+    "sales": [200, 150, 175, 225],
+})
+
+# Step 1: inspect
+print(df.dtypes)   # month is 'object' (string)
+
+# Step 2: parse the date
+df["month"] = pd.to_datetime(df["month"])
+
+# Step 3: sort
+df = df.sort_values("month")
+
+# Step 4: plot
+fig = px.line(df, x="month", y="sales",
+              markers=True,
+              template="simple_white",
+              title="Sales over time — now correctly ordered")
+fig.show()
+`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Your line chart looks like a **scribble** — lines crossing back and forth instead of going left-to-right. The most likely cause is:
+
+- A bug in Plotly.
+- The wrong template.
+- [o] The DataFrame is not sorted by the x-axis column. Lines connect points in DataFrame order, not in x-axis order.
+  > Yes. Plotly connects points in the order they appear in the DataFrame. If your data is unsorted by x, the line will zigzag. Fix: **df.sort_values("x")** before plotting.
+- You need more colors.
+
+This is *the* most common line-chart bug. Always sort by x first.`}
+/>
+
+<MultipleChoice
+  markdown={`Plotly Express generally expects data in:
+
+- Wide format (one column per category).
+- [o] Long format (one row per observation, with separate columns for the category, the value, and any grouping variable).
+  > Right. Long ("tidy") format is the Plotly Express convention. If your data is wide, use **df.melt(...)** to reshape it before plotting.
+- A NumPy array.
+- A nested dictionary.
+
+Most "I can't get this chart to work" problems for beginners trace back to wide-vs-long format confusion.`}
+/>
+
+<MultipleChoice
+  markdown={`You add **log_y=True** to a scatter plot and suddenly some points disappear. Why?
+
+- Plotly randomly samples points on log axes.
+- [o] Log of zero or a negative number is undefined, so those points are silently dropped.
+  > Exactly. The log axis can only show positive values. If your data has zeros or negatives, those rows quietly disappear. Either filter them out explicitly (so you know what's gone) or use a linear axis.
+- Log axes only show 100 points.
+- The **simple_white** template hides points.
+
+If a transform changes your data, do it explicitly so you stay in control.`}
+/>
+
+<MultipleChoice
+  markdown={`When a chart looks wrong, the **first** debugging step should be:
+
+- Try a different chart type.
+- Try a different template.
+- [o] Inspect the DataFrame: **head()**, **dtypes**, **shape**, **isna().sum()**. The chart is usually showing the data correctly; the data isn't what you think it is.
+  > Yes. The chart is honest about what's in the DataFrame. If the chart looks wrong, almost always the *data* is the surprise — wrong types, unsorted, missing values, or the wrong shape. Look at the data first.
+- Restart the notebook.
+
+This single habit — inspect before adjusting — will save you hours.`}
+/>

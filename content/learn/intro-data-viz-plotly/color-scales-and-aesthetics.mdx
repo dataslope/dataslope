@@ -1,0 +1,241 @@
+---
+title: Color Scales and Aesthetics
+description: How to pick a color palette that conveys meaning and respects your audience
+---
+
+We have talked about color in passing — now we focus on it
+deliberately. Color is the most over-used and abused encoding in
+data visualization. A well-chosen palette is invisible: the reader
+just *reads* the chart. A poorly-chosen one fights the data and
+sometimes lies about it.
+
+## The three families of color scales
+
+There are essentially three families. Knowing which family fits
+which kind of data is 80% of the battle.
+
+```mermaid
+flowchart TB
+    D[Data] --> A{What kind?}
+    A -->|Categories<br/>no order| QUAL[Qualitative<br/>distinct hues]
+    A -->|Ordered low to high<br/>no special midpoint| SEQ[Sequential<br/>light to dark of one hue]
+    A -->|Diverging from a midpoint<br/>e.g. positive vs negative| DIV[Diverging<br/>two hues + white in middle]
+```
+
+### Qualitative (categorical) palettes
+
+For **distinct, unordered categories** (continents, products,
+teams). The palette uses different *hues* and the reader sees
+"these belong together, those belong over there."
+
+Good qualitative palettes: `"Plotly"`, `"D3"`, `"G10"`,
+`"Vivid"`, `"Set2"`, `"Pastel"`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    color="continent",
+    log_x=True,
+    color_discrete_sequence=px.colors.qualitative.Vivid,
+    template="simple_white",
+    title="Qualitative palette: Vivid",
+    labels={"gdpPercap": "GDP per capita (USD, log)",
+            "lifeExp": "Life expectancy"},
+)
+fig.show()
+`}
+/>
+
+Rule of thumb: **keep qualitative palettes to ≤7 colors.** Past
+that, the eye starts confusing similar hues.
+
+### Sequential palettes
+
+For **ordered, one-sided** data — low to high, with no special
+midpoint. Sequential palettes vary in *luminance* of a single hue
+(or smoothly through related hues).
+
+Good sequential palettes: `"Viridis"`, `"Plasma"`, `"Magma"`,
+`"Cividis"`, `"Blues"`, `"YlOrRd"`, `"YlGnBu"`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    color="lifeExp",  # numeric -> continuous color
+    log_x=True,
+    color_continuous_scale="Viridis",
+    template="simple_white",
+    title="Sequential palette: Viridis",
+    labels={"gdpPercap": "GDP per capita (USD, log)",
+            "lifeExp": "Life expectancy"},
+)
+fig.show()
+`}
+/>
+
+### Diverging palettes
+
+For **two-sided** data with a meaningful midpoint — correlations
+around 0, year-over-year change, deviations from a baseline.
+Diverging palettes use *two* hues for the extremes and white (or
+neutral) for the midpoint.
+
+Good diverging palettes: `"RdBu"`, `"RdBu_r"` (reversed),
+`"PiYG"`, `"BrBG"`, `"Spectral"` (use carefully — borderline).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+import pandas as pd
+
+# Simulated year-over-year change for several products
+df = pd.DataFrame({
+    "product": ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"],
+    "yoy_pct": [-18, -3, 7, 22, -5, 12],
+})
+
+fig = px.bar(
+    df.sort_values("yoy_pct"),
+    x="yoy_pct", y="product", orientation="h",
+    color="yoy_pct",
+    color_continuous_scale="RdBu",
+    color_continuous_midpoint=0,
+    template="simple_white",
+    title="Year-over-year change — diverging palette centered at 0",
+    labels={"yoy_pct": "YoY change (%)", "product": "Product"},
+)
+fig.show()
+`}
+/>
+
+The centerpiece move: `color_continuous_midpoint=0`. Without it,
+the white anchor floats arbitrarily; with it, "no change" is the
+neutral pivot, and the reader instantly sees positive vs negative.
+
+## The Jet / rainbow trap, revisited
+
+We mentioned this already, but it's important enough to repeat:
+**avoid Jet, rainbow, and any palette that is not perceptually
+uniform.** They create false visual structure that looks like
+data features but isn't. `Viridis` is the modern default for a
+reason — it's specifically designed to be smooth and uniform.
+
+## Accessibility: colorblind-safe palettes
+
+Roughly **8% of men and 0.5% of women** have some form of color
+vision deficiency, most commonly red-green confusion. Several
+Plotly palettes are colorblind-safe by design:
+
+- `"Viridis"`, `"Cividis"`, `"Plasma"`, `"Magma"` (sequential)
+- `"BrBG"`, `"PuOr"`, `"PRGn"` (diverging)
+- `"Safe"`, `"Plotly"` (qualitative — both reasonably safe)
+
+If your chart uses red-vs-green to convey "bad vs good," fix it.
+Either use a colorblind-safe palette or double-encode with shape
+or labels.
+
+## Don't use color for emphasis if you don't have to
+
+A common beginner habit: every chart series gets a different
+color, even when only one matters. The result is a noisy "Christmas
+tree" chart.
+
+Better: **gray out everything except the focus**.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("continent == 'Europe'")
+
+# Highlight just Germany; gray everything else.
+df["highlight"] = df["country"].where(df["country"] == "Germany", "Other")
+
+fig = px.line(
+    df, x="year", y="lifeExp",
+    color="highlight",
+    line_group="country",
+    color_discrete_map={"Germany": "#d62728", "Other": "lightgray"},
+    template="simple_white",
+    title="Life expectancy in Europe — Germany highlighted",
+    labels={"year": "Year", "lifeExp": "Life expectancy"},
+)
+fig.show()
+`}
+/>
+
+The reader's eye goes directly to Germany. The other 29 countries
+provide *context* without competing for attention.
+
+## A few quick rules
+
+- **Qualitative palettes for nominal categories** (≤7 colors).
+- **Sequential palettes for ordered/quantitative** with one-sided
+  range.
+- **Diverging palettes for data with a meaningful midpoint**
+  (always set `color_continuous_midpoint`).
+- **Avoid rainbow / Jet** for any quantitative data.
+- **Test in grayscale** — if the chart still works in B&W, you've
+  used color carefully.
+- **Highlight, don't decorate** — if only one series matters,
+  color only that one.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which color palette family should you use for **unordered categorical** data with 5-7 categories?
+
+- A sequential palette like **Viridis**.
+- A diverging palette like **RdBu**.
+- [o] A **qualitative** palette like **Plotly** or **Vivid** — distinct hues with no implied ordering.
+  > Yes. Qualitative palettes use different *hues* so the eye sees the categories as distinct, with no implied order or magnitude. For more than ~7 categories, even good qualitative palettes start running out of distinguishable hues and you should reach for facets instead.
+- A grayscale ramp.
+
+Color hue = categories. Color intensity = quantity. Don't mix them up.`}
+/>
+
+<MultipleChoice
+  markdown={`Why should a **diverging** color palette like **RdBu** be **centered at the meaningful midpoint** (e.g., 0 for correlations or year-over-year change)?
+
+- Plotly requires it.
+- It makes the chart smaller.
+- [o] Centering the white anchor at the meaningful zero makes the reader instantly see positive vs negative, and the chart's coloring directly mirrors the data's sign.
+  > Right. If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral" — it means "average," which is a different and often confusing message. **color_continuous_midpoint=0** (in Plotly Express) makes the encoding honest.
+- White is more accessible than other colors.
+
+Diverging data deserves diverging palettes, centered at the meaningful midpoint.`}
+/>
+
+<MultipleChoice
+  markdown={`A reasonable design move for a chart with **30 lines** where you want to spotlight just one is:
+
+- Use a different color for all 30 lines.
+- Add a 3-D effect.
+- [o] Color the one important line in a bright hue and color the other 29 light gray.
+  > Yes. This "spotlight" technique cuts visual noise dramatically. The 29 gray lines provide *context* without competing for attention; the highlighted line reads immediately. Newspaper graphics teams use this constantly.
+- Drop 29 lines and only show the important one.
+
+Sometimes the context lines are essential — dropping them would hide whether the highlighted line is normal or unusual. Graying them keeps the context but lowers its visual weight.`}
+/>
+
+<MultipleChoice
+  markdown={`Approximately what fraction of men have some form of **color vision deficiency**?
+
+- About 0.1%.
+- About 1%.
+- [o] About 8%.
+  > Right. Red-green color blindness is the most common form. That's roughly 1 in 12 men. A chart that conveys "good vs bad" only with red vs green excludes a large slice of the audience. Use a colorblind-safe palette and/or double-encode with shape or labels.
+- About 50%.
+
+Accessibility isn't a niche concern — it's a meaningful slice of every audience.`}
+/>

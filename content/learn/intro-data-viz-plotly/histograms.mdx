@@ -1,0 +1,227 @@
+---
+title: Histograms
+description: The chart that shows the *shape* of one variable — distribution, skew, and outliers
+---
+
+A **histogram** answers a single, fundamental question: **what
+does the distribution of this one variable look like?** Where do
+most values cluster? Is the distribution symmetric or skewed? Are
+there outliers? Is it bell-shaped, uniform, or bimodal?
+
+You will use histograms constantly during *exploratory analysis* —
+every time you load a new dataset, you should histogram every
+numeric column as part of getting acquainted.
+
+## How a histogram works
+
+A histogram chops the range of a numeric variable into **bins**
+(usually equal-width buckets) and shows the **count** of values
+that fall into each bin. The result looks like a bar chart, but
+the bars represent *intervals*, not categories.
+
+```mermaid
+flowchart LR
+    V["Numeric column<br/>(values)"] --> B["Cut into bins<br/>e.g. 0-10, 10-20, ..."]
+    B --> C["Count per bin"]
+    C --> P["Plot as bars"]
+```
+
+## The simplest histogram
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+fig = px.histogram(
+    df, x="total_bill",
+    template="simple_white",
+    title="Distribution of restaurant bills",
+    labels={"total_bill": "Total bill (USD)"},
+)
+fig.show()
+`}
+/>
+
+You can see immediately: most bills are between $10-25, the
+distribution has a *right tail* (a few large bills), and very few
+bills exceed $40.
+
+## Bin width matters — a lot
+
+The number of bins you choose changes how the distribution looks.
+Too few bins hide structure; too many bins create noise.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+# Try changing nbins to 5, 20, 50, 100
+fig = px.histogram(
+    df, x="total_bill", nbins=30,
+    template="simple_white",
+    title="Bill distribution with nbins=30 — try other values",
+    labels={"total_bill": "Total bill (USD)"},
+)
+fig.show()
+`}
+/>
+
+Edit the code: try `nbins=5`, then `100`. You'll see two failure
+modes — too-few hides the shape; too-many turns the chart into
+noise.
+
+A useful default heuristic is the **square-root rule**: number of
+bins ≈ √n, where n is the row count. For `tips()` (244 rows), √244
+is about 16, which is a reasonable starting point. Plotly's own
+default is sensible for most datasets; only override when you
+have a reason.
+
+## Comparing groups: stacked, grouped, or overlaid
+
+Add `color="..."` to split the histogram by a categorical variable:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+fig = px.histogram(
+    df, x="total_bill", color="sex",
+    barmode="overlay",
+    opacity=0.6,
+    template="simple_white",
+    title="Bill distribution by sex (overlaid)",
+    labels={"total_bill": "Total bill (USD)"},
+)
+fig.show()
+`}
+/>
+
+`barmode="overlay"` with reduced opacity lets two distributions sit
+on top of each other so you can compare their *shapes*. Other
+options:
+
+- `barmode="stack"` — stacks the counts (good for showing
+  composition, bad for comparing distributions).
+- `barmode="group"` — places bars side by side per bin (can get
+  noisy fast).
+
+## Histograms of *proportions* with `histnorm`
+
+If your groups have very different sizes, counts are misleading —
+the larger group will always have taller bars. Use `histnorm` to
+normalize:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+fig = px.histogram(
+    df, x="total_bill", color="sex",
+    barmode="overlay", opacity=0.6,
+    histnorm="probability density",
+    template="simple_white",
+    title="Bill distribution by sex (normalized)",
+    labels={"total_bill": "Total bill (USD)"},
+)
+fig.show()
+`}
+/>
+
+Now the bars represent *probability density* (so each group's
+total area sums to 1), making the *shapes* directly comparable
+regardless of group size.
+
+Other `histnorm` values: `"percent"`, `"probability"`, `"density"`.
+
+## When NOT to use a histogram
+
+- For **categorical** data, use a bar chart (`px.bar`) showing
+  counts per category, not a histogram.
+- For comparing **summary statistics** across many groups, a **box
+  plot** (next page) is more concise.
+- For **two** numeric variables, use a **2-D density heatmap** or
+  scatter plot.
+
+## A real-world reading of a histogram
+
+When you look at a histogram, ask:
+
+1. **Where is the center?** (Mode, median, mean.)
+2. **How spread out is it?** (Standard deviation, IQR.)
+3. **Is it symmetric or skewed?** Most real-world distributions
+   (income, wait times, page views) are *right-skewed* — a long
+   tail of large values.
+4. **Are there multiple peaks (bimodality)?** This often signals
+   *two mixed populations*, which is a big analytical clue.
+5. **Are there outliers / extreme values?**
+
+Train yourself to ask these five questions on every histogram you
+ever see.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a **histogram** designed to show?
+
+- The relationship between two variables.
+- A comparison across distinct categories.
+- [o] The distribution (shape, spread, center, skew) of a single numeric variable.
+  > Yes. A histogram divides the range of one variable into bins and counts how many values fall in each. The resulting shape reveals the distribution — where values cluster, how spread out they are, whether the distribution is skewed, and whether there are multiple peaks.
+- A trend over time.
+
+For trends over time, use a line chart; for relationships between two variables, use a scatter plot.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens if you choose **too few bins** for a histogram?
+
+- The chart looks noisy.
+- The chart fails to render.
+- [o] Structure in the distribution (e.g., bimodality, fine clustering) gets averaged away — you only see a coarse outline.
+  > Right. Too few bins is the visual equivalent of zooming out — you lose detail. Too many bins is the opposite: noise overwhelms signal. The sweet spot reveals *real* structure without amplifying random fluctuations. A common starting heuristic is √n bins, where n is the row count.
+
+Always sweep through 2-3 bin counts when first exploring a histogram.`}
+/>
+
+<MultipleChoice
+  markdown={`You're comparing the bill-size distribution between two groups with **very different group sizes**. Why might raw counts on a histogram be misleading?
+
+- Raw counts are illegal.
+- Raw counts force a log scale.
+- [o] The larger group will always have taller bars, even if the *shape* of the distributions is similar — counts confound group size with distribution shape.
+  > Yes. To compare *shapes* fairly, normalize: use **histnorm="probability density"** or **"percent"**. That way each group's distribution integrates to the same total, and you can compare apples to apples.
+- Raw counts are always wrong.
+
+When comparing distributions across groups, the question "is this group different?" is almost always best answered with normalized histograms.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following is a sign of a **bimodal** distribution on a histogram?
+
+- A single tall peak in the middle.
+- A long tail on the right side.
+- [o] Two distinct peaks separated by a valley.
+  > Right. Two peaks usually means your data contains two underlying populations mixed together (e.g., "two species of fish in one tank measurement"). Bimodality is a strong analytical clue — almost always worth investigating.
+- All bars at the same height.
+
+Catching bimodality early can completely change your analysis. A summary statistic like the mean would fall *between* the two modes, making it misleading.`}
+/>
+
+<MultipleChoice
+  markdown={`Which question would a histogram **NOT** help answer?
+
+- "What's the most common range of values?"
+- "Are there outliers far from the typical range?"
+- [o] "What's the correlation between income and education?"
+  > Correct — this is the odd one out. Correlation is a *two-variable* question, best answered with a scatter plot. Histograms are designed for *one* variable's distribution. The other three questions all concern the shape of a single variable, which is exactly what a histogram shows.
+
+Match the chart type to the *number of variables* and the *kind of question* you're asking.`}
+/>

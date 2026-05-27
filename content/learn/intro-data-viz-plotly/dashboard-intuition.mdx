@@ -1,0 +1,201 @@
+---
+title: Dashboard Intuition
+description: Why dashboards exist, why most are bad, and how to organize charts that work together
+---
+
+A **dashboard** is just a collection of charts on one page,
+usually arranged in a grid, usually meant to be glanced at
+quickly. The word originally came from cars: an instrument panel
+of dials and gauges meant to be readable at speed.
+
+Dashboards are *everywhere* in modern business. Most are bad.
+This page is about what makes a dashboard work — and what makes
+it fail.
+
+## What dashboards are for
+
+A good dashboard answers a *small number of recurring questions*
+about an ongoing situation, in a way that the audience can read in
+*seconds*, not minutes.
+
+Examples of good dashboard questions:
+
+- "How is our website doing today?"
+- "What's our cash position this week?"
+- "Which servers are unhealthy right now?"
+- "Are any KPIs trending in the wrong direction?"
+
+Each is a *recurring* question — something the user looks at again
+and again, expecting to see something *change*.
+
+Dashboards are **not** good for:
+
+- **One-time analysis.** Use a notebook or report.
+- **Deep exploration.** Use an interactive tool, not a dashboard.
+- **Telling a single story.** Use a narrative document with a few
+  charts.
+
+The mistake of putting a one-time analysis in a "dashboard"
+because it's the easiest tool at hand creates a graveyard of stale
+dashboards everyone ignores.
+
+## Why most dashboards fail
+
+The classic dashboard failure mode is the **wall of charts**: 30+
+small panels, each showing a different metric, with no apparent
+priority. The user opens it, freezes, and closes it.
+
+```mermaid
+flowchart TB
+    B[Bad dashboard]
+    B --> M[Too many charts]
+    B --> NP[No visual priority]
+    B --> NC[No clear question]
+    B --> SS[Stale data]
+    B --> NL[Unlabeled axes]
+    B --> NA[No annotations]
+```
+
+Why does this happen? Because dashboards are *cheap* to build and
+*expensive* to delete. Every stakeholder who ever wanted "their
+chart" got it added. Five years later the dashboard has 50 charts
+and nobody knows which still matter.
+
+## Principles of a good dashboard
+
+### 1. **Five rows or fewer**
+
+If your dashboard needs scrolling, it's probably two dashboards
+pretending to be one. The whole point is "glance at speed."
+
+### 2. **Big numbers at the top**
+
+The top-left is the most-read part of any chart. Put the *most
+important single number* there, big and labeled.
+
+### 3. **Time-series charts in the middle**
+
+The body of the dashboard is usually a few time-series charts
+showing how the headline numbers are evolving.
+
+### 4. **Detail at the bottom**
+
+Breakdowns by category, top-N tables, and other detail go below.
+The user scrolls only when they want depth.
+
+### 5. **One question per chart**
+
+Every chart on the dashboard should answer one clear question. If
+a chart doesn't, remove it.
+
+### 6. **A consistent visual language**
+
+Same colors mean the same thing across charts. Same axes use the
+same scales. Same time periods.
+
+## A toy dashboard pattern
+
+You can hand-build a multi-chart "dashboard-like" display by
+making each chart in a single notebook cell:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+# Fabricated sales data
+import numpy as np
+np.random.seed(42)
+df = pd.DataFrame({
+    "date": pd.date_range("2024-01-01", periods=180),
+    "region": np.random.choice(["North", "South", "East", "West"], 180),
+    "sales": np.random.gamma(shape=2, scale=1000, size=180),
+})
+
+# Headline: total sales (year-to-date)
+total = df["sales"].sum()
+print(f"YTD SALES: \${total:,.0f}")
+print(f"DAILY AVG: \${df['sales'].mean():,.0f}")
+print()
+
+# Time series of daily sales
+ts = df.groupby("date", as_index=False)["sales"].sum()
+fig1 = px.line(ts, x="date", y="sales",
+               template="simple_white",
+               title="Daily total sales",
+               labels={"date": "Date", "sales": "Sales (USD)"})
+fig1.show()
+
+# Breakdown by region
+by_region = df.groupby("region", as_index=False)["sales"].sum().sort_values("sales", ascending=False)
+fig2 = px.bar(by_region, x="region", y="sales",
+              template="simple_white",
+              title="Total sales by region",
+              labels={"region": "Region", "sales": "Sales (USD)"})
+fig2.show()
+`}
+/>
+
+That's the rough rhythm of a dashboard: **headline numbers →
+trend chart → breakdown**. Real dashboards (Plotly Dash, Tableau,
+Power BI, Streamlit) add layout, filtering controls, and live data
+— but the *information architecture* is the same.
+
+## Real dashboards: Dash and Streamlit
+
+Plotly has a sister project, **Dash**, that lets you turn Plotly
+charts into a multi-chart web dashboard with dropdowns and
+sliders. **Streamlit** is a similar tool that's even simpler. Both
+go beyond what we'll cover in this course — they're full
+frameworks.
+
+The good news: every chart you've learned to build in Plotly
+Express works *unchanged* in Dash and Streamlit. Learning Plotly
+Express is the foundation for both.
+
+## A diagnostic question for your dashboards
+
+When you're tempted to add a chart to a dashboard, ask:
+
+> *"If the value on this chart changes, will someone do something
+> different?"*
+
+If yes — add it. If no — delete it. That single question prevents
+~80% of dashboard bloat.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a **dashboard** primarily designed for?
+
+- Telling a story once and never looking at it again.
+- Exploring data in depth.
+- [o] Quickly answering a small number of **recurring** questions about an ongoing situation.
+  > Yes. Dashboards are meant to be glanced at — repeatedly — and absorbed in seconds. They are not the right tool for one-off analysis or for deep exploration. Those tasks deserve a notebook or an interactive tool.
+- Running statistical tests.
+
+Dashboards = "what is happening right now / this week, and is anything alarming?" Anything else is a different tool.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is a typical **failure mode** of real-world dashboards?
+
+- Showing too few charts.
+- Loading too quickly.
+- [o] A "wall of charts" — many small panels with no visual priority, no clear question per chart, and no story to read.
+  > Right. Dashboards are cheap to add to and expensive to delete from. Over years they accumulate every stakeholder's pet chart until nobody knows what to look at. The cure is a *regular* deletion pass: any chart that hasn't driven a decision in N months goes.
+
+A single number in big text often communicates more than a chart of the same number.`}
+/>
+
+<MultipleChoice
+  markdown={`Which question is the best **single test** for whether a chart belongs on a dashboard?
+
+- "Does it use bright colors?"
+- "Is it interactive?"
+- [o] "If the value on this chart changes, will someone do something different?"
+  > Yes. The point of a dashboard is to *drive action*. A chart whose changes never trigger any decision is just decoration. Delete it. This question alone prevents most dashboard bloat.
+- "Does it have a legend?"
+
+Make the action-orientation explicit and your dashboards stay focused.`}
+/>

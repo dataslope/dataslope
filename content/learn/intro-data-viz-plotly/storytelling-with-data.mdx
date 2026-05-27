@@ -1,0 +1,183 @@
+---
+title: Storytelling with Data
+description: Turning a chart into an argument that lands
+---
+
+By now you can produce technically correct charts. This page is
+about producing *charts that change minds* — the difference
+between *displaying* data and *communicating* with it.
+
+The discipline is sometimes called **data storytelling**. It's not
+a separate skill bolted onto visualization; it's how you *use*
+visualization in service of an argument.
+
+## A chart is an argument
+
+Every chart you make is making a claim:
+
+- "Sales are growing."
+- "Customers in city A behave differently from customers in city B."
+- "This pricing change worked."
+
+The chart is the *evidence*; the argument is what the chart is
+*for*. Storytelling is the discipline of making the chart match
+the argument so well that the reader can't miss it.
+
+```mermaid
+flowchart LR
+    Q[Question /<br/>Argument] --> D[Data]
+    D --> C[Chart]
+    C --> R[Reader]
+    R --> A[Acts /<br/>Believes]
+```
+
+## Three ingredients of a good story-chart
+
+### 1. A clear *claim*
+
+Before you build the chart, write down — in *one sentence* — the
+claim you want to make. "Mobile traffic surpassed desktop in Q2."
+That's a claim. "Here is some data on traffic" is not.
+
+The claim shapes everything: which data to filter, which encoding
+to choose, what to highlight, what to leave out.
+
+### 2. A focused *encoding*
+
+Once the claim is clear, pick the encoding that makes the claim
+*visually obvious*. If the claim is "X surpassed Y" — a line chart
+with X and Y both visible, plus an annotation at the crossover, is
+the right shape.
+
+If the claim is "X dwarfs everything else" — a sorted bar chart
+with X colored prominently and everyone else gray.
+
+### 3. A clear *title and annotation*
+
+The title should *state the claim*. Not "Sales by quarter" — say
+"Mobile sales overtook desktop in Q2 2024." The annotation should
+*point at* the moment that proves the claim.
+
+## Side by side: same data, different stories
+
+Watch how the same data can tell two different stories depending
+on framing.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "year": list(range(2018, 2025)) * 2,
+    "channel": ["Desktop"]*7 + ["Mobile"]*7,
+    "sales": [100, 95, 92, 88, 80, 70, 55,
+              30, 45, 60, 75, 95, 110, 130],
+})
+
+# Story 1: "Mobile is growing fast"
+fig1 = px.line(
+    df, x="year", y="sales", color="channel",
+    markers=True,
+    template="simple_white",
+    title="Mobile sales tripled while desktop sales fell by half",
+    labels={"sales": "Sales (units)", "year": "Year"},
+)
+fig1.add_annotation(x=2024, y=130, text="Mobile<br>+330% since 2018", showarrow=True, ax=-60, ay=-30)
+fig1.show()
+
+# Story 2: "Total sales are flat" — same data, summed
+total = df.groupby("year", as_index=False)["sales"].sum()
+fig2 = px.line(
+    total, x="year", y="sales",
+    markers=True,
+    template="simple_white",
+    title="Total sales held roughly steady over six years",
+    labels={"sales": "Total sales (units)", "year": "Year"},
+)
+fig2.show()
+`}
+/>
+
+Both charts are *true*. The first emphasizes the channel mix shift;
+the second emphasizes the total. **Neither is wrong — but they
+make different arguments.** Choose the one that matches the
+honest argument you're trying to make.
+
+## The narrative arc
+
+A multi-chart presentation often follows a small arc:
+
+1. **Hook** — one big chart that establishes the headline.
+2. **Detail** — a few charts that drill into the *why*.
+3. **Conclusion** — a chart or table that anchors the *what next*.
+
+This is the same structure as a news article. Three to five charts
+told as a sequence beat fifteen charts dumped on a slide.
+
+## Annotation: don't make the reader work for the insight
+
+If your chart's point is "this peak in February is the story," put
+an arrow on the peak with a label that says so. The reader's eye
+goes where the annotation is. *Direct the gaze.*
+
+The most-shared newspaper graphics in the world (NYT, WSJ,
+Bloomberg) lean *heavily* on annotations. They almost never let a
+chart speak for itself.
+
+## Don't lie — but do focus
+
+There is a difference between *focusing* an argument and *misleading*
+the reader.
+
+- **Focusing**: choose the slice of data that matches your claim;
+  highlight what matters; annotate the takeaway.
+- **Misleading**: truncate axes to inflate small differences;
+  cherry-pick the date range that supports your story; omit
+  context that would change the conclusion.
+
+The line is sometimes fuzzy, but the test is clear: **could a
+careful reader, given your chart plus your caption, come to a
+different reasonable conclusion than yours?** If yes, you're
+focusing. If no — and the conclusion contradicts the full data —
+you're misleading.
+
+The next chapter dives into ethics in more detail.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the **first step** in data storytelling, before you ever open a chart library?
+
+- Pick a color palette.
+- Choose between Plotly and Matplotlib.
+- [o] State the **claim** you want to make in one clear sentence.
+  > Yes. Without a claim, you cannot pick the right chart, the right data slice, or the right title. The claim is the spine of the entire story. "Sales are up" is too vague; "Mobile sales overtook desktop in Q2 2024" is a claim a chart can support.
+- Decide on the chart type.
+
+Claim first; chart second. This is the discipline that separates "displaying data" from "telling a story."`}
+/>
+
+<MultipleChoice
+  markdown={`Which **title** is more **narrative** and likely more effective for a presentation chart?
+
+- "Sales by quarter."
+- "Quarterly metrics."
+- [o] "Q4 sales grew 23%, the steepest jump since 2019."
+  > Right. A descriptive title tells the reader *what the chart is*. A narrative title tells them *what it means*. For presentations and dashboards, narrative titles do much of the cognitive work for the reader and dramatically increase the chance the takeaway lands.
+- "Untitled."
+
+Narrative titles are not "spin" — they're a respectful summary of what the data actually says.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the **difference between focusing and misleading**?
+
+- They are the same thing.
+- Misleading uses Plotly, focusing uses Matplotlib.
+- [o] Focusing chooses a slice / framing that matches an honest claim; misleading omits or distorts context so the reader concludes something that the full data wouldn't support.
+  > Yes. The test is: *if a careful reader saw the underlying full data, would they reach a different reasonable conclusion?* Focusing helps the reader see what the data says; misleading prevents them from seeing what the data really says. The first is competent storytelling; the second is a form of dishonesty.
+- Focusing requires a license.
+
+Every chart leaves something out — that's not the problem. The problem is leaving out things that would change the conclusion.`}
+/>

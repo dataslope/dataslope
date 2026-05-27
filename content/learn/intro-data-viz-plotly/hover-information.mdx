@@ -1,0 +1,203 @@
+---
+title: Hover Information
+description: Customizing the tooltip — one of the most under-used interactive features
+---
+
+Every Plotly Express chart has hover tooltips for free. They show
+the x and y values of whatever you point at. With a little extra
+configuration, you can make the tooltip a *mini information panel*
+that turns each dot into a self-contained record.
+
+This is one of the most under-used features of Plotly — and one of
+the highest-leverage. A great hover tooltip can answer questions
+that would otherwise require a separate table.
+
+## The default tooltip
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    log_x=True,
+    template="simple_white",
+    title="Default hover — just x and y",
+)
+fig.show()
+`}
+/>
+
+Hover over any dot. You see `gdpPercap = ...` and `lifeExp = ...`.
+Useful but anonymous — you don't know *which country*.
+
+## `hover_name`: a headline for the tooltip
+
+`hover_name="column"` puts the value of that column in **bold** at
+the top of the tooltip.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    hover_name="country",
+    log_x=True,
+    template="simple_white",
+    title="With hover_name='country'",
+)
+fig.show()
+`}
+/>
+
+Now each hover starts with the country name. Already a huge
+improvement.
+
+## `hover_data`: add or remove fields
+
+`hover_data=[...]` adds extra columns to the tooltip. You can also
+pass a dictionary to control formatting and visibility per field.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    hover_name="country",
+    hover_data={
+        "continent": True,
+        "pop": ":,",        # comma-separated thousands
+        "gdpPercap": ":.0f", # no decimals
+        "lifeExp": ":.1f",   # one decimal
+    },
+    log_x=True,
+    color="continent",
+    template="simple_white",
+    title="Custom hover_data with number formatting",
+)
+fig.show()
+`}
+/>
+
+Now hovering shows continent, population, GDP, and life expectancy
+— each formatted to read well. The format strings (`":,"`,
+`":.0f"`, `":.1f"`) are Python's standard f-string mini-language.
+
+## Hiding default fields
+
+If a field is *already encoded* in the chart (e.g., `x="gdpPercap"`),
+it appears in the hover by default. To hide it:
+
+```python
+hover_data={"gdpPercap": False}
+```
+
+This is useful for keeping the tooltip clean.
+
+## Custom hover labels with units
+
+You can also relabel hover fields using `labels={}` — the same
+mapping you use for axis labels. Plotly Express reuses the labels
+in the hover automatically.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    hover_name="country",
+    hover_data={"pop": ":,"},
+    color="continent",
+    log_x=True,
+    template="simple_white",
+    labels={
+        "gdpPercap": "GDP per capita (USD)",
+        "lifeExp": "Life expectancy (years)",
+        "pop": "Population",
+        "continent": "Continent",
+    },
+    title="Friendly hover labels via labels={...}",
+)
+fig.show()
+`}
+/>
+
+Hover over a dot. The labels now read "GDP per capita (USD)"
+instead of "gdpPercap" — no separate hover-label configuration
+needed.
+
+## Format string reference
+
+A handful of f-string formats cover 90% of needs:
+
+| Format | Result | Use for |
+| --- | --- | --- |
+| `:,` | 1,234,567 | Thousands separator |
+| `:.0f` | 1235 | No decimals |
+| `:.2f` | 1234.57 | Two decimals |
+| `:,.0f` | 1,235 | Thousands, no decimals |
+| `:.1%` | 12.3% | Percentage |
+| `:.2e` | 1.23e+03 | Scientific notation |
+| `:$,.0f` | $1,235 | Dollars (in Plotly, use d3 spec) |
+
+(Plotly hover formats use the same syntax as D3.js number formats,
+which is mostly the same as Python's.)
+
+## Why this matters: hover is the *detail* layer
+
+Recall Ben Shneiderman's mantra: **overview first, details on
+demand**. The hover tooltip is *the* details-on-demand mechanism.
+A good hover lets the chart show summary structure (overview)
+while making every individual point *queryable* (detail).
+
+A bare-default hover wastes that opportunity. Spend the extra 30
+seconds.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does **hover_name="country"** do in a Plotly Express call?
+
+- Renames the country column.
+- Hides the country column from the data.
+- [o] Sets the value of that column as a bold headline at the top of the hover tooltip for each data point.
+  > Yes. **hover_name** is for the "title" of the tooltip — usually a unique identifier like a name, ID, or label. Combined with **hover_data** for extra fields, you can turn each hover into a small information panel about a single data point.
+- Forces the chart to use country as the color.
+
+Adding **hover_name** is often the single biggest improvement you can make to an analytical scatter plot.`}
+/>
+
+<MultipleChoice
+  markdown={`Which **hover_data** value would format a population of **1234567** as **"1,234,567"**?
+
+- **True**
+- **":.2f"**
+- [o] **":,"**
+  > Right. The **","** format spec inserts thousands separators. For more control, combine: **":,.0f"** gives 1,234,567 (no decimals) and **":,.2f"** gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
+- **"%population%"**
+
+Plotly's hover format strings mostly follow Python's mini-format-language, which is convenient if you already know f-strings.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a **well-crafted hover tooltip** valuable for analytical charts?
+
+- It makes the chart look more colorful.
+- It speeds up rendering.
+- [o] It provides "details on demand" — the reader can investigate any individual data point without leaving the chart or consulting a separate table.
+  > Yes. The hover is the chart's *detail layer*. The default chart shows overall structure; the hover answers "what *is* this particular point?" Combined, they form a complete analytical experience inside a single interactive chart.
+- It is required for the chart to be interactive.
+
+A great hover is the difference between a chart that's "pretty" and a chart that's a *tool*.`}
+/>

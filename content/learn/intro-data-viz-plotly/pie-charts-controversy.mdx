@@ -1,0 +1,209 @@
+---
+title: Pie Charts and Why They Are Controversial
+description: When pie charts are reasonable, when they fail, and what to use instead
+---
+
+The **pie chart** is the most controversial chart type in data
+visualization. Some people use them constantly; many serious
+practitioners would happily ban them. This page explains *both*
+positions and gives you a clear rule for when a pie chart is — and
+isn't — the right tool.
+
+## What a pie chart shows
+
+A pie chart shows **parts of a whole**. The full circle = 100% of
+the total, and each slice's angle represents the share contributed
+by one category.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
+    "share":   [45, 22, 15, 10, 8],
+})
+
+fig = px.pie(
+    df, names="channel", values="share",
+    template="simple_white",
+    title="Traffic by channel (pie)",
+)
+fig.show()
+`}
+/>
+
+The chart says "Organic is the biggest chunk." With 5 slices and a
+dominant one, it works *reasonably* well.
+
+## Why critics dislike pies
+
+Recall the **Cleveland-McGill ranking** from earlier:
+
+1. Position along a common scale  ← *most accurate*
+2. Length
+3. Angle / slope
+4. Area
+5. Volume
+6. Color intensity                ← *least accurate*
+
+Pie charts encode quantity using **angles and areas** — both near
+the bottom of the ranking. That's the technical core of the
+criticism: the eye is bad at comparing angles. Try the next chart:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+# Five close-to-equal categories
+df = pd.DataFrame({
+    "team":  ["A", "B", "C", "D", "E"],
+    "share": [21, 22, 19, 18, 20],
+})
+
+fig1 = px.pie(df, names="team", values="share",
+              template="simple_white",
+              title="Pie — can you rank these by size?")
+fig1.show()
+
+fig2 = px.bar(df.sort_values("share", ascending=False),
+              x="team", y="share",
+              template="simple_white",
+              title="Same data as a bar — much easier to rank")
+fig2.show()
+`}
+/>
+
+On the pie, ranking the slices takes real concentration. On the
+bar, it's instant. **For comparison tasks, bars beat pies almost
+every time.**
+
+## When are pies *acceptable*?
+
+Pie charts aren't universally bad. They are *reasonable* when:
+
+- You have **just a few categories** (2-4 slices).
+- One slice is **dramatically larger** than the others.
+- The story is **part-of-a-whole**, not precise comparison.
+- You need the audience to immediately *recognize* "this is a
+  share of something."
+
+Example: *"60% of users are on mobile, 30% on desktop, 10% on
+tablet."* The story is composition, the categories are few, and
+the dominant category is clear. A pie works.
+
+## When are pies *bad*?
+
+- **Many slices** (more than ~5).
+- **Slices of similar size** (humans can't rank similar angles).
+- **Comparing two pies** (a famously hopeless task).
+- **3-D pies**, **exploded pies**, **donut-with-icon pies** — any
+  decoration that makes it harder to read the angles.
+
+## Better alternatives
+
+When a pie isn't a good fit, the alternatives are almost always:
+
+- **Sorted bar chart** — for comparing magnitudes.
+- **Stacked bar chart** (single tall bar) — for parts-of-a-whole
+  with named segments.
+- **Treemap** — for nested hierarchies.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
+    "share":   [45, 22, 15, 10, 8],
+})
+
+# A horizontal stacked bar — communicates "parts of a whole" without angles.
+df["total"] = "Traffic"
+fig = px.bar(
+    df, y="total", x="share", color="channel",
+    orientation="h",
+    template="simple_white",
+    title="Traffic by channel (stacked bar — pie alternative)",
+    labels={"share": "Share (%)", "total": ""},
+)
+fig.update_layout(showlegend=True, height=200)
+fig.show()
+`}
+/>
+
+A horizontal stacked bar carries the same "part of a whole"
+message without forcing the eye to compare angles.
+
+## A balanced rule of thumb
+
+> **Use a pie when there are ≤4 slices, one slice dominates, and
+> the story is composition. Use a sorted bar chart in every other
+> case.**
+
+That single rule will keep you out of trouble.
+
+## Why this matters: charts as arguments
+
+A pie chart, when used carelessly, makes data *harder* to read
+than the raw numbers. That undermines the whole point of
+visualization. The reason this chapter exists is not to win an
+internet argument about pies — it's to make you *think about
+which encoding earns its place* on every chart you make.
+
+The deeper lesson: **every chart type is a tool, and tools have
+appropriate uses.** Pie charts have a small but real niche. Don't
+use them outside it.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why are pie charts often criticized for **comparing values**?
+
+- Pie charts cannot be interactive.
+- Pie charts are mathematically incorrect.
+- [o] Pie charts encode quantity using **angles and areas**, which the human visual system judges much less accurately than **position and length** used by bar charts.
+  > Yes. The Cleveland-McGill ranking places angle and area near the *bottom* of accuracy for quantitative comparison. For 5+ slices of similar size, viewers cannot reliably rank them. A sorted bar chart makes the same comparison trivially easy.
+- Pie charts are too colorful.
+
+The criticism is empirical, not aesthetic. Bars consistently outperform pies on accuracy in controlled experiments.`}
+/>
+
+<MultipleChoice
+  markdown={`In which situation is a pie chart **most reasonable**?
+
+- Comparing the populations of 30 countries.
+- Showing a trend over time.
+- [o] Showing a part-of-a-whole composition with 2-4 slices where one slice clearly dominates.
+  > Right. Pie charts shine when "this is a share of a total" is the *headline* story, the categories are few, and one dominant slice makes the ranking obvious. Outside that narrow zone, a sorted bar chart almost always communicates the same thing more clearly.
+- Showing the distribution of customer ages.
+
+For distributions use a histogram; for trends use a line chart; for many-category comparisons use bars.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague hands you a chart with **two pies side by side**, asking you to compare them. Why is this a difficult task for the viewer?
+
+- Pies are forbidden in modern reports.
+- The colors might clash.
+- [o] Comparing the same slice across two different pies requires comparing two *angles*, which the eye is poor at — and any subtle change in slice composition makes the comparison harder still.
+  > Yes. This is one of the most famously hopeless visualization tasks. A paired or grouped bar chart, or a slope chart, makes the comparison much easier. If anyone gives you "two pies side by side" as analysis, you can almost always do better.
+- Two pies cannot fit on one page.
+
+Whenever you see paired pies, mentally translate them to paired bars — you'll see how much information is being thrown away.`}
+/>
+
+<MultipleChoice
+  markdown={`The best alternative to a pie chart for showing **parts of a whole** when comparison matters is usually:
+
+- A 3-D pie chart.
+- A scatter plot.
+- [o] A sorted bar chart, or a single stacked bar.
+  > Yes. A sorted bar chart makes ranking trivial; a single horizontal stacked bar visually communicates "shares of a total" without forcing angle comparison. Both replace the pie's weaknesses with stronger encodings.
+- A histogram.
+
+Treemaps work for nested hierarchies. Donut charts are just pies with a hole and inherit the same problems.`}
+/>

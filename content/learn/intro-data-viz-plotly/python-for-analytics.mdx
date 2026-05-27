@@ -1,0 +1,214 @@
+---
+title: Why Python Became the Language of Analytics
+description: How a general-purpose scripting language quietly became the workhorse of modern data work
+---
+
+If you walked into a data team at any major company today and
+asked "what language do you use?", the most common answer — by a
+wide margin — would be **Python**. This was not always the case,
+and it was not even obvious twenty years ago. The story of how
+Python ended up there is worth understanding, because it explains
+*why this course uses Python at all*.
+
+## The competition
+
+In the early 2000s, the analytics world ran on three or four
+mutually-suspicious languages:
+
+- **SAS**, **SPSS**, and **Stata** — proprietary statistical
+  packages with enormous installed bases in academia, government,
+  and pharma.
+- **R** — a free, open-source statistical language designed by
+  and for statisticians.
+- **MATLAB** — dominant in engineering and physics.
+- **Excel + VBA** — the lingua franca of business.
+- **SQL** — the universal language for *getting* data, but not
+  *analyzing* it deeply.
+
+Python was *nowhere* on this list. In 2005, Python was a "scripting
+language" — popular with web developers and system administrators
+but viewed with mild suspicion by serious analysts. It had no good
+numerical library, no good plotting library, no good DataFrame
+library, no notebook.
+
+```mermaid
+timeline
+    title Python's slow takeover of analytics
+    2005 : NumPy 1.0 - unifies array libraries
+    2008 : pandas - DataFrames arrive
+    2010 : IPython Notebook
+    2012 : scikit-learn 0.10 - ML for the masses
+    2014 : Jupyter project formed
+    2015 : Plotly Python API launched
+    2016 : TensorFlow / PyTorch ride the deep-learning wave
+    2019 : Plotly Express released
+    2024 : Python is the #1 language on TIOBE
+```
+
+## Three libraries that changed everything
+
+Three libraries — and a notebook — turned Python into an analytics
+platform between 2005 and 2014.
+
+### NumPy: arrays
+
+**NumPy** (Numerical Python, 2005) gave Python its first proper
+numerical array type. Suddenly you could write `a + b` to add two
+arrays of a million numbers in a single line, and it would run as
+fast as C. Every other analytics library since has been built on
+top of NumPy.
+
+### pandas: DataFrames
+
+**pandas** (2008, by Wes McKinney) added the **DataFrame** — a
+labeled, spreadsheet-like table that lives in memory. If NumPy
+made Python *numerical*, pandas made Python *tabular*. A DataFrame
+looks and behaves a lot like a sheet in Excel — but you can have
+*billions* of rows, you can write code to manipulate it, and you
+can chain operations together cleanly.
+
+DataFrames are the **central object** of the rest of this course.
+Plotly Express expects a DataFrame as input. Every chart on every
+page of this course starts with a pandas DataFrame.
+
+### Matplotlib: plotting
+
+**Matplotlib** (2003) was the original Python plotting library —
+designed deliberately to feel like MATLAB's plotting commands so
+that scientists could switch over with zero friction. Matplotlib
+is the *grandparent* of every Python visualization library,
+including Plotly Express. It is still excellent for static,
+publication-quality figures.
+
+### Jupyter: the notebook
+
+In 2010, **Fernando Pérez** released the **IPython Notebook** — a
+web-based environment where you could write Python and prose side
+by side, and see chart outputs appear inline. Renamed **Jupyter**
+in 2014, the notebook is now the *default* working environment for
+data scientists, ML researchers, and quantitative analysts
+worldwide.
+
+```mermaid
+flowchart LR
+    NP[NumPy<br/>arrays] --> PD[pandas<br/>DataFrames]
+    NP --> MPL[Matplotlib<br/>plots]
+    PD --> MPL
+    PD --> PX[Plotly Express]
+    MPL --> PX
+    PX --> J[Jupyter<br/>notebook]
+    PD --> J
+```
+
+## Why Python won
+
+There were better statistical languages (R), better numerical
+languages (MATLAB, Julia), and better systems languages (C++,
+Rust). Why did Python — a deliberately *unspecialized* language —
+end up at the center?
+
+Three reasons:
+
+1. **Python is "good enough" at everything.** You can write a
+   data pipeline, train a machine-learning model, build a web
+   app, and write a script to email yourself the results — all in
+   one language. R analysts had to drop into Python or Bash for
+   "the other stuff"; Python analysts rarely had to leave.
+2. **Python reads like English.** A line of pandas code is often
+   readable to someone who has never seen pandas. This matters
+   *enormously* when you're sharing analyses with non-programmers.
+3. **The ecosystem became self-reinforcing.** Once every machine-
+   learning library, every cloud SDK, every bioinformatics tool,
+   and every visualization library had a Python interface, *not*
+   using Python became the costly choice.
+
+## Why Python is great for visualization, specifically
+
+For visualization in particular, Python offers a sweet spot:
+
+- **DataFrames in, charts out.** Plotly Express, Matplotlib,
+  Seaborn, and Altair all consume pandas DataFrames. You spend
+  almost no time on data wrangling between *cleaning* and
+  *plotting*.
+- **Code is the recipe.** A Plotly Express chart is one line of
+  Python. That one line is the *definitive*, reproducible record
+  of how that chart was made. Six months later, you can re-run
+  it and get the same result.
+- **You can embed charts everywhere.** Inside a Jupyter notebook,
+  inside a static HTML report, inside an interactive web
+  application, inside a slide deck. The same Python chart code
+  works in all of them.
+
+## A tiny tour
+
+Here is a hint of what a Python visualization workflow feels like.
+Don't worry about understanding every line yet — we will unpack
+all of this in detail soon.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+# Load a tiny built-in dataset:
+df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
+
+# Pandas: peek at the first 5 rows.
+print(df.head())
+
+# Plotly Express: one line, one chart.
+fig = px.bar(
+    df.sort_values("lifeExp"),
+    x="lifeExp",
+    y="country",
+    orientation="h",
+    template="simple_white",
+    title="Life expectancy in Europe (2007)",
+    labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
+)
+fig.show()
+`}
+/>
+
+That is the *entire workflow*: load data into a DataFrame, optionally
+manipulate it, call one Plotly Express function. The chart is
+interactive and shippable. This pattern will repeat on essentially
+every page from here on.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which Python library introduced the **DataFrame** — a labeled, spreadsheet-like table that has become the central object of Python data analysis?
+
+- NumPy
+- Matplotlib
+- [o] pandas
+  > Yes. pandas (2008, by Wes McKinney) brought the DataFrame to Python, building on top of NumPy's arrays. Plotly Express expects DataFrames as input, so pandas is the workhorse you'll use throughout this course.
+- Jupyter
+
+Almost every page of this course starts with a **px.data.something()** call that returns a pandas DataFrame.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following is the **best** reason that Python "won" the analytics ecosystem?
+
+- Python is faster than C++ for numerical code.
+- Python charts are prettier than R charts.
+- [o] Python is "good enough" at everything from data pipelines to ML to web apps, so analysts rarely have to leave it.
+  > Correct. Python is rarely the *best* language for any single task, but the cost of switching languages mid-project is high. By being adequate at everything, Python eliminated the friction of "which language do I write this next part in?"
+- Python is the only language with notebooks.
+
+R, Julia, and even SQL have notebook-like environments — but the Python ecosystem became self-reinforcing first, and now leads by a wide margin.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a **Jupyter notebook**?
+
+- A spreadsheet application.
+- A database management tool.
+- [o] A web-based environment for writing code, prose, and seeing chart outputs inline — the default working environment for many data scientists.
+  > Yes. Jupyter (originally IPython Notebook, 2010) lets you write Python and Markdown side by side, with chart and table outputs appearing directly under the code that produced them. It is to modern analytics what the spreadsheet was to 1990s business.
+- A type of Python web framework.
+
+This course doesn't require you to install Jupyter — every code block here runs in your browser — but you'll likely use Jupyter outside this course.`}
+/>
