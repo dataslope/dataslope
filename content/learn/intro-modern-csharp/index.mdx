@@ -1,0 +1,153 @@
+---
+title: Welcome
+description: A beginner-friendly course on programming foundations and software engineering fundamentals, taught with modern C# and .NET
+---
+
+Welcome to **Introduction to Modern C#**. This course is designed for
+learners with **zero to little programming experience**. If you have
+never written a line of code, or you have copy-pasted a few scripts
+without ever really understanding what was happening, you are exactly
+the audience this course was written for.
+
+C# is the *vehicle*, but the real goal is much bigger than any one
+language. By the end of the course you should be able to:
+
+- Look at a real-world problem and break it into pieces a computer can
+  handle.
+- Understand what is *actually happening* inside the machine when your
+  code runs — memory, types, methods, objects, the runtime.
+- Read and write small to medium C# programs with confidence.
+- Reason about programs that don't behave the way you expected, and
+  fix them.
+- Speak the vocabulary of modern software engineering: object,
+  reference, encapsulation, exception, abstraction, runtime, garbage
+  collector.
+
+## What you will learn
+
+```mermaid
+mindmap
+  root((Intro to<br/>Modern C#))
+    Story
+      Software history
+      Birth of OOP
+      Birth of .NET and C#
+    Foundations
+      Computational thinking
+      How programs execute
+      Managed runtimes
+    Building blocks
+      Variables and memory
+      Types
+      Control flow
+      Methods
+    Objects
+      Classes and objects
+      Encapsulation
+      Inheritance
+      Collections
+    Engineering
+      Errors and debugging
+      Resource management
+      Maintainable software
+```
+
+The course is split into seven parts. The first part is a **story** —
+how programming languages evolved, why object-oriented programming
+appeared, where Java fit in, why Microsoft built .NET, and why
+**Anders Hejlsberg** ended up designing C#. The rest of the course is
+hands-on: variables, types, control flow, methods, classes, objects,
+collections, errors, debugging, and software organization.
+
+## What this course is *not*
+
+This course is **not** a framework bootcamp. We deliberately do *not*
+spend time on:
+
+- Heavy ASP.NET Core tutorials
+- Enterprise frameworks and dependency injection containers
+- Cloud, DevOps, and Kubernetes
+- Advanced concurrency
+- Competitive-programming puzzles
+- Memorizing design patterns
+- Compiler internals
+
+Those are valuable topics — but they are the second thing you learn,
+not the first. Trying to learn them before you understand variables,
+references, methods, and objects is the most common reason new
+programmers stall.
+
+## How to use this site
+
+Every page mixes prose with three kinds of interactive widgets:
+
+1. **Executable C# code blocks.** Each block is compiled by **Roslyn**
+   and runs on the **.NET WebAssembly** runtime *inside your browser*.
+   The first run in a session is slow because the runtime has to boot;
+   subsequent runs are fast.
+2. **Multi-file challenge cards.** Real C# programs live in many
+   files. You will see workspaces with several `.cs` files side by
+   side and fill in the missing pieces.
+3. **Multiple-choice questions.** Short single-answer checks at the
+   end of most pages, with per-choice explanations so even a wrong
+   answer teaches you something.
+
+<Callout type="info" title="Each code block is independent">
+A variable, class, or method defined in one `<CodeBlock>` is **not**
+visible in the next one. Every example is self-contained.
+</Callout>
+
+## A tiny taste
+
+This is a complete C# program. It introduces a class, an object, a
+field, and two methods. Read it once, then click **Run**.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+class Lamp
+{
+    private bool isOn;
+    private string name;
+
+    public Lamp(string name)
+    {
+        this.name = name;
+        this.isOn = false;
+    }
+
+    public void TurnOn()  { isOn = true; }
+    public void TurnOff() { isOn = false; }
+
+    public string Describe()
+        => $"{name} lamp is {(isOn ? "ON" : "off")}";
+}
+
+class Program
+{
+    static void Main()
+    {
+        var desk = new Lamp("desk");
+        Console.WriteLine(desk.Describe());
+        desk.TurnOn();
+        Console.WriteLine(desk.Describe());
+        desk.TurnOff();
+        Console.WriteLine(desk.Describe());
+    }
+}
+`}
+/>
+
+If that example feels intimidating, that is completely normal — it
+uses ideas we have not yet introduced (`class`, `private`, `this`,
+constructors, expression-bodied methods). The point is just to show
+you what a real C# program looks like. By the end of the course,
+every line of that example will feel obvious.
+
+## Where to next
+
+<Callout type="success">
+Click **Early programming and software complexity** in the sidebar to
+begin the story.
+</Callout>
