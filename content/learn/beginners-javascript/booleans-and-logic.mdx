@@ -1,0 +1,391 @@
+---
+title: Booleans and Logic
+description: True, false, and the operators that let a program reason about combinations of conditions.
+---
+
+A **boolean** is a value that is either `true` or `false`. There
+are only two of them. They are the smallest, simplest, and possibly
+the most important type in the language — because *every decision a
+program ever makes* is, at the bottom, a boolean.
+
+## Where booleans come from
+
+You rarely *write* the literals `true` and `false` directly.
+Booleans usually come from **comparisons** and **logical
+expressions**.
+
+### Comparison operators
+
+| Operator | Meaning | Example | Result |
+| :---: | --- | --- | :---: |
+| `===` | strictly equal | `5 === 5` | `true` |
+| `!==` | strictly not equal | `5 !== 6` | `true` |
+| `<`   | less than | `3 < 4` | `true` |
+| `>`   | greater than | `3 > 4` | `false` |
+| `<=`  | less than or equal | `3 <= 3` | `true` |
+| `>=`  | greater than or equal | `5 >= 6` | `false` |
+
+(The loose `==` and `!=` exist too; we will keep avoiding them.)
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`console.log(5 === 5);     // true
+console.log(5 === "5");   // false (different types)
+console.log(3 < 4);       // true
+console.log("apple" < "banana"); // true — strings compare lexicographically
+console.log("a" < "B");   // false — uppercase letters come before lowercase in Unicode
+`}
+/>
+
+A surprising one: strings can be compared with `<`, `>`, etc. They
+compare **lexicographically** (dictionary order, but using the
+Unicode code point of each character). This matters because
+uppercase letters have *lower* Unicode values than lowercase ones,
+so `"Z" < "a"` is `true`. When comparing user-facing text, use
+locale-aware methods like `"a".localeCompare("B")`.
+
+## The three logical operators
+
+Once you have boolean values, you combine them with three logical
+operators:
+
+| Operator | Name | Read as | Example | Result |
+| :---: | --- | --- | --- | :---: |
+| `&&` | AND | "both" | `true && false` | `false` |
+| `\|\|` | OR | "either" | `true \|\| false` | `true` |
+| `!`  | NOT | "not" | `!true` | `false` |
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const isAdmin = true;
+const isActive = false;
+
+console.log(isAdmin && isActive);   // false — needs both
+console.log(isAdmin || isActive);   // true  — needs at least one
+console.log(!isAdmin);              // false — flip
+console.log(!isActive);             // true
+
+// Combine them — parentheses make precedence obvious:
+const canEdit = isAdmin && (isActive || !isActive);
+console.log(canEdit);   // true
+`}
+/>
+
+### Truth tables
+
+The classic way to learn the operators is a tiny table:
+
+`a && b`
+
+| `a` | `b` | `a && b` |
+| :---: | :---: | :---: |
+| `false` | `false` | `false` |
+| `false` | `true` | `false` |
+| `true` | `false` | `false` |
+| `true` | `true` | `true` |
+
+`a || b`
+
+| `a` | `b` | `a || b` |
+| :---: | :---: | :---: |
+| `false` | `false` | `false` |
+| `false` | `true` | `true` |
+| `true` | `false` | `true` |
+| `true` | `true` | `true` |
+
+`!a`
+
+| `a` | `!a` |
+| :---: | :---: |
+| `false` | `true` |
+| `true` | `false` |
+
+## Short-circuit evaluation
+
+This is one of the most useful properties of `&&` and `||`:
+
+- `a && b` only evaluates `b` if `a` is truthy. If `a` is falsy,
+  the result is `a` and `b` is never touched.
+- `a || b` only evaluates `b` if `a` is falsy. If `a` is truthy,
+  the result is `a` and `b` is never touched.
+
+This is called **short-circuit evaluation**. The right-hand side
+might never run.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function expensive() {
+  console.log("(expensive was called)");
+  return true;
+}
+
+console.log("--- AND ---");
+const a = false && expensive();   // expensive() is NOT called
+console.log(a);
+
+console.log("--- OR ---");
+const b = true || expensive();    // expensive() is NOT called
+console.log(b);
+`}
+/>
+
+Two practical patterns use short-circuiting all the time:
+
+- **Default values:** `const greeting = name || "stranger";`
+  → if `name` is empty/falsy, use `"stranger"`.
+- **Safe conditional action:** `user && user.notify();`
+  → only call `notify()` if `user` is truthy.
+
+In modern code, the special **nullish coalescing** operator `??`
+is often a better choice than `||` for defaults, because it only
+triggers on `null`/`undefined` (not `0` or `""`):
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function withDefault(value) {
+  return value ?? "default";
+}
+
+console.log(withDefault("hi"));       // "hi"
+console.log(withDefault(""));         // ""  (empty string is kept!)
+console.log(withDefault(0));          // 0   (zero is kept!)
+console.log(withDefault(null));       // "default"
+console.log(withDefault(undefined));  // "default"
+
+// Compare with ||, which would replace ALL falsy values:
+function withDefaultOr(value) {
+  return value || "default";
+}
+console.log(withDefaultOr(""));   // "default" — empty string got replaced!
+console.log(withDefaultOr(0));    // "default" — zero got replaced!
+`}
+/>
+
+Pick `??` when you specifically mean "fall back if missing", and
+`||` when you mean "fall back if falsy (empty, zero, false, …)".
+
+## Truthy and falsy, revisited
+
+Recall from *Values and Types* — every value can be used in a
+boolean context. The **falsy** values are:
+
+- `false`
+- `0` (and `-0`, `0n`)
+- `""`
+- `null`
+- `undefined`
+- `NaN`
+
+Everything else is truthy. That fact unlocks short, readable
+idioms:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function greet(name) {
+  if (name) {
+    console.log("Hello, " + name + "!");
+  } else {
+    console.log("Hello, stranger.");
+  }
+}
+
+greet("Ada");
+greet("");
+greet();
+greet(null);
+greet(0);   // careful — 0 is falsy! we treat it like "no name"
+`}
+/>
+
+The `if (name)` check covers all "missing or empty" cases at once.
+This is concise and idiomatic — just remember it also rules out
+`0` and `false`, which sometimes matters.
+
+## De Morgan's laws (very useful!)
+
+Two algebraic identities that come up constantly in real code:
+
+- `!(a && b)` is equivalent to `!a || !b`
+- `!(a || b)` is equivalent to `!a && !b`
+
+In plain English: *"not both"* is *"not one, or not the other"*,
+and *"neither"* is *"not one, and not the other"*.
+
+These are not just pedantic. They let you simplify confusing
+negations into cleaner conditions.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Original:
+//   if (!(isAdmin && isActive)) ...
+// Equivalent (often clearer):
+//   if (!isAdmin || !isActive) ...
+
+const isAdmin = true;
+const isActive = false;
+
+console.log(!(isAdmin && isActive));      // true
+console.log(!isAdmin || !isActive);       // true — same result
+
+// Original:
+//   if (!(name || email)) ...
+// Equivalent:
+//   if (!name && !email) ...
+
+const name = "";
+const email = "";
+
+console.log(!(name || email));    // true
+console.log(!name && !email);     // true — same result
+`}
+/>
+
+## The ternary expression: `a ? b : c`
+
+This is not strictly a logic operator, but it lives in the same
+neighbourhood. The **ternary operator** lets you choose between
+two values based on a condition:
+
+```javascript
+const result = condition ? valueIfTrue : valueIfFalse;
+```
+
+Use it for small, single-line choices. For anything more
+complicated, use a regular `if`/`else` — readability beats
+cleverness.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function describeNumber(n) {
+  const sign = n < 0 ? "negative" : n > 0 ? "positive" : "zero";
+  const parity = n % 2 === 0 ? "even" : "odd";
+  return n + " is " + sign + " and " + parity + ".";
+}
+
+console.log(describeNumber(0));
+console.log(describeNumber(5));
+console.log(describeNumber(-4));
+console.log(describeNumber(7));
+`}
+/>
+
+## A worked example: a tiny rule engine
+
+Below is a small example that combines comparisons, logical
+operators, truthy/falsy, and the ternary. It models a "can this
+user post a comment?" rule. Read each `canComment` line carefully —
+it expresses a fairly complex business rule in a single, readable
+line.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function canComment(user, article) {
+  const isAuthor = user && user.id === article.authorId;
+  const isMember = user && user.role === "member";
+  const isAdmin  = user && user.role === "admin";
+  const articleOpen = !article.closedToComments;
+
+  return (isMember || isAdmin) && (articleOpen || isAuthor || isAdmin);
+}
+
+const article = { id: 1, authorId: 42, closedToComments: false };
+
+console.log(canComment(null,                                  article)); // false
+console.log(canComment({ id: 7,  role: "guest"  },            article)); // false
+console.log(canComment({ id: 7,  role: "member" },            article)); // true
+console.log(canComment({ id: 42, role: "member" },            article)); // true
+console.log(canComment({ id: 7,  role: "member" }, { ...article, closedToComments: true })); // false
+console.log(canComment({ id: 42, role: "member" }, { ...article, closedToComments: true })); // true (author can comment even when closed)
+console.log(canComment({ id: 7,  role: "admin"  }, { ...article, closedToComments: true })); // true
+`}
+/>
+
+That single boolean expression in `canComment` encodes a rule that
+might take a paragraph of English to describe. **This is why
+booleans are the most powerful tiny thing in programming.**
+
+## Challenge
+
+<ChallengeCard
+  adapter="javascript"
+  title="Leap year"
+  instructions={`A year is a leap year if it is divisible by 4, *except* that years divisible by 100 are *not* leap years, *unless* they are also divisible by 400.
+
+Examples:
+- 2024 → \`true\` (divisible by 4)
+- 1900 → \`false\` (divisible by 100 but not 400)
+- 2000 → \`true\` (divisible by 400)
+- 2023 → \`false\`
+
+Write \`isLeapYear(year)\` that returns the correct boolean.`}
+  initialCode={`function isLeapYear(year) {
+  // your code here
+  return false;
+}
+
+console.log(isLeapYear(2024)); // true
+console.log(isLeapYear(1900)); // false
+console.log(isLeapYear(2000)); // true
+console.log(isLeapYear(2023)); // false
+`}
+  solutionCode={`function isLeapYear(year) {
+  if (year % 400 === 0) return true;
+  if (year % 100 === 0) return false;
+  if (year % 4 === 0)   return true;
+  return false;
+  // Equivalent one-liner:
+  // return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+console.log(isLeapYear(2024));
+console.log(isLeapYear(1900));
+console.log(isLeapYear(2000));
+console.log(isLeapYear(2023));
+`}
+  tests={[
+    {
+      id: "div4",
+      name: "Divisible by 4",
+      description: "2024 → true",
+      code: `if (isLeapYear(2024) !== true) throw new Error("2024 should be leap");`,
+    },
+    {
+      id: "div100",
+      name: "Divisible by 100 but not 400",
+      description: "1900 → false",
+      code: `if (isLeapYear(1900) !== false) throw new Error("1900 should not be leap");`,
+    },
+    {
+      id: "div400",
+      name: "Divisible by 400",
+      description: "2000 → true",
+      code: `if (isLeapYear(2000) !== true) throw new Error("2000 should be leap");`,
+    },
+    {
+      id: "ordinary",
+      name: "Not divisible by 4",
+      description: "2023 → false",
+      code: `if (isLeapYear(2023) !== false) throw new Error("2023 should not be leap");`,
+    },
+    {
+      id: "returns_boolean",
+      name: "Returns a boolean",
+      description: "typeof must be 'boolean'",
+      code: `if (typeof isLeapYear(2024) !== "boolean") throw new Error("must return a boolean");`,
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`What does "short-circuit evaluation" mean for the \`&&\` operator?
+
+- Both sides are always evaluated, but only the first matters
+- [o] The right side is evaluated **only** if the left side is truthy; otherwise the left side is returned without ever touching the right
+  > Correct. \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\` — \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
+- It produces a shorter machine-code instruction
+- It only works for boolean values, not truthy/falsy ones
+
+Short-circuit evaluation is what lets \`a || b\` work as a default-value pattern and \`a && b\` work as a safe-call pattern.`}
+/>

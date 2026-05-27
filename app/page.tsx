@@ -62,6 +62,12 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/beginners-javascript" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Beginner&apos;s Guide to JavaScript
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/python-basics" className={styles.courseCard}>
               <span className={styles.courseTitle}>Python Basics</span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>

@@ -1,0 +1,470 @@
+---
+title: Objects
+description: Bags of named values — how to create them, read them, change them, and compose them into real-world data models.
+---
+
+If an **array** is an ordered list of values, an **object** is an
+unordered bag of *named* values. Objects are how JavaScript models
+"things with properties": a user with a name and an email, a
+configuration with a host and a port, a product with a price and a
+title.
+
+Objects are the most important compound type in JavaScript. The
+language itself is built around them.
+
+## Creating objects
+
+The classic syntax — **object literal** notation:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const user = {
+  name: "Ada",
+  age: 28,
+  email: "ada@example.com",
+  isAdmin: true,
+};
+
+console.log(user);
+console.log(typeof user);   // "object"
+`}
+/>
+
+Each entry is a **property** with a **key** (the name) and a
+**value**. Keys are strings (with very rare exceptions you can
+ignore for now). Values can be anything — numbers, strings,
+booleans, arrays, other objects, even functions.
+
+## Reading properties: dot vs bracket notation
+
+There are two ways to read a property:
+
+- **Dot notation:** `user.name`. Concise; preferred when the key
+  is a valid identifier you know at write-time.
+- **Bracket notation:** `user["name"]`. Required when the key is
+  not a valid identifier (has spaces, starts with a digit) or when
+  it is computed at runtime.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const user = { name: "Ada", age: 28, "favourite color": "blue" };
+
+console.log(user.name);                  // "Ada"
+console.log(user["name"]);               // "Ada"
+console.log(user["favourite color"]);    // bracket required: key has a space
+
+const key = "age";
+console.log(user[key]);                  // 28 — bracket required for dynamic keys
+
+console.log(user.email);                 // undefined — missing property
+`}
+/>
+
+That last line is important: reading a property that doesn't
+exist returns `undefined`, not an error. That is convenient and a
+common source of subtle bugs.
+
+## Writing properties
+
+You can set (or change, or add) a property with assignment:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const user = { name: "Ada" };
+
+user.age = 28;            // add a new property
+user.name = "Ada Lovelace"; // change an existing one
+user["role"] = "admin";   // bracket-set also works
+
+console.log(user);
+
+// Delete a property
+delete user.role;
+console.log(user);
+`}
+/>
+
+Notice that `const user = {...}` does *not* prevent us from
+modifying the object. `const` only prevents *reassigning* `user`
+to point at a different object. The object itself is mutable.
+
+## Shorthand property names
+
+When a variable already holds the value you want to store under
+the same name, you can omit the repetition:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const name = "Ada";
+const age = 28;
+
+// Long form:
+const user1 = { name: name, age: age };
+
+// Shorthand — these are exactly equivalent:
+const user2 = { name, age };
+
+console.log(user1);
+console.log(user2);
+`}
+/>
+
+This crops up all the time in modern JavaScript. Functions
+returning objects often use the shorthand to keep things tidy:
+
+```javascript
+function makeUser(name, age) {
+  return { name, age };
+}
+```
+
+## Methods: functions inside objects
+
+When a property's value is a function, we call it a **method**.
+There is a tidy shorthand for declaring methods:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const greeter = {
+  name: "Ada",
+  // Long form:
+  greet1: function (other) {
+    return "Hi " + other + ", I'm " + this.name + ".";
+  },
+  // Modern shorthand:
+  greet2(other) {
+    return "Hi " + other + ", I'm " + this.name + ".";
+  },
+};
+
+console.log(greeter.greet1("Linus"));
+console.log(greeter.greet2("Grace"));
+`}
+/>
+
+Notice the keyword `this`. Inside a method, `this` refers to the
+object that the method was called on. We'll touch on `this` more
+in the next chapter; for now, the rule is "`this` inside a method
+is the object before the dot".
+
+## Iterating over objects
+
+Three common ways to walk an object's contents.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const scores = { math: 90, science: 87, history: 73 };
+
+// Keys
+console.log(Object.keys(scores));            // ["math","science","history"]
+
+// Values
+console.log(Object.values(scores));          // [90, 87, 73]
+
+// Both at once — array of [key, value] pairs
+console.log(Object.entries(scores));         // [["math",90],...]
+
+// Loop with for...of + entries() and destructuring
+for (const [subject, score] of Object.entries(scores)) {
+  console.log(subject, "->", score);
+}
+
+// for...in walks the keys directly
+for (const subject in scores) {
+  console.log(subject, "->", scores[subject]);
+}
+`}
+/>
+
+For most everyday code, `Object.entries` + `for...of` is the
+clearest pattern.
+
+## Destructuring objects
+
+Just like with arrays, we can pull properties out by name in one
+line. This is one of modern JavaScript's most-loved features.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const user = { name: "Ada", age: 28, email: "ada@example.com" };
+
+// Basic destructuring
+const { name, age } = user;
+console.log(name, age);
+
+// Rename on the way out
+const { name: userName } = user;
+console.log(userName);
+
+// Default values for missing properties
+const { city = "Unknown" } = user;
+console.log(city);
+
+// Nested destructuring
+const order = {
+  id: 7,
+  customer: { name: "Linus", email: "linus@example.com" },
+};
+const { customer: { name: customerName, email } } = order;
+console.log(customerName, email);
+`}
+/>
+
+Destructuring is wonderful in **function parameters**, where it
+replaces a stack of `options.x` lookups:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Without destructuring:
+function describe1(user) {
+  return user.name + " (" + user.age + ")";
+}
+
+// With destructuring — the parameter list tells you exactly what
+// the function reads from its input.
+function describe2({ name, age }) {
+  return name + " (" + age + ")";
+}
+
+const u = { name: "Ada", age: 28, email: "irrelevant" };
+console.log(describe1(u));
+console.log(describe2(u));
+`}
+/>
+
+## Spread, rest, and copying
+
+The `...` syntax works for objects too.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const base = { color: "red", size: "M" };
+const extra = { material: "cotton", size: "L" };   // overrides 'size'
+
+const merged = { ...base, ...extra };
+console.log(merged);
+// { color: "red", size: "L", material: "cotton" }
+// Later properties win on conflict.
+
+// A shallow copy:
+const copy = { ...base };
+copy.color = "blue";
+console.log("base:", base);   // unchanged
+console.log("copy:", copy);
+
+// Rest in destructuring — "everything else":
+const { color, ...rest } = merged;
+console.log("color:", color);   // "red"
+console.log("rest: ", rest);    // { size: "L", material: "cotton" }
+`}
+/>
+
+A note: this is a **shallow** copy. If a property's value is itself
+an object or array, the *reference* is copied — both the original
+and the copy will share that nested object. We'll revisit this in
+the *nested data* chapter.
+
+## Objects are references, just like arrays
+
+The same reference-vs-value point we made for arrays applies to all
+objects.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const a = { count: 0 };
+const b = a;
+b.count = 99;
+console.log("a:", a);    // { count: 99 } — surprising if you weren't expecting it
+console.log(a === b);    // true
+
+const c = { ...a };      // copy
+c.count = "different";
+console.log("a:", a);    // unchanged
+console.log("c:", c);
+`}
+/>
+
+## Comparing objects
+
+Object equality with `===` is **reference equality**, not
+structural equality. Two objects with identical contents are not
+considered equal unless they are *literally the same object*.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`const a = { x: 1 };
+const b = { x: 1 };
+const c = a;
+
+console.log(a === b);   // false — different objects, same contents
+console.log(a === c);   // true  — same reference
+
+// To compare contents, you need a deep-equality check, which JavaScript
+// doesn't have built in. A common trick (for simple data) is to compare
+// JSON strings:
+console.log(JSON.stringify(a) === JSON.stringify(b));  // true
+`}
+/>
+
+The JSON trick has limitations (it can't handle functions, dates,
+circular structures, etc.), but for "plain data" it is a quick
+deep-equal check.
+
+## Why we use objects
+
+Objects let you give *meaning* to a group of related values
+without inventing a custom data type. Compare:
+
+```javascript
+// Loosely-grouped values — easy to mix up
+function move(playerName, x, y, hp, isAlive) { ... }
+
+// Grouped in an object — meaning is obvious, hard to mis-order
+function move(player) { ... }
+const player = { name: "Ada", x: 10, y: 20, hp: 100, isAlive: true };
+```
+
+The second style scales as your domain grows. Adding a new
+property (say, `score`) is a one-line change; no function
+signatures break.
+
+## A multi-file object example
+
+A typical pattern: one file defines functions that *take and
+return* objects representing some piece of your domain; another
+file uses them.
+
+<CodeBlock
+  adapter="javascript"
+  entryFilename="index.js"
+  files={[
+    {
+      filename: "index.js",
+      initialContent: `const { newPlayer, move, hit, describe } = require("./player");
+
+let p = newPlayer("Ada");
+console.log(describe(p));
+
+p = move(p, 3, 4);
+console.log(describe(p));
+
+p = hit(p, 30);
+console.log(describe(p));
+
+p = hit(p, 200);
+console.log(describe(p));
+`,
+    },
+    {
+      filename: "player.js",
+      initialContent: `function newPlayer(name) {
+  return { name, x: 0, y: 0, hp: 100, alive: true };
+}
+
+function move(player, dx, dy) {
+  return { ...player, x: player.x + dx, y: player.y + dy };
+}
+
+function hit(player, damage) {
+  const hp = Math.max(0, player.hp - damage);
+  return { ...player, hp, alive: hp > 0 };
+}
+
+function describe(player) {
+  return \`\${player.name} @(\${player.x},\${player.y}) hp=\${player.hp} \${player.alive ? "alive" : "DEAD"}\`;
+}
+
+module.exports = { newPlayer, move, hit, describe };
+`,
+    },
+  ]}
+/>
+
+Notice that each function takes a player object and returns a
+**new** player object instead of mutating the old one. The driver
+then *reassigns* `p` to the new value. This is a very common
+modern style — sometimes called **immutable updates** — and it
+keeps the state of the program much easier to reason about.
+
+## Challenge
+
+<ChallengeCard
+  adapter="javascript"
+  title="Merge user records"
+  instructions={`Write a function \`mergeUser(base, updates)\` that returns a *new* user object combining \`base\` and \`updates\`. Rules:
+
+- Any property in \`updates\` overrides the same property in \`base\`.
+- Properties whose value in \`updates\` is \`undefined\` should be **ignored** (do not overwrite \`base\`).
+- The original \`base\` and \`updates\` must not be mutated.
+
+Examples:
+- \`mergeUser({name:"Ada",age:28}, {age:29})\` → \`{name:"Ada", age:29}\`
+- \`mergeUser({name:"Ada",age:28}, {age:undefined, role:"admin"})\` → \`{name:"Ada", age:28, role:"admin"}\``}
+  initialCode={`function mergeUser(base, updates) {
+  // your code here
+  return { ...base };
+}
+
+console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
+console.log(mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }));
+`}
+  solutionCode={`function mergeUser(base, updates) {
+  const out = { ...base };
+  for (const [key, value] of Object.entries(updates)) {
+    if (value !== undefined) out[key] = value;
+  }
+  return out;
+}
+
+console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
+console.log(mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }));
+`}
+  tests={[
+    {
+      id: "override",
+      name: "Override an existing property",
+      description: "age 28 → 29",
+      code: `const r = mergeUser({name:"Ada", age:28}, {age:29});
+if (r.name !== "Ada" || r.age !== 29) throw new Error("bad merge: " + JSON.stringify(r));`,
+    },
+    {
+      id: "add",
+      name: "Add a new property",
+      description: "+role",
+      code: `const r = mergeUser({name:"Ada"}, {role:"admin"});
+if (r.role !== "admin" || r.name !== "Ada") throw new Error("bad merge: " + JSON.stringify(r));`,
+    },
+    {
+      id: "ignore_undefined",
+      name: "Ignore undefined values",
+      description: "age:undefined should NOT overwrite",
+      code: `const r = mergeUser({name:"Ada", age:28}, {age: undefined, role:"admin"});
+if (r.age !== 28) throw new Error("age should not be overwritten by undefined, got " + r.age);
+if (r.role !== "admin") throw new Error("role should be added");`,
+    },
+    {
+      id: "no_mutation",
+      name: "Inputs are not mutated",
+      description: "base and updates unchanged",
+      code: `const base = {name:"Ada", age:28};
+const updates = {age:29};
+mergeUser(base, updates);
+if (base.age !== 28) throw new Error("base was mutated");
+if (JSON.stringify(updates) !== '{"age":29}') throw new Error("updates was mutated");`,
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`What does \`{ ...base, ...updates }\` do in modern JavaScript?
+
+- It creates a deep clone of \`base\` and \`updates\`
+- It throws an error because objects can't be spread
+- [o] It creates a new object combining the properties of \`base\` and \`updates\`. Where both objects have the same key, the later one (\`updates\`) wins.
+  > Correct. Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow* — nested objects and arrays are still shared by reference.
+- It modifies \`base\` in place by adding the properties of \`updates\`
+
+This pattern is the foundation of immutable-update code style: produce new objects instead of mutating existing ones.`}
+/>
