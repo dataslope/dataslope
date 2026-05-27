@@ -1,0 +1,107 @@
+---
+title: Next Steps
+description: Where to go from here — recommended books, projects, and habits to keep growing as a C++ programmer.
+---
+
+If you've made it through this course, you now have something
+durable: a *mental model* of how programs execute, how memory is
+organized, how C++ classes own resources, and how to think about
+costs and trade-offs. That model will let you learn any specific
+library or framework far more easily than someone who memorized
+syntax without it.
+
+Here are some directions to take next.
+
+## Cement what you know with small projects
+
+Reading and exercises are necessary but not sufficient. You need
+projects of your own — small ones, finished ones — to internalize
+the material. A few suggestions, ordered from gentlest to most
+ambitious:
+
+- A **command-line calculator** that supports `+ - * /` with
+  parentheses. Forces you to write a tokenizer, a parser, and a
+  little interpreter.
+- A **todo list** that reads/writes a text file. Exercises file I/O,
+  strings, and basic data structures.
+- A **simple text-based game** (guess-the-number, hangman). Practice
+  classes, control flow, and user input.
+- A **mini key-value store** with persistence. Combines containers,
+  file I/O, and a small command protocol.
+- A **simple ray tracer** that renders a few spheres to an image
+  file. A surprising amount of fundamental graphics in a few
+  hundred lines.
+
+Whatever you pick, finish it. A finished tiny project teaches more
+than ten half-built clever ones.
+
+## Books worth your time
+
+These are widely considered the gold standard for a *foundations*
+education in modern C++:
+
+- **A Tour of C++** by Bjarne Stroustrup — short, dense, written by
+  the creator of C++ for programmers who already know one language.
+  Read it twice.
+- **C++ Primer** by Lippman, Lajoie, Moo — a thorough, beginner-
+  friendly path through the language at book length.
+- **Effective Modern C++** by Scott Meyers — once you're comfortable,
+  this collects the "items" of idiomatic modern style.
+- **The C++ Programming Language** by Stroustrup — the reference,
+  not a tutorial. Browse, don't read cover to cover.
+
+For thinking about *software* rather than just *C++*:
+
+- **The Pragmatic Programmer** by Hunt and Thomas — habits and
+  attitudes that transcend any language.
+- **A Philosophy of Software Design** by John Ousterhout — clear,
+  contrarian, focused on managing complexity.
+- **Code Complete** by Steve McConnell — encyclopedic and dated in
+  spots, but the fundamentals are evergreen.
+
+## Habits that pay compound interest
+
+- **Read other people's code.** Open-source C++ projects (CppCon
+  conference talks pair well with this) are the easiest way to see
+  how idiomatic code is structured at scale.
+- **Profile before optimizing.** Performance intuition is great;
+  measurement is better. Learn one profiler.
+- **Keep up with the language.** C++ evolves every three years.
+  Skim the *what's new* posts; you'll absorb the highlights even if
+  you never use the obscure corners.
+- **Write what you learn down.** A short note on a tricky concept
+  you just understood is worth a hundred unwatched videos.
+
+## Specialized directions
+
+C++ is wide. Some places you might go after the foundations:
+
+- **Systems programming and OS internals.** Learn how the kernel,
+  memory mapping, threads, and syscalls actually work.
+- **Game development.** Engines like Unreal are built in C++; even
+  simple game loops teach you a lot about object lifecycles and
+  performance.
+- **Embedded.** Tight resources, no exceptions, careful ownership.
+  It will sharpen your discipline.
+- **Numerics / scientific computing.** Eigen, BLAS, profiling math
+  kernels.
+- **Compilers / language implementation.** LLVM is C++ and is a
+  master class in clean, layered design.
+
+You don't have to pick one. Most working C++ programmers brush up
+against several over a career.
+
+## A closing thought
+
+The most important thing you can take from this course is not a
+particular keyword or library, but a *way of thinking*. Programs
+are made of small, comprehensible parts. Memory is laid out in
+predictable ways. Cost is a function of how many operations you
+do. Bugs are contradictions between belief and behaviour, and you
+can chase them methodically.
+
+The language will evolve. Frameworks will rise and fall. The
+underlying habits of clear thought, careful ownership, and humble
+debugging will keep paying off for the entire span of your career.
+
+Good luck. Now go build something.
