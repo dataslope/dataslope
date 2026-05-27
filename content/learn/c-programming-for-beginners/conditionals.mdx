@@ -103,15 +103,15 @@ condition is true runs, and the rest are skipped.
 <Callout type="warn" title="`=` is assignment, `==` is comparison">
 This is the most famous typo in C history:
 
-\`\`\`c
-if (x = 5) { ... }   // ALWAYS true (also sets x to 5!)
-if (x == 5) { ... }  // what you meant
-\`\`\`
+```c
+if (x = 5)  { /* ALWAYS true; also sets x to 5! */ }
+if (x == 5) { /* what you meant */ }
+```
 
-The first version *assigns* 5 to \`x\`, then uses 5 as the condition
+The first version *assigns* 5 to `x`, then uses 5 as the condition
 (non-zero, therefore true). Most modern compilers will warn you, but
 the bug has burned countless programmers. Turn on warnings
-(\`-Wall\`).
+(`-Wall`).
 </Callout>
 
 ## Logical operators
