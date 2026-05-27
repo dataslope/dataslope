@@ -286,6 +286,16 @@ export default {
     // Authorization headers are kept so authenticated API calls work.
     upstreamHeaders.delete("cookie");
 
+    // Let the Workers runtime negotiate content encoding itself. If we forward
+    // the client's Accept-Encoding, fetch() switches to pass-through mode where
+    // the returned body and Content-Encoding header can disagree (the runtime
+    // may hand back a decompressed body while still reporting the upstream
+    // Content-Encoding). Clients that trust that header — e.g. pandas read_csv
+    // in Pyodide — then try to gunzip already-decoded bytes and fail with
+    // "Not a gzipped file". Removing it lets Cloudflare transparently
+    // decompress and return a clean, identity-encoded body.
+    upstreamHeaders.delete("accept-encoding");
+
     // Tag requests so upstream servers can identify the proxy.
     upstreamHeaders.set("User-Agent", "dataslope-cors-proxy/1.0");
     upstreamHeaders.set("X-Forwarded-By", "dataslope-cors-proxy");
