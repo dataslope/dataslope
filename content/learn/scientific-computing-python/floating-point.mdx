@@ -1,0 +1,339 @@
+---
+title: Floating-Point Arithmetic
+description: How real numbers are squeezed into 64 bits, and what surprises come with the squeeze
+---
+
+Almost every number you compute in this course will be stored as
+a **64-bit IEEE 754 double-precision float**. The next four pages
+build the *numerical foundation* of the course on top of that
+choice. This first page covers the format itself, the operations
+defined on it, and the most common ways those operations bite
+working scientists.
+
+## The format
+
+A 64-bit double is a triplet of bit fields:
+
+| Field | Bits | Meaning |
+| --- | --- | --- |
+| Sign $s$ | 1 | $0$ for positive, $1$ for negative |
+| Exponent $e$ | 11 | Biased integer, $0 \\le e \\le 2047$ |
+| Mantissa (a.k.a. fraction) $m$ | 52 | Binary fraction, $0 \\le m < 1$ |
+
+The value represented is
+
+$$ (-1)^s \\cdot (1 + m) \\cdot 2^{e - 1023} $$
+
+for ordinary "normal" numbers. There are also *subnormals*
+(extremely small numbers near zero), *infinities* (`±inf`), and
+*NaNs* (not-a-number values).
+
+You can pry the bits open and look:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import struct
+
+def bits(x):
+    [u] = struct.unpack(">Q", struct.pack(">d", x))
+    s = (u >> 63) & 1
+    e = (u >> 52) & 0x7FF
+    m = u & ((1 << 52) - 1)
+    return s, e, m
+
+for x in [1.0, 2.0, 0.5, 0.1, -3.0, float("inf"), float("nan")]:
+    s, e, m = bits(x)
+    print(f"{x!r:>25}  sign={s}  exp={e:4d} (unbiased={e-1023:+5d})  mantissa=0x{m:013x}")
+`}
+/>
+
+A few things to notice:
+
+- `1.0` has exponent $1023$ (the bias) and mantissa $0$ — it is
+  literally $1 \cdot 2^0$.
+- `2.0` differs from `1.0` in *one bit*: the exponent.
+- `0.1` has a non-zero mantissa, because $0.1$ cannot be written
+  exactly in binary — it is a repeating binary fraction.
+
+## Machine epsilon
+
+The smallest float strictly greater than $1.0$ is $1 + \epsilon$
+where $\epsilon = 2^{-52} \approx 2.22 \times 10^{-16}$. This is
+called the **machine epsilon** and it is the most important
+constant in numerical analysis.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import sys, math
+
+eps = sys.float_info.epsilon
+print(f"epsilon          = {eps}")
+print(f"epsilon in hex   = {eps.hex()}")
+print(f"1 + eps == 1?    {1 + eps == 1}")
+print(f"1 + eps/2 == 1?  {1 + eps/2 == 1}")
+
+# log2(eps) tells us how many bits of relative precision we have:
+print(f"bits of precision = {-math.log2(eps):.0f}")
+`}
+/>
+
+When you read a number off a `print(x)`, you can usually trust the
+first **15 to 16 decimal digits**. Beyond that, the value is noise.
+
+## Special values
+
+Three special "numbers" appear all the time:
+
+- **`+inf` / `-inf`** — produced by `1.0 / 0.0` or by overflow
+- **`nan`** — *not a number*, produced by indeterminate forms like
+  `0.0 / 0.0` or `inf - inf`
+- **`-0.0`** — yes, negative zero, distinguishable from `+0.0`
+  in a few rare cases
+
+NaN is special because it is **not equal to anything, including
+itself**. This is a deliberate design choice: it lets you check
+whether a computation went wrong with `x != x`, and it makes any
+chained calculation that touches a NaN end in NaN (rather than
+silently producing a finite garbage result).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math
+import numpy as np
+
+print(1.0 / 0.0 if False else float("inf"))
+print(float("inf") - float("inf"))      # -> nan
+print(math.nan == math.nan)              # -> False
+print(math.isnan(math.nan))              # the correct test
+
+# NaN propagates through arithmetic and through arrays
+arr = np.array([1.0, 2.0, np.nan, 4.0])
+print("sum  =", arr.sum())               # -> nan
+print("mean =", arr.mean())              # -> nan
+print("nansum =", np.nansum(arr))        # -> ignores NaN
+`}
+/>
+
+<Callout type="warn" title="Always check for NaN at the boundary">
+A common source of mysterious bugs is a NaN that sneaks into your
+data from a missing value, a `log(0)`, or a `sqrt(-1)`. Use
+`np.isnan(x).any()` after loading data or after any operation that
+could produce one, and decide explicitly what to do.
+</Callout>
+
+## How rounding works
+
+When an exact arithmetic result is not representable as a float, IEEE
+754 specifies **round-to-nearest, ties-to-even** (also called
+*banker's rounding*). Halfway cases round to the float whose last
+mantissa bit is zero. This eliminates the systematic upward bias
+that plain "round half up" would introduce.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Python's built-in round() also uses banker's rounding
+print(round(0.5))    # 0
+print(round(1.5))    # 2
+print(round(2.5))    # 2
+print(round(3.5))    # 4
+
+# This is *not* a Python bug — it is the IEEE 754 standard.
+# Banker's rounding keeps the average rounding error at zero.
+`}
+/>
+
+## Comparing floats
+
+You should almost never compare floats with `==`. Use a tolerance
+instead. NumPy ships a helper that lets you specify both *absolute*
+and *relative* tolerance:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math, numpy as np
+
+a = 0.1 + 0.2
+b = 0.3
+print(a == b)                                          # False!
+print(math.isclose(a, b))                              # True
+print(np.isclose(a, b, atol=1e-12, rtol=1e-9))         # True
+
+# A typical idiom for "are these arrays equal up to noise?"
+x = np.linspace(0, 1, 5)
+y = (x * 3) / 3
+print(np.allclose(x, y))                               # True
+`}
+/>
+
+The rule of thumb: `rtol` should be a few times machine epsilon if
+you expect a "good" computation, and looser if your inputs come from
+measurements with their own uncertainty.
+
+## Subtraction is where precision dies
+
+We have already met *catastrophic cancellation* in the story
+chapters. It is worth restating it as a numerical principle:
+
+> If two floats $a$ and $b$ agree in their first $k$ leading bits,
+> then $a - b$ has only $\\approx 53 - k$ bits of precision left.
+
+If $k$ is large (the numbers are close), the subtraction throws
+away most of the information.
+
+The classic example: a midpoint approximation of the derivative.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import math
+import numpy as np
+
+# f'(x) ≈ (f(x+h) - f(x-h)) / (2h)   for small h
+f  = math.sin
+fp = math.cos            # the true derivative
+x0 = 1.0
+
+print("       h          finite-diff error")
+for k in range(0, 18):
+    h = 10 ** (-k)
+    est = (f(x0 + h) - f(x0 - h)) / (2*h)
+    err = abs(est - fp(x0))
+    print(f"  10^{-k:>3d}     {err:.3e}")
+`}
+/>
+
+Truncation error shrinks like $h^2$ at first — you can see the
+error drop by a factor of $100$ for each factor-of-10 reduction in
+$h$. But around $h = 10^{-6}$, *round-off* takes over and the error
+starts to **grow**. The optimum is somewhere near $h = \sqrt[3]{\epsilon}$.
+
+This is one of the most important pictures in numerical analysis,
+and we will return to it in *Approximation and Error*.
+
+## Overflow, underflow, and dynamic range
+
+A float can hold values from roughly $2 \times 10^{-308}$ to
+$1.8 \times 10^{308}$ before underflow/overflow. Inside that range,
+arithmetic is reliable. Outside, things go wrong silently.
+
+The classic trap: computing $\log(\sum_i e^{x_i})$ — the *log-sum-exp*
+that appears all over physics and machine learning. If any $x_i$ is
+around $1000$, then $e^{x_i}$ overflows to `inf`. The trick is to
+subtract the maximum first.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from scipy.special import logsumexp
+
+xs = np.array([1000.0, 1001.0, 999.0])
+
+# Naive:  overflows
+naive = np.log(np.sum(np.exp(xs)))
+print("naive   =", naive)
+
+# Manual trick: subtract the maximum
+m = xs.max()
+stable = m + np.log(np.sum(np.exp(xs - m)))
+print("manual  =", stable)
+
+# SciPy already implements this
+print("logsumexp =", logsumexp(xs))
+`}
+/>
+
+The naive answer is `inf`. The stable answer is around $1001.41$.
+**Same equation, very different floating-point behavior.**
+
+## A short practice problem
+
+<ChallengeCard
+  adapter="python"
+  title="Stable variance"
+  instructions={`The textbook formula for variance,
+
+$$\\mathrm{Var}(x) = \\frac{1}{n} \\sum_i x_i^2 \\; - \\; \\left( \\frac{1}{n} \\sum_i x_i \\right)^2$$
+
+is numerically **disastrous** for data with large mean and small
+spread, because the two terms become nearly equal and cancel.
+
+Implement \`stable_variance(xs)\` that computes the population
+variance using the two-pass algorithm
+
+$$\\bar{x} = \\frac{1}{n}\\sum_i x_i, \\qquad \\mathrm{Var}(x) = \\frac{1}{n} \\sum_i (x_i - \\bar{x})^2$$
+
+The naive implementation is provided as \`naive_variance\` so you
+can see what it returns.`}
+  initCode={`import numpy as np
+
+def naive_variance(xs):
+    xs = np.asarray(xs, dtype=float)
+    return (xs**2).mean() - xs.mean()**2
+`}
+  initialCode={`def stable_variance(xs):
+    # TODO: two-pass algorithm
+    return 0.0
+
+# Quick sanity check
+data = [1e9 + 1, 1e9 + 2, 1e9 + 3, 1e9 + 4, 1e9 + 5]
+print("naive  =", naive_variance(data))
+print("stable =", stable_variance(data))
+print("numpy  =", np.var(data))
+`}
+  solutionCode={`def stable_variance(xs):
+    xs = np.asarray(xs, dtype=float)
+    mean = xs.mean()
+    return ((xs - mean) ** 2).mean()
+`}
+  tests={[
+    {
+      id: "matches_numpy_simple",
+      name: "Matches numpy on small data",
+      code: `import numpy as np
+import math
+data = [1.0, 2.0, 3.0, 4.0, 5.0]
+assert math.isclose(stable_variance(data), np.var(data), rel_tol=1e-12)`,
+    },
+    {
+      id: "matches_numpy_offset",
+      name: "Stable on large-mean data",
+      code: `import numpy as np, math
+data = [1e9 + i for i in range(1, 6)]
+assert math.isclose(stable_variance(data), np.var(data), rel_tol=1e-9)`,
+    },
+    {
+      id: "beats_naive",
+      name: "Strictly more accurate than the naive formula",
+      code: `import numpy as np
+data = [1e9 + i for i in range(1, 6)]
+naive_err  = abs(naive_variance(data)  - np.var(data))
+stable_err = abs(stable_variance(data) - np.var(data))
+assert stable_err < naive_err, "stable should be at least as accurate as naive"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the bit pattern $s=0$, $e=1023$, $m=0$ represent in IEEE 754 double precision?
+
+- $0.0$
+- [o] $1.0$
+  > Correct. With sign 0, biased exponent 1023 (unbiased 0), and mantissa 0, the value is $(-1)^0 \\cdot (1 + 0) \\cdot 2^0 = 1$.
+- $1023.0$
+- $-0.0$
+
+The bias of 1023 means an "unbiased" exponent of 0, so the value is just $1 + m$ with $m = 0$.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do experienced numerical programmers usually avoid \`a == b\` for floating-point comparison?
+
+- The \`==\` operator is slow
+- [o] Arithmetic that should produce equal values often differs by a few ULPs (units in the last place), so two values that are "morally" equal compare false
+  > Yes. Operations are rounded, and algebraically equivalent expressions can land on *adjacent* floats. Tolerant comparisons (\`math.isclose\`, \`np.isclose\`) are almost always what you want.
+- \`==\` raises an exception on \`nan\`
+- Python compares floats by string representation
+
+Using a tolerance is part of writing robust numerical code.`}
+/>
