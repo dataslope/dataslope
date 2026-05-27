@@ -1,0 +1,251 @@
+---
+title: Capstone — A Functional Data Pipeline
+description: Combine everything from the course into a single, multi-file, end-to-end functional program.
+---
+
+This chapter is a small project that ties together almost every
+idea from the course. We'll build a complete program that:
+
+1. **Parses** raw input strings into a typed domain.
+2. **Validates** them with `Result` so all errors are first-class.
+3. **Transforms** the valid records with a `pipe` of pure
+   functions.
+4. **Aggregates** the data using `reduce`.
+5. **Reports** the output through a tiny imperative shell.
+
+There is no library involved; just plain TypeScript.
+
+## The scenario
+
+We're given a list of raw "sale" rows from a CSV-like source:
+
+```
+"2024-09-01,A,3,12.50"
+"2024-09-01,B,1,9.99"
+"2024-09-02,A,2,12.50"
+"bogus row"
+"2024-09-02,C,4,2.00"
+```
+
+Each well-formed row is `date,sku,qty,price`. We want to:
+
+- skip bogus rows but *report* them,
+- compute the total revenue per SKU,
+- compute the date with the highest revenue,
+- print a small report.
+
+We will solve it as a chain of pure functions; the shell will only
+hold the raw data and print the final report.
+
+## The core
+
+<CodeBlock
+  adapter="typescript"
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      initialContent: `import { runReport } from "./pipeline";
+
+const rows = [
+  "2024-09-01,A,3,12.50",
+  "2024-09-01,B,1,9.99",
+  "2024-09-02,A,2,12.50",
+  "bogus row",
+  "2024-09-02,C,4,2.00",
+];
+
+const report = runReport(rows);
+
+console.log("=== rejected rows ===");
+report.rejected.forEach((r) => console.log("-", r.raw, "→", r.error));
+
+console.log("\\n=== revenue per SKU ===");
+[...report.byProduct.entries()]
+  .sort()
+  .forEach(([sku, total]) => console.log(\`\${sku}: \${total.toFixed(2)}\`));
+
+console.log("\\n=== best day ===");
+console.log(report.bestDay.date, "=", report.bestDay.revenue.toFixed(2));
+`,
+    },
+    {
+      filename: "types.ts",
+      initialContent: `export type Result<E, A> =
+  | { kind: "ok"; value: A }
+  | { kind: "err"; error: E };
+
+export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
+
+export type Sale = {
+  readonly date:  string;     // YYYY-MM-DD
+  readonly sku:   string;
+  readonly qty:   number;
+  readonly price: number;     // unit price
+};
+
+export type Rejected = { readonly raw: string; readonly error: string };
+
+export type Report = {
+  readonly rejected:   ReadonlyArray<Rejected>;
+  readonly byProduct:  ReadonlyMap<string, number>;     // sku -> revenue
+  readonly bestDay:    { readonly date: string; readonly revenue: number };
+};
+`,
+    },
+    {
+      filename: "parse.ts",
+      initialContent: `import { Result, ok, err, Sale } from "./types";
+
+const isDate = (s: string) => /^\\d{4}-\\d{2}-\\d{2}$/.test(s);
+
+export function parseRow(raw: string): Result<string, Sale> {
+  const parts = raw.split(",");
+  if (parts.length !== 4) return err(\`expected 4 fields, got \${parts.length}\`);
+  const [date, sku, qtyS, priceS] = parts;
+  if (!isDate(date)) return err("bad date");
+  if (sku.length === 0) return err("empty sku");
+  const qty = Number(qtyS);
+  if (!Number.isInteger(qty) || qty <= 0) return err("bad qty");
+  const price = Number(priceS);
+  if (!Number.isFinite(price) || price < 0) return err("bad price");
+  return ok({ date, sku, qty, price });
+}
+`,
+    },
+    {
+      filename: "transform.ts",
+      initialContent: `import { Sale } from "./types";
+
+export type Priced = Sale & { readonly revenue: number };
+
+export const withRevenue = (s: Sale): Priced =>
+  ({ ...s, revenue: s.qty * s.price });
+
+export const sumByKey = <A,>(
+  xs: ReadonlyArray<A>,
+  key:   (a: A) => string,
+  value: (a: A) => number,
+): ReadonlyMap<string, number> => {
+  const out = new Map<string, number>();
+  for (const x of xs) {
+    const k = key(x);
+    out.set(k, (out.get(k) ?? 0) + value(x));
+  }
+  return out;
+};
+
+export const maxByValue = (
+  m: ReadonlyMap<string, number>,
+): { date: string; revenue: number } => {
+  let bestK = "";
+  let bestV = -Infinity;
+  for (const [k, v] of m) {
+    if (v > bestV) { bestK = k; bestV = v; }
+  }
+  return { date: bestK, revenue: Number.isFinite(bestV) ? bestV : 0 };
+};
+`,
+    },
+    {
+      filename: "pipeline.ts",
+      initialContent: `import { Result, Sale, Rejected, Report } from "./types";
+import { parseRow } from "./parse";
+import { withRevenue, sumByKey, maxByValue } from "./transform";
+
+// Partition raw rows into accepted Sales and rejected reasons (pure)
+function partition(raws: ReadonlyArray<string>): {
+  sales:    ReadonlyArray<Sale>;
+  rejected: ReadonlyArray<Rejected>;
+} {
+  const sales:    Sale[]     = [];
+  const rejected: Rejected[] = [];
+  for (const raw of raws) {
+    const r: Result<string, Sale> = parseRow(raw);
+    if (r.kind === "ok") sales.push(r.value);
+    else                 rejected.push({ raw, error: r.error });
+  }
+  return { sales, rejected };
+}
+
+export function runReport(raws: ReadonlyArray<string>): Report {
+  const { sales, rejected } = partition(raws);
+
+  const priced = sales.map(withRevenue);
+
+  const byProduct = sumByKey(priced, (p) => p.sku,  (p) => p.revenue);
+  const byDay     = sumByKey(priced, (p) => p.date, (p) => p.revenue);
+  const bestDay   = maxByValue(byDay);
+
+  return { rejected, byProduct, bestDay };
+}
+`,
+    },
+  ]}
+/>
+
+Run the example. Every function in `parse.ts`, `transform.ts`, and
+`pipeline.ts` is pure. Every type in `types.ts` is immutable.
+Every error is a value. The only impure code is the four
+`console.log`s in `main.ts` — and that's exactly where it should
+be: the **edge** of the program.
+
+## What patterns from the course you just used
+
+Let's audit. In this single small program you used:
+
+- **Pure functions** (`parseRow`, `withRevenue`, `sumByKey`,
+  `maxByValue`, `partition`, `runReport`).
+- **Immutability** (`readonly` everywhere; spread updates).
+- **Discriminated unions** (`Result<E, A>`).
+- **Type-driven design** (`Sale` and `Priced` types make illegal
+  states unrepresentable; `Result` makes failures part of the
+  signature).
+- **Generic abstractions** (`sumByKey` works for any element type).
+- **Composition** (`runReport` is `partition → map(withRevenue) →
+  sumByKey → maxByValue`).
+- **Functional core, imperative shell** (`pipeline.ts` is the
+  pure core; `main.ts` is the shell).
+
+That's the entire course in one screen of code. None of it
+required a library or a framework. It only required *thinking* in
+the functional style.
+
+## Extending the capstone
+
+Try these on your own:
+
+1. Add a **filter** for sales below a minimum price *before*
+   aggregating. Where in the pipeline does it go? (Hint: between
+   `withRevenue` and `sumByKey`.)
+2. Add a **second report**: top 3 SKUs by revenue. (Hint: sort the
+   `byProduct` entries.)
+3. Make the pipeline **async**: change `parseRow` to a
+   `TaskResult<string, Sale>` and have the shell run them in
+   parallel. Notice how little the *core* changes — most of the
+   work is on the boundary.
+4. Add **branded types**: make `SKU` a branded `string`, and have
+   `parseRow` produce a `Sale` whose `sku` field has that brand.
+   Now any function that takes an `SKU` is guaranteed to receive a
+   parsed one.
+
+Each extension is a small, mostly-pure change. That's the dividend
+of building this way.
+
+---
+
+<MultipleChoice
+  markdown={`Looking at the capstone, what makes the program *as a whole* easy to test and evolve?
+
+- It uses ES modules
+  > Modules help with organization, but the deeper property is something else.
+- Every \`.ts\` file is small
+  > Helpful, but not the structural reason.
+- [o] All business logic lives in pure functions that take data and return data, with side effects confined to a tiny shell — so each piece can be tested with plain inputs, and the parts you'll want to change live where you expect them
+  > Correct. The architectural choice of "pure core, imperative shell" is what turns a *style* (FP) into a *system property* (maintainability).
+- The program is short
+  > Toy programs are easy to test for many reasons; the *real* benefit scales to large programs.
+
+When you scale this same pattern from one screen of code to a hundred thousand lines, the property does not break — the codebase still consists of pure transforms plus thin adapters.`}
+/>

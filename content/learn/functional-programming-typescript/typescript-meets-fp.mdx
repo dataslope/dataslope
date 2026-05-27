@@ -1,0 +1,348 @@
+---
+title: TypeScript Meets Functional Programming
+description: How TypeScript's type system turns functional intuitions into compile-time guarantees.
+---
+
+JavaScript can *imitate* functional programming. TypeScript can
+*enforce* it. The difference is not cosmetic — it changes which
+kinds of mistakes the compiler catches and, therefore, which patterns
+are actually safe to rely on in a large codebase.
+
+This chapter is a guided tour of the specific TypeScript features
+that make functional programming practical, and a preview of the
+shape of the rest of the course.
+
+## Why TypeScript is a great FP teaching language
+
+TypeScript was not designed as a functional language. It was
+designed to add types to JavaScript without breaking the JavaScript
+mental model. And yet, almost by accident, it ended up with a set of
+features that map *unusually well* onto the functional toolbox:
+
+- **Structural typing** — two types are compatible if their shapes
+  match. No mandatory class hierarchies, no nominal ceremony.
+- **Discriminated unions** — first-class algebraic data types.
+- **Exhaustiveness checking via `never`** — the compiler can prove
+  a `switch` covers every case.
+- **Generics with constraints** — parametric polymorphism, the
+  backbone of generic FP abstractions.
+- **Literal types and template-literal types** — values can appear
+  *in* types, enabling precise modeling.
+- **Type narrowing** — control-flow analysis that refines a type as
+  you check it.
+- **Readonly markers** — you can express "this value cannot be
+  mutated" right in the type.
+
+What TypeScript *doesn't* have natively:
+
+- Higher-kinded types (`F<_>`), which Haskell uses to express
+  generic abstractions like `Functor` or `Monad`. Libraries like
+  `fp-ts` simulate them with clever encodings, but we will not need
+  them.
+- Pattern matching as a syntax. We use `switch` on a discriminant.
+- A "purity" annotation. We rely on convention and discipline.
+
+We can build everything in this course without the missing pieces.
+The missing pieces are mostly conveniences.
+
+## Functions as first-class values
+
+The atom of the language:
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// A function is a value with a function type.
+const double: (n: number) => number = (n) => n * 2;
+
+// Functions can be passed as arguments.
+function twice<T>(f: (x: T) => T, x: T): T {
+  return f(f(x));
+}
+
+console.log(twice(double, 3));  // 12
+
+// Functions can be returned from functions.
+function adder(amount: number): (n: number) => number {
+  return (n) => n + amount;
+}
+
+const addTen = adder(10);
+console.log(addTen(5));   // 15
+console.log(addTen(100)); // 110
+`}
+/>
+
+The signature `(n: number) => number` is itself a *type*. You can
+assign it to a variable, pass it around, name it with `type`. This
+is what makes higher-order functions possible.
+
+## Immutability through `readonly` and `as const`
+
+TypeScript lets you mark values as unable to be mutated *through this
+binding*. This is not a deep guarantee — the underlying object is
+the same as a mutable one at runtime — but it is enough to catch a
+huge category of bugs at compile time.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Point = { readonly x: number; readonly y: number };
+
+const p: Point = { x: 1, y: 2 };
+// p.x = 10;  // ❌ Cannot assign to 'x' because it is a read-only property.
+
+const xs: readonly number[] = [1, 2, 3];
+// xs.push(4);  // ❌ Property 'push' does not exist on type 'readonly number[]'.
+
+// 'as const' freezes a literal entirely
+const config = {
+  retries: 3,
+  endpoints: ["a", "b", "c"],
+} as const;
+// config.retries = 5;        // ❌
+// config.endpoints.push("d"); // ❌
+// config.endpoints[0] = "z"; // ❌
+
+console.log("point:", p);
+console.log("xs:", xs);
+console.log("config:", config);
+`}
+/>
+
+We will use `readonly` everywhere in this course. It costs nothing
+and rules out a vast amount of accidental mutation.
+
+## Discriminated unions: algebraic data types in TypeScript
+
+This is the single most powerful FP-enabling feature TypeScript has.
+A **discriminated union** is a sum type: "this value is either an A
+or a B or a C", with a tag that tells you which.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// "A loading widget's state is one of three things"
+type LoadState<A> =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "ready"; data: A }
+  | { kind: "error"; message: string };
+
+function describe<A>(s: LoadState<A>): string {
+  switch (s.kind) {
+    case "idle":    return "not started";
+    case "loading": return "in progress";
+    case "ready":   return \`ready with: \${JSON.stringify(s.data)}\`;
+    case "error":   return \`failed: \${s.message}\`;
+  }
+}
+
+console.log(describe<number>({ kind: "idle" }));
+console.log(describe<number>({ kind: "loading" }));
+console.log(describe<number>({ kind: "ready", data: 42 }));
+console.log(describe<number>({ kind: "error", message: "timeout" }));
+`}
+/>
+
+If you add a new case (`"cancelled"`) to `LoadState`, the compiler
+will flag every `switch` that doesn't handle it. This is **exhaustiveness
+checking**, and it is the mechanism that makes "make illegal states
+unrepresentable" actually work.
+
+The `never` type completes the picture. It is the type with *no
+values*. The compiler will assign `never` to a variable that has
+been narrowed to "impossible".
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Color = "red" | "green" | "blue";
+
+function describe(c: Color): string {
+  switch (c) {
+    case "red":   return "stop";
+    case "green": return "go";
+    case "blue":  return "ocean";
+    default: {
+      const _exhaustive: never = c; // ❌ if you add a Color and forget a case
+      return _exhaustive;
+    }
+  }
+}
+
+console.log(describe("red"));
+console.log(describe("green"));
+console.log(describe("blue"));
+`}
+/>
+
+This pattern — `const _exhaustive: never = x` in the default case —
+is how you turn "I think this `switch` is complete" into "the
+compiler will *prove* this `switch` is complete".
+
+## Generics: types as parameters
+
+Most useful FP abstractions are *generic*. They work for any inner
+type, with no extra runtime cost.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`// "Pair" is generic in two types.
+type Pair<A, B> = { readonly first: A; readonly second: B };
+
+function pair<A, B>(a: A, b: B): Pair<A, B> {
+  return { first: a, second: b };
+}
+
+function swap<A, B>(p: Pair<A, B>): Pair<B, A> {
+  return { first: p.second, second: p.first };
+}
+
+const x = pair("age", 30);              // Pair<string, number>
+const y = swap(x);                       // Pair<number, string>
+console.log(x);
+console.log(y);
+`}
+/>
+
+Generics let us write each FP combinator (`map`, `flatMap`,
+`compose`, `pipe`, `chain`) once, in a way that works for every
+shape — and the compiler still tracks the types end-to-end.
+
+## A type-driven "Option" preview
+
+We'll spend a whole chapter on this later, but here is a tiny preview
+of what type-driven design feels like when all three pieces — sum
+types, generics, exhaustiveness — come together.
+
+<CodeBlock
+  adapter="typescript"
+  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+
+const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
+const none = <A,>(): Option<A> => ({ kind: "none" });
+
+function map<A, B>(o: Option<A>, f: (a: A) => B): Option<B> {
+  switch (o.kind) {
+    case "none": return none<B>();
+    case "some": return some(f(o.value));
+  }
+}
+
+function getOrElse<A>(o: Option<A>, fallback: A): A {
+  switch (o.kind) {
+    case "none": return fallback;
+    case "some": return o.value;
+  }
+}
+
+// Find a user, double their age if present, default to 0
+const lookup: Option<{ name: string; age: number }> = some({ name: "Ada", age: 36 });
+const doubled = map(lookup, (u) => u.age * 2);
+console.log(getOrElse(doubled, 0));
+
+const missing: Option<{ name: string; age: number }> = none();
+console.log(getOrElse(map(missing, (u) => u.age * 2), 0));
+`}
+/>
+
+Notice:
+
+- There is no `null`, no `undefined`, no exception.
+- The compiler will not let you read `.value` until you've narrowed
+  the `kind`.
+- `map` works for *any* inner type without losing precision.
+
+This is the shape of every functional abstraction we will build.
+
+## A multi-file preview: separating "what" from "how"
+
+Functional code tends to live in three layers: pure values (data),
+pure transformations (functions), and an impure shell that drives
+them. Here is a tiny taste of that shape, spread across three files.
+
+<CodeBlock
+  adapter="typescript"
+  entryFilename="main.ts"
+  files={[{
+    filename: "main.ts",
+    initialContent: `import { greetings, makeMessage } from "./greet";
+
+const names = ["Ada", "Linus", "Grace"];
+
+// "shell" — does the I/O
+for (const g of greetings(names)) {
+  console.log(makeMessage(g));
+}
+`,
+  }, {
+    filename: "greet.ts",
+    initialContent: `import { Greeting, formatGreeting } from "./types";
+
+// pure: build values
+export function greetings(names: readonly string[]): readonly Greeting[] {
+  return names.map((n) => ({ name: n, language: "en" as const }));
+}
+
+// pure: transform values
+export const makeMessage = (g: Greeting): string => formatGreeting(g);
+`,
+  }, {
+    filename: "types.ts",
+    initialContent: `export type Greeting = {
+  readonly name: string;
+  readonly language: "en" | "es" | "fr";
+};
+
+export function formatGreeting(g: Greeting): string {
+  switch (g.language) {
+    case "en": return \`Hello, \${g.name}!\`;
+    case "es": return \`¡Hola, \${g.name}!\`;
+    case "fr": return \`Bonjour, \${g.name}!\`;
+  }
+}
+`,
+  }]}
+/>
+
+Every function in `greet.ts` and `types.ts` is pure: same inputs,
+same outputs, no side effects. The only impurity (`console.log`)
+lives in `main.ts`, the shell. Adding a new language is a one-line
+change in `types.ts`; the compiler will *force* you to handle it in
+`formatGreeting` thanks to exhaustiveness checking.
+
+This is the architectural pattern the whole course is building
+toward: **pure functional core, thin imperative shell, type system as
+the integration test**.
+
+## What we will *not* lean on
+
+Some quick context-setting before the foundations chapters:
+
+- We will not teach `fp-ts`, `Effect`, `Ramda`, or any other library
+  as the *primary* mechanism for any concept. Libraries appear at
+  the end of chapters as optional ecosystem notes.
+- We will not bring in a framework. No React, no Next, no Express.
+  Every example runs in the browser via almostnode.
+- We will not import unnecessary tools. If we need composition, we
+  write three-line `pipe` and `compose` helpers. If we need a
+  `Result`, we define it.
+
+The reason is pedagogical: it is much easier to understand a
+`Functor` once you've written `map` for `Option`, `Result`, `Array`,
+and `Tree` yourself than to learn it as "the thing this library does
+that has a `Foo.map` method".
+
+---
+
+<MultipleChoice
+  markdown={`Which TypeScript feature is the most direct enabler of "make illegal states unrepresentable"?
+
+- The \`any\` type
+  > \`any\` is the *opposite* — it disables the type system. It allows illegal states everywhere.
+- The \`strict\` compiler flag
+  > Strict mode enables many useful checks, but it doesn't itself model your domain. It's a *prerequisite*, not the mechanism.
+- [o] Discriminated unions with exhaustiveness checking
+  > Correct. By modeling "this is one of N possibilities" as a discriminated union and then handling every variant in a \`switch\`, you make impossible combinations *unrepresentable* in the types. The compiler enforces it.
+- Interfaces
+  > Interfaces model *product types* — a record with these fields. They cannot express "one of several alternatives", which is what we need to rule out illegal combinations.
+
+Sums + products + exhaustive case analysis are the trio that lets the *compiler* prove your data model has no impossible states.`}
+/>
