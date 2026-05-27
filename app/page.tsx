@@ -117,6 +117,36 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/intro-modern-csharp" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Introduction to Modern C#
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
+            <Link href="/learn/practical-r-for-beginners" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Practical R for Beginners
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
+            <Link href="/learn/scientific-computing-python" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                Scientific Computing with Python
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
+            <Link href="/learn/c-programming-for-beginners" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                C Programming for Beginners
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
+            <Link href="/learn/from-zero-to-cpp" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                From Zero to C++ Programming
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
