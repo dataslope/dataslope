@@ -287,15 +287,15 @@ This is why CSV files are portable across every OS, language, and tool.`}
 />
 
 <MultipleChoice
-  markdown={`Why might Pandas read a ZIP code column like `04210` as the integer `4210`?
+  markdown={`Why might Pandas read a ZIP code column like \`04210\` as the integer \`4210\`?
 
 - Pandas has a bug
 - The CSV file is corrupted
-- [o] Pandas inferred the column as `int64` (because all values look like integers) and integers cannot have leading zeros — the `0` is dropped silently
-  > Yes. This is the canonical example of type inference biting you. Fix it by passing `dtype={"zip": "string"}` to `pd.read_csv`.
+- [o] Pandas inferred the column as \`int64\` (because all values look like integers) and integers cannot have leading zeros — the \`0\` is dropped silently
+  > Yes. This is the canonical example of type inference biting you. Fix it by passing \`dtype={"zip": "string"}\` to \`pd.read_csv\`.
 - ZIP codes are not real data
 
-Always check `df.dtypes` after loading; it is the cheapest bug-prevention habit you can build.`}
+Always check \`df.dtypes\` after loading; it is the cheapest bug-prevention habit you can build.`}
 />
 
 <MultipleChoice
@@ -307,17 +307,17 @@ Always check `df.dtypes` after loading; it is the cheapest bug-prevention habit 
   > Right. Column-store layouts are the standard for analytical systems (Pandas, Parquet, DuckDB, ClickHouse, BigQuery). Row-stores are better for transactional databases that touch one row at a time.
 - Pandas was invented after rows existed
 
-Understanding column orientation explains why `df["age"].mean()` is fast and why memory usage scales by column rather than by row.`}
+Understanding column orientation explains why \`df["age"].mean()\` is fast and why memory usage scales by column rather than by row.`}
 />
 
 <MultipleChoice
-  markdown={`A column containing the values `"true"`, `"false"`, `"true"` is loaded by Pandas. What dtype is it most likely to get by default?
+  markdown={`A column containing the values \`"true"\`, \`"false"\`, \`"true"\` is loaded by Pandas. What dtype is it most likely to get by default?
 
-- `bool`
-- `int64`
-- [o] `object` (Python strings)
-  > Correct. Pandas does not auto-recognize lowercase `"true"` / `"false"` as booleans (it has done so in some versions for `True`/`False`, but not reliably). You need to convert explicitly with `df["col"].map({"true": True, "false": False})` or `astype("bool")` after cleaning.
-- `category`
+- \`bool\`
+- \`int64\`
+- [o] \`object\` (Python strings)
+  > Correct. Pandas does not auto-recognize lowercase \`"true"\` / \`"false"\` as booleans (it has done so in some versions for \`True\`/\`False\`, but not reliably). You need to convert explicitly with \`df["col"].map({"true": True, "false": False})\` or \`astype("bool")\` after cleaning.
+- \`category\`
 
 Booleans-as-strings are a common surprise; defensive type checking catches them.`}
 />

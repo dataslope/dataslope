@@ -96,8 +96,8 @@ rate = 0.075
 # print("Hi " + name + ", your raise is " + str(salary * rate))
 
 # Modern way: f-strings
-print(f"Hi {name}, your raise is ${salary * rate:,.2f}")
-print(f"That is {rate:.1%} of your current salary of ${salary:,}")
+print(f"Hi {name}, your raise is \${salary * rate:,.2f}")
+print(f"That is {rate:.1%} of your current salary of \${salary:,}")
 `}
 />
 
@@ -166,7 +166,7 @@ print("JPY" in exchange)
 
 # Iterate
 for currency, rate in exchange.items():
-    print(f"  1 {currency} = ${rate:.2f}")
+    print(f"  1 {currency} = \${rate:.2f}")
 `}
 />
 
@@ -364,7 +364,7 @@ Format specifiers like this make report-ready output trivial.`}
 - It is a NumPy convention only
 - Slices always exclude the first item
 
-Same rule as Pandas' `iloc` — useful to remember.`}
+Same rule as Pandas' \`iloc\` — useful to remember.`}
 />
 
 <MultipleChoice
