@@ -67,7 +67,7 @@ By convention, single-letter names like `T`, `U`, `V` are used for generic type 
 graph LR
     A[identity call with 42] --> B[Compiler infers T = number]
     B --> C[Return type: number]
-    D[identity call with "hello"] --> E[Compiler infers T = string]
+    D["identity call with 'hello'"] --> E[Compiler infers T = string]
     E --> F[Return type: string]
 ```
 

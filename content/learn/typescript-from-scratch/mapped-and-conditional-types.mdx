@@ -3,8 +3,6 @@ title: Mapped & Conditional Types
 description: Transform and filter types with mapped types, conditional logic, and the infer keyword.
 ---
 
-# Mapped & Conditional Types
-
 You've learned how to build generic types that work with any input. But what if you need to *transform* a type systematically — taking every property and making it optional, or readonly, or changing its value type? What if you need *conditional logic* at the type level — "if this type extends that, then produce X, otherwise Y"?
 
 These questions lead us to **mapped types** and **conditional types**, two of TypeScript's most powerful metaprogramming tools. They let you write type-level functions that inspect, filter, and reshape other types. They're the building blocks behind the standard library's utility types (which we'll tour in the next chapter), and they're essential for modeling complex, real-world constraints.

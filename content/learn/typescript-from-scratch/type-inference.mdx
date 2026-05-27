@@ -53,8 +53,8 @@ This is called **widening**: the compiler expands a narrow literal type into a b
 
 ```mermaid
 graph TD
-    A[const x = "hello"] --> B[Type: "hello" literal]
-    C[let y = "hello"] --> D[Type: string widened]
+    A["const x = 'hello'"] --> B["Type: 'hello' literal"]
+    C["let y = 'hello'"] --> D[Type: string widened]
     B --> E[Cannot reassign]
     D --> F[Can reassign to any string]
 ```
