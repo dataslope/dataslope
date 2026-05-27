@@ -1,0 +1,243 @@
+---
+title: Bar Charts
+description: The everyday workhorse — when bars are the right answer and when they aren't
+---
+
+The **bar chart** is the most-used chart type in the world for a
+reason: it answers the most common question in business and
+science — *how do these categories compare?* — using the most
+accurate encoding the human eye has access to.
+
+## When to reach for a bar chart
+
+A bar chart is the right choice when:
+
+- You are comparing values across a **set of discrete categories**.
+- The values are **quantitative** (counts, dollars, percentages).
+- You want the reader to **rank** or **compare** the categories.
+
+Examples:
+
+- Sales per region.
+- Tickets sold per movie.
+- Population per country.
+- Average score per student group.
+
+If your x-axis is *time* (with many points in regular intervals),
+prefer a **line chart**. If you are showing a *distribution* of a
+single variable, prefer a **histogram**. Bar charts are for
+**comparing discrete categories**.
+
+## The simplest bar chart
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "team":   ["Marketing", "Engineering", "Sales", "Support"],
+    "people": [12, 47, 28, 19],
+})
+
+fig = px.bar(
+    df, x="team", y="people",
+    template="simple_white",
+    title="Headcount by team",
+    labels={"team": "Team", "people": "Headcount"},
+)
+fig.show()
+`}
+/>
+
+That's the canonical Plotly Express call. Note:
+
+- `x="team"` puts categories on the x-axis.
+- `y="people"` makes the bar heights encode the count.
+- The bars share a common baseline (zero), which is what makes
+  comparison easy.
+
+## Sort by value, almost always
+
+A bar chart in *alphabetical* order is almost always worse than one
+sorted by value. Sorting lets the eye read the *ranking* in zero
+time.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame({
+    "team":   ["Marketing", "Engineering", "Sales", "Support"],
+    "people": [12, 47, 28, 19],
+}).sort_values("people", ascending=False)
+
+fig = px.bar(
+    df, x="team", y="people",
+    template="simple_white",
+    title="Headcount by team (sorted)",
+    labels={"team": "Team", "people": "Headcount"},
+)
+fig.show()
+`}
+/>
+
+The only time you should *not* sort by value is when the categories
+have a **natural order**:
+
+- Months: Jan, Feb, ..., Dec
+- Ordinal categories: small, medium, large
+- Years on a time axis
+
+## Horizontal bars for long labels
+
+When category labels are long, **horizontal bars** are far more
+readable than vertical bars with rotated labels.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
+df = df.sort_values("lifeExp")
+
+fig = px.bar(
+    df, x="lifeExp", y="country",
+    orientation="h",
+    template="simple_white",
+    title="European life expectancy in 2007",
+    labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
+)
+fig.show()
+`}
+/>
+
+The pattern: `orientation="h"` plus swap the x and y arguments.
+Notice the bars are sorted *ascending* — for horizontal bars, that
+puts the largest at the top, which matches how we read top-to-
+bottom.
+
+## Grouped bars: comparing across two categories
+
+When each "category" also has a *sub-category*, use **grouped bars**
+with `color="..."` and `barmode="group"`.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+avg = (
+    df.groupby(["day", "sex"], as_index=False)["tip"].mean()
+)
+
+fig = px.bar(
+    avg, x="day", y="tip", color="sex",
+    barmode="group",
+    template="simple_white",
+    title="Average tip by day and sex",
+    labels={"tip": "Mean tip (USD)", "day": "Day", "sex": "Sex"},
+    category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
+)
+fig.show()
+`}
+/>
+
+`category_orders={...}` is a small but invaluable trick — it forces
+the days into chronological order instead of alphabetical.
+
+## Stacked bars: parts of a whole, across categories
+
+Use `barmode="stack"` when each category is a *total* you want to
+break into parts.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+avg = df.groupby(["day", "sex"], as_index=False)["tip"].sum()
+
+fig = px.bar(
+    avg, x="day", y="tip", color="sex",
+    barmode="stack",
+    template="simple_white",
+    title="Total tips by day, stacked by sex",
+    labels={"tip": "Total tips (USD)", "day": "Day"},
+    category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
+)
+fig.show()
+`}
+/>
+
+<Callout type="warn" title="Be careful with stacked bars">
+Stacked bars are great for showing **totals** but **bad** for
+comparing the segments *across* categories. The bottom segments
+share a baseline (easy to compare), but the upper segments float
+at different heights (much harder to compare). If sub-category
+comparison is the main point, use grouped bars instead.
+</Callout>
+
+## Common bar chart mistakes
+
+- **Truncating the y-axis baseline.** Bar lengths encode quantity
+  relative to *zero*. Cutting the axis (so bars start at 90
+  instead of 0) inflates small differences and is a classic
+  misleading-chart move.
+- **Sorting alphabetically when value order would be clearer.**
+- **Using a 3-D bar chart.** Just don't.
+- **Drawing 50 bars on one chart** when a horizontal layout, a
+  filter, or a "top 10" would be more useful.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`When is a **bar chart** the right choice?
+
+- For showing a continuous trend over time.
+- For showing the distribution of a single variable.
+- [o] For comparing a quantitative value across a small-to-medium number of discrete categories.
+  > Yes. Bar charts use length-on-a-common-scale to encode quantity, which is one of the most accurate visual encodings. They're ideal when "how do these categories compare?" is the question.
+- For comparing two quantitative variables.
+
+For time use a line chart; for distributions use a histogram; for two-variable relationships use a scatter plot.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is **sorting bars by value** usually preferable to alphabetical order?
+
+- It is required by Plotly.
+- It makes the chart render faster.
+- [o] The eye reads a ranked bar chart almost instantly, while alphabetical order forces the reader to do the ranking mentally.
+  > Right. The whole point of a bar chart is comparison. Sorting does the comparison work for the reader. Alphabetical order is essentially random in terms of the values, so it adds work without adding clarity.
+- It uses less memory.
+
+Two exceptions: categories with a natural order (months, sizes) and time-based categories should keep their natural order.`}
+/>
+
+<MultipleChoice
+  markdown={`Truncating a bar chart's y-axis so it starts at, say, 90 instead of 0 is generally:
+
+- A great way to save vertical space.
+- Required for log-scale data.
+- [o] Misleading — bar length encodes magnitude *relative to zero*, so truncating exaggerates small differences and can mislead readers.
+  > Yes. This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable — for bar charts, almost never.
+- The default behavior in Plotly Express.
+
+If you want to emphasize a small difference, use a line chart or a dot plot — not a truncated bar chart.`}
+/>
+
+<MultipleChoice
+  markdown={`When should you use **horizontal** bars (`orientation="h"`) instead of vertical?
+
+- When you have fewer than 5 categories.
+- When you have more than 100 categories.
+- [o] When category labels are long, or when you have many categories that would otherwise crowd the x-axis.
+  > Yes. Horizontal bars let the labels sit comfortably to the left of each bar, no rotation needed. They also let you stack a lot of categories vertically without crowding.
+- Whenever the data is sorted.
+
+A horizontal layout is often the small change that turns a cluttered chart into a readable one.`}
+/>

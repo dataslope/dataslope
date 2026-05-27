@@ -1,0 +1,187 @@
+---
+title: Bubble Charts
+description: Scatter plots that encode a third quantitative variable as marker size
+---
+
+A **bubble chart** is a scatter plot where each dot's *size*
+encodes a third quantitative variable. It's not really a different
+chart type — it's a scatter plot with an extra trick — but it's so
+useful that it gets its own page.
+
+## The pitch
+
+If a scatter plot uses x and y for two variables, a bubble chart
+gives you *three* variables in one picture: x, y, and bubble size.
+Add `color` and you have *four*. Add `facet_col` and you have
+*five*. This information density is the bubble chart's superpower.
+
+The most famous bubble chart is **Hans Rosling's Gapminder**
+animation — life expectancy vs GDP per capita, with population as
+bubble size and continent as color, animated over time.
+
+## Your first bubble chart
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    size="pop",
+    color="continent",
+    hover_name="country",
+    log_x=True,
+    size_max=55,
+    template="simple_white",
+    title="Gapminder 2007 — the classic bubble chart",
+    labels={"gdpPercap": "GDP per capita (USD, log)",
+            "lifeExp": "Life expectancy (years)",
+            "pop": "Population"},
+)
+fig.show()
+`}
+/>
+
+Four variables shown at once, and it's still readable. Hover over
+the big bubbles — China and India dominate the view because
+`size="pop"`.
+
+`size_max` controls the radius of the largest bubble in pixels.
+Without it, very-populous countries can swallow the chart.
+
+## Why size is a *weaker* encoding than position
+
+The Cleveland-McGill ranking puts area near the *bottom* of
+encoding accuracy. The eye can perceive "bigger" and "smaller" but
+cannot reliably tell you "this is 2.3× that." So:
+
+- **Reserve bubble size for a variable where the reader only
+  needs to notice "this is big" or "this is small."** Population
+  works perfectly — nobody is doing arithmetic with bubble sizes.
+- **Use x and y for the variables where precise comparison
+  matters.**
+
+## Linear vs square-root size scaling
+
+By default, Plotly Express scales bubble *area* in proportion to
+the value — which is correct: when a value doubles, the area
+doubles, and that's roughly what the eye reads. *Do not* be
+tempted to scale by radius — it makes bubbles look 4× bigger when
+the value doubles, which lies.
+
+If your population spans many orders of magnitude (e.g., 1,000 to
+1,000,000,000), even area-proportional bubbles can become extreme.
+Solutions:
+
+- Take `np.log` of the value before passing to `size=`.
+- Filter out the extreme tails.
+- Switch to a different encoding (color intensity).
+
+## Animated bubble charts: Hans Rosling's classic
+
+Plotly Express makes the *animated* Gapminder essentially free:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+fig = px.scatter(
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    size="pop",
+    color="continent",
+    hover_name="country",
+    animation_frame="year",
+    animation_group="country",
+    log_x=True,
+    size_max=55,
+    range_x=[100, 100000],
+    range_y=[25, 90],
+    template="simple_white",
+    title="Gapminder — animated through time",
+    labels={"gdpPercap": "GDP per capita (USD, log)",
+            "lifeExp": "Life expectancy (years)"},
+)
+fig.show()
+`}
+/>
+
+Press the **play button** below the chart. You're watching 50
+years of global development in 30 seconds. This is Hans Rosling's
+chart, in three Python lines.
+
+Two arguments make the animation work:
+
+- `animation_frame="year"` — each year is a frame.
+- `animation_group="country"` — connect each country's dot across
+  frames so it morphs in place instead of jumping.
+
+A handful of `range_x` / `range_y` arguments keep the axes fixed
+across frames, so the eye reads change without re-anchoring.
+
+## When animation goes wrong
+
+Animation is powerful but expensive — viewers can't pause and
+study a frame while it's moving. A few rules:
+
+- Always provide a **slider** (Plotly Express does this by default).
+- Use animation when **time** is the third dimension — never
+  animate just because you can.
+- For a printed report or a slide deck, **make a static "small
+  multiples" version** with one panel per year as a backup.
+
+## A bubble chart that doesn't work
+
+A bubble chart fails when:
+
+- The size variable's range is too narrow to perceive (every
+  bubble looks the same).
+- There are *too many* bubbles and they overlap completely.
+- The size variable is *negative* (negative areas don't exist).
+
+In those cases, prefer color or a different encoding.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A **bubble chart** is essentially:
+
+- A pie chart with multiple values per slice.
+- A 3-D scatter plot.
+- [o] A scatter plot where marker size encodes a third quantitative variable.
+  > Yes. By adding `size="..."` to a Plotly Express scatter call, you turn a 2-variable chart into a 3-variable bubble chart. Add `color="..."` for a 4th variable.
+- A type of histogram.
+
+The Gapminder chart by Hans Rosling is the canonical example of a bubble chart.`}
+/>
+
+<MultipleChoice
+  markdown={`Why should you usually pick **less critical** variables for the **size** encoding in a bubble chart?
+
+- Size is calculated last by the rendering engine.
+- Size cannot be larger than 50 pixels.
+- [o] Area is a relatively weak encoding — the eye perceives "bigger / smaller" categorically but not precise multiples. Reserve size for variables where rough comparison is good enough.
+  > Right. According to the Cleveland-McGill ranking, area is much less accurate than position for quantitative comparison. Use size to *flag* which observations are big and which are small; use position (x and y) for the variables where the reader needs precise comparison.
+- Size is hidden from screen readers.
+
+Always put your most important quantitative variables on x and y.`}
+/>
+
+<MultipleChoice
+  markdown={`Which Plotly Express argument turns a bubble chart into an **animated** Gapminder-style chart?
+
+- `animation=True`
+- `play=True`
+- [o] `animation_frame="..."` (and usually `animation_group="..."`)
+  > Yes. `animation_frame="year"` (for example) creates one frame per unique value of that column. `animation_group="country"` keeps each country's dot connected across frames so it moves smoothly instead of jumping. Plotly Express adds a play button and slider automatically.
+- `time=True`
+
+Animation is fun and instantly impressive — but use it only when *time* is meaningfully the third dimension. Animation for animation's sake makes charts harder to study.`}
+/>

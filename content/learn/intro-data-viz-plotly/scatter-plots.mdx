@@ -1,0 +1,204 @@
+---
+title: Scatter Plots
+description: The chart for seeing the relationship between two variables — and many extensions of it
+---
+
+A **scatter plot** maps two quantitative variables to the x and y
+axes and draws one dot per row. It is, on the perceptual ranking
+we met earlier, the *most powerful chart in the world*: both axes
+use the most accurate visual encoding (position), so the eye can
+read correlation, clusters, outliers, and shape at a glance.
+
+If you forget every other chart, remember the scatter plot.
+
+## When to use a scatter plot
+
+- You want to see **relationship** between two quantitative
+  variables: correlated? non-linear? clustered?
+- You want to spot **outliers** — points far from everyone else.
+- You want to compare *individuals* (one dot per row), not
+  aggregates.
+- You'll later add a **third or fourth variable** through color or
+  size (which makes it a *bubble chart* — its own page later).
+
+## The minimum
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(
+    df, x="sepal_width", y="sepal_length",
+    template="simple_white",
+    title="Iris: sepal width vs length",
+    labels={"sepal_width": "Sepal width (cm)",
+            "sepal_length": "Sepal length (cm)"},
+)
+fig.show()
+`}
+/>
+
+The picture answers "are these two measurements related?" in
+about half a second.
+
+## Adding categorical color
+
+Color reveals *groups*. The classic iris example becomes much
+richer once we color by species:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(
+    df, x="sepal_width", y="sepal_length", color="species",
+    template="simple_white",
+    title="Iris by species",
+    labels={"sepal_width": "Sepal width (cm)",
+            "sepal_length": "Sepal length (cm)"},
+)
+fig.show()
+`}
+/>
+
+Suddenly the structure becomes obvious: the three species occupy
+different regions of the chart. *That's the magic of adding the
+third variable.*
+
+## Adding size for a fourth variable
+
+A scatter where the size of each dot encodes another quantitative
+variable is sometimes called a **bubble chart** (we'll dedicate a
+whole page to it later):
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(
+    df, x="sepal_width", y="sepal_length",
+    color="species", size="petal_length",
+    template="simple_white",
+    title="Iris with size encoding petal length",
+    labels={"sepal_width": "Sepal width (cm)",
+            "sepal_length": "Sepal length (cm)"},
+)
+fig.show()
+`}
+/>
+
+Four variables on one chart — and still readable.
+
+## Trendlines
+
+When you want to summarize a relationship, add `trendline="ols"`
+(ordinary least squares) or `trendline="lowess"` (a smoothed local
+regression):
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.tips()
+
+fig = px.scatter(
+    df, x="total_bill", y="tip", color="sex",
+    trendline="ols",
+    template="simple_white",
+    title="Tip vs total bill with linear trendlines per group",
+    labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
+)
+fig.show()
+`}
+/>
+
+Trendlines turn a noisy cloud into a clear *direction*. Use them
+when the question is "is there a relationship?" and the cloud is
+busy.
+
+## Overplotting: when there are too many points
+
+Scatter plots can break down when you have **many thousands** of
+points — they pile on top of each other and the dense regions all
+look equally black. Two fixes:
+
+### Opacity
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder()
+
+fig = px.scatter(
+    df, x="gdpPercap", y="lifeExp",
+    log_x=True,
+    opacity=0.3,
+    template="simple_white",
+    title="Gapminder (all years), opacity=0.3",
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
+)
+fig.show()
+`}
+/>
+
+Each dot is now semi-transparent, so dense regions become visibly
+*darker*.
+
+### Density heatmap
+
+For really dense data, switch to a **density heatmap** (which we'll
+meet in its own chapter), where the chart shows *how many points*
+are in each region of the plane.
+
+## A typical scatter-plot mistake
+
+Drawing a scatter plot with one *categorical* axis is usually not
+what you want — it produces tall stacks of dots above each category
+label. Use a **strip plot** (`px.strip`), **violin plot**
+(`px.violin`), or **box plot** (`px.box`) instead — we'll cover
+boxes next.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a scatter plot best at showing?
+
+- A part-of-a-whole breakdown.
+- A trend across regular time intervals.
+- [o] The relationship between two quantitative variables — correlation, clusters, and outliers.
+  > Yes. Scatter plots use position on both axes, the most accurate visual encoding. They reveal the *shape* of a two-variable relationship — linear? non-linear? clustered? — at a glance.
+- The composition of categorical groups.
+
+Scatter plots are the workhorse of exploratory analysis. When in doubt about how two numeric variables relate, scatter them.`}
+/>
+
+<MultipleChoice
+  markdown={`You have a scatter plot of 50,000 data points and everything looks like a black blob. What is a sensible fix?
+
+- Switch to a pie chart.
+- Increase the marker size.
+- [o] Lower the marker opacity (e.g., `opacity=0.3`) or switch to a 2-D density heatmap.
+  > Right. Overplotting hides structure. Lowering opacity lets dense regions render darker, revealing where the points pile up. For very dense data, a `density_heatmap` or `density_contour` chart represents counts rather than individual points.
+- Hide the axis labels.
+
+Visualization is the art of *seeing structure*. When the chart hides it, change the encoding.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a **trendline** on a scatter plot useful for?
+
+- It changes the underlying data.
+- It applies a database join.
+- [o] It summarizes the central tendency of the relationship between x and y, making it easier to see direction (positive, negative, none) and to compare it across groups.
+  > Yes. A noisy cloud of points can hide the underlying trend. A regression trendline (`trendline="ols"` for linear, `trendline="lowess"` for smoothed) extracts the central tendency. Just be sure to ask whether a *linear* line is appropriate before claiming the relationship is linear.
+- It removes outliers.
+
+Trendlines are a *summary* layered on top of the data. Always show the underlying points too — the dispersion of the data is part of the story.`}
+/>

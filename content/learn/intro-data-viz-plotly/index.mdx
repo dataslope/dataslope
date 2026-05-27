@@ -1,0 +1,144 @@
+---
+title: Welcome
+description: A beginner-friendly, story-first introduction to data visualization with Python and Plotly Express
+---
+
+Welcome to **Introduction to Data Visualization with Python and
+Plotly Express**. This course is written for someone who has *never*
+made a chart in code before — perhaps you have never written a line
+of Python, perhaps you have only ever seen graphs in a newspaper or
+a school textbook. You will not need a statistics background, you
+will not need to install anything, and you will not need to memorize
+syntax.
+
+What you *will* do is learn to **see data**. By the end of this
+course, when you look at a table of numbers you will instinctively
+reach for a chart, and you will know which chart to reach for.
+
+<Callout type="info" title="Who this course is for">
+- People with **zero or very little** programming experience.
+- People who have heard of "data analytics" but find dashboards
+  intimidating.
+- Analysts moving from Excel charts to Python charts.
+- Anyone who has ever stared at a confusing graph and thought
+  "this can't be the best way to show this."
+</Callout>
+
+## What this course is — and is not
+
+This is a course about **visual reasoning**. We will spend more time
+talking about *why* a chart works than typing chart code. We will
+use [Plotly Express](https://plotly.com/python/plotly-express/) — a
+small, friendly Python library that lets you go from a table to an
+interactive chart in a single line — but Plotly Express is the
+*vehicle*, not the destination.
+
+This course is **not**:
+
+- An advanced statistics or machine-learning course.
+- A frontend engineering or React/D3.js course.
+- A deep dive into enterprise BI platforms like Tableau or Power BI.
+- A book on mathematical proofs of perception.
+- A guide to deploying production dashboards on Kubernetes.
+
+This course **is**:
+
+- A guided tour of the *ideas* behind good visualization.
+- A practical workshop on Plotly Express, one chart at a time.
+- A primer on data storytelling and visualization ethics.
+
+## What you will learn
+
+```mermaid
+flowchart LR
+    A[The Story] --> B[Visual<br/>Reasoning]
+    B --> C[Plotly Express<br/>Fundamentals]
+    C --> D[Chart Types]
+    D --> E[Encodings &<br/>Color]
+    E --> F[Domain<br/>Workflows]
+    F --> G[Storytelling<br/>& Ethics]
+```
+
+The course is organized as a journey:
+
+1. **The story** — How humans went from carving tally marks on bone
+   to building interactive dashboards in a web browser.
+2. **Visual reasoning** — Why charts work at all, and why some
+   charts work better than others.
+3. **Plotly Express fundamentals** — The smallest amount of Python
+   you need to make your first chart.
+4. **Core chart types** — Bar, line, scatter, histogram, box, pie,
+   heatmap, bubble. One per page, with the *when* and *why* in
+   front of the *how*.
+5. **Encodings, color, and layout** — How charts gain their meaning
+   from columns mapped to position, color, size, and shape.
+6. **Workflows and domains** — Time series, geographic maps,
+   filtering, and the rhythm of an *exploratory* analysis.
+7. **Storytelling, ethics, and practice** — How to turn charts into
+   arguments, how to avoid lying with graphics, and how to debug
+   the visualization that "just looks wrong."
+
+## How the interactive pages work
+
+Every Python code block on these pages runs **in your browser** via
+[Pyodide](https://pyodide.org) — a full CPython 3.13 build compiled
+to WebAssembly. There is nothing to install. Plotly, Pandas, NumPy,
+and the sample datasets all ship with the runtime.
+
+You will see three kinds of widgets:
+
+1. **Executable code blocks.** Edit any snippet and click **Run**.
+   Charts appear inline and are fully interactive — hover, zoom,
+   pan, and toggle legend items.
+2. **Multiple-choice questions.** Quick conceptual checks. Some
+   pages have several, especially the foundational ones — getting
+   the intuition right early on saves you hours later.
+3. **Callouts** that flag tips, warnings, and "why does this
+   matter?" moments.
+
+<Callout type="info" title="Each block is isolated">
+Variables defined in one `<CodeBlock>` are **not visible** to the
+next, even on the same page. This keeps every example self-
+contained. If you want a long-lived workspace, open the
+[Python Playground](/playground/python) in a new tab.
+</Callout>
+
+## A taste of what is coming
+
+Here is a complete interactive visualization you will be able to
+write — and *understand deeply* — by the end of this course.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+# A built-in dataset of life expectancy & GDP for 142 countries.
+df = px.data.gapminder().query("year == 2007")
+
+fig = px.scatter(
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    size="pop",
+    color="continent",
+    hover_name="country",
+    log_x=True,
+    size_max=55,
+    template="simple_white",
+    title="Life expectancy vs GDP per capita (2007)",
+    labels={
+        "gdpPercap": "GDP per capita (USD, log scale)",
+        "lifeExp": "Life expectancy (years)",
+    },
+)
+fig.show()
+`}
+/>
+
+If that looks intimidating right now — good. Every line of that
+chart will feel obvious by the time you reach the end of the course.
+
+<Callout type="success">
+Ready to begin? Click **The History of Visual Communication** in
+the sidebar to start the story.
+</Callout>

@@ -1,0 +1,239 @@
+---
+title: Line Charts
+description: The chart of *change* — when to use lines, when to add markers, and how to keep them readable
+---
+
+A **line chart** is the right tool when your data has a *meaningful
+order along the x-axis* — almost always **time**, but sometimes
+another continuous or ordered variable. Lines connect successive
+points to show *how a value evolves*.
+
+## When to use a line chart
+
+Use a line chart when:
+
+- The x-axis represents **time**, or another ordered, continuous
+  variable.
+- You want to show **trend**, **change**, or **rate of change**.
+- You have **multiple series** to compare over the same axis (one
+  line per group).
+
+Never use a line chart when the x-axis is a set of *unordered
+categories* like "Apple, Banana, Cherry." Lines drawn between them
+imply a relationship that isn't there.
+
+## A simple time series
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.stocks()  # Date + several tech stocks normalized to 1.0
+
+fig = px.line(
+    df, x="date", y="GOOG",
+    template="simple_white",
+    title="Google stock price (normalized to 1.0)",
+    labels={"date": "Date", "GOOG": "Normalized price"},
+)
+fig.show()
+`}
+/>
+
+That's the simplest possible line chart: one x, one y, one line.
+Hover over the line — you'll see Plotly's tooltip pop up showing
+exact dates and values.
+
+## Multiple series with `color`
+
+To show several lines, **reshape your data to long form** and use
+`color` to encode the series.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.stocks()
+
+# stocks() returns wide. Melt to long so each series is a "row group":
+long = df.melt(id_vars="date", var_name="ticker", value_name="price")
+
+fig = px.line(
+    long, x="date", y="price", color="ticker",
+    template="simple_white",
+    title="Tech stocks, normalized",
+    labels={"date": "Date", "price": "Normalized price", "ticker": "Ticker"},
+)
+fig.show()
+`}
+/>
+
+Now you have several lines, each in a different color, with an
+interactive legend you can click to hide/show series.
+
+## Markers: show the actual data points
+
+Lines are great for showing the *shape* of a trend, but sometimes
+you want to also see exactly where each measurement was taken.
+Add `markers=True`:
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("country in ['Japan', 'Brazil', 'Nigeria']")
+
+fig = px.line(
+    df, x="year", y="lifeExp", color="country",
+    markers=True,
+    template="simple_white",
+    title="Life expectancy in three countries over time",
+    labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
+)
+fig.show()
+`}
+/>
+
+The markers help when:
+
+- You have **sparse** data (just a handful of points).
+- The reader needs to know *which* are the measured points.
+- The chart will be exported as a static PNG.
+
+If you have **dense** data (thousands of points), omit markers —
+they'll just clutter the line.
+
+## Many lines? Avoid the spaghetti
+
+A common failure mode is the **spaghetti chart** — twenty or more
+overlapping lines that no one can read.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("continent == 'Europe'")
+
+fig = px.line(
+    df, x="year", y="lifeExp", color="country",
+    template="simple_white",
+    title="Life expectancy in Europe — too many lines!",
+    labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
+)
+fig.show()
+`}
+/>
+
+There are 30 lines on that chart and even with interactive
+toggling it's hard to read. **Fixes:**
+
+- Filter to a smaller set of series (top 5 countries by some
+  metric).
+- Use **facets** (small multiples) — one mini-chart per country.
+- Highlight a few lines and gray out the rest.
+
+We'll cover faceting in its own chapter. For now, the rule: **if
+you have more than ~7 lines, plan how you'll keep them readable.**
+
+## Linear and log scales
+
+When values span many orders of magnitude (e.g., country GDPs,
+COVID case counts), a **log scale** for y reveals structure that a
+linear scale flattens out.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import plotly.express as px
+
+df = px.data.gapminder().query("country in ['China', 'India', 'United States', 'Japan']")
+
+fig_linear = px.line(
+    df, x="year", y="gdpPercap", color="country",
+    template="simple_white",
+    title="GDP per capita over time (linear y)",
+    labels={"year": "Year", "gdpPercap": "GDP per capita (USD)"},
+)
+fig_linear.show()
+
+fig_log = px.line(
+    df, x="year", y="gdpPercap", color="country",
+    log_y=True,
+    template="simple_white",
+    title="GDP per capita over time (log y)",
+    labels={"year": "Year", "gdpPercap": "GDP per capita (USD, log)"},
+)
+fig_log.show()
+`}
+/>
+
+On the **linear** chart, the USA's huge values squash everyone
+else. On the **log** chart, you can compare the *relative growth
+rates* of all four countries.
+
+Log scales are powerful but require *labeling* — always say
+"log scale" in your axis label, because viewers do not assume it.
+
+## A common subtle mistake
+
+Plotly Express orders line points by their order in the DataFrame,
+not by the x-axis value. If your data isn't sorted by x, you'll
+get a tangled chart:
+
+```python
+# Suspicious! Sort before plotting:
+df = df.sort_values("date")
+px.line(df, x="date", y="price")
+```
+
+If a line chart ever looks bizarrely scribbled, the first thing to
+check is whether the data is sorted by x.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`When is a **line chart** the right choice?
+
+- For comparing values across a handful of unrelated categories.
+- For showing the distribution of one variable.
+- [o] For showing how a value changes over an ordered axis — most commonly time.
+  > Yes. Lines visually encode *connection* between successive points, which only makes sense when the x-axis has a meaningful order. Time series is the most common case.
+- For showing a part-of-a-whole breakdown.
+
+For unrelated categories use a bar chart; for distributions use a histogram or box plot.`}
+/>
+
+<MultipleChoice
+  markdown={`Why should you almost never draw a line chart with `x` as a set of **unordered categories** like cities or product names?
+
+- Plotly will refuse to render it.
+- It uses too much memory.
+- [o] The line implies a meaningful order/connection between successive x-values; with unordered categories, the line is misleading.
+  > Right. The very shape of a line — going up between two points — *suggests* a transition or trend. If the x-axis is just "Apple, Banana, Cherry," then a line between Apple and Banana is meaningless. The reader's eye will still try to read meaning into it. Use a bar chart instead.
+- Lines can only show one series at a time.
+
+A common test: if reordering the x-axis would make the chart "say something different," then the x-axis is ordered and a line is fine. If it would mean the same, the x-axis is unordered and you want bars.`}
+/>
+
+<MultipleChoice
+  markdown={`Your line chart of 30 countries has become an unreadable **spaghetti chart**. Which is *NOT* a good fix?
+
+- Filter to the top 5 most relevant countries.
+- Facet into one mini-chart per country.
+- Highlight 3 countries in color and gray out the rest.
+- [o] Increase the line thickness for all 30 countries.
+  > Correct — this is the odd one out. Thicker lines just make the tangle *more visible*. The other three fixes (filtering, faceting, selective highlighting) all *reduce the cognitive load* the chart asks of the reader. Spaghetti is a structural problem; styling cannot rescue it.
+
+A good rule: ~7 lines is the practical max for a single chart. Past that, you need a different structure.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a **log y-axis** especially useful for a line chart?
+
+- When values are all between 0 and 1.
+- When the chart only has one line.
+- [o] When values span many orders of magnitude (e.g., 100 vs 1,000,000) and you want to compare *rates of growth* across series.
+  > Yes. A log scale converts multiplicative differences into additive distances, so a 10× change looks the same as another 10× change anywhere on the axis. This is invaluable for comparing relative growth rates of values that differ wildly in absolute size. Always label the axis as "log" so readers don't misread it.
+- When the data has fewer than 10 points.
+
+Log scales are very honest *when labeled* and very misleading *when not labeled*. Always label.`}
+/>
