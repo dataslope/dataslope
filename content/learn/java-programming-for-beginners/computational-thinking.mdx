@@ -1,0 +1,208 @@
+---
+title: Computational Thinking
+description: The four habits — decomposition, pattern recognition, abstraction, and algorithm design — that turn a vague task into something a machine can actually do
+---
+
+The hardest part of programming is rarely the syntax. It is
+*figuring out what you want the program to do, precisely enough that
+the machine can do it*. The set of mental habits that get you from
+a fuzzy English description to a working program is called
+**computational thinking**.
+
+The term was popularized by Jeannette Wing in 2006, but the habits
+are far older. There are four of them. Each is worth a lifetime of
+practice.
+
+```mermaid
+flowchart LR
+    Vague[Vague problem<br/>in English] --> D[1. Decompose]
+    D --> P[2. Find patterns]
+    P --> A[3. Abstract]
+    A --> Algo[4. Design algorithm]
+    Algo --> Code[Code it]
+```
+
+## 1. Decomposition: break it into pieces
+
+The first habit is the simplest: **a big problem is solved by
+splitting it into smaller problems, and then splitting *those* until
+each piece is small enough to think about.**
+
+Suppose someone asks you: "Write a program that grades multiple
+choice exams." That's huge. But decompose it:
+
+- Read the answer key.
+- Read each student's submission.
+- For each student:
+  - Compare each answer to the key.
+  - Count how many were correct.
+  - Compute the percentage.
+- Print a report for each student.
+- Print class statistics (average, highest, lowest).
+
+Each bullet is now a much smaller problem. Each one can be
+decomposed further until it is one short method (function).
+
+A core skill of an experienced programmer is *knowing where to cut*.
+There is no formula. With practice you start to see natural seams in
+a problem the way a carpenter sees the grain in a piece of wood.
+
+## 2. Pattern recognition: look for familiar shapes
+
+When you decompose a problem, you will notice that some of the
+sub-problems look like things you have done before. **"Oh, this is
+basically a search." "Oh, this is just counting." "Oh, this is the
+same as the average we computed last week, just with different
+data."**
+
+Pattern recognition is what turns a one-off solver into a fluent
+programmer. After a few months you will start to see:
+
+- *Iterate over a collection and count things that satisfy a
+  condition* — you do this hundreds of times.
+- *Look something up in a table given a key* — you do this hundreds
+  of times.
+- *Combine two collections into a third* — you do this hundreds of
+  times.
+
+We will spend whole lessons later on the patterns that show up most
+often.
+
+## 3. Abstraction: hide what doesn't matter right now
+
+**Abstraction** is the habit of working with the *idea* of a thing
+without the distracting details. When you press the "M" key on your
+keyboard, you do not think about the electrical signal, the USB
+protocol, the keyboard driver, the operating system's event queue,
+the editor's input handler, or the font renderer that draws the
+glyph. You just think: *type M*.
+
+Each of those layers is an abstraction. You can ignore them because
+*somebody else worked out a clean interface*. That is the whole game
+of software design: build interfaces clean enough that other people
+(including future-you) can ignore your code's internals.
+
+When you write a method called `gradeExam(String[] answers, String[] key)`,
+its *callers* see only "give me answers and a key, get a score
+back." That is their abstraction. Inside, you can do whatever you
+want — change the algorithm, optimize it, fix bugs — without
+disturbing the callers.
+
+```mermaid
+flowchart TB
+    Caller["Caller:<br/>gradeExam(...)"] -->|sees only this| API["gradeExam returns int"]
+    API -. hides .-> Inside["Inside: loop, compare,<br/>count, maybe cache"]
+```
+
+## 4. Algorithm design: a precise sequence of steps
+
+Once a sub-problem is small and familiar, you write an **algorithm**:
+a finite, unambiguous sequence of steps that solves it. The classic
+example is the recipe for finding the largest number in a list:
+
+```text
+Let "biggest" = the first number
+For each remaining number n:
+    if n > biggest:
+        biggest = n
+Return biggest
+```
+
+That is an algorithm. It is precise. It always terminates. It always
+gives the right answer. And it can be translated into Java almost
+mechanically:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int[] nums = {3, 8, 1, 9, 4, 7, 2};
+
+        int biggest = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > biggest) {
+                biggest = nums[i];
+            }
+        }
+
+        System.out.println("biggest = " + biggest);
+    }
+}
+`}
+/>
+
+Notice how directly the English version maps onto the code. **Good
+algorithms are usually short, simple, and boring.** That is a
+feature.
+
+## A worked example: the four habits together
+
+Suppose the task is: *given a paragraph, find the most common word.*
+
+**Decompose.**
+
+1. Get the paragraph.
+2. Break it into words.
+3. Count how many times each word appears.
+4. Find the word with the highest count.
+5. Print it.
+
+**Recognize patterns.** Steps 3 and 4 are both *patterns we have
+seen*: "tally" and "find the max." Good — we don't have to invent
+those from scratch.
+
+**Abstract.** We can hide the implementation of each step behind a
+small named method: `splitIntoWords(text)`, `countOccurrences(words)`,
+`mostCommon(counts)`. The `main` method becomes a one-line story:
+`mostCommon(countOccurrences(splitIntoWords(paragraph)))`.
+
+**Algorithm.** Each named method needs a concrete sequence of steps
+inside. The "find the max" algorithm we wrote above can be reused
+almost verbatim for step 4.
+
+We are not going to implement the full thing now — we don't yet know
+about maps or strings. But notice how *the four habits did the hard
+part*. Translating into Java becomes a clerical task.
+
+<MultipleChoice
+  markdown={`Which of the four habits of computational thinking is most directly about *splitting* a big problem into smaller ones?
+
+- Pattern recognition
+  > That's about *spotting* familiar sub-problems, not creating them.
+- [o] Decomposition
+  > Correct. Decomposition is breaking a problem down.
+- Abstraction
+  > Abstraction hides details, but does not split the work.
+- Algorithm design
+  > That's writing the steps once a sub-problem is small enough.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is *abstraction* useful when writing software?
+
+- It makes programs run faster
+  > Abstraction is about *managing complexity*, not speed.
+- [o] It lets the caller use a piece of code without needing to understand its internals
+  > Correct. Hiding details lets each part of the program be understood on its own.
+- It removes bugs from the program automatically
+  > It does not.
+- It is required by the Java compiler
+  > Abstraction is a design idea, not a syntax rule.`}
+/>
+
+## A small puzzle for your head
+
+Without writing any code, decompose this problem on paper or in your
+head: *Given a long string, print only the lines that contain the
+word "Java".* What are the sub-problems? What patterns are present?
+What can you abstract behind a name?
+
+You should arrive at something like: *split into lines* → *filter
+lines containing "Java"* → *print each remaining line*. Two of those
+three steps are extremely common patterns. The whole problem is, at
+its core, "filter a collection by a condition" — which is one of the
+most common patterns in all of programming.
+
+This is the kind of mental work you will do *before every program*
+for the rest of your career. The next page sharpens it into a
+problem-solving method.

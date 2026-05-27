@@ -1,0 +1,252 @@
+---
+title: Problem Solving
+description: A simple, repeatable method for going from "I have no idea where to start" to "the program works"
+---
+
+Every programmer, at every level, repeatedly meets problems they do
+not yet know how to solve. The difference between a beginner and an
+experienced engineer is not that the experienced one *knows the
+answer*. It is that the experienced one **has a method**.
+
+There are many such methods. The one in this lesson is a beginner
+favorite, sometimes called **Polya's method** after the
+mathematician George Pólya, who described it in his 1945 book
+*How to Solve It*. It works as well for programming as it does for
+math.
+
+## The four steps
+
+```mermaid
+flowchart LR
+    A[1. Understand<br/>the problem] --> B[2. Devise<br/>a plan]
+    B --> C[3. Carry out<br/>the plan]
+    C --> D[4. Look back<br/>and reflect]
+    D -. revise .-> B
+```
+
+1. **Understand the problem.** Restate it. List the inputs. List the
+   outputs. Find an example. Find an *edge case* example.
+2. **Devise a plan.** What kind of problem is this? Is it like
+   something you've seen? Can you solve a smaller version first?
+3. **Carry out the plan.** Translate it into code, step by step.
+4. **Look back.** Does it actually work? Does it work on weird
+   inputs? Is it readable? Could it be simpler?
+
+These steps look obvious written down. But almost every beginner
+mistake comes from skipping one of them — usually by jumping
+straight to step 3.
+
+## Step 1: Understand the problem
+
+Suppose the problem is: *Given a positive integer n, print the sum
+of the integers from 1 to n.*
+
+Before you touch the keyboard, answer:
+
+- **What is the input?** A single positive integer, call it `n`.
+- **What is the output?** A single integer — the sum.
+- **Tiny example.** If `n = 5`, the output is `15` because
+  `1+2+3+4+5 = 15`.
+- **Edge cases.** What if `n = 1`? Output should be `1`. What if `n
+  = 0`? Probably `0`. What if `n` is huge, like a million? The
+  answer is still mathematically defined, but might be a big number.
+
+It is genuinely embarrassing how often a bug is "I never decided
+what should happen at `n = 0`." Decide early. Write it down.
+
+## Step 2: Devise a plan
+
+How might you solve this?
+
+- **Plan A.** Loop from 1 to `n`, add each number to a running
+  total. Simple, obviously correct.
+- **Plan B.** Use the math formula `n * (n + 1) / 2`. Much faster,
+  but you have to trust the formula.
+
+For a beginner, Plan A is the right choice. It maps directly onto
+your understanding. (We'll come back to Plan B in *Look back*.)
+
+## Step 3: Carry out the plan
+
+Translate it into Java:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int n = 5;
+
+        int sum = 0;
+        for (int i = 1; i <= n; i++) {
+            sum = sum + i;
+        }
+
+        System.out.println("sum 1.." + n + " = " + sum);
+    }
+}
+`}
+/>
+
+Read it aloud:
+
+- Start `sum` at 0.
+- For each `i` from 1 to `n`, add `i` to `sum`.
+- Print the answer.
+
+This is plan A, written in Java. The English plan and the code are
+almost the same thing. That is a sign you understood the problem
+properly before coding.
+
+## Step 4: Look back
+
+Now the question every beginner forgets to ask: **Does it actually
+work? Can I break it?**
+
+Try `n = 1`. Expected `1`. Try `n = 0`. We get `0` (the loop runs
+zero times, so `sum` stays `0`). Good.
+
+What if `n` is negative? The loop runs zero times, so we'd return
+`0`. Is that what the problem asked for? The problem said
+*positive* integer. So a user passing `-3` is misusing the function.
+We have a choice: silently return `0`, or refuse and report an
+error. We will learn later (in the chapter on exceptions) how to
+refuse politely.
+
+Is the code as clear as possible? Yes — three lines for three ideas.
+
+What about Plan B, the formula? In Java that's literally one line:
+`int sum = n * (n + 1) / 2;`. It is faster (no loop). It is also
+*less obviously correct* unless you remember the formula.
+**Readability matters more than micro-performance** until proven
+otherwise. We'll keep the loop.
+
+## A method for getting unstuck
+
+Sometimes you'll feel completely stuck. Here are the moves that
+almost always work.
+
+### Move 1: Solve a smaller version
+
+Cannot do `n = 1,000,000`? Can you do `n = 5` by hand on paper?
+Often, doing it manually for a tiny case reveals the algorithm. You
+were not stuck on the *algorithm*; you were intimidated by the
+*size*.
+
+### Move 2: Talk it through (out loud, even to nobody)
+
+Programmers literally talk to objects on their desks. There is a
+classic technique called **rubber duck debugging** — you explain
+your code, line by line, to a rubber duck. The duck never answers,
+but somehow halfway through you say *"…and then it adds X — wait,
+that's the bug!"*. The act of forming sentences in plain language
+forces your brain to confront things it was skipping over.
+
+### Move 3: Reduce to the simplest failing case
+
+If something doesn't work, do not stare at the whole 50-line
+program. **Strip it down**. Remove everything that is not necessary
+to reproduce the bug. You'll often delete the bug by accident
+halfway through — which itself tells you where the bug was.
+
+### Move 4: Take a walk
+
+This is not a joke. Your subconscious is a serious problem-solver,
+and it works best when you stop staring at the screen. A
+ten-minute walk has rescued more programmers than any single
+debugger.
+
+<MultipleChoice
+  markdown={`A friend asks you to "write a program to sort the survey responses." What is the *first* thing you should do?
+
+- Open your editor and start typing
+  > That's step 3 of Pólya's method, not step 1.
+- Look up the fastest sorting algorithm
+  > Premature — you don't yet know the problem.
+- [o] Ask clarifying questions: what does "sort" mean here? Sort by what? Where does the data come from? Where should the result go?
+  > Correct. Understanding the problem comes first.
+- Buy a faster computer
+  > No.`}
+/>
+
+## A small challenge
+
+The challenge below uses the *same* approach: understand → plan →
+code → look back. Try to walk through the four steps explicitly.
+
+<ChallengeCard
+  adapter="java"
+  title="Count vowels in a string"
+  instructions={`Write a program that prints how many vowels are in the string \`text\`. A vowel is one of \`a e i o u A E I O U\`.
+
+\`Main.java\` is given. Compute the count and assign it to the local variable \`count\`. The provided print statement will then print:
+
+\`\`\`
+vowels = N
+\`\`\`
+
+where N is the number of vowels.`}
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `public class Main {
+    public static void main(String[] args) {
+        String text = "Hello, beautiful World!";
+
+        int count = 0;
+        // TODO: count the vowels in 'text' and store in count
+
+        System.out.println("vowels = " + count);
+    }
+}
+`,
+      solutionContent: `public class Main {
+    public static void main(String[] args) {
+        String text = "Hello, beautiful World!";
+
+        int count = 0;
+        String vowels = "aeiouAEIOU";
+        for (int i = 0; i < text.length(); i++) {
+            if (vowels.indexOf(text.charAt(i)) >= 0) {
+                count++;
+            }
+        }
+
+        System.out.println("vowels = " + count);
+    }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "vowel-count",
+      name: "Counts vowels correctly",
+      expect: {
+        stdoutLines: ["vowels = 9"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
+(For *Hello, beautiful World!* the vowels are e, o, e, a, u, i, u, o,
+o — nine of them.)
+
+<MultipleChoice
+  markdown={`What is "rubber duck debugging"?
+
+- Using a debugger toy as a substitute for a real debugger
+  > It's a technique, not a tool replacement.
+- [o] Explaining your code aloud (to a rubber duck or anyone) so that the act of forming sentences reveals what you missed
+  > Correct. Verbalizing forces clarity.
+- A way of testing programs by throwing a duck at the screen
+  > No, please don't.
+- A formal Java debugger built into Eclipse
+  > Not a thing.`}
+/>
+
+You now have a real, repeatable problem-solving method. Use it on
+every challenge in this course. In the next section we finally start
+learning Java in earnest — beginning with what really happens when
+you write `int x = 5;`.
