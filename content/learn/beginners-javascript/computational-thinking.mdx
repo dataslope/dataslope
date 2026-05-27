@@ -1,0 +1,396 @@
+---
+title: Computational Thinking
+description: The mental moves — decomposition, pattern matching, abstraction, and algorithms — that separate "knowing syntax" from "solving problems with code".
+---
+
+Programming is not the same as *coding*. Coding is typing the right
+symbols in the right order. Programming is *figuring out what to
+type*. The thinking that lets you do the second is often called
+**computational thinking**, and it has nothing to do with any
+particular language.
+
+There are four classic moves to it. We will go through each one and
+practice them on small JavaScript problems.
+
+## 1. Decomposition
+
+> **Decomposition** is breaking a fuzzy, big problem into smaller,
+> well-defined problems you can actually solve.
+
+Imagine someone says: *"Write a program that figures out a fair way
+to split a restaurant bill, including tip."*
+
+That sentence is not yet a program. It is a goal. To turn it into
+code, you have to break it apart:
+
+- How is the bill given to the program? A single number? A list of
+  items per person?
+- How is the tip calculated? A fixed percentage? Adjustable?
+- How do we round it — to the nearest cent? The nearest dollar?
+- Do we output a single number per person, or a detailed
+  breakdown?
+
+Each of those questions defines a smaller sub-problem. Each
+sub-problem becomes a function, a calculation, a step.
+
+Here is a tiny version where the sub-problems are obvious:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Sub-problem 1: compute the tip from the bill and the tip rate.
+function computeTip(billTotal, tipRate) {
+  return billTotal * tipRate;
+}
+
+// Sub-problem 2: compute the per-person share.
+function splitEvenly(amount, people) {
+  return amount / people;
+}
+
+// Sub-problem 3: round to two decimals (cents).
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
+// Top-level: combine the sub-problems.
+const bill = 84.50;
+const tipRate = 0.18;
+const people = 4;
+
+const tip = computeTip(bill, tipRate);
+const total = bill + tip;
+const perPerson = splitEvenly(total, people);
+
+console.log("Tip:", round2(tip));
+console.log("Total:", round2(total));
+console.log("Each person pays:", round2(perPerson));
+`}
+/>
+
+The big problem ("split the bill") got cut into three small
+problems (compute tip, split, round). Each small problem fits in a
+few lines. *Each could be tested and fixed on its own.*
+
+The skill of decomposition is mostly the skill of asking: *what is
+one small piece of this I can solve right now?*
+
+## 2. Pattern matching
+
+> **Pattern matching** is noticing when a new problem looks like
+> something you have solved before, so you can reuse the same idea.
+
+Once you've written `splitEvenly(total, people)` above, the next
+time you face "divide one quantity equally among N consumers", you
+will recognise it. You will not redesign from scratch — you will
+think *"oh, this is the same shape"*.
+
+Patterns can be very small ("looping over a list and summing") or
+very large ("client/server communication"). Programmers build a
+library of patterns in their heads over time. A lot of "experience"
+is exactly this: more patterns recognised, more quickly.
+
+Here is one of the most fundamental patterns in all of programming
+— **accumulating a result over a list**:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Pattern: start with a "blank" result, walk the list, update the result.
+const numbers = [10, 22, 3, 47, 9];
+
+// Sum:
+let total = 0;
+for (const n of numbers) {
+  total = total + n;
+}
+console.log("Total:", total);
+
+// Maximum: same pattern, different update rule.
+let max = numbers[0];
+for (const n of numbers) {
+  if (n > max) max = n;
+}
+console.log("Max:", max);
+
+// Count of items bigger than 10: same pattern again.
+let count = 0;
+for (const n of numbers) {
+  if (n > 10) count = count + 1;
+}
+console.log("Count > 10:", count);
+`}
+/>
+
+Notice that the *shape* of all three solutions is identical:
+
+1. Start with a blank result (`0`, `numbers[0]`, `0`).
+2. Walk through the list.
+3. Update the result based on each element.
+4. Print or return the result.
+
+Once you see that pattern, you see it *everywhere*. Half of all
+"loop-and-do-something-with-a-list" problems are just an instance
+of it.
+
+## 3. Abstraction
+
+> **Abstraction** is hiding details behind a name, so you can think
+> at a higher level.
+
+When you call `Math.sqrt(25)` you don't think about how the runtime
+actually computes a square root. The name `Math.sqrt` *abstracts*
+all of that away. You think: "this gives me a square root", and
+move on.
+
+Every time you write a function, you are creating an abstraction.
+Every time you give something a meaningful name, you are creating
+an abstraction. Good abstractions are the difference between code
+you can read at a glance and code that makes you re-derive the
+meaning every time.
+
+Compare:
+
+```javascript
+// No abstraction — what is this even doing?
+const t = b + b * r;
+const p = t / n;
+```
+
+…with:
+
+```javascript
+// With abstraction — the meaning is in the names.
+const tipRate = 0.18;
+const total = bill + bill * tipRate;
+const perPerson = total / people;
+```
+
+Both pieces of code do the same thing. One is readable; one is a
+small puzzle. The difference is purely *abstraction* — choosing
+good names and grouping related steps.
+
+We can abstract *further* by giving the steps themselves names:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function totalWithTip(bill, tipRate) {
+  return bill + bill * tipRate;
+}
+
+function perPerson(amount, people) {
+  return amount / people;
+}
+
+// Now the top-level code reads like a description of the task.
+const bill = 84.5;
+const tipRate = 0.18;
+const people = 4;
+
+const total = totalWithTip(bill, tipRate);
+const share = perPerson(total, people);
+
+console.log("Each person pays:", share.toFixed(2));
+`}
+/>
+
+Notice how the bottom block reads almost like English: *total with
+tip, per person, log it*. The numerical details — the
+multiplication, the division — are hidden inside the functions,
+where they belong.
+
+## 4. Algorithmic thinking
+
+> **Algorithmic thinking** is designing a precise sequence of steps
+> that will reliably solve a problem.
+
+An **algorithm** is just a recipe: a clear, ordered set of
+instructions that, if followed exactly, gets you from inputs to
+outputs.
+
+You use algorithms all day without naming them. "How do I make
+coffee?" is an algorithm. "How do I get from home to work?" is an
+algorithm. The skill in programming is making them precise enough
+that a computer — which has zero common sense — can follow them.
+
+Suppose I ask you to write a function `isPrime(n)` that returns
+`true` if `n` is a prime number and `false` otherwise. Before
+typing a single character, talk yourself through the algorithm:
+
+1. If `n` is less than 2, it is not prime.
+2. Otherwise, try dividing `n` by every integer from 2 up to
+   `n - 1`.
+3. If any of those divisions has a remainder of 0, `n` is *not*
+   prime.
+4. If none of them do, `n` *is* prime.
+
+Now we translate the recipe into code:
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function isPrime(n) {
+  if (n < 2) return false;          // Step 1.
+  for (let i = 2; i < n; i++) {     // Step 2.
+    if (n % i === 0) return false;  // Step 3.
+  }
+  return true;                      // Step 4.
+}
+
+console.log("2 prime?", isPrime(2));
+console.log("3 prime?", isPrime(3));
+console.log("9 prime?", isPrime(9));
+console.log("17 prime?", isPrime(17));
+console.log("25 prime?", isPrime(25));
+`}
+/>
+
+Notice how the algorithm came *first*, in English. The translation
+to JavaScript was almost mechanical. **This is the right order.**
+
+(There are faster ways to test primality. The point right now is
+not the cleverness of the algorithm; it is that you specified the
+recipe before you wrote the code.)
+
+## Putting all four moves together
+
+Here is a slightly bigger problem we can solve using all four
+moves. The problem:
+
+> *Given a list of student grades (numbers 0–100), report the
+> average, the highest, the lowest, and how many students passed
+> (60 or above).*
+
+**Decomposition** — what are the sub-problems?
+
+- Compute the average.
+- Find the highest.
+- Find the lowest.
+- Count passes.
+
+**Pattern matching** — three of those (average, max, min) are
+instances of the "accumulator over a list" pattern. Count is too.
+
+**Abstraction** — give each sub-problem a name.
+
+**Algorithm** — the steps for each are clear; we already know them.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`function average(numbers) {
+  let total = 0;
+  for (const n of numbers) total += n;
+  return total / numbers.length;
+}
+
+function highest(numbers) {
+  let best = numbers[0];
+  for (const n of numbers) if (n > best) best = n;
+  return best;
+}
+
+function lowest(numbers) {
+  let worst = numbers[0];
+  for (const n of numbers) if (n < worst) worst = n;
+  return worst;
+}
+
+function countAtLeast(numbers, threshold) {
+  let count = 0;
+  for (const n of numbers) if (n >= threshold) count += 1;
+  return count;
+}
+
+function reportGrades(grades) {
+  console.log("Students:", grades.length);
+  console.log("Average:  ", average(grades).toFixed(1));
+  console.log("Highest:  ", highest(grades));
+  console.log("Lowest:   ", lowest(grades));
+  console.log("Passed:   ", countAtLeast(grades, 60));
+}
+
+reportGrades([82, 47, 91, 58, 73, 65, 99, 30, 88, 60]);
+`}
+/>
+
+Notice how the *top-level* function, `reportGrades`, reads like a
+description of the task. The numerical machinery is tucked into
+small, named helpers. If you had to change *what counts as passing*,
+you would know exactly where to look. If you had to add a new
+statistic (say, the median), you would know exactly where it would
+go.
+
+That is computational thinking in action. The code is almost a
+side effect of the careful thought you did before writing it.
+
+## Challenge
+
+<ChallengeCard
+  adapter="javascript"
+  title="Word counter"
+  instructions={`Write a function \`countWords(text)\` that returns how many *words* are in the given string. A word is any group of non-space characters separated by one or more spaces.
+
+For example:
+- \`countWords("hello world")\` should return \`2\`.
+- \`countWords("")\` should return \`0\`.
+- \`countWords("   spaced   out   ")\` should return \`2\`.
+
+Hint: \`"a b  c".split(/\\s+/)\` splits on one-or-more whitespace characters. You may need to filter out empty strings.`}
+  initialCode={`function countWords(text) {
+  // your code here
+  return 0;
+}
+
+console.log(countWords("hello world"));
+console.log(countWords(""));
+console.log(countWords("   spaced   out   "));
+`}
+  solutionCode={`function countWords(text) {
+  return text
+    .split(/\\s+/)
+    .filter((w) => w.length > 0)
+    .length;
+}
+
+console.log(countWords("hello world"));
+console.log(countWords(""));
+console.log(countWords("   spaced   out   "));
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Two words",
+      description: `"hello world" → 2`,
+      code: `if (countWords("hello world") !== 2) throw new Error("expected 2");`,
+    },
+    {
+      id: "empty",
+      name: "Empty string",
+      description: `"" → 0`,
+      code: `if (countWords("") !== 0) throw new Error("expected 0");`,
+    },
+    {
+      id: "whitespace",
+      name: "Lots of whitespace",
+      description: `"   spaced   out   " → 2`,
+      code: `if (countWords("   spaced   out   ") !== 2) throw new Error("expected 2");`,
+    },
+    {
+      id: "single",
+      name: "Single word",
+      description: `"javascript" → 1`,
+      code: `if (countWords("javascript") !== 1) throw new Error("expected 1");`,
+    },
+  ]}
+/>
+
+---
+
+<MultipleChoice
+  markdown={`Which of the four computational-thinking moves is most directly responsible for turning a vague task like "split a restaurant bill fairly" into something you can actually code?
+
+- [o] Decomposition — breaking the big task into small, well-defined sub-problems
+  > Correct. The first move on any unfamiliar problem is almost always decomposition: turning a fuzzy goal into a list of concrete questions you can each answer with a few lines of code.
+- Pattern matching — noticing that this looks like a previous problem
+- Abstraction — hiding details behind names
+- Algorithmic thinking — writing precise step-by-step recipes
+
+All four moves are needed eventually, but decomposition is what gets you off the starting line.`}
+/>

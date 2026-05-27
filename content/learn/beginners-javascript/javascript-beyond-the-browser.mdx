@@ -1,0 +1,271 @@
+---
+title: JavaScript Beyond the Browser
+description: How JavaScript spread from web pages to servers, command-line tools, desktops, phones, and even hardware devices.
+---
+
+After Node.js, JavaScript could run *anywhere a runtime could run*.
+And it turned out that with a little effort, a JavaScript runtime
+could be embedded into almost anything. In this page we look at the
+surprising number of places JavaScript ended up — not because you
+need to write code in all of them, but because it explains *why*
+JavaScript is worth learning deeply.
+
+## The idea of a "runtime"
+
+Before we tour all the places JavaScript runs, let's pin down a word
+we have been using loosely: **runtime**.
+
+A **JavaScript runtime** is a program (often written in C++) that:
+
+1. Reads JavaScript source code.
+2. Turns it into something the CPU can actually execute (often a
+   stream of low-level instructions).
+3. Provides a set of built-in capabilities for your code — like
+   reading a file, drawing on a screen, or talking to the network.
+
+The *language* (ECMAScript) defines the syntax and core data types.
+The *runtime* defines what your code can actually *do* with the
+outside world. Different runtimes give you different capabilities,
+and that is why "JavaScript in a browser" and "JavaScript on a
+server" feel like slightly different worlds, even though it is the
+same language.
+
+```mermaid
+flowchart TB
+    subgraph Lang["The JavaScript language (ECMAScript)"]
+        L1["Numbers, strings, booleans"]
+        L2["Variables, functions, loops"]
+        L3["Arrays, objects"]
+        L4["Promises, async/await"]
+    end
+    subgraph Runtimes["Runtimes layer different capabilities on top"]
+        R1["Browser<br/>DOM, fetch, localStorage"]
+        R2["Node.js<br/>fs, http, child processes"]
+        R3["Deno / Bun<br/>fs, http, native fetch"]
+        R4["Embedded engines<br/>game scripting, IoT"]
+    end
+    Lang --> Runtimes
+```
+
+The same `if`/`for`/`function` works everywhere. What changes is the
+*environment*: the set of built-in objects available, and what those
+built-ins can touch.
+
+## Server-side JavaScript
+
+The first big domain JavaScript conquered, outside the browser, was
+the **server**. With **Node.js** (and its newer cousins **Deno** and
+**Bun**), JavaScript became a perfectly reasonable choice for:
+
+- **Web backends**: serving HTML pages, handling form submissions,
+  responding to API requests.
+- **Real-time servers**: chat systems, multiplayer game servers,
+  collaborative editors.
+- **API gateways**: small services that stitch together other
+  services.
+- **Build tools**: tools that take source files and produce output
+  files. Almost the entire modern front-end build pipeline is
+  written in JavaScript.
+
+Why JavaScript on the server? A few reasons:
+
+- **Shared language with the browser.** A team building a website no
+  longer needed two completely different stacks. The same developers
+  could move freely between front and back.
+- **Strong asynchronous model.** JavaScript's event-driven design
+  (which we will study in detail later) happens to be very well
+  suited to network servers that handle many connections at once.
+- **The npm ecosystem.** Two million ready-made packages is a
+  powerful gravitational pull.
+
+## Command-line tools
+
+A huge number of small utilities you use every day, if you do any
+kind of development, are actually JavaScript programs running on
+Node.js:
+
+- **`npm`** and **`yarn`** themselves — the package managers.
+- **TypeScript** — the type checker.
+- **ESLint, Prettier** — code-quality tools.
+- **Webpack, Vite, Rollup, esbuild, Parcel** — bundlers.
+- **Jest, Vitest, Mocha** — test runners.
+- **Many static-site generators** — Hugo aside, much of the
+  static-site world is JavaScript-based (Astro, Eleventy, Next.js,
+  etc.).
+
+There is nothing browser-y about these tools. They read files, run
+processes, print to your terminal, exit with a status code. They are
+the spiritual descendants of the old shell scripts and Perl scripts
+of the 1980s and 1990s — just written in JavaScript now.
+
+## Desktop applications
+
+Several wildly popular desktop applications are, under the hood,
+JavaScript running in a wrapped-up browser:
+
+- **Visual Studio Code** — Microsoft's editor.
+- **Slack**, **Discord**, **Notion**, **Figma** desktop clients.
+- **Postman**, **Insomnia** — API testing tools.
+- **GitHub Desktop**.
+- The original **Atom** editor.
+
+The technology that powers most of these is called **Electron** — it
+bundles a Chromium browser and Node.js together into a single
+desktop application. The user interface is HTML/CSS/JavaScript; the
+"underneath" features (filesystem, processes, notifications) are
+provided by Node.js APIs.
+
+There are trade-offs (Electron apps tend to be heavy), but the
+ability to use the same skills you would use for the web to build a
+real desktop app is part of why this pattern is so common.
+
+## Mobile applications
+
+Several frameworks let you build native-feeling mobile applications
+in JavaScript:
+
+- **React Native** (Meta) — uses React-style components but renders
+  to *real* native iOS and Android views.
+- **Ionic**, **Cordova / PhoneGap** — embed a web view in a phone
+  app and write the whole UI in HTML/CSS/JS.
+- **NativeScript** — JavaScript directly bound to native iOS and
+  Android APIs.
+
+So a single JavaScript developer can plausibly build a website, a
+desktop app, an iOS app, and an Android app — all using one
+language.
+
+## Hardware, IoT, and the weird places
+
+JavaScript runtimes have been squeezed into surprising places:
+
+- **Espruino** and **Johnny-Five** let you control microcontrollers,
+  LEDs, sensors, and robots using JavaScript.
+- **Hilt and IoT devices** sometimes ship a JavaScript engine
+  (often a small one like **Duktape** or **QuickJS**) so users can
+  script behaviour.
+- **Game engines** sometimes embed JavaScript for scripting game
+  rules (similar to how Lua is traditionally used).
+- **Databases** like **MongoDB** use JavaScript as their query and
+  scripting language.
+- **Image editors**, **3D modellers**, and **CAD programs**
+  sometimes expose JavaScript as the user automation language.
+
+## The point of this tour
+
+We are not going to *use* most of these environments in this course.
+We are going to focus on the language itself, with a runtime that
+runs JavaScript right in the browser. But it matters that you know:
+
+> *Once you really understand JavaScript, you can run useful code
+> almost anywhere — on a website, a server, your laptop's command
+> line, a desktop app, a phone, even hardware.*
+
+The skill you are building is **portable** in a way that very few
+other skills in software are.
+
+## What stays the same across all of these
+
+Every JavaScript runtime, no matter where it runs, supports the same
+**core language**:
+
+- Numbers, strings, booleans, `null`, `undefined`.
+- Variables (`let`, `const`).
+- Functions and arrow functions.
+- Arrays and objects.
+- `if`/`while`/`for`/`return`.
+- Promises and `async`/`await`.
+
+If you write a function that takes some numbers and returns a result
+— no files, no network — that function will run identically in
+Chrome, Firefox, Safari, Node.js, Deno, Bun, an Electron app, a
+React Native app, or a smart light switch.
+
+Here is a piece of code that has nothing to do with a browser. It is
+pure JavaScript — exactly the kind of code that will run, byte for
+byte, anywhere a JavaScript runtime exists.
+
+<CodeBlock
+  adapter="javascript"
+  initialCode={`// Pure logic: no DOM, no network, no files.
+// This function counts how many days are in a given month and year.
+function daysInMonth(year, month) {
+  // 'month' is 1..12. We ask: what is day 0 of the *next* month?
+  // JavaScript's Date treats day 0 as "the last day of the previous month".
+  return new Date(year, month, 0).getDate();
+}
+
+console.log("Feb 2024:", daysInMonth(2024, 2)); // Leap year
+console.log("Feb 2025:", daysInMonth(2025, 2));
+console.log("Apr 2025:", daysInMonth(2025, 4));
+console.log("Dec 2025:", daysInMonth(2025, 12));
+`}
+/>
+
+That same function, copy-pasted, would work without modification in a
+Node.js script, an Electron app, a React Native app, or a tiny
+script you embed in a hardware device. *Learning the core language
+well is, by far, the most reusable thing you can do.*
+
+## Multi-file example: the same logic, organised
+
+One thing all serious runtimes share is the ability to split code
+across multiple files. Here is a small example of how a "real"
+project might break the same logic into two files: one for the
+*function*, one for the *script* that uses it.
+
+<CodeBlock
+  adapter="javascript"
+  entryFilename="index.js"
+  files={[
+    {
+      filename: "index.js",
+      initialContent: `const { daysInMonth, monthName } = require("./calendar");
+
+const year = 2025;
+for (let m = 1; m <= 12; m++) {
+  console.log(\`\${monthName(m)} \${year}: \${daysInMonth(year, m)} days\`);
+}
+`,
+    },
+    {
+      filename: "calendar.js",
+      initialContent: `// A small helper module. No browser, no network — pure JavaScript.
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+const NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function monthName(month) {
+  return NAMES[month - 1];
+}
+
+module.exports = { daysInMonth, monthName };
+`,
+    },
+  ]}
+/>
+
+This is the shape of nearly every real-world project, no matter the
+platform: a collection of files, each one defining some functions,
+importing some others. Once you can read code like this with
+confidence, you can read code in almost any JavaScript runtime in the
+world.
+
+---
+
+<MultipleChoice
+  markdown={`Why is the core JavaScript language (numbers, strings, functions, arrays, control flow) the most important thing for a beginner to focus on?
+
+- Because frameworks like React change every year
+- Because browsers will eventually stop supporting old JavaScript
+- [o] Because that core works identically across every JavaScript runtime — browsers, Node.js, mobile, desktop, IoT — so the skill is broadly reusable
+  > Correct. Built-in APIs and frameworks differ between runtimes, but the language itself is shared. Mastering the language pays off in every environment you will ever encounter.
+- Because runtimes are too slow to handle anything else
+
+Browser APIs, Node APIs, and frameworks come and go. The language stays. That's why this course focuses on it.`}
+/>
