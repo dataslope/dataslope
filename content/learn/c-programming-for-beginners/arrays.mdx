@@ -1,0 +1,377 @@
+---
+title: Arrays
+description: A row of boxes, all the same type, accessed by index — and what happens when you walk off the end
+---
+
+So far we've worked with one variable at a time. But many problems
+involve **lots** of values of the same kind: a list of scores, a
+sequence of temperatures, a row of pixels. C's most basic answer is
+the **array**: a contiguous block of memory holding many values of
+the same type.
+
+## Declaring and indexing
+
+```c
+int scores[5];               // 5 ints, indices 0..4, values undefined
+int primes[5] = {2, 3, 5, 7, 11};   // declared and initialized
+```
+
+Each individual cell is accessed by **index**, starting from **zero**:
+
+```c
+primes[0]   // 2
+primes[1]   // 3
+primes[4]   // 11
+```
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int primes[5] = {2, 3, 5, 7, 11};
+
+    printf("first  = %d\\n", primes[0]);
+    printf("last   = %d\\n", primes[4]);
+
+    // change an element
+    primes[2] = 555;
+    printf("middle = %d\\n", primes[2]);
+    return 0;
+}
+`}
+/>
+
+If you don't supply a size, the compiler counts the initializers:
+
+```c
+int primes[] = {2, 3, 5, 7, 11};   // size becomes 5 automatically
+```
+
+## Memory layout: an array is a row of boxes
+
+```text
+Address:  0x100  0x104  0x108  0x10c  0x110
+Index:    [0]    [1]    [2]    [3]    [4]
+Value:     2      3      5      7      11
+```
+
+Each `int` is (say) 4 bytes. The five cells sit **next to each
+other** in memory. `primes[i]` is shorthand for "the cell at address
+`primes + i * sizeof(int)`". This contiguity is the secret to why
+arrays are fast: predicting the next address is one addition.
+
+## The size is fixed at declaration
+
+In C, the size of a standard array is **set when it's declared** and
+cannot grow:
+
+```c
+int data[10];   // exactly 10 ints, forever
+```
+
+If you need a list that resizes, you need to **manage memory
+yourself** with `malloc` and `realloc` — the topic of the dynamic
+memory chapter.
+
+## Walking an array with a loop
+
+The natural way to process every element:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int data[] = {3, 1, 4, 1, 5, 9, 2, 6};
+    int n = (int)(sizeof(data) / sizeof(data[0]));
+
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += data[i];
+    }
+    double avg = (double)sum / n;
+    printf("count = %d, sum = %d, avg = %.2f\\n", n, sum, avg);
+    return 0;
+}
+`}
+/>
+
+Two new tricks above:
+
+- `sizeof(data) / sizeof(data[0])` computes the number of elements at
+  compile time. (It works *only* on a real array, not on a pointer —
+  more on that subtlety in the pointers chapter.)
+- `(double)sum / n` casts so we get a real average, not an integer
+  one.
+
+## Initialization shortcuts
+
+```c
+int zeros[100] = {0};   // first element is 0; the rest are zero-filled
+
+int arr[5];             // uninitialized! contents are garbage.
+
+int chars[8] = {[2] = 'a', [4] = 'b'};   // designated initializers (C99)
+```
+
+The first form is a common idiom: any partial initializer list
+zero-fills the remaining elements.
+
+## Off-by-one and bounds
+
+C does **not** check array indices. If you write `primes[10]` and the
+array only has five elements, the compiler will not stop you and the
+program may:
+
+- Crash (if it reads past the end of allocated memory).
+- Silently return garbage from neighboring memory.
+- Corrupt a *different* variable that happened to be next door.
+
+This is called a **buffer overflow**, and it has been responsible for
+an astonishing fraction of all software security flaws since the
+1980s.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a[3] = {10, 20, 30};
+    // Don't do this in real code! Reading past the end is undefined behavior.
+    for (int i = 0; i < 5; i++) {
+        printf("a[%d] = %d\\n", i, a[i]);
+    }
+    return 0;
+}
+`}
+/>
+
+The first three lines are sensible; the last two are garbage (and
+could be different each run). The rule is simple but iron:
+
+> **Always check that your index `i` satisfies `0 <= i < N`** before
+> using `a[i]`.
+
+## Common patterns
+
+### Find the maximum
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a[] = {7, 2, 9, 4, 9, 6};
+    int n = (int)(sizeof(a) / sizeof(a[0]));
+
+    int best = a[0];
+    for (int i = 1; i < n; i++) {
+        if (a[i] > best) best = a[i];
+    }
+    printf("max = %d\\n", best);
+    return 0;
+}
+`}
+/>
+
+### Reverse in place
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a[] = {1, 2, 3, 4, 5};
+    int n = (int)(sizeof(a) / sizeof(a[0]));
+
+    // swap a[i] and a[n-1-i] for i from 0..n/2
+    for (int i = 0; i < n / 2; i++) {
+        int tmp = a[i];
+        a[i] = a[n - 1 - i];
+        a[n - 1 - i] = tmp;
+    }
+
+    for (int i = 0; i < n; i++) printf("%d ", a[i]);
+    printf("\\n");
+    return 0;
+}
+`}
+/>
+
+Visualize one swap:
+
+```mermaid
+flowchart LR
+    subgraph before
+      A1[1] --- A2[2] --- A3[3] --- A4[4] --- A5[5]
+    end
+    subgraph after
+      B1[5] --- B2[4] --- B3[3] --- B4[2] --- B5[1]
+    end
+```
+
+### Count occurrences
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a[] = {1, 3, 5, 3, 2, 3, 7};
+    int n = (int)(sizeof(a) / sizeof(a[0]));
+    int target = 3;
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        if (a[i] == target) count++;
+    }
+    printf("%d appears %d times\\n", target, count);
+    return 0;
+}
+`}
+/>
+
+## Multi-dimensional arrays
+
+You can have arrays of arrays:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int grid[3][4] = {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+    };
+
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 4; c++) {
+            printf("%3d ", grid[r][c]);
+        }
+        printf("\\n");
+    }
+    return 0;
+}
+`}
+/>
+
+`grid[3][4]` is laid out as 12 consecutive integers in **row-major**
+order — row 0, then row 1, then row 2. Knowing the layout helps you
+reason about cache performance and pointer arithmetic later.
+
+## Passing arrays to functions
+
+When you pass an array to a function, you actually pass a **pointer
+to its first element**. The function has no automatic way to know the
+length. You must pass it explicitly:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int sum(int *a, int n) {
+    int total = 0;
+    for (int i = 0; i < n; i++) total += a[i];
+    return total;
+}
+
+int main(void) {
+    int data[] = {1, 2, 3, 4, 5};
+    int n = (int)(sizeof(data) / sizeof(data[0]));
+    printf("sum = %d\\n", sum(data, n));
+    return 0;
+}
+`}
+/>
+
+Inside `sum`, `sizeof(a)` would return the size of a pointer (8 on a
+64-bit system), **not** the size of the original array. The
+information is genuinely lost at the call site. This is the most
+notorious "gotcha" in C, and the reason every C function that takes
+an array also takes a length.
+
+## Challenge: count odds and evens
+
+<ChallengeCard
+  adapter="c"
+  title="Count odd and even numbers in an array"
+  instructions={`The array \`data\` holds \`{7, 2, 9, 4, 9, 6, 1, 8}\`. Compute how many of its elements are odd and how many are even, and print exactly:
+
+\`\`\`
+odd = 4
+even = 4
+\`\`\``}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int data[] = {7, 2, 9, 4, 9, 6, 1, 8};
+    int n = (int)(sizeof(data) / sizeof(data[0]));
+    int odd = 0, even = 0;
+    // count here
+    printf("odd = %d\\neven = %d\\n", odd, even);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    int data[] = {7, 2, 9, 4, 9, 6, 1, 8};
+    int n = (int)(sizeof(data) / sizeof(data[0]));
+    int odd = 0, even = 0;
+    for (int i = 0; i < n; i++) {
+        if (data[i] % 2 == 0) even++;
+        else                  odd++;
+    }
+    printf("odd = %d\\neven = %d\\n", odd, even);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "counts",
+      name: "Counts odd and even correctly",
+      description: "stdout matches expected counts",
+      expect: { stdoutLines: ["odd = 4", "even = 4"], stdoutLinesExact: true },
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`What is the value of \`a[2]\` after this code runs?
+
+\`\`\`c
+int a[5] = {10, 20, 30, 40, 50};
+a[2] = a[0] + a[4];
+\`\`\`
+
+- 30
+- 50
+- [o] 60
+  > Correct! \`a[0]\` is \`10\`, \`a[4]\` is \`50\`. \`10 + 50 = 60\`, written back into \`a[2]\`.
+- 100
+
+C arrays are zero-indexed: the first element is at index \`0\`, the last element of an array of size \`n\` is at index \`n - 1\`.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is the following code **dangerous**?
+
+\`\`\`c
+int data[10];
+for (int i = 0; i <= 10; i++) {
+    data[i] = i * i;
+}
+\`\`\`
+
+- It doesn't compile.
+  > It compiles cleanly. The danger is at runtime.
+- It runs an infinite loop.
+- [o] It writes one element past the end of the array (\`data[10]\`), which is undefined behavior and may corrupt other memory.
+  > Correct! Valid indices are \`0..9\`. Writing \`data[10]\` clobbers whatever happens to live in the next 4 bytes — possibly another variable, possibly internal bookkeeping. This is the classic off-by-one bug.
+- It runs correctly because C will resize the array.
+  > C arrays do **not** resize. The size is fixed at declaration.
+
+Off-by-one bugs are one of the most common defects in C code. A useful habit: always read the condition as \`i < n\` (not \`i <= n\`) when iterating \`0\` through \`n - 1\`.`}
+/>

@@ -1,0 +1,282 @@
+---
+title: Debugging and Reasoning About Programs
+description: How to think clearly when your program doesn't do what you expected
+---
+
+Every working program was, at some point, a broken one. The
+difference between a beginner and an experienced programmer is not
+that the experienced one writes fewer bugs — it's that they find
+and fix them faster.
+
+That speed comes from a few habits. None of them are magic. All of
+them can be practiced.
+
+## Step 1: read the error message
+
+The single biggest improvement a new programmer can make is to
+**actually read** what the compiler says, slowly. Compiler errors
+look intimidating because they're terse and reference jargon, but
+they almost always include:
+
+- A **file name** and **line number** (usually the first thing).
+- A short **description** of the problem.
+- Sometimes a **hint** ("did you mean…").
+
+```text
+hello.c:5:9: error: expected ';' before 'return'
+    5 |     printf("hi")
+      |                ^
+      |                ;
+    6 |     return 0;
+```
+
+Read it as: *"in `hello.c`, on line 5, column 9, you forgot a `;`
+before `return`. Here's where to put it."*
+
+Trust the location. Compiler errors point at the spot the compiler
+*noticed* the problem, which is sometimes one line **after** the
+real mistake (because, say, you forgot a semicolon and the compiler
+only realized while parsing the next line). When the error doesn't
+make sense at the indicated line, look at the line **above**.
+
+### Warnings are errors in disguise
+
+Compile with `-Wall -Wextra` (or whatever the equivalent is in your
+toolchain) and **fix every warning**. Warnings almost always
+identify a real bug — uninitialized variables, comparisons that are
+always true, format-string mismatches. Treat a warning-free build as
+the standard.
+
+## Step 2: form a hypothesis before you change anything
+
+The most common pattern in beginner debugging is "tweak something at
+random and hope". This is a trap. Each random change introduces new
+unknowns and you lose track of what you were trying to test.
+
+Instead, every time you face a bug, complete this sentence first:
+
+> "I believe the bug is *here*, because *this evidence* suggests
+> *that cause*. To test the hypothesis I will *do this*, and if I'm
+> right I should see *that result*."
+
+That single sentence converts you from a flailing tinkerer into a
+scientist. The fix often becomes obvious before you even run the
+test.
+
+## Step 3: trace tables
+
+Pick a small example, take pen and paper (or a comment block), and
+write down the value of every relevant variable after every step.
+This is called a **trace table** and it's the most boring,
+unglamorous, and effective debugging technique ever invented.
+
+Consider this buggy function meant to compute a factorial:
+
+```c
+int fact(int n) {
+    int r = 0;
+    for (int i = 1; i < n; i++) r *= i;
+    return r;
+}
+```
+
+Trace `fact(4)`:
+
+| Step             | i | r | reason                  |
+|------------------|---|---|-------------------------|
+| start            | – | 0 | initial `r = 0`         |
+| enter loop, i=1  | 1 | 0 | `0 * 1 = 0`             |
+| i=2              | 2 | 0 | `0 * 2 = 0`             |
+| i=3              | 3 | 0 | `0 * 3 = 0`             |
+| i=4, exit `i<n`  | – | 0 | `i < n` is false at i=4 |
+
+Two bugs are now obvious from the table:
+
+1. `r` should start at `1`, not `0` — multiplying by zero makes the
+   answer zero forever.
+2. The loop should go up to `i <= n`, not `i < n`, or we never
+   include `n` itself in the product.
+
+You would have stared at the code for a long time before seeing
+either. The trace table reveals both within a minute.
+
+## Step 4: print debugging
+
+The humble `printf` is the workhorse of C debugging. Insert prints
+to show the value of suspicious variables and where execution went:
+
+```c
+printf("DEBUG: i=%d, r=%d\n", i, r);
+```
+
+A few tips:
+
+- **Print to `stderr`** (`fprintf(stderr, ...)`) when the program's
+  normal output goes to `stdout`, so the debug prints don't get
+  tangled with the real output.
+- **Use a recognizable prefix** like `[DBG]` so you can `grep` for
+  them and remove them later.
+- **Flush** if your program might crash:
+  `fflush(stdout);` — without a flush, your print might never
+  appear if the program dies just after.
+
+Print debugging is sometimes derided as primitive, but it has a huge
+advantage: it works in environments where a debugger doesn't, and it
+makes you write down explicit hypotheses about what should happen.
+
+## Step 5: shrink the input until the bug shrinks
+
+If the bug only appears with a 10,000-line input file, you cannot
+debug it. Cut the input in half. Does the bug still happen? Cut it
+in half again. Keep going.
+
+This binary-search technique — *minimization* — turns "my program
+crashes mysteriously on this giant input" into "my program crashes
+on the four characters `\n\n\n\0`", at which point the bug usually
+diagnoses itself.
+
+The same idea works with code: if you can't tell which function is
+the culprit, **comment out** half of them and see if the bug
+persists.
+
+## Step 6: rubber-duck explanation
+
+Out loud (or in writing), explain the code to an inanimate object,
+line by line, as if it had never seen the program before. Most of
+the time, you'll hear yourself say something that doesn't make
+sense — "and here we increment `i`, then we add it to `total`, then
+we... wait, why did I subtract `1` here?" — and the bug is found
+without anyone else needing to look.
+
+## Memory bugs: the special category
+
+Memory bugs — use-after-free, double-free, buffer overflow, leak —
+are particularly nasty in C because they often *don't crash
+immediately*. They corrupt some data, and the program crashes a
+million instructions later, in some innocent code that had nothing
+to do with the original bug.
+
+Tools that catch them at the moment they happen:
+
+- **AddressSanitizer** (`-fsanitize=address` on most compilers).
+- **Valgrind** (`valgrind ./your_program`).
+- **UndefinedBehaviorSanitizer** (`-fsanitize=undefined`).
+
+Reach for these *before* a memory bug ruins your day. If your
+toolchain supports them, run your tests under a sanitizer at least
+once.
+
+## Compiler warnings worth memorizing
+
+A small selection of warnings you'll see often, and what they
+usually mean:
+
+| Warning                                    | Real meaning                          |
+|--------------------------------------------|---------------------------------------|
+| `'x' is used uninitialized`                | You read a variable before assigning. |
+| `comparison between signed and unsigned`   | A subtle bug waiting to happen.       |
+| `implicit declaration of function 'foo'`   | Missing `#include`.                   |
+| `format '%d' expects type 'int'`           | Format string and argument mismatch.  |
+| `control reaches end of non-void function` | Missing `return`.                     |
+| `assignment within if`                     | You wrote `=` when you meant `==`.    |
+
+If you treat these as "must-fix immediately", a huge class of bugs
+will simply never reach the running program.
+
+## Reasoning about correctness without running
+
+The best debugging is the kind you do before pressing "run". For
+each piece of code, ask:
+
+- **Invariant**: what is true *every time we reach this point*?
+- **Pre-condition**: what must already be true for this code to be
+  correct?
+- **Post-condition**: what is guaranteed to be true when it
+  finishes?
+
+For loops in particular, write down the **loop invariant** —
+something that's true before the loop starts, remains true after
+each iteration, and tells you the answer when the loop exits:
+
+```c
+// Invariant: sum == a[0] + a[1] + ... + a[i-1]
+int sum = 0;
+for (int i = 0; i < n; i++) {
+    sum += a[i];
+}
+// After the loop: sum == a[0] + ... + a[n-1]   ✅
+```
+
+Once you can state the invariant, off-by-one bugs become very rare.
+
+## Challenge: spot the bug
+
+<ChallengeCard
+  adapter="c"
+  title="Fix the broken factorial"
+  instructions={`The following function should compute \`n!\` (1 * 2 * ... * n). It has two bugs: \`r\` is initialized wrong, and the loop range is wrong. Fix both, then run with \`n = 5\`.
+
+The program must print exactly \`120\`.`}
+  initialCode={`#include <stdio.h>
+
+int fact(int n) {
+    int r = 0;
+    for (int i = 1; i < n; i++) {
+        r *= i;
+    }
+    return r;
+}
+
+int main(void) {
+    printf("%d\\n", fact(5));
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int fact(int n) {
+    int r = 1;
+    for (int i = 1; i <= n; i++) {
+        r *= i;
+    }
+    return r;
+}
+
+int main(void) {
+    printf("%d\\n", fact(5));
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "fact5",
+      name: "fact(5) is 120",
+      description: "stdout equals `120`",
+      expect: { stdoutEquals: "120" },
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Your program crashes with a "segmentation fault" on the line \`*p = 5;\`. Which is **least** likely to be the cause?
+
+- \`p\` is \`NULL\`.
+- \`p\` points to memory that has already been \`free\`'d.
+- \`p\` was never initialized and points at a random address.
+- [o] The variable \`p\` is misspelled.
+  > Correct! A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
+
+The first instinct on a segfault should be: "I'm dereferencing a pointer that doesn't point at anything I own." Then ask: NULL? freed? uninitialized? out-of-bounds?`}
+/>
+
+<MultipleChoice
+  markdown={`You're asked to debug a program you didn't write. It produces wrong output on a 50MB input file but you don't know which part of the file triggers it. What should you do **first**?
+
+- Read all 50,000 lines of the program looking for the bug.
+- Rewrite the program from scratch.
+- Add \`printf\` statements throughout the code, then re-run with the full input.
+- [o] Try to reproduce the bug on a much smaller input — half the file, then half of that, etc.
+  > Correct! Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
+
+Once you have a tiny failing input, *then* it's worth reading the code carefully or adding prints. Trying to debug with the full input is like trying to find a needle in 50MB of hay.`}
+/>

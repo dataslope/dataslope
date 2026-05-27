@@ -1,0 +1,293 @@
+---
+title: Input and Output
+description: printf, scanf, format specifiers, and reading data the program didn't already know
+---
+
+Up to this point our programs have always known their inputs in
+advance — they were hard-coded into the source. A real program needs
+to talk to the outside world: read from the keyboard, write to the
+terminal, read from files. This is **I/O**, short for *input/output*.
+
+C provides I/O through the standard library `<stdio.h>`. The
+philosophy is *small, simple, and printable*. Everything you read or
+write is a stream of bytes.
+
+## Printing with `printf`
+
+You've used `printf` since the first chapter. Time to look at it
+properly.
+
+```c
+printf(format_string, args...);
+```
+
+The **format string** is text with embedded **conversion
+specifications** like `%d`, `%s`, `%f`, each of which is replaced by
+the corresponding argument.
+
+| Spec  | Type                             | Example                  |
+|-------|----------------------------------|--------------------------|
+| `%d`  | `int`                            | `printf("%d", 42);`      |
+| `%ld` | `long`                           | `printf("%ld", 1000000L);` |
+| `%u`  | `unsigned int`                   | `printf("%u", 100u);`    |
+| `%f`  | `double` (yes, `double` not `float`) | `printf("%f", 3.14);` |
+| `%.2f`| `double` with 2 decimal places   | `printf("%.2f", 3.14159);` |
+| `%c`  | `char` (printed as a character)  | `printf("%c", 'A');`     |
+| `%s`  | `char *` (a C string)            | `printf("%s", "hello");` |
+| `%x`  | `int` printed in hexadecimal     | `printf("%x", 255);`     |
+| `%%`  | a literal `%`                    | `printf("50%%");`        |
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int n = 42;
+    double pi = 3.14159;
+    char letter = 'C';
+    const char *name = "Dennis";
+
+    printf("integer:  %d\\n", n);
+    printf("float:    %.2f\\n", pi);
+    printf("char:     %c\\n", letter);
+    printf("string:   %s\\n", name);
+    printf("hex:      0x%x\\n", n);
+    printf("percent:  100%%\\n");
+    return 0;
+}
+`}
+/>
+
+### Field width and padding
+
+You can ask for a minimum field width — useful for tables:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    printf("%-10s %5s\\n", "name", "score");
+    printf("%-10s %5d\\n", "Alice", 92);
+    printf("%-10s %5d\\n", "Bob", 7);
+    printf("%-10s %5d\\n", "Charlie", 145);
+    return 0;
+}
+`}
+/>
+
+- `%-10s` — string in a 10-wide field, left-justified (the `-`).
+- `%5d`   — integer in a 5-wide field, right-justified (the default).
+
+Tiny formatting tricks like these are how plain-text reports stay
+readable.
+
+## Reading with `scanf`
+
+`scanf` reads input from the keyboard (or any redirected source).
+Its format string looks similar to `printf`'s but with one critical
+difference: you must pass the **address** of each variable to fill
+(using the `&` operator).
+
+```c
+int n;
+scanf("%d", &n);    // read an int into n
+```
+
+`&n` means "the memory address of `n`". `scanf` needs the address so
+it can *write* the new value into your variable. (When we cover
+pointers, this will make even more sense.)
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int age;
+    printf("Pretend you typed: 30\\n");
+    // In the browser sandbox, stdin is usually empty, but on a real
+    // system this would block until the user typed a number.
+    if (scanf("%d", &age) == 1) {
+        printf("You are %d years old.\\n", age);
+    } else {
+        printf("(no input was provided)\\n");
+    }
+    return 0;
+}
+`}
+/>
+
+<Callout type="info" title="Why `if (scanf(...) == 1)`?">
+\`scanf\` returns the **number of items it successfully read**. Always
+check it. If the user types \`hello\` when you asked for a number,
+\`scanf\` returns \`0\` and your variable is unchanged (and probably
+uninitialized!).
+</Callout>
+
+### Reading multiple values
+
+Format specifiers in `scanf` skip whitespace between values (except
+for `%c`).
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a, b;
+    printf("(pretend you typed: 3 4)\\n");
+    if (scanf("%d %d", &a, &b) == 2) {
+        printf("sum = %d\\n", a + b);
+    } else {
+        printf("(no input provided)\\n");
+    }
+    return 0;
+}
+`}
+/>
+
+### `scanf` and strings
+
+Reading a string with `%s` reads **one whitespace-delimited word**
+and **never reads more characters than fit in your buffer if you use
+a width**:
+
+```c
+char name[32];
+scanf("%31s", name);   // read at most 31 chars + null terminator
+```
+
+Always specify the maximum width when reading strings with `scanf`,
+or your program is one long input away from a buffer overflow. We'll
+return to strings and buffers in upcoming chapters.
+
+## `getchar` and `putchar` — one character at a time
+
+For character-by-character I/O, the standard library offers
+`getchar()` and `putchar()`.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    // Echo every character from stdin until EOF.
+    int c;                          // int so we can check for EOF
+    while ((c = getchar()) != EOF) {
+        putchar(c);
+    }
+    return 0;
+}
+`}
+/>
+
+This is a tiny, classic loop. Why is `c` an `int` rather than a
+`char`? Because `getchar` returns `EOF` (typically `-1`) to signal
+"no more input", and `EOF` must be distinguishable from every valid
+character — including `0xFF`. Storing the result in a `char` would
+make that distinction impossible.
+
+## Standard streams
+
+Every C program automatically has three streams open:
+
+| Stream  | C name   | Default               |
+|---------|----------|-----------------------|
+| input   | `stdin`  | the keyboard          |
+| output  | `stdout` | the terminal          |
+| errors  | `stderr` | also the terminal     |
+
+`printf` writes to `stdout`. `scanf` reads from `stdin`. For error
+messages, use `fprintf(stderr, "oops: %s\n", msg);`. Separating
+errors lets a user redirect them differently from normal output.
+
+## Formatted vs unformatted I/O
+
+`printf` and `scanf` are **formatted** I/O — they understand types
+and format specifications. There are also **unformatted** I/O
+functions like `fgets` (read a line into a buffer) and `fputs`
+(write a string) that operate on raw bytes. For real input handling
+in larger programs, `fgets` is usually safer than `scanf`:
+
+```c
+char line[256];
+if (fgets(line, sizeof(line), stdin) != NULL) {
+    // line now holds at most 255 characters + a null terminator
+    // (it may include a trailing '\n')
+}
+```
+
+We'll see more of `fgets` in the chapter on strings.
+
+## Challenge: print a small invoice
+
+<ChallengeCard
+  adapter="c"
+  title="Format an invoice line"
+  instructions={`Two variables \`item\` (string) and \`qty\` (int) and \`unit_price\` (double) are set to \`"Widget"\`, \`5\`, and \`3.50\`. Print exactly:
+
+\`\`\`
+Item: Widget    Qty: 5  Unit: $3.50  Total: $17.50
+\`\`\`
+
+Use the field widths:
+- \`%-8s\` for \`item\`
+- plain \`%d\` for \`qty\`
+- \`%.2f\` for prices`}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    const char *item = "Widget";
+    int qty = 5;
+    double unit_price = 3.50;
+    // print the invoice line here
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    const char *item = "Widget";
+    int qty = 5;
+    double unit_price = 3.50;
+    double total = qty * unit_price;
+    printf("Item: %-8s Qty: %d  Unit: $%.2f  Total: $%.2f\\n",
+           item, qty, unit_price, total);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "invoice",
+      name: "Prints the formatted invoice line",
+      description: "stdout matches the expected line",
+      expect: { stdoutEquals: "Item: Widget   Qty: 5  Unit: $3.50  Total: $17.50" },
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which format specifier should you use to print a \`double\` with three digits after the decimal point?
+
+- \`%d\`
+  > \`%d\` is for integers.
+- \`%f\`
+  > Close, but \`%f\` defaults to **6** digits.
+- \`%s\`
+- [o] \`%.3f\`
+  > Correct! The \`.3\` between \`%\` and \`f\` specifies the number of digits after the decimal point.
+
+\`printf\`'s format mini-language is small but expressive: you can control width, precision, padding, sign, and base all with a few characters between \`%\` and the conversion letter.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`scanf\` require the \`&\` operator in front of integer variables, as in \`scanf("%d", &n);\`?
+
+- Because the C standard forbids passing values directly to \`scanf\`.
+- [o] Because \`scanf\` needs the *address* of \`n\` to write the parsed value back into it.
+  > Correct! C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
+- Because \`&\` converts \`n\` to a string suitable for parsing.
+- Because \`%d\` requires a special pointer type.
+
+When you write \`&n\`, you're saying "here is the address of the box called \`n\` — please put the answer in it". This is one of the most common uses of the \`&\` (address-of) operator in C.`}
+/>

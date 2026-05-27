@@ -1,0 +1,313 @@
+---
+title: Variables and Memory
+description: What a variable really is, where it lives, and how to think about it as a labelled box in RAM
+---
+
+A **variable** in C is a name attached to a piece of memory. Behind
+the friendly name is a fixed-size box of bytes at a specific address.
+
+That mental model — *variable = labelled box in memory* — will guide
+every chapter from now on.
+
+## Declaring a variable
+
+The minimum recipe for a variable is:
+
+```c
+type name;            // declare, value is undefined
+type name = value;    // declare and initialize
+```
+
+Examples:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int age = 30;
+    int year_of_birth = 2025 - age;
+
+    printf("age = %d\\n", age);
+    printf("year of birth = %d\\n", year_of_birth);
+    return 0;
+}
+`}
+/>
+
+Three things happen on the line `int age = 30;`:
+
+1. **Reserve memory.** The compiler picks 4 bytes (on a typical
+   system) somewhere in memory to hold the value.
+2. **Bind the name.** From now on, every occurrence of `age` in this
+   scope refers to those 4 bytes.
+3. **Initialize.** The bit pattern for `30` is written into those
+   bytes.
+
+## Picture it
+
+After the two declarations above, memory might look like:
+
+```text
+Address      Variable          Value (decimal)
+----------   ---------------   --------------
+0x7ffc...0   age               30
+0x7ffc...4   year_of_birth     1995
+```
+
+Each box is 4 bytes. The actual addresses are not predictable across
+runs — they depend on the OS, the architecture, and security
+features like ASLR. But the **shape** is reliable.
+
+## Assignment versus declaration
+
+Once a variable has been declared, you can change its value with the
+`=` operator. The type is not repeated.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int score = 0;          // declare and initialize
+    printf("score = %d\\n", score);
+
+    score = 10;             // assignment
+    printf("score = %d\\n", score);
+
+    score = score + 5;      // read old value, add 5, write back
+    printf("score = %d\\n", score);
+    return 0;
+}
+`}
+/>
+
+That last line, `score = score + 5;`, is a great example of
+*sequential thinking*. The right-hand side is evaluated **first**,
+producing the new value `15`, which is then **stored** back into
+`score`. C is full of these "read, compute, write" patterns.
+
+### Read versus write
+
+When `score` appears on the **left** of `=`, you are **writing** to
+it. When it appears on the **right**, or in an expression, you are
+**reading** from it.
+
+```text
+score = score + 5;
+  ^         ^
+  |         +-- read
+  +------------ write
+```
+
+## Naming variables
+
+Variable names in C:
+
+- May contain letters, digits, and underscores `_`.
+- Must **not** start with a digit.
+- Are **case-sensitive** — `Score`, `score`, and `SCORE` are three
+  different variables.
+- Cannot collide with C **keywords** (`int`, `if`, `return`, ...).
+- Should be **descriptive**. `n` is fine for a loop counter; `score`
+  is better than `s` for a score.
+
+```c
+int score;            // good
+int playerScore;      // also fine (camelCase)
+int player_score;     // fine (snake_case — more common in C)
+int 1st_score;        // ERROR: starts with a digit
+int return;           // ERROR: keyword
+```
+
+<Callout type="info" title="A style note">
+The C ecosystem traditionally uses \`snake_case\` for variable and
+function names (\`player_score\`, \`compute_total\`). Pick a style and
+stay consistent within a project. Consistency matters more than the
+exact convention.
+</Callout>
+
+## What "uninitialized" really means
+
+If you declare a variable without giving it a value:
+
+```c
+int x;
+printf("%d\n", x);   // prints whatever happened to be in memory
+```
+
+…the compiler reserves the memory but does not zero it. The contents
+are whatever was left there by the previous use of those bytes. The
+value you read is **undefined behavior** — the program may print
+anything, including different values on different runs. **Always
+initialize**.
+
+Try it (the exact number printed below is unpredictable and varies
+between runs and compilers):
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int x;       // not initialized
+    printf("x = %d (unpredictable!)\\n", x);
+    return 0;
+}
+`}
+/>
+
+Modern compilers will often warn you about this. Pay attention.
+
+## Constants
+
+Sometimes you want a name that refers to a fixed value that must
+*never* change. There are two common ways.
+
+**`const`** marks a variable read-only after initialization:
+
+```c
+const int SPEED_OF_LIGHT = 299792458;  // m/s
+```
+
+The compiler will reject any attempt to write to it later.
+
+**`#define`** is a textual constant handled by the preprocessor:
+
+```c
+#define MAX_PLAYERS 8
+```
+
+Both are useful; `const` is more strongly typed and easier to debug,
+so prefer it unless you specifically need a preprocessor macro.
+
+## Memory diagram practice
+
+Predict the final values of `a` and `b` after this program runs, then
+run it to check:
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int a = 1;
+    int b = 2;
+
+    int tmp = a;   // tmp is now 1
+    a = b;         // a is now 2
+    b = tmp;       // b is now 1
+
+    printf("a = %d, b = %d\\n", a, b);
+    return 0;
+}
+`}
+/>
+
+This is the classic **swap** idiom. Trace it with a table:
+
+| step | a | b | tmp |
+|-----:|--:|--:|----:|
+| start | 1 | 2 | — |
+| `int tmp = a;` | 1 | 2 | 1 |
+| `a = b;` | 2 | 2 | 1 |
+| `b = tmp;` | 2 | 1 | 1 |
+
+A common rookie mistake is to try `a = b; b = a;` *without* a
+temporary — but by the time the second line runs, `a` already holds
+the new value, so you copy it back into `b` and lose the original.
+Always think *what's in each box, right now?*
+
+## Why memory matters even for `int`
+
+A `int` on most systems is 4 bytes. That means it can hold values
+roughly between `-2,147,483,648` and `+2,147,483,647`. Go above that
+and the value **wraps around** — a phenomenon called **integer
+overflow**.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <limits.h>
+
+int main(void) {
+    int big = INT_MAX;
+    printf("INT_MAX     = %d\\n", big);
+    printf("INT_MAX + 1 = %d  (oops!)\\n", big + 1);
+    return 0;
+}
+`}
+/>
+
+This is a small but profound lesson: in C, **every variable has a
+finite number of bits**. There are no infinite integers, no arbitrary
+precision. You have to choose a type that fits your data.
+
+We'll meet more types in the next chapter.
+
+## Challenge: temperatures
+
+<ChallengeCard
+  adapter="c"
+  title="Convert Celsius to Fahrenheit"
+  instructions={`A variable \`celsius\` is set to \`25\`. Compute the equivalent Fahrenheit value using the formula \`F = C * 9 / 5 + 32\` and print exactly:
+
+\`25 C = 77 F\``}
+  initialCode={`#include <stdio.h>
+
+int main(void) {
+    int celsius = 25;
+    int fahrenheit = 0;
+    // compute fahrenheit here
+    printf("%d C = %d F\\n", celsius, fahrenheit);
+    return 0;
+}
+`}
+  solutionCode={`#include <stdio.h>
+
+int main(void) {
+    int celsius = 25;
+    int fahrenheit = celsius * 9 / 5 + 32;
+    printf("%d C = %d F\\n", celsius, fahrenheit);
+    return 0;
+}
+`}
+  tests={[
+    {
+      id: "exact",
+      name: "Prints exact line",
+      description: "stdout equals `25 C = 77 F`",
+      expect: { stdoutEquals: "25 C = 77 F" },
+    },
+  ]}
+/>
+
+<MultipleChoice
+  markdown={`Which statement best describes a variable in C?
+
+- A keyword reserved by the compiler.
+- An object that grows and shrinks automatically based on the value assigned to it.
+- [o] A name bound to a fixed-size region of memory whose contents can be read or written.
+  > Correct! In C, variable size is fixed at declaration based on its type. The variable is essentially a labelled box at a specific address.
+- A function that always returns the most recent value passed to it.
+
+C is a *statically typed* language: the size and layout of a variable are decided when you write \`int x;\`, not at runtime.`}
+/>
+
+<MultipleChoice
+  markdown={`What is wrong with this code?
+
+\`\`\`c
+int x;
+int y = x + 1;
+printf("%d\\n", y);
+\`\`\`
+
+- Nothing — \`y\` will always be \`1\`.
+- The compiler will refuse to build it.
+- [o] \`x\` is uninitialized, so reading it is undefined behavior; \`y\` could be anything.
+  > Correct! The compiler reserves memory for \`x\` but doesn't zero it out. Whatever bits happened to be there become its value.
+- \`y\` cannot be initialized from another variable.
+
+Always initialize your variables. Modern compilers will often emit a warning for uninitialized reads — turn warnings on and pay attention to them.`}
+/>
