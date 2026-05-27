@@ -1,0 +1,286 @@
+---
+title: Interpreting Plots
+description: A chart you can build is useful. A chart you can *read* is twice as valuable. A short field guide to seeing what a plot is actually saying — and what it isn't.
+---
+
+It is one thing to *make* a chart. It is a more advanced skill to
+*read* one carefully — to extract everything it is telling you,
+and to notice everything it is *not* telling you.
+
+This page is a tour of how to look at a chart. Every analyst
+needs this, and almost nobody teaches it explicitly.
+
+## Step 1: read the axes before the picture
+
+Before you stare at the shape, look at:
+
+- What is on the **x axis**?
+- What is on the **y axis**?
+- What are the **units**?
+- Does either axis start at **zero**? If not, is that defensible?
+- Is either axis on a **log scale**? (Log axes can make
+  exponential growth look linear and small differences look
+  huge.)
+
+A chart whose y-axis starts at 85 instead of 0 can make a 1%
+difference look like a mountain. A chart on a log scale can hide
+a 10× difference. Knowing what scale you're looking at is half
+the battle.
+
+## Step 2: identify the encoding
+
+Every chart maps data to visual properties. Make sure you know
+the mapping:
+
+- Position (x, y): usually the main variables.
+- Color: a third variable.
+- Size: sometimes a fourth.
+- Shape, line type, panel (facet): more dimensions.
+
+If there's a legend, *read it.* If a color is encoding something,
+know what it's encoding before you interpret the picture.
+
+## Step 3: look at the shape, then the details
+
+For a **scatterplot**, ask:
+
+- Direction (positive / negative / no slope)
+- Strength (tight band or diffuse cloud)
+- Linear or curved?
+- Outliers?
+- Distinct clusters? (might suggest a hidden category)
+
+For a **histogram or density**, ask:
+
+- Where's the center?
+- How wide?
+- Skewed?
+- One peak or several?
+- Where are the gaps?
+
+For a **boxplot**, ask:
+
+- Where are the medians?
+- Do the boxes (middle 50%) overlap a lot, or are they clearly
+  separate?
+- Are the outliers in one direction?
+- Are some groups much more variable than others?
+
+For a **line chart**, ask:
+
+- Trend up, down, flat, or cyclical?
+- Sudden changes? Where, and what was happening then?
+- Comparable across panels / colors?
+
+## Step 4: ask "what isn't shown?"
+
+The most important interpretation question is *what's missing
+from the picture*. Some examples:
+
+- A scatterplot of price vs square footage — but what about
+  **neighborhood**? Bigger houses might cluster in better
+  neighborhoods.
+- A line chart of sales over time — but what about **inflation**?
+  A nominal rise may be a real decline.
+- A bar chart of complaints by store — but what about **traffic
+  per store**? More complaints might just mean more customers.
+
+A chart is a *projection* — a few dimensions of a higher-dimensional
+truth. The skilled reader always asks what *other* dimensions
+might explain the picture.
+
+```mermaid
+flowchart TB
+  chart["You see a chart"]
+  chart --> a["Read the axes and legend"]
+  a --> b["Identify the encoding"]
+  b --> c["See the shape (direction, strength, outliers)"]
+  c --> d["Ask: what's NOT shown that could explain this?"]
+  d --> e["Form an interpretation — *with appropriate uncertainty*"]
+  style e fill:#dcfce7
+```
+
+## Anscombe revisited: four shapes, one summary
+
+We met Anscombe's quartet earlier. Let's actually plot it now,
+to drive home why looking matters:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+data(anscombe)
+
+# Reshape to long form
+long <- anscombe |>
+  mutate(obs = row_number()) |>
+  pivot_longer(-obs,
+               names_to  = c(".value", "set"),
+               names_pattern = "(.)(.)")
+
+ggplot(long, aes(x = x, y = y)) +
+  geom_point(color = "steelblue", size = 2) +
+  geom_smooth(method = "lm", se = FALSE,
+              color = "red", formula = y ~ x) +
+  facet_wrap(~ set) +
+  labs(title = "Anscombe's quartet: 4 datasets, 4 stories")
+`}
+/>
+
+All four datasets have almost identical means, standard
+deviations, correlations, and regression lines. They look
+*nothing* alike. **Always plot.**
+
+## A worked example: read this chart
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(airquality)
+
+ggplot(airquality, aes(x = Temp, y = Ozone)) +
+  geom_point(color = "steelblue", alpha = 0.7) +
+  geom_smooth(method = "loess", se = FALSE,
+              color = "red", formula = y ~ x) +
+  labs(
+    title = "Ozone vs. temperature (NYC, May–Sep 1973)",
+    x     = "Temperature (°F)",
+    y     = "Ozone (ppb)"
+  )
+`}
+/>
+
+How might you read it?
+
+1. **Axes**: temperature in °F (x), ozone concentration in parts
+   per billion (y). Both start near the minimum value — not at
+   zero, but that's fine for a scatterplot.
+2. **Encoding**: each dot is one day. No color or facet — just
+   two variables.
+3. **Shape**: clear *positive* relationship — hotter days have
+   higher ozone. The relationship looks *curved*: ozone rises
+   slowly at low temps and shoots up at high temps. There's a
+   single far outlier around 90°F.
+4. **What's missing?** Wind, time of day, the day of week, the
+   season, pollution sources. Maybe what we're really seeing is
+   that hot days are usually *still* days, and ozone accumulates
+   when there's no wind to disperse it. The chart can't tell us
+   that — but we know to ask.
+
+Notice we did not say "high temperature *causes* high ozone." We
+said *associated with*. That's the discipline.
+
+## The honest interpretation has hedges
+
+The trained analyst is allergic to overclaiming. Compare:
+
+- ❌ "Temperature drives ozone."
+- ✅ "Ozone is positively associated with temperature on hot
+  days in this dataset; further investigation could test
+  whether wind speed accounts for some of the relationship."
+
+This is not just polite throat-clearing. It's accurate. Data
+shows us *associations*; causation requires more.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`When reading a chart, what's the very first thing you should look at?
+
+- The legend
+- [o] The axes — their labels, units, scale, and starting values
+  > Correct! Without knowing what the axes are showing, the picture itself is uninterpretable. A y-axis starting at 85 vs. 0 can completely change the story.
+- The colors
+- The chart's title`}
+/>
+
+<MultipleChoice
+  markdown={`Anscombe's quartet shows that:
+
+- R sometimes plots data incorrectly.
+- Correlation is always meaningless.
+- [o] Datasets with nearly identical summary statistics can have completely different shapes — so you must visualize, not just summarize.
+  > Correct! It is the canonical demonstration of why "plot first" is non-negotiable in EDA.
+- Linear regression is always wrong.`}
+/>
+
+<MultipleChoice
+  markdown={`You see a scatterplot showing a positive relationship between ice cream sales and drowning rates. What's the most responsible interpretation?
+
+- Ice cream causes drowning.
+- Drowning causes ice cream sales.
+- [o] The two are associated; a likely cause is a confounding variable like summer weather, but the chart alone cannot establish causation.
+  > Correct! The chart describes an association. Causation requires either an experiment or careful reasoning about confounders.
+- The chart is wrong.`}
+/>
+
+## Mini challenge: critique a chart
+
+We've built a deliberately-bad chart of `mtcars`. Identify the
+problems by *editing the chart* into a better one. The starting
+chart has no title, no axis labels, mapping color to a constant
+string, and uses pie/3D-style ornamentation we should drop.
+
+<ChallengeCard
+  adapter="r"
+  title="Fix the bad chart"
+  instructions={`Rewrite the ggplot below into a clean one with: meaningful axis labels (mpg → "Miles per gallon", wt → "Weight"), a real title, and color mapped to \`factor(cyl)\` (a real categorical variable). Assign the improved chart to \`fixed\`.`}
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+# A bad chart:
+bad <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(aes(color = "blue"), size = 4)
+print(bad)
+
+fixed <- NULL  # build a clean version
+
+print(fixed)
+`}
+  solutionCode={`library(ggplot2)
+data(mtcars)
+
+fixed <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+           geom_point(size = 3, alpha = 0.85) +
+           labs(
+             title = "Fuel economy by weight, colored by cylinders",
+             x     = "Weight (1000s of lbs)",
+             y     = "Miles per gallon",
+             color = "Cylinders"
+           )
+print(fixed)
+`}
+  tests={[
+    {
+      id: "is_gg",
+      name: "fixed is a ggplot",
+      code: `if (!inherits(fixed, "ggplot")) stop("fixed must be a ggplot")`,
+    },
+    {
+      id: "has_title",
+      name: "Has a non-empty title",
+      code: `t <- fixed$labels$title
+if (is.null(t) || nchar(t) == 0) stop("must set a title")`,
+    },
+    {
+      id: "has_axes",
+      name: "Has meaningful axis labels",
+      code: `xl <- fixed$labels$x; yl <- fixed$labels$y
+if (is.null(xl) || xl == "wt") stop("set an informative x label")
+if (is.null(yl) || yl == "mpg") stop("set an informative y label")`,
+    },
+    {
+      id: "color_mapping",
+      name: "Color mapped to cyl",
+      code: `cm <- rlang::as_label(fixed$mapping$colour)
+if (is.null(cm) || !grepl("cyl", cm)) stop("color should map to cyl")`,
+    },
+  ]}
+/>
+
+We've gone from raw data to summaries to visualizations to
+interpretation. The next section steps back and asks the deeper
+question: how can we tell what's *real* in our data versus what's
+just noise?

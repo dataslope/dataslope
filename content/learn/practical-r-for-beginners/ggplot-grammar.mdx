@@ -1,0 +1,336 @@
+---
+title: The ggplot2 Grammar
+description: ggplot2's central idea — that every plot is data + aesthetic mapping + geometry + scales + faceting — and how that idea makes building rich, principled visualizations almost mechanical.
+---
+
+`ggplot2` is the most influential R package of the last 20 years.
+It is based on a 1999 book, *The Grammar of Graphics*, by Leland
+Wilkinson. The grammar's central claim: **every chart, no matter
+how complex, is built from the same handful of components.**
+
+Learn those components and you can build any chart you can
+imagine.
+
+The components:
+
+| Component | What it answers |
+| --- | --- |
+| **Data** | Where do the numbers come from? |
+| **Aesthetic mapping** | Which columns map to which visual properties (x, y, color, size, shape)? |
+| **Geometry (geom)** | What kind of marks do we draw (points, lines, bars, boxes)? |
+| **Scales** | How do data values map to visual values (axis breaks, color palettes)? |
+| **Facets** | Do we want a grid of small charts split by some variable? |
+| **Coordinates** | Cartesian, polar, flipped? |
+| **Theme** | Cosmetic styling — fonts, colors, gridlines. |
+
+Each part is added with `+`.
+
+## A first ggplot
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "steelblue", size = 3)
+`}
+/>
+
+Read it as a sentence:
+
+- *Start a plot of `mtcars`* (the data)
+- *...mapping wt to x and mpg to y* (the aesthetics)
+- *...and add a layer of points* (the geometry)
+
+That's the whole grammar. Every ggplot in existence is some
+extension of this skeleton.
+
+## Geometries: change the chart, not the rest
+
+Try different geoms on the same data:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+p <- ggplot(mtcars, aes(x = wt, y = mpg))
+
+p + geom_point()        # scatter
+p + geom_smooth()       # smoothed trend
+p + geom_point() + geom_smooth(method = "lm")  # both!
+`}
+/>
+
+You change one word (`geom_point` → `geom_smooth`) and you get a
+fundamentally different chart. Same data, same mapping, different
+mark.
+
+A small map of the most-used geoms:
+
+| Geom | What it draws |
+| --- | --- |
+| `geom_point()` | dots — scatterplots |
+| `geom_line()` | line connecting points in x order |
+| `geom_bar()` | bars (counts) — needs only x |
+| `geom_col()` | bars (specified heights) — needs x and y |
+| `geom_histogram()` | a histogram of one variable |
+| `geom_density()` | a smoothed density |
+| `geom_boxplot()` | boxplots |
+| `geom_smooth()` | a smoothed trend line with confidence band |
+
+## Mapping vs. setting
+
+This is the single most common confusion for ggplot beginners.
+
+- **Inside `aes()`**: you're saying "let *this column* control
+  this property."
+- **Outside `aes()`**: you're saying "set this property to *this
+  constant value*."
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+# MAPPING color to a column (cyl): one color per unique value of cyl
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3)
+
+# SETTING color to a constant: every point the same color
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "steelblue", size = 3)
+`}
+/>
+
+If you put a literal `color = "steelblue"` *inside* `aes()`,
+ggplot will treat `"steelblue"` as a category name and give you
+the default categorical color, with a useless legend. The
+takeaway:
+
+- Want it driven by data? → put it *inside* `aes()`
+- Want it constant? → put it *outside* `aes()`
+
+## Faceting: small multiples for free
+
+Often you want the same plot, broken into panels by some
+variable. ggplot makes this trivial with `facet_wrap()` and
+`facet_grid()`:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(iris)
+
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
+  geom_point(color = "steelblue") +
+  facet_wrap(~ Species) +
+  labs(title = "Sepal length vs. petal length, by species")
+`}
+/>
+
+One line — `facet_wrap(~ Species)` — and you get three
+side-by-side panels, one per species. *Small multiples*, the
+single most powerful visualization technique for spotting
+group-level differences.
+
+## Labels and titles
+
+`labs()` is for everything textual:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(
+    title    = "Fuel economy falls with weight",
+    subtitle = "1974 Motor Trend cars",
+    x        = "Weight (1000s of lbs)",
+    y        = "Miles per gallon",
+    color    = "Cylinders",
+    caption  = "Source: built-in mtcars dataset"
+  )
+`}
+/>
+
+Always set the title and axis labels. *Always*. They cost almost
+nothing and save your reader a lot of guessing.
+
+## A few more geoms in action
+
+A bar chart with counts (categorical x):
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+ggplot(mtcars, aes(x = factor(cyl))) +
+  geom_bar(fill = "steelblue") +
+  labs(x = "Cylinders", y = "Number of cars")
+`}
+/>
+
+A grouped boxplot (numeric y by categorical x):
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(iris)
+
+ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +
+  geom_boxplot() +
+  labs(y = "Petal length (cm)") +
+  theme(legend.position = "none")
+`}
+/>
+
+A line chart over time:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(airquality)
+
+ggplot(airquality, aes(x = Day, y = Temp)) +
+  geom_line(color = "steelblue") +
+  geom_point(color = "steelblue") +
+  facet_wrap(~ Month, ncol = 5) +
+  labs(title = "Daily temperatures by month, NY 1973",
+       x = "Day of month", y = "Temp (°F)")
+`}
+/>
+
+Notice how almost identical the structure is across very
+different chart types. That's the grammar at work.
+
+## Themes
+
+A `theme()` call lets you tweak almost any visual element. Ggplot
+also ships with several full themes:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(mtcars)
+
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+       geom_point(color = "steelblue", size = 3)
+
+p + theme_minimal()
+p + theme_bw()
+p + theme_classic()
+`}
+/>
+
+For most analytical work, `theme_minimal()` is a great default —
+clean, gridded, modern.
+
+```mermaid
+flowchart TB
+  d["data"] --> a["aes() mapping"] --> g["geom_*()"] --> s["scales / labs / theme"] --> chart["a chart"]
+  facet["facet_wrap / facet_grid"] --> chart
+  style chart fill:#bfdbfe
+```
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What's the difference between writing \`geom_point(color = "red")\` and \`geom_point(aes(color = "red"))\`?
+
+- They are equivalent.
+- The first errors; only the second works.
+- [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category — usually not red — and adds a useless legend.
+  > Correct! Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
+- The second is faster.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the right ggplot to make a scatterplot of \`hp\` (x) vs \`mpg\` (y) from \`mtcars\`?
+
+- \`ggplot(mtcars) + geom_point(hp, mpg)\`
+- [o] \`ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()\`
+  > Correct! Aesthetic mappings go in \`aes()\` inside \`ggplot()\` (or inside the geom).
+- \`plot(mtcars$hp, mtcars$mpg)\`
+- \`ggplot(mtcars, hp, mpg) + scatter()\``}
+/>
+
+<MultipleChoice
+  markdown={`To split a ggplot into one small panel per Species in \`iris\`, you add:
+
+- [o] \`facet_wrap(~ Species)\`
+  > Correct! \`facet_wrap()\` creates one panel per unique value, laid out in a wrapping grid.
+- \`group_by(Species)\`
+- \`color = Species\`
+- \`split(Species)\``}
+/>
+
+## Mini challenge: a publication-ready iris plot
+
+Build a ggplot of `iris` showing **Sepal.Length** on the x axis,
+**Petal.Length** on the y axis, colored by **Species**, with a
+linear smoother per species, faceted by species, with a real
+title and axis labels.
+
+<ChallengeCard
+  adapter="r"
+  title="Compose a real ggplot"
+  instructions={`Assign the plot to a variable called \`p\`. It should:
+- use \`iris\` as data
+- map \`Sepal.Length\` to x, \`Petal.Length\` to y, \`Species\` to color
+- include \`geom_point()\` and \`geom_smooth(method = "lm")\`
+- be faceted by \`Species\`
+- have a title and meaningful axis labels (use \`labs()\`)
+
+Then print(p) to render it.`}
+  initialCode={`library(ggplot2)
+data(iris)
+
+p <- NULL   # build the plot
+
+print(p)
+`}
+  solutionCode={`library(ggplot2)
+data(iris)
+
+p <- ggplot(iris, aes(x = Sepal.Length, y = Petal.Length,
+                      color = Species)) +
+       geom_point(size = 2, alpha = 0.7) +
+       geom_smooth(method = "lm", se = FALSE) +
+       facet_wrap(~ Species) +
+       labs(
+         title = "Sepal length vs. petal length, by species",
+         x = "Sepal length (cm)",
+         y = "Petal length (cm)"
+       )
+print(p)
+`}
+  tests={[
+    {
+      id: "is_gg",
+      name: "p is a ggplot",
+      code: `if (!inherits(p, "ggplot")) stop("p must be a ggplot")`,
+    },
+    {
+      id: "mapping",
+      name: "Maps Sepal.Length and Petal.Length",
+      code: `m <- p$mapping
+xs <- rlang::as_label(m$x); ys <- rlang::as_label(m$y)
+if (!grepl("Sepal.Length", xs)) stop("x should be Sepal.Length")
+if (!grepl("Petal.Length", ys)) stop("y should be Petal.Length")`,
+    },
+    {
+      id: "facet",
+      name: "Faceted by Species",
+      code: `if (!inherits(p$facet, "FacetWrap")) stop("must use facet_wrap")`,
+    },
+  ]}
+/>
+
+We can now make principled, well-labeled charts. The next page
+is about *reading* them — what to look for when a chart lands on
+your desk.

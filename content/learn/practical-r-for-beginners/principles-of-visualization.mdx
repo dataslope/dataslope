@@ -1,0 +1,236 @@
+---
+title: Principles of Visualization
+description: Before you learn a plotting library, learn what makes a chart *good*. A short tour of the timeless rules: encode well, declutter ruthlessly, tell one story.
+---
+
+A good chart is a *thought made visible*. A bad chart is a
+distraction at best, a lie at worst. Both use the same software,
+the same data, even sometimes the same chart type. The difference
+is in the *choices* — and most of the choices follow a handful of
+principles that have been refined over a century.
+
+This page is about those principles. We won't write much code on
+this page. The next page (ggplot2) gives you the tools to apply
+what you learn here.
+
+## Charts are *encodings*
+
+Every chart maps a *variable in the data* to a *visual property
+on the page*. The toolbox of visual properties is small:
+
+| Visual property | Best for | Notes |
+| --- | --- | --- |
+| Position (x, y) | numeric variables, comparison | by far the most accurate channel |
+| Length | numeric, compared to a common baseline | bars |
+| Angle / area | numeric (poorly) | avoid pie charts when accuracy matters |
+| Color (hue) | categorical | ~7 distinct values is a hard limit |
+| Color (intensity) | numeric (ordered) | sequential scales |
+| Shape | categorical | low precision; limit to a few values |
+| Size | numeric | low precision; only for emphasis |
+
+The most important rule: **encode your most important variable
+in position**. People read position with near-perfect accuracy
+and color/size only crudely.
+
+```mermaid
+flowchart LR
+  data["a variable"] -->|"encoded as"| visual["a visual property"]
+  visual --> chart["a chart"]
+  pos["position"] -.most accurate.-> visual
+  len["length"] -.very accurate.-> visual
+  col["color"] -.coarse.-> visual
+  area["area"] -.coarse.-> visual
+  style pos fill:#dcfce7
+  style len fill:#dcfce7
+  style col fill:#fde68a
+  style area fill:#fee2e2
+```
+
+## Match the chart type to the question
+
+Different questions call for different charts:
+
+| Question | Best chart |
+| --- | --- |
+| How is one numeric variable distributed? | histogram, density |
+| How do two numeric variables relate? | scatterplot |
+| How does a numeric variable differ by group? | boxplot, violin, dot plot |
+| How do counts compare across categories? | bar chart |
+| How does something change over time? | line chart |
+| How is a whole made of parts? | bar chart (yes — almost always better than a pie) |
+
+Bar charts are dramatically underrated. Pie charts and 3D charts
+are wildly overrated. The eye is bad at angles and worse at
+volumes.
+
+## Less is more: the data-ink ratio
+
+Edward Tufte coined the term *data-ink ratio*: the proportion of
+a chart's ink that is actually showing data. Maximize it.
+*Ruthlessly remove*:
+
+- 3D effects on 2D data
+- Background colors that don't encode anything
+- Drop shadows
+- Heavy gridlines (light is fine; thick is noise)
+- Decorative icons
+- Redundant labels and legends
+
+A chart's job is to *show data*. Everything else is competition.
+
+## Use color with intention
+
+Color is powerful and easily abused.
+
+- **Categorical hues** (red, blue, green, ...): use to distinguish
+  *unordered* categories. Keep the count low — most people can
+  hold ~7 colors apart, and many fewer if the chart is small or
+  the dots are tiny.
+- **Sequential color scales** (light → dark single hue): use for
+  *ordered* numeric variables. Light = low, dark = high.
+- **Diverging scales** (blue → white → red, etc.): use when the
+  variable has a meaningful *midpoint* (zero, average).
+
+Two additional rules:
+
+1. **Color is not free.** Each color you add is one more thing
+   the reader has to translate. If you can encode something
+   structurally instead (with position, faceting, or order),
+   prefer that.
+2. **Be colorblind-friendly.** Avoid red/green as the only
+   distinguishing pair. Use palettes like `viridis` or
+   `RColorBrewer`'s color-safe sets — modern R plotting tools
+   make this almost free.
+
+## Order matters
+
+If your categories don't have a natural order (alphabetic doesn't
+count), *sort them by the thing you're showing*. A bar chart of
+sales by region, sorted by sales, is dramatically clearer than
+the same chart sorted alphabetically. The eye can read "decreasing
+in this direction" without effort.
+
+## Aspect ratio and scale
+
+- **Don't truncate axes** for bar charts. (Truncating amplifies
+  small differences and is a classic chart crime.)
+- **Don't add a meaningless baseline** to line charts. Starting a
+  y-axis at zero is the *default* for bars but a *choice* for
+  lines.
+- **Use the right aspect ratio** so trends look the way they
+  actually are. Stretching a chart wide flattens trends;
+  squishing it tall exaggerates them.
+
+## Title, axis labels, units
+
+This sounds obvious. It is, and yet 80% of beginner charts skip
+at least one:
+
+- Title that says *what the chart is showing*, not just the
+  variable names ("MPG falls as weight rises" is better than
+  "mpg vs wt")
+- Axis labels with **units** ("Weight (1000s of lbs)" not just
+  "wt")
+- Legend that doesn't restate something already obvious
+
+If a chart needs paragraphs of caption to make sense, the chart
+isn't doing its job.
+
+## One chart, one message
+
+Cram more than one main message into a chart, and most readers
+will absorb none of them. If you have two things to say, make
+two charts. The eye is a serial reader; charts are best when
+they are crisp and singular.
+
+```mermaid
+flowchart TB
+  goal{"What is the one thing you want the reader to take away?"}
+  goal --> single["A single, clear takeaway"]
+  single --> encode["Encode that takeaway in *position* if you can"]
+  encode --> declutter["Remove every drop of non-data ink"]
+  declutter --> label["Title and axis labels that name the takeaway"]
+  label --> done["A chart that doesn't need explaining"]
+  style done fill:#dcfce7
+```
+
+A bad chart and a good chart, same data — look at them and pick
+the one you'd put in a report.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# A bad chart: rainbow colors, 3D-looking effect, no labels
+data(mtcars)
+mtcars$car <- rownames(mtcars)
+top <- mtcars[order(-mtcars$mpg), ][1:5, ]
+
+barplot(top$mpg,
+        names.arg = top$car,
+        col       = rainbow(5),
+        main      = "")
+`}
+/>
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# A better chart: single color, sorted, real title, axis label
+data(mtcars)
+mtcars$car <- rownames(mtcars)
+top <- mtcars[order(-mtcars$mpg), ][1:5, ]
+
+par(mar = c(5, 8, 4, 2))   # extra left margin for names
+barplot(rev(top$mpg),
+        names.arg = rev(top$car),
+        horiz     = TRUE,
+        col       = "steelblue",
+        las       = 1,
+        xlab      = "Miles per gallon",
+        main      = "Top 5 most fuel-efficient cars (mtcars)")
+`}
+/>
+
+What changed:
+
+- Sorted (so the order encodes ranking)
+- Horizontal (so the names fit and read naturally)
+- Single color (no false categorical distinctions)
+- Title that says what the chart is *about*
+- Axis label with the right name
+
+The data is the same. The reader's experience is not.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Which visual property is read with the **highest accuracy** by the human eye?
+
+- Color hue
+- [o] Position along a common scale
+  > Correct! Position (and length to a common baseline) is the most accurate visual channel. Color and area are far coarser.
+- Area
+- Shape`}
+/>
+
+<MultipleChoice
+  markdown={`Why are pie charts often a poor choice?
+
+- They take more pixels.
+- They cannot show more than two categories.
+- [o] The eye reads angles and areas poorly — bar charts (which use position/length) are usually clearer and more accurate.
+  > Correct! Almost any time you'd reach for a pie chart, a sorted bar chart is better.
+- R does not support them.`}
+/>
+
+<MultipleChoice
+  markdown={`If you have a bar chart with five regions and no inherent order, you should:
+
+- Sort alphabetically.
+- Sort by region ID.
+- [o] Sort by the value you're plotting, so the chart's order itself encodes a ranking.
+  > Correct! Sorting by value lets the reader see the ranking instantly with no conscious effort.
+- Leave them in a random order.`}
+/>
+
+The principles are language-agnostic. The next page is about
+the *language* that makes them easy to apply in R: the **grammar
+of graphics** as implemented in `ggplot2`.
