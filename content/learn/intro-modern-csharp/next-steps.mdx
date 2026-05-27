@@ -1,0 +1,167 @@
+---
+title: Where to Go From Here
+description: A roadmap for continuing your C# journey beyond the fundamentals
+---
+
+You've just walked a long path:
+
+- **The story** of how C# came to be, from punch cards to .NET 8.
+- **Computational thinking** and what programs actually do at
+  runtime.
+- **Variables, types, and control flow** — the everyday
+  vocabulary.
+- **Methods and modularity** — small named pieces composed into
+  bigger ones.
+- **Classes and objects** — bundling state and behavior.
+- **Encapsulation, abstraction, inheritance, and polymorphism** —
+  the core ideas of OOP.
+- **Collections** for organizing data.
+- **Error handling, debugging, and resource management** — making
+  programs robust.
+- **Maintainable code and software organization** — building things
+  that age well.
+- **A capstone** that pulled it all together.
+
+You're no longer "starting out." You're ready to *build*.
+
+## What level are you at, really?
+
+Honestly: junior developer territory. You'll still find new
+syntax (records, pattern matching, LINQ, async/await, generics in
+depth) — but you have the *concepts* you need to absorb them
+without floundering. Every language feature, no matter how fancy,
+will land somewhere in the picture you've built.
+
+## A few directions to grow into
+
+There's no single "next thing." Pick the one that excites you.
+
+```mermaid
+mindmap
+  root((Modern C#))
+    Backend & APIs
+      ASP.NET Core
+      Minimal APIs
+      EF Core
+    Desktop & Mobile
+      WPF / WinForms
+      .NET MAUI
+    Games
+      Unity
+      Godot's C# bindings
+    Cloud
+      Azure SDK
+      AWS .NET SDK
+    Tooling
+      Roslyn analyzers
+      Source generators
+    Language depth
+      Generics
+      LINQ
+      async / await
+      Patterns & records
+```
+
+### Backend (most common path)
+
+The de-facto path for professional C# is web services with
+**ASP.NET Core**. It's fast, free, cross-platform, and runs anywhere.
+Start with the official "Minimal API" tutorial; once you're
+comfortable, learn **Entity Framework Core** for database access.
+
+### Desktop apps
+
+If you want to build apps people install:
+
+- **.NET MAUI** — modern cross-platform UI (Windows, macOS, iOS,
+  Android).
+- **WPF / WinForms** — Windows-only, mature, lots of business
+  software.
+- **Avalonia** — community cross-platform UI framework.
+
+### Games
+
+Many games are written in C#:
+
+- **Unity** uses C# as its scripting language and powers an
+  enormous share of indie and AAA titles.
+- **Godot** has first-class C# support (alongside its own
+  GDScript).
+
+### Cloud and DevOps
+
+Azure has rich first-party C# SDKs, and most major cloud providers
+support .NET fully. Once you're comfortable with ASP.NET Core,
+hosting it on Azure, AWS, or in Docker becomes straightforward.
+
+## Language features you'll naturally pick up next
+
+Now that the fundamentals are solid, these are worth learning in
+roughly this order:
+
+1. **Generics** — `List<T>`, `Dictionary<K,V>` you've already used.
+   Now learn to write your own `Cache<T>` or `Repository<T>`.
+2. **LINQ** — fluent operations over collections (`.Where`, `.Select`,
+   `.GroupBy`). Once it clicks, you'll write half as much code.
+3. **`record` and pattern matching** — modern, expressive value
+   types and `switch` expressions.
+4. **`async` / `await`** — how modern C# does concurrency without
+   manual threads.
+5. **Nullable reference types** — let the compiler help you avoid
+   `NullReferenceException`.
+6. **Dependency injection** — the standard way ASP.NET Core glues
+   apps together.
+
+Don't rush. Each of these is a small ocean. They reward steady
+study and lots of writing-real-code time.
+
+## Habits that compound
+
+Of everything in this course, the chapter on **writing maintainable
+software** is the one that will keep paying you back for the rest
+of your career. To recap the most important ones:
+
+- **Name things well.** Always.
+- **Keep methods small.**
+- **Prefer immutability when you can.**
+- **Write tests as you go.**
+- **Read other people's code.** A lot of it.
+
+## A reading list
+
+A few timeless books that have shaped how good C#/OOP code is
+written:
+
+- *Clean Code* by Robert C. Martin — strongly opinionated, very
+  influential.
+- *Refactoring* by Martin Fowler — naming the moves you'll make
+  every day.
+- *Code Complete* by Steve McConnell — the classic "how to build
+  software" book.
+- *The Pragmatic Programmer* by Hunt & Thomas — wisdom that goes
+  beyond any single language.
+- *Domain-Driven Design Distilled* by Vaughn Vernon — when your
+  programs get big enough to need it.
+
+For C# specifically, the **official .NET documentation**
+(`learn.microsoft.com/dotnet`) is genuinely excellent. The C# spec
+is approachable. The .NET team blogs are worth subscribing to.
+
+## A small parting thought
+
+Programming is one of those rare crafts where the only way to get
+better is to write a lot of programs — and the only way to write a
+lot of programs you care about is to build things you actually
+want to exist.
+
+Build something. Then build something better. Then build something
+smaller. Then build something with someone else. The fundamentals
+you've practiced here will hold every one of them up.
+
+Welcome to the field.
+
+<Callout type="success">
+Course complete. You've gone from "what is a variable?" to
+designing and shipping a small, well-organized C# program. Take a
+breath, pick a project, and keep going.
+</Callout>

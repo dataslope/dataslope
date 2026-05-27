@@ -1,0 +1,248 @@
+---
+title: Writing Maintainable Software
+description: Code is read far more often than it is written — habits that make programs a pleasure to come back to
+---
+
+Most professional software engineering isn't writing brand-new
+code. It's *changing* code that someone (often a past version of
+yourself) wrote months or years ago. The code that's easy to come
+back to and change without breaking is **maintainable** code.
+
+This chapter isn't about C# features. It's about the small habits
+that compound over a career.
+
+## The first audience for your code is the next person
+
+Including future-you, six months from now, who's forgotten
+everything. Write for that person. They're tired, they're in a
+hurry, and they want to understand your code in five minutes, not
+fifty.
+
+Three concrete consequences:
+
+1. **Names matter more than cleverness.** A clear name is worth ten
+   comments.
+2. **Small things beat big things.** Small classes, small methods,
+   small files.
+3. **Boring is good.** Surprising code is hard to maintain, even when
+   it's correct.
+
+## Naming
+
+Compare:
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+// hard to read
+double F(double a, double b) => a / (b * b);
+
+Console.WriteLine(F(70, 1.75));
+`}
+/>
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+double Bmi(double weightKg, double heightMeters)
+    => weightKg / (heightMeters * heightMeters);
+
+Console.WriteLine(Bmi(70, 1.75));
+`}
+/>
+
+Both produce the same number. Only one tells you *what's
+happening* at the call site. The C# community has well-trodden
+naming conventions:
+
+| Thing                   | Convention             | Example              |
+|-------------------------|------------------------|----------------------|
+| Class, struct, record   | `PascalCase`           | `BankAccount`        |
+| Public method, property | `PascalCase`           | `Deposit`, `Balance` |
+| Local variable          | `camelCase`            | `totalAmount`        |
+| Parameter               | `camelCase`            | `accountId`          |
+| Private field           | `_camelCase` (common)  | `_balance`           |
+| Interface               | `IPascalCase`          | `IDisposable`        |
+| Constant                | `PascalCase`           | `MaxRetries`         |
+
+Following the conventions sounds trivial but pays off the moment
+someone else reads your code: they immediately know what kind of
+thing each identifier is.
+
+## Methods that do one thing
+
+We saw this in the methods chapter; it's worth repeating because
+it's the single biggest readability lever.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// long, mixed-concern method
+void ProcessOrders(List<int> amounts)
+{
+    int total = 0;
+    int big = 0;
+    foreach (var a in amounts)
+    {
+        if (a < 0) throw new ArgumentException("negative amount");
+        total += a;
+        if (a > 100) big++;
+    }
+    Console.WriteLine($"total: {total}, big: {big}, average: {(double)total / amounts.Count:F2}");
+}
+
+ProcessOrders(new List<int> { 50, 120, 30, 200 });
+`}
+/>
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+using System.Collections.Generic;
+using System.Linq;
+
+void ValidateAmounts(IEnumerable<int> amounts)
+{
+    foreach (var a in amounts)
+        if (a < 0) throw new ArgumentException("negative amount");
+}
+
+int CountBigOrders(IEnumerable<int> amounts) => amounts.Count(a => a > 100);
+
+void PrintSummary(List<int> amounts)
+{
+    ValidateAmounts(amounts);
+    var total = amounts.Sum();
+    Console.WriteLine($"total: {total}, big: {CountBigOrders(amounts)}, average: {(double)total / amounts.Count:F2}");
+}
+
+PrintSummary(new List<int> { 50, 120, 30, 200 });
+`}
+/>
+
+The second version is slightly longer but each piece is independently
+nameable and testable.
+
+## Don't repeat yourself (DRY)
+
+Duplicated code is duplicated bugs. The moment a piece of logic
+appears twice and starts diverging, extract it into a method or a
+class.
+
+But DRY is a guideline, not a religion. Two pieces of code that
+*look* the same today but model different concepts may need to
+diverge tomorrow. Be pragmatic.
+
+## Comments: explain *why*, not *what*
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`// BAD: restates the code
+i += 1; // increment i by 1
+
+// GOOD: explains why
+i += 1; // skip the header row, which is never an order
+`}
+/>
+
+A good comment answers a question the code can't: *why* this
+particular value, *why* this particular order, *why* this
+seemingly-odd branch exists. The code already shows *what*.
+
+## Cyclomatic complexity, in plain words
+
+Every `if`, `switch`, `loop`, `&&`, or `||` adds a new path through
+a method. The more paths, the harder it is to think about all the
+cases. Methods with one or two branches are easy; methods with
+fifteen are nightmares.
+
+If a method has more than ~10 decision points, that's a sign to
+refactor — usually by extracting smaller methods or replacing
+nested conditionals with polymorphism.
+
+## Mutable state is a tax
+
+Every variable that can change makes a program harder to reason
+about. Where you can:
+
+- Prefer `readonly` fields and `get`-only properties.
+- Prefer returning new values to mutating existing ones.
+- Prefer **immutable** types like `record` for "value-shaped" data.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+public record Money(decimal Amount, string Currency);
+
+var a = new Money(10m, "USD");
+var b = a with { Amount = 25m };   // a is unchanged
+
+Console.WriteLine($"{a}, {b}");
+`}
+/>
+
+`record` types give you value-style equality and the `with`
+expression for non-destructive updates. They are excellent for
+data carriers in modern C#.
+
+## A maintenance-friendly project ages well
+
+A useful self-test, six months in:
+
+1. Can you understand what each file is for from its name?
+2. Can you read any single method in under a minute?
+3. Are tests present, and do they tell you what the code is *for*?
+4. When a change is needed, is the change *localized*?
+
+If yes to all four, the project is in good shape. If not, you've
+just found your refactoring targets.
+
+## Small habits, big payoff
+
+A short, rotating set of habits that compound massively:
+
+- **Run tests on every change.** Don't accumulate weeks of red.
+- **Commit small.** A commit per logical change beats giant blobs.
+- **Format consistently.** Pick a style and stick to it.
+- **Delete code aggressively.** Dead code rots.
+- **Refactor with the change.** Don't promise to "clean it up later."
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Why does code readability matter so much?
+
+- The compiler runs unreadable code more slowly
+  > Performance doesn't depend on readability.
+- Readability is required by the language spec
+  > It isn't.
+- [o] Code is read far more often than it is written; readable code is cheaper to maintain and less likely to harbor bugs
+  > Correct. Reading time dwarfs writing time over a project's life.
+- Readable code uses less memory
+  > Unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the *best* comment to attach to a line of code?
+
+- A restatement of what the code does in English
+  > Adds noise without information.
+- The author's initials and the current date
+  > Source control already records this.
+- [o] An explanation of *why* the code is the way it is — context the code itself can't capture
+  > Correct. Comments earn their keep when they answer the questions code can't.
+- Nothing — comments should always be removed
+  > Sometimes a comment is exactly what saves the reader.`}
+/>
+
+<Callout type="success">
+You've now met the habits that turn working code into *good* code.
+Next, we zoom out to look at how programs are organized into
+files, namespaces, and projects — **software organization**.
+</Callout>
