@@ -1,0 +1,143 @@
+---
+title: Welcome
+description: A friendly, narrative-driven introduction to R for learners who want to understand data, statistics, and computational thinking — no programming background required.
+---
+
+Welcome to **Practical R for Beginners**. This course is for you if any
+of these sound familiar:
+
+- You have heard that "data is the new oil" but you have never actually
+  *worked* with data on a computer.
+- You took a statistics class once and remember formulas, but you have
+  no idea how the calculations are done in the real world.
+- You can use a spreadsheet to add up a column, but the moment a
+  dataset has thousands of rows or messy values, you feel stuck.
+- You are curious about data science, research, or analytics — but
+  every tutorial you find starts with `tidyverse pipelines` or
+  `Bayesian inference` and leaves you behind on page one.
+
+You do **not** need any prior programming experience. You do not need
+to remember calculus, linear algebra, or the difference between a
+median and a mode. We will build everything from the ground up — and
+we will build it the way working data analysts actually think about
+problems.
+
+<Callout type="info" title="What is R, in one sentence?">
+R is a programming language designed by statisticians, for
+statisticians, to make working with data — counting it, summarizing
+it, visualizing it, modeling it — feel as direct and expressive as
+sketching a graph on a notebook page.
+</Callout>
+
+## How this course is organized
+
+We start with a story, not with syntax. The first chapters walk
+through how humanity went from counting sheep on clay tablets to
+analyzing terabytes of genomic data — and why, somewhere along the
+way, a language called **R** quietly became one of the most
+important tools in science and business.
+
+Only after you understand *why* R exists do we start writing code.
+And when we do, every concept is grounded in a question a data
+analyst actually asks: *What does this dataset look like? Are these
+two groups really different? Is this number more interesting than
+random chance?*
+
+```mermaid
+flowchart LR
+  A[The Story]:::story --> B[Computational Thinking]:::think
+  B --> C[Vectors]:::vec
+  C --> D[Tabular Data]:::tab
+  D --> E[Transformation]:::trans
+  E --> F[Exploration]:::eda
+  F --> G[Visualization]:::vis
+  G --> H[Statistical Reasoning]:::stat
+  H --> I[Mini Project]:::final
+  classDef story fill:#fde68a,stroke:#92400e,color:#7c2d12
+  classDef think fill:#bfdbfe,stroke:#1d4ed8,color:#1e3a8a
+  classDef vec fill:#bbf7d0,stroke:#15803d,color:#14532d
+  classDef tab fill:#fbcfe8,stroke:#be185d,color:#831843
+  classDef trans fill:#e9d5ff,stroke:#7c3aed,color:#581c87
+  classDef eda fill:#fed7aa,stroke:#c2410c,color:#7c2d12
+  classDef vis fill:#fecaca,stroke:#b91c1c,color:#7f1d1d
+  classDef stat fill:#a7f3d0,stroke:#047857,color:#064e3b
+  classDef final fill:#c7d2fe,stroke:#4338ca,color:#312e81
+```
+
+## What you will be able to do
+
+By the end of this course you will be able to:
+
+- **Read a dataset** into R and describe what is in it without
+  guessing.
+- **Clean and reshape** messy data into a tidy, analysis-ready form.
+- **Visualize** distributions and relationships with `ggplot2`, and —
+  more importantly — *interpret* what you see.
+- **Reason statistically** about variability, uncertainty, and what
+  makes a finding meaningful versus accidental.
+- **Write small R programs** that other people (including future-you)
+  can read, re-run, and trust.
+
+This is **not** a course in software engineering, web development, or
+production machine learning. We will not build a Shiny app, deploy a
+microservice, or train a transformer. There are excellent courses
+that do those things; this one focuses on what we believe is more
+foundational: thinking clearly about data.
+
+## How to use the interactive widgets
+
+Every code block on these pages is **live**. R runs directly in your
+browser through [WebR](https://docs.r-wasm.org/webr/latest/) — a full
+WebAssembly build of R that loads on demand. There is nothing to
+install, no environment to configure.
+
+You will see four kinds of interactive content:
+
+1. **Runnable code blocks.** Click *Run* to execute. Edit anything
+   and re-run. Every block starts in a fresh R session, so a
+   variable in one block is not visible in the next unless the block
+   has its own setup code.
+2. **Multi-file code blocks.** Some examples span two or three R
+   files — the entry script `source()`s the others. This is how real
+   analyses are organized.
+3. **Challenge cards.** Small problems with hidden tests. Edit the
+   code, click *Run*, and see whether your solution passes. Peek at
+   the solution if you get stuck — peeking is learning.
+4. **Multiple-choice questions.** Quick comprehension checks. Wrong
+   answers get specific feedback, so a miss is a learning moment.
+
+<Callout type="info" title="A note on packages">
+When a code block uses a library like `library(dplyr)` or
+`library(ggplot2)`, WebR will fetch and install it automatically the
+first time it is needed. This can take 10–30 seconds on the first
+run; after that, it is instant for the rest of the session.
+</Callout>
+
+## A taste of what's coming
+
+Here is a small example of the kind of analysis we will build
+toward. Do not worry about understanding every line yet — by the
+middle of the course you will.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# Built-in dataset: measurements of 150 iris flowers
+data(iris)
+
+# How many flowers? How many of each species?
+cat("Rows:", nrow(iris), "  Columns:", ncol(iris), "\\n")
+print(table(iris$Species))
+
+# Average petal length per species
+aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
+`}
+/>
+
+In four lines, we loaded a famous dataset, counted it, and computed
+a group-level summary. The output is a small table comparing the
+three species. This is what data analysis looks like in R: short,
+expressive, and built around *thinking* rather than typing.
+
+<Callout type="success">
+Ready? Click **The Age of Data** in the sidebar to start the story.
+</Callout>

@@ -1,0 +1,375 @@
+---
+title: Mini Project Walkthrough
+description: A complete end-to-end analysis of a real built-in dataset — load, inspect, tidy, transform, summarize, visualize, interpret. This is the workflow every analysis follows.
+---
+
+You've now met every piece of the puzzle: vectors, data frames,
+dplyr verbs, ggplot, summary statistics, and inference. This
+page strings them all together on a real dataset so you can see
+the whole arc of an analysis at once.
+
+We'll use the built-in **`airquality`** dataset — daily air
+quality measurements from New York during May–September 1973.
+Our question:
+
+> **Is ozone higher on hotter days, and how does it vary across
+> the summer months?**
+
+That single question will pull us through the entire workflow.
+
+## Step 1 — Load and inspect
+
+Look before you leap. Always.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# airquality is built into R — no loading needed
+dim(airquality)
+head(airquality)
+str(airquality)
+summary(airquality)
+`}
+/>
+
+What we learn:
+
+- ~153 rows, 6 columns: `Ozone`, `Solar.R`, `Wind`, `Temp`,
+  `Month`, `Day`.
+- `Ozone` and `Solar.R` have **NAs** — missing values we'll need
+  to handle.
+- `Month` is numeric (5 through 9) but conceptually categorical.
+- `Temp` is in degrees Fahrenheit.
+
+```mermaid
+flowchart LR
+  load["Load airquality"] --> insp["Inspect: dim, head, str, summary"]
+  insp --> tidy["Tidy: NAs, types, factor for Month"]
+  tidy --> trans["Transform: add °C, monthly summaries"]
+  trans --> viz["Visualize: scatter, box, line"]
+  viz --> interp["Interpret"]
+  style load fill:#dcfce7
+  style interp fill:#bfdbfe
+```
+
+## Step 2 — Tidy: handle NAs and fix types
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>           # drop rows missing the response
+  mutate(
+    Month_name = factor(Month,
+                        levels = 5:9,
+                        labels = c("May","Jun","Jul","Aug","Sep")),
+    Temp_C     = round((Temp - 32) * 5/9, 1)
+  )
+
+head(aq)
+cat("Rows after dropping Ozone NAs:", nrow(aq), "\\n")
+`}
+/>
+
+A few notes:
+
+- We *dropped* rows missing Ozone because Ozone is the variable
+  we want to analyze. (`Solar.R` NAs we'll handle later if
+  needed.) Dropping rows is fine **when** you've thought about
+  whether NAs are random — for now, assume yes.
+- We added a `Month_name` factor with proper ordering, and a
+  more reader-friendly `Temp_C` column.
+
+## Step 3 — First look: summary statistics
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>
+  mutate(
+    Month_name = factor(Month, levels = 5:9, labels = c("May","Jun","Jul","Aug","Sep")),
+    Temp_C     = round((Temp - 32) * 5/9, 1)
+  )
+
+# Overall
+summary(aq$Ozone)
+
+# By month
+monthly <- aq |>
+  group_by(Month_name) |>
+  summarise(
+    n         = n(),
+    median    = median(Ozone),
+    mean      = round(mean(Ozone), 1),
+    sd        = round(sd(Ozone),   1),
+    mean_temp = round(mean(Temp_C), 1),
+    .groups   = "drop"
+  )
+print(monthly)
+`}
+/>
+
+Already the pattern emerges: July and August have the highest
+mean Ozone *and* the highest mean temperature. May and September
+are cooler and cleaner.
+
+## Step 4 — Visualize the relationship
+
+Plots will tell us more than summary tables ever can.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+library(ggplot2)
+
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>
+  mutate(
+    Month_name = factor(Month, levels = 5:9, labels = c("May","Jun","Jul","Aug","Sep")),
+    Temp_C     = round((Temp - 32) * 5/9, 1)
+  )
+
+ggplot(aq, aes(x = Temp_C, y = Ozone, color = Month_name)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "loess", se = FALSE, color = "black", linewidth = 0.5) +
+  labs(
+    title    = "Ozone vs. temperature in NYC, May–Sep 1973",
+    subtitle = "Each point is one day",
+    x        = "Daily max temperature (°C)",
+    y        = "Ozone (ppb)",
+    color    = "Month"
+  ) +
+  theme_minimal()
+`}
+/>
+
+The picture is unambiguous: warmer days have higher Ozone. The
+relationship looks roughly monotonic, and a bit curvier at high
+temperatures.
+
+## Step 5 — Look at monthly variation explicitly
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+library(ggplot2)
+
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>
+  mutate(Month_name = factor(Month, levels = 5:9,
+                             labels = c("May","Jun","Jul","Aug","Sep")))
+
+ggplot(aq, aes(x = Month_name, y = Ozone, fill = Month_name)) +
+  geom_boxplot(alpha = 0.85, outlier.alpha = 0.6) +
+  labs(
+    title = "Ozone distribution by month",
+    x = NULL, y = "Ozone (ppb)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+`}
+/>
+
+July and August have clearly higher medians and wider spreads —
+both more Ozone *and* more variable Ozone. The shoulder months
+(May, September) are tighter and lower.
+
+## Step 6 — A quick formal check
+
+We *see* a relationship between Temperature and Ozone, but how
+strong is it? And is it surprising given the noise?
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>
+  mutate(Temp_C = (Temp - 32) * 5/9)
+
+# Correlation
+cor(aq$Temp_C, aq$Ozone)
+
+# Simple linear regression: Ozone ~ Temp
+model <- lm(Ozone ~ Temp_C, data = aq)
+summary(model)
+`}
+/>
+
+Reading the output:
+
+- The **correlation** is around 0.7 — a strong positive linear
+  relationship.
+- The regression coefficient on `Temp_C` is positive and the
+  p-value is *very* small, well below any conventional cutoff.
+- The R² (multiple R-squared in the output) tells you what
+  fraction of Ozone variation is explained by temperature alone.
+
+We're not making causal claims (Ozone formation has many
+drivers!) — only describing a strong *association* in this
+dataset.
+
+## Step 7 — Interpret
+
+Pulling it together in a short, plain-English paragraph (this is
+literally the kind of write-up an analyst delivers):
+
+> Across the 1973 New York summer, daily ozone levels rose
+> sharply with daily temperature. The relationship is strong
+> (correlation ≈ 0.7) and is very unlikely to be a chance pattern
+> given the sample size. Ozone was both higher and more variable
+> in July and August than in May or September, consistent with
+> the known link between heat, sunlight, and photochemical ozone
+> production. About half the day-to-day variation in ozone is
+> explained by temperature alone; the rest is presumably driven
+> by factors not in this dataset, like wind, precursor
+> emissions, and atmospheric mixing.
+
+That paragraph is *the deliverable*. Everything before it —
+loading, cleaning, plotting, modeling — was scaffolding to make
+it trustworthy.
+
+## Putting it all in one script
+
+Here's the entire analysis condensed:
+
+```r
+# air-quality-analysis.R
+library(dplyr)
+library(ggplot2)
+
+# 1. Load + tidy
+aq <- airquality |>
+  filter(!is.na(Ozone)) |>
+  mutate(
+    Month_name = factor(Month, levels = 5:9,
+                        labels = c("May","Jun","Jul","Aug","Sep")),
+    Temp_C     = (Temp - 32) * 5/9
+  )
+
+# 2. Summarize
+monthly <- aq |>
+  group_by(Month_name) |>
+  summarise(
+    n        = n(),
+    median_O = median(Ozone),
+    mean_O   = mean(Ozone),
+    mean_T   = mean(Temp_C),
+    .groups  = "drop"
+  )
+print(monthly)
+
+# 3. Model
+cat("Correlation:", cor(aq$Temp_C, aq$Ozone), "\n")
+print(summary(lm(Ozone ~ Temp_C, data = aq)))
+
+# 4. Plot
+ggplot(aq, aes(Temp_C, Ozone, color = Month_name)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "loess", se = FALSE, color = "black") +
+  labs(title = "Ozone vs. temperature, NYC 1973")
+```
+
+That's ~25 lines for an entire analysis. *That* is the leverage
+R gives you.
+
+## The full challenge
+
+Now you do one yourself. Use the built-in `iris` dataset.
+Compute, for each species, the **median** and **mean** petal
+length, into a tibble (or data frame) named `iris_summary` with
+three columns: `Species`, `median_petal_length`,
+`mean_petal_length`.
+
+<ChallengeCard
+  adapter="r"
+  title="Per-species petal length summary"
+  instructions={`Using dplyr, build \`iris_summary\` from \`iris\`: group by \`Species\` and summarise to produce columns \`median_petal_length\` and \`mean_petal_length\`. There should be 3 rows (one per species).`}
+  entryFilename="main.R"
+  files={[
+    {
+      filename: "main.R",
+      initialContent: `library(dplyr)
+
+iris_summary <- NULL   # build me
+
+print(iris_summary)
+`,
+      solutionContent: `library(dplyr)
+
+iris_summary <- iris |>
+  group_by(Species) |>
+  summarise(
+    median_petal_length = median(Petal.Length),
+    mean_petal_length   = mean(Petal.Length),
+    .groups = "drop"
+  )
+
+print(iris_summary)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "exists",
+      name: "iris_summary exists and is a data frame",
+      code: `if (!exists("iris_summary") || !is.data.frame(iris_summary)) stop("iris_summary should be a data frame")`,
+    },
+    {
+      id: "rows",
+      name: "Three rows (one per species)",
+      code: `if (nrow(iris_summary) != 3) stop(sprintf("expected 3 rows, got %s", nrow(iris_summary)))`,
+    },
+    {
+      id: "cols",
+      name: "Has the required columns",
+      code: `if (!all(c("Species","median_petal_length","mean_petal_length") %in% names(iris_summary))) stop("missing required columns")`,
+    },
+    {
+      id: "values",
+      name: "Mean values match a direct computation",
+      code: `ref <- tapply(iris$Petal.Length, iris$Species, mean); got <- setNames(iris_summary$mean_petal_length, as.character(iris_summary$Species)); if (any(abs(ref[names(got)] - got) > 1e-9)) stop("mean_petal_length values are wrong")`,
+    },
+  ]}
+/>
+
+You just did a complete analysis: question → data → cleaning →
+summary → visualization → interpretation. That's the loop. Every
+real analysis is a longer, deeper version of the same loop.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What's the *very first thing* you should do after loading any new dataset?
+
+- Run a regression.
+- Make a plot.
+- [o] Inspect it — \`dim()\`, \`head()\`, \`str()\`, \`summary()\` — so you understand what's actually there before assuming anything.
+  > Correct! Skipping inspection is the #1 cause of confidently-wrong analyses.
+- Compute the mean of every column.`}
+/>
+
+<MultipleChoice
+  markdown={`In the analysis above, we showed Ozone ~ Temp is strongly correlated. That means:
+
+- Temperature causes ozone.
+- [o] The two vary together strongly in this dataset — a real association, but correlation alone doesn't prove causation; other plausible factors (sunlight, emissions, weather patterns) are not ruled out.
+  > Correct! Stating associations carefully — and not over-claiming — is core craft.
+- The model is broken.
+- Ozone causes temperature.`}
+/>
+
+<MultipleChoice
+  markdown={`What's the actual *deliverable* of an analysis like this one?
+
+- The raw data.
+- The R code.
+- [o] A clearly-written, honest interpretation of what was found, backed up by reproducible code and clear visualizations.
+  > Correct! Code and plots are means; communicating an honest finding is the end.
+- A p-value.`}
+/>
+
+You've reached the last conceptual page of the course. The next
+page wraps everything up and points you to what's next.

@@ -1,0 +1,252 @@
+---
+title: Subsetting and Filtering
+description: How to ask a dataset the question "show me only the rows I care about, and only the columns I need" — the everyday operation of data analysis.
+---
+
+The single most common operation in data analysis is some flavor
+of: **keep some of the rows, keep some of the columns, ignore the
+rest.**
+
+R has more than one way to do this. On this page we'll learn the
+*base R* way — using `[ , ]` — because it builds directly on
+what you already know about vectors. On the next pages we'll meet
+`dplyr`, which gives a more readable syntax for the same ideas.
+
+## The mental model: `[rows, cols]`
+
+The bracket on a data frame takes two arguments separated by a
+comma: which rows, which columns. An empty slot means *all*.
+
+```mermaid
+flowchart LR
+  df["data frame"] -->|"[rows, cols]"| sub["subset"]
+  rows["rows: numeric, logical, or character"] --> df
+  cols["cols: numeric, logical, character, or empty"] --> df
+  style sub fill:#bfdbfe
+```
+
+## Selecting columns
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(mtcars)
+
+# A single column by name (returns a vector)
+mtcars[, "mpg"][1:6]
+
+# A single column by name as a data frame (note: drop = FALSE)
+head(mtcars[, "mpg", drop = FALSE])
+
+# Multiple columns by name
+head(mtcars[, c("mpg", "hp", "wt")])
+
+# By position
+head(mtcars[, 1:3])
+
+# Drop columns by negative index
+head(mtcars[, -c(1, 2)])
+`}
+/>
+
+The "single column returns a vector" surprise trips beginners up.
+If you want to *always* get back a data frame, either select
+multiple columns or pass `drop = FALSE`.
+
+## Selecting rows
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(mtcars)
+
+# Rows by position
+mtcars[1:5, ]
+
+# Specific rows by name (mtcars has rownames!)
+mtcars[c("Mazda RX4", "Fiat 128"), ]
+
+# Rows by logical condition — the most useful pattern
+mtcars[mtcars$mpg > 25, ]
+
+# Combine conditions
+mtcars[mtcars$mpg > 20 & mtcars$cyl == 4, ]
+`}
+/>
+
+The third form — passing a *logical vector* of the same length as
+the number of rows — is the workhorse. Every "filter" you'll ever
+do is some variation of it.
+
+## Selecting rows AND columns at once
+
+You can do both in one expression:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(mtcars)
+
+# Fuel-efficient cars: just mpg, cyl, and weight
+mtcars[mtcars$mpg > 25, c("mpg", "cyl", "wt")]
+
+# 8-cylinder cars: just horsepower and quarter-mile time
+mtcars[mtcars$cyl == 8, c("hp", "qsec")]
+`}
+/>
+
+Read these out loud: "from mtcars, take the rows where mpg > 25,
+and from those, just the mpg, cyl, and wt columns." The bracket
+notation maps cleanly onto the sentence.
+
+## A common pitfall: `==` vs `%in%`
+
+If you want to match against a *set* of values, don't try to
+combine many `==` with `|`. Use `%in%`:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(iris)
+
+# Tedious and error-prone:
+sub1 <- iris[iris$Species == "setosa" | iris$Species == "virginica", ]
+
+# Idiomatic:
+sub2 <- iris[iris$Species %in% c("setosa", "virginica"), ]
+
+# Confirm they're the same
+identical(sub1, sub2)
+nrow(sub2)
+`}
+/>
+
+`%in%` is one of R's nicest small operators. It's vectorized:
+*"for each element of the left side, is it found anywhere in the
+right side?"*
+
+## A common pitfall: missing values in the condition
+
+If your filter condition involves a column with `NA`s, those rows
+become problematic — `NA > 5` is `NA`, not `FALSE`, and indexing
+with `NA` yields a row of all `NA`s.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(airquality)
+
+# Naive filter — includes rows of all NAs!
+naive <- airquality[airquality$Ozone > 100, ]
+head(naive)
+nrow(naive)
+
+# Safer: handle NAs explicitly
+safe <- airquality[!is.na(airquality$Ozone) & airquality$Ozone > 100, ]
+head(safe)
+nrow(safe)
+`}
+/>
+
+The fix is to always guard with `!is.na(col)` when filtering on a
+column that might be missing. (`dplyr::filter()`, which we'll meet
+soon, does this for you.)
+
+## Sorting
+
+Sorting is a sibling of subsetting. You sort a data frame by
+ordering its rows according to one or more columns. `order()` is
+the helper:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`data(mtcars)
+
+# Sort by mpg ascending
+head(mtcars[order(mtcars$mpg), c("mpg","cyl","wt")])
+
+# Descending — wrap in -
+head(mtcars[order(-mtcars$mpg), c("mpg","cyl","wt")])
+
+# By two columns: first cyl ascending, then mpg descending within each
+head(mtcars[order(mtcars$cyl, -mtcars$mpg), c("mpg","cyl","wt")])
+`}
+/>
+
+`order()` returns the *positions* that would sort the vector; you
+then use those positions as row indices.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What is the convention for indexing a data frame with brackets?
+
+- \`df[cols, rows]\`
+- [o] \`df[rows, cols]\`
+  > Correct! Rows first, columns second — same convention as matrices in mathematics.
+- \`df[rows][cols]\`
+- \`df.rows.cols\``}
+/>
+
+<MultipleChoice
+  markdown={`Which expression filters \`iris\` to rows where the species is either "setosa" or "versicolor"?
+
+- \`iris[iris$Species == "setosa" == "versicolor", ]\`
+- [o] \`iris[iris$Species %in% c("setosa", "versicolor"), ]\`
+  > Correct! \`%in%\` is the idiomatic way to match against a set of values.
+- \`iris[iris$Species = "setosa" | "versicolor", ]\`
+- \`iris[in(iris$Species, "setosa", "versicolor"), ]\``}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`airquality[airquality$Ozone > 100, ]\` potentially dangerous?
+
+- It's not — it works perfectly.
+- [o] \`Ozone\` contains NAs, and \`NA > 100\` evaluates to NA, which produces rows of all NAs in the result.
+  > Correct! Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
+- It sorts the data instead of filtering it.
+- \`Ozone\` is character, so the comparison errors.`}
+/>
+
+## Mini challenge: heavy cars with poor fuel economy
+
+From `mtcars`, build `heavy_inefficient`: a data frame containing
+only the rows where `wt > 4` and `mpg < 18`, and only the columns
+`mpg`, `cyl`, and `wt`.
+
+<ChallengeCard
+  adapter="r"
+  title="Filter and select"
+  instructions={`Use base R subsetting to filter \`mtcars\` to cars with \`wt > 4\` and \`mpg < 18\`, keeping only the \`mpg\`, \`cyl\`, and \`wt\` columns. Assign the result to \`heavy_inefficient\`.`}
+  initialCode={`data(mtcars)
+
+heavy_inefficient <- NULL  # replace with a subset of mtcars
+
+print(heavy_inefficient)
+cat("Number of cars:", nrow(heavy_inefficient), "\\n")
+`}
+  solutionCode={`data(mtcars)
+
+heavy_inefficient <- mtcars[mtcars$wt > 4 & mtcars$mpg < 18,
+                            c("mpg", "cyl", "wt")]
+print(heavy_inefficient)
+cat("Number of cars:", nrow(heavy_inefficient), "\\n")
+`}
+  tests={[
+    {
+      id: "is_df",
+      name: "Result is a data.frame",
+      code: `if (!is.data.frame(heavy_inefficient)) stop("must be a data.frame")`,
+    },
+    {
+      id: "cols",
+      name: "Has exactly the right columns",
+      code: `if (!identical(sort(names(heavy_inefficient)), sort(c("mpg","cyl","wt")))) stop("wrong columns")`,
+    },
+    {
+      id: "rows",
+      name: "Filter is correct",
+      code: `expected <- mtcars[mtcars$wt > 4 & mtcars$mpg < 18, c("mpg","cyl","wt")]
+if (nrow(heavy_inefficient) != nrow(expected)) stop(sprintf("expected %s rows, got %s", nrow(expected), nrow(heavy_inefficient)))`,
+    },
+  ]}
+/>
+
+We've now seen the *bracket* way to wrangle data. It is powerful
+but verbose. The next big topic is **tidy data** — a principle for
+how to *shape* your data so wrangling becomes easy.

@@ -1,0 +1,273 @@
+---
+title: Vectorized Computation
+description: Why R lets you write `prices * 1.08` to add tax to a thousand prices at once — and why that one idea changes how you think about programming.
+---
+
+In most programming languages, if you want to add 1 to every
+number in a list, you write a loop:
+
+```
+for each item in list:
+    item = item + 1
+```
+
+In R, you write:
+
+```r
+xs + 1
+```
+
+That's it. No loop. R applies the `+ 1` to every element of `xs`
+automatically. This is called **vectorized computation**, and once
+you internalize it, your R code becomes shorter, clearer, and
+often *much* faster.
+
+## Arithmetic on whole vectors
+
+Every basic operator works element-by-element on vectors:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`prices <- c(9.99, 14.50, 24.00, 5.75)
+
+# Add 8% sales tax to every price
+prices * 1.08
+
+# Convert to euros (say, 1 USD = 0.92 EUR)
+prices * 0.92
+
+# Round each to two decimals
+round(prices * 1.08, 2)
+`}
+/>
+
+No loops, no temporary variables. The expression *describes the
+shape of the answer*, and R fills it in.
+
+## Two vectors of the same length
+
+When you combine two vectors, R lines them up element-by-element:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`quantities <- c(2, 1, 3, 4)
+unit_prices <- c(9.99, 14.50, 24.00, 5.75)
+
+# Line item totals
+totals <- quantities * unit_prices
+print(totals)
+
+# Grand total
+sum(totals)
+`}
+/>
+
+This is the heart of how data analysts think: you have
+*parallel columns*, and you operate on them as wholes.
+
+```mermaid
+flowchart LR
+  q["quantities: [2, 1, 3, 4]"] --> mul
+  p["unit_prices: [9.99, 14.50, 24.00, 5.75]"] --> mul
+  mul["element-wise * "] --> r["totals: [19.98, 14.50, 72.00, 23.00]"]
+  style mul fill:#fde68a
+```
+
+## Recycling: when lengths differ
+
+If the two vectors are *different lengths*, R **recycles** the
+shorter one — it repeats it as needed to match the length of the
+longer one.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# Length 6 + length 1 — the scalar gets recycled
+c(10, 20, 30, 40, 50, 60) + 1
+
+# Length 6 + length 2 — (1, 2) is repeated as (1,2,1,2,1,2)
+c(10, 20, 30, 40, 50, 60) + c(1, 2)
+
+# Length 6 + length 3 — (1,2,3) repeats as (1,2,3,1,2,3)
+c(10, 20, 30, 40, 50, 60) + c(1, 2, 3)
+`}
+/>
+
+This is most useful in the very common case where one vector is
+length 1 (a "scalar"). When the lengths don't divide evenly, R
+will *warn* you — that warning almost always means a bug:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# Length 5 + length 2: doesn't divide evenly, R warns
+c(1, 2, 3, 4, 5) + c(10, 20)
+`}
+/>
+
+The result is computed (R recycles `(10, 20)` to `(10, 20, 10, 20,
+10)` and adds), but the warning is R saying: "Are you sure you
+meant this?" Almost always: no. Either trim or extend one of the
+vectors deliberately.
+
+## Built-in summary functions
+
+R has a small army of functions that take a vector and return a
+single summary value. You will use these constantly:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+
+mean(scores)     # average
+median(scores)   # middle value
+sd(scores)       # standard deviation
+var(scores)      # variance
+min(scores)
+max(scores)
+range(scores)    # min and max together
+sum(scores)
+length(scores)
+quantile(scores) # five-number summary
+`}
+/>
+
+Notice how every one of these functions has the same shape:
+*vector in, summary out*. Once you have this mental model, half of
+"data analysis in R" is just knowing which summary function to
+call.
+
+## Cumulative and rolling operations
+
+A few functions take a vector in and give a vector of the same
+length out, computing as they go:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`daily_sales <- c(120, 150, 80, 200, 175, 90, 110)
+
+# Running totals
+cumsum(daily_sales)
+
+# Running averages can be made by combining cumsum and seq_along
+cumsum(daily_sales) / seq_along(daily_sales)
+
+# Differences day to day
+diff(daily_sales)
+`}
+/>
+
+## A small but mighty example: standardizing a vector
+
+A common data-prep step is *standardizing* a vector — subtracting
+the mean and dividing by the standard deviation, so the result has
+mean 0 and standard deviation 1.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`heights <- c(160, 172, 168, 181, 155, 175, 169, 178)
+
+# Step by step
+mean_h <- mean(heights)
+sd_h   <- sd(heights)
+z      <- (heights - mean_h) / sd_h
+
+print(round(z, 2))
+
+# Check: standardized vector has mean ~0, sd ~1
+mean(z)
+sd(z)
+`}
+/>
+
+Three lines, no loops. This is *the* archetypal R operation: a
+small chain of vectorized expressions producing a transformed
+column.
+
+## Why vectorized code is faster, too
+
+In most interpreted languages, a `for` loop in user code has
+overhead at every step. In R, every vectorized operation is
+implemented in highly-optimized C under the hood — when you write
+`x + y`, R does the whole computation in one call to a fast
+internal routine.
+
+This means **vectorized R is often 10–100x faster than the
+equivalent loop**, on top of being shorter and easier to read.
+
+```mermaid
+flowchart TB
+  loop["for (i in 1:n) result[i] <- xs[i] + ys[i]"] -->|interpreted per element| slow["Slow"]
+  vec["result <- xs + ys"] -->|single C call| fast["Fast"]
+  style fast fill:#dcfce7
+  style slow fill:#fee2e2
+```
+
+You can — and sometimes should — write loops in R. But your *first
+instinct* should always be: "is there a vectorized way to express
+this?" 95% of the time, there is.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What does \`c(1, 2, 3) * 10\` return?
+
+- \`60\` (the product of all elements times 10)
+- [o] \`10 20 30\`
+  > Correct! The \`10\` is recycled to match the length of the vector, then multiplied element-wise.
+- An error — different lengths
+- \`c(10, 2, 3)\``}
+/>
+
+<MultipleChoice
+  markdown={`What value does \`mean(c(2, 4, 6, 8))\` produce?
+
+- \`4\`
+- [o] \`5\`
+  > Correct! \`(2 + 4 + 6 + 8) / 4 = 20 / 4 = 5\`.
+- \`6\`
+- \`20\``}
+/>
+
+<MultipleChoice
+  markdown={`In R, you almost never need to write a \`for\` loop to apply an operation to every element of a vector. Why?
+
+- Because \`for\` loops are forbidden in R.
+- [o] Because operations and most built-in functions are *vectorized* — they automatically apply to every element.
+  > Correct! This is R's signature design choice and is the reason R code for data work is so compact.
+- Because R secretly rewrites loops as parallel code.
+- Because R cannot iterate over vectors.`}
+/>
+
+## Mini challenge: convert Celsius to Fahrenheit
+
+Given a vector of temperatures in Celsius, produce a vector of
+temperatures in Fahrenheit using the formula `F = C * 9/5 + 32`.
+
+<ChallengeCard
+  adapter="r"
+  title="Vectorized temperature conversion"
+  instructions={`Given \`celsius\`, compute \`fahrenheit\` as a vector. No loops needed — use vectorized arithmetic.`}
+  initCode={`celsius <- c(0, 10, 20, 30, 37, 100)
+`}
+  initialCode={`# celsius is already defined
+fahrenheit <- NULL   # replace NULL with the vectorized formula
+
+print(fahrenheit)
+`}
+  solutionCode={`fahrenheit <- celsius * 9/5 + 32
+print(fahrenheit)
+`}
+  tests={[
+    {
+      id: "temps",
+      name: "Conversion is correct",
+      description: "Compare against the expected output",
+      code: `expected <- c(32, 50, 68, 86, 98.6, 212)
+if (!isTRUE(all.equal(fahrenheit, expected))) stop(sprintf("expected %s, got %s", paste(expected, collapse=","), paste(fahrenheit, collapse=",")))`,
+    },
+  ]}
+/>
+
+Next we will look at the two specialized vector types that get
+heavy use in data work: **logical** vectors (which power filtering)
+and **character** vectors (which carry every label, name, and
+category in your dataset).

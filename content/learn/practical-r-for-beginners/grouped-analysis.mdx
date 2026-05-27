@@ -1,0 +1,321 @@
+---
+title: Grouped Analysis
+description: The single most powerful idea in data analysis — split your data into groups, compute something per group, combine the results. `group_by()` makes it one line.
+---
+
+Almost every interesting analytical question is a "per-group"
+question:
+
+- Average sales **per region**.
+- Median salary **per department**.
+- Maximum temperature **per month**.
+- Win rate **per team**.
+- Conversion rate **per campaign**.
+
+The pattern is universal and has a name: **split-apply-combine**.
+
+```mermaid
+flowchart LR
+  data["Whole dataset"] -->|split| grp1["region A"]
+  data --> grp2["region B"]
+  data --> grp3["region C"]
+  grp1 -->|apply: mean(sales)| s1["sales=120"]
+  grp2 -->|apply: mean(sales)| s2["sales=98"]
+  grp3 -->|apply: mean(sales)| s3["sales=145"]
+  s1 -->|combine| out["summary table"]
+  s2 --> out
+  s3 --> out
+  style data fill:#bfdbfe
+  style out fill:#dcfce7
+```
+
+In dplyr, you do it in two lines: `group_by()` + `summarise()`.
+
+## The basic pattern
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+# Average mpg per number of cylinders
+mtcars |>
+  group_by(cyl) |>
+  summarise(avg_mpg = mean(mpg))
+`}
+/>
+
+Read it: "Group the data by `cyl`. Within each group, compute the
+mean of `mpg`. Combine."
+
+Without `group_by()`, `summarise()` returns one row total. With
+`group_by(cyl)`, it returns one row *per cyl* value. That tiny
+change is enormous.
+
+## Multiple summaries at once
+
+You can compute many summary columns in a single `summarise()`
+call:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+mtcars |>
+  group_by(cyl) |>
+  summarise(
+    n       = n(),
+    avg_mpg = mean(mpg),
+    sd_mpg  = sd(mpg),
+    avg_hp  = mean(hp),
+    max_hp  = max(hp)
+  )
+`}
+/>
+
+`n()` is a special dplyr helper meaning "how many rows in this
+group." You will use it constantly.
+
+## Multiple grouping variables
+
+Group by more than one column to get all combinations:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+mtcars |>
+  group_by(cyl, am) |>      # am = transmission (0 = auto, 1 = manual)
+  summarise(
+    n       = n(),
+    avg_mpg = mean(mpg),
+    .groups = "drop"
+  )
+`}
+/>
+
+The `.groups = "drop"` argument is a small dplyr nicety that tells
+it to *un-group* the result after summarising. Without it, dplyr
+prints a friendly message reminding you the result is still
+grouped. Either way, it's good practice to be explicit.
+
+## Counting groups: `count()`
+
+Counting how many rows are in each group is so common that there's
+a shortcut: `count()`. These two are equivalent:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+# Long form
+mtcars |>
+  group_by(cyl) |>
+  summarise(n = n())
+
+# Short form
+mtcars |> count(cyl)
+
+# Multi-level
+mtcars |> count(cyl, am)
+
+# Sorted by count descending
+mtcars |> count(cyl, sort = TRUE)
+`}
+/>
+
+`count()` is your go-to for the question *"what categories exist,
+and how many rows of each?"*
+
+## Grouped `mutate()`: per-group calculations that keep the rows
+
+`group_by()` doesn't only work with `summarise()`. With `mutate()`,
+it computes the new column *within each group*, but keeps every
+row.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+# Add each car's mpg as a fraction of the average mpg for cars with that many cyl
+mtcars |>
+  group_by(cyl) |>
+  mutate(
+    cyl_avg_mpg = mean(mpg),
+    pct_of_cyl  = mpg / cyl_avg_mpg
+  ) |>
+  ungroup() |>
+  select(mpg, cyl, cyl_avg_mpg, pct_of_cyl) |>
+  head(10)
+`}
+/>
+
+This pattern — "compute a per-group statistic, then express each
+row relative to it" — is extremely common. It's how you
+normalize, rank within groups, compute z-scores per category,
+etc.
+
+`ungroup()` is the inverse of `group_by()`. After you're done
+with grouped work, ungroup so later code isn't surprised.
+
+## Slicing: top N per group
+
+A frequent question: "show me the *top* N items *per group*." The
+verb is `slice_max()` (and friends).
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+# Top 2 most fuel-efficient cars per cylinder count
+mtcars |>
+  tibble::rownames_to_column("car") |>
+  group_by(cyl) |>
+  slice_max(mpg, n = 2) |>
+  select(car, cyl, mpg)
+`}
+/>
+
+`slice_max(col, n)` keeps the top `n` rows in each group by some
+column. Siblings: `slice_min()`, `slice_head()`, `slice_tail()`,
+`slice_sample()`.
+
+## A realistic example: iris by species
+
+`iris` has 150 flowers, 50 of each of three species. Per-species
+summary statistics are the natural question:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(iris)
+
+iris |>
+  group_by(Species) |>
+  summarise(
+    n             = n(),
+    avg_sepal_len = mean(Sepal.Length),
+    avg_petal_len = mean(Petal.Length),
+    sd_petal_len  = sd(Petal.Length),
+    .groups       = "drop"
+  )
+`}
+/>
+
+One row per species, all summaries on the same line.
+
+## Multi-file challenge: monthly air quality
+
+Let's apply this to `airquality`. We'll structure the analysis
+across two files: one helper file with reusable functions, and
+one main script that computes a monthly summary.
+
+<ChallengeCard
+  adapter="r"
+  title="Monthly summary of NYC air quality"
+  instructions={`Complete \`main.R\` so it produces a data frame \`monthly\` with one row per month, columns:
+- \`Month\`
+- \`avg_ozone\` (mean of Ozone, NAs removed)
+- \`avg_temp\`  (mean of Temp)
+- \`n_obs\`     (number of rows in that month)
+
+You can use the helper \`mean_na()\` from \`utils.R\`.`}
+  initialCode={null}
+  entryFilename="main.R"
+  files={[
+    {
+      filename: "main.R",
+      initialContent: `library(dplyr)
+source("utils.R")
+
+data(airquality)
+
+monthly <- NULL  # build using group_by + summarise
+
+print(monthly)
+`,
+      solutionContent: `library(dplyr)
+source("utils.R")
+
+data(airquality)
+
+monthly <- airquality |>
+  group_by(Month) |>
+  summarise(
+    avg_ozone = mean_na(Ozone),
+    avg_temp  = mean_na(Temp),
+    n_obs     = n(),
+    .groups   = "drop"
+  )
+
+print(monthly)
+`,
+    },
+    {
+      filename: "utils.R",
+      initialContent: `# Helper to compute mean ignoring NAs
+mean_na <- function(x) mean(x, na.rm = TRUE)
+`,
+      solutionContent: `mean_na <- function(x) mean(x, na.rm = TRUE)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "df",
+      name: "monthly is a data frame",
+      code: `if (!is.data.frame(monthly)) stop("monthly must be a data frame")`,
+    },
+    {
+      id: "rows",
+      name: "Has 5 rows (one per month)",
+      code: `if (nrow(monthly) != 5) stop(sprintf("expected 5 rows, got %s", nrow(monthly)))`,
+    },
+    {
+      id: "cols",
+      name: "Has the right columns",
+      code: `need <- c("Month","avg_ozone","avg_temp","n_obs")
+if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(need, names(monthly)), collapse=",")))`,
+    },
+  ]}
+/>
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What's the universal pattern that \`group_by() |> summarise()\` implements?
+
+- Filter-arrange-join
+- [o] Split-apply-combine
+  > Correct! Split the data into groups, apply a computation to each, combine the results into a single table.
+- Map-reduce-filter
+- Sort-merge-deduplicate`}
+/>
+
+<MultipleChoice
+  markdown={`In a dplyr pipeline, what does \`n()\` do?
+
+- Returns the number of columns.
+- [o] Returns the number of rows in the current (possibly grouped) data.
+  > Correct! Inside \`summarise()\` after a \`group_by()\`, \`n()\` gives the count per group.
+- Returns the mean of the data.
+- Returns the row name.`}
+/>
+
+<MultipleChoice
+  markdown={`What's the difference between \`group_by(cyl) |> summarise(avg = mean(mpg))\` and \`group_by(cyl) |> mutate(avg = mean(mpg))\`?
+
+- They're the same.
+- \`summarise\` is slower than \`mutate\`.
+- [o] \`summarise\` returns one row per group (collapses); \`mutate\` keeps every row and broadcasts the group statistic into each row.
+  > Correct! Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.
+- \`mutate\` cannot be used with \`group_by\`.`}
+/>
+
+The last page in this section covers *reshaping* — switching
+between wide and long forms when your data isn't yet tidy.
