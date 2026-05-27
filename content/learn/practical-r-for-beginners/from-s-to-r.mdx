@@ -1,0 +1,301 @@
+---
+title: From S to R
+description: The unlikely story of two New Zealand statisticians who wrote a teaching tool that quietly grew into the language of modern statistics, displacing the commercial system it was originally meant to imitate.
+---
+
+In 1991, Ross Ihaka and Robert Gentleman were colleagues in the
+statistics department at the University of Auckland, New Zealand.
+They were both interested in computing — Ihaka had a PhD in
+statistics from Berkeley, Gentleman had done postdoctoral work on
+genetics — and both had used the **S** language at previous
+institutions.
+
+They had a small, local problem: they wanted to teach introductory
+statistics with a hands-on computer lab. They wanted students to
+play with data, not just read about it. The natural tool for this
+was S-PLUS — but Auckland could not afford site licenses for every
+student machine.
+
+So they decided to write their own.
+
+## A weekend project that wouldn't end
+
+They began on what they later described as a small experiment. They
+took inspiration from S in *syntax* — they wanted the language to
+feel familiar to anyone who already knew S — but built the
+**implementation** from scratch, drawing also on a Lisp-family
+language called **Scheme** for the way variables and environments
+worked under the hood.
+
+They named it **R**: partly because both their first names started
+with R, partly as a nod to "S minus 1" in the alphabet, partly
+because, like S, the single-letter name was easy to type at a
+prompt.
+
+The first internal version ran in late 1991. For several years it
+was used only by themselves and their students. Then, in 1993, they
+made a fateful decision: they posted the source code to the
+**StatLib** archive at Carnegie Mellon, freely available, and sent
+a quiet announcement to the `s-news` mailing list.
+
+People started using it.
+
+```mermaid
+timeline
+    title The birth of R
+    1991 Aug : Ihaka and Gentleman start the project
+    1993 : Source code posted publicly on StatLib
+    1995 : R licensed under the GNU General Public License
+    1996 : Ihaka & Gentleman publish "R: A Language for Data Analysis and Graphics"
+           Core development team forms (now "R Core")
+    1997 : CRAN — the Comprehensive R Archive Network — launches
+    2000 Feb : R 1.0.0 released
+    2001 : First R-help mailing list community grows past hobbyist scale
+```
+
+## What made R take off
+
+By the late 1990s, R was a curiosity in a fast-growing ecosystem of
+open-source tools (Linux had reached 1.0 in 1994, Apache in 1995,
+Perl was at its peak). But it was not obvious it would win. SAS was
+firmly entrenched in business. S-PLUS was the polished commercial
+version of S that already had everything R was trying to build.
+SPSS had captured the social sciences. Why did R succeed?
+
+A few reasons stand out.
+
+**It was free, and the license meant it would stay that way.** R
+was released under the **GNU General Public License (GPL)**. This
+meant anyone — students, researchers, companies in developing
+countries, statisticians at small institutions — could install it,
+share it, and build on it without paying anyone. For a research
+field that runs on graduate students, this was decisive.
+
+**It was a real programming language.** Unlike SAS or SPSS, where
+"writing your own analysis" felt like fighting the system, R was
+designed so that *users could extend it themselves*. Anyone could
+write a function, package it up, and share it with the world.
+
+**CRAN.** In 1997, Kurt Hornik and Friedrich Leisch — Austrian
+statisticians collaborating with the R team — launched the
+**Comprehensive R Archive Network**. CRAN was a single, central
+repository where anyone could submit a package, and where anyone
+could install one with a single command. Combined with R's
+extensibility, this turned R into a *platform* — a place where the
+world's statistical methods were collected.
+
+**Academic credibility.** R was built by statisticians, used by
+statisticians, and adopted in the statistics curriculum at one
+university after another through the 2000s. New PhDs entered
+industry already fluent in R, and brought it with them.
+
+```mermaid
+flowchart LR
+  Core[R Core: the language] --> CRAN[CRAN: package archive]
+  CRAN --> A[ggplot2: plotting]
+  CRAN --> B[dplyr: data wrangling]
+  CRAN --> C[caret: machine learning]
+  CRAN --> D[shiny: web apps]
+  CRAN --> E[lme4: mixed models]
+  CRAN --> F[Bioconductor: genomics]
+  CRAN --> G[...thousands more]
+  style Core fill:#a7f3d0,stroke:#047857
+  style CRAN fill:#bfdbfe,stroke:#1d4ed8
+```
+
+By 2010, CRAN had over 2,000 packages. By 2020, over 16,000. Today
+there are more than 20,000. Whatever obscure statistical method you
+need — from non-parametric regression to phylogenetic tree
+estimation — there is almost certainly an R package for it, often
+written by the original inventor of the method.
+
+## R was always an "S dialect"
+
+Crucially, R was never advertised as "better than S." Ihaka and
+Gentleman wrote in their famous 1996 paper:
+
+> *"We have developed a language for data analysis and graphics
+> which is closely related to the S language… The new language,
+> which we call R, attempts to be both compatible with S and
+> different in important ways."*
+
+The intentional compatibility meant that code written in S could
+often run in R with little or no change. Books written for S were
+useful as books for R. Decades of accumulated wisdom about
+statistical computing came with the language for free.
+
+Compare that to the cost of starting a brand new language: every
+book, every tutorial, every method would have had to be rewritten
+from scratch. R inherited the entire S culture and then expanded
+it.
+
+In 2017, John Chambers — the original creator of S — gave the
+keynote at the *useR!* conference. He spoke generously about R as
+"the realization of S in the open-source world." S-PLUS, the
+commercial product, was already in decline. The free, community-built
+descendant had outgrown the commercial parent.
+
+## What R inherited from S — and what it added
+
+Let's look at the very same code idea, written so it would run in
+S in 1985 or in R today. The semantics are nearly identical.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`# Code that is essentially identical to 1985-era S
+heights <- c(168, 172, 165, 180, 175, 170, 169)
+weights <- c(63, 70, 58, 85, 75, 68, 65)
+
+# Vectorized operations
+bmi <- weights / (heights / 100)^2
+print(round(bmi, 2))
+
+# Summary functions
+cat("min:", min(bmi), " median:", median(bmi), " max:", max(bmi), "\\n")
+
+# A linear model — one of S's signature features
+model <- lm(weights ~ heights)
+print(coef(model))
+`}
+/>
+
+That same expression — `weights ~ heights` as a model formula —
+was an S innovation. R inherited it directly. Notice how
+*readable* it is: "regress weights on heights." That is the
+fingerprint of a language designed by people who wanted to make
+analysis feel close to how you'd describe it in a sentence.
+
+But R added things S never had. A modern R script can use
+**lazy evaluation tricks** to build entire chains of operations:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+# A dplyr pipeline — distinctly modern-R idiom
+mtcars |>
+  group_by(cyl) |>
+  summarise(
+    n         = n(),
+    avg_mpg   = mean(mpg),
+    avg_hp    = mean(hp),
+    avg_wt    = mean(wt)
+  )
+`}
+/>
+
+The `|>` operator (called the *native pipe*, added to R in 4.1 in
+2021) lets you read code left-to-right: "take mtcars, group by
+cylinder, then summarize." That is **not** S syntax — it is a
+modern R idiom built on top of decades of community experimentation.
+The same query in raw S would have been three or four nested
+function calls, much harder to read.
+
+## R today
+
+In 2025 R is one of the two most-used languages in data science
+(the other being Python). They are often used together. R's
+strengths are:
+
+- **Statistical depth**: if a method exists in academia, R probably
+  has a high-quality implementation.
+- **Visualization**: `ggplot2` is widely considered the best general
+  plotting library in any language.
+- **Reproducibility**: tools like `R Markdown` and `Quarto` make it
+  easy to produce documents (reports, papers, slides) that include
+  live code and embedded results.
+- **Domain ecosystems**: in genomics (Bioconductor), in
+  epidemiology, in psychometrics, in econometrics, R is the lingua
+  franca.
+
+R is not the right tool for every problem. It is not what you would
+pick to build a web backend, a large machine-learning training
+pipeline, or a real-time control system. But for **thinking with
+data** — exploring, modeling, visualizing, communicating — it is
+extraordinarily well-suited.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Who created R?
+
+- John Chambers and Rick Becker at Bell Labs.
+  > Chambers and Becker created **S**, the language R is descended from. R itself was created by two other people.
+- [o] Ross Ihaka and Robert Gentleman at the University of Auckland.
+  > Correct! They started R as a teaching tool in 1991 and released it publicly in 1993.
+- Hadley Wickham as part of the tidyverse project.
+  > Hadley Wickham is one of R's most influential contributors today, but R itself predates his work by many years.
+- The R Foundation as an institutional project.
+  > The R Foundation was formed *later*, to steward the language; it did not create it.`}
+/>
+
+<MultipleChoice
+  markdown={`What is **CRAN**?
+
+- The interactive R user interface.
+- A book series about R.
+- [o] The Comprehensive R Archive Network — a worldwide repository of R packages.
+  > Correct! CRAN launched in 1997 and is the place from which R packages are submitted, reviewed, and distributed.
+- The compiler used to build the R interpreter.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following best explains why R has been so successful in academic statistics?
+
+- R is faster than any other language for numerical computing.
+  > R is competitive in many cases, but raw speed is not where it shines — and other languages (Julia, C++, Python with NumPy) are often faster for pure number-crunching.
+- [o] It is free, extensible, and lets users contribute packages that the entire community can use.
+  > Correct. The combination of "free under the GPL" + "real programming language" + "CRAN as a central package archive" is what turned R into a true platform for the world's statisticians.
+- R was bundled with university computer science textbooks.
+- R is the only language that supports the t-test.`}
+/>
+
+## Mini challenge: build a simple analysis
+
+Many famous datasets ship with R. One of them is `women`, with
+heights and weights of 15 American women. Practice the
+S-inherited idioms: subset a vector, compute a summary, and fit a
+linear model.
+
+<ChallengeCard
+  adapter="r"
+  title="Fit a height/weight model"
+  instructions={`Using the built-in \`women\` dataset (already loaded):
+1. Assign the women's average weight (\`mean\` of \`women$weight\`) to \`avg_weight\`.
+2. Fit a linear model \`weight ~ height\` and assign it to \`model\`.
+3. Extract the slope coefficient (the "height" coefficient) into a numeric scalar \`slope\`.`}
+  initCode={`data(women)`}
+  initialCode={`avg_weight <- NA
+model      <- NULL
+slope      <- NA
+`}
+  solutionCode={`avg_weight <- mean(women$weight)
+model      <- lm(weight ~ height, data = women)
+slope      <- unname(coef(model)["height"])
+`}
+  tests={[
+    {
+      id: "avg_weight",
+      name: "avg_weight matches mean(women$weight)",
+      description: "Should be the arithmetic mean.",
+      code: `if (!isTRUE(all.equal(avg_weight, mean(women$weight)))) stop("avg_weight is incorrect")`,
+    },
+    {
+      id: "model_type",
+      name: "model is a linear model",
+      description: "Should be of class 'lm'",
+      code: `if (!inherits(model, "lm")) stop("model must be an 'lm' object")`,
+    },
+    {
+      id: "slope",
+      name: "slope matches the height coefficient",
+      description: "Numeric scalar",
+      code: `expected <- unname(coef(lm(weight ~ height, data = women))["height"]); if (!isTRUE(all.equal(slope, expected))) stop(sprintf("expected slope %s", expected))`,
+    },
+  ]}
+/>
+
+In the next chapter we will zoom out one more time and answer the
+"so what?" question — why R, specifically, matters in 2025, even in
+a world that also has Python, Julia, and a thousand other tools.

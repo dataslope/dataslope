@@ -1,0 +1,278 @@
+---
+title: Why R Matters Today
+description: In a world full of programming languages, what is the case for R in 2025? A look at why statisticians, scientists, journalists, and analysts keep choosing it — and where it sits in the modern data-science stack.
+---
+
+If R was invented in 1991 and the world has since gained Python,
+Julia, SQL-everywhere tools, and a parade of "AI-powered" notebook
+products, why does R still matter?
+
+The short answer is that R was *designed* for one specific job:
+helping a thoughtful person reason about data with statistical
+honesty. After 30 years of refinement, it is still one of the very
+best tools for that job — even though it was never the right tool
+for many *other* jobs.
+
+This page is about understanding that distinction.
+
+## R vs. "general purpose" programming languages
+
+A general-purpose programming language — Python, JavaScript, Java,
+C++, Go — is a Swiss army knife. You can use it to build a website,
+control a robot, render a 3D scene, train a neural network, or
+analyze data. Each of those things is one of many possible uses.
+
+R is more like a **specialized woodworking chisel**. Most of its
+shape, balance, and weight are tuned for one craft. You *can* use a
+chisel to open a paint can, but that is not why it was made — and
+better tools exist.
+
+Here is a rough split.
+
+| Task                                | Best fit |
+| ----------------------------------- | -------- |
+| Building a website or web API       | JavaScript / TypeScript / Python / Go |
+| Mobile app development              | Swift / Kotlin / React Native |
+| Training a production deep-learning model | Python (PyTorch / JAX) |
+| Real-time game engine               | C++ / Rust |
+| Statistical analysis of a dataset   | **R** (or Python with care) |
+| Exploratory data visualization      | **R** (`ggplot2`) |
+| Reproducible scientific reports     | **R** (R Markdown / Quarto) |
+| Quick data wrangling at the SQL level | SQL itself + a thin wrapper |
+| Teaching statistics                 | **R** |
+
+The interesting cells are the **R** cells. For *those* problems, R
+is often the most direct, expressive, and statistically rigorous
+choice in any language.
+
+## What R is unusually good at
+
+A few specific things, hard to find elsewhere:
+
+**1. A vocabulary built for statistical thinking.** When a
+statistician describes a model on a whiteboard — "regress y on x1
+and x2 controlling for cluster" — R lets them type something very
+close to that as code. `lm(y ~ x1 + x2)` is *almost the same
+expression*. Most languages force a translation; R doesn't.
+
+**2. World-class plotting via `ggplot2`.** The `ggplot2` package
+implements Leland Wilkinson's *Grammar of Graphics*. It lets you
+describe a plot as a layered specification ("map mpg to x, weight
+to y, color by cylinder count, add a smooth line") — a much
+cleaner mental model than the imperative "draw a rectangle here,
+draw a line there" approach.
+
+**3. Reproducibility tools.** R Markdown and **Quarto** let you
+write a single document that interleaves prose, code, and live
+results. Re-render the document and every figure and table
+recomputes. Many scientific papers are now published this way.
+
+**4. A statistical packages ecosystem.** New statistical methods
+in academia are very often released first as R packages. If you
+read a paper from the last 20 years that introduces a new model,
+the chance that an R implementation exists is high.
+
+**5. Deep integration with reporting and BI.** Tools like
+**Shiny** (for interactive web apps) and **flexdashboard** (for
+business dashboards) let analysts build polished interactive
+outputs without leaving the language.
+
+## What R is not as good at
+
+Honesty matters more than tribalism. Here is where you should
+probably reach for something else:
+
+- **Building production web backends.** R can serve HTTP, but for
+  a real backend system, Python, Go, Node.js, or Java are better
+  fits.
+- **Heavy software engineering and large applications.** R is a
+  dynamic, late-binding language. It is not designed for tightly
+  typed million-line systems. There are people who build large
+  apps in R; there are people who climb mountains in flip-flops.
+- **Training the world's largest neural networks.** PyTorch, JAX,
+  and the surrounding GPU ecosystem live in Python and C++.
+- **Mobile, embedded, or systems programming.** Not what R is for.
+
+The key insight is this: **R is for thinking, not for shipping**.
+The output of an R analysis is almost always *understanding* — a
+report, a chart, a conclusion, a recommendation — not a running
+production service. If your job is to understand things from data,
+R is among the best tools that exist. If your job is to deploy
+things to millions of users, R is rarely the right pick.
+
+## A snapshot of who uses R
+
+```mermaid
+flowchart LR
+  R[R]:::r --> A[Academic statistics]:::aca
+  R --> B[Biomedical & pharma research]:::aca
+  R --> C[Genomics & bioinformatics]:::aca
+  R --> D[Government statistical agencies]:::gov
+  R --> E[Central banks & economic policy]:::gov
+  R --> F[Data journalism]:::media
+  R --> G[Sports analytics]:::biz
+  R --> H[Marketing analytics]:::biz
+  R --> I[Insurance & actuarial science]:::biz
+  R --> J[Environmental science & climate]:::aca
+  classDef r fill:#a7f3d0,stroke:#047857
+  classDef aca fill:#bfdbfe,stroke:#1d4ed8
+  classDef gov fill:#fde68a,stroke:#92400e
+  classDef media fill:#fbcfe8,stroke:#be185d
+  classDef biz fill:#e9d5ff,stroke:#7c3aed
+```
+
+- The **US Bureau of Labor Statistics**, **Statistics Canada**, the
+  **UK Office for National Statistics**, and dozens of other
+  national statistical agencies use R for routine analysis and
+  reports.
+- The **FDA** accepts R-based statistical analyses for drug
+  approval submissions.
+- Major **newsrooms** (The New York Times, FiveThirtyEight, BBC) use
+  R for data journalism and the charts you see in their articles.
+- **Genomics** runs on Bioconductor, a parallel R package archive
+  with thousands of bioinformatics packages.
+- **Insurance** companies model risk in R; **central banks** model
+  monetary policy in R; **sports teams** model player performance
+  in R.
+
+R is not the loudest language in tech, but it has quietly become
+the language of *evidence-based decision-making* in a remarkable
+variety of fields.
+
+## R and Python: a practical reality
+
+The most common question newcomers ask is "should I learn R or
+Python?" The most useful answer is: **probably both, eventually**,
+and the order depends on what you want to do.
+
+- If your day-to-day work is **statistics, study design,
+  visualization, reporting** — start with R. The path from
+  question to chart is shorter, and the surrounding ecosystem is
+  built for you.
+- If your day-to-day work is **software engineering with some data
+  analysis on the side, or production machine learning** — start
+  with Python. The general-programming surface area is broader.
+- If your work is in between — you will end up using both. Many
+  data teams have an R-heavy "analysis" side and a Python-heavy
+  "engineering" side, with tools (like `reticulate` and `arrow`)
+  to move data between them.
+
+In other words: this is not a religious war. R and Python are
+complementary tools. Picking one to learn now does not commit you
+forever.
+
+## A taste of what makes R feel like R
+
+To wrap up the "story" portion of this course, here are three small
+examples that, taken together, give a flavor of what R is like as a
+working tool.
+
+**1. Statistics as one-liners.** A simple two-sample t-test:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`group_a <- c(5.2, 5.4, 5.1, 5.6, 5.3, 5.5)
+group_b <- c(4.8, 4.9, 5.1, 4.7, 4.6, 5.0)
+
+result <- t.test(group_a, group_b)
+print(result)
+`}
+/>
+
+One function call gives you the t-statistic, degrees of freedom,
+p-value, confidence interval, and the means. There is no
+"library import," no "create a model object then call .fit()."
+
+**2. Plots from a single layered expression.** A scatter plot of
+the famous `iris` dataset, colored by species, with a smooth
+trend line:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+data(iris)
+
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Sepal vs. Petal length by iris species",
+    x     = "Sepal length (cm)",
+    y     = "Petal length (cm)"
+  )
+`}
+/>
+
+That code reads almost like a description of what you want, and
+you get a publication-quality figure.
+
+**3. A pipeline of transformations.** With `dplyr`, the verbs of
+data manipulation become a readable chain:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(dplyr)
+data(mtcars)
+
+mtcars |>
+  filter(mpg >= 20) |>
+  mutate(weight_class = ifelse(wt < 3, "light", "heavy")) |>
+  group_by(weight_class) |>
+  summarise(
+    n           = n(),
+    avg_mpg     = mean(mpg),
+    avg_horsepower = mean(hp)
+  )
+`}
+/>
+
+This reads, line by line, exactly as you would describe the
+operation in English: "take mtcars, filter to fuel-efficient cars,
+add a weight class, group by it, and summarize." That's
+characteristic of *modern* R, and we will spend a whole chapter on
+it later.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`Which of the following is the **strongest** reason to choose R for a project?
+
+- You want to build a production-grade mobile app.
+  > R is not suited to mobile development.
+- [o] You want to perform a careful statistical analysis and produce a reproducible report with charts.
+  > Correct! This is R's home turf — statistical analysis, visualization, and reproducible documents are exactly what R was designed for.
+- You want to train a 10-billion-parameter language model.
+  > That kind of work happens almost exclusively in Python + GPU kernels written in C++ or CUDA.
+- You want to build a high-frequency trading system.
+  > Real-time trading systems typically use C++ or specialized FPGA hardware.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following is **true** about R and Python in modern data science?
+
+- They are mutually exclusive — choosing one means abandoning the other.
+- Python has completely replaced R in academia.
+  > Python has grown rapidly, but R remains dominant in many statistical fields, especially genomics, biostatistics, epidemiology, and parts of econometrics.
+- [o] They are complementary tools, often used together, with R typically stronger for statistics and visualization, and Python typically stronger for general programming and large-scale ML.
+  > Correct! Real data teams routinely use both languages and pick whichever fits the task.
+- R has been deprecated in favor of Julia.
+  > Julia is a promising language for numerical computing, but R is very much alive and growing.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is R commonly described as a "language for statisticians, by statisticians"?
+
+- Because it can only be used in academia.
+  > R is heavily used in industry, government, and journalism — not just universities.
+- Because it does not support general programming constructs.
+  > R supports functions, loops, conditionals, packages, and most general-purpose constructs.
+- [o] Because its syntax, conventions, and ecosystem were shaped around how statisticians actually think about and work with data.
+  > Correct! From model formulas (\`y ~ x1 + x2\`) to "data frames" to the way packages encapsulate statistical methods, R's design choices flow from a statistical worldview.
+- Because it does not run on personal computers.
+  > R runs on Windows, macOS, Linux, and even in the browser (which is how this very page runs it).`}
+/>
+
+In the next page, we will look at the last big idea from this
+narrative section: **reproducible analysis**, which is the practice
+that ties everything together — and the cultural shift R helped
+make mainstream.
