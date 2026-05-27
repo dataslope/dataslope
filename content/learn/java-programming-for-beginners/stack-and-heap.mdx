@@ -1,0 +1,311 @@
+---
+title: The Stack and the Heap
+description: The two memory regions every Java programmer thinks about — and what really happens when you call a method or create an object
+---
+
+You can write Java for years without thinking about memory. But the
+*moment* you hit a tricky bug — a `NullPointerException`, an
+unexpected shared mutation, a stack overflow — a mental model of
+the **stack** and the **heap** turns confusion into clarity.
+
+## The two regions, side by side
+
+```mermaid
+flowchart LR
+    subgraph Stack[Stack — one per thread]
+        direction TB
+        F1[main frame]
+        F2[printScores frame]
+        F3[average frame]
+        F1 --> F2 --> F3
+    end
+    subgraph Heap[Heap — shared]
+        direction TB
+        O1[int array<br/>length=3, values=80,90,100]
+        O2[String 'Ada']
+        O3[Student object]
+    end
+    F2 -. holds reference to .-> O1
+```
+
+- **Stack:** holds method *call frames*. Each frame contains the
+  parameters and local variables of one call. Strictly
+  last-in-first-out: when a method returns, its frame disappears.
+- **Heap:** holds objects. Every `new` allocates here. Objects
+  outlive the method that created them, as long as *some* reference
+  still points at them.
+
+## Primitives live on the stack; objects live on the heap
+
+When you write:
+
+```java
+int    x = 42;
+String s = "hello";
+```
+
+- `x` is a *primitive* `int`. Its 4 bytes sit directly inside the
+  current stack frame.
+- `s` is a *reference variable*. Inside the frame it holds an
+  arrow (a memory address). The `"hello"` `String` object itself
+  lives on the heap.
+
+```mermaid
+flowchart LR
+    subgraph S[stack frame]
+        X["x = 42"]
+        SREF["s = ●─"]
+    end
+    subgraph H[heap]
+        STR["String 'hello'"]
+    end
+    SREF --> STR
+```
+
+Two different variables can hold *the same arrow* — they then refer
+to the *same* heap object. That is **aliasing**, and it is the
+single most important thing to picture about heap memory.
+
+## Aliasing demonstrated
+
+<CodeBlock
+  adapter="java"
+  initialCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> a = new ArrayList<>();
+        a.add("first");
+
+        List<String> b = a;            // b and a are the SAME list
+        b.add("second");
+
+        System.out.println("a = " + a);   // prints both
+        System.out.println("b = " + b);   // prints both
+        System.out.println("same? " + (a == b));
+    }
+}
+`}
+/>
+
+`b = a` did **not** copy the list. It copied the *reference*. Now
+`a` and `b` both point at the *same* heap object. Adding via `b`
+shows up via `a`.
+
+```mermaid
+flowchart LR
+    subgraph stack
+        A["a = ●─"]
+        B["b = ●─"]
+    end
+    subgraph heap
+        L["ArrayList: first, second"]
+    end
+    A --> L
+    B --> L
+```
+
+## What happens during a method call
+
+Every method call pushes a fresh frame onto the stack. Every return
+pops it. Watch what happens here:
+
+<CodeBlock
+  adapter="java"
+  initialCode={`public class Main {
+    public static void main(String[] args) {
+        int n = 4;
+        long result = factorial(n);
+        System.out.println(n + "! = " + result);
+    }
+
+    static long factorial(int n) {
+        if (n <= 1) return 1;
+        return n * factorial(n - 1);
+    }
+}
+`}
+/>
+
+Calling `factorial(4)` builds up a stack of frames:
+
+```mermaid
+flowchart TB
+    M["main: n=4, result=?"]
+    F4["factorial: n=4"]
+    F3["factorial: n=3"]
+    F2["factorial: n=2"]
+    F1["factorial: n=1 returns 1"]
+    M --> F4 --> F3 --> F2 --> F1
+```
+
+Each frame has *its own* `n`. They do not interfere with each
+other. As each call returns, its frame is destroyed and its locals
+disappear. This is why recursion works at all.
+
+If recursion goes too deep, the stack runs out of room and you get
+`StackOverflowError`. Try removing the base case sometime — you'll
+see it instantly.
+
+## Pass-by-value, always
+
+Java is **always pass-by-value**. What gets copied depends on the
+type:
+
+- For a primitive parameter, the *value* is copied. Changing it
+  inside the method does not affect the caller's variable.
+- For a reference parameter, the *reference* is copied. The method
+  gets its own arrow pointing at the *same* object. Mutating the
+  object affects what the caller sees, but reassigning the
+  parameter does *not* change the caller's variable.
+
+<CodeBlock
+  adapter="java"
+  entryFilename="Main.java"
+  files={[
+    {
+      filename: "Main.java",
+      initialContent: `import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        int n = 5;
+        bumpPrimitive(n);
+        System.out.println("after bumpPrimitive: n = " + n);
+
+        List<String> items = new ArrayList<>();
+        items.add("a");
+        mutate(items);                  // changes the object
+        System.out.println("after mutate: items = " + items);
+
+        replace(items);                 // does NOT replace caller's variable
+        System.out.println("after replace: items = " + items);
+    }
+
+    static void bumpPrimitive(int x) {
+        x = x + 100;                    // local x changes; caller unaffected
+    }
+
+    static void mutate(List<String> list) {
+        list.add("b");                  // same object → caller sees change
+    }
+
+    static void replace(List<String> list) {
+        list = new ArrayList<>();       // local reassign; caller unaffected
+        list.add("hidden");
+    }
+}
+`,
+    },
+  ]}
+/>
+
+Expected output:
+
+```
+after bumpPrimitive: n = 5
+after mutate: items = [a, b]
+after replace: items = [a, b]
+```
+
+The mental picture: every parameter is an *arrow drawn fresh* inside
+the new frame. Pointing it somewhere new does not affect the
+caller's arrow. Modifying the *target* of the arrow does.
+
+## When does heap memory get freed?
+
+When no live reference points at an object, it becomes
+**unreachable** — and eventually, the garbage collector reclaims
+the space. You almost never think about this directly. You just
+stop holding references to things you no longer need (often by
+letting variables go out of scope, or by reassigning fields).
+
+```mermaid
+flowchart LR
+    subgraph before
+        V["v = ●─"]
+        O1[Order #1]
+        V --> O1
+    end
+    subgraph after
+        V2["v = ●─"]
+        O2[Order #2]
+        Old[(Order #1<br/>now garbage)]
+        V2 --> O2
+    end
+```
+
+After `v = new Order(2);`, the original `Order #1` has no incoming
+arrows. It will be collected on a future GC pass.
+
+## Two famous bugs explained
+
+### `NullPointerException`
+
+A reference variable that holds the special value `null` points to
+*no* object. Dereferencing it (`x.foo()`) crashes with an `NPE`.
+
+```java
+String s = null;
+System.out.println(s.length());   // NullPointerException
+```
+
+The fix: don't *use* references that may be null without checking
+first, or design APIs that never return null in the first place.
+
+### `StackOverflowError`
+
+A method calls itself (directly or indirectly) without a base case,
+pushing frames forever until the stack runs out:
+
+```java
+static void boom() { boom(); }   // StackOverflowError
+```
+
+The fix: every recursion must reach a base case.
+
+<MultipleChoice
+  markdown={`What is stored in a stack frame for a method call?
+
+- All objects the method has ever created
+  > Objects live on the heap, not in stack frames.
+- [o] The method's parameters and local variables, including primitives by value and references that point to heap objects
+  > Correct.
+- A copy of every object passed to the method
+  > Java does not deep-copy objects on call; it copies the reference.
+- The bytecode of the method
+  > Bytecode lives in the method area, not in a frame.`}
+/>
+
+<MultipleChoice
+  markdown={`After \`List<String> b = a;\`, how many list objects exist on the heap?
+
+- Two — \`a\` and \`b\` each point to a different list
+  > No, only one list exists.
+- Zero — Java doesn't allocate a list yet
+  > One was already allocated when \`a\` was created.
+- [o] One — \`a\` and \`b\` are two references pointing to the *same* list
+  > Correct. That's aliasing.
+- One, but \`b\` is an immutable copy
+  > It's not a copy at all.`}
+/>
+
+<MultipleChoice
+  markdown={`A method receives a parameter of type \`Order\` and then writes \`order = new Order();\` inside its body. What does the caller observe?
+
+- The caller's variable now points to the new Order
+  > No — the parameter was a *local* reference variable.
+- The original Order is silently destroyed
+  > Other references may still hold it.
+- [o] Nothing — Java is pass-by-value; reassigning the parameter only changes the local reference inside the method, not the caller's variable
+  > Correct.
+- A compile error
+  > It compiles fine.`}
+/>
+
+You now have the mental model that unlocks everything else: stack
+frames flow with calls, heap objects live until no one points at
+them, and references are *arrows*, not copies. Next we leave
+single-object thinking and start organizing *collections* of data.
