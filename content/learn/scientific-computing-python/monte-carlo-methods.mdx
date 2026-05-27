@@ -1,0 +1,347 @@
+---
+title: Monte Carlo Methods
+description: Compute with random numbers — integration, simulation, and uncertainty quantification
+---
+
+When a problem has too many dimensions, too much geometric
+complexity, or too much randomness baked into its physics,
+deterministic methods grind to a halt. **Monte Carlo** sidesteps
+the difficulty by sampling randomly and letting the law of large
+numbers do the work.
+
+Three things make Monte Carlo special:
+
+- The error scales as $1/\sqrt\{N\}$ **regardless of dimension**.
+  This is bad for low-dimensional smooth integrals (deterministic
+  quadrature crushes it) and *unbeatable* in high dimensions.
+- It needs almost no problem structure — you only have to be
+  able to *sample* and *evaluate*.
+- It produces an error estimate as a byproduct.
+
+## A first example: estimating $\pi$
+
+Drop random points uniformly into the unit square. The fraction
+that lands inside the unit quarter-disk approximates $\pi/4$.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+rng = np.random.default_rng(0)
+N = 1_000_000
+xy = rng.uniform(0, 1, size=(N, 2))
+inside = (xy[:, 0]**2 + xy[:, 1]**2 <= 1).mean()
+print(f"π ≈ {4*inside:.6f}   true π = {np.pi:.6f}")
+print(f"standard error ≈ 4·√(p(1-p)/N) = {4*np.sqrt(inside*(1-inside)/N):.6f}")
+`}
+/>
+
+A million samples buy you about three correct digits. To get one
+more digit you would need 100× as many samples. This **$1/\sqrt
+N$ scaling** is the central law of Monte Carlo — slow, but
+unaffected by the dimensionality of the problem.
+
+## Monte Carlo integration
+
+For any integrable $f$ over a domain $D$ with volume $V$,
+
+$$
+\int_D f \, dV \approx \frac\{V\}\{N\} \sum_\{i=1\}^\{N\} f(x_i),
+\quad x_i \sim \text\{Uniform\}(D).
+$$
+
+The estimator's standard error is $V \sigma / \sqrt N$ where
+$\sigma^2 = \text\{Var\}\,f$ over the domain. Compare to a $d$-D
+deterministic grid which requires $n^d$ points: in 10 dimensions,
+$10^\{10\}$ grid points vs Monte Carlo's $10^6$ samples for similar
+accuracy.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+# Volume of a 10-D hypersphere of radius 1 inscribed in [-1,1]^10
+rng = np.random.default_rng(0)
+d, N = 10, 2_000_000
+
+X = rng.uniform(-1, 1, size=(N, d))
+inside = (np.sum(X**2, axis=1) <= 1.0).mean()
+volume_box = 2**d
+estimate = volume_box * inside
+
+# Closed form
+from math import pi, gamma
+exact = pi**(d/2) / gamma(d/2 + 1)
+print(f"MC estimate : {estimate:.6f}")
+print(f"exact       : {exact:.6f}")
+print(f"relative err: {abs(estimate-exact)/exact:.4f}")
+`}
+/>
+
+In 10 dimensions, the unit ball occupies only about $0.25\%$ of
+its bounding box. Monte Carlo handles this effortlessly while a
+deterministic grid would be hopeless.
+
+## Variance reduction: importance sampling
+
+If $f$ is large only in a small region, uniform sampling wastes
+most of its budget. **Importance sampling** draws from a
+distribution $g$ that mirrors $f$'s shape, then re-weights:
+
+$$
+\int f(x)\,dx = \int \frac\{f(x)\}\{g(x)\} \, g(x)\,dx
+\approx \frac\{1\}\{N\}\sum \frac\{f(x_i)\}\{g(x_i)\}, \quad x_i \sim g.
+$$
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+# Estimate  ∫₀^∞ x · exp(-x) dx  (= 1)
+rng = np.random.default_rng(0)
+N = 100_000
+
+# Uniform sampling on [0, 50] — most samples in the tail are wasted
+xu = rng.uniform(0, 50, N)
+mc_uniform = 50 * np.mean(xu * np.exp(-xu))
+
+# Importance sampling from exponential(1) — perfectly matched
+xe = rng.exponential(scale=1.0, size=N)
+mc_importance = np.mean(xe * np.exp(-xe) / np.exp(-xe))  # = mean(xe)
+
+print(f"truth          : 1.000000")
+print(f"uniform MC     : {mc_uniform:.6f}")
+print(f"importance MC  : {mc_importance:.6f}")
+`}
+/>
+
+The importance-sampled estimator has dramatically lower variance.
+The principle is universal: **sample where the integrand matters**.
+
+## Random walks and diffusion
+
+Monte Carlo is also a *simulation* tool, not just an integration
+tool. A random walk in 2-D models a pollen grain bouncing through
+fluid, a stock price diffusing in time, or a photon scattering in
+tissue.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(0)
+n_walkers, n_steps = 500, 1000
+
+# Each step is a Gaussian increment
+steps = rng.standard_normal(size=(n_walkers, n_steps, 2))
+paths = np.cumsum(steps, axis=1)
+
+# Plot a few sample paths
+fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+for k in range(8):
+    ax[0].plot(paths[k, :, 0], paths[k, :, 1], lw=0.5)
+ax[0].set_aspect("equal"); ax[0].set_title("8 random-walk paths")
+
+# Mean squared displacement should grow linearly with step number
+msd = np.mean(np.sum(paths**2, axis=2), axis=0)
+ax[1].plot(msd, label="empirical")
+ax[1].plot(2 * np.arange(n_steps), "--", label="theory: 2·n")
+ax[1].set_xlabel("step n"); ax[1].set_ylabel("mean ||r||²")
+ax[1].legend(); plt.tight_layout(); plt.show()
+`}
+/>
+
+The mean-squared displacement grows linearly with time — the
+diffusion law. This same simulation underlies Brownian motion,
+neutron transport, and option pricing.
+
+## Simulating a stochastic process: Ornstein–Uhlenbeck
+
+A more interesting random process: the OU process, which is a
+random walk pulled back toward zero by a restoring force. It
+models interest rates, particle velocities, and many biological
+signals.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+import matplotlib.pyplot as plt
+
+# dX = -theta·X dt + sigma·dW,   discretized via Euler-Maruyama
+rng = np.random.default_rng(0)
+theta, sigma, dt = 1.0, 0.5, 0.01
+N_steps, N_paths = 2000, 300
+
+X = np.zeros((N_paths, N_steps))
+for n in range(1, N_steps):
+    dW = rng.standard_normal(N_paths) * np.sqrt(dt)
+    X[:, n] = X[:, n-1] - theta * X[:, n-1] * dt + sigma * dW
+
+t = np.arange(N_steps) * dt
+fig, ax = plt.subplots(1, 2, figsize=(10, 3))
+for k in range(6):
+    ax[0].plot(t, X[k], lw=0.6)
+ax[0].set_title("OU sample paths")
+
+# Stationary variance is sigma²/(2θ)
+ax[1].hist(X[:, -1], bins=40, density=True, alpha=0.6, label="t = 20")
+xs = np.linspace(-1.5, 1.5, 200)
+import math
+stationary = np.sqrt(theta/(math.pi*sigma**2)) * np.exp(-theta*xs**2/sigma**2)
+ax[1].plot(xs, stationary, lw=2, label="stationary N(0, σ²/2θ)")
+ax[1].legend(); ax[1].set_title("marginal distribution at large t")
+plt.tight_layout(); plt.show()
+`}
+/>
+
+After enough time, every walker's marginal distribution converges
+to the same Gaussian — the *stationary distribution*. Monte Carlo
+lets you see analytical results emerge from raw randomness.
+
+## Uncertainty quantification by bootstrap
+
+Got a sample of measurements and want a confidence interval for
+the mean, median, or any statistic? Resample with replacement
+many times and compute the statistic on each resample. The spread
+of resampled statistics estimates the spread of the estimator.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+rng = np.random.default_rng(0)
+data = rng.gamma(shape=2.0, scale=1.5, size=80)   # skewed sample
+n = len(data)
+
+B = 5000
+boot_means = np.array([
+    rng.choice(data, size=n, replace=True).mean() for _ in range(B)
+])
+
+ci = np.percentile(boot_means, [2.5, 97.5])
+print(f"sample mean         : {data.mean():.4f}")
+print(f"bootstrap 95% CI    : [{ci[0]:.4f}, {ci[1]:.4f}]")
+print(f"bootstrap std error : {boot_means.std(ddof=1):.4f}")
+`}
+/>
+
+The bootstrap works for *any* statistic — median, regression
+coefficient, correlation, anything you can compute on a sample.
+It is one of the most powerful applications of Monte Carlo to
+statistics.
+
+## A multi-file Monte Carlo experiment
+
+<CodeBlock
+  adapter="python"
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `import numpy as np
+import matplotlib.pyplot as plt
+from mc import estimate_with_se
+
+def integrand(x):
+    return np.exp(-x**2) * np.cos(2*x)
+
+# Run Monte Carlo with increasing sample sizes
+Ns = [10**k for k in range(2, 7)]
+ests, ses = zip(*[estimate_with_se(integrand, low=-3, high=3, N=N, seed=0)
+                  for N in Ns])
+
+plt.errorbar(Ns, ests, yerr=ses, fmt="o-", capsize=4)
+plt.xscale("log"); plt.xlabel("N"); plt.ylabel("estimate ± SE")
+plt.title("Monte Carlo converges as 1/√N")
+plt.show()
+
+for N, est, se in zip(Ns, ests, ses):
+    print(f"N = {N:>8d}   estimate = {est:.6f}   ±{se:.6f}")
+`,
+    },
+    {
+      filename: "mc.py",
+      initialContent: `import numpy as np
+
+def estimate_with_se(f, low, high, N, seed=0):
+    """Monte Carlo estimator of ∫ f over [low, high] and its standard error."""
+    rng = np.random.default_rng(seed)
+    x = rng.uniform(low, high, size=N)
+    width = high - low
+    samples = width * f(x)
+    return samples.mean(), samples.std(ddof=1) / np.sqrt(N)
+`,
+    },
+  ]}
+/>
+
+Notice how the error bars shrink as $1/\sqrt N$ — every 100×
+increase in samples buys you one extra digit. This is both the
+power and the limitation of Monte Carlo.
+
+## Challenge: estimate the area of an irregular region
+
+<ChallengeCard
+  adapter="python"
+  title="Monte Carlo area estimator"
+  instructions={`Implement \`mc_area(predicate, bounds, n_samples, seed=0)\` that estimates the area of the region $\\{(x, y) : \\text\{predicate\}(x, y) = \\text\{True\}\\}$ inside the rectangle defined by \`bounds = (xlow, xhigh, ylow, yhigh)\`.
+
+Use \`numpy.random.default_rng(seed)\` for reproducibility.
+
+Test on the unit disk where the true area is $\\pi$.`}
+  initialCode={`import numpy as np
+
+def mc_area(predicate, bounds, n_samples, seed=0):
+    # TODO: sample uniformly in the rectangle, count predicate hits, scale by rect area
+    return 0.0
+`}
+  solutionCode={`import numpy as np
+
+def mc_area(predicate, bounds, n_samples, seed=0):
+    xlow, xhigh, ylow, yhigh = bounds
+    rng = np.random.default_rng(seed)
+    x = rng.uniform(xlow, xhigh, n_samples)
+    y = rng.uniform(ylow, yhigh, n_samples)
+    fraction = predicate(x, y).mean()
+    return float(fraction * (xhigh - xlow) * (yhigh - ylow))
+`}
+  tests={[
+    {
+      id: "disk",
+      name: "Unit disk area ≈ π",
+      code: "import math\nimport numpy as np\npred = lambda x, y: x*x + y*y <= 1\narea = mc_area(pred, (-1, 1, -1, 1), 200_000, seed=42)\nassert math.isclose(area, math.pi, rel_tol=0.02)",
+    },
+    {
+      id: "square",
+      name: "Inscribed square area = 2",
+      code: "import math\nimport numpy as np\npred = lambda x, y: np.abs(x) + np.abs(y) <= 1\narea = mc_area(pred, (-1, 1, -1, 1), 200_000, seed=0)\nassert math.isclose(area, 2.0, rel_tol=0.02)",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`You are integrating a smooth 12-dimensional function. You compare deterministic Gauss quadrature with $n$ nodes per axis against a Monte Carlo estimator with $N$ total samples. Both are forced to use the *same* total budget of evaluations. Which usually wins, and why?
+
+- Deterministic quadrature always wins because it is higher order
+- [o] Monte Carlo usually wins because deterministic quadrature costs $n^\{12\}$ evaluations — only $n = 2$ fits in any reasonable budget — while MC's $1/\\sqrt\{N\}$ error is independent of dimension
+  > Exactly. In high dimensions deterministic quadrature suffers from the curse of dimensionality: doubling accuracy multiplies cost by $2^d$. Monte Carlo's dimension-free error scaling is what makes it the standard tool for integrals beyond ~5 dimensions.
+- They are always equivalent
+- Neither converges
+
+Use deterministic quadrature for $d \\le 4$; use Monte Carlo (or quasi-Monte Carlo) for higher dimensions.`}
+/>
+
+<MultipleChoice
+  markdown={`You ran a Monte Carlo estimator with $N = 10^4$ samples and obtained a standard error of $0.05$. About how many samples would you need to reduce the standard error to $0.005$ (one extra digit)?
+
+- About $10^5$
+- [o] About $10^6$
+  > Right. Monte Carlo error scales as $1/\\sqrt N$, so reducing the error by 10× requires 100× more samples. From $10^4$ that is $10^6$. This brutal scaling is exactly why variance-reduction techniques (importance sampling, control variates, antithetic variates) matter.
+- About $2 \\times 10^4$
+- About $10^7$
+
+The $1/\\sqrt N$ law is the single most important fact to remember about Monte Carlo.`}
+/>

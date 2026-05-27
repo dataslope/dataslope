@@ -39,14 +39,14 @@ $\delta x$, how big is $f(x + \delta x) - f(x)$? The ratio of
 
 For evaluating $f$:
 
-$$ \\kappa_f(x) \\approx \\left| \\frac{x f'(x)}{f(x)} \\right| $$
+$$ \\kappa_f(x) \\approx \\left| \\frac\{x f'(x)\}\{f(x)\} \\right| $$
 
 For a linear system $A x = b$:
 
-$$ \\kappa(A) = \\|A\\| \\, \\|A^{-1}\\| $$
+$$ \\kappa(A) = \\|A\\| \\, \\|A^\{-1\}\\| $$
 
 A condition number near $1$ is excellent. A condition number near
-$1/\epsilon \approx 10^{16}$ means **no algorithm can give you more
+$1/\epsilon \approx 10^\{16\}$ means **no algorithm can give you more
 than a couple of correct bits**.
 
 <CodeBlock
@@ -114,7 +114,7 @@ print("\\ncondition number κ(A) =", np.linalg.cond(A))
 `}
 />
 
-The condition number $\kappa(A) \approx 4 \times 10^{13}$ tells us
+The condition number $\kappa(A) \approx 4 \times 10^\{13\}$ tells us
 we have lost roughly 13 digits of precision *no matter what*.
 `solve` recovers the remaining 3 digits cleanly; `inv` is acceptable
 but worse; `cramer` is the worst of the three because it does
@@ -124,9 +124,9 @@ extra cancellation. None of them can do better than $\kappa$ allows.
 
 Consider the integrals
 
-$$ I_n = \\int_0^1 \\frac{x^n}{x + 10} \\, dx $$
+$$ I_n = \\int_0^1 \\frac\{x^n\}\{x + 10\} \\, dx $$
 
-These satisfy a tidy recurrence $I_n = \frac{1}{n} - 10 \, I_{n-1}$
+These satisfy a tidy recurrence $I_n = \frac\{1\}\{n\} - 10 \, I_\{n-1\}$
 with $I_0 = \ln(1.1)$. The forward recurrence is *numerically
 unstable* — every step multiplies the error by $-10$ — even though
 the integrals themselves are perfectly well-defined small positive
@@ -183,18 +183,18 @@ most useful identities are:
 | Vector 2-norm | $\\lVert v \\rVert_2$ | Euclidean length |
 | Matrix induced 2-norm | $\\lVert A \\rVert_2$ | Largest stretch factor |
 | Frobenius norm | $\\lVert A \\rVert_F$ | Square root of sum of squares |
-| Condition number | $\\kappa(A) = \\lVert A \\rVert \\lVert A^{-1} \\rVert$ | Error amplification |
+| Condition number | $\\kappa(A) = \\lVert A \\rVert \\lVert A^\{-1\} \\rVert$ | Error amplification |
 
 For $A x = b$, the relative error in $x$ is bounded by:
 
-$$ \\frac{\\lVert \\hat x - x \\rVert}{\\lVert x \\rVert}
+$$ \\frac\{\\lVert \\hat x - x \\rVert\}\{\\lVert x \\rVert\}
    \\;\\le\\; \\kappa(A) \\left(
-      \\frac{\\lVert \\delta A \\rVert}{\\lVert A \\rVert}
-    + \\frac{\\lVert \\delta b \\rVert}{\\lVert b \\rVert}
+      \\frac\{\\lVert \\delta A \\rVert\}\{\\lVert A \\rVert\}
+    + \\frac\{\\lVert \\delta b \\rVert\}\{\\lVert b \\rVert\}
    \\right) $$
 
-A condition number of $10^{14}$ and a perturbation of $10^{-16}$
-gives a relative output error of $10^{-2}$ — two correct digits.
+A condition number of $10^\{14\}$ and a perturbation of $10^\{-16\}$
+gives a relative output error of $10^\{-2\}$ — two correct digits.
 That number is your **truth ceiling**, set by the *problem*, not
 the *algorithm*.
 
@@ -219,7 +219,7 @@ for n in [5, 8, 10, 12, 15]:
 />
 
 Watch how the relative error scales with $\kappa$. Once
-$\kappa(H) > 10^{16}$, you have lost all your precision.
+$\kappa(H) > 10^\{16\}$, you have lost all your precision.
 
 ## Designing stable algorithms
 
@@ -233,7 +233,7 @@ A handful of rules turn most numerical code from fragile to robust.
 3. **Prefer factorizations over inverses.** `np.linalg.solve(A, b)`
    beats `np.linalg.inv(A) @ b` *every* time.
 4. **Scale your inputs.** If one column of your matrix has values
-   in $[10^{-9}]$ and another in $[10^{9}]$, condition number
+   in $[10^\{-9\}]$ and another in $[10^\{9\}]$, condition number
    explodes for no real reason; rescale them.
 5. **Pick algorithms with proven backward error bounds.** LAPACK,
    SciPy, Eigen, and PETSc routines all come with these. Custom
@@ -279,12 +279,12 @@ when you really need it.
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`A problem has condition number $\\kappa \\approx 10^{12}$. You compute the answer with a backward-stable algorithm at 64-bit precision. Roughly how many correct decimal digits should you expect?
+  markdown={`A problem has condition number $\\kappa \\approx 10^\{12\}$. You compute the answer with a backward-stable algorithm at 64-bit precision. Roughly how many correct decimal digits should you expect?
 
 - All 16
 - About 12
 - [o] About 4
-  > Right. The truth ceiling is roughly $\\kappa \\cdot \\epsilon \\approx 10^{12} \\cdot 10^{-16} = 10^{-4}$, i.e. $\\sim 4$ correct digits. A *stable* algorithm achieves this; an *unstable* one would get fewer.
+  > Right. The truth ceiling is roughly $\\kappa \\cdot \\epsilon \\approx 10^\{12\} \\cdot 10^\{-16\} = 10^\{-4\}$, i.e. $\\sim 4$ correct digits. A *stable* algorithm achieves this; an *unstable* one would get fewer.
 - Zero — the problem is unsolvable
 
 The condition number tells you the **best** an algorithm can hope to achieve.`}

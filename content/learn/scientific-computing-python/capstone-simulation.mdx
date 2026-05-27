@@ -1,0 +1,314 @@
+---
+title: Capstone Simulation
+description: A complete predator–prey + parameter-sweep mini-project tying it all together
+---
+
+This capstone is a complete scientific computing project compressed
+into a single page. We will:
+
+- Build a multi-file simulation of a **Lotka–Volterra**
+  predator–prey ecosystem
+- Solve the ODE with `solve_ivp` and detect *extinction events*
+- Run a **parameter sweep** over predation rates
+- **Visualize** with small multiples and a phase portrait
+- Quantify uncertainty by repeating with multiple seeds
+
+By the end you will have used every skill from the course in a
+single, coherent workflow.
+
+## The model
+
+A classic Lotka–Volterra system with logistic prey growth:
+
+$$
+\begin\{aligned\}
+\dot x &= r\,x\,(1 - x/K) - a\,x\,y \\
+\dot y &= e\,a\,x\,y - m\,y
+\end\{aligned\}
+$$
+
+- $x$ = prey population (e.g. rabbits)
+- $y$ = predator population (e.g. foxes)
+- $r$ = prey intrinsic growth rate
+- $K$ = prey carrying capacity
+- $a$ = attack rate (how often predators catch prey)
+- $e$ = conversion efficiency
+- $m$ = predator mortality
+
+## Pipeline overview
+
+```mermaid
+flowchart LR
+    Cfg[Config:<br/>sweep over a] --> Sim[simulate.py:<br/>solve_ivp + event]
+    Sim --> Res[results: time-series<br/>+ extinction flag]
+    Res --> Agg[aggregate.py:<br/>per-config summary]
+    Agg --> Viz[plot.py:<br/>small multiples + phase portrait]
+    Sim -. seed .-> Sim
+```
+
+## The simulation module
+
+<CodeBlock
+  adapter="python"
+  entryFilename="main.py"
+  files={[
+    {
+      filename: "main.py",
+      initialContent: `import numpy as np
+import matplotlib.pyplot as plt
+from simulate import run_one
+from aggregate import summarize
+from plot import small_multiples
+
+# Parameter sweep over attack rate 'a' with 5 random seeds each
+sweep = np.linspace(0.005, 0.04, 6)
+seeds = [11, 22, 33, 44, 55]
+
+all_runs = []
+for a in sweep:
+    for seed in seeds:
+        all_runs.append(run_one(a=a, seed=seed))
+
+summary = summarize(all_runs)
+for row in summary:
+    print(f"a = {row['a']:.4f}   "
+          f"P(extinction) = {row['p_extinction']:.2f}   "
+          f"⟨peak prey⟩ = {row['mean_peak_prey']:.1f}")
+
+small_multiples(all_runs, sweep)
+plt.show()
+`,
+    },
+    {
+      filename: "simulate.py",
+      initialContent: `import numpy as np
+from scipy.integrate import solve_ivp
+
+def make_rhs(r, K, a, e, m, sigma, rng):
+    """Returns f(t, y) with stochastic prey growth perturbation."""
+    def f(t, z):
+        x, y = z
+        # Tiny random perturbation in prey growth to make seeds matter
+        noise = sigma * rng.standard_normal()
+        return [r*x*(1 - x/K) - a*x*y + noise*x,
+                e*a*x*y - m*y]
+    return f
+
+def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4,
+            sigma=0.02, t_end=200.0):
+    rng = np.random.default_rng(seed)
+    rhs = make_rhs(r, K, a, e, m, sigma, rng)
+
+    # Event: predators go extinct (y drops below 0.5)
+    def extinct(t, z): return z[1] - 0.5
+    extinct.terminal = True
+    extinct.direction = -1
+
+    sol = solve_ivp(rhs, [0, t_end], y0=[40.0, 9.0],
+                    method="RK45", rtol=1e-7, atol=1e-9,
+                    events=extinct, dense_output=True, max_step=0.5)
+
+    t = np.linspace(0, sol.t[-1], 400)
+    x, y = sol.sol(t)
+    return {
+        "a": a, "seed": seed,
+        "t": t, "x": x, "y": y,
+        "extinct": bool(sol.t_events[0].size),
+        "t_extinct": float(sol.t_events[0][0]) if sol.t_events[0].size else None,
+    }
+`,
+    },
+    {
+      filename: "aggregate.py",
+      initialContent: `import numpy as np
+from collections import defaultdict
+
+def summarize(runs):
+    """Group runs by parameter 'a' and compute summary stats."""
+    groups = defaultdict(list)
+    for r in runs:
+        groups[r["a"]].append(r)
+
+    out = []
+    for a, group in sorted(groups.items()):
+        ext = [r["extinct"] for r in group]
+        peaks = [float(np.max(r["x"])) for r in group]
+        out.append({
+            "a": a,
+            "n": len(group),
+            "p_extinction": np.mean(ext),
+            "mean_peak_prey": np.mean(peaks),
+        })
+    return out
+`,
+    },
+    {
+      filename: "plot.py",
+      initialContent: `import numpy as np
+import matplotlib.pyplot as plt
+
+def small_multiples(runs, sweep):
+    cols = len(sweep)
+    fig, axes = plt.subplots(1, cols, figsize=(2.5*cols, 3),
+                             sharex=True, sharey=True,
+                             constrained_layout=True)
+    for ax, a in zip(axes, sweep):
+        for r in runs:
+            if r["a"] != a: continue
+            color = "tab:red" if r["extinct"] else "tab:blue"
+            ax.plot(r["t"], r["x"], color=color, lw=0.8, alpha=0.7)
+        ax.set_title(f"a = {a:.3f}", fontsize=10)
+        ax.set_xlabel("time")
+    axes[0].set_ylabel("prey x(t)")
+    fig.suptitle("Prey trajectories (red = predator extinction)", y=1.02)
+`,
+    },
+  ]}
+/>
+
+What this little project demonstrates:
+
+- **Modeling.** Translating a biological story into a system of
+  ODEs with parameters that have physical meaning.
+- **Stable numerical integration.** Using `solve_ivp` with
+  `dense_output` and `max_step` to get smooth, controllable
+  output.
+- **Event detection.** Catching the extinction moment exactly.
+- **Reproducible stochasticity.** A per-run `default_rng(seed)` so
+  every replicate is exactly repeatable.
+- **Parameter sweeps.** A clean loop over a grid of attack rates
+  and seeds.
+- **Aggregation.** Grouping replicates and computing summary
+  statistics.
+- **Visualization.** Small multiples that let your eye compare
+  parameter regimes at a glance.
+
+## A phase portrait
+
+The classical way to look at a predator–prey system is in phase
+space — predator on one axis, prey on the other. Closed orbits
+mean sustained oscillations; spirals mean damped or growing
+oscillations; runaway escape means extinction.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+def rhs(t, z, r=1.0, K=200.0, a=0.015, e=0.1, m=0.4):
+    x, y = z
+    return [r*x*(1 - x/K) - a*x*y,
+            e*a*x*y - m*y]
+
+# Several initial conditions
+fig, ax = plt.subplots(figsize=(6, 5))
+for x0 in [20, 60, 120, 180]:
+    sol = solve_ivp(rhs, [0, 300], [x0, 5], dense_output=True,
+                    rtol=1e-8, atol=1e-10)
+    t = np.linspace(0, 300, 4000)
+    x, y = sol.sol(t)
+    ax.plot(x, y, lw=0.7, label=f"x₀ = {x0}")
+
+# Equilibrium point
+x_eq = 0.4 / (0.1 * 0.015)
+y_eq = 1.0 * (1 - x_eq/200) / 0.015
+ax.plot(x_eq, y_eq, "k*", ms=14, label="equilibrium")
+
+ax.set_xlabel("prey x"); ax.set_ylabel("predator y")
+ax.set_title("Lotka–Volterra phase portrait"); ax.legend()
+plt.show()
+`}
+/>
+
+Different starting populations spiral *into the same equilibrium*
+— a behavior driven entirely by the prey's logistic carrying
+capacity. Without that term the orbits would be perfect closed
+loops (the classic Lotka–Volterra cycle).
+
+## Quantifying sensitivity
+
+A useful question: **how sensitive is extinction probability to
+the attack rate $a$?** A small Monte Carlo over many seeds gives
+us an answer with confidence bars.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from scipy.integrate import solve_ivp
+
+def survives(a, seed):
+    rng = np.random.default_rng(seed)
+    def rhs(t, z, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.05):
+        x, y = z
+        noise = sigma * rng.standard_normal()
+        return [r*x*(1 - x/K) - a*x*y + noise*x,
+                e*a*x*y - m*y]
+
+    def extinct(t, z): return z[1] - 0.5
+    extinct.terminal = True; extinct.direction = -1
+
+    sol = solve_ivp(rhs, [0, 200], [40, 9],
+                    rtol=1e-6, atol=1e-9, events=extinct, max_step=0.5)
+    return 0 if sol.t_events[0].size else 1
+
+# 20 replicates per a; estimate survival probability and 1-sigma error
+for a in [0.005, 0.010, 0.015, 0.020, 0.030]:
+    outcomes = np.array([survives(a, seed) for seed in range(20)])
+    p = outcomes.mean()
+    se = np.sqrt(p*(1-p)/len(outcomes))
+    print(f"a = {a:.3f}   survival = {p:.2f} ± {se:.2f}")
+`}
+/>
+
+The survival probability falls as predation intensifies, and
+binomial standard errors quantify how confident we are in each
+estimate. This is the *output* of a real computational science
+project: not just a number, but a number with an uncertainty.
+
+## What you just used
+
+A non-exhaustive list of techniques from this course that appear
+in the capstone:
+
+| Technique | Where |
+| --- | --- |
+| Vectorized NumPy | the entire RHS |
+| Adaptive ODE integration | `solve_ivp` with RK45 |
+| Event detection | extinction at $y = 0.5$ |
+| Reproducible randomness | `default_rng(seed)` per run |
+| Multi-file project layout | `simulate / aggregate / plot` |
+| Parameter sweep | nested loops over `a` and `seed` |
+| Small-multiples visualization | `plot.small_multiples` |
+| Monte Carlo uncertainty | survival probability ± SE |
+| Phase-portrait analysis | predator–prey trajectories |
+
+Scientific computing is rarely a single algorithm. It is a *pipeline*
+of choices, each grounded in numerical understanding, glued
+together by reproducible code.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`The capstone uses \`solve_ivp(..., events=extinct, dense_output=True, max_step=0.5)\`. Why \`max_step=0.5\` rather than letting the solver pick freely?
+
+- To slow down the simulation for visualization
+- [o] An adaptive solver may take huge steps over slow dynamics and *miss* short-lived events; capping the step size forces the solver to evaluate the event function frequently enough to detect a fast extinction transient
+  > Right. The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
+- It changes the order of the integrator
+- It enables GPU acceleration
+
+\`max_step\` is the underrated knob you reach for whenever events or sharp transients matter.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the capstone summary report **both** \`mean_peak_prey\` and \`p_extinction\` per parameter setting, rather than just the population trajectory of one representative run?
+
+- For aesthetic reasons
+- [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw — and they come with quantifiable uncertainty
+  > Yes. Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
+- It is required by the language
+- The CPU is faster that way
+
+A computational experiment should always report aggregates and uncertainties, never a single representative run.`}
+/>

@@ -290,12 +290,12 @@ operator that runs at BLAS speed on millions of points.
   title="Outer + reduce"
   instructions={`Implement \`weighted_centroid(points, weights)\` that takes:
 
-- \`points\` of shape \`(n, d)\`: $n$ points in $\\mathbb{R}^d$
+- \`points\` of shape \`(n, d)\`: $n$ points in $\\mathbb\{R\}^d$
 - \`weights\` of shape \`(n,)\`: non-negative weights
 
 and returns the weighted centroid
 
-$$ c = \\frac{\\sum_i w_i \\, p_i}{\\sum_i w_i} \\in \\mathbb{R}^d $$
+$$ c = \\frac\{\\sum_i w_i \\, p_i\}\{\\sum_i w_i\} \\in \\mathbb\{R\}^d $$
 
 as a 1-D array of shape \`(d,)\`. Do it **without any explicit
 Python loops** — use broadcasting and a single reduction.`}

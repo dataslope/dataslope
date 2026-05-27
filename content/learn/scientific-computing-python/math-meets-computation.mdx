@@ -47,10 +47,10 @@ it.
 
 ## How wrong is a floating-point number?
 
-A 64-bit IEEE 754 double can represent about $1.8 \times 10^{308}$
+A 64-bit IEEE 754 double can represent about $1.8 \times 10^\{308\}$
 distinct positive values, but it cannot represent any of them
 exactly between most pairs. The spacing between representable
-numbers near $1$ is about $\epsilon \approx 2.22 \times 10^{-16}$ —
+numbers near $1$ is about $\epsilon \approx 2.22 \times 10^\{-16\}$ —
 the famous *machine epsilon*. You will see this number again and
 again.
 
@@ -129,9 +129,9 @@ for n in [4, 8, 12, 16]:
 `}
 />
 
-A condition number of $10^{18}$ means a relative input error of
-$\epsilon \approx 10^{-16}$ becomes a relative *output* error of
-$\epsilon \cdot 10^{18} = 100$ — utterly useless. No clever
+A condition number of $10^\{18\}$ means a relative input error of
+$\epsilon \approx 10^\{-16\}$ becomes a relative *output* error of
+$\epsilon \cdot 10^\{18\} = 100$ — utterly useless. No clever
 algorithm can fix this; the *problem* itself is broken at 64-bit
 precision.
 
@@ -294,5 +294,5 @@ This is *the* foundational fact of numerical computing.`}
 - It measures memory usage
 - It measures the symmetry of $A$
 
-When you see $\\kappa(A) = 10^{15}$ and you have $\\epsilon \\approx 10^{-16}$ of precision, you should expect to keep at most 1 digit of your answer.`}
+When you see $\\kappa(A) = 10^\{15\}$ and you have $\\epsilon \\approx 10^\{-16\}$ of precision, you should expect to keep at most 1 digit of your answer.`}
 />

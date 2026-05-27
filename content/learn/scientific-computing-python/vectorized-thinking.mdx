@@ -75,12 +75,12 @@ The full hierarchy of "things that go fast":
 
 | Layer | What it does | Cost per element |
 | --- | --- | --- |
-| Python `for` over a list | Interpreted bytecode | ~$10^{-6}$ s |
-| Python `for` over an ndarray | Same, plus boxing/unboxing | ~$10^{-6}$ s |
-| `np.vectorize` | Cosmetic wrapper around a Python function — *not* fast | ~$10^{-6}$ s |
-| NumPy ufunc / arithmetic | Compiled SIMD loop | ~$10^{-9}$ s |
-| BLAS routine (matmul, etc.) | Heavily tuned blocked algorithm | ~$10^{-10}$ s |
-| GPU | Massively parallel | ~$10^{-11}$ s |
+| Python `for` over a list | Interpreted bytecode | ~$10^\{-6\}$ s |
+| Python `for` over an ndarray | Same, plus boxing/unboxing | ~$10^\{-6\}$ s |
+| `np.vectorize` | Cosmetic wrapper around a Python function — *not* fast | ~$10^\{-6\}$ s |
+| NumPy ufunc / arithmetic | Compiled SIMD loop | ~$10^\{-9\}$ s |
+| BLAS routine (matmul, etc.) | Heavily tuned blocked algorithm | ~$10^\{-10\}$ s |
+| GPU | Massively parallel | ~$10^\{-11\}$ s |
 
 **Almost every speedup in scientific Python comes from moving one
 layer down this table.**
@@ -130,7 +130,7 @@ operations become as easy to write as one-dimensional ones.
 ## A non-trivial vectorization
 
 Suppose you have a cloud of $N$ points in 2-D and you want the
-**pairwise distance matrix**: $D_{ij} = \\|p_i - p_j\\|$. The
+**pairwise distance matrix**: $D_\{ij\} = \\|p_i - p_j\\|$. The
 explicit Python is two nested loops. The vectorized version is two
 lines.
 
