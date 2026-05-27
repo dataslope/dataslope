@@ -1,0 +1,261 @@
+---
+title: The Rise of Object-Oriented Programming
+description: How a Norwegian simulation language and a Californian research lab quietly reshaped how we think about software
+---
+
+The previous page ended with a problem: as programs grew, the
+**procedural style** of "many functions over shared global data"
+collapsed under its own weight. The fix was a different way of
+organizing programs — **object-oriented programming**, or **OOP**.
+
+The idea sounds simple once you have heard it:
+
+> Instead of separating *data* and the *functions that act on it*,
+> bundle them together into a single thing called an **object**.
+
+That single move, taken seriously, changes almost everything about
+how software is structured.
+
+## Simula: simulating the real world
+
+The first object-oriented language was **Simula**, designed in
+Norway by **Ole-Johan Dahl** and **Kristen Nygaard** in the 1960s.
+Simula was created to simulate real-world systems — ships docking in
+a harbor, customers queueing at a bank, particles in a physics
+experiment.
+
+When you simulate the real world, you very quickly notice that the
+world isn't made of *functions and global variables*. The world is
+made of **things** — ships, customers, particles — and each thing
+has its own state and its own behavior.
+
+```mermaid
+flowchart LR
+    subgraph Harbor
+        S1[Ship A<br/>position, speed, cargo]
+        S2[Ship B<br/>position, speed, cargo]
+        D[Dock<br/>capacity, queue]
+    end
+    S1 -->|"requestDock()"| D
+    S2 -->|"requestDock()"| D
+```
+
+Dahl and Nygaard's insight was: let's just *say that* in the
+language. A ship is a `Ship`. It carries its own data and its own
+behavior with it. That single idea — packaging data and behavior
+together — is the heart of OOP.
+
+## Smalltalk: everything is an object
+
+A few years later in California, **Alan Kay** and his colleagues at
+**Xerox PARC** built **Smalltalk**, a language and environment that
+pushed the idea to its limit: in Smalltalk, *everything is an
+object* — numbers, text, even the code itself. Objects communicated
+by **sending messages** to each other.
+
+Smalltalk also gave us many other ideas we now take for granted:
+the graphical user interface with overlapping windows, the
+WYSIWYG editor, and the mouse. It is no exaggeration to say that
+the way you interact with your computer right now traces back to
+that lab.
+
+## What an "object" actually is
+
+Forget the jargon for a moment. An **object** is just:
+
+1. **Some data** ("state") that the object owns.
+2. **Some operations** ("behavior", or "methods") that act on that
+   data.
+3. A **boundary** that prevents outsiders from messing with the
+   data directly.
+
+Here is one of the simplest possible objects in C#: a counter that
+can be incremented and read, but never reset to a nonsense value.
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+class Counter
+{
+    // STATE: the data this object owns.
+    private int count;
+
+    // BEHAVIOR: operations the outside world is allowed to perform.
+    public void Increment() { count++; }
+
+    public int Value() { return count; }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var c = new Counter();
+        c.Increment();
+        c.Increment();
+        c.Increment();
+        Console.WriteLine($"count = {c.Value()}");
+    }
+}
+`}
+/>
+
+Look closely:
+
+- The variable `count` is marked `private`. Code *outside* the
+  `Counter` class cannot reach in and assign `count = -999`. The
+  only way to change `count` is to call `Increment`.
+- `Increment` and `Value` are marked `public`. They are the
+  **interface** the rest of the program is allowed to use.
+- The class itself is the *boundary*.
+
+That tiny example contains the entire seed of OOP. Everything else —
+inheritance, polymorphism, design patterns — is just elaboration on
+this idea.
+
+## Procedural vs object-oriented, side by side
+
+Imagine modeling a bank account. The procedural way might look like
+this (in pseudocode):
+
+```text
+balance = 0
+
+function deposit(amount):
+    balance = balance + amount
+
+function withdraw(amount):
+    balance = balance - amount   # oops: no check!
+```
+
+Nothing stops someone, somewhere, from writing `balance = -1000000`
+directly. The "rule" that a balance cannot go negative lives in a
+comment, not in the code.
+
+The object-oriented way:
+
+<CodeBlock
+  adapter="csharp"
+  initialCode={`using System;
+
+class BankAccount
+{
+    private decimal balance;   // hidden — nobody outside can touch it
+
+    public void Deposit(decimal amount)
+    {
+        if (amount <= 0) throw new ArgumentException("must be positive");
+        balance += amount;
+    }
+
+    public bool Withdraw(decimal amount)
+    {
+        if (amount <= 0) throw new ArgumentException("must be positive");
+        if (amount > balance) return false;   // refuse to go negative
+        balance -= amount;
+        return true;
+    }
+
+    public decimal Balance() => balance;
+}
+
+class Program
+{
+    static void Main()
+    {
+        var a = new BankAccount();
+        a.Deposit(100m);
+        Console.WriteLine($"balance after deposit: {a.Balance()}");
+        bool ok = a.Withdraw(1000m);
+        Console.WriteLine($"big withdraw allowed? {ok}");
+        Console.WriteLine($"final balance: {a.Balance()}");
+    }
+}
+`}
+/>
+
+The rule "balance is never negative" is now **enforced by the
+class itself**. There is no path through the public API that can
+break it. That is the gift of OOP.
+
+## The four ideas you keep hearing about
+
+OOP is usually summarized with four words. We will spend whole
+pages on each later in the course. For now, just a one-line
+preview:
+
+```mermaid
+mindmap
+  root((OOP))
+    Encapsulation
+      Hide internal state<br/>behind methods
+    Abstraction
+      Expose what matters,<br/>hide how it works
+    Inheritance
+      Build new types from<br/>existing ones
+    Polymorphism
+      Different objects respond<br/>to the same message<br/>in different ways
+```
+
+- **Encapsulation.** Each object hides its data behind a small
+  interface of methods. (You just saw this with `BankAccount`.)
+- **Abstraction.** You can use an object without knowing how it
+  works internally. You drive a car without knowing how the engine
+  is built.
+- **Inheritance.** You can build a new kind of object on top of an
+  existing one. A `SavingsAccount` *is a* `BankAccount` with
+  interest.
+- **Polymorphism.** The same call (`account.Withdraw(50)`) can do
+  different things depending on which *kind* of account it is.
+
+## Why OOP became dominant
+
+By the late 1980s and 1990s, OOP had been picked up and refined by
+**C++** (a superset of C with classes, designed by Bjarne
+Stroustrup) and then by **Java** (1995, designed by James Gosling
+at Sun Microsystems). Big companies bet enormous amounts of money
+on OOP because it offered something procedural code couldn't:
+
+- A way to *structure* very large codebases.
+- A way to *reuse* code across projects.
+- A way to *enforce* rules at the language level instead of in a
+  comment.
+
+When Microsoft eventually designed C#, OOP was the default
+assumption. C# was object-oriented from line one — and we will
+spend a large part of this course learning to think in objects.
+
+## Test your understanding
+
+<MultipleChoice
+  markdown={`What is the single most important idea introduced by object-oriented programming?
+
+- Programs run faster
+  > OOP doesn't fundamentally change how fast code runs.
+- Computers can be replaced more often
+  > Unrelated.
+- [o] Data and the operations that act on it are bundled together, with a boundary that prevents outsiders from changing the data directly
+  > Correct. That is the seed idea — every other OOP concept is built on top of it.
+- Programs no longer need variables
+  > They very much do; OOP is about organizing them, not removing them.`}
+/>
+
+<MultipleChoice
+  markdown={`In the \`BankAccount\` example, why is \`balance\` declared \`private\`?
+
+- The compiler is faster on private fields
+  > Performance is not the reason.
+- Private fields take less memory
+  > Visibility doesn't change memory size.
+- [o] So no code outside \`BankAccount\` can bypass the rules in \`Deposit\` and \`Withdraw\` and corrupt the balance
+  > Correct. \`private\` is what gives the class authority to enforce its own invariants.
+- C# requires every field to be private
+  > It doesn't — \`public\` and other modifiers are also allowed; you choose deliberately.`}
+/>
+
+<Callout type="success">
+Next: while OOP was spreading, a parallel story was unfolding —
+the rise of **Windows** and the enormous enterprise software
+ecosystem Microsoft built around it.
+</Callout>
