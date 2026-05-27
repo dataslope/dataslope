@@ -173,11 +173,11 @@ ink. Tradeoffs.
 <MultipleChoice
   markdown={`Which Plotly Express argument maps a column to **horizontal position**?
 
-- `color="..."`
-- `size="..."`
-- [o] `x="..."`
-  > Yes. `x="column_name"` tells Plotly Express to use that column for the horizontal axis. Combined with `y`, these two arguments do most of the work in any scatter, line, or bar chart.
-- `facet_col="..."`
+- **color="..."**
+- **size="..."**
+- [o] **x="..."**
+  > Yes. **x="column_name"** tells Plotly Express to use that column for the horizontal axis. Combined with **y**, these two arguments do most of the work in any scatter, line, or bar chart.
+- **facet_col="..."**
 
 Position along x and y are the two most powerful encodings — use them for what matters most.`}
 />
@@ -188,7 +188,7 @@ Position along x and y are the two most powerful encodings — use them for what
 - color = price, x = year built, y = square footage, size = neighborhood
 - size = price, color = year built, x = neighborhood, y = square footage
 - [o] x = square footage, y = price, color = neighborhood, size = year built (or similar)
-  > Yes. Position (x and y) is the most accurate channel — putting the two quantitative variables you most want to compare (`price` and `square footage`) on x and y gives the reader the clearest possible read of their relationship. Color carries the categorical neighborhood; size carries the secondary continuous variable.
+  > Yes. Position (x and y) is the most accurate channel — putting the two quantitative variables you most want to compare (**price** and **square footage**) on x and y gives the reader the clearest possible read of their relationship. Color carries the categorical neighborhood; size carries the secondary continuous variable.
 - color = neighborhood, size = price, x = year built, y = price
 
 A general rule: the two most important *quantitative* variables go on x and y.`}
@@ -207,7 +207,7 @@ Color hue = categories. Color intensity (light → dark) = quantity. Mixing them
 />
 
 <MultipleChoice
-  markdown={`You facet a Plotly Express chart by `facet_col="region"` *and* also color by `color="region"`. What is the result?
+  markdown={`You facet a Plotly Express chart by **facet_col="region"** *and* also color by **color="region"**. What is the result?
 
 - The chart will fail to render.
 - Plotly will crash.

@@ -195,9 +195,9 @@ provide *context* without competing for attention.
 <MultipleChoice
   markdown={`Which color palette family should you use for **unordered categorical** data with 5-7 categories?
 
-- A sequential palette like `Viridis`.
-- A diverging palette like `RdBu`.
-- [o] A **qualitative** palette like `Plotly` or `Vivid` — distinct hues with no implied ordering.
+- A sequential palette like **Viridis**.
+- A diverging palette like **RdBu**.
+- [o] A **qualitative** palette like **Plotly** or **Vivid** — distinct hues with no implied ordering.
   > Yes. Qualitative palettes use different *hues* so the eye sees the categories as distinct, with no implied order or magnitude. For more than ~7 categories, even good qualitative palettes start running out of distinguishable hues and you should reach for facets instead.
 - A grayscale ramp.
 
@@ -205,12 +205,12 @@ Color hue = categories. Color intensity = quantity. Don't mix them up.`}
 />
 
 <MultipleChoice
-  markdown={`Why should a **diverging** color palette like `RdBu` be **centered at the meaningful midpoint** (e.g., 0 for correlations or year-over-year change)?
+  markdown={`Why should a **diverging** color palette like **RdBu** be **centered at the meaningful midpoint** (e.g., 0 for correlations or year-over-year change)?
 
 - Plotly requires it.
 - It makes the chart smaller.
 - [o] Centering the white anchor at the meaningful zero makes the reader instantly see positive vs negative, and the chart's coloring directly mirrors the data's sign.
-  > Right. If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral" — it means "average," which is a different and often confusing message. `color_continuous_midpoint=0` (in Plotly Express) makes the encoding honest.
+  > Right. If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral" — it means "average," which is a different and often confusing message. **color_continuous_midpoint=0** (in Plotly Express) makes the encoding honest.
 - White is more accessible than other colors.
 
 Diverging data deserves diverging palettes, centered at the meaningful midpoint.`}

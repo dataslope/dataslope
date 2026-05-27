@@ -167,25 +167,25 @@ seconds.
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does **`hover_name="country"`** do in a Plotly Express call?
+  markdown={`What does ****hover_name="country"**** do in a Plotly Express call?
 
 - Renames the country column.
 - Hides the country column from the data.
 - [o] Sets the value of that column as a bold headline at the top of the hover tooltip for each data point.
-  > Yes. `hover_name` is for the "title" of the tooltip — usually a unique identifier like a name, ID, or label. Combined with `hover_data` for extra fields, you can turn each hover into a small information panel about a single data point.
+  > Yes. **hover_name** is for the "title" of the tooltip — usually a unique identifier like a name, ID, or label. Combined with **hover_data** for extra fields, you can turn each hover into a small information panel about a single data point.
 - Forces the chart to use country as the color.
 
-Adding `hover_name` is often the single biggest improvement you can make to an analytical scatter plot.`}
+Adding **hover_name** is often the single biggest improvement you can make to an analytical scatter plot.`}
 />
 
 <MultipleChoice
-  markdown={`Which `hover_data` value would format a population of `1234567` as `"1,234,567"`?
+  markdown={`Which **hover_data** value would format a population of **1234567** as **"1,234,567"**?
 
-- `True`
-- `":.2f"`
-- [o] `":,"`
-  > Right. The `","` format spec inserts thousands separators. For more control, combine: `":,.0f"` gives 1,234,567 (no decimals) and `":,.2f"` gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
-- `"%population%"`
+- **True**
+- **":.2f"**
+- [o] **":,"**
+  > Right. The **","** format spec inserts thousands separators. For more control, combine: **":,.0f"** gives 1,234,567 (no decimals) and **":,.2f"** gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
+- **"%population%"**
 
 Plotly's hover format strings mostly follow Python's mini-format-language, which is convenient if you already know f-strings.`}
 />

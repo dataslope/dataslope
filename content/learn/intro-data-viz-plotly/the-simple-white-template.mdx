@@ -168,28 +168,28 @@ and dashboards.
   > Yes. A template is a named bundle of styling defaults. It does not change any analytical content — only how the chart *looks*. Templates are layered on top of whatever encodings you've already chosen.
 - Whether the chart is interactive.
 
-Templates are pure cosmetics. Your encoding choices (`x`, `y`, `color`, ...) determine what the chart *means*.`}
+Templates are pure cosmetics. Your encoding choices (**x**, **y**, **color**, ...) determine what the chart *means*.`}
 />
 
 <MultipleChoice
-  markdown={`Why does this course pick `template="simple_white"` as the default?
+  markdown={`Why does this course pick **template="simple_white"** as the default?
 
 - It is the only template that supports interactive charts.
 - It is required by Plotly Express.
 - [o] It removes visual noise (no gray background, minimal gridlines), letting the data stand out — and it prints / renders cleanly on most surfaces.
-  > Yes. `simple_white` is a deliberately minimal style: light background, light gridlines, clean fonts. It works well for both screen and print, and lets the encoded data be the most prominent element. Other templates (e.g., `plotly_dark`) are perfectly valid for other contexts.
-- `simple_white` makes charts render faster.
+  > Yes. **simple_white** is a deliberately minimal style: light background, light gridlines, clean fonts. It works well for both screen and print, and lets the encoded data be the most prominent element. Other templates (e.g., **plotly_dark**) are perfectly valid for other contexts.
+- **simple_white** makes charts render faster.
 
-Other templates are equally valid; `simple_white` was chosen here for consistency and clarity, not because it's "best."`}
+Other templates are equally valid; **simple_white** was chosen here for consistency and clarity, not because it's "best."`}
 />
 
 <MultipleChoice
-  markdown={`How can you set `simple_white` as the **default template for an entire session**, so you don't have to type `template="simple_white"` on every chart?
+  markdown={`How can you set **simple_white** as the **default template for an entire session**, so you don't have to type **template="simple_white"** on every chart?
 
-- Pass `default=True` to your first chart.
+- Pass **default=True** to your first chart.
 - Rename the package.
-- [o] Set `plotly.io.templates.default = "simple_white"` once near your imports.
-  > Right. `plotly.io.templates.default = "..."` configures the default template for all subsequent Plotly figures in the session. You can still override it on individual charts by passing an explicit `template=`.
+- [o] Set **plotly.io.templates.default = "simple_white"** once near your imports.
+  > Right. **plotly.io.templates.default = "..."** configures the default template for all subsequent Plotly figures in the session. You can still override it on individual charts by passing an explicit **template=**.
 - Edit the Plotly source code.
 
 In a notebook, this one line near the top saves you a lot of repetition.`}

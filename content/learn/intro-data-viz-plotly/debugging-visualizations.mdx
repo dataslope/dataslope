@@ -207,7 +207,7 @@ fig.show()
 - A bug in Plotly.
 - The wrong template.
 - [o] The DataFrame is not sorted by the x-axis column. Lines connect points in DataFrame order, not in x-axis order.
-  > Yes. Plotly connects points in the order they appear in the DataFrame. If your data is unsorted by x, the line will zigzag. Fix: `df.sort_values("x")` before plotting.
+  > Yes. Plotly connects points in the order they appear in the DataFrame. If your data is unsorted by x, the line will zigzag. Fix: **df.sort_values("x")** before plotting.
 - You need more colors.
 
 This is *the* most common line-chart bug. Always sort by x first.`}
@@ -218,7 +218,7 @@ This is *the* most common line-chart bug. Always sort by x first.`}
 
 - Wide format (one column per category).
 - [o] Long format (one row per observation, with separate columns for the category, the value, and any grouping variable).
-  > Right. Long ("tidy") format is the Plotly Express convention. If your data is wide, use `df.melt(...)` to reshape it before plotting.
+  > Right. Long ("tidy") format is the Plotly Express convention. If your data is wide, use **df.melt(...)** to reshape it before plotting.
 - A NumPy array.
 - A nested dictionary.
 
@@ -226,13 +226,13 @@ Most "I can't get this chart to work" problems for beginners trace back to wide-
 />
 
 <MultipleChoice
-  markdown={`You add `log_y=True` to a scatter plot and suddenly some points disappear. Why?
+  markdown={`You add **log_y=True** to a scatter plot and suddenly some points disappear. Why?
 
 - Plotly randomly samples points on log axes.
 - [o] Log of zero or a negative number is undefined, so those points are silently dropped.
   > Exactly. The log axis can only show positive values. If your data has zeros or negatives, those rows quietly disappear. Either filter them out explicitly (so you know what's gone) or use a linear axis.
 - Log axes only show 100 points.
-- The `simple_white` template hides points.
+- The **simple_white** template hides points.
 
 If a transform changes your data, do it explicitly so you stay in control.`}
 />
@@ -242,7 +242,7 @@ If a transform changes your data, do it explicitly so you stay in control.`}
 
 - Try a different chart type.
 - Try a different template.
-- [o] Inspect the DataFrame: `head()`, `dtypes`, `shape`, `isna().sum()`. The chart is usually showing the data correctly; the data isn't what you think it is.
+- [o] Inspect the DataFrame: **head()**, **dtypes**, **shape**, **isna().sum()**. The chart is usually showing the data correctly; the data isn't what you think it is.
   > Yes. The chart is honest about what's in the DataFrame. If the chart looks wrong, almost always the *data* is the surprise — wrong types, unsorted, missing values, or the wrong shape. Look at the data first.
 - Restart the notebook.
 

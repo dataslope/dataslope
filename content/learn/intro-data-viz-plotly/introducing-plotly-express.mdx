@@ -186,35 +186,35 @@ small, real, and don't require any file I/O.
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does `import plotly.express as px` do?
+  markdown={`What does **import plotly.express as px** do?
 
-- It imports the `plotly` module and runs it.
+- It imports the **plotly** module and runs it.
 - It installs Plotly Express.
-- [o] It loads the Plotly Express module and gives it the short alias `px`, so you can write `px.bar(...)` instead of `plotly.express.bar(...)`.
-  > Yes. Aliasing imports (`as px`, `as pd`, `as np`) is a near-universal Python convention. The alias `px` is the canonical one for Plotly Express; you will see it in essentially every notebook in the wild.
+- [o] It loads the Plotly Express module and gives it the short alias **px**, so you can write **px.bar(...)** instead of **plotly.express.bar(...)**.
+  > Yes. Aliasing imports (**as px**, **as pd**, **as np**) is a near-universal Python convention. The alias **px** is the canonical one for Plotly Express; you will see it in essentially every notebook in the wild.
 - It downloads a Plotly chart.
 
 You will type this line at the top of nearly every file in this course.`}
 />
 
 <MultipleChoice
-  markdown={`A Plotly Express function call like `px.bar(df, x="month", y="sales")` returns:
+  markdown={`A Plotly Express function call like **px.bar(df, x="month", y="sales")** returns:
 
 - A PNG image.
 - An HTML string.
-- [o] A Plotly **Figure** object that can be inspected, modified, and rendered with `fig.show()`.
-  > Right. The Figure is a Python object that holds a complete description of the chart. Calling `.show()` sends it to your browser to be drawn by Plotly.js. You can also modify the figure (e.g., `fig.update_layout(...)`) before showing it.
+- [o] A Plotly **Figure** object that can be inspected, modified, and rendered with **fig.show()**.
+  > Right. The Figure is a Python object that holds a complete description of the chart. Calling **.show()** sends it to your browser to be drawn by Plotly.js. You can also modify the figure (e.g., **fig.update_layout(...)**) before showing it.
 - The DataFrame, sorted.
 
-The fact that `fig` is a real Python object is what makes Plotly Express extensible: you can call Plotly Express for the easy 90% and then tweak the figure for the last 10%.`}
+The fact that **fig** is a real Python object is what makes Plotly Express extensible: you can call Plotly Express for the easy 90% and then tweak the figure for the last 10%.`}
 />
 
 <MultipleChoice
   markdown={`Which of these is **NOT** part of the standard Plotly Express call pattern?
 
 - A DataFrame as the first argument.
-- Column names as the values of `x`, `y`, `color`, etc.
-- A `template=...` argument for visual styling.
+- Column names as the values of **x**, **y**, **color**, etc.
+- A **template=...** argument for visual styling.
 - [o] A function that runs the chart against a SQL database directly.
   > Correct — this is the odd one out. Plotly Express does not query databases. You first load data into a pandas DataFrame (using SQL, CSV, Parquet, or whatever), and *then* you call Plotly Express. Keeping data loading separate from charting is a feature, not a limitation.
 
@@ -224,11 +224,11 @@ Pandas does the loading and reshaping; Plotly Express does the visualization. Tw
 <MultipleChoice
   markdown={`Which built-in Plotly Express dataset is most useful for **time-series** examples?
 
-- `px.data.iris()`
-- `px.data.tips()`
-- [o] `px.data.gapminder()` or `px.data.stocks()`
-  > Yes. `gapminder()` has yearly country-level data from 1952-2007; `stocks()` has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. `iris` and `tips` are static datasets — no time component.
-- `px.data.election()`
+- **px.data.iris()**
+- **px.data.tips()**
+- [o] **px.data.gapminder()** or **px.data.stocks()**
+  > Yes. **gapminder()** has yearly country-level data from 1952-2007; **stocks()** has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. **iris** and **tips** are static datasets — no time component.
+- **px.data.election()**
 
 The built-in datasets are deliberately diverse so you have a sample for each chart type.`}
 />

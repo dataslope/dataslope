@@ -168,15 +168,15 @@ The best charts often start with the question: *what am I going to filter out?*`
 />
 
 <MultipleChoice
-  markdown={`Which pandas idiom keeps rows where the **`continent`** column is in `["Europe", "Asia"]`?
+  markdown={`Which pandas idiom keeps rows where the ****continent**** column is in **["Europe", "Asia"]**?
 
-- `df[df["continent"] == ["Europe", "Asia"]]`
-- `df[df["continent"] in ["Europe", "Asia"]]`
-- [o] `df[df["continent"].isin(["Europe", "Asia"])]`
-  > Yes. `.isin([...])` is the canonical "value matches any of these" filter. It also works with `~df["continent"].isin([...])` for *NOT in*. The other two syntaxes either don't do what they look like or raise an error.
-- `df.filter(continent=["Europe", "Asia"])`
+- **df[df["continent"] == ["Europe", "Asia"]]**
+- **df[df["continent"] in ["Europe", "Asia"]]**
+- [o] **df[df["continent"].isin(["Europe", "Asia"])]**
+  > Yes. **.isin([...])** is the canonical "value matches any of these" filter. It also works with **~df["continent"].isin([...])** for *NOT in*. The other two syntaxes either don't do what they look like or raise an error.
+- **df.filter(continent=["Europe", "Asia"])**
 
-`.isin()` is one of the most-used pandas methods. Worth memorizing.`}
+**.isin()** is one of the most-used pandas methods. Worth memorizing.`}
 />
 
 <MultipleChoice
