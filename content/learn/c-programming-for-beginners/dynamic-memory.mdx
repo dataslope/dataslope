@@ -1,0 +1,376 @@
+---
+title: Dynamic Memory
+description: malloc, free, the heap, and why managing memory by hand is both powerful and dangerous
+---
+
+So far, every variable we've used has been a **local variable**
+(sitting on the stack) or a fixed-size array known at compile time.
+What if you don't know how much memory you'll need until the program
+is already running?
+
+That's what the **heap** is for. The heap is a big pool of memory
+your program can grab chunks from and give back as it sees fit. The
+controls are `malloc` and `free`.
+
+## Stack vs heap, in one picture
+
+```mermaid
+flowchart TB
+    subgraph "Process memory"
+      CODE["Code (your compiled instructions)"]
+      DATA["Globals & constants"]
+      HEAP["Heap (grows downward in this picture)<br/>malloc lives here"]
+      STACK["Stack (grows upward in this picture)<br/>function locals live here"]
+    end
+```
+
+| Stack                                | Heap                              |
+|--------------------------------------|-----------------------------------|
+| Automatic — frame per function call  | Manual — `malloc` / `free`        |
+| Size fixed at compile time           | Size decided at runtime           |
+| Very fast                            | Fast, but slower than stack       |
+| Freed automatically on return        | Lives until **you** free it       |
+| Small (typically a few MB)           | Large (often many GB)             |
+
+If a value is small and short-lived, put it on the stack. If a value
+must outlive the function that created it, or must be sized at
+runtime, put it on the heap.
+
+## `malloc` and `free`
+
+`malloc(n)` asks the operating system for a chunk of `n` bytes and
+returns a pointer to it (or `NULL` if it failed). Always include
+`<stdlib.h>`.
+
+```c
+int *nums = malloc(10 * sizeof(int));
+if (nums == NULL) {
+    // out of memory — handle it
+}
+// use nums[0]..nums[9]
+free(nums);
+nums = NULL;       // optional but smart
+```
+
+The shape `malloc(N * sizeof(T))` is the canonical form. Read it as
+"give me room for N things of type T".
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int n;
+    printf("How many numbers? ");
+    if (scanf("%d", &n) != 1 || n <= 0) {
+        return 1;
+    }
+
+    int *nums = malloc(n * sizeof(int));
+    if (nums == NULL) {
+        fprintf(stderr, "out of memory\\n");
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) nums[i] = i * i;
+    for (int i = 0; i < n; i++) printf("%d ", nums[i]);
+    printf("\\n");
+
+    free(nums);
+    return 0;
+}
+`}
+/>
+
+The point is the **runtime-decided size**. You could not have
+written `int nums[n];` at the top of `main` portably; with `malloc`
+you can ask for exactly as much as you need.
+
+## What `free` does (and doesn't do)
+
+`free(p)` returns the chunk `p` points at to the heap, so other
+parts of the program can reuse it. It does **not**:
+
+- Set `p` to `NULL` — the variable `p` still holds the same address.
+- Erase the memory — the bytes are still there until something
+  overwrites them.
+- Tell you whether you'd already freed the chunk.
+
+That's why dangling pointers — pointers to memory that has already
+been freed — are one of the most dangerous bug types in C. A
+self-discipline that helps: after `free(p)`, immediately do
+`p = NULL;`.
+
+## `calloc` and `realloc`
+
+Two close cousins of `malloc` are worth knowing:
+
+- `calloc(count, size)` — like `malloc(count * size)` but
+  **zero-initializes** the memory. Useful when you want a clean
+  slate.
+- `realloc(p, new_size)` — resize an existing allocation. May move
+  it; always reassign:
+  `p = realloc(p, new_size);` and check the result before using.
+
+A classic pattern is a growable buffer: start with a small `malloc`,
+`realloc` to double the capacity when full.
+
+## Lifetimes and ownership
+
+Every chunk of `malloc`-ed memory belongs to *someone*. That someone
+is responsible for eventually calling `free`. C doesn't track this
+for you; it's a convention your code has to make obvious.
+
+A useful rule: **wherever you create a heap allocation, decide who
+will free it before you write another line**. The most common
+discipline is "the function that allocates is also the function that
+frees", but for larger structures, you often have an explicit
+*destructor* function:
+
+```c
+struct Foo *foo_new(void);
+void        foo_free(struct Foo *foo);
+```
+
+A function called `_new` allocates, the matching `_free` releases.
+Every `_new` call must be balanced by exactly one `_free` call.
+
+## The three memory bugs you must recognize
+
+These are the classics. Every C programmer will write them at some
+point. The skill is recognizing them quickly.
+
+### 1. Memory leak
+
+You allocated memory and never freed it. Each leak is a slow drip;
+in a long-running program they add up until the system runs out of
+RAM.
+
+```c
+int *p = malloc(1000 * sizeof(int));
+// ...use p...
+// forgot to free(p)
+```
+
+### 2. Use-after-free
+
+You freed memory, then used the pointer anyway:
+
+```c
+free(p);
+p[0] = 5;       // UB — that memory is no longer yours
+```
+
+### 3. Double-free
+
+You freed the same pointer twice:
+
+```c
+free(p);
+free(p);        // UB — corruption of the heap's bookkeeping
+```
+
+Tools like Valgrind and AddressSanitizer can catch all three
+automatically. We'll mention them again in the debugging chapter.
+
+## Returning a heap-allocated array from a function
+
+This is the canonical reason for `malloc`: you can't return a local
+array (it'd die when the function returns), but you *can* return a
+pointer to heap memory.
+
+<CodeBlock
+  adapter="c"
+  initialCode={`#include <stdio.h>
+#include <stdlib.h>
+
+int *make_squares(int n) {
+    int *out = malloc(n * sizeof(int));
+    if (out == NULL) return NULL;
+    for (int i = 0; i < n; i++) out[i] = i * i;
+    return out;
+}
+
+int main(void) {
+    int n = 6;
+    int *sq = make_squares(n);
+    if (sq == NULL) return 1;
+
+    for (int i = 0; i < n; i++) printf("%d ", sq[i]);
+    printf("\\n");
+
+    free(sq);             // caller is responsible
+    return 0;
+}
+`}
+/>
+
+Notice the comment in the source code is doing real work: it tells
+the reader that `main` must `free` what `make_squares` returned.
+
+## Multi-file challenge: a growable integer buffer
+
+Build a tiny "dynamic array" in two files. The header declares the
+type and operations, the implementation manages a `malloc`-ed
+buffer. `main.c` exercises it.
+
+<ChallengeCard
+  adapter="c"
+  title="Build a tiny dynamic array"
+  entryFilename="main.c"
+  instructions={`Implement a small dynamic array of ints split across three files.
+
+**\`dynarr.h\`** declares:
+
+\`\`\`c
+typedef struct {
+    int   *data;
+    size_t length;
+    size_t capacity;
+} DynArr;
+
+void da_init(DynArr *a);
+void da_push(DynArr *a, int value);
+void da_free(DynArr *a);
+\`\`\`
+
+**\`dynarr.c\`** implements them. \`da_push\` must double the capacity (starting from 1) whenever \`length == capacity\`.
+
+**\`main.c\`** pushes 1..5 and prints them space-separated on one line, then frees.
+
+The program must print exactly:
+
+\`\`\`
+1 2 3 4 5
+\`\`\``}
+  files={[
+    {
+      filename: "main.c",
+      initialContent: `#include <stdio.h>
+#include "dynarr.h"
+
+int main(void) {
+    DynArr a;
+    da_init(&a);
+    for (int i = 1; i <= 5; i++) {
+        da_push(&a, i);
+    }
+    for (size_t i = 0; i < a.length; i++) {
+        printf("%d%s", a.data[i], i + 1 == a.length ? "\\n" : " ");
+    }
+    da_free(&a);
+    return 0;
+}
+`,
+    },
+    {
+      filename: "dynarr.h",
+      initialContent: `#ifndef DYNARR_H
+#define DYNARR_H
+
+#include <stddef.h>
+
+typedef struct {
+    int   *data;
+    size_t length;
+    size_t capacity;
+} DynArr;
+
+void da_init(DynArr *a);
+void da_push(DynArr *a, int value);
+void da_free(DynArr *a);
+
+#endif
+`,
+    },
+    {
+      filename: "dynarr.c",
+      initialContent: `#include <stdlib.h>
+#include "dynarr.h"
+
+void da_init(DynArr *a) {
+    // your code here
+}
+
+void da_push(DynArr *a, int value) {
+    // your code here
+}
+
+void da_free(DynArr *a) {
+    // your code here
+}
+`,
+      solutionContent: `#include <stdlib.h>
+#include "dynarr.h"
+
+void da_init(DynArr *a) {
+    a->data = NULL;
+    a->length = 0;
+    a->capacity = 0;
+}
+
+void da_push(DynArr *a, int value) {
+    if (a->length == a->capacity) {
+        size_t new_cap = a->capacity == 0 ? 1 : a->capacity * 2;
+        int *new_data = realloc(a->data, new_cap * sizeof(int));
+        if (new_data == NULL) return;
+        a->data = new_data;
+        a->capacity = new_cap;
+    }
+    a->data[a->length++] = value;
+}
+
+void da_free(DynArr *a) {
+    free(a->data);
+    a->data = NULL;
+    a->length = 0;
+    a->capacity = 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "dynarr",
+      name: "Prints 1..5 space-separated",
+      description: "stdout equals `1 2 3 4 5`",
+      expect: { stdoutEquals: "1 2 3 4 5" },
+    },
+  ]}
+/>
+
+The doubling strategy is what `std::vector` does in C++ and what
+Python's `list` does. Allocating one element at a time would make
+every push O(n); doubling makes each push amortized O(1).
+
+<MultipleChoice
+  markdown={`What is wrong with this code?
+
+\`\`\`c
+int *p = malloc(sizeof(int));
+*p = 42;
+free(p);
+printf("%d\\n", *p);
+\`\`\`
+
+- It will fail to compile.
+- The \`malloc\` will fail because 4 bytes is too small.
+- [o] \`*p\` is a use-after-free; the memory was returned to the heap and may now belong to something else.
+  > Correct! Reading or writing through a pointer after \`free\` is undefined behavior. It might appear to work today and crash tomorrow.
+- The \`printf\` requires \`%p\`, not \`%d\`.
+
+The cure is to either not access the memory after \`free\`, or to set \`p = NULL;\` after the \`free\` so the bug crashes loudly rather than silently corrupting other data.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of the following allocations leaves you with **zero-initialized** memory without a separate loop?
+
+- \`malloc(n * sizeof(int))\`
+- [o] \`calloc(n, sizeof(int))\`
+  > Correct! \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
+- \`realloc(NULL, n * sizeof(int))\`
+- \`alloca(n * sizeof(int))\`
+
+\`calloc\` is also the idiomatic choice when you need an array of structs where every field should start at zero.`}
+/>

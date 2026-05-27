@@ -1,0 +1,208 @@
+---
+title: Where to Go Next
+description: A roadmap for life after this course
+---
+
+If you've made it through this course, you can now write, read, and
+reason about real C programs. You understand how variables live in
+memory, how pointers walk through it, how the stack grows and
+shrinks with function calls, how the heap supports data structures
+the size of which you don't know in advance, and why "undefined
+behavior" is a phrase to take seriously.
+
+That's a real foundation. So — what's next?
+
+## Solidify the basics
+
+Before sprinting toward new languages and frameworks, spend time
+deepening the C you already have. The fastest path is to **write
+more C**, especially programs that don't fit in a single page.
+
+Project ideas at the right size:
+
+- A **word-frequency counter**: read a text file, print words sorted
+  by frequency. Exercises file I/O, strings, hash maps (you build
+  one), and sorting.
+- A **tiny calculator**: tokenize and evaluate expressions like
+  `3 + 4 * (5 - 2)`. Exercises recursion, parsing, structs.
+- A **`grep` clone**: take a pattern and a filename, print matching
+  lines. Exercises file I/O, command-line arguments, strings.
+- A **maze solver**: read a grid from a file, find a path from start
+  to end. Exercises 2D arrays, recursion or BFS, basic algorithms.
+- A **memory-mapped database**: store key/value pairs in a file,
+  with insert and lookup. Exercises file I/O, structs, persistent
+  data.
+
+Each one will teach you more than another tutorial would. Aim to
+finish each project completely (including reading from real input,
+handling errors, and freeing all memory) rather than starting many
+and finishing none.
+
+## The C standard library
+
+You've met `<stdio.h>`, `<stdlib.h>`, `<string.h>`. There's more.
+Worth exploring next:
+
+- `<ctype.h>` — character classification (`isspace`, `isdigit`,
+  `tolower`).
+- `<math.h>` — `sqrt`, `sin`, `pow`, `floor`. Often needs `-lm` at
+  link time outside browser playgrounds.
+- `<time.h>` — clocks, timers, formatting dates.
+- `<assert.h>` — `assert(x)` aborts the program if `x` is false; a
+  useful sanity check during development.
+- `<stdint.h>` and `<stdbool.h>` — exact-width integer types
+  (`int32_t`, `uint8_t`) and `bool`.
+- `<errno.h>` — how system calls report errors.
+
+Browse the [cppreference C library](https://en.cppreference.com/w/c)
+section. You don't need to memorize anything; just know what's
+*there* so you can look it up when you need it.
+
+## Tools every C programmer should know
+
+C is a small language with a big ecosystem of tools. Three are
+indispensable:
+
+### A real build system
+
+You've been using single-file builds. Real projects use a build
+system that handles many files, dependencies, and incremental
+recompilation. **Make** is the classic. **CMake** is the modern
+de-facto standard for cross-platform projects. **Meson** and
+**Ninja** are excellent newer alternatives.
+
+Don't learn all of them. Pick one, build something with it.
+
+### A debugger
+
+`gdb` (GNU Debugger) and `lldb` (LLVM Debugger) let you stop a
+running program at any line, inspect variables, walk through code
+one step at a time. Beginners often resist debuggers because they
+feel "advanced", but the basics are tiny:
+
+```text
+gdb ./myprog
+> break main
+> run
+> next
+> print x
+> continue
+```
+
+That's enough to debug 90% of bugs.
+
+### Sanitizers
+
+Compile with `-fsanitize=address -fsanitize=undefined` (Clang and
+GCC). Your program will run a bit slower but will *halt immediately*
+with a precise diagnosis the moment you hit a memory bug or
+undefined behavior. This is the single biggest productivity boost
+available to a C programmer.
+
+## Recommended books
+
+A small, opinionated list — none of these are mandatory, but each is
+worth its weight.
+
+- **"The C Programming Language"** by Brian W. Kernighan and Dennis
+  M. Ritchie ("K&R"). The original book by C's creator. Slim, clear,
+  still essentially correct. Read it cover to cover — it's short.
+- **"C Programming: A Modern Approach"** by K. N. King. A thorough
+  modern textbook with great exercises. Good as a reference too.
+- **"Computer Systems: A Programmer's Perspective"** by Bryant and
+  O'Hallaron. Not strictly a C book, but the book that will deepen
+  your understanding of *what's actually happening* when your C
+  program runs.
+- **"The Practice of Programming"** by Kernighan and Pike. Style,
+  debugging, testing. Slim and brilliant.
+
+If you only read one, read K&R. It's a rite of passage.
+
+## What to learn after C
+
+C is one of the best languages to *start* with, but rarely the best
+language to *finish* with. A few natural follow-ups:
+
+### C++
+
+The closest neighbor. Adds classes, generics (templates),
+exceptions, a huge standard library (the STL), and a powerful but
+intimidating type system. If you already know C, you can read C++
+code immediately; writing idiomatic C++ takes time. Start with
+"A Tour of C++" by Bjarne Stroustrup.
+
+### Rust
+
+C's spiritual successor for low-level work. Same performance
+profile, but the compiler refuses to let you write the memory bugs
+you learned to fear in C. Steep learning curve, very rewarding. The
+official "The Rust Programming Language" book is excellent.
+
+### Go
+
+Garbage-collected and easy to learn, with a syntax that feels like
+"C with packages and concurrency". Great for servers and command-line
+tools. You'll feel productive in a weekend.
+
+### Python or JavaScript
+
+For everyday scripting, data work, and web development, a
+high-level language pays off quickly. You'll appreciate the
+conveniences — strings without manual memory management, hash maps
+as a built-in type — much more than someone who'd never used C.
+
+### Assembly
+
+The other direction. Write a few small programs in x86-64 or ARM
+assembly. You'll understand exactly what `i++` compiles into, why a
+function call has overhead, and why the stack grows the way it does.
+You'll never write much assembly in real life, but once you've seen
+under the hood your C will improve.
+
+## A note on what really matters
+
+It is tempting at this stage to chase "the next language". Resist
+that for a few months. The single best thing you can do for your
+programming life — in any language — is to **write more programs
+end-to-end**, debug them, finish them, and read other people's
+finished programs.
+
+Languages are tools. The thing you're actually building is your
+ability to think clearly about computation: to decompose problems,
+to imagine how memory changes step by step, to predict what a piece
+of code will do before running it, to find bugs by hypothesis rather
+than panic. Every chapter of this course was, in the end, training
+in that skill. C is just an unusually honest place to practice it.
+
+Welcome to the craft. There is a lot of code waiting for you.
+
+<Callout type="info" title="One last challenge">
+  Pick **one** of the project ideas above and start it this week.
+  Don't plan, don't shop for the perfect language — open an editor,
+  create `main.c`, and write `printf("starting...\n");`. Everything
+  else follows.
+</Callout>
+
+<MultipleChoice
+  markdown={`Which of the following is the **single most useful** tool to add to your workflow once you start writing non-trivial C?
+
+- A new IDE with prettier syntax highlighting.
+- A web search engine.
+- [o] AddressSanitizer (\`-fsanitize=address\`) or Valgrind, to catch memory bugs at the moment they happen.
+  > Correct! Memory bugs in C are infamous for crashing the program far from where the actual bug is. Sanitizers turn "mysterious crash an hour later" into "precise error message at the offending line". Nothing else comes close in productivity gain.
+- A heavier build system.
+
+A close runner-up is the debugger (\`gdb\` / \`lldb\`), but sanitizers tend to win on raw bug-finding power, especially for beginners.`}
+/>
+
+<MultipleChoice
+  markdown={`You finish this course and want to keep growing as a programmer. The advice from this chapter is best summarized as:
+
+- Read every recommended book before writing more code.
+- Switch immediately to Rust or C++ to avoid C's pitfalls.
+- [o] Write more complete programs in C, end-to-end, and use tools (debugger, sanitizers) to deepen your understanding before chasing new languages.
+  > Correct! Skill comes from writing and finishing programs, not from collecting languages. C is an unusually honest place to practice computational thinking; staying with it for a while pays off no matter what you write next.
+- Memorize the entire C standard library.
+
+There is nothing wrong with learning a new language soon — but the foundation you've built is the part that's hardest to acquire, and the most valuable to deepen first.`}
+/>
