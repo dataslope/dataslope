@@ -148,6 +148,7 @@ interface PlotlyAPI {
     layout?: Record<string, unknown>,
     config?: Record<string, unknown>,
   ): Promise<unknown>;
+  templates?: Record<string, unknown>;
 }
 
 
@@ -316,7 +317,6 @@ function computeRunButtonState(
 }
 
 const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
-const PLOTLY_DARK_DEFAULTS = { template: "plotly_dark", margin: PLOTLY_MARGIN };
 const PLOTLY_LIGHT_DEFAULTS = { template: "plotly", margin: PLOTLY_MARGIN };
 
 function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
@@ -331,10 +331,18 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
       const mod = await import("plotly.js-dist-min");
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      const isLight =
-        document.documentElement.getAttribute("data-pg-theme") === "light";
+      // Playground pages set data-pg-theme; /learn pages use Fumadocs which
+      // adds the .dark class via next-themes. Check both.
+      const html = document.documentElement;
+      const pgTheme = html.getAttribute("data-pg-theme");
+      const isLight = pgTheme
+        ? pgTheme === "light"
+        : !html.classList.contains("dark");
+      // Resolve the template object directly so string lookup can't silently
+      // fall back to the default light template.
+      const darkTemplate = Plotly.templates?.["plotly_dark"] ?? "plotly_dark";
       const layout = {
-        ...(isLight ? PLOTLY_LIGHT_DEFAULTS : PLOTLY_DARK_DEFAULTS),
+        ...(isLight ? PLOTLY_LIGHT_DEFAULTS : { template: darkTemplate, margin: PLOTLY_MARGIN }),
         ...(figure.layout ?? {}),
       };
       void Plotly.newPlot(el, figure.data, layout, {
