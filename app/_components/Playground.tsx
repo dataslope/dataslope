@@ -315,24 +315,22 @@ function computeRunButtonState(
   };
 }
 
-// Plotly dark layout defaults applied to every chart when the user doesn't
-// override them.
-const PLOTLY_DARK_DEFAULTS = {
-  paper_bgcolor: "#0f1117",
-  plot_bgcolor: "#161b27",
-  font: { color: "#e2e8f0", family: "Inter, system-ui, sans-serif" },
-  xaxis: {
-    gridcolor: "#2a3347",
-    linecolor: "#2a3347",
-    zerolinecolor: "#2a3347",
-  },
-  yaxis: {
-    gridcolor: "#2a3347",
-    linecolor: "#2a3347",
-    zerolinecolor: "#2a3347",
-  },
-  margin: { l: 48, r: 24, t: 48, b: 48 },
-};
+const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
+
+// Read the current theme's CSS variables to build Plotly layout defaults that
+// match whatever theme (light or dark) is active.
+function buildPlotlyThemeDefaults() {
+  const v = (name: string) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return {
+    paper_bgcolor: v("--bg"),
+    plot_bgcolor: v("--bg2"),
+    font: { color: v("--text"), family: "Inter, system-ui, sans-serif" },
+    xaxis: { gridcolor: v("--border"), linecolor: v("--border"), zerolinecolor: v("--border") },
+    yaxis: { gridcolor: v("--border"), linecolor: v("--border"), zerolinecolor: v("--border") },
+    margin: PLOTLY_MARGIN,
+  };
+}
 
 function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -347,13 +345,12 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
       const userLayout = figure.layout ?? {};
-      // If the user set an explicit template, respect it — don't overwrite
-      // paper_bgcolor / plot_bgcolor / font / axis colors with dark defaults,
-      // because layout properties take precedence over templates in Plotly.
+      // If the user set an explicit template, respect it — only apply margin
+      // so layout color properties don't override what the template specifies.
       const defaults =
         userLayout.template != null
-          ? { margin: PLOTLY_DARK_DEFAULTS.margin }
-          : PLOTLY_DARK_DEFAULTS;
+          ? { margin: PLOTLY_MARGIN }
+          : buildPlotlyThemeDefaults();
       const layout = { ...defaults, ...userLayout };
       void Plotly.newPlot(el, figure.data, layout, {
         responsive: true,
