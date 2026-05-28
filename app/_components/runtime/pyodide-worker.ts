@@ -43,7 +43,7 @@ interface OutputCellMessage {
 // ─── Protocol ──────────────────────────────────────────────────────────
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string }
+  | { kind: "run"; id: number; code: string; theme?: "light" | "dark" }
   | { kind: "complete"; id: number; line: string; column: number }
   | {
       kind: "prepare-fs";
@@ -295,7 +295,11 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
   post({ kind: "ready" });
 }
 
-async function runCode(id: number, code: string): Promise<void> {
+async function runCode(
+  id: number,
+  code: string,
+  theme: "light" | "dark" = "dark",
+): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
   let stdout = "";
@@ -332,8 +336,16 @@ async function runCode(id: number, code: string): Promise<void> {
   // figure JSON instead of trying to open a browser tab.  The user code is
   // executed via _execute_with_last_display so that the last expression is
   // auto-displayed (Jupyter-style) when it evaluates to a non-None value.
+  // Match the playground's light/dark UI by making the theme-appropriate
+  // Plotly template the default. plotly.py resolves this at figure-creation
+  // time, so figures the user builds without an explicit `template=` pick it
+  // up, while an explicit template in user code still wins.
+  const plotlyDefaultTemplate = theme === "light" ? "plotly" : "plotly_dark";
+
   const wrappedCode = `
 import plotly as _plotly
+import plotly.io as _pio
+_pio.templates.default = "${plotlyDefaultTemplate}"
 
 _plotly_json_outputs = []
 _orig_plotly_show = _plotly.io.show
@@ -542,11 +554,11 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   }
 
   if (msg.kind === "run") {
-    const { id, code } = msg;
+    const { id, code, theme } = msg;
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await runCode(id, code);
+        await runCode(id, code, theme);
         post({ kind: "done", id });
       } catch (err) {
         post({

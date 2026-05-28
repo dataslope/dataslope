@@ -1296,22 +1296,7 @@ interface PlotlyAPI {
   ): Promise<unknown>;
 }
 
-const PLOTLY_DARK_DEFAULTS = {
-  paper_bgcolor: "#0f1117",
-  plot_bgcolor: "#161b27",
-  font: { color: "#e2e8f0", family: "Inter, system-ui, sans-serif" },
-  xaxis: {
-    gridcolor: "#2a3347",
-    linecolor: "#2a3347",
-    zerolinecolor: "#2a3347",
-  },
-  yaxis: {
-    gridcolor: "#2a3347",
-    linecolor: "#2a3347",
-    zerolinecolor: "#2a3347",
-  },
-  margin: { l: 48, r: 24, t: 48, b: 48 },
-};
+const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
 
 function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -1325,10 +1310,10 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
       const mod = await import("plotly.js-dist-min");
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      const layout = {
-        ...PLOTLY_DARK_DEFAULTS,
-        ...(figure.layout ?? {}),
-      };
+      // The Python runtime bakes the theme-appropriate template (plotly_dark in
+      // dark mode, plotly in light mode) into figure.layout.template, so we only
+      // set a default margin here and otherwise render the figure as-is.
+      const layout = { margin: PLOTLY_MARGIN, ...(figure.layout ?? {}) };
       void Plotly.newPlot(el, figure.data, layout, {
         responsive: true,
         displayModeBar: true,
