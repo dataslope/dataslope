@@ -14,15 +14,19 @@
  *
  * Usage:
  *
- *   # Start the app first (in another terminal):
- *   npm run dev                 # serves on http://localhost:3000
- *
- *   # Then run the checker:
+ *   # No need to start the app yourself — the script boots the Next.js dev
+ *   # server automatically if nothing is already serving BASE_URL, and shuts
+ *   # it down when finished:
  *   node scripts/check-mermaid-errors.mjs
+ *
+ *   # If you already have `npm run dev` running, the script reuses it.
  *
  *   # Against a different origin / with more concurrency:
  *   BASE_URL=http://localhost:3457 CONCURRENCY=10 \
  *     node scripts/check-mermaid-errors.mjs
+ *
+ *   # Never auto-start a server (fail if BASE_URL isn't reachable):
+ *   NO_AUTO_SERVER=1 node scripts/check-mermaid-errors.mjs
  *
  * Incremental re-runs:
  *
@@ -37,6 +41,7 @@
 import { chromium } from "playwright";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -54,10 +59,102 @@ const CONCURRENCY = Number(process.env.CONCURRENCY ?? 6);
 const SETTLE_MS = Number(process.env.SETTLE_MS ?? 8000);
 const NAV_TIMEOUT_MS = Number(process.env.NAV_TIMEOUT_MS ?? 45000);
 const FORCE_ALL = process.argv.includes("--all");
+// Auto-start the dev server if BASE_URL isn't already serving. Set
+// NO_AUTO_SERVER=1 to opt out. SERVER_TIMEOUT_MS bounds the startup wait —
+// a cold `next dev` (Turbopack + fumadocs-mdx + worker bundling) can be slow.
+const NO_AUTO_SERVER = process.env.NO_AUTO_SERVER === "1";
+const SERVER_TIMEOUT_MS = Number(process.env.SERVER_TIMEOUT_MS ?? 180000);
 
 // The two text fragments Mermaid's error SVG always contains. We require
 // BOTH so a lesson that merely *mentions* the phrase in prose isn't flagged.
 const ERROR_NEEDLES = ["Syntax error in text", "mermaid version"];
+
+// ── Dev-server management ───────────────────────────────────────────────────
+
+/** Is something already serving BASE_URL? (Used for reuse + readiness polls.) */
+async function isServerUp() {
+  try {
+    const res = await fetch(BASE_URL, { method: "HEAD" });
+    // Any HTTP response — even a 404 — means the server is accepting requests.
+    return res.status > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Ensure a server is reachable at BASE_URL, starting `next dev` if needed.
+ * Returns a `stop()` teardown that kills any server we launched (and is a
+ * no-op when we reused an already-running one).
+ */
+async function ensureServer() {
+  const noop = async () => {};
+
+  if (await isServerUp()) {
+    console.log(`Reusing the server already running at ${BASE_URL}.`);
+    return noop;
+  }
+  if (NO_AUTO_SERVER) {
+    throw new Error(
+      `Nothing is serving ${BASE_URL} and NO_AUTO_SERVER=1 is set. ` +
+        `Start the app (e.g. \`npm run dev\`) or unset NO_AUTO_SERVER.`,
+    );
+  }
+
+  const port = Number(new URL(BASE_URL).port || 3000);
+  console.log(`No server at ${BASE_URL}; starting \`next dev -p ${port}\`…`);
+
+  const child = spawn("npx", ["next", "dev", "-p", String(port)], {
+    cwd: REPO_ROOT,
+    stdio: ["ignore", "ignore", "inherit"], // surface startup errors on stderr
+    env: process.env,
+  });
+
+  let exited = false;
+  child.on("exit", (code) => {
+    exited = true;
+    if (code && code !== 0 && !serverReady) {
+      console.error(`Dev server exited early with code ${code}.`);
+    }
+  });
+
+  let serverReady = false;
+  const stop = async () => {
+    if (exited || child.killed) return;
+    child.kill("SIGTERM");
+    // Give it a moment to exit cleanly, then force-kill.
+    await new Promise((resolve) => {
+      const t = setTimeout(() => {
+        if (!exited) child.kill("SIGKILL");
+        resolve();
+      }, 5000);
+      child.once("exit", () => {
+        clearTimeout(t);
+        resolve();
+      });
+    });
+  };
+
+  // Poll until the server answers or we time out.
+  const deadline = Date.now() + SERVER_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    if (exited) {
+      throw new Error("Dev server process exited before becoming ready.");
+    }
+    if (await isServerUp()) {
+      serverReady = true;
+      console.log("Dev server is up.\n");
+      return stop;
+    }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+
+  await stop();
+  throw new Error(
+    `Dev server did not become ready within ${SERVER_TIMEOUT_MS} ms ` +
+      `(raise SERVER_TIMEOUT_MS if your machine needs longer).`,
+  );
+}
 
 /**
  * Walk `content/learn/` and turn every `.mdx` file into its public route.
@@ -192,25 +289,32 @@ async function main() {
 
   console.log(`Base URL: ${BASE_URL}  |  concurrency: ${CONCURRENCY}\n`);
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ ignoreHTTPSErrors: true });
+  // Boot (or reuse) the app, then always tear down whatever we started.
+  const stopServer = await ensureServer();
+  let fresh;
+  try {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({ ignoreHTTPSErrors: true });
 
-  let done = 0;
-  const fresh = await runPool(routesToCheck, CONCURRENCY, async (route) => {
-    const result = await checkRoute(context, route);
-    done += 1;
-    const mark =
-      result.status === "pass" ? "✓" : result.status === "fail" ? "✗" : "!";
-    console.log(
-      `[${String(done).padStart(3)}/${routesToCheck.length}] ${mark} ` +
-        `${result.status.toUpperCase().padEnd(5)} ${result.route}` +
-        (result.detail ? `  (${result.detail})` : ""),
-    );
-    return result;
-  });
+    let done = 0;
+    fresh = await runPool(routesToCheck, CONCURRENCY, async (route) => {
+      const result = await checkRoute(context, route);
+      done += 1;
+      const mark =
+        result.status === "pass" ? "✓" : result.status === "fail" ? "✗" : "!";
+      console.log(
+        `[${String(done).padStart(3)}/${routesToCheck.length}] ${mark} ` +
+          `${result.status.toUpperCase().padEnd(5)} ${result.route}` +
+          (result.detail ? `  (${result.detail})` : ""),
+      );
+      return result;
+    });
 
-  await context.close();
-  await browser.close();
+    await context.close();
+    await browser.close();
+  } finally {
+    await stopServer();
+  }
 
   // Merge fresh results over any prior ones (incremental runs update in place).
   const byRoute = new Map(priorResults.map((r) => [r.route, r]));
