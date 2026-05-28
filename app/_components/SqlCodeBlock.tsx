@@ -136,7 +136,6 @@ export default function SqlCodeBlock({
   // promise (not the resolved engine) is cached so two near-simultaneous
   // clicks share a single boot.
   const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
-  const engineSeededRef = useRef(false);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
 
@@ -348,35 +347,44 @@ export default function SqlCodeBlock({
   );
 
   // ─── Engine bootstrap ───────────────────────────────────────────────
+  // Seeding (running `initSql`) is folded INTO the cached promise so
+  // every caller awaits the same fully-seeded engine. A previous design
+  // flipped a separate "seeded" flag *before* `await engine.exec(initSql)`
+  // resolved, which let a second caller — e.g. the user clicking Run
+  // while the mount-time table-viewer boot was still seeding — get the
+  // engine back and query a table that didn't exist yet. That race is
+  // invisible for in-process SQLite but fired reliably on DuckDB, whose
+  // multi-second WASM download widens the window.
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
-      enginePromiseRef.current = createEngineForDialect(dialect).catch((err) => {
+      enginePromiseRef.current = (async () => {
+        const engine = await createEngineForDialect(dialect);
+        setEngineLabel(`${engine.label} ${engine.version}`.trim());
+        if (initSql && initSql.trim()) {
+          await engine.exec(initSql);
+        }
+        return engine;
+      })().catch((err) => {
         // Don't poison the cache with a failed init — let the next
         // attempt try again.
         enginePromiseRef.current = null;
         throw err;
       });
     }
-    const engine = await enginePromiseRef.current;
-    if (!engineSeededRef.current) {
-      engineSeededRef.current = true;
-      setEngineLabel(`${engine.label} ${engine.version}`.trim());
-      if (initSql && initSql.trim()) {
-        await engine.exec(initSql);
-      }
-      await refreshTableViewer(engine);
-    }
-    return engine;
-  }, [dialect, initSql, refreshTableViewer]);
+    return enginePromiseRef.current;
+  }, [dialect, initSql]);
 
   // Eagerly boot the engine on mount so the table viewer can populate
   // before the learner clicks Run.
   useEffect(() => {
     if (!tableViewerEnabled) return;
-    void ensureEngine().catch(() => {
-      /* surface errors via the per-table error column instead of blocking mount */
-    });
-  }, [ensureEngine, tableViewerEnabled]);
+    void ensureEngine()
+      .then((engine) => refreshTableViewer(engine))
+      .catch(() => {
+        /* surface errors via the per-table error column / result panel
+           instead of blocking mount */
+      });
+  }, [ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   const executeSql = useCallback(
@@ -484,7 +492,6 @@ export default function SqlCodeBlock({
     clearPersistedCode(persistedKey);
     const oldEngine = enginePromiseRef.current;
     enginePromiseRef.current = null;
-    engineSeededRef.current = false;
     if (oldEngine) {
       void oldEngine.then((e) => e.destroy?.()).catch(() => {});
     }
@@ -496,12 +503,14 @@ export default function SqlCodeBlock({
     setStatusMessage("");
     setTableEntries([]);
     if (tableViewerEnabled) {
-      void ensureEngine().catch(() => {
-        /* see mount-time bootstrap */
-      });
+      void ensureEngine()
+        .then((engine) => refreshTableViewer(engine))
+        .catch(() => {
+          /* see mount-time bootstrap */
+        });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, tableViewerEnabled, toasts]);
+  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";

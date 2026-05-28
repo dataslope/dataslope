@@ -136,3 +136,68 @@ SELECT n, n * n AS squared
 FROM seq;`}
 />
 ```
+
+## 4. Multiple tables (JOIN)
+
+Seed two related tables, then join them. Each seeded table shows up as
+its own tab in the **Tables** viewer.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Books and their authors"
+  initSql={`CREATE TABLE authors (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE books (
+  id        INTEGER PRIMARY KEY,
+  author_id INTEGER,
+  title     TEXT,
+  year      INTEGER
+);
+INSERT INTO authors (id, name) VALUES
+  (1, 'Frank Herbert'),
+  (2, 'William Gibson'),
+  (3, 'Ursula K. Le Guin');
+INSERT INTO books (id, author_id, title, year) VALUES
+  (1, 1, 'Dune', 1965),
+  (2, 1, 'Dune Messiah', 1969),
+  (3, 2, 'Neuromancer', 1984),
+  (4, 3, 'The Left Hand of Darkness', 1969),
+  (5, 3, 'The Dispossessed', 1974);`}
+  initialCode={`SELECT a.name AS author, b.title, b.year
+FROM books b
+JOIN authors a ON a.id = b.author_id
+ORDER BY a.name, b.year;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Books and their authors"
+  initSql={`CREATE TABLE authors (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE books (
+  id        INTEGER PRIMARY KEY,
+  author_id INTEGER,
+  title     TEXT,
+  year      INTEGER
+);
+INSERT INTO authors (id, name) VALUES
+  (1, 'Frank Herbert'),
+  (2, 'William Gibson'),
+  (3, 'Ursula K. Le Guin');
+INSERT INTO books (id, author_id, title, year) VALUES
+  (1, 1, 'Dune', 1965),
+  (2, 1, 'Dune Messiah', 1969),
+  (3, 2, 'Neuromancer', 1984),
+  (4, 3, 'The Left Hand of Darkness', 1969),
+  (5, 3, 'The Dispossessed', 1974);`}
+  initialCode={`SELECT a.name AS author, b.title, b.year
+FROM books b
+JOIN authors a ON a.id = b.author_id
+ORDER BY a.name, b.year;`}
+/>
+```

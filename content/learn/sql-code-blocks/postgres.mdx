@@ -107,3 +107,74 @@ FROM generate_series(1, 10) AS n;`}
 FROM generate_series(1, 10) AS n;`}
 />
 ```
+
+## 4. Multiple tables (JOIN)
+
+Seed two related tables with a foreign key, then join and aggregate.
+Each seeded table shows up as its own tab in the **Tables** viewer.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Headcount and pay per department"
+  initSql={`CREATE TABLE departments (
+  id   SERIAL PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE employees (
+  id      SERIAL PRIMARY KEY,
+  name    TEXT,
+  dept_id INTEGER REFERENCES departments(id),
+  salary  NUMERIC
+);
+INSERT INTO departments (name) VALUES
+  ('Engineering'),
+  ('Sales'),
+  ('Marketing');
+INSERT INTO employees (name, dept_id, salary) VALUES
+  ('Alice', 1, 120000),
+  ('Bob',   1,  95000),
+  ('Carol', 2,  80000),
+  ('Dave',  2,  72000),
+  ('Eve',   3,  68000);`}
+  initialCode={`SELECT d.name AS department,
+       COUNT(*) AS headcount,
+       ROUND(AVG(e.salary)) AS avg_salary
+FROM employees e
+JOIN departments d ON d.id = e.dept_id
+GROUP BY d.name
+ORDER BY avg_salary DESC;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="Headcount and pay per department"
+  initSql={`CREATE TABLE departments (
+  id   SERIAL PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE employees (
+  id      SERIAL PRIMARY KEY,
+  name    TEXT,
+  dept_id INTEGER REFERENCES departments(id),
+  salary  NUMERIC
+);
+INSERT INTO departments (name) VALUES
+  ('Engineering'),
+  ('Sales'),
+  ('Marketing');
+INSERT INTO employees (name, dept_id, salary) VALUES
+  ('Alice', 1, 120000),
+  ('Bob',   1,  95000),
+  ('Carol', 2,  80000),
+  ('Dave',  2,  72000),
+  ('Eve',   3,  68000);`}
+  initialCode={`SELECT d.name AS department,
+       COUNT(*) AS headcount,
+       ROUND(AVG(e.salary)) AS avg_salary
+FROM employees e
+JOIN departments d ON d.id = e.dept_id
+GROUP BY d.name
+ORDER BY avg_salary DESC;`}
+/>
+```
