@@ -333,21 +333,20 @@ async function runCode(id: number, code: string): Promise<void> {
   // executed via _execute_with_last_display so that the last expression is
   // auto-displayed (Jupyter-style) when it evaluates to a non-None value.
   const wrappedCode = `
-import json as _json
 import plotly as _plotly
 
 _plotly_json_outputs = []
 _orig_plotly_show = _plotly.io.show
 
 def _patched_plotly_show(fig, *args, **kwargs):
-    _plotly_json_outputs.append(_json.dumps(fig.to_dict()))
+    _plotly_json_outputs.append(fig.to_json())
 
 _plotly.io.show = _patched_plotly_show
 try:
     import plotly.graph_objects as _go
     _orig_go_show = _go.Figure.show
     def _patched_go_show(self, *args, **kwargs):
-        _plotly_json_outputs.append(_json.dumps(self.to_dict()))
+        _plotly_json_outputs.append(self.to_json())
     _go.Figure.show = _patched_go_show
 except: pass
 
