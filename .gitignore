@@ -52,3 +52,6 @@ script-runner-src/__pycache__/
 # Pre-bundled almostnode JS/TS workers (rebuilt by
 # `scripts/build-almostnode-workers.mjs` on postinstall + build + dev).
 /public/_workers/
+
+# Output of scripts/check-mermaid-errors.mjs (regenerated on demand).
+/mermaid-check-results.json
