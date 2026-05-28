@@ -1297,19 +1297,8 @@ interface PlotlyAPI {
 }
 
 const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
-
-function buildPlotlyThemeDefaults() {
-  const v = (name: string) =>
-    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return {
-    paper_bgcolor: v("--bg"),
-    plot_bgcolor: v("--bg2"),
-    font: { color: v("--text"), family: "Inter, system-ui, sans-serif" },
-    xaxis: { gridcolor: v("--border"), linecolor: v("--border"), zerolinecolor: v("--border") },
-    yaxis: { gridcolor: v("--border"), linecolor: v("--border"), zerolinecolor: v("--border") },
-    margin: PLOTLY_MARGIN,
-  };
-}
+const PLOTLY_DARK_DEFAULTS = { template: "plotly_dark", margin: PLOTLY_MARGIN };
+const PLOTLY_LIGHT_DEFAULTS = { template: "plotly", margin: PLOTLY_MARGIN };
 
 function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -1323,14 +1312,12 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
       const mod = await import("plotly.js-dist-min");
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      const userLayout = figure.layout ?? {};
-      // If the user set an explicit template, respect it — only apply margin
-      // so layout color properties don't override what the template specifies.
-      const defaults =
-        userLayout.template != null
-          ? { margin: PLOTLY_MARGIN }
-          : buildPlotlyThemeDefaults();
-      const layout = { ...defaults, ...userLayout };
+      const isLight =
+        document.documentElement.getAttribute("data-pg-theme") === "light";
+      const layout = {
+        ...(isLight ? PLOTLY_LIGHT_DEFAULTS : PLOTLY_DARK_DEFAULTS),
+        ...(figure.layout ?? {}),
+      };
       void Plotly.newPlot(el, figure.data, layout, {
         responsive: true,
         displayModeBar: true,
