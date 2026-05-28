@@ -176,7 +176,7 @@ export interface SqlChallengeCardProps {
 }
 
 /** One table entry in the viewer panel. */
-interface TableViewerEntry {
+export interface TableViewerEntry {
   schema: string | null;
   table: string;
   result: SqlResult | null;
@@ -186,7 +186,7 @@ interface TableViewerEntry {
 
 // ─── Engine adapter ───────────────────────────────────────────────────
 
-interface SqlEngineLike {
+export interface SqlEngineLike {
   exec: (sql: string) => Promise<SqlResult[]>;
   /** Optional: detach any worker / connection so component unmount
    *  doesn't leak background threads. */
@@ -246,7 +246,7 @@ async function createPostgresChallengeEngine(): Promise<SqlEngineLike> {
   };
 }
 
-function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
+export function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
   switch (dialect) {
     case "sqlite":
       return createSqliteChallengeEngine();
@@ -260,7 +260,7 @@ function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
 /** Default schema where a dialect's user tables live unless qualified
  *  otherwise. SQLite has no schema concept (we use `main`); DuckDB
  *  uses `main`; PostgreSQL uses `public`. */
-function defaultSchemaFor(dialect: SqlDialect): string {
+export function defaultSchemaFor(dialect: SqlDialect): string {
   return dialect === "postgres" ? "public" : "main";
 }
 
@@ -268,7 +268,7 @@ function defaultSchemaFor(dialect: SqlDialect): string {
  *  a given dialect. Used by the table viewer to enumerate tables when
  *  the author didn't hand-pick a list. Returns rows of
  *  (schema, table_name). */
-function listTablesSqlFor(dialect: SqlDialect): string {
+export function listTablesSqlFor(dialect: SqlDialect): string {
   if (dialect === "sqlite") {
     return `SELECT 'main' AS schema_name, name AS table_name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name;`;
   }
@@ -286,7 +286,7 @@ function quoteIdent(name: string): string {
 
 /** Build a qualified table reference for a given dialect, quoting
  *  every component. */
-function qualifiedTable(
+export function qualifiedTable(
   dialect: SqlDialect,
   schema: string | null,
   table: string,
@@ -537,7 +537,7 @@ function languageIconKeyForDialect(d: SqlDialect): string {
 
 // Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
 // SQL challenge card shows the same blue-wave hint while running/submitting.
-function RunOverlay({ active }: { active: boolean }) {
+export function RunOverlay({ active }: { active: boolean }) {
   return (
     <div
       className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
@@ -563,7 +563,7 @@ function RunOverlay({ active }: { active: boolean }) {
   );
 }
 
-function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
+export function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
   const key = languageIconKeyForDialect(dialect);
   const Icon = LANGUAGE_ICONS[key];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[key] ?? 1;
@@ -582,7 +582,7 @@ function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
 /** Map dialect → sql-formatter language identifier. PGlite is Postgres-
  *  compatible; DuckDB's grammar is largely Postgres-derived too, so
  *  reusing the postgres rules produces good results for both. */
-function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
+export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
   if (d === "sqlite") return "sqlite";
   if (d === "duckdb") return "duckdb";
   return "postgresql";
@@ -1930,7 +1930,7 @@ function SolutionModal({
  *  `@tanstack/react-virtual` + a TanStack table for the column
  *  definitions. For very wide tables the inner row is still a
  *  regular `<tr>` so column auto-widths just work. */
-function VirtualizedResultTable({
+export function VirtualizedResultTable({
   columns,
   values,
   maxHeight,
@@ -2053,7 +2053,7 @@ function VirtualizedResultTable({
 /** Renders a single table's contents inside the table viewer panel.
  *  Errors and empty-table cases produce a contextual message rather
  *  than a blank pane. */
-function TableViewerPane({
+export function TableViewerPane({
   entry,
   limit,
 }: {

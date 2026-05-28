@@ -1,0 +1,48 @@
+---
+title: SQL Code Blocks
+description: Runnable SQL snippets for SQLite, DuckDB, and PostgreSQL — editor, Run button, and result table, no grading.
+---
+
+A **SQL code block** is the SQL counterpart to `<CodeBlock>`: an editor, a
+Run button, and a result table that runs entirely in your browser via
+WebAssembly. It's a lighter sibling of the [SQL Challenge Card](../challenge-cards/sqlite)
+— same editor, same engines, same result viewer — but **without** the
+instructions panel, the Submit / grading flow, and the reference-solution
+button. Just type SQL and see the rows.
+
+## Dialects
+
+| Dialect | Runtime | Page |
+|---|---|---|
+| SQLite | @sqlite.org/sqlite-wasm | [SQLite code blocks](./sqlite) |
+| DuckDB | @duckdb/duckdb-wasm | [DuckDB code blocks](./duckdb) |
+| PostgreSQL | PGlite | [PostgreSQL code blocks](./postgres) |
+
+## Authoring
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Browse the books table"
+  initSql={`CREATE TABLE books (id INTEGER PRIMARY KEY, title TEXT);
+INSERT INTO books VALUES (1, 'Dune');`}
+  initialCode={`SELECT * FROM books;`}
+/>
+```
+
+Props:
+
+- **`dialect`** — `"sqlite"`, `"duckdb"`, or `"postgres"`.
+- **`initialCode`** — the starter SQL shown in the editor.
+- **`title`** _(optional)_ — a heading for the card.
+- **`badge`** _(optional)_ — header badge label. Defaults to `"SQL"`.
+- **`initSql`** _(optional)_ — setup SQL run once before the first
+  execution (create tables, seed data, …).
+- **`tables`** _(optional)_ — hand-pick which tables the viewer shows.
+  Omit to show every user table; pass `false` to hide the viewer.
+- **`tableRowLimit`** _(optional)_ — max rows per table in the viewer
+  (default `50`).
+
+Each block owns an isolated engine, so one block's `CREATE TABLE` never
+leaks into another's results, and the editor buffer is persisted to
+`localStorage` so an in-progress query survives reloads.

@@ -1,0 +1,109 @@
+---
+title: Code Blocks — PostgreSQL
+description: Runnable <SqlCodeBlock dialect="postgres"> examples, with the raw JSX shown beneath each one.
+---
+
+PostgreSQL code blocks run via **PGlite** — a full Postgres compiled to
+WebAssembly, running entirely in your browser. Each example below is
+live; the raw JSX that produced it is shown directly underneath.
+
+## 1. Basic SELECT
+
+Seed a table with `initSql`, then read it back. The seeded table appears
+in the **Tables** viewer above the editor.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Browse the employees table"
+  initSql={`CREATE TABLE employees (
+  id     SERIAL PRIMARY KEY,
+  name   TEXT NOT NULL,
+  dept   TEXT NOT NULL,
+  salary NUMERIC
+);
+INSERT INTO employees (name, dept, salary) VALUES
+  ('Alice', 'Engineering', 120000),
+  ('Bob',   'Engineering',  95000),
+  ('Carol', 'Sales',        80000),
+  ('Dave',  'Sales',        72000),
+  ('Eve',   'Marketing',    68000);`}
+  initialCode={`SELECT name, dept, salary
+FROM employees
+ORDER BY salary DESC;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="Browse the employees table"
+  initSql={`CREATE TABLE employees (
+  id     SERIAL PRIMARY KEY,
+  name   TEXT NOT NULL,
+  dept   TEXT NOT NULL,
+  salary NUMERIC
+);
+INSERT INTO employees (name, dept, salary) VALUES
+  ('Alice', 'Engineering', 120000),
+  ('Bob',   'Engineering',  95000),
+  ('Carol', 'Sales',        80000),
+  ('Dave',  'Sales',        72000),
+  ('Eve',   'Marketing',    68000);`}
+  initialCode={`SELECT name, dept, salary
+FROM employees
+ORDER BY salary DESC;`}
+/>
+```
+
+## 2. `generate_series` over dates
+
+Postgres set-returning functions like `generate_series` are handy for
+building rowsets without a table.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A week of dates"
+  initialCode={`SELECT
+  d::date                  AS day,
+  to_char(d, 'Dy')         AS weekday
+FROM generate_series('2026-01-01'::timestamp,
+                     '2026-01-07'::timestamp,
+                     '1 day') AS d;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="A week of dates"
+  initialCode={`SELECT
+  d::date                  AS day,
+  to_char(d, 'Dy')         AS weekday
+FROM generate_series('2026-01-01'::timestamp,
+                     '2026-01-07'::timestamp,
+                     '1 day') AS d;`}
+/>
+```
+
+## 3. Window function
+
+A running total with a window function over a generated series — no seed
+data required.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Running total"
+  initialCode={`SELECT
+  n,
+  SUM(n) OVER (ORDER BY n) AS running_total
+FROM generate_series(1, 10) AS n;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="Running total"
+  initialCode={`SELECT
+  n,
+  SUM(n) OVER (ORDER BY n) AS running_total
+FROM generate_series(1, 10) AS n;`}
+/>
+```

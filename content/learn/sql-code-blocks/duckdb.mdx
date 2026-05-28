@@ -1,0 +1,111 @@
+---
+title: Code Blocks — DuckDB
+description: Runnable <SqlCodeBlock dialect="duckdb"> examples, with the raw JSX shown beneath each one.
+---
+
+DuckDB code blocks run via **@duckdb/duckdb-wasm**, loaded on demand from
+a CDN and executed entirely in your browser. Each example below is live;
+the raw JSX that produced it is shown directly underneath.
+
+## 1. Basic SELECT
+
+Seed a table with `initSql`, then read it back. The seeded table appears
+in the **Tables** viewer above the editor.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Browse the books table"
+  initSql={`CREATE TABLE books (
+  id     INTEGER,
+  title  TEXT,
+  author TEXT,
+  year   INTEGER
+);
+INSERT INTO books VALUES
+  (1, 'Dune', 'Frank Herbert', 1965),
+  (2, 'Neuromancer', 'William Gibson', 1984),
+  (3, 'Snow Crash', 'Neal Stephenson', 1992),
+  (4, 'Foundation', 'Isaac Asimov', 1951),
+  (5, 'The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
+  initialCode={`SELECT title, author, year
+FROM books
+ORDER BY year;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Browse the books table"
+  initSql={`CREATE TABLE books (
+  id     INTEGER,
+  title  TEXT,
+  author TEXT,
+  year   INTEGER
+);
+INSERT INTO books VALUES
+  (1, 'Dune', 'Frank Herbert', 1965),
+  (2, 'Neuromancer', 'William Gibson', 1984),
+  (3, 'Snow Crash', 'Neal Stephenson', 1992),
+  (4, 'Foundation', 'Isaac Asimov', 1951),
+  (5, 'The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
+  initialCode={`SELECT title, author, year
+FROM books
+ORDER BY year;`}
+/>
+```
+
+## 2. `range()` + `GROUP BY ALL`
+
+DuckDB's `range()` table function and `GROUP BY ALL` (group by every
+non-aggregated column) make ad-hoc aggregation terse.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Bucket a generated series"
+  initialCode={`SELECT
+  i % 3 AS bucket,
+  COUNT(*) AS n,
+  SUM(i)  AS total
+FROM range(1, 31) AS t(i)
+GROUP BY ALL
+ORDER BY bucket;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Bucket a generated series"
+  initialCode={`SELECT
+  i % 3 AS bucket,
+  COUNT(*) AS n,
+  SUM(i)  AS total
+FROM range(1, 31) AS t(i)
+GROUP BY ALL
+ORDER BY bucket;`}
+/>
+```
+
+## 3. List values and lambdas
+
+DuckDB has first-class `LIST` columns plus lambda helpers like
+`list_transform`.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Transform a list with a lambda"
+  initialCode={`SELECT
+  [1, 2, 3, 4]                              AS nums,
+  list_transform([1, 2, 3, 4], x -> x * x) AS squares,
+  list_aggregate([1, 2, 3, 4], 'sum')      AS total;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Transform a list with a lambda"
+  initialCode={`SELECT
+  [1, 2, 3, 4]                              AS nums,
+  list_transform([1, 2, 3, 4], x -> x * x) AS squares,
+  list_aggregate([1, 2, 3, 4], 'sum')      AS total;`}
+/>
+```
