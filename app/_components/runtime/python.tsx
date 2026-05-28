@@ -666,6 +666,19 @@ type WorkerOutMessage =
       replaceLength: number;
     };
 
+/**
+ * Resolve the active light/dark mode so the worker can pick a matching Plotly
+ * template. Playground pages set `data-pg-theme` on <html>; the Fumadocs-powered
+ * `/learn` pages use next-themes, which toggles a `.dark` class instead.
+ */
+function detectChartTheme(): "light" | "dark" {
+  if (typeof document === "undefined") return "dark";
+  const html = document.documentElement;
+  const pgTheme = html.getAttribute("data-pg-theme");
+  if (pgTheme) return pgTheme === "light" ? "light" : "dark";
+  return html.classList.contains("dark") ? "dark" : "light";
+}
+
 class PyodideWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
 
@@ -690,7 +703,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         else reject(new Error(msg.message));
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code });
+      this.worker.postMessage({ kind: "run", id, code, theme: detectChartTheme() });
     });
   }
 
