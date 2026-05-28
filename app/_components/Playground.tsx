@@ -346,10 +346,15 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
       const mod = await import("plotly.js-dist-min");
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      const layout = {
-        ...PLOTLY_DARK_DEFAULTS,
-        ...(figure.layout ?? {}),
-      };
+      const userLayout = figure.layout ?? {};
+      // If the user set an explicit template, respect it — don't overwrite
+      // paper_bgcolor / plot_bgcolor / font / axis colors with dark defaults,
+      // because layout properties take precedence over templates in Plotly.
+      const defaults =
+        userLayout.template != null
+          ? { margin: PLOTLY_DARK_DEFAULTS.margin }
+          : PLOTLY_DARK_DEFAULTS;
+      const layout = { ...defaults, ...userLayout };
       void Plotly.newPlot(el, figure.data, layout, {
         responsive: true,
         displayModeBar: true,
