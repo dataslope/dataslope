@@ -176,3 +176,39 @@ GROUP BY ALL
 ORDER BY total_spent DESC;`}
 />
 ```
+
+## 5. Infinite scroll (10,000 rows)
+
+Seed a three-column table with 10,000 rows using `range()`. The
+**Tables** viewer loads the first page, then streams in more rows as you
+scroll. Drag the bar at the bottom of the panel to resize it.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics AS
+SELECT
+  i              AS id,
+  'row-' || i    AS label,
+  ROUND(i * 1.5, 2) AS value
+FROM range(1, 10001) AS t(i);`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics AS
+SELECT
+  i              AS id,
+  'row-' || i    AS label,
+  ROUND(i * 1.5, 2) AS value
+FROM range(1, 10001) AS t(i);`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+```

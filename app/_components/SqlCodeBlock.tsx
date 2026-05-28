@@ -24,7 +24,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, ChevronDown, Database } from "lucide-react";
+import { RotateCcw, Database } from "lucide-react";
 import {
   CopyIcon,
   FormatIcon,
@@ -58,19 +58,16 @@ import {
 import styles from "./ChallengeCard.module.css";
 import {
   createEngineForDialect,
-  defaultSchemaFor,
   DialectGlyph,
-  listTablesSqlFor,
-  qualifiedTable,
   RunOverlay,
   sqlFormatterLanguage,
-  TableViewerPane,
+  TableViewer,
+  useSqlTableViewer,
   VirtualizedResultTable,
   type SqlDialect,
   type SqlEngineLike,
   type SqlResult,
   type SqlTableViewerSpec,
-  type TableViewerEntry,
 } from "./SqlChallengeCard";
 
 export type { SqlDialect } from "./SqlChallengeCard";
@@ -145,9 +142,6 @@ export default function SqlCodeBlock({
   const [resultMessage, setResultMessage] = useState<string>("");
   const [resultError, setResultError] = useState<string>("");
   const [elapsed, setElapsed] = useState<string>("");
-  const [tableEntries, setTableEntries] = useState<TableViewerEntry[]>([]);
-  const [tableViewerOpen, setTableViewerOpen] = useState(true);
-  const [activeTableIdx, setActiveTableIdx] = useState(0);
   const [isFormatting, setIsFormatting] = useState(false);
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
@@ -278,74 +272,6 @@ export default function SqlCodeBlock({
     };
   }, []);
 
-  // ─── Table viewer ───────────────────────────────────────────────────
-  const tableViewerEnabled = tables !== false;
-
-  const refreshTableViewer = useCallback(
-    async (engine: SqlEngineLike) => {
-      if (!tableViewerEnabled) return;
-      const defaultSchema = defaultSchemaFor(dialect);
-      let plan: { schema: string | null; table: string }[];
-      if (Array.isArray(tables)) {
-        plan = tables.map((t) =>
-          typeof t === "string"
-            ? { schema: defaultSchema, table: t }
-            : { schema: t.schema ?? defaultSchema, table: t.table },
-        );
-      } else {
-        try {
-          const listed = await engine.exec(listTablesSqlFor(dialect));
-          const row = listed.find((r) => r.columns.length > 0);
-          plan = (row?.values ?? []).map((r) => ({
-            schema: String(r[0] ?? defaultSchema),
-            table: String(r[1] ?? ""),
-          }));
-        } catch {
-          plan = [];
-        }
-      }
-      const limit = Math.max(1, Math.floor(tableRowLimit));
-      const fetchLimit = limit + 1;
-      const entries: TableViewerEntry[] = await Promise.all(
-        plan.map(async ({ schema, table }) => {
-          if (!table) {
-            return {
-              schema,
-              table,
-              result: null,
-              error: "Empty table name.",
-              truncated: false,
-            };
-          }
-          try {
-            const ref = qualifiedTable(dialect, schema, table);
-            const out = await engine.exec(`SELECT * FROM ${ref} LIMIT ${fetchLimit};`);
-            const last =
-              out.findLast?.((r) => r.columns.length > 0) ??
-              [...out].reverse().find((r) => r.columns.length > 0) ??
-              null;
-            if (!last) {
-              return { schema, table, result: null, error: null, truncated: false };
-            }
-            const truncated = last.values.length > limit;
-            const trimmed: SqlResult = truncated
-              ? { columns: last.columns, values: last.values.slice(0, limit) }
-              : last;
-            return { schema, table, result: trimmed, error: null, truncated };
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            return { schema, table, result: null, error: msg, truncated: false };
-          }
-        }),
-      );
-      setTableEntries(entries);
-      setActiveTableIdx((idx) =>
-        entries.length === 0 ? 0 : Math.min(idx, entries.length - 1),
-      );
-    },
-    [dialect, tableViewerEnabled, tableRowLimit, tables],
-  );
-
   // ─── Engine bootstrap ───────────────────────────────────────────────
   // Seeding (running `initSql`) is folded INTO the cached promise so
   // every caller awaits the same fully-seeded engine. A previous design
@@ -374,6 +300,25 @@ export default function SqlCodeBlock({
     return enginePromiseRef.current;
   }, [dialect, initSql]);
 
+  // ─── Table viewer ───────────────────────────────────────────────────
+  // Shared with `<SqlChallengeCard>` so both stay consistent.
+  const {
+    enabled: tableViewerEnabled,
+    entries: tableEntries,
+    activeIdx: activeTableIdx,
+    setActiveIdx: setActiveTableIdx,
+    initializing: tablesInitializing,
+    refresh: refreshTableViewer,
+    loadMore: loadMoreTable,
+    clear: clearTableViewer,
+    markInitDone: markTablesInitDone,
+  } = useSqlTableViewer({ dialect, tables, tableRowLimit, ensureEngine });
+
+  const loadMoreActiveTable = useCallback(
+    () => void loadMoreTable(activeTableIdx),
+    [loadMoreTable, activeTableIdx],
+  );
+
   // Eagerly boot the engine on mount so the table viewer can populate
   // before the learner clicks Run.
   useEffect(() => {
@@ -381,10 +326,10 @@ export default function SqlCodeBlock({
     void ensureEngine()
       .then((engine) => refreshTableViewer(engine))
       .catch(() => {
-        /* surface errors via the per-table error column / result panel
-           instead of blocking mount */
+        // Lower the skeleton so it doesn't spin forever.
+        markTablesInitDone();
       });
-  }, [ensureEngine, refreshTableViewer, tableViewerEnabled]);
+  }, [ensureEngine, refreshTableViewer, tableViewerEnabled, markTablesInitDone]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   const executeSql = useCallback(
@@ -501,16 +446,16 @@ export default function SqlCodeBlock({
     setElapsed("");
     setStatus("idle");
     setStatusMessage("");
-    setTableEntries([]);
+    clearTableViewer();
     if (tableViewerEnabled) {
       void ensureEngine()
         .then((engine) => refreshTableViewer(engine))
         .catch(() => {
-          /* see mount-time bootstrap */
+          markTablesInitDone();
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, tableViewerEnabled, toasts]);
+  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -592,60 +537,15 @@ export default function SqlCodeBlock({
       </div>
 
       {/* ── Table viewer ── */}
-      {tableViewerEnabled && tableEntries.length > 0 && (
-        <div className={styles.tableViewer}>
-          <button
-            type="button"
-            className={styles.tableViewerHeader}
-            onClick={() => setTableViewerOpen((v) => !v)}
-            aria-expanded={tableViewerOpen}
-          >
-            <span className={styles.tableViewerLabel}>Tables</span>
-            <span className={styles.tableViewerCount}>
-              {tableEntries.length} {tableEntries.length === 1 ? "table" : "tables"}
-            </span>
-            <ChevronDown
-              size={14}
-              aria-hidden
-              className={`${styles.testChevron} ${
-                tableViewerOpen ? styles.testChevronOpen : ""
-              }`}
-            />
-          </button>
-          {tableViewerOpen && (
-            <>
-              <div className={styles.tableViewerTabs} role="tablist">
-                {tableEntries.map((entry, idx) => (
-                  <button
-                    key={`${entry.schema ?? ""}.${entry.table}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={idx === activeTableIdx}
-                    className={`${styles.tableViewerTab} ${
-                      idx === activeTableIdx ? styles.tableViewerTabActive : ""
-                    }`}
-                    onClick={() => setActiveTableIdx(idx)}
-                  >
-                    {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
-                      <>
-                        <span className={styles.tableViewerSchema}>{entry.schema}.</span>
-                        {entry.table}
-                      </>
-                    ) : (
-                      entry.table
-                    )}
-                  </button>
-                ))}
-              </div>
-              {tableEntries[activeTableIdx] && (
-                <TableViewerPane
-                  entry={tableEntries[activeTableIdx]}
-                  limit={tableRowLimit}
-                />
-              )}
-            </>
-          )}
-        </div>
+      {tableViewerEnabled && (
+        <TableViewer
+          dialect={dialect}
+          entries={tableEntries}
+          activeIdx={activeTableIdx}
+          setActiveIdx={setActiveTableIdx}
+          initializing={tablesInitializing}
+          onLoadMore={loadMoreActiveTable}
+        />
       )}
 
       {/* ── Editor ── */}

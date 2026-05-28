@@ -46,7 +46,6 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   LANGUAGE_ICONS,
-  LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
 import {
@@ -175,13 +174,19 @@ export interface SqlChallengeCardProps {
   tests: SqlChallengeTest[];
 }
 
-/** One table entry in the viewer panel. */
+/** One table entry in the viewer panel. Rows are loaded a page at a
+ *  time: `result.values` holds everything fetched so far, `hasMore`
+ *  records whether another page exists (so the viewer can keep
+ *  scroll-loading), and `loadingMore` guards/labels an in-flight fetch. */
 export interface TableViewerEntry {
   schema: string | null;
   table: string;
   result: SqlResult | null;
   error: string | null;
-  truncated: boolean;
+  /** True when at least one more row exists beyond what's loaded. */
+  hasMore: boolean;
+  /** True while the next page is being fetched (drives the spinner). */
+  loadingMore: boolean;
 }
 
 // ─── Engine adapter ───────────────────────────────────────────────────
@@ -588,6 +593,205 @@ export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "
   return "postgresql";
 }
 
+// ─── Table viewer hook ────────────────────────────────────────────────
+
+/** Fetch a single page of a table's rows. Asks for `pageSize + 1` rows
+ *  so the caller can tell — without a second COUNT(*) round-trip —
+ *  whether more rows remain past this page. Works for every dialect
+ *  because `LIMIT … OFFSET …` is supported by SQLite, DuckDB, and
+ *  Postgres alike. Errors are returned, not thrown, so one broken table
+ *  can't blank the whole viewer. */
+export async function fetchTablePage(
+  engine: SqlEngineLike,
+  dialect: SqlDialect,
+  schema: string | null,
+  table: string,
+  pageSize: number,
+  offset: number,
+): Promise<{ result: SqlResult | null; hasMore: boolean; error: string | null }> {
+  if (!table) return { result: null, hasMore: false, error: "Empty table name." };
+  try {
+    const ref = qualifiedTable(dialect, schema, table);
+    const out = await engine.exec(
+      `SELECT * FROM ${ref} LIMIT ${pageSize + 1} OFFSET ${offset};`,
+    );
+    const last =
+      out.findLast?.((r) => r.columns.length > 0) ??
+      [...out].reverse().find((r) => r.columns.length > 0) ??
+      null;
+    if (!last) return { result: null, hasMore: false, error: null };
+    const hasMore = last.values.length > pageSize;
+    const result: SqlResult = hasMore
+      ? { columns: last.columns, values: last.values.slice(0, pageSize) }
+      : last;
+    return { result, hasMore, error: null };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { result: null, hasMore: false, error: msg };
+  }
+}
+
+export interface UseSqlTableViewerOptions {
+  dialect: SqlDialect;
+  tables: SqlTableViewerSpec[] | false | undefined;
+  /** Rows fetched per page. The viewer scroll-loads further pages on
+   *  demand, so this is a page size rather than a hard cap. */
+  tableRowLimit: number;
+  ensureEngine: () => Promise<SqlEngineLike>;
+}
+
+/** Shared table-viewer state machine for `<SqlChallengeCard>` and
+ *  `<SqlCodeBlock>`. Owns the list of tables, the active tab, the
+ *  open/closed state, the first-load "initializing" flag (which drives
+ *  the skeleton animation while the WASM engine boots and seeds), and
+ *  the per-table infinite-scroll paging. Living here keeps the two
+ *  card components byte-for-byte consistent. */
+export function useSqlTableViewer({
+  dialect,
+  tables,
+  tableRowLimit,
+  ensureEngine,
+}: UseSqlTableViewerOptions) {
+  const enabled = tables !== false;
+  const pageSize = Math.max(1, Math.floor(tableRowLimit));
+
+  const [entries, setEntries] = useState<TableViewerEntry[]>([]);
+  const [activeIdx, setActiveIdx] = useState(0);
+  // True from mount until the first table list has been fetched (or the
+  // boot failed). Drives the loading skeleton. Subsequent refreshes
+  // don't re-raise it, so re-running a query updates rows in place
+  // rather than flashing the skeleton.
+  const [initializing, setInitializing] = useState(enabled);
+
+  // Mirror of `entries` for stale-free reads inside async callbacks.
+  const entriesRef = useRef(entries);
+  useEffect(() => {
+    entriesRef.current = entries;
+  });
+  // Guards against firing a duplicate page fetch for the same table
+  // while one is already in flight (the scroll handler can fire many
+  // times before React commits the `loadingMore` flag).
+  const inFlightRef = useRef<Set<number>>(new Set());
+
+  const refresh = useCallback(
+    async (engine: SqlEngineLike) => {
+      if (!enabled) return;
+      const defaultSchema = defaultSchemaFor(dialect);
+      let plan: { schema: string | null; table: string }[];
+      if (Array.isArray(tables)) {
+        plan = tables.map((t) =>
+          typeof t === "string"
+            ? { schema: defaultSchema, table: t }
+            : { schema: t.schema ?? defaultSchema, table: t.table },
+        );
+      } else {
+        try {
+          const listed = await engine.exec(listTablesSqlFor(dialect));
+          const row = listed.find((r) => r.columns.length > 0);
+          plan = (row?.values ?? []).map((r) => ({
+            schema: String(r[0] ?? defaultSchema),
+            table: String(r[1] ?? ""),
+          }));
+        } catch {
+          plan = [];
+        }
+      }
+      inFlightRef.current.clear();
+      const next: TableViewerEntry[] = await Promise.all(
+        plan.map(async ({ schema, table }) => {
+          const page = await fetchTablePage(engine, dialect, schema, table, pageSize, 0);
+          return {
+            schema,
+            table,
+            result: page.result,
+            error: page.error,
+            hasMore: page.hasMore,
+            loadingMore: false,
+          };
+        }),
+      );
+      setEntries(next);
+      setActiveIdx((idx) => (next.length === 0 ? 0 : Math.min(idx, next.length - 1)));
+      setInitializing(false);
+    },
+    [dialect, enabled, pageSize, tables],
+  );
+
+  /** Append the next page of rows to the table at `idx`. No-op when the
+   *  table has no more rows, errored, or already has a fetch in flight. */
+  const loadMore = useCallback(
+    async (idx: number) => {
+      const entry = entriesRef.current[idx];
+      if (!entry || !entry.hasMore || entry.error || !entry.result) return;
+      if (inFlightRef.current.has(idx)) return;
+      inFlightRef.current.add(idx);
+      setEntries((prev) =>
+        prev.map((e, i) => (i === idx ? { ...e, loadingMore: true } : e)),
+      );
+      try {
+        const engine = await ensureEngine();
+        const offset = entry.result.values.length;
+        const page = await fetchTablePage(
+          engine,
+          dialect,
+          entry.schema,
+          entry.table,
+          pageSize,
+          offset,
+        );
+        setEntries((prev) =>
+          prev.map((e, i) => {
+            if (i !== idx) return e;
+            const added = page.result?.values ?? [];
+            const mergedResult: SqlResult | null = e.result
+              ? { columns: e.result.columns, values: [...e.result.values, ...added] }
+              : page.result;
+            return {
+              ...e,
+              result: mergedResult,
+              hasMore: page.error ? false : page.hasMore,
+              loadingMore: false,
+            };
+          }),
+        );
+      } catch {
+        setEntries((prev) =>
+          prev.map((e, i) =>
+            i === idx ? { ...e, hasMore: false, loadingMore: false } : e,
+          ),
+        );
+      } finally {
+        inFlightRef.current.delete(idx);
+      }
+    },
+    [dialect, ensureEngine, pageSize],
+  );
+
+  /** Clear all entries and re-arm the loading skeleton — used by Reset,
+   *  which destroys and re-seeds the engine. */
+  const clear = useCallback(() => {
+    inFlightRef.current.clear();
+    setEntries([]);
+    setInitializing(enabled);
+  }, [enabled]);
+
+  /** Lower the skeleton without populating tables — used when engine
+   *  bootstrap fails so the skeleton doesn't spin forever. */
+  const markInitDone = useCallback(() => setInitializing(false), []);
+
+  return {
+    enabled,
+    entries,
+    activeIdx,
+    setActiveIdx,
+    initializing,
+    refresh,
+    loadMore,
+    clear,
+    markInitDone,
+  };
+}
+
 export default function SqlChallengeCard({
   dialect,
   title,
@@ -645,9 +849,6 @@ export default function SqlChallengeCard({
   const [resultError, setResultError] = useState<string>("");
   const [elapsed, setElapsed] = useState<string>("");
   const [solutionOpen, setSolutionOpen] = useState(false);
-  const [tableEntries, setTableEntries] = useState<TableViewerEntry[]>([]);
-  const [tableViewerOpen, setTableViewerOpen] = useState(true);
-  const [activeTableIdx, setActiveTableIdx] = useState(0);
   const [testResults, setTestResults] = useState<DisplayedTest[]>([]);
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
@@ -854,76 +1055,6 @@ export default function SqlChallengeCard({
     };
   }, []);
 
-  // ─── Table viewer ───────────────────────────────────────────────────
-  const tableViewerEnabled = tables !== false;
-
-  /** Refresh the table viewer's contents. Lists tables (either the
-   *  hand-picked subset or every user table in the default schema),
-   *  then runs `SELECT ... LIMIT N` against each. Errors per table are
-   *  isolated so one broken entry doesn't blank the panel. */
-  const refreshTableViewer = useCallback(
-    async (engine: SqlEngineLike) => {
-      if (!tableViewerEnabled) return;
-      const defaultSchema = defaultSchemaFor(dialect);
-      let plan: { schema: string | null; table: string }[];
-      if (Array.isArray(tables)) {
-        plan = tables.map((t) =>
-          typeof t === "string"
-            ? { schema: defaultSchema, table: t }
-            : { schema: t.schema ?? defaultSchema, table: t.table },
-        );
-      } else {
-        try {
-          const listed = await engine.exec(listTablesSqlFor(dialect));
-          const row = listed.find((r) => r.columns.length > 0);
-          plan = (row?.values ?? []).map((r) => ({
-            schema: String(r[0] ?? defaultSchema),
-            table: String(r[1] ?? ""),
-          }));
-        } catch {
-          plan = [];
-        }
-      }
-      const limit = Math.max(1, Math.floor(tableRowLimit));
-      const fetchLimit = limit + 1;
-      const entries: TableViewerEntry[] = await Promise.all(
-        plan.map(async ({ schema, table }) => {
-          if (!table) {
-            return {
-              schema,
-              table,
-              result: null,
-              error: "Empty table name.",
-              truncated: false,
-            };
-          }
-          try {
-            const ref = qualifiedTable(dialect, schema, table);
-            const out = await engine.exec(`SELECT * FROM ${ref} LIMIT ${fetchLimit};`);
-            const last = out.findLast?.((r) => r.columns.length > 0) ??
-              [...out].reverse().find((r) => r.columns.length > 0) ?? null;
-            if (!last) {
-              return { schema, table, result: null, error: null, truncated: false };
-            }
-            const truncated = last.values.length > limit;
-            const trimmed: SqlResult = truncated
-              ? { columns: last.columns, values: last.values.slice(0, limit) }
-              : last;
-            return { schema, table, result: trimmed, error: null, truncated };
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            return { schema, table, result: null, error: msg, truncated: false };
-          }
-        }),
-      );
-      setTableEntries(entries);
-      setActiveTableIdx((idx) =>
-        entries.length === 0 ? 0 : Math.min(idx, entries.length - 1),
-      );
-    },
-    [dialect, tableViewerEnabled, tableRowLimit, tables],
-  );
-
   // ─── Engine bootstrap ───────────────────────────────────────────────
   // Seeding (running `initSql`) is folded INTO the cached promise so
   // every caller awaits the same fully-seeded engine. A previous design
@@ -953,6 +1084,26 @@ export default function SqlChallengeCard({
     return enginePromiseRef.current;
   }, [dialect, initSql]);
 
+  // ─── Table viewer ───────────────────────────────────────────────────
+  // All table-list / paging / loading state lives in the shared hook so
+  // this card and `<SqlCodeBlock>` behave identically.
+  const {
+    enabled: tableViewerEnabled,
+    entries: tableEntries,
+    activeIdx: activeTableIdx,
+    setActiveIdx: setActiveTableIdx,
+    initializing: tablesInitializing,
+    refresh: refreshTableViewer,
+    loadMore: loadMoreTable,
+    clear: clearTableViewer,
+    markInitDone: markTablesInitDone,
+  } = useSqlTableViewer({ dialect, tables, tableRowLimit, ensureEngine });
+
+  const loadMoreActiveTable = useCallback(
+    () => void loadMoreTable(activeTableIdx),
+    [loadMoreTable, activeTableIdx],
+  );
+
   // Eagerly boot the engine on mount so the table viewer can populate
   // before the learner clicks Run. The engine is per-card and isolated,
   // so doing this once per mount is safe.
@@ -961,9 +1112,11 @@ export default function SqlChallengeCard({
     void ensureEngine()
       .then((engine) => refreshTableViewer(engine))
       .catch(() => {
-        /* surface errors via the per-table error column instead of blocking mount */
+        // Lower the skeleton so it doesn't spin forever; per-table
+        // errors surface in their own column once a run succeeds.
+        markTablesInitDone();
       });
-  }, [ensureEngine, refreshTableViewer, tableViewerEnabled]);
+  }, [ensureEngine, refreshTableViewer, tableViewerEnabled, markTablesInitDone]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   /**
@@ -1280,7 +1433,7 @@ export default function SqlChallengeCard({
     setStatusMessage("");
     setTestResults([]);
     setBannerState(null);
-    setTableEntries([]);
+    clearTableViewer();
     if (tableViewerEnabled) {
       void ensureEngine()
         .then((engine) => refreshTableViewer(engine))
@@ -1289,7 +1442,7 @@ export default function SqlChallengeCard({
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, tableViewerEnabled, toasts]);
+  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -1405,60 +1558,15 @@ export default function SqlChallengeCard({
       </div>
 
       {/* ── Table viewer ── */}
-      {tableViewerEnabled && tableEntries.length > 0 && (
-        <div className={styles.tableViewer}>
-          <button
-            type="button"
-            className={styles.tableViewerHeader}
-            onClick={() => setTableViewerOpen((v) => !v)}
-            aria-expanded={tableViewerOpen}
-          >
-            <span className={styles.tableViewerLabel}>Tables</span>
-            <span className={styles.tableViewerCount}>
-              {tableEntries.length} {tableEntries.length === 1 ? "table" : "tables"}
-            </span>
-            <ChevronDown
-              size={14}
-              aria-hidden
-              className={`${styles.testChevron} ${
-                tableViewerOpen ? styles.testChevronOpen : ""
-              }`}
-            />
-          </button>
-          {tableViewerOpen && (
-            <>
-              <div className={styles.tableViewerTabs} role="tablist">
-                {tableEntries.map((entry, idx) => (
-                  <button
-                    key={`${entry.schema ?? ""}.${entry.table}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={idx === activeTableIdx}
-                    className={`${styles.tableViewerTab} ${
-                      idx === activeTableIdx ? styles.tableViewerTabActive : ""
-                    }`}
-                    onClick={() => setActiveTableIdx(idx)}
-                  >
-                    {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
-                      <>
-                        <span className={styles.tableViewerSchema}>{entry.schema}.</span>
-                        {entry.table}
-                      </>
-                    ) : (
-                      entry.table
-                    )}
-                  </button>
-                ))}
-              </div>
-              {tableEntries[activeTableIdx] && (
-                <TableViewerPane
-                  entry={tableEntries[activeTableIdx]}
-                  limit={tableRowLimit}
-                />
-              )}
-            </>
-          )}
-        </div>
+      {tableViewerEnabled && (
+        <TableViewer
+          dialect={dialect}
+          entries={tableEntries}
+          activeIdx={activeTableIdx}
+          setActiveIdx={setActiveTableIdx}
+          initializing={tablesInitializing}
+          onLoadMore={loadMoreActiveTable}
+        />
       )}
 
       {/* ── Editor ── */}
@@ -1930,25 +2038,47 @@ function SolutionModal({
   );
 }
 
-/** Renders a single table's contents inside the table viewer panel.
+/** Human-readable form of a cell value, used both for the visible text
+ *  (where applicable) and the `title` tooltip so a value clipped by the
+ *  column's max-width is still fully readable on hover. */
+function cellText(v: unknown): string {
+  if (v === null || v === undefined) return "NULL";
+  if (v instanceof Uint8Array) return `<${v.byteLength} bytes>`;
+  return String(v);
+}
+
 /** Virtualised SQL result table — used both by the main result pane
- *  and the per-table viewer at the bottom of the card. The result
- *  set is in memory by the time we render (executeSql returns the
- *  full Promise<SqlResult>), so there's no per-page load — we just
- *  render only the rows currently in the viewport via
- *  `@tanstack/react-virtual` + a TanStack table for the column
- *  definitions. For very wide tables the inner row is still a
- *  regular `<tr>` so column auto-widths just work. */
+ *  and the per-table viewer at the bottom of the card. The query
+ *  result set is in memory by the time we render (executeSql returns
+ *  the full Promise<SqlResult>), so we just render the rows currently
+ *  in the viewport via `@tanstack/react-virtual` + a TanStack table for
+ *  the column definitions.
+ *
+ *  The table viewer passes `onLoadMore`/`hasMore` so browsing a large
+ *  seeded table scroll-loads further pages on demand (infinite scroll);
+ *  the main result pane omits them (the whole result is already here).
+ *  Long column names / values are clipped with an ellipsis via CSS and
+ *  carry a `title` so the full text stays available on hover. */
 export function VirtualizedResultTable({
   columns,
   values,
   maxHeight,
+  onLoadMore,
+  hasMore = false,
+  loadingMore = false,
 }: {
   columns: string[];
   values: unknown[][];
   /** CSS max-height of the scroll container. Defaults to 320px so a
    *  giant result set doesn't push the whole page below the fold. */
   maxHeight?: number;
+  /** Called when the viewport nears the bottom and `hasMore` is true.
+   *  Omit for fully-in-memory result sets (no paging). */
+  onLoadMore?: () => void;
+  /** Whether another page of rows exists past what's rendered. */
+  hasMore?: boolean;
+  /** Whether the next page is currently being fetched. */
+  loadingMore?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   // Stable row identity — TanStack Table keys rows by index when no
@@ -1973,10 +2103,7 @@ export function VirtualizedResultTable({
             if (v === null || v === undefined) {
               return <span className={styles.sqlNullValue}>NULL</span>;
             }
-            if (v instanceof Uint8Array) {
-              return `<${v.byteLength} bytes>`;
-            }
-            return String(v);
+            return cellText(v);
           },
         }),
       ),
@@ -2006,6 +2133,20 @@ export function VirtualizedResultTable({
       : 0;
   const colSpan = tableColumns.length;
 
+  // Infinite scroll: when the last virtualised row gets within a short
+  // distance of the end of what's loaded, ask the owner for the next
+  // page. The owner guards against duplicate fetches, so a few extra
+  // calls during fast scrolling are harmless.
+  const lastIndex =
+    virtualRows.length > 0 ? virtualRows[virtualRows.length - 1].index : -1;
+  useEffect(() => {
+    if (!onLoadMore || !hasMore || loadingMore) return;
+    if (lastIndex < 0) return;
+    if (lastIndex >= tableRows.length - 1 - 8) {
+      onLoadMore();
+    }
+  }, [lastIndex, hasMore, loadingMore, tableRows.length, onLoadMore]);
+
   return (
     <div
       ref={scrollRef}
@@ -2017,7 +2158,7 @@ export function VirtualizedResultTable({
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((h) => (
-                <th key={h.id}>
+                <th key={h.id} title={columns[Number(h.column.id)]}>
                   {h.isPlaceholder
                     ? null
                     : flexRender(h.column.columnDef.header, h.getContext())}
@@ -2041,7 +2182,7 @@ export function VirtualizedResultTable({
                 ref={rowVirtualizer.measureElement}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
+                  <td key={cell.id} title={cellText(row.original.row[Number(cell.column.id)])}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -2053,6 +2194,13 @@ export function VirtualizedResultTable({
               <td colSpan={colSpan} />
             </tr>
           )}
+          {loadingMore && (
+            <tr aria-hidden className={styles.sqlResultLoadingRow}>
+              <td colSpan={colSpan}>
+                <span className={styles.tableViewerSpinner} /> Loading more rows…
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
@@ -2061,13 +2209,18 @@ export function VirtualizedResultTable({
 
 /** Renders a single table's contents inside the table viewer panel.
  *  Errors and empty-table cases produce a contextual message rather
- *  than a blank pane. */
+ *  than a blank pane. Wires the result table's infinite scroll so more
+ *  rows stream in as the learner scrolls. */
 export function TableViewerPane({
   entry,
-  limit,
+  height = 220,
+  onLoadMore,
 }: {
   entry: TableViewerEntry;
-  limit: number;
+  /** Height (px) of the table's scroll area — driven by the viewer's
+   *  drag-to-resize bar. */
+  height?: number;
+  onLoadMore?: () => void;
 }) {
   if (entry.error) {
     return (
@@ -2092,12 +2245,175 @@ export function TableViewerPane({
       <VirtualizedResultTable
         columns={r.columns}
         values={r.values}
-        maxHeight={220}
+        maxHeight={height}
+        onLoadMore={onLoadMore}
+        hasMore={entry.hasMore}
+        loadingMore={entry.loadingMore}
       />
-      {entry.truncated && (
-        <div className={styles.tableViewerFootnote}>
-          Showing first {limit} row{limit === 1 ? "" : "s"}.
+      <div className={styles.tableViewerFootnote}>
+        {entry.loadingMore
+          ? "Loading more rows…"
+          : entry.hasMore
+            ? `${r.values.length} rows loaded — scroll for more`
+            : `${r.values.length} row${r.values.length === 1 ? "" : "s"}`}
+      </div>
+    </div>
+  );
+}
+
+/** Shimmering placeholder rows shown while the WASM engine boots and
+ *  seeds, before the first table list is available. */
+export function TableViewerSkeleton() {
+  return (
+    <div className={styles.tableViewerSkeleton} aria-hidden>
+      {Array.from({ length: 4 }).map((_, r) => (
+        <div key={r} className={styles.skeletonRow}>
+          {Array.from({ length: 4 }).map((_, c) => (
+            <div key={c} className={styles.skeletonCell} />
+          ))}
         </div>
+      ))}
+    </div>
+  );
+}
+
+// Drag-to-resize bounds for the table viewer's contents (px).
+const TABLE_VIEWER_MIN_HEIGHT = 120;
+const TABLE_VIEWER_MAX_HEIGHT = 640;
+const TABLE_VIEWER_DEFAULT_HEIGHT = 240;
+
+/** The always-visible "Tables" panel shared by `<SqlChallengeCard>` and
+ *  `<SqlCodeBlock>`. Shows a loading skeleton until the first table
+ *  list is fetched, then a tab bar (styled to match the non-SQL code
+ *  block file tabs) plus the active table's paginated contents. The
+ *  panel is not collapsible; instead a drag bar at the bottom lets the
+ *  learner resize the visible table area. */
+export function TableViewer({
+  dialect,
+  entries,
+  activeIdx,
+  setActiveIdx,
+  initializing,
+  onLoadMore,
+}: {
+  dialect: SqlDialect;
+  entries: TableViewerEntry[];
+  activeIdx: number;
+  setActiveIdx: React.Dispatch<React.SetStateAction<number>>;
+  initializing: boolean;
+  onLoadMore: () => void;
+}) {
+  const [paneHeight, setPaneHeight] = useState(TABLE_VIEWER_DEFAULT_HEIGHT);
+  // Live drag origin; null when not dragging. Stored in a ref so the
+  // window-level move/up listeners read fresh values without re-binding.
+  const dragRef = useRef<{ startY: number; startH: number } | null>(null);
+
+  const onResizeStart = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      dragRef.current = { startY: e.clientY, startH: paneHeight };
+      const onMove = (ev: PointerEvent) => {
+        if (!dragRef.current) return;
+        const dy = ev.clientY - dragRef.current.startY;
+        const next = Math.min(
+          TABLE_VIEWER_MAX_HEIGHT,
+          Math.max(TABLE_VIEWER_MIN_HEIGHT, dragRef.current.startH + dy),
+        );
+        setPaneHeight(next);
+      };
+      const onUp = () => {
+        dragRef.current = null;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        document.body.style.userSelect = "";
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      // Suppress text selection while dragging the bar.
+      document.body.style.userSelect = "none";
+    },
+    [paneHeight],
+  );
+
+  // Keyboard resize for accessibility (focus the bar, use arrow keys).
+  const onResizeKey = useCallback((e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 48 : 16;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setPaneHeight((h) => Math.min(TABLE_VIEWER_MAX_HEIGHT, h + step));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setPaneHeight((h) => Math.max(TABLE_VIEWER_MIN_HEIGHT, h - step));
+    }
+  }, []);
+
+  const showSkeleton = initializing && entries.length === 0;
+  // Nothing to show: not initializing and no tables were found.
+  if (!showSkeleton && entries.length === 0) return null;
+  const active = entries[activeIdx];
+  return (
+    <div className={styles.tableViewer}>
+      <div className={styles.tableViewerHeader}>
+        <span className={styles.tableViewerLabel}>Tables</span>
+        {showSkeleton ? (
+          <span className={styles.tableViewerCount}>
+            <span className={styles.tableViewerSpinner} aria-hidden /> Initializing…
+          </span>
+        ) : (
+          <span className={styles.tableViewerCount}>
+            {entries.length} {entries.length === 1 ? "table" : "tables"}
+          </span>
+        )}
+      </div>
+      {showSkeleton ? (
+        <TableViewerSkeleton />
+      ) : (
+        <>
+          <div className={styles.tableViewerTabs} role="tablist">
+            {entries.map((entry, idx) => (
+              <button
+                key={`${entry.schema ?? ""}.${entry.table}`}
+                type="button"
+                role="tab"
+                aria-selected={idx === activeIdx}
+                className={`${styles.tableViewerTab} ${
+                  idx === activeIdx ? styles.tableViewerTabActive : ""
+                }`}
+                onClick={() => setActiveIdx(idx)}
+              >
+                {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
+                  <>
+                    <span className={styles.tableViewerSchema}>{entry.schema}.</span>
+                    {entry.table}
+                  </>
+                ) : (
+                  entry.table
+                )}
+              </button>
+            ))}
+          </div>
+          {active && (
+            <TableViewerPane
+              // Re-key per table so switching tabs resets scroll to the
+              // top instead of inheriting the previous table's offset.
+              key={`${active.schema ?? ""}.${active.table}`}
+              entry={active}
+              height={paneHeight}
+              onLoadMore={onLoadMore}
+            />
+          )}
+          <div
+            className={styles.tableViewerResizer}
+            onPointerDown={onResizeStart}
+            onKeyDown={onResizeKey}
+            role="separator"
+            aria-orientation="horizontal"
+            aria-label="Drag to resize the tables panel"
+            tabIndex={0}
+          >
+            <span className={styles.tableViewerResizerGrip} aria-hidden />
+          </div>
+        </>
       )}
     </div>
   );
