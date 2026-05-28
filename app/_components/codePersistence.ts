@@ -18,7 +18,11 @@
 
 const STORAGE_PREFIX = "dataslope:";
 
-export type PersistKind = "codeblock" | "challenge" | "sql-challenge";
+export type PersistKind =
+  | "codeblock"
+  | "challenge"
+  | "sql-challenge"
+  | "sql-codeblock";
 
 interface PersistedRecord {
   /** The user's current buffer contents. */

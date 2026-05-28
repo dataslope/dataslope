@@ -1,0 +1,203 @@
+---
+title: Code Blocks — SQLite
+description: Runnable <SqlCodeBlock dialect="sqlite"> examples, with the raw JSX shown beneath each one.
+---
+
+SQLite code blocks run via **@sqlite.org/sqlite-wasm** — the official
+WebAssembly build, in-process, in your browser. Each example below is
+live; the raw JSX that produced it is shown directly underneath.
+
+## 1. Basic SELECT
+
+Seed a table with `initSql`, then read it back. The seeded table shows up
+in the **Tables** viewer above the editor.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Browse the books table"
+  initSql={`CREATE TABLE books (
+  id     INTEGER PRIMARY KEY,
+  title  TEXT,
+  author TEXT,
+  year   INTEGER
+);
+INSERT INTO books (title, author, year) VALUES
+  ('Dune', 'Frank Herbert', 1965),
+  ('Neuromancer', 'William Gibson', 1984),
+  ('Snow Crash', 'Neal Stephenson', 1992),
+  ('Foundation', 'Isaac Asimov', 1951),
+  ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
+  initialCode={`SELECT title, author, year
+FROM books
+ORDER BY year;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Browse the books table"
+  initSql={`CREATE TABLE books (
+  id     INTEGER PRIMARY KEY,
+  title  TEXT,
+  author TEXT,
+  year   INTEGER
+);
+INSERT INTO books (title, author, year) VALUES
+  ('Dune', 'Frank Herbert', 1965),
+  ('Neuromancer', 'William Gibson', 1984),
+  ('Snow Crash', 'Neal Stephenson', 1992),
+  ('Foundation', 'Isaac Asimov', 1951),
+  ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
+  initialCode={`SELECT title, author, year
+FROM books
+ORDER BY year;`}
+/>
+```
+
+## 2. Aggregation with GROUP BY
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Revenue per category"
+  initSql={`CREATE TABLE sales (
+  id       INTEGER PRIMARY KEY,
+  category TEXT,
+  product  TEXT,
+  revenue  REAL
+);
+INSERT INTO sales (category, product, revenue) VALUES
+  ('Electronics', 'Laptop',     1200.0),
+  ('Electronics', 'Headphones',  180.0),
+  ('Electronics', 'Phone',       900.0),
+  ('Clothing',    'Jacket',      210.0),
+  ('Clothing',    'Shirt',        40.0),
+  ('Food',        'Coffee',        8.5),
+  ('Food',        'Tea',           5.0),
+  ('Food',        'Bread',         3.0);`}
+  initialCode={`SELECT category, SUM(revenue) AS total_revenue
+FROM sales
+GROUP BY category
+ORDER BY total_revenue DESC;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Revenue per category"
+  initSql={`CREATE TABLE sales (
+  id       INTEGER PRIMARY KEY,
+  category TEXT,
+  product  TEXT,
+  revenue  REAL
+);
+INSERT INTO sales (category, product, revenue) VALUES
+  ('Electronics', 'Laptop',     1200.0),
+  ('Electronics', 'Headphones',  180.0),
+  ('Electronics', 'Phone',       900.0),
+  ('Clothing',    'Jacket',      210.0),
+  ('Clothing',    'Shirt',        40.0),
+  ('Food',        'Coffee',        8.5),
+  ('Food',        'Tea',           5.0),
+  ('Food',        'Bread',         3.0);`}
+  initialCode={`SELECT category, SUM(revenue) AS total_revenue
+FROM sales
+GROUP BY category
+ORDER BY total_revenue DESC;`}
+/>
+```
+
+## 3. Recursive CTE (no seed data)
+
+With no `initSql` the **Tables** viewer stays hidden — handy for pure
+expression demos like generating a number series.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Generate a number series"
+  initialCode={`WITH RECURSIVE seq(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM seq WHERE n < 10
+)
+SELECT n, n * n AS squared
+FROM seq;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Generate a number series"
+  initialCode={`WITH RECURSIVE seq(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM seq WHERE n < 10
+)
+SELECT n, n * n AS squared
+FROM seq;`}
+/>
+```
+
+## 4. Multiple tables (JOIN)
+
+Seed two related tables, then join them. Each seeded table shows up as
+its own tab in the **Tables** viewer.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Books and their authors"
+  initSql={`CREATE TABLE authors (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE books (
+  id        INTEGER PRIMARY KEY,
+  author_id INTEGER,
+  title     TEXT,
+  year      INTEGER
+);
+INSERT INTO authors (id, name) VALUES
+  (1, 'Frank Herbert'),
+  (2, 'William Gibson'),
+  (3, 'Ursula K. Le Guin');
+INSERT INTO books (id, author_id, title, year) VALUES
+  (1, 1, 'Dune', 1965),
+  (2, 1, 'Dune Messiah', 1969),
+  (3, 2, 'Neuromancer', 1984),
+  (4, 3, 'The Left Hand of Darkness', 1969),
+  (5, 3, 'The Dispossessed', 1974);`}
+  initialCode={`SELECT a.name AS author, b.title, b.year
+FROM books b
+JOIN authors a ON a.id = b.author_id
+ORDER BY a.name, b.year;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Books and their authors"
+  initSql={`CREATE TABLE authors (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE books (
+  id        INTEGER PRIMARY KEY,
+  author_id INTEGER,
+  title     TEXT,
+  year      INTEGER
+);
+INSERT INTO authors (id, name) VALUES
+  (1, 'Frank Herbert'),
+  (2, 'William Gibson'),
+  (3, 'Ursula K. Le Guin');
+INSERT INTO books (id, author_id, title, year) VALUES
+  (1, 1, 'Dune', 1965),
+  (2, 1, 'Dune Messiah', 1969),
+  (3, 2, 'Neuromancer', 1984),
+  (4, 3, 'The Left Hand of Darkness', 1969),
+  (5, 3, 'The Dispossessed', 1974);`}
+  initialCode={`SELECT a.name AS author, b.title, b.year
+FROM books b
+JOIN authors a ON a.id = b.author_id
+ORDER BY a.name, b.year;`}
+/>
+```

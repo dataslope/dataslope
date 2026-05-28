@@ -176,7 +176,7 @@ export interface SqlChallengeCardProps {
 }
 
 /** One table entry in the viewer panel. */
-interface TableViewerEntry {
+export interface TableViewerEntry {
   schema: string | null;
   table: string;
   result: SqlResult | null;
@@ -186,7 +186,7 @@ interface TableViewerEntry {
 
 // ─── Engine adapter ───────────────────────────────────────────────────
 
-interface SqlEngineLike {
+export interface SqlEngineLike {
   exec: (sql: string) => Promise<SqlResult[]>;
   /** Optional: detach any worker / connection so component unmount
    *  doesn't leak background threads. */
@@ -246,7 +246,7 @@ async function createPostgresChallengeEngine(): Promise<SqlEngineLike> {
   };
 }
 
-function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
+export function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
   switch (dialect) {
     case "sqlite":
       return createSqliteChallengeEngine();
@@ -260,7 +260,7 @@ function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLike> {
 /** Default schema where a dialect's user tables live unless qualified
  *  otherwise. SQLite has no schema concept (we use `main`); DuckDB
  *  uses `main`; PostgreSQL uses `public`. */
-function defaultSchemaFor(dialect: SqlDialect): string {
+export function defaultSchemaFor(dialect: SqlDialect): string {
   return dialect === "postgres" ? "public" : "main";
 }
 
@@ -268,7 +268,7 @@ function defaultSchemaFor(dialect: SqlDialect): string {
  *  a given dialect. Used by the table viewer to enumerate tables when
  *  the author didn't hand-pick a list. Returns rows of
  *  (schema, table_name). */
-function listTablesSqlFor(dialect: SqlDialect): string {
+export function listTablesSqlFor(dialect: SqlDialect): string {
   if (dialect === "sqlite") {
     return `SELECT 'main' AS schema_name, name AS table_name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name;`;
   }
@@ -286,7 +286,7 @@ function quoteIdent(name: string): string {
 
 /** Build a qualified table reference for a given dialect, quoting
  *  every component. */
-function qualifiedTable(
+export function qualifiedTable(
   dialect: SqlDialect,
   schema: string | null,
   table: string,
@@ -537,7 +537,7 @@ function languageIconKeyForDialect(d: SqlDialect): string {
 
 // Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
 // SQL challenge card shows the same blue-wave hint while running/submitting.
-function RunOverlay({ active }: { active: boolean }) {
+export function RunOverlay({ active }: { active: boolean }) {
   return (
     <div
       className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
@@ -563,7 +563,7 @@ function RunOverlay({ active }: { active: boolean }) {
   );
 }
 
-function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
+export function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
   const key = languageIconKeyForDialect(dialect);
   const Icon = LANGUAGE_ICONS[key];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[key] ?? 1;
@@ -582,7 +582,7 @@ function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
 /** Map dialect → sql-formatter language identifier. PGlite is Postgres-
  *  compatible; DuckDB's grammar is largely Postgres-derived too, so
  *  reusing the postgres rules produces good results for both. */
-function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
+export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
   if (d === "sqlite") return "sqlite";
   if (d === "duckdb") return "duckdb";
   return "postgresql";
@@ -626,7 +626,6 @@ export default function SqlChallengeCard({
   // checks. The promise (not the resolved engine) is cached so two
   // near-simultaneous clicks share a single boot.
   const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
-  const engineSeededRef = useRef(false);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
   // Default action of the split button (Submit when canCheck,
@@ -926,36 +925,45 @@ export default function SqlChallengeCard({
   );
 
   // ─── Engine bootstrap ───────────────────────────────────────────────
+  // Seeding (running `initSql`) is folded INTO the cached promise so
+  // every caller awaits the same fully-seeded engine. A previous design
+  // flipped a separate "seeded" flag *before* `await engine.exec(initSql)`
+  // resolved, which let a second caller — e.g. the user clicking Submit
+  // while the mount-time table-viewer boot was still seeding — get the
+  // engine back and query a table that didn't exist yet. That race is
+  // invisible for in-process SQLite but fired reliably on DuckDB (whose
+  // multi-second WASM download widens the window), especially for
+  // multi-statement `initSql` that seeds several tables.
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
-      enginePromiseRef.current = createEngineForDialect(dialect).catch((err) => {
+      enginePromiseRef.current = (async () => {
+        const engine = await createEngineForDialect(dialect);
+        setEngineLabel(`${engine.label} ${engine.version}`.trim());
+        if (initSql && initSql.trim()) {
+          await engine.exec(initSql);
+        }
+        return engine;
+      })().catch((err) => {
         // Don't poison the cache with a failed init — let the next
         // attempt try again.
         enginePromiseRef.current = null;
         throw err;
       });
     }
-    const engine = await enginePromiseRef.current;
-    if (!engineSeededRef.current) {
-      engineSeededRef.current = true;
-      setEngineLabel(`${engine.label} ${engine.version}`.trim());
-      if (initSql && initSql.trim()) {
-        await engine.exec(initSql);
-      }
-      await refreshTableViewer(engine);
-    }
-    return engine;
-  }, [dialect, initSql, refreshTableViewer]);
+    return enginePromiseRef.current;
+  }, [dialect, initSql]);
 
   // Eagerly boot the engine on mount so the table viewer can populate
   // before the learner clicks Run. The engine is per-card and isolated,
   // so doing this once per mount is safe.
   useEffect(() => {
     if (!tableViewerEnabled) return;
-    void ensureEngine().catch(() => {
-      /* surface errors via the per-table error column instead of blocking mount */
-    });
-  }, [ensureEngine, tableViewerEnabled]);
+    void ensureEngine()
+      .then((engine) => refreshTableViewer(engine))
+      .catch(() => {
+        /* surface errors via the per-table error column instead of blocking mount */
+      });
+  }, [ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   /**
@@ -1261,7 +1269,6 @@ export default function SqlChallengeCard({
     clearPersistedCode(persistedKey);
     const oldEngine = enginePromiseRef.current;
     enginePromiseRef.current = null;
-    engineSeededRef.current = false;
     if (oldEngine) {
       void oldEngine.then((e) => e.destroy?.()).catch(() => {});
     }
@@ -1275,12 +1282,14 @@ export default function SqlChallengeCard({
     setBannerState(null);
     setTableEntries([]);
     if (tableViewerEnabled) {
-      void ensureEngine().catch(() => {
-        /* see mount-time bootstrap */
-      });
+      void ensureEngine()
+        .then((engine) => refreshTableViewer(engine))
+        .catch(() => {
+          /* see mount-time bootstrap */
+        });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, tableViewerEnabled, toasts]);
+  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -1930,7 +1939,7 @@ function SolutionModal({
  *  `@tanstack/react-virtual` + a TanStack table for the column
  *  definitions. For very wide tables the inner row is still a
  *  regular `<tr>` so column auto-widths just work. */
-function VirtualizedResultTable({
+export function VirtualizedResultTable({
   columns,
   values,
   maxHeight,
@@ -2053,7 +2062,7 @@ function VirtualizedResultTable({
 /** Renders a single table's contents inside the table viewer panel.
  *  Errors and empty-table cases produce a contextual message rather
  *  than a blank pane. */
-function TableViewerPane({
+export function TableViewerPane({
   entry,
   limit,
 }: {

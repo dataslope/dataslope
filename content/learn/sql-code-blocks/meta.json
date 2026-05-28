@@ -1,0 +1,10 @@
+{
+  "title": "SQL Code Blocks",
+  "pages": [
+    "index",
+    "---",
+    "sqlite",
+    "duckdb",
+    "postgres"
+  ]
+}
