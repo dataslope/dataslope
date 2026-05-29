@@ -15,9 +15,9 @@ Strip away every detail and a computer is just three things:
 
 ```mermaid
 flowchart LR
-    M[(Memory<br/>a long ruler of<br/>numbered boxes)]
-    C[CPU<br/>one tiny worker]
-    IO[Input / Output<br/>keyboard, screen, files]
+    M[("Memory<br/>a long ruler of<br/>numbered boxes")]
+    C["CPU<br/>one tiny worker"]
+    IO["Input / Output<br/>keyboard, screen, files"]
     C <-->|reads + writes| M
     C <-->|reads + writes| IO
 ```
@@ -81,8 +81,8 @@ per second. It is called the **fetch–decode–execute loop**:
 
 ```mermaid
 flowchart LR
-    A[Fetch:<br/>read the next<br/>instruction from<br/>memory] --> B[Decode:<br/>figure out what<br/>this instruction<br/>means]
-    B --> C[Execute:<br/>do it. read or<br/>write memory,<br/>do math, jump]
+    A["Fetch:<br/>read the next<br/>instruction from<br/>memory"] --> B["Decode:<br/>figure out what<br/>this instruction<br/>means"]
+    B --> C["Execute:<br/>do it, read or<br/>write memory,<br/>do math, jump"]
     C --> A
 ```
 
@@ -100,9 +100,9 @@ the result back to memory.
 
 ```mermaid
 flowchart LR
-    M[(Main memory<br/>billions of bytes<br/>slow-ish)] -->|load| R[CPU registers<br/>~32 slots<br/>blazing fast]
+    M[("Main memory<br/>billions of bytes<br/>slow-ish")] -->|load| R["CPU registers<br/>~32 slots<br/>blazing fast"]
     R -->|store| M
-    R --> ALU[Arithmetic/Logic Unit:<br/>add, sub, and, or, ...]
+    R --> ALU["Arithmetic/Logic Unit:<br/>add, sub, and, or, ..."]
     ALU --> R
 ```
 
@@ -118,12 +118,12 @@ sequenceDiagram
     participant Disk as Disk
     participant Mem as RAM
     participant CPU
-    U->>OS: "Run hello.exe"
+    U->>OS: Run hello.exe
     OS->>Disk: Read the program file
     Disk-->>OS: Bytes of the program
     OS->>Mem: Copy program into a fresh region of memory
-    OS->>CPU: Set instruction pointer to main()
-    CPU->>Mem: Fetch instruction, run it, repeat...
+    OS->>CPU: Set instruction pointer to main
+    CPU->>Mem: Fetch instruction, run it, repeat
     CPU-->>U: Output to screen, files, network
     CPU->>OS: main returns; please clean up
     OS->>Mem: Reclaim memory
@@ -144,11 +144,11 @@ course, so it helps to meet them now:
 ```mermaid
 flowchart TB
     subgraph "Program address space"
-        T[Text / code<br/>the compiled instructions]
-        D[Data<br/>global and static variables]
-        H[Heap<br/>grows upward as you<br/>allocate dynamically]
+        T["Text / code<br/>the compiled instructions"]
+        D["Data<br/>global and static variables"]
+        H["Heap<br/>grows upward as you<br/>allocate dynamically"]
         Sp[ ]
-        S[Stack<br/>grows downward<br/>function call frames]
+        S["Stack<br/>grows downward<br/>function call frames"]
     end
 ```
 
