@@ -496,9 +496,9 @@ function PgTypeSelector({
       openOnInputClick
       autoHighlight
     >
-      <div className="pg-type-input-group">
+      <div className="playground-type-input-group">
         <Combobox.Input
-          className="sql-rename-input sql-modify-col-type pg-type-input"
+          className="sql-rename-input sql-modify-col-type playground-type-input"
           placeholder="e.g. varchar(255)"
           aria-label="Column type"
           onBlur={() => {
@@ -524,7 +524,7 @@ function PgTypeSelector({
           }}
         />
         <Combobox.Trigger
-          className="pg-type-trigger"
+          className="playground-type-trigger"
           aria-label="Open type list"
         >
           <ChevronDown size={14} />
@@ -534,13 +534,13 @@ function PgTypeSelector({
         <Combobox.Positioner
           sideOffset={4}
           align="start"
-          className="pg-type-positioner"
+          className="playground-type-positioner"
         >
-          <Combobox.Popup className="bui-select-popup pg-type-popup">
+          <Combobox.Popup className="bui-select-popup playground-type-popup">
             <Combobox.List>
               {visibleGroups.map((group) => (
-                <Combobox.Group key={group.label} className="pg-type-group">
-                  <Combobox.GroupLabel className="pg-type-group-label">
+                <Combobox.Group key={group.label} className="playground-type-group">
+                  <Combobox.GroupLabel className="playground-type-group-label">
                     {group.label}
                   </Combobox.GroupLabel>
                   {group.types.map((type) => (
@@ -555,7 +555,7 @@ function PgTypeSelector({
                 </Combobox.Group>
               ))}
               {visibleGroups.length === 0 && (
-                <div className="pg-type-empty">
+                <div className="playground-type-empty">
                   No matching built-in types. You can keep the typed value.
                 </div>
               )}
@@ -1513,7 +1513,7 @@ function PostgresPlaygroundInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.title = "PostgreSQL Playground";
-    document.body.classList.add("pg-active");
+    document.body.classList.add("playground-active");
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize =
       Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) ||
@@ -1566,7 +1566,7 @@ function PostgresPlaygroundInner() {
     }
 
     return () => {
-      document.body.classList.remove("pg-active");
+      document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [
@@ -1631,7 +1631,7 @@ function PostgresPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
-          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
             if (window.sessionStorage.getItem(noticeKey) !== "1") {
               const hasLock = await acquireWorkspaceLock(workspace.id);

@@ -57,11 +57,11 @@ export function TabBar({
   onReorderTabs,
   className,
 }: TabBarProps) {
-  const cls = ["pg-tabbar", className].filter(Boolean).join(" ");
+  const cls = ["playground-tabbar", className].filter(Boolean).join(" ");
   const sortable = !!onReorderTabs;
 
   const strip = (
-    <div className="pg-tabs" role="tablist">
+    <div className="playground-tabs" role="tablist">
       {tabs.map((tab) => (
         <TabItem
           key={tab.id}
@@ -97,7 +97,7 @@ export function TabBar({
       {onAddTab && (
         <button
           type="button"
-          className="pg-tab-add"
+          className="playground-tab-add"
           onMouseDown={(e) => e.preventDefault()}
           onClick={onAddTab}
           aria-label="New tab"
@@ -354,7 +354,7 @@ const TabItem = memo(function TabItem({
               {...(sortable ? sortableState.listeners : {})}
               ref={sortable ? sortableState.setNodeRef : undefined}
               style={dragStyle}
-              className={`pg-tab${active ? " active" : ""} pg-tab--kind-${tab.kind}${isClosing ? " pg-tab--closing" : ""}`}
+              className={`playground-tab${active ? " active" : ""} playground-tab--kind-${tab.kind}${isClosing ? " playground-tab--closing" : ""}`}
               onClick={onSelect}
               onDoubleClick={openRename}
               onAnimationEnd={handleAnimationEnd}
@@ -378,11 +378,11 @@ const TabItem = memo(function TabItem({
               }}
             >
               {tab.icon && (
-                <span className="pg-tab-icon" aria-hidden="true">
+                <span className="playground-tab-icon" aria-hidden="true">
                   {tab.icon}
                 </span>
               )}
-              <span ref={titleRef} className="pg-tab-title">
+              <span ref={titleRef} className="playground-tab-title">
                 {tab.label}
               </span>
               {tooltipMounted && (
@@ -393,9 +393,9 @@ const TabItem = memo(function TabItem({
                       side="top"
                       sideOffset={6}
                       align="center"
-                      className="pg-tab-name-positioner"
+                      className="playground-tab-name-positioner"
                     >
-                      <Popover.Popup className="bui-popup pg-tab-name-popover">
+                      <Popover.Popup className="bui-popup playground-tab-name-popover">
                         {tab.label}
                       </Popover.Popup>
                     </Popover.Positioner>
@@ -406,7 +406,7 @@ const TabItem = memo(function TabItem({
                 <span
                   role="button"
                   tabIndex={-1}
-                  className="pg-tab-close"
+                  className="playground-tab-close"
                   aria-label={`Close ${tab.label}`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -481,16 +481,16 @@ function TabOverlay({
   return (
     <button
       type="button"
-      className={`pg-tab${active ? " active" : ""} pg-tab--kind-${tab.kind}`}
+      className={`playground-tab${active ? " active" : ""} playground-tab--kind-${tab.kind}`}
       style={{ opacity: 0.85, cursor: "grabbing" }}
     >
       {tab.icon && (
-        <span className="pg-tab-icon" aria-hidden="true">
+        <span className="playground-tab-icon" aria-hidden="true">
           {tab.icon}
         </span>
       )}
-      <span className="pg-tab-title">{tab.label}</span>
-      <span className="pg-tab-close">
+      <span className="playground-tab-title">{tab.label}</span>
+      <span className="playground-tab-close">
         <X size={10} aria-hidden="true" />
       </span>
     </button>

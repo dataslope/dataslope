@@ -621,7 +621,7 @@ function ToastList() {
 
 function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Initial settings (persisted in localStorage, namespaced per-language) ─
-  const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
+  const storageKey = (k: string) => `playground_${adapter.id}_${k}`;
   const [fontSize, setFontSizeState] = useState<number>(
     DEFAULT_PLAYGROUND_SETTINGS.fontSize,
   );
@@ -824,7 +824,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.title = adapter.documentTitle;
-    document.body.classList.add("pg-active");
+    document.body.classList.add("playground-active");
 
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) || D.fontSize;
@@ -862,7 +862,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     );
 
     return () => {
-      document.body.classList.remove("pg-active");
+      document.body.classList.remove("playground-active");
       clearThemePalette();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -935,7 +935,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // for this workspace, surface a one-time toast so the user
         // knows their edits in this tab are unsafe. Shown at most once
         // per (workspace × session) via sessionStorage.
-        const noticeKey = `pg_ws_warned_${ws.id}`;
+        const noticeKey = `playground_ws_warned_${ws.id}`;
         try {
           if (window.sessionStorage.getItem(noticeKey) !== "1") {
             const hasLock = await acquireWorkspaceLock(ws.id);
@@ -2702,7 +2702,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   return (
-    <div className="pg-root">
+    <div className="playground-root">
       {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
@@ -2748,8 +2748,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         </div>
       )}
 
-      <div className="pg-app">
-        <header className="pg-header">
+      <div className="playground-app">
+        <header className="playground-header">
           <div className="logo">
             <Link href="/" aria-label="Dataslope home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2793,8 +2793,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Positioner sideOffset={0} alignItemWithTrigger={false} className="pg-lang-switcher-positioner">
-                  <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
+                <Select.Positioner sideOffset={0} alignItemWithTrigger={false} className="playground-lang-switcher-positioner">
+                  <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
                     {PLAYGROUNDS.map((p) => {
                       const Icon = PLAYGROUND_ICONS[p.id];
                       const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
@@ -2847,7 +2847,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span className="btn-label">Examples</span>
               </Menu.Trigger>
               <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="pg-header-positioner">
+                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
                   <Menu.Popup className="bui-popup examples-dropdown">
                     {adapter.examples.map((ex) => (
                       <Menu.Item
@@ -2874,7 +2874,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span className="btn-label">Export</span>
               </Menu.Trigger>
               <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="pg-header-positioner">
+                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
                   <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
                     {adapter.exportFormats.map((fmt) => (
                       <Menu.Item
@@ -2920,7 +2920,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <FaInfo size={13} aria-hidden="true" />
               </Popover.Trigger>
               <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end" className="pg-header-positioner">
+                <Popover.Positioner sideOffset={6} align="end" className="playground-header-positioner">
                   <Popover.Popup className="bui-popup info-popover">
                     <RuntimeInfoContent info={adapter.runtimeInfo} />
                   </Popover.Popup>
@@ -3309,9 +3309,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        <div className="pg-body">
-          <nav className="pg-icon-sidebar" aria-label="Panel navigation">
-            <div className="pg-icon-sidebar-top">
+        <div className="playground-body">
+          <nav className="playground-icon-sidebar" aria-label="Panel navigation">
+            <div className="playground-icon-sidebar-top">
               <Popover.Root>
                 <Popover.Trigger
                   openOnHover
@@ -3321,7 +3321,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className="pg-icon-sidebar-btn active"
+                      className="playground-icon-sidebar-btn active"
                       aria-label="Editor"
                     >
                       <Code2 size={16} aria-hidden="true" />
@@ -3346,7 +3346,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className={`pg-icon-sidebar-btn${filesPaneOpen ? " active" : ""}`}
+                      className={`playground-icon-sidebar-btn${filesPaneOpen ? " active" : ""}`}
                       aria-label="Files"
                       aria-pressed={filesPaneOpen}
                       onClick={() => setFilesPaneOpen((v) => !v)}
@@ -3364,7 +3364,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Portal>
               </Popover.Root>
             </div>
-            <div className="pg-icon-sidebar-bottom">
+            <div className="playground-icon-sidebar-bottom">
               <Popover.Root>
                 <Popover.Trigger
                   openOnHover
@@ -3374,7 +3374,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className="pg-icon-sidebar-btn"
+                      className="playground-icon-sidebar-btn"
                       aria-label="Settings"
                       onClick={openSettingsTab}
                     >
@@ -3396,12 +3396,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </div>
           </nav>
           {filesPaneOpen && (
-            <div className="pg-files-sidebar">
-              <div className="pg-files-sidebar-header">
-                <span className="pg-files-sidebar-title">Files</span>
+            <div className="playground-files-sidebar">
+              <div className="playground-files-sidebar-header">
+                <span className="playground-files-sidebar-title">Files</span>
                 <button
                   type="button"
-                  className="pg-files-sidebar-close"
+                  className="playground-files-sidebar-close"
                   aria-label="Close files panel"
                   onClick={() => setFilesPaneOpen(false)}
                 >
@@ -3422,7 +3422,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               />
             </div>
           )}
-          <div className="pg-body-content">
+          <div className="playground-body-content">
         {/* File tabs: one tab per workspace file. The active tab's
             editor + output pane appear directly below — switching tabs
             swaps both the editor doc and the output history so each
@@ -3436,7 +3436,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             onAddTab={addNewFile}
             onRenameTab={renameFileTab}
             onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
-            className="pg-file-tabbar"
+            className="playground-file-tabbar"
           />
         )}
         <div className="mobile-tabs" role="tablist" aria-label="Pane">
@@ -3557,7 +3557,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <kbd className="kbd">Enter</kbd>
               </span>
               <div
-                className={`pg-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}`}
+                className={`playground-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}`}
               >
                 <Popover.Root>
                   <Popover.Trigger
@@ -3565,7 +3565,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       <button
                         {...props}
                         type="button"
-                        className={`run-btn pg-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
+                        className={`run-btn playground-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
                         disabled={!loaded || statusState === "running"}
                         onClick={() => {
                           void runCode(runButtonState.primaryEntry ?? undefined);
@@ -3578,7 +3578,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         ) : (
                           <Play size={10} aria-hidden="true" />
                         )}
-                        <span className="pg-run-multi-label">
+                        <span className="playground-run-multi-label">
                           {statusState === "running"
                             ? "Running…"
                             : runButtonState.primaryLabel}
@@ -3603,7 +3603,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         <button
                           {...props}
                           type="button"
-                          className={`run-btn pg-run-multi-chevron${statusState === "running" ? " running" : ""}`}
+                          className={`run-btn playground-run-multi-chevron${statusState === "running" ? " running" : ""}`}
                           disabled={!loaded || statusState === "running"}
                           aria-label="More run options"
                         >
@@ -3613,11 +3613,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     />
                     <Menu.Portal>
                       <Menu.Positioner sideOffset={6} align="end">
-                        <Menu.Popup className="bui-popup pg-run-multi-dropdown">
+                        <Menu.Popup className="bui-popup playground-run-multi-dropdown">
                           {runButtonState.dropdownItems.map((item) => (
                             <Menu.Item
                               key={item.entryFilename}
-                              className="pg-run-multi-item"
+                              className="playground-run-multi-item"
                               onClick={() => {
                                 void runCode(item.entryFilename);
                               }}
@@ -3731,7 +3731,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <DataslopeRunOverlay running={statusState === "running"} />
           </div>
           {activeTabId === SETTINGS_TAB_ID && (
-            <div className="pg-settings-tab-pane">
+            <div className="playground-settings-tab-pane">
               <SettingsPanelContent
                 fontSize={fontSize}
                 setFontSize={setFontSize}

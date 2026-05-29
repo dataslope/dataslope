@@ -45,12 +45,12 @@ export interface SqlPlaygroundShellProps {
    *  Postgres/DuckDB use 3, SQLite uses 4. */
   loadingHeroRepeat?: number;
   /** Right-of-logo header actions (Import, Export, Examples, …). The
-   *  shell renders them directly inside `<header className="pg-header">`
+   *  shell renders them directly inside `<header className="playground-header">`
    *  after the logo + separator. */
   headerActions?: ReactNode;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
-   *  `<div className="pg-app">` after the header. */
+   *  `<div className="playground-app">` after the header. */
   children: ReactNode;
 }
 
@@ -83,7 +83,7 @@ export function SqlPlaygroundShell({
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
   return (
-    <div className="pg-root">
+    <div className="playground-root">
       {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
@@ -109,8 +109,8 @@ export function SqlPlaygroundShell({
           </div>
         </div>
       )}
-      <div className="pg-app">
-        <header className="pg-header">
+      <div className="playground-app">
+        <header className="playground-header">
           <SqlPlaygroundSwitcher playgroundId={playgroundId} />
           <div className="header-sep" />
           {headerActions}

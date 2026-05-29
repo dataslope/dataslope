@@ -46,7 +46,7 @@ interface WorkspaceMeta {
 // Constants
 // ---------------------------------------------------------------------------
 
-const REGISTRY_KEY = "pg_workspaces";
+const REGISTRY_KEY = "playground_workspaces";
 const WORKSPACES_DIR = "workspaces";
 
 // ---------------------------------------------------------------------------
@@ -342,7 +342,7 @@ export async function acquireWorkspaceLock(
     const locks = (navigator as unknown as { locks: LockManager }).locks;
 
     locks.request(
-      `pg_workspace_${workspaceId}`,
+      `playground_workspace_${workspaceId}`,
       { ifAvailable: true },
       (lock: unknown) => {
         if (!lock) {

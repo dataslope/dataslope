@@ -46,13 +46,13 @@
 }
 
 /* ─── Light mode — only non-variable overrides remain ─── */
-html[data-pg-theme="light"] .pyodide-loading {
+html[data-playground-theme="light"] .pyodide-loading {
   background: var(--bg);
 }
 
-.pg-root *,
-.pg-root *::before,
-.pg-root *::after {
+.playground-root *,
+.playground-root *::before,
+.playground-root *::after {
   box-sizing: border-box;
 }
 
@@ -67,24 +67,24 @@ html[data-pg-theme="light"] .pyodide-loading {
    – `scrollbar-width` / `scrollbar-color` for Firefox & modern Chromium.
    – `::-webkit-scrollbar*` pseudo-elements for WebKit / Chromium.
 
-   Scoped under `.pg-root` so the marketing pages (and the Fumadocs
+   Scoped under `.playground-root` so the marketing pages (and the Fumadocs
    `/learn` route) keep their own native scrollbars. */
-.pg-root,
-.pg-root * {
+.playground-root,
+.playground-root * {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.pg-root ::-webkit-scrollbar,
-.pg-root::-webkit-scrollbar {
+.playground-root ::-webkit-scrollbar,
+.playground-root::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-.pg-root ::-webkit-scrollbar-track,
-.pg-root::-webkit-scrollbar-track {
+.playground-root ::-webkit-scrollbar-track,
+.playground-root::-webkit-scrollbar-track {
   background: transparent;
 }
-.pg-root ::-webkit-scrollbar-thumb,
-.pg-root::-webkit-scrollbar-thumb {
+.playground-root ::-webkit-scrollbar-thumb,
+.playground-root::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
   /* Slightly inset so the thumb doesn't run flush against the gutter
@@ -93,18 +93,18 @@ html[data-pg-theme="light"] .pyodide-loading {
   background-clip: padding-box;
   border: 1px solid transparent;
 }
-.pg-root ::-webkit-scrollbar-thumb:hover,
-.pg-root::-webkit-scrollbar-thumb:hover {
+.playground-root ::-webkit-scrollbar-thumb:hover,
+.playground-root::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
   background-clip: padding-box;
   border: 1px solid transparent;
 }
-.pg-root ::-webkit-scrollbar-corner,
-.pg-root::-webkit-scrollbar-corner {
+.playground-root ::-webkit-scrollbar-corner,
+.playground-root::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-body.pg-active {
+body.playground-active {
   min-height: 100%;
   background: var(--bg);
   color: var(--text);
@@ -112,12 +112,12 @@ body.pg-active {
   font-size: 14px;
 }
 
-body.pg-active {
+body.playground-active {
   overflow: hidden;
 }
 
 /* ─── Layout ─── */
-.pg-app {
+.playground-app {
   display: grid;
   grid-template-rows: 40px 1fr;
   /* Use the dynamic viewport height on mobile browsers so that the
@@ -129,7 +129,7 @@ body.pg-active {
 }
 
 /* ─── Header ─── */
-.pg-header {
+.playground-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -238,24 +238,24 @@ body.pg-active {
    on both the Floating UI positioner and the popup so it wins
    regardless of which element Base UI uses as the stacking-context
    anchor across versions. */
-.pg-lang-switcher-positioner {
+.playground-lang-switcher-positioner {
   z-index: 500;
 }
-.pg-lang-switcher-popup {
+.playground-lang-switcher-popup {
   z-index: 500;
 }
 /* All header-level dropdowns/popovers/menus (workspace, examples, export,
-   runtime info) need a high z-index so they paint above the pg-header
+   runtime info) need a high z-index so they paint above the playground-header
    stacking context (z-index: 10) and the settings tab overlay (z-index: 10).
    The Positioner element creates its own stacking context; giving it an
    explicit z-index ensures it wins in the root stacking order. */
-.pg-header-positioner {
+.playground-header-positioner {
   z-index: 500;
 }
 /* Icon sidebar hover-popovers must render above in-page elements that
    create stacking contexts (e.g. .sql-schema-selector-wrap with
-   position: relative; z-index: 1, and .pg-icon-sidebar with z-index: 5). */
-.pg-icon-sidebar-popover-positioner {
+   position: relative; z-index: 1, and .playground-icon-sidebar with z-index: 5). */
+.playground-icon-sidebar-popover-positioner {
   z-index: 600;
 }
 .bui-select-popup[data-starting-style],
@@ -293,10 +293,10 @@ body.pg-active {
 
 /* Icons inside the language-switcher dropdown default to --text; only
    the currently-selected (active) item's icon uses --primary. */
-.pg-lang-switcher-popup .bui-select-item-icon {
+.playground-lang-switcher-popup .bui-select-item-icon {
   color: var(--text);
 }
-.pg-lang-switcher-popup .bui-select-item[data-selected] .bui-select-item-icon {
+.playground-lang-switcher-popup .bui-select-item[data-selected] .bui-select-item-icon {
   color: var(--primary);
 }
 
@@ -435,7 +435,7 @@ body.pg-active {
 }
 
 /* ─── Icon sidebar wrapper — wraps icon sidebar + panes on desktop ─── */
-.pg-body {
+.playground-body {
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -444,7 +444,7 @@ body.pg-active {
 }
 
 /* ─── Thin vertical icon sidebar (activity bar) ─── */
-.pg-icon-sidebar {
+.playground-icon-sidebar {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -457,7 +457,7 @@ body.pg-active {
 }
 
 /* Top group: regular panel buttons. Bottom group is pinned to the bottom. */
-.pg-icon-sidebar-top {
+.playground-icon-sidebar-top {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -465,7 +465,7 @@ body.pg-active {
   flex: 1;
 }
 
-.pg-icon-sidebar-bottom {
+.playground-icon-sidebar-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -473,7 +473,7 @@ body.pg-active {
   padding-top: 4px;
 }
 
-.pg-icon-sidebar-btn {
+.playground-icon-sidebar-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,23 +490,23 @@ body.pg-active {
     background 0.15s;
 }
 
-.pg-icon-sidebar-btn:hover {
+.playground-icon-sidebar-btn:hover {
   color: var(--text);
   background: var(--bg3);
 }
 
-.pg-icon-sidebar-btn.active {
+.playground-icon-sidebar-btn.active {
   color: var(--text);
   background: var(--bg3);
 }
 
-.pg-icon-sidebar-btn:focus-visible {
+.playground-icon-sidebar-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
 
 /* ─── Content area next to the icon sidebar ─── */
-.pg-body-content {
+.playground-body-content {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -515,7 +515,7 @@ body.pg-active {
 }
 
 /* ─── Files sidebar panel (between icon sidebar and body content) ─── */
-.pg-files-sidebar {
+.playground-files-sidebar {
   display: flex;
   flex-direction: column;
   width: 220px;
@@ -526,7 +526,7 @@ body.pg-active {
   min-height: 0;
 }
 
-.pg-files-sidebar-header {
+.playground-files-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -535,7 +535,7 @@ body.pg-active {
   flex-shrink: 0;
 }
 
-.pg-files-sidebar-title {
+.playground-files-sidebar-title {
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 600;
@@ -544,7 +544,7 @@ body.pg-active {
   letter-spacing: 0.04em;
 }
 
-.pg-files-sidebar-close {
+.playground-files-sidebar-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -559,32 +559,32 @@ body.pg-active {
   transition: color 0.15s, background 0.15s;
 }
 
-.pg-files-sidebar-close:hover {
+.playground-files-sidebar-close:hover {
   color: var(--text);
   background: var(--bg3);
 }
 
-/* ─── Shared files panel component (pg-files-*) ─── */
-.pg-files {
+/* ─── Shared files panel component (playground-files-*) ─── */
+.playground-files {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
 }
 
-.pg-files-dragging {
+.playground-files-dragging {
   outline: 2px dashed var(--primary);
   outline-offset: -4px;
   background: color-mix(in srgb, var(--primary) 6%, transparent);
 }
 
-.pg-files-toolbar {
+.playground-files-toolbar {
   display: flex;
   gap: 4px;
   padding: 6px 8px;
 }
 
-.pg-files-toolbar-btn {
+.playground-files-toolbar-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -599,16 +599,16 @@ body.pg-active {
   transition: background 120ms ease, color 120ms ease;
 }
 
-.pg-files-toolbar-btn:hover {
+.playground-files-toolbar-btn:hover {
   background: var(--bg3);
   color: var(--text);
 }
 
-.pg-files-hidden-input {
+.playground-files-hidden-input {
   display: none;
 }
 
-.pg-files-target-hint {
+.playground-files-target-hint {
   padding: 6px 10px;
   background: var(--bg2);
   color: var(--text-dim);
@@ -619,19 +619,19 @@ body.pg-active {
   text-overflow: ellipsis;
 }
 
-.pg-files-target-hint strong {
+.playground-files-target-hint strong {
   color: var(--text);
   font-weight: 600;
 }
 
-.pg-files-tree {
+.playground-files-tree {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: 4px 0;
 }
 
-.pg-files-row {
+.playground-files-row {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -645,37 +645,37 @@ body.pg-active {
   position: relative;
 }
 
-.pg-files-row:hover {
+.playground-files-row:hover {
   background: var(--bg3);
 }
 
-.pg-files-row-selected {
+.playground-files-row-selected {
   background: color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
-.pg-files-row-drop-target {
+.playground-files-row-drop-target {
   background: color-mix(in srgb, var(--primary) 24%, transparent);
   outline: 1px solid var(--primary);
   outline-offset: -1px;
 }
 
-.pg-files-chevron {
+.playground-files-chevron {
   flex-shrink: 0;
   color: var(--text-dim);
 }
 
-.pg-files-chevron-spacer {
+.playground-files-chevron-spacer {
   display: inline-block;
   width: 11px;
   flex-shrink: 0;
 }
 
-.pg-files-icon {
+.playground-files-icon {
   flex-shrink: 0;
   color: var(--text-dim);
 }
 
-.pg-files-name {
+.playground-files-name {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -683,7 +683,7 @@ body.pg-active {
   white-space: nowrap;
 }
 
-.pg-files-size {
+.playground-files-size {
   color: var(--text-dim);
   font-size: 10px;
   font-family: var(--font-mono);
@@ -694,33 +694,33 @@ body.pg-active {
 /* Context menu styling matches the Base UI menus used elsewhere
    (examples-dropdown). Items already get the common .example-item
    treatment; only file-tree-specific tweaks live here. */
-.pg-files-ctx-menu {
+.playground-files-ctx-menu {
   min-width: 160px;
 }
 
 /* Lay icons and labels on the same line. */
-.pg-files-ctx-menu .example-item {
+.playground-files-ctx-menu .example-item {
   display: flex;
   align-items: center;
   gap: 7px;
 }
 
-.pg-files-ctx-danger {
+.playground-files-ctx-danger {
   color: var(--red);
 }
 
-.pg-files-ctx-danger:hover,
-.pg-files-ctx-danger[data-highlighted] {
+.playground-files-ctx-danger:hover,
+.playground-files-ctx-danger[data-highlighted] {
   background: color-mix(in srgb, var(--red) 14%, transparent);
   color: var(--red);
 }
 
 /* Info dialog (compact) */
-.pg-files-info-popup {
+.playground-files-info-popup {
   min-width: 360px;
 }
 
-.pg-files-info-grid {
+.playground-files-info-grid {
   display: grid;
   grid-template-columns: 90px 1fr;
   gap: 6px 14px;
@@ -729,21 +729,21 @@ body.pg-active {
   font-size: 12px;
 }
 
-.pg-files-info-label {
+.playground-files-info-label {
   color: var(--text-dim);
 }
 
-.pg-files-info-value {
+.playground-files-info-value {
   color: var(--text);
   word-break: break-all;
 }
 
-.pg-files-info-path {
+.playground-files-info-path {
   font-family: var(--font-mono);
   font-size: 11px;
 }
 
-.pg-files-rename-input {
+.playground-files-rename-input {
   flex: 1;
   min-width: 0;
   padding: 1px 4px;
@@ -756,7 +756,7 @@ body.pg-active {
   outline: none;
 }
 
-.pg-files-empty {
+.playground-files-empty {
   padding: 24px 16px;
   text-align: center;
   color: var(--text-dim);
@@ -764,7 +764,7 @@ body.pg-active {
   font-size: 12px;
 }
 
-.pg-files-empty-hint {
+.playground-files-empty-hint {
   display: inline-block;
   margin-top: 6px;
   color: var(--text-muted, var(--text-dim));
@@ -772,10 +772,10 @@ body.pg-active {
 }
 
 @media (max-width: 768px) {
-  .pg-icon-sidebar {
+  .playground-icon-sidebar {
     display: none;
   }
-  .pg-files-sidebar {
+  .playground-files-sidebar {
     display: none;
   }
 }
@@ -910,10 +910,10 @@ body.pg-active {
   cursor: not-allowed;
 }
 .run-btn-spinner {
-  animation: pg-spin 0.75s linear infinite;
+  animation: playground-spin 0.75s linear infinite;
   fill: none;
 }
-@keyframes pg-spin {
+@keyframes playground-spin {
   to {
     transform: rotate(360deg);
   }
@@ -1023,7 +1023,7 @@ body.pg-active {
  * C# / Python / R / JS / TS / PHP playgrounds get the same primary
  * button + chevron + divider treatment as the SQL playground's
  * "Run Selection / Run All" split control. */
-.pg-run-multi {
+.playground-run-multi {
   display: flex;
   align-items: stretch;
   border-radius: 4px;
@@ -1034,10 +1034,10 @@ body.pg-active {
    * primary button instead of pushing the toolbar out of bounds. */
   max-width: 240px;
 }
-.pg-run-multi.running {
+.playground-run-multi.running {
   opacity: 0.75;
 }
-.pg-run-multi-main {
+.playground-run-multi-main {
   /* Override `.run-btn` background to participate in the shared group
    * background; the parent provides the brand color. */
   background: transparent !important;
@@ -1045,20 +1045,20 @@ body.pg-active {
   padding: 5px 12px;
   min-width: 0;
 }
-.pg-run-multi-main:hover:not(:disabled) {
+.playground-run-multi-main:hover:not(:disabled) {
   filter: brightness(1.1);
 }
-.pg-run-multi-main:disabled {
+.playground-run-multi-main:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   filter: none;
 }
-.pg-run-multi-main.has-chevron {
+.playground-run-multi-main.has-chevron {
   /* Visual divider between primary action and the chevron — same
    * 1px translucent-white treatment as `.run-btn-split-divider`. */
   box-shadow: inset -1px 0 0 0 rgba(255, 255, 255, 0.3);
 }
-.pg-run-multi-label {
+.playground-run-multi-label {
   /* Truncate long entry-file labels with an ellipsis. The full label
    * shows in a Base UI popover on hover. */
   overflow: hidden;
@@ -1066,21 +1066,21 @@ body.pg-active {
   white-space: nowrap;
   min-width: 0;
 }
-.pg-run-multi-chevron {
+.playground-run-multi-chevron {
   background: transparent !important;
   border-radius: 0;
   padding: 5px 8px;
   flex-shrink: 0;
 }
-.pg-run-multi-chevron:hover:not(:disabled) {
+.playground-run-multi-chevron:hover:not(:disabled) {
   filter: brightness(1.1);
 }
-.pg-run-multi-chevron:disabled {
+.playground-run-multi-chevron:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   filter: none;
 }
-.pg-run-multi-chevron svg {
+.playground-run-multi-chevron svg {
   width: 12px;
   height: 12px;
   flex-shrink: 0;
@@ -1088,10 +1088,10 @@ body.pg-active {
   stroke: white;
 }
 
-.pg-run-multi-dropdown {
+.playground-run-multi-dropdown {
   min-width: 200px;
 }
-.pg-run-multi-item {
+.playground-run-multi-item {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -1101,8 +1101,8 @@ body.pg-active {
   color: var(--text);
   border-radius: 4px;
 }
-.pg-run-multi-item[data-highlighted],
-.pg-run-multi-item:hover {
+.playground-run-multi-item[data-highlighted],
+.playground-run-multi-item:hover {
   background: var(--bg3);
 }
 
@@ -1112,14 +1112,14 @@ body.pg-active {
   position: relative;
 }
 
-/* All CodeMirror overrides below are scoped under `.pg-root` so they
+/* All CodeMirror overrides below are scoped under `.playground-root` so they
    only apply inside a playground page. Without this scoping, the
    `!important` background/font rules leak globally and override the
    embedded CodeBlock editors on `/learn` pages whenever the playground
    stylesheet has been loaded (e.g. after an SPA navigation
    /playground → /learn), making the learn-page editors render with the
    playground's `--bg` / palette tokens instead of their own. */
-.pg-root .cm-editor {
+.playground-root .cm-editor {
   height: 100% !important;
   font-family: var(--font-mono) !important;
   font-size: var(--cm-font-size, 14px) !important;
@@ -1132,22 +1132,22 @@ body.pg-active {
     "clig" 0,
     "dlig" 0 !important;
 }
-.pg-root .cm-editor .cm-scroller,
-.pg-root .cm-editor .cm-content {
+.playground-root .cm-editor .cm-scroller,
+.playground-root .cm-editor .cm-content {
   font-variant-ligatures: inherit !important;
   font-feature-settings: inherit !important;
   font-family: inherit !important;
   font-size: inherit !important;
   line-height: inherit !important;
 }
-.pg-root .cm-editor .cm-scroller {
+.playground-root .cm-editor .cm-scroller {
   height: 100%;
 }
-.pg-root .cm-gutters {
+.playground-root .cm-gutters {
   background: var(--bg) !important;
   border-right: 1px solid var(--border) !important;
 }
-.pg-root .cm-lineNumbers .cm-gutterElement {
+.playground-root .cm-lineNumbers .cm-gutterElement {
   color: var(--text-dim) !important;
 }
 
@@ -1157,10 +1157,10 @@ body.pg-active {
    Two selectors are needed: the non-focused layer (.cm-selectionBackground
    directly on the element) and the focused selection layer rendered by
    CodeMirror's drawSelection() plugin. */
-.pg-root .cm-selectionBackground {
+.playground-root .cm-selectionBackground {
   background: color-mix(in srgb, var(--primary) 22%, transparent) !important;
 }
-.pg-root
+.playground-root
   .cm-focused
   > .cm-scroller
   > .cm-selectionLayer
@@ -1169,14 +1169,14 @@ body.pg-active {
 }
 /* Native ::selection (shown when the editor loses focus or the
    browser falls back from the CM layer). */
-.pg-root .cm-line::selection,
-.pg-root .cm-line > span::selection,
-.pg-root .cm-line > span > span::selection {
+.playground-root .cm-line::selection,
+.playground-root .cm-line > span::selection,
+.playground-root .cm-line > span > span::selection {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
-.pg-root .cm-line::-moz-selection,
-.pg-root .cm-line > span::-moz-selection,
-.pg-root .cm-line > span > span::-moz-selection {
+.playground-root .cm-line::-moz-selection,
+.playground-root .cm-line > span::-moz-selection,
+.playground-root .cm-line > span > span::-moz-selection {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
@@ -1186,22 +1186,22 @@ body.pg-active {
    invisible. The global subtle rule above already fixes this, but we keep
    the TN80s entry to ensure the non-focused layer also uses the accent
    tint rather than the invisible theme default. */
-.pg-root .cm-s-tomorrow-night-eighties .cm-selectionBackground,
-.pg-root
+.playground-root .cm-s-tomorrow-night-eighties .cm-selectionBackground,
+.playground-root
   .cm-s-tomorrow-night-eighties.cm-focused
   > .cm-scroller
   > .cm-selectionLayer
   .cm-selectionBackground {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
-.pg-root .cm-s-tomorrow-night-eighties .cm-line::selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span::selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection {
+.playground-root .cm-s-tomorrow-night-eighties .cm-line::selection,
+.playground-root .cm-s-tomorrow-night-eighties .cm-line > span::selection,
+.playground-root .cm-s-tomorrow-night-eighties .cm-line > span > span::selection {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
-.pg-root .cm-s-tomorrow-night-eighties .cm-line::-moz-selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span::-moz-selection,
-.pg-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection {
+.playground-root .cm-s-tomorrow-night-eighties .cm-line::-moz-selection,
+.playground-root .cm-s-tomorrow-night-eighties .cm-line > span::-moz-selection,
+.playground-root .cm-s-tomorrow-night-eighties .cm-line > span > span::-moz-selection {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
@@ -1279,9 +1279,9 @@ body.pg-active {
 .out-cell {
   border-radius: var(--radius);
   overflow: hidden;
-  animation: pg-fadeSlide 0.2s ease;
+  animation: playground-fadeSlide 0.2s ease;
 }
-@keyframes pg-fadeSlide {
+@keyframes playground-fadeSlide {
   from {
     opacity: 0;
     transform: translateY(6px);
@@ -1526,7 +1526,7 @@ body.pg-active {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  animation: pg-fadeSlide 0.18s ease;
+  animation: playground-fadeSlide 0.18s ease;
 }
 .info-popover-row {
   display: flex;
@@ -1649,7 +1649,7 @@ body.pg-active {
   min-height: 0;
   overflow-y: auto;
   /* The settings panel renders in a Dialog portal at body level, so it
-     falls outside .pg-root and doesn't inherit the global scrollbar
+     falls outside .playground-root and doesn't inherit the global scrollbar
      theme. Re-apply it explicitly here. */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -2364,7 +2364,7 @@ input[type="range"].fs-slider:disabled {
   flex-shrink: 0;
   gap: 1.5em;
   white-space: nowrap;
-  animation: pg-loadHero 18s linear infinite;
+  animation: playground-loadHero 18s linear infinite;
   will-change: transform;
 }
 .loading-hero-text {
@@ -2375,7 +2375,7 @@ input[type="range"].fs-slider:disabled {
   letter-spacing: -0.04em;
   color: var(--text);
 }
-@keyframes pg-loadHero {
+@keyframes playground-loadHero {
   from {
     transform: translateX(0);
   }
@@ -2404,9 +2404,9 @@ input[type="range"].fs-slider:disabled {
   min-height: 1.4em;
   line-height: 1.4;
   /* Soft cross-fade so consecutive quips don't snap. */
-  animation: pg-quipFade 0.5s ease;
+  animation: playground-quipFade 0.5s ease;
 }
-@keyframes pg-quipFade {
+@keyframes playground-quipFade {
   from {
     opacity: 0;
     transform: translateY(2px);
@@ -2427,9 +2427,9 @@ input[type="range"].fs-slider:disabled {
   height: 100%;
   background: var(--text);
   border-radius: 2px;
-  animation: pg-loadBar 2.5s ease-in-out infinite;
+  animation: playground-loadBar 2.5s ease-in-out infinite;
 }
-@keyframes pg-loadBar {
+@keyframes playground-loadBar {
   0% {
     width: 5%;
     margin-left: 0;
@@ -2590,14 +2590,14 @@ input[type="range"].fs-slider:disabled {
 }
 
 @media (max-width: 768px) {
-  .pg-app {
+  .playground-app {
     grid-template-rows: 48px 1fr;
   }
 
   /* Header on mobile is compact — the playground switcher stays on the
      left and a single hamburger menu replaces all individual action
      buttons. */
-  .pg-header {
+  .playground-header {
     gap: 8px;
     padding: 0 12px;
   }
@@ -2638,10 +2638,10 @@ input[type="range"].fs-slider:disabled {
      tapping near the edge to position the caret / start a selection is
      easier (without the inset the very first character sits flush
      against the screen edge). */
-  .pg-root .cm-gutters {
+  .playground-root .cm-gutters {
     display: none !important;
   }
-  .pg-root .cm-line {
+  .playground-root .cm-line {
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
@@ -3275,7 +3275,7 @@ input[type="range"].fs-slider:disabled {
     height 0.15s;
 }
 
-html[data-pg-theme="light"] .toast {
+html[data-playground-theme="light"] .toast {
   box-shadow:
     0 4px 16px rgb(0 0 0 / 0.1),
     0 1px 4px rgb(0 0 0 / 0.06);
@@ -3403,18 +3403,18 @@ html[data-pg-theme="light"] .toast {
    the empty-output welcome heading so they remain legible against the
    editor-themed background (which can use a colored "muted" hue that
    doesn't read as a UI label). Light themes keep the existing palette. */
-html[data-pg-theme="dark"] .header-btn {
+html[data-playground-theme="dark"] .header-btn {
   color: var(--text);
 }
-html[data-pg-theme="dark"] .header-btn:disabled {
+html[data-playground-theme="dark"] .header-btn:disabled {
   color: color-mix(in srgb, var(--text) 45%, transparent);
 }
-html[data-pg-theme="dark"] .header-btn:hover:not(:disabled),
-html[data-pg-theme="dark"] .header-btn:focus-visible,
-html[data-pg-theme="dark"] .header-btn[data-popup-open] {
+html[data-playground-theme="dark"] .header-btn:hover:not(:disabled),
+html[data-playground-theme="dark"] .header-btn:focus-visible,
+html[data-playground-theme="dark"] .header-btn[data-popup-open] {
   color: var(--text);
 }
-html[data-pg-theme="dark"] .welcome h3 {
+html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text);
 }
 
@@ -3602,7 +3602,7 @@ html[data-pg-theme="dark"] .welcome h3 {
    SQL playgrounds feel uniform.
    ─────────────────────────────────────────────────────────────────────── */
 
-.pg-tabbar {
+.playground-tabbar {
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -3617,7 +3617,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   flex-shrink: 0;
 }
 
-.pg-tabs {
+.playground-tabs {
   display: flex;
   align-items: stretch;
   flex: 0 1 auto;
@@ -3626,7 +3626,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   gap: 2px;
 }
 
-.pg-tab {
+.playground-tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3647,32 +3647,32 @@ html[data-pg-theme="dark"] .welcome h3 {
   transition:
     background 120ms ease,
     color 120ms ease;
-  animation: pg-tab-appear 0.15s ease backwards;
+  animation: playground-tab-appear 0.15s ease backwards;
 }
 
-@keyframes pg-tab-appear {
+@keyframes playground-tab-appear {
   from { opacity: 0; max-width: 0; }
   to   { opacity: 1; max-width: 240px; }
 }
 
-.pg-tab--closing {
-  animation: pg-tab-close 0.15s ease both;
+.playground-tab--closing {
+  animation: playground-tab-close 0.15s ease both;
   pointer-events: none;
 }
 
-@keyframes pg-tab-close {
+@keyframes playground-tab-close {
   from { opacity: 1; transform: scaleX(1); max-width: 240px; }
   to   { opacity: 0; transform: scaleX(0.7); max-width: 0; }
 }
 
-.pg-tab:hover {
+.playground-tab:hover {
   color: var(--text);
   background: color-mix(in srgb, var(--bg) 90%, transparent);
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
 }
 
-.pg-tab.active {
+.playground-tab.active {
   background: var(--bg);
   color: var(--text);
   border-top-left-radius: 7px;
@@ -3680,18 +3680,18 @@ html[data-pg-theme="dark"] .welcome h3 {
   box-shadow: inset 0 2px 0 0 var(--primary);
 }
 
-.pg-tab-icon {
+.playground-tab-icon {
   display: inline-flex;
   align-items: center;
   color: var(--text-dim);
   flex-shrink: 0;
 }
 
-.pg-tab.active .pg-tab-icon {
+.playground-tab.active .playground-tab-icon {
   color: var(--text);
 }
 
-.pg-tab-title {
+.playground-tab-title {
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
@@ -3701,7 +3701,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   pointer-events: none;
 }
 
-.pg-tab-close {
+.playground-tab-close {
   background: transparent;
   border: 0;
   width: 16px;
@@ -3716,12 +3716,12 @@ html[data-pg-theme="dark"] .welcome h3 {
   flex-shrink: 0;
 }
 
-.pg-tab-close:hover {
+.playground-tab-close:hover {
   background: var(--border);
   color: var(--text);
 }
 
-.pg-tab-add {
+.playground-tab-add {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3736,7 +3736,7 @@ html[data-pg-theme="dark"] .welcome h3 {
   flex-shrink: 0;
 }
 
-.pg-tab-add:hover {
+.playground-tab-add:hover {
   background: color-mix(in srgb, var(--bg) 90%, transparent);
 }
 
@@ -4032,7 +4032,7 @@ html[data-pg-theme="dark"] .welcome h3 {
    stretches to cover both `.editor-pane` and `.output-pane` via absolute
    positioning anchored to the `.panes` container.
    ─────────────────────────────────────────────────────────────────────── */
-.pg-settings-tab-pane {
+.playground-settings-tab-pane {
   /* Overlay the full .panes container (which has position: relative) so
      the settings content spans both the editor and output panes. */
   position: absolute;
@@ -4043,13 +4043,13 @@ html[data-pg-theme="dark"] .welcome h3 {
   background: var(--bg);
   overflow: hidden;
 }
-.pg-settings-tab-pane .settings-tabs {
+.playground-settings-tab-pane .settings-tabs {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-.pg-settings-tab-pane .settings-panel-pane {
+.playground-settings-tab-pane .settings-panel-pane {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
@@ -4057,8 +4057,8 @@ html[data-pg-theme="dark"] .welcome h3 {
 /* Limit the inner content width so labels and switches don't spread too
    far apart on wide screens. Left-aligned (no auto-centering) so the
    content sits flush to the left with its own built-in padding. */
-.pg-settings-tab-pane .settings-body,
-.pg-settings-tab-pane .settings-body-themes,
-.pg-settings-tab-pane .settings-actions {
+.playground-settings-tab-pane .settings-body,
+.playground-settings-tab-pane .settings-body-themes,
+.playground-settings-tab-pane .settings-actions {
   max-width: 720px;
 }

@@ -2,9 +2,9 @@
 
 import type { QueryTabSeed } from "./runtime/sqliteSamples";
 
-const STORAGE_PREFIX = "pg_sqlite_";
+const STORAGE_PREFIX = "playground_sqlite_";
 
-// localStorage keys are namespaced under `pg_sqlite_` so they collide
+// localStorage keys are namespaced under `playground_sqlite_` so they collide
 // neither with the language playgrounds nor with the upcoming Postgres
 // playground.
 export const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;

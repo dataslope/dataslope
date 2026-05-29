@@ -1538,7 +1538,7 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.title = "SQLite Playground";
-    document.body.classList.add("pg-active");
+    document.body.classList.add("playground-active");
 
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize =
@@ -1604,7 +1604,7 @@ function SqlPlaygroundInner() {
     );
 
     return () => {
-      document.body.classList.remove("pg-active");
+      document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [
@@ -1683,7 +1683,7 @@ function SqlPlaygroundInner() {
           // Tab-isolation notice: warn once per (workspace × session)
           // when another tab already holds the OPFS lock for this
           // workspace, so the user knows edits here can conflict.
-          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
             if (window.sessionStorage.getItem(noticeKey) !== "1") {
               const hasLock = await acquireWorkspaceLock(workspace.id);

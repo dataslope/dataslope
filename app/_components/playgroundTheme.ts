@@ -35,6 +35,8 @@ export const ALL_THEMES: ThemeEntry[] = [
   { value: "zenburn", label: "Zenburn" },
   { value: "mdn-like", label: "MDN-like" },
   { value: "base16-light", label: "Base16 Light" },
+  { value: "github-dark", label: "GitHub Dark" },
+  { value: "github-light", label: "GitHub Light" },
 ];
 
 export const LIGHT_THEMES = new Set([
@@ -43,9 +45,10 @@ export const LIGHT_THEMES = new Set([
   "solarized light",
   "idea",
   "base16-light",
+  "github-light",
 ]);
 
-export const PLAYGROUND_EDITOR_THEME_STORAGE_KEY = "pg_editor_theme";
+export const PLAYGROUND_EDITOR_THEME_STORAGE_KEY = "playground_editor_theme";
 
 export interface ThemePalette {
   bg: string;
@@ -349,6 +352,41 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     accent1: "#90a959",
     accent2: "#6a9fb5",
   },
+  // GitHub themes drive the editor from the @uiw/codemirror-theme-github
+  // package (see `themeFor` in cmExtensions.ts), which bypasses the
+  // synthetic `buildTheme`. These palettes therefore only tint the
+  // surrounding UI chrome and the theme-card preview swatch; the token
+  // colors below mirror the @uiw GitHub themes so the two stay in sync.
+  "github-dark": {
+    bg: "#0d1117",
+    bg2: "#010409",
+    bg3: "#161b22",
+    border: "#30363d",
+    text: "#c9d1d9",
+    dim: "#8b949e",
+    muted: "#79c0ff",
+    kw: "#ff7b72",
+    fn: "#d2a8ff",
+    arg: "#ffa657",
+    str: "#a5d6ff",
+    accent1: "#d2a8ff",
+    accent2: "#79c0ff",
+  },
+  "github-light": {
+    bg: "#ffffff",
+    bg2: "#f6f8fa",
+    bg3: "#eaeef2",
+    border: "#d0d7de",
+    text: "#24292f",
+    dim: "#6e7781",
+    muted: "#0550ae",
+    kw: "#cf222e",
+    fn: "#8250df",
+    arg: "#953800",
+    str: "#0a3069",
+    accent1: "#8250df",
+    accent2: "#0550ae",
+  },
 };
 
 /** Push the given theme's palette into CSS custom properties on `<html>`
@@ -387,7 +425,7 @@ export function clearThemePalette(): void {
   ]) {
     root.style.removeProperty(name);
   }
-  root.removeAttribute("data-pg-theme");
+  root.removeAttribute("data-playground-theme");
 }
 
 export function getStoredEditorTheme(legacyKey?: string): string | null {
@@ -414,11 +452,11 @@ export function setStoredEditorTheme(theme: string): void {
   }
 }
 
-/** Toggle `data-pg-theme` on `<html>` so playground-specific light-mode
+/** Toggle `data-playground-theme` on `<html>` so playground-specific light-mode
  *  CSS overrides apply (e.g. inverting the loading overlay for light
  *  themes). Uses a playground-namespaced attribute so it never conflicts
  *  with the docs site's own `data-theme` / class-based dark mode. */
 export function applyMode(theme: string): void {
   const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
-  document.documentElement.setAttribute("data-pg-theme", resolved);
+  document.documentElement.setAttribute("data-playground-theme", resolved);
 }

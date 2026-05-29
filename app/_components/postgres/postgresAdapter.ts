@@ -19,7 +19,7 @@ export const postgresAdapter: SqlEngineAdapter<
 > = {
   dialect: "postgres",
   playgroundId: "postgres",
-  storagePrefix: "pg_postgres_",
+  storagePrefix: "playground_postgres_",
   createEngine: (sampleId, workspaceId) => createPostgresEngine(sampleId, workspaceId),
   samples: POSTGRES_SAMPLE_DATABASES,
   blankSample: POSTGRES_BLANK_DATABASE,

@@ -121,7 +121,7 @@ function detectIsMac(): boolean {
 // playground sets that attribute for its own light/dark switching and
 // it can transiently persist during SPA navigation (between playground
 // unmount cleanup and learn page mount), causing CodeBlocks on /learn
-// to pick up the wrong theme. Playgrounds use `data-pg-theme` instead.
+// to pick up the wrong theme. Playgrounds use `data-playground-theme` instead.
 function detectIsDark(): boolean {
   if (typeof document === "undefined") return true;
   const root = document.documentElement;

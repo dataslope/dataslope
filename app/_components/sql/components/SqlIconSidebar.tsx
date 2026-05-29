@@ -21,7 +21,7 @@ interface SqlIconSidebarProps {
  * `.sql-db-selector-wrap`.  Each button shows a Base UI hover-popover
  * label and highlights when `isActive` is true.
  *
- * Reuses the `.pg-icon-sidebar` / `.pg-icon-sidebar-btn` CSS from
+ * Reuses the `.playground-icon-sidebar` / `.playground-icon-sidebar-btn` CSS from
  * `playground.css` so the visual treatment stays consistent with the
  * language playground (Python, R, etc.) activity bars.
  *
@@ -29,8 +29,8 @@ interface SqlIconSidebarProps {
  */
 export function SqlIconSidebar({ buttons, bottomButtons }: SqlIconSidebarProps) {
   return (
-    <nav className="pg-icon-sidebar" aria-label="Panel navigation">
-      <div className="pg-icon-sidebar-top">
+    <nav className="playground-icon-sidebar" aria-label="Panel navigation">
+      <div className="playground-icon-sidebar-top">
         {buttons.map((btn) => (
           <React.Fragment key={btn.label}>
             <IconSidebarButton btn={btn} />
@@ -38,7 +38,7 @@ export function SqlIconSidebar({ buttons, bottomButtons }: SqlIconSidebarProps) 
         ))}
       </div>
       {bottomButtons && bottomButtons.length > 0 && (
-        <div className="pg-icon-sidebar-bottom">
+        <div className="playground-icon-sidebar-bottom">
           {bottomButtons.map((btn) => (
             <React.Fragment key={btn.label}>
               <IconSidebarButton btn={btn} />
@@ -79,7 +79,7 @@ function IconSidebarButton({ btn }: { btn: SqlIconSidebarButton }) {
           <button
             {...triggerProps}
             type="button"
-            className={`pg-icon-sidebar-btn${btn.isActive ? " active" : ""}`}
+            className={`playground-icon-sidebar-btn${btn.isActive ? " active" : ""}`}
             aria-label={btn.label}
             onClick={btn.onClick}
           >
@@ -91,7 +91,7 @@ function IconSidebarButton({ btn }: { btn: SqlIconSidebarButton }) {
         <Popover.Positioner
           sideOffset={6}
           side="right"
-          className="pg-icon-sidebar-popover-positioner"
+          className="playground-icon-sidebar-popover-positioner"
         >
           <Popover.Popup className="bui-popup pane-btn-popover">
             {btn.label}
