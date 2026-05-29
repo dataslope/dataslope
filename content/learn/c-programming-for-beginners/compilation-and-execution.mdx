@@ -13,12 +13,12 @@ to one specific stage.
 
 ```mermaid
 flowchart LR
-    SRC[hello.c<br/>source text] --> PP[Preprocessor]
+    SRC["hello.c<br/>source text"] --> PP[Preprocessor]
     PP --> CC[Compiler]
     CC --> AS[Assembler]
     AS --> LD[Linker]
     LD --> EXE[Executable]
-    EXE --> RUN[Operating system<br/>loads and runs it]
+    EXE --> RUN["Operating system<br/>loads and runs it"]
 ```
 
 | Stage         | Input              | Output             | Job                                                  |
@@ -222,9 +222,9 @@ least one definition per used symbol — no more, no less.
 
 ```mermaid
 flowchart LR
-    H[greetings.h<br/>void say_hello(...)] -->|included by| M[main.c]
+    H["greetings.h<br/>void say_hello(...)"] -->|included by| M[main.c]
     H -->|included by| G[greetings.c]
-    G -->|defines| BODY[body of<br/>say_hello]
+    G -->|defines| BODY["body of<br/>say_hello"]
     M -->|calls| BODY
 ```
 

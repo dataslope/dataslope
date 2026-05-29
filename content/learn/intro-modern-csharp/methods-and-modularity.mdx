@@ -95,11 +95,11 @@ That picture is worth pinning to the wall:
 
 ```mermaid
 sequenceDiagram
-    participant Main as "(top level)"
+    participant Main as top level
     participant Sq as Square
-    Main->>Sq: call Square(5) — new stack frame with x=5
+    Main->>Sq: call Square(5), new stack frame with x=5
     Sq->>Sq: compute 5 * 5 = 25
-    Sq-->>Main: return 25; Sq's frame is destroyed
+    Sq-->>Main: return 25, frame is destroyed
     Main->>Main: continue with the 25
 ```
 

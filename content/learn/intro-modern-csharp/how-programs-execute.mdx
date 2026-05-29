@@ -95,14 +95,14 @@ code for the CPU you're on.
 ```mermaid
 sequenceDiagram
     participant U as You
-    participant CLR as .NET runtime
+    participant CLR as NET runtime
     participant JIT as JIT compiler
     participant CPU as CPU
-    U->>CLR: "run Program.dll"
+    U->>CLR: run Program.dll
     CLR->>CLR: load DLL, type check
-    CLR->>JIT: please compile Main() to native
+    CLR->>JIT: please compile Main to native
     JIT-->>CLR: returns machine code
-    CLR->>CPU: jump to Main()'s machine code
+    CLR->>CPU: jump to Main machine code
     CPU->>CPU: executes; produces output
 ```
 
@@ -171,7 +171,7 @@ sequenceDiagram
     Stack-->>Stack: pop Square's frame, return 25
     Note right of Stack: back in caller
     Stack->>Stack: answer = 25
-    Stack->>Stack: call Console.WriteLine("square = 25")
+    Stack->>Stack: call Console.WriteLine with square=25
 ```
 
 Two things to notice:
@@ -198,15 +198,15 @@ reach, and frees their memory.
 ```mermaid
 flowchart TB
     subgraph Heap
-        L["List<Person>"]
+        L["List of Person"]
         P1["Person 'Ada'"]
         P2["Person 'Bob'"]
         Orphan["Person 'Gone'<br/>(no references)"]
     end
     L --> P1
     L --> P2
-    GC["Garbage<br/>collector"] -.scans heap.-> Heap
-    GC -.reclaims.-> Orphan
+    GC["Garbage<br/>collector"] -. scans heap .-> Heap
+    GC -. reclaims .-> Orphan
 ```
 
 You will not "feel" the garbage collector most of the time. But the

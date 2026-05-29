@@ -127,16 +127,16 @@ the variable) and dispatches to *that* class's `area`. This is
 
 ```mermaid
 sequenceDiagram
-    participant Loop as for-loop
+    participant Loop as for loop
     participant JVM
-    participant C as Circle.area
-    participant R as Rectangle.area
-    Loop->>JVM: s.area()  (s actually is a Circle)
+    participant C as Circle area
+    participant R as Rectangle area
+    Loop->>JVM: s.area() — s is a Circle
     JVM->>C: invoke Circle.area
-    C-->>JVM: 12.566...
-    JVM-->>Loop: 12.566...
+    C-->>JVM: 12.566
+    JVM-->>Loop: 12.566
 
-    Loop->>JVM: s.area()  (s actually is a Rectangle)
+    Loop->>JVM: s.area() — s is a Rectangle
     JVM->>R: invoke Rectangle.area
     R-->>JVM: 12.0
     JVM-->>Loop: 12.0

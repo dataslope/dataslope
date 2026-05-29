@@ -20,7 +20,7 @@ you are telling the compiler:
 ```mermaid
 flowchart LR
     subgraph "Stack frame for main()"
-        X[x : int<br/>4 bytes<br/>value = 42]
+        X["x : int<br/>4 bytes<br/>value = 42"]
     end
 ```
 
@@ -91,11 +91,11 @@ label; it tells the compiler:
 ```mermaid
 flowchart LR
     subgraph Memory
-        B[4 raw bytes<br/>0x2A 0x00 0x00 0x00]
+        B["4 raw bytes<br/>0x2A 0x00 0x00 0x00"]
     end
     B -->|interpreted as int| I[42]
     B -->|interpreted as float| F[5.88e-44]
-    B -->|interpreted as 4 chars| C['*' '\\0' '\\0' '\\0']
+    B -->|interpreted as 4 chars| C["'*' NUL NUL NUL"]
 ```
 
 This is why C++ is called a **statically typed** language: every
@@ -182,11 +182,11 @@ block.
 ```mermaid
 flowchart TB
     subgraph "main scope"
-        A[int a = 1;]
+        A["int a = 1;"]
         subgraph "inner block"
-            B[int b = 2;]
+            B["int b = 2;"]
         end
-        C[a is visible here; b is NOT]
+        C["a is visible here; b is NOT"]
     end
 ```
 
@@ -220,7 +220,7 @@ Closely related to scope is **lifetime**: the period of time during
 flowchart LR
     A["{ ... declare x"] -->|x is born| B[use x]
     B -->|use x| C[use x]
-    C -->|reaches }| D[x is destroyed]
+    C -->|scope closes| D[x is destroyed]
 ```
 
 For a local variable, the lifetime equals the scope: the variable is
