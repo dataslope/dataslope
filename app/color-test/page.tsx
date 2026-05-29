@@ -123,7 +123,7 @@ export default function ColorTestPage() {
   }
 
   return (
-    <div className={`pg-root ${styles.root}`}>
+    <div className={`playground-root ${styles.root}`}>
       {/* ── Theme switcher ── */}
       <header className={styles.header}>
         <div className={styles.themeGrid}>

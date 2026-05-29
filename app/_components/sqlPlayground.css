@@ -1192,29 +1192,29 @@
   overflow: hidden;
 }
 
-/* ─── SQL playground tab bar (uses generic .pg-tab classes via TabBar) ─── */
+/* ─── SQL playground tab bar (uses generic .playground-tab classes via TabBar) ─── */
 /* When the generic TabBar is rendered with className="sql-tabbar" the
-   pg-tab DOM is reused unchanged; these rules layer SQL-specific
+   playground-tab DOM is reused unchanged; these rules layer SQL-specific
    colour/cursor cues over the kind-aware classes. */
-.sql-tabbar .pg-tab {
+.sql-tabbar .playground-tab {
   cursor: grab;
 }
 
-.sql-tabbar .pg-tab:active {
+.sql-tabbar .playground-tab:active {
   cursor: grabbing;
 }
 
-.pg-tab--kind-view-data .pg-tab-icon,
-.pg-tab--kind-er-diagram .pg-tab-icon,
-.pg-tab--kind-query-history .pg-tab-icon {
+.playground-tab--kind-view-data .playground-tab-icon,
+.playground-tab--kind-er-diagram .playground-tab-icon,
+.playground-tab--kind-query-history .playground-tab-icon {
   color: color-mix(in srgb, var(--primary) 70%, var(--text-dim));
 }
 
-.pg-tab-name-positioner {
+.playground-tab-name-positioner {
   z-index: 9999;
 }
 
-.pg-tab-name-popover {
+.playground-tab-name-popover {
   font-family: var(--font-ui);
   font-size: 12px;
   padding: 4px 8px;
@@ -1409,7 +1409,7 @@
 
 .sql-ddl-code-wrap .cm-editor .cm-scroller {
   overflow-x: hidden !important;
-  /* The View DDL dialog renders in a portal (outside .pg-root), so the
+  /* The View DDL dialog renders in a portal (outside .playground-root), so the
      global scrollbar theme doesn't apply to the CodeMirror scroller.
      Re-apply it here to match the rest of the playground. */
   scrollbar-width: thin;
@@ -1579,7 +1579,7 @@
 .sql-modify-body {
   /* Body becomes the only scrolling region inside the drawer so the
      header and footer stay pinned. The drawer renders in a portal (outside
-     .pg-root), so the global scrollbar theme must be re-applied here. */
+     .playground-root), so the global scrollbar theme must be re-applied here. */
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1643,7 +1643,7 @@
   border-radius: 8px;
   overflow: auto;
   /* The modify-structure drawer renders in a portal at body level (outside
-     .pg-root), so the global scrollbar theme doesn't apply. Re-apply here. */
+     .playground-root), so the global scrollbar theme doesn't apply. Re-apply here. */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
@@ -2041,7 +2041,7 @@
   overflow: auto;
   max-height: 160px;
   margin: 4px 0 8px;
-  /* Import dialog renders in a portal (outside .pg-root). Re-apply scrollbar
+  /* Import dialog renders in a portal (outside .playground-root). Re-apply scrollbar
      theme so it matches the rest of the playground. */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -2172,7 +2172,7 @@
   overflow: auto;
   max-height: 220px;
   margin: 4px 0 8px;
-  /* Import dialog renders in a portal (outside .pg-root). Re-apply scrollbar
+  /* Import dialog renders in a portal (outside .playground-root). Re-apply scrollbar
      theme so it matches the rest of the playground. */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -3154,7 +3154,7 @@
   color: var(--text-dim);
 }
 
-.pg-type-input-group,
+.playground-type-input-group,
 .duckdb-type-input-group {
   position: relative;
   display: flex;
@@ -3163,14 +3163,14 @@
   min-width: 160px;
 }
 
-.pg-type-input,
+.playground-type-input,
 .duckdb-type-input {
   min-width: 0;
   width: 100%;
   padding-right: 26px;
 }
 
-.pg-type-trigger,
+.playground-type-trigger,
 .duckdb-type-trigger {
   position: absolute;
   right: 4px;
@@ -3188,67 +3188,67 @@
   outline: none;
 }
 
-.pg-type-trigger:hover,
+.playground-type-trigger:hover,
 .duckdb-type-trigger:hover {
   color: var(--text);
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
-.pg-type-trigger:focus-visible,
+.playground-type-trigger:focus-visible,
 .duckdb-type-trigger:focus-visible {
   box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-.pg-type-trigger[data-popup-open] svg,
+.playground-type-trigger[data-popup-open] svg,
 .duckdb-type-trigger[data-popup-open] svg {
   transform: rotate(180deg);
 }
 
-.pg-type-trigger svg,
+.playground-type-trigger svg,
 .duckdb-type-trigger svg {
   transition: transform 0.15s ease;
 }
 
-.pg-type-positioner,
+.playground-type-positioner,
 .duckdb-type-positioner {
   /* Must sit above .sql-modify-drawer (z-index: 401) since the popup is
      portaled to the body and would otherwise render behind the drawer. */
   z-index: 500;
 }
 
-.pg-type-popup,
+.playground-type-popup,
 .duckdb-type-popup {
   max-height: 280px;
   min-width: 220px;
   overflow: auto;
-  /* The combobox renders in a portal (outside .pg-root). Re-apply scrollbar
+  /* The combobox renders in a portal (outside .playground-root). Re-apply scrollbar
      theme so it matches the rest of the playground. */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 
-.pg-type-popup::-webkit-scrollbar,
+.playground-type-popup::-webkit-scrollbar,
 .duckdb-type-popup::-webkit-scrollbar {
   width: 6px;
 }
 
-.pg-type-popup::-webkit-scrollbar-track,
+.playground-type-popup::-webkit-scrollbar-track,
 .duckdb-type-popup::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.pg-type-popup::-webkit-scrollbar-thumb,
+.playground-type-popup::-webkit-scrollbar-thumb,
 .duckdb-type-popup::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
 
-.pg-type-popup::-webkit-scrollbar-thumb:hover,
+.playground-type-popup::-webkit-scrollbar-thumb:hover,
 .duckdb-type-popup::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
 }
 
-.pg-type-group-label,
+.playground-type-group-label,
 .duckdb-type-group-label {
   padding: 6px 10px 3px;
   font-size: 10px;
@@ -3258,7 +3258,7 @@
   letter-spacing: 0.05em;
 }
 
-.pg-type-empty,
+.playground-type-empty,
 .duckdb-type-empty {
   padding: 8px 10px;
   font-size: 12px;

@@ -188,9 +188,9 @@ function TreeRow({
   const isRenaming = renamingPath === node.fullPath;
   const isDropTarget = dropTargetPath === node.fullPath;
   const rowClass = [
-    "pg-files-row",
-    isSelected && "pg-files-row-selected",
-    isDropTarget && "pg-files-row-drop-target",
+    "playground-files-row",
+    isSelected && "playground-files-row-selected",
+    isDropTarget && "playground-files-row-drop-target",
   ]
     .filter(Boolean)
     .join(" ");
@@ -236,18 +236,18 @@ function TreeRow({
                   <ChevronDown
                     size={11}
                     aria-hidden="true"
-                    className="pg-files-chevron"
+                    className="playground-files-chevron"
                   />
                 ) : (
                   <ChevronRight
                     size={11}
                     aria-hidden="true"
-                    className="pg-files-chevron"
+                    className="playground-files-chevron"
                   />
                 )
               ) : (
                 <span
-                  className="pg-files-chevron-spacer"
+                  className="playground-files-chevron-spacer"
                   aria-hidden="true"
                 />
               )}
@@ -256,26 +256,26 @@ function TreeRow({
                   <FolderOpen
                     size={12}
                     aria-hidden="true"
-                    className="pg-files-icon"
+                    className="playground-files-icon"
                   />
                 ) : (
                   <Folder
                     size={12}
                     aria-hidden="true"
-                    className="pg-files-icon"
+                    className="playground-files-icon"
                   />
                 )
               ) : (
                 <FileText
                   size={12}
                   aria-hidden="true"
-                  className="pg-files-icon"
+                  className="playground-files-icon"
                 />
               )}
               {isRenaming ? (
                 <input
                   type="text"
-                  className="pg-files-rename-input"
+                  className="playground-files-rename-input"
                   value={renameValue}
                   autoFocus
                   onChange={(e) => onRenameChange(e.target.value)}
@@ -287,19 +287,19 @@ function TreeRow({
                   onBlur={onCommitRename}
                 />
               ) : (
-                <span className="pg-files-name" title={node.fullPath}>
+                <span className="playground-files-name" title={node.fullPath}>
                   {node.name}
                 </span>
               )}
               {!isRenaming && !node.isFolder && (
-                <span className="pg-files-size">{formatSize(node.size)}</span>
+                <span className="playground-files-size">{formatSize(node.size)}</span>
               )}
             </div>
           )}
         />
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={4}>
-            <ContextMenu.Popup className="bui-popup examples-dropdown pg-files-ctx-menu">
+            <ContextMenu.Popup className="bui-popup examples-dropdown playground-files-ctx-menu">
               {!node.isFolder && onOpenQuery && (
                 <ContextMenu.Item
                   className="example-item"
@@ -353,7 +353,7 @@ function TreeRow({
                 </div>
               </ContextMenu.Item>
               <ContextMenu.Item
-                className="example-item pg-files-ctx-danger"
+                className="example-item playground-files-ctx-danger"
                 onClick={() => onRequestDelete(node)}
               >
                 <Trash2 size={12} aria-hidden="true" />
@@ -632,16 +632,16 @@ export function FilesPanel({
 
   return (
     <div
-      className={`pg-files${externalDragging ? " pg-files-dragging" : ""}`}
+      className={`playground-files${externalDragging ? " playground-files-dragging" : ""}`}
       onDragEnter={handlePanelDragEnter}
       onDragOver={handlePanelDragOver}
       onDragLeave={handlePanelDragLeave}
       onDrop={handlePanelDrop}
     >
-      <div className="pg-files-toolbar">
+      <div className="playground-files-toolbar">
         <button
           type="button"
-          className="pg-files-toolbar-btn"
+          className="playground-files-toolbar-btn"
           title="Upload files"
           aria-label="Upload files"
           onClick={() => fileInputRef.current?.click()}
@@ -651,7 +651,7 @@ export function FilesPanel({
         </button>
         <button
           type="button"
-          className="pg-files-toolbar-btn"
+          className="playground-files-toolbar-btn"
           title="New folder"
           aria-label="New folder"
           onClick={() => {
@@ -666,7 +666,7 @@ export function FilesPanel({
           ref={fileInputRef}
           type="file"
           multiple
-          className="pg-files-hidden-input"
+          className="playground-files-hidden-input"
           onChange={(e) => {
             if (e.target.files && e.target.files.length > 0) {
               onUpload(e.target.files, parentPath);
@@ -676,7 +676,7 @@ export function FilesPanel({
         />
       </div>
       {parentPath && (
-        <div className="pg-files-target-hint">
+        <div className="playground-files-target-hint">
           Adding to: <strong>{parentPath}/</strong>
         </div>
       )}
@@ -685,7 +685,7 @@ export function FilesPanel({
           render={(triggerProps) => (
             <div
               {...triggerProps}
-              className="pg-files-tree"
+              className="playground-files-tree"
               onDragOver={(e) => {
                 if (internalDragPath && !e.dataTransfer.types.includes("Files")) {
                   e.preventDefault();
@@ -695,12 +695,12 @@ export function FilesPanel({
               onDrop={handleRootDrop}
             >
               {newFileActive && (
-                <div className="pg-files-row" style={{ paddingLeft: 8 }}>
-                  <span className="pg-files-chevron-spacer" aria-hidden="true" />
-                  <FileText size={12} aria-hidden="true" className="pg-files-icon" />
+                <div className="playground-files-row" style={{ paddingLeft: 8 }}>
+                  <span className="playground-files-chevron-spacer" aria-hidden="true" />
+                  <FileText size={12} aria-hidden="true" className="playground-files-icon" />
                   <input
                     type="text"
-                    className="pg-files-rename-input"
+                    className="playground-files-rename-input"
                     value={newFileName}
                     autoFocus
                     placeholder="file name"
@@ -717,12 +717,12 @@ export function FilesPanel({
                 </div>
               )}
               {newFolderActive && (
-                <div className="pg-files-row" style={{ paddingLeft: 8 }}>
-                  <span className="pg-files-chevron-spacer" aria-hidden="true" />
-                  <Folder size={12} aria-hidden="true" className="pg-files-icon" />
+                <div className="playground-files-row" style={{ paddingLeft: 8 }}>
+                  <span className="playground-files-chevron-spacer" aria-hidden="true" />
+                  <Folder size={12} aria-hidden="true" className="playground-files-icon" />
                   <input
                     type="text"
-                    className="pg-files-rename-input"
+                    className="playground-files-rename-input"
                     value={newFolderName}
                     autoFocus
                     placeholder="folder name"
@@ -739,10 +739,10 @@ export function FilesPanel({
                 </div>
               )}
               {tree.children.length === 0 && !isCreatingNewItem ? (
-                <div className="pg-files-empty">
+                <div className="playground-files-empty">
                   No files yet.
                   <br />
-                  <span className="pg-files-empty-hint">
+                  <span className="playground-files-empty-hint">
                     Drop files here or click Upload to add them.
                   </span>
                 </div>
@@ -783,7 +783,7 @@ export function FilesPanel({
         />
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={4}>
-            <ContextMenu.Popup className="bui-popup examples-dropdown pg-files-ctx-menu">
+            <ContextMenu.Popup className="bui-popup examples-dropdown playground-files-ctx-menu">
               {onCreateFile && (
                 <ContextMenu.Item
                   className="example-item"
@@ -869,35 +869,35 @@ export function FilesPanel({
       >
         <Dialog.Portal>
           <Dialog.Backdrop className="confirm-backdrop" />
-          <Dialog.Popup className="confirm-popup pg-files-info-popup">
+          <Dialog.Popup className="confirm-popup playground-files-info-popup">
             <Dialog.Title className="confirm-title">
               {infoTarget?.isFolder ? "Folder info" : "File info"}
             </Dialog.Title>
-            <div className="pg-files-info-grid">
-              <div className="pg-files-info-label">Name</div>
-              <div className="pg-files-info-value">
+            <div className="playground-files-info-grid">
+              <div className="playground-files-info-label">Name</div>
+              <div className="playground-files-info-value">
                 {infoTarget?.path.split("/").pop()}
               </div>
-              <div className="pg-files-info-label">Path</div>
-              <div className="pg-files-info-value pg-files-info-path">
+              <div className="playground-files-info-label">Path</div>
+              <div className="playground-files-info-value playground-files-info-path">
                 {infoTarget?.path}
               </div>
-              <div className="pg-files-info-label">Kind</div>
-              <div className="pg-files-info-value">
+              <div className="playground-files-info-label">Kind</div>
+              <div className="playground-files-info-value">
                 {infoTarget?.isFolder ? "Folder" : "File"}
               </div>
               {infoTarget?.isFolder ? (
                 <>
-                  <div className="pg-files-info-label">Contents</div>
-                  <div className="pg-files-info-value">
+                  <div className="playground-files-info-label">Contents</div>
+                  <div className="playground-files-info-value">
                     {infoTarget.childCount} item
                     {infoTarget.childCount === 1 ? "" : "s"}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="pg-files-info-label">Size</div>
-                  <div className="pg-files-info-value">
+                  <div className="playground-files-info-label">Size</div>
+                  <div className="playground-files-info-value">
                     {formatSize(infoTarget?.size ?? 0)}
                   </div>
                 </>

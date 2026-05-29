@@ -1538,7 +1538,7 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.title = "SQLite Playground";
-    document.body.classList.add("pg-active");
+    document.body.classList.add("playground-active");
 
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize =
@@ -1604,7 +1604,7 @@ function SqlPlaygroundInner() {
     );
 
     return () => {
-      document.body.classList.remove("pg-active");
+      document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [

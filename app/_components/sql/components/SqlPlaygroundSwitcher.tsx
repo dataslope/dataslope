@@ -72,11 +72,11 @@ export function SqlPlaygroundSwitcher({
         </Select.Trigger>
         <Select.Portal>
           <Select.Positioner
-            className="pg-lang-switcher-positioner"
+            className="playground-lang-switcher-positioner"
             sideOffset={6}
             alignItemWithTrigger={false}
           >
-            <Select.Popup className="bui-select-popup pg-lang-switcher-popup">
+            <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
               {PLAYGROUNDS.map((playground) => {
                 const Icon = PLAYGROUND_ICONS[playground.id];
                 const factor =
