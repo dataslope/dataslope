@@ -19,15 +19,15 @@ problem.
 ```mermaid
 flowchart TB
     P[Problem]
-    P --> R{Want f(x) = 0?}
-    R -- 1-D, bracketed --> Brent[brentq / brenth]
-    R -- 1-D, need derivative --> Newton1[newton]
-    R -- n-D --> Hybr[fsolve / root]
-    P --> O{Want min F(x)?}
+    P --> R{"f(x) = 0?"}
+    R -- "1-D, bracketed" --> Brent[brentq / brenth]
+    R -- "1-D, derivative" --> Newton1[newton]
+    R -- "n-D" --> Hybr[fsolve / root]
+    P --> O{"min F(x)?"}
     O -- "1-D, bounded" --> Min1[minimize_scalar]
-    O -- "n-D, smooth" --> BFGS[minimize: BFGS / L-BFGS-B]
+    O -- "n-D, smooth" --> BFGS["BFGS / L-BFGS-B"]
     O -- "least squares" --> LS[least_squares / curve_fit]
-    O -- "constrained" --> Con[minimize: SLSQP / trust-constr]
+    O -- "constrained" --> Con["SLSQP / trust-constr"]
     O -- "no derivatives" --> NM[Nelder-Mead / differential_evolution]
     O -- "global" --> Glob[differential_evolution / dual_annealing]
 ```

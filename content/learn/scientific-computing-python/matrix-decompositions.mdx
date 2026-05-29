@@ -21,8 +21,8 @@ flowchart LR
     LU["A = P L U<br/>any square A"] --> Solve[Linear systems]
     CH["A = L Lᵀ<br/>SPD A"] --> Solve
     QR["A = Q R<br/>any A"] --> LS[Least squares]
-    SVD["A = U Σ Vᵀ<br/>any A"] --> Many[Rank, pseudoinverse,<br/>PCA, low-rank]
-    EIG["A = V Λ V⁻¹<br/>square A"] --> Dyn[Dynamics, modes]
+    SVD["A = U Σ Vᵀ<br/>any A"] --> Many["Rank, pseudoinverse,<br/>PCA, low-rank"]
+    EIG["A = V Λ V⁻¹<br/>square A"] --> Dyn["Dynamics, modes"]
 ```
 
 | Factorization | Cost (n×n) | Best for |
@@ -330,18 +330,18 @@ route.
 
 ```mermaid
 flowchart TB
-    Q[Need to...]
-    Q --> Q1{Solve A x = b?}
+    Q["Need to..."]
+    Q --> Q1{"Solve A x = b?"}
     Q1 -- "A is SPD" --> CH[Cholesky]
     Q1 -- "A square general" --> LU
-    Q1 -- "A is sparse" --> SP[scipy.sparse.linalg]
-    Q --> Q2{Minimize<br/>||A x - b||²?}
-    Q2 -- "rank deficient<br/>or ill-conditioned" --> SVD
+    Q1 -- "A is sparse" --> SP["scipy.sparse.linalg"]
+    Q --> Q2{"Minimize ||Ax-b||²?"}
+    Q2 -- "rank deficient or ill-conditioned" --> SVD
     Q2 -- "full rank" --> QR
-    Q --> Q3{Need eigen-<br/>values?}
+    Q --> Q3{"Need eigenvalues?"}
     Q3 -- "symmetric" --> Eigh["np.linalg.eigh"]
     Q3 -- "general" --> Eig["np.linalg.eig"]
-    Q --> Q4{Need rank,<br/>compression,<br/>or PCA?}
+    Q --> Q4{"Need rank, compression, or PCA?"}
     Q4 --> SVD
 ```
 
