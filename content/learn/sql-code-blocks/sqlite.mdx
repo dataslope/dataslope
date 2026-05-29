@@ -201,3 +201,51 @@ JOIN authors a ON a.id = b.author_id
 ORDER BY a.name, b.year;`}
 />
 ```
+
+## 5. Infinite scroll (10,000 rows)
+
+Seed a three-column table with 10,000 rows. The **Tables** viewer loads
+the first page, then streams in more rows as you scroll. Drag the bar at
+the bottom of the panel to resize it.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics (
+  id    INTEGER PRIMARY KEY,
+  label TEXT,
+  value REAL
+);
+WITH RECURSIVE seq(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM seq WHERE n < 10000
+)
+INSERT INTO metrics (id, label, value)
+SELECT n, 'row-' || n, ROUND(n * 1.5, 2) FROM seq;`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics (
+  id    INTEGER PRIMARY KEY,
+  label TEXT,
+  value REAL
+);
+WITH RECURSIVE seq(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM seq WHERE n < 10000
+)
+INSERT INTO metrics (id, label, value)
+SELECT n, 'row-' || n, ROUND(n * 1.5, 2) FROM seq;`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+```

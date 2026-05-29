@@ -10,11 +10,10 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { ChevronDown, ChevronUp, Play, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, Lock, Play, RotateCcw } from "lucide-react";
 import { Toast } from "@base-ui-components/react/toast";
 import {
   LANGUAGE_ICONS,
-  LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
 import { FormatIcon, PlayIcon } from "./challengeShared";
@@ -189,20 +188,21 @@ function CopyIcon() {
   );
 }
 
-// Brand-coloured glyph for the adapter's language. Uses the shared
-// `languageIcons` registry so the playground header, the /playground
-// index, and embedded code blocks all render the same icons + brand
-// colours. Falls back to the adapter's two-character monogram so future
+// Glyph for the adapter's language. Uses the shared `languageIcons`
+// registry so the embedded code blocks render the same icons as the
+// rest of the app. The colour is intentionally NOT the brand colour
+// here: code blocks share the challenge card's `.headerRuntimeLabel`
+// chrome, so the glyph inherits that label's two-tone (light/dark)
+// icon colour to stay visually consistent with the challenge cards.
+// Falls back to the adapter's two-character monogram so future
 // adapters render reasonably without having to update the registry first.
 function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   const Icon = LANGUAGE_ICONS[adapter.id];
-  const color = LANGUAGE_ICON_COLORS[adapter.id];
   const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
   if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
   return (
     <Icon
       style={{
-        color,
         width: `${Math.round(14 * factor)}px`,
         height: `${Math.round(14 * factor)}px`,
       }}
@@ -928,7 +928,7 @@ function CodeBlockInner({
 
       {hasInit && (
         <div className={challengeStyles.initWrap}>
-          {initLineCount > 3 && (
+          {initLineCount > 3 ? (
             <button
               type="button"
               className={challengeStyles.initToggle}
@@ -951,6 +951,22 @@ function CodeBlockInner({
                 {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
               </span>
             </button>
+          ) : (
+            // Short init code isn't collapsible, but it still needs a
+            // label so the learner knows the first block is read-only
+            // setup code rather than part of the editable snippet.
+            <div className={challengeStyles.initHeaderStatic}>
+              <Lock
+                size={11}
+                strokeWidth={2}
+                aria-hidden
+                className={challengeStyles.initLockIcon}
+              />
+              <span className={challengeStyles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={challengeStyles.initMeta}>read-only</span>
+            </div>
           )}
           <div
             className={`${challengeStyles.initEditorWrap} ${

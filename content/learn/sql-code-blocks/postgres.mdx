@@ -178,3 +178,39 @@ GROUP BY d.name
 ORDER BY avg_salary DESC;`}
 />
 ```
+
+## 5. Infinite scroll (10,000 rows)
+
+Seed a three-column table with 10,000 rows using `generate_series`. The
+**Tables** viewer loads the first page, then streams in more rows as you
+scroll. Drag the bar at the bottom of the panel to resize it.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics AS
+SELECT
+  g                 AS id,
+  'row-' || g       AS label,
+  ROUND(g * 1.5, 2) AS value
+FROM generate_series(1, 10000) AS g;`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="Scroll through 10,000 metrics"
+  initSql={`CREATE TABLE metrics AS
+SELECT
+  g                 AS id,
+  'row-' || g       AS label,
+  ROUND(g * 1.5, 2) AS value
+FROM generate_series(1, 10000) AS g;`}
+  initialCode={`SELECT id, label, value
+FROM metrics
+ORDER BY id;`}
+/>
+```

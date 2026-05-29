@@ -62,7 +62,6 @@ import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
 import {
   LANGUAGE_ICONS,
-  LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
 import type {

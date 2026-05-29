@@ -295,14 +295,14 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
 
 The result pane virtualises its rows so a `SELECT *` against a 10k-row
 table stays responsive — only the rows actually inside the viewport
-are rendered.
+are rendered. The **Tables** viewer above the editor pages its rows
+in on scroll (infinite scroll) rather than loading all 10,000 up front.
 
 <SqlChallengeCard
   dialect="postgres"
   title="Bucket 10,000 rows by score"
   instructions={`A 10,000-row table \`big\` is preloaded with a numeric \`score\` in [0, 100). Write a query that bins the rows into buckets of 10 (so \`bucket\` is \`0\`, \`10\`, \`20\`, …, \`90\`) and returns the bucket plus the row count, sorted by \`bucket\`.`}
 
-  tableRowLimit={10000}
   initSql={`CREATE TABLE big AS
 SELECT
   s.i AS id,

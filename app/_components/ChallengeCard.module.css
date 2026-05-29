@@ -784,6 +784,28 @@
   background: var(--ch-bg-hover);
 }
 
+/* Static label for short (non-collapsible) init code. Mirrors
+   `.initToggle` but isn't interactive — just identifies the block as
+   read-only initialization code. */
+.initHeaderStatic {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px 14px;
+  background: var(--ch-bg);
+  color: var(--ch-gray-700);
+  font-family: var(--ch-font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  text-align: left;
+}
+
+.initLockIcon {
+  flex-shrink: 0;
+  color: var(--ch-text-muted);
+}
+
 .initCaret {
   display: inline-block;
   font-size: 9px;
@@ -909,7 +931,10 @@
   outline-offset: -2px;
 }
 
-/* "Click to expand" label centred at the bottom of the fade overlay. */
+/* "Click to expand" label centred at the bottom of the fade overlay.
+   Sits on a solid rounded pill with a soft shadow so the text + chevron
+   stay legible even when code lines show through the gradient behind
+   them. */
 .initFadeLabel {
   position: absolute;
   bottom: 4px;
@@ -918,14 +943,22 @@
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 500;
-  color: var(--ch-text-muted);
+  color: var(--ch-text-secondary);
   pointer-events: none;
   white-space: nowrap;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 0px;
-  padding-bottom: 3px;
+  padding: 3px 12px 4px;
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-border-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+:global(html.dark) .initFadeLabel {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .initFadeLabel svg {
@@ -934,6 +967,7 @@
 
 .initFade:hover .initFadeLabel {
   color: var(--ch-text);
+  border-color: var(--ch-border);
 }
 
 /* "Click to collapse" button shown at the bottom of the expanded init panel. */
@@ -1863,12 +1897,15 @@
   font-family: var(--ch-font-mono);
 }
 
+/* Full-bleed: no horizontal margin so the table spans the whole card
+   width (up to the container). Top/bottom borders only — the card's own
+   border supplies the left/right edges, so a boxed border + radius here
+   would just inset the table needlessly. */
 .sqlResultScroll {
   max-height: 320px;
   overflow: auto;
-  margin: 0 14px 14px;
-  border: 1px solid var(--ch-border-light);
-  border-radius: 6px;
+  border-top: 1px solid var(--ch-border-light);
+  border-bottom: 1px solid var(--ch-border-light);
 }
 
 .sqlResultTable {
@@ -1891,6 +1928,12 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  /* Clip overlong column names so one verbose header can't stretch the
+     table wider than the card. The full name stays available via the
+     cell's `title` tooltip. */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sqlResultTable th:last-child {
@@ -1904,6 +1947,11 @@
   text-align: left;
   white-space: nowrap;
   color: var(--ch-text);
+  /* Same clipping as headers — long string values get an ellipsis
+     rather than blowing out the column width. */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sqlResultTable td:last-child {
@@ -1921,6 +1969,21 @@
 .sqlNullValue {
   color: var(--ch-text-muted);
   font-style: italic;
+}
+
+/* "Loading more rows…" row appended to the table viewer while the next
+   page streams in via infinite scroll. */
+.sqlResultLoadingRow td {
+  text-align: center;
+  color: var(--ch-text-muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 6px 12px;
+  background: var(--ch-bg-subtle);
+}
+
+.sqlResultLoadingRow td:hover {
+  background: var(--ch-bg-subtle);
 }
 
 .sqlEmptyResult {
@@ -2026,7 +2089,8 @@
   color: var(--ch-blue-100);
 }
 
-:global(html.dark) .initToggle {
+:global(html.dark) .initToggle,
+:global(html.dark) .initHeaderStatic {
   color: var(--ch-gray-300);
 }
 
@@ -2136,26 +2200,16 @@
   border-bottom: 1px solid var(--ch-border-light);
 }
 
+/* Static label row — the panel is no longer collapsible, so this is a
+   plain header (not a button) showing the table count / loading state. */
 .tableViewerHeader {
   display: flex;
   align-items: center;
   padding: 8px 14px;
   gap: 10px;
-  background: none;
-  border: none;
   width: 100%;
-  text-align: left;
-  cursor: pointer;
   font-family: var(--ch-font-ui);
   user-select: none;
-}
-
-.tableViewerHeader:hover {
-  background: var(--ch-bg-hover);
-}
-
-:global(html.dark) .tableViewerHeader:hover {
-  background: #222222;
 }
 
 .tableViewerLabel {
@@ -2173,40 +2227,168 @@
   color: var(--ch-text-muted);
 }
 
+/* Table tabs are styled to match the non-SQL code block file tab bar
+   (`.fileTabBar` / `.fileTab`): a flat, full-width strip of tabs with
+   right-border separators and an accent underline on the active tab,
+   rather than the previous free-floating pills. */
 .tableViewerTabs {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 14px 6px;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  background: var(--ch-bg-subtle);
+  border-top: 1px solid var(--ch-border-light);
+  border-bottom: 1px solid var(--ch-border-light);
+  overflow-x: auto;
+  scrollbar-width: none;
+  user-select: none;
+}
+
+.tableViewerTabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tableViewerTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--ch-border-light);
   font-family: var(--ch-font-mono);
-  font-size: 12.5px;
-  padding: 3px 9px;
-  border-radius: 4px;
-  border: 1px solid var(--ch-border-light);
-  background: var(--ch-bg);
-  color: var(--ch-text-secondary);
+  font-size: 13px;
+  color: var(--ch-text-muted);
   cursor: pointer;
-  transition: all 0.15s;
+  white-space: nowrap;
+  position: relative;
+  transition: background 0.12s, color 0.12s;
 }
 
 .tableViewerTab:hover {
-  border-color: var(--ch-border);
+  background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 
 .tableViewerTabActive {
-  background: var(--ch-badge-bg);
-  border-color: var(--ch-badge-border);
-  color: var(--ch-badge-color);
+  background: var(--ch-bg);
+  color: var(--ch-text);
+}
+
+.tableViewerTabActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ch-accent);
 }
 
 .tableViewerSchema {
   color: var(--ch-text-muted);
   font-weight: 400;
+}
+
+/* ─── Table viewer loading skeleton ─────────────────────────────────── */
+
+.tableViewerSpinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 5px;
+  vertical-align: -1px;
+  border: 1.5px solid var(--ch-border);
+  border-top-color: var(--ch-accent);
+  border-radius: 50%;
+  animation: tableViewerSpin 0.7s linear infinite;
+}
+
+@keyframes tableViewerSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tableViewerSkeleton {
+  margin: 0 14px 12px;
+  border: 1px solid var(--ch-border-light);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--ch-border-light);
+}
+
+.skeletonRow:last-child {
+  border-bottom: none;
+}
+
+.skeletonCell {
+  flex: 1;
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--ch-bg-subtle) 0%,
+    var(--ch-bg-hover) 50%,
+    var(--ch-bg-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tableViewerSpinner,
+  .skeletonCell {
+    animation-duration: 0s;
+  }
+}
+
+/* ─── Table viewer resize bar ───────────────────────────────────────── */
+
+/* Drag handle at the bottom of the (non-collapsible) tables panel. Drag
+   vertically to grow/shrink the visible table area. */
+.tableViewerResizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 12px;
+  cursor: ns-resize;
+  background: var(--ch-bg-subtle);
+  border-top: 1px solid var(--ch-border-light);
+  touch-action: none;
+}
+
+.tableViewerResizer:hover,
+.tableViewerResizer:focus-visible {
+  background: var(--ch-bg-hover);
+  outline: none;
+}
+
+.tableViewerResizerGrip {
+  width: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--ch-border);
+  transition: background 0.12s;
+}
+
+.tableViewerResizer:hover .tableViewerResizerGrip,
+.tableViewerResizer:focus-visible .tableViewerResizerGrip {
+  background: var(--ch-accent);
 }
 
 .tableViewerScroll {
@@ -2241,11 +2423,12 @@
 }
 
 .tableViewerFootnote {
-  padding: 4px 10px;
+  padding: 4px 14px;
   font-family: var(--ch-font-mono);
   font-size: 12px;
   color: var(--ch-text-muted);
-  border-top: 1px solid var(--ch-border-light);
+  /* The result scroll above already draws a bottom border, so no
+     border-top here (avoids a doubled 2px line). */
   background: var(--ch-bg-subtle);
 }
 
