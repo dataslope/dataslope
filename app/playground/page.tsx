@@ -19,7 +19,6 @@ interface CardEntry {
   href: string;
   title: string;
   desc: string;
-  disabled?: boolean;
 }
 
 const CARDS: CardEntry[] = [
