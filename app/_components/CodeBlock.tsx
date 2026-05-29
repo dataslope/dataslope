@@ -903,7 +903,6 @@ function CodeBlockInner({
   return (
     <div
       className={`${challengeStyles.card} ${styles.outputScope}`}
-      data-cb-theme={isDark ? "dark" : "light"}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
     >
       <div className={challengeStyles.header}>
