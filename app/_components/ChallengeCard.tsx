@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -1443,6 +1443,7 @@ export default function ChallengeCard({
                 data-testid="challenge-file-tab"
                 data-filename={f.filename}
               >
+                <File size={12} aria-hidden />
                 {f.filename}
               </button>
             );
@@ -1945,6 +1946,7 @@ function SolutionModal({
                       : `${f.filename} (unchanged from starter)`
                   }
                 >
+                  <File size={12} aria-hidden />
                   {f.filename}
                   {!f.hasSolution && (
                     <span className={styles.modalTabHint} aria-hidden>

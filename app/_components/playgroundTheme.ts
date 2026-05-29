@@ -16,35 +16,22 @@ export interface ThemeEntry {
 }
 
 export const ALL_THEMES: ThemeEntry[] = [
+  { value: "github-light", label: "GitHub Light" },
+  { value: "github-dark", label: "GitHub Dark" },
   { value: "lucario", label: "Lucario" },
   { value: "dracula", label: "Dracula" },
   { value: "monokai", label: "Monokai" },
   { value: "nord", label: "Nord" },
   { value: "material-darker", label: "Material Darker" },
   { value: "tomorrow-night-eighties", label: "Tomorrow Night" },
-  { value: "solarized dark", label: "Solarized Dark" },
-  { value: "eclipse", label: "Eclipse" },
   { value: "gruvbox-dark", label: "Gruvbox Dark" },
-  { value: "oceanic-next", label: "Oceanic Next" },
   { value: "material-palenight", label: "Material Palenight" },
   { value: "solarized light", label: "Solarized Light" },
-  { value: "darcula", label: "Darcula" },
   { value: "ayu-mirage", label: "Ayu Mirage" },
-  { value: "idea", label: "IntelliJ IDEA" },
-  { value: "panda-syntax", label: "Panda" },
-  { value: "zenburn", label: "Zenburn" },
-  { value: "mdn-like", label: "MDN-like" },
-  { value: "base16-light", label: "Base16 Light" },
-  { value: "github-dark", label: "GitHub Dark" },
-  { value: "github-light", label: "GitHub Light" },
 ];
 
 export const LIGHT_THEMES = new Set([
-  "eclipse",
-  "mdn-like",
   "solarized light",
-  "idea",
-  "base16-light",
   "github-light",
 ]);
 

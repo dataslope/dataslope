@@ -35,7 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   createColumnHelper,
@@ -2394,6 +2394,7 @@ export function TableViewer({
                 }`}
                 onClick={() => setActiveIdx(idx)}
               >
+                <Table size={12} aria-hidden />
                 {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
                   <>
                     <span className={styles.tableViewerSchema}>{entry.schema}.</span>
