@@ -196,7 +196,7 @@ This asymmetry surprises everyone the first time. Lock it in.`}
 - The first is shorter
 - They are equivalent
 - [o] The chained version may operate on a copy of the data and silently fail to update the original DataFrame (the *SettingWithCopyWarning*); \`loc\` guarantees in-place update on the original
-  > Correct. This is the single most common Pandas footgun. Always use \`loc\` for assignment.
+  > This is the single most common Pandas footgun. Always use \`loc\` for assignment.
 - Pandas does not support boolean masks
 
 Train your fingers to write \`df.loc[mask, "col"] = ...\` and you will save yourself many hours of debugging.`}

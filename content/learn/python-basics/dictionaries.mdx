@@ -419,7 +419,7 @@ Assume all values are numbers.`}
 - \`[1, 2, 3]\`
   > Lists are mutable and not hashable, so no.
 - [o] \`(1, 2, 3)\`
-  > Correct. Tuples of hashables are hashable.
+  > Tuples of hashables are hashable.
 - \`{"a": 1}\`
   > Dicts are mutable and not hashable, so no.`}
 />
@@ -437,7 +437,7 @@ print(d)
 - \`{"a": 99, "b": 2, "c": 3}\`
   > \`setdefault\` only writes when the key is missing.
 - [o] \`{"a": 1, "b": 2, "c": 3}\`
-  > Correct. \`a\` already exists so it is untouched; \`c\` is added.
+  > \`a\` already exists so it is untouched; \`c\` is added.
 - \`{"a": 1, "b": 2}\`
   > \`c\` is missing, so it is added.
 - A \`KeyError\`
@@ -448,7 +448,7 @@ print(d)
   markdown={`What is the time complexity of \`key in d\` where \`d\` is a dict?
 
 - [o] O(1) average case
-  > Correct. Dicts use hash tables, giving O(1) average-case lookup.
+  > Dicts use hash tables, giving O(1) average-case lookup.
 - O(n)
   > That would be true for a list, not a dict.
 - O(log n)
@@ -465,7 +465,7 @@ print(d)
 - Sorted by key alphabetically.
   > Dicts preserve insertion order, not sorted order.
 - [o] Insertion order is preserved.
-  > Correct. The first item inserted is the first one you see when iterating.
+  > The first item inserted is the first one you see when iterating.
 - Sorted by value.
   > Dicts do not sort by value automatically.`}
 />

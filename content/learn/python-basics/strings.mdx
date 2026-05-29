@@ -462,7 +462,7 @@ print(slugify("Python 3.12 Released"))
 - \`"bcd"\`
   > The third number is the step, not the stop. Step of 2 means every other character.
 - [o] \`"bd"\`
-  > Correct. Start at index 1 (\`"b"\`), stop before index 5 (\`"e"\`), step by 2: indices 1 and 3.
+  > Start at index 1 (\`"b"\`), stop before index 5 (\`"e"\`), step by 2: indices 1 and 3.
 - \`"ace"\`
   > That would be \`"abcdef"[0:5:2]\`.
 - An \`IndexError\`
@@ -477,7 +477,7 @@ print(slugify("Python 3.12 Released"))
 - You can mutate a string by assigning to an index: \`s[0] = "H"\`.
   > This raises a \`TypeError\`. Strings are immutable.
 - [o] To "change" a string, you must rebind the variable to a new string.
-  > Correct. \`s = s.upper()\` creates a new string and rebinds \`s\` to it.
+  > \`s = s.upper()\` creates a new string and rebinds \`s\` to it.
 - Immutability means you can't create new strings.
   > You can create as many new strings as you want; you just can't change existing ones.`}
 />
@@ -488,7 +488,7 @@ print(slugify("Python 3.12 Released"))
 - \`"123"\`
   > The format spec \`05d\` means zero-pad to width 5.
 - [o] \`"00123"\`
-  > Correct. \`05d\` means "decimal integer, width 5, zero-padded".
+  > \`05d\` means "decimal integer, width 5, zero-padded".
 - \`"123.00"\`
   > That would require \`f\` (float) or \`.2f\` (two decimal places).
 - An error
@@ -503,7 +503,7 @@ print(slugify("Python 3.12 Released"))
 - \`result = "".join(map(str, items))\`
   > This works and is idiomatic. \`join\` is the best tool for this job.
 - [o] \`result = "".join(str(x) for x in items)\`
-  > Correct. This is idiomatic and efficient—\`join\` does a single allocation.
+  > This is idiomatic and efficient—\`join\` does a single allocation.
 - \`result = ""  # and pray\`
   > Prayer is not a valid optimization strategy.`}
 />

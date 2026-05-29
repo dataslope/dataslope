@@ -316,7 +316,7 @@ int main(void) {
 - \`*(p + 3)\`
 - \`*(a + 3)\`
 - [o] \`a + 3\`
-  > Correct! \`a + 3\` is the **address** of the fourth element, not its value. To get the value you need \`*(a + 3)\` or \`a[3]\`.
+  > \`a + 3\` is the **address** of the fourth element, not its value. To get the value you need \`*(a + 3)\` or \`a[3]\`.
 
 The relationship \`a[i]\` ≡ \`*(a + i)\` is built into the C standard. Notice this also implies the bizarre legal expression \`3[a]\`, which evaluates to \`*(3 + a)\`, which is the same as \`a[3]\`. Just because something is legal doesn't mean it's a good idea.`}
 />
@@ -335,7 +335,7 @@ void show(int arr[]) {
 - The function should declare \`arr\` as \`int *arr\` instead.
   > Actually \`int arr[]\` and \`int *arr\` mean exactly the same thing in a function parameter.
 - [o] Inside the function, \`arr\` is a pointer, not an array. \`sizeof(arr)\` is the size of a pointer (typically 8), not the array's total size.
-  > Correct! When an array is passed to a function, it decays to a pointer to its first element, and the size information is lost.
+  > When an array is passed to a function, it decays to a pointer to its first element, and the size information is lost.
 - C functions cannot compute the length of an array under any circumstances.
   > Functions can — but only if the caller passes the length explicitly.
 

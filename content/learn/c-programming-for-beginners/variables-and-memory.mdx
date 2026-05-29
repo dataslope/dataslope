@@ -288,7 +288,7 @@ int main(void) {
 - A keyword reserved by the compiler.
 - An object that grows and shrinks automatically based on the value assigned to it.
 - [o] A name bound to a fixed-size region of memory whose contents can be read or written.
-  > Correct! In C, variable size is fixed at declaration based on its type. The variable is essentially a labelled box at a specific address.
+  > In C, variable size is fixed at declaration based on its type. The variable is essentially a labelled box at a specific address.
 - A function that always returns the most recent value passed to it.
 
 C is a *statically typed* language: the size and layout of a variable are decided when you write \`int x;\`, not at runtime.`}
@@ -306,7 +306,7 @@ printf("%d\\n", y);
 - Nothing — \`y\` will always be \`1\`.
 - The compiler will refuse to build it.
 - [o] \`x\` is uninitialized, so reading it is undefined behavior; \`y\` could be anything.
-  > Correct! The compiler reserves memory for \`x\` but doesn't zero it out. Whatever bits happened to be there become its value.
+  > The compiler reserves memory for \`x\` but doesn't zero it out. Whatever bits happened to be there become its value.
 - \`y\` cannot be initialized from another variable.
 
 Always initialize your variables. Modern compilers will often emit a warning for uninitialized reads — turn warnings on and pay attention to them.`}

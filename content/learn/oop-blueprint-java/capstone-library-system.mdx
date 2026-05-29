@@ -414,7 +414,7 @@ Each of those is a textbook responsibility-driven extension.
 - Because Java requires every \`Library\` to use one
   > Java requires nothing of the sort.
 - [o] So that different libraries can plug in different policies without modifying \`Library\`
-  > Correct. This is "program to an interface" and the Strategy pattern.
+  > This is "program to an interface" and the Strategy pattern.
 - Because Java forbids classes from holding boolean methods
   > It doesn't.
 - To save memory
@@ -429,7 +429,7 @@ Each of those is a textbook responsibility-driven extension.
 - Java forbids \`Library\` from having boolean methods
   > It doesn't.
 - [o] The relevant data (the due date) lives on \`Loan\`, so the *behavior* belongs there too — that's "tell, don't ask"
-  > Correct. Behavior follows data; this avoids feature envy.
+  > Behavior follows data; this avoids feature envy.
 - To make \`Loan\` extend \`Library\`
   > There is no inheritance between them in this design.`}
 />
@@ -442,7 +442,7 @@ Each of those is a textbook responsibility-driven extension.
 - Add a new field to \`Member\`
   > The change is about a rule, not about member state.
 - [o] Write a new class \`WeekendPolicy implements BorrowingPolicy\` and pass it into \`Library\`'s constructor — \`Library\` itself does not change
-  > Correct. This is the open-closed principle and polymorphism in action.
+  > This is the open-closed principle and polymorphism in action.
 - Modify \`LimitPolicy\` to know about weekends
   > That muddles two policies and breaks the single-responsibility idea.`}
 />

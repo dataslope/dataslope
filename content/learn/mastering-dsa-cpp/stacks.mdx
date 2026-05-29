@@ -336,7 +336,7 @@ int main() {
 - Lowest input, first output
   > LIFO is about insertion order, not numeric value.
 - [o] Last in, first out
-  > Correct. The newest pushed element is removed first.
+  > The newest pushed element is removed first.
 - Linear index, fast offset
   > That is not a stack term.
 - Linked item, fixed order
@@ -360,7 +360,7 @@ int main() {
   markdown={`Why is \`std::deque\` a good default underlying container for \`std::stack\`?
 
 - [o] It supports efficient insertion and removal at the back without requiring contiguous reallocation like a vector.
-  > Correct. It gives stable, efficient end operations.
+  > It gives stable, efficient end operations.
 - It sorts stack values automatically.
   > A stack preserves LIFO order; it does not sort.
 - It makes \`top\` O(n).

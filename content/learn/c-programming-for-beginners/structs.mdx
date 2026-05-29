@@ -313,7 +313,7 @@ int main(void) {
 - \`p.x\`
 - \`*p.x\`
 - [o] \`p->x\`
-  > Correct! When you have a pointer to a struct, the arrow operator dereferences and accesses the field in one step. Equivalent to \`(*p).x\`.
+  > When you have a pointer to a struct, the arrow operator dereferences and accesses the field in one step. Equivalent to \`(*p).x\`.
 - \`&p.x\`
 
 The arrow operator exists purely because \`(*p).x\` is so common — and because the parentheses are easy to forget. \`*p.x\` would be parsed as \`*(p.x)\`, which is almost never what you want.`}
@@ -333,7 +333,7 @@ printf("%d %d\\n", x.a, y.a);
 - \`99 99\`
 - \`99 1\`
 - [o] \`1 99\`
-  > Correct! Struct assignment makes a full copy. Modifying \`y.a\` doesn't touch \`x\`.
+  > Struct assignment makes a full copy. Modifying \`y.a\` doesn't touch \`x\`.
 - The code is invalid; you can't assign one struct to another.
 
 If \`S\` had contained a pointer field, only the pointer value (the address) would have been copied, not the data the pointer points at — that's known as a "shallow copy" and is something to watch out for once your structs start owning heap memory.`}

@@ -420,7 +420,7 @@ public class Countdown implements Iterable<Integer> {
 - Because iterators are smaller in memory
   > Size isn't the design driver.
 - [o] So multiple independent walks of the same container can happen at once, each with its own cursor
-  > Correct. Nested loops over the same collection rely on each walk having its own state.
+  > Nested loops over the same collection rely on each walk having its own state.
 - Because \`Iterator\` is older than \`Iterable\`
   > Iterable was added in Java 5 specifically to support \`for-each\` over \`Iterator\`-producing types.
 - Because the JVM forbids state in interfaces
@@ -435,7 +435,7 @@ public class Countdown implements Iterable<Integer> {
 - \`NoSuchElementException\`
   > That is what \`next()\` throws past the end.
 - [o] \`ConcurrentModificationException\`
-  > Correct. JCF iterators are fail-fast: they detect concurrent mutation and throw immediately.
+  > JCF iterators are fail-fast: they detect concurrent mutation and throw immediately.
 - \`UnsupportedOperationException\`
   > That is what an immutable collection throws on a mutating call.`}
 />
@@ -448,7 +448,7 @@ public class Countdown implements Iterable<Integer> {
 - Iterate \`values()\`
   > That gives you values without keys.
 - [o] Iterate \`entrySet()\` and read \`getKey()\` / \`getValue()\` on each entry
-  > Correct. A single walk over the entry view yields both halves of each pair.
+  > A single walk over the entry view yields both halves of each pair.
 - Convert the map to a \`List\` and iterate that
   > Unnecessary copying; \`entrySet()\` already does what you need.`}
 />

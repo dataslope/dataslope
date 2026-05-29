@@ -409,7 +409,7 @@ if (b.value() !== 99) throw new Error("b should be 99");`,
 - A way to close (terminate) a function early
 - A keyword that hides a variable from the outside world
 - [o] A function that "remembers" the variables from the scope where it was defined, even after that scope has finished
-  > Correct. When an inner function refers to a variable from its enclosing scope, JavaScript keeps that variable alive for as long as the inner function exists. This lets us create private state, configurable functions, memoisation caches, modules, and many other powerful patterns — all built on the same underlying mechanism.
+  > When an inner function refers to a variable from its enclosing scope, JavaScript keeps that variable alive for as long as the inner function exists. This lets us create private state, configurable functions, memoisation caches, modules, and many other powerful patterns — all built on the same underlying mechanism.
 - A way to copy values into a function
 
 Closures are arguably the single most important idea to understand in JavaScript. Once you see them clearly, an enormous amount of "magic" in libraries and frameworks turns into ordinary code.`}

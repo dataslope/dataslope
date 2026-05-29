@@ -556,7 +556,7 @@ type Mystery<T> = { [K in keyof T]-?: T[K] };
 - \`Partial<T>\`
   > \`Partial\` adds \`?\`, not removes it.
 - [o] \`Required<T>\`
-  > Correct. The \`-?\` modifier removes optionality, making all properties required.
+  > The \`-?\` modifier removes optionality, making all properties required.
 - \`Readonly<T>\`
   > \`Readonly\` uses \`readonly\`, not \`-?\`.
 
@@ -580,7 +580,7 @@ What is \`Result\`?
 - \`{ id: number; name: string }\`
   > \`ReturnType\` extracts the return type *as-is*, which is the Promise, not the resolved value.
 - [o] \`Promise<{ id: number; name: string }>\`
-  > Correct. \`ReturnType\` captures the function's return type exactly.
+  > \`ReturnType\` captures the function's return type exactly.
 - \`string\`
   > The function doesn't return a string.
 

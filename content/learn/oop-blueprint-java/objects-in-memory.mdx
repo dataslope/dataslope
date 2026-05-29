@@ -304,7 +304,7 @@ many of them.
 - Zero
   > \`new Dog(...)\` allocated one.
 - [o] One — both \`a\` and \`b\` are references to the same object
-  > Correct. Assigning one reference to another copies the reference, not the underlying object.
+  > Assigning one reference to another copies the reference, not the underlying object.
 - Two — Java duplicates on assignment
   > Java never silently duplicates objects.
 - It depends on the garbage collector
@@ -317,7 +317,7 @@ many of them.
 - An error from running out of heap memory
   > That is an \`OutOfMemoryError\`.
 - [o] An error from invoking a method or accessing a field on a reference whose value is \`null\`
-  > Correct. Dereferencing \`null\` is the cause.
+  > Dereferencing \`null\` is the cause.
 - An error from overflowing the call stack
   > That is a \`StackOverflowError\`.
 - An error from dividing by zero
@@ -332,7 +332,7 @@ many of them.
 - The original object is freed immediately
   > The GC decides when, not the language.
 - [o] The caller's variable still points at the original object — only the local parameter changed
-  > Correct. The parameter is a separate local variable holding its own copy of the reference.
+  > The parameter is a separate local variable holding its own copy of the reference.
 - The program throws a \`NullPointerException\`
   > No exception; reassignment is legal.`}
 />

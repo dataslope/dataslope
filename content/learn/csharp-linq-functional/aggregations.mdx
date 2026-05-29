@@ -278,7 +278,7 @@ public static class Checksum
 - Returns \`null\`.
   > Returning \`null\` isn't possible for a non-nullable \`int\`, and even for nullable types the empty behavior depends on the overload.
 - [o] Throws \`InvalidOperationException\` because the sequence is empty.
-  > Correct. \`Min\` on an empty non-nullable \`IEnumerable<int>\` throws. Use \`DefaultIfEmpty\`, \`MinBy\`, or guard with \`Any()\` to handle the empty case.
+  > \`Min\` on an empty non-nullable \`IEnumerable<int>\` throws. Use \`DefaultIfEmpty\`, \`MinBy\`, or guard with \`Any()\` to handle the empty case.
 
 \`Sum\` and \`Count\` have natural answers for empty sequences (zero),
 but \`Min\`, \`Max\`, and \`Average\` do not. They throw. Always

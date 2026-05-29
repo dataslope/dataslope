@@ -244,7 +244,7 @@ more often than bare arrays.
 - Returns null
   > No.
 - [o] Throws \`ArrayIndexOutOfBoundsException\` at runtime
-  > Correct. Valid indices are 0..length-1.
+  > Valid indices are 0..length-1.
 - Grows the array by one
   > Arrays cannot grow; ArrayList can.`}
 />
@@ -255,7 +255,6 @@ more often than bare arrays.
 - It is faster
   > Arrays are slightly faster for primitives.
 - [o] It can grow and shrink, has a richer API, and integrates with the rest of the collections framework
-  > Correct.
 - It uses less memory
   > It actually uses more (boxing overhead).
 - The compiler refuses to use \`int[]\`
@@ -270,7 +269,6 @@ more often than bare arrays.
 - Nothing — that's the recommended pattern
   > Not recommended; it throws.
 - [o] It throws \`ConcurrentModificationException\` because the iterator detects the structural change
-  > Correct.
 - It silently loses one element
   > It throws; it does not silently corrupt.`}
 />

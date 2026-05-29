@@ -357,7 +357,7 @@ printf("%d\\n", *p);
 - It will fail to compile.
 - The \`malloc\` will fail because 4 bytes is too small.
 - [o] \`*p\` is a use-after-free; the memory was returned to the heap and may now belong to something else.
-  > Correct! Reading or writing through a pointer after \`free\` is undefined behavior. It might appear to work today and crash tomorrow.
+  > Reading or writing through a pointer after \`free\` is undefined behavior. It might appear to work today and crash tomorrow.
 - The \`printf\` requires \`%p\`, not \`%d\`.
 
 The cure is to either not access the memory after \`free\`, or to set \`p = NULL;\` after the \`free\` so the bug crashes loudly rather than silently corrupting other data.`}
@@ -368,7 +368,7 @@ The cure is to either not access the memory after \`free\`, or to set \`p = NULL
 
 - \`malloc(n * sizeof(int))\`
 - [o] \`calloc(n, sizeof(int))\`
-  > Correct! \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
+  > \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
 - \`realloc(NULL, n * sizeof(int))\`
 - \`alloca(n * sizeof(int))\`
 

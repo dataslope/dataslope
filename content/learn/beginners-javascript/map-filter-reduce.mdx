@@ -408,7 +408,7 @@ if (r.length !== 1 || typeof r[0] !== "string") throw new Error("must return an 
 - A \`for\` loop that pushes into a new array
 - A \`for...of\` loop with manual indexing
 - [o] \`users.map((u) => ({ ...u, name: u.name.toUpperCase() }))\`
-  > Correct. \`map\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map\` is the standard idiom for "produce a new array of updated objects".
+  > \`map\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map\` is the standard idiom for "produce a new array of updated objects".
 - A \`while\` loop that builds a new array index-by-index
 
 \`map\` makes the *intent* obvious. Hand-written loops do the same work but force the reader to figure out what you're trying to express.`}

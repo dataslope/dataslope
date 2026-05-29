@@ -409,7 +409,7 @@ int main() {
 - O(1) always
   > The new value may need to move up the tree.
 - [o] O(log n)
-  > Correct. Sift-up follows the tree height.
+  > Sift-up follows the tree height.
 - O(n)
   > A single push does not scan every element in a heap.
 - O(n log n)
@@ -418,7 +418,7 @@ int main() {
 <MultipleChoice markdown={`When might a heap be preferred over a BST?
 
 - [o] When you only need repeated access to the minimum or maximum item.
-  > Correct. Heaps optimize top, push, and pop for priority behavior.
+  > Heaps optimize top, push, and pop for priority behavior.
 - When you need sorted iteration over all keys at all times.
   > A BST is better for ordered traversal.
 - When you need fast search for any arbitrary value.
@@ -431,7 +431,7 @@ int main() {
 - It is a min-heap.
   > The smallest value is not on top by default.
 - [o] It is a max-heap.
-  > Correct. The largest value appears at top.
+  > The largest value appears at top.
 - It keeps all values sorted in ascending iteration.
   > Priority queues do not expose sorted iteration.
 - It removes elements in insertion order.

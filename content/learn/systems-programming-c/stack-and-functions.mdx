@@ -362,7 +362,7 @@ int main(void) {
 - The variable is allocated successfully but slowly.
   > The allocation is just a stack-pointer adjustment; size, not speed, is the issue.
 - [o] The program runs out of stack and crashes (stack overflow).
-  > Correct. Large buffers belong on the heap (\`malloc\`), not on the stack.`}
+  > Large buffers belong on the heap (\`malloc\`), not on the stack.`}
 />
 
 <MultipleChoice
@@ -382,7 +382,7 @@ char *greeting(void) {
 - It forgets to null-terminate.
   > The literal "Hello" is already null-terminated.
 - [o] It returns a pointer to a local array whose stack frame is destroyed the moment the function returns; the caller dereferences a dangling pointer.
-  > Correct. Either let the caller pass in a buffer or allocate on the heap and document the ownership.`}
+  > Either let the caller pass in a buffer or allocate on the heap and document the ownership.`}
 />
 
 <MultipleChoice
@@ -393,7 +393,7 @@ char *greeting(void) {
 - The compiler can vectorize iteration but never recursion.
   > Vectorization is unrelated.
 - [o] It uses a constant number of stack frames regardless of \`n\`, eliminating the risk of stack overflow for large inputs.
-  > Correct. Without guaranteed tail-call optimization, deep recursion is a real risk in C.
+  > Without guaranteed tail-call optimization, deep recursion is a real risk in C.
 - The recursive version is undefined behavior in standard C.
   > It is perfectly well-defined.`}
 />

@@ -448,7 +448,7 @@ else:
 \`\`\`
 
 - [o] \`a\`
-  > Correct. Only the **first** matching branch runs, even though \`x > 5\` is also true.
+  > Only the **first** matching branch runs, even though \`x > 5\` is also true.
 - \`b\`
   > The first branch matches, so the \`elif\` is never evaluated.
 - \`a\` then \`b\`
@@ -463,7 +463,7 @@ else:
 - \`case x | y:\` at the start
   > \`|\` works for alternatives inside a pattern (e.g. \`case 1 | 2:\`), but the syntax error here is that you need a concrete value or wildcard first.
 - [o] \`case (x, y) if x == y:\`
-  > Correct. This matches a 2-tuple and adds a guard clause.
+  > This matches a 2-tuple and adds a guard clause.
 - \`case [x, y, z, *rest] if len(rest) > 0:\`
   > Guards can only reference bound variables, not call functions like \`len\` on them. This would raise a name error.
 - \`case x and y:\`
@@ -481,7 +481,7 @@ result = "big" if x > 10 else "small"
 - \`"big"\`
   > The condition \`x > 10\` is false.
 - [o] \`"small"\`
-  > Correct. When the condition is false, the \`else\` part is used.
+  > When the condition is false, the \`else\` part is used.
 - \`None\`
   > The conditional expression always evaluates to one of the two values.
 - A \`SyntaxError\`
@@ -494,7 +494,7 @@ result = "big" if x > 10 else "small"
 - \`(0 < x) < 10\`
   > This would compare a boolean to 10, which is not the same.
 - [o] \`0 < x and x < 10\`
-  > Correct. Chained comparisons are equivalent to combining with \`and\`.
+  > Chained comparisons are equivalent to combining with \`and\`.
 - \`0 < (x < 10)\`
   > Parentheses do not change the chaining behavior.
 - \`x in range(1, 10)\`

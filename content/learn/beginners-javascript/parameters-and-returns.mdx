@@ -373,7 +373,7 @@ if (JSON.stringify(r) !== "[2,5]") throw new Error("expected [2,5], got " + JSON
 - A \`TypeError\` is thrown immediately
 - The missing arguments are filled in with \`null\`
 - [o] The missing parameters are bound to \`undefined\`; the call still proceeds. (If you want a different default, use \`= defaultValue\` in the parameter list.)
-  > Correct. JavaScript is forgiving about argument counts — missing parameters become \`undefined\` and the function runs anyway. This is why default parameter values (\`function f(x = 10)\`) are so useful: they make missing arguments behave the way you actually want.
+  > JavaScript is forgiving about argument counts — missing parameters become \`undefined\` and the function runs anyway. This is why default parameter values (\`function f(x = 10)\`) are so useful: they make missing arguments behave the way you actually want.
 - The first argument is duplicated to fill the slots
 
 JavaScript's tolerance of mismatched argument counts is convenient but can hide bugs. Default values make your intent explicit.`}

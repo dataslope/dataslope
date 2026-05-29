@@ -283,7 +283,7 @@ export function topSpender(orders: ReadonlyArray<Order>): string | null {
 - In the shell, because the shell knows where the data came from
   > The shell should be as dumb as possible: gather inputs, call the core, write outputs.
 - [o] In the pure core, as functions of \`(state, input) → output\` that depend on no I/O
-  > Correct. Centralizing decisions in pure code makes them inspectable, testable, replayable, and independent of infrastructure choices.
+  > Centralizing decisions in pure code makes them inspectable, testable, replayable, and independent of infrastructure choices.
 - Spread evenly throughout the codebase
   > That's the *anti*-pattern this architecture exists to avoid.
 

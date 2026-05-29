@@ -364,7 +364,7 @@ int main(void) {
 - It takes the address of \`p\`.
   > That is the unary \`&\` operator.
 - [o] It reads (or assigns to) the \`int\` value stored at the address \`p\` holds.
-  > Correct. \`*\` is the *dereference* operator.
+  > \`*\` is the *dereference* operator.
 - It marks \`p\` as a pointer in the declaration.
   > That meaning of \`*\` only applies in declarations, not in expressions.`}
 />
@@ -377,7 +377,7 @@ int main(void) {
 - Because the compiler optimizes the swap away.
   > Even with optimization disabled, the function still cannot affect the caller's variables.
 - [o] Because C passes arguments **by value** — the function gets copies of the caller's ints, and modifying the copies leaves the originals untouched.
-  > Correct. To modify the caller's variables you must pass *pointers* to them.
+  > To modify the caller's variables you must pass *pointers* to them.
 - Because \`int\` is not large enough to be swapped on this machine.
   > Size has nothing to do with it.`}
 />
@@ -388,7 +388,7 @@ int main(void) {
 - You cannot change \`p\` to point at a different \`int\`.
   > That would require \`int *const p\` (a const *pointer*, not a pointer to const).
 - [o] You cannot modify the \`int\` that \`p\` currently points at through \`p\`.
-  > Correct. \`const int *p\` is a pointer to a *const* int; the pointer itself can be reassigned, but writes through it are forbidden.
+  > \`const int *p\` is a pointer to a *const* int; the pointer itself can be reassigned, but writes through it are forbidden.
 - The pointer is automatically initialized to \`NULL\`.
   > Initialization is unrelated to \`const\`.
 - The compiler stores the int in read-only memory.

@@ -383,7 +383,7 @@ console.log(isLeapYear(2023));
 
 - Both sides are always evaluated, but only the first matters
 - [o] The right side is evaluated **only** if the left side is truthy; otherwise the left side is returned without ever touching the right
-  > Correct. \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\` — \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
+  > \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\` — \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
 - It produces a shorter machine-code instruction
 - It only works for boolean values, not truthy/falsy ones
 

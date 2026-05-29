@@ -399,7 +399,7 @@ type, arrays do not.**
 - \`any[]\`
 - \`Array<number | string | boolean>\`
 - [o] \`(number | string | boolean)[]\`
-  > Correct! TypeScript infers a union array type because the elements have different types.
+  > TypeScript infers a union array type because the elements have different types.
 - \`[number, string, boolean]\` (tuple)
 
 TypeScript infers an array type, not a tuple, because the length is not encoded. If you want a tuple, you must annotate explicitly: \`const x: [number, string, boolean] = [1, "two", true];\``}
@@ -410,7 +410,7 @@ TypeScript infers an array type, not a tuple, because the length is not encoded.
 
 - \`[number, string]\`
 - [o] \`[string, number]\`
-  > Correct! The order in a tuple type corresponds to the order of the elements.
+  > The order in a tuple type corresponds to the order of the elements.
 - \`{ 0: string, 1: number }\`
 - \`string | number\`
 

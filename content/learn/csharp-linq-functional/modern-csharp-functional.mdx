@@ -294,7 +294,7 @@ with the most important idea of all: **pure functions**.
 - It mutates \`p\` so that its Age becomes 37 and returns \`p\`.
   > Records support non-destructive update; \`with\` never mutates the original. The original \`p\` is unchanged.
 - [o] It creates a new record value that is a copy of \`p\` but with \`Age\` set to 37, leaving \`p\` unchanged.
-  > Correct. \`with\` is the non-destructive update operator: it produces a brand-new record with selected fields replaced. The original record is immutable.
+  > \`with\` is the non-destructive update operator: it produces a brand-new record with selected fields replaced. The original record is immutable.
 - It throws a compile error because records do not support partial updates.
   > Records explicitly support \`with\` expressions for exactly this purpose.
 - It modifies \`p\` only if \`p\` is a mutable record (i.e. not declared with init-only properties).

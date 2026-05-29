@@ -171,7 +171,7 @@ almost always be slower than a vector.**
 - \`std::deque\`
   > Use it only when you really need double-ended push/pop.
 - [o] \`std::vector\`
-  > Correct. Contiguous storage is fast for iteration and most operations.
+  > Contiguous storage is fast for iteration and most operations.
 - \`std::map\`
   > That is a key/value container, not a plain sequence.`}
 />
@@ -184,7 +184,7 @@ almost always be slower than a vector.**
 - When the data fits in cache.
   > Both can.
 - [o] When you need to iterate keys in sorted order, or want bounded worst-case complexity instead of average-case.
-  > Correct. Otherwise \`unordered_map\` is usually faster.
+  > Otherwise \`unordered_map\` is usually faster.
 - Whenever performance matters.
   > \`unordered_map\` is generally faster for plain lookup.`}
 />

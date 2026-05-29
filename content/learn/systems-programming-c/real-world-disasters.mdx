@@ -367,7 +367,7 @@ already absorbed the most important lesson of this chapter.
 - A double-free during certificate rotation.
   > Not Heartbleed.
 - [o] A buffer **over-read**: the server trusted an attacker-supplied length field and \`memcpy\`'d that many bytes out of its own memory back to the attacker.
-  > Correct. The defensive lesson is "never trust a length field from the network without checking it against what you actually received."
+  > The defensive lesson is "never trust a length field from the network without checking it against what you actually received."
 - A stack overflow during certificate parsing.
   > Heartbleed was a *read* past a heap buffer; no stack frame was overwritten.`}
 />
@@ -380,7 +380,7 @@ already absorbed the most important lesson of this chapter.
 - \`malloc\`
   > \`malloc\` itself was not the issue.
 - [o] \`gets\`, which reads input into a buffer with no length check at all.
-  > Correct. \`gets\` is so dangerous it was deprecated in C99 and removed in C11.
+  > \`gets\` is so dangerous it was deprecated in C99 and removed in C11.
 - \`strncpy\`
   > \`strncpy\` has its own footguns but did not cause this incident.`}
 />
@@ -393,7 +393,7 @@ already absorbed the most important lesson of this chapter.
 - Double-free.
   > Same — no double free was involved.
 - [o] An *off-by-one* error (the end-of-buffer test used \`==\` instead of \`>=\`), causing a buffer over-read.
-  > Correct. A one-character fix; weeks of cache purging to clean up.
+  > A one-character fix; weeks of cache purging to clean up.
 - An integer overflow during certificate signing.
   > Cloudbleed was an HTML-rewriting parser bug, unrelated to certificates.`}
 />
@@ -406,7 +406,7 @@ already absorbed the most important lesson of this chapter.
 - Always cast \`size_t\` to \`int\` to keep types simple.
   > The opposite — that is a common source of integer-truncation bugs.
 - [o] Cross-check every length that comes from outside the program (network, file, user) against the size of the buffer it will be written to or read from.
-  > Correct. Almost every catastrophe on the page reduces to "trusted a length field that should have been validated."
+  > Almost every catastrophe on the page reduces to "trusted a length field that should have been validated."
 - Always use \`gets()\` because it is the simplest input function.
   > Never use \`gets()\` — it is the canonical example of *what not to do*.`}
 />

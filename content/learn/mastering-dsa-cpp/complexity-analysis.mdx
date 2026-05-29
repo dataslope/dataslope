@@ -250,7 +250,7 @@ int main() {
   markdown={`Which complexity grows more slowly for large \`n\`: O(n log n) or O(n^2)?
 
 - [o] O(n log n) grows more slowly
-  > Correct. \`n log n\` grows more slowly than \`n^2\` as \`n\` becomes large.
+  > \`n log n\` grows more slowly than \`n^2\` as \`n\` becomes large.
 - O(n^2) is asymptotically faster
   > Quadratic growth eventually dominates \`n log n\`.
 - They are the same because both contain \`n\`
@@ -265,7 +265,7 @@ int main() {
 - O(1)
   > It usually takes more than one comparison.
 - [o] O(log n)
-  > Correct. Each comparison halves the remaining search space.
+  > Each comparison halves the remaining search space.
 - O(n)
   > That describes a linear scan.
 - O(n^2)
@@ -280,7 +280,7 @@ int main() {
 - Every call is worst-case O(1), even when the vector reallocates
   > Reallocation can move existing elements, so one call can be O(n).
 - [o] A sequence of many pushes has constant average cost per push, even though occasional pushes are expensive
-  > Correct. Reallocations are spread across many cheap insertions.
+  > Reallocations are spread across many cheap insertions.
 - It means pushing is O(log n) but written differently
   > Amortized O(1) and O(log n) are different claims.`}
 />
@@ -289,7 +289,7 @@ int main() {
   markdown={`For a fixed input size \`n = 10\`, is an O(n!) algorithm always slower than an O(2^n) algorithm?
 
 - [o] No; asymptotic notation describes growth, and constants/implementation details can dominate at one fixed input size
-  > Correct. O(n!) grows faster eventually, but Big-O alone does not guarantee runtime for one fixed small input.
+  > O(n!) grows faster eventually, but Big-O alone does not guarantee runtime for one fixed small input.
 - Yes; Big-O gives exact runtimes for every \`n\`
   > Big-O is not an exact stopwatch.
 - Yes; Big-O rankings give exact runtime order at \`n = 10\`

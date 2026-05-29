@@ -426,7 +426,7 @@ for (let i = 0; i < expected.length; i++) {
 - A \`for (let i = 0; i < arr.length; i++)\` loop
 - A \`for...in\` loop
 - [o] A \`for...of\` loop: \`for (const item of arr) { ... }\`
-  > Correct. \`for...of\` walks each element directly, with no index arithmetic to get wrong. Use it whenever you don't need the index. If you do need the index, either fall back to the classic \`for (let i ...)\` loop or use \`arr.entries()\` for destructured \`[index, item]\` pairs.
+  > \`for...of\` walks each element directly, with no index arithmetic to get wrong. Use it whenever you don't need the index. If you do need the index, either fall back to the classic \`for (let i ...)\` loop or use \`arr.entries()\` for destructured \`[index, item]\` pairs.
 
 The other forms work, but \`for...of\` expresses the intent most clearly. (And \`for...in\` is for object keys, not array elements — using it on arrays is a common bug.)`}
 />

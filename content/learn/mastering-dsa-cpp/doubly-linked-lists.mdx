@@ -326,7 +326,7 @@ int main() {
 - A pointer to the head of the whole program
   > Nodes do not point to the whole program.
 - [o] A pointer to the previous node
-  > Correct. The previous pointer enables backward traversal.
+  > The previous pointer enables backward traversal.
 - A copy of every earlier value
   > That would be wasteful and is not how lists work.
 - A random-access index table
@@ -337,7 +337,7 @@ int main() {
   markdown={`Which statement about \`std::list\` is true?
 
 - [o] It has stable iterators for elements not erased, but it does not support random access.
-  > Correct. You can insert without invalidating other iterators, but you cannot use \`list[i]\`.
+  > You can insert without invalidating other iterators, but you cannot use \`list[i]\`.
 - It is always faster than \`std::vector\` for iteration.
   > Usually the opposite is true because of cache locality.
 - It stores all values contiguously.
@@ -354,7 +354,7 @@ int main() {
 - When you want the best cache locality for scanning
   > Vector is usually better for scanning.
 - [o] When you rely on splice operations or stable iterators.
-  > Correct. These are the list's distinctive strengths.
+  > These are the list's distinctive strengths.
 - When values must be sorted automatically
   > A list does not automatically keep itself sorted.`}
 />

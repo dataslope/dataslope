@@ -347,7 +347,7 @@ int main(void) {
 - Nothing, because \`if (x = 10)\` is a compile error.
 - \`x = 5\`, because the assignment doesn't take effect.
 - [o] \`hello\` followed by \`x = 10\`.
-  > Correct! \`x = 10\` is an assignment expression whose value is \`10\` (non-zero, therefore true). The body of the \`if\` runs, and \`x\` is now \`10\`.
+  > \`x = 10\` is an assignment expression whose value is \`10\` (non-zero, therefore true). The body of the \`if\` runs, and \`x\` is now \`10\`.
 - \`hello\` followed by \`x = 5\`.
 
 A single \`=\` is assignment; a double \`==\` is comparison. Most modern compilers will warn you when an assignment appears as an \`if\` condition.`}
@@ -370,7 +370,7 @@ What does the program print when \`n\` is \`1\`?
   > Without an explicit \`break\` after case 1, execution **falls through** to the next case.
 - \`one other \`
 - [o] \`one two \`
-  > Correct! Execution falls through into \`case 2\`, prints \`two\`, then hits \`break\` and exits the switch.
+  > Execution falls through into \`case 2\`, prints \`two\`, then hits \`break\` and exits the switch.
 - A compile-time error.
 
 Switch fall-through is occasionally useful (when several cases share code), but it is a frequent source of bugs. Always write \`break\` unless you specifically want fall-through and you've commented why.`}

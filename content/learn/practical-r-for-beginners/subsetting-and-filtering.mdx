@@ -178,7 +178,7 @@ then use those positions as row indices.
 
 - \`df[cols, rows]\`
 - [o] \`df[rows, cols]\`
-  > Correct! Rows first, columns second — same convention as matrices in mathematics.
+  > Rows first, columns second — same convention as matrices in mathematics.
 - \`df[rows][cols]\`
 - \`df.rows.cols\``}
 />
@@ -188,7 +188,7 @@ then use those positions as row indices.
 
 - \`iris[iris$Species == "setosa" == "versicolor", ]\`
 - [o] \`iris[iris$Species %in% c("setosa", "versicolor"), ]\`
-  > Correct! \`%in%\` is the idiomatic way to match against a set of values.
+  > \`%in%\` is the idiomatic way to match against a set of values.
 - \`iris[iris$Species = "setosa" | "versicolor", ]\`
 - \`iris[in(iris$Species, "setosa", "versicolor"), ]\``}
 />
@@ -198,7 +198,7 @@ then use those positions as row indices.
 
 - It's not — it works perfectly.
 - [o] \`Ozone\` contains NAs, and \`NA > 100\` evaluates to NA, which produces rows of all NAs in the result.
-  > Correct! Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
+  > Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
 - It sorts the data instead of filtering it.
 - \`Ozone\` is character, so the comparison errors.`}
 />

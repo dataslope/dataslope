@@ -302,7 +302,7 @@ foreach (var s in shapes)
 - It eliminates the need for classes
   > It depends on classes.
 - [o] One call site (\`shape.Area()\`) automatically does the right thing for every subclass, so new subclasses don't require changes to existing code
-  > Correct. This is the "open for extension, closed for modification" idea.
+  > This is the "open for extension, closed for modification" idea.
 - It makes programs run faster
   > Performance is neutral to slightly worse than direct calls.
 - It allows multiple inheritance
@@ -319,7 +319,7 @@ foreach (var s in shapes)
 - Inheritance for unrelated types, composition for related types
   > That's backwards.
 - [o] Use inheritance for genuine "is-a" relationships; use composition for "has-a" relationships
-  > Correct. Many design problems get simpler when you reach for composition first.`}
+  > Many design problems get simpler when you reach for composition first.`}
 />
 
 <Callout type="success">

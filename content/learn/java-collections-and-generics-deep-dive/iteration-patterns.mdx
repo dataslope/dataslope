@@ -366,7 +366,7 @@ for (Integer n : list) if (n % 2 == 0) list.remove(n);
 - Because \`list.remove(Object)\` is \`O(n)\`
   > That's a performance issue, not a correctness one.
 - [o] Because the enhanced-for uses an \`Iterator\`, and modifying the underlying list via \`list.remove\` invalidates the iterator's internal modCount
-  > Correct. Either use \`Iterator.remove()\` directly or call \`list.removeIf(...)\`.
+  > Either use \`Iterator.remove()\` directly or call \`list.removeIf(...)\`.
 - Because \`list\` is unmodifiable
   > It need not be; the exception fires on a mutable list too.
 - Because integers are autoboxed
@@ -383,7 +383,7 @@ for (Integer n : list) if (n % 2 == 0) list.remove(n);
 - Plain \`Iterator\`
   > Plain \`Iterator\` only supports \`remove\`, not \`add\`.
 - [o] \`ListIterator\`
-  > Correct. \`ListIterator.add(e)\` inserts at the current cursor position.`}
+  > \`ListIterator.add(e)\` inserts at the current cursor position.`}
 />
 
 <MultipleChoice
@@ -394,7 +394,7 @@ for (Integer n : list) if (n % 2 == 0) list.remove(n);
 - When the body needs \`break\` or \`return\`
   > Streams don't have \`break\`; a \`for\` loop is cleaner there.
 - [o] When the body is a straightforward pipeline of filter / transform / collect with no early exit
-  > Correct. Streams trade flexibility for declarative clarity in exactly that case.
+  > Streams trade flexibility for declarative clarity in exactly that case.
 - When you need to mutate the source collection
   > Streams must not mutate their source.`}
 />

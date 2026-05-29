@@ -265,7 +265,7 @@ int main() {
 - Merge sort can be O(n^2), while quicksort is always O(n log n).
   > This reverses the usual guarantee.
 - [o] Merge sort guarantees O(n log n), while naive quicksort can be O(n^2).
-  > Correct. Bad pivots make partitions unbalanced.
+  > Bad pivots make partitions unbalanced.
 - Both are always O(n^2).
   > Both are designed to be faster than quadratic on typical inputs.
 - Both require O(n) extra arrays in standard forms.
@@ -280,7 +280,7 @@ int main() {
 - Pure merge sort only
   > Merge-sort-like algorithms are more associated with stable sorting.
 - [o] Introsort: quicksort-style partitioning with safeguards and small-range optimizations
-  > Correct. It combines speed with fallback protection.
+  > It combines speed with fallback protection.
 - Linear search followed by insertion
   > Searching alone does not sort a range.`}
 />
@@ -293,7 +293,7 @@ int main() {
 - When sorting descending instead of ascending.
   > Direction does not determine stability.
 - [o] When equal keys should preserve their previous relative order.
-  > Correct. This is common with records and multiple fields.
+  > This is common with records and multiple fields.
 - When the vector is stored contiguously.
   > Contiguous storage is unrelated to stability.`}
 />

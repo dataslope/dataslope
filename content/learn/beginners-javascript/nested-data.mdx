@@ -439,7 +439,7 @@ console.log(getPath({}, "x", "n/a"));
 - It runs faster than ordinary property access
 - It automatically creates missing properties
 - [o] It safely returns \`undefined\` if any link in the chain is \`null\` or \`undefined\`, instead of throwing a \`TypeError\` and crashing the program
-  > Correct. Real-world data is often partial — some fields are missing, optional, or not yet loaded. \`?.\` lets you write \`user?.address?.city\` and get back \`undefined\` for any missing link, instead of an exception. Combined with \`??\` for defaults, it replaces many lines of defensive \`if\` checks.
+  > Real-world data is often partial — some fields are missing, optional, or not yet loaded. \`?.\` lets you write \`user?.address?.city\` and get back \`undefined\` for any missing link, instead of an exception. Combined with \`??\` for defaults, it replaces many lines of defensive \`if\` checks.
 - It is a faster form of array indexing
 
 Optional chaining is one of the most quietly useful additions to modern JavaScript. Once you've used it, going back to nested \`&&\` checks feels archaic.`}

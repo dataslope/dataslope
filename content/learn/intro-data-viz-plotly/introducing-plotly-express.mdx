@@ -216,7 +216,7 @@ The fact that **fig** is a real Python object is what makes Plotly Express exten
 - Column names as the values of **x**, **y**, **color**, etc.
 - A **template=...** argument for visual styling.
 - [o] A function that runs the chart against a SQL database directly.
-  > Correct — this is the odd one out. Plotly Express does not query databases. You first load data into a pandas DataFrame (using SQL, CSV, Parquet, or whatever), and *then* you call Plotly Express. Keeping data loading separate from charting is a feature, not a limitation.
+  > This is the odd one out. Plotly Express does not query databases. You first load data into a pandas DataFrame (using SQL, CSV, Parquet, or whatever), and *then* you call Plotly Express. Keeping data loading separate from charting is a feature, not a limitation.
 
 Pandas does the loading and reshaping; Plotly Express does the visualization. Two tools, one workflow.`}
 />

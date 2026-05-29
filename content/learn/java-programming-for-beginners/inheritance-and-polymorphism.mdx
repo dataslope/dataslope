@@ -258,7 +258,7 @@ Common red flags that you should *not* be using inheritance:
 - Allocate less memory for subclasses
   > Memory layout is unrelated.
 - [o] Call the same method on different objects and have each respond in its own way, decided at runtime
-  > Correct. That's exactly dynamic dispatch.
+  > That's exactly dynamic dispatch.
 - Write a class without any methods
   > Not what polymorphism means.`}
 />
@@ -271,7 +271,7 @@ Common red flags that you should *not* be using inheritance:
 - They sound related in English
   > Too loose a criterion.
 - [o] Every instance of the child class genuinely *is a* legitimate instance of the parent and can be used wherever the parent is expected
-  > Correct — this is the Liskov substitution intuition.
+  > This is the Liskov substitution intuition.
 - The child wants to reuse one helper method from the parent
   > Reuse alone is not enough — use composition instead.`}
 />
@@ -282,7 +282,6 @@ Common red flags that you should *not* be using inheritance:
 - It makes the override happen
   > The override happens whether or not you annotate it.
 - [o] It tells the compiler "this method is supposed to override a parent's method," so a typo or signature mismatch becomes a compile error instead of a silently-new method
-  > Correct.
 - It marks the method as final
   > That's \`final\`, not \`@Override\`.
 - It improves runtime performance

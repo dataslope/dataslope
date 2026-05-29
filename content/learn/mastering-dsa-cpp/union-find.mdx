@@ -524,7 +524,7 @@ int main() {
 - O(log n) exactly
   > The optimized bound is even tighter asymptotically.
 - [o] Near O(α(n)), practically constant
-  > Correct. α(n) is the inverse Ackermann function.
+  > α(n) is the inverse Ackermann function.
 - O(n²)
   > DSU operations are much faster than quadratic.
 
@@ -537,7 +537,7 @@ Tarjan's analysis gives the famous inverse-Ackermann amortized bound.`}
 - It sorts all elements in the set
   > DSU does not maintain sorted set contents.
 - [o] It makes nodes on the search path point directly to the root
-  > Correct. This flattens the tree for future finds.
+  > This flattens the tree for future finds.
 - It deletes the set containing x
   > Find is a query/update optimization, not deletion.
 - It always chooses the larger root
@@ -550,7 +550,7 @@ Path compression is why repeated finds become extremely fast.`}
   markdown={`Why is DSU often preferred over rerunning BFS for incremental connectivity queries where edges are only added?
 
 - [o] DSU updates connectivity with very fast unite operations
-  > Correct. Each added edge can be processed almost constantly.
+  > Each added edge can be processed almost constantly.
 - BFS cannot traverse graphs
   > BFS traverses graphs well, but rerunning it after every edge can be expensive.
 - DSU stores shortest paths

@@ -264,7 +264,7 @@ int main() {
 - When the argument may be missing and represented as null
   > That is a reason to use a pointer or another optional type.
 - [o] When the function requires a valid object and may modify it
-  > Correct. A non-const reference clearly means a valid object is required and can be changed.
+  > A non-const reference clearly means a valid object is required and can be changed.
 - When you need to allocate memory manually
   > References do not allocate memory.
 - When you want to store an address in a container
@@ -279,7 +279,7 @@ int main() {
 - It allows the function to delete elements faster
   > \`const\` prevents modification.
 - [o] It avoids copying the whole vector while preventing modification
-  > Correct. This is the standard pattern for read-only access to large objects.
+  > This is the standard pattern for read-only access to large objects.
 - It converts the vector into an array
   > No conversion happens.`}
 />
@@ -292,7 +292,7 @@ int main() {
 - \`<vector>\`
   > This provides \`std::vector\`, not sorting algorithms.
 - [o] \`<algorithm>\`
-  > Correct. Many general-purpose STL algorithms live in \`<algorithm>\`.
+  > Many general-purpose STL algorithms live in \`<algorithm>\`.
 - \`<queue>\`
   > This provides queue adapters such as \`std::queue\` and \`std::priority_queue\`.`}
 />

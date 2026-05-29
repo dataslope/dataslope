@@ -248,7 +248,6 @@ month the marketing team says "make shipping free above $40" or
 - The compiler inlines them automatically
   > It may, but that's not the maintainability reason.
 - [o] Each method reads like a sentence, can be understood in isolation, and can be changed without affecting unrelated logic
-  > Correct.
 - The JIT runs faster on small methods
   > That's a tiny detail at best, not the point.`}
 />
@@ -261,7 +260,7 @@ month the marketing team says "make shipping free above $40" or
 - The literal \`1\` used to add one to a counter
   > Usually fine.
 - [o] The literal \`0.07\` used to multiply a price for tax
-  > Correct — its meaning ("tax rate") is not obvious from the digits.
+  > Its meaning ("tax rate") is not obvious from the digits.
 - The literal \`"\\n"\` used in a print statement
   > Often fine inline.`}
 />
@@ -274,7 +273,6 @@ month the marketing team says "make shipping free above $40" or
 - It needs more methods
   > It needs fewer responsibilities, not more methods.
 - [o] It is doing too many unrelated things — the word "and" in its description hints that it should be split into several focused classes
-  > Correct.
 - It should be made \`abstract\`
   > Abstractness doesn't address the responsibility problem.`}
 />

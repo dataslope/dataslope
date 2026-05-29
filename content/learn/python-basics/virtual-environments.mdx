@@ -286,7 +286,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 - It makes \`import\` statements run faster.
   > Virtual environments do not affect import speed.
 - [o] It isolates each project's dependencies so they do not conflict with each other or with the system Python.
-  > Correct. Different projects can pin different versions of the same library safely.
+  > Different projects can pin different versions of the same library safely.
 - It is the only way to use \`pip\`.
   > You can use \`pip\` without a venv (not recommended), but venvs are the only safe way to manage dependencies.
 - It compiles your code to a single executable.
@@ -297,7 +297,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
   markdown={`What does activating a virtual environment do?
 
 - [o] It modifies your shell's \`PATH\` so \`python\` and \`pip\` point to the venv's binaries.
-  > Correct. Activation is purely a shell trick — no system-wide changes are made.
+  > Activation is purely a shell trick — no system-wide changes are made.
 - It permanently changes the system Python installation.
   > Activation is temporary and local to the current shell session. Closing the terminal reverts it.
 - It installs all packages listed in \`requirements.txt\`.
@@ -312,7 +312,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 - The \`.venv/\` directory, so everyone has the same packages.
   > Virtual environments are NOT portable. Commit a lockfile instead.
 - [o] \`requirements.txt\` or \`pyproject.toml\`, so teammates can recreate the environment.
-  > Correct. Lockfiles and metadata files are portable; the venv itself is not.
+  > Lockfiles and metadata files are portable; the venv itself is not.
 - Nothing — each developer should figure out dependencies on their own.
   > Without a lockfile, your project is not reproducible.
 - Only the Python interpreter binary.
@@ -325,7 +325,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 - \`npm\`
   > \`npm\` is for JavaScript, not Python.
 - [o] \`uv\`
-  > Correct. \`uv\` is a Rust-based tool that replaces \`pip\`, \`pip-tools\`, and \`venv\` with a much faster implementation.
+  > \`uv\` is a Rust-based tool that replaces \`pip\`, \`pip-tools\`, and \`venv\` with a much faster implementation.
 - \`conda\`
   > \`conda\` is a separate package manager primarily for scientific computing. It's powerful but not the same as \`pip\` + \`venv\`.
 - \`virtualenv\`

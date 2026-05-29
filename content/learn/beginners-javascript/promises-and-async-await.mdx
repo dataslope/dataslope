@@ -546,7 +546,7 @@ retry(flaky, 5)
   const pb = fetchB();
   const [a, b] = await Promise.all([pa, pb]);
   \`\`\`
-  > Correct. Both \`fetchA()\` and \`fetchB()\` are *called* before any \`await\` runs, so the host kicks off both right away. \`Promise.all\` then waits for both to settle. The first snippet, by contrast, only starts \`fetchB()\` after \`fetchA()\` has fully fulfilled — that's sequential, not concurrent.
+  > Both \`fetchA()\` and \`fetchB()\` are *called* before any \`await\` runs, so the host kicks off both right away. \`Promise.all\` then waits for both to settle. The first snippet, by contrast, only starts \`fetchB()\` after \`fetchA()\` has fully fulfilled — that's sequential, not concurrent.
 - 
   \`\`\`javascript
   await fetchA();

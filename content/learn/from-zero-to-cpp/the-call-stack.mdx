@@ -288,7 +288,7 @@ The stack is the secret protagonist of every C++ program.
 - The visible part of the call stack in your debugger UI.
   > That is one way to *view* a frame, but the frame itself is a memory concept.
 - [o] A region of memory allocated on entry to a function that holds its parameters, locals, and bookkeeping such as the return address.
-  > Correct. Each function call creates a new frame; returning destroys it.
+  > Each function call creates a new frame; returning destroys it.
 - A shared region of memory used by all currently-running threads.
   > Each thread has its own stack; frames are per-call, not shared.
 - A backup copy of all global variables at the time of the call.
@@ -303,7 +303,7 @@ The stack is the secret protagonist of every C++ program.
 - The OS encrypts stack memory after a function returns.
   > It does not.
 - [o] When the function returns, its frame is popped and the memory may be reused; the pointer then refers to something that no longer exists, which is undefined behavior.
-  > Correct. Return by value, or return something heap-allocated.
+  > Return by value, or return something heap-allocated.
 - Local variables are read-only and cannot be addressed.
   > Local variables are perfectly addressable while they exist.`}
 />
@@ -316,7 +316,7 @@ The stack is the secret protagonist of every C++ program.
 - A loop that ran too many iterations.
   > A loop reuses the same stack space; it doesn't grow the stack.
 - [o] Unbounded recursion (or a missing base case) caused the call stack to outgrow the OS-imposed size limit.
-  > Correct. Either fix the base case, or convert the recursion to iteration.
+  > Either fix the base case, or convert the recursion to iteration.
 - The program tried to print too much to standard output.
   > Output is unrelated to the call stack.`}
 />
@@ -331,7 +331,7 @@ The stack is the secret protagonist of every C++ program.
 - In a separate "parameter segment" of memory.
   > C++ does not have such a thing; parameters live in the callee's frame.
 - [o] In the callee's stack frame, initialized from the caller's arguments at the moment of the call.
-  > Correct. Parameters are just local variables that the language sets up for you on entry.`}
+  > Parameters are just local variables that the language sets up for you on entry.`}
 />
 
 Up next: zoom out from the stack to the *whole* memory model — what

@@ -386,7 +386,7 @@ public class Payroll {
 - Neither — the compiler rejects this code
   > It compiles fine; \`Animal\` declares \`speak()\`.
 - [o] \`Dog.speak()\` because the runtime type of the object \`a\` points to is \`Dog\`
-  > Correct. Java uses dynamic dispatch on instance methods.
+  > Java uses dynamic dispatch on instance methods.
 - It is undefined; the JVM picks at random
   > Behavior is fully deterministic.`}
 />
@@ -399,7 +399,7 @@ public class Payroll {
 - Because it removes the need for any interfaces or abstract classes
   > Polymorphism is *enabled by* interfaces and inheritance.
 - [o] Because one piece of generic code can handle any number of concrete types, including types that don't exist yet
-  > Correct. This is the open-closed principle in action.
+  > This is the open-closed principle in action.
 - Because it allows downcasting without checks
   > Downcasting is the *risky* operation polymorphism is supposed to let you avoid.`}
 />
@@ -412,7 +412,7 @@ public class Payroll {
 - You override \`equals\` and \`hashCode\` on your value classes
   > That's normal.
 - [o] Several methods in your code do \`if (x instanceof A) ... else if (x instanceof B) ...\` and call different code per branch
-  > Correct. That pattern usually points at a missing abstraction — give the parent a method and let each subtype override it.
+  > That pattern usually points at a missing abstraction — give the parent a method and let each subtype override it.
 - Your interfaces have only one method
   > Single-method interfaces are common and often fine.`}
 />

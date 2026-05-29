@@ -267,7 +267,7 @@ int main() {
 - It returns the number zero from the program to the caller of \`main\`.
   > Technically true, but the meaning of that number matters more than the number itself.
 - [o] It signals to the operating system that the program completed successfully.
-  > Correct. By convention, \`0\` means success and any other value means a particular kind of failure.
+  > By convention, \`0\` means success and any other value means a particular kind of failure.
 - It frees all memory used by the program.
   > Memory cleanup is performed automatically by the OS when the process ends.
 - It is required only in debug builds.
@@ -282,7 +282,7 @@ int main() {
 - Because C++ uses dollar signs to indicate variables.
   > C++ does not use dollar signs for that.
 - [o] Because \`cout\` lives in the standard-library namespace \`std\`, and \`std::cout\` fully qualifies which \`cout\` we mean.
-  > Correct. Namespaces prevent collisions between libraries that happen to share short names.
+  > Namespaces prevent collisions between libraries that happen to share short names.
 - Because \`std\` makes the program run faster.
   > Namespaces have no runtime cost.`}
 />
@@ -293,7 +293,7 @@ int main() {
 - The two characters backslash and \`n\`.
   > Only if it were written as \`\\\\n\`.
 - [o] A single newline character.
-  > Correct. \`\\n\` is shorthand for the newline byte.
+  > \`\\n\` is shorthand for the newline byte.
 - The end of the string.
   > Strings end with an implicit null byte in C++ string literals; \`\\n\` is just a newline.
 - A tab character.
@@ -306,7 +306,7 @@ int main() {
 - They are the same thing.
   > They have different *types* and different storage.
 - [o] \`'a'\` is a single \`char\` (1 byte), while \`"a"\` is a string literal of two characters (\`'a'\` followed by a hidden null terminator).
-  > Correct. The type of \`'a'\` is \`char\`; the type of \`"a"\` is \`const char[2]\`.
+  > The type of \`'a'\` is \`char\`; the type of \`"a"\` is \`const char[2]\`.
 - \`'a'\` is a string; \`"a"\` is a character.
   > It is the opposite.
 - \`"a"\` is invalid; only single quotes work.

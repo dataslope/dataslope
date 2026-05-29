@@ -340,7 +340,7 @@ for (Node *cur = head; cur != NULL; cur = cur->next) {
 - It will leak memory.
 - It runs forever.
 - [o] \`cur->next\` is read after \`cur\` has been freed — undefined behavior.
-  > Correct! By the time the loop step \`cur = cur->next\` runs, the memory at \`cur\` has already been returned to the heap. The fix is to save \`cur->next\` into a local before \`free(cur)\`.
+  > By the time the loop step \`cur = cur->next\` runs, the memory at \`cur\` has already been returned to the heap. The fix is to save \`cur->next\` into a local before \`free(cur)\`.
 - It frees one node too few.
 
 This bug often *appears* to work because the freed memory hasn't been overwritten yet. Such bugs are a nightmare to debug. Tools like AddressSanitizer flag them immediately.`}
@@ -352,7 +352,7 @@ This bug often *appears* to work because the freed memory hasn't been overwritte
 - uses less memory.
 - gives faster random access by index.
 - [o] gives O(1) insertion at the front, but O(n) access by index.
-  > Correct! That's the classic trade-off. Lists win when you insert and remove a lot, especially at the front. Arrays win when you index a lot.
+  > That's the classic trade-off. Lists win when you insert and remove a lot, especially at the front. Arrays win when you index a lot.
 - has cache-friendlier access patterns.
 
 In practice, modern hardware loves arrays — they're contiguous and the CPU cache prefetches the next elements. Linked lists are conceptually elegant but are slower than arrays for most real workloads. Use them when you specifically need their insertion characteristics or as a building block for more complex structures like trees and graphs.`}

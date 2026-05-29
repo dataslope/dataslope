@@ -232,7 +232,7 @@ int main(void) {
 - It runs first when the program starts.
 - It tells the operating system to use the standard input format.
 - [o] It instructs the preprocessor to insert the declarations from \`stdio.h\` so the compiler knows about functions like \`printf\`.
-  > Correct! \`#include\` is a textual paste handled before compilation. Without it, the compiler doesn't know what \`printf\` looks like.
+  > \`#include\` is a textual paste handled before compilation. Without it, the compiler doesn't know what \`printf\` looks like.
 - It compiles \`stdio.h\` into a separate executable.
 
 The preprocessor literally copies the contents of \`stdio.h\` into your translation unit before the compiler ever looks at your code.`}
@@ -244,7 +244,7 @@ The preprocessor literally copies the contents of \`stdio.h\` into your translat
 - A period \`.\`
 - A newline character
 - [o] A semicolon \`;\`
-  > Correct! C is *not* a whitespace-sensitive language; you can spread a statement across multiple lines or put many statements on one line, as long as each statement ends with a semicolon.
+  > C is *not* a whitespace-sensitive language; you can spread a statement across multiple lines or put many statements on one line, as long as each statement ends with a semicolon.
 - The closing brace \`}\`
 
 Forgetting semicolons is by far the most common syntax error for newcomers to C. Read your compiler's error messages carefully — they almost always point to the right line (or the line just after the missing semicolon).`}

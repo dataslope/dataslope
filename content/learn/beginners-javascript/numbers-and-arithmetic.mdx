@@ -361,7 +361,7 @@ if (typeof toFahrenheit(50) !== "number") throw new Error("toFahrenheit must ret
 
 - Because JavaScript has a bug in its addition operator
 - [o] Because JavaScript numbers are 64-bit floating-point, and decimals like 0.1 cannot be represented exactly in binary — tiny rounding errors are unavoidable
-  > Correct. This behaviour is built into the IEEE 754 floating-point standard used by almost every modern language. When you need to compare decimals, compare with a small tolerance (\`Math.abs(a - b) < 1e-9\`), or for money, work in integer cents and only format for display.
+  > This behaviour is built into the IEEE 754 floating-point standard used by almost every modern language. When you need to compare decimals, compare with a small tolerance (\`Math.abs(a - b) < 1e-9\`), or for money, work in integer cents and only format for display.
 - Because \`0.3\` is actually \`null\` under the hood
 - Because \`===\` always returns false for decimals
 

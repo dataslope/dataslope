@@ -338,7 +338,7 @@ int main() {
 - Adjacency matrix
   > A matrix needs O(V²) space, which is enormous for one million vertices.
 - [o] Adjacency list
-  > Correct. It stores only existing edges and uses O(V + E) space.
+  > It stores only existing edges and uses O(V + E) space.
 - A sorted array of vertices only
   > Vertices alone do not store connectivity.
 - A single stack
@@ -355,7 +355,7 @@ Sparse graphs usually favor adjacency lists because they avoid storing absent ed
 - A dense adjacency graph
   > Density describes how many edges exist, not whether cycles exist.
 - [o] A directed acyclic graph
-  > Correct. DAG stands for directed acyclic graph.
+  > DAG stands for directed acyclic graph.
 - A graph represented only by a matrix
   > Representation does not define whether a graph is a DAG.
 
@@ -366,7 +366,7 @@ DAGs are common in dependency graphs, build systems, and scheduling.`}
   markdown={`How does edge lookup \`hasEdge(u, v)\` compare between an adjacency matrix and an unsorted adjacency list?
 
 - [o] Matrix is O(1); list is O(degree(u))
-  > Correct. A matrix indexes directly, while a list scans neighbors of u.
+  > A matrix indexes directly, while a list scans neighbors of u.
 - Matrix is O(V²); list is O(1)
   > Matrix construction is O(V²), but lookup is direct.
 - Both are always O(1)

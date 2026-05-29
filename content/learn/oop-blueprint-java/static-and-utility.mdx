@@ -329,7 +329,7 @@ sum=15
 - Each instance, with one independent copy per instance
   > That describes *non-static* (instance) fields.
 - [o] The class itself; there is one copy shared by all instances
-  > Correct. \`static\` members belong to the class, not to any individual object.
+  > \`static\` members belong to the class, not to any individual object.
 - The first instance created
   > Static state is independent of any instance.
 - The package that contains the class
@@ -344,7 +344,7 @@ sum=15
 - \`@Constant\` annotation
   > No such annotation.
 - [o] \`public static final\` field, written in \`UPPER_SNAKE_CASE\`
-  > Correct. This is the standard idiom — class-wide, immutable, and easy to spot.
+  > This is the standard idiom — class-wide, immutable, and easy to spot.
 - \`private\` field with a getter
   > That makes a constant-ish *instance* value, but the canonical Java idiom is \`public static final\`.`}
 />
@@ -355,7 +355,7 @@ sum=15
 - Whenever you want to avoid writing constructors
   > Avoidance isn't a design reason.
 - [o] When the methods are genuinely stateless and don't naturally belong to any particular object
-  > Correct. Pure functions on a shared theme (like \`Math\`) fit this nicely.
+  > Pure functions on a shared theme (like \`Math\`) fit this nicely.
 - For all classes — it makes them easier to test
   > Heavy static use *hurts* testability and reuse. It also negates most OOP benefits.
 - For any class that has more than ten methods

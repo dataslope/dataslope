@@ -275,7 +275,7 @@ int main(void) {
   > Close, but \`%f\` defaults to **6** digits.
 - \`%s\`
 - [o] \`%.3f\`
-  > Correct! The \`.3\` between \`%\` and \`f\` specifies the number of digits after the decimal point.
+  > The \`.3\` between \`%\` and \`f\` specifies the number of digits after the decimal point.
 
 \`printf\`'s format mini-language is small but expressive: you can control width, precision, padding, sign, and base all with a few characters between \`%\` and the conversion letter.`}
 />
@@ -285,7 +285,7 @@ int main(void) {
 
 - Because the C standard forbids passing values directly to \`scanf\`.
 - [o] Because \`scanf\` needs the *address* of \`n\` to write the parsed value back into it.
-  > Correct! C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
+  > C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
 - Because \`&\` converts \`n\` to a string suitable for parsing.
 - Because \`%d\` requires a special pointer type.
 

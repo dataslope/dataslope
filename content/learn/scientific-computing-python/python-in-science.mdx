@@ -280,7 +280,7 @@ The slowness of the interpreter is irrelevant when 99% of compute time is spent 
 - pandas → NumPy → Matplotlib → SciPy
 - SciPy → NumPy → BLAS/LAPACK
 - [o] Almost every other scientific package is built on top of NumPy; SciPy adds higher-level algorithms (optimize, integrate, signal, stats) and itself depends on NumPy and on FORTRAN libraries like BLAS/LAPACK/MINPACK
-  > Correct. NumPy is the foundation: it defines the array type and the broadcasting rules. SciPy sits on top of NumPy and provides algorithms; under the hood many of those algorithms are FORTRAN. pandas, scikit-learn, scikit-image, PyTorch, xarray, AstroPy all assume NumPy arrays.
+  > NumPy is the foundation: it defines the array type and the broadcasting rules. SciPy sits on top of NumPy and provides algorithms; under the hood many of those algorithms are FORTRAN. pandas, scikit-learn, scikit-image, PyTorch, xarray, AstroPy all assume NumPy arrays.
 - All four packages are siblings with no dependency relationships
 
 Understanding this layering helps you debug performance problems and pick the right library for a given task.`}

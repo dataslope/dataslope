@@ -324,7 +324,7 @@ public final class OrderIndex {
 - A \`Set<Message>\`
   > Loses order; doesn't index by user.
 - [o] A \`Map<UserId, List<Message>>\` updated on every arrival
-  > Correct. Lookup becomes \`O(1)\` and per-user order is preserved.
+  > Lookup becomes \`O(1)\` and per-user order is preserved.
 - A \`Map<UserId, Set<Message>>\`
   > Wrong if order matters; messages aren't naturally unique either.`}
 />
@@ -337,7 +337,7 @@ public final class OrderIndex {
 - One \`Map<TagId, List<PostId>>\`
   > Symmetric problem.
 - [o] Two indices: \`Map<PostId, Set<TagId>>\` and \`Map<TagId, Set<PostId>>\`, kept in sync on every change
-  > Correct. Each direction is \`O(1)\`; updates do a tiny bit more work.
+  > Each direction is \`O(1)\`; updates do a tiny bit more work.
 - A \`List<Pair<PostId, TagId>>\`
   > Both queries become \`O(n)\`.`}
 />
@@ -350,7 +350,7 @@ public final class OrderIndex {
 - It's faster
   > It is comparable.
 - [o] The compiler now refuses to mix up customer ids with other strings (order ids, emails, etc.), and you can put validation in the record's constructor
-  > Correct. Type-driven modeling shifts entire categories of bugs from runtime to compile time.
+  > Type-driven modeling shifts entire categories of bugs from runtime to compile time.
 - It's required by the Collections API
   > It is not.`}
 />

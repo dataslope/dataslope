@@ -146,7 +146,7 @@ Reach for `class` when you have something to protect.
 - A field whose value is fixed.
   > That would be a \`const\` member.
 - [o] A property of the object's state that must always hold whenever no method is in progress.
-  > Correct. The class's public methods are responsible for maintaining it.
+  > The class's public methods are responsible for maintaining it.
 - A type alias used by the class.
   > That is not the meaning here.`}
 />
@@ -159,7 +159,7 @@ Reach for `class` when you have something to protect.
 - It hides the field from the debugger.
   > It does not; debuggers can see private members.
 - [o] It prevents outside code from putting the object in an invalid state, letting the class defend its invariants.
-  > Correct. It also lets you change the storage without breaking callers.
+  > It also lets you change the storage without breaking callers.
 - It is required for inheritance.
   > It isn't.`}
 />

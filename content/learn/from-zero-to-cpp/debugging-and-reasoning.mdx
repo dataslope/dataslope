@@ -167,7 +167,7 @@ A few standard tricks:
 - They are the only way to handle errors.
   > For real runtime errors, use \`if\` plus exceptions or status codes.
 - [o] They catch broken assumptions *near* the cause, by crashing immediately when an invariant is violated, instead of letting bad state propagate.
-  > Correct. They make bugs loud and local.
+  > They make bugs loud and local.
 - They throw a recoverable exception.
   > A failed assert typically calls \`abort()\`; it is not recoverable.`}
 />
@@ -180,7 +180,6 @@ A few standard tricks:
 - The compiler refuses to debug intermittent bugs.
   > Debuggers handle intermittent bugs; they're just harder.
 - [o] Until you can trigger the bug on demand, you cannot verify a fix or apply any debugging tool consistently; reproduction turns a mystery into a test case.
-  > Correct.
 - It is required by the C++ standard.
   > The standard says nothing about debugging methodology.`}
 />

@@ -562,7 +562,7 @@ Which type definition makes illegal states **unrepresentable**?
 - \`type Flag = { enabled: boolean; percentage?: number }\`
   > No. This allows \`enabled: false, percentage: 50\` (disabled but with a percentage?) and \`enabled: true, percentage: undefined\` (enabled for everyone or for a percentage?). The type is ambiguous.
 - [o] \`type Flag = { kind: "disabled" } | { kind: "enabled-all" } | { kind: "enabled-percentage"; percentage: number }\`
-  > Correct! Each state is a distinct variant. Disabled has no percentage, enabled-all has no percentage, and enabled-percentage requires a percentage. Illegal states cannot be represented.
+  > Each state is a distinct variant. Disabled has no percentage, enabled-all has no percentage, and enabled-percentage requires a percentage. Illegal states cannot be represented.
 - \`type Flag = { kind: "disabled" | "enabled-all" | "enabled-percentage"; percentage?: number }\`
   > No. This allows \`kind: "disabled", percentage: 50\` (disabled but with a percentage?). The discriminant and the optional field are independent, so invalid combinations are possible.
 

@@ -303,7 +303,7 @@ int main() {
 - It marks the function as faster to call.
   > Virtual functions are slightly *slower* due to the indirect call.
 - [o] It makes the function dispatched at runtime through the vtable, so calls via a base pointer/reference run the most-derived override.
-  > Correct. This is the mechanism for runtime polymorphism.
+  > This is the mechanism for runtime polymorphism.
 - It hides the function from derived classes.
   > That is what \`private\` does.
 - It is required for any inherited function.
@@ -318,7 +318,6 @@ int main() {
 - It makes destruction faster.
   > It is slightly slower.
 - [o] So that \`delete\` through a base-class pointer also calls the derived destructor and releases derived-class resources; otherwise you get a partial cleanup which is undefined behavior.
-  > Correct.
 - It is purely stylistic.
   > It has real semantic consequences.`}
 />

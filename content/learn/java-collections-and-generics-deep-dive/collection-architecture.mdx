@@ -322,7 +322,7 @@ public class Inbox {
 - \`HashMap<String,?>\`
   > Wrong kind altogether.
 - [o] \`Iterable<String>\` (or \`Collection<String>\` if you also need \`size()\`)
-  > Correct. Accept the widest interface that satisfies your needs.
+  > Accept the widest interface that satisfies your needs.
 - \`Object\`
   > Too wide; loses static type information.`}
 />
@@ -333,7 +333,7 @@ public class Inbox {
 - \`final\` is wrong here
   > \`final\` is fine; it refers to the reference, not the contents.
 - [o] The caller receives a reference to your live mutable state and can \`add\`, \`remove\`, or \`clear\` it, corrupting your invariants
-  > Correct. Return an unmodifiable view or an immutable copy instead.
+  > Return an unmodifiable view or an immutable copy instead.
 - It throws \`ConcurrentModificationException\`
   > Not by itself.
 - It causes a memory leak
@@ -348,7 +348,7 @@ public class Inbox {
 - \`Iterator<Item>\` exposed directly
   > Iterators are poor public API; they support \`remove\` and have no good way to be closed.
 - [o] \`Stream<Item>\` (or a paged result type), so the caller composes filters before materializing — and the repository can lazily fetch in batches
-  > Correct. Lazy, composable, and never materializes the whole set if the caller filters first.
+  > Lazy, composable, and never materializes the whole set if the caller filters first.
 - \`Set<Item>\` for "uniqueness"
   > Same memory problem and the wrong shape.`}
 />

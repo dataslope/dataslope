@@ -443,7 +443,7 @@ if (r[0].score !== 90) throw new Error("should not change unrelated entries");`,
 - always returns the same type
 - uses arrow-function syntax
 - [o] returns the same output for the same input and has no side effects
-  > Correct. Purity is about *behavior*, not syntax: a pure function depends only on its arguments and changes nothing outside itself (no I/O, no mutation of inputs, no reliance on hidden state).
+  > Purity is about *behavior*, not syntax: a pure function depends only on its arguments and changes nothing outside itself (no I/O, no mutation of inputs, no reliance on hidden state).
 - doesn't use any \`if\` statements
 
 Purity is what makes functions easy to test, easy to combine, and easy to reason about. It's a property of *what* a function does, not *how* it's written.`}

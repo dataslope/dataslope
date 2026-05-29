@@ -307,7 +307,7 @@ single ten-line interface.
 - The lambda parameter \`s\` is declared as \`string\`, which is how \`T\` is decided.
   > Close, but inverted. The compiler first infers \`T\` from the *source*, then types the lambda accordingly.
 - [o] The compiler infers \`T = string\` from the source array's element type, then specializes \`MyWhere\` for \`string\`.
-  > Correct. C# infers generic type arguments by looking at the call site — most importantly the type of the source expression — and then synthesizes a strongly typed specialization. No casting, no boxing, full IntelliSense.
+  > C# infers generic type arguments by looking at the call site — most importantly the type of the source expression — and then synthesizes a strongly typed specialization. No casting, no boxing, full IntelliSense.
 - \`T\` is resolved at runtime by reflection.
   > No — generic type resolution happens at compile time in C#. Reflection is not involved at the call site.
 

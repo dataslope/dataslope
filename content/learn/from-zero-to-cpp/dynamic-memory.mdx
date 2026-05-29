@@ -310,7 +310,7 @@ int main() {
 - Returns a copy of \`T\`.
   > It returns a *pointer* to a newly constructed object.
 - [o] Allocates enough memory for one \`T\` on the heap, constructs a \`T\` in it, and returns a pointer to it.
-  > Correct. Allocation + construction in one step.
+  > Allocation + construction in one step.
 - Frees existing memory and reallocates it.
   > That would be \`realloc\`, which is a C concept and not what \`new\` does.`}
 />
@@ -323,7 +323,7 @@ int main() {
 - The OS tracks them separately on disk.
   > The OS is not involved at that level of detail.
 - [o] \`new[]\` may record an element count alongside the allocation, and \`delete[]\` knows how to invoke each destructor and release the whole block; \`delete\` does not.
-  > Correct. Mixing them is undefined behavior.
+  > Mixing them is undefined behavior.
 - They are interchangeable in modern C++.
   > They are not.`}
 />
@@ -336,7 +336,7 @@ int main() {
 - It causes data corruption in unrelated objects.
   > That is *use-after-free* or buffer overflow, not a leak.
 - [o] Memory is allocated but never freed, so a long-running program can exhaust available memory over time.
-  > Correct. Leaks degrade reliability and performance of long-running services.
+  > Leaks degrade reliability and performance of long-running services.
 - It triggers a compile-time error.
   > Compilers don't track allocation/free pairs in general.`}
 />
@@ -349,7 +349,7 @@ int main() {
 - Use \`malloc\`/\`free\`.
   > Those are C functions; they don't construct C++ objects.
 - [o] Use \`std::unique_ptr\` (often via \`std::make_unique\`); its destructor frees the object automatically.
-  > Correct. This applies the RAII pattern and removes the need for manual \`delete\`.
+  > This applies the RAII pattern and removes the need for manual \`delete\`.
 - Allocate it on the stack with \`new\` followed by no \`delete\`.
   > \`new\` does not allocate on the stack.`}
 />

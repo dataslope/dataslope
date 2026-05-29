@@ -388,7 +388,7 @@ export const slug = (s: string): string =>
 - \`compose\` curries its arguments; \`pipe\` does not
   > Currying is independent of composition direction.
 - [o] They express the same idea in different argument orders; \`compose(f, g)(x) = f(g(x))\`, while \`pipe(x, g, f)\` applies \`g\` first then \`f\`
-  > Correct. \`compose\` reads right-to-left (the math convention); \`pipe\` reads left-to-right, which usually matches data flow more naturally in TypeScript.
+  > \`compose\` reads right-to-left (the math convention); \`pipe\` reads left-to-right, which usually matches data flow more naturally in TypeScript.
 - \`compose\` can only combine two functions; \`pipe\` works for any number
   > Both can be variadic depending on the implementation.
 

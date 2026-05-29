@@ -285,7 +285,7 @@ int square(int x) {
   markdown={`Which build stage replaces \`#include <stdio.h>\` with the actual contents of \`stdio.h\`?
 
 - [o] The preprocessor
-  > Correct. \`#include\` is a textual directive handled before the compiler ever parses C.
+  > \`#include\` is a textual directive handled before the compiler ever parses C.
 - The compiler
   > By the time the compiler runs, the include has already been expanded into the translation unit.
 - The assembler
@@ -302,7 +302,7 @@ int square(int x) {
 - A missing semicolon in your code.
   > That would also be a compile-time error, not a link-time error.
 - [o] The function was declared (via a header) but the library that defines it was not passed to the linker, or the object file containing it was not compiled in.
-  > Correct. "Undefined reference" is the linker's way of saying it cannot find a body for a name.
+  > "Undefined reference" is the linker's way of saying it cannot find a body for a name.
 - The CPU does not support the \`strdup\` instruction.
   > CPUs do not have function-specific instructions for libc functions.`}
 />
@@ -315,7 +315,7 @@ int square(int x) {
 - To hide the contents of the header from other developers.
   > Include guards do not hide anything; the file is still plain text.
 - [o] To prevent the same header from being textually included more than once in a single translation unit, which would re-declare types and functions.
-  > Correct. Without guards, transitive includes can re-declare the same names and break compilation.
+  > Without guards, transitive includes can re-declare the same names and break compilation.
 - Because the C standard library requires it.
   > It is a convention, not a standard library requirement.`}
 />

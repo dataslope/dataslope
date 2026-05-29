@@ -360,7 +360,7 @@ int main(void) {
 - The total number of bytes in the original array.
   > That information is lost on the way in — the array has decayed.
 - [o] The size of a pointer (because \`a\` has decayed to \`int *\`).
-  > Correct. This is why you must pass the length as a separate parameter.
+  > This is why you must pass the length as a separate parameter.
 - The number of elements in the array.
   > That would be \`n\` (which you must pass in), not \`sizeof(a)\`.
 - Always zero.
@@ -375,7 +375,7 @@ int main(void) {
 - \`3 * sizeof(int)\`
   > Same — that would be the byte distance, not the element count.
 - [o] 3 elements
-  > Correct. \`p\` points three ints past the start of \`a\`.
+  > \`p\` points three ints past the start of \`a\`.
 - Undefined behavior
   > Subtracting two pointers into the same array (within bounds) is well-defined.`}
 />
@@ -390,7 +390,7 @@ int main(void) {
 - The write silently fails and leaves memory unchanged.
   > The write goes through; what it stomps on depends on the layout.
 - [o] It is undefined behavior — it may crash, may overwrite unrelated data, or may appear to work.
-  > Correct. Out-of-bounds memory access is one of the most dangerous C bugs.`}
+  > Out-of-bounds memory access is one of the most dangerous C bugs.`}
 />
 
 <Callout type="success" title="Next: strings">

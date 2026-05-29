@@ -303,7 +303,7 @@ int main(void) {
   > C's \`/\` between two \`int\`s does **integer** division — the result is itself an \`int\`, so there is no \`.5\`.
 - 4
 - [o] 3
-  > Correct! Integer division truncates toward zero: \`7 / 2\` yields \`3\`.
+  > Integer division truncates toward zero: \`7 / 2\` yields \`3\`.
 - A compile-time error.
 
 To get a fractional result, at least one of the operands must be a floating-point value: \`(double)a / b\` or \`a / 2.0\`.`}
@@ -317,7 +317,7 @@ To get a fractional result, at least one of the operands must be a floating-poin
 - \`char\` — temperatures fit in one byte.
   > \`char\` can only hold whole integers in a small range; the fractional part would be lost.
 - [o] \`double\` — for accurate fractional values.
-  > Correct! \`double\` is the standard choice for general-purpose fractional numbers in C.
+  > \`double\` is the standard choice for general-purpose fractional numbers in C.
 - \`unsigned int\` — temperatures are always positive.
   > Temperatures can be negative; \`unsigned\` types cannot hold negative values.
 

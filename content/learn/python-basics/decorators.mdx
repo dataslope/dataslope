@@ -595,7 +595,7 @@ assert foo.__name__ == "foo"`,
 - It makes the wrapper run faster.
   > \`wraps\` has no effect on performance.
 - [o] It copies metadata (name, docstring, signature) from \`fn\` onto the wrapper.
-  > Correct. Without it, tools and tracebacks see the wrapper's name instead of the real function's.
+  > Without it, tools and tracebacks see the wrapper's name instead of the real function's.
 - It prevents the wrapper from accepting \`*args\` and \`**kwargs\`.
   > \`wraps\` does not change the wrapper's signature — you still need \`*args, **kwargs\`.
 - It is required syntax for the \`@\` decorator notation to work.
@@ -616,7 +616,7 @@ Which is equivalent?
 - \`f = a(b)(f)\`
   > This would be the case if \`a\` were a decorator factory, but here both \`a\` and \`b\` are decorators.
 - [o] \`f = a(b(f))\`
-  > Correct. Decorators apply bottom-up: \`b\` wraps \`f\` first, then \`a\` wraps the result.
+  > Decorators apply bottom-up: \`b\` wraps \`f\` first, then \`a\` wraps the result.
 - \`f = b(a(f))\`
   > This is top-down, which is not how stacking works.
 - \`f = a(f) + b(f)\`
@@ -629,7 +629,7 @@ Which is equivalent?
 - A function that creates multiple decorators at once.
   > A factory returns one decorator per call, not multiple.
 - [o] A function that takes arguments and returns a decorator.
-  > Correct. The pattern is \`factory(args) → decorator → wrapper\`. This is how \`@retry(3)\` or \`@app.route("/path")\` work.
+  > The pattern is \`factory(args) → decorator → wrapper\`. This is how \`@retry(3)\` or \`@app.route("/path")\` work.
 - A built-in Python module for generating decorators.
   > There is no such module. "Factory" refers to the three-layer nesting pattern.
 - A decorator that only works on factory functions.
@@ -642,7 +642,7 @@ Which is equivalent?
 - To make the wrapper run faster.
   > \`*args, **kwargs\` has no performance impact.
 - [o] To accept any arguments the wrapped function expects, without knowing them in advance.
-  > Correct. Decorators are generic — they should work on any function signature.
+  > Decorators are generic — they should work on any function signature.
 - It is required syntax for decorators to work.
   > You can write a decorator without \`*args, **kwargs\`, but it will only work on functions with a specific signature.
 - To prevent the function from being called with keyword arguments.
@@ -655,7 +655,7 @@ Which is equivalent?
 - The original function is called anyway.
   > No, if you don't call it explicitly, it is not called at all.
 - [o] The wrapped function always returns \`None\`, breaking its behavior.
-  > Correct. The wrapper implicitly returns \`None\` if you don't return the result of \`fn(*args, **kwargs)\`.
+  > The wrapper implicitly returns \`None\` if you don't return the result of \`fn(*args, **kwargs)\`.
 - Python raises a \`DecoratorError\`.
   > No such error exists. The code runs but behaves incorrectly.
 - The decorator is ignored and the original function is used.
@@ -668,7 +668,7 @@ Which is equivalent?
 - It is called when the decorator is applied to a function.
   > \`__init__\` is called when the decorator is applied. \`__call__\` is called when the wrapped function is invoked.
 - [o] It is called each time the wrapped function is invoked, making the instance callable.
-  > Correct. \`__call__\` lets the class instance act like a function.
+  > \`__call__\` lets the class instance act like a function.
 - It registers the class as a decorator in Python's internal registry.
   > No such registry exists. \`__call__\` is a standard dunder method for making objects callable.
 - It is required syntax for class decorators to work.

@@ -412,7 +412,7 @@ export function emailOfManagerOf(id: string): Option<string> {
 - It hides errors from the caller
   > The opposite — it makes errors *unhideable*.
 - [o] The error possibility appears in the function's return type, so the caller is forced by the compiler to handle it
-  > Correct. With exceptions, a function's failure modes are invisible in its type. With \`Result<E, A>\`, the failure is part of the signature; you literally cannot read \`.value\` without first checking \`.kind\`.
+  > With exceptions, a function's failure modes are invisible in its type. With \`Result<E, A>\`, the failure is part of the signature; you literally cannot read \`.value\` without first checking \`.kind\`.
 - It eliminates the need for the \`try\`/\`catch\` keyword
   > You can still use \`try\`/\`catch\` at boundaries (e.g. wrapping a throwing API). \`Result\` is about *what flows through your own code*, not what the language permits.
 

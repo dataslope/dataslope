@@ -352,7 +352,7 @@ console.log(compute());
 - Only in the current function's scope
 - Only in the global scope
 - [o] First in the current scope, then in the enclosing scope, and so on outward through the *scope chain* until either it finds the name or reaches the global scope
-  > Correct. JavaScript uses *lexical* scoping: the chain of scopes is determined by where the code is written. Each scope contains its own declarations, and unresolved names fall through to the enclosing scope. The first match wins.
+  > JavaScript uses *lexical* scoping: the chain of scopes is determined by where the code is written. Each scope contains its own declarations, and unresolved names fall through to the enclosing scope. The first match wins.
 - Wherever the function was called from (dynamic scoping)
 
 Lexical scoping makes the meaning of a name predictable from the source code — you don't need to know who called a function to know which variable it sees.`}

@@ -421,7 +421,7 @@ public class Roster {
 - Faster sorting algorithms
   > Sorting got faster eventually, but speed wasn't the design idea.
 - [o] Separating *interfaces* that describe container shapes from *implementations* that realize them
-  > Correct. That separation is what lets one method body work for every present and future implementation.
+  > That separation is what lets one method body work for every present and future implementation.
 - Replacing arrays as the JVM's underlying storage
   > Arrays are still the substrate of most collections.
 - Adding network synchronization to data structures
@@ -434,7 +434,7 @@ public class Roster {
 - Because maps don't store data
   > Maps very much store data.
 - [o] Because maps fundamentally hold (key, value) pairs, not single elements, so the \`Collection\` operations (\`add(E)\`, \`contains(E)\`) don't fit
-  > Correct. The shape of a map is different enough that putting it under \`Collection\` would have meant either weaker types or awkward method signatures.
+  > The shape of a map is different enough that putting it under \`Collection\` would have meant either weaker types or awkward method signatures.
 - Because \`Map\` is older than \`Collection\`
   > Both arrived together in Java 1.2.
 - Because maps cannot be iterated
@@ -447,7 +447,7 @@ public class Roster {
 - It compiles faster
   > Compile time is unaffected.
 - [o] The variable is typed by what it represents (a list of strings), so the implementation can be swapped without touching the rest of the code
-  > Correct. Programming to the interface is what makes JCF code so refactor-friendly.
+  > Programming to the interface is what makes JCF code so refactor-friendly.
 - \`ArrayList\` does not exist in modern Java
   > It does and is widely used.
 - The garbage collector treats interfaces and classes differently

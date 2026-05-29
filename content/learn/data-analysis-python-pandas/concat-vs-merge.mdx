@@ -173,7 +173,7 @@ Whenever a *key* relates the two tables, merge.`}
 - It is slow
 - It does not work with strings
 - [o] It pairs rows by index/position rather than by a key — easy to silently mis-align rows if the two frames are in different orders
-  > Correct. Even if it works today, a future sort or reset on one frame breaks the pairing. Use merge when you have an ID.
+  > Even if it works today, a future sort or reset on one frame breaks the pairing. Use merge when you have an ID.
 - It is deprecated
 
 Position-based joins are dangerous in any data tool, not just Pandas.`}

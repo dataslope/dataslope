@@ -293,7 +293,7 @@ container/pointer to do it for you.
 - On the heap, allocated by \`new\` each call.
   > They are allocated once for the whole program.
 - [o] In the data segment, alongside globals — its memory survives between calls.
-  > Correct. A \`static\` local is essentially a hidden global with restricted scope.
+  > A \`static\` local is essentially a hidden global with restricted scope.
 - In CPU registers.
   > Registers are too small and too temporary for this.`}
 />
@@ -306,7 +306,7 @@ container/pointer to do it for you.
 - The OS reclaims them at process exit.
   > That would happen eventually, but it would be a leak in the meantime.
 - [o] The vector's destructor runs automatically when the local goes out of scope, and it frees the heap memory for you.
-  > Correct. This is RAII: ownership is tied to a stack object.
+  > This is RAII: ownership is tied to a stack object.
 - The compiler issues a warning.
   > No warning is needed because there is no leak.`}
 />
@@ -317,7 +317,7 @@ container/pointer to do it for you.
 - \`new std::vector<int>(1000)\`
   > That allocates the vector handle on the heap AND the 1000-int buffer on the heap.
 - [o] \`int x = 0;\` inside a function.
-  > Correct. A stack allocation is essentially "advance the stack pointer by 4 bytes," which the CPU can do in a single instruction.
+  > A stack allocation is essentially "advance the stack pointer by 4 bytes," which the CPU can do in a single instruction.
 - \`int* p = new int[1000];\`
   > Heap allocation requires bookkeeping in the allocator.
 - A \`std::string\` of length 1000 declared as a local.
@@ -332,7 +332,7 @@ container/pointer to do it for you.
 - Scope is runtime, storage duration is compile-time.
   > It is the other way around in spirit: scope is a compile-time concept (about names), storage duration is a runtime concept (about memory).
 - [o] Scope is the region of source code where a name is visible; storage duration is how long the underlying memory lives at runtime.
-  > Correct. A \`static\` local is the textbook example: small scope, but long storage duration.
+  > A \`static\` local is the textbook example: small scope, but long storage duration.
 - Storage duration only applies to heap allocations.
   > It applies to every variable, in every region.`}
 />

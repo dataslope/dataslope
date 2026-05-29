@@ -477,7 +477,7 @@ int main() {
 - O(1) always
   > Each character must be followed.
 - [o] O(L)
-  > Correct. One edge is followed per character.
+  > One edge is followed per character.
 - O(n log n)
   > The number of stored words is not directly multiplied this way.
 - O(26 to the power L)
@@ -486,7 +486,7 @@ int main() {
 <MultipleChoice markdown={`When can a trie beat a hash set of strings?
 
 - [o] When many prefix queries such as starts-with or autocomplete are needed.
-  > Correct. Prefix navigation is the trie specialty.
+  > Prefix navigation is the trie specialty.
 - When memory must always be minimized.
   > Tries often use more memory because of child links.
 - When only exact membership is needed and no prefixes matter.
@@ -499,7 +499,7 @@ int main() {
 - A whole independent hash table of all words
   > A node may store child links, but it represents a prefix position.
 - [o] A prefix formed by the path from the root to that node
-  > Correct. The end flag says whether that prefix is also a complete word.
+  > The end flag says whether that prefix is also a complete word.
 - Always exactly one complete word
   > Internal nodes can be prefixes for many words and may or may not end a word.
 - The sorted rank of a string

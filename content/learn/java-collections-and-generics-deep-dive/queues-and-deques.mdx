@@ -365,7 +365,7 @@ public class SlidingWindow<E> {
 - \`LinkedList\`
   > It works, but \`ArrayDeque\` is faster and uses less memory.
 - [o] \`ArrayDeque\`
-  > Correct. Circular array, both ends \`O(1)\`, far better cache behavior than a linked list.
+  > Circular array, both ends \`O(1)\`, far better cache behavior than a linked list.
 - \`PriorityQueue\`
   > That gives you priority order, not FIFO.
 - \`Vector\`
@@ -380,7 +380,7 @@ public class SlidingWindow<E> {
 - The first inserted element
   > That would be FIFO, not priority.
 - [o] The smallest element according to natural order
-  > Correct. The heap is a min-heap by default; use \`Comparator.reverseOrder()\` for a max-heap.
+  > The heap is a min-heap by default; use \`Comparator.reverseOrder()\` for a max-heap.
 - A random element
   > Heap order is deterministic, not random.`}
 />
@@ -391,7 +391,7 @@ public class SlidingWindow<E> {
 - Iteration throws \`UnsupportedOperationException\`
   > It does not.
 - [o] Iteration walks the underlying heap array, which is *not* in sorted order — drain via \`poll()\` if you need sorted order
-  > Correct. Heap order only guarantees the *root* is the smallest; the rest is partially ordered.
+  > Heap order only guarantees the *root* is the smallest; the rest is partially ordered.
 - It is \`O(n²)\`
   > Iteration is \`O(n)\`.
 - It mutates the queue

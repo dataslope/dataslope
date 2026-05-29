@@ -389,7 +389,7 @@ assert all_truthy(["a", "", "c"]) is False`,
 - \`None\`
   > \`None\` is falsy.
 - [o] \`[0]\`
-  > Correct. A list containing the number 0 is **non-empty**, so it is truthy. Only the empty list \`[]\` is falsy.`}
+  > A list containing the number 0 is **non-empty**, so it is truthy. Only the empty list \`[]\` is falsy.`}
 />
 
 <MultipleChoice
@@ -402,7 +402,7 @@ assert all_truthy(["a", "", "c"]) is False`,
 - \`""\`
   > Empty string is falsy, so \`or\` keeps looking.
 - [o] \`"x"\`
-  > Correct. The first three operands are falsy, so \`or\` keeps evaluating and lands on \`"x"\`, which is truthy.`}
+  > The first three operands are falsy, so \`or\` keeps evaluating and lands on \`"x"\`, which is truthy.`}
 />
 
 <MultipleChoice
@@ -413,7 +413,7 @@ assert all_truthy(["a", "", "c"]) is False`,
 - \`False\`
   > Close, but \`and\` returns the first falsy operand or the last operand, not necessarily \`False\`.
 - [o] \`[]\`
-  > Correct. \`and\` returns the first falsy operand. \`[]\` is falsy, so that's what it returns.
+  > \`and\` returns the first falsy operand. \`[]\` is falsy, so that's what it returns.
 - \`"hello"\`
   > \`and\` would return \`"hello"\` only if the first operand were truthy.`}
 />
@@ -424,7 +424,7 @@ assert all_truthy(["a", "", "c"]) is False`,
 - \`if len(items) > 0:\`
   > This works, but it's verbose. Pythonic code uses truthiness.
 - [o] \`if items:\`
-  > Correct. This is the idiomatic Pythonic way—concise and readable.
+  > This is the idiomatic Pythonic way—concise and readable.
 - \`if items is not None:\`
   > This checks whether \`items\` is \`None\`, not whether it's empty. An empty list \`[]\` would pass this check.
 - \`if items == True:\`

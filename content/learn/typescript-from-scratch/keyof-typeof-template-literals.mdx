@@ -356,7 +356,7 @@ What is \`ColorName\`?
 - \`string\`
   > \`keyof\` produces a union of literal types, not the broad \`string\` type.
 - [o] \`"red" | "green" | "blue"\`
-  > Correct. \`typeof colors\` lifts the object to a type, and \`keyof\` extracts its keys as a union.
+  > \`typeof colors\` lifts the object to a type, and \`keyof\` extracts its keys as a union.
 - \`"#f00" | "#0f0" | "#00f"\`
   > Those are the *values*, not the keys.
 
@@ -379,7 +379,7 @@ How many string literal types does \`Combined\` contain?
 - 2
   > Template literals distribute over unions, producing the Cartesian product.
 - [o] 4
-  > Correct: \`"getName" | "getAge" | "setName" | "setAge"\`. Each \`Prefix\` is combined with each \`Prop\`.
+  > The result is \`"getName" | "getAge" | "setName" | "setAge"\`. Each \`Prefix\` is combined with each \`Prop\`.
 - 8
   > There are only 2 prefixes and 2 props, so 2 × 2 = 4 combinations.
 

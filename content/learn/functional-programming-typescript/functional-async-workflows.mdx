@@ -323,7 +323,7 @@ export function run(userId: string): TaskResult<string, string> {
 - Tasks can hold synchronous values, Promises can't
   > Both can hold synchronous values; \`Promise.resolve(x)\` is fine.
 - [o] A \`Task\` is *lazy* — building one does no work, so you can compose, retry, parallelize, or substitute it without accidentally kicking off the computation
-  > Correct. A \`Promise\` starts running the moment it's created; that's not always what you want when composing. A \`Task\` is a recipe you choose when to run.
+  > A \`Promise\` starts running the moment it's created; that's not always what you want when composing. A \`Task\` is a recipe you choose when to run.
 - Tasks cannot fail
   > They certainly can; you usually pair them with \`Result\` (as \`TaskResult<E, A>\`) for typed failure.
 

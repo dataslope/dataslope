@@ -294,7 +294,7 @@ int main() {
 - Last in, first out
   > That describes a stack.
 - [o] First in, first out
-  > Correct. The oldest enqueued element is served first.
+  > The oldest enqueued element is served first.
 - Highest value, first out
   > That describes a priority queue pattern, not a normal queue.
 - Random element, first out
@@ -305,7 +305,7 @@ int main() {
   markdown={`Why is \`std::deque\` often preferred over \`std::list\` for queue-like work?
 
 - [o] It supports efficient end operations with better locality and fewer per-element allocations.
-  > Correct. Deque storage is usually friendlier to caches than linked nodes.
+  > Deque storage is usually friendlier to caches than linked nodes.
 - It makes every operation O(log n).
   > Queue end operations are constant time.
 - It automatically removes duplicates.
@@ -320,7 +320,7 @@ int main() {
 - Both are always O(1).
   > Vector must shift remaining elements.
 - [o] Vector front erase is O(n), while deque pop_front is O(1).
-  > Correct. This is why deque is a natural queue backing container.
+  > This is why deque is a natural queue backing container.
 - Vector front erase is O(log n), while deque pop_front is O(n).
   > These are not the usual complexities.
 - Both are O(n^2).

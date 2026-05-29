@@ -459,7 +459,7 @@ int main() {
 - O(n)
   > This is possible in the worst case, but not the expected average for a healthy table.
 - [o] O(1)
-  > Correct. A good hash function and controlled load factor make lookup constant on average.
+  > A good hash function and controlled load factor make lookup constant on average.
 - O(log n)
   > This is typical of balanced binary search trees.
 - O(n log n)
@@ -472,14 +472,14 @@ int main() {
 - A stack
   > A stack only exposes the top element.
 - [o] A hash table with buckets
-  > Correct. Keys are hashed to choose buckets.
+  > Keys are hashed to choose buckets.
 - A linked list only
   > Some implementations use nodes, but the core idea is bucketed hashing.`} />
 
 <MultipleChoice markdown={`Why might std::map be preferred over std::unordered_map?
 
 - [o] It iterates keys in sorted order and supports ordered operations.
-  > Correct. The tree structure keeps keys ordered.
+  > The tree structure keeps keys ordered.
 - It always has O(1) lookup.
   > std::map lookup is O(log n), not O(1).
 - It uses no comparisons.
@@ -494,6 +494,6 @@ int main() {
 - One key is silently deleted.
   > Correct implementations preserve both keys.
 - [o] The table resolves the collision with chaining or probing.
-  > Correct. Collision resolution is part of hash-table design.
+  > Collision resolution is part of hash-table design.
 - The keys become equal.
   > Equal hash values do not imply equal keys.`} />

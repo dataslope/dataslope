@@ -292,7 +292,7 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 
 - Filter-arrange-join
 - [o] Split-apply-combine
-  > Correct! Split the data into groups, apply a computation to each, combine the results into a single table.
+  > Split the data into groups, apply a computation to each, combine the results into a single table.
 - Map-reduce-filter
 - Sort-merge-deduplicate`}
 />
@@ -302,7 +302,7 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 
 - Returns the number of columns.
 - [o] Returns the number of rows in the current (possibly grouped) data.
-  > Correct! Inside \`summarise()\` after a \`group_by()\`, \`n()\` gives the count per group.
+  > Inside \`summarise()\` after a \`group_by()\`, \`n()\` gives the count per group.
 - Returns the mean of the data.
 - Returns the row name.`}
 />
@@ -313,7 +313,7 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 - They're the same.
 - \`summarise\` is slower than \`mutate\`.
 - [o] \`summarise\` returns one row per group (collapses); \`mutate\` keeps every row and broadcasts the group statistic into each row.
-  > Correct! Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.
+  > Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.
 - \`mutate\` cannot be used with \`group_by\`.`}
 />
 
