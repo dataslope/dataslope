@@ -28,7 +28,7 @@ import {
   type WorkspaceEntry,
 } from "./workspace";
 
-const SESSION_KEY_PREFIX = "pg_active_ws_";
+const SESSION_KEY_PREFIX = "playground_active_ws_";
 
 const DEFAULT_NAMES: Record<string, string> = {
   sqlite: "Default SQLite Workspace",

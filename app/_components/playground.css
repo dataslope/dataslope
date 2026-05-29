@@ -46,7 +46,7 @@
 }
 
 /* ─── Light mode — only non-variable overrides remain ─── */
-html[data-pg-theme="light"] .pyodide-loading {
+html[data-playground-theme="light"] .pyodide-loading {
   background: var(--bg);
 }
 
@@ -3275,7 +3275,7 @@ input[type="range"].fs-slider:disabled {
     height 0.15s;
 }
 
-html[data-pg-theme="light"] .toast {
+html[data-playground-theme="light"] .toast {
   box-shadow:
     0 4px 16px rgb(0 0 0 / 0.1),
     0 1px 4px rgb(0 0 0 / 0.06);
@@ -3403,18 +3403,18 @@ html[data-pg-theme="light"] .toast {
    the empty-output welcome heading so they remain legible against the
    editor-themed background (which can use a colored "muted" hue that
    doesn't read as a UI label). Light themes keep the existing palette. */
-html[data-pg-theme="dark"] .header-btn {
+html[data-playground-theme="dark"] .header-btn {
   color: var(--text);
 }
-html[data-pg-theme="dark"] .header-btn:disabled {
+html[data-playground-theme="dark"] .header-btn:disabled {
   color: color-mix(in srgb, var(--text) 45%, transparent);
 }
-html[data-pg-theme="dark"] .header-btn:hover:not(:disabled),
-html[data-pg-theme="dark"] .header-btn:focus-visible,
-html[data-pg-theme="dark"] .header-btn[data-popup-open] {
+html[data-playground-theme="dark"] .header-btn:hover:not(:disabled),
+html[data-playground-theme="dark"] .header-btn:focus-visible,
+html[data-playground-theme="dark"] .header-btn[data-popup-open] {
   color: var(--text);
 }
-html[data-pg-theme="dark"] .welcome h3 {
+html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text);
 }
 

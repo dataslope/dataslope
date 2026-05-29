@@ -78,7 +78,7 @@ interface ManifestPayload {
 }
 
 function manifestKey(adapterId: string, workspaceId: string): string {
-  return `pg_files_${adapterId}_${workspaceId}`;
+  return `playground_files_${adapterId}_${workspaceId}`;
 }
 
 export function loadManifest(

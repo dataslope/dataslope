@@ -35,7 +35,7 @@ const themeBootstrapScript = `
     };
     var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
     if (!/^\\/playground(?:\\/|$)/.test(location.pathname)) return;
-    var theme = localStorage.getItem("pg_editor_theme");
+    var theme = localStorage.getItem("playground_editor_theme");
     if (!theme || !palettes[theme]) return;
     var p = palettes[theme];
     var r = document.documentElement;

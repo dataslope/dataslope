@@ -621,7 +621,7 @@ function ToastList() {
 
 function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Initial settings (persisted in localStorage, namespaced per-language) ─
-  const storageKey = (k: string) => `pg_${adapter.id}_${k}`;
+  const storageKey = (k: string) => `playground_${adapter.id}_${k}`;
   const [fontSize, setFontSizeState] = useState<number>(
     DEFAULT_PLAYGROUND_SETTINGS.fontSize,
   );
@@ -935,7 +935,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // for this workspace, surface a one-time toast so the user
         // knows their edits in this tab are unsafe. Shown at most once
         // per (workspace × session) via sessionStorage.
-        const noticeKey = `pg_ws_warned_${ws.id}`;
+        const noticeKey = `playground_ws_warned_${ws.id}`;
         try {
           if (window.sessionStorage.getItem(noticeKey) !== "1") {
             const hasLock = await acquireWorkspaceLock(ws.id);

@@ -24,7 +24,7 @@ import type {
 } from "../../runtime/sqlSamples";
 
 /** A storage namespace each playground uses for `localStorage` keys
- *  (e.g. `"duckdb_"`, `"pg_postgres_"`, `"sqlite:"`). The shell uses
+ *  (e.g. `"duckdb_"`, `"playground_postgres_"`, `"sqlite:"`). The shell uses
  *  it for tab/settings persistence so per-dialect state never
  *  collides. */
 export type SqlPlaygroundStoragePrefix = string;

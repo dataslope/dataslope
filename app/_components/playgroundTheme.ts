@@ -48,7 +48,7 @@ export const LIGHT_THEMES = new Set([
   "github-light",
 ]);
 
-export const PLAYGROUND_EDITOR_THEME_STORAGE_KEY = "pg_editor_theme";
+export const PLAYGROUND_EDITOR_THEME_STORAGE_KEY = "playground_editor_theme";
 
 export interface ThemePalette {
   bg: string;
@@ -425,7 +425,7 @@ export function clearThemePalette(): void {
   ]) {
     root.style.removeProperty(name);
   }
-  root.removeAttribute("data-pg-theme");
+  root.removeAttribute("data-playground-theme");
 }
 
 export function getStoredEditorTheme(legacyKey?: string): string | null {
@@ -452,11 +452,11 @@ export function setStoredEditorTheme(theme: string): void {
   }
 }
 
-/** Toggle `data-pg-theme` on `<html>` so playground-specific light-mode
+/** Toggle `data-playground-theme` on `<html>` so playground-specific light-mode
  *  CSS overrides apply (e.g. inverting the loading overlay for light
  *  themes). Uses a playground-namespaced attribute so it never conflicts
  *  with the docs site's own `data-theme` / class-based dark mode. */
 export function applyMode(theme: string): void {
   const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
-  document.documentElement.setAttribute("data-pg-theme", resolved);
+  document.documentElement.setAttribute("data-playground-theme", resolved);
 }

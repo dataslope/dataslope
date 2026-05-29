@@ -668,13 +668,13 @@ type WorkerOutMessage =
 
 /**
  * Resolve the active light/dark mode so the worker can pick a matching Plotly
- * template. Playground pages set `data-pg-theme` on <html>; the Fumadocs-powered
+ * template. Playground pages set `data-playground-theme` on <html>; the Fumadocs-powered
  * `/learn` pages use next-themes, which toggles a `.dark` class instead.
  */
 function detectChartTheme(): "light" | "dark" {
   if (typeof document === "undefined") return "dark";
   const html = document.documentElement;
-  const pgTheme = html.getAttribute("data-pg-theme");
+  const pgTheme = html.getAttribute("data-playground-theme");
   if (pgTheme) return pgTheme === "light" ? "light" : "dark";
   return html.classList.contains("dark") ? "dark" : "light";
 }

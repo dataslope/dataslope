@@ -1691,7 +1691,7 @@ function DuckDbPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
-          const noticeKey = `pg_ws_warned_${workspace.id}`;
+          const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
             if (window.sessionStorage.getItem(noticeKey) !== "1") {
               const hasLock = await acquireWorkspaceLock(workspace.id);
