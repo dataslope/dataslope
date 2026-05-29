@@ -25,10 +25,10 @@ data analysis.
 
 ```mermaid
 flowchart LR
-  subgraph Hand[ "By hand: one number at a time" ]
-    A1[5 × 4 = 20] --> A2[7 × 3 = 21] --> A3[2 × 8 = 16] --> A4[...]
+  subgraph Hand["By hand: one number at a time"]
+    A1["5 × 4 = 20"] --> A2["7 × 3 = 21"] --> A3["2 × 8 = 16"] --> A4["..."]
   end
-  subgraph Comp[ "By computer: one collection at a time" ]
+  subgraph Comp["By computer: one collection at a time"]
     B1["widths = (5, 7, 2)"] --> B3["areas = widths × heights"]
     B2["heights = (4, 3, 8)"] --> B3
   end
@@ -174,15 +174,15 @@ statistics.
 
 ```mermaid
 flowchart LR
-  subgraph P1[Pattern 1: Map]
+  subgraph P1["Pattern 1: Map"]
     C1[collection] --> Op1[operation] --> R1[collection]
   end
-  subgraph P2[Pattern 2: Combine]
-    C2a[collection A] --> Op2[operation]
-    C2b[collection B] --> Op2 --> R2[collection]
+  subgraph P2["Pattern 2: Combine"]
+    C2a["collection A"] --> Op2[operation]
+    C2b["collection B"] --> Op2 --> R2[collection]
   end
-  subgraph P3[Pattern 3: Summarize]
-    C3[collection] --> Op3[summary fn] --> R3[single value]
+  subgraph P3["Pattern 3: Summarize"]
+    C3[collection] --> Op3["summary fn"] --> R3["single value"]
   end
   style R1 fill:#bfdbfe,stroke:#1d4ed8
   style R2 fill:#bfdbfe,stroke:#1d4ed8

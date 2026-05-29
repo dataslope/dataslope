@@ -19,9 +19,9 @@ flowchart LR
   data["Whole dataset"] -->|split| grp1["region A"]
   data --> grp2["region B"]
   data --> grp3["region C"]
-  grp1 -->|apply: mean(sales)| s1["sales=120"]
-  grp2 -->|apply: mean(sales)| s2["sales=98"]
-  grp3 -->|apply: mean(sales)| s3["sales=145"]
+  grp1 -->|apply mean| s1["sales=120"]
+  grp2 -->|apply mean| s2["sales=98"]
+  grp3 -->|apply mean| s3["sales=145"]
   s1 -->|combine| out["summary table"]
   s2 --> out
   s3 --> out
