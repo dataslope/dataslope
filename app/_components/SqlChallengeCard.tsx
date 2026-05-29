@@ -2279,8 +2279,21 @@ export function TableViewerSkeleton() {
 
 // Drag-to-resize bounds for the table viewer's contents (px).
 const TABLE_VIEWER_MIN_HEIGHT = 120;
-const TABLE_VIEWER_MAX_HEIGHT = 640;
+const TABLE_VIEWER_MAX_HEIGHT = 520;
 const TABLE_VIEWER_DEFAULT_HEIGHT = 240;
+
+/** Effective maximum height for the resizable table area. Capped at
+ *  `TABLE_VIEWER_MAX_HEIGHT`, but also never more than ~70% of the
+ *  viewport so the panel can't swallow the whole screen on short
+ *  windows. Recomputed per drag/keystroke so it tracks window resizes. */
+function tableViewerMaxHeight(): number {
+  const vh = typeof window !== "undefined" ? window.innerHeight : 0;
+  const viewportCap = vh > 0 ? Math.round(vh * 0.7) : TABLE_VIEWER_MAX_HEIGHT;
+  return Math.max(
+    TABLE_VIEWER_MIN_HEIGHT,
+    Math.min(TABLE_VIEWER_MAX_HEIGHT, viewportCap),
+  );
+}
 
 /** The always-visible "Tables" panel shared by `<SqlChallengeCard>` and
  *  `<SqlCodeBlock>`. Shows a loading skeleton until the first table
@@ -2316,7 +2329,7 @@ export function TableViewer({
         if (!dragRef.current) return;
         const dy = ev.clientY - dragRef.current.startY;
         const next = Math.min(
-          TABLE_VIEWER_MAX_HEIGHT,
+          tableViewerMaxHeight(),
           Math.max(TABLE_VIEWER_MIN_HEIGHT, dragRef.current.startH + dy),
         );
         setPaneHeight(next);
@@ -2340,7 +2353,7 @@ export function TableViewer({
     const step = e.shiftKey ? 48 : 16;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setPaneHeight((h) => Math.min(TABLE_VIEWER_MAX_HEIGHT, h + step));
+      setPaneHeight((h) => Math.min(tableViewerMaxHeight(), h + step));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setPaneHeight((h) => Math.max(TABLE_VIEWER_MIN_HEIGHT, h - step));
