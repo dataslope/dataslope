@@ -10,7 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { ChevronDown, ChevronUp, Lock, Play, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw, Table } from "lucide-react";
 import { Toast } from "@base-ui-components/react/toast";
 import {
   LANGUAGE_ICONS,
@@ -1034,6 +1034,10 @@ function CodeBlockInner({
                     : f.filename
                 }
               >
+                {f.filename.endsWith(".sql")
+                  ? <Table size={12} aria-hidden />
+                  : <File size={12} aria-hidden />
+                }
                 {f.filename}
               </button>
             );

@@ -7,7 +7,7 @@
 // playground (the SQL playground) can mount the same components without
 // duplicating them.
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Switch } from "@base-ui-components/react/switch";
 import { Tabs } from "@base-ui-components/react/tabs";
 import {
@@ -351,12 +351,28 @@ export function SettingsPanelContent({
   extraActionRows,
   extraTabs,
 }: SettingsPanelProps) {
-  const [tab, setTab] = useState<string>("general");
+  const [tab, setTab] = useState<string>(() => {
+    try {
+      return localStorage.getItem("settings_active_tab") ?? "general";
+    } catch {
+      return "general";
+    }
+  });
+
+  const handleTabChange = useCallback((v: string | number | null) => {
+    const next = String(v);
+    setTab(next);
+    try {
+      localStorage.setItem("settings_active_tab", next);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   return (
     <Tabs.Root
       value={tab}
-      onValueChange={(v) => setTab(String(v))}
+      onValueChange={handleTabChange}
       className="settings-tabs"
     >
       <Tabs.List
