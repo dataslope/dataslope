@@ -352,7 +352,7 @@ export function reduce(state: State, action: Action): State {
 - Because reducers can be written without TypeScript
   > Irrelevant — most reducers in real codebases *do* use TypeScript.
 - [o] Because each transition is a pure function — same inputs give the same output — so state changes are predictable, replayable, and trivially testable
-  > Correct. Purity buys you predictability, replayability, time-travel debugging, and ordinary unit-testability for free.
+  > Purity buys you predictability, replayability, time-travel debugging, and ordinary unit-testability for free.
 - Because reducers can mutate the state in place for performance
   > That defeats almost every benefit listed above.
 - Because actions are usually classes

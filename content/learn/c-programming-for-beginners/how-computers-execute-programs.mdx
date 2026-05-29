@@ -180,7 +180,7 @@ exactly why it's such a great teacher.
 
 - It counts how many programs are currently running on the computer.
 - [o] It holds the address of the next instruction the CPU will fetch.
-  > Correct! The PC is just a special register that points into memory at the next instruction. Jumps, function calls, and \`if\` statements all work by changing the PC.
+  > The PC is just a special register that points into memory at the next instruction. Jumps, function calls, and \`if\` statements all work by changing the PC.
 - It records how many instructions a program has executed in total.
 - It stores the result of the most recent arithmetic operation.
 
@@ -193,7 +193,7 @@ The CPU repeats: read the instruction at the address in PC, advance (or change) 
 - The CPU creates a brand-new memory chip labeled \`x\`.
 - The compiler stores \`x\` as the literal text \`"x"\` somewhere in memory.
 - [o] The compiler reserves a small region of memory (typically 4 bytes) to hold the value 42; the name \`x\` only exists in the source code.
-  > Correct! Variable names are a human convenience. At runtime, the CPU sees only addresses. The compiler is the bridge between the two views.
+  > Variable names are a human convenience. At runtime, the CPU sees only addresses. The compiler is the bridge between the two views.
 - The number 42 is sent to the CPU directly, not stored in memory.
 
 The hardware doesn't know variable names. The compiler maps each name to a specific memory location (or sometimes a register), and from then on the CPU just shuffles bits between addresses.`}

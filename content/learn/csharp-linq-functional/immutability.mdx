@@ -278,7 +278,7 @@ public record Money(decimal Amount, string Currency)
 - Immutability is mainly a matter of code style.
   > It looks like style, but it has direct consequences for correctness, threading, and reasoning. It is structural, not cosmetic.
 - [o] Immutable values cannot be aliased into incorrect states, because nothing can change them after construction.
-  > Correct. Aliasing only causes bugs when one of the aliases *mutates* the shared object. If the object is immutable, no aliased reference can ever observe an unexpected change.
+  > Aliasing only causes bugs when one of the aliases *mutates* the shared object. If the object is immutable, no aliased reference can ever observe an unexpected change.
 
 Immutability doesn't *forbid* sharing references — it makes shared
 references *safe*. Two pieces of code that both hold the same

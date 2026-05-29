@@ -360,7 +360,7 @@ int main(void) {
 - 6
 - 0
 - [o] 5
-  > Correct! Arguments in C are passed by value. \`increment\` receives a copy of \`n\`; modifying that copy does not affect \`n\` in \`main\`.
+  > Arguments in C are passed by value. \`increment\` receives a copy of \`n\`; modifying that copy does not affect \`n\` in \`main\`.
 - A compile-time error.
 
 To modify a caller's variable, the function would need to receive a *pointer* to it — \`void increment(int *x) { (*x)++; }\` — and the caller would pass \`&n\`. We'll meet pointers soon.`}
@@ -373,7 +373,7 @@ To modify a caller's variable, the function would need to receive a *pointer* to
   > Modern compilers can sometimes inline calls so there's no speed difference. The main benefit is for *humans*.
 - The C standard limits how many lines \`main\` may have.
 - [o] It lets a human reader understand the program one small piece at a time.
-  > Correct! Functions are an *abstraction tool*. They let you reason about *what* a chunk of code does without having to read every line.
+  > Functions are an *abstraction tool*. They let you reason about *what* a chunk of code does without having to read every line.
 - It is required by the compiler.
 
 Abstraction is the only sustainable defense against complexity. Every well-named function you extract is one less thing the next reader (often: future you) has to hold in their head.`}

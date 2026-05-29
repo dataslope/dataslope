@@ -271,7 +271,7 @@ int main(void) {
 
 - 4
 - [o] 5
-  > Correct! \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
+  > \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
 - 6
   > That would be the array's **storage size** (5 letters + 1 null). \`strlen\` excludes the terminator.
 - It depends on the system.
@@ -292,7 +292,7 @@ strcpy(buf, "This message is much longer than ten bytes.");
 - It runs but \`buf\` will silently be truncated to 10 bytes.
   > \`strcpy\` does **not** truncate. It just keeps writing.
 - [o] \`strcpy\` doesn't check the destination size, so it writes far past the end of \`buf\`, corrupting other memory.
-  > Correct! This is the classic *buffer overflow*. The runtime behavior is undefined: the program may crash, silently corrupt unrelated variables, or be exploitable by an attacker.
+  > This is the classic *buffer overflow*. The runtime behavior is undefined: the program may crash, silently corrupt unrelated variables, or be exploitable by an attacker.
 - The compiler will refuse to copy a string longer than \`buf\`.
 
 Safer alternatives: \`strncpy\` (with explicit size, but always null-terminate yourself), or \`snprintf\` (with size limit and truncation reporting). Or use a bigger buffer that you've sized to your data.`}

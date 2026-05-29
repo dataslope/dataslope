@@ -278,7 +278,7 @@ foreach (var x in q) { ... }
 - A compile error, because you can't iterate a deferred sequence twice.
   > It compiles and runs fine, but it re-executes the pipeline on each iteration.
 - [o] The pipeline (and the underlying \`LoadFromDatabase\` call) runs *twice*, once per \`foreach\`.
-  > Correct. Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again — re-running any side-effectful or expensive source method.
+  > Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again — re-running any side-effectful or expensive source method.
 - The second \`foreach\` produces no output, because the enumerator is already at the end.
   > Each \`foreach\` calls \`GetEnumerator\` again, so it starts from the beginning each time.
 

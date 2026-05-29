@@ -244,7 +244,7 @@ lambda calculus through Lisp and Haskell to the modern ecosystem.
 - It is always slower than immutable data
   > Performance is not the core problem. Mutable code can be very fast. The problem is comprehension and correctness, not speed.
 - [o] The behavior of a function depends on the entire history of every other function that touched the same state
-  > Correct. With mutable shared state, a function's outputs depend not just on its inputs but on *when* it ran and *who* ran before it. That coupling grows quadratically with the size of the codebase.
+  > With mutable shared state, a function's outputs depend not just on its inputs but on *when* it ran and *who* ran before it. That coupling grows quadratically with the size of the codebase.
 - TypeScript cannot type-check mutable variables
   > TypeScript does type-check mutable variables. The issue is not typing but reasoning: types describe shape, not history.
 - It always causes the program to crash

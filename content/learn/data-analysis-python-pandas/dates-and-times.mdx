@@ -337,7 +337,7 @@ When you have time-series data, almost always promote the timestamp to the index
 - A datetime
 - A float (days)
 - [o] A \`Timedelta\` — a duration value that you can convert to days, seconds, etc. via \`.dt.days\`, \`.dt.total_seconds()\`, etc.
-  > Correct. Always be explicit about the unit when converting Timedeltas to floats.
+  > Always be explicit about the unit when converting Timedeltas to floats.
 - An integer
 
 The Timedelta type keeps you safe — it would be much worse if Pandas guessed at days vs hours vs seconds.`}

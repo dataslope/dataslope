@@ -270,7 +270,7 @@ picture.
 - A Word document
   > No.
 - [o] An assembly (a \`.dll\` or \`.exe\`) containing Intermediate Language (IL)
-  > Correct. IL is a portable lower-level representation that the .NET runtime knows how to execute.
+  > IL is a portable lower-level representation that the .NET runtime knows how to execute.
 - A pre-rendered video of your program running
   > No.`}
 />
@@ -283,7 +283,6 @@ picture.
 - They are the same thing
   > They are distinct memory regions with different lifetime rules.
 - [o] The stack holds short-lived bookkeeping for method calls (parameters, locals, return addresses). The heap holds longer-lived objects created with \`new\` and managed by the garbage collector.
-  > Correct.
 - The heap is faster than the stack
   > It's usually the other way around — stack access is extremely fast.`}
 />
@@ -296,7 +295,7 @@ picture.
 - Recompiles your code
   > That's the JIT.
 - [o] Finds heap objects that no living code can still reach, and reclaims their memory so it can be reused
-  > Correct. This is what makes C# a "memory-safe" language in everyday use.
+  > This is what makes C# a "memory-safe" language in everyday use.
 - Slows your program down on purpose
   > It does occasionally pause work to scan the heap, but its purpose is to *reclaim* memory, not to slow things down.`}
 />

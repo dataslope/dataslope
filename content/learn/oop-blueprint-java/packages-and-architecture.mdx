@@ -358,7 +358,7 @@ package. The domain doesn't move.
 - Make every member \`protected\` because it's "in the middle"
   > Protected is more permissive than you usually want.
 - [o] Make everything as restrictive as possible (\`private\` by default, package-private when needed) and widen only when there's a real reason
-  > Correct. Narrow visibility keeps refactoring safe.
+  > Narrow visibility keeps refactoring safe.
 - Always use \`package-private\` for everything
   > Sometimes you genuinely need \`public\` (the API) or \`private\` (internals).`}
 />
@@ -371,7 +371,7 @@ package. The domain doesn't move.
 - Domain should depend on the presentation layer
   > Definitely not; the domain is the most independent piece.
 - [o] From the outer layers (presentation, infrastructure) toward the inner core (application, domain) — the domain depends on nothing else of yours
-  > Correct. This is the "dependencies point inward" rule that keeps the core swappable.
+  > This is the "dependencies point inward" rule that keeps the core swappable.
 - All layers should depend on every other layer equally
   > That recreates the spaghetti you're trying to avoid.`}
 />
@@ -384,7 +384,7 @@ package. The domain doesn't move.
 - Combine all classes into one giant package so nothing has to import anything
   > That maximizes coupling and destroys cohesion.
 - [o] Classes within a package should belong together; packages should depend on each other as little as possible
-  > Correct. This is the classic measure of a healthy modular design.
+  > This is the classic measure of a healthy modular design.
 - Use the keyword \`public\` on as many members as possible
   > Visibility breadth and cohesion are unrelated.`}
 />

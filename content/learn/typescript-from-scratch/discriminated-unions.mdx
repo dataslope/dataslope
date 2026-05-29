@@ -403,7 +403,7 @@ export type Notification = { type: "info"; message: string };
 - The code compiles and runs, but crashes at runtime when the new variant is encountered.
   > No. With exhaustiveness checking (\`const _exhaustive: never = value\`), the code won't even *compile* if you miss a case. The compiler catches it at build time.
 - [o] The code fails to compile because the unhandled variant isn't assignable to \`never\`.
-  > Correct! The exhaustiveness check tries to assign the leftover variant to \`never\`. If any variant is unhandled, it still has a type, and assigning it to \`never\` is a type error. This is exactly what we want: the compiler forces you to handle every case.
+  > The exhaustiveness check tries to assign the leftover variant to \`never\`. If any variant is unhandled, it still has a type, and assigning it to \`never\` is a type error. This is exactly what we want: the compiler forces you to handle every case.
 - The new variant is ignored, and the \`default\` case handles it silently.
   > No. If you have exhaustiveness checking, the \`default\` case tries to assign the value to \`never\`. If a variant is unhandled, this fails at compile time, not runtime.
 

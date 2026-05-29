@@ -441,7 +441,7 @@ int main() {
 - All descendants are greater than the node
   > Left descendants should be smaller.
 - [o] Values in the left subtree are smaller and values in the right subtree are larger.
-  > Correct. The rule applies recursively.
+  > The rule applies recursively.
 - Only immediate children must be sorted alphabetically
   > The invariant must hold through entire subtrees.
 - Every node has exactly two children
@@ -450,7 +450,7 @@ int main() {
 <MultipleChoice markdown={`What is the cost of search in a BST of height h?
 
 - [o] O(h)
-  > Correct. Search follows one path from the root.
+  > Search follows one path from the root.
 - O(1) always
   > Only the root can be checked in constant time.
 - O(n log n)
@@ -465,6 +465,6 @@ int main() {
 - To make recursion iterative
   > Bounds work in either recursive or iterative validation.
 - [o] A node can satisfy its parent but violate an ancestor.
-  > Correct. Ancestor constraints must be carried downward.
+  > Ancestor constraints must be carried downward.
 - Because leaf nodes are always invalid
   > Leaves can be perfectly valid.`} />

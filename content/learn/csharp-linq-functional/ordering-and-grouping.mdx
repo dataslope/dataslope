@@ -314,7 +314,7 @@ public static class SalesReport
 - A sequence sorted by A, with ties in A broken by B.
   > That's what \`ThenBy\` does. Two consecutive \`OrderBy\` calls behave differently.
 - [o] A sequence sorted by B, with ties in B broken by A.
-  > Correct. The *second* \`OrderBy\` re-sorts everything by B; the first \`OrderBy\`'s ordering survives only within tied B values (because the sort is stable).
+  > The *second* \`OrderBy\` re-sorts everything by B; the first \`OrderBy\`'s ordering survives only within tied B values (because the sort is stable).
 - A compile error, because you can't apply \`OrderBy\` twice.
   > It compiles fine — every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
 - A sequence in undefined order.

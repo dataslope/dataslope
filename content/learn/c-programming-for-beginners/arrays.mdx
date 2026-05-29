@@ -349,7 +349,7 @@ a[2] = a[0] + a[4];
 - 30
 - 50
 - [o] 60
-  > Correct! \`a[0]\` is \`10\`, \`a[4]\` is \`50\`. \`10 + 50 = 60\`, written back into \`a[2]\`.
+  > \`a[0]\` is \`10\`, \`a[4]\` is \`50\`. \`10 + 50 = 60\`, written back into \`a[2]\`.
 - 100
 
 C arrays are zero-indexed: the first element is at index \`0\`, the last element of an array of size \`n\` is at index \`n - 1\`.`}
@@ -369,7 +369,7 @@ for (int i = 0; i <= 10; i++) {
   > It compiles cleanly. The danger is at runtime.
 - It runs an infinite loop.
 - [o] It writes one element past the end of the array (\`data[10]\`), which is undefined behavior and may corrupt other memory.
-  > Correct! Valid indices are \`0..9\`. Writing \`data[10]\` clobbers whatever happens to live in the next 4 bytes — possibly another variable, possibly internal bookkeeping. This is the classic off-by-one bug.
+  > Valid indices are \`0..9\`. Writing \`data[10]\` clobbers whatever happens to live in the next 4 bytes — possibly another variable, possibly internal bookkeeping. This is the classic off-by-one bug.
 - It runs correctly because C will resize the array.
   > C arrays do **not** resize. The size is fixed at declaration.
 

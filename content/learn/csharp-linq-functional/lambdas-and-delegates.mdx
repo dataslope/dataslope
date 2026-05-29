@@ -267,7 +267,7 @@ recompiling. That power comes from treating functions as values.
 - \`Func<int, bool>\` can only be created from a method, while \`Expression<Func<int, bool>>\` can be created from a lambda.
   > Both can be created from a lambda; the *compiler* decides which target type to produce based on the variable's declared type.
 - [o] \`Func<int, bool>\` compiles to executable code that can be invoked directly; \`Expression<Func<int, bool>>\` compiles to a data structure that describes the lambda and can be inspected or translated by a LINQ provider.
-  > Correct. The same lambda \`x => x > 30\` becomes a callable delegate when assigned to \`Func<int, bool>\`, and an inspectable tree when assigned to \`Expression<Func<int, bool>>\`. Providers like EF use the latter to translate to SQL.
+  > The same lambda \`x => x > 30\` becomes a callable delegate when assigned to \`Func<int, bool>\`, and an inspectable tree when assigned to \`Expression<Func<int, bool>>\`. Providers like EF use the latter to translate to SQL.
 - \`Expression<Func<int, bool>>\` is the async version of \`Func<int, bool>\`.
   > Async has nothing to do with expression trees; there is no asynchronous variant of either type implied by these names.
 

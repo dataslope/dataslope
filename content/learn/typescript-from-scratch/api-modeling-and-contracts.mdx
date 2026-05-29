@@ -461,7 +461,7 @@ The compiler ensures you check `resp.type` before accessing `results`. If you ad
 - Reduces code duplication
   > That's a benefit, but not the main one. The key is *synchronization*.
 - [o] Ensures both sides agree on the contract at compile time
-  > Correct. If the server changes a type, the client gets a compile error immediately. The contract is enforced by the compiler.
+  > If the server changes a type, the client gets a compile error immediately. The contract is enforced by the compiler.
 - Improves runtime performance
   > Types are erased at runtime; there's no performance impact.
 
@@ -486,7 +486,7 @@ What must the caller do to access \`data\`?
 - Check \`data !== undefined\`
   > The type system guarantees \`data\` is present when \`status === "ok"\`, but you still need to narrow.
 - [o] Check \`status === "ok"\` to narrow the discriminated union
-  > Correct. Once you check \`status\`, TypeScript narrows to the \`ok\` branch, where \`data\` is guaranteed.
+  > Once you check \`status\`, TypeScript narrows to the \`ok\` branch, where \`data\` is guaranteed.
 - Cast \`response.data as User\`
   > Casting is unsafe and defeats the purpose of the discriminated union.
 

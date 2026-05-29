@@ -277,7 +277,7 @@ public static class MathCore
 - \`static int RollDie() => new Random().Next(1, 7);\`
   > Not pure — it reads from a random number generator (hidden state), so two calls with no arguments can give different results.
 - [o] \`static int Triple(int x) => x * 3;\`
-  > Correct. Output depends only on the input, and the method has no side effects.
+  > Output depends only on the input, and the method has no side effects.
 - \`static int LogAndReturn(int x) { System.Console.WriteLine(x); return x; }\`
   > Not pure — it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
 - \`static void Add(System.Collections.Generic.List<int> xs, int x) => xs.Add(x);\`

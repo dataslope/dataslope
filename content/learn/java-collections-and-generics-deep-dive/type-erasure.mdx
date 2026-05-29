@@ -255,7 +255,7 @@ and many reflective APIs.
 - \`false\` — they are different parameterized types
   > That would be true if Java kept type parameters at runtime, but it doesn't.
 - [o] \`true\` — both share the same erasure (\`ArrayList\`)
-  > Correct. Generics are erased; the runtime class is the same regardless of the type parameter.
+  > Generics are erased; the runtime class is the same regardless of the type parameter.
 - A compile error
   > It compiles.
 - \`null\`
@@ -268,7 +268,7 @@ and many reflective APIs.
 - Arrays don't allow size 10
   > Arrays allow any non-negative size.
 - [o] Arrays carry their element type at runtime, but \`T\` is erased — the JVM can't enforce the element type, so the language forbids the construction
-  > Correct. Use \`List<T>\` (or a \`Class<T>\` token plus \`Array.newInstance\`) instead.
+  > Use \`List<T>\` (or a \`Class<T>\` token plus \`Array.newInstance\`) instead.
 - It would always throw \`ClassCastException\`
   > It would create *unsafe* arrays, which is precisely why it's banned at compile time.
 - The JVM only supports primitive arrays
@@ -283,7 +283,7 @@ and many reflective APIs.
 - Use \`instanceof List<X>\` checks
   > Such checks are forbidden by the language.
 - [o] Accept a \`Class<T>\` token as a constructor or method parameter and use it for \`isInstance\`, \`cast\`, or array creation
-  > Correct. This is the pattern used by \`Collections.checkedList\`, many reflective APIs, and most JSON libraries.
+  > This is the pattern used by \`Collections.checkedList\`, many reflective APIs, and most JSON libraries.
 - Switch to a different language
   > Unnecessary; the \`Class<T>\` idiom handles essentially every case.`}
 />

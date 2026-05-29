@@ -332,7 +332,7 @@ public final class Leaderboard {
 - Always, just in case
   > Many types have no single meaningful order.
 - [o] When there is **one** obvious natural order that is consistent with \`equals\` and serves most callers
-  > Correct. Otherwise prefer a \`Comparator\`, which can have many flavors.
+  > Otherwise prefer a \`Comparator\`, which can have many flavors.
 - Only when the class will be stored in a \`TreeSet\`
   > That's one consumer; \`Comparator\` works there too.
 - Whenever the class has numeric fields
@@ -345,7 +345,7 @@ public final class Leaderboard {
 - It is slower than \`Integer.compare\`
   > Performance is not the concern; correctness is.
 - [o] It can **overflow** when \`a\` and \`b\` are far apart in sign or magnitude, returning a wrong sign
-  > Correct. Always use \`Integer.compare(a, b)\` for \`int\` and \`Long.compare\` for \`long\`.
+  > Always use \`Integer.compare(a, b)\` for \`int\` and \`Long.compare\` for \`long\`.
 - It does not compile
   > It compiles.
 - It returns a value outside \`{-1, 0, 1}\`
@@ -358,7 +358,7 @@ public final class Leaderboard {
 - Sorts by \`b\` and then by \`a\`
   > Reversed.
 - [o] Sorts by \`a\` ascending; uses \`b\` to break ties
-  > Correct. \`thenComparing\` only kicks in when the primary comparison returns 0.
+  > \`thenComparing\` only kicks in when the primary comparison returns 0.
 - Sums the two comparison results
   > Comparators are not added.
 - Sorts only by \`a\`

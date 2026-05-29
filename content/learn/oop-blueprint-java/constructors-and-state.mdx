@@ -330,7 +330,7 @@ bad: invalid email
 - To call all the other methods in the class
   > Constructors typically don't call public methods at all.
 - [o] To bring an object into existence in a valid state, enforcing its invariants
-  > Correct. After a constructor returns, every other method should be able to assume the object is valid.
+  > After a constructor returns, every other method should be able to assume the object is valid.
 - To print a debug message describing the new object
   > Side effects like logging don't belong in constructors.
 - To allocate memory for the object
@@ -345,7 +345,7 @@ bad: invalid email
 - It runs the two-argument constructor with \`null\` and \`0\`
   > Java does not invent argument values.
 - [o] It fails to compile — there is no matching constructor
-  > Correct. Once you declare any constructor, the implicit no-arg one disappears.
+  > Once you declare any constructor, the implicit no-arg one disappears.
 - It produces a \`NullPointerException\` at runtime
   > The problem is detected at compile time, not runtime.`}
 />
@@ -358,7 +358,7 @@ bad: invalid email
 - The JVM can compile them down to machine code more easily
   > That's not the design motivation.
 - [o] They cannot accidentally change underneath you, so they can be passed and shared freely without surprising mutations
-  > Correct. Immutability eliminates an entire class of bug.
+  > Immutability eliminates an entire class of bug.
 - They automatically run faster than mutable objects
   > Performance is not guaranteed; safety is the real benefit.`}
 />

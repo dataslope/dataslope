@@ -176,7 +176,7 @@ Rust `Iterator` pipeline.
 - Anonymous types
   > Anonymous types let you build ad-hoc shapes mid-pipeline, but they have nothing to do with how \`Where\` attaches to \`IEnumerable<T>\`.
 - [o] Extension methods
-  > Correct. Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
+  > Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
 - Expression trees
   > Expression trees are what let LINQ to Providers translate lambdas into SQL — they are not how \`Where\` is attached to a collection.
 

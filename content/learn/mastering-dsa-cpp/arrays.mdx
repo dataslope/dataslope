@@ -329,7 +329,7 @@ int main() {
   markdown={`Why does iterating through a \`std::vector<int>\` often run faster than iterating through a linked list with the same number of integers?
 
 - [o] The vector stores elements contiguously, which improves cache locality.
-  > Correct. Nearby values are likely loaded into CPU cache together.
+  > Nearby values are likely loaded into CPU cache together.
 - A vector changes every operation to O(log n).
   > Vector iteration is O(n), but constants are often smaller.
 - A linked list cannot store integers.
@@ -344,7 +344,7 @@ int main() {
 - \`std::list\` has O(1) random access.
   > It does not. Random access in a list requires walking nodes.
 - [o] \`std::vector\` has compact storage, O(1) indexing, and excellent iteration performance.
-  > Correct. These properties make it the default sequence container.
+  > These properties make it the default sequence container.
 - \`std::vector\` can only store primitive types.
   > It can store objects too.
 - \`std::list\` is always asymptotically slower for every operation.
@@ -359,7 +359,7 @@ int main() {
 - \`v[i]\` checks bounds and throws if invalid.
   > That describes \`at\`, not \`operator[]\`.
 - [o] \`v.at(i)\` performs bounds checking and throws an exception when \`i\` is invalid.
-  > Correct. \`operator[]\` has undefined behavior for an invalid index.
+  > \`operator[]\` has undefined behavior for an invalid index.
 - \`v.at(i)\` inserts a new element if \`i\` is too large.
   > It does not insert; it reports an error.`}
 />

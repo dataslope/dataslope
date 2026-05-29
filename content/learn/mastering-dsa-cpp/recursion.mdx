@@ -247,7 +247,7 @@ int main() {
 - It makes the function run in O(1) time.
   > A base case does not guarantee constant time; it only defines when recursion stops.
 - [o] It stops recursive calls from continuing forever.
-  > Correct. Without a reachable base case, calls keep stacking until failure.
+  > Without a reachable base case, calls keep stacking until failure.
 - It stores all previous answers automatically.
   > That describes memoization, not a base case.
 - It lets C++ allocate variables on the heap.
@@ -264,7 +264,7 @@ A base case is the smallest input that can be answered directly.`}
 - O(n log n)
   > The branching recurrence is larger than this.
 - [o] Exponential, often written as O(2^n)
-  > Correct. Each call branches and repeats work.
+  > Each call branches and repeats work.
 - O(log n)
   > O(log n) fits fast exponentiation, not naive Fibonacci.
 
@@ -279,7 +279,7 @@ Repeated subproblems are what dynamic programming fixes.`}
 - A hash table
   > Hash tables help memoization but are not required for recursion itself.
 - [o] The call stack
-  > Correct. Each active call has its own stack frame.
+  > Each active call has its own stack frame.
 - A sorted vector
   > Sorting is unrelated to tracking recursive calls.
 

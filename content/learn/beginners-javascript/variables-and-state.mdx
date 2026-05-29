@@ -357,7 +357,7 @@ console.log({ balance, deposits, withdrawals });
 - Always use \`var\` for backwards compatibility
 - Use \`let\` for everything to keep things flexible
 - [o] Use \`const\` by default; switch to \`let\` only when you actually need to reassign; avoid \`var\`
-  > Correct. \`const\` documents that the binding won't change, which makes code easier to read and reason about. \`let\` is reserved for the cases where you really do reassign. \`var\` is kept only for legacy reasons.
+  > \`const\` documents that the binding won't change, which makes code easier to read and reason about. \`let\` is reserved for the cases where you really do reassign. \`var\` is kept only for legacy reasons.
 - Use \`const\` for primitives and \`let\` for objects
 
 The right rule has nothing to do with the value's type — it's about whether you intend to reassign the variable.`}

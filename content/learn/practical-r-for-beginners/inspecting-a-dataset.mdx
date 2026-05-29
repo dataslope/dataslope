@@ -214,7 +214,7 @@ report("NAs per column", colSums(is.na(iris)))
 - \`summary()\`
 - \`head()\`
 - [o] \`str()\`
-  > Correct! \`str()\` is the structural summary — types and a sample, in one screen.
+  > \`str()\` is the structural summary — types and a sample, in one screen.
 - \`dim()\``}
 />
 
@@ -224,7 +224,7 @@ report("NAs per column", colSums(is.na(iris)))
 - It's required by R; the language won't compute without it.
   > Not true — R will happily compute on a dataset you've never looked at.
 - [o] Because real datasets contain surprises (missing values, wrong types, implausible values) that can silently corrupt every downstream analysis.
-  > Correct! Five minutes of inspection saves hours of debugging later.
+  > Five minutes of inspection saves hours of debugging later.
 - Because \`summary()\` is the only way to compute means.
 - Because it's a tradition.`}
 />
@@ -235,7 +235,7 @@ report("NAs per column", colSums(is.na(iris)))
 - The \`mean\` function is broken.
 - The dataset has fewer than 30 rows.
 - [o] The \`Ozone\` column contains \`NA\` values, and \`mean()\` returns \`NA\` unless told otherwise.
-  > Correct! Fix it with \`mean(airquality$Ozone, na.rm = TRUE)\`.
+  > Fix it with \`mean(airquality$Ozone, na.rm = TRUE)\`.
 - R refuses to compute means on built-in datasets.`}
 />
 

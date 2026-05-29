@@ -339,7 +339,7 @@ public final class Roster {
 - They are the same
   > They are not.
 - [o] \`List.of\` is truly immutable (no backing to mutate); \`Collections.unmodifiableList\` is an unmodifiable **view** over a list whose owner can still mutate it
-  > Correct. For a snapshot that nobody can change, use \`List.copyOf\` or \`List.of\`.
+  > For a snapshot that nobody can change, use \`List.copyOf\` or \`List.of\`.
 - \`Collections.unmodifiableList\` is faster
   > It's a thin wrapper, but mutability semantics are the issue.
 - \`List.of\` allows nulls
@@ -352,7 +352,7 @@ public final class Roster {
 - To save memory
   > It actually uses more.
 - [o] Because otherwise the caller still holds a reference to the same list and can mutate "your" state after construction
-  > Correct. Defensive copy at the boundary is what protects your invariants.
+  > Defensive copy at the boundary is what protects your invariants.
 - Because Java requires it
   > It does not.
 - Because lists are not serializable otherwise
@@ -367,7 +367,7 @@ public final class Roster {
 - It returns \`{a, b, a}\`
   > Sets cannot contain duplicates.
 - [o] It throws \`IllegalArgumentException\` at construction
-  > Correct. \`Set.of\` and \`Map.of\` are strict about duplicates.
+  > \`Set.of\` and \`Map.of\` are strict about duplicates.
 - It throws \`NullPointerException\`
   > That's for null elements/keys/values.`}
 />

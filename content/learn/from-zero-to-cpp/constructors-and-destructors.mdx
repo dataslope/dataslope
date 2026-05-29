@@ -223,7 +223,7 @@ int main() {
 - Whenever the compiler decides.
   > It runs deterministically.
 - [o] At the closing brace of the scope in which the object was created, in reverse order of construction.
-  > Correct. This is what makes RAII reliable.
+  > This is what makes RAII reliable.
 - When you explicitly call \`delete\` on it.
   > \`delete\` is only for objects created with \`new\`.`}
 />
@@ -236,7 +236,6 @@ int main() {
 - The body cannot reference members.
   > It can.
 - [o] The initializer list constructs each field directly with the right value, instead of default-constructing it first and then overwriting it. This is more efficient and required for \`const\` and reference members.
-  > Correct.
 - It causes the constructor to run twice.
   > It does not.`}
 />

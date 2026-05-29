@@ -349,7 +349,7 @@ public class RecentHistory<E> {
 - Appending at the end
   > Both are \`O(1)\` amortized at the end.
 - [o] \`get(i)\` for arbitrary \`i\`
-  > Correct. An \`ArrayList\` indexes by arithmetic; a \`LinkedList\` must walk.
+  > An \`ArrayList\` indexes by arithmetic; a \`LinkedList\` must walk.
 - \`contains(x)\`
   > Both are \`O(n)\` — they scan.
 - Removing the first element
@@ -362,7 +362,7 @@ public class RecentHistory<E> {
 - The JVM secretly stores \`LinkedList\` nodes contiguously
   > It does not.
 - [o] Contiguous array memory is far more cache-friendly than scattered linked-list nodes, so the CPU spends much less time waiting on memory
-  > Correct. Big-O hides the constant factors that cache misses dominate in modern hardware.
+  > Big-O hides the constant factors that cache misses dominate in modern hardware.
 - \`LinkedList\` was deprecated in Java 11
   > It is not deprecated.
 - \`ArrayList\` is implemented in native code
@@ -377,7 +377,7 @@ public class RecentHistory<E> {
 - A primitive \`int[]\`
   > It returns a \`List\`.
 - [o] A live *view* of the original list; mutations affect the backing list and structural changes to the backing list invalidate the view
-  > Correct. This is both powerful and a frequent source of surprise.
+  > This is both powerful and a frequent source of surprise.
 - An immutable list snapshot
   > Sublists are mutable views, not immutable snapshots.`}
 />

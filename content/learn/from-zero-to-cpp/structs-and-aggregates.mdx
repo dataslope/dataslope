@@ -234,7 +234,7 @@ int main() {
 - \`class\` is allocated on the heap, \`struct\` on the stack.
   > Storage location is independent of \`struct\` vs \`class\`.
 - [o] The default member access: \`struct\` members are public by default, \`class\` members are private by default.
-  > Correct. Conventions add more meaning, but the language only distinguishes default access.
+  > Conventions add more meaning, but the language only distinguishes default access.
 - \`struct\` does not support inheritance.
   > It does.`}
 />
@@ -245,7 +245,7 @@ int main() {
 - It allocates memory on the heap.
   > It does not; \`p\` is a local on the stack.
 - [o] The fields hold whatever bytes were already in that memory, so reading them is undefined behavior until you assign meaningful values.
-  > Correct. Prefer \`Point p{};\` or aggregate initialization with explicit values.
+  > Prefer \`Point p{};\` or aggregate initialization with explicit values.
 - It is forbidden by the C++ standard.
   > It is allowed; that's why it's a footgun.
 - It causes the compiler to emit a warning.

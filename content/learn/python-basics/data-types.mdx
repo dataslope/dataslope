@@ -306,7 +306,7 @@ print(safe_int("", -1))
 - \`dict\`
   > Dicts are mutable: \`d["key"] = value\` changes them in place.
 - [o] \`tuple\`
-  > Correct. Tuples are immutable sequences—you can't change their contents after creation.
+  > Tuples are immutable sequences—you can't change their contents after creation.
 - \`set\`
   > Sets are mutable: \`s.add(x)\` changes them in place.`}
 />
@@ -317,7 +317,7 @@ print(safe_int("", -1))
 - \`False\`
   > \`bool\` is a subclass of \`int\`, so \`isinstance\` returns \`True\`.
 - [o] \`True\`
-  > Correct. \`bool\` inherits from \`int\`, so \`isinstance(True, int)\` is \`True\`.
+  > \`bool\` inherits from \`int\`, so \`isinstance(True, int)\` is \`True\`.
 - A \`TypeError\`
   > \`isinstance\` is perfectly legal with \`int\` and \`bool\`.
 - \`None\`
@@ -335,7 +335,7 @@ x = int(x)
 - \`str\`
   > The second line rebinds \`x\` to an integer.
 - [o] \`int\`
-  > Correct. \`int("42")\` converts the string to the integer \`42\`, and the assignment rebinds \`x\` to that integer.
+  > \`int("42")\` converts the string to the integer \`42\`, and the assignment rebinds \`x\` to that integer.
 - \`float\`
   > We called \`int(x)\`, not \`float(x)\`.
 - A \`TypeError\`

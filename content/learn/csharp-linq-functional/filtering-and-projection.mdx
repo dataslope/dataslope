@@ -287,7 +287,7 @@ public static class PeopleFilter
 - The \`Select\` lambda runs for every element of \`nums\`, regardless of the filter.
   > Pipelined operators only invoke later steps for elements that survive earlier steps; \`Select\` does not run for elements that \`Where\` rejected.
 - [o] \`result\` is a deferred \`IEnumerable<int>\` — neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
-  > Correct. LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
+  > LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
 - \`Where\` and \`Select\` can only be used on \`List<T>\` and arrays.
   > They are extension methods on \`IEnumerable<T>\`, which is implemented by virtually every collection in .NET and by hand-written iterators.
 

@@ -296,7 +296,7 @@ implementation to the call from `main`.
   markdown={`Which stage of the pipeline expands \`#include\` directives?
 
 - [o] The preprocessor.
-  > Correct. The preprocessor pastes the entire contents of the included file before the compiler sees anything.
+  > The preprocessor pastes the entire contents of the included file before the compiler sees anything.
 - The compiler.
   > By the time the compiler runs, includes have already been expanded.
 - The assembler.
@@ -313,7 +313,7 @@ implementation to the call from `main`.
 - The compiler.
   > The compiler accepts a declaration of \`foo\`; it does not need a body.
 - [o] The linker.
-  > Correct. The linker tried to match a *use* of \`foo\` to a *definition* and could not find one.
+  > The linker tried to match a *use* of \`foo\` to a *definition* and could not find one.
 - The operating system at runtime.
   > By the time the OS runs the program, all references must already be resolved.`}
 />
@@ -326,7 +326,7 @@ implementation to the call from `main`.
 - Because compilers cannot read \`.cpp\` files.
   > Compilers absolutely can read \`.cpp\` files.
 - [o] To obey the One-Definition Rule: many \`.cpp\` files can share the same *declarations* (via \`#include\`) but the function must be *defined* in exactly one place.
-  > Correct. Putting definitions in headers would cause linker errors when the header is included by more than one source file.
+  > Putting definitions in headers would cause linker errors when the header is included by more than one source file.
 - Because headers run faster than source files.
   > Headers and source files do not "run"; they are just compiled.`}
 />
@@ -339,7 +339,7 @@ implementation to the call from `main`.
 - A source file with macros expanded.
   > That is the output of the preprocessor.
 - [o] An object file containing machine code plus tables of defined and required symbols.
-  > Correct. Object files are the puzzle pieces the linker assembles.
+  > Object files are the puzzle pieces the linker assembles.
 - An interpreter bytecode file.
   > C++ is not interpreted; it produces native machine code.`}
 />

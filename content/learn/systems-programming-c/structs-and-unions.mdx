@@ -542,7 +542,7 @@ int main(void) {
 - The compiler inserts random bytes for security.
   > Padding is for alignment, not for security.
 - [o] The compiler inserts padding so each member sits at a properly aligned offset and so arrays of the struct keep their members aligned.
-  > Correct. Reordering fields by descending alignment usually shrinks the struct.
+  > Reordering fields by descending alignment usually shrinks the struct.
 - The struct must always be a multiple of 12 bytes by language rule.
   > There is no such rule.
 - \`char\` is actually 4 bytes on most platforms.
@@ -557,7 +557,7 @@ int main(void) {
 - The union always uses the sum of its members' sizes.
   > A union uses the size of its *largest* member.
 - [o] All members share the same storage; the union holds at most one of them at a time, and its size is the size of the largest member (plus padding).
-  > Correct. Writing one member overwrites the others.
+  > Writing one member overwrites the others.
 - Unions are always initialized to zero on declaration.
   > Initialization rules are the same as for any other variable.`}
 />
@@ -570,7 +570,7 @@ int main(void) {
 - A nested struct.
   > Nested structs do not change allocation count.
 - [o] A flexible array member declared as the last field, e.g. \`char data[];\`, allocated via \`malloc(sizeof *s + n)\`.
-  > Correct. One allocation holds the header and the payload contiguously.
+  > One allocation holds the header and the payload contiguously.
 - A bitfield.
   > Bitfields pack small integers, not variable-length data.`}
 />

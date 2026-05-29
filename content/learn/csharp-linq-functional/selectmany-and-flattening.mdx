@@ -293,7 +293,7 @@ public static class Reports
 - Doubling every element of an \`int[]\`.
   > That's a one-to-one transformation, so \`Select\` is the right operator. No nesting is involved.
 - [o] Producing a flat list of every tag across every blog post in a list of posts.
-  > Correct. Each post has *many* tags, and you want one flat sequence. That's exactly the flattening that \`SelectMany\` performs.
+  > Each post has *many* tags, and you want one flat sequence. That's exactly the flattening that \`SelectMany\` performs.
 - Filtering a list of orders to only those with \`Total > 100\`.
   > That's a filter, not a flattening — \`Where\` is the right operator.
 - Counting how many items are in a list.

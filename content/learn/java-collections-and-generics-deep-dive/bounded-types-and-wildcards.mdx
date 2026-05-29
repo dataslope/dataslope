@@ -402,7 +402,7 @@ public class Bag<T> {
 - Because \`Dog\` and \`Animal\` are different classes
   > They are — but that's true of subclass relationships generally.
 - [o] Because if it were, you could add a \`Cat\` to a \`List<Dog>\` via the wider reference, breaking type safety
-  > Correct. Java keeps generics invariant precisely to prevent that smuggling.
+  > Java keeps generics invariant precisely to prevent that smuggling.
 - Because Java doesn't support polymorphism for collections
   > It does support polymorphism — through wildcards.
 - Because \`Animal\` is abstract
@@ -415,7 +415,7 @@ public class Bag<T> {
 - "Public, Encapsulated, Composed, Shared" — for OO design
   > Made-up; PECS is about variance.
 - [o] "Producer Extends, Consumer Super" — use \`? extends T\` for parameters you only read from, \`? super T\` for parameters you only write into
-  > Correct. PECS is the standard mnemonic for choosing wildcard variance.
+  > PECS is the standard mnemonic for choosing wildcard variance.
 - "Performance, Encapsulation, Cohesion, Safety"
   > Made-up.
 - "Parameter Extends, Class Super" — applied to class declarations
@@ -428,7 +428,7 @@ public class Bag<T> {
 - It is forbidden by the compiler
   > It compiles.
 - [o] It pushes "I don't know the exact element type" onto every caller, while a concrete return type like \`List<Integer>\` is just as easy to produce
-  > Correct. Wildcards belong on inputs (where you want flexibility); outputs should be specific.
+  > Wildcards belong on inputs (where you want flexibility); outputs should be specific.
 - It causes runtime casts to fail
   > It does not cause runtime cast failures.
 - It is slower than \`List<Integer>\` at runtime

@@ -463,7 +463,7 @@ if (JSON.stringify(updates) !== '{"age":29}') throw new Error("updates was mutat
 - It creates a deep clone of \`base\` and \`updates\`
 - It throws an error because objects can't be spread
 - [o] It creates a new object combining the properties of \`base\` and \`updates\`. Where both objects have the same key, the later one (\`updates\`) wins.
-  > Correct. Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow* — nested objects and arrays are still shared by reference.
+  > Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow* — nested objects and arrays are still shared by reference.
 - It modifies \`base\` in place by adding the properties of \`updates\`
 
 This pattern is the foundation of immutable-update code style: produce new objects instead of mutating existing ones.`}

@@ -368,7 +368,7 @@ ada / 36
 - In the class header
   > That introduces type parameters scoped to the entire class, not just one method.
 - [o] Immediately before the return type, e.g. \`public static <T> T identity(T x)\`
-  > Correct. A method-scoped type parameter list goes right before the return type.
+  > A method-scoped type parameter list goes right before the return type.
 - In the calling code only
   > The declaration must appear on the method itself.`}
 />
@@ -379,7 +379,7 @@ ada / 36
 - Call any method of \`Object\` on \`T\`
   > Both forms allow that — every type is an \`Object\`.
 - [o] Call methods defined on \`Number\` (such as \`intValue()\`, \`doubleValue()\`) on any value of type \`T\`
-  > Correct. The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.
+  > The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.
 - Compare \`T\` values with \`<\` and \`>\`
   > Java does not overload \`<\` for objects, regardless of generics.
 - Construct new instances of \`T\`
@@ -392,7 +392,7 @@ ada / 36
 - It uses less memory
   > Memory use is similar.
 - [o] It composes a \`List\` instead of extending \`Vector\`, so its public API contains only the stack operations — not random list methods
-  > Correct. Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.
+  > Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.
 - It is faster on every operation
   > Performance is comparable; the win is API hygiene.
 - The legacy \`Stack\` does not compile in modern Java

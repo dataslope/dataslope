@@ -544,7 +544,7 @@ xs[1:4] = [9]
 - \`[1, 9, 4, 5]\`
   > Slice assignment replaces the entire slice, not item-by-item.
 - [o] \`[1, 9, 5]\`
-  > Correct. The slice \`xs[1:4]\` (items 2, 3, 4) is replaced by the single element \`9\`.
+  > The slice \`xs[1:4]\` (items 2, 3, 4) is replaced by the single element \`9\`.
 - \`[1, 9, 2, 3, 4, 5]\`
   > That would be insertion, not slice assignment.
 - A \`ValueError\` because lengths differ
@@ -557,7 +557,7 @@ xs[1:4] = [9]
 - \`sorted(xs)\`
   > \`sorted\` returns a new list and leaves \`xs\` untouched.
 - [o] \`xs.sort()\`
-  > Correct. \`.sort()\` modifies \`xs\` directly and returns \`None\`.
+  > \`.sort()\` modifies \`xs\` directly and returns \`None\`.
 - \`xs + [9]\`
   > \`+\` returns a new list; it does not modify either operand.
 - \`list(xs)\`
@@ -572,7 +572,7 @@ xs[1:4] = [9]
 - \`1\`
   > \`pop()\` with no argument removes the **last** item, not the first.
 - [o] \`3\`
-  > Correct. \`pop()\` removes and returns the last item.
+  > \`pop()\` removes and returns the last item.
 - \`None\`
   > \`pop\` returns the removed item, not \`None\`.`}
 />
@@ -583,7 +583,7 @@ xs[1:4] = [9]
 - O(1)
   > That would be true for a set or dict, not a list.
 - [o] O(n)
-  > Correct. Python scans the list from start to finish in the worst case.
+  > Python scans the list from start to finish in the worst case.
 - O(log n)
   > Lists are not sorted by default, so binary search does not apply.
 - O(n²)

@@ -315,7 +315,7 @@ public static class Filters
 - A "Multiplier" method that returns \`Func<int, int>\` for a given factor.
   > Returning a function makes a method higher-order, so this *is* higher-order.
 - [o] \`static int Add(int x, int y) => x + y;\`
-  > Correct. \`Add\` neither takes a function as a parameter nor returns one — it only operates on values. It is a perfectly ordinary first-order function.
+  > \`Add\` neither takes a function as a parameter nor returns one — it only operates on values. It is a perfectly ordinary first-order function.
 
 A higher-order function must either accept a function as an argument
 or return a function. Plain functions over plain values (like \`Add\`)

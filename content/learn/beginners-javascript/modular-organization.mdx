@@ -494,7 +494,7 @@ if (!threw) throw new Error("must throw for negative amount");`,
 - Smaller exports make the program run faster
 - Files with fewer exports use less memory
 - [o] Anything you export becomes a commitment — callers can rely on it, so the more you expose, the less freedom you have to change the internals later
-  > Correct. Module exports define a *contract*. Once other code starts using \`pad\` or \`SYMBOLS\`, renaming or removing them risks breaking callers. Keeping internals private leaves you free to refactor without breaking anyone, which is one of the biggest long-term wins of good modular design.
+  > Module exports define a *contract*. Once other code starts using \`pad\` or \`SYMBOLS\`, renaming or removing them risks breaking callers. Keeping internals private leaves you free to refactor without breaking anyone, which is one of the biggest long-term wins of good modular design.
 - Smaller exports look nicer in editors
 
 Modules are about *information hiding*. The less you expose, the easier the code is to evolve.`}

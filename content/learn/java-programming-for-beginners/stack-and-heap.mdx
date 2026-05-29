@@ -272,7 +272,6 @@ The fix: every recursion must reach a base case.
 - All objects the method has ever created
   > Objects live on the heap, not in stack frames.
 - [o] The method's parameters and local variables, including primitives by value and references that point to heap objects
-  > Correct.
 - A copy of every object passed to the method
   > Java does not deep-copy objects on call; it copies the reference.
 - The bytecode of the method
@@ -287,7 +286,7 @@ The fix: every recursion must reach a base case.
 - Zero — Java doesn't allocate a list yet
   > One was already allocated when \`a\` was created.
 - [o] One — \`a\` and \`b\` are two references pointing to the *same* list
-  > Correct. That's aliasing.
+  > That's aliasing.
 - One, but \`b\` is an immutable copy
   > It's not a copy at all.`}
 />
@@ -300,7 +299,6 @@ The fix: every recursion must reach a base case.
 - The original Order is silently destroyed
   > Other references may still hold it.
 - [o] Nothing — Java is pass-by-value; reassigning the parameter only changes the local reference inside the method, not the caller's variable
-  > Correct.
 - A compile error
   > It compiles fine.`}
 />

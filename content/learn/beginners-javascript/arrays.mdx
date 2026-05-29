@@ -457,7 +457,7 @@ if (JSON.stringify(original) !== "[1,2,3,4,5]") throw new Error("original array 
 
 - \`[1, 2, 3]\` — \`a\` is independent of \`b\`
 - [o] \`[1, 2, 3, 99]\` — \`a\` and \`b\` reference the *same* array, so changes through one are visible through the other
-  > Correct. Arrays (and all objects) in JavaScript are passed by reference. Assigning \`b = a\` makes \`b\` refer to the same array, not a copy. To get a real copy, use \`[...a]\` or \`a.slice()\`.
+  > Arrays (and all objects) in JavaScript are passed by reference. Assigning \`b = a\` makes \`b\` refer to the same array, not a copy. To get a real copy, use \`[...a]\` or \`a.slice()\`.
 - \`undefined\` — pushing through \`b\` clears \`a\`
 - A \`TypeError\` is thrown
 

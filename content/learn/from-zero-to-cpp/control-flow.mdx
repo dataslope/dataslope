@@ -457,7 +457,7 @@ int main() {
 - They are interchangeable.
   > They are very different.
 - [o] \`==\` compares two values; \`=\` assigns the right-hand side to the left-hand side.
-  > Correct. \`if (x = 5)\` is almost certainly a bug.
+  > \`if (x = 5)\` is almost certainly a bug.
 - \`=\` compares; \`==\` assigns.
   > It is the other way around.
 - Both compare values, but \`==\` is faster.
@@ -470,7 +470,7 @@ int main() {
 - For backwards compatibility with Fortran.
   > That is not the reason.
 - [o] So the right-hand side is only evaluated when needed, which lets you write safe guards like \`p != nullptr && p->value > 0\`.
-  > Correct. Short-circuiting is essential for safe pointer access.
+  > Short-circuiting is essential for safe pointer access.
 - To make code run faster on multi-core CPUs.
   > Short-circuiting is unrelated to multi-core execution.
 - It is a quirk inherited from C with no real benefit.
@@ -485,7 +485,7 @@ int main() {
 - The case threw an exception that fell through to a handler.
   > \`switch\` is unrelated to exceptions.
 - [o] Without \`break\`, execution continues into the next case's body, running its code as well.
-  > Correct. Fall-through is occasionally useful but usually a bug; modern compilers warn about it.
+  > Fall-through is occasionally useful but usually a bug; modern compilers warn about it.
 - The compiler emitted a warning that the user can ignore.
   > Fall-through is a runtime behavior, not just a warning.`}
 />
@@ -498,7 +498,7 @@ int main() {
 - The current file.
   > Definitely not.
 - [o] Only inside the loop header and body; \`i\` ceases to exist after the loop ends.
-  > Correct. This is exactly the smallest-scope principle from the previous chapter.
+  > This is exactly the smallest-scope principle from the previous chapter.
 - All functions called from inside the loop.
   > A called function cannot see the caller's local variables.`}
 />

@@ -295,7 +295,7 @@ void say_goodbye(const char *name) {
   markdown={`Which stage of the C toolchain replaces \`#include\` directives with the contents of header files?
 
 - [o] The preprocessor.
-  > Correct! \`#include\` is handled before the compiler proper ever sees your code.
+  > \`#include\` is handled before the compiler proper ever sees your code.
 - The compiler.
 - The assembler.
 - The linker.
@@ -310,7 +310,7 @@ The preprocessor is a text-only stage. It handles \`#include\`, \`#define\`, con
 - A compiler error about an unknown function.
   > The compiler is happy: it has the declaration from \`util.h\`. The problem appears later.
 - [o] A linker error: \`undefined reference to \`compute'\`.
-  > Correct! The header gave the compiler the declaration, so the call type-checks. But the linker has no \`.o\` file containing the definition of \`compute\`, so it can't resolve the symbol.
+  > The header gave the compiler the declaration, so the call type-checks. But the linker has no \`.o\` file containing the definition of \`compute\`, so it can't resolve the symbol.
 - A runtime error when \`compute()\` is first called.
 
 Remember: declarations satisfy the compiler; *definitions* are what the linker needs.`}

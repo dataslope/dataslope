@@ -230,7 +230,6 @@ But this table covers an *astonishing* fraction of day-to-day code.
 - The algorithm uses the index parity
   > It does not.
 - [o] Each step compares the target to the middle element and then *discards an entire half* of the remaining range based on the ordering; without an ordering, you cannot rule out a half
-  > Correct.
 - Java's binary search throws an exception on unsorted input
   > Behavior is *undefined*, but it doesn't necessarily throw — it can simply return wrong answers.`}
 />
@@ -243,7 +242,6 @@ But this table covers an *astonishing* fraction of day-to-day code.
 - The next-to-last to come out
   > No — it's the very next one.
 - [o] The first one to come out when you pop
-  > Correct.
 - Sorted to the bottom
   > Stacks do not sort.`}
 />
@@ -256,7 +254,6 @@ But this table covers an *astonishing* fraction of day-to-day code.
 - Sort the list first and keep using \`contains\`
   > \`contains\` does not benefit from sorting.
 - [o] Replace the ArrayList with a HashSet so each \`contains\` call runs in roughly constant time
-  > Correct.
 - Re-create the list with a smaller capacity
   > Does not change \`contains\`'s linear cost.`}
 />

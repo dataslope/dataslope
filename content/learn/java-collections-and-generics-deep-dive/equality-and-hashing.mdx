@@ -390,7 +390,7 @@ public class UniquenessTracker {
 - All collections stop working
   > Most things still work; the bug is specific to hash-based collections.
 - [o] Hash-based collections (\`HashSet\`, \`HashMap\`) can fail to find equal objects because they look in the wrong bucket
-  > Correct. The lookup uses \`hashCode\` to choose a bucket, so unequal hashcodes for equal values mean the element is invisible to lookup.
+  > The lookup uses \`hashCode\` to choose a bucket, so unequal hashcodes for equal values mean the element is invisible to lookup.
 - \`equals\` calls go into infinite recursion
   > They don't.`}
 />
@@ -403,7 +403,7 @@ public class UniquenessTracker {
 - They double the memory cost
   > They don't.
 - [o] If a field that participates in \`hashCode\` changes while the object is a key, the entry becomes unreachable
-  > Correct. The map indexed it in a bucket computed from the old hash; after mutation, it looks in a different bucket and reports "not present."
+  > The map indexed it in a bucket computed from the old hash; after mutation, it looks in a different bucket and reports "not present."
 - \`HashMap\` deep-copies keys, so the cost is performance
   > \`HashMap\` does not deep-copy.`}
 />
@@ -416,7 +416,7 @@ public class UniquenessTracker {
 - Inherit them from \`Object\`
   > That gives identity equality, which is rarely what you want.
 - [o] Declare the class as a \`record\`
-  > Correct. Records automatically generate \`equals\`, \`hashCode\`, and \`toString\` from the components.
+  > Records automatically generate \`equals\`, \`hashCode\`, and \`toString\` from the components.
 - Implement \`Comparable\`
   > \`Comparable\` is about ordering, not value equality.`}
 />

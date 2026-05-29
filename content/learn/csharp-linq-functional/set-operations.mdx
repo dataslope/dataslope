@@ -327,7 +327,7 @@ public static class Roster
 - \`Union\` always produces a longer sequence than \`Concat\`.
   > The opposite is often true — \`Union\` deduplicates and can be shorter than \`Concat\`.
 - [o] \`Concat\` preserves every element including duplicates between the two sequences; \`Union\` deduplicates so each value appears at most once.
-  > Correct. \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
+  > \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
 - \`Concat\` requires both sequences to have the same element type; \`Union\` does not.
   > Both require compatible element types (typically the same type or a common base type).
 

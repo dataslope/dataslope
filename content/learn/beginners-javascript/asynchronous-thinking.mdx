@@ -455,7 +455,7 @@ runSequentially(tasks, (err, results) => {
 - Because it makes code faster on multi-core CPUs
 - Because the language standard requires it
 - [o] Because it lets the single thread stay busy on other work while waiting for slow operations, instead of blocking
-  > Correct. Async is about *concurrency*, not parallelism. While the host is doing something slow (timers, network, disk), the JS thread is free to handle other code. Without async, every slow operation would freeze the entire program — including, in a browser, the UI.
+  > Async is about *concurrency*, not parallelism. While the host is doing something slow (timers, network, disk), the JS thread is free to handle other code. Without async, every slow operation would freeze the entire program — including, in a browser, the UI.
 - Because asynchronous code is always easier to read
 
 JavaScript still runs one piece of code at a time — async simply lets it *choose* what to run instead of being stuck waiting.`}

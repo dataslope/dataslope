@@ -280,7 +280,7 @@ limitation (your dataset must fit).
 - A spreadsheet
 - A binary database table
 - [o] A sequence of bytes (typically interpreted as text) with rows separated by newlines and values separated by commas
-  > Correct. CSV is plain text. The "table-ness" is imposed by whatever reader (Excel, Pandas, etc.) interprets the bytes.
+  > CSV is plain text. The "table-ness" is imposed by whatever reader (Excel, Pandas, etc.) interprets the bytes.
 - A proprietary Pandas format
 
 This is why CSV files are portable across every OS, language, and tool.`}
@@ -316,7 +316,7 @@ Understanding column orientation explains why \`df["age"].mean()\` is fast and w
 - \`bool\`
 - \`int64\`
 - [o] \`object\` (Python strings)
-  > Correct. Pandas does not auto-recognize lowercase \`"true"\` / \`"false"\` as booleans (it has done so in some versions for \`True\`/\`False\`, but not reliably). You need to convert explicitly with \`df["col"].map({"true": True, "false": False})\` or \`astype("bool")\` after cleaning.
+  > Pandas does not auto-recognize lowercase \`"true"\` / \`"false"\` as booleans (it has done so in some versions for \`True\`/\`False\`, but not reliably). You need to convert explicitly with \`df["col"].map({"true": True, "false": False})\` or \`astype("bool")\` after cleaning.
 - \`category\`
 
 Booleans-as-strings are a common surprise; defensive type checking catches them.`}

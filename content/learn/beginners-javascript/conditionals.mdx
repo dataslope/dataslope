@@ -390,7 +390,7 @@ if (action("") !== "unknown signal") throw new Error("empty string should also b
 - Guard clauses run faster
 - Guard clauses use less memory
 - [o] Guard clauses keep the main logic at the top indent level, making the function easier to read and easier to extend
-  > Correct. Each guard clause handles an edge case and exits, so the "happy path" stays flat and obvious. Deeply nested \`if\` blocks hide the main logic inside a pyramid and make it painful to add new conditions later.
+  > Each guard clause handles an edge case and exits, so the "happy path" stays flat and obvious. Deeply nested \`if\` blocks hide the main logic inside a pyramid and make it painful to add new conditions later.
 - Guard clauses are the only way to return from a function
 
 Guard clauses are a style choice that consistently makes code more readable in practice, with no performance trade-off.`}

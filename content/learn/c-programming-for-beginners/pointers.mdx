@@ -330,7 +330,7 @@ What is the value of \`n\` afterwards?
 - 5
 - The address of \`n\`.
 - [o] 10
-  > Correct! \`*p = 10\` writes \`10\` into the memory location \`p\` points at, which is \`n\`'s memory.
+  > \`*p = 10\` writes \`10\` into the memory location \`p\` points at, which is \`n\`'s memory.
 - Undefined, because \`p\` was reassigned.
 
 \`p\` is just a sticky note with \`n\`'s address on it; \`*p = 10\` follows the sticky note to \`n\` and writes \`10\` there.`}
@@ -343,7 +343,7 @@ What is the value of \`n\` afterwards?
 - \`int *\`
 - \`void *\`
 - [o] \`double *\`
-  > Correct! The address-of operator yields a pointer whose target type is the same as the operand's type — so \`&x\` where \`x\` is a \`double\` is a \`double *\`.
+  > The address-of operator yields a pointer whose target type is the same as the operand's type — so \`&x\` where \`x\` is a \`double\` is a \`double *\`.
 
 The type of a pointer matters: a \`double *\` and an \`int *\` step through memory in different sized strides during pointer arithmetic, and reading or writing through them touches different numbers of bytes.`}
 />

@@ -334,7 +334,7 @@ export function apply(balance: number, e: Event): number {
 - It throws an error at runtime when an unhandled case occurs
   > Only as a secondary effect. The real value is at *compile* time.
 - [o] It causes a compile error if a new variant is added to the union and not handled, because the value would no longer be of type \`never\`
-  > Correct. The pattern turns "I forgot to handle this case" from a runtime surprise into a build-time error.
+  > The pattern turns "I forgot to handle this case" from a runtime surprise into a build-time error.
 - It improves runtime performance of the \`switch\`
   > No measurable effect.
 

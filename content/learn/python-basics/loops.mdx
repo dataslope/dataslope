@@ -457,7 +457,7 @@ for i in range(3):
 - \`0\\n1\\n2\`
   > \`continue\` skips the rest of the iteration, so 1 is never printed.
 - [o] \`0\\n2\`
-  > Correct. \`continue\` skips the \`print\` when \`i == 1\`, so only 0 and 2 print.
+  > \`continue\` skips the \`print\` when \`i == 1\`, so only 0 and 2 print.
 - \`0\\n1\`
   > The loop does not break; it continues to \`i == 2\`.
 - \`2\`
@@ -472,7 +472,7 @@ for i in range(3):
 - When the loop body raises an exception
   > No — exceptions skip the else clause.
 - [o] Only when the loop finishes without hitting \`break\`
-  > Correct. That is what makes it useful for search loops.
+  > That is what makes it useful for search loops.
 - Only when the iterable is empty
   > No — it runs after a **successful** completion, not an empty iterable.`}
 />
@@ -492,7 +492,7 @@ print(i)
 - \`3\`
   > \`i\` retains its last value after the loop exits.
 - [o] \`3\`
-  > Correct. The loop breaks when \`i == 3\`, and \`i\` retains that value.
+  > The loop breaks when \`i == 3\`, and \`i\` retains that value.
 - A \`NameError\`
   > \`i\` is still in scope after the loop.`}
 />
@@ -503,7 +503,7 @@ print(i)
 - \`(0, "a"), (1, "b"), (2, "c")\`
   > That would be the default \`start=0\`.
 - [o] \`(1, "a"), (2, "b"), (3, "c")\`
-  > Correct. \`start=1\` shifts the index to 1-based.
+  > \`start=1\` shifts the index to 1-based.
 - \`("a", 1), ("b", 2), ("c", 3)\`
   > The order is (index, value), not (value, index).
 - \`["a", "b", "c"]\`

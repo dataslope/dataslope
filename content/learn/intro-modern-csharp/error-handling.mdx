@@ -337,7 +337,7 @@ Console.WriteLine(SafeMath.SumNumbers(data));
 - Only when you want to crash the program
   > Exceptions are designed to be *caught*, not just to crash.
 - [o] When the failure is unusual or unexpected, and forcing every call site to check for it would be noisy
-  > Correct. Ordinary, expected failures should use return values like \`TryParse\`.
+  > Ordinary, expected failures should use return values like \`TryParse\`.
 - Whenever your method touches a file
   > Reaching for exceptions reflexively misses the real distinction.`}
 />
@@ -350,7 +350,7 @@ Console.WriteLine(SafeMath.SumNumbers(data));
 - The compiler removes it
   > It doesn't.
 - [o] It hides bugs by swallowing every exception, even ones you never anticipated
-  > Correct. The program continues with corrupt state and you have no idea anything went wrong.
+  > The program continues with corrupt state and you have no idea anything went wrong.
 - It uses too much memory
   > Memory isn't the issue.`}
 />

@@ -326,7 +326,7 @@ int multiply(int a, int b) {
 - It makes the variable read-only.
 - It makes the variable visible to all functions in the file.
 - [o] It gives the variable a single, persistent storage location that retains its value across calls to the function.
-  > Correct! \`static\` inside a function changes the variable's *lifetime* (whole program) and *initialization rules* (initialized once), but its *scope* is still that one function.
+  > \`static\` inside a function changes the variable's *lifetime* (whole program) and *initialization rules* (initialized once), but its *scope* is still that one function.
 - It causes the variable to be initialized every time the function is called.
 
 Compare two ideas: \`static\` *inside* a function gives a long lifetime + local scope. \`static\` *outside* any function (at file scope) restricts the linkage to the current file.`}
@@ -339,7 +339,7 @@ Compare two ideas: \`static\` *inside* a function gives a long lifetime + local 
   > Most compilers warn, but it's syntactically valid.
 - It would be slower than returning the value directly.
 - [o] The local variable's memory is reclaimed when the function returns, so the pointer is left pointing at memory that may be overwritten at any time.
-  > Correct! Local variables live on the stack. Once the function returns, that stack space is reused by the next call. Reading or writing through the returned pointer is undefined behavior.
+  > Local variables live on the stack. Once the function returns, that stack space is reused by the next call. Reading or writing through the returned pointer is undefined behavior.
 - C functions cannot return any kind of pointer.
 
 Functions can absolutely return pointers — to globals, to data on the heap (\`malloc\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}

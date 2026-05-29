@@ -344,7 +344,6 @@ careful."
 - The runtime checks types as the program runs
   > That's dynamic typing.
 - [o] The compiler knows the type of every variable and refuses to compile code that uses values in a way that doesn't match their type
-  > Correct.
 - C# uses no types at all
   > C# is one of the most strongly typed mainstream languages.`}
 />
@@ -365,7 +364,7 @@ What is in \`a\`?
 - \`[3]\`
   > The original items are still there.
 - [o] \`[1, 2, 3]\`
-  > Correct. \`a\` and \`b\` reference the *same* list on the heap.
+  > \`a\` and \`b\` reference the *same* list on the heap.
 - Compile error
   > It compiles fine.`}
 />
@@ -378,7 +377,7 @@ What is in \`a\`?
 - \`int.Parse(userInput)\` and ignore the result
   > It throws on bad input — your program will crash.
 - [o] \`int.TryParse(userInput, out int n)\` and handle the \`false\` case
-  > Correct. \`TryParse\` returns \`false\` instead of throwing, so you can react gracefully.
+  > \`TryParse\` returns \`false\` instead of throwing, so you can react gracefully.
 - Convert it to \`double\` first and then to \`int\`
   > Doesn't solve the "what if it's not a number?" problem.`}
 />

@@ -342,7 +342,7 @@ For columns with millions of rows and only a handful of distinct values, the sav
 - Restart your computer
 - Convert to float
 - [o] Pass \`dtype={"phone": "string"}\` to \`pd.read_csv\` so the values are read as strings from the start
-  > Correct. Once a leading-zero phone or ZIP code has been parsed as int, the leading zeros are gone. Force the string type at read time.
+  > Once a leading-zero phone or ZIP code has been parsed as int, the leading zeros are gone. Force the string type at read time.
 - Use \`.astype("int64")\` afterwards
 
 Specifying \`dtype\` at read time is much safer than trying to recover later.`}

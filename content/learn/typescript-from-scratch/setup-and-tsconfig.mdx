@@ -467,7 +467,7 @@ In the next section, we'll dive into the **core type system**: primitives, objec
 - \`noImplicitAny\`
 - \`esModuleInterop\`
 - [o] \`strictNullChecks\` (enabled by \`strict: true\`)
-  > Correct! \`strictNullChecks\` makes \`null\` and \`undefined\` separate types, so you must explicitly handle them. This eliminates the most common source of runtime errors in JavaScript: \`Cannot read property 'x' of null/undefined\`. It's enabled by \`"strict": true\`.
+  > \`strictNullChecks\` makes \`null\` and \`undefined\` separate types, so you must explicitly handle them. This eliminates the most common source of runtime errors in JavaScript: \`Cannot read property 'x' of null/undefined\`. It's enabled by \`"strict": true\`.
 - \`skipLibCheck\`
 
 While \`noImplicitAny\` prevents untyped variables and \`esModuleInterop\` improves module syntax, \`strictNullChecks\` directly prevents the "billion-dollar mistake" of null-pointer dereferences.`}

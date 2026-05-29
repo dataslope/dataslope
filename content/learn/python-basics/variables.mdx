@@ -286,7 +286,7 @@ print(nums)
 - \`[1, 2, 3]\`
   > Assignment binds \`also_nums\` to the same list object that \`nums\` references. Both names point to the same list in memory.
 - [o] \`[1, 2, 3, 4]\`
-  > Correct. \`nums\` and \`also_nums\` are two names for the same list. Mutating through one name is visible through the other.
+  > \`nums\` and \`also_nums\` are two names for the same list. Mutating through one name is visible through the other.
 - A \`NameError\`
   > No error—\`nums\` is defined before \`also_nums\` references it.
 - \`[4]\`
@@ -301,7 +301,7 @@ print(nums)
 - \`_private\`
   > Valid. Leading underscores are allowed.
 - [o] \`2nd_place\`
-  > Correct. Identifiers cannot start with a digit.
+  > Identifiers cannot start with a digit.
 - \`café\`
   > Valid. Python 3 allows Unicode letters in identifiers.`}
 />
@@ -318,7 +318,7 @@ y = y + [30]
 - \`[10, 20, 30, 30]\`
   > \`y + [30]\` creates a new list; it doesn't mutate the original.
 - [o] \`[10, 20]\`
-  > Correct. The line \`y = y + [30]\` creates a new list and rebinds \`y\` to it. The original list \`x\` references is unchanged.
+  > The line \`y = y + [30]\` creates a new list and rebinds \`y\` to it. The original list \`x\` references is unchanged.
 - \`[10, 20, 30]\`
   > That's the value of \`y\` after the reassignment, not \`x\`.
 - An error

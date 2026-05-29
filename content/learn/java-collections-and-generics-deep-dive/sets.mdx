@@ -320,7 +320,7 @@ public class Distinct {
 - \`TreeSet\`
   > Sorted, not insertion order.
 - [o] \`LinkedHashSet\`
-  > Correct. It pays a small constant-factor cost for a linked list threaded through the entries.
+  > It pays a small constant-factor cost for a linked list threaded through the entries.
 - \`ArrayList\`
   > A list is not a set and allows duplicates.`}
 />
@@ -333,7 +333,7 @@ public class Distinct {
 - The size becomes 2
   > A correctly implemented \`User\` would have value equality, leading to dedup; using the same object instance is *definitely* a duplicate.
 - [o] The second \`add\` returns \`false\` and the set is unchanged
-  > Correct. \`add\` is the standard "have I seen this before?" primitive.
+  > \`add\` is the standard "have I seen this before?" primitive.
 - The first \`User\` is overwritten
   > \`Set\` does not overwrite — it ignores the duplicate.`}
 />
@@ -344,7 +344,7 @@ public class Distinct {
 - It triggers \`ConcurrentModificationException\`
   > Not by itself.
 - [o] The element's bucket was chosen from the old hash; after mutation the set looks for it in a different bucket and reports "not present"
-  > Correct. Treat set elements (and map keys) as immutable for this exact reason.
+  > Treat set elements (and map keys) as immutable for this exact reason.
 - It silently clears the set
   > It does not.
 - It throws \`UnsupportedOperationException\`

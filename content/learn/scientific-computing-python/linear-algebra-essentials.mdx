@@ -366,7 +366,7 @@ Knowing what your library is actually doing lets you predict its runtime and sta
 
 - It is the only factorization that exists for SPD matrices
 - [o] It requires roughly half the operations of LU, needs no pivoting (because it is unconditionally stable for SPD inputs), and uses half the storage
-  > Correct. SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD — covariance matrices, mass matrices, Laplacians — switch to Cholesky.
+  > SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD — covariance matrices, mass matrices, Laplacians — switch to Cholesky.
 - It allows complex eigenvalues
 - It is required to compute inverses
 

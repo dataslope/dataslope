@@ -408,7 +408,7 @@ if (a.length !== 3 || a[0] !== 1) throw new Error("must not mutate input");`,
 - Rewrite the function from scratch and hope the new version is correct
 - Search the web for "JavaScript function wrong number"
 - [o] Add logs that print your inputs, intermediate values, and assumptions — then re-run to see *where* the actual values diverge from what you expected
-  > Correct. Bugs are gaps between your mental model and reality. The fastest way to close that gap is to print what you *think* is happening at each step and compare with what's actually happening. Rewriting blindly often reintroduces the same bug; reasoning from data tells you *where* the wrong value first appeared.
+  > Bugs are gaps between your mental model and reality. The fastest way to close that gap is to print what you *think* is happening at each step and compare with what's actually happening. Rewriting blindly often reintroduces the same bug; reasoning from data tells you *where* the wrong value first appeared.
 - Add try/catch around the call to suppress the error
 
 Debugging is investigation, not vandalism. Don't change code until you know what's wrong.`}

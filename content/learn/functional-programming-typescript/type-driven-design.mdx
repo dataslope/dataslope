@@ -346,7 +346,7 @@ export function next(state: Checkout, event: Event): Checkout {
 - Parsing happens at compile time; validation happens at runtime
   > Both run at runtime. The difference is what they *return*.
 - [o] Validation checks a constraint and returns the same type; parsing checks a constraint and returns a *stricter* type that carries the proof going forward
-  > Correct. Once you have a value of the stricter type, the rest of the program doesn't need to re-check the constraint — the type system does.
+  > Once you have a value of the stricter type, the rest of the program doesn't need to re-check the constraint — the type system does.
 - Validation is faster than parsing
   > No meaningful difference; both are typically a few CPU cycles.
 

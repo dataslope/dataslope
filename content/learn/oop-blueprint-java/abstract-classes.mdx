@@ -359,7 +359,7 @@ To +1-555-0100: Your code is 1234
 - It is the same as an interface
   > Interfaces and abstract classes are related but different (next page).
 - [o] It can have both concrete and abstract methods, and cannot be instantiated with \`new\` directly
-  > Correct. Abstract classes are partial blueprints — useful when you want to share both code and a contract.
+  > Abstract classes are partial blueprints — useful when you want to share both code and a contract.
 - It can only have static methods
   > That would be a utility class.`}
 />
@@ -370,7 +370,7 @@ To +1-555-0100: Your code is 1234
 - To make it run faster
   > Performance isn't the motivation.
 - [o] To prevent subclasses from changing the overall shape of the algorithm; they may only fill in the marked steps
-  > Correct. The base class controls the *order* of work; subclasses choose only what each step does.
+  > The base class controls the *order* of work; subclasses choose only what each step does.
 - Because the JVM forbids overriding abstract methods
   > It doesn't — that's exactly what you *must* do.
 - To make the class implicitly abstract
@@ -383,7 +383,7 @@ To +1-555-0100: Your code is 1234
 - When you want many unrelated classes to share a tiny contract
   > That's a job for an interface.
 - [o] When you have genuine shared *state* and *concrete code* that all subclasses would otherwise duplicate
-  > Correct. Abstract classes earn their keep when there is real shared implementation to factor out.
+  > Abstract classes earn their keep when there is real shared implementation to factor out.
 - Whenever you have more than three methods
   > Method count is irrelevant.
 - When you don't want to use \`@Override\`

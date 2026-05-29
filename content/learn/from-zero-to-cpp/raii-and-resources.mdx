@@ -176,7 +176,7 @@ RAII wrappers, where the language can enforce correctness.
 - Recursive Algorithm Implementation Interface.
   > Also not a real term.
 - [o] *Resource Acquisition Is Initialization*: acquire resources in constructors and release them in destructors, so that scope exit always cleans up correctly.
-  > Correct. It is the foundation of modern C++ resource management.
+  > It is the foundation of modern C++ resource management.
 - Read-After-Initialize Idiom; read fields after constructing.
   > That is not what RAII means.`}
 />
@@ -189,7 +189,7 @@ RAII wrappers, where the language can enforce correctness.
 - The runtime keeps a list of every \`new\` and calls \`delete\` for each.
   > It does not; you must arrange ownership yourself.
 - [o] During stack unwinding, the destructors of every fully-constructed object in scope run automatically, releasing their resources.
-  > Correct. This is why RAII makes exception safety practical.
+  > This is why RAII makes exception safety practical.
 - It does not; exceptions are unsafe and you should disable them.
   > Modern C++ relies on exception-safe RAII.`}
 />

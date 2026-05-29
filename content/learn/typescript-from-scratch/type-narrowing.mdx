@@ -528,7 +528,7 @@ if (result !== 25) throw new Error("Expected 25, got " + result);
 
 - \`if (value) { ... }\`
 - [o] \`if (typeof value === "string") { ... }\`
-  > Correct! The \`typeof\` guard narrows to \`string\` in the \`if\` branch.
+  > The \`typeof\` guard narrows to \`string\` in the \`if\` branch.
 - \`if (value instanceof String) { ... }\`
 - \`if ("length" in value) { ... }\`
 
@@ -540,7 +540,7 @@ if (result !== 25) throw new Error("Expected 25, got " + result);
 
 - It converts \`x\` to a string at runtime
 - [o] It tells the compiler that \`x\` is a \`string\` if the function returns \`true\`
-  > Correct! Type predicates enable custom narrowing logic.
+  > Type predicates enable custom narrowing logic.
 - It asserts that \`x\` is always a string
 - It's a syntax error
 

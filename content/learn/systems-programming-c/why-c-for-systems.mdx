@@ -177,7 +177,7 @@ constantly.
 - Direct access to hardware addresses and registers
   > That is a real C advantage; volatile pointers map to MMIO.
 - [o] Built-in safety against out-of-bounds memory access
-  > Correct. C deliberately does **not** check array bounds; that's why memory bugs are such a recurring theme in this course.`}
+  > C deliberately does **not** check array bounds; that's why memory bugs are such a recurring theme in this course.`}
 />
 
 <MultipleChoice
@@ -188,7 +188,7 @@ constantly.
 - The program will reliably crash with a clear error message.
   > UB has no required behavior; "appears to work" is a frequent and dangerous outcome.
 - [o] The standard imposes no requirements: the compiler may produce any code at all, including code that appears to work in testing.
-  > Correct. UB is the root cause of many silent C bugs.
+  > UB is the root cause of many silent C bugs.
 - It is only a problem in debug builds; optimizers ignore it.
   > Optimizers actively assume UB never happens, which can make the symptoms worse, not better.`}
 />
@@ -199,7 +199,7 @@ constantly.
 - Because every C compiler emits the same assembly language.
   > Different targets emit completely different assembly.
 - [o] Because C exposes the underlying machine model — flat addressable memory, fixed-size values, and direct pointer arithmetic — while still letting you retarget the compiler to many CPUs.
-  > Correct. C is high enough to be portable but low enough to map closely to hardware.
+  > C is high enough to be portable but low enough to map closely to hardware.
 - Because C programs are written in mnemonics like \`MOV\` and \`ADD\`.
   > Those are assembly mnemonics; C is a higher-level language than assembly.
 - Because every C statement maps to exactly one CPU instruction.

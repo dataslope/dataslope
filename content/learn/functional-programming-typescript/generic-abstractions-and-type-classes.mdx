@@ -306,7 +306,7 @@ export function combineAll<A>(s: Semigroup<A>, xs: ReadonlyArray<A>): A | undefi
 - It must work for some specific union of concrete types
   > Closer, but parametric means *every* type, not a chosen list.
 - [o] It works uniformly for every choice of \`A\` and makes no assumptions about \`A\`'s structure
-  > Correct. Parametric polymorphism gives the strongest guarantees: because the function knows *nothing* about \`A\`, very few behaviors are compatible with its type.
+  > Parametric polymorphism gives the strongest guarantees: because the function knows *nothing* about \`A\`, very few behaviors are compatible with its type.
 - It uses \`unknown\` everywhere and casts at the boundary
   > That defeats the purpose — \`unknown\` erases the polymorphism.
 

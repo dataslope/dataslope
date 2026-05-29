@@ -230,7 +230,7 @@ That single class touches every major idea in the course:
 - It allows duplicates
   > It does not.
 - [o] It keeps insertion order, which makes the printed output deterministic and matches the user-visible "as encountered" order
-  > Correct. Determinism matters as soon as a human or a test reads the output.
+  > Determinism matters as soon as a human or a test reads the output.
 - It supports concurrent reads
   > It does not (no built-in synchronization).`}
 />
@@ -241,7 +241,7 @@ That single class touches every major idea in the course:
 - It is faster
   > It is not.
 - [o] Because sorting in place would permanently reorder the library, making "insertion order" queries (like \`byArtist\`) wrong on subsequent calls
-  > Correct. Never mutate state to compute a query result.
+  > Never mutate state to compute a query result.
 - The \`Comparator\` requires a fresh list
   > It does not.
 - The original list is unmodifiable

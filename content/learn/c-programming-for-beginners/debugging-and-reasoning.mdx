@@ -264,7 +264,7 @@ int main(void) {
 - \`p\` points to memory that has already been \`free\`'d.
 - \`p\` was never initialized and points at a random address.
 - [o] The variable \`p\` is misspelled.
-  > Correct! A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
+  > A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
 
 The first instinct on a segfault should be: "I'm dereferencing a pointer that doesn't point at anything I own." Then ask: NULL? freed? uninitialized? out-of-bounds?`}
 />
@@ -276,7 +276,7 @@ The first instinct on a segfault should be: "I'm dereferencing a pointer that do
 - Rewrite the program from scratch.
 - Add \`printf\` statements throughout the code, then re-run with the full input.
 - [o] Try to reproduce the bug on a much smaller input — half the file, then half of that, etc.
-  > Correct! Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
+  > Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
 
 Once you have a tiny failing input, *then* it's worth reading the code carefully or adding prints. Trying to debug with the full input is like trying to find a needle in 50MB of hay.`}
 />

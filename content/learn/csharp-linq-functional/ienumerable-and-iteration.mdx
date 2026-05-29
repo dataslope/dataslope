@@ -285,7 +285,7 @@ you've locked your caller into one concrete type for no reason.
 - You can iterate the returned sequence multiple times and always get the same results.
   > The sequence might be backed by a \`yield\` method, a network stream, or a one-shot reader. Iterating twice can re-run the source — or fail.
 - [o] You can call \`foreach\` over the result and read elements one at a time.
-  > Correct. That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
+  > That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
 - The results are already in memory and indexing is O(1).
   > Indexing isn't part of \`IEnumerable<T>\` at all — that's \`IList<T>\` or arrays. And the elements may be computed on demand rather than stored.
 

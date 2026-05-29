@@ -469,7 +469,7 @@ name: 1
 - Implement many classes and extend many interfaces
   > The wording is reversed and both halves are inaccurate.
 - [o] Implement *many* interfaces but extend *at most one* class
-  > Correct. This is one of Java's defining design decisions.
+  > This is one of Java's defining design decisions.
 - Implement many interfaces and extend many classes
   > Java does not allow multiple class inheritance.`}
 />
@@ -482,7 +482,7 @@ name: 1
 - Never use concrete classes
   > Concrete classes are required to actually have an instance — somebody must implement the interface.
 - [o] When declaring variables, parameters, and return types, prefer the more general interface type so callers aren't locked to a specific implementation
-  > Correct. This is how interfaces unlock loose coupling.
+  > This is how interfaces unlock loose coupling.
 - Use only abstract classes
   > That's a separate idea and not the same principle.`}
 />
@@ -493,7 +493,7 @@ name: 1
 - An interface can have a constructor; an abstract class cannot
   > Reversed.
 - [o] An interface has no instance state; an abstract class may have fields, a constructor, and concrete methods
-  > Correct. Interfaces describe capabilities; abstract classes can also carry shared state.
+  > Interfaces describe capabilities; abstract classes can also carry shared state.
 - An interface can extend many other interfaces; an abstract class cannot extend anything
   > Abstract classes can extend a class and implement interfaces.
 - They are exactly the same since Java 8 added default methods

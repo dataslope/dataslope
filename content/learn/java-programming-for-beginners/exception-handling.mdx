@@ -287,7 +287,6 @@ each problem is *recognized*, *named*, and *handled*.
 - Unchecked exceptions cannot be caught
   > They can be caught — the compiler just doesn't *require* it.
 - [o] Checked exceptions must be either caught or declared in a \`throws\` clause; unchecked exceptions (RuntimeException and its subclasses) have no such requirement
-  > Correct.
 - Unchecked exceptions are always fatal
   > They can be caught and recovered from.`}
 />
@@ -300,7 +299,6 @@ each problem is *recognized*, *named*, and *handled*.
 - The compiler refuses to compile it
   > It compiles fine.
 - [o] It silently swallows every failure, hiding bugs and making the program produce wrong answers without telling anyone
-  > Correct.
 - It always throws \`NullPointerException\`
   > It does nothing of the sort.`}
 />
@@ -313,7 +311,6 @@ each problem is *recognized*, *named*, and *handled*.
 - Only when an exception was thrown
   > It runs in both cases.
 - [o] Always — after the try (and any catch) finishes, whether or not an exception was thrown
-  > Correct.
 - Only when the JVM is shutting down
   > It runs at the end of every \`try\` block.`}
 />

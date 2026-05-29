@@ -161,7 +161,7 @@ flowchart LR
 - A native executable for your operating system
   > That's what C/C++ compilers produce, not \`javac\`.
 - [o] One or more \`.class\` files containing platform-independent bytecode
-  > Correct. Bytecode is the input to the JVM.
+  > Bytecode is the input to the JVM.
 - A new \`.java\` file
   > It reads \`.java\` and produces \`.class\`.
 - Machine code that only runs on the developer's CPU
@@ -176,7 +176,6 @@ flowchart LR
 - Because the JVM is faster than native execution
   > Generally the opposite, though the JIT closes much of the gap.
 - [o] Because bytecode is portable — the same \`.class\` files can run on any platform that has a JVM, fulfilling Java's "write once, run anywhere" promise
-  > Correct.
 - Because Java cannot be compiled directly
   > It could be, in principle — the design choice was portability.`}
 />
@@ -187,7 +186,7 @@ flowchart LR
 - The actual numeric value of an int variable
   > That depends on input or computation at run time.
 - [o] Whether a particular field is accessible from a particular call site, based on its access modifier
-  > Correct. Access checks are done by the compiler.
+  > Access checks are done by the compiler.
 - Which override of a method is dispatched to
   > That's a runtime decision (dynamic dispatch).
 - Whether a file actually exists on disk

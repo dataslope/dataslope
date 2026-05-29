@@ -234,7 +234,7 @@ flowchart TB
 - \`pivot_wider()\`
 - \`group_by()\`
 - [o] \`pivot_longer()\`
-  > Correct! \`pivot_longer()\` folds multiple columns into a key column (year) and a value column (gdp).
+  > \`pivot_longer()\` folds multiple columns into a key column (year) and a value column (gdp).
 - \`select()\``}
 />
 
@@ -242,7 +242,7 @@ flowchart TB
   markdown={`A long table has columns \`country\`, \`year\`, \`gdp\`. To produce a display-friendly wide table with one column per year, you would use:
 
 - [o] \`pivot_wider(names_from = year, values_from = gdp)\`
-  > Correct! Year's *values* become the new column *names*; gdp's values fill them.
+  > Year's *values* become the new column *names*; gdp's values fill them.
 - \`pivot_longer(cols = year)\`
 - \`summarise(gdp = mean(gdp))\`
 - \`mutate(year = as.character(year))\``}
@@ -253,7 +253,7 @@ flowchart TB
 
 - Wide form, because plots need rectangles.
 - [o] Long form, because ggplot maps **columns** to visual properties (one column per variable).
-  > Correct! Long form is what makes \`aes(color = metric)\`-style mappings work cleanly.
+  > Long form is what makes \`aes(color = metric)\`-style mappings work cleanly.
 - Either — ggplot doesn't care.
 - A matrix, not a data frame.`}
 />

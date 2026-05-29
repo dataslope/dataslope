@@ -482,7 +482,7 @@ TypeScript doesn't have special syntax, but discriminated unions and type narrow
 - Faster runtime performance
   > \`Result\` has similar performance to exceptions; the benefit is static safety, not speed.
 - [o] Errors are visible in the type signature and must be handled
-  > Correct. The return type \`Result<T, E>\` documents that the function can fail, and the compiler forces you to check \`.ok\` before accessing the value.
+  > The return type \`Result<T, E>\` documents that the function can fail, and the compiler forces you to check \`.ok\` before accessing the value.
 - Easier to write
   > \`Result\` requires more boilerplate (but combinators help). The payoff is correctness.
 
@@ -504,7 +504,7 @@ What happens if \`parseNumber\` returns an error?
 - \`sqrt\` is called with the error
   > \`andThen\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
 - [o] \`sqrt\` is not called; the error propagates
-  > Correct. \`andThen\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
+  > \`andThen\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
 - The program throws an exception
   > \`Result\` doesn't throw. Errors are returned as values.
 

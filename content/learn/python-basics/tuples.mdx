@@ -326,7 +326,7 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
 - \`(1)\`
   > This is just the integer \`1\` in parentheses, not a tuple.
 - [o] \`(1,)\`
-  > Correct. The trailing comma is what makes it a tuple.
+  > The trailing comma is what makes it a tuple.
 - \`[1]\`
   > This is a list, not a tuple.
 - \`{1}\`
@@ -339,7 +339,7 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
 - Tuples are faster to iterate than lists.
   > The performance difference is negligible and not the right reason.
 - [o] Tuples are immutable and hashable, so they can be used as dict keys.
-  > Correct. Immutability also signals that the pair is a fixed-size record.
+  > Immutability also signals that the pair is a fixed-size record.
 - Lists cannot contain floats.
   > Lists can absolutely contain floats.
 - Tuples support more methods than lists.
@@ -357,7 +357,7 @@ print(rest)
 - \`(2, 3, 4)\`
   > The \`*rest\` catches items as a **list**, not a tuple.
 - [o] \`[2, 3, 4]\`
-  > Correct. The star unpacking always produces a list.
+  > The star unpacking always produces a list.
 - \`2\`
   > \`*rest\` catches **all** remaining items, not just one.
 - A \`ValueError\``}

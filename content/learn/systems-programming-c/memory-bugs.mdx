@@ -443,7 +443,7 @@ int main(void) {
 - Wrap every \`free\` in a \`try / catch\`.
   > C has no \`try / catch\`.
 - [o] After \`free(p);\`, immediately set \`p = NULL;\`. Future \`free(NULL)\` is a no-op and \`*p\` immediately crashes instead of silently corrupting memory.
-  > Correct. This is one of the most common C defensive idioms.
+  > This is one of the most common C defensive idioms.
 - Call \`free\` twice in a row to be certain.
   > That is the bug, not the defense.`}
 />
@@ -456,7 +456,7 @@ int main(void) {
 - It always allocates extra memory you forget to free.
   > It does not allocate at all.
 - [o] It has no way to know how big \`buf\` is and will keep copying until it finds a \`'\\0'\` in \`user_input\`, overflowing the buffer if the input is too long.
-  > Correct. Use \`snprintf\` or another length-aware API.
+  > Use \`snprintf\` or another length-aware API.
 - It corrupts the file descriptor table.
   > It does not touch file descriptors.`}
 />
@@ -467,7 +467,7 @@ int main(void) {
 - The CPU refuses to execute the read.
   > The CPU executes it without complaint; the *language* says the result is undefined.
 - [o] The C standard explicitly declares the read undefined behavior; the compiler is allowed to assume it never happens and may optimize accordingly, producing surprising results.
-  > Correct. UB is about what the language guarantees, not just about runtime values.
+  > UB is about what the language guarantees, not just about runtime values.
 - It always reads the value zero.
   > It does not — stack memory contains whatever the previous use left there.
 - The OS will trap and terminate the program.

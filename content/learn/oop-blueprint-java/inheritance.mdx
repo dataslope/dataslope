@@ -368,7 +368,7 @@ public class Main {
 - Calls a static method on the parent class
   > It calls the parent's *constructor*, not a static method.
 - [o] Invokes the parent class's constructor with the given arguments to initialize the parent part of the new object
-  > Correct. It must be the first statement of the subclass constructor.
+  > It must be the first statement of the subclass constructor.
 - Creates an entirely separate parent object
   > No second object is created — the subclass instance *is* also an instance of the parent.
 - Marks the constructor as overriding
@@ -383,7 +383,7 @@ public class Main {
 - It tells the JVM to skip the parent method entirely
   > That is what overriding does in general, regardless of the annotation.
 - [o] It asks the compiler to verify that you really are overriding an inherited method, catching typos and signature mismatches at compile time
-  > Correct. It's a cheap, valuable form of static checking.
+  > It's a cheap, valuable form of static checking.
 - It improves runtime performance of the method
   > It has no effect on performance.`}
 />
@@ -396,7 +396,7 @@ public class Main {
 - The other class has many methods
   > Method count is not a design criterion.
 - [o] The new class is genuinely a *kind of* the other class, and the parent was designed for extension
-  > Correct. True "is-a" relationships with extension-ready base classes are where inheritance shines.
+  > True "is-a" relationships with extension-ready base classes are where inheritance shines.
 - You want to avoid creating new files
   > File hygiene is not a design criterion.`}
 />

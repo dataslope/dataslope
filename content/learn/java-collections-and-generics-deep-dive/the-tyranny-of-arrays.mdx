@@ -219,7 +219,7 @@ string.
 - They use too much memory
   > Memory use is rarely the dominant problem; arrays are actually quite memory-efficient.
 - [o] They have a fixed size and offer no built-in support for resizing, searching, uniqueness, or higher-level access patterns
-  > Correct. Arrays solve one job — O(1) indexed storage — and leave every other data-handling concern to the programmer.
+  > Arrays solve one job — O(1) indexed storage — and leave every other data-handling concern to the programmer.
 - They cannot be iterated
   > Arrays can be iterated; the issue is uniformity, not capability.
 - The Java compiler doesn't allow them in modern code
@@ -232,7 +232,7 @@ string.
 - Because hand-rolled code is always slower
   > A hand-rolled version can be just as fast; speed is not the main issue.
 - [o] Because each copy is slightly different and accumulates slightly different bugs over time
-  > Correct. Repeated reinvention guarantees inconsistency, and inconsistency is what makes large systems unmaintainable.
+  > Repeated reinvention guarantees inconsistency, and inconsistency is what makes large systems unmaintainable.
 - Because the JVM forbids more than one growing array per program
   > It does not.
 - Because arrays cannot be passed to methods
@@ -245,7 +245,7 @@ string.
 - That arrays were too slow to use directly
   > Arrays are very fast; speed isn't the lesson.
 - [o] That higher-level data-handling concerns were duplicated across modules, with no shared abstraction
-  > Correct. Without a standard library of containers, every team reinvents the same handful of patterns with their own quirks.
+  > Without a standard library of containers, every team reinvents the same handful of patterns with their own quirks.
 - That arrays could not be shared between modules
   > Arrays can be shared; sharing isn't the issue.
 - That Java forbids modules from owning their own data

@@ -400,7 +400,7 @@ What does it print?
 - A B C D
 - A D B C
 - [o] A D C B
-  > Correct. \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout\` callback \`B\`. Even though \`setTimeout\` is scheduled before the promise, microtasks always win against macrotasks.
+  > \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout\` callback \`B\`. Even though \`setTimeout\` is scheduled before the promise, microtasks always win against macrotasks.
 - A C D B
 
 The crucial rule: microtasks (promises, \`queueMicrotask\`) run between every task. \`setTimeout(..., 0)\` is a *task*, so it has to wait its turn.`}

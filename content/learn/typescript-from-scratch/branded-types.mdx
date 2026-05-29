@@ -436,7 +436,7 @@ export function sendEmail(to: Email, message: string): string {
 - The smart constructor function
   > The smart constructor creates the brand, but it's the intersection type that enforces incompatibility.
 - [o] The intersection with a phantom property
-  > Correct. The intersection \`T & { readonly __brand: ... }\` adds a type-level property that makes the branded type structurally distinct from the base type.
+  > The intersection \`T & { readonly __brand: ... }\` adds a type-level property that makes the branded type structurally distinct from the base type.
 - The \`as\` cast inside the constructor
   > The cast is necessary to create the value, but it doesn't enforce safety. The type itself does.
 
@@ -453,7 +453,7 @@ The phantom property exists only in the type system, adding a "tag" that prevent
 - String brands are less type-safe
   > Both are equally type-safe. The difference is in collision risk.
 - [o] \`unique symbol\` prevents accidental collisions across modules
-  > Correct. Each \`unique symbol\` declaration creates a distinct type, even if named the same. String literals can collide.
+  > Each \`unique symbol\` declaration creates a distinct type, even if named the same. String literals can collide.
 - \`unique symbol\` has better runtime performance
   > Brands are purely compile-time constructs; there's no runtime difference.
 

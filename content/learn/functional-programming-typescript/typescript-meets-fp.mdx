@@ -340,7 +340,7 @@ that has a `Foo.map` method".
 - The \`strict\` compiler flag
   > Strict mode enables many useful checks, but it doesn't itself model your domain. It's a *prerequisite*, not the mechanism.
 - [o] Discriminated unions with exhaustiveness checking
-  > Correct. By modeling "this is one of N possibilities" as a discriminated union and then handling every variant in a \`switch\`, you make impossible combinations *unrepresentable* in the types. The compiler enforces it.
+  > By modeling "this is one of N possibilities" as a discriminated union and then handling every variant in a \`switch\`, you make impossible combinations *unrepresentable* in the types. The compiler enforces it.
 - Interfaces
   > Interfaces model *product types* — a record with these fields. They cannot express "one of several alternatives", which is what we need to rule out illegal combinations.
 

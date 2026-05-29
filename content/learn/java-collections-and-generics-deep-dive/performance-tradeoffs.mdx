@@ -245,7 +245,7 @@ flowchart TD
 - \`ArrayList.iterator()\` is \`O(log n)\`
   > Both are \`O(n)\` per \`next()\`.
 - [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
-  > Correct. Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
+  > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
 - \`LinkedList.iterator()\` allocates per element
   > It does not.
 - \`ArrayList\` parallelizes by default
@@ -260,7 +260,7 @@ flowchart TD
 - The maximum number of entries
   > \`HashMap\` has no hard cap.
 - [o] The ratio of size to capacity at which the table doubles and rehashes
-  > Correct. Default 0.75: a 16-bucket map rehashes when it reaches 12 entries.
+  > Default 0.75: a 16-bucket map rehashes when it reaches 12 entries.
 - The hash function used for keys
   > That's determined by the key type's \`hashCode\`.`}
 />
@@ -273,7 +273,7 @@ flowchart TD
 - \`new ArrayList<>(10)\`, then call \`add\` 50k times
   > Worse: even more resizes.
 - [o] \`new ArrayList<>(50_000)\`, then call \`add\` 50k times
-  > Correct. One allocation, zero resizes.
+  > One allocation, zero resizes.
 - \`new LinkedList<>()\`
   > More memory and slower iteration in almost every scenario.`}
 />

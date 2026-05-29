@@ -285,7 +285,7 @@ public static class WordCounter
 - \`string[]\`
   > Same problem — and arrays don't grow.
 - [o] \`HashSet<string>\`
-  > Correct. Sets are designed for fast membership tests and automatic de-duplication.
+  > Sets are designed for fast membership tests and automatic de-duplication.
 - \`Dictionary<string, string>\`
   > Possible, but wasteful: there's no value to associate with each key.`}
 />
@@ -298,7 +298,7 @@ public static class WordCounter
 - It returns a default value silently
   > It doesn't — \`TryGetValue\` is the safe alternative.
 - [o] It throws a \`KeyNotFoundException\`
-  > Correct. Use \`ContainsKey\` or \`TryGetValue\` to look up safely.
+  > Use \`ContainsKey\` or \`TryGetValue\` to look up safely.
 - It adds the key with a default value
   > That would be surprising; the indexer doesn't do that on read.`}
 />

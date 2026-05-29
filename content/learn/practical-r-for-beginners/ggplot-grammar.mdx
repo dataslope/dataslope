@@ -245,7 +245,7 @@ flowchart TB
 - They are equivalent.
 - The first errors; only the second works.
 - [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category — usually not red — and adds a useless legend.
-  > Correct! Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
+  > Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
 - The second is faster.`}
 />
 
@@ -254,7 +254,7 @@ flowchart TB
 
 - \`ggplot(mtcars) + geom_point(hp, mpg)\`
 - [o] \`ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()\`
-  > Correct! Aesthetic mappings go in \`aes()\` inside \`ggplot()\` (or inside the geom).
+  > Aesthetic mappings go in \`aes()\` inside \`ggplot()\` (or inside the geom).
 - \`plot(mtcars$hp, mtcars$mpg)\`
 - \`ggplot(mtcars, hp, mpg) + scatter()\``}
 />
@@ -263,7 +263,7 @@ flowchart TB
   markdown={`To split a ggplot into one small panel per Species in \`iris\`, you add:
 
 - [o] \`facet_wrap(~ Species)\`
-  > Correct! \`facet_wrap()\` creates one panel per unique value, laid out in a wrapping grid.
+  > \`facet_wrap()\` creates one panel per unique value, laid out in a wrapping grid.
 - \`group_by(Species)\`
 - \`color = Species\`
 - \`split(Species)\``}

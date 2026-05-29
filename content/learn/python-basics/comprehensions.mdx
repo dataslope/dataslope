@@ -334,7 +334,7 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 - \`[0, 2, 4, 6]\`
   > That would be without the \`if\`.
 - [o] \`[2, 6]\`
-  > Correct. \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
+  > \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
 - \`[1, 3]\`
   > The expression is \`x * 2\`, not \`x\`.
 - \`[0, 4]\`
@@ -349,7 +349,7 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 - \`{x*x for x in range(5)}\`
   > That is a set comprehension, not a list.
 - [o] \`list(x*x for x in range(5))\`
-  > Correct. Converting the generator to a list gives the same result.
+  > Converting the generator to a list gives the same result.
 - \`{x: x*x for x in range(5)}\`
   > That is a dict comprehension, not a list.`}
 />
@@ -360,7 +360,7 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 - Generators are always faster.
   > Not always — list access is O(1), generator iteration has per-item overhead.
 - [o] Generators use O(1) memory regardless of input size.
-  > Correct. Generators produce items lazily, one at a time.
+  > Generators produce items lazily, one at a time.
 - Generators support slicing.
   > Generators do **not** support slicing; lists do.
 - Generators automatically deduplicate.
@@ -377,7 +377,7 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 - \`[11, 21, 12, 22]\`
   > That is the correct order.
 - [o] \`[11, 21, 12, 22]\`
-  > Correct. The outer loop is \`x\`, the inner loop is \`y\`.
+  > The outer loop is \`x\`, the inner loop is \`y\`.
 - \`[11, 12, 21, 22]\`
   > That would be if \`y\` were the outer loop.
 - \`[30, 40]\`

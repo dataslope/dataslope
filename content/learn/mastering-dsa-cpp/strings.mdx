@@ -316,7 +316,7 @@ int main() {
   markdown={`What is the time complexity of indexing a valid position in a \`std::string\` with \`s[i]\`?
 
 - [o] O(1)
-  > Correct. A string stores characters contiguously and computes the address directly.
+  > A string stores characters contiguously and computes the address directly.
 - O(log n)
   > There is no tree search involved.
 - O(n)
@@ -329,7 +329,7 @@ int main() {
   markdown={`Why might a function take \`std::string_view\` instead of \`const std::string&\`?
 
 - [o] It can accept strings, literals, and slices without owning or copying the characters.
-  > Correct. A view is just a pointer and a length.
+  > A view is just a pointer and a length.
 - It always extends the lifetime of temporary character data.
   > It does not own data, so lifetime must still be valid.
 - It allows mutation of the original string.
@@ -344,7 +344,7 @@ int main() {
 - A pointer into the original string that can mutate it.
   > \`substr\` returns a string object, not a mutable pointer.
 - [o] A new string containing up to \`count\` characters starting at \`pos\`.
-  > Correct. The result owns its copied characters.
+  > The result owns its copied characters.
 - The number of characters after \`pos\`.
   > That would be a length calculation, not \`substr\`.
 - A boolean indicating whether the substring exists.

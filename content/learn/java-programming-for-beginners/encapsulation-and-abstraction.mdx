@@ -209,7 +209,7 @@ return an unmodifiable view, or expose specific operations like
 - It makes the class faster
   > Access modifiers do not change speed in any meaningful way.
 - [o] So the class itself is the only place that decides how its own data may change, allowing it to enforce its invariants
-  > Correct. Encapsulation gives the class ownership of its own rules.
+  > Encapsulation gives the class ownership of its own rules.
 - Because the Java compiler refuses to compile public fields
   > It compiles them fine — encapsulation is a design choice, not a language requirement.`}
 />
@@ -222,7 +222,7 @@ return an unmodifiable view, or expose specific operations like
 - It has a getter and setter for every field
   > That is often a sign of *bad* encapsulation — the API mirrors the storage.
 - [o] Its public methods are named for behaviors that callers actually need, and its fields are private
-  > Correct. The API talks about *behavior*, not storage.
+  > The API talks about *behavior*, not storage.
 - It uses the keyword \`final\` somewhere
   > \`final\` helps but is not the central criterion.`}
 />

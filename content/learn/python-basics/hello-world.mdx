@@ -232,7 +232,7 @@ print("a", "b", "c", sep="-", end="!")
 - \`a-b-c\\n\`
   > \`end\` was overridden too, so there is no trailing newline.
 - [o] \`a-b-c!\`
-  > Correct. Items are joined by \`sep\` and \`end\` is appended after them.
+  > Items are joined by \`sep\` and \`end\` is appended after them.
 - \`a-b-c!\\n\`
   > The default \`end\` is \`"\\n"\`, but it was overridden to \`"!"\`.`}
 />
@@ -245,7 +245,7 @@ print("a", "b", "c", sep="-", end="!")
 - Any triple-quoted string in the code
   > Not quite. It must be the first statement in a module, function, or class.
 - [o] A string literal at the top of a module, function, or class, used for documentation
-  > Correct. Docstrings are stored in \`__doc__\` and read by \`help()\` and documentation tools.
+  > Docstrings are stored in \`__doc__\` and read by \`help()\` and documentation tools.
 - A string that is never executed
   > All string literals are evaluated, but docstrings are retained for introspection.`}
 />
@@ -258,7 +258,7 @@ print("a", "b", "c", sep="-", end="!")
 - \`print("Hello", end="")\`
   > This works! But there is another correct answer too.
 - [o] \`print("Hello", end="")\`
-  > Correct. Setting \`end=""\` removes the newline.
+  > Setting \`end=""\` removes the newline.
 - \`print("Hello", sep="")\`
   > \`sep\` controls how multiple arguments are joined, not the ending.`}
 />

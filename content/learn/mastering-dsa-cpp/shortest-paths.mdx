@@ -463,7 +463,7 @@ int main() {
 - It uses recursion, which cannot handle negative numbers
   > Dijkstra is usually iterative, and C++ can store negative integers.
 - [o] A finalized smallest distance could later be improved by a negative edge
-  > Correct. Negative edges break the greedy guarantee.
+  > Negative edges break the greedy guarantee.
 - Priority queues cannot store negative values
   > Priority queues can store negative values just fine.
 - Weighted graphs are always acyclic
@@ -480,7 +480,7 @@ Use Bellman-Ford when negative edges are allowed.`}
 - O(log V)
   > A single heap operation is logarithmic, but the whole algorithm processes vertices and edges.
 - [o] O((V + E) log V)
-  > Correct. Heap operations occur as distances are pushed and popped while edges are scanned.
+  > Heap operations occur as distances are pushed and popped while edges are scanned.
 - O(1)
   > Shortest paths require examining graph structure.
 
@@ -493,7 +493,7 @@ The exact bound is often written O(E log V) for connected sparse graphs, but O((
 - To process the largest vertex id first
   > Vertex id is not the priority.
 - [o] To always expand the currently smallest known distance
-  > Correct. That is Dijkstra's greedy step.
+  > That is Dijkstra's greedy step.
 - To make all edges positive
   > A heap does not change edge weights.
 - To store the graph itself
