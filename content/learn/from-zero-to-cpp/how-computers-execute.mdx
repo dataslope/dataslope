@@ -125,7 +125,7 @@ sequenceDiagram
     OS->>CPU: Set instruction pointer to main
     CPU->>Mem: Fetch instruction, run it, repeat
     CPU-->>U: Output to screen, files, network
-    CPU->>OS: main returns; please clean up
+    CPU->>OS: main returns, please clean up
     OS->>Mem: Reclaim memory
 ```
 

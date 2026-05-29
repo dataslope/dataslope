@@ -103,7 +103,7 @@ sequenceDiagram
     CLR->>JIT: please compile Main to native
     JIT-->>CLR: returns machine code
     CLR->>CPU: jump to Main machine code
-    CPU->>CPU: executes; produces output
+    CPU->>CPU: executes, produces output
 ```
 
 This is why your *first* run might feel slightly slow: the JIT is
