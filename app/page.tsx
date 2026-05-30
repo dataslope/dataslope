@@ -144,6 +144,15 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link
+              href="/learn/intro-sql-postgres"
+              className={styles.courseCard}
+            >
+              <span className={styles.courseTitle}>
+                Introduction to SQL and Relational Databases with PostgreSQL
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
             <Link href="/learn/scientific-computing-python" className={styles.courseCard}>
               <span className={styles.courseTitle}>
                 Scientific Computing with Python

@@ -1,0 +1,170 @@
+---
+title: Creating Tables
+description: How to define a table's shape with CREATE TABLE, choose columns and types, and add simple rules that keep your data clean.
+---
+
+So far, the runnable blocks have quietly created tables for you with
+their `initSql`. Now you will create them yourself. Defining a table
+is how you give a database its structure — and it is more
+interesting than it sounds, because a table definition is really a
+set of *promises* about your data.
+
+## The CREATE TABLE statement
+
+To make a table, you list its columns and each column's type inside
+`CREATE TABLE`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Create a table, then read it"
+  initialCode={`CREATE TABLE books (
+  id     INTEGER,
+  title  TEXT,
+  author TEXT,
+  year   INTEGER
+);
+
+-- The table exists but is empty, so this returns no rows yet:
+SELECT * FROM books;`}
+/>
+
+Read it as a sentence: *"Create a table called `books` with an
+integer `id`, a text `title`, a text `author`, and an integer
+`year`."* The parentheses hold a comma-separated list of
+`column_name TYPE` pairs. That is the core of the whole statement.
+
+```mermaid
+flowchart TB
+    K["CREATE TABLE books ("] --> C1["id INTEGER,"]
+    C1 --> C2["title TEXT,"]
+    C2 --> C3["author TEXT,"]
+    C3 --> C4["year INTEGER"]
+    C4 --> E[")"]
+```
+
+## Adding rules with constraints
+
+Beyond a name and type, each column can carry **constraints** —
+rules the database enforces on every row. They turn a table from a
+loose grid into a guardrail for clean data. The common ones:
+
+| Constraint | Meaning |
+| --- | --- |
+| `PRIMARY KEY` | Uniquely identifies each row (unique + not null) |
+| `NOT NULL` | This column can never be empty |
+| `UNIQUE` | No two rows may share this value |
+| `DEFAULT x` | If no value is given, use `x` |
+| `CHECK (...)` | The value must satisfy a condition |
+
+Here is the same table, upgraded with rules that express real
+intent about the data:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A table that protects itself"
+  initialCode={`CREATE TABLE books (
+  id     INTEGER PRIMARY KEY,
+  title  TEXT NOT NULL,
+  author TEXT NOT NULL,
+  year   INTEGER CHECK (year > 0),
+  genre  TEXT DEFAULT 'Unknown'
+);
+
+INSERT INTO books (id, title, author, year) VALUES
+  (1, 'Dune', 'Herbert', 1965);
+
+SELECT * FROM books;`}
+/>
+
+Look at the result: even though we never supplied a `genre`, the row
+has `Unknown`, because of `DEFAULT 'Unknown'`. The table filled in
+the blank for us. Meanwhile `title NOT NULL` guarantees no book can
+ever be saved without a title, and `CHECK (year > 0)` blocks
+nonsensical years.
+
+<Callout type="info" title="Constraints are documentation that bites">
+A good set of constraints tells the next person (and future you)
+what the data *means* — "a book must have a title," "a year is
+positive." Unlike a comment, the database actually **enforces**
+these promises, so they can never quietly drift out of date.
+</Callout>
+
+## Auto-generating ids with SERIAL
+
+Typing `id` values by hand is tedious and error-prone. PostgreSQL
+can generate them for you. Declaring a column as `SERIAL` makes the
+database assign the next number automatically on each insert:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Let PostgreSQL number the rows"
+  initialCode={`CREATE TABLE books (
+  id     SERIAL PRIMARY KEY,
+  title  TEXT NOT NULL
+);
+
+-- Notice we do NOT provide id; Postgres fills it in: 1, 2, 3 ...
+INSERT INTO books (title) VALUES ('Dune'), ('Hyperion'), ('Foundation');
+
+SELECT * FROM books ORDER BY id;`}
+/>
+
+This is the everyday way to create surrogate primary keys (from the
+**Primary Keys** page): a `SERIAL PRIMARY KEY` gives every row a
+guaranteed-unique id without you tracking the numbers yourself.
+
+## Removing a table
+
+To delete an entire table and all its rows, use `DROP TABLE`. Handle
+with care — it is permanent.
+
+```sql
+DROP TABLE books;
+```
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`CREATE TABLE\` do?
+
+- It inserts new rows into an existing table.
+  > Inserting rows is done with \`INSERT\`; \`CREATE TABLE\` defines the table's structure, not its data.
+- [o] It defines a new table's structure — its name, columns, and their types and rules.
+  > \`CREATE TABLE\` is how you declare the shape (schema) of a table before any rows go in.
+- It permanently deletes a table.
+  > Deleting a table is \`DROP TABLE\`; \`CREATE TABLE\` does the opposite.
+- It runs a search over the data.
+  > Searching is done with \`SELECT\`; \`CREATE TABLE\` defines structure.
+
+\`CREATE TABLE\` declares a table's columns, types, and constraints.`}
+/>
+
+<MultipleChoice
+  markdown={`A column is declared \`genre TEXT DEFAULT 'Unknown'\`. A row is inserted without providing a genre. What is stored?
+
+- The row is rejected because genre is missing.
+  > A \`DEFAULT\` exists precisely so the row is *not* rejected; the default value is used instead.
+- An empty/null genre.
+  > Because a default is defined, the column is filled with that default rather than left empty.
+- [o] The value \`'Unknown'\`, because \`DEFAULT\` supplies it when no value is given.
+  > \`DEFAULT\` fills in the specified value whenever an insert omits that column.
+- A random genre chosen by the database.
+  > Databases do not invent random values; they use the declared default.
+
+A \`DEFAULT\` constraint supplies a fallback value when an insert omits the column.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is declaring a column as \`SERIAL PRIMARY KEY\` so common?
+
+- It encrypts the column for security.
+  > \`SERIAL\` does not encrypt anything; it auto-generates increasing numbers.
+- It sorts the table by that column automatically.
+  > \`SERIAL\` does not sort the table; it just assigns the next number on insert.
+- [o] PostgreSQL automatically assigns the next unique number, giving each row a stable surrogate key without manual tracking.
+  > It conveniently produces guaranteed-unique identifiers, which is exactly what a surrogate primary key needs.
+- It allows the column to store text and numbers together.
+  > \`SERIAL\` is for auto-incrementing integers, not mixed types.
+
+\`SERIAL PRIMARY KEY\` auto-generates unique ids, the standard way to create surrogate keys.`}
+/>

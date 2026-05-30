@@ -1,0 +1,183 @@
+---
+title: Many-to-Many Relationships
+description: When rows on both sides can connect to many rows on the other — and the junction table that makes it possible.
+---
+
+Some relationships do not fit "one row points to one other row." A
+student takes **many** courses; a course holds **many** students.
+This is a **many-to-many** relationship, and it needs a special
+structure — because no single foreign key can express it.
+
+## Why a foreign key is not enough
+
+Picture trying to store this with one column. If `students` had a
+`course_id`, each student could take only one course. If `courses`
+had a `student_id`, each course could hold only one student. Neither
+works, because **both sides are "many."**
+
+```mermaid
+flowchart LR
+    S1["Ada"] --- C1["Math"]
+    S1 --- C2["History"]
+    S2["Grace"] --- C1
+    S2 --- C3["Art"]
+    S3["Linus"] --- C2
+```
+
+Ada connects to two courses; Math connects to two students. The
+links cross over each other — you cannot capture that with a single
+column on either table.
+
+## The junction table
+
+The solution is a third table that sits **between** the two,
+storing one row per connection. It is called a **junction**,
+**bridge**, or **join** table. Each of its rows holds two foreign
+keys: one to each side.
+
+```mermaid
+erDiagram
+    students ||--o{ enrollments : "has"
+    courses  ||--o{ enrollments : "has"
+    students {
+        int id PK
+        text name
+    }
+    courses {
+        int id PK
+        text title
+    }
+    enrollments {
+        int student_id FK
+        int course_id FK
+    }
+```
+
+Read it as two one-to-many relationships pointing **inward**: one
+student has many enrollments; one course has many enrollments. The
+`enrollments` table turns a single, awkward many-to-many into two
+ordinary, well-understood one-to-many links.
+
+## Building and querying it
+
+Each row in `enrollments` says "this student is in this course."
+To list real names, you join through the junction table to both
+sides:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Students and the courses they take"
+  initSql={`CREATE TABLE students (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE courses (
+  id    INTEGER PRIMARY KEY,
+  title TEXT
+);
+CREATE TABLE enrollments (
+  student_id INTEGER REFERENCES students(id),
+  course_id  INTEGER REFERENCES courses(id),
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
+INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO enrollments (student_id, course_id) VALUES
+  (1,10), (1,11),   -- Ada: Math, History
+  (2,10), (2,12),   -- Grace: Math, Art
+  (3,11);           -- Linus: History`}
+  initialCode={`SELECT s.name, c.title
+FROM enrollments e
+JOIN students s ON s.id = e.student_id
+JOIN courses  c ON c.id = e.course_id
+ORDER BY s.name, c.title;`}
+/>
+
+The query "walks" from `enrollments` out to both `students` and
+`courses`, producing one readable row per connection. Notice the
+junction's primary key is the **pair** `(student_id, course_id)` —
+a composite key that prevents enrolling the same student in the same
+course twice.
+
+<Callout type="info" title="The junction table can hold its own facts">
+A junction row often carries extra columns about the *relationship
+itself* — an `enrolled_on` date, a `grade`, a `role`. These belong
+to the pairing, not to either table alone, so the junction table is
+their natural home.
+</Callout>
+
+## Answering questions from both directions
+
+Because the structure is symmetric, you can ask in either
+direction just by changing what you group or filter:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="How many students each course has"
+  initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (
+  student_id INTEGER, course_id INTEGER,
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
+INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO enrollments (student_id, course_id) VALUES
+  (1,10),(1,11),(2,10),(2,12),(3,11);`}
+  initialCode={`SELECT c.title, COUNT(*) AS student_count
+FROM courses c
+JOIN enrollments e ON e.course_id = c.id
+GROUP BY c.title
+ORDER BY student_count DESC, c.title;`}
+/>
+
+Same three tables, different question — "students per course"
+instead of "courses per student." The junction table answers both
+without any change to the schema.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why can't a single foreign key represent a many-to-many relationship like students and courses?
+
+- Because foreign keys are not allowed between unrelated tables.
+  > Foreign keys are exactly the tool for relating tables; the problem is the *cardinality*, not legality.
+- [o] Because a single column can hold only one value, so it can represent "many" on only one side, not both.
+  > One foreign key forces one of the sides to be singular, which fails when both sides are "many."
+- Because foreign keys cannot reference primary keys.
+  > Foreign keys normally reference primary keys; that is their usual purpose.
+- Because PostgreSQL forbids more than two tables in a query.
+  > Queries routinely span many tables; there is no such limit.
+
+A lone foreign key can express "many" on just one side, so many-to-many needs a third table.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the role of a junction (bridge) table?
+
+- To store a backup copy of both tables.
+  > A junction table holds connections, not duplicated copies of the other tables' data.
+- [o] To store one row per connection, holding a foreign key to each of the two related tables.
+  > Each junction row links one row from each side, turning a many-to-many into two one-to-many links.
+- To replace the need for primary keys.
+  > Junction tables rely on keys — often a composite primary key — rather than replacing them.
+- To speed up queries by caching results.
+  > A junction table models relationships; it is not a results cache.
+
+A junction table records each pairing as a row with a foreign key to each side.`}
+/>
+
+<MultipleChoice
+  markdown={`In an \`enrollments\` junction table, where does a per-enrollment \`grade\` column most naturally belong?
+
+- In the \`students\` table.
+  > A grade depends on *which course*, so it cannot live on the student alone.
+- In the \`courses\` table.
+  > A grade depends on *which student*, so it cannot live on the course alone.
+- [o] In the \`enrollments\` table, because the grade describes the specific student-course pairing.
+  > A grade is a fact about the relationship itself, so the junction row is its natural home.
+- In a brand-new fourth table by itself.
+  > The enrollment row already represents the pairing, so the grade belongs there rather than in a separate table.
+
+A value that describes the pairing itself belongs on the junction row.`}
+/>

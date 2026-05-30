@@ -1,0 +1,146 @@
+---
+title: How Data Is Stored
+description: A gentle, intuition-first look at how a database actually keeps information — rows, columns, and tables — without any scary internals.
+---
+
+You do not need to know how a car engine works to drive. Likewise,
+you do not need to know the deep internals of a database to use one
+well. But a *little* intuition about how data is stored will make
+everything that follows click into place.
+
+## From facts to rows
+
+Almost all useful data is a collection of **facts about things**.
+"This customer is named Ada and lives in Toronto." "This order was
+placed on March 3rd for \$42." A database's job is to keep millions
+of such facts tidy.
+
+The relational database's big idea is to group facts into neat
+**rectangles**. Each rectangle is a **table**. Inside a table:
+
+- A **row** is one thing — one customer, one order, one product.
+- A **column** is one attribute of those things — a name, a city,
+  a price.
+- A **cell** (one row, one column) holds a single value.
+
+```mermaid
+flowchart TB
+    subgraph customers["Table: customers"]
+        direction LR
+        H1["id"]:::hdr
+        H2["name"]:::hdr
+        H3["city"]:::hdr
+        R1["1"]
+        R2["Ada"]
+        R3["Toronto"]
+        S1["2"]
+        S2["Linus"]
+        S3["Helsinki"]
+        T1["3"]
+        T2["Grace"]
+        T3["New York"]
+    end
+    classDef hdr fill:#dbeafe,stroke:#1d4ed8
+```
+
+That picture — a labeled grid of rows and columns — is the single
+most important image in this entire course. Almost everything we do
+is either *reading* such a grid, *changing* it, or *combining* two
+of them.
+
+## Why a grid?
+
+Why store data as rectangles instead of, say, paragraphs of text?
+Because a grid makes questions answerable in a uniform way:
+
+- "How many rows are there?" → count the rows.
+- "Which rows have `city = 'Toronto'`?" → check one column.
+- "What is the average price?" → look down the `price` column.
+
+Every value has a **known place** (which row, which column) and a
+**known kind** (text, number, date). That regularity is what lets a
+computer answer questions about the data mechanically and quickly.
+
+<Callout type="info" title="Same shape, everywhere">
+This rows-and-columns shape is the same one you see in a
+spreadsheet — and that is no accident. The grid is just an
+extremely natural way to lay out facts about many similar things.
+The difference is what the *system around the grid* can do, which
+is the subject of the next two pages.
+</Callout>
+
+## A table is described by its columns
+
+Before a table can hold any rows, the database needs to know its
+**shape**: what columns exist and what kind of value each holds.
+This description is called the table's **schema**.
+
+```mermaid
+flowchart LR
+    Schema["Schema:<br/>id (number)<br/>name (text)<br/>city (text)"] --> Table["An empty table<br/>ready for rows"]
+    Table --> Rows["Rows get<br/>added over time"]
+```
+
+You define the schema once ("a customer has a numeric id, a text
+name, and a text city"), and from then on every row must fit that
+shape. This is a feature, not a restriction: because every row has
+the same columns of the same kinds, the database can store, check,
+and search them efficiently and catch mistakes early.
+
+## Seeing it for real
+
+Here is the table from the diagram, brought to life. Click *Run* to
+see the stored grid come back to you.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A stored table is just a grid of rows and columns"
+  initSql={`CREATE TABLE customers (
+  id   INTEGER,
+  name TEXT,
+  city TEXT
+);
+INSERT INTO customers (id, name, city) VALUES
+  (1, 'Ada',   'Toronto'),
+  (2, 'Linus', 'Helsinki'),
+  (3, 'Grace', 'New York');`}
+  initialCode={`SELECT *
+FROM customers;`}
+/>
+
+The `*` means "every column." The result you see — three rows,
+three columns — *is* the stored data. We will spend the whole
+**Querying Data** section learning to ask for exactly the slices we
+want instead of everything.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In a relational table, what does a single **row** represent?
+
+- One attribute, such as "city," shared by all the data.
+  > That describes a *column* — a single attribute. A row is something else.
+- [o] One thing — for example one customer or one order — with a value for each column.
+  > A row gathers all the attributes of a single entity into one record across the table's columns.
+- The name of the table.
+  > The table name labels the whole grid, not an individual row.
+- The rules describing what columns the table has.
+  > Those rules are the table's *schema*, not a row.
+
+A row is a single record: one thing, described across all of the table's columns.`}
+/>
+
+<MultipleChoice
+  markdown={`A table's **schema** describes what about the table?
+
+- The current number of rows it contains.
+  > The row count changes constantly as data is added or removed; the schema is the stable description of the table's structure.
+- [o] Its structure — which columns exist and what kind of value each column holds.
+  > Defining the columns and their types up front is what lets the database store, validate, and search rows consistently.
+- The colors used to display the table.
+  > Appearance is a property of whatever tool displays the data, not of the database schema.
+- The list of people allowed to read the table.
+  > Access rules are a separate concern; the schema is about the table's columns and their types.
+
+The schema is the blueprint of a table: its columns and the type of value each one stores.`}
+/>
