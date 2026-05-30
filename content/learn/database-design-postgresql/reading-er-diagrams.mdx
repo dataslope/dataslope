@@ -1,0 +1,292 @@
+---
+title: Reading an ER Diagram
+description: Practice reading entities, attributes, keys, relationships, and cardinalities from a small ER model.
+---
+
+Now that you have seen entities, attributes, relationships, and
+cardinality separately, it is time to read a whole ER diagram as a
+story.
+
+We will use a small shop model: customers place orders, orders contain
+order items, and order items point to products.
+
+## The full model
+
+Start by looking at the diagram without worrying about SQL syntax.
+Ask: what are the boxes, what are the keys, and what do the lines say?
+
+```mermaid
+erDiagram
+    customers ||--o{ orders : places
+    orders ||--|{ order_items : contains
+    products ||--o{ order_items : appears
+    customers {
+        int id PK
+        text name
+        text email UK
+    }
+    orders {
+        int id PK
+        int customer_id FK
+        date placed_on
+        text status
+    }
+    products {
+        int id PK
+        text name
+        numeric price
+    }
+    order_items {
+        int order_id PK, FK
+        int line_number PK
+        int product_id FK
+        int quantity
+    }
+```
+
+This one picture contains most of the design vocabulary we have built.
+Let's read it slowly.
+
+## Step 1: identify the entities
+
+The entity boxes are `customers`, `orders`, `products`, and
+`order_items`.
+
+```mermaid
+flowchart LR
+    Diagram["ER diagram"] --> Customers["customers"]
+    Diagram --> Orders["orders"]
+    Diagram --> Products["products"]
+    Diagram --> Items["order_items"]
+```
+
+Each box is a kind of thing the system tracks. Each will usually
+become a table.
+
+## Step 2: read the attributes
+
+Inside each box are attributes. For example, `customers` has `id`,
+`name`, and `email`. The `orders` entity has `id`, `customer_id`,
+`placed_on`, and `status`.
+
+```mermaid
+flowchart TB
+    Entity["orders"] --> ID["id PK"]
+    Entity --> CustomerID["customer_id FK"]
+    Entity --> Placed["placed_on"]
+    Entity --> Status["status"]
+```
+
+The markers matter. `PK` says a column helps identify rows in that
+entity. `FK` says a column points to another entity. `UK` says values
+must be unique.
+
+## Step 3: read the relationships as sentences
+
+Every relationship line can become an English sentence.
+
+```mermaid
+flowchart TB
+    A["customers ||--o{ orders"] --> S1["One customer places zero or many orders"]
+    B["orders ||--|{ order_items"] --> S2["One order contains one or many order items"]
+    C["products ||--o{ order_items"] --> S3["One product appears in zero or many order items"]
+```
+
+The words are just as important as the symbols. If the sentence sounds
+wrong to the business, the diagram needs work.
+
+## Quick check
+
+<MultipleChoice
+  markdown={`In the shop diagram, which entity acts as the line between orders and products?
+
+- customers.
+  > Customers place orders, but they do not represent individual product lines inside an order.
+- [o] order_items.
+  > Each order item connects one order to one product and stores facts about that line.
+- products.
+  > Products are the things being purchased, not the per-order line rows.
+- email.
+  > Email is an attribute of customers, not an entity connecting orders and products.
+
+Order items turn the order-product association into rows that can store quantity and line number.`}
+/>
+
+## Step 4: connect the keys to the lines
+
+The relationship lines are stored using foreign keys:
+
+- `orders.customer_id` points to `customers.id`.
+- `order_items.order_id` points to `orders.id`.
+- `order_items.product_id` points to `products.id`.
+
+```mermaid
+flowchart LR
+    O["orders.customer_id<br/>FK"] --> C["customers.id<br/>PK"]
+    I1["order_items.order_id<br/>FK"] --> OID["orders.id<br/>PK"]
+    I2["order_items.product_id<br/>FK"] --> P["products.id<br/>PK"]
+```
+
+The diagram tells you where joins will happen, but it also tells you
+where integrity rules should exist.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Querying through the diagram"
+  initSql={`CREATE TABLE customers (
+  id    INTEGER PRIMARY KEY,
+  name  TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE
+);
+CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER NOT NULL REFERENCES customers(id),
+  placed_on   DATE NOT NULL,
+  status      TEXT NOT NULL
+);
+CREATE TABLE products (
+  id    INTEGER PRIMARY KEY,
+  name  TEXT NOT NULL,
+  price NUMERIC NOT NULL
+);
+CREATE TABLE order_items (
+  order_id    INTEGER NOT NULL REFERENCES orders(id),
+  line_number INTEGER NOT NULL,
+  product_id  INTEGER NOT NULL REFERENCES products(id),
+  quantity    INTEGER NOT NULL CHECK (quantity > 0),
+  PRIMARY KEY (order_id, line_number)
+);
+INSERT INTO customers VALUES (1, 'Ada', 'ada@example.com');
+INSERT INTO orders VALUES (101, 1, DATE '2025-04-01', 'placed');
+INSERT INTO products VALUES (10, 'Notebook', 8.50), (11, 'Pen', 1.25);
+INSERT INTO order_items VALUES (101, 1, 10, 2), (101, 2, 11, 3);`}
+  initialCode={`SELECT c.name AS customer,
+       o.id AS order_id,
+       oi.line_number,
+       p.name AS product,
+       oi.quantity
+FROM customers c
+JOIN orders o ON o.customer_id = c.id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products p ON p.id = oi.product_id
+ORDER BY o.id, oi.line_number;`}
+/>
+
+The joins follow the foreign keys from the diagram. Reading the diagram
+helps you predict the query path.
+
+## Step 5: notice composite keys
+
+`order_items` uses `(order_id, line_number)` as its primary key. That
+means line `1` can appear in many different orders, but only once
+inside the same order.
+
+```mermaid
+flowchart TB
+    Key["Primary key:<br/>order_id + line_number"] --> Row1["order 101,<br/>line 1"]
+    Key --> Row2["order 101,<br/>line 2"]
+    Key --> Row3["order 102,<br/>line 1"]
+```
+
+Composite keys are common for line-item tables because the line number
+only has meaning within its parent order.
+
+## Reading checklist
+
+When you meet a new ER diagram, use this order:
+
+```mermaid
+flowchart TB
+    A["1. Find entity boxes"] --> B["2. Read attributes"]
+    B --> C["3. Mark PK, FK, UK"]
+    C --> D["4. Turn lines into sentences"]
+    D --> E["5. Check cardinality<br/>in both directions"]
+    E --> F["6. Imagine the joins"]
+```
+
+This keeps you from staring at symbols randomly. You are translating a
+picture into plain English and then into schema rules.
+
+## Check your understanding
+
+Use this small diagram for the questions below:
+
+```mermaid
+erDiagram
+    authors ||--o{ books : writes
+    publishers ||--o{ books : publishes
+    authors {
+        int id PK
+        text name
+    }
+    publishers {
+        int id PK
+        text name
+    }
+    books {
+        int id PK
+        int author_id FK
+        int publisher_id FK
+        text title
+    }
+```
+
+<MultipleChoice
+  markdown={`According to the diagram, how many books can one author write?
+
+- Exactly one book.
+  > The books side shows o{, which allows zero or many books for one author.
+- [o] Zero or many books.
+  > The circle plus crow's foot on the books side means an author may have no books or many books.
+- Exactly two books.
+  > Crow's-foot notation does not express a fixed count of two here.
+- No books, because authors and books are separate entities.
+  > Separate entities can still be related through foreign keys.
+
+The symbol at the far side tells how many rows can connect to one row on the near side.`}
+/>
+
+<MultipleChoice
+  markdown={`Which column in books stores the relationship to publishers?
+
+- books.id.
+  > The book id identifies the book row itself.
+- books.title.
+  > The title describes the book but does not point to a publisher row.
+- [o] books.publisher_id.
+  > The FK marker shows this column points to publishers.id.
+- authors.name.
+  > The author's name belongs to the authors entity, not the books-to-publishers relationship.
+
+Foreign key attributes are the stored links between entities.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the primary key of authors in the diagram?
+
+- name.
+  > The diagram does not mark name as the primary key.
+- [o] id.
+  > The PK marker beside id identifies it as the primary key.
+- book_id.
+  > No book_id attribute appears inside authors.
+- publisher_id.
+  > Publisher ids appear in the books table, not as the authors primary key.
+
+The PK marker tells you which attribute identifies rows in that entity.`}
+/>
+
+<MultipleChoice
+  markdown={`Which plain-English sentence best matches publishers ||--o{ books : publishes?
+
+- One book publishes zero or many publishers.
+  > The sentence reverses the meaning of the relationship.
+- Every publisher must publish exactly one book.
+  > The o{ symbol allows zero or many books, not exactly one.
+- [o] One publisher can publish zero or many books, and each book points to one publisher.
+  > This matches the one-to-many cardinality shown by the line and the foreign key in books.
+- Publishers and books cannot be joined.
+  > The publisher_id FK column is exactly the join path.
+
+Reading ER diagrams means turning symbols into careful English statements.`}
+/>

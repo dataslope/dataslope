@@ -1,0 +1,312 @@
+---
+title: Referential Integrity
+description: Understand how PostgreSQL keeps references valid and how delete or update actions express design choices.
+---
+
+A foreign key says one row points to another. **Referential integrity**
+is the guarantee that the pointer is not a lie.
+
+If an order stores `customer_id = 7`, then customer `7` must exist. If a
+comment stores `post_id = 20`, then post `20` must exist. The database
+protects those promises so your design cannot quietly drift into broken
+links.
+
+## The orphan-row problem
+
+An **orphan row** is a child row that points to a parent row that does
+not exist.
+
+```mermaid
+flowchart LR
+    O["orders<br/>order_id = 101<br/>customer_id = 7"] --> C["customers<br/>customer_id = 7"]
+    X["orders<br/>order_id = 102<br/>customer_id = 99"] --> M["missing customer 99"]:::bad
+    M --> P["Orphan row"]:::bad
+    classDef bad fill:#fee2e2,stroke:#b91c1c
+```
+
+Orphans are not just untidy. They break the meaning of the data. A join
+may lose the order. A report may count revenue without a customer. A UI
+may try to show details that do not exist.
+
+Referential integrity says: every reference must point to something
+real.
+
+```mermaid
+flowchart TB
+    FK["Child foreign key value"] --> Q{"Does the parent key exist?"}
+    Q -->|"yes"| A["Accept the row"]:::good
+    Q -->|"no"| R["Reject the change"]:::bad
+    classDef good fill:#dcfce7,stroke:#15803d
+    classDef bad fill:#fee2e2,stroke:#b91c1c
+```
+
+## Enforcement is part of the design
+
+When you declare a foreign key, PostgreSQL checks inserts and updates on
+the child table. It also checks changes to the parent table. If deleting
+a parent would leave children pointing nowhere, the database needs a
+rule for what should happen.
+
+That rule is not just a DBA setting. It expresses what the relationship
+*means*.
+
+## Quick check
+
+<MultipleChoice
+  markdown={`What does referential integrity guarantee?
+
+- Every table has the same number of rows.
+  > Related tables usually have different row counts.
+- [o] Every foreign key value points to an existing referenced row.
+  > Referential integrity keeps child references from dangling.
+- Every text value is spelled correctly.
+  > Spelling is a data quality issue, but not the meaning of referential integrity.
+- Every primary key starts at 1.
+  > Key numbering is unrelated; the guarantee is about valid references.
+
+Referential integrity means references remain real, not imaginary.`}
+/>
+
+## Delete behavior is a design choice
+
+Imagine deleting a customer who has orders. What should happen to the
+orders? PostgreSQL can enforce several designs.
+
+```mermaid
+flowchart TB
+    D["Delete parent row"] --> Q{"What should happen to child rows?"}
+    Q -->|"RESTRICT"| R["Block the delete"]
+    Q -->|"CASCADE"| C["Delete children too"]
+    Q -->|"SET NULL"| N["Keep children<br/>clear the reference"]
+```
+
+The right answer depends on the meaning of the relationship.
+
+### RESTRICT: child rows must keep their parent
+
+`RESTRICT` means the parent cannot be deleted while children still refer
+to it. This is a good fit when child rows make no sense without the
+parent, or when deleting history would be dangerous.
+
+Examples: orders that must keep their customer, invoice lines that must
+keep their invoice, payments that must keep their account.
+
+```mermaid
+flowchart LR
+    C["Customer"] --> O["Orders exist"]
+    O --> R["Delete is blocked"]:::warn
+    classDef warn fill:#fef3c7,stroke:#b45309
+```
+
+### CASCADE: child rows belong entirely to the parent
+
+`CASCADE` means deleting the parent also deletes the children. This is a
+good fit when child rows are dependent details that should disappear
+with the parent.
+
+Examples: comments on a deleted draft, line items in a temporary cart,
+settings owned by a removed profile.
+
+```mermaid
+flowchart LR
+    P["Delete project"] --> T["Delete project tasks"] --> D["No leftovers"]:::good
+    classDef good fill:#dcfce7,stroke:#15803d
+```
+
+### SET NULL: the child can survive without a parent
+
+`SET NULL` means the child row remains, but the foreign key is cleared.
+This only works when the foreign key column allows `NULL`.
+
+Examples: a support ticket whose assigned employee left, or a blog post
+whose optional editor was removed.
+
+```mermaid
+flowchart LR
+    E["Delete employee"] --> T["ticket.assigned_employee_id = NULL"]
+    T --> K["Ticket stays open"]
+```
+
+## Quick check
+
+<MultipleChoice
+  markdown={`Which delete behavior best matches "a task should disappear when its temporary project is deleted"?
+
+- RESTRICT.
+  > RESTRICT would block deleting the project while tasks exist.
+- [o] CASCADE.
+  > CASCADE matches dependent child rows that should be removed with their parent.
+- SET NULL on a NOT NULL column.
+  > SET NULL requires the foreign key column to allow nulls.
+- No foreign key.
+  > Removing the constraint would allow broken references instead of defining the intended behavior.
+
+Delete behavior should match the real meaning of the parent-child relationship.`}
+/>
+
+## Watch CASCADE and RESTRICT differ
+
+This block creates two parent-child designs. Deleting a draft cascades to
+its comments. Deleting an account with invoices is restricted.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="ON DELETE CASCADE versus RESTRICT"
+  initSql={`CREATE TABLE drafts (
+  draft_id INTEGER PRIMARY KEY,
+  title    TEXT NOT NULL
+);
+
+CREATE TABLE draft_comments (
+  comment_id INTEGER PRIMARY KEY,
+  draft_id   INTEGER NOT NULL REFERENCES drafts(draft_id) ON DELETE CASCADE,
+  body       TEXT NOT NULL
+);
+
+CREATE TABLE accounts (
+  account_id INTEGER PRIMARY KEY,
+  name       TEXT NOT NULL
+);
+
+CREATE TABLE invoices (
+  invoice_id INTEGER PRIMARY KEY,
+  account_id INTEGER NOT NULL REFERENCES accounts(account_id) ON DELETE RESTRICT,
+  total      NUMERIC NOT NULL
+);
+
+INSERT INTO drafts VALUES (1, 'Temporary plan');
+INSERT INTO draft_comments VALUES (10, 1, 'Needs revision');
+
+INSERT INTO accounts VALUES (1, 'Ada Co');
+INSERT INTO invoices VALUES (100, 1, 250.00);`}
+  initialCode={`-- CASCADE: deleting the draft also deletes its comments.
+DELETE FROM drafts WHERE draft_id = 1;
+SELECT * FROM draft_comments;
+
+-- RESTRICT: deleting this account would orphan an invoice, so it fails.
+DELETE FROM accounts WHERE account_id = 1;
+SELECT * FROM invoices;`}
+/>
+
+The first delete removes dependent comments. The second delete is
+blocked because invoices are treated as records that must not lose their
+account.
+
+## ON UPDATE is the same kind of question
+
+Primary keys should be stable, but natural keys sometimes change. `ON
+UPDATE` actions define what happens to child references if the parent
+key changes.
+
+```mermaid
+flowchart TB
+    U["Parent key changes"] --> Q{"How should references respond?"}
+    Q -->|"RESTRICT"| A["Block the key change"]
+    Q -->|"CASCADE"| B["Update child keys too"]
+    Q -->|"SET NULL"| C["Clear child references"]
+```
+
+The design lesson is the same: choose the behavior that matches the
+meaning of your data. If a key change would be dangerous, restrict it.
+If the child should follow the parent identity, cascade may make sense.
+If the relationship is optional, setting null may be appropriate.
+
+<Callout type="info" title="Prefer stable keys">
+If you often need `ON UPDATE CASCADE`, ask whether the parent key is too
+changeable. A generated surrogate key usually avoids that pressure by
+keeping identity separate from editable real-world attributes.
+</Callout>
+
+## How to choose
+
+Use this decision path as a design conversation, not a mechanical rule.
+
+```mermaid
+flowchart TB
+    S["Parent row is removed"] --> A{"Must child rows remain?"}
+    A -->|"no"| C["CASCADE"]
+    A -->|"yes"| B{"Can the relationship become unknown or optional?"}
+    B -->|"yes"| N["SET NULL"]
+    B -->|"no"| R["RESTRICT"]
+```
+
+Ask what the child row means without the parent. If it means nothing,
+cascade may be honest. If it must preserve history, restrict the delete.
+If it can exist unattached, set the reference to null.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is an orphan row?
+
+- A parent row with many children.
+  > Having many children is a normal one-to-many relationship.
+- [o] A child row whose foreign key points to a parent row that does not exist.
+  > Orphans are exactly the broken references referential integrity prevents.
+- A row with a primary key.
+  > Primary keys identify rows; they do not make rows orphaned.
+- A row that appears at the top of a result set.
+  > Result order is unrelated to parent-child validity.
+
+Orphan rows are broken links in the data model.`}
+/>
+
+<MultipleChoice
+  markdown={`When is \`ON DELETE RESTRICT\` a good design choice?
+
+- When children should always be deleted automatically with the parent.
+  > That meaning is modeled by \`CASCADE\`, not \`RESTRICT\`.
+- [o] When child rows must not lose their parent, so deleting the parent should be blocked.
+  > RESTRICT protects child rows by refusing a parent delete that would orphan them.
+- When the foreign key should become null every time.
+  > That meaning is modeled by \`SET NULL\` when the column allows nulls.
+- When there is no relationship between the tables.
+  > Delete behavior only matters because a relationship exists.
+
+RESTRICT is the "do not break this relationship" option.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`ON DELETE CASCADE\` mean?
+
+- Deleting a child row deletes the whole database.
+  > Cascade applies to related rows through the declared foreign key, not to the entire database.
+- Deleting a parent sets every child foreign key to zero.
+  > Cascade deletes child rows; it does not invent a replacement value.
+- [o] Deleting a parent row automatically deletes child rows that reference it.
+  > CASCADE is useful for dependent data that should not outlive its parent.
+- Deleting a parent is always blocked.
+  > Blocking the delete is the role of RESTRICT.
+
+CASCADE treats child rows as dependent parts of the parent.`}
+/>
+
+<MultipleChoice
+  markdown={`What must be true for \`ON DELETE SET NULL\` to work?
+
+- The child foreign key column must be \`NOT NULL\`.
+  > A NOT NULL column cannot be set to null, so this would conflict with SET NULL.
+- [o] The child foreign key column must allow \`NULL\`.
+  > SET NULL needs somewhere to put the cleared reference, so the column cannot be \`NOT NULL\`.
+- The parent table must have no primary key.
+  > A referenced parent key is still required.
+- The child row must be deleted first.
+  > SET NULL keeps the child row instead of requiring its deletion.
+
+SET NULL models an optional relationship where the child can survive unattached.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are \`ON DELETE\` and \`ON UPDATE\` actions design choices?
+
+- Because they change the font used in ER diagrams.
+  > They affect data behavior, not diagram appearance.
+- Because they decide whether SQL keywords are uppercase.
+  > Keyword style is unrelated to relationship meaning.
+- [o] Because they define what the relationship means when referenced rows change or disappear.
+  > The action encodes whether children are dependent, historical, optional, or protected.
+- Because PostgreSQL chooses a random behavior unless you draw a diagram.
+  > PostgreSQL follows declared constraints and defaults; designers should choose intentionally.
+
+Reference actions turn relationship meaning into enforced database behavior.`}
+/>

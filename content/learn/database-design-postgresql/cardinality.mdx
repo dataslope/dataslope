@@ -1,0 +1,343 @@
+---
+title: "Cardinality: One, Many, and How Many"
+description: Learn how cardinality describes the number of rows that may participate on each side of a relationship.
+---
+
+Two entities can be related, but that is not enough detail. A customer
+places orders — but how many orders can one customer place? Must every
+order have a customer? Can one product appear on many orders?
+
+**Cardinality** answers: *how many rows on one side may relate to how
+many rows on the other side?*
+
+## Cardinality is about counts
+
+When you read a relationship, ask both directions:
+
+- For one row on the left, how many rows on the right can connect?
+- For one row on the right, how many rows on the left can connect?
+
+```mermaid
+flowchart TB
+    Relationship["Customer places Order"] --> Q1["One customer can have<br/>how many orders?"]
+    Relationship --> Q2["One order can have<br/>how many customers?"]
+    Q1 --> Many["zero, one, or many"]
+    Q2 --> One["exactly one"]
+```
+
+That gives us a one-to-many relationship: one customer, many orders.
+
+## One-to-many
+
+A **one-to-many** relationship means one row on the first side can
+connect to many rows on the second side, while each row on the second
+side connects back to one row on the first side.
+
+```mermaid
+erDiagram
+    customers ||--o{ orders : places
+    customers {
+        int id PK
+        text name
+    }
+    orders {
+        int id PK
+        int customer_id FK
+    }
+```
+
+Read `||--o{` as "one to zero-or-many." The order side is optional
+and many: a customer may have no orders yet, or many orders later.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="One customer can have many orders"
+  initSql={`CREATE TABLE customers (
+  id   INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER NOT NULL REFERENCES customers(id)
+);
+INSERT INTO customers VALUES (1, 'Ada'), (2, 'Grace');
+INSERT INTO orders VALUES (101, 1), (102, 1), (103, 2);`}
+  initialCode={`SELECT c.name, COUNT(o.id) AS order_count
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.id, c.name
+ORDER BY c.id;`}
+/>
+
+The foreign key goes on the "many" side. Many order rows can store the
+same `customer_id`.
+
+## One-to-one
+
+A **one-to-one** relationship means one row on each side can connect to
+at most one row on the other side. A common example is a user and a
+profile.
+
+```mermaid
+erDiagram
+    users ||--|| profiles : owns
+    users {
+        int id PK
+        text email
+    }
+    profiles {
+        int user_id PK, FK
+        text display_name
+    }
+```
+
+The `||--||` line says each side is exactly one. In practice, some
+one-to-one relationships are optional on one side.
+
+```mermaid
+erDiagram
+    employees ||--o| parking_passes : receives
+    employees {
+        int id PK
+        text name
+    }
+    parking_passes {
+        int id PK
+        int employee_id FK, UK
+    }
+```
+
+Here an employee may have zero or one parking pass. A parking pass, if
+it exists, belongs to one employee.
+
+## Quick check
+
+<MultipleChoice
+  markdown={`In a one-to-many relationship between customers and orders, where does the foreign key usually go?
+
+- On the customers table, storing a list of order ids.
+  > A single customer row may relate to many orders, and a single cell should not store a list of ids.
+- [o] On the orders table, because each order points to one customer.
+  > The many-side table can repeat the same customer id across many rows.
+- On both tables, with each side copying all columns from the other.
+  > Copying columns duplicates data and does not create a clean relationship.
+- On neither table, because one-to-many relationships cannot be stored.
+  > One-to-many relationships are commonly stored with a foreign key on the many side.
+
+The many side carries the foreign key because each many-side row chooses one parent.`}
+/>
+
+## Many-to-many
+
+A **many-to-many** relationship means many rows on each side can
+connect to many rows on the other side. Students and courses are the
+classic example.
+
+```mermaid
+erDiagram
+    students }o--o{ courses : enrolls
+    students {
+        int id PK
+        text name
+    }
+    courses {
+        int id PK
+        text title
+    }
+```
+
+This diagram describes the real-world cardinality, but the relational
+schema needs a junction table to store the pairings.
+
+```mermaid
+erDiagram
+    students ||--o{ enrollments : has
+    courses ||--o{ enrollments : has
+    students {
+        int id PK
+        text name
+    }
+    courses {
+        int id PK
+        text title
+    }
+    enrollments {
+        int student_id PK, FK
+        int course_id PK, FK
+    }
+```
+
+The junction table turns many-to-many into two one-to-many
+relationships.
+
+## Optional vs mandatory participation
+
+Cardinality also includes the minimum number of related rows. This is
+sometimes called **participation**.
+
+- **Optional** means zero is allowed.
+- **Mandatory** means at least one is required.
+
+```mermaid
+flowchart LR
+    Optional["o<br/>zero allowed"] --> Meaning1["optional participation"]
+    Mandatory["|<br/>one required"] --> Meaning2["mandatory participation"]
+    Many["{<br/>many allowed"] --> Meaning3["maximum is many"]
+```
+
+Crow's-foot symbols combine minimum and maximum. `o{` means zero or
+many. `||` means exactly one. `o|` means zero or one.
+
+```mermaid
+erDiagram
+    customers ||--o{ orders : places
+    orders ||--|{ order_items : contains
+    products ||--o{ order_items : appears
+    customers {
+        int id PK
+    }
+    orders {
+        int id PK
+        int customer_id FK
+    }
+    products {
+        int id PK
+    }
+    order_items {
+        int order_id FK
+        int product_id FK
+    }
+```
+
+This says a customer can have zero or many orders, but an order has one
+or more order items. The `|{` end means "one or many."
+
+## Quick check
+
+<MultipleChoice
+  markdown={`What does optional participation mean in a relationship?
+
+- The relationship is not important and should be ignored.
+  > Optional still matters; it only means a row can exist without a related row on that side.
+- [o] A row is allowed to have zero related rows on that side of the relationship.
+  > Optional participation means the minimum cardinality is zero.
+- Every row must have at least two related rows.
+  > That describes a different minimum, not optional participation.
+- The foreign key must always be text.
+  > Participation is about row counts, not data type.
+
+Optionality is the minimum side of cardinality: zero allowed or not.`}
+/>
+
+## Cardinality changes the schema
+
+If one employee can have many devices, the devices table can store
+`employee_id`. If one employee can have at most one active badge, the
+badge table needs a uniqueness rule on `employee_id`.
+
+```mermaid
+erDiagram
+    employees ||--o{ devices : assigned
+    employees ||--o| badges : receives
+    employees {
+        int id PK
+        text name
+    }
+    devices {
+        int id PK
+        int employee_id FK
+    }
+    badges {
+        int id PK
+        int employee_id FK, UK
+    }
+```
+
+The difference between `o{` and `o|` is not decorative. It changes the
+constraints you need.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Uniqueness turns many into at-most-one"
+  initSql={`CREATE TABLE employees (
+  id   INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE badges (
+  id          INTEGER PRIMARY KEY,
+  employee_id INTEGER NOT NULL UNIQUE REFERENCES employees(id)
+);
+INSERT INTO employees VALUES (1, 'Ada');
+INSERT INTO badges VALUES (10, 1);`}
+  initialCode={`-- This tries to give Ada a second badge.
+-- The UNIQUE rule on employee_id rejects it.
+INSERT INTO badges VALUES (11, 1);
+
+SELECT * FROM badges;`}
+/>
+
+PostgreSQL does not understand the picture directly. You translate the
+picture into keys, `NOT NULL`, `UNIQUE`, and sometimes additional
+constraints or application rules.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does **cardinality** describe?
+
+- The color used for a table in a diagram.
+  > Diagram styling is not the meaning of cardinality.
+- [o] How many rows on each side of a relationship may relate to rows on the other side.
+  > Cardinality is about counts: one, many, optional, and mandatory.
+- The exact order in which SQL statements must be typed.
+  > SQL order is separate from the modeling concept of cardinality.
+- Whether a column stores text or numbers.
+  > Data type describes values inside a column, not relationship counts.
+
+Cardinality turns a vague relationship into a precise modeling rule.`}
+/>
+
+<MultipleChoice
+  markdown={`Which relationship is best described as many-to-many?
+
+- One order is placed by one customer, and a customer may place many orders.
+  > That is one-to-many from customers to orders.
+- One user has one required profile.
+  > That is one-to-one.
+- [o] A student can take many courses, and a course can contain many students.
+  > Both sides can have many related rows, so the relationship is many-to-many.
+- One parking pass belongs to one employee, and an employee may have no pass.
+  > That is one-to-zero-or-one, not many-to-many.
+
+Many-to-many means "many" is possible in both directions.`}
+/>
+
+<MultipleChoice
+  markdown={`In Crow's-foot notation, what does o{ usually mean at one end of a relationship?
+
+- Exactly one.
+  > The two-bar symbol, ||, represents exactly one.
+- Zero or one.
+  > Zero or one is represented by o|.
+- [o] Zero or many.
+  > The circle means optional, and the crow's foot means many.
+- One or many, with zero forbidden.
+  > One or many is represented by |{.
+
+The two symbols together show minimum and maximum cardinality.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a one-to-zero-or-one relationship often need a UNIQUE constraint on the foreign key?
+
+- To make the foreign key store several ids in one cell.
+  > A unique foreign key still stores one value per row; it prevents repeats across rows.
+- [o] To prevent many rows from pointing to the same parent row.
+  > Without uniqueness, the same parent id could appear on many child rows, making the relationship one-to-many.
+- To remove the need for a primary key on the parent table.
+  > The foreign key still needs a reliable target, usually the parent's primary key.
+- To make optional rows mandatory.
+  > Uniqueness controls the maximum count; optionality controls the minimum count.
+
+Maximum cardinality often becomes a uniqueness rule in the schema.`}
+/>
