@@ -119,6 +119,18 @@ samp {
   color: hsl(0, 0%, 80%);
 }
 
+/* Sidebar navigation links, folder-trigger buttons, and separator labels
+   ("Dataslope" logo link included) → Source Serif. The opsz axis is set
+   to 14 for text at ~13–15 px to get the optical balance right at small
+   sizes. Letter-spacing resets to 0 to undo the tight `body` tracking. */
+#nd-sidebar a,
+#nd-sidebar button,
+#nd-sidebar p {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-variation-settings: "opsz" 14;
+  letter-spacing: 0;
+}
+
 /* Item 3: Dark mode — make the sidebar use the same background as the content
    area (#121212) instead of the default card color (#191919). Also bring
    prose body text in line with the Fumadocs foreground token so it matches
@@ -135,15 +147,19 @@ body {
   letter-spacing: -0.011em;
 }
 
-/* Tighten headings a touch more — Inter looks crispest with negative
-   tracking at display sizes. */
+/* Source Serif 4 for headings — the opsz axis is bumped to 20 so the
+   typeface self-optimises at display sizes (wider apertures, adjusted
+   contrast). Letter-spacing resets to 0 to undo the tight Inter value
+   set on `body` above. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-variation-settings: "opsz" 20;
+  letter-spacing: 0;
 }
 
 /* ── Syntax highlighting (highlight.js, GitHub theme) ────────────────
@@ -364,18 +380,67 @@ code.hljs {
   letter-spacing: 0;
 }
 
-/* Restore sans-serif inside challenge / quiz / code components in case any
-   of those elements happen to fall under a .prose ancestor. */
+/* ── TOC navigation ──────────────────────────────────────────────────────
+   Each TOC item is an <a> inside #nd-toc (desktop) or inside the mobile
+   popover ([data-toc-popover-content]). The panel title is an <h3>.
+   opsz 14 is appropriate for the small (~13–14 px) text used here.
+   ─────────────────────────────────────────────────────────────────────── */
+#nd-toc a,
+#nd-toc h3,
+[data-toc-popover-content] a {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-variation-settings: "opsz" 14;
+  letter-spacing: 0;
+}
+
+/* ── Page-footer navigation (prev / next) ────────────────────────────────
+   The footer <a> links each contain <p> elements for the page name and
+   the "Previous / Next page" label. They live inside a <div> that is a
+   direct child of #nd-page (outside .prose). Targeting #nd-page > div a p
+   avoids touching breadcrumb links (which use <span>, not <p>).
+   ─────────────────────────────────────────────────────────────────────── */
+#nd-page > div a p {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-variation-settings: "opsz" 14;
+  letter-spacing: 0;
+}
+
+/* ── Source Serif for MCQ and challenge card body text ──────────────────
+   The .prose rule above excludes these components so its prose font-size
+   (1.125 rem) doesn't bleed in. We apply Source Serif here directly at a
+   smaller opsz that suits the ~14–15 px text used inside the cards.
+
+   Neither component's header uses <p> or <li> — the badge, mode label,
+   title, and status labels are all rendered as <span> or <div> — so no
+   extra header exclusion is needed: they naturally stay in Inter (their
+   CSS module sets font-family on the .card container, which those spans
+   inherit).
+
+   <code>, <pre>, and elements with explicit font-family in their CSS
+   module (e.g. .submitBtn, .sqlResultTable) are unaffected because those
+   rules directly target those selectors with higher specificity or
+   explicit values that beat inheritance.
+   ─────────────────────────────────────────────────────────────────────── */
 [data-flavor] p,
 [data-flavor] li,
-[data-flavor] td,
-[data-flavor] th,
 [data-testid="challenge-card"] p,
 [data-testid="challenge-card"] li,
+[aria-label="Multiple choice question"] p,
+[aria-label="Multiple choice question"] li {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-variation-settings: "opsz" 14;
+  letter-spacing: 0;
+}
+
+/* Restore sans-serif on <td> and <th> inside challenge/quiz cards.
+   These cover SQL result tables (.sqlResultTable) and markdown tables in
+   instructions. The CSS module sets font-family: mono on .sqlResultTable
+   itself (inherited by td/th), so forcing sans-serif here avoids the
+   Source Serif rule overriding that inherited mono value. */
+[data-flavor] td,
+[data-flavor] th,
 [data-testid="challenge-card"] td,
 [data-testid="challenge-card"] th,
-[aria-label="Multiple choice question"] p,
-[aria-label="Multiple choice question"] li,
 [aria-label="Multiple choice question"] td,
 [aria-label="Multiple choice question"] th {
   font-family: var(--font-sans);
