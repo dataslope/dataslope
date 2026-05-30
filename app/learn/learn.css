@@ -325,6 +325,7 @@ code.hljs {
   :where([data-callout] *, .callout *)
 ) {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
   font-variation-settings: "opsz" 16;
   letter-spacing: 0;
 }
