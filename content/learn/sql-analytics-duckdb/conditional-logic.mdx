@@ -1,0 +1,219 @@
+---
+title: Conditional Logic
+description: CASE expressions for bucketing, labeling, and conditional aggregation — including the powerful FILTER clause and SUM(CASE ...) pattern that builds pivot-style summaries.
+---
+
+Raw data rarely arrives in the categories your analysis needs. You have
+exact ages but want brackets; exact amounts but want "small / medium /
+large"; a `status` column but want separate counts of paid and refunded
+in one row. **Conditional logic** — the `CASE` expression and friends — is
+how analysts reshape values on the fly. This page also introduces
+**conditional aggregation**, one of the most useful patterns in all of
+analytical SQL.
+
+## `CASE`: if/else for a column
+
+A `CASE` expression evaluates conditions in order and returns the value
+for the first one that matches. It is SQL's if/else, and it turns a
+continuous or messy column into clean, analysis-ready categories.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Bucket amounts into size labels"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500);`}
+  initialCode={`SELECT
+  id,
+  amount,
+  CASE
+    WHEN amount < 50  THEN 'small'
+    WHEN amount < 200 THEN 'medium'
+    ELSE 'large'
+  END AS size_bucket
+FROM orders
+ORDER BY amount;`}
+/>
+
+The conditions are tested **top to bottom**, and the first match wins —
+so order them from most specific to most general. If nothing matches and
+there is no `ELSE`, the result is `NULL`.
+
+## Group by a `CASE` bucket
+
+Because a `CASE` produces a value like any other, you can `GROUP BY` it —
+inventing a dimension that does not exist in the data and summarizing by
+it. This is the "derived bucket" idea from the grouping lesson, now in
+your toolkit for good.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="How many orders in each size bucket?"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
+  initialCode={`SELECT
+  CASE
+    WHEN amount < 50  THEN 'small'
+    WHEN amount < 200 THEN 'medium'
+    ELSE 'large'
+  END         AS size_bucket,
+  COUNT(*)    AS orders,
+  SUM(amount) AS revenue
+FROM orders
+GROUP BY size_bucket
+ORDER BY revenue DESC;`}
+/>
+
+## Conditional aggregation: `SUM(CASE ...)`
+
+Here is the pattern that feels like magic the first time you see it. By
+putting a `CASE` *inside* an aggregate, you can compute **several
+filtered totals in a single row** — paid vs. refunded, this year vs. last,
+mobile vs. desktop — all side by side.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Paid and refunded totals, side by side"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
+  (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95),
+  (7,'East','refunded',30),(8,'North','paid',100);`}
+  initialCode={`SELECT
+  region,
+  SUM(CASE WHEN status = 'paid'     THEN amount ELSE 0 END) AS paid_revenue,
+  SUM(CASE WHEN status = 'refunded' THEN amount ELSE 0 END) AS refunded_revenue,
+  COUNT(*) FILTER (WHERE status = 'paid')                   AS paid_orders
+FROM orders
+GROUP BY region
+ORDER BY region;`}
+/>
+
+How it works: for each row, the inner `CASE` contributes the `amount` only
+when the condition holds (and `0` otherwise), so `SUM` adds up just the
+matching rows. You get one column per condition — effectively pivoting a
+category into columns. The last column uses DuckDB's cleaner **`FILTER`**
+clause, which does the same thing more readably.
+
+```mermaid
+flowchart LR
+    R[("rows with<br/>status: paid / refunded")] --> C1["SUM(CASE WHEN paid)"]
+    R --> C2["SUM(CASE WHEN refunded)"]
+    C1 --> Out["one row:<br/>paid_revenue | refunded_revenue"]
+    C2 --> Out
+```
+
+## `FILTER` — the modern, readable alternative
+
+DuckDB supports the SQL-standard `FILTER (WHERE ...)` clause on aggregates,
+which expresses conditional aggregation more clearly than `CASE` inside
+`SUM`. Prefer it when available.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="The same idea, written with FILTER"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
+  (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95);`}
+  initialCode={`SELECT
+  region,
+  SUM(amount) FILTER (WHERE status = 'paid')     AS paid_revenue,
+  SUM(amount) FILTER (WHERE status = 'refunded') AS refunded_revenue,
+  COUNT(*)    FILTER (WHERE status = 'paid')     AS paid_orders
+FROM orders
+GROUP BY region
+ORDER BY region;`}
+/>
+
+`SUM(amount) FILTER (WHERE status = 'paid')` reads almost like English:
+"sum the amount, but only for paid rows." It is the analyst's preferred
+way to build these side-by-side filtered metrics.
+
+## Handling NULLs: `COALESCE` and `NULLIF`
+
+Two small but constant companions of conditional logic:
+
+- **`COALESCE(a, b, ...)`** returns the first non-NULL argument — perfect
+  for filling in a default: `COALESCE(discount, 0)`.
+- **`NULLIF(a, b)`** returns `NULL` when `a = b` — most often used to
+  avoid divide-by-zero: `amount / NULLIF(quantity, 0)`.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Safe defaults and safe division"
+  initSql={`CREATE TABLE line_items (
+  id INTEGER, amount DECIMAL(8,2), quantity INTEGER, discount DECIMAL(8,2)
+);
+INSERT INTO line_items VALUES
+  (1, 100, 4, NULL), (2, 60, 0, 5), (3, 80, 2, NULL);`}
+  initialCode={`SELECT
+  id,
+  COALESCE(discount, 0)                  AS discount_filled,
+  ROUND(amount / NULLIF(quantity, 0), 2) AS price_each  -- NULL, not error, when qty=0
+FROM line_items
+ORDER BY id;`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In a \`CASE\` expression with several \`WHEN\` branches, which branch's value is returned?
+
+- The branch with the largest value.
+  > \`CASE\` does not compare result values; it returns the first matching condition's value.
+- [o] The first \`WHEN\` whose condition is true, evaluated top to bottom.
+  > \`CASE\` tests conditions in order and stops at the first match, so branch order matters.
+- All matching branches, concatenated.
+  > Only one value is returned — that of the first matching branch.
+- A random matching branch.
+  > Evaluation is deterministic: the first true condition wins.
+
+\`CASE\` returns the first matching branch, so order conditions from
+specific to general.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END)\` compute per group?
+
+- The total amount of all rows regardless of status.
+  > The \`CASE\` contributes 0 for non-paid rows, so only paid amounts are summed.
+- [o] The total \`amount\` of only the \`paid\` rows, because non-paid rows contribute 0.
+  > The inner \`CASE\` zeroes out non-matching rows, so \`SUM\` effectively totals just the paid amounts.
+- The count of paid rows.
+  > It sums \`amount\`, not a count; a count would use \`COUNT(...)\`.
+- NULL, because of the \`ELSE\`.
+  > The \`ELSE 0\` ensures a numeric contribution; the result is a real sum, not NULL.
+
+Conditional aggregation sums only the rows matching the inner condition,
+producing a filtered total in its own column.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`amount / NULLIF(quantity, 0)\` safer than \`amount / quantity\`?
+
+- It rounds the result automatically.
+  > \`NULLIF\` does not round; it guards against a specific divisor value.
+- [o] When \`quantity\` is 0, \`NULLIF\` turns it into \`NULL\`, so the division yields \`NULL\` instead of a divide-by-zero error.
+  > Dividing by NULL produces NULL rather than failing, which keeps the query running on bad rows.
+- It makes the division faster.
+  > The benefit is safety, not speed.
+- It converts the result to text.
+  > The result stays numeric (or NULL); no type change occurs.
+
+\`NULLIF(quantity, 0)\` converts a zero divisor to NULL, avoiding
+divide-by-zero.`}
+/>
+
+You can now reshape values with conditions and build pivot-style filtered
+metrics. Next, a data type that has its own rules and rewards — **dates
+and time**.
