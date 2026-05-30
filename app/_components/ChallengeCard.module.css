@@ -886,6 +886,7 @@
   border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
   user-select: none;
 }
@@ -960,7 +961,7 @@
    Run pill, but a thinner column reserved just for the disclosure
    arrow. Anchored to the right of `.btnGroupPrimary`. */
 .runBtnChevron {
-  background: var(--ch-accent);
+  background: #1a1a1a;
   color: var(--ch-white);
   border: none;
   padding: 0 8px;
@@ -972,16 +973,16 @@
 }
 
 .runBtnChevron:hover:not(:disabled) {
-  background: var(--ch-accent-hover);
+  background: #111111;
 }
 
 .runBtnChevron:disabled {
-  background: var(--ch-accent-disabled);
+  background: #8a8a8a;
   cursor: not-allowed;
 }
 
 .runBtnChevron[data-popup-open] {
-  background: var(--ch-accent-hover);
+  background: #111111;
 }
 
 .runBtnChevron svg {
@@ -1008,8 +1009,8 @@
   --ch-blue-700: #1d4ed8;
   --ch-blue-900: #1e3a8a;
 
-  background: var(--ch-blue-600);
-  border: 1px solid var(--ch-blue-700);
+  background: #1a1a1a;
+  border: 1px solid #333333;
   border-radius: 8px;
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--ch-black) 12%, transparent),
@@ -1037,7 +1038,7 @@
 
 .runMenuItem:hover,
 .runMenuItem[data-highlighted] {
-  background: var(--ch-blue-700);
+  background: #111111;
 }
 
 .runMenuItem svg {
@@ -1079,7 +1080,7 @@
 }
 
 .runBtn {
-  background: var(--ch-accent);
+  background: #1a1a1a;
   color: var(--ch-white);
   border: none;
   padding: 6px 12px;
@@ -1094,11 +1095,11 @@
 }
 
 .runBtn:hover:not(:disabled) {
-  background: var(--ch-accent-hover);
+  background: #111111;
 }
 
 .runBtn:disabled {
-  background: var(--ch-accent-disabled);
+  background: #8a8a8a;
   cursor: not-allowed;
 }
 
@@ -1760,8 +1761,6 @@
 .sqlResultScroll {
   max-height: 320px;
   overflow: auto;
-  border-top: 1px solid var(--ch-border-light);
-  border-bottom: 1px solid var(--ch-border-light);
 }
 
 .sqlResultTable {
@@ -1769,6 +1768,7 @@
   font-family: var(--ch-font-mono);
   font-size: 13px;
   width: 100%;
+  margin: 0;
 }
 
 .sqlResultTable th {
@@ -1779,7 +1779,7 @@
   text-align: left;
   font-size: 12px;
   color: var(--ch-text-muted);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   position: sticky;
   top: 0;
@@ -1968,13 +1968,12 @@
   box-shadow: 0 1px 0 #0d0d0d;
 }
 
-/* Keep the dropdown menu's kbd chips as semi-transparent white on blue
-   even in dark mode — the general .kbd dark rule would otherwise make them
-   gray (#252525) which clashes with the blue popup background. */
+/* Keep the dropdown menu's kbd chips readable on the white popup background
+   in dark mode. */
 :global(html.dark) .runMenuKbd .kbd {
-  background: color-mix(in srgb, #ffffff 16%, transparent);
-  border-color: color-mix(in srgb, #ffffff 28%, transparent);
-  color: color-mix(in srgb, #ffffff 88%, transparent);
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.7);
   box-shadow: none;
 }
 
@@ -2033,6 +2032,56 @@
   background: #1a1a1a;
 }
 
+:global(html.dark) .runBtn {
+  background: #ffffff;
+  color: #111111;
+}
+
+:global(html.dark) .runBtn:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+:global(html.dark) .runBtn:disabled {
+  background: #cccccc;
+  color: #888888;
+}
+
+:global(html.dark) .btnGroupPrimary .runBtn:not(:last-child) {
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+:global(html.dark) .runBtnChevron {
+  background: #ffffff;
+  color: #111111;
+}
+
+:global(html.dark) .runBtnChevron:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+:global(html.dark) .runBtnChevron:disabled {
+  background: #cccccc;
+  color: #888888;
+}
+
+:global(html.dark) .runBtnChevron[data-popup-open] {
+  background: #e8e8e8;
+}
+
+:global(html.dark) .runMenuPopup {
+  --ch-white: #111111;
+  background: #ffffff;
+  border-color: #e0e0e0;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+:global(html.dark) .runMenuItem:hover,
+:global(html.dark) .runMenuItem[data-highlighted] {
+  background: #f0f0f0;
+}
+
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
 
 .tableViewer {
@@ -2079,6 +2128,7 @@
   border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
   user-select: none;
 }
