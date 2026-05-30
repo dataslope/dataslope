@@ -1,5 +1,7 @@
 .wrap {
   position: relative;
+  font-size: 1rem;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 .expandBtn {

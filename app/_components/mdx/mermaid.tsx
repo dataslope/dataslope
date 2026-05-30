@@ -44,7 +44,8 @@ function MermaidContent({ chart }: { chart: string }) {
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: "strict",
-    fontFamily: "inherit",
+    fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
+    fontSize: 14,
     themeCSS: "margin: 1.5rem auto 0;",
     theme: resolvedTheme === "dark" ? "dark" : "neutral",
   });
