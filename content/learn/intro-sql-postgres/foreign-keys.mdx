@@ -1,0 +1,167 @@
+---
+title: Foreign Keys
+description: The column that turns two separate tables into a connected pair — how a foreign key points at a primary key, and how it protects your data's integrity.
+---
+
+We have hinted at how tables connect: an order stores a customer's
+`id`. That pointing column has a name — a **foreign key** — and it is
+the mechanism that makes the relational model relational. This page
+makes it concrete.
+
+## A foreign key is a pointer to a primary key
+
+A **foreign key** is a column in one table that holds the **primary
+key value of a row in another table.** It is a *reference* — a way
+for one row to say "I belong to that row over there."
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER {
+        int id PK
+        string name
+    }
+    ORDER {
+        int id PK
+        int customer_id FK
+        numeric amount
+    }
+```
+
+In the `orders` table, `customer_id` is a foreign key. Its value is
+the `id` of some customer. Order 101 storing `customer_id = 1` means
+"this order belongs to customer 1 (Ada)."
+
+```mermaid
+flowchart LR
+    O["orders.customer_id = 1"] -->|"refers to"| C["customers.id = 1<br/>(Ada)"]
+```
+
+## Why store an id instead of the name?
+
+Because of everything we learned about identity and consistency.
+The id is **stable** and **unique**; the name is neither. Storing
+`customer_id = 1` rather than `"Ada"` means:
+
+- Ada's name lives in exactly **one** place (the customers table).
+- If she changes her name, every order still points correctly,
+  because the id never changed.
+- Two customers named "Ada" are still unambiguous — they have
+  different ids.
+
+This is the duplication cure from the **Spreadsheets vs. Databases**
+page, now given a precise mechanism.
+
+## Foreign keys protect integrity
+
+Declaring a foreign key does more than document intent — PostgreSQL
+**enforces** it. It will refuse to create an order that points to a
+customer who does not exist. This guarantee is called **referential
+integrity**: every reference actually points to something real.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A foreign key rejects a dangling reference"
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Grace');`}
+  initialCode={`-- Customer 1 (Ada) exists, so this is fine:
+INSERT INTO orders (customer_id, amount) VALUES (1, 42);
+
+-- Customer 99 does NOT exist; the foreign key blocks this:
+INSERT INTO orders (customer_id, amount) VALUES (99, 17);
+
+SELECT * FROM orders;`}
+/>
+
+The phrase `REFERENCES customers(id)` is what declares the foreign
+key. The first insert succeeds; the second is rejected because there
+is no customer 99. The database is preventing an **orphan** — an
+order belonging to nobody.
+
+<Callout type="info" title="Why orphans are dangerous">
+Without referential integrity, you could have orders pointing at
+customers that were deleted or never existed. Reports would
+undercount, joins would lose rows, and "show this order's customer"
+would fail. Foreign keys make such broken links impossible.
+</Callout>
+
+## The shape of a connected pair
+
+Put the two ideas side by side and the whole relational mechanism
+appears:
+
+```mermaid
+flowchart TB
+    subgraph customers["customers"]
+        C1["id = 1 (PK)<br/>name = Ada"]
+        C2["id = 2 (PK)<br/>name = Grace"]
+    end
+    subgraph orders["orders"]
+        O1["id = 101<br/>customer_id = 1 (FK)"]
+        O2["id = 102<br/>customer_id = 1 (FK)"]
+        O3["id = 103<br/>customer_id = 2 (FK)"]
+    end
+    O1 -->|"FK → PK"| C1
+    O2 -->|"FK → PK"| C1
+    O3 -->|"FK → PK"| C2
+```
+
+Primary key on one side, foreign key on the other, arrows pointing
+from the *many* to the *one*. Once you can see this picture, you are
+ready to actually *combine* the two tables — which is the **join**,
+the subject of the next page.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a **foreign key**?
+
+- A second primary key that identifies the same row.
+  > A table has one primary key for identity; a foreign key is different — it points to another table's row.
+- [o] A column that stores the primary key value of a row in another table, creating a reference between them.
+  > A foreign key links tables by holding the identifying value of a related row elsewhere.
+- A password that locks a table.
+  > "Key" here means an identifying reference, not a security credential.
+- A column that must always be unique within its own table.
+  > Uniqueness describes a primary key or a unique constraint; a foreign key value can repeat (many orders share one customer).
+
+A foreign key holds another table's primary key value, linking the two tables.`}
+/>
+
+<MultipleChoice
+  markdown={`Why store \`customer_id\` on an order instead of copying the customer's \`name\`?
+
+- Because names cannot be stored in PostgreSQL.
+  > Names can certainly be stored; the point is that ids make better, stabler references.
+- [o] Because the id is stable and unique, so the customer's details stay in one place and references remain correct even if the name changes.
+  > Referencing by id keeps a single source of truth and avoids duplication and ambiguity.
+- Because an id takes exactly one byte and a name does not.
+  > The benefit is reliability of reference, not a specific storage size.
+- Because foreign keys are not allowed to be text.
+  > Foreign keys can reference text keys too; ids are preferred for stability and uniqueness, not a type restriction.
+
+Referencing by a stable, unique id keeps customer data in one place and references valid over time.`}
+/>
+
+<MultipleChoice
+  markdown={`A foreign key from \`orders.customer_id\` to \`customers.id\` is declared. What does PostgreSQL do if you try to insert an order with \`customer_id = 99\` when no customer 99 exists?
+
+- It creates a placeholder customer 99 automatically.
+  > The database does not invent missing rows; it rejects the reference instead.
+- It inserts the order with a NULL customer.
+  > It does not silently alter your value; it refuses the insert to preserve integrity.
+- [o] It rejects the insert, because the foreign key requires the referenced customer to exist (referential integrity).
+  > Enforcing referential integrity prevents orphaned rows that point to nonexistent records.
+- It deletes the orders table to stay safe.
+  > Rejecting one bad insert never destroys the table; only that insert fails.
+
+A foreign key enforces referential integrity by rejecting references to rows that do not exist.`}
+/>

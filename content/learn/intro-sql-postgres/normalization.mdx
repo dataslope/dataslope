@@ -1,0 +1,209 @@
+---
+title: Normalization
+description: Why we split data into multiple tables — removing duplication step by step so updates stay correct and simple.
+---
+
+When beginners first meet databases, the instinct is to put
+*everything in one big table*. **Normalization** is the disciplined
+process of splitting that big table into smaller, related ones so
+each fact is stored **once**. This page builds the intuition behind
+why that matters — and walks through it step by step.
+
+## The problem: one big table
+
+Imagine tracking orders in a single flat table. Every row repeats
+the customer's name and email, and even the product's price:
+
+```mermaid
+flowchart TB
+    T["orders_flat<br/>order_id | customer_name | customer_email | product | price"]
+    T --> R1["1 | Ada | ada@x.com | Book | 20"]
+    T --> R2["2 | Ada | ada@x.com | Pen  | 3"]
+    T --> R3["3 | Grace | grace@x.com | Book | 20"]
+```
+
+Look at the repetition. "Ada / ada@x.com" appears twice; "Book / 20"
+appears twice. This duplication causes three classic problems.
+
+## The three anomalies duplication causes
+
+```mermaid
+flowchart LR
+    D["Duplicated data"] --> U["Update anomaly:<br/>change Ada's email →<br/>must fix every row"]
+    D --> I["Insertion anomaly:<br/>can't add a product<br/>until someone orders it"]
+    D --> X["Deletion anomaly:<br/>delete last order →<br/>lose the customer too"]
+```
+
+- **Update anomaly:** Ada changes her email. You must update *every*
+  row that mentions her — miss one and the data now disagrees with
+  itself.
+- **Insertion anomaly:** You want to record a new product's price,
+  but the table is about orders — you cannot add the product until
+  someone buys it.
+- **Deletion anomaly:** Delete Ada's only order and you also erase
+  the only record of who Ada is.
+
+Normalization removes these by giving every fact a single home.
+
+## Step by step: splitting the table
+
+The fix is to pull each independent thing into its own table and
+**link** them with keys. Customers become a `customers` table,
+products a `products` table, and `orders` keeps only what is true of
+*that order* plus foreign keys.
+
+```mermaid
+erDiagram
+    customers ||--o{ orders : "places"
+    products  ||--o{ orders : "ordered in"
+    customers {
+        int  id PK
+        text name
+        text email
+    }
+    products {
+        int     id PK
+        text    title
+        numeric price
+    }
+    orders {
+        int id PK
+        int customer_id FK
+        int product_id FK
+    }
+```
+
+Now Ada's email lives in **one** row of `customers`; the book's
+price lives in **one** row of `products`. An order just *points* to
+them. Change the email once and every order instantly reflects it —
+the anomalies vanish.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The normalized design in action"
+  initSql={`CREATE TABLE customers (
+  id    INTEGER PRIMARY KEY,
+  name  TEXT,
+  email TEXT
+);
+CREATE TABLE products (
+  id    INTEGER PRIMARY KEY,
+  title TEXT,
+  price NUMERIC
+);
+CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  product_id  INTEGER REFERENCES products(id)
+);
+INSERT INTO customers (id, name, email) VALUES
+  (1,'Ada','ada@x.com'), (2,'Grace','grace@x.com');
+INSERT INTO products (id, title, price) VALUES
+  (10,'Book',20), (11,'Pen',3);
+INSERT INTO orders (id, customer_id, product_id) VALUES
+  (1,1,10), (2,1,11), (3,2,10);`}
+  initialCode={`-- The duplicated, readable view is rebuilt on demand with a join:
+SELECT o.id AS order_id, c.name, c.email, p.title, p.price
+FROM orders o
+JOIN customers c ON c.id = o.customer_id
+JOIN products  p ON p.id = o.product_id
+ORDER BY o.id;`}
+/>
+
+The "flat" view people liked is not lost — a join reproduces it any
+time. The difference is that it is now *computed* from
+single-source-of-truth tables instead of *stored* with duplication.
+
+## The normal forms, in plain words
+
+Normalization is traditionally described in stages called **normal
+forms**. You do not need the formal definitions yet — the intuition
+is what counts:
+
+```mermaid
+flowchart LR
+    UNF["Unnormalized<br/>one big table"] --> NF1["1NF:<br/>one value per cell,<br/>no repeating groups"]
+    NF1 --> NF2["2NF:<br/>non-key columns depend<br/>on the whole key"]
+    NF2 --> NF3["3NF:<br/>non-key columns depend<br/>on nothing but the key"]
+```
+
+- **First normal form (1NF):** each cell holds a single value — no
+  comma-separated lists, no "product1, product2" in one column.
+- **Second normal form (2NF):** every non-key column depends on the
+  *entire* primary key, not just part of it.
+- **Third normal form (3NF):** non-key columns depend *only* on the
+  key — a customer's email depends on the customer, so it belongs in
+  `customers`, not `orders`.
+
+A handy summary of 3NF: every column should describe **"the key, the
+whole key, and nothing but the key."**
+
+<Callout type="warn" title="Normalization is a balance">
+More tables mean more joins. Most application databases aim for
+third normal form — clean enough to avoid anomalies, practical
+enough to query. Deliberately *de*-normalizing for speed is a real
+technique too, but learn the clean form first: you can only break
+the rules well once you understand them.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the main goal of normalization?
+
+- To make every query run as fast as possible.
+  > Normalization targets correctness and reduced duplication; it can even add joins. Speed is a separate concern.
+- [o] To store each fact once, eliminating the duplication that causes update, insertion, and deletion anomalies.
+  > Giving every fact a single home removes the inconsistencies that duplicated data creates.
+- To combine many tables into one big table.
+  > That is the opposite of normalization; combining tables reintroduces duplication.
+- To remove all relationships between tables.
+  > Normalization relies on relationships (foreign keys) to link the split-out tables.
+
+Normalization removes duplication so each fact lives in exactly one place.`}
+/>
+
+<MultipleChoice
+  markdown={`A flat orders table repeats each customer's email on every order row. What problem does this most directly cause?
+
+- Queries become impossible to write.
+  > Queries still work; the issue is keeping the duplicated values consistent.
+- [o] An update anomaly: changing the email means updating every row that repeats it, risking inconsistency.
+  > With the email duplicated, one missed row leaves the data disagreeing with itself.
+- The table can store only one customer.
+  > A flat table can store many customers; the problem is the repetition, not capacity.
+- Foreign keys stop working.
+  > A flat table has no such foreign keys yet; the problem is duplication.
+
+Duplicated values force multi-row updates, which is the classic update anomaly.`}
+/>
+
+<MultipleChoice
+  markdown={`After normalizing into \`customers\`, \`products\`, and \`orders\`, how do you reproduce the original flat, all-in-one-row view?
+
+- It is permanently lost once you split the tables.
+  > The information is preserved; it is simply recombined on demand.
+- [o] Join the tables back together on their keys whenever you need the combined view.
+  > A join recomputes the flat view from the single-source-of-truth tables.
+- Copy the columns back into the orders table.
+  > Copying columns back would reintroduce the very duplication normalization removed.
+- Delete the foreign keys.
+  > Foreign keys are what make the join possible; removing them would break the link.
+
+A join rebuilds the combined view from the normalized tables without storing duplication.`}
+/>
+
+<MultipleChoice
+  markdown={`The phrase "the key, the whole key, and nothing but the key" summarizes which idea?
+
+- That a table may have only one column.
+  > Tables can have many columns; the phrase is about what those columns depend on.
+- That primary keys must be numbers.
+  > Keys need not be numbers; the phrase concerns dependency, not data type.
+- [o] That every non-key column should depend on the table's key — the essence of reaching third normal form.
+  > Each non-key column should be a fact about the key itself, which is what 3NF requires.
+- That foreign keys are unnecessary.
+  > Foreign keys remain essential for linking normalized tables.
+
+The phrase captures 3NF: non-key columns depend on the key, the whole key, and nothing else.`}
+/>
