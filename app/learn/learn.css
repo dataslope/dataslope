@@ -95,11 +95,28 @@ samp {
   color: hsl(0, 0%, 96%);
 }
 
-/* Item 2: Sidebar footer bar (GitHub icon + theme toggle) — remove the
-   input-like border and secondary background so it looks like plain icons. */
+/* Sidebar separator labels (rendered as <p> by Fumadocs SidebarSeparator)
+   should read as section dividers, not navigation targets — use a softer
+   color so they recede behind the linked page items. */
+:root:not(.dark) #nd-sidebar p {
+  color: hsl(0, 0%, 52%);
+}
+.dark #nd-sidebar p {
+  color: hsl(0, 0%, 48%);
+}
+
+/* Sidebar footer bar (GitHub icon + theme toggle SVGs) — remove the
+   input-like border and secondary background, and dim the icons so they
+   don't compete with the navigation links. */
 #nd-sidebar div.border.rounded-lg {
   background-color: transparent;
   border: none;
+}
+:root:not(.dark) #nd-sidebar div.border.rounded-lg svg {
+  color: hsl(0, 0%, 58%);
+}
+.dark #nd-sidebar div.border.rounded-lg svg {
+  color: hsl(0, 0%, 44%);
 }
 
 /* Item 3: Dark mode — make the sidebar use the same background as the content
