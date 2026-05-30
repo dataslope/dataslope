@@ -41,7 +41,7 @@ export default async function LearnPage(props: LearnPageProps) {
 
   const MDX = page.data.body;
   const slug = params.slug ?? [];
-  const courseSlug = slug.length > 1 ? slug[0] : null;
+  const courseSlug = slug.length >= 1 ? slug[0] : null;
   const courseTitle = courseSlug ? await getCourseTitle(courseSlug) : null;
 
   return (

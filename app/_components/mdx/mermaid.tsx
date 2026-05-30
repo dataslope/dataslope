@@ -45,9 +45,16 @@ function MermaidContent({ chart }: { chart: string }) {
     startOnLoad: false,
     securityLevel: "strict",
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
-    fontSize: 14,
+    fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
     theme: resolvedTheme === "dark" ? "dark" : "neutral",
+    themeVariables: {
+      // Controls the font-size written into the SVG's inline <style> block.
+      // Without this, Mermaid inherits the container's computed size (16px
+      // from the 1rem wrapper) and writes that into the SVG, overriding the
+      // fontSize config above which only governs text measurement.
+      fontSize: "15px",
+    },
   });
 
   const { svg, bindFunctions } = use(
@@ -58,8 +65,8 @@ function MermaidContent({ chart }: { chart: string }) {
       // explicitly triggered. `fonts.load()` guarantees the face is available
       // (or settles with a no-op if it can't load) before we render.
       await Promise.allSettled([
-        document.fonts.load('400 13px "Source Serif 4"'),
-        document.fonts.load('700 13px "Source Serif 4"'),
+        document.fonts.load('400 15px "Source Serif 4"'),
+        document.fonts.load('700 15px "Source Serif 4"'),
       ]);
       return mermaid.render(id, chart.replaceAll("\\n", "\n"));
     }),
