@@ -54,30 +54,45 @@ samp {
   --color-fd-card: hsl(0, 0%, 100%);
 }
 
-/* Sidebar active + hover overrides — fumadocs defaults use blue-tinted
-   accent tokens that stand out too much. Non-layered rules beat Tailwind's
-   @layer utilities so these reliably win without !important. */
+/* Sidebar text + active/hover overrides.
+   Non-layered rules beat Tailwind's @layer utilities, so these win
+   without !important.
 
-/* Light mode active */
-:root:not(.dark) #nd-sidebar [data-active="true"] {
-  background-color: hsl(0, 0%, 94%);
+   Base text: override --color-fd-muted-foreground inside the sidebar to
+   a higher-contrast value so page link labels are easy to read.
+   Active/hover: bump text further toward full foreground and add a
+   background tint so keyboard-focus and pointer state are visible. */
+
+/* Light mode — base text near-black, active + hover darker bg + text */
+:root:not(.dark) #nd-sidebar {
+  --color-fd-muted-foreground: hsl(0, 0%, 22%);
 }
 
-/* Light mode hover (non-active items) */
+:root:not(.dark) #nd-sidebar [data-active="true"] {
+  background-color: hsl(0, 0%, 94%);
+  color: hsl(0, 0%, 4%);
+}
+
 :root:not(.dark) #nd-sidebar a:hover:not([data-active="true"]),
 :root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: hsl(0, 0%, 97%);
+  color: hsl(0, 0%, 4%);
 }
 
-/* Dark mode active — very subtle white overlay on the #121212 background */
+/* Dark mode — base text near-white, active + hover lighter bg + text */
+.dark #nd-sidebar {
+  --color-fd-muted-foreground: hsl(0, 0%, 82%);
+}
+
 .dark #nd-sidebar [data-active="true"] {
   background-color: rgba(255, 255, 255, 0.07);
+  color: hsl(0, 0%, 96%);
 }
 
-/* Dark mode hover (non-active items) */
 .dark #nd-sidebar a:hover:not([data-active="true"]),
 .dark #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: rgba(255, 255, 255, 0.04);
+  color: hsl(0, 0%, 96%);
 }
 
 /* Item 2: Sidebar footer bar (GitHub icon + theme toggle) — remove the
