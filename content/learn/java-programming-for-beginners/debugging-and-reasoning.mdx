@@ -31,7 +31,7 @@ Debugging is the disciplined process of finding that chain.
 ## A four-step debugging loop
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[1. Observe<br/>what actually happened] --> B[2. Hypothesize<br/>why that could happen]
     B --> C[3. Test<br/>add a print, set a breakpoint, write a tiny example]
     C --> D[4. Update<br/>your mental model]
@@ -158,7 +158,7 @@ the bug is *below*. This is bisection thinking, and it is wildly
 faster than poking at random.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Bug suspected] --> B{Check invariant<br/>at midpoint}
     B -->|broken| C[Bug is in first half]
     B -->|holds| D[Bug is in second half]

@@ -179,7 +179,7 @@ Let's trace what happens for a single element flowing through the
 pipeline above:
 
 ```mermaid
-flowchart LR
+flowchart TD
     O1["Order(Widget, 9.99, 3)"] --> W1{"Where: Product == 'Widget'"}
     W1 -->|"pass"| W2{"Where: Quantity > 0"}
     W2 -->|"pass"| S["Select: new { Price=9.99, Total=29.97 }"]

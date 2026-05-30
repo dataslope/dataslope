@@ -1967,26 +1967,13 @@
   box-shadow: 0 1px 0 #0d0d0d;
 }
 
-/* Keep the dropdown menu's kbd chips readable on the white popup background
+/* Keep the dropdown menu's kbd chips readable on the blue popup background
    in dark mode. */
 :global(html.dark) .runMenuKbd .kbd {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.15);
-  color: rgba(0, 0, 0, 0.7);
+  background: color-mix(in srgb, #ffffff 16%, transparent);
+  border-color: color-mix(in srgb, #ffffff 28%, transparent);
+  color: color-mix(in srgb, #ffffff 88%, transparent);
   box-shadow: none;
-}
-
-/* In dark mode the Run/Submit button is white, so its embedded kbd chips
-   need dark-on-light colors (the light-mode rule uses white-on-dark). */
-:global(html.dark) .runBtn .btnKbd .kbd {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.16);
-  color: rgba(0, 0, 0, 0.72);
-  box-shadow: none;
-}
-
-:global(html.dark) .runBtn .btnKbd .kbdSep {
-  color: rgba(0, 0, 0, 0.4);
 }
 
 :global(html.dark) .testItem {
@@ -2042,56 +2029,6 @@
 
 :global(html.dark) .outCellHtml :global(tr:hover td) {
   background: #1a1a1a;
-}
-
-:global(html.dark) .runBtn {
-  background: #ffffff;
-  color: #111111;
-}
-
-:global(html.dark) .runBtn:hover:not(:disabled) {
-  background: #f0f0f0;
-}
-
-:global(html.dark) .runBtn:disabled {
-  background: #cccccc;
-  color: #888888;
-}
-
-:global(html.dark) .btnGroupPrimary .runBtn:not(:last-child) {
-  border-right: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-:global(html.dark) .runBtnChevron {
-  background: #ffffff;
-  color: #111111;
-}
-
-:global(html.dark) .runBtnChevron:hover:not(:disabled) {
-  background: #f0f0f0;
-}
-
-:global(html.dark) .runBtnChevron:disabled {
-  background: #cccccc;
-  color: #888888;
-}
-
-:global(html.dark) .runBtnChevron[data-popup-open] {
-  background: #e8e8e8;
-}
-
-:global(html.dark) .runMenuPopup {
-  --ch-white: #111111;
-  background: #ffffff;
-  border-color: #e0e0e0;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.06),
-    0 8px 24px rgba(0, 0, 0, 0.10);
-}
-
-:global(html.dark) .runMenuItem:hover,
-:global(html.dark) .runMenuItem[data-highlighted] {
-  background: #f0f0f0;
 }
 
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */

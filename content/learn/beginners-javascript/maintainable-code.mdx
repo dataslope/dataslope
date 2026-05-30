@@ -285,7 +285,7 @@ A useful pattern is to think of every module as having an
 *inside* (where data has already been validated).
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Untrusted input] -->|validate| B[Trusted core]
     B --> C[Compute / transform]
     C --> D[Output]

@@ -99,7 +99,7 @@ In a typical layered application, collections move through several
 roles:
 
 ```mermaid
-flowchart LR
+flowchart TD
     DB[(Storage)] --> Repo[Repository]
     Repo -->|read-only snapshots| Svc[Service / Domain]
     Svc -->|narrow query types| Web[Controller / API]

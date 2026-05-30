@@ -18,7 +18,7 @@ of a kitchen ("chop, chop, chop, stir, stir, chop, stir, …").
 ## Anatomy of a function
 
 ```mermaid
-flowchart LR
+flowchart TD
   call["my_fun(x = 3, y = 4)"] --> args["Arguments bind to parameter names"]
   args --> body["Function body runs"]
   body --> ret["Last expression (or explicit return()) is returned"]

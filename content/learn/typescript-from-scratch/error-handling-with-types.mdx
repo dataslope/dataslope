@@ -267,7 +267,7 @@ Notice:
 4. Errors propagate automatically — no manual `if` checks at every step.
 
 ```mermaid
-graph LR
+graph TD
     A[Input: '5'] --> B[parseNumber]
     B --> C{ok?}
     C -->|yes| D[validatePositive]

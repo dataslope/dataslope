@@ -196,7 +196,7 @@ with open("data.txt") as f:
 You can write your own context managers with `__enter__` and `__exit__`, or use the `contextlib` module.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Enter 'with' block] --> B["__enter__() called"]
     B --> C[Body executes]
     C --> D["__exit__() called"]

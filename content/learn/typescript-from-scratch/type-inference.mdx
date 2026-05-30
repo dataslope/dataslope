@@ -217,7 +217,7 @@ console.log(\`First feature: \${firstFeature}\`);
 Here's the inference chain:
 
 ```mermaid
-graph LR
+graph TD
     A[getConfig return literal] --> B[Inferred object type]
     B --> C[config: inferred type]
     C --> D[config.features: string array]

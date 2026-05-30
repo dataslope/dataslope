@@ -8,7 +8,7 @@ A hash table stores key-value data in an array of buckets. A hash function conve
 ## The core idea
 
 ```mermaid
-flowchart LR
+flowchart TD
     K["key: apple"] --> H["hash(key)"]
     H --> M["% capacity"]
     M --> B["bucket index"]
@@ -78,7 +78,7 @@ int main() {
 Open addressing keeps entries in the array itself. If the home bucket is occupied, probing tries another bucket. Linear probing moves one slot at a time; double hashing uses a second hash to choose the step size.
 
 ```mermaid
-flowchart LR
+flowchart TD
     H["hash(key)=2"] --> B2["bucket 2 occupied"]
     B2 --> B3["linear probe bucket 3 occupied"]
     B3 --> B4["bucket 4 empty: insert"]

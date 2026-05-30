@@ -242,7 +242,7 @@ A chain of `.filter().map().reduce()` is a small **data pipeline**.
 Each step takes the previous output as input.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[orders] --> B["filter: status === 'paid'"]
     B --> C["map: o => o.amount"]
     C --> D["reduce: sum"]

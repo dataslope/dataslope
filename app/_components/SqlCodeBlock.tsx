@@ -543,11 +543,6 @@ export default function SqlCodeBlock({
             />
           </div>
         </div>
-        {title && (
-          <div className={styles.titleRow}>
-            <div className={styles.title}>{title}</div>
-          </div>
-        )}
       </div>
 
       {/* ── Table viewer / Result viewer ── */}

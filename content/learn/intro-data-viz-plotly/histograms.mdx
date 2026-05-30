@@ -20,7 +20,7 @@ that fall into each bin. The result looks like a bar chart, but
 the bars represent *intervals*, not categories.
 
 ```mermaid
-flowchart LR
+flowchart TD
     V["Numeric column<br/>(values)"] --> B["Cut into bins<br/>e.g. 0-10, 10-20, ..."]
     B --> C["Count per bin"]
     C --> P["Plot as bars"]

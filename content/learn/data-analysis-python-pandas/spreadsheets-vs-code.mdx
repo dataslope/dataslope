@@ -54,7 +54,7 @@ df.groupby("region")["revenue"].sum().plot.bar()
 Save the file as `weekly_report.py`. **Next Monday: re-run.**
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph "Spreadsheet workflow"
         A1[Open CSV] --> A2[Manual import]
         A2 --> A3[Eyeball + fix types]

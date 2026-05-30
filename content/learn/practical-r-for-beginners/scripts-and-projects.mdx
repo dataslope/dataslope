@@ -185,7 +185,7 @@ Git turns "I overwrote yesterday's file" from a tragedy into
 "oh, let me check the history."
 
 ```mermaid
-flowchart LR
+flowchart TD
   edit["Edit files"] --> stage["git add ."]
   stage --> commit["git commit -m 'why'"]
   commit --> push["git push"]

@@ -93,7 +93,7 @@ That single picture explains every `ArrayList` performance fact:
 holding the value plus pointers to the previous and next nodes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     H[head] --> N1["[a | prev=null | next=•]"]
     N1 --> N2["[b | prev=• | next=•]"]
     N2 --> N3["[c | prev=• | next=•]"]

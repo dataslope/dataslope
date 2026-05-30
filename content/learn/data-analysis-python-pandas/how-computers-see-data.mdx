@@ -28,7 +28,7 @@ sequence does not know it is a CSV until something reads it as
 one.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Raw bytes<br/>on disk] --> B[File format<br/>convention]
     B --> C[Reader software<br/>e.g. pandas]
     C --> D[Typed,<br/>labeled<br/>DataFrame]

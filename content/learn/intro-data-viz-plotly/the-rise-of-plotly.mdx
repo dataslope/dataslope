@@ -142,7 +142,7 @@ chart libraries:
    pannable, zoomable, hoverable. You don't have to opt in.
 
 ```mermaid
-flowchart LR
+flowchart TD
     DF[(DataFrame)] --> PX["px.bar / px.line / px.scatter / ..."]
     PX --> Args["x= y= color= size= facet_col= ..."]
     Args --> Fig[Interactive Plotly figure]

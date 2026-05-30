@@ -91,7 +91,7 @@ many charts arranged like the instrument panel of a car —
 "speedometer," "fuel gauge," "warning lights" for the business.
 
 ```mermaid
-flowchart LR
+flowchart TD
     DB[(Database)] --> ETL[ETL pipeline]
     ETL --> DW[(Data warehouse)]
     DW --> BI[BI tool]

@@ -115,7 +115,7 @@ human reads `MOV AL, 5`; the machine sees `10110000 00000101`. Same
 thing, different presentation.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Assembly text<br/>MOV AL, 5] --> B[Assembler]
     B --> C[Machine code<br/>10110000 00000101]
     C --> D[CPU executes]

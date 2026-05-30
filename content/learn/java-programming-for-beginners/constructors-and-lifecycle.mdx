@@ -155,7 +155,7 @@ hours later when something downstream blows up.
 ## The lifecycle of an object
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[1. allocated<br/>on heap] --> B[2. fields default-initialized<br/>0 / null / false]
     B --> C[3. constructor runs]
     C --> D[4. object is alive<br/>methods can be called]

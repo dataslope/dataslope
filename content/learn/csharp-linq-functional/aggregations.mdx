@@ -199,7 +199,7 @@ Let's trace `nums.Aggregate(0, (acc, n) => acc + n)` for
 `nums = [3, 1, 4]`:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["acc=0"] --> B["+3 → acc=3"]
     B --> C["+1 → acc=4"]
     C --> D["+4 → acc=8"]

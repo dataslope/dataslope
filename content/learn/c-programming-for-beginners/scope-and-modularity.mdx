@@ -97,7 +97,7 @@ A local variable is born when execution enters its scope, and
 frame, automatically allocated on entry and reclaimed on return.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[enter function] --> B[locals exist]
     B --> C[leave function]
     C --> D[locals destroyed]

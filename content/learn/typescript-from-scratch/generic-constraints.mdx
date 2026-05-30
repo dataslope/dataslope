@@ -180,7 +180,7 @@ When you preserve precise input types (readonly, literals, exact shapes), the co
 </Callout>
 
 ```mermaid
-graph LR
+graph TD
     A[Input: readonly array of literals] --> B[T extends readonly unknown]
     B --> C[T binds to precise type]
     C --> D[Return T 0: preserves literal]

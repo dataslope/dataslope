@@ -80,7 +80,7 @@ A single C++ statement that does a *lot*.
   same way English sentences end with a period.
 
 ```mermaid
-flowchart LR
+flowchart TD
     L["'Hello, World!\\n'<br/>(literal bytes in<br/>read-only memory)"] -->|stream insertion <<| O["std::cout<br/>(an output stream object)"]
     O -->|delegates to| OS[Operating system]
     OS --> T[Terminal / browser console]

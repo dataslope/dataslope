@@ -130,7 +130,7 @@ When you call `fig.show()`, Plotly Express does the following:
    wrapped in HTML.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Code["Python code<br/>px.bar(...)"] --> Fig["Figure object<br/>(JSON spec)"]
     Fig --> Show["fig.show()"]
     Show --> JS["Plotly.js<br/>in browser"]

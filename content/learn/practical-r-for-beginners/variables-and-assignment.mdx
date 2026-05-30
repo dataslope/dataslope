@@ -67,7 +67,7 @@ variables: `if`, `else`, `for`, `while`, `function`, `return`,
 never want to use these as variable names anyway.)
 
 ```mermaid
-flowchart LR
+flowchart TD
   Name["A name (e.g. avg_price)"] -->|<-| Value["A value (e.g. 9.99)"]
   Value -->|stored in environment| Env["Workspace"]
   User["Later code"] -->|references name| Env

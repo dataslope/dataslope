@@ -245,7 +245,7 @@ for k in 0..n-1:
 ```
 
 ```mermaid
-graph LR
+graph TD
     K["allow vertices 0..k as intermediates"] --> I["try every source i"]
     I --> J["try every target j"]
     J --> U["improve dist[i][j] through k"]
