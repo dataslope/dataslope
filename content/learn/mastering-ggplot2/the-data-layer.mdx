@@ -1,0 +1,183 @@
+---
+title: The Data Layer
+description: Why ggplot2 expects tidy data frames, how the shape of your data determines what you can map, and how to reshape data so ggplot2 can see it.
+---
+
+Every ggplot starts with **data**. It is the first argument to
+`ggplot()` and the foundation every other component builds on. Getting
+the data into the right *shape* is half the battle of plotting — and
+the half beginners most often skip.
+
+## ggplot2 wants a data frame
+
+ggplot2 plots **data frames** (or tibbles): a rectangle where each
+**row is one observation** and each **column is one variable**. The
+plot's mappings then refer to columns by name.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+# Every column is a variable you can map; every row is one car.
+head(mpg)
+cat("rows:", nrow(mpg), " columns:", ncol(mpg), "\\n")
+`}
+/>
+
+You can map any of those columns to an aesthetic: `displ` to x, `hwy`
+to y, `class` to color, and so on. The set of columns *is* the menu of
+things you are allowed to map.
+
+## Tidy data: the shape ggplot2 loves
+
+ggplot2 works best with **tidy** data, where:
+
+1. Each variable is its own column.
+2. Each observation is its own row.
+
+This matters because **mappings refer to columns**. If the variable
+you want to put on the x-axis is not a column, you cannot map it.
+
+```mermaid
+flowchart LR
+    W["Wide / messy<br/>year columns: 2019, 2020, 2021"] -->|reshape| T["Tidy / long<br/>columns: year, value"]
+    T --> P["Now 'year' is a column<br/>you can map to x"]
+```
+
+### A concrete reshaping example
+
+Suppose sales are stored with one **column per year** — convenient for
+a spreadsheet, useless for ggplot2, because "year" is not a column,
+it is spread across column *names*.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# "Wide" data: each year is a separate column.
+wide <- data.frame(
+  region = c("North", "South"),
+  y2019  = c(100, 80),
+  y2020  = c(120, 95),
+  y2021  = c(150, 110)
+)
+print(wide)
+
+# We cannot map "year" to x, because there is no 'year' column.
+# Reshape to LONG so that year and value each become a column.
+long <- reshape(wide,
+  direction = "long",
+  varying   = c("y2019", "y2020", "y2021"),
+  v.names   = "sales",
+  timevar   = "year",
+  times     = c(2019, 2020, 2021))
+long <- long[order(long$region, long$year), c("region", "year", "sales")]
+print(long, row.names = FALSE)
+`}
+/>
+
+Now `year` and `sales` are real columns, so they can be mapped:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+long <- data.frame(
+  region = rep(c("North", "South"), each = 3),
+  year   = rep(c(2019, 2020, 2021), times = 2),
+  sales  = c(100, 120, 150, 80, 95, 110)
+)
+
+ggplot(long, aes(x = year, y = sales, color = region)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2)
+`}
+/>
+
+<Callout type="info" title="The rule of thumb">
+If a variable you want to put on an axis or in a legend is *not a
+single column*, reshape the data first. In real projects you would use
+`tidyr::pivot_longer()`; the idea is identical to the `reshape()` above
+— move information out of column **names** and into column **values**.
+</Callout>
+
+## Continuous vs. categorical columns
+
+ggplot2 treats columns differently based on their type, and this
+ripples through scales, legends, and even which geoms make sense:
+
+| Column type in R | ggplot2 treats it as | Typical use |
+| --- | --- | --- |
+| `numeric` / `integer` | **continuous** | x/y position, size, smooth color gradient |
+| `factor` / `character` | **discrete** (categorical) | grouping, discrete color, separate bars/facets |
+
+This is why `factor()` shows up so often in ggplot code. In `mpg`,
+`cyl` (cylinders) is stored as a *number*, so ggplot2 gives it a
+continuous color gradient. Wrap it in `factor()` and it becomes
+categorical with one distinct color per value:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# cyl as a NUMBER -> continuous color gradient (a smooth scale bar).
+ggplot(mpg, aes(displ, hwy, color = cyl)) +
+  geom_point()
+`}
+/>
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# cyl as a FACTOR -> discrete colors, one per cylinder count.
+ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
+  geom_point()
+`}
+/>
+
+Same column, same mapping target (color), but a completely different
+legend and palette — because the *type* changed from continuous to
+discrete. Keep this in mind; it explains a surprising number of "why
+does my plot look wrong?" moments.
+
+<MultipleChoice
+  markdown={`Your sales data has separate columns \`y2019\`, \`y2020\`, \`y2021\`, and you want year on the x-axis. Why must you reshape it first?
+
+- ggplot2 cannot plot numbers larger than 2018.
+  > Year values are fine; the issue is structural, not numeric.
+- ggplot2 requires every data frame to have exactly three columns.
+  > There is no column-count requirement.
+- [o] Mappings refer to *columns*, and "year" currently lives in the column *names* rather than in a single column of values.
+  > To map year to x, year must be one column; reshaping to long form creates it.
+- You must convert all the values to characters first.
+  > Type conversion is unrelated; the problem is the wide layout.
+
+Tidy/long data puts each variable in its own column so it can be
+mapped. This is the most common data-prep step before plotting.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`mpg\`, \`cyl\` is stored as a number. Mapping \`color = cyl\` gives a smooth color gradient, but \`color = factor(cyl)\` gives distinct colors per value. Why?
+
+- \`factor()\` changes the data values themselves.
+  > \`factor()\` changes how the column is *typed and treated*, not the underlying values.
+- ggplot2 picks colors at random each run.
+  > Colors are determined by the scale, which depends on the variable's type.
+- [o] A numeric column is treated as **continuous** (gradient scale), while a factor is treated as **discrete** (one color per category).
+  > The column's type decides whether ggplot2 uses a continuous or discrete color scale.
+- Gradients are only allowed for the x-axis.
+  > Gradients apply to any continuous aesthetic, including color.
+
+Whether a column is continuous or discrete drives the scale, the
+legend, and the palette — a core reason \`factor()\` appears so often.`}
+/>
+
+## Key takeaways
+
+- ggplot2 plots **data frames**: rows are observations, columns are
+  variables, and **mappings refer to columns by name**.
+- Prefer **tidy/long** data — if a variable is hiding in column
+  *names*, reshape it into a column before plotting.
+- A column's **type** matters: numeric → continuous scales, factor /
+  character → discrete scales. Use `factor()` to switch a number to
+  categorical treatment.

@@ -1,0 +1,185 @@
+---
+title: The Seven Components
+description: The seven building blocks of every ggplot — data, mappings, geometries, statistics, scales, coordinates, and facets — plus the theme that styles them.
+---
+
+This page is the conceptual spine of the whole course. Read it
+slowly. Everything after this is a deep dive into one of these
+components.
+
+The Grammar of Graphics says that **every** chart is assembled from a
+small set of components. ggplot2 organizes them like this:
+
+```mermaid
+flowchart TD
+    D["1 - Data<br/>the table of values"] --> M["2 - Mappings<br/>columns to aesthetics"]
+    M --> G["3 - Geometries<br/>the marks drawn"]
+    G --> S["4 - Statistics<br/>transform before drawing"]
+    S --> SC["5 - Scales<br/>data values to visual values"]
+    SC --> C["6 - Coordinates<br/>the space marks live in"]
+    C --> F["7 - Facets<br/>split into small panels"]
+    F --> T["Theme<br/>non-data styling"]
+    T --> OUT["Rendered plot"]
+```
+
+Let us meet each one with a single sentence and a concrete example
+using the built-in `mpg` data set (fuel-economy records for 234 cars).
+
+## 1. Data
+
+**The table of values the chart describes.** Without data there is
+nothing to show. In ggplot2 the data is almost always a *data frame*
+(or tibble) — rows are observations, columns are variables.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+# 'mpg' ships with ggplot2. Look at its structure.
+str(mpg)
+head(mpg)
+`}
+/>
+
+## 2. Aesthetic mappings
+
+**The rules that connect columns to visual properties.** "Put `displ`
+on the x-axis. Put `hwy` on the y-axis. Let `drv` control color." A
+mapping is a *correspondence*, written inside `aes()`.
+
+## 3. Geometries (geoms)
+
+**The kind of mark used to represent each row** — points, lines, bars,
+boxes. The geom is what you literally see on the canvas.
+
+## 4. Statistics (stats)
+
+**A transformation applied to the data before it is drawn.** Some
+geoms draw the raw data (a scatter plot's points are the rows
+themselves). Others *summarize* first: a histogram **bins and counts**;
+a boxplot computes **quartiles**. That summarizing step is the
+statistic.
+
+## 5. Scales
+
+**The translation from data values into visual values.** A scale
+decides that `displ = 2.0` sits at a particular x-pixel, or that
+`drv = "f"` becomes a particular shade of blue. Axes and legends are
+the *visible face* of scales.
+
+## 6. Coordinates
+
+**The space the marks are placed in.** Usually Cartesian (x across, y
+up), but it could be flipped, or polar — which, as we saw, turns a
+stacked bar into a pie.
+
+## 7. Facets
+
+**A rule for splitting the data into a grid of small panels**, one per
+group, sharing axes so panels are comparable at a glance.
+
+## And the theme
+
+The **theme** is everything *not* tied to data: fonts, background
+color, gridline style, legend position. It changes how a plot *looks*
+without changing what it *means*.
+
+## Seeing all seven at once
+
+Here is one plot. Run it, then read the annotated breakdown below — try
+to point to where each component lives.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +  # data + mappings
+  geom_point() +                                      # geometry
+  geom_smooth(method = "lm", se = FALSE) +            # geometry + stat (lm)
+  scale_color_brewer(palette = "Dark2") +             # a scale
+  coord_cartesian(xlim = c(1, 7)) +                    # coordinates
+  facet_wrap(~ drv) +                                  # facets
+  theme_minimal()                                      # theme
+`}
+/>
+
+| Line | Component |
+| --- | --- |
+| `ggplot(mpg, ...)` | **Data** |
+| `aes(x = displ, y = hwy, color = drv)` | **Mappings** |
+| `geom_point()` | **Geometry** |
+| `geom_smooth(method = "lm")` | **Geometry** carrying a **Statistic** |
+| `scale_color_brewer(...)` | **Scale** |
+| `coord_cartesian(...)` | **Coordinates** |
+| `facet_wrap(~ drv)` | **Facets** |
+| `theme_minimal()` | **Theme** |
+
+<Callout type="info" title="You only write what you need">
+You rarely specify all seven. ggplot2 fills in sensible defaults: an
+unspecified scale, coordinate system, and theme are chosen for you. A
+minimal plot is often just **data + mappings + one geometry** — the
+other components quietly take their defaults.
+</Callout>
+
+This is the most important page in the course, so it gets extra
+practice. Take your time with these.
+
+<MultipleChoice
+  markdown={`Which component decides *that one column controls the color of the marks* (as opposed to deciding *which actual colors are used*)?
+
+- The geometry.
+  > The geometry chooses the *kind of mark* (point, line, bar), not which variable controls color.
+- [o] The aesthetic mapping.
+  > A mapping connects a column (e.g. \`drv\`) to a visual property (e.g. color). *Which* colors result is then handled by a scale.
+- The theme.
+  > The theme styles non-data elements; it does not bind variables to visual properties.
+- The coordinate system.
+  > Coordinates place marks in space; they do not assign variables to color.
+
+The *mapping* says "this column controls color." The *scale* later
+decides which specific colors that becomes — two different components
+working together.`}
+/>
+
+<MultipleChoice
+  markdown={`A histogram needs to **bin** a continuous variable and **count** how many values fall in each bin before any bars can be drawn. Which component is responsible for that binning-and-counting step?
+
+- The geometry.
+  > The geometry draws the bars, but the binning and counting happen in a separate step.
+- The scale.
+  > Scales translate data values to visual values; they do not bin or count.
+- [o] The statistic.
+  > A statistic transforms the data before drawing — here, binning the values and counting them per bin.
+- The facet.
+  > Facets split data into panels; they do not summarize values within a panel.
+
+This separation is why ggplot2 is powerful: the same bar *geometry*
+can be paired with a counting *statistic* (histogram) or with raw
+values (a plain bar chart of given heights).`}
+/>
+
+<MultipleChoice
+  markdown={`Why can a minimal ggplot often be written as just data + one mapping + one geometry, with nothing else specified?
+
+- ggplot2 cannot use scales, coordinates, or themes unless you import extra packages.
+  > Those components are always available; they are just optional to write.
+- Those other components do nothing useful.
+  > They are essential — they are simply applied *by default* when unspecified.
+- [o] ggplot2 supplies sensible defaults for the unspecified components (a default scale, Cartesian coordinates, a default theme).
+  > You only write the components you want to change; the rest take defaults.
+- Minimal plots secretly disable the other components.
+  > The components are still active; they just use their default settings.
+
+Defaults are why the grammar feels light in practice: you describe
+only the parts that differ from the defaults.`}
+/>
+
+## Key takeaways
+
+- Every ggplot is built from **data, mappings, geometries, statistics,
+  scales, coordinates, and facets**, with a **theme** for styling.
+- **Mappings** bind columns to visual properties; **scales** decide the
+  actual visual values; the two are distinct.
+- **Statistics** transform data before drawing; some geoms draw raw
+  data, others summarize first.
+- You only write the components you want to change — the rest take
+  sensible **defaults**.

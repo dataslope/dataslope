@@ -1,0 +1,157 @@
+---
+title: Layering Multiple Geoms
+description: How to combine several geoms into one figure, share or override mappings per layer, and control inheritance — the craft of multi-layer plots.
+---
+
+We have seen that a plot is a stack of layers. Now we make that
+practical: combining several geoms into a single, information-rich
+figure, and controlling exactly which data and mappings each layer
+uses.
+
+## Stacking geoms that share a mapping
+
+The simplest multi-layer plot adds geoms that all read the base
+mappings. Points + a smoother is the canonical example:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE)
+`}
+/>
+
+Both layers inherit `x = displ, y = hwy` from `ggplot()`. The points
+show the raw data; the smoother summarizes the trend. Together they say
+more than either alone — *here are the data, and here is the pattern in
+them.*
+
+## Inheritance: layers borrow from the base by default
+
+A key rule: **layers inherit the data and mappings declared in
+`ggplot()`** unless you override them. This diagram shows the flow:
+
+```mermaid
+flowchart TD
+    G["ggplot(data = mpg,<br/>aes(displ, hwy, color = drv))"] --> P["geom_point()<br/>inherits all three"]
+    G --> S["geom_smooth()<br/>inherits all three<br/>-> one line per drv"]
+```
+
+So a `color = drv` mapping in `ggplot()` reaches *every* layer:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# color = drv is in ggplot(), so BOTH layers are split by drivetrain:
+# colored points AND one smoother per drivetrain.
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE)
+`}
+/>
+
+## Scoping a mapping to one layer
+
+What if you want colored *points* but a single overall trend line, not
+one per group? Move the `color` mapping out of `ggplot()` and into the
+point layer only:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# color lives ONLY in geom_point, so the smoother stays a single line.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv), alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "black")
+`}
+/>
+
+The points are colored by drivetrain; the smoother — which never saw
+`color = drv` — fits one black line to all the data. **Where you place
+a mapping decides which layers it affects.** This is the lever behind
+most sophisticated ggplot figures.
+
+## Overriding inherited data for one layer
+
+A layer can also swap in different *data*. This is how you annotate or
+highlight. Here we label only the most fuel-efficient cars:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+best <- subset(mpg, hwy >= 40)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(color = "grey70") +
+  geom_point(data = best, color = "red", size = 3) +
+  geom_text(data = best, aes(label = model),
+            vjust = -1, size = 3)
+`}
+/>
+
+Three layers: all cars in grey, the standout cars re-emphasized in red,
+and text labels — the red layer and the text layer both override the
+base data with `best`, while still inheriting the `x`/`y` mappings.
+
+<Callout type="info" title="inherit.aes = FALSE">
+Occasionally a layer needs to ignore the base mappings entirely (common
+with reference lines or annotations from a separate table). Passing
+`inherit.aes = FALSE` to a geom tells it *not* to borrow the base
+`aes()`, so it uses only the mappings you give it directly.
+</Callout>
+
+## Order still matters
+
+Because layers composite in order, put the marks you want *on top*
+last. In the highlight example, drawing the grey points first and the
+red points second ensures the red ones are never hidden behind grey
+ones.
+
+<MultipleChoice
+  markdown={`You write \`ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point() + geom_smooth(method = "lm")\`. How many trend lines appear, and why?
+
+- One line, because \`geom_smooth\` ignores color.
+  > \`geom_smooth\` does respect an inherited \`color\` grouping.
+- [o] Three lines — one per drivetrain — because \`color = drv\` is declared in \`ggplot()\` and therefore inherited by the smoother, which groups by it.
+  > Mappings in \`ggplot()\` reach every layer, so the smoother fits one line per \`drv\` group.
+- No lines, because \`geom_smooth\` needs its own \`aes()\`.
+  > \`geom_smooth\` inherits the base \`aes()\`; no separate \`aes()\` is required.
+- Two lines, one for points and one for smooth.
+  > The number of smoother lines equals the number of \`drv\` groups, which is three.
+
+A \`color\` mapping in \`ggplot()\` groups *every* layer that understands
+it — including the smoother.`}
+/>
+
+<MultipleChoice
+  markdown={`You want points colored by \`drv\` but only **one** overall trend line. What is the correct change?
+
+- Add \`color = "black"\` inside \`ggplot(aes(...))\`.
+  > Putting color in \`ggplot()\` affects all layers and still would not give per-point drivetrain colors.
+- [o] Move the color mapping into the point layer: \`geom_point(aes(color = drv))\`, and leave \`color\` out of \`ggplot()\` so the smoother fits all data together.
+  > Scoping \`color = drv\` to the point layer keeps the smoother ungrouped.
+- Delete the \`geom_smooth\` layer.
+  > That removes the trend line entirely rather than making it a single line.
+- Use \`inherit.aes = FALSE\` on \`geom_point\`.
+  > That would strip the points of x/y too; the fix is *where* the color mapping lives.
+
+The placement of a mapping (base vs. layer) controls which layers it
+affects — the core skill of multi-layer plotting.`}
+/>
+
+## Key takeaways
+
+- Layers **inherit** the data and mappings from `ggplot()` unless
+  overridden.
+- A mapping in `ggplot()` affects **all** layers; a mapping inside a
+  geom affects **only that layer**.
+- A layer can override **data** (`data =`) to highlight or annotate a
+  subset.
+- `inherit.aes = FALSE` opts a layer out of the base mappings entirely.
+- Add the layer you want **on top** last, since layers composite in
+  order.

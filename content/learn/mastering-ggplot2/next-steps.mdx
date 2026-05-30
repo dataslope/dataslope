@@ -1,0 +1,156 @@
+---
+title: Next Steps
+description: Where to go after mastering the grammar — the ggplot2 extension ecosystem, further reading, and how to keep thinking in components.
+---
+
+You have reached the end of the course. More importantly, you have
+reached a new way of *seeing* charts. Before you go, let us consolidate
+what you have learned and point you toward where to take it.
+
+## What you now know
+
+You can decompose **any** visualization into the components of the
+Grammar of Graphics:
+
+```mermaid
+flowchart TD
+    D["Data"] --> M["Aesthetic mappings"]
+    M --> G["Geometries"]
+    G --> S["Statistics"]
+    S --> SC["Scales"]
+    SC --> C["Coordinates"]
+    C --> F["Facets"]
+    F --> T["Theme"]
+    T --> O["A communicative plot"]
+```
+
+And you understand the *ideas* that make those components powerful:
+
+- A chart is **described**, not drawn command-by-command.
+- Plots are built by **adding layers** with `+`.
+- **Mapping** (inside `aes()`) differs from **setting** (outside it).
+- Every layer runs a **stat** before its **geom** draws.
+- **Scales** translate data values to visual values and produce
+  axes/legends.
+- **Coordinates** can reshape the same plot — even a bar into a pie.
+- **Facets** make honest small multiples through shared scales.
+- **Themes** restyle non-data ink through inheritance.
+
+That is not a pile of recipes — it is a *system*. It will let you read,
+write, and debug charts you have never seen before.
+
+## The extension ecosystem
+
+ggplot2 was built to be *extended*, and a rich ecosystem has grown
+around it. Each package adds new components that snap into the same
+grammar — so your `+` skills transfer directly:
+
+| Package | Adds | In grammar terms |
+| --- | --- | --- |
+| `scales` | Better axis formats (%, $, commas) | richer **scales** |
+| `ggrepel` | Non-overlapping text labels | a smarter text **geom** |
+| `patchwork` | Combine multiple plots into one figure | plot **composition** |
+| `gganimate` | Animate over a variable | time as a new dimension |
+| `ggthemes` | Extra complete **themes** | more **theme** options |
+| `sf` + `geom_sf` | Map geometries and projections | spatial **geoms/coords** |
+
+You do not need to learn these now. The point is that each one is
+*more of the same grammar* — new geoms, scales, or themes added with
+`+`. Because you understand the system, picking them up is
+straightforward.
+
+## A note on `dplyr` and data prep
+
+Many real plots need a little reshaping first — aggregating, filtering,
+pivoting to long form. That is the job of `dplyr` and `tidyr`, ggplot2's
+tidyverse siblings. A common pattern is to prepare data with the pipe
+and feed it straight into `ggplot()`:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+library(dplyr)
+
+mpg |>
+  group_by(class) |>
+  summarise(mean_hwy = mean(hwy)) |>
+  ggplot(aes(x = reorder(class, mean_hwy), y = mean_hwy)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(x = NULL, y = "Mean highway MPG",
+       title = "Average highway efficiency by class")
+`}
+/>
+
+Notice the data is summarized *first*, then piped into a `ggplot()`
+that uses `geom_col()` (heights we computed) — every component is one
+you now know.
+
+## Further reading
+
+When you want to go deeper, three sources stand out:
+
+- ***ggplot2: Elegant Graphics for Data Analysis*** by Hadley Wickham —
+  the definitive book, free online.
+- **The ggplot2 reference site** at `ggplot2.tidyverse.org` — every
+  geom, stat, scale, and theme, with examples.
+- **Leland Wilkinson's *The Grammar of Graphics*** — the original
+  theory, if you want the deepest foundations.
+
+## Keep thinking in components
+
+The single habit to carry forward: when you see *any* chart — in a
+paper, a dashboard, a newspaper — pause and ask, *"What are its
+components?"* What is the data, what is mapped to what, which geom,
+which stat, which coordinate system? That decomposition is the skill
+this course set out to give you, and it works far beyond ggplot2.
+
+<Callout type="success" title="Congratulations">
+You came in able to *make* charts. You leave able to *think* in the
+Grammar of Graphics — to see every visualization as a structured
+combination of components you can name, modify, and recombine. That is
+mastery. Go build something.
+</Callout>
+
+<MultipleChoice
+  markdown={`A colleague shows you an unfamiliar chart made with a ggplot2 *extension* package you have never used. Why are you still well-equipped to understand and modify it?
+
+- Extensions replace the grammar with their own unrelated system.
+  > Extensions build *on* the grammar; they do not replace it.
+- You would need to memorize each extension's recipes first.
+  > The component model transfers, so you reason about it rather than memorize recipes.
+- [o] Extensions add new components (geoms, scales, themes) that plug into the same grammar and are combined with \`+\`, so your component-based understanding transfers directly.
+  > New pieces still slot into data + mappings + layers + scales + coords + facets + theme.
+- Charts from extensions cannot be modified.
+  > They are ordinary ggplots and are fully modifiable.
+
+Because the grammar is a system, new components extend it rather than
+escape it — which is exactly why your skills generalize.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the most important *transferable* skill this course aimed to build?
+
+- Memorizing the names of every geom and scale function.
+  > Function names are easy to look up; the deeper skill is conceptual.
+- Always preferring ggplot2 over every other tool.
+  > Tool loyalty is not the goal; understanding is.
+- [o] The ability to decompose any visualization into grammar components — data, mappings, geom, stat, scale, coordinates, facets, theme — and reason about them.
+  > Component-thinking applies far beyond ggplot2 itself.
+- Producing pie charts efficiently.
+  > Pie charts were a teaching example, not the goal — and rarely the best display.
+
+The lasting payoff is a way of *thinking*: seeing every chart as a
+nameable, modifiable combination of components.`}
+/>
+
+## Key takeaways
+
+- You can now decompose any chart into **data, mappings, geoms, stats,
+  scales, coordinates, facets, and theme**.
+- The ggplot2 **extension ecosystem** adds new components that combine
+  with the same `+` grammar you already know.
+- `dplyr`/`tidyr` handle the **data prep** that often precedes a plot,
+  and pipe naturally into `ggplot()`.
+- The durable skill is **thinking in components** — it outlasts any
+  single function, package, or tool.

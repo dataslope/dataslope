@@ -1,0 +1,186 @@
+---
+title: Aesthetic Mappings
+description: What aes() really means — connecting data columns to visual channels like position, color, size, and shape — and why mappings are the heart of the grammar.
+---
+
+If data is the foundation, **aesthetic mappings** are the heart of the
+grammar. The word "aesthetic" here is jargon, and it trips people up,
+so let us define it precisely.
+
+## What "aesthetic" means in ggplot2
+
+An **aesthetic** is any **visual property of a mark** that can carry
+information:
+
+- **position** — x, y
+- **color** (outline) and **fill** (interior)
+- **size**
+- **shape**
+- **alpha** (transparency)
+- **linetype**
+
+An **aesthetic mapping** is a *correspondence between a data column and
+one of these visual properties*. "Map `displ` to x." "Map `class` to
+color." You declare mappings inside `aes()`.
+
+```mermaid
+flowchart LR
+    subgraph Data columns
+      A["displ"]
+      B["hwy"]
+      C["class"]
+      D["cty"]
+    end
+    subgraph Aesthetics
+      X["x position"]
+      Y["y position"]
+      COL["color"]
+      SZ["size"]
+    end
+    A --> X
+    B --> Y
+    C --> COL
+    D --> SZ
+```
+
+That diagram *is* a call to
+`aes(x = displ, y = hwy, color = class, size = cty)`. The arrows are
+the mappings.
+
+## Aesthetics are information channels
+
+Here is the deep idea: **each aesthetic is a channel through which a
+variable can be seen.** Position is the strongest channel; color and
+size are weaker but let you pack *more variables* into one chart. A
+2-D scatter shows two variables through position; map color and size
+too and you are showing four variables at once.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# Four variables in one plot, each through its own aesthetic channel.
+ggplot(mpg, aes(x = displ, y = hwy,
+                color = class, size = cty)) +
+  geom_point(alpha = 0.7)
+`}
+/>
+
+Read the channels: x = engine size, y = highway MPG, color = vehicle
+class, size = city MPG. Four columns, four aesthetics, one chart. Each
+mapping also produced its own **guide** (the axes, the color legend,
+the size legend) automatically.
+
+<Callout type="warn" title="Channels have a budget">
+Just because you *can* map many aesthetics does not mean you *should*.
+Every extra channel adds cognitive load. Color + size + shape all at
+once can overwhelm a reader. Map what the *question* needs, not
+everything you have.
+</Callout>
+
+## The same column can drive several aesthetics
+
+Mapping one variable to *two* aesthetics at once **reinforces** it,
+making groups easier to tell apart (and more accessible to readers who
+have trouble distinguishing colors):
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# drv drives BOTH color and shape: redundant encoding, easier to read.
+ggplot(mpg, aes(displ, hwy, color = drv, shape = drv)) +
+  geom_point(size = 2.5)
+`}
+/>
+
+Both legends merge into one because they encode the same variable —
+another automatic courtesy from the mapping system.
+
+## Aesthetics depend on the geom
+
+Not every geom understands every aesthetic. A `geom_point()` uses
+`shape`; a `geom_line()` ignores `shape` but uses `linetype`. A bar
+uses `fill` (its interior) more than `color` (its border). This is not
+arbitrary — it follows from *what kind of mark* the geom draws.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# 'fill' colors the interior of bars; 'color' would only outline them.
+ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar()
+`}
+/>
+
+We will return to `color` vs. `fill` repeatedly. For now: **points and
+lines use `color`; areas and bars use `fill` for their interior.**
+
+## Mappings, not assignments
+
+A subtle but vital point: `aes(x = displ)` is **not** "set x to the
+value displ." It is "**let the column `displ` *vary* x across the
+rows.**" Each row gets its own x from its own `displ`. A mapping is a
+*rule applied to every row*, not a single value. This distinction is
+the entire subject of the next page — mapping versus setting.
+
+<MultipleChoice
+  markdown={`In ggplot2, what is an "aesthetic"?
+
+- The overall visual style or theme of the plot.
+  > That is closer to the *theme*. An aesthetic is more specific.
+- A synonym for "geometry."
+  > Geometries are the marks; aesthetics are visual *properties* of those marks.
+- [o] A visual property of a mark — such as x/y position, color, size, or shape — that a data column can be mapped to.
+  > Aesthetics are the information-carrying channels (position, color, size, shape, ...).
+- The data frame passed to \`ggplot()\`.
+  > That is the data; aesthetics are what data columns get mapped *to*.
+
+Aesthetics are the visual channels; \`aes()\` maps columns onto them.`}
+/>
+
+<MultipleChoice
+  markdown={`You map \`aes(x = displ, y = hwy, color = class, size = cty)\`. How many variables does the resulting scatter plot encode, and through what?
+
+- Two variables, through x and y only.
+  > Color and size are also mappings, each carrying a variable.
+- One variable, repeated four times.
+  > Four *different* columns are mapped, so four variables are shown.
+- [o] Four variables — \`displ\` via x, \`hwy\` via y, \`class\` via color, and \`cty\` via size.
+  > Each aesthetic is an independent channel encoding one column.
+- Four variables, but only if you add a legend manually.
+  > The legends/guides are generated automatically from the mappings.
+
+Aesthetics are independent information channels; mapping more columns
+lets a single chart show more variables (within reason).`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`geom_bar()\` use \`fill\` rather than \`color\` to encode a grouping variable across the body of each bar?
+
+- \`color\` does not exist for bars.
+  > \`color\` exists for bars, but it controls only the *outline*.
+- ggplot2 forbids \`color\` on any area geom.
+  > It is allowed; it just affects the border, not the interior.
+- [o] For area-based marks like bars, \`fill\` controls the interior while \`color\` controls only the border, so \`fill\` is what shades the bar body.
+  > The right aesthetic follows from the kind of mark: areas are shaded with \`fill\`.
+- Bars can only ever be one color.
+  > Bars can encode a variable; the correct interior aesthetic is \`fill\`.
+
+Which aesthetics a geom uses follows from the mark it draws — points
+and lines use \`color\`, areas and bars use \`fill\` for their interior.`}
+/>
+
+## Key takeaways
+
+- An **aesthetic** is an information-carrying visual property: position,
+  color, fill, size, shape, alpha, linetype.
+- An **aesthetic mapping** (`aes()`) connects a *column* to an
+  aesthetic, applied **per row**.
+- Each mapping generates its own **guide** (axis or legend)
+  automatically.
+- Mapping more aesthetics shows more variables — but spend the
+  "channel budget" wisely.
+- Which aesthetics matter depends on the **geom**: points/lines use
+  `color`; bars/areas use `fill` for their interior.

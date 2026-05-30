@@ -1,0 +1,129 @@
+---
+title: The Origins of the Grammar
+description: How Leland Wilkinson's Grammar of Graphics reframed a chart as a structured combination of components rather than a named chart type.
+---
+
+The phrase **"Grammar of Graphics"** comes from a 1999 book of the
+same name by the statistician **Leland Wilkinson**. The book is dense
+and theoretical, but its central idea is simple enough to change how
+you see every chart for the rest of your life.
+
+## A grammar, by analogy
+
+Think about natural language. There is no fixed list of "approved
+sentences" you must memorize. Instead, there is a **grammar** — a set
+of components (nouns, verbs, objects) and rules for combining them.
+From a small vocabulary and a few rules, you can produce an infinite
+number of sentences, including ones nobody has ever spoken before.
+
+Wilkinson asked: *what if charts worked the same way?*
+
+```mermaid
+flowchart LR
+    subgraph Language
+      W["Words +<br/>grammar rules"] --> SS["Infinite<br/>sentences"]
+    end
+    subgraph Graphics
+      C["Graphical components<br/>+ combination rules"] --> GG["Infinite<br/>charts"]
+    end
+```
+
+Instead of a **catalogue** of chart types — "bar chart," "pie chart,"
+"scatter plot," each a separate special case — Wilkinson proposed a
+small set of **components** that *combine* to produce any chart,
+including ones without a familiar name.
+
+## From "chart types" to components
+
+This is the mental flip at the heart of the whole course. Consider how
+differently the two worldviews answer a simple question.
+
+| Question | Chart-type thinking | Grammar thinking |
+| --- | --- | --- |
+| "What is a bar chart?" | A named chart you pick from a menu. | Data + an x mapping + a *count* statistic + a *bar* geometry on a Cartesian coordinate system. |
+| "What is a pie chart?" | A totally different named chart. | The **same** bar chart, drawn in *polar* coordinates. |
+| "How do I make a new kind of chart?" | Hope the menu has it. | Combine components differently. |
+
+Read that pie-chart row again. In the chart-type worldview, a pie
+chart and a stacked bar chart are unrelated items on a menu. In the
+grammar worldview, **a pie chart *is* a stacked bar chart in polar
+coordinates** — same data, same statistic, same geometry, only the
+*coordinate system* changes. You will actually build this
+transformation yourself later in the course.
+
+<Callout type="info" title="Why this is powerful">
+When charts are *combinations of components* rather than *named
+types*, you are no longer limited to a menu. You can build any chart
+that the components allow — and you can understand any chart by
+decomposing it back into its components.
+</Callout>
+
+## Wilkinson's components
+
+Wilkinson's grammar identified the building blocks a chart is made of.
+ggplot2 adapts them into a practical set we will spend the rest of the
+course on:
+
+- **Data** — the table of values being shown.
+- **Aesthetic mappings** — which variables map to which visual
+  properties (position, color, size, shape).
+- **Geometries** — the kind of mark used (points, lines, bars).
+- **Statistics** — transformations applied to the data before drawing
+  (counts, bins, smoothers).
+- **Scales** — how data values translate into visual values (axis
+  ticks, color palettes).
+- **Coordinates** — the space the marks live in (Cartesian, polar).
+- **Facets** — splitting the data into a grid of small panels.
+
+Do not memorize these yet. Just absorb the *shape* of the idea: a
+chart is a **structured object** with named parts, not a monolithic
+picture.
+
+<MultipleChoice
+  markdown={`What is the key conceptual shift introduced by the Grammar of Graphics?
+
+- It replaced bar charts with scatter plots as the default chart.
+  > The grammar does not favor any particular chart; it changes how *all* charts are described.
+- It made charts render faster on large data sets.
+  > The grammar is about *description and structure*, not rendering speed.
+- [o] It reframed a chart as a structured combination of reusable components instead of a single named chart type chosen from a menu.
+  > Components plus combination rules replace a fixed catalogue of chart types.
+- It is a list of every possible chart you are allowed to make.
+  > It is the opposite of a fixed list — a generative system, like grammar in language.
+
+Like words and grammar rules generating infinite sentences,
+graphical components and combination rules generate an open-ended
+space of charts.`}
+/>
+
+## Why this matters for you
+
+You already know many chart *types*. The grammar gives you something
+better: a way to see the **components shared across all of them**. A
+boxplot and a violin plot stop being two unrelated entries on a menu
+and become two *geometries* over the same data and mappings. A
+histogram and a bar chart share the same *bar geometry* but differ in
+their *statistic*.
+
+This is why a grammar *scales* where a menu does not: a handful of
+components recombine into thousands of charts.
+
+Wilkinson supplied the theory. The next page is about the person who
+turned that theory into the tool you will actually use.
+
+<MultipleChoice
+  markdown={`In grammar-of-graphics terms, how is a pie chart related to a stacked bar chart?
+
+- They are completely unrelated chart types.
+  > In a menu of chart types they look unrelated, but the grammar reveals a deep connection.
+- A pie chart uses points while a bar chart uses bars.
+  > Both use a bar geometry; the difference lies elsewhere.
+- [o] A pie chart is a stacked bar chart drawn in a polar coordinate system instead of a Cartesian one.
+  > Same data, statistic, and geometry — only the coordinate system changes.
+- A pie chart requires a special "pie" statistic that bars do not use.
+  > No special statistic is needed; the change is the coordinate system.
+
+Decomposing both charts into components shows they share everything
+except the coordinate system — a perfect illustration of grammar
+thinking.`}
+/>

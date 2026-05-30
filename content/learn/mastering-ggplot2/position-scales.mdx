@@ -1,0 +1,188 @@
+---
+title: Position Scales
+description: Controlling the x and y axes — limits, breaks, transformations like log scales, and why zooming with a scale is different from zooming with coordinates.
+---
+
+The x and y axes are **position scales**, and they are the scales you
+will adjust most often. This page covers limits, breaks, labels, and —
+most importantly — *transformations* like the log scale, plus a subtle
+trap about how scales filter data.
+
+## Continuous position scales
+
+For numeric axes you use `scale_x_continuous()` and
+`scale_y_continuous()`. Set breaks (tick positions), labels, and the
+axis name:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_y_continuous(
+    name   = "Highway MPG",
+    breaks = seq(10, 45, by = 5)
+  )
+`}
+/>
+
+## Transformations: the log scale
+
+A **transformation** changes the *spacing* of the axis, not the data.
+The classic case is a log scale, which turns multiplicative
+relationships into straight lines and tames skewed data:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# A heavily skewed variable: US city populations would be ideal,
+# but we'll use a synthetic skewed example for clarity.
+set.seed(1)
+df <- data.frame(
+  size  = 10^runif(200, 0, 5),     # values from 1 to 100,000
+  score = runif(200, 0, 100)
+)
+
+# Linear scale: most points squashed against the left edge.
+ggplot(df, aes(size, score)) + geom_point(alpha = 0.5)
+`}
+/>
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+set.seed(1)
+df <- data.frame(
+  size  = 10^runif(200, 0, 5),
+  score = runif(200, 0, 100)
+)
+
+# Log10 scale: the same data, now spread evenly and readable.
+ggplot(df, aes(size, score)) +
+  geom_point(alpha = 0.5) +
+  scale_x_log10()
+`}
+/>
+
+Same data, same mapping, same geom. Only the **scale's
+transformation** changed — and the chart went from unreadable to clear.
+
+```mermaid
+flowchart LR
+    DATA["Skewed data<br/>1 ... 100000"] --> T["scale_x_log10<br/>transform spacing"]
+    T --> EVEN["Evenly spread axis<br/>equal gaps = 10x steps"]
+```
+
+<Callout type="info" title="Transform the scale, not the data">
+You *could* create a new column `log10(size)` and plot that. But then
+your axis would read 0–5 instead of 1–100,000, confusing readers.
+Transforming the **scale** keeps the axis labeled in original units
+while changing only the spacing. Let the scale do the transform.
+</Callout>
+
+## The zoom trap: scale limits remove data
+
+Here is a subtle but important behavior. Setting `limits` on a position
+scale does **not** just zoom — it **drops** any data outside the range
+*before* statistics run. Watch what it does to a smoother:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# Setting scale limits DROPS points with displ > 5 entirely.
+# The smoother is then fit only to the remaining data.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth() +
+  scale_x_continuous(limits = c(1, 5))
+`}
+/>
+
+The large-engine cars are *gone*, and the smoother never saw them. If
+all you wanted was to **zoom** — keep all the data but look at a
+sub-region — you must use the *coordinate system* instead, which we
+cover in the next section:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# coord_cartesian zooms WITHOUT discarding data: the smoother still
+# uses every point, we just view a window of it.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth() +
+  coord_cartesian(xlim = c(1, 5))
+`}
+/>
+
+<Callout type="warn" title="Remember this distinction">
+**Scale limits filter the data; coordinate limits zoom the view.**
+Use `scale_*_continuous(limits = ...)` to *exclude* data, and
+`coord_cartesian(xlim = ...)` to *zoom* while keeping all data in the
+calculations.
+</Callout>
+
+## Discrete position scales
+
+When x is categorical, the position scale is discrete
+(`scale_x_discrete()`), letting you reorder or relabel categories:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(x = drv)) +
+  geom_bar() +
+  scale_x_discrete(
+    labels = c("4" = "4-wheel", "f" = "front", "r" = "rear")
+  )
+`}
+/>
+
+<MultipleChoice
+  markdown={`Why prefer \`scale_x_log10()\` over creating a \`log10(x)\` column and plotting that?
+
+- Creating a new column is impossible in R.
+  > It is possible; it is just a worse choice here.
+- The two approaches give different point positions.
+  > The point *positions* are the same; the difference is the axis labels.
+- [o] Transforming the scale keeps the axis labeled in the original units (1, 100, 10000) while only changing the spacing, whereas a log column would label the axis 0–5 and confuse readers.
+  > Let the scale transform so the axis stays interpretable.
+- \`scale_x_log10()\` also changes the y-axis automatically.
+  > It only affects the x scale.
+
+Transformations belong to the scale so the visual spacing changes while
+the data and its natural units remain intact.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the key difference between \`scale_x_continuous(limits = c(1, 5))\` and \`coord_cartesian(xlim = c(1, 5))\`?
+
+- They are identical in every way.
+  > They differ crucially in how they treat out-of-range data.
+- The scale version zooms; the coord version deletes data.
+  > It is the reverse — the scale version is the one that deletes data.
+- [o] The scale version *removes* data outside the range before stats are computed (so a smoother changes), while the coord version *zooms* the view and keeps all data in the calculations.
+  > Scale limits filter; coordinate limits zoom.
+- Only \`coord_cartesian\` works on the x-axis.
+  > Both can affect x; the difference is filtering vs. zooming.
+
+Confusing these is a common source of "why did my trend line change
+when I zoomed?" bugs. Scale limits filter; coordinate limits zoom.`}
+/>
+
+## Key takeaways
+
+- Position scales (`scale_x/y_continuous`, `scale_x/y_discrete`) set
+  **limits, breaks, labels, and transformations** for the axes.
+- A **log transformation** belongs on the *scale*, so the axis keeps
+  its original units while changing spacing.
+- **Scale limits remove** out-of-range data *before* stats run;
+  **`coord_cartesian()` zooms** while keeping all data — choose
+  deliberately.
+- Discrete position scales let you **reorder and relabel** categories.
