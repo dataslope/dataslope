@@ -45,7 +45,7 @@ function MermaidContent({ chart }: { chart: string }) {
     startOnLoad: false,
     securityLevel: "strict",
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
-    fontSize: 13,
+    fontSize: 14,
     themeCSS: "margin: 1.5rem auto 0;",
     theme: resolvedTheme === "dark" ? "dark" : "neutral",
   });

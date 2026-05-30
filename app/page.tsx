@@ -1,3 +1,5 @@
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
 import Link from "next/link";
 import styles from "./root.module.css";
 
@@ -5,6 +7,35 @@ export const metadata = {
   title: "Dataslope",
   description: "Dataslope — browser-based playgrounds and tooling.",
 };
+
+interface CourseMeta {
+  title: string;
+  root?: boolean;
+}
+
+async function getCourses(): Promise<{ slug: string; title: string }[]> {
+  const learnDir = path.join(process.cwd(), "content", "learn");
+  const entries = await readdir(learnDir, { withFileTypes: true });
+
+  const courses: { slug: string; title: string }[] = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    try {
+      const raw = await readFile(
+        path.join(learnDir, entry.name, "meta.json"),
+        "utf-8",
+      );
+      const meta = JSON.parse(raw) as CourseMeta;
+      if (meta.root && meta.title) {
+        courses.push({ slug: entry.name, title: meta.title });
+      }
+    } catch {
+      // No meta.json or unreadable — skip
+    }
+  }
+
+  return courses.sort((a, b) => a.title.localeCompare(b.title));
+}
 
 function GitHubIcon() {
   return (
@@ -20,7 +51,9 @@ function GitHubIcon() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const courses = await getCourses();
+
   return (
     <main className={styles.main}>
       <div className={styles.container}>
@@ -56,133 +89,18 @@ export default function Home() {
         <section className={styles.courses}>
           <h2 className={styles.coursesHeading}>Courses</h2>
           <div className={styles.courseList}>
-            <Link href="/learn/typescript-from-scratch" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                TypeScript from Scratch
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/beginners-javascript" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Beginner&apos;s Guide to JavaScript
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/python-basics" className={styles.courseCard}>
-              <span className={styles.courseTitle}>Python Basics</span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/mastering-dsa-cpp" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Mastering Data Structures and Algorithms with C++
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/oop-blueprint-java" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Object-Oriented Programming Blueprint with Java
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/learn/java-programming-for-beginners"
-              className={styles.courseCard}
-            >
-              <span className={styles.courseTitle}>
-                Java Programming for Beginners
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/systems-programming-c" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Systems Programming with C
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/learn/java-collections-and-generics-deep-dive"
-              className={styles.courseCard}
-            >
-              <span className={styles.courseTitle}>
-                Java Collections and Generics Deep Dive
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/csharp-linq-functional" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                C# LINQ and Functional Patterns
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/learn/functional-programming-typescript"
-              className={styles.courseCard}
-            >
-              <span className={styles.courseTitle}>
-                Functional Programming with TypeScript
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/intro-modern-csharp" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Introduction to Modern C#
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/practical-r-for-beginners" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Practical R for Beginners
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/learn/data-analysis-python-pandas"
-              className={styles.courseCard}
-            >
-              <span className={styles.courseTitle}>
-                Data Analysis with Python Pandas
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/learn/intro-sql-postgres"
-              className={styles.courseCard}
-            >
-              <span className={styles.courseTitle}>
-                Introduction to SQL and Relational Databases with PostgreSQL
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/scientific-computing-python" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Scientific Computing with Python
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/intro-data-viz-plotly" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                Introduction to Data Visualization with Plotly
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/c-programming-for-beginners" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                C Programming for Beginners
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/from-zero-to-cpp" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                From Zero to C++ Programming
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
-            <Link href="/learn/sql-analytics-duckdb" className={styles.courseCard}>
-              <span className={styles.courseTitle}>
-                SQL Analytics with DuckDB
-              </span>
-              <span className={styles.courseArrow} aria-hidden="true">→</span>
-            </Link>
+            {courses.map(({ slug, title }) => (
+              <Link
+                key={slug}
+                href={`/learn/${slug}`}
+                className={styles.courseCard}
+              >
+                <span className={styles.courseTitle}>{title}</span>
+                <span className={styles.courseArrow} aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
       </div>
