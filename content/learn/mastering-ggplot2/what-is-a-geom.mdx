@@ -1,0 +1,139 @@
+---
+title: What Is a Geom?
+description: Geometries are the marks ggplot2 draws — understand them as interchangeable representations of the same data and mappings.
+---
+
+A **geom** (geometry) is the kind of **mark** ggplot2 draws to
+represent your data: a point, a line, a bar, a box. It is the most
+visible component — when someone says "make a scatter plot" or "make a
+bar chart," they are really choosing a *geom*.
+
+## One data + mapping, many geoms
+
+Here is the liberating idea. The data and mappings describe *what
+variables relate to what visual channels*. The geom decides *how those
+relationships are drawn*. Swap the geom and you get a different chart
+**from the same description**.
+
+```mermaid
+flowchart TD
+    DM["Same data + mappings<br/>aes(x = displ, y = hwy)"] --> P["geom_point<br/>scatter"]
+    DM --> L["geom_line<br/>connected line"]
+    DM --> B["geom_bin2d<br/>2-D density"]
+    DM --> S["geom_smooth<br/>trend + band"]
+```
+
+Watch the geom change while everything else stays fixed:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+base <- ggplot(mpg, aes(displ, hwy))
+
+base + geom_point()    # marks = points  -> scatter plot
+`}
+/>
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+base <- ggplot(mpg, aes(displ, hwy))
+
+base + geom_smooth()   # marks = a smoothed trend line + confidence band
+`}
+/>
+
+You changed exactly one word and the chart's *character* changed
+completely — yet the data and mappings are identical. That is the geom
+doing its one job: choosing the mark.
+
+## Geoms have required aesthetics
+
+Each geom needs certain aesthetics to make sense, and ignores others:
+
+| Geom | Needs | Draws |
+| --- | --- | --- |
+| `geom_point()` | x, y | a dot per row |
+| `geom_line()` | x, y | a line through points in x order |
+| `geom_col()` | x, y | a bar of height y at each x |
+| `geom_bar()` | x | a bar whose height is the **count** at each x |
+| `geom_histogram()` | x | bars over **binned** counts of x |
+| `geom_boxplot()` | x (group), y | a five-number-summary box per group |
+| `geom_tile()` | x, y, fill | a colored cell — heatmaps |
+
+Notice `geom_bar()` and `geom_histogram()` need only **x**. That is a
+clue we will unpack in the next section: those geoms *compute* their y
+themselves, via a statistic.
+
+## A line needs an order; a scatter does not
+
+A geom is not just a different look — it carries *assumptions*. Points
+are unordered: each is independent. A line **connects points in x
+order**, which only makes sense when x has a meaningful sequence (like
+time). Using a line on unordered data produces the dreaded "spaghetti":
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# economics is a time series shipped with ggplot2: unemployment over time.
+ggplot(economics, aes(x = date, y = unemploy)) +
+  geom_line(color = "steelblue")
+`}
+/>
+
+A line is right here because `date` is ordered. On `mpg`'s `displ`
+(which has no inherent sequence between cars), a line would zig-zag
+meaninglessly. **Choosing a geom is partly choosing a claim about your
+data.**
+
+<Callout type="info" title="Geoms vs. chart types">
+In a menu-of-charts tool, "scatter plot" and "line chart" are separate
+items. In ggplot2 they are the *same plot* with a different geom. This
+is the grammar paying off: you stop memorizing chart types and start
+swapping one component.
+</Callout>
+
+<MultipleChoice
+  markdown={`What does a *geom* determine in a ggplot?
+
+- Which data frame is plotted.
+  > That is the *data* component, set in \`ggplot()\`.
+- Which columns map to x, y, and color.
+  > Those are *aesthetic mappings*, set in \`aes()\`.
+- [o] The kind of mark used to represent the data — points, lines, bars, boxes, and so on.
+  > The geom chooses *how* the mapped data is drawn.
+- The fonts and background styling of the plot.
+  > That is the *theme*.
+
+The geom is the visible mark. Keeping data and mappings fixed while
+swapping the geom yields different charts from one description.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`geom_line()\` appropriate for the \`economics\` data (unemployment over \`date\`) but a poor choice for \`mpg\` mapped as \`aes(displ, hwy)\`?
+
+- \`geom_line()\` only works on data sets with more than 400 rows.
+  > Row count is irrelevant; the issue is ordering.
+- \`mpg\` has missing values that break lines.
+  > That is not the reason; the reason is the absence of a meaningful order.
+- [o] A line connects points in x order, which is meaningful for an ordered variable like \`date\` but produces meaningless zig-zags for an unordered variable like \`displ\`.
+  > Lines encode sequence; only ordered x-values justify them.
+- Lines cannot be colored, so they are unsuitable for \`mpg\`.
+  > Lines can be colored; suitability is about ordering, not color.
+
+A geom carries assumptions. Choosing \`geom_line\` asserts that the
+x-values form a meaningful sequence.`}
+/>
+
+## Key takeaways
+
+- A **geom** is the *mark* drawn — point, line, bar, box, tile.
+- The **same data + mappings** can be drawn by many geoms; swapping the
+  geom changes the chart without changing the description.
+- Each geom has **required aesthetics** and carries **assumptions**
+  (e.g. a line implies ordered x).
+- "Scatter plot" vs. "line chart" is just a change of geom — the
+  grammar replaces a menu of chart types with one swappable component.

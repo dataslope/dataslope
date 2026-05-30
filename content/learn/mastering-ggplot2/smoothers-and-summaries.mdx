@@ -1,0 +1,178 @@
+---
+title: Smoothers and Summaries
+description: Using statistical layers to reveal trends and summaries — geom_smooth, stat_summary, and the idea that a layer can show a computed pattern rather than raw data.
+---
+
+Some layers do not show your data at all — they show a **computation
+over** your data: a trend line, a group average, a confidence band.
+These statistical layers are how ggplot2 turns a cloud of points into
+an argument.
+
+## geom_smooth: a trend made visible
+
+`geom_smooth()` fits a model to the data and draws the fitted curve
+plus a confidence band. Its stat does real statistical work, then hands
+a smooth curve to the geom.
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth()
+`}
+/>
+
+By default it uses a flexible **loess** curve (for smaller data) that
+bends to follow local structure. The grey ribbon is the **confidence
+interval** — the stat computed it for you.
+
+## Choosing the model with `method`
+
+The same geom can fit different models. `method = "lm"` fits a straight
+line (linear model); the default follows the data's curves:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# A straight-line fit: assumes a linear relationship.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "darkred")
+`}
+/>
+
+```mermaid
+flowchart LR
+    D["Raw points<br/>(displ, hwy)"] --> SM["stat_smooth<br/>fit model (lm or loess)"]
+    SM --> CURVE["Fitted values<br/>+ confidence band"]
+    CURVE --> G["geom_smooth<br/>draw line + ribbon"]
+```
+
+Switching `method` swaps the *statistic's* model while the *geom*
+(line + ribbon) stays the same — yet another instance of separating
+computation from drawing.
+
+<Callout type="warn" title="A smoother is a claim, not a fact">
+A straight `lm` line *assumes* the relationship is linear; a loess
+curve assumes it is locally smooth. Neither is "the truth" — each is a
+model. Always show the raw points alongside a smoother so readers can
+judge whether the model fits.
+</Callout>
+
+## stat_summary: summarize per group, your way
+
+When you want a custom summary — say, the **mean** of y for each x
+category with error bars — `stat_summary()` computes it on the fly
+without you pre-aggregating the data:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# Mean highway MPG per class, computed at plot time, drawn as points.
+ggplot(mpg, aes(class, hwy)) +
+  geom_jitter(width = 0.15, alpha = 0.3) +
+  stat_summary(fun = mean, geom = "point",
+               color = "red", size = 4)
+`}
+/>
+
+The red dots are *not* in your data — `stat_summary` computed the mean
+per class and the `point` geom drew them on top of the raw (jittered)
+values. Notice `geom =` *inside* a stat: confirming again that stats
+and geoms are interchangeable partners.
+
+You can add a range too:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# Mean with a min-max range bar per class.
+ggplot(mpg, aes(class, hwy)) +
+  stat_summary(fun = mean,
+               fun.min = min, fun.max = max,
+               geom = "pointrange", color = "steelblue")
+`}
+/>
+
+## Raw data + summary: the honest pattern
+
+The most trustworthy statistical graphics show **both** the raw data
+and the summary, so the reader sees the evidence *and* the claim:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(alpha = 0.4) +                       # the evidence
+  geom_smooth(method = "lm", se = TRUE) +         # the claim + uncertainty
+  labs(title = "Bigger engines tend to use more fuel")
+`}
+/>
+
+This layered honesty is something the grammar makes *natural*: the raw
+layer and the summary layer are just two geoms stacked with `+`.
+
+<MultipleChoice
+  markdown={`What does \`geom_smooth(method = "lm")\` draw, and what is the grey ribbon around it?
+
+- The raw data points connected in order, with a shadow.
+  > \`geom_smooth\` does not connect raw points; it draws a *fitted* line.
+- [o] A straight line fitted by a linear model, surrounded by a confidence band computed by the layer's statistic.
+  > The stat fits the model and computes the interval; the geom draws the line and ribbon.
+- A random trend line with a decorative border.
+  > The line is a deterministic model fit, and the ribbon is a meaningful confidence interval.
+- The median of y at each x value.
+  > That is closer to a summary stat; \`method = "lm"\` fits a regression line.
+
+\`geom_smooth\` exposes a fitted model plus its uncertainty — a
+computation over the data, not the raw data itself.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`stat_summary(fun = mean, geom = "point")\`, why can you specify a \`geom =\` argument inside a *stat* function?
+
+- It is a quirk that only works for \`stat_summary\`.
+  > It reflects a general design, not a special case.
+- Because stats secretly are geoms.
+  > They are distinct components; the point is that they *pair* and are interchangeable.
+- [o] Because every layer is a stat paired with a geom, so a stat function lets you choose which geom draws its computed output.
+  > Stats compute; geoms draw; specifying \`geom =\` picks the partner for the stat's results.
+- Because \`mean\` requires a point geom.
+  > The mean could be drawn by other geoms too (e.g. a line or bar); \`point\` is just one choice.
+
+The stat computes the summary and the chosen geom renders it — the same
+separable stat/geom relationship seen with bars and histograms.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is it good practice to plot raw points *and* a smoother together rather than the smoother alone?
+
+- The smoother will not render without points.
+  > \`geom_smooth\` renders fine on its own; the reason is interpretive.
+- It makes the plot more colorful.
+  > Aesthetics aside, the real benefit is trustworthiness.
+- [o] A smoother encodes a model's *assumptions*; showing the raw data lets the reader judge whether that model actually fits.
+  > Raw + summary together present both the evidence and the claim.
+- Points make the confidence band wider.
+  > Showing points does not change the band; it changes what the reader can verify.
+
+A smoother is a claim about the data. Layering it over the raw points
+keeps the graphic honest — easy to do because both are just layers.`}
+/>
+
+## Key takeaways
+
+- Statistical layers show a **computation over** the data, not the raw
+  data: trends, means, intervals.
+- `geom_smooth()` fits a model (default loess, or `method = "lm"` for a
+  line) and draws it with a confidence band.
+- `stat_summary()` computes a custom per-group summary (e.g. `mean`) at
+  plot time and renders it through a chosen geom.
+- A smoother is a **model**, i.e. a claim — pair it with the raw data
+  so readers can judge the fit.
