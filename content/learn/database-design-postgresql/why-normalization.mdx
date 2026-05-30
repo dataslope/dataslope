@@ -107,7 +107,7 @@ different fact.
 ## Quick check
 
 <MultipleChoice
-  markdown={`In the flat \\`orders_flat\\` table, Ada's email appears on every order row. What makes that dangerous?
+  markdown={`In the flat \`orders_flat\` table, Ada's email appears on every order row. What makes that dangerous?
 
 - It prevents SQL from filtering rows.
   > Filtering still works; the risk is that repeated copies can drift apart.
@@ -124,7 +124,7 @@ Duplication turns one real-world change into many database updates.`}
 <MultipleChoice
   markdown={`Which situation is the clearest deletion anomaly?
 
-- A query returns no rows because the \\`WHERE\\` clause is too strict.
+- A query returns no rows because the \`WHERE\` clause is too strict.
   > That is a query issue, not a table-design anomaly.
 - A customer changes email and one old row is missed.
   > That is an update anomaly because stored copies no longer match.
@@ -231,7 +231,7 @@ Insertion anomalies appear when unrelated facts are forced into the same row.`}
 <MultipleChoice
   markdown={`After splitting customers, products, and orders into separate tables, how can you show the familiar all-in-one order report?
 
-- Store the customer email again in \\`orders\\` for convenience.
+- Store the customer email again in \`orders\` for convenience.
   > Copying the email back into orders recreates the original duplication risk.
 - [o] Join the related tables when reading the report.
   > Joins rebuild the combined view from facts stored once in their proper tables.

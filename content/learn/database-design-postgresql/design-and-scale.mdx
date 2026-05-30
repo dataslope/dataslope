@@ -1,0 +1,215 @@
+---
+title: How Design Affects Scalability
+description: Learn why clean relational design makes a schema easier to grow as data, features, and queries increase.
+---
+
+Scalability is not only about servers. Long before a database needs
+advanced operations work, the schema either helps the product grow or
+gets in the way.
+
+This page keeps the focus on design: structure, relationships, keys,
+and duplication.
+
+## Designs scale when meaning is clear
+
+A schema that scales well has clear tables, stable keys, and
+relationships that match the real world.
+
+```mermaid
+flowchart TD
+    Clear["Clear entity tables"] --> Keys["Stable keys"]
+    Keys --> Relationships["Reliable relationships"]
+    Relationships --> Constraints["Enforced rules"]
+    Constraints --> Growth["Easier growth"]
+```
+
+When the schema expresses meaning clearly, new features can reuse the
+model instead of working around it.
+
+## Avoid wide god-tables
+
+A **god-table** tries to store too many kinds of things in one place.
+It often has many nullable columns, repeated groups, and confusing
+rules.
+
+```mermaid
+flowchart LR
+    Bad["one huge activity table"] --> UserFacts["user facts"]
+    Bad --> OrderFacts["order facts"]
+    Bad --> PaymentFacts["payment facts"]
+    Bad --> SupportFacts["support facts"]
+    UserFacts --> Confusion["unclear rules"]
+    OrderFacts --> Confusion
+    PaymentFacts --> Confusion
+    SupportFacts --> Confusion
+```
+
+A cleaner design separates entities and connects them.
+
+```mermaid
+erDiagram
+    customers ||--o{ orders : places
+    orders ||--o{ payments : paid
+    customers ||--o{ support_tickets : opens
+    customers {
+        int id PK
+        text email UK
+    }
+    orders {
+        int id PK
+        int customer_id FK
+    }
+    payments {
+        int id PK
+        int order_id FK
+    }
+    support_tickets {
+        int id PK
+        int customer_id FK
+    }
+```
+
+Each table can grow according to its own rules.
+
+<MultipleChoice
+  markdown={`Why does a wide god-table usually scale poorly as a design?
+
+- It has a primary key.
+  > A primary key is useful; the problem is mixing unrelated meanings.
+- [o] It mixes several entity types, creating unclear columns and rules.
+  > Different kinds of facts need different constraints and relationships.
+- It uses too many foreign keys to separate entities.
+  > Separating entities with foreign keys is usually the cleaner design.
+- It has rows.
+  > All relational tables have rows.
+
+A table should represent one kind of thing with coherent rules.`}
+/>
+
+## Keys and relationships guide future lookups
+
+Primary keys, foreign keys, and unique constraints are design tools.
+They also imply the paths software will use to find related data.
+
+```mermaid
+flowchart TD
+    Customer["customers.id primary key"] --> OrderFK["orders.customer_id foreign key"]
+    Email["customers.email unique"] --> AccountLookup["find account by email"]
+    OrderFK --> OrderHistory["find customer orders"]
+```
+
+This is not a performance-tuning lesson. The design point is simpler:
+clean keys make the common paths obvious and enforceable.
+
+## Normalize enough to avoid unbounded duplication
+
+Some duplication is deliberate, like copying an order line's historical
+unit price. Unbounded duplication is different. It repeats the same
+fact across many rows for no good reason.
+
+```mermaid
+flowchart LR
+    Repeat["Product name copied into every order item"] --> ManyCopies["many copies"]
+    ManyCopies --> ExpensiveChange["hard to change safely"]
+    Normalize["order_items references products"] --> OneCopy["product name stored once"]
+```
+
+A normalized structure lets related data grow without copying every
+fact into every row.
+
+```mermaid
+erDiagram
+    products ||--o{ order_items : appears
+    orders ||--o{ order_items : contains
+    products {
+        int id PK
+        text sku UK
+        text name
+    }
+    orders {
+        int id PK
+    }
+    order_items {
+        int order_id PK,FK
+        int product_id PK,FK
+        int quantity
+    }
+```
+
+## Design trade-offs still matter
+
+Good design is not "normalize everything forever." It is choosing the
+structure that preserves meaning while supporting expected growth.
+
+For example:
+
+- Store product names once on `products`.
+- Store `unit_price` on `order_items` to preserve history.
+- Use a junction table when many rows relate to many rows.
+- Avoid columns that contain comma-separated lists.
+
+```mermaid
+flowchart TD
+    Choice["Design choice"] --> Meaning["Preserve meaning"]
+    Choice --> Growth["Support growth"]
+    Choice --> Rules["Keep rules enforceable"]
+    Meaning --> Better["Scales better conceptually"]
+    Growth --> Better
+    Rules --> Better
+```
+
+## What this page is not about
+
+Later, you may learn about indexes, query plans, caching, sharding,
+replication, and administration. Those are important topics, but they
+come after the schema has a clear model.
+
+A poor model is hard to rescue with operational tricks. A clear model
+is easier to improve later.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which design is usually easier to grow?
+
+- One table that stores customers, orders, payments, and tickets together.
+  > Mixing unrelated entities creates unclear rules and many irrelevant columns.
+- [o] Separate tables for separate entities, connected by keys.
+  > Each table can enforce rules for one kind of thing while relationships connect them.
+- A table with comma-separated product IDs.
+  > Comma-separated lists hide relationships inside text.
+- A schema with no primary keys.
+  > Stable identity is important for relationships and growth.
+
+Clear structure gives future features a reliable foundation.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are comma-separated lists in a column a poor fit for scalable relational design?
+
+- They are too normalized.
+  > A comma-separated list is not normalized relational structure.
+- [o] The database cannot easily enforce relationships for each listed value.
+  > Individual relationships should be rows that can use keys and constraints.
+- They create too many tables by themselves.
+  > The list is inside one column, which hides structure rather than creating tables.
+- They automatically preserve history.
+  > A list of IDs does not explain historical meaning.
+
+Relationships should be represented as relationships, not packed text.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the design-level benefit of clean primary and foreign keys?
+
+- They remove the need to understand requirements.
+  > Keys should come from a clear understanding of the model.
+- [o] They make identity and relationship paths explicit.
+  > Software can follow reliable references between tables.
+- They force every query to be fast in every situation.
+  > Performance depends on more than the existence of keys.
+- They require all tables to have the same columns.
+  > Different entities need different attributes.
+
+Keys are the backbone of a schema that can grow coherently.`}
+/>

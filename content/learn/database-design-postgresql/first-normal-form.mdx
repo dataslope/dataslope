@@ -73,20 +73,20 @@ column.
 <MultipleChoice
   markdown={`Which table design most clearly violates 1NF?
 
-- \\`students(student_id, name)\\` with one row per student.
+- \`students(student_id, name)\` with one row per student.
   > Each listed column stores one value about one student.
-- [o] \\`students(student_id, name, phones)\\` where \\`phones\\` contains \\`555-1000, 555-2000\\`.
+- [o] \`students(student_id, name, phones)\` where \`phones\` contains \`555-1000, 555-2000\`.
   > The phones cell contains multiple values hidden inside one string.
-- \\`student_phones(student_id, phone_number)\\` with one row per phone number.
+- \`student_phones(student_id, phone_number)\` with one row per phone number.
   > Separate rows are the usual 1NF-friendly way to store multiple values.
-- \\`products(product_id, name, price)\\` with one price per product.
+- \`products(product_id, name, price)\` with one price per product.
   > One price value per row does not create a repeating group.
 
 1NF asks whether each cell holds one value of the right kind.`}
 />
 
 <MultipleChoice
-  markdown={`Why are columns like \\`phone1\\`, \\`phone2\\`, and \\`phone3\\` a design smell?
+  markdown={`Why are columns like \`phone1\`, \`phone2\`, and \`phone3\` a design smell?
 
 - They use text instead of numbers.
   > The problem is not the data type; phone numbers are often stored as text.
@@ -206,7 +206,7 @@ atomic, do the columns depend on the right key?
 />
 
 <MultipleChoice
-  markdown={`A row stores \\`items = 'Book, Pen, Mug'\\`. What is the best 1NF-friendly fix?
+  markdown={`A row stores \`items = 'Book, Pen, Mug'\`. What is the best 1NF-friendly fix?
 
 - Keep the list and search it with string matching.
   > String matching hides separate values inside one cell and keeps the 1NF problem.
