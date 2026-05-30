@@ -51,7 +51,12 @@ function MermaidContent({ chart }: { chart: string }) {
   });
 
   const { svg, bindFunctions } = use(
-    cachePromise(`${chart}-${resolvedTheme}`, () => {
+    cachePromise(`${chart}-${resolvedTheme}`, async () => {
+      // Wait for all fonts (including Source Serif 4) to finish loading
+      // before asking Mermaid to measure text and size nodes. Without this,
+      // Mermaid measures with the browser fallback font (Georgia / serif),
+      // which is narrower than Source Serif 4, so labels overflow their boxes.
+      await document.fonts.ready;
       return mermaid.render(id, chart.replaceAll("\\n", "\n"));
     }),
   );
