@@ -1,0 +1,206 @@
+---
+title: Building Business Metrics
+description: Turning raw rows into the numbers a business actually decides on — conversion rates, retention, revenue per user — and the analytical reasoning that keeps a metric honest.
+---
+
+Everything so far has been technique. This page is about *purpose*: using
+those techniques to compute the **metrics** a business runs on —
+conversion rate, average revenue per user, retention, growth. The SQL is
+familiar by now; the new skill is **reasoning about what a number really
+means** and constructing it so it tells the truth.
+
+## A metric is a definition first, SQL second
+
+Before writing any query, an analyst pins down the **definition**. "Active
+users" — active doing what, over what window? "Conversion rate" — converted
+from which step to which, counted by users or by sessions? Most metric
+disputes are definition disputes, not SQL bugs.
+
+```mermaid
+flowchart LR
+    Q["Vague question:<br/>how is conversion?"] --> D["Precise definition:<br/>distinct users who purchased<br/>/ distinct users who visited"]
+    D --> SQL["SQL that<br/>implements the definition"]
+    SQL --> M["A metric you<br/>can defend"]
+```
+
+The discipline: **write the definition in words, then translate it
+literally into SQL.** A metric you cannot state in a sentence is one you
+cannot trust.
+
+## Conversion rate: a ratio of two counts
+
+A conversion rate is "of the people who *could* convert, what fraction
+*did*?" That is two counts and a division — and the division must guard
+against zero. `COUNT(DISTINCT ...)` ensures you count *people*, not events.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Visit-to-purchase conversion per channel"
+  initSql={`CREATE TABLE events (
+  user_id INTEGER, channel TEXT, action TEXT
+);
+INSERT INTO events VALUES
+  (1,'ads','visit'),(1,'ads','purchase'),
+  (2,'ads','visit'),
+  (3,'organic','visit'),(3,'organic','purchase'),
+  (4,'organic','visit'),(5,'organic','visit'),(5,'organic','purchase'),
+  (6,'ads','visit'),(6,'ads','purchase');`}
+  initialCode={`SELECT
+  channel,
+  COUNT(DISTINCT user_id) FILTER (WHERE action = 'visit')    AS visitors,
+  COUNT(DISTINCT user_id) FILTER (WHERE action = 'purchase') AS buyers,
+  ROUND(
+    100.0 * COUNT(DISTINCT user_id) FILTER (WHERE action = 'purchase')
+          / NULLIF(COUNT(DISTINCT user_id) FILTER (WHERE action = 'visit'), 0),
+    1
+  ) AS conversion_pct
+FROM events
+GROUP BY channel
+ORDER BY conversion_pct DESC;`}
+/>
+
+Every analytical tool from this course is here: conditional aggregation
+(`FILTER`), distinct counting (people not events), and safe division
+(`NULLIF`). The query is the *literal* translation of "distinct buyers
+divided by distinct visitors, per channel."
+
+## Revenue per user: averages that do not lie
+
+"Average revenue per user" sounds simple but hides a trap: do you divide
+revenue by *paying* users or by *all* users? They are different metrics
+(ARPPU vs. ARPU) and answer different questions. Being explicit is the
+whole job.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="ARPU vs. ARPPU — two honest, different numbers"
+  initSql={`CREATE TABLE users (id INTEGER);
+INSERT INTO users SELECT i FROM range(1, 11) t(i);   -- 10 users
+CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8,2));
+INSERT INTO payments VALUES
+  (1, 50), (1, 20), (3, 100), (7, 30);               -- only 3 users paid`}
+  initialCode={`SELECT
+  (SELECT COUNT(*) FROM users)                          AS all_users,
+  COUNT(DISTINCT user_id)                               AS paying_users,
+  SUM(amount)                                           AS revenue,
+  ROUND(SUM(amount) / (SELECT COUNT(*) FROM users), 2)  AS arpu,   -- per all users
+  ROUND(SUM(amount) / COUNT(DISTINCT user_id), 2)       AS arppu   -- per paying user
+FROM payments;`}
+/>
+
+`arpu` (\$20.00 over 10 users) and `arppu` (\$66.67 over 3 payers) are
+both correct — for different questions. Quoting the wrong one, or not
+saying which, is how metrics mislead. The analytical skill is choosing the
+denominator that matches the decision.
+
+## Period-over-period growth
+
+Leaders rarely want a raw number; they want *change*. Growth is this
+period versus the last, which is `LAG` over an ordered, truncated time
+series — a direct application of the window-function lessons.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Month-over-month revenue growth"
+  initSql={`CREATE TABLE orders AS
+SELECT
+  DATE '2024-01-01' + (i * 9) AS order_date,
+  (i * 23) % 150 + 50         AS amount
+FROM range(0, 30) t(i);`}
+  initialCode={`WITH monthly AS (
+  SELECT
+    date_trunc('month', order_date) AS month,
+    SUM(amount)                     AS revenue
+  FROM orders
+  GROUP BY month
+)
+SELECT
+  month,
+  revenue,
+  LAG(revenue) OVER (ORDER BY month) AS prev_revenue,
+  ROUND(
+    100.0 * (revenue - LAG(revenue) OVER (ORDER BY month))
+          / NULLIF(LAG(revenue) OVER (ORDER BY month), 0),
+    1
+  ) AS growth_pct
+FROM monthly
+ORDER BY month;`}
+/>
+
+A CTE to build the monthly series, `LAG` to reach the previous month,
+`NULLIF` to survive the first month's missing prior value. This single
+query is a microcosm of the whole course.
+
+## Keeping metrics honest
+
+A few habits that separate trustworthy metrics from misleading ones:
+
+- **Count the right unit.** Users vs. events vs. sessions are different
+  denominators — `COUNT(DISTINCT ...)` when you mean people.
+- **State the denominator.** "Per user" must say *which* users.
+- **Mind the NULLs.** Missing values silently drop from averages; decide
+  whether that is right.
+- **Beware survivorship and gaps.** A trend over only the periods that had
+  data can hide the zeros (recall the date-spine fix).
+
+```mermaid
+flowchart LR
+    Raw[("Raw rows")] --> Def["Clear definition"]
+    Def --> Unit["Right unit<br/>(users vs events)"]
+    Unit --> Guard["Guard NULLs<br/>and gaps"]
+    Guard --> Trust["A metric you<br/>can defend"]
+```
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why does a conversion-rate query use \`COUNT(DISTINCT user_id)\` rather than \`COUNT(*)\`?
+
+- Because \`COUNT(*)\` is not allowed with \`FILTER\`.
+  > \`COUNT(*)\` works with \`FILTER\`; the issue is what you intend to count.
+- [o] Conversion is about *people*, so you must count distinct users, not raw events (a user with three visits should count once).
+  > Counting events would inflate both numerator and denominator; distinct users measures the actual people converting.
+- \`DISTINCT\` makes the query run faster.
+  > The reason is correctness of the unit, not speed.
+- \`COUNT(*)\` returns NULL for missing rows.
+  > \`COUNT(*)\` does not return NULL; the distinct count is about measuring people, not nulls.
+
+Conversion measures people, so count distinct users to avoid
+double-counting repeat events.`}
+/>
+
+<MultipleChoice
+  markdown={`Revenue is \$1,000. Ten users exist; only four paid. What are ARPU and ARPPU?
+
+- Both are \$100 (1000 / 10).
+  > ARPU divides by all users (\$100), but ARPPU divides by paying users, giving a different figure.
+- [o] ARPU = \$100 (1000 / 10 users); ARPPU = \$250 (1000 / 4 paying users).
+  > ARPU uses all users as the denominator; ARPPU uses only payers, so the two correctly differ.
+- Both are \$250 (1000 / 4).
+  > Only ARPPU divides by 4; ARPU divides by all 10 users.
+- ARPU = \$250; ARPPU = \$100.
+  > The denominators are swapped: ARPU is per *all* users (larger denominator, smaller value).
+
+ARPU and ARPPU differ only in the denominator — all users vs. paying
+users — and answer different questions.`}
+/>
+
+<MultipleChoice
+  markdown={`Why wrap the previous-period value in \`NULLIF(..., 0)\` when computing growth percent?
+
+- To round the growth to one decimal.
+  > Rounding is done by \`ROUND\`; \`NULLIF\` guards the division.
+- [o] To avoid dividing by zero when the previous period's value is 0, returning NULL instead of an error.
+  > If a prior period had zero revenue, dividing by it would fail; \`NULLIF\` turns the 0 into NULL so the query survives.
+- To convert the result to a percentage.
+  > Multiplying by 100 makes it a percentage; \`NULLIF\` only guards the divisor.
+- To fill missing months with zero.
+  > Filling gaps is a date-spine concern; \`NULLIF\` only handles the zero-divisor case.
+
+\`NULLIF\` on the divisor prevents divide-by-zero in period-over-period
+calculations.`}
+/>
+
+You can now build the metrics a business decides on. The final skill is
+making that work **reproducible** — so the same question always yields the
+same trustworthy answer.
