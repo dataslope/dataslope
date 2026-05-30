@@ -1,0 +1,157 @@
+---
+title: Your First Queries
+description: Run real SQL right now — compute values, name results, and understand the anatomy of a basic SELECT before we touch tables.
+---
+
+Enough concepts — let us *write SQL*. The wonderful thing about
+PostgreSQL is that you can run a query without any tables at all,
+which makes it a perfect, friendly calculator for learning the
+shape of the language.
+
+## SQL you can run with no tables
+
+The keyword `SELECT` means "compute and give me back these values."
+On its own, it can do arithmetic and produce text. Run this:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="SELECT as a calculator"
+  initialCode={`SELECT 2 + 2;`}
+/>
+
+PostgreSQL evaluated `2 + 2` and handed back a one-row, one-column
+result containing `4`. You just ran a complete, valid SQL query.
+
+## Naming results with AS
+
+That last result column had an unhelpful auto-generated name. You
+can name a result column yourself with `AS`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Give results friendly names"
+  initialCode={`SELECT
+  2 + 2          AS sum,
+  10 * 3         AS product,
+  'PostgreSQL'   AS database_name;`}
+/>
+
+Notice three things that will recur all course long:
+
+- You can `SELECT` **several values at once**, separated by commas.
+- Text values go in **single quotes**: `'PostgreSQL'`. Double quotes
+  mean something different in SQL (they refer to names), so stick to
+  single quotes for text.
+- `AS name` labels each result column. The label is for *you* — it
+  does not change any stored data.
+
+## The anatomy of a query
+
+Here is the basic shape you will type thousands of times, with the
+parts named:
+
+```mermaid
+flowchart LR
+    K["SELECT"] --> C["which columns<br/>or values you want"]
+    C --> F["FROM"]
+    F --> T["which table<br/>to read from"]
+```
+
+- **`SELECT`** — *what* you want back (columns or computed values).
+- **`FROM`** — *where* to get it (which table).
+
+When you are just computing values, like `SELECT 2 + 2`, you can
+skip `FROM` entirely. The moment you want stored data, you add
+`FROM table_name`.
+
+<Callout type="info" title="SQL keywords and your style">
+SQL keywords like \`SELECT\` and \`FROM\` are not case-sensitive —
+\`select\`, \`Select\`, and \`SELECT\` all work. By strong
+convention, this course writes keywords in UPPERCASE and names in
+lowercase, because it makes queries far easier to read at a glance.
+</Callout>
+
+## Statements end with a semicolon
+
+Each SQL statement ends with a semicolon `;`. It marks where one
+instruction stops. With a single statement it is often optional, but
+it becomes essential when you run several statements together — so we
+will always include it as a good habit.
+
+```mermaid
+flowchart LR
+    S1["SELECT 1;"] --> S2["SELECT 2;"] --> S3["SELECT 3;"]
+```
+
+## A first look at reading from a table
+
+To prove the `FROM` half works, here is a tiny pre-loaded table.
+Reading from it is just `SELECT` columns `FROM` the table:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="SELECT ... FROM a real table"
+  initSql={`CREATE TABLE cities (
+  name       TEXT,
+  country    TEXT,
+  population INTEGER
+);
+INSERT INTO cities (name, country, population) VALUES
+  ('Tokyo',  'Japan',  37000000),
+  ('Lagos',  'Nigeria', 15000000),
+  ('Lima',   'Peru',    11000000);`}
+  initialCode={`SELECT name, population
+FROM cities;`}
+/>
+
+Try editing it: replace `name, population` with `*` to get every
+column, or with just `country` to get one. You are already steering
+a query — choosing exactly what comes back. The whole **Querying
+Data** section expands on this.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the \`SELECT\` keyword do in a query?
+
+- It permanently deletes the chosen columns.
+  > Deleting data is done with other statements; \`SELECT\` only reads or computes values.
+- [o] It specifies which columns or computed values you want the database to return.
+  > \`SELECT\` is the "what do I want back" part of a query, whether reading columns or computing values.
+- It creates a brand-new table.
+  > Creating tables is done with \`CREATE TABLE\`, not \`SELECT\`.
+- It sorts the table alphabetically.
+  > Sorting is the job of \`ORDER BY\`; \`SELECT\` chooses what to return, not the order.
+
+\`SELECT\` declares the columns or values you want the query to produce.`}
+/>
+
+<MultipleChoice
+  markdown={`In the query \`SELECT 5 * 3 AS total;\`, what is the role of \`AS total\`?
+
+- It multiplies the result by a value called total.
+  > \`AS\` does no arithmetic; the multiplication is done by \`5 * 3\`. \`AS\` only labels the result.
+- It stores the result permanently in a table named total.
+  > \`AS\` does not store anything; it just names the column in the returned result.
+- [o] It gives the resulting column the friendly name "total" in the output.
+  > \`AS\` assigns a readable label to a result column, which makes output easier to understand.
+- It is required or the query will fail.
+  > \`AS\` is optional; without it the column simply gets an auto-generated name.
+
+\`AS\` provides a readable alias for a result column; it changes only the label, not the data.`}
+/>
+
+<MultipleChoice
+  markdown={`Which part of a query tells the database **which table** to read from?
+
+- \`SELECT\`
+  > \`SELECT\` lists the columns or values you want; it does not name the source table.
+- [o] \`FROM\`
+  > \`FROM table_name\` is exactly how you tell the database which table to pull rows from.
+- \`AS\`
+  > \`AS\` labels a result column; it does not choose the source table.
+- The semicolon
+  > The semicolon ends the statement; it does not identify a table.
+
+\`FROM\` specifies the table that supplies the rows for a query.`}
+/>
