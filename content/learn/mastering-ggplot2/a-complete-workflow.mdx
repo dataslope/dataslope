@@ -1,0 +1,177 @@
+---
+title: A Complete Workflow
+description: A realistic end-to-end ggplot2 session — from a question, through exploratory plots, to a polished final figure — using the grammar at every step.
+---
+
+Let us put everything together the way you will actually use it: start
+with a question, explore quickly, then refine one chart into something
+worth sharing. Throughout, notice how the *grammar* guides every
+decision.
+
+## The question
+
+> *How does engine displacement relate to highway fuel efficiency, and
+> does that relationship depend on the type of car?*
+
+We have two continuous variables (`displ`, `hwy`) and a candidate
+grouping variable (`class` or `drv`). The grammar already tells us:
+two continuous variables → **points**; a group → **color** or
+**facets**.
+
+## Stage 1: a fast exploratory plot
+
+Exploration values speed over polish. The minimal *data + mapping +
+geom* gets us looking immediately:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point()
+`}
+/>
+
+There is a clear negative relationship. Good — the question is worth
+pursuing. Next: does it depend on car type?
+
+## Stage 2: bring in the grouping variable
+
+Try **color** first, since it keeps everything in one panel:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+`}
+/>
+
+Interesting: front-wheel-drive cars (`f`) sit higher (more efficient).
+But the three colored clouds overlap. When color gets crowded, the
+grammar offers **facets** as the next move.
+
+## Stage 3: facet to separate the groups
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ drv)
+`}
+/>
+
+Now each drivetrain's trend is unmistakable, on shared axes so the
+panels are comparable. The exploratory phase has answered the question.
+Time to make it presentable.
+
+## The exploration-to-polish pipeline
+
+```mermaid
+flowchart LR
+    Q["Question"] --> E["Explore<br/>minimal plots, fast"]
+    E --> I["Iterate<br/>add color / facets / stats"]
+    I --> R["Refine<br/>scales, labels, theme"]
+    R --> S["Share<br/>final figure"]
+```
+
+The first three stages are *exploration* — bare and quick. Only now, at
+*refinement*, do we spend effort on scales, labels, and theme.
+
+## Stage 4: refine into a final figure
+
+Add the communication layer — a meaningful title, plain-language axis
+labels, a deliberate color scale, and a clean theme:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ drv) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title    = "Front-wheel-drive cars are the most fuel-efficient",
+    subtitle = "Highway MPG falls as engine size grows, across all drivetrains",
+    x        = "Engine displacement (litres)",
+    y        = "Highway miles per gallon",
+    color    = "Drivetrain",
+    caption  = "Source: ggplot2 mpg dataset"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none")
+`}
+/>
+
+We dropped the legend (`legend.position = "none"`) because the facet
+strips already name each drivetrain — a small judgment call the grammar
+made easy. The title now states the *conclusion*. This figure could go
+in a report unchanged.
+
+## Saving your work
+
+Outside the browser, `ggsave()` writes the last plot (or a named plot
+object) to a file. The grammar's "a plot is a value" nature means you
+can pass the object directly:
+
+```r
+p <- ggplot(mpg, aes(displ, hwy)) + geom_point()
+ggsave("engine-efficiency.png", plot = p, width = 8, height = 5, dpi = 300)
+```
+
+<Callout type="info" title="The rhythm to internalize">
+**Explore rough, refine once.** Most of your plots will never leave the
+exploratory stage — they exist to answer a question for *you*. Spend
+polish effort only on the few that need to communicate to *others*.
+The grammar supports both: the same components, dialed from quick to
+publication-ready.
+</Callout>
+
+<MultipleChoice
+  markdown={`In an exploratory data analysis, why start with a bare \`geom_point()\` (no titles, colors, or theme)?
+
+- Because adding color before a theme causes errors.
+  > Order does not cause errors; the reason is about speed and purpose.
+- Because exploratory plots cannot have titles.
+  > They can; you simply defer them until the chart is worth polishing.
+- [o] Because exploration prioritizes speed of insight — a minimal data + mapping + geom answers "is there anything here?" before any effort goes into polish.
+  > You refine only the charts that prove worth communicating.
+- Because \`geom_point\` is the only geom allowed during exploration.
+  > Any geom can be used; the point is to stay minimal and fast.
+
+Explore rough and fast; reserve scales, labels, and themes for the few
+plots that will be shared.`}
+/>
+
+<MultipleChoice
+  markdown={`During refinement, the final figure sets \`legend.position = "none"\`. Why is dropping the legend reasonable here?
+
+- Legends always clutter plots and should be removed.
+  > Legends are often essential; removal is justified only when the information is shown elsewhere.
+- The color mapping was deleted, so no legend is needed.
+  > The color mapping remains; the legend is redundant for a different reason.
+- [o] The plot is faceted by drivetrain, so each panel's strip label already identifies the group the legend would describe.
+  > With the grouping shown by facet strips, the legend is redundant.
+- Themes cannot display legends.
+  > Themes can show or hide legends; here it is a deliberate choice given the facets.
+
+When another component (the facet strips) already conveys the grouping,
+the legend becomes redundant and can be removed for cleanliness.`}
+/>
+
+## Key takeaways
+
+- Let the **grammar guide choices**: variable count and type suggest
+  the geom; crowded color suggests facets.
+- Work in stages — **explore (minimal) → iterate → refine → share** —
+  and spend polish effort late, only on charts that must communicate.
+- Refinement is adding the **scale, labels, and theme** components on
+  top of an already-correct exploratory plot.
+- A ggplot is a **value**: store it, grow it, and `ggsave()` it.
