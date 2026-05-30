@@ -2200,9 +2200,7 @@
 }
 
 .tableViewerSkeleton {
-  margin: 0 14px 12px;
-  border: 1px solid var(--ch-border-light);
-  border-radius: 6px;
+  margin: 0;
   overflow: hidden;
 }
 
@@ -2245,6 +2243,57 @@
   .skeletonCell {
     animation-duration: 0s;
   }
+}
+
+/* ─── Result tab ──────────────────────────────────────────────────── */
+
+.resultTabClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  margin-left: 2px;
+  color: var(--ch-text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.resultTabClose:hover {
+  background: var(--ch-bg-hover);
+  color: var(--ch-text);
+}
+
+.resultPane {
+  position: relative;
+  overflow: hidden;
+}
+
+.resultPaneInfo {
+  display: flex;
+  align-items: center;
+  padding: 5px 14px;
+  gap: 8px;
+  background: var(--ch-bg-subtle);
+  border-bottom: 1px solid var(--ch-border-light);
+  min-height: 28px;
+}
+
+.resultFlashOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--ch-accent);
+  opacity: 0;
+  animation: ch-result-flash 0.5s ease-out forwards;
+  z-index: 2;
+}
+
+@keyframes ch-result-flash {
+  0% { opacity: 0.12; }
+  100% { opacity: 0; }
 }
 
 /* ─── Table viewer resize bar ───────────────────────────────────────── */

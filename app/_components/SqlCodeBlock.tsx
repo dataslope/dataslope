@@ -64,6 +64,7 @@ import {
   TableViewer,
   useSqlTableViewer,
   VirtualizedResultTable,
+  type ResultTabData,
   type SqlDialect,
   type SqlEngineLike,
   type SqlResult,
@@ -143,6 +144,7 @@ export default function SqlCodeBlock({
   const [resultError, setResultError] = useState<string>("");
   const [elapsed, setElapsed] = useState<string>("");
   const [isFormatting, setIsFormatting] = useState(false);
+  const [resultRunSeq, setResultRunSeq] = useState(0);
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
@@ -378,6 +380,7 @@ export default function SqlCodeBlock({
 
   // ─── Run ────────────────────────────────────────────────────────────
   const run = useCallback(async () => {
+    setResultRunSeq((s) => s + 1);
     const userSql = editorRef.current?.state.doc.toString() ?? "";
     setResultError("");
     setResultMessage("");
@@ -503,6 +506,17 @@ export default function SqlCodeBlock({
   }, [dialect, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+  const hasResult = isBusy || resultSet !== null || resultError !== "" || resultMessage !== "";
+  const resultTabDataProp: ResultTabData | null = hasResult
+    ? {
+        resultSet,
+        error: resultError,
+        message: resultMessage,
+        loading: isBusy,
+        elapsed,
+        runSeq: resultRunSeq,
+      }
+    : null;
 
   return (
     <div
@@ -536,8 +550,8 @@ export default function SqlCodeBlock({
         )}
       </div>
 
-      {/* ── Table viewer ── */}
-      {tableViewerEnabled && (
+      {/* ── Table viewer / Result viewer ── */}
+      {(tableViewerEnabled || hasResult) && (
         <TableViewer
           dialect={dialect}
           entries={tableEntries}
@@ -545,6 +559,7 @@ export default function SqlCodeBlock({
           setActiveIdx={setActiveTableIdx}
           initializing={tablesInitializing}
           onLoadMore={loadMoreActiveTable}
+          resultTabData={resultTabDataProp}
         />
       )}
 
@@ -571,7 +586,7 @@ export default function SqlCodeBlock({
                   cy="6"
                   r="4.5"
                   fill="none"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeDasharray="14 8"
@@ -651,43 +666,6 @@ export default function SqlCodeBlock({
         />
       </div>
 
-      {/* ── Result panel ── */}
-      {(resultSet || resultMessage || resultError || isBusy) && (
-        <div className={styles.sqlResultPanel} aria-live="polite">
-          <div className={styles.sqlResultHeader}>
-            <div className={styles.accentBar} data-error={resultError.length > 0} />
-            <span className={styles.sqlResultLabel}>Result</span>
-            {resultSet && resultSet.columns.length > 0 && (
-              <span className={styles.sqlResultCount}>
-                {resultSet.values.length} row{resultSet.values.length === 1 ? "" : "s"}
-                {elapsed ? ` · ${elapsed}` : ""}
-              </span>
-            )}
-            {(!resultSet || resultSet.columns.length === 0) && elapsed && (
-              <span className={styles.sqlResultCount}>{elapsed}</span>
-            )}
-          </div>
-          {resultError ? (
-            <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
-              {resultError}
-            </div>
-          ) : resultSet && resultSet.columns.length > 0 ? (
-            resultSet.values.length === 0 ? (
-              <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
-            ) : (
-              <VirtualizedResultTable
-                columns={resultSet.columns}
-                values={resultSet.values}
-              />
-            )
-          ) : resultMessage ? (
-            <div className={styles.sqlMessage}>{resultMessage}</div>
-          ) : (
-            <div className={styles.sqlMessage}>Running…</div>
-          )}
-          <RunOverlay active={isBusy} />
-        </div>
-      )}
     </div>
   );
 }

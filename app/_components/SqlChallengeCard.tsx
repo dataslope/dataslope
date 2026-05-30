@@ -35,7 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table, List } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   createColumnHelper,
@@ -640,6 +640,15 @@ export interface UseSqlTableViewerOptions {
   ensureEngine: () => Promise<SqlEngineLike>;
 }
 
+export interface ResultTabData {
+  resultSet: SqlResult | null;
+  error: string;
+  message: string;
+  loading: boolean;
+  elapsed?: string;
+  runSeq: number;
+}
+
 /** Shared table-viewer state machine for `<SqlChallengeCard>` and
  *  `<SqlCodeBlock>`. Owns the list of tables, the active tab, the
  *  open/closed state, the first-load "initializing" flag (which drives
@@ -853,6 +862,7 @@ export default function SqlChallengeCard({
   const [testListOpen, setTestListOpen] = useState(true);
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
   const [isFormatting, setIsFormatting] = useState(false);
+  const [resultRunSeq, setResultRunSeq] = useState(0);
   const toasts = useChallengeToasts();
   const [engineLabel, setEngineLabel] = useState<string>(
     dialect === "sqlite"
@@ -1177,6 +1187,7 @@ export default function SqlChallengeCard({
 
   // ─── Run (no tests) ─────────────────────────────────────────────────
   const run = useCallback(async () => {
+    setResultRunSeq((s) => s + 1);
     setActiveAction("run");
     const userSql = editorRef.current?.state.doc.toString() ?? "";
     setTestResults([]);
@@ -1221,6 +1232,7 @@ export default function SqlChallengeCard({
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    setResultRunSeq((s) => s + 1);
     setActiveAction("submit");
     try {
     const userSql = editorRef.current?.state.doc.toString() ?? "";
@@ -1492,6 +1504,17 @@ export default function SqlChallengeCard({
   }, [dialect, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+  const hasResult = isBusy || resultSet !== null || resultError !== "" || resultMessage !== "";
+  const resultTabDataProp: ResultTabData | null = hasResult
+    ? {
+        resultSet,
+        error: resultError,
+        message: resultMessage,
+        loading: isBusy,
+        elapsed,
+        runSeq: resultRunSeq,
+      }
+    : null;
   const passedCount = testResults.filter((t) => t.state === "pass").length;
   const totalTests = testResults.length;
   const allPassed = totalTests > 0 && passedCount === totalTests;
@@ -1557,8 +1580,8 @@ export default function SqlChallengeCard({
         </div>
       </div>
 
-      {/* ── Table viewer ── */}
-      {tableViewerEnabled && (
+      {/* ── Table viewer / Result viewer ── */}
+      {(tableViewerEnabled || hasResult) && (
         <TableViewer
           dialect={dialect}
           entries={tableEntries}
@@ -1566,6 +1589,7 @@ export default function SqlChallengeCard({
           setActiveIdx={setActiveTableIdx}
           initializing={tablesInitializing}
           onLoadMore={loadMoreActiveTable}
+          resultTabData={resultTabDataProp}
         />
       )}
 
@@ -1598,7 +1622,7 @@ export default function SqlChallengeCard({
                       cy="6"
                       r="4.5"
                       fill="none"
-                      stroke="white"
+                      stroke="currentColor"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeDasharray="14 8"
@@ -1701,7 +1725,7 @@ export default function SqlChallengeCard({
                     cy="6"
                     r="4.5"
                     fill="none"
-                    stroke="white"
+                    stroke="currentColor"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeDasharray="14 8"
@@ -1801,49 +1825,6 @@ export default function SqlChallengeCard({
           itemClassName={styles.toast}
         />
       </div>
-
-      {/* ── Result panel ── */}
-      {(resultSet || resultMessage || resultError || isBusy) && (
-        <div className={styles.sqlResultPanel} aria-live="polite">
-          <div className={styles.sqlResultHeader}>
-            <div
-              className={styles.accentBar}
-              data-error={resultError.length > 0}
-            />
-            <span className={styles.sqlResultLabel}>Result</span>
-            {resultSet && resultSet.columns.length > 0 && (
-              <span className={styles.sqlResultCount}>
-                {resultSet.values.length} row{resultSet.values.length === 1 ? "" : "s"}
-                {elapsed ? ` · ${elapsed}` : ""}
-              </span>
-            )}
-            {(!resultSet || resultSet.columns.length === 0) && elapsed && (
-              <span className={styles.sqlResultCount}>{elapsed}</span>
-            )}
-          </div>
-          {resultError ? (
-            <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
-              {resultError}
-            </div>
-          ) : resultSet && resultSet.columns.length > 0 ? (
-            resultSet.values.length === 0 ? (
-              <div className={styles.sqlEmptyResult}>
-                Query returned no rows.
-              </div>
-            ) : (
-              <VirtualizedResultTable
-                columns={resultSet.columns}
-                values={resultSet.values}
-              />
-            )
-          ) : resultMessage ? (
-            <div className={styles.sqlMessage}>{resultMessage}</div>
-          ) : (
-            <div className={styles.sqlMessage}>Running…</div>
-          )}
-          <RunOverlay active={isBusy} />
-        </div>
-      )}
 
       {/* ── Test results ── */}
       {testResults.length > 0 && (
@@ -2308,6 +2289,7 @@ export function TableViewer({
   setActiveIdx,
   initializing,
   onLoadMore,
+  resultTabData,
 }: {
   dialect: SqlDialect;
   entries: TableViewerEntry[];
@@ -2315,11 +2297,31 @@ export function TableViewer({
   setActiveIdx: React.Dispatch<React.SetStateAction<number>>;
   initializing: boolean;
   onLoadMore: () => void;
+  resultTabData?: ResultTabData | null;
 }) {
   const [paneHeight, setPaneHeight] = useState(TABLE_VIEWER_DEFAULT_HEIGHT);
   // Live drag origin; null when not dragging. Stored in a ref so the
   // window-level move/up listeners read fresh values without re-binding.
   const dragRef = useRef<{ startY: number; startH: number } | null>(null);
+
+  const [resultTabDismissed, setResultTabDismissed] = useState(false);
+  const [resultIsActive, setResultIsActive] = useState(false);
+  const [flashKey, setFlashKey] = useState(0);
+  const prevRunSeqRef = useRef<number>(-1);
+
+  useEffect(() => {
+    if (resultTabData == null) {
+      setResultTabDismissed(false);
+      setResultIsActive(false);
+      return;
+    }
+    if (resultTabData.runSeq !== prevRunSeqRef.current) {
+      prevRunSeqRef.current = resultTabData.runSeq;
+      setResultTabDismissed(false);
+      setResultIsActive(true);
+      setFlashKey((k) => k + 1);
+    }
+  }, [resultTabData]);
 
   const onResizeStart = useCallback(
     (e: React.PointerEvent) => {
@@ -2360,24 +2362,13 @@ export function TableViewer({
     }
   }, []);
 
-  const showSkeleton = initializing && entries.length === 0;
+  const resultTabVisible = resultTabData != null && !resultTabDismissed;
+  const showSkeleton = initializing && entries.length === 0 && !resultTabVisible;
   // Nothing to show: not initializing and no tables were found.
-  if (!showSkeleton && entries.length === 0) return null;
+  if (!showSkeleton && entries.length === 0 && !resultTabVisible) return null;
   const active = entries[activeIdx];
   return (
     <div className={styles.tableViewer}>
-      <div className={styles.tableViewerHeader}>
-        <span className={styles.tableViewerLabel}>Tables</span>
-        {showSkeleton ? (
-          <span className={styles.tableViewerCount}>
-            <span className={styles.tableViewerSpinner} aria-hidden /> Initializing…
-          </span>
-        ) : (
-          <span className={styles.tableViewerCount}>
-            {entries.length} {entries.length === 1 ? "table" : "tables"}
-          </span>
-        )}
-      </div>
       {showSkeleton ? (
         <TableViewerSkeleton />
       ) : (
@@ -2390,9 +2381,9 @@ export function TableViewer({
                 role="tab"
                 aria-selected={idx === activeIdx}
                 className={`${styles.tableViewerTab} ${
-                  idx === activeIdx ? styles.tableViewerTabActive : ""
+                  idx === activeIdx && !resultIsActive ? styles.tableViewerTabActive : ""
                 }`}
-                onClick={() => setActiveIdx(idx)}
+                onClick={() => { setActiveIdx(idx); setResultIsActive(false); }}
               >
                 <Table size={12} aria-hidden />
                 {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
@@ -2405,16 +2396,91 @@ export function TableViewer({
                 )}
               </button>
             ))}
+            {resultTabVisible && (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={resultIsActive}
+                className={`${styles.tableViewerTab} ${resultIsActive ? styles.tableViewerTabActive : ""}`}
+                onClick={() => setResultIsActive(true)}
+              >
+                <List size={12} aria-hidden />
+                Result
+                <span
+                  role="button"
+                  aria-label="Close result tab"
+                  className={styles.resultTabClose}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setResultTabDismissed(true);
+                    setResultIsActive(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setResultTabDismissed(true);
+                      setResultIsActive(false);
+                    }
+                  }}
+                  tabIndex={0}
+                >
+                  <X size={10} aria-hidden />
+                </span>
+              </button>
+            )}
           </div>
-          {active && (
-            <TableViewerPane
-              // Re-key per table so switching tabs resets scroll to the
-              // top instead of inheriting the previous table's offset.
-              key={`${active.schema ?? ""}.${active.table}`}
-              entry={active}
-              height={paneHeight}
-              onLoadMore={onLoadMore}
-            />
+          {resultIsActive && resultTabVisible && resultTabData ? (
+            <div className={styles.resultPane} style={{ position: "relative" }}>
+              {flashKey > 0 && (
+                <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
+              )}
+              <div className={styles.resultPaneInfo}>
+                {resultTabData.error ? (
+                  <span className={styles.sqlResultLabel} style={{ color: "var(--ch-red)" }}>
+                    Error
+                  </span>
+                ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
+                  <span className={styles.sqlResultCount}>
+                    {resultTabData.resultSet.values.length} row{resultTabData.resultSet.values.length === 1 ? "" : "s"}
+                    {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                  </span>
+                ) : resultTabData.elapsed ? (
+                  <span className={styles.sqlResultCount}>{resultTabData.elapsed}</span>
+                ) : null}
+              </div>
+              {resultTabData.error ? (
+                <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
+                  {resultTabData.error}
+                </div>
+              ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
+                resultTabData.resultSet.values.length === 0 ? (
+                  <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
+                ) : (
+                  <VirtualizedResultTable
+                    columns={resultTabData.resultSet.columns}
+                    values={resultTabData.resultSet.values}
+                    maxHeight={paneHeight}
+                  />
+                )
+              ) : resultTabData.message ? (
+                <div className={styles.sqlMessage}>{resultTabData.message}</div>
+              ) : (
+                <div className={styles.sqlMessage}>Running…</div>
+              )}
+              <RunOverlay active={resultTabData.loading} />
+            </div>
+          ) : (
+            active && (
+              <TableViewerPane
+                // Re-key per table so switching tabs resets scroll to the
+                // top instead of inheriting the previous table's offset.
+                key={`${active.schema ?? ""}.${active.table}`}
+                entry={active}
+                height={paneHeight}
+                onLoadMore={onLoadMore}
+              />
+            )
           )}
           <div
             className={styles.tableViewerResizer}
