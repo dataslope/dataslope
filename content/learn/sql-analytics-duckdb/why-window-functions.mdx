@@ -1,0 +1,248 @@
+---
+title: Why Window Functions Exist
+description: The problem GROUP BY cannot solve — keeping every row while also seeing a summary. Window functions explained from the ground up, with the OVER clause demystified.
+---
+
+Window functions are the technique that separates casual SQL users from
+fluent analysts — and the one most people find genuinely hard at first.
+This page goes slowly and builds the *why* before any syntax, because the
+mechanics only make sense once you see the problem they solve. Because
+this is a foundational, often-confusing concept, this page has extra
+practice questions.
+
+## The problem `GROUP BY` cannot solve
+
+`GROUP BY` is powerful but it **destroys the individual rows**. When you
+group orders by region, you get one row per region — the orders
+themselves are gone. That is fine for a summary, but it fails the moment
+you want to *keep every row* and *also* show a summary beside it.
+
+Consider a deceptively simple request:
+
+> "Show every order, and next to each one, what percentage of its
+> region's total it represents."
+
+You need **both** at once: the individual order (a row-level fact) *and*
+the region total (a group-level fact). `GROUP BY` can give you one or the
+other, never both in the same row.
+
+```mermaid
+flowchart TB
+    subgraph GB["GROUP BY: rows collapse"]
+        G1["5 West orders"] --> G2["1 row: West total"]
+    end
+    subgraph WF["Window: rows survive"]
+        W1["5 West orders"] --> W2["5 rows, each tagged<br/>with the West total"]
+    end
+```
+
+A **window function** is the answer: it computes a summary *across a set
+of related rows* but **attaches the result to every row** instead of
+collapsing them. You keep all your detail *and* gain the summary.
+
+## The `OVER` clause is what makes it a window
+
+Any aggregate becomes a window function when you add an `OVER (...)`
+clause. `SUM(amount)` collapses; `SUM(amount) OVER (...)` does **not** —
+it computes a sum over a "window" of rows and writes it onto each row.
+
+Start with the simplest possible window: `OVER ()` with empty parentheses
+means "the whole result set is one window." Every row gets the grand
+total beside it.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="The grand total, on every row"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),
+  (4,'East',200),(5,'North',60);`}
+  initialCode={`SELECT
+  id,
+  region,
+  amount,
+  SUM(amount) OVER () AS grand_total   -- same total on every row
+FROM orders
+ORDER BY id;`}
+/>
+
+Notice all five rows survived, each carrying the grand total `505`. A
+plain `SUM(amount)` would have returned a single row. The `OVER ()` is the
+entire difference.
+
+## `PARTITION BY` — windows per group
+
+`OVER ()` uses the whole table as one window. `PARTITION BY region` splits
+the rows into one window **per region**, so each row gets *its own
+region's* total. This is the window-function echo of `GROUP BY` — but the
+rows stay.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Each order tagged with its region total"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),
+  (4,'East',200),(5,'North',60);`}
+  initialCode={`SELECT
+  id,
+  region,
+  amount,
+  SUM(amount) OVER (PARTITION BY region) AS region_total
+FROM orders
+ORDER BY region, id;`}
+/>
+
+```mermaid
+flowchart LR
+    All[("All orders")] --> P["PARTITION BY region"]
+    P --> W["West window"]
+    P --> E["East window"]
+    P --> N["North window"]
+    W --> WT["each West row<br/>gets West total"]
+    E --> ET["each East row<br/>gets East total"]
+    N --> NT["each North row<br/>gets North total"]
+```
+
+Now the original request is one step away — divide each `amount` by its
+`region_total`:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Each order's share of its region"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),
+  (4,'East',200),(5,'North',60);`}
+  initialCode={`SELECT
+  id,
+  region,
+  amount,
+  ROUND(100.0 * amount
+        / SUM(amount) OVER (PARTITION BY region), 1) AS pct_of_region
+FROM orders
+ORDER BY region, pct_of_region DESC;`}
+/>
+
+That `pct_of_region` is impossible with `GROUP BY` alone in a single
+query, because it needs the row *and* the group total side by side.
+Window functions make it one line.
+
+## `GROUP BY` vs window — the key contrast
+
+| | `GROUP BY` | Window function (`OVER`) |
+| --- | --- | --- |
+| Rows in result | One per group | One per **original row** |
+| Detail rows | Collapsed away | **Preserved** |
+| Sees the group summary? | Yes | Yes |
+| Sees each individual row? | No | **Yes** |
+| Typical use | "Total per region" | "Each order vs its region total" |
+
+The one-sentence summary: **`GROUP BY` summarizes *instead of* the rows; a
+window function summarizes *alongside* the rows.**
+
+## Anatomy of a window function
+
+```
+SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
+└────┬────┘        └──────┬──────────┘  └────────┬─────────┘
+  what to            which rows share        order within
+  compute            a window                the window
+```
+
+- The **function** (`SUM`, `AVG`, `COUNT`, `ROW_NUMBER`, ...) is what to
+  compute.
+- **`PARTITION BY`** decides which rows belong to the same window
+  (optional — omit it for one big window).
+- **`ORDER BY`** orders rows *inside* each window, which matters for
+  running totals and rankings (next pages).
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the fundamental difference between a window function and \`GROUP BY\`?
+
+- Window functions can only count, while \`GROUP BY\` can sum.
+  > Both can use the same aggregates; the difference is whether rows are preserved.
+- [o] A window function keeps every original row and attaches a summary to each; \`GROUP BY\` collapses rows into one per group.
+  > Windows summarize *alongside* the rows; \`GROUP BY\` summarizes *instead of* them.
+- \`GROUP BY\` keeps every row while window functions collapse them.
+  > It is the reverse: \`GROUP BY\` collapses; window functions preserve rows.
+- They always return identical results.
+  > They return different shapes — one row per group vs one row per input row.
+
+A window function preserves detail rows and adds a per-window summary;
+\`GROUP BY\` collapses detail into group summaries.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the empty \`OVER ()\` clause mean in \`SUM(amount) OVER ()\`?
+
+- Compute the sum of just the current row.
+  > With no frame restriction, the window is the whole result set, not a single row.
+- [o] Treat the entire result set as one window, so every row receives the grand total.
+  > Empty parentheses mean "one window over all rows," attaching the overall sum to each row.
+- It is invalid syntax.
+  > \`OVER ()\` is valid and means the full result set is the window.
+- Sort the rows ascending.
+  > \`OVER ()\` does not sort; it defines the window as all rows.
+
+\`OVER ()\` makes the whole result a single window — the grand total lands
+on every row.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`PARTITION BY region\` do inside an \`OVER\` clause?
+
+- It permanently splits the table into separate region tables.
+  > It only defines per-region windows for the calculation; the table is unchanged.
+- [o] It divides the rows into one window per region, so each row's window calculation uses only its own region's rows.
+  > \`PARTITION BY\` scopes the window to matching rows, like a per-group calculation that still returns every row.
+- It removes the region column from the output.
+  > The region column remains; partitioning only scopes the window.
+- It is required in every window function.
+  > \`PARTITION BY\` is optional; without it the window spans all rows.
+
+\`PARTITION BY\` creates a separate window per group while preserving all
+rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is "each order's percentage of its region's total" hard with \`GROUP BY\` alone?
+
+- Because \`GROUP BY\` cannot compute a \`SUM\`.
+  > \`GROUP BY\` computes sums fine; the difficulty is combining the sum with each detail row.
+- [o] It needs the individual order **and** the region total in the same row, but \`GROUP BY\` collapses the orders away.
+  > The per-row share requires row-level detail beside the group total — exactly what windows provide and \`GROUP BY\` does not.
+- Because percentages are not allowed in SQL.
+  > Percentages are ordinary arithmetic; SQL handles them.
+- Because regions cannot be grouped.
+  > Regions group fine; the issue is keeping detail rows alongside the total.
+
+The calculation needs row and group-total together, which is the signature
+case for a window function.`}
+/>
+
+<MultipleChoice
+  markdown={`Which clause turns an ordinary aggregate like \`AVG(score)\` into a window function?
+
+- \`GROUP BY\`
+  > \`GROUP BY\` makes it collapse rows; it does not create a window.
+- \`HAVING\`
+  > \`HAVING\` filters groups; it has nothing to do with windows.
+- [o] \`OVER (...)\`
+  > Adding an \`OVER\` clause turns any aggregate into a window function that preserves rows.
+- \`DISTINCT\`
+  > \`DISTINCT\` removes duplicates; it does not create a window.
+
+The \`OVER\` clause is what makes an aggregate a window function.`}
+/>
+
+Now that the `OVER` clause makes sense, the next pages put it to work:
+ranking rows, then computing running totals and moving averages.
