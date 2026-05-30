@@ -1,0 +1,233 @@
+---
+title: SELECT Basics
+description: Choose columns from a SQLite table, read every row, reorder output, and remove duplicate values with DISTINCT.
+---
+
+`SELECT` is the SQL word you will use most often. It asks a database to
+read data and return an answer. On this page, you will use `SELECT` to
+choose which **columns** you want from a table.
+
+A helpful first idea: a `SELECT` query does **not** change the stored
+table. It creates a temporary result table for you to look at.
+
+## SELECT chooses columns
+
+Imagine a table like a spreadsheet. It has rows going down and columns
+going across. `SELECT` names the columns you want to see, and `FROM`
+names the table that holds them.
+
+```mermaid
+flowchart LR
+    T[("books table<br/>stored data")] --> C["SELECT title, author<br/>choose columns"]
+    C --> R["result table<br/>title + author"]
+    T -.-> T
+```
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Pick two columns"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
+  initialCode={`SELECT title, author
+FROM books;`}
+/>
+
+You asked for `title` and `author`, so the result has exactly those two
+columns. By default, SQLite returns those columns for **every row** in
+the table.
+
+## SELECT star means every column
+
+The asterisk, `*`, is shorthand for "all columns." It is useful when
+you are exploring a table for the first time.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Show every column"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
+  initialCode={`SELECT *
+FROM books;`}
+/>
+
+`SELECT *` is great for a quick peek. In real work, naming only the
+columns you need is usually clearer.
+
+<MultipleChoice
+  markdown={`If you write \`SELECT title, price FROM books;\`, which columns appear in the result?
+
+- Every column in the table.
+  > Listing column names is more specific than \`*\`; it returns only the columns you named.
+- [o] Only \`title\` and \`price\`.
+  > The \`SELECT\` list controls the columns in the result.
+- Only rows where the title has a price.
+  > Choosing rows is the job of \`WHERE\`, not the basic \`SELECT\` list.
+- A count of books.
+  > Counting rows uses an aggregate function such as \`COUNT(*)\`.`}
+/>
+
+## Choose the order of output columns
+
+The result columns appear in the order you write them. You do not have
+to follow the table's original column order.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Put price before title"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
+  initialCode={`SELECT price, title, genre
+FROM books;`}
+/>
+
+This query does not reorder the stored table. It only changes the shape
+of the result you receive.
+
+```mermaid
+flowchart TB
+    A["stored row<br/>id, title, author, genre, price"] --> B["SELECT price, title, genre"]
+    B --> C["result row<br/>price, title, genre"]
+```
+
+## Pick one column
+
+You can select just one column when that is all you need.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="List book titles"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
+  initialCode={`SELECT title
+FROM books;`}
+/>
+
+## Remove duplicates with DISTINCT
+
+Sometimes you do not want every row. You want the list of different
+values that appear in a column. `DISTINCT` removes duplicate result
+rows.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Unique genres"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25);`}
+  initialCode={`SELECT DISTINCT genre
+FROM books;`}
+/>
+
+There are five books, but only three genres. `DISTINCT` is perfect for
+questions like "what categories exist?"
+
+`DISTINCT` works on the whole selected row. If you select two columns,
+SQLite keeps each unique combination of those two columns.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Unique author and genre pairs"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC
+);
+INSERT INTO books (title, author, genre, price) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00),
+  ('Cloud Recipes', 'Mina Park', 'Fiction', 18.25);`}
+  initialCode={`SELECT DISTINCT author, genre
+FROM books;`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`SELECT * FROM books;\` return?
+
+- Only the first column.
+  > The asterisk means all columns, not one column.
+- [o] Every column from \`books\`.
+  > \`*\` is shorthand for all columns in the table.
+- Only unique rows.
+  > Removing duplicates requires \`DISTINCT\`.
+- No rows, only column names.
+  > \`SELECT *\` returns data rows as well as column names.`}
+/>
+
+<MultipleChoice
+  markdown={`Does a \`SELECT\` query change the stored table?
+
+- Yes, it deletes columns you did not select.
+  > Unselected columns simply do not appear in the result; they remain stored.
+- Yes, it permanently rearranges the columns.
+  > Column order in the result does not change the table definition.
+- [o] No, it reads data and returns a temporary result.
+  > A basic \`SELECT\` is safe because it does not modify stored data.
+- Only when you use \`DISTINCT\`.
+  > \`DISTINCT\` changes the result, not the stored table.`}
+/>
+
+<MultipleChoice
+  markdown={`A table has genres \`Fiction\`, \`Technology\`, \`Fiction\`, and \`Travel\`. What does \`SELECT DISTINCT genre\` return?
+
+- Four rows, including both \`Fiction\` values.
+  > \`DISTINCT\` removes repeated result rows.
+- [o] Three rows, one for each different genre.
+  > Each unique genre appears once.
+- Only \`Fiction\`, because it appears most often.
+  > \`DISTINCT\` does not choose the most common value; it keeps every unique value.
+- Nothing, because one value repeats.
+  > Repeated values are allowed; duplicates are simply collapsed.`}
+/>

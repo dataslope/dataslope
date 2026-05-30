@@ -1,0 +1,350 @@
+---
+title: Grouping Data with GROUP BY
+description: Learn how SQLite GROUP BY splits rows into categories so each category gets its own count, total, average, or other summary.
+---
+
+Aggregate functions can summarize a whole table into one answer. That is useful, but many real questions need one answer **per category**:
+
+- How many orders did each customer place?
+- What is the total sales amount for each product?
+- What is the average salary in each department?
+- How many visits happened in each month?
+
+`GROUP BY` is how you ask SQLite to split rows into groups first, then summarize each group.
+
+## The big idea: split, then summarize
+
+Without `GROUP BY`, an aggregate gives one summary for all rows. With `GROUP BY`, SQLite makes one group for each distinct value, then runs the aggregate once per group.
+
+```mermaid
+flowchart TB
+    Rows["All employee rows"] --> Group{"GROUP BY dept"}
+    Group --> Eng["Engineering group"]
+    Group --> Sales["Sales group"]
+    Group --> Mkt["Marketing group"]
+    Eng --> EngAvg["AVG(salary)<br/>for Engineering"]
+    Sales --> SalesAvg["AVG(salary)<br/>for Sales"]
+    Mkt --> MktAvg["AVG(salary)<br/>for Marketing"]
+```
+
+The result is not one average salary. It is one average salary **per department**.
+
+## Your first GROUP BY query
+
+Start with a small employee table. The query below counts employees and computes average salary for each department.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Headcount and average salary per department"
+  initSql={`CREATE TABLE employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  dept TEXT,
+  salary REAL
+);
+INSERT INTO employees (name, dept, salary) VALUES
+  ('Alice', 'Engineering', 120000),
+  ('Bob', 'Engineering', 95000),
+  ('Carol', 'Sales', 80000),
+  ('Dave', 'Sales', 72000),
+  ('Eve', 'Marketing', 68000);`}
+  initialCode={`SELECT
+  dept,
+  COUNT(*) AS headcount,
+  ROUND(AVG(salary), 0) AS average_salary
+FROM employees
+GROUP BY dept
+ORDER BY dept;`}
+/>
+
+Read the query out loud like this:
+
+> For each `dept`, count the rows and average the salaries.
+
+The `dept` column appears in the result because it labels each group. Without it, you would see numbers but not know which department they describe.
+
+```mermaid
+flowchart LR
+    F["FROM employees"] --> G["GROUP BY dept"]
+    G --> S["SELECT dept,<br/>COUNT(*), AVG(salary)"]
+    S --> O["ORDER BY dept"]
+```
+
+## One result row per group
+
+A group is a bucket of rows that share the same grouped value. If the table has three departments, the grouped query returns three rows.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="One row for each category"
+  initSql={`CREATE TABLE tickets (
+  id INTEGER PRIMARY KEY,
+  priority TEXT
+);
+INSERT INTO tickets (priority) VALUES
+  ('High'),
+  ('Low'),
+  ('High'),
+  ('Medium'),
+  ('Low'),
+  ('Low');`}
+  initialCode={`SELECT priority, COUNT(*) AS ticket_count
+FROM tickets
+GROUP BY priority
+ORDER BY ticket_count DESC;`}
+/>
+
+There are six ticket rows, but only three priority groups: `High`, `Medium`, and `Low`.
+
+<MultipleChoice
+  markdown={`What does \`GROUP BY priority\` do before \`COUNT(*)\` runs?
+
+- It deletes duplicate priorities from the table.
+  > The table is not changed; grouping only affects the query result.
+- [o] It puts rows with the same \`priority\` value into the same group.
+  > The aggregate then runs once for each priority group.
+- It sorts the table permanently by priority.
+  > \`ORDER BY\` controls result order; \`GROUP BY\` forms groups.
+- It changes all priorities to the same value.
+  > Grouping does not edit values.
+
+\`GROUP BY\` creates buckets of rows that can be summarized separately.`}
+/>
+
+## The golden rule of GROUP BY
+
+When a query uses `GROUP BY`, each result row represents a whole group. That creates an important rule:
+
+> Every expression in `SELECT` must either be part of the `GROUP BY` or be inside an aggregate function.
+
+This is easier to understand with a question: if one output row represents all Engineering employees, which single `name` should SQLite show for that row? Alice? Bob? Someone else?
+
+A grouped result row needs values that make sense for the whole group.
+
+```mermaid
+flowchart TB
+    Col["Column in SELECT"] --> Ask{"One value<br/>for the whole group?"}
+    Ask -->|"yes, grouped column"| Allowed["Allowed as-is"]
+    Ask -->|"no, many values"| Aggregate["Use an aggregate<br/>COUNT, SUM, AVG, MIN, MAX"]
+```
+
+<Callout type="warning" title="SQLite note">
+Some databases reject ungrouped columns immediately. SQLite may allow them in some grouped queries, but the value can be arbitrary and misleading. For clear beginner-friendly SQL, follow the golden rule: select grouped columns or aggregate results.
+</Callout>
+
+## Grouping and summing
+
+`GROUP BY` is often paired with `SUM` for category totals.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Total sales per product"
+  initSql={`CREATE TABLE sales (
+  id INTEGER PRIMARY KEY,
+  product TEXT,
+  amount REAL
+);
+INSERT INTO sales (product, amount) VALUES
+  ('Notebook', 12.00),
+  ('Pencil', 3.00),
+  ('Notebook', 18.00),
+  ('Backpack', 45.00),
+  ('Pencil', 2.50);`}
+  initialCode={`SELECT product, SUM(amount) AS total_sales
+FROM sales
+GROUP BY product
+ORDER BY total_sales DESC;`}
+/>
+
+This is the pattern behind many reports: category on the left, summary number on the right.
+
+## Grouping by more than one column
+
+You can group by multiple columns. The group becomes each unique combination of those column values.
+
+For example, `GROUP BY region, year` means:
+
+> Make one group for each region-and-year pair.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Total sales per region per year"
+  initSql={`CREATE TABLE sales (
+  id INTEGER PRIMARY KEY,
+  region TEXT,
+  year INTEGER,
+  amount REAL
+);
+INSERT INTO sales (region, year, amount) VALUES
+  ('West', 2025, 100.00),
+  ('West', 2025, 50.00),
+  ('West', 2026, 200.00),
+  ('East', 2025, 80.00),
+  ('East', 2026, 120.00),
+  ('East', 2026, 60.00);`}
+  initialCode={`SELECT region, year, SUM(amount) AS total_sales
+FROM sales
+GROUP BY region, year
+ORDER BY region, year;`}
+/>
+
+Each result row is one distinct `(region, year)` combination.
+
+```mermaid
+flowchart TB
+    Rows["Sales rows"] --> Pair["Group by<br/>region + year"]
+    Pair --> W2025["West, 2025"]
+    Pair --> W2026["West, 2026"]
+    Pair --> E2025["East, 2025"]
+    Pair --> E2026["East, 2026"]
+    W2025 --> Total["SUM(amount)<br/>per combination"]
+    W2026 --> Total
+    E2025 --> Total
+    E2026 --> Total
+```
+
+<MultipleChoice
+  markdown={`When you write \`GROUP BY region, year\`, what does each output row represent?
+
+- One row per region only.
+  > The year also participates in the grouping.
+- One row per year only.
+  > The region also participates in the grouping.
+- [o] One row per unique combination of region and year.
+  > Multiple grouped columns form groups from distinct value combinations.
+- One row per original sale.
+  > Aggregation collapses original sale rows into summary rows.
+
+Grouping by multiple columns is grouping by combinations.`}
+/>
+
+## WHERE happens before GROUP BY
+
+You can filter rows before they are grouped. This is useful when only some rows should enter the summary.
+
+In SQLite, use `INTEGER` values like `1` and `0` for true/false flags.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Average salary per department for full-time employees"
+  initSql={`CREATE TABLE employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  dept TEXT,
+  salary REAL,
+  is_intern INTEGER
+);
+INSERT INTO employees (name, dept, salary, is_intern) VALUES
+  ('Alice', 'Engineering', 120000, 0),
+  ('Bob', 'Engineering', 95000, 0),
+  ('Cara', 'Engineering', 30000, 1),
+  ('Dave', 'Sales', 80000, 0),
+  ('Eve', 'Sales', 72000, 0);`}
+  initialCode={`SELECT dept, ROUND(AVG(salary), 0) AS average_salary
+FROM employees
+WHERE is_intern = 0
+GROUP BY dept
+ORDER BY dept;`}
+/>
+
+The intern row is removed first. Then SQLite groups the remaining rows by department.
+
+```mermaid
+flowchart LR
+    Raw["Raw employee rows"] --> Where["WHERE is_intern = 0<br/>keep full-time rows"]
+    Where --> Group["GROUP BY dept<br/>make department groups"]
+    Group --> Avg["AVG(salary)<br/>inside each group"]
+    Avg --> Result["One row per department"]
+```
+
+## GROUP BY changes the meaning of SELECT
+
+Before grouping, `SELECT name, salary` means "show me each row's name and salary."
+
+After grouping, `SELECT dept, COUNT(*)` means "show me each group's label and summary."
+
+That mental shift is the tricky part: the output rows are no longer individual original rows. They are **summary rows**.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Detail rows versus summary rows"
+  initSql={`CREATE TABLE pets (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  species TEXT
+);
+INSERT INTO pets (name, species) VALUES
+  ('Luna', 'Cat'),
+  ('Milo', 'Dog'),
+  ('Nori', 'Cat'),
+  ('Pip', 'Bird'),
+  ('Rex', 'Dog');`}
+  initialCode={`SELECT species, COUNT(*) AS pet_count
+FROM pets
+GROUP BY species
+ORDER BY species;`}
+/>
+
+The result does not show Luna, Milo, or Nori as separate rows. It shows one row per species.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the main purpose of \`GROUP BY\`?
+
+- To permanently rearrange rows in a table.
+  > Query results can be ordered with \`ORDER BY\`, but \`GROUP BY\` does not rearrange the stored table.
+- [o] To split rows into groups so aggregates can be calculated separately for each group.
+  > \`GROUP BY\` turns one grand summary into one summary per category.
+- To remove all \`NULL\` values from a table.
+  > \`GROUP BY\` does not clean or delete table data.
+- To create a new table automatically.
+  > A normal grouped \`SELECT\` returns a result; it does not create a stored table.
+
+Use \`GROUP BY\` when the words "per" or "for each" appear in your question.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`SELECT dept, COUNT(*) FROM employees GROUP BY dept;\`, why is \`dept\` allowed in \`SELECT\`?
+
+- Because text columns are always allowed in grouped queries.
+  > The data type is not the reason.
+- [o] Because \`dept\` is the grouped column, so each output row has one department value.
+  > The department value labels the group represented by that result row.
+- Because \`COUNT(*)\` changes \`dept\` into a number.
+  > \`COUNT(*)\` counts rows; it does not convert the department column.
+- Because \`dept\` is the first column in the table.
+  > Column position in the table is not what matters.
+
+Grouped columns can appear as labels for the grouped result rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Which query best answers "How many orders did each customer place?"?
+
+- \`SELECT COUNT(*) FROM orders;\`
+  > This gives one count for all orders, not one count per customer.
+- [o] \`SELECT customer, COUNT(*) FROM orders GROUP BY customer;\`
+  > This groups orders by customer and counts each customer's rows.
+- \`SELECT customer FROM orders;\`
+  > This lists customer values but does not count orders.
+- \`SELECT customer, amount FROM orders ORDER BY amount;\`
+  > This shows detail rows sorted by amount, not grouped counts.
+
+The phrase "each customer" is a clue to group by customer.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens first in a query that has both \`WHERE\` and \`GROUP BY\`?
+
+- \`GROUP BY\` forms groups first, then \`WHERE\` filters those groups.
+  > Group filters use \`HAVING\`; \`WHERE\` acts earlier on individual rows.
+- [o] \`WHERE\` filters individual rows first, then \`GROUP BY\` groups the remaining rows.
+  > Only rows that pass \`WHERE\` are included in the groups.
+- \`SELECT\` creates aliases first, then \`WHERE\` and \`GROUP BY\` run.
+  > Aliases are not the first step in this query flow.
+- They happen in random order.
+  > SQL has a logical processing order; row filtering comes before grouping.
+
+\`WHERE\` controls which raw rows enter the grouped summary.`}
+/>

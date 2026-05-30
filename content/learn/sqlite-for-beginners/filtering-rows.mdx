@@ -1,0 +1,327 @@
+---
+title: Filtering Rows with WHERE
+description: Keep only the SQLite rows you care about using WHERE, comparisons, AND, OR, NOT, BETWEEN, IN, and LIKE.
+---
+
+`SELECT` chooses columns. `WHERE` chooses rows.
+
+That difference matters. A table may hold hundreds or millions of rows,
+but most questions only need some of them: books under a certain price,
+employees in one department, or customers in one city.
+
+## WHERE keeps matching rows
+
+A `WHERE` clause is a test that SQLite applies to each row. If the test
+is true, the row stays in the result. If the test is false, the row is
+left out.
+
+```mermaid
+flowchart LR
+    A["all rows<br/>in books"] --> W{"WHERE condition<br/>is true?"}
+    W -->|"true"| K["keep row<br/>in result"]
+    W -->|"false"| D["drop row<br/>from result"]
+```
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Keep one genre"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre, price
+FROM books
+WHERE genre = 'Technology';`}
+/>
+
+The equals sign, `=`, means "is equal to." Text values go in single
+quotes.
+
+## Comparison operators
+
+SQLite supports the comparisons beginners use constantly:
+
+| Operator | Means | Example |
+| --- | --- | --- |
+| `=` | equal to | `genre = 'Fiction'` |
+| `<>` or `!=` | not equal to | `genre <> 'Travel'` |
+| `<` and `>` | less than, greater than | `price < 20` |
+| `<=` and `>=` | at most, at least | `pages >= 300` |
+| `BETWEEN a AND b` | from `a` through `b`, inclusive | `price BETWEEN 10 AND 20` |
+| `IN (...)` | matches any value in a list | `genre IN ('Fiction', 'Travel')` |
+| `LIKE` | matches a text pattern | `title LIKE 'Data%'` |
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Books under 20 dollars"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, price
+FROM books
+WHERE price < 20;`}
+/>
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="A page range with BETWEEN"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, pages
+FROM books
+WHERE pages BETWEEN 200 AND 320;`}
+/>
+
+`BETWEEN` includes both ends of the range. In the example, 200 and 320
+would both count as matches.
+
+<MultipleChoice
+  markdown={`Which clause keeps only rows that pass a test?
+
+- SELECT
+  > SELECT chooses which columns appear.
+- [o] WHERE
+  > WHERE applies a condition to each row and keeps only true matches.
+- ORDER BY
+  > ORDER BY changes row order after rows have been chosen.
+- LIMIT
+  > LIMIT trims how many rows are returned.`}
+/>
+
+## Combine conditions with AND, OR, and NOT
+
+Real questions often have more than one part.
+
+- `AND` means both conditions must be true.
+- `OR` means at least one condition must be true.
+- `NOT` flips a condition.
+
+```mermaid
+flowchart TB
+    A["condition one"] --> AND["AND<br/>both must be true"]
+    B["condition two"] --> AND
+    AND --> R["row is kept"]
+```
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Technology books under 30 dollars"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre, price
+FROM books
+WHERE genre = 'Technology' AND price < 30;`}
+/>
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Fiction or travel books"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre
+FROM books
+WHERE genre = 'Fiction' OR genre = 'Travel';`}
+/>
+
+When you mix `AND` and `OR`, use parentheses so your meaning is clear.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Use parentheses for mixed logic"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre, price
+FROM books
+WHERE price < 20 AND (genre = 'Fiction' OR genre = 'Travel');`}
+/>
+
+## IN is a shorter OR list
+
+`IN` checks whether a value is one of several choices. It is often much
+cleaner than writing many `OR` conditions.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Match several genres with IN"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre
+FROM books
+WHERE genre IN ('Fiction', 'Travel');`}
+/>
+
+## LIKE finds text patterns
+
+`LIKE` compares text to a pattern.
+
+- `%` means any number of characters, including none.
+- `_` means exactly one character.
+
+In SQLite, `LIKE` is case-insensitive for ordinary ASCII letters by
+default. That means `'sql%'` can match `SQL Street`.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Titles that start with SQL"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title
+FROM books
+WHERE title LIKE 'sql%';`}
+/>
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Titles containing the letter sequence ar"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title
+FROM books
+WHERE title LIKE '%ar%';`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does BETWEEN 10 AND 20 mean for a price?
+
+- More than 10 and less than 20, excluding both ends.
+  > BETWEEN includes its boundary values.
+- [o] From 10 through 20, including 10 and 20.
+  > SQLite treats BETWEEN as an inclusive range test.
+- Exactly 10 or exactly 20 only.
+  > Values between the two ends also match.
+- Any price except 10 through 20.
+  > That would need NOT BETWEEN.`}
+/>
+
+<MultipleChoice
+  markdown={`Which condition keeps books that are either Fiction or Travel?
+
+- genre = 'Fiction' AND genre = 'Travel'
+  > One row cannot have both different genre values at the same time.
+- [o] genre IN ('Fiction', 'Travel')
+  > IN checks whether the value is any item in the list.
+- genre NOT IN ('Fiction', 'Travel')
+  > NOT IN keeps everything outside the list.
+- genre LIKE 'Fiction Travel'
+  > LIKE is for text patterns, not a list of separate choices.`}
+/>
+
+<MultipleChoice
+  markdown={`In SQLite, what does the LIKE pattern 'Data%' match?
+
+- Only the exact text Data%.
+  > The percent sign is a wildcard in a LIKE pattern.
+- [o] Text that starts with Data, followed by any characters.
+  > Percent means any number of characters after Data.
+- Text that ends with Data.
+  > A pattern for ending with Data would be '%Data'.
+- Only text with exactly one character after Data.
+  > The underscore wildcard matches one character; percent matches any number.`}
+/>

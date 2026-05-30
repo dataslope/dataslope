@@ -1,0 +1,224 @@
+---
+title: Primary Keys
+description: Learn how SQLite uses primary keys to give every row a stable unique identity.
+---
+
+Imagine two people have the same name. If your table only stores names, how can SQLite tell them apart?
+
+That is the job of a **primary key**: it gives each row a reliable identity.
+
+## The identity problem
+
+Two rows can look almost the same:
+
+```mermaid
+flowchart TB
+    O["Order for<br/>John Smith"] --> J1["John Smith<br/>Springfield"]
+    O --> J2["John Smith<br/>Springfield"]
+    J1 --> Q["Which row is the right person?"]
+    J2 --> Q
+```
+
+Names can repeat. Addresses can repeat. Phone numbers can change. A table needs one value that means: **this exact row, not any other row**.
+
+## What a primary key is
+
+A **primary key** is a column, or sometimes a combination of columns, that uniquely identifies each row in a table.
+
+For beginners, the most common pattern in SQLite is a column named `id`:
+
+```mermaid
+flowchart TB
+    subgraph Customers["Table: customers"]
+        direction LR
+        H1["id<br/>primary key"]:::pk
+        H2["name"]:::hdr
+        H3["city"]:::hdr
+        A1["1"]:::pk
+        A2["John Smith"]
+        A3["Springfield"]
+        B1["2"]:::pk
+        B2["John Smith"]
+        B3["Springfield"]
+        C1["3"]:::pk
+        C2["Maya Chen"]
+        C3["Denver"]
+    end
+    classDef hdr fill:#dbeafe,stroke:#1d4ed8
+    classDef pk fill:#fde68a,stroke:#b45309
+```
+
+Now the two John Smith rows are not confused:
+
+- Customer `1` is one person.
+- Customer `2` is another person.
+
+The `id` value is the row's identity inside this table.
+
+## The two promises of a primary key
+
+A primary key gives two important guarantees:
+
+```mermaid
+flowchart LR
+    PK["Primary key"] --> U["Unique<br/>no duplicates"]
+    PK --> N["Not null<br/>never missing"]
+```
+
+1. **Unique**: no two rows may have the same primary key value.
+2. **Not null**: every row must have an identity value.
+
+Those promises make the key safe to use when you need to point to a specific row.
+
+<MultipleChoice
+  markdown={`Why is a person's name usually a poor primary key?
+
+- Names cannot be stored as text in SQLite.
+  > SQLite can store names as text; storage is not the issue.
+- [o] Names can repeat, change, or be missing.
+  > A primary key should be unique, stable, and present for every row.
+- Names are always longer than numbers.
+  > Length is less important than reliability as an identifier.
+- SQLite only allows primary keys on price columns.
+  > A primary key can be declared on many kinds of columns; the design choice matters.`}
+/>
+
+## Natural keys and surrogate keys
+
+There are two common ways to choose a primary key.
+
+```mermaid
+flowchart TB
+    PK["Primary key choices"]
+    PK --> NAT["Natural key<br/>real-world value"]
+    PK --> SUR["Surrogate key<br/>made-up identifier"]
+    NAT --> N1["country code<br/>ISBN"]
+    SUR --> S1["id values<br/>1, 2, 3"]
+```
+
+A **natural key** is a real-world value that is already unique, such as a country code.
+
+A **surrogate key** is a made-up value used only to identify the row, such as `id = 1`.
+
+Surrogate keys are very common because they are simple and stable. The number does not have to mean anything. Its job is only to identify the row.
+
+## SQLite's special `INTEGER PRIMARY KEY`
+
+In SQLite, this declaration is special:
+
+```sql
+id INTEGER PRIMARY KEY
+```
+
+It makes `id` an alias for SQLite's internal **rowid**. In plain language: SQLite can automatically assign a new whole-number id when you insert a row and leave `id` out.
+
+```mermaid
+sequenceDiagram
+    participant You as You
+    participant SQLite as SQLite
+    You->>SQLite: Insert a customer without an id
+    SQLite-->>SQLite: Choose the next rowid value
+    SQLite-->>You: Store the row with a new id
+```
+
+<Callout type="info" title="No SERIAL in SQLite">
+SQLite does not use PostgreSQL's `SERIAL` type. For the usual beginner auto-id pattern, write `id INTEGER PRIMARY KEY`.
+</Callout>
+
+## See it in SQLite
+
+Run this example. Notice that the `INSERT` statements do not provide ids. SQLite fills them in.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Auto-assigned integer primary keys"
+  initSql={`CREATE TABLE customers (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  city TEXT
+);
+
+INSERT INTO customers (name, city) VALUES
+  ('Ada', 'London'),
+  ('Grace', 'Arlington'),
+  ('Lin', 'Taipei');`}
+  initialCode={`SELECT id, name, city
+FROM customers
+ORDER BY id;`}
+/>
+
+You should see ids like `1`, `2`, and `3`. Those ids are stable row identities you can use in other tables later.
+
+## Primary keys help tables connect
+
+Primary keys are especially important when one table refers to another.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDERS : places
+    CUSTOMER {
+        integer id PK
+        text name
+    }
+    ORDERS {
+        integer id PK
+        integer customer_id FK
+        numeric total
+    }
+```
+
+The `orders.customer_id` value points to a customer's `id`. Without primary keys, that link would be unreliable.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the main purpose of a primary key?
+
+- To make a table display in rainbow colors.
+  > Display style is unrelated to primary keys.
+- [o] To uniquely identify each row in a table.
+  > A primary key gives each row a dependable identity.
+- To force every value in the table to be text.
+  > Primary keys identify rows; they do not make every column text.
+- To delete duplicate rows automatically.
+  > A primary key prevents duplicate key values, but it does not automatically decide which existing rows to delete.`}
+/>
+
+<MultipleChoice
+  markdown={`Which SQLite column definition is the usual beginner pattern for an automatically assigned id?
+
+- \`id SERIAL PRIMARY KEY\`
+  > \`SERIAL\` is a PostgreSQL pattern, not SQLite's usual syntax.
+- [o] \`id INTEGER PRIMARY KEY\`
+  > In SQLite, \`INTEGER PRIMARY KEY\` aliases the rowid and can auto-assign ids.
+- \`id TEXT ALWAYS NUMBER\`
+  > This is not valid SQLite syntax.
+- \`id BOOLEAN PRIMARY KEY\`
+  > SQLite does not have a separate boolean storage class, and true/false would not give many unique ids.`}
+/>
+
+<MultipleChoice
+  markdown={`What two rules does a primary key provide?
+
+- It must be alphabetic and lowercase.
+  > Primary keys are often numbers, and letter case is not the key rule.
+- It must be sorted and visible.
+  > Sorting is separate from identity.
+- [o] It must be unique and not null.
+  > These guarantees make each row's identity reliable.
+- It must contain the row's full description.
+  > A primary key should identify the row, not store every fact about it.`}
+/>
+
+<MultipleChoice
+  markdown={`A surrogate key is best described as what?
+
+- A real-world value like a person's current phone number.
+  > That is closer to a natural value, and it may change.
+- [o] A made-up identifier, often an id number, created only to identify a row.
+  > Surrogate keys are artificial values used for stable row identity.
+- A column that stores several names in one cell.
+  > That is not a key; it is a messy storage pattern.
+- A query that sorts a table.
+  > Sorting uses clauses such as \`ORDER BY\`, not surrogate keys.`}
+/>

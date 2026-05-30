@@ -1,0 +1,227 @@
+---
+title: Exploring Data
+description: How to walk into an unfamiliar SQLite database and quickly understand what it holds — its tables, columns, sizes, ranges, and quirks.
+---
+
+Most of this course has built tables from scratch. But often you are
+handed a database someone *else* made and asked, *"what's in here?"*
+**Data exploration** is the skill of answering that question quickly
+and methodically — before you write a single "real" query.
+
+This page gives you a repeatable routine. Think of it as the
+questions a careful analyst always asks first.
+
+## The exploration loop
+
+You rarely understand a dataset in one look. You **loop**: get the
+shape, peek at rows, then ask sharper questions as the data tells you
+what to ask next.
+
+```mermaid
+flowchart LR
+    A["What tables<br/>exist?"] --> B["What columns<br/>does each have?"]
+    B --> C["What do a few<br/>rows look like?"]
+    C --> D["How big? What<br/>ranges and values?"]
+    D --> E["Any gaps,<br/>NULLs, or surprises?"]
+    E --> A
+```
+
+## Step 1 — What tables exist?
+
+In SQLite, the database keeps a built-in catalog of itself in a
+special table called `sqlite_master` (also available as
+`sqlite_schema`). Querying it lists every table you can work with.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="List the tables in the database"
+  initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
+CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
+INSERT INTO customers (name, city) VALUES
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);
+INSERT INTO orders (customer_id, amount, placed_on) VALUES
+  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
+  (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,NULL,'2024-03-06');`}
+  initialCode={`SELECT name
+FROM sqlite_master
+WHERE type = 'table'
+ORDER BY name;`}
+/>
+
+<Callout type="info" title="The Tables viewer">
+The runnable blocks on this site also show a **Tables** panel above
+the editor, so you can often see the table list without querying
+`sqlite_master`. But knowing the query means you can explore *any*
+SQLite database, anywhere.
+</Callout>
+
+## Step 2 — What columns does a table have?
+
+To see a table's columns and their declared types, SQLite gives you a
+special command called `PRAGMA table_info`. It returns one row per
+column.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Inspect a table's columns"
+  initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
+INSERT INTO orders (customer_id, amount, placed_on) VALUES (1,42.0,'2024-01-03');`}
+  initialCode={`PRAGMA table_info(orders);`}
+/>
+
+Each row tells you the column's name, its declared type, whether it
+is `NOT NULL`, its default, and whether it is part of the primary key.
+That is the table's **schema** — its shape — at a glance.
+
+## Step 3 — Peek at a few rows
+
+Numbers and types only tell you so much. Always look at real rows.
+`LIMIT` keeps the peek small even if the table is huge.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Look at a sample of rows"
+  initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
+INSERT INTO customers (name, city) VALUES
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);`}
+  initialCode={`SELECT *
+FROM customers
+LIMIT 5;`}
+/>
+
+A five-row peek instantly answers questions a schema cannot: Are
+names capitalized consistently? Is `city` sometimes blank? Do the
+values match what the column *names* promised?
+
+## Step 4 — How big, and what's in the columns?
+
+Now ask quantitative questions. Three are almost always useful:
+
+- **How many rows?** `COUNT(*)`
+- **What distinct values does a column take?** `DISTINCT` or
+  `GROUP BY`
+- **What is the range of a number or date?** `MIN` and `MAX`
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Counts, distinct values, and ranges"
+  initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
+INSERT INTO orders (customer_id, amount, placed_on) VALUES
+  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
+  (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,55.00,'2024-03-06');`}
+  initialCode={`SELECT
+  COUNT(*)        AS row_count,
+  MIN(amount)     AS smallest,
+  MAX(amount)     AS largest,
+  MIN(placed_on)  AS first_date,
+  MAX(placed_on)  AS last_date
+FROM orders;`}
+/>
+
+To see how a column's values are distributed, group by it and count —
+a quick **frequency table** that often reveals typos, unexpected
+categories, or skew:
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="A frequency table for one column"
+  initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
+INSERT INTO customers (name, city) VALUES
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),
+  ('Mary','Oslo'),('Femi','Lagos'),('Nils',NULL);`}
+  initialCode={`SELECT city, COUNT(*) AS how_many
+FROM customers
+GROUP BY city
+ORDER BY how_many DESC;`}
+/>
+
+## Step 5 — Hunt for gaps and surprises
+
+Real data is messy. Before trusting a column, check whether it has
+missing values. A single query can count the holes:
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="How many values are missing?"
+  initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
+INSERT INTO customers (name, city) VALUES
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),('Nils',NULL);`}
+  initialCode={`SELECT
+  COUNT(*)                              AS total_rows,
+  COUNT(city)                           AS city_present,
+  COUNT(*) - COUNT(city)                AS city_missing
+FROM customers;`}
+/>
+
+Remember from **Working with NULL** that `COUNT(city)` skips `NULL`s,
+while `COUNT(*)` counts every row. The difference is exactly how many
+values are missing — a fast, reliable data-quality check.
+
+<Callout type="success" title="A routine you can reuse forever">
+List the tables → inspect each table's columns → peek at rows → count
+and range the important columns → check for missing values. Run that
+loop on any database and within minutes you will understand it far
+better than someone who jumped straight to writing queries.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`You open an unfamiliar SQLite database and want a list of its tables. Which is the most reliable first step?
+
+- Guess common table names like \`users\` and \`data\` and \`SELECT\` from them.
+  > Guessing wastes time and fails on databases with unusual names.
+- [o] Query \`sqlite_master\` (or \`sqlite_schema\`) where \`type = 'table'\`.
+  > SQLite stores a catalog of itself there, so this lists every table reliably.
+- Run \`SELECT * \` with no \`FROM\` clause.
+  > That does not enumerate tables; it would just error or return a single computed row.
+- Delete a table to see what happens.
+  > Never explore by destroying data; you want to *read* the catalog, not change it.
+
+\`sqlite_master\` is SQLite's built-in catalog of its own tables, indexes, and views.`}
+/>
+
+<MultipleChoice
+  markdown={`Why add \`LIMIT 5\` when peeking at rows from a table you don't know?
+
+- Because \`SELECT\` requires a \`LIMIT\`.
+  > \`LIMIT\` is optional; \`SELECT\` works without it.
+- [o] To see a small sample quickly without pulling back a potentially huge table.
+  > A small peek is fast and enough to learn the column shapes and value formats.
+- Because \`LIMIT\` sorts the rows for you.
+  > \`LIMIT\` does not sort; only \`ORDER BY\` does. \`LIMIT\` just caps the row count.
+- Because without it the query would be invalid.
+  > The query is valid without \`LIMIT\`; the limit is purely for a manageable sample.
+
+A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
+/>
+
+<MultipleChoice
+  markdown={`A column \`amount\` has \`COUNT(*) = 200\` but \`COUNT(amount) = 188\`. What does that tell you?
+
+- The table has 388 rows.
+  > These are two counts of the same 200 rows, not two separate tables to add together.
+- Nothing — the two counts should always match.
+  > They differ precisely because \`COUNT(amount)\` ignores \`NULL\`s while \`COUNT(*)\` does not.
+- [o] 12 rows have a \`NULL\` (missing) \`amount\`.
+  > \`COUNT(*)\` counts all rows; \`COUNT(amount)\` skips \`NULL\`s, so the gap of 12 is the missing values.
+- The \`amount\` column is the primary key.
+  > Primary keys cannot be \`NULL\`, so this pattern would be impossible for one.
+
+\`COUNT(*) - COUNT(column)\` is a quick count of missing values in that column.`}
+/>
+
+<MultipleChoice
+  markdown={`Which query best reveals how a category column \`status\` is distributed?
+
+- \`SELECT * FROM tickets;\`
+  > Dumping every row makes you eyeball distribution by hand — slow and error-prone.
+- [o] \`SELECT status, COUNT(*) FROM tickets GROUP BY status ORDER BY COUNT(*) DESC;\`
+  > Grouping and counting builds a frequency table that shows each value and how often it occurs.
+- \`SELECT MAX(status) FROM tickets;\`
+  > A single max value says nothing about how the categories are distributed.
+- \`SELECT DISTINCT status FROM tickets LIMIT 1;\`
+  > One distinct value is not the distribution; you want counts across all values.
+
+A \`GROUP BY\` + \`COUNT(*)\` frequency table is the standard way to profile a category column.`}
+/>

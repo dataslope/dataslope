@@ -1,0 +1,202 @@
+---
+title: Query Execution Order
+description: The hidden order in which SQL clauses really run in SQLite — and why understanding it explains many puzzling errors and results.
+---
+
+You **write** a query as `SELECT ... FROM ... WHERE ... GROUP BY ...`,
+but SQLite does **not** run it in that order. SQL has a hidden
+**logical execution order**, and learning it explains a whole class
+of confusing errors — like *"why can't I use an alias in `WHERE`?"*
+This is one of the most clarifying ideas in all of SQL.
+
+## Written order vs. execution order
+
+The order you type is for human readability. The order the database
+*reasons* about the query is different:
+
+```mermaid
+flowchart TB
+    F["1. FROM / JOIN<br/>gather and combine tables"]
+    W["2. WHERE<br/>filter individual rows"]
+    G["3. GROUP BY<br/>form groups"]
+    H["4. HAVING<br/>filter groups"]
+    S["5. SELECT<br/>choose columns, compute aliases"]
+    D["6. DISTINCT<br/>remove duplicates"]
+    O["7. ORDER BY<br/>sort"]
+    L["8. LIMIT<br/>keep the first N"]
+    F --> W --> G --> H --> S --> D --> O --> L
+```
+
+Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
+`LIMIT` is last. The clause you *write* first (`SELECT`) is among the
+*last* to actually run.
+
+## Why this explains real errors
+
+Most "why doesn't this work?" moments dissolve once you know the
+order. Two classic examples:
+
+**You cannot use a `SELECT` alias in `WHERE`.** Because `WHERE`
+(step 2) runs *before* `SELECT` (step 5), the alias does not exist
+yet when `WHERE` is evaluated:
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="An alias is not visible to WHERE"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  amount NUMERIC
+);
+INSERT INTO orders (id, amount) VALUES (1,20),(2,80),(3,60);`}
+  initialCode={`-- This FAILS: "doubled" does not exist yet when WHERE runs.
+-- SELECT amount * 2 AS doubled FROM orders WHERE doubled > 100;
+
+-- This works: repeat the expression, since WHERE runs before SELECT.
+SELECT amount * 2 AS doubled
+FROM orders
+WHERE amount * 2 > 100
+ORDER BY doubled;`}
+/>
+
+**But you *can* use the alias in `ORDER BY`,** because `ORDER BY`
+(step 7) runs *after* `SELECT` (step 5), by which time the alias
+exists. The execution order predicts exactly which works.
+
+<Callout type="info" title="A rule you can now derive, not memorize">
+"Aliases work in `ORDER BY` but not in `WHERE`" used to be a fact to
+memorize. Now it is something you can *derive*: `ORDER BY` comes
+after `SELECT`, `WHERE` comes before it. The order is the
+explanation.
+</Callout>
+
+## Tracing a full query
+
+Watch every clause take its turn on this query. Each step hands its
+result to the next:
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Every clause, in execution order"
+  initSql={`CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  amount      NUMERIC
+);
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40);`}
+  initialCode={`SELECT customer_id, SUM(amount) AS total
+FROM orders
+WHERE amount > 10
+GROUP BY customer_id
+HAVING SUM(amount) > 50
+ORDER BY total DESC
+LIMIT 2;`}
+/>
+
+Trace it in execution order:
+
+1. **FROM** `orders` — start with all rows.
+2. **WHERE** `amount > 10` — drop the small individual orders.
+3. **GROUP BY** `customer_id` — bundle rows into one group per
+   customer.
+4. **HAVING** `SUM(amount) > 50` — drop groups whose total is too
+   small.
+5. **SELECT** `customer_id, SUM(amount) AS total` — compute the
+   output, naming the sum `total`.
+6. **ORDER BY** `total DESC` — sort the surviving groups.
+7. **LIMIT 2** — keep the top two.
+
+This is the **query transformation pipeline**: each stage reshapes a
+table and passes it on. Every query you write — however complex —
+flows through these same steps.
+
+```mermaid
+flowchart LR
+    T["orders<br/>(all rows)"] --> W["WHERE"]
+    W --> G["GROUP BY"]
+    G --> H["HAVING"]
+    H --> S["SELECT"]
+    S --> O["ORDER BY"]
+    O --> L["LIMIT"]
+    L --> R["final result"]
+```
+
+## WHERE vs. HAVING, settled
+
+The order also makes the `WHERE`/`HAVING` distinction obvious.
+`WHERE` (step 2) runs **before** grouping, so it filters *individual
+rows*. `HAVING` (step 4) runs **after** grouping, so it filters
+*whole groups*:
+
+```mermaid
+flowchart LR
+    R["rows"] --> W["WHERE<br/>filter rows<br/>(before grouping)"]
+    W --> G["GROUP BY<br/>form groups"]
+    G --> H["HAVING<br/>filter groups<br/>(after grouping)"]
+```
+
+You cannot filter on `SUM(amount)` in `WHERE`, because the sum does
+not exist until grouping happens — which is step 3, *after* `WHERE`.
+You must use `HAVING`. Once again, the order is the reason.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which clause is evaluated **first** in a SQL query's logical execution order?
+
+- \`SELECT\`, because it is written first.
+  > Written order is not execution order; \`SELECT\` actually runs near the end.
+- [o] \`FROM\` (and its joins), which gathers the source rows before anything else.
+  > Execution begins by assembling the tables in \`FROM\`, then filtering and shaping them.
+- \`ORDER BY\`, because sorting must happen up front.
+  > Sorting happens late, after the rows and columns are determined.
+- \`WHERE\`, before the tables are even chosen.
+  > \`WHERE\` filters rows, but only after \`FROM\` has produced them.
+
+Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can a column alias defined in \`SELECT\` be used in \`ORDER BY\` but **not** in \`WHERE\`?
+
+- Because \`ORDER BY\` is optional and \`WHERE\` is required.
+  > Being optional or not has nothing to do with alias visibility.
+- [o] Because \`WHERE\` runs before \`SELECT\` (so the alias does not exist yet), while \`ORDER BY\` runs after \`SELECT\`.
+  > Aliases are created at the \`SELECT\` step, so only clauses that run after it can see them.
+- Because aliases only work with numbers.
+  > Alias visibility depends on execution order, not on data type.
+- Because \`WHERE\` cannot reference any columns at all.
+  > \`WHERE\` can reference real columns; it just cannot see aliases created later in \`SELECT\`.
+
+\`WHERE\` runs before \`SELECT\`, so the alias is not yet defined; \`ORDER BY\` runs after, so it is.`}
+/>
+
+<MultipleChoice
+  markdown={`Why must you filter on \`SUM(amount) > 50\` using \`HAVING\` rather than \`WHERE\`?
+
+- Because \`WHERE\` cannot contain numbers.
+  > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.
+- [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
+  > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
+- Because \`HAVING\` is just a faster version of \`WHERE\`.
+  > They filter at different stages — rows vs. groups — not at different speeds.
+- Because \`SUM\` cannot be used anywhere except \`HAVING\`.
+  > \`SUM\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
+
+Group aggregates exist only after \`GROUP BY\`, so filtering on them belongs in \`HAVING\`, not \`WHERE\`.`}
+/>
+
+<MultipleChoice
+  markdown={`In the execution order, where does \`LIMIT\` fall?
+
+- First, to reduce work before anything else.
+  > \`LIMIT\` cannot run first because it needs the final, sorted rows to choose from.
+- Right after \`FROM\`.
+  > Immediately after \`FROM\` the rows are neither filtered nor sorted, so limiting then would be meaningless.
+- [o] Last, after \`ORDER BY\`, keeping the first N of the final sorted rows.
+  > \`LIMIT\` acts at the very end, trimming the already-sorted result to N rows.
+- Before \`WHERE\`.
+  > Limiting before filtering would keep the wrong rows; \`LIMIT\` is the final step.
+
+\`LIMIT\` runs last, after sorting, to keep the first N rows of the final result.`}
+/>

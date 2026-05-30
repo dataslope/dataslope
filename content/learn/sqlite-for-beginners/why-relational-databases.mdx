@@ -1,0 +1,273 @@
+---
+title: Why Relational Databases?
+description: Learn why tables and relationships became such a durable way to model data.
+---
+
+Relational databases became popular because they give you a simple way to store connected facts without repeating everything everywhere.
+
+That may sound small, but it changes how reliably software can work with information.
+
+SQLite is a relational database system. It stores data in tables and lets you connect rows using keys.
+
+## The problem: repeated facts drift apart
+
+Imagine tracking bookstore orders in one big list:
+
+```text
+order_id | customer_name | customer_email     | book_title   | quantity
+-------- | ------------- | ------------------ | ------------ | --------
+1001     | Maya Chen     | maya@example.com   | SQL Basics   | 1
+1002     | Maya Chen     | maya@example.com   | Data Stories | 2
+1003     | Jordan Lee    | jordan@example.com | SQL Basics   | 1
+```
+
+This looks convenient at first.
+
+But what happens when Maya changes her email address?
+
+You must update every row where Maya appears.
+
+If one row is missed, the data disagrees with itself.
+
+```mermaid
+flowchart TB
+    A["Same customer copied<br/>into many rows"] --> B["Update one copy"]
+    A --> C["Forget another copy"]
+    B --> D["maya@new.com"]
+    C --> E["maya@example.com"]
+    D --> F["Conflicting facts"]
+    E --> F
+```
+
+This is a duplication problem. The same fact lives in more than one place.
+
+## The relational answer
+
+A relational database separates different kinds of facts into different tables, then connects them.
+
+Instead of copying the full customer information into every order row, you store the customer once.
+
+Then each order points to that customer.
+
+```text
+customers
+id | name       | email
+-- | ---------- | ----------------
+1  | Maya Chen  | maya@example.com
+2  | Jordan Lee | jordan@example.com
+
+orders
+id   | customer_id
+---- | -----------
+1001 | 1
+1002 | 1
+1003 | 2
+```
+
+Now if Maya changes her email, there is one customer row to update.
+
+```mermaid
+flowchart LR
+    C["customers"] -->|"customer id"| O["orders"]
+```
+
+```mermaid
+flowchart TB
+    A["One customer fact"] --> B["Many related orders"]
+    B --> C["Less duplication"]
+    C --> D["Fewer disagreements"]
+```
+
+## Relationships use keys
+
+A **key** is a value that identifies a row.
+
+Most tables have a primary key, often named `id`.
+
+Another table can store that id to create a relationship.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER {
+      integer id PK
+      text name
+      text email
+    }
+    ORDER {
+      integer id PK
+      integer customer_id FK
+    }
+```
+
+In this example:
+
+- `customers.id` identifies one customer.
+- `orders.customer_id` points to the customer who placed the order.
+
+The relationship lets you ask questions across tables:
+
+- Which orders belong to Maya?
+- Which customers have placed no orders?
+- How many orders has each customer placed?
+
+<MultipleChoice
+  markdown={`Why is storing one customer row and pointing orders to it useful?
+
+- It requires copying the customer's email into every order forever
+  > The relational design reduces repeated copies instead of requiring them.
+- [o] It makes customer changes happen in one place
+  > Updating one customer row avoids chasing repeated copies in many order rows.
+- It prevents all orders from having ids
+  > Orders can still have their own ids.
+- It turns rows into pictures
+  > Relationships connect rows; they do not change rows into images.`}
+/>
+
+## One fact in one place
+
+A useful relational design goal is:
+
+> Store each important fact in one place when you reasonably can.
+
+That does not mean every database is perfect or every repeated value is wrong. It means you should notice when repeated facts can drift apart.
+
+```mermaid
+flowchart LR
+    A["Repeated email copies"] --> B["Hard updates"]
+    C["One customer row"] --> D["Easier updates"]
+```
+
+## Relational does not mean spreadsheet
+
+Tables may look like spreadsheets, but the relational model adds an important idea: relationships between tables are part of the design.
+
+A spreadsheet can have multiple sheets, formulas, and lookups. A relational database is built around formally storing related sets of facts and querying across them.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--o{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : appears_in
+    CUSTOMER {
+      integer id PK
+      text name
+    }
+    ORDER {
+      integer id PK
+      integer customer_id FK
+    }
+    PRODUCT {
+      integer id PK
+      text name
+    }
+    ORDER_ITEM {
+      integer order_id FK
+      integer product_id FK
+      integer quantity
+    }
+```
+
+## Why this model lasted
+
+The relational model became dominant because it is:
+
+- **simple enough to understand**: tables, rows, columns
+- **strong enough to model real work**: customers place orders, students enroll in classes, posts have comments
+- **flexible to query**: you can combine facts in many ways later
+- **good at reducing duplication**: one fact can live in one place
+
+```mermaid
+flowchart TB
+    A["Relational model"] --> B["Tables"]
+    A --> C["Keys"]
+    A --> D["Relationships"]
+    A --> E["Queries across tables"]
+```
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Relate orders to customers"
+  initSql={`CREATE TABLE customers (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  email TEXT
+);
+CREATE TABLE orders (
+  id INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  total NUMERIC
+);
+INSERT INTO customers (name, email) VALUES
+  ('Maya Chen', 'maya@example.com'),
+  ('Jordan Lee', 'jordan@example.com');
+INSERT INTO orders (customer_id, total) VALUES
+  (1, 24.99),
+  (1, 15.50),
+  (2, 9.99);`}
+  initialCode={`SELECT customers.name, orders.total
+FROM customers
+JOIN orders ON orders.customer_id = customers.id;`}
+/>
+
+## The main idea
+
+Relational databases help you store connected facts without copying everything everywhere.
+
+Tables hold one kind of thing. Keys identify rows. Relationships let rows refer to other rows.
+
+That is why the model has lasted for decades.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a primary key usually used for?
+
+- Decorating the table with a color
+  > A primary key identifies data; it is not visual formatting.
+- [o] Identifying one row in a table
+  > A primary key gives each row a reliable identifier.
+- Choosing text color
+  > Keys are about identifying data, not formatting.
+- Deleting every table automatically
+  > A key does not automatically delete tables.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a foreign key idea, in plain language?
+
+- A key that unlocks a physical door
+  > A foreign key is a database relationship idea, not a physical key.
+- [o] A value in one table that points to a row in another table
+  > For example, orders.customer_id can point to customers.id.
+- A password written in another language
+  > It is not a password.
+- A chart title
+  > Foreign keys describe relationships between rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Why did the relational model become so useful?
+
+- It requires every fact to be copied into every table
+  > The relational model helps avoid unnecessary repeated copies.
+- [o] It can model connected facts while reducing repeated copies
+  > Tables and keys let one fact live in one place while related rows point to it.
+- It only stores images
+  > Relational databases store structured values, not only images.
+- It forbids questions across tables
+  > Querying across related tables is one of the model's strengths.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the risk of copying the same customer email into many order rows?
+
+- The email will automatically update itself in every plain copied cell
+  > Repeated copies often require separate updates unless the design avoids duplication.
+- [o] The copies can drift apart when one is updated and another is missed
+  > Repeated facts can become conflicting facts.
+- It makes tables impossible to create
+  > Tables can still be created, but the design may be harder to maintain.
+- It prevents SQL from reading rows
+  > SQL can read rows, but the data may be less trustworthy.`}
+/>

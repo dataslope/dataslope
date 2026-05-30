@@ -1,0 +1,296 @@
+---
+title: Sorting and Limiting
+description: Put SQLite query results in a clear order, then return only the rows you need with LIMIT and OFFSET.
+---
+
+Tables do not have a natural reading order. Even if rows seem to come
+back in the same order today, you should not rely on that. If order
+matters, say so with `ORDER BY`.
+
+After the rows are ordered, `LIMIT` and `OFFSET` let you take a smaller
+piece of the result. Together, they answer questions like "which books
+are cheapest?" and "show the next page."
+
+## ORDER BY sorts rows
+
+`ORDER BY` sorts the result by a column. Use `ASC` for ascending order
+(low to high, A to Z) or `DESC` for descending order (high to low, Z to
+A). `ASC` is the default.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Cheapest books first"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, price
+FROM books
+ORDER BY price ASC;`}
+/>
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Most expensive books first"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, price
+FROM books
+ORDER BY price DESC;`}
+/>
+
+```mermaid
+flowchart LR
+    A["unsorted result rows"] --> B["ORDER BY price DESC<br/>sort high to low"]
+    B --> C["ordered result rows"]
+```
+
+Text can be sorted too. For ordinary text, ascending order is
+alphabetical.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Alphabetical titles"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, author
+FROM books
+ORDER BY title;`}
+/>
+
+## Sort by more than one column
+
+You can give SQLite a first sort key, then a second sort key for ties.
+Think of sorting books by genre first, and then by price inside each
+genre.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Genre first, price within genre"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT genre, title, price
+FROM books
+ORDER BY genre ASC, price DESC;`}
+/>
+
+```mermaid
+flowchart TB
+    A["ORDER BY genre ASC, price DESC"] --> B["first key<br/>genre A to Z"]
+    B --> C["tie breaker<br/>price high to low"]
+    C --> D["final sorted result"]
+```
+
+The order of columns in `ORDER BY` sets priority. The first column is
+the main sort. Later columns break ties.
+
+## LIMIT keeps the first rows of the sorted result
+
+`LIMIT n` keeps only the first `n` rows. When you use it with
+`ORDER BY`, you can ask for "top N" or "bottom N" lists.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Three cheapest books"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, price
+FROM books
+ORDER BY price ASC
+LIMIT 3;`}
+/>
+
+<Callout type="warning" title="LIMIT needs order when meaning matters">
+`LIMIT 3` without `ORDER BY` means "some three rows." If you mean the
+cheapest three, newest three, or first three alphabetically, sort first.
+</Callout>
+
+## OFFSET skips rows
+
+`OFFSET n` skips the first `n` rows before returning results. Combined
+with `LIMIT`, it is how websites make pages of results.
+
+```mermaid
+flowchart LR
+    A["all matching rows"] --> S["ORDER BY<br/>sort rows"]
+    S --> O["OFFSET 2<br/>skip two"]
+    O --> L["LIMIT 2<br/>take two"]
+    L --> R["page result"]
+```
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Second page of two books"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, price
+FROM books
+ORDER BY price ASC
+LIMIT 2 OFFSET 2;`}
+/>
+
+This orders all books by price, skips the two cheapest, then returns the
+next two.
+
+## Clause order
+
+When these clauses appear together, write them in this order:
+
+```mermaid
+flowchart LR
+    A["SELECT<br/>columns"] --> B["FROM<br/>table"]
+    B --> C["WHERE<br/>filter rows"]
+    C --> D["ORDER BY<br/>sort rows"]
+    D --> E["LIMIT and OFFSET<br/>trim result"]
+```
+
+You can leave out `WHERE`, `ORDER BY`, `LIMIT`, or `OFFSET` when you do
+not need them. But if you include them, keep the order shown above.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Filter, sort, and limit together"
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  initialCode={`SELECT title, genre, price
+FROM books
+WHERE price < 25
+ORDER BY price DESC
+LIMIT 2;`}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which clause sorts query results into a deliberate order?
+
+- WHERE
+  > WHERE filters rows; it does not sort them.
+- [o] ORDER BY
+  > ORDER BY arranges result rows by one or more columns.
+- LIMIT
+  > LIMIT controls how many rows are returned.
+- SELECT
+  > SELECT chooses columns, not row order.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is LIMIT usually paired with ORDER BY?
+
+- LIMIT cannot run without ORDER BY.
+  > SQLite allows LIMIT without ORDER BY, but the meaning is weak.
+- [o] Rows have no reliable natural order, so sorting makes the chosen rows meaningful.
+  > ORDER BY defines which rows count as first, cheapest, newest, or top.
+- ORDER BY deletes extra rows.
+  > LIMIT trims the result; ORDER BY only sorts it.
+- LIMIT changes ascending order into descending order.
+  > ASC and DESC control sort direction.`}
+/>
+
+<MultipleChoice
+  markdown={`What does LIMIT 2 OFFSET 2 do after results have been sorted?
+
+- Returns the first four rows.
+  > LIMIT 2 returns only two rows.
+- [o] Skips the first two rows and returns the next two.
+  > OFFSET skips rows before LIMIT takes rows.
+- Skips the first four rows.
+  > OFFSET 2 skips two, not four.
+- Returns every row except the first two.
+  > LIMIT 2 still caps the result at two rows.`}
+/>
+
+<MultipleChoice
+  markdown={`In ORDER BY genre ASC, price DESC, what is the first priority?
+
+- price descending
+  > Price is the second key, so it breaks ties within a genre.
+- [o] genre ascending
+  > The first expression in ORDER BY is the primary sort key.
+- title alphabetical
+  > Title is not listed in the ORDER BY clause.
+- row insertion order
+  > ORDER BY replaces any reliance on insertion order.`}
+/>

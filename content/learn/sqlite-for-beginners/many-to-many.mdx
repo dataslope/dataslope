@@ -1,0 +1,298 @@
+---
+title: Many-to-Many Relationships
+description: Learn why SQLite many-to-many relationships need a junction table and how to join through it.
+---
+
+Some relationships are not one-to-many. A student can take many courses, and a course can have many students. That is a **many-to-many** relationship.
+
+```mermaid
+flowchart LR
+    S1["Ada"] --- C1["Math"]
+    S1 --- C2["History"]
+    S2["Grace"] --- C1
+    S2 --- C3["Art"]
+    S3["Linus"] --- C2
+```
+
+Ada connects to more than one course. Math connects to more than one student. A single foreign-key column on either table cannot describe all those crossings.
+
+## Why one foreign key is not enough
+
+If you put `course_id` on `students`, each student could store only one course. If you put `student_id` on `courses`, each course could store only one student. Both designs lose information.
+
+```mermaid
+flowchart TB
+    Bad1["students.course_id"] --> Problem1["one student row<br/>can point to only one course"]
+    Bad2["courses.student_id"] --> Problem2["one course row<br/>can point to only one student"]
+    Problem1 --> Need["need many links<br/>on both sides"]
+    Problem2 --> Need
+```
+
+<MultipleChoice
+  markdown={`Why can't a single \`course_id\` column on \`students\` represent students and courses correctly?
+
+- SQLite does not allow integer columns.
+  > SQLite commonly uses integer id columns.
+- [o] One column value can point to only one course for each student row.
+  > A student who takes Math and History needs two separate links.
+- Course names are too long.
+  > The problem is relationship shape, not text length.
+- Primary keys cannot be joined.
+  > Primary keys are often joined to foreign keys.
+
+Many-to-many means both sides need multiple links, so one pointer column is not enough.`}
+/>
+
+## The junction table
+
+The solution is a third table between them. It is often called a **junction table**, **bridge table**, or **join table**.
+
+Each row in the junction table stores one connection:
+
+```text
+student 1 is enrolled in course 10
+student 1 is enrolled in course 11
+student 2 is enrolled in course 10
+```
+
+```mermaid
+erDiagram
+    STUDENT ||--o{ ENROLLMENT : "has enrollment"
+    COURSE ||--o{ ENROLLMENT : "has enrollment"
+    STUDENT {
+        integer id PK
+        text name
+    }
+    COURSE {
+        integer id PK
+        text title
+    }
+    ENROLLMENT {
+        integer student_id PK,FK
+        integer course_id PK,FK
+        text enrolled_on
+    }
+```
+
+Read the diagram as two one-to-many relationships:
+
+- one student can have many enrollment rows
+- one course can have many enrollment rows
+
+The many-to-many relationship becomes two ordinary one-to-many relationships meeting in the middle.
+
+## Build the three tables
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Students, courses, and enrollments"
+  initSql={`CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE courses (
+  id INTEGER PRIMARY KEY,
+  title TEXT
+);
+CREATE TABLE enrollments (
+  student_id INTEGER REFERENCES students(id),
+  course_id INTEGER REFERENCES courses(id),
+  enrolled_on TEXT,
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'),
+  (2, 'Grace'),
+  (3, 'Linus');
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'),
+  (11, 'History'),
+  (12, 'Art');
+INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
+  (1, 10, '2024-09-01'),
+  (1, 11, '2024-09-02'),
+  (2, 10, '2024-09-01'),
+  (2, 12, '2024-09-03'),
+  (3, 11, '2024-09-02');`}
+  initialCode={`SELECT * FROM enrollments ORDER BY student_id, course_id;`}
+/>
+
+The primary key is the pair `(student_id, course_id)`. That means the same student cannot be enrolled in the same course twice.
+
+```mermaid
+flowchart LR
+    S["students"] -->|"student_id"| E["enrollments<br/>one row per link"]
+    E -->|"course_id"| C["courses"]
+```
+
+## Join across the bridge
+
+To show names and course titles, start at `enrollments` and join outward to both parent tables.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="List students and their courses"
+  initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (
+  student_id INTEGER,
+  course_id INTEGER,
+  enrolled_on TEXT,
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
+  (1, 10, '2024-09-01'),
+  (1, 11, '2024-09-02'),
+  (2, 10, '2024-09-01'),
+  (2, 12, '2024-09-03'),
+  (3, 11, '2024-09-02');`}
+  initialCode={`SELECT s.name, c.title, e.enrolled_on
+FROM enrollments e
+JOIN students s ON s.id = e.student_id
+JOIN courses c ON c.id = e.course_id
+ORDER BY s.name, c.title;`}
+/>
+
+```mermaid
+flowchart TB
+    E1["enrollment<br/>student_id 1<br/>course_id 10"] -->|"student_id = id"| S1["Ada"]
+    E1 -->|"course_id = id"| C1["Math"]
+    S1 --> R["Ada takes Math"]
+    C1 --> R
+```
+
+## Ask questions from either direction
+
+Because the junction table stores links, you can ask student-focused or course-focused questions without changing the design.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="How many students are in each course"
+  initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER, PRIMARY KEY (student_id, course_id));
+INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO enrollments (student_id, course_id) VALUES
+  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
+  initialCode={`SELECT c.title, COUNT(e.student_id) AS student_count
+FROM courses c
+JOIN enrollments e ON e.course_id = c.id
+GROUP BY c.id, c.title
+ORDER BY student_count DESC, c.title;`}
+/>
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="How many courses each student takes"
+  initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER, PRIMARY KEY (student_id, course_id));
+INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO enrollments (student_id, course_id) VALUES
+  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
+  initialCode={`SELECT s.name, COUNT(e.course_id) AS course_count
+FROM students s
+JOIN enrollments e ON e.student_id = s.id
+GROUP BY s.id, s.name
+ORDER BY course_count DESC, s.name;`}
+/>
+
+## Junction tables can hold facts about the relationship
+
+A value like `grade` or `enrolled_on` belongs on `enrollments`, because it describes a particular student-course pairing. Ada's grade in Math is not just a fact about Ada, and it is not just a fact about Math. It is a fact about Ada taking Math.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Store relationship details on the junction row"
+  initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (
+  student_id INTEGER,
+  course_id INTEGER,
+  grade TEXT,
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO enrollments (student_id, course_id, grade) VALUES
+  (1, 10, 'A'),
+  (1, 11, 'B'),
+  (2, 10, 'A'),
+  (2, 12, 'A'),
+  (3, 11, 'B');`}
+  initialCode={`SELECT s.name, c.title, e.grade
+FROM enrollments e
+JOIN students s ON s.id = e.student_id
+JOIN courses c ON c.id = e.course_id
+ORDER BY s.name, c.title;`}
+/>
+
+<Callout type="info" title="Naming junction tables">
+Use a name that describes the relationship: \`enrollments\`, \`memberships\`, \`order_items\`, \`book_authors\`. The table is not just plumbing; it represents real connections.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a junction table?
+
+- A copy of two complete tables pasted together.
+  > A junction table stores links, not duplicate copies of all data.
+- [o] A table that stores one row per connection between two related tables.
+  > Each row usually contains a foreign key to each side.
+- A table with no primary key or foreign keys.
+  > Junction tables usually rely heavily on keys.
+- A table used only for sorting results.
+  > Its purpose is to model relationships.
+
+A junction table turns a many-to-many relationship into stored link rows.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`enrollments(student_id, course_id)\`, what does one row represent?
+
+- One student by themselves.
+  > Student details live in the students table.
+- One course by itself.
+  > Course details live in the courses table.
+- [o] One student-course connection.
+  > The two ids together say that a specific student is enrolled in a specific course.
+- Every student in every course.
+  > One row represents one connection, not all connections.
+
+The junction row is the relationship instance.`}
+/>
+
+<MultipleChoice
+  markdown={`Why use \`PRIMARY KEY (student_id, course_id)\` on enrollments?
+
+- It makes every student take exactly one course.
+  > Students can still appear in many rows with different courses.
+- [o] It prevents the exact same student-course pair from being inserted twice.
+  > The pair must be unique, while each individual id can repeat.
+- It prevents a course from having many students.
+  > A course id can still appear in many enrollment rows.
+- It hides the table from joins.
+  > Primary keys do not hide tables.
+
+The composite primary key protects the uniqueness of each link.`}
+/>
+
+<MultipleChoice
+  markdown={`Where should a \`grade\` for Ada in Math be stored?
+
+- On Ada's student row only.
+  > Ada may have different grades in different courses.
+- On the Math course row only.
+  > Each student may have a different grade in Math.
+- [o] On the enrollment row connecting Ada to Math.
+  > The grade describes that specific relationship.
+- In both students and courses as copied text.
+  > Copying the same fact into multiple places creates inconsistency.
+
+Facts about the pairing belong in the junction table.`}
+/>
