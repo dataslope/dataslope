@@ -65,7 +65,7 @@ samp {
 
 /* Light mode hover (non-active items) */
 :root:not(.dark) #nd-sidebar a:hover:not([data-active="true"]),
-:root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]) {
+:root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: hsl(0, 0%, 97%);
 }
 
@@ -76,7 +76,7 @@ samp {
 
 /* Dark mode hover (non-active items) */
 .dark #nd-sidebar a:hover:not([data-active="true"]),
-.dark #nd-sidebar button:hover:not([data-active="true"]) {
+.dark #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: rgba(255, 255, 255, 0.04);
 }
 

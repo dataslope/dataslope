@@ -384,7 +384,6 @@
 
 .instructions {
   padding: 4px 20px 18px;
-  border-bottom: 1px solid var(--ch-border-light);
   background: var(--ch-bg);
 }
 
@@ -1977,6 +1976,19 @@
   box-shadow: none;
 }
 
+/* In dark mode the Run/Submit button is white, so its embedded kbd chips
+   need dark-on-light colors (the light-mode rule uses white-on-dark). */
+:global(html.dark) .runBtn .btnKbd .kbd {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.16);
+  color: rgba(0, 0, 0, 0.72);
+  box-shadow: none;
+}
+
+:global(html.dark) .runBtn .btnKbd .kbdSep {
+  color: rgba(0, 0, 0, 0.4);
+}
+
 :global(html.dark) .testItem {
   background: #0d0d0d;
   border-color: #2a2a2a;
@@ -2124,7 +2136,6 @@
   display: flex;
   align-items: stretch;
   gap: 0;
-  background: var(--ch-bg-subtle);
   border-top: 1px solid var(--ch-border-light);
   border-bottom: 1px solid var(--ch-border-light);
   overflow-x: auto;
