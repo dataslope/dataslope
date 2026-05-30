@@ -360,6 +360,10 @@ code.hljs {
    - .nd-codeblock, pre, code         code blocks
    - [data-rehype-pretty-code-figure] Fumadocs syntax-highlighted code
    - [data-callout], .callout         legacy callout selectors (kept for safety)
+   - svg *                            Mermaid renders labels as <p> inside
+                                      <foreignObject>; forcing 1.125rem here
+                                      overrides Mermaid's own font-size and the
+                                      text overflows its measured node boxes
    - h1–h6                            headings (handled separately)
    Optical size axis (opsz) is enabled via font-variation-settings so the
    typeface self-optimises at body text sizes. Letter-spacing resets to 0
@@ -371,7 +375,8 @@ code.hljs {
   :where([data-testid="challenge-card"] *),
   :where([aria-label="Multiple choice question"] *),
   :where(.nd-codeblock *, pre *, [data-rehype-pretty-code-figure] *),
-  :where([data-callout] *, .callout *)
+  :where([data-callout] *, .callout *),
+  :where(svg *)
 ) {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-size: 1.125rem;
