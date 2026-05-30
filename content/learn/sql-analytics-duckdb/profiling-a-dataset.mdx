@@ -1,0 +1,207 @@
+---
+title: Profiling a Dataset
+description: The analyst's first ten minutes with new data — counting rows, checking ranges, measuring distinctness, and finding missing values. DuckDB's SUMMARIZE makes it nearly automatic.
+---
+
+When an analyst opens an unfamiliar dataset, they do not start with the
+interesting business question. They start by **profiling** it: a few quick
+queries that reveal the data's size, range, distinctness, and gaps.
+Skipping this step is how analysts get fooled — by duplicates, missing
+values, or a date column that secretly stops in March. This page is the
+profiling checklist, expressed in SQL.
+
+## Why profile first
+
+A dataset can lie to you in quiet ways:
+
+- It is **smaller or larger** than you assumed.
+- A column has **far fewer distinct values** than expected (or far more).
+- Some values are **missing** (`NULL`), silently dropping rows from
+  averages.
+- The **range** is wrong — dates that stop early, amounts that go
+  negative.
+
+Profiling surfaces these before they corrupt a conclusion. Think of it as
+checking the ingredients before you cook.
+
+```mermaid
+flowchart LR
+    N["New, unfamiliar<br/>dataset"] --> P["Profile it"]
+    P --> Q1["How many rows?"]
+    P --> Q2["What ranges?"]
+    P --> Q3["How distinct?"]
+    P --> Q4["Any NULLs?"]
+    Q1 --> T["Trustworthy<br/>mental model"]
+    Q2 --> T
+    Q3 --> T
+    Q4 --> T
+```
+
+## Size and range
+
+The first two questions are always *how many rows* and *what does the key
+column span*. `COUNT(*)`, `MIN`, and `MAX` answer both at once.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Size and span in one query"
+  initSql={`CREATE TABLE signups AS
+SELECT
+  i                              AS id,
+  DATE '2024-01-01' + (i % 200)  AS signup_date,
+  (i * 11) % 5                    AS plan_id
+FROM range(1, 1201) t(i);`}
+  initialCode={`SELECT
+  COUNT(*)          AS rows,
+  MIN(signup_date)  AS earliest,
+  MAX(signup_date)  AS latest
+FROM signups;`}
+/>
+
+In seconds you learn the table's size and the window of time it covers —
+without scrolling a single row.
+
+## Distinctness: `COUNT(DISTINCT ...)`
+
+How many *different* values does a column hold? This reveals whether a
+column is a category (a few values), an identifier (all unique), or
+something in between. The gap between `COUNT(*)` and `COUNT(DISTINCT id)`
+also reveals **duplicates**.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Distinct counts expose categories and duplicates"
+  initSql={`CREATE TABLE signups AS
+SELECT
+  i                              AS id,
+  DATE '2024-01-01' + (i % 200)  AS signup_date,
+  (i * 11) % 5                    AS plan_id
+FROM range(1, 1201) t(i);`}
+  initialCode={`SELECT
+  COUNT(*)                  AS rows,
+  COUNT(DISTINCT id)        AS distinct_ids,
+  COUNT(DISTINCT plan_id)   AS distinct_plans,
+  COUNT(DISTINCT signup_date) AS distinct_days
+FROM signups;`}
+/>
+
+If `distinct_ids` were less than `rows`, you would have duplicate ids — a
+red flag worth investigating before trusting any per-id summary.
+
+## Missing values: counting `NULL`s
+
+`COUNT(column)` ignores `NULL`s, while `COUNT(*)` counts every row. The
+difference is exactly the number of missing values — a one-line null
+check.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Find the missing emails"
+  initSql={`CREATE TABLE users (
+  id INTEGER, email TEXT, country TEXT
+);
+INSERT INTO users VALUES
+  (1, 'a@x.com', 'US'), (2, NULL, 'US'), (3, 'c@x.com', NULL),
+  (4, NULL, 'CA'), (5, 'e@x.com', 'US'), (6, 'f@x.com', NULL);`}
+  initialCode={`SELECT
+  COUNT(*)                        AS rows,
+  COUNT(email)                    AS has_email,
+  COUNT(*) - COUNT(email)         AS missing_email,
+  COUNT(*) - COUNT(country)       AS missing_country
+FROM users;`}
+/>
+
+Knowing *how many* values are missing tells you whether a column is
+trustworthy or needs cleaning before analysis.
+
+## The shortcut: `SUMMARIZE`
+
+DuckDB bundles the whole profiling checklist into one keyword:
+**`SUMMARIZE`**. Prefix any table or query with it and DuckDB returns, per
+column, the count, number of distinct values, null percentage, min, max,
+average, and approximate quantiles.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Profile every column at once with SUMMARIZE"
+  initSql={`CREATE TABLE orders AS
+SELECT
+  i                                            AS id,
+  DATE '2024-01-01' + (i % 90)                 AS order_date,
+  ['Books','Electronics','Home'][(i % 3) + 1]  AS category,
+  (i * 13) % 300 + 20                          AS amount
+FROM range(1, 501) t(i);`}
+  initialCode={`SUMMARIZE orders;`}
+/>
+
+One line, a complete profile. `SUMMARIZE` is the first thing many DuckDB
+analysts type when they meet a new table — it answers size, range,
+distinctness, and nulls for *every* column simultaneously.
+
+```mermaid
+flowchart LR
+    S["SUMMARIZE table"] --> R["Per-column report:<br/>count, distinct,<br/>null %, min, max,<br/>avg, quantiles"]
+```
+
+## The profiling checklist
+
+Before analyzing any new dataset, answer:
+
+1. **How many rows?** (`COUNT(*)`)
+2. **What range does the key/date span?** (`MIN`, `MAX`)
+3. **How distinct is each important column?** (`COUNT(DISTINCT ...)`)
+4. **Are there duplicates?** (`COUNT(*)` vs `COUNT(DISTINCT id)`)
+5. **What is missing?** (`COUNT(*) - COUNT(column)`)
+
+Or just run `SUMMARIZE` and read the lot at a glance.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A table has \`COUNT(*) = 1000\` but \`COUNT(DISTINCT id) = 980\`. What does this most likely indicate?
+
+- The \`id\` column has 20 NULL values.
+  > \`COUNT(DISTINCT id)\` already ignores NULLs; the gap here points to repeated id *values*, i.e. duplicates.
+- [o] There are duplicate \`id\` values — 1000 rows but only 980 unique ids.
+  > When distinct ids are fewer than total rows, some ids repeat, which usually signals duplicate rows worth investigating.
+- The query is invalid.
+  > Both counts are valid; their difference is meaningful information.
+- The table is sorted incorrectly.
+  > Sort order has no effect on these counts; the gap is about duplicate values.
+
+Total rows exceeding distinct ids is the classic signature of duplicates.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you count the **missing** values in a column \`email\`?
+
+- \`COUNT(email)\` gives the number of missing values directly.
+  > \`COUNT(email)\` counts the *present* (non-NULL) values, not the missing ones.
+- [o] \`COUNT(*) - COUNT(email)\`, because \`COUNT(*)\` counts all rows and \`COUNT(email)\` skips NULLs.
+  > The difference between total rows and non-NULL emails is exactly the count of missing emails.
+- \`SUM(email)\`, which adds up the NULLs.
+  > You cannot \`SUM\` a text column, and NULLs are not summed; this does not count missing values.
+- It is impossible to count NULLs in SQL.
+  > NULLs are easy to count via the \`COUNT(*) - COUNT(col)\` difference (or other null checks).
+
+\`COUNT(*)\` counts every row; \`COUNT(col)\` counts non-NULLs; their
+difference is the number of missing values.`}
+/>
+
+<MultipleChoice
+  markdown={`What does DuckDB's \`SUMMARIZE\` keyword do?
+
+- It deletes summary rows from a table.
+  > \`SUMMARIZE\` produces a report; it changes nothing in the table.
+- [o] It returns a per-column profile — count, distinct values, null percentage, min, max, average, and quantiles — for a table or query.
+  > \`SUMMARIZE\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
+- It permanently sorts the table by every column.
+  > It neither sorts nor modifies the table; it only reports statistics.
+- It is an alias for \`GROUP BY\`.
+  > \`SUMMARIZE\` describes columns; \`GROUP BY\` groups rows for aggregation. They are unrelated.
+
+\`SUMMARIZE\` is a one-keyword profile of every column in a dataset.`}
+/>
+
+With a trustworthy mental model in hand, you can start carving the data
+into the slices you care about — which is exactly the next page.
