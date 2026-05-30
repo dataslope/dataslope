@@ -20,7 +20,6 @@ import { source } from "@/lib/source";
 const sourceSerif4 = Source_Serif_4({
   subsets: ["latin"],
   axes: ["opsz"],
-  weight: ["400", "600"],
   style: ["normal", "italic"],
   variable: "--font-serif",
   display: "swap",
