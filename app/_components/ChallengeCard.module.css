@@ -1976,6 +1976,37 @@
   box-shadow: none;
 }
 
+/* Restore original blue accent for Run/Submit buttons in dark mode.
+   The base style uses #1a1a1a for light-mode contrast; dark mode reverts
+   to the standard accent (blue) so the button reads as a primary action. */
+:global(html.dark) .runBtn {
+  background: #2563eb;
+}
+
+:global(html.dark) .runBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+:global(html.dark) .runBtn:disabled {
+  background: #93c5fd;
+}
+
+:global(html.dark) .runBtnChevron {
+  background: #2563eb;
+}
+
+:global(html.dark) .runBtnChevron:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+:global(html.dark) .runBtnChevron:disabled {
+  background: #93c5fd;
+}
+
+:global(html.dark) .runBtnChevron[data-popup-open] {
+  background: #1d4ed8;
+}
+
 :global(html.dark) .testItem {
   background: #0d0d0d;
   border-color: #2a2a2a;

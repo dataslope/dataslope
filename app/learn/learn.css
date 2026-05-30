@@ -327,6 +327,7 @@ code.hljs {
 ) {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-size: 1.125rem;
+  line-height: 1.75;
   font-variation-settings: "opsz" 16;
   letter-spacing: 0;
 }
