@@ -116,7 +116,7 @@ samp {
   color: hsl(0, 0%, 58%);
 }
 .dark #nd-sidebar div.border.rounded-lg svg {
-  color: hsl(0, 0%, 44%);
+  color: hsl(0, 0%, 80%);
 }
 
 /* Item 3: Dark mode — make the sidebar use the same background as the content
