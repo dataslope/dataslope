@@ -1,0 +1,176 @@
+---
+title: Filtering Groups with HAVING
+description: WHERE filters rows before grouping; HAVING filters groups after aggregating. Why analysts need both, and how to keep them straight.
+---
+
+You can summarize per group. Now you want to keep only the *interesting*
+groups — "regions with revenue over \$1000", "customers with more than 10
+orders", "products averaging below 3 stars." That is **`HAVING`**: a
+filter that runs *after* aggregation, on the group summaries themselves.
+The hardest part is keeping it distinct from `WHERE`, so that is what this
+page nails down.
+
+## Two filters, two moments
+
+`WHERE` and `HAVING` both filter — but at different stages of the query.
+
+- **`WHERE`** runs **before** grouping. It filters individual *rows*, so
+  it can only see raw columns, never group totals.
+- **`HAVING`** runs **after** grouping. It filters whole *groups*, so it
+  can see aggregates like `SUM(amount)`.
+
+```mermaid
+flowchart LR
+    R[("Rows")] --> W["WHERE<br/>(filter rows)"]
+    W --> G["GROUP BY<br/>(form groups)"]
+    G --> A["aggregate<br/>(per-group totals)"]
+    A --> H["HAVING<br/>(filter groups)"]
+    H --> O["ORDER BY"]
+```
+
+That single diagram is the whole mental model. `WHERE` is upstream of the
+groups; `HAVING` is downstream. A condition that mentions an aggregate
+*must* go in `HAVING`, because the aggregate does not exist yet when
+`WHERE` runs.
+
+## `HAVING` in action
+
+"Which regions brought in more than \$150 of revenue?" The condition is
+about `SUM(amount)` — a group total — so it belongs in `HAVING`.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Only the high-revenue regions"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),
+  (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',30);`}
+  initialCode={`SELECT
+  region,
+  SUM(amount) AS revenue
+FROM orders
+GROUP BY region
+HAVING SUM(amount) > 150     -- filter on the group total
+ORDER BY revenue DESC;`}
+/>
+
+North (60) and any other small region are dropped *after* their totals
+are computed. You cannot express this with `WHERE`, because at `WHERE`
+time there is no per-region total to compare against.
+
+## Using `WHERE` and `HAVING` together
+
+They are not rivals — analysts routinely use both in one query, each doing
+its proper job: `WHERE` narrows the rows that *enter* the groups; `HAVING`
+selects which resulting groups *survive*.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Filter rows first, then filter groups"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West','paid',120),(2,'East','paid',80),(3,'West','refunded',45),
+  (4,'East','paid',200),(5,'North','paid',60),(6,'West','paid',95),
+  (7,'East','refunded',300),(8,'North','paid',100);`}
+  initialCode={`SELECT
+  region,
+  COUNT(*)    AS paid_orders,
+  SUM(amount) AS paid_revenue
+FROM orders
+WHERE status = 'paid'           -- 1) keep only paid rows
+GROUP BY region
+HAVING SUM(amount) > 150        -- 2) keep only big-revenue regions
+ORDER BY paid_revenue DESC;`}
+/>
+
+Read it as a pipeline: *"Of the **paid** orders, group by region, and show
+only regions whose paid revenue exceeds \$150."* The refunded rows never
+enter the groups at all — and that changes the totals `HAVING` then
+judges.
+
+## The classic mistake
+
+Putting an aggregate in `WHERE` is the error everyone makes once:
+
+```sql
+-- ❌ Wrong: SUM() does not exist yet when WHERE runs
+SELECT region, SUM(amount)
+FROM orders
+WHERE SUM(amount) > 150
+GROUP BY region;
+```
+
+DuckDB rejects this because `WHERE` filters rows *before* any grouping or
+summing happens. Move the aggregate condition to `HAVING` and it works.
+The reverse mistake — putting a plain row condition in `HAVING` — usually
+runs but is wasteful: filter rows in `WHERE` so fewer rows ever reach the
+grouping step.
+
+```mermaid
+flowchart LR
+    Cond1["Condition on a raw column<br/>(status = 'paid')"] --> Where["belongs in WHERE"]
+    Cond2["Condition on an aggregate<br/>(SUM(amount) > 150)"] --> Having["belongs in HAVING"]
+```
+
+## A quick decision rule
+
+Ask: *does my condition mention an aggregate?*
+
+- **No** (it is about a single row's column) → `WHERE`.
+- **Yes** (it is about a group total/average/count) → `HAVING`.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the key difference between \`WHERE\` and \`HAVING\`?
+
+- \`WHERE\` is for numbers and \`HAVING\` is for text.
+  > Both work with any data type; the difference is *when* they run, not what type they filter.
+- [o] \`WHERE\` filters individual rows before grouping; \`HAVING\` filters groups after aggregates are computed.
+  > \`WHERE\` runs upstream of \`GROUP BY\` (raw rows), while \`HAVING\` runs downstream (group summaries).
+- \`HAVING\` runs before \`WHERE\`.
+  > The order is \`WHERE\` then \`GROUP BY\` then \`HAVING\`; \`HAVING\` runs later, not earlier.
+- They are interchangeable synonyms.
+  > They filter at different stages and can see different things, so they are not interchangeable.
+
+\`WHERE\` filters rows pre-grouping; \`HAVING\` filters groups post-aggregation.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`WHERE SUM(amount) > 150\` fail?
+
+- \`SUM\` is not a valid function.
+  > \`SUM\` is valid; the problem is *where* it is used.
+- [o] \`WHERE\` runs before grouping, so per-group sums do not exist yet — aggregate conditions belong in \`HAVING\`.
+  > At \`WHERE\` time there are only individual rows, no group totals, so \`SUM(amount)\` cannot be evaluated there.
+- \`WHERE\` cannot compare numbers with \`>\`.
+  > \`WHERE\` compares numbers fine; the issue is the aggregate, not the operator.
+- You must always use \`SUM\` in \`WHERE\`.
+  > You must *never* use an aggregate in \`WHERE\`; it goes in \`HAVING\`.
+
+Aggregate conditions must go in \`HAVING\` because aggregates are computed
+after \`WHERE\`.`}
+/>
+
+<MultipleChoice
+  markdown={`A query keeps only **paid** orders, groups by region, and keeps regions with revenue over \$1000. Where does each condition go?
+
+- Both conditions go in \`HAVING\`.
+  > \`status = 'paid'\` is a per-row condition and should filter rows in \`WHERE\`, before grouping.
+- Both conditions go in \`WHERE\`.
+  > \`revenue > 1000\` uses \`SUM\`, an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
+- [o] \`status = 'paid'\` goes in \`WHERE\`; \`SUM(amount) > 1000\` goes in \`HAVING\`.
+  > The row-level condition filters rows before grouping; the aggregate condition filters groups after summing.
+- The query is impossible in SQL.
+  > Combining \`WHERE\` and \`HAVING\` in one query is common and fully valid.
+
+Row conditions → \`WHERE\`; aggregate conditions → \`HAVING\`.`}
+/>
+
+You have now mastered summarization: aggregates, grouping, multi-level
+subtotals, and group filtering. Next comes a different superpower —
+**window functions**, which summarize *without collapsing* the rows.
