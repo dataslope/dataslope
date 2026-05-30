@@ -217,7 +217,7 @@ Closely related to scope is **lifetime**: the period of time during
 *execution* when the variable's memory is valid.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["{ ... declare x"] -->|x is born| B[use x]
     B -->|use x| C[use x]
     C -->|scope closes| D[x is destroyed]

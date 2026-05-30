@@ -65,7 +65,7 @@ does:
 - Function calls push a frame on the stack and `return` pops it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[C source] -->|clang / gcc| B[Machine code]
     B -->|loads into| C[Process address space]
     C --> D[CPU executes<br/>one instruction<br/>at a time]

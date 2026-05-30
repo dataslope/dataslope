@@ -81,7 +81,7 @@ is messy:
 Almost any real-world messiness fits one of these.
 
 ```mermaid
-flowchart LR
+flowchart TD
   raw["Raw / messy data"] -->|"pivot_longer / pivot_wider"| reshape["Reshape"]
   reshape -->|"separate / unite"| split["Split combined columns"]
   split -->|"join / split into multiple tables"| sep["Separate observational units"]

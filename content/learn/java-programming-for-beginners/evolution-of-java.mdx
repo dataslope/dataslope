@@ -16,7 +16,7 @@ the browser downloaded and ran in a sandbox. Applets did simple
 animations, calculators, simple games, and proof-of-concept demos.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Page[Web page HTML]
     Page -->|<applet> tag| Browser
     Browser -->|download| Server[Web server: .class]
@@ -116,7 +116,7 @@ We will not use most of these advanced features in this course, but
 it is worth knowing they exist. Java is not standing still.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Java 1<br/>1996<br/>Applets] --> B[Java 5<br/>2004<br/>Generics, enums]
     B --> C[Java 8<br/>2014<br/>Lambdas, streams]
     C --> D[Java 11<br/>2018<br/>Modern LTS]

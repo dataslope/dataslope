@@ -38,7 +38,7 @@ cleaned up automatically — even if an exception is thrown, even if
 the function has many `return` paths.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Function entry] --> B[Construct resource owner<br/>acquires resource]
     B --> C[Use the resource]
     C -->|normal return| D[Destructor runs<br/>releases resource]

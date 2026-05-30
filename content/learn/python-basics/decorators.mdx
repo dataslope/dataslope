@@ -58,7 +58,7 @@ greet = shout(greet)
 The decorator `shout` takes the original `greet`, wraps it in a new function that uppercases the result, and replaces `greet` with that wrapper.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Original function] --> B[Decorator]
     B --> C[Wrapper function]
     C --> D[Wrapped function replaces original]

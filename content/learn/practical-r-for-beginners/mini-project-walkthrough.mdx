@@ -41,7 +41,7 @@ What we learn:
 - `Temp` is in degrees Fahrenheit.
 
 ```mermaid
-flowchart LR
+flowchart TD
   load["Load airquality"] --> insp["Inspect: dim, head, str, summary"]
   insp --> tidy["Tidy: NAs, types, factor for Month"]
   tidy --> trans["Transform: add °C, monthly summaries"]

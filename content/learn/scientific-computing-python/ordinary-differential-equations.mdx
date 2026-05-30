@@ -26,7 +26,7 @@ differences are *how* the prediction is made and *how* the step
 size $h$ is chosen.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Y0[y at tₙ] --> Eval[evaluate f at one or more points]
     Eval --> Step[combine slopes →<br/>predict y at tₙ+h]
     Step --> Est[estimate local error]

@@ -40,7 +40,7 @@ Intermediate Language, sometimes called IL), and the CLR
 just-in-time compiles it to real machine code as it runs.
 
 ```mermaid
-flowchart LR
+flowchart TD
     SRC["Source (C#, F#, VB.NET, ...)"] --> COMP["Compiler"]
     COMP --> IL["CIL (Intermediate Language)<br/>.dll / .exe"]
     IL --> CLR["CLR<br/>(JIT + GC + type checks)"]

@@ -121,7 +121,7 @@ cleanup is the magic that makes RAII possible.
 ## Lifecycle of an object
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Allocate storage] --> B[Constructor runs:<br/>initializer list, then body]
     B --> C[Object is alive<br/>methods may be called]
     C --> D[Destructor runs:<br/>release resources]

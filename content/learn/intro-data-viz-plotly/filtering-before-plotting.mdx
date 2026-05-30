@@ -23,7 +23,7 @@ If you skip the filter, the chart drowns in noise. Worse, the
 chart may *technically* be correct but answer the wrong question.
 
 ```mermaid
-flowchart LR
+flowchart TD
     R[Raw data<br/>2M rows] --> F[Filter to<br/>relevant slice]
     F --> A[Aggregate if needed]
     A --> P[Plot]

@@ -120,7 +120,7 @@ they hand a result back to JS by **scheduling a task**.
 A simplified picture:
 
 ```mermaid
-flowchart LR
+flowchart TD
     JS[JS Engine + Call Stack] -->|"calls e.g. setTimeout(fn, 100)"| HOST[Host]
     HOST -->|after 100ms| Q[Task Queue]
     Q -->|when stack is empty| JS

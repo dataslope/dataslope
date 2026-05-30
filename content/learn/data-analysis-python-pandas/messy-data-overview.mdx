@@ -34,7 +34,7 @@ what you did.
 ## A canonical workflow
 
 ```mermaid
-flowchart LR
+flowchart TD
     R[Raw data] --> I[Inspect:<br/>shape, dtypes,<br/>head, describe]
     I --> D[Detect issues:<br/>NaN, duplicates,<br/>outliers, types]
     D --> P[Plan fixes:<br/>drop? fix?<br/>impute? flag?]

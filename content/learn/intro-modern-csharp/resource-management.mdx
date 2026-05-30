@@ -30,7 +30,7 @@ memory on the heap. When nothing points to that object anymore,
 the GC eventually reclaims the space:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["new Person()"] --> H["heap allocation"]
     H --> R["program holds reference"]
     R -->|reference dropped| O["object becomes unreachable"]

@@ -15,7 +15,7 @@ errors come from confusing one stage with another.
 The traditional C++ toolchain has four steps:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Source code<br/>.cpp + .h] --> P[1. Preprocess<br/>expand #include,<br/>#define, ifdef]
     P --> C[2. Compile<br/>parse, type-check,<br/>generate assembly]
     C --> AS[3. Assemble<br/>assembly to<br/>object code .o]
@@ -65,7 +65,7 @@ The actual **compiler** takes one translation unit and turns it into
 CPU. Inside, the compiler runs many sub-passes:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Translation unit] --> L[Lexer:<br/>text to tokens]
     L --> Pa[Parser:<br/>tokens to syntax tree]
     Pa --> Sm[Semantic analysis:<br/>type-check, lookup names]
@@ -216,7 +216,7 @@ header/implementation split exists to obey this rule even when many
 `.cpp` files need to *use* the same function.
 
 ```mermaid
-flowchart LR
+flowchart TD
     H[mathx.h<br/>declarations only] -->|"#include"| M1[main.cpp]
     H -->|"#include"| M2[other.cpp]
     H -->|"#include"| M3[third.cpp]

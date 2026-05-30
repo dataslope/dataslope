@@ -49,7 +49,7 @@ minimum in O(log n). Every chapter of this course pairs a structure
 with the operations it makes cheap (and the ones it makes expensive).
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Problem] --> B{What ops<br/>are hot?}
     B -->|lookup by key| C[Hash table]
     B -->|lookup by order| D[Balanced BST]

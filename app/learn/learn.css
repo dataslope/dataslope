@@ -54,43 +54,78 @@ samp {
   --color-fd-card: hsl(0, 0%, 100%);
 }
 
-/* Sidebar active + hover overrides — fumadocs defaults use blue-tinted
-   accent tokens that stand out too much. Non-layered rules beat Tailwind's
-   @layer utilities so these reliably win without !important. */
+/* Sidebar text + active/hover overrides.
+   Non-layered rules beat Tailwind's @layer utilities, so these win
+   without !important.
 
-/* Light mode active */
+   Base text: override --color-fd-muted-foreground inside the sidebar to
+   a higher-contrast value so page link labels are easy to read.
+   Active/hover: bump text further toward full foreground and add a
+   background tint so keyboard-focus and pointer state are visible. */
+
+/* Light mode — base text near-black, active + hover darker bg + text */
+:root:not(.dark) #nd-sidebar {
+  --color-fd-muted-foreground: hsl(0, 0%, 22%);
+}
+
 :root:not(.dark) #nd-sidebar [data-active="true"] {
   background-color: hsl(0, 0%, 94%);
+  color: hsl(0, 0%, 4%);
 }
 
-/* Light mode hover (non-active items) */
 :root:not(.dark) #nd-sidebar a:hover:not([data-active="true"]),
-:root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]) {
+:root:not(.dark) #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: hsl(0, 0%, 97%);
+  color: hsl(0, 0%, 4%);
 }
 
-/* Dark mode active — very subtle white overlay on the #121212 background */
+/* Dark mode — base text near-white, active + hover lighter bg + text */
+.dark #nd-sidebar {
+  --color-fd-muted-foreground: hsl(0, 0%, 82%);
+}
+
 .dark #nd-sidebar [data-active="true"] {
   background-color: rgba(255, 255, 255, 0.07);
+  color: hsl(0, 0%, 96%);
 }
 
-/* Dark mode hover (non-active items) */
 .dark #nd-sidebar a:hover:not([data-active="true"]),
-.dark #nd-sidebar button:hover:not([data-active="true"]) {
+.dark #nd-sidebar button:hover:not([data-active="true"]):not([aria-label="Toggle Theme"]) {
   background-color: rgba(255, 255, 255, 0.04);
+  color: hsl(0, 0%, 96%);
 }
 
-/* Item 2: Sidebar footer bar (GitHub icon + theme toggle) — remove the
-   input-like border and secondary background so it looks like plain icons. */
+/* Sidebar separator labels (rendered as <p> by Fumadocs SidebarSeparator)
+   should read as section dividers, not navigation targets — use a softer
+   color so they recede behind the linked page items. */
+:root:not(.dark) #nd-sidebar p {
+  color: hsl(0, 0%, 52%);
+}
+.dark #nd-sidebar p {
+  color: hsl(0, 0%, 48%);
+}
+
+/* Sidebar footer bar (GitHub icon + theme toggle SVGs) — remove the
+   input-like border and secondary background, and dim the icons so they
+   don't compete with the navigation links. */
 #nd-sidebar div.border.rounded-lg {
   background-color: transparent;
   border: none;
 }
+:root:not(.dark) #nd-sidebar div.border.rounded-lg svg {
+  color: hsl(0, 0%, 58%);
+}
+.dark #nd-sidebar div.border.rounded-lg svg {
+  color: hsl(0, 0%, 80%);
+}
 
 /* Item 3: Dark mode — make the sidebar use the same background as the content
-   area (#121212) instead of the default card color (#191919). */
+   area (#121212) instead of the default card color (#191919). Also bring
+   prose body text in line with the Fumadocs foreground token so it matches
+   the rest of the UI instead of defaulting to Tailwind Typography's gray. */
 .dark {
   --color-fd-card: var(--color-fd-background);
+  --tw-prose-body: var(--color-fd-foreground);
 }
 
 body {
@@ -285,6 +320,7 @@ h6 {
 /* Remove the border Tailwind Typography adds to inline <code> elements. */
 .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
   border: none;
+  white-space: nowrap;
 }
 
 /* Suppress the default hljs padding/background — our <pre> handles both. */
@@ -297,4 +333,52 @@ pre code.hljs {
 code.hljs {
   padding: 0;
   background: transparent;
+}
+
+/* ── Source Serif 4 for prose content ───────────────────────────────────
+   Applied to paragraphs, list items, and table cells inside Fumadocs
+   prose regions. Explicitly excluded:
+   - [data-flavor]                    SQL/non-SQL challenge cards & code blocks
+   - [data-testid="challenge-card"]   non-SQL challenge cards
+   - [aria-label="Multiple choice question"]  quiz components
+   - .nd-codeblock, pre, code         code blocks
+   - [data-rehype-pretty-code-figure] Fumadocs syntax-highlighted code
+   - .callout, [data-callout]         callout blocks
+   - h1–h6                            headings (handled separately)
+   Optical size axis (opsz) is enabled via font-variation-settings so the
+   typeface self-optimises at body text sizes. Letter-spacing resets to 0
+   to avoid the tight value set on `body` above bleeding into serif text.
+   ─────────────────────────────────────────────────────────────────────── */
+.prose :where(p, li, td, th):not(
+  :where([class~="not-prose"], [class~="not-prose"] *),
+  :where([data-flavor] *),
+  :where([data-testid="challenge-card"] *),
+  :where([aria-label="Multiple choice question"] *),
+  :where(.nd-codeblock *, pre *, [data-rehype-pretty-code-figure] *),
+  :where([data-callout] *, .callout *)
+) {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  font-variation-settings: "opsz" 16;
+  letter-spacing: 0;
+}
+
+/* Restore sans-serif inside challenge / quiz / code components in case any
+   of those elements happen to fall under a .prose ancestor. */
+[data-flavor] p,
+[data-flavor] li,
+[data-flavor] td,
+[data-flavor] th,
+[data-testid="challenge-card"] p,
+[data-testid="challenge-card"] li,
+[data-testid="challenge-card"] td,
+[data-testid="challenge-card"] th,
+[aria-label="Multiple choice question"] p,
+[aria-label="Multiple choice question"] li,
+[aria-label="Multiple choice question"] td,
+[aria-label="Multiple choice question"] th {
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: -0.011em;
 }

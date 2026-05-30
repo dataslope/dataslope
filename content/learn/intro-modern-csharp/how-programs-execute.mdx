@@ -15,7 +15,7 @@ CPU instructions, just build the mental model.
 ## The big picture
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Source code<br/>(.cs files)"] --> B["Compiler<br/>(Roslyn)"]
     B --> C["Intermediate Language<br/>(CIL / IL)"]
     C --> D["Runtime<br/>(.NET CLR or WebAssembly)"]

@@ -11,7 +11,7 @@ output."
 ## The four stages
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[1. Source<br/>Main.java] --> B[2. Compile<br/>javac]
     B --> C[3. Bytecode<br/>Main.class]
     C --> D[4. Run<br/>JVM]
@@ -149,7 +149,7 @@ behind the scenes. There is no shortcut around `.java → .class → run`
 — you just don't have to type it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Click Run] --> B[IDE silently invokes javac]
     B --> C[IDE silently invokes java]
     C --> D[You see output]

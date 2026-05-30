@@ -48,7 +48,7 @@ This minimal contract is exactly what makes LINQ work uniformly over
 arrays, files, network streams, and infinite sequences.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["IEnumerable&lt;T&gt;"] -->|GetEnumerator| B["IEnumerator&lt;T&gt;"]
     B -->|MoveNext| C{has next?}
     C -->|yes| D[Current → consumer]

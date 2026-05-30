@@ -120,7 +120,7 @@ A pipeline of operations can succeed or fail at any step. Picture it
 as two parallel tracks:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A([Input]) --> B[Step 1]
     B -->|Ok| C[Step 2]
     B -->|Err| F[(Error track)]

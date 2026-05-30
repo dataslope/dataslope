@@ -46,7 +46,7 @@ Plus one helper: `group_by()`, which makes `summarise()`,
 properly on the next page.
 
 ```mermaid
-flowchart LR
+flowchart TD
   raw["data frame"] -->|filter| rows["fewer rows"]
   rows -->|select| cols["fewer/different columns"]
   cols -->|mutate| derived["new columns added"]

@@ -158,7 +158,7 @@ Suppose you rename `fullName` to `name`. Every place that accesses `.fullName` b
 The TypeScript compiler is organized into phases:
 
 ```mermaid
-graph LR
+graph TD
     A[Source Code .ts] --> B[Scanner<br/>Tokens]
     B --> C[Parser<br/>AST]
     C --> D[Binder<br/>Symbols]

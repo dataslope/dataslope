@@ -12,9 +12,18 @@
  */
 import "./learn.css";
 import type { ReactNode } from "react";
+import { Source_Serif_4 } from "next/font/google";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { source } from "@/lib/source";
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 export default function LearnLayout({ children }: { children: ReactNode }) {
   return (
@@ -37,9 +46,11 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
           url: "/",
         }}
         githubUrl="https://github.com/dataslope/dataslope/"
+        containerProps={{ className: sourceSerif4.variable }}
       >
         {children}
       </DocsLayout>
     </RootProvider>
   );
 }
+

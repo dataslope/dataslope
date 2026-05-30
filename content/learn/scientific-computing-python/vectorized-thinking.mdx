@@ -58,7 +58,7 @@ call, and the wrapping of a `float` into a `numpy.float64` and back.
 ## How NumPy actually runs
 
 ```mermaid
-flowchart LR
+flowchart TD
     Code["np.sin(xs) ** 2"] --> Ufunc["ufunc loop"]
     Ufunc --> C["compiled C loop"]
     C --> SIMD["CPU SIMD instructions"]

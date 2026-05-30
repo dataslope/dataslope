@@ -102,7 +102,7 @@ For `std::stack` backed by `std::deque`, `push`, `pop`, `top`, and `empty` are O
 A stack is perfect when recent history matters. For parentheses, push opening brackets; when a closing bracket appears, the top must be the matching opener.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["read '{' -> push"] --> B["read '[' -> push"]
     B --> C["read ']' -> matches top, pop"]
     C --> D["read '}' -> matches top, pop"]

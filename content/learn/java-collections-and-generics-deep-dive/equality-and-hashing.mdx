@@ -51,7 +51,7 @@ the bucket where the element should live — instead of scanning all
 buckets.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["new Customer('ada@…')"] --> H["hashCode()<br/>= 8132917"]
     H --> M["bucket = 8132917 mod N<br/>= 5"]
     M --> B5["bucket 5<br/>1–2 candidates"]

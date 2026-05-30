@@ -120,7 +120,7 @@ element up later is as easy as: compute the hash, go to that
 bucket, check what's there.
 
 ```mermaid
-flowchart LR
+flowchart TD
     K["key 'Ada'"] --> H["hashCode() = 65823..."]
     H --> B["bucket index = hash % bucketCount"]
     B --> Bucket["bucket → key/value pair"]
