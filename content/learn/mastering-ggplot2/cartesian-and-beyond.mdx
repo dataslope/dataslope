@@ -1,0 +1,141 @@
+---
+title: Cartesian and Beyond
+description: The coordinate system is the space marks live in — usually Cartesian, but the choice is a real grammar component with real consequences.
+---
+
+The **coordinate system** is the space your marks are placed in. You
+have been using one all along — the standard Cartesian plane, x running
+left-to-right and y bottom-to-top — without naming it. Making it an
+explicit component unlocks zooming, aspect-ratio control, and (next
+page) entirely different chart shapes.
+
+## The default: Cartesian
+
+`coord_cartesian()` is the familiar flat plane. It is applied
+automatically, so these two are identical:
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# The coordinate system is implicit here...
+ggplot(mpg, aes(displ, hwy)) + geom_point()
+`}
+/>
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# ...and explicit here. Same plot.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  coord_cartesian()
+`}
+/>
+
+## Coordinates transform the *space*, not the data
+
+Here is the key mental model. Scales and stats operate in **data
+space** — they change values. Coordinates operate on the **final
+space** — they reshape where already-computed marks land, *after* the
+stats and scales have run.
+
+```mermaid
+flowchart LR
+    DATA["Data"] --> STAT["Stat<br/>(data space)"]
+    STAT --> SCALE["Scale<br/>(data space)"]
+    SCALE --> COORD["Coordinate system<br/>(arranges final space)"]
+    COORD --> DRAW["Rendered marks"]
+```
+
+This ordering is exactly why `coord_cartesian(xlim = ...)` *zooms*
+rather than *filters*: the coordinate step happens last, after the
+smoother has already been fit on all the data. (We met this on the
+Position Scales page — now you can see *why*.)
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# Zoom into a region with all data still used by the smoother.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth() +
+  coord_cartesian(xlim = c(2, 5), ylim = c(20, 35))
+`}
+/>
+
+## Fixing the aspect ratio
+
+`coord_fixed()` forces one data unit on x to equal one data unit on y —
+essential when x and y are in the **same units** and distances should
+be comparable (maps, before/after on the same measurement scale):
+
+<CodeBlock
+  adapter="r"
+  initialCode={`library(ggplot2)
+
+# city vs highway MPG are the same units; fix the ratio so the
+# y = x reference line is a true 45-degree diagonal.
+ggplot(mpg, aes(cty, hwy)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  coord_fixed()
+`}
+/>
+
+With `coord_fixed()`, the red `y = x` line is a genuine 45° diagonal,
+so you can read "highway beats city MPG" as *every point above the
+line*. Without it, the plot would stretch to fill the panel and distort
+that comparison.
+
+<Callout type="info" title="Coordinates are a full grammar component">
+It is tempting to ignore coordinates because the default is almost
+always right. But treating them as a real, swappable component is what
+lets the *same* bar chart become a pie chart, or a Cartesian plot
+become a map projection. The next page makes this dramatic.
+</Callout>
+
+<MultipleChoice
+  markdown={`In the ggplot pipeline, when does the coordinate system act relative to stats and scales?
+
+- Before the stat, so it can change which rows are counted.
+  > Coordinates act on the final arranged space, not on the raw data the stat sees.
+- [o] After stats and scales, arranging the already-computed marks in the final space — which is why \`coord_cartesian(xlim=)\` zooms instead of filtering.
+  > Coordinates reshape the final space last, so no data is dropped.
+- At the same time as the mapping.
+  > Mapping happens up front; coordinates come at the end.
+- Coordinates never affect a plot; they are decorative.
+  > They affect zoom, aspect ratio, and the very shape of the plot.
+
+Because the coordinate step is last, it changes the *view* of computed
+marks rather than the data feeding the stats.`}
+/>
+
+<MultipleChoice
+  markdown={`Why might you add \`coord_fixed()\` to a plot of city MPG vs. highway MPG?
+
+- To filter out cars with low MPG.
+  > \`coord_fixed\` changes the aspect ratio, not the data.
+- To convert the axes to a log scale.
+  > That is a scale transformation, unrelated to \`coord_fixed\`.
+- [o] Because both axes are in the same units, so equal data distances should look equal — making a \`y = x\` reference line a true 45-degree diagonal.
+  > Fixing the ratio keeps same-unit comparisons visually honest.
+- To add a confidence band to the points.
+  > Bands come from \`geom_smooth\`, not from coordinates.
+
+When x and y share units, a fixed coordinate ratio prevents the panel
+from distorting the comparison between them.`}
+/>
+
+## Key takeaways
+
+- The **coordinate system** is the space marks occupy; Cartesian is the
+  default (`coord_cartesian()`).
+- Coordinates act **last**, on the final space — so
+  `coord_cartesian(xlim=)` **zooms** without discarding data.
+- `coord_fixed()` enforces an equal x/y unit ratio, vital when the axes
+  share units.
+- Coordinates are a genuine, swappable component — the foundation for
+  the polar and flipped charts on the next page.
