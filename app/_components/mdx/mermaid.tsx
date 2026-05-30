@@ -45,18 +45,22 @@ function MermaidContent({ chart }: { chart: string }) {
     startOnLoad: false,
     securityLevel: "strict",
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
-    fontSize: 14,
+    fontSize: 13,
     themeCSS: "margin: 1.5rem auto 0;",
     theme: resolvedTheme === "dark" ? "dark" : "neutral",
   });
 
   const { svg, bindFunctions } = use(
     cachePromise(`${chart}-${resolvedTheme}`, async () => {
-      // Wait for all fonts (including Source Serif 4) to finish loading
-      // before asking Mermaid to measure text and size nodes. Without this,
-      // Mermaid measures with the browser fallback font (Georgia / serif),
-      // which is narrower than Source Serif 4, so labels overflow their boxes.
-      await document.fonts.ready;
+      // Explicitly request Source Serif 4 at the weight/size Mermaid will use
+      // before asking it to measure text. `document.fonts.ready` is insufficient
+      // because font-display:swap fonts may not be in the "ready" set until
+      // explicitly triggered. `fonts.load()` guarantees the face is available
+      // (or settles with a no-op if it can't load) before we render.
+      await Promise.allSettled([
+        document.fonts.load('400 13px "Source Serif 4"'),
+        document.fonts.load('700 13px "Source Serif 4"'),
+      ]);
       return mermaid.render(id, chart.replaceAll("\\n", "\n"));
     }),
   );

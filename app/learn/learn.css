@@ -359,7 +359,7 @@ code.hljs {
    - [aria-label="Multiple choice question"]  quiz components
    - .nd-codeblock, pre, code         code blocks
    - [data-rehype-pretty-code-figure] Fumadocs syntax-highlighted code
-   - .callout, [data-callout]         callout blocks
+   - [data-callout], .callout         legacy callout selectors (kept for safety)
    - h1–h6                            headings (handled separately)
    Optical size axis (opsz) is enabled via font-variation-settings so the
    typeface self-optimises at body text sizes. Letter-spacing resets to 0
@@ -378,6 +378,29 @@ code.hljs {
   line-height: 1.75;
   font-variation-settings: "opsz" 16;
   letter-spacing: 0;
+}
+
+/* ── Table and callout font-size override ────────────────────────────────
+   Tables and callouts are compact, information-dense contexts — scale
+   their Source Serif text back to 1rem (16px) with tighter leading.
+
+   Fumadocs v16 callouts don't use [data-callout] or .callout — the
+   CalloutContainer renders a plain <div> with an inline CSS custom
+   property (--callout-color). That property is the most reliable hook.
+   ─────────────────────────────────────────────────────────────────────── */
+.prose :where(td, th):not(
+  :where([class~="not-prose"], [class~="not-prose"] *),
+  :where([data-flavor] *),
+  :where([data-testid="challenge-card"] *),
+  :where([aria-label="Multiple choice question"] *)
+) {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.prose [style*="--callout-color"] :where(p, li) {
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* ── TOC navigation ──────────────────────────────────────────────────────
@@ -430,6 +453,25 @@ code.hljs {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-variation-settings: "opsz" 14;
   letter-spacing: 0;
+}
+
+/* ── Course breadcrumb label ─────────────────────────────────────────────
+   Rendered above DocsTitle on pages nested inside a course (slug length > 1).
+   Styled as a small, muted serif link so it reads as context, not a heading.
+   ─────────────────────────────────────────────────────────────────────── */
+[data-course-label] {
+  display: block;
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 0.875rem;
+  font-variation-settings: "opsz" 12;
+  letter-spacing: 0;
+  color: var(--color-fd-muted-foreground);
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+}
+
+[data-course-label]:hover {
+  text-decoration: underline;
 }
 
 /* Restore sans-serif on <td> and <th> inside challenge/quiz cards.

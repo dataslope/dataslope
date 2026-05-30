@@ -177,6 +177,12 @@ export default function Home() {
               </span>
               <span className={styles.courseArrow} aria-hidden="true">→</span>
             </Link>
+            <Link href="/learn/sql-analytics-duckdb" className={styles.courseCard}>
+              <span className={styles.courseTitle}>
+                SQL Analytics with DuckDB
+              </span>
+              <span className={styles.courseArrow} aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       </div>
