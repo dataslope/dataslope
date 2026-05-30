@@ -1,0 +1,186 @@
+---
+title: Common Table Expressions
+description: CTEs (WITH clauses) turn one tangled query into a readable pipeline of named steps. The single most important tool for writing analytical SQL that humans can read and trust.
+---
+
+Analytical questions get complicated fast: filter, then aggregate, then
+rank, then compare. Cramming all of that into one nested query is how SQL
+earns its reputation for being unreadable. **Common Table Expressions
+(CTEs)** — the `WITH` clause — are the cure. They let you build a query as
+a sequence of named, readable steps, like a recipe. This is arguably the
+most important *style* skill in analytical SQL, so it gets a page of its
+own.
+
+## The problem: queries that nest inward
+
+Without CTEs, a multi-step analysis nests subqueries inside subqueries.
+You have to read it *inside-out*, and the logic is buried:
+
+```sql
+-- Hard to read: logic nested inside out
+SELECT region, avg_order
+FROM (
+  SELECT region, AVG(amount) AS avg_order
+  FROM (
+    SELECT * FROM orders WHERE status = 'paid'
+  )
+  GROUP BY region
+)
+WHERE avg_order > 100;
+```
+
+The actual steps — *keep paid orders, average per region, keep big
+averages* — are scrambled. A reader has to mentally unwrap it.
+
+## The fix: a pipeline of named steps
+
+A CTE pulls each step out, names it, and stacks the steps **top to
+bottom** in the order you think about them. The same logic becomes a
+readable pipeline:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="The same analysis as a readable pipeline"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
+  (4,'East','paid',50),(5,'North','paid',60),(6,'West','paid',95),
+  (7,'East','paid',150),(8,'North','refunded',30);`}
+  initialCode={`WITH paid AS (
+  SELECT * FROM orders WHERE status = 'paid'
+),
+per_region AS (
+  SELECT region, AVG(amount) AS avg_order
+  FROM paid
+  GROUP BY region
+)
+SELECT region, ROUND(avg_order, 2) AS avg_order
+FROM per_region
+WHERE avg_order > 100
+ORDER BY avg_order DESC;`}
+/>
+
+Read it straight down: *define `paid`, then `per_region` built on `paid`,
+then the final query built on `per_region`.* Each step has a name that
+says what it is. This is how analysts write queries they can revisit a
+month later and still understand.
+
+```mermaid
+flowchart LR
+    A["WITH paid<br/>(filter)"] --> B["per_region<br/>(aggregate)"]
+    B --> C["final SELECT<br/>(filter + sort)"]
+```
+
+## Why CTEs matter for analysis specifically
+
+CTEs are not just cosmetic. For exploratory analytical work they are a
+genuine accelerator:
+
+- **Readability.** Named steps document the logic; the query *is* its own
+  explanation.
+- **Iteration.** You can run a CTE pipeline and inspect any step by
+  temporarily selecting from it — perfect for the question-query-look loop.
+- **Reuse within a query.** A CTE can be referenced multiple times below
+  its definition, so you compute something once and use it twice.
+- **Composability.** Complex analyses become a stack of simple
+  transformations, each easy to verify on its own.
+
+## Reusing a CTE: compute once, compare twice
+
+A classic pattern: compute a summary, then compare each row to that
+summary. With a CTE you compute the summary once and join or cross-reference
+it. Here, each region's revenue is compared to the company-wide average.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Compare each region to the overall average"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),(4,'East',200),
+  (5,'North',60),(6,'West',95),(7,'East',150),(8,'North',100);`}
+  initialCode={`WITH region_rev AS (
+  SELECT region, SUM(amount) AS revenue
+  FROM orders
+  GROUP BY region
+),
+overall AS (
+  SELECT AVG(revenue) AS avg_region_revenue
+  FROM region_rev
+)
+SELECT
+  r.region,
+  r.revenue,
+  ROUND(o.avg_region_revenue, 1)              AS avg_region_revenue,
+  ROUND(r.revenue - o.avg_region_revenue, 1)  AS vs_average
+FROM region_rev r
+CROSS JOIN overall o
+ORDER BY r.revenue DESC;`}
+/>
+
+The `region_rev` step is computed once and reused; `overall` summarizes
+it; the final query compares them. Three small, verifiable steps replace
+one inscrutable nest.
+
+## A note on recursive CTEs
+
+CTEs can also be **recursive** (`WITH RECURSIVE`), which lets a query
+reference itself to walk hierarchies — org charts, category trees, graph
+paths. It is a powerful corner of SQL, but it leans toward data
+*structure* rather than the summarizing analytics this course focuses on,
+so we only flag it here. When you meet a "find all descendants" problem,
+remember recursive CTEs exist.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the main benefit of rewriting a deeply nested query using CTEs?
+
+- CTEs always make queries run faster.
+  > CTEs are primarily about readability and structure; they do not guarantee a speed change.
+- [o] They turn inside-out nesting into a top-to-bottom pipeline of named steps that is far easier to read and verify.
+  > Each \`WITH\` step is named and built on the previous one, so the logic reads in the order you think about it.
+- They remove the need for \`GROUP BY\`.
+  > CTEs organize steps; you still use \`GROUP BY\` inside them as needed.
+- They convert the query into multiple permanent tables.
+  > A CTE is a temporary, query-scoped name, not a stored table.
+
+CTEs restructure a query into readable, named, sequential steps.`}
+/>
+
+<MultipleChoice
+  markdown={`In a \`WITH a AS (...), b AS (...) SELECT ...\` query, what can \`b\` reference?
+
+- Only the original tables, never \`a\`.
+  > A later CTE can build on an earlier one; that chaining is the whole point.
+- [o] The CTE \`a\` defined above it, as well as base tables — CTEs can build on earlier CTEs.
+  > Each CTE may reference any CTE defined before it, forming a pipeline.
+- Only \`b\` itself.
+  > A non-recursive CTE does not reference itself; it can reference earlier CTEs.
+- The final \`SELECT\`'s result.
+  > The final \`SELECT\` is downstream; a CTE cannot reference something defined after it.
+
+Later CTEs can reference earlier ones, which is how a pipeline is built.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are CTEs especially useful during **exploratory** analysis?
+
+- They prevent you from ever changing the query.
+  > Exploration is about changing queries constantly; CTEs *support* iteration rather than preventing it.
+- [o] You can inspect any named step by temporarily selecting from it, making the question-query-look loop fast.
+  > Because each step is named, you can run and examine intermediate results, which suits iterative exploration.
+- They hide the intermediate results so you only see the final answer.
+  > CTEs make intermediate steps *accessible*, not hidden, which is exactly what helps exploration.
+- They automatically visualize the data.
+  > CTEs structure SQL; they do not produce visualizations.
+
+Named steps let analysts inspect and iterate on each stage of a pipeline.`}
+/>
+
+CTEs are the *named* way to build sub-results. SQL also has unnamed,
+inline ones — **subqueries** — each with its own best use. That contrast
+is the next page.

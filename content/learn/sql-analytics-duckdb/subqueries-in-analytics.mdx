@@ -1,0 +1,207 @@
+---
+title: Subqueries in Analytics
+description: Scalar, IN, and correlated subqueries — where each fits in analytical work, how they compare to CTEs and joins, and how to choose the clearest tool for the question.
+---
+
+A **subquery** is a query nested inside another. You met them implicitly
+in the last page (and saw why deep nesting hurts readability). Used in
+moderation, though, subqueries are a precise, expressive tool. This page
+sorts the common kinds, shows where each shines in analysis, and gives you
+a rule for choosing between a subquery, a CTE, and a join.
+
+## Three kinds of subquery
+
+```mermaid
+flowchart TB
+    S["Subquery"] --> A["Scalar:<br/>returns one value"]
+    S --> B["IN / list:<br/>returns a column<br/>of values"]
+    S --> C["Correlated:<br/>re-runs per outer row"]
+```
+
+They differ by *what they return* and *how they connect* to the outer
+query. Let us take them in turn.
+
+## Scalar subquery: a single value
+
+A scalar subquery returns exactly one row, one column — a single number
+you can drop into a `SELECT` or `WHERE`. It is perfect for comparing each
+row to a global summary, like "how does this order compare to the overall
+average?"
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Each order vs. the overall average"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,120),(2,80),(3,45),(4,200),(5,60),(6,95);`}
+  initialCode={`SELECT
+  id,
+  amount,
+  (SELECT ROUND(AVG(amount), 1) FROM orders) AS overall_avg,
+  amount - (SELECT AVG(amount) FROM orders)  AS diff_from_avg
+FROM orders
+ORDER BY diff_from_avg DESC;`}
+/>
+
+The inner `(SELECT AVG(amount) FROM orders)` computes one number, reused
+on every row. (A window `AVG(amount) OVER ()` would also work — often the
+choice is taste plus clarity.)
+
+## `IN` subquery: a filter list
+
+An `IN` subquery returns a *column* of values to filter against. It
+answers "keep rows whose key appears in this other set" — e.g. "orders
+from customers in the loyalty program."
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Orders from high-value customers only"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, customer_id INTEGER, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,10,120),(2,11,80),(3,10,45),(4,12,200),(5,11,60),(6,13,95);
+CREATE TABLE customers (
+  id INTEGER, tier TEXT
+);
+INSERT INTO customers VALUES
+  (10,'gold'),(11,'silver'),(12,'gold'),(13,'bronze');`}
+  initialCode={`SELECT id, customer_id, amount
+FROM orders
+WHERE customer_id IN (
+  SELECT id FROM customers WHERE tier = 'gold'
+)
+ORDER BY amount DESC;`}
+/>
+
+The subquery produces the gold customers' ids; the outer query keeps only
+matching orders. Read it as "orders whose customer is in the gold set."
+
+## Correlated subquery: one per outer row
+
+A **correlated** subquery references a column from the outer query, so it
+is conceptually re-evaluated for *each* outer row. It is expressive — "the
+average amount for *this row's* region" — but can be slower, and a window
+function or join is often clearer.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Each order vs. its own region's average"
+  initSql={`CREATE TABLE orders (
+  id INTEGER, region TEXT, amount DECIMAL(8,2)
+);
+INSERT INTO orders VALUES
+  (1,'West',120),(2,'East',80),(3,'West',45),
+  (4,'East',200),(5,'North',60),(6,'West',95);`}
+  initialCode={`SELECT
+  o.id,
+  o.region,
+  o.amount,
+  (SELECT ROUND(AVG(x.amount), 1)
+   FROM orders x
+   WHERE x.region = o.region) AS region_avg   -- correlated on o.region
+FROM orders o
+ORDER BY o.region, o.amount DESC;`}
+/>
+
+Notice `WHERE x.region = o.region` — the inner query depends on the outer
+row's `region`. This works, but `AVG(amount) OVER (PARTITION BY region)`
+expresses the same idea more directly and usually runs better. Knowing
+*when not to* reach for a correlated subquery is part of the skill.
+
+## `EXISTS`: does any matching row exist?
+
+`EXISTS` is a correlated subquery that returns true/false — "is there at
+least one matching row?" It is the natural way to ask "customers who have
+placed *any* order" without caring how many.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Customers who have ordered at least once"
+  initSql={`CREATE TABLE customers (id INTEGER, name TEXT);
+INSERT INTO customers VALUES (1,'Ada'),(2,'Bo'),(3,'Cy');
+CREATE TABLE orders (id INTEGER, customer_id INTEGER);
+INSERT INTO orders VALUES (101,1),(102,1),(103,3);`}
+  initialCode={`SELECT name
+FROM customers c
+WHERE EXISTS (
+  SELECT 1 FROM orders o WHERE o.customer_id = c.id
+)
+ORDER BY name;`}
+/>
+
+Bo has no orders, so Bo is excluded. `EXISTS` stops at the first match,
+making it an efficient "has any" test.
+
+## Choosing: subquery vs. CTE vs. join
+
+These tools overlap. A rough guide for analytical work:
+
+| You want... | Reach for |
+| --- | --- |
+| A single value to compare against | **Scalar subquery** or `OVER ()` |
+| To keep rows matching a set of keys | **`IN`** subquery or a join |
+| A per-row value from related rows | **Window function** (clearest), else correlated subquery |
+| A multi-step pipeline you will read later | **CTEs** |
+| To combine columns from two tables | **Join** |
+
+The meta-rule: **prefer the clearest tool, not the cleverest.** Reach for
+a CTE when steps pile up; a window function when you need per-row context;
+a join when you are combining tables; a small subquery when it genuinely
+reads better.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does a **scalar** subquery return?
+
+- A whole table of rows and columns.
+  > That is a table subquery; a scalar subquery returns just one value.
+- [o] Exactly one row and one column — a single value usable in \`SELECT\` or \`WHERE\`.
+  > A scalar subquery yields one value, ideal for comparing each row to a global summary.
+- A list of values for an \`IN\` filter.
+  > A single-column list is what an \`IN\` subquery returns; a scalar returns one value.
+- Nothing; it only filters.
+  > A scalar subquery produces a value that the outer query uses.
+
+A scalar subquery produces one value, often a global summary to compare
+against.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes a subquery **correlated**?
+
+- It returns more than one column.
+  > Column count does not define correlation; referencing the outer query does.
+- [o] It references a column from the outer query, so it conceptually re-runs for each outer row.
+  > The dependency on an outer-row value (e.g. \`o.region\`) is exactly what correlation means.
+- It is written using a \`WITH\` clause.
+  > A \`WITH\` clause defines a CTE, which is a different construct from a correlated subquery.
+- It always uses \`EXISTS\`.
+  > \`EXISTS\` is one correlated form, but correlation is about referencing the outer row, not a specific keyword.
+
+A correlated subquery depends on the outer row, so it is evaluated per
+outer row.`}
+/>
+
+<MultipleChoice
+  markdown={`You want each order shown alongside its own region's average amount. Which is usually the **clearest** tool?
+
+- A correlated subquery re-computing the average per row.
+  > It works but is verbose and often slower; a window function expresses the same idea more directly.
+- [o] A window function: \`AVG(amount) OVER (PARTITION BY region)\`.
+  > It attaches the per-region average to each row in one readable expression — the idiomatic analytical choice.
+- A \`GROUP BY region\` query.
+  > Grouping collapses the orders, so you would lose the individual rows you want to display.
+- An \`IN\` subquery.
+  > \`IN\` filters rows by membership; it does not attach a per-region average to each row.
+
+When you need a per-row value from related rows, a window function is
+usually the clearest tool.`}
+/>
+
+You can now compose analytical queries from clear building blocks. Time to
+put everything together toward the real goal — turning data into business
+insight.
