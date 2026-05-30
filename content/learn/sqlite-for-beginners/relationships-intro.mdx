@@ -1,0 +1,286 @@
+---
+title: Introduction to Relationships
+description: Learn why relational databases split data into tables and connect those tables with keys.
+---
+
+A relational database is powerful because tables can **relate** to each other.
+
+Instead of storing every fact in one giant table, you store each kind of thing in its own table, then connect the tables with key values.
+
+## Why not one giant table?
+
+Imagine an orders table that repeats the customer's details on every order.
+
+```mermaid
+flowchart TB
+    subgraph Giant["One giant table"]
+        direction LR
+        H1["order_id"]:::bad
+        H2["order_date"]:::bad
+        H3["customer_name"]:::bad
+        H4["customer_phone"]:::bad
+        H5["total"]:::bad
+        A1["101"]
+        A2["2026-01-05"]
+        A3["Ada"]
+        A4["555-0101"]
+        A5["42.00"]
+        B1["102"]
+        B2["2026-01-12"]
+        B3["Ada"]
+        B4["555-0101"]
+        B5["18.00"]
+    end
+    classDef bad fill:#fee2e2,stroke:#b91c1c
+```
+
+Ada's phone number is copied in multiple rows. If it changes, you must find and update every copy. Miss one copy, and the database disagrees with itself.
+
+The relational solution is to store each fact once.
+
+```mermaid
+flowchart LR
+    BAD["Repeated customer details<br/>inside order rows"] --> GOOD["Separate tables"]
+    GOOD --> C["customers<br/>customer details once"]
+    GOOD --> O["orders<br/>order facts only"]
+    O -->|"customer_id points to id"| C
+```
+
+## Tables connect through keys
+
+The customer table has a primary key: `customers.id`. The orders table stores a matching value: `orders.customer_id`.
+
+```mermaid
+flowchart LR
+    C["customers.id<br/>primary key"]:::pk --> O["orders.customer_id<br/>points to customer"]:::fk
+    classDef pk fill:#fde68a,stroke:#b45309
+    classDef fk fill:#dcfce7,stroke:#15803d
+```
+
+That pointing column is called a **foreign key**. You will learn foreign keys in more detail later. For now, remember the picture: one table stores the identity, and another table stores that identity to create a link.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDERS : places
+    CUSTOMER {
+        integer id PK
+        text name
+        text phone
+    }
+    ORDERS {
+        integer id PK
+        integer customer_id FK
+        numeric total
+    }
+```
+
+Read it as: one customer can place many orders, and each order belongs to one customer.
+
+## Relationship shape 1: one-to-many
+
+**One-to-many** is the most common relationship shape.
+
+Examples:
+
+- One customer has many orders.
+- One author writes many books.
+- One city has many residents.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDERS : "has many"
+```
+
+```mermaid
+flowchart LR
+    ONE["One customer<br/>Ada"] --> O1["Order 101"]
+    ONE --> O2["Order 102"]
+    ONE --> O3["Order 103"]
+```
+
+The key question is: can one row on the left match many rows on the right? If yes, you may have a one-to-many relationship.
+
+<MultipleChoice
+  markdown={`Which example is a one-to-many relationship?
+
+- One passport belongs to one person, and one person has one passport.
+  > That is one-to-one.
+- [o] One customer can place many orders, and each order belongs to one customer.
+  > One row on the customer side can connect to many rows on the order side.
+- Many students can take many courses.
+  > That is many-to-many because both sides can have many.
+- One table has one column.
+  > Table shape is not the same as a relationship between rows in two tables.`}
+/>
+
+## Relationship shape 2: one-to-one
+
+A **one-to-one** relationship means one row here matches at most one row there.
+
+Examples:
+
+- One person has one passport.
+- One employee has one employee profile.
+- One product has one detailed specification row.
+
+```mermaid
+erDiagram
+    PERSON ||--|| PASSPORT : "has one"
+```
+
+```mermaid
+flowchart LR
+    P["Person row<br/>Maya"] --> PASS["Passport row<br/>Maya's passport"]
+```
+
+One-to-one relationships are less common than one-to-many. They are often used when you want to keep optional or rarely used details in a separate table.
+
+## Relationship shape 3: many-to-many
+
+A **many-to-many** relationship means many rows on each side can connect to many rows on the other side.
+
+Examples:
+
+- Many students take many courses.
+- Many actors appear in many movies.
+- Many recipes use many ingredients.
+
+```mermaid
+erDiagram
+    STUDENT }o--o{ COURSE : enrolls
+```
+
+In real tables, many-to-many relationships usually need a helper table.
+
+```mermaid
+erDiagram
+    STUDENT ||--o{ ENROLLMENT : has
+    COURSE ||--o{ ENROLLMENT : has
+    STUDENT {
+        integer id PK
+        text name
+    }
+    COURSE {
+        integer id PK
+        text title
+    }
+    ENROLLMENT {
+        integer student_id FK
+        integer course_id FK
+    }
+```
+
+The helper table stores the pairs: which student is in which course.
+
+```mermaid
+flowchart TB
+    S["students"] --> E["enrollments<br/>student_id plus course_id"]
+    C["courses"] --> E
+    E --> PAIR["One row means<br/>one student-course pairing"]
+```
+
+## See a relationship in SQLite
+
+This example stores customers once and orders separately. The query joins them so you can read order totals beside customer names.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Follow a customer-to-orders relationship"
+  initSql={`CREATE TABLE customers (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  phone TEXT
+);
+
+CREATE TABLE orders (
+  id INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  total NUMERIC
+);
+
+INSERT INTO customers (name, phone) VALUES
+  ('Ada', '555-0101'),
+  ('Grace', '555-0102');
+
+INSERT INTO orders (customer_id, total) VALUES
+  (1, 42.00),
+  (1, 18.00),
+  (2, 99.00);`}
+  initialCode={`SELECT
+  customers.name,
+  orders.id AS order_id,
+  orders.total
+FROM orders
+JOIN customers ON orders.customer_id = customers.id
+ORDER BY customers.name, orders.id;`}
+/>
+
+Ada appears twice in the result because she has two orders. But Ada's customer row is stored only once.
+
+## Read every relationship two ways
+
+A relationship is easier when you say it from both directions.
+
+```mermaid
+flowchart TB
+    A["Customer to orders"] --> S1["A customer has many orders"]
+    A --> S2["An order belongs to one customer"]
+    S1 --> SHAPE["Shape: one-to-many"]
+    S2 --> SHAPE
+```
+
+This two-sentence habit helps you choose the correct relationship shape.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why do relational databases often split data across multiple tables?
+
+- To make the same fact appear in as many places as possible.
+  > Repeating facts is exactly what good relational design tries to avoid.
+- [o] To store each kind of thing once and connect related facts with keys.
+  > Separate tables reduce duplication while relationships keep the data connected.
+- Because SQLite cannot store more than one table.
+  > A SQLite database can contain many tables.
+- Because queries are not allowed to combine tables.
+  > Queries can combine related tables with joins.`}
+/>
+
+<MultipleChoice
+  markdown={`In an \`orders\` table, what does \`customer_id\` usually do?
+
+- It stores the customer's entire phone history.
+  > A key column stores an identifier, not every customer detail.
+- [o] It points to the matching customer's primary key value.
+  > This is how an order can be connected to the customer who placed it.
+- It forces all customers to have the same name.
+  > A key relationship does not change customer names.
+- It sorts orders by total automatically.
+  > Sorting requires \`ORDER BY\`.`}
+/>
+
+<MultipleChoice
+  markdown={`A student can take many courses, and a course can have many students. What shape is this?
+
+- One-to-one.
+  > One-to-one would allow only one match on each side.
+- One-to-many.
+  > One-to-many has many on only one side.
+- [o] Many-to-many.
+  > Both sides can connect to many rows on the other side.
+- No relationship.
+  > Students and courses are related through enrollment.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a many-to-many relationship usually need a helper table?
+
+- To store the database password.
+  > Helper tables model relationships; they do not store passwords.
+- [o] To store each pairing between one row on the first side and one row on the second side.
+  > For students and courses, the helper table can store one student-course enrollment per row.
+- To prevent primary keys from existing.
+  > Helper tables often use keys to connect rows.
+- To make all rows identical.
+  > The helper table records meaningful pairs, not identical rows.`}
+/>
