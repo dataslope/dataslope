@@ -960,7 +960,7 @@
    Run pill, but a thinner column reserved just for the disclosure
    arrow. Anchored to the right of `.btnGroupPrimary`. */
 .runBtnChevron {
-  background: #1a1a1a;
+  background: var(--ch-accent);
   color: var(--ch-white);
   border: none;
   padding: 0 8px;
@@ -971,16 +971,33 @@
   transition: background 0.15s;
 }
 
+/* Light mode: match the dark-gray Submit button */
+:global(html:not(.dark)) .runBtnChevron {
+  background: #1a1a1a;
+}
+
 .runBtnChevron:hover:not(:disabled) {
+  background: var(--ch-accent-hover);
+}
+
+:global(html:not(.dark)) .runBtnChevron:hover:not(:disabled) {
   background: #111111;
 }
 
 .runBtnChevron:disabled {
-  background: #8a8a8a;
+  background: var(--ch-accent-disabled);
   cursor: not-allowed;
 }
 
+:global(html:not(.dark)) .runBtnChevron:disabled {
+  background: #8a8a8a;
+}
+
 .runBtnChevron[data-popup-open] {
+  background: var(--ch-accent-hover);
+}
+
+:global(html:not(.dark)) .runBtnChevron[data-popup-open] {
   background: #111111;
 }
 
@@ -1991,21 +2008,6 @@
   background: #93c5fd;
 }
 
-:global(html.dark) .runBtnChevron {
-  background: #2563eb;
-}
-
-:global(html.dark) .runBtnChevron:hover:not(:disabled) {
-  background: #1d4ed8;
-}
-
-:global(html.dark) .runBtnChevron:disabled {
-  background: #93c5fd;
-}
-
-:global(html.dark) .runBtnChevron[data-popup-open] {
-  background: #1d4ed8;
-}
 
 :global(html.dark) .testItem {
   background: #0d0d0d;
