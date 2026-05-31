@@ -20,6 +20,17 @@ import * as path from "node:path";
 const RUN_TIMEOUT = 150_000;
 const RESULTS_DIR = path.join(process.cwd(), "audit-results");
 
+// AUDIT_ISOLATE=1 reloads the runtime before every snippet so each runs in
+// a pristine session. This matters for stateful runtimes — e.g. WebR keeps
+// packages attached across runs, so a warm sweep can let one package's
+// functions mask another's (data.table::wday vs lubridate::wday). Slower,
+// but gives accurate per-snippet results.
+const ISOLATE = !!process.env.AUDIT_ISOLATE;
+// AUDIT_ONLY=<substr> restricts the sweep to snippets whose title/name
+// contains the substring (case-insensitive). Handy for re-checking one
+// failure in isolation: AUDIT_ISOLATE=1 AUDIT_ONLY=lubridate.
+const ONLY = (process.env.AUDIT_ONLY ?? "").toLowerCase();
+
 interface RunResult {
   /** "example:<title>" or "package:<name>" */
   label: string;
@@ -181,6 +192,11 @@ async function auditPlayground(page: Page, langId: string, route: string) {
   // ── Examples ──────────────────────────────────────────────────────
   const titles = await exampleTitles(page);
   for (let i = 0; i < titles.length; i++) {
+    if (ONLY && !titles[i].toLowerCase().includes(ONLY)) continue;
+    if (ISOLATE) {
+      await page.goto(route);
+      await waitForRuntimeReady(page);
+    }
     await loadExample(page, i);
     await clearOutput(page);
     const cells = await runAndCollect(page);
@@ -202,6 +218,11 @@ async function auditPlayground(page: Page, langId: string, route: string) {
   // ── Package examples ──────────────────────────────────────────────
   const pkgNames = await packageExampleNames(page);
   for (const name of pkgNames) {
+    if (ONLY && !name.toLowerCase().includes(ONLY)) continue;
+    if (ISOLATE) {
+      await page.goto(route);
+      await waitForRuntimeReady(page);
+    }
     await loadPackageExample(page, name);
     await clearOutput(page);
     const cells = await runAndCollect(page);

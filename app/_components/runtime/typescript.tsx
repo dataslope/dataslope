@@ -170,18 +170,23 @@ console.log("platform =>", os.platform());
     key: "multi_file",
     title: "Multi-File Modules",
     desc: "Split logic across .ts files",
-    code: `// Add another tab named "utils.ts" with the contents:
-//
-//   export const greet = (name: string): string => \`Hello, \${name}!\`;
-//   export const shout = (s: string): string => s.toUpperCase() + "!";
-//
-// then run this file — TypeScript's CommonJS emit resolves the import
-// through almostnode's VirtualFS.
+    code: `// utils.ts sits alongside this file in the workspace — the import
+// resolves through almostnode's VirtualFS via TypeScript's CommonJS
+// emit. Edit either tab and re-run.
 import { greet, shout } from "./utils";
 
 console.log(greet("almostnode"));
 console.log(shout("multi-file TypeScript just works"));
 `,
+    files: [
+      {
+        filename: "utils.ts",
+        content: `export const greet = (name: string): string => \`Hello, \${name}!\`;
+export const shout = (s: string): string => s.toUpperCase() + "!";
+`,
+      },
+    ],
+    entryFilename: "index.ts",
   },
   {
     key: "utility_types",
