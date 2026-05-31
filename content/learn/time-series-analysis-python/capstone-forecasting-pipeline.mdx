@@ -259,8 +259,8 @@ fc_sarima = np.exp(sarima.get_forecast(H).predicted_mean)
 plain = ARIMA(log_train, order=(2,1,2)).fit()
 fc_plain = np.exp(plain.forecast(H))
 
-# Baseline: seasonal-naive (last 24 train months = the previous two seasons).
-fc_snaive = train.values[-H:]
+# Baseline: seasonal-naive (each month = same month last year -> last 12, repeated).
+fc_snaive = np.tile(train.values[-12:], H // 12)
 
 yt = test.values
 print(f"{'forecaster':30s}{'MAE':>8}{'RMSE':>8}{'MAPE':>8}")

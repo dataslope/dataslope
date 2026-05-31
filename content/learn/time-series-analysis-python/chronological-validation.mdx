@@ -468,7 +468,7 @@ assert tr[0] == 0 and tr[-1] == 59 and te[0] == 60 and te[-1] == 71`,
 
 Compute the test-set **MAE** for two forecasts of those 24 months:
 
-- \`mae_snaive\` — the seasonal-naive forecast (each test month = the value 12 months before it; here, use the last 24 months of the *training* set, since the test horizon equals 24 = 2x12).
+- \`mae_snaive\` — the seasonal-naive forecast: each test month equals the value from the same month one year earlier. For this 24-month horizon that is the **last 12 training months repeated twice** (\`np.tile(train.values[-12:], 2)\`).
 - \`mae_mean\` — a trivial flat forecast equal to the training mean, repeated 24 times.
 
 Set \`baseline_wins\` to \`True\` if the seasonal-naive MAE is lower than the flat-mean MAE (it should be — seasonality matters here).`}
@@ -499,7 +499,7 @@ print("seasonal-naive MAE:", mae_snaive, " flat-mean MAE:", mae_mean, " snaive w
   solutionCode={`import numpy as np
 h = 24
 train, test = air.iloc[:-h], air.iloc[-h:]
-snaive_pred = train.values[-h:]                 # last 24 train months (= 2 seasons)
+snaive_pred = np.tile(train.values[-12:], 2)    # seasonal naive: last 12 months, repeated
 mean_pred = np.full(h, train.mean())
 mae_snaive = float(np.mean(np.abs(test.values - snaive_pred)))
 mae_mean = float(np.mean(np.abs(test.values - mean_pred)))
