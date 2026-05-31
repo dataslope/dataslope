@@ -344,9 +344,12 @@ print("matches statsmodels:", matches)
 <ChallengeCard
   adapter="python"
   title="Read the AR order off the PACF"
-  instructions={`A stationary series \`s\` was generated as a pure AR process of unknown order \`p\` (between 1 and 3). Use the **PACF** to identify it: compute the PACF (via \`statsmodels.tsa.stattools.pacf(s, nlags=8)\`) and count how many of lags 1..8 fall **outside** the approximate 95% band \`±1.96/sqrt(len(s))\`.
+  instructions={`A stationary series \`s\` was generated as a pure AR process. Use the **PACF** to identify its order. Compute the PACF at lags 1..8 (via \`statsmodels.tsa.stattools.pacf(s, nlags=8, method="ywm")\`) and the significance band \`±1.96/sqrt(len(s))\`. Then produce:
 
-Set \`p_hat\` to the largest lag that is significant *and* contiguous from lag 1 (i.e., the AR order = number of leading significant PACF spikes before the first insignificant one). For this series \`p_hat\` should be 2.`}
+- \`sig_lags\` — the list of lags in 1..8 whose \`|PACF|\` exceeds the band
+- \`p_hat\` — the AR order, taken as the number of the **leading** lags (1 and 2) that are significant
+
+The PACF here is significant at lags 1 and 2 and then cuts off (later lags fall within the band, give or take the occasional chance spike), so this is an **AR(2)** and \`p_hat\` should be 2.`}
   initCode={`import numpy as np
 from statsmodels.tsa.stattools import pacf
 rng = np.random.default_rng(9)
@@ -356,28 +359,38 @@ y = np.zeros(n)
 for t in range(2, n):
     y[t] = 0.6 * y[t-1] - 0.3 * y[t-2] + e[t]   # AR(2)
 s = y[50:]`}
-  initialCode={`p_hat = None  # number of leading significant PACF spikes
-print("estimated AR order:", p_hat)
+  initialCode={`sig_lags = None  # significant lags in 1..8
+p_hat = None     # AR order from the leading significant spikes
+print("significant lags:", sig_lags, " estimated AR order:", p_hat)
 `}
   solutionCode={`import numpy as np
 from statsmodels.tsa.stattools import pacf
 
 vals = pacf(s, nlags=8, method="ywm")
 band = 1.96 / np.sqrt(len(s))
-p_hat = 0
-for k in range(1, len(vals)):
-    if abs(vals[k]) > band:
-        p_hat = k
-    else:
-        break
-print("estimated AR order:", p_hat)
+sig_lags = [k for k in range(1, 9) if abs(vals[k]) > band]
+p_hat = sum(1 for k in (1, 2) if abs(vals[k]) > band)
+print("significant lags:", sig_lags, " estimated AR order:", p_hat)
 `}
   tests={[
     {
+      id: "leading_two",
+      name: "lags 1 and 2 are significant",
+      description: "The AR(2) signature in the PACF",
+      code: `assert 1 in sig_lags and 2 in sig_lags, f"Expected lags 1 and 2 significant, got {sig_lags}"`,
+    },
+    {
       id: "order",
       name: "PACF identifies AR(2)",
-      description: "Two leading significant spikes",
-      code: `assert p_hat == 2, f"Expected p_hat=2 from the PACF cutoff, got {p_hat}"`,
+      description: "Two leading significant spikes -> p_hat = 2",
+      code: `assert p_hat == 2, f"Expected p_hat=2, got {p_hat}"`,
+    },
+    {
+      id: "cutoff",
+      name: "PACF cuts off after lag 2",
+      description: "At most one chance spike beyond lag 2",
+      code: `beyond = [k for k in sig_lags if k >= 3]
+assert len(beyond) <= 1, f"Expected the PACF to cut off after lag 2, but found significant lags {beyond}"`,
     },
   ]}
 />
