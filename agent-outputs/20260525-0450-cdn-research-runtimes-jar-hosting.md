@@ -123,7 +123,7 @@ https://cdn.statically.io/gh/{owner}/{repo}/{tag_or_branch}/{path}
 
 **Example for this project** (if `tools.jar` were committed to a `cdn-assets/` path under a release tag):
 ```
-https://cdn.statically.io/gh/dataslope/dataslope@v1.0.3-cdn-assets/cdn-assets/tools.jar
+https://cdn.statically.io/gh/dataslope/dataslope@v1.0.4-cdn-assets/cdn-assets/tools.jar
 ```
 
 **Pros**:
@@ -150,7 +150,7 @@ https://github.com/{owner}/{repo}/releases/download/{tag}/{filename}
 
 **Example**:
 ```
-https://github.com/dataslope/dataslope/releases/download/v1.0.3-cdn-assets/tools.jar
+https://github.com/dataslope/dataslope/releases/download/v1.0.4-cdn-assets/tools.jar 
 ```
 
 **Pros**:
