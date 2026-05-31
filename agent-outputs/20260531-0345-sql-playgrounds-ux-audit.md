@@ -17,6 +17,10 @@
 > 2. **Edited row no longer jumps to the bottom of the grid, and stays correct across multiple edits.** Postgres & DuckDB move an updated row to the end of the heap (MVCC). The post-commit re-fetch is ordered by the table's primary key when no user sort is applied, **and** the `UPDATE` now identifies the target row by its primary-key value(s) instead of a display-order-dependent ctid/rowid offset (PK-less tables keep the offset fallback). This matches the existing PK-based delete path and is robust to rows moving position between edits. `ResultView.tsx` (`commitEdits`) + `runtime/{postgres,duckdb,sqlite-core}.ts` (`updateRows`).
 > 3. **GitHub Light is now the default editor/playground theme** (was Lucario). `playgroundShared.tsx`, `useSettingsStore.ts`, `SqlPlayground.tsx`.
 
+> **✅ Update — Phase 3 mobile/responsive shipped (2026-05-31, third pass).** The playgrounds are now **usable and comfortable on phones** (UX-23, the last remaining 🔴). Below 768px the desktop 3-pane IDE collapses to a **single full-width surface at a time**, switched from a **bottom tab bar** (Schema / Editor / Results); the 270px rail no longer eats the screen, the header no longer overflows, and running a query (or opening a table) auto-jumps to **Results**. All of it lives in the **shared `SqlPlaygroundShell` + `sqlPlayground.css`** (driven by a `data-mobile-pane` attribute), so the three 5k-line playground bodies were **not touched** and desktop/tablet are **byte-for-byte unchanged**.
+> - **Verified live with Playwright (this session the WASM CDN *is* reachable):** **27/27** mobile checks across all three engines at 390×844 (0 horizontal overflow before *and* after rendering results, every pane reachable, Run→Results auto-switch with real rows), plus **12/12** desktop+tablet non-regression checks. A new **committed e2e spec** (`e2e/playground-mobile.spec.ts`, **4 tests**) locks in the no-overflow + pane-switching guarantees without depending on the CDN. `tsc`/ESLint: **0 errors**.
+> - **Carried forward:** UX-24 (card-per-column structure editor) and the off-canvas-drawer refinement of the schema rail — see §12 Phase 3.
+>
 > **✅ Update — Phase 2b cell-editing continued (2026-05-31, second pass).** Type-aware editing extended beyond the boolean toggle and JSON modal:
 > - **UX-04 / UX-09 — date & time pickers.** `date` / `timestamp(tz)` / `time` columns now open a **native `<input type="date|datetime-local|time">`** on double-click (across all three engines, driven by `set.columnTypes`). The committed value reconstructs the original string by substituting only its date/time substrings, so it **preserves the separator (`T`/space), fractional seconds and timezone suffix** and round-trips exactly like the existing free-text editor. Non-temporal stored values (e.g. an epoch integer) fall back to the text editor — never mangled.
 > - **UX-20 — literal-`"NULL"` escape hatch (now complete).** `parseCellEditValue` no longer coerces the typed text `"NULL"` to SQL NULL (an empty field still clears to NULL, and the explicit **Set to NULL** menu item remains for real NULLs). The stale duplicate in `SqlPlayground.tsx` was aligned.
@@ -59,7 +63,7 @@ The remaining problems cluster into five themes:
 
 4. **Engine identity leaks.** The shared result pane hard-codes "Loading SQLite engine…", which appears **on the Postgres and DuckDB pages** during a database switch (reproduced live). (§4.1.)
 
-5. **Not usable on mobile.** At 390 px the desktop layout overflows horizontally; the fixed 270 px sidebar eats 70 % of the screen and the editor/results are crushed into a thin strip. There is no responsive mode at all. (§7, §10.)
+5. ~~**Not usable on mobile.**~~ **✅ Fixed (Phase 3).** Was: at 390 px the desktop layout overflowed horizontally, the fixed 270 px sidebar ate 70 % of the screen, and the editor/results were crushed into a thin strip with no responsive mode. Now: below 768 px the playground is a single-pane app with a Schema / Editor / Results bottom tab bar, 0 horizontal overflow, verified live on all three engines. (§7, §10, §12 Phase 3.)
 
 Everything here is fixable inside the shared components — most fixes land in `ResultView.tsx`, the per-engine type-selector components, `SchemaActionDialogs.tsx`, and the layout CSS.
 
@@ -104,8 +108,8 @@ Each finding carries an ID (`UX-NN`) for cross-reference from the phased plan in
 | **UX-20 ✅ Fixed** | Cannot enter the literal string `"NULL"`; "NULL" is coerced to SQL NULL; no explicit Set-NULL affordance | 🟢 | All | Explicit "Set to NULL" context-menu item **+** typed `"NULL"` now stored verbatim (`parseCellEditValue`, `cellUtils.ts` + aligned `SqlPlayground.tsx`) |
 | **UX-21 ✅ Partial** | BLOB shown as `BLOB (N bytes)`; modal editor mangles binary; no hex/base64/upload | 🟡 | All | Binary cells now read-only inline (closes a commit-corruption bug) + **hex/base64 viewer** in the modal. Upload-into-cell still TODO. `components/ResultView.tsx`, `utils/cellEditing.ts` |
 | **UX-22 ✅ Fixed** | Generated/read-only columns not visually distinguished; edits fail only on commit | 🟡 ♿ | PG, SQLite | Generated columns now carry a header lock marker, are non-editable inline, and the modal/Set-to-NULL paths are blocked with a toast. `ColumnKeyHints.readOnly` (from `TableColumnInfo.generated`) → `ResultView.tsx`. (DuckDB doesn't yet surface generation metadata.) |
-| UX-23 | Not mobile-responsive: horizontal overflow at 390 px, 270 px sidebar dominates | 🔴 (mobile) | All | layout CSS (see §10) |
-| UX-24 | Add Table 13-column table never collapses; horizontal scroll hides most fields on narrow widths | 🟡 ♿ | All | `sqlPlayground.css` (table wrapper) |
+| **UX-23 ✅ Fixed** | Not mobile-responsive: horizontal overflow at 390 px, 270 px sidebar dominates | 🔴 (mobile) | All | Single-pane mobile shell (Schema/Editor/Results bottom tab bar) below 768 px; 0 overflow, verified live. `components/SqlPlaygroundShell.tsx`, `sqlPlayground.css` |
+| UX-24 | Add Table 13-column table never collapses; horizontal scroll hides most fields on narrow widths | 🟡 ♿ | All | `sqlPlayground.css` (table wrapper) — carried into Phase 3 follow-up |
 
 ---
 
@@ -243,11 +247,11 @@ Measured live (`06-*` screenshots, DOM metrics):
 | Viewport | Horizontal overflow | Sidebar | Verdict |
 |---|---|---|---|
 | 1600×1000 desktop | none | 270 px | ✅ good |
-| 820×1180 tablet | none (scrollW 820) | 270 px | 🟡 usable, cramped |
-| 390×844 mobile | **yes** (scrollW 494 > 390) | 270 px (70 % of screen) | 🔴 unusable |
+| 820×1180 tablet | none (scrollW 820) | 270 px | 🟡 usable, cramped (unchanged) |
+| 390×844 mobile | **none** (was scrollW 458 > 390) | off-canvas | ✅ **now usable** |
 
-- 🔴 **UX-23** — At 390 px the desktop layout is rendered as-is: header actions and query tabs overflow off-screen, the sidebar dominates, and the editor/results are a thin right strip needing horizontal scroll (`06-mobile-postgres-initial.png`). No hamburger, no collapsible sidebar, no panel switching.
-- 🟡 **UX-24** — The Create/Edit Table 13-column table never collapses; on mobile only Name/Type/Not-null are visible and the rest require horizontal scroll inside the drawer (`06-mobile-postgres-add-table.png`). Needs a card-per-column layout below ~900 px.
+- ✅ **UX-23 — Fixed.** Below 768 px the 3-pane IDE collapses to a **single full-width surface at a time**, switched from a bottom tab bar (Schema / Editor / Results). The 270 px rail becomes the full-screen "Schema" surface instead of a permanent strip; the header drops the wordmark and caps the workspace pill so it stops overflowing; the drag-resizers are hidden; and running a query (or double-clicking a table) auto-jumps to **Results**. Measured live: `documentElement.scrollWidth == clientWidth` at 390 px on all three engines, before and after rendering results. Before: `06-mobile-postgres-initial.png` (the broken 270 px-rail layout). After: `mobile-after-{sqlite,postgres,duckdb}-{editor,schema,results}.png` (this pass) — the full-width editor, full-screen schema tree, and full-width results grid with the Schema/Editor/Results bottom bar.
+- 🟡 **UX-24 — Carried forward.** The Create/Edit Table 13-column table still scrolls horizontally inside its (portaled, full-height on mobile) drawer; the card-per-column layout below ~900 px is the next slice of Phase 3.
 
 See §10 for a concrete mobile strategy.
 
@@ -386,11 +390,13 @@ Shipped the contained, low-risk, high-value slice of Phase 2 and verified live w
 - **UX-20 literal-`"NULL"` — ✅ DONE (2026-05-31, 2nd pass).** `parseCellEditValue` stores typed `"NULL"` verbatim (only an empty field clears to NULL); the explicit "Set to NULL" item (prior pass) covers real NULLs; the stale duplicate in `SqlPlayground.tsx` was aligned. Unit-tested.
 - **UX-A1 (a11y) — ✅ Partial.** The inline text **and** date/time `<input>`s now carry an `aria-label` (`Edit <column>`); the BLOB viewer textareas are labelled too.
 
-### Phase 3 — Responsive & mobile (see §10)
+### Phase 3 — Responsive & mobile (see §10) — ✅ CORE SHIPPED (2026-05-31)
 
-12. **UX-23 Phase A** layout/overflow fixes + breakpoints. *Accept:* `scrollWidth ≤ clientWidth` at 390 px on all three playgrounds.
-13. **UX-24 / mobile shell** — off-canvas sidebar, bottom tab bar, header overflow menu, full-screen sheets, card-per-column structure editor below ~900 px.
-14. Add Playwright mobile projects asserting no overflow + reachable panes.
+The "pragmatic first cut" from §10 (Phase A + the single-pane shell) is done and verified live; the heavier per-form work is carried forward.
+
+12. **UX-23 Phase A + mobile shell — ✅ Done.** Below 768 px the shell collapses to one full-width surface, switched from a **bottom tab bar** (Schema / Editor / Results) the shared `SqlPlaygroundShell` renders. Implementation notes: the schema rail becomes the full-screen "Schema" surface (not an off-canvas drawer — simpler and avoids a backdrop/z-index layer); the editor/results split becomes a single full-height pane per a `data-mobile-pane` attribute, scoped with `:not([class*="--"])` so the existing view-data / er-diagram / settings / query-history takeover modes are untouched; the drag-resizers are hidden; the header drops the wordmark and caps the workspace pill; and a delegated `click`/`dblclick` listener jumps to **Results** when you Run or open a table. **Zero changes to the three playground bodies.** *Accept (met):* `scrollWidth == clientWidth` at 390 px on all three, before and after results render. Files: `app/_components/sql/components/SqlPlaygroundShell.tsx`, `app/_components/sqlPlayground.css`. Also right-sized the loading hero on mobile (UX-18 slice).
+13. **UX-24 / refinements — carried forward.** Still open: the **card-per-column structure editor** below ~900 px (the 13-column Add/Edit-Table table), an optional **off-canvas drawer** variant of the schema rail, full-screen dialog *sheets*, and a header **overflow menu** so the (currently `.desktop-only`, i.e. hidden-on-mobile) Import/Export/History/ER/Info actions are reachable on a phone.
+14. **Playwright mobile coverage — ✅ Done.** `e2e/playground-mobile.spec.ts` (4 tests) asserts, for all three engines, no horizontal overflow + a working bottom tab bar (Schema/Editor/Results reachable) at 390 px, plus a desktop non-regression check (3-pane intact, no bottom bar) at 1280 px. Deliberately does **not** wait for the WASM engine to boot (it hides the boot overlay and exercises the shell/CSS), so it's fast and CDN-independent.
 
 ### Phase 4 — Feature gaps & polish
 

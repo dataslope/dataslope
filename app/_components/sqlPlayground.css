@@ -3920,3 +3920,151 @@
 .sql-settings-tab-pane .settings-actions {
   max-width: 720px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Mobile / responsive layout  (≤ 768px)
+   ───────────────────────────────────────────────────────────────────────
+   The desktop UI is a 3-pane IDE (schema rail | editor | results) inside a
+   fixed-width grid. On a phone that renders as an unusable thin strip with
+   the 270px rail eating ~70% of the screen and the header overflowing
+   horizontally. Below the mobile breakpoint we collapse to a single
+   full-width surface at a time, switched from a bottom tab bar that the
+   shared `SqlPlaygroundShell` renders (Schema / Editor / Results). The
+   shell sets `data-mobile-pane` on `.playground-root`; all of the
+   show/hide logic lives here so the three 5k-line playground bodies stay
+   untouched. None of these rules fire on desktop.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Bottom tab bar — rendered always, shown only on mobile (below). */
+.sql-mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* ── Header: keep brand + switcher + workspace pill inside the viewport.
+     The full action set is already `.desktop-only`; here we drop the brand
+     wordmark (the logo glyph + playground switcher carry the identity) and
+     cap the workspace pill so the row never forces a horizontal scroll. ── */
+  .playground-app {
+    grid-template-rows: 44px minmax(0, 1fr) auto;
+  }
+  .playground-header {
+    gap: 8px;
+    padding: 0 10px;
+    overflow: hidden;
+  }
+  .playground-header .brand-name {
+    display: none;
+  }
+  .playground-header .workspace-badge {
+    max-width: 38vw;
+  }
+
+  /* ── Collapse the 3-column shell to one full-width column. The sidebar
+     and both drag handles leave the flow; the bottom tab bar decides which
+     surface is on screen. ── */
+  .sql-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    position: relative;
+  }
+  .sql-sidebar-resizer,
+  .sql-resizer {
+    display: none !important;
+  }
+
+  /* Sidebar becomes the full-screen "Schema" surface rather than a rail. */
+  .sql-sidebar {
+    display: none;
+  }
+  .playground-root[data-mobile-pane="schema"] .sql-sidebar {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    border-right: none;
+  }
+  .playground-root[data-mobile-pane="schema"] .sql-panes {
+    display: none;
+  }
+
+  /* Editor / Results: a single full-height pane for a *normal* query tab.
+     Special tabs (view-data / er-diagram / settings / query-history) carry a
+     `sql-panes--…` modifier and keep their existing desktop takeover layout
+     — the `:not([class*="--"])` guard leaves those untouched. The query-tab
+     strip (grid row 1) stays visible in both modes for context. ── */
+  .sql-panes:not([class*="--"]) {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .playground-root[data-mobile-pane="editor"]
+    .sql-panes:not([class*="--"])
+    .sql-results-pane {
+    display: none;
+  }
+  .playground-root[data-mobile-pane="results"]
+    .sql-panes:not([class*="--"])
+    .sql-editor-pane {
+    display: none;
+  }
+  /* The visible pane occupies the single 1fr track (overrides the explicit
+     grid-row:4 the results pane carries for the desktop split). */
+  .playground-root[data-mobile-pane="results"]
+    .sql-panes:not([class*="--"])
+    .sql-results-pane {
+    grid-row: 2;
+  }
+
+  /* Wide result tables scroll inside their own pane, never the page. */
+  .sql-results-pane,
+  .sql-results-body {
+    max-width: 100%;
+  }
+
+  /* ── Bottom tab bar ── */
+  .sql-mobile-tabs {
+    display: flex;
+    align-items: stretch;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    /* Clear the iOS home indicator. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 20;
+  }
+  .sql-mobile-tab {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 52px;
+    background: transparent;
+    border: none;
+    border-top: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      color 0.12s ease,
+      border-color 0.12s ease,
+      background 0.12s ease;
+  }
+  .sql-mobile-tab:active {
+    background: color-mix(in srgb, var(--text) 7%, transparent);
+  }
+  .sql-mobile-tab.active {
+    color: var(--primary);
+    border-top-color: var(--primary);
+  }
+  .sql-mobile-tab span {
+    line-height: 1;
+  }
+
+  /* The loading hero stamps the title 3–4× at desktop size; shrink it so it
+     doesn't tower over a phone screen (UX-18). */
+  .pyodide-loading .loading-hero-text {
+    font-size: clamp(32px, 12vw, 64px);
+  }
+}

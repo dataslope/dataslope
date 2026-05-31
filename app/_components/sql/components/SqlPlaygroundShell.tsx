@@ -1,9 +1,20 @@
 "use client";
 
-import React, { type ReactNode } from "react";
+import React, { useEffect, useRef, useState, type ReactNode } from "react";
+import { Database, Code2, Table2 } from "lucide-react";
 import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
+
+/**
+ * Which of the three logical surfaces the single-pane mobile layout is
+ * currently showing. Desktop ignores this entirely (the CSS only acts on
+ * it below the mobile breakpoint); it lives here so the shared bottom tab
+ * bar — and the small "jump to results when you run a query" affordance —
+ * work for all three SQL playgrounds without each 5k-line playground body
+ * having to know anything about responsiveness.
+ */
+export type SqlMobilePane = "schema" | "editor" | "results";
 
 /**
  * Visual + interactive states the loading overlay can be in. Mirrors
@@ -82,8 +93,57 @@ export function SqlPlaygroundShell({
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
+
+  // ─── Mobile single-pane navigation ───────────────────────────────────
+  // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
+  // full-width surface at a time, switched from the bottom tab bar. The
+  // state has no effect on desktop (the CSS that reads `data-mobile-pane`
+  // is scoped to the mobile media query), so it's safe to keep mounted.
+  const [mobilePane, setMobilePane] = useState<SqlMobilePane>("editor");
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Comfort affordance: when the user runs a query (Run button) or opens a
+  // table by double-clicking it in the schema tree, jump the mobile view to
+  // the surface that's about to show the answer — Results — so they don't
+  // have to hunt for the right tab after every run. Implemented with event
+  // delegation on the shell so the individual playgrounds stay untouched;
+  // it's a no-op on desktop where the bottom bar is hidden.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const isMobile = () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 768px)").matches;
+    const onClick = (e: Event) => {
+      if (!isMobile()) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest(".run-btn, .run-btn-split-main")) {
+        setMobilePane("results");
+      }
+    };
+    const onDblClick = (e: Event) => {
+      if (!isMobile()) return;
+      const t = e.target as HTMLElement | null;
+      // A double-click on a schema *leaf* (table/view row) opens & runs it;
+      // double-clicks on section headers (which only collapse a group) are
+      // ignored so we don't yank the user to a stale Results pane.
+      if (
+        t?.closest(".sql-tree") &&
+        !t.closest(".sql-tree-section-header")
+      ) {
+        setMobilePane("results");
+      }
+    };
+    root.addEventListener("click", onClick);
+    root.addEventListener("dblclick", onDblClick);
+    return () => {
+      root.removeEventListener("click", onClick);
+      root.removeEventListener("dblclick", onDblClick);
+    };
+  }, []);
+
   return (
-    <div className="playground-root">
+    <div className="playground-root" ref={rootRef} data-mobile-pane={mobilePane}>
       {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
@@ -116,6 +176,33 @@ export function SqlPlaygroundShell({
           {headerActions}
         </header>
         {children}
+        <nav
+          className="sql-mobile-tabs"
+          role="tablist"
+          aria-label="Playground section"
+        >
+          {(
+            [
+              ["schema", "Schema", Database],
+              ["editor", "Editor", Code2],
+              ["results", "Results", Table2],
+            ] as const
+          ).map(([pane, label, Icon]) => (
+            <button
+              key={pane}
+              type="button"
+              role="tab"
+              aria-selected={mobilePane === pane}
+              className={`sql-mobile-tab${
+                mobilePane === pane ? " active" : ""
+              }`}
+              onClick={() => setMobilePane(pane)}
+            >
+              <Icon size={18} aria-hidden="true" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
       </div>
     </div>
   );
