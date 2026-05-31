@@ -22,7 +22,7 @@ export const useSettingsStore = create<SqlSettingsState>((set) => ({
   fontSize: DEFAULT_PLAYGROUND_SETTINGS.fontSize,
   outputFontSizeEnabled: false,
   outputFontSize: 13,
-  editorTheme: "lucario",
+  editorTheme: DEFAULT_PLAYGROUND_SETTINGS.editorTheme,
   wordWrap: true,
   clearBeforeRun: false,
   setFontSize: (fontSize) => set({ fontSize }),

@@ -468,7 +468,14 @@ export interface DuckDbEngine {
   ) => Promise<number>;
   updateRows: (
     tableName: string,
-    updates: ReadonlyArray<{ rowIndex: number; column: string; value: unknown }>,
+    updates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+      /** When present, identifies the target row by primary-key value(s)
+       *  instead of the rowid offset — robust to display reordering. */
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
+    }>,
     schema?: string,
   ) => Promise<number>;
   insertRow: (
@@ -1392,24 +1399,36 @@ export async function createDuckDbEngine(
       // fallback for PKless tables we use a CTID-style emulation via
       // ROW_NUMBER() OVER () over a stable ordering of the table.
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
+      const toLiteral = (v: unknown): string => {
+        if (v === null || v === undefined) return "NULL";
+        if (typeof v === "number" || typeof v === "bigint") return String(v);
+        if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
+        return `'${String(v).replace(/'/g, "''")}'`;
+      };
       let count = 0;
       for (const update of updates) {
-        const literal = (() => {
-          const v = update.value;
-          if (v === null || v === undefined) return "NULL";
-          if (typeof v === "number" || typeof v === "bigint") return String(v);
-          if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
-          return `'${String(v).replace(/'/g, "''")}'`;
-        })();
-        await conn.query(
-          `UPDATE ${qualifiedTable}
-           SET ${quoteIdent(update.column)} = ${literal}
-           WHERE rowid = (
-             SELECT rowid FROM ${qualifiedTable}
-             ORDER BY rowid
-             LIMIT 1 OFFSET ${update.rowIndex}
-           )`,
-        );
+        const literal = toLiteral(update.value);
+        if (update.pk && update.pk.length > 0) {
+          // Primary-key identification: stable regardless of display order.
+          const where = update.pk
+            .map((p) => `${quoteIdent(p.column)} = ${toLiteral(p.value)}`)
+            .join(" AND ");
+          await conn.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = ${literal}
+             WHERE ${where}`,
+          );
+        } else {
+          await conn.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = ${literal}
+             WHERE rowid = (
+               SELECT rowid FROM ${qualifiedTable}
+               ORDER BY rowid
+               LIMIT 1 OFFSET ${update.rowIndex}
+             )`,
+          );
+        }
         count += 1;
       }
       return count;

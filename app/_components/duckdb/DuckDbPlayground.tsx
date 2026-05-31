@@ -160,6 +160,7 @@ import {
   isSingleSelectSql,
   hasLimitClause,
   stripSqlComments,
+  bareTableSelectSource,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import {
@@ -486,14 +487,21 @@ function DuckDbTypeSelector({
   }, [value]);
 
   const query = inputVal.trim().toLowerCase();
-  const visibleGroups = useMemo(
-    () =>
-      DUCKDB_TYPE_GROUPS.map((group) => ({
-        ...group,
-        types: group.types.filter((type) => type.toLowerCase().includes(query)),
-      })).filter((group) => group.types.length > 0),
-    [query],
-  );
+  // When the field is empty or already holds a committed type (i.e. the user
+  // opened the list via the chevron rather than typing a search fragment),
+  // show every group so all types stay discoverable. Only filter once they
+  // type a partial that is not itself a known type.
+  const visibleGroups = useMemo(() => {
+    const showAll =
+      query === "" ||
+      DUCKDB_TYPE_OPTIONS.some((type) => type.toLowerCase() === query);
+    return DUCKDB_TYPE_GROUPS.map((group) => ({
+      ...group,
+      types: showAll
+        ? [...group.types]
+        : group.types.filter((type) => type.toLowerCase().includes(query)),
+    })).filter((group) => group.types.length > 0);
+  }, [query]);
 
   return (
     <Combobox.Root
@@ -890,7 +898,12 @@ function DuckDbPlaygroundInner() {
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
       startTransition(() => {
-        toastManager.add({ title, data: { kind } });
+        // Failures ("warn") linger longer than transient "info" notices.
+        toastManager.add({
+          title,
+          data: { kind },
+          timeout: kind === "warn" ? 8000 : undefined,
+        });
       });
     },
     [toastManager],
@@ -1046,6 +1059,13 @@ function DuckDbPlaygroundInner() {
     handleSchemaChange: handleSchemaChangeFromHook,
   } = schemaTree;
 
+  // Synchronous view of the table list so runSqlForTab can decide whether a
+  // hand-typed `SELECT * FROM <table>` should be made editable.
+  const tablesRef = useRef(tables);
+  useEffect(() => {
+    tablesRef.current = tables;
+  }, [tables]);
+
   // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
   const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
   const [virtualFiles, setVirtualFiles] = useState<VirtualFile[]>([]);
@@ -1058,7 +1078,7 @@ function DuckDbPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
-  } = useQueryHistory();
+  } = useQueryHistory(storageKey("query_history"));
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1397,6 +1417,15 @@ function DuckDbPlaygroundInner() {
       }
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
+      // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
+      // editable, just like opening the table from the sidebar — but only
+      // for an actual table (not a view), so edits never fail on commit.
+      if (!sourceTable) {
+        const detected = bareTableSelectSource(trimmed, noComments);
+        if (detected && tablesRef.current.includes(detected)) {
+          sourceTable = detected;
+        }
+      }
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const effectivePageSize =
@@ -2603,6 +2632,9 @@ function DuckDbPlaygroundInner() {
     return {
       pk: new Set(cols.filter((col) => col.pk > 0).map((col) => col.name)),
       fk: new Map(fks.map((fk) => [fk.from, fk])),
+      readOnly: new Set(
+        cols.filter((col) => col.generated).map((col) => col.name),
+      ),
     };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
@@ -4112,6 +4144,23 @@ function DuckDbPlaygroundInner() {
           truncatePending={pendingTruncate}
           onTruncateOpenChange={(next) => { if (!next) setPendingTruncate(null); }}
           onTruncateConfirm={() => void confirmTruncate()}
+          dropDetail={
+            pendingDropEntity &&
+            (pendingDropEntity.kind === "table" ||
+              pendingDropEntity.kind === "view") ? (
+              <>
+                Dependent objects are <strong>not</strong> cascaded; if another
+                object depends on it the drop may fail.
+              </>
+            ) : null
+          }
+          truncateDetail={
+            <>
+              Runs as a plain <strong>DELETE FROM</strong> (DuckDB has no
+              TRUNCATE): identity/sequence counters are <strong>not</strong>{" "}
+              reset.
+            </>
+          }
         />
 
         <SqlSettingsConfirmDialogs
@@ -5314,6 +5363,7 @@ function DuckDbPlaygroundInner() {
               <ResultView
                 result={result}
                 loading={statusState === "loading"}
+                engineLabel="DuckDB"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
                 onDeleteRows={deleteRowsFromTable}

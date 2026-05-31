@@ -233,6 +233,9 @@ export interface SqliteEngine {
       rowIndex: number;
       column: string;
       value: unknown;
+      /** When present, identifies the target row by primary-key value(s)
+       *  instead of the rowid offset — robust to display reordering. */
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
   ) => Promise<number>;
   /** Replace the active in-memory database with a fresh empty database.
@@ -1291,32 +1294,45 @@ export async function createSqliteEngineInProcess(
         rowIndex: number;
         column: string;
         value: unknown;
+        pk?: ReadonlyArray<{ column: string; value: unknown }>;
       }>,
     ) {
       if (updates.length === 0) return 0;
       const d = require();
-      // Each row is identified by its rowid, fetched via OFFSET on the
-      // table's natural scan order. This is safe for a single-user
-      // in-memory playground and removes any requirement for a PK.
-      // We build one prepared statement per distinct target column so
-      // repeated edits to the same column can reuse the same stmt.
+      // Each row is identified by its primary-key value(s) when available
+      // (stable regardless of display order), falling back to the rowid
+      // OFFSET on the table's natural scan order for PK-less tables.
+      // We build one prepared statement per distinct (column, key-shape)
+      // so repeated edits reuse the same stmt.
       const stmtCache = new Map<string, ReturnType<Database["prepare"]>>();
       let count = 0;
       try {
         d.exec("BEGIN");
         try {
           for (const upd of updates) {
-            const colKey = upd.column;
+            const usePk = !!(upd.pk && upd.pk.length > 0);
+            const pkCols = usePk ? upd.pk!.map((p) => p.column) : [];
+            const colKey = usePk
+              ? `pk:${upd.column}:${pkCols.join(",")}`
+              : `off:${upd.column}`;
             let stmt = stmtCache.get(colKey);
             if (!stmt) {
-              // Subquery resolves the rowid for the Nth row (0-based).
-              const sql =
-                `UPDATE ${quoteIdent(tableName)} SET ${quoteIdent(upd.column)} = ?1 ` +
-                `WHERE rowid = (SELECT rowid FROM ${quoteIdent(tableName)} ORDER BY rowid LIMIT 1 OFFSET ?2)`;
+              const sql = usePk
+                ? `UPDATE ${quoteIdent(tableName)} SET ${quoteIdent(upd.column)} = ?1 ` +
+                  `WHERE ${pkCols.map((c, i) => `${quoteIdent(c)} = ?${i + 2}`).join(" AND ")}`
+                : `UPDATE ${quoteIdent(tableName)} SET ${quoteIdent(upd.column)} = ?1 ` +
+                  `WHERE rowid = (SELECT rowid FROM ${quoteIdent(tableName)} ORDER BY rowid LIMIT 1 OFFSET ?2)`;
               stmt = d.prepare(sql);
               stmtCache.set(colKey, stmt);
             }
-            stmt.bind([upd.value as SqlValue, upd.rowIndex]);
+            // SQLite stores booleans as 0/1 and sql.js can't bind a JS
+            // boolean, so coerce booleans (e.g. from the boolean toggle).
+            const toBind = (v: unknown): SqlValue =>
+              typeof v === "boolean" ? (v ? 1 : 0) : (v as SqlValue);
+            const binds: SqlValue[] = usePk
+              ? [toBind(upd.value), ...upd.pk!.map((p) => toBind(p.value))]
+              : [toBind(upd.value), upd.rowIndex];
+            stmt.bind(binds);
             stmt.step();
             stmt.reset();
             count += 1;

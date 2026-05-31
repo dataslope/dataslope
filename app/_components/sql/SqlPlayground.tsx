@@ -1276,7 +1276,7 @@ function SqlPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
-  } = useQueryHistory();
+  } = useQueryHistory(storageKey("query_history"));
   const queryRunnerRefs = {
     engineRef,
     editorRef,
@@ -1626,7 +1626,8 @@ function SqlPlaygroundInner() {
 
     if (editorHostRef.current && !editorRef.current) {
       const initialTheme =
-        getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
+        getStoredEditorTheme(storageKey("editortheme")) ??
+        DEFAULT_PLAYGROUND_SETTINGS.editorTheme;
       const initialWordWrap =
         localStorage.getItem(storageKey("wordwrap")) !== "false";
       const compartments = makeSqlEditorCompartments();
@@ -2176,7 +2177,11 @@ function SqlPlaygroundInner() {
     }
     const fkByName = new Map<string, ForeignKeyInfo>();
     for (const fk of fks ?? []) fkByName.set(fk.from, fk);
-    return { pk, fk: fkByName };
+    const readOnly = new Set<string>();
+    for (const c of cols ?? []) {
+      if (c.generated) readOnly.add(c.name);
+    }
+    return { pk, fk: fkByName, readOnly };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
   const resultConstraintInfo = useMemo<
@@ -2554,6 +2559,10 @@ function SqlPlaygroundInner() {
                 every row but keeps the schema. The change is in-memory only and
                 will be undone next page load.
               </AlertDialog.Description>
+              <p className="confirm-desc-note">
+                Runs as a plain <strong>DELETE</strong> (SQLite has no
+                TRUNCATE).
+              </p>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
@@ -4110,6 +4119,7 @@ function SqlPlaygroundInner() {
                 <ResultView
                   result={result}
                   loading={!loaded}
+                  engineLabel="SQLite"
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
                   constraintInfo={resultConstraintInfo}

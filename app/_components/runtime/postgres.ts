@@ -39,6 +39,12 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
+function isPlainObject(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
 function toSqlValue(value: unknown): SqlValue {
   if (value === null || value === undefined) return null;
   if (value instanceof Uint8Array) return value;
@@ -47,6 +53,20 @@ function toSqlValue(value: unknown): SqlValue {
   if (typeof value === "boolean") return value ? 1 : 0;
   if (typeof value === "number" || typeof value === "string") return value;
   if (typeof value === "bigint") return Number(value);
+  // json/jsonb columns arrive as plain objects and array/composite columns
+  // as JS arrays/objects. String() would render them as "[object Object]"
+  // or comma-joined text; serialize to JSON instead so the grid is readable
+  // and an edited json/jsonb value round-trips through a text -> json cast
+  // on UPDATE.
+  if (Array.isArray(value) || isPlainObject(value)) {
+    try {
+      return JSON.stringify(value, (_k, v) =>
+        typeof v === "bigint" ? v.toString() : v,
+      );
+    } catch {
+      return String(value);
+    }
+  }
   return String(value);
 }
 
@@ -81,6 +101,28 @@ const PG_TYPE_NAMES: Record<number, string> = {
   1700: "numeric",
   2950: "uuid",
   3802: "jsonb",
+  // Array types (OID of the element type's array). Without these, array
+  // columns fall back to a misleading "text" label in the result header.
+  1000: "boolean[]",
+  1005: "smallint[]",
+  1007: "integer[]",
+  1016: "bigint[]",
+  1009: "text[]",
+  1014: "char[]",
+  1015: "varchar[]",
+  1021: "real[]",
+  1022: "double precision[]",
+  1231: "numeric[]",
+  1115: "timestamp[]",
+  1185: "timestamptz[]",
+  1182: "date[]",
+  1183: "time[]",
+  1187: "interval[]",
+  2951: "uuid[]",
+  199: "json[]",
+  3807: "jsonb[]",
+  1041: "inet[]",
+  1561: "bit[]",
 };
 
 let pgRebuildCounter = 0;
@@ -203,7 +245,15 @@ export interface PostgresEngine {
   ) => Promise<number>;
   updateRows: (
     tableName: string,
-    updates: ReadonlyArray<{ rowIndex: number; column: string; value: unknown }>,
+    updates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+      /** When present, identifies the target row by primary-key value(s)
+       *  instead of the (display-order-dependent) ctid offset. Robust to
+       *  rows moving position after a prior edit. */
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
+    }>,
     schema?: string,
   ) => Promise<number>;
   insertRow: (
@@ -798,14 +848,30 @@ export async function createPostgresEngine(
       let count = 0;
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       for (const update of updates) {
-        await db.query(
-          `UPDATE ${qualifiedTable}
-           SET ${quoteIdent(update.column)} = $1
-           WHERE ctid = (
-             SELECT ctid FROM ${qualifiedTable} ORDER BY ctid LIMIT 1 OFFSET $2
-           )`,
-          [update.value, update.rowIndex],
-        );
+        if (update.pk && update.pk.length > 0) {
+          // Primary-key identification: order-independent and stable even
+          // after a prior edit moved the row to a new ctid.
+          const where = update.pk
+            .map((p, i) => `${quoteIdent(p.column)} = $${i + 2}`)
+            .join(" AND ");
+          await db.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = $1
+             WHERE ${where}`,
+            [update.value, ...update.pk.map((p) => p.value)],
+          );
+        } else {
+          // Fallback for tables without a primary key: locate the row by
+          // its position in ctid (heap) order.
+          await db.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = $1
+             WHERE ctid = (
+               SELECT ctid FROM ${qualifiedTable} ORDER BY ctid LIMIT 1 OFFSET $2
+             )`,
+            [update.value, update.rowIndex],
+          );
+        }
         count += 1;
       }
       return count;

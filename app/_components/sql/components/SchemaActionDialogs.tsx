@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 
 export interface SchemaActionDialogsProps {
@@ -9,6 +10,12 @@ export interface SchemaActionDialogsProps {
   truncatePending: string | null;
   onTruncateOpenChange: (open: boolean) => void;
   onTruncateConfirm: () => void;
+  /** Engine-specific disclosure of what Drop actually does (e.g. that it
+   *  cascades to dependent objects). Rendered as a muted note. */
+  dropDetail?: ReactNode;
+  /** Engine-specific disclosure of what Truncate actually does (e.g. that
+   *  it resets identity sequences, or runs as a plain DELETE). */
+  truncateDetail?: ReactNode;
 }
 
 export function SchemaActionDialogs({
@@ -18,6 +25,8 @@ export function SchemaActionDialogs({
   truncatePending,
   onTruncateOpenChange,
   onTruncateConfirm,
+  dropDetail,
+  truncateDetail,
 }: SchemaActionDialogsProps) {
   return (
     <>
@@ -36,6 +45,7 @@ export function SchemaActionDialogs({
               <strong>{dropEntityPending?.name ?? ""}</strong> from the
               in-memory database. Reload the page to restore the sample.
             </AlertDialog.Description>
+            {dropDetail && <p className="confirm-desc-note">{dropDetail}</p>}
             <div className="confirm-actions">
               <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
@@ -66,6 +76,9 @@ export function SchemaActionDialogs({
               every row but keeps the schema. The change is in-memory only and
               will be undone next page load.
             </AlertDialog.Description>
+            {truncateDetail && (
+              <p className="confirm-desc-note">{truncateDetail}</p>
+            )}
             <div className="confirm-actions">
               <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel

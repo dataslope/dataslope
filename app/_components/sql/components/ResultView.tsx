@@ -34,6 +34,7 @@ import {
   ChevronUp,
   Clock,
   Hash,
+  Lock,
   Minus,
   SearchX,
   ToggleLeft,
@@ -66,7 +67,10 @@ import {
 // Local helpers
 // ────────────────────────────────────────────────────────────────────────
 
-function getSqliteErrorHint(error: string): string | null {
+/** Produce a friendly hint for a raw engine error string. Despite the
+ *  per-engine sections, this is shared across SQLite, DuckDB, and
+ *  PostgreSQL. */
+function getEngineErrorHint(error: string): string | null {
   // SQLite patterns
   const nearMatch = error.match(/^near "(.+)": syntax error$/i);
   if (nearMatch) {
@@ -122,6 +126,54 @@ function getSqliteErrorHint(error: string): string | null {
     return `Column "${pgAmbiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
   }
   return null;
+}
+
+/** Small self-contained button that copies an error string to the
+ *  clipboard and briefly shows a "Copied" confirmation. */
+function CopyErrorButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="sql-result-error-copy"
+      onClick={() => {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          })
+          .catch(() => undefined);
+      }}
+    >
+      {copied ? "Copied" : "Copy error"}
+    </button>
+  );
+}
+
+/** True for a boolean column type across engines (Postgres `boolean`,
+ *  DuckDB Arrow `Bool`, SQLite declared `BOOLEAN`). */
+function isBooleanType(type: string | undefined): boolean {
+  return /^bool(ean)?$/i.test((type ?? "").trim());
+}
+
+/** Interpret a cell value (which may be 1/0, true/false, or "t"/"f"/"true"
+ *  /"false" depending on engine) as a boolean for the toggle checkbox. */
+function boolTruthy(v: unknown): boolean {
+  if (v === true || v === 1) return true;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    return s === "1" || s === "t" || s === "true";
+  }
+  return false;
+}
+
+/** Heuristic: does this string look like a JSON object/array? Used to offer
+ *  pretty-print + validation in the edit-in-modal dialog. */
+function looksLikeJson(s: string): boolean {
+  const t = s.trim();
+  if (!t) return false;
+  return t[0] === "{" || t[0] === "[";
 }
 
 function quoteIdentSql(name: string): string {
@@ -390,6 +442,7 @@ export const ResultView = memo(ResultViewImpl);
 function ResultViewImpl({
   result,
   loading,
+  engineLabel = "SQLite",
   keyHints,
   sourceTable,
   constraintInfo,
@@ -406,6 +459,9 @@ function ResultViewImpl({
 }: {
   result: QueryRunResult | null;
   loading: boolean;
+  /** Human-readable engine name shown in the loading placeholder
+   *  (e.g. "PostgreSQL", "DuckDB", "SQLite"). Defaults to "SQLite". */
+  engineLabel?: string;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
@@ -420,6 +476,7 @@ function ResultViewImpl({
       rowIndex: number;
       column: string;
       value: unknown;
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
     refetchSql?: string,
     refetchBaseSql?: string,
@@ -636,10 +693,22 @@ function ResultViewImpl({
       if (!sourceTable || !onUpdateRows) return;
       const edits = pendingEditsByIndex[setIdx];
       if (!edits || edits.size === 0) return;
+      // Resolve primary-key column indices once so each edited row can be
+      // identified by its PK value(s) — stable even if the row has moved
+      // position since the previous edit (Postgres changes ctid on UPDATE).
+      const pkCols = pkColumnsForSet(set);
+      const pkColIndexes = pkCols
+        ? pkCols.map((c) => set.columns.indexOf(c))
+        : null;
+      const lazyOffset =
+        result?.lazySql !== undefined && result?.lazyPage !== undefined
+          ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
+          : 0;
       const updates: Array<{
         rowIndex: number;
         column: string;
         value: unknown;
+        pk?: ReadonlyArray<{ column: string; value: unknown }>;
       }> = [];
       for (const [cellKey, value] of edits) {
         const [rowStr, colStr] = cellKey.split(":");
@@ -647,7 +716,14 @@ function ResultViewImpl({
         const colIdx = Number(colStr);
         const colName = set.columns[colIdx];
         if (!colName) continue;
-        updates.push({ rowIndex: absoluteRow, column: colName, value });
+        let pk: Array<{ column: string; value: unknown }> | undefined;
+        if (pkCols && pkColIndexes && pkColIndexes.every((i) => i >= 0)) {
+          const row = set.values[absoluteRow - lazyOffset];
+          if (row) {
+            pk = pkCols.map((c, i) => ({ column: c, value: row[pkColIndexes[i]] }));
+          }
+        }
+        updates.push({ rowIndex: absoluteRow, column: colName, value, pk });
       }
       if (updates.length === 0) return;
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
@@ -668,6 +744,17 @@ function ResultViewImpl({
           if (parsed) {
             refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
           }
+        } else {
+          // With no user-applied sort, order the re-fetch by the table's
+          // primary key so the edited row keeps its position. Postgres and
+          // DuckDB move an updated row to the end of the heap (MVCC), so an
+          // unordered re-fetch would otherwise make the row jump to the
+          // bottom of the grid right after a cell edit.
+          const pkCols = pkColumnsForSet(set);
+          if (pkCols && pkCols.length > 0) {
+            const orderBy = pkCols.map((c) => quoteIdentSql(c)).join(", ");
+            refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${orderBy}`;
+          }
         }
         refetchSql = refetchSql ?? baseSql;
       }
@@ -680,7 +767,9 @@ function ResultViewImpl({
       selectedByIndex,
       sortingByIndex,
       result,
+      globalPageSize,
       preserveStateForReload,
+      pkColumnsForSet,
     ],
   );
 
@@ -887,7 +976,7 @@ function ResultViewImpl({
     return (
       <div className="welcome">
         <div className="welcome-icon">⌬</div>
-        <h3>Loading SQLite engine…</h3>
+        <h3>Loading {engineLabel} engine…</h3>
       </div>
     );
   }
@@ -905,10 +994,14 @@ function ResultViewImpl({
     );
   }
   if (result.error) {
-    const hint = getSqliteErrorHint(result.error);
+    const hint = getEngineErrorHint(result.error);
     return (
       <div className="sql-result-error">
-        <div className="sql-result-error-title">Query failed</div>
+        <div className="sql-result-error-header">
+          <span className="sql-result-error-title">Query failed</span>
+          <span className="sql-result-error-engine">{engineLabel}</span>
+          <CopyErrorButton text={result.error} />
+        </div>
         <pre className="sql-result-error-body">{result.error}</pre>
         {hint && <div className="sql-result-error-hint">{hint}</div>}
       </div>
@@ -1397,6 +1490,8 @@ export function ResultTableBody({
     colName: string;
     value: string;
   } | null>(null);
+  // Validation message for the edit-in-modal dialog (e.g. invalid JSON).
+  const [modalError, setModalError] = useState<string | null>(null);
 
   // ── Column rename state ────────────────────────────────────────────────
   const [renamedColumns, setRenamedColumns] = useState<Map<number, string>>(
@@ -1522,15 +1617,18 @@ export function ResultTableBody({
             } satisfies ColumnDef<ResultTableRow>,
           ]
         : []),
-      ...set.columns.map(
-        (c, ci) =>
-          ({
+      ...set.columns.map((c, ci) => {
+        const isBoolCol = isBooleanType(
+          set.columnTypes?.[ci] || inferColumnType(set.values, ci),
+        );
+        return {
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
             meta: { ci },
             header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
+              const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
               const sorted = column.getIsSorted();
               const colType =
                 set.columnTypes?.[ci] || inferColumnType(set.values, ci);
@@ -1642,6 +1740,14 @@ export function ResultTableBody({
                               </Popover.Root>
                             )}
                             <span>{displayName}</span>
+                            {isReadOnly && (
+                              <span
+                                className="sql-result-th-readonly"
+                                title="Read-only — generated column"
+                              >
+                                <Lock size={10} aria-label="Read-only column" />
+                              </span>
+                            )}
                           </span>
                           <span
                             className={
@@ -1784,7 +1890,11 @@ export function ResultTableBody({
               );
             },
             cell: (info) => {
-              if (!editable) {
+              // Generated / computed columns can't be updated; render them
+              // read-only so an edit can't be started that would only fail at
+              // commit time.
+              const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
+              if (!editable || isReadOnly) {
                 return formatCellValue(info.getValue());
               }
               const absoluteRow = info.row.original.absoluteRow;
@@ -1793,6 +1903,41 @@ export function ResultTableBody({
               const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
               const pendingValue = pendingEdits?.get(cellKey);
               const rawValue = info.getValue();
+              // Boolean columns render as a tri-state checkbox toggle instead
+              // of a 0/1 text input. Clicking flips true/false (NULL via the
+              // row context menu's "Set to NULL").
+              if (isBoolCol) {
+                const effective = hasPendingEdit ? pendingValue : rawValue;
+                const isNull = effective === null || effective === undefined;
+                const checked = boolTruthy(effective);
+                return (
+                  <input
+                    type="checkbox"
+                    className={
+                      hasPendingEdit
+                        ? "sql-cell-bool sql-cell-edited"
+                        : "sql-cell-bool"
+                    }
+                    checked={checked}
+                    ref={(el) => {
+                      if (el) el.indeterminate = isNull;
+                    }}
+                    aria-label={`Toggle ${c}`}
+                    onChange={() => {
+                      const next = isNull ? true : !checked;
+                      const origNull =
+                        rawValue === null || rawValue === undefined;
+                      if (!origNull && next === boolTruthy(rawValue)) {
+                        if (hasPendingEdit) onClearPendingEdit(cellKey);
+                      } else {
+                        onSetPendingEdit(cellKey, next);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    onDoubleClick={(e) => e.stopPropagation()}
+                  />
+                );
+              }
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
               if (isActiveEdit) {
@@ -1847,8 +1992,8 @@ export function ResultTableBody({
                 </span>
               );
             },
-          }) satisfies ColumnDef<ResultTableRow>,
-      ),
+          } satisfies ColumnDef<ResultTableRow>;
+      }),
     ],
     [
       activeEditCell,
@@ -2006,6 +2151,13 @@ export function ResultTableBody({
                     const cell = rightClickedCellRef.current;
                     if (cell === null || cell.colIdx < 0) return;
                     const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
                     const cellKey = `${absoluteRow}:${cell.colIdx}`;
                     const current = pendingEdits?.has(cellKey)
                       ? String(pendingEdits.get(cellKey) ?? "")
@@ -2014,6 +2166,26 @@ export function ResultTableBody({
                   }}
                 >
                   <div className="ex-title">Edit cell in modal</div>
+                </ContextMenu.Item>
+              )}
+              {editable && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cell = rightClickedCellRef.current;
+                    if (cell === null || cell.colIdx < 0) return;
+                    const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
+                    onSetPendingEdit(`${absoluteRow}:${cell.colIdx}`, null);
+                  }}
+                >
+                  <div className="ex-title">Set to NULL</div>
                 </ContextMenu.Item>
               )}
               <ContextMenu.Item
@@ -2176,7 +2348,10 @@ export function ResultTableBody({
       <Dialog.Root
         open={modalEditCell !== null}
         onOpenChange={(open) => {
-          if (!open) setModalEditCell(null);
+          if (!open) {
+            setModalEditCell(null);
+            setModalError(null);
+          }
         }}
       >
         <Dialog.Portal>
@@ -2193,23 +2368,67 @@ export function ResultTableBody({
                 className="sql-cell-modal-form"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  // Validate JSON-looking values so the user can't commit a
+                  // malformed document that the engine would then reject.
+                  if (looksLikeJson(modalEditCell.value)) {
+                    try {
+                      JSON.parse(modalEditCell.value);
+                    } catch (err) {
+                      setModalError(
+                        `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+                      );
+                      return;
+                    }
+                  }
+                  setModalError(null);
                   onSetPendingEdit(modalEditCell.cellKey, modalEditCell.value);
                   setModalEditCell(null);
                 }}
               >
                 <textarea
-                  className="sql-cell-modal-textarea"
+                  className="sql-cell-modal-textarea sql-cell-modal-textarea-mono"
                   value={modalEditCell.value}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    setModalError(null);
                     setModalEditCell({
                       ...modalEditCell,
                       value: e.target.value,
-                    })
-                  }
+                    });
+                  }}
                   autoFocus
-                  rows={8}
+                  rows={12}
+                  spellCheck={false}
                 />
+                {modalError && (
+                  <div className="sql-cell-modal-error">{modalError}</div>
+                )}
                 <div className="confirm-actions">
+                  {looksLikeJson(modalEditCell.value) && (
+                    <button
+                      type="button"
+                      className="confirm-btn confirm-btn-secondary sql-cell-modal-format"
+                      onClick={() => {
+                        try {
+                          const formatted = JSON.stringify(
+                            JSON.parse(modalEditCell.value),
+                            null,
+                            2,
+                          );
+                          setModalError(null);
+                          setModalEditCell({
+                            ...modalEditCell,
+                            value: formatted,
+                          });
+                        } catch (err) {
+                          setModalError(
+                            `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+                          );
+                        }
+                      }}
+                    >
+                      Format JSON
+                    </button>
+                  )}
                   <Dialog.Close className="confirm-btn confirm-btn-secondary">
                     Cancel
                   </Dialog.Close>
