@@ -1,0 +1,152 @@
+---
+title: Welcome
+description: A practical, intuition-first statistics course for data scientists who already know Python and Pandas — built around reasoning under uncertainty, not memorizing formulas.
+---
+
+Welcome to **Statistics for Data Science with Python**. You already
+know how to load a CSV, filter a DataFrame, group it, and chart it.
+You can answer "*what does the data say?*" This course teaches the
+harder, more valuable question: "*how much should I trust what the
+data says?*"
+
+That second question is where statistics lives. Two teams can run the
+exact same query on the exact same table and walk away with opposite
+conclusions — one ships a feature, the other kills it — because one
+of them mistook a random wiggle for a real signal. Statistics is the
+discipline that keeps you from fooling yourself.
+
+<Callout type="info" title="What we assume you already know">
+You can write basic Python, use Pandas (`read_csv`, filtering,
+`groupby`, `merge`), and make a chart. You do **not** need any prior
+statistics, probability, or heavy math. We build all of that from
+intuition.
+</Callout>
+
+## This is a reasoning course, not a formula course
+
+Most statistics material is a wall of symbols: estimators, theorems,
+and derivations you memorize for an exam and forget by Friday. This
+course is the opposite. For every idea we ask:
+
+- **What problem does it solve?** Why was it invented?
+- **When should you use it — and when should you *not*?**
+- **What do people get wrong about it?**
+- **Where does it show up in real data-science work?**
+
+You will still see formulas, but only when a formula makes the
+intuition *clearer*, never as something to memorize. The computer does
+the arithmetic; your job is to know which question you're asking and
+whether the answer makes sense.
+
+<Callout type="tip" title="The mantra for this whole course">
+Data describes the **sample** you happened to collect. Statistics is
+how you reason about the **population** you actually care about. Almost
+every concept here is a tool for crossing that gap honestly.
+</Callout>
+
+## What you'll be able to do by the end
+
+By the time you finish, you'll be able to:
+
+- Reason about **uncertainty, variation, and randomness** instead of
+  treating every number as exact.
+- Pick the right **summary statistics** and know when a mean lies to you.
+- Use **probability and probability distributions** to model how data behaves.
+- Understand **sampling** — why a sample of 1,000 can speak for millions, and how it goes wrong.
+- Build and interpret **confidence intervals** and **the bootstrap**.
+- Run and *correctly interpret* **hypothesis tests** with `scipy.stats`.
+- Explain what a **p-value** really is (and the four things it is *not*).
+- Distinguish **statistical significance from practical significance** using **effect sizes**.
+- Spot the classic **statistical fallacies** that sink real analyses.
+- Run a credible **A/B test** and a disciplined **exploratory statistical analysis**.
+
+## How the course is organized
+
+We move from *describing* data, to *modeling* uncertainty, to *making
+inferences* and *testing claims*, and finally to *applying* it all.
+
+```mermaid
+flowchart TD
+    A["Why Statistics<br/>(thinking under uncertainty)"] --> B["Describing Data<br/>(center, spread, shape)"]
+    B --> C["Probability<br/>(the language of chance)"]
+    C --> D["Distributions<br/>(models for data)"]
+    D --> E["Sampling & the CLT<br/>(samples speak for populations)"]
+    E --> F["Confidence Intervals<br/>(how precise is my estimate?)"]
+    F --> G["Hypothesis Testing<br/>(signal vs noise)"]
+    G --> H["Effect Sizes & Reasoning<br/>(does it matter? is it real?)"]
+    H --> I["Applied Statistics<br/>(EDA, A/B testing)"]
+```
+
+Each section builds on the one before it. The middle of the course —
+**sampling distributions**, the **central limit theorem**, **confidence
+intervals**, and **p-values** — is the conceptual heart. If those
+four ideas click, everything else is application.
+
+## The tools we use
+
+Every code block on every page is runnable. Edit it, click **Run**,
+and the output appears underneath. We lean on four libraries you'll
+use constantly as a working data scientist:
+
+| Library | What we use it for |
+| --- | --- |
+| **NumPy** | Generating data, vectorized math, random sampling |
+| **pandas** | Real datasets, grouping, summaries |
+| **scipy.stats** | Distributions, hypothesis tests, confidence intervals |
+| **Plotly Express** | Visualizing distributions, sampling, and results |
+
+Here's a taste. This snippet simulates an A/B test where the two
+groups are *truly identical*, then asks `scipy.stats` whether it can
+tell them apart. Run it a few times in your head — sometimes the
+"difference" looks convincing even though there's nothing there.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(7)
+
+# Two groups drawn from the EXACT same process — no real difference.
+control   = rng.normal(loc=100, scale=15, size=50)
+treatment = rng.normal(loc=100, scale=15, size=50)
+
+diff = treatment.mean() - control.mean()
+t, p = stats.ttest_ind(control, treatment)
+
+print(f"Observed difference in means: {diff:+.2f}")
+print(f"p-value from a t-test:        {p:.3f}")
+print()
+print("Even with NO real effect, random samples differ.")
+print("Statistics is how we decide whether a difference is believable.")
+`}
+/>
+
+By the end of the course, every line of that snippet — `normal`,
+`ttest_ind`, the p-value, and especially how to *interpret* it — will
+be second nature.
+
+## How the interactive widgets work
+
+You'll meet three kinds of interactive elements:
+
+1. **Code blocks** — editable, runnable Python. Change anything, re-run, experiment.
+2. **Challenge cards** — small problems with hidden tests. Write a solution, click **Submit**, and see which tests pass. These are where the learning sticks, so do them.
+3. **Multiple-choice questions** — quick conceptual checks with an explanation for every option.
+
+<Callout type="info" title="Each code block runs on its own">
+Variables you define in one code block are not shared with the next
+one, even on the same page. Every block starts fresh, so each example
+is self-contained.
+</Callout>
+
+## A note on honesty
+
+Statistics has a reputation for being a tool people use to lie. The
+truth is the opposite: statistics is the toolkit for *not* lying — to
+others, and especially to yourself. The whole field is a set of
+disciplined habits for staying humble about what a pile of numbers can
+and cannot prove.
+
+Let's begin with the most important question of all: if we already
+have the data, why isn't the data enough?
