@@ -34,6 +34,7 @@ import {
   ChevronUp,
   Clock,
   Hash,
+  Lock,
   Minus,
   SearchX,
   ToggleLeft,
@@ -1608,6 +1609,7 @@ export function ResultTableBody({
             header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
+              const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
               const sorted = column.getIsSorted();
               const colType =
                 set.columnTypes?.[ci] || inferColumnType(set.values, ci);
@@ -1719,6 +1721,14 @@ export function ResultTableBody({
                               </Popover.Root>
                             )}
                             <span>{displayName}</span>
+                            {isReadOnly && (
+                              <span
+                                className="sql-result-th-readonly"
+                                title="Read-only — generated column"
+                              >
+                                <Lock size={10} aria-label="Read-only column" />
+                              </span>
+                            )}
                           </span>
                           <span
                             className={
@@ -1861,7 +1871,11 @@ export function ResultTableBody({
               );
             },
             cell: (info) => {
-              if (!editable) {
+              // Generated / computed columns can't be updated; render them
+              // read-only so an edit can't be started that would only fail at
+              // commit time.
+              const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
+              if (!editable || isReadOnly) {
                 return formatCellValue(info.getValue());
               }
               const absoluteRow = info.row.original.absoluteRow;
@@ -2083,6 +2097,13 @@ export function ResultTableBody({
                     const cell = rightClickedCellRef.current;
                     if (cell === null || cell.colIdx < 0) return;
                     const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
                     const cellKey = `${absoluteRow}:${cell.colIdx}`;
                     const current = pendingEdits?.has(cellKey)
                       ? String(pendingEdits.get(cellKey) ?? "")
@@ -2099,6 +2120,14 @@ export function ResultTableBody({
                   onClick={() => {
                     const cell = rightClickedCellRef.current;
                     if (cell === null || cell.colIdx < 0) return;
+                    const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
                     onSetPendingEdit(`${absoluteRow}:${cell.colIdx}`, null);
                   }}
                 >

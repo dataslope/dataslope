@@ -95,7 +95,7 @@ Each finding carries an ID (`UX-NN`) for cross-reference from the phased plan in
 | UX-19 | Add Table subtitle "Create a new table" rendered in **green** accent (reads like a status) | 🟢 | All | `PostgresPlayground.tsx:3758-3759`; `sqlPlayground.css:1529-1532` |
 | **UX-20 ✅ Partial** | Cannot enter the literal string `"NULL"`; "NULL" is coerced to SQL NULL; no explicit Set-NULL affordance | 🟢 | All | Explicit "Set to NULL" context-menu item added, `ResultView.tsx`. Literal-`"NULL"` escape hatch → Phase 2b |
 | UX-21 | BLOB shown as `BLOB (N bytes)`; modal editor mangles binary; no hex/base64/upload | 🟡 | All | `utils/cellUtils.ts:21`; `components/ResultView.tsx:2200` |
-| UX-22 | Generated/view/read-only columns not visually distinguished; edits fail only on commit | 🟡 ♿ | All | `components/ResultView.tsx:1833-1848` |
+| **UX-22 ✅ Fixed** | Generated/read-only columns not visually distinguished; edits fail only on commit | 🟡 ♿ | PG, SQLite | Generated columns now carry a header lock marker, are non-editable inline, and the modal/Set-to-NULL paths are blocked with a toast. `ColumnKeyHints.readOnly` (from `TableColumnInfo.generated`) → `ResultView.tsx`. (DuckDB doesn't yet surface generation metadata.) |
 | UX-23 | Not mobile-responsive: horizontal overflow at 390 px, 270 px sidebar dominates | 🔴 (mobile) | All | layout CSS (see §10) |
 | UX-24 | Add Table 13-column table never collapses; horizontal scroll hides most fields on narrow widths | 🟡 ♿ | All | `sqlPlayground.css` (table wrapper) |
 
@@ -373,7 +373,7 @@ Shipped the contained, low-risk, high-value slice of Phase 2 and verified live w
 7. **UX-06 Editable hand-typed selects — ✅ DONE (2026-05-31).** `bareTableSelectSource` (`utils/sqlAnalysis.ts`) detects a bare `SELECT * FROM <table>` (optional LIMIT/OFFSET; rejects WHERE/JOIN/ORDER/GROUP/aggregate/subquery/multi-statement — 16/16 unit cases). Each `runSqlForTab` auto-sets `sourceTable` only when the name is an actual **table** (not a view), so edits never fail on commit. Safe because `SELECT *` guarantees the PK is present and the unfiltered order matches the table; the PK-based update path (above) handles identification. *Verified live:* `SELECT * FROM users` is editable and commits/round-trips; `SELECT name …`, `SELECT * … WHERE …`, and views stay read-only.
 8. **UX-08 Error attribution** — per-statement success/error badges, "statement N of M", and an editor line highlight of the failing token (pairs with the UX-14 line-highlight deferral). Touches the runtime/`useQueryRunner` multi-statement path.
 9. **UX-10 Commit/undo** — per-row/column discard of pending edits, keyboard commit/discard, and a one-step post-commit undo.
-10. **UX-22 read-only columns** — a lock/italic marker on generated/view/join columns, blocking the edit gracefully (needs generated-column metadata threaded into `ResultView`).
+10. **UX-22 read-only columns — ✅ DONE (2026-05-31).** Generated columns now carry a header lock marker, render non-editable inline, and reject the "Edit cell in modal" / "Set to NULL" paths with an informational toast. Implemented by extending `ColumnKeyHints` with a `readOnly` set (populated from `TableColumnInfo.generated` in each playground's `resultKeyHints`) and honouring it in `ResultView`. Works for Postgres + SQLite (both introspect generated columns); DuckDB's `duckdb_columns()` doesn't surface generation metadata yet, so its generated columns aren't marked (harmless — additive). *Verified live 5/5.*
 
 ### Phase 3 — Responsive & mobile (see §10)
 

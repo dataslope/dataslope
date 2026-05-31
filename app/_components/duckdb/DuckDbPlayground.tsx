@@ -2632,6 +2632,9 @@ function DuckDbPlaygroundInner() {
     return {
       pk: new Set(cols.filter((col) => col.pk > 0).map((col) => col.name)),
       fk: new Map(fks.map((fk) => [fk.from, fk])),
+      readOnly: new Set(
+        cols.filter((col) => col.generated).map((col) => col.name),
+      ),
     };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 

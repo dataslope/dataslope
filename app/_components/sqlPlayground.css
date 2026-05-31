@@ -1491,6 +1491,14 @@
   margin-right: 2px;
 }
 
+.sql-result-th-readonly {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
 .sql-result-th-fk {
   color: var(--text-dim);
   flex-shrink: 0;

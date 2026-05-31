@@ -57,6 +57,10 @@ export interface ResultTableRow {
 export interface ColumnKeyHints {
   pk: Set<string>;
   fk: Map<string, ForeignKeyInfo>;
+  /** Columns that cannot be edited (e.g. generated/computed columns). The
+   *  result grid marks them read-only so an edit can't be started that would
+   *  only fail at commit time. */
+  readOnly?: Set<string>;
 }
 
 export type ResultSetExportScope = "page" | "all";

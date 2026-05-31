@@ -2177,7 +2177,11 @@ function SqlPlaygroundInner() {
     }
     const fkByName = new Map<string, ForeignKeyInfo>();
     for (const fk of fks ?? []) fkByName.set(fk.from, fk);
-    return { pk, fk: fkByName };
+    const readOnly = new Set<string>();
+    for (const c of cols ?? []) {
+      if (c.generated) readOnly.add(c.name);
+    }
+    return { pk, fk: fkByName, readOnly };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
   const resultConstraintInfo = useMemo<
