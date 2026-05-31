@@ -1,0 +1,378 @@
+---
+title: The Train/Test Split
+description: Why we hide data from our own models — the single most important habit in machine learning, and the foundation of every honest evaluation.
+---
+
+If you remember one idea from this entire course, make it this one: **a
+model must be judged on data it has never seen.** Everything else —
+overfitting, cross-validation, every metric in the evaluation chapters —
+is a refinement of that single sentence.
+
+This page is about the simplest way to honor it: the **train/test split**.
+
+## The problem it solves
+
+Imagine a student who is given the exact questions and answers for an exam
+the night before. The next day they score 100%. Did they learn the
+material? You have no idea. The score is meaningless because they were
+tested on the very thing they memorized.
+
+Machine learning models can memorize too. A flexible enough model can
+essentially store the training data and replay it. If you then "test" it
+on that same data, it looks brilliant — and tells you nothing about how it
+will do tomorrow on a customer, a patient, or a transaction it has never
+encountered.
+
+<Callout type="warn" title="The cardinal sin">
+Evaluating a model on the same data it was trained on is the single most
+common way beginners fool themselves. The number you get is not
+performance — it is a measure of memory. We need a number that predicts
+the *future*, not one that flatters the *past*.
+</Callout>
+
+## The fix: hold some data back
+
+Before training, we randomly set aside a portion of the data — the **test
+set** — and lock it in a drawer. The model never sees it during training.
+We train on the rest (the **training set**), and only at the very end do we
+unlock the drawer and measure performance on those held-out rows.
+
+```mermaid
+flowchart LR
+    A["Full dataset<br/>(all rows)"] --> B{"random split"}
+    B --> C["Training set<br/>(about 70-80%)"]
+    B --> D["Test set<br/>(about 20-30%)"]
+    C --> E["model.fit(...)"]
+    E --> G["Trained model"]
+    D --> F["model.score(...)"]
+    G --> F
+    F --> H["Honest estimate of<br/>real-world performance"]
+```
+
+Because the test rows played no part in training, the model's score on
+them is a fair stand-in for how it will behave on genuinely new data. That
+is the whole trick.
+
+## `train_test_split` in practice
+
+scikit-learn gives us one function for this. It shuffles the rows and cuts
+them into two groups.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+print("Whole dataset:", X.shape, "->", len(y), "labels")
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.25,     # put 25% of rows in the test set
+    random_state=0,     # fixed seed so the split is reproducible
+)
+
+print("Training set:", X_train.shape)
+print("Test set:    ", X_test.shape)
+`}
+/>
+
+Four things come back, always in this order: `X_train, X_test, y_train,
+y_test`. The features and their labels are split *together*, row for row,
+so `y_train` still lines up with `X_train`.
+
+<Callout type="info" title="X and y, a quick reminder">
+By convention `X` (capital) is the feature matrix — one row per example,
+one column per feature — and `y` (lowercase) is the target we want to
+predict. We will use this naming on every page.
+</Callout>
+
+## Seeing the trap with your own eyes
+
+Let us make the danger concrete. We will train a deliberately
+over-flexible decision tree, then score it two ways: on the training data
+it memorized, and on the held-out test data. Watch the gap.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0
+)
+
+# A tree with no depth limit will grow until it fits the training data
+# almost perfectly.
+tree = DecisionTreeClassifier(random_state=0)
+tree.fit(X_train, y_train)
+
+print(f"Accuracy on TRAINING data: {tree.score(X_train, y_train):.3f}")
+print(f"Accuracy on TEST data:     {tree.score(X_test, y_test):.3f}")
+`}
+/>
+
+The training score is a perfect (or near-perfect) `1.000`. If that were
+our report card, we would declare victory. But the test score — the one
+that actually matters — is noticeably lower. That gap *is* overfitting,
+and the only reason we can see it at all is that we held data back.
+
+<Callout type="danger" title="A perfect training score is a red flag, not a trophy">
+When a model scores 100% on its training data, the right reaction is
+suspicion, not celebration. It usually means the model has memorized noise
+that will not repeat on new data. The test score is your reality check.
+</Callout>
+
+## `random_state`: making the split reproducible
+
+`train_test_split` shuffles before cutting, so without a fixed seed you
+would get a different split every run — and a slightly different score each
+time. Passing `random_state=0` (any fixed integer works) freezes the
+shuffle so your results are reproducible and you can compare models fairly.
+
+<Callout type="tip" title="Same seed, fair comparison">
+When comparing two models, give them the *same* `random_state` so they are
+trained and tested on exactly the same rows. Otherwise you might be
+comparing models, or you might just be comparing two lucky draws — you
+would not be able to tell which.
+</Callout>
+
+## `stratify`: keeping the class balance honest
+
+For classification, a purely random split can get unlucky and put, say,
+most of the rare class into the test set. Then the training set barely
+contains examples of it. The fix is **stratified** splitting: preserve each
+class's proportion in both halves.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from sklearn.model_selection import train_test_split
+
+# An imbalanced target: 90% class 0, 10% class 1.
+y = np.array([0] * 90 + [1] * 10)
+X = np.arange(100).reshape(-1, 1)
+
+# Without stratify, the test set's class 1 share is left to chance.
+_, _, _, y_test_plain = train_test_split(X, y, test_size=0.3, random_state=2)
+
+# With stratify=y, the 90/10 ratio is preserved in both halves.
+_, _, _, y_test_strat = train_test_split(
+    X, y, test_size=0.3, random_state=2, stratify=y
+)
+
+print("Class 1 count in test set, no stratify:", int((y_test_plain == 1).sum()))
+print("Class 1 count in test set, stratified: ", int((y_test_strat == 1).sum()))
+`}
+/>
+
+With `stratify=y`, the test set reliably contains 10% of class 1 — the same
+proportion as the full data. Use it whenever classes are imbalanced.
+
+## How big should the test set be?
+
+There is no magic number, but the tradeoff is intuitive:
+
+- **Bigger test set** → a more *precise* estimate of performance, but
+  *less* data to learn from, so the model itself may be weaker.
+- **Smaller test set** → more training data, but a noisier estimate that
+  swings with luck.
+
+Common choices are `test_size=0.2` or `0.25`. With only a few hundred rows,
+even 20% is a thin test set, and a single split becomes unreliable — which
+is exactly the motivation for **cross-validation**, coming up in a few
+pages.
+
+<Callout type="info" title="A subtle leak to avoid">
+The split must happen *before* you do anything that learns from the data —
+scaling, filling missing values, selecting features. If you scale using the
+mean of the *whole* dataset and then split, information from the test set
+has already leaked into training. Later, `Pipeline` will make doing this
+correctly the path of least resistance.
+</Callout>
+
+## When a *random* split is the wrong tool
+
+The plain random split assumes every row is independent and
+interchangeable. Sometimes that is false, and a random split quietly
+cheats:
+
+- **Time series.** To predict the future you must train on the past and
+  test on later data. A random split lets the model peek at the future to
+  predict the past. Split by time instead.
+- **Grouped data.** If the same patient, user, or device appears in many
+  rows, a random split can put some of their rows in training and some in
+  test. The model recognizes the individual, not the pattern. Split by
+  group (scikit-learn has `GroupShuffleSplit` for this).
+
+<Callout type="warn" title="Independence is an assumption, not a guarantee">
+`train_test_split` is correct only when rows are independent. For temporal
+or grouped data, a naive random split produces an optimistic score that
+collapses in production. Always ask: could a test row share its secret with
+a training row?
+</Callout>
+
+## Common misconceptions
+
+- **"More test data is always better."** No — it is a tradeoff. Past a
+  point you are starving the model to slightly sharpen an estimate.
+- **"The test score is the exact accuracy I will get in production."** It
+  is an *estimate* from one finite sample, with its own uncertainty. A
+  different split gives a different number.
+- **"Once I've looked at the test set, I can keep tuning against it."**
+  The moment you make decisions based on the test score, it stops being
+  unseen. Repeatedly tuning to the test set leaks it in slowly. That is
+  what a separate validation set and cross-validation are for.
+
+## Real-world applications
+
+Every credible deployed model rests on this habit. A bank estimating
+default risk, a hospital triaging scans, a streaming service ranking shows
+— all measure quality on held-out data first, because the cost of
+discovering overfitting *after* launch is measured in money, trust, or
+lives.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Split, train, and expose the gap"
+  category="model evaluation · train/test split"
+  estimatedTime="~6 min"
+  instructions={`The wine dataset has 178 samples in 3 classes.
+
+1. Load it with \`load_wine(return_X_y=True)\` into \`X\` and \`y\`.
+2. Split into train/test with **30%** in the test set, \`random_state=42\`,
+   and **stratified** on \`y\`.
+3. Train a \`DecisionTreeClassifier(random_state=42)\` on the training set.
+4. Store its training accuracy in \`train_acc\` and its test accuracy in
+   \`test_acc\` (both via \`.score(...)\`).
+
+The hidden tests check that the split is the right size, that it is
+stratified, and that \`train_acc\` is higher than \`test_acc\` (the
+overfitting gap).`}
+  initCode={`from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier`}
+  initialCode={`X, y = load_wine(return_X_y=True)
+
+# 1. Split (30% test, random_state=42, stratified on y)
+X_train, X_test, y_train, y_test = None, None, None, None
+
+# 2. Train a decision tree
+
+# 3. Record both accuracies
+train_acc = None
+test_acc = None
+
+print("train:", train_acc, "test:", test_acc)
+`}
+  solutionCode={`X, y = load_wine(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+tree = DecisionTreeClassifier(random_state=42)
+tree.fit(X_train, y_train)
+
+train_acc = tree.score(X_train, y_train)
+test_acc = tree.score(X_test, y_test)
+
+print("train:", train_acc, "test:", test_acc)
+`}
+  tests={[
+    {
+      id: "test_size",
+      name: "Test set is 30% of the data",
+      description: "54 of 178 rows held out",
+      code: `assert X_test.shape[0] == 54, f"Expected 54 test rows, got {X_test.shape[0]}"`,
+    },
+    {
+      id: "train_size",
+      name: "Training set is the other 70%",
+      description: "124 rows used for training",
+      code: `assert X_train.shape[0] == 124, f"Expected 124 train rows, got {X_train.shape[0]}"`,
+    },
+    {
+      id: "stratified",
+      name: "Split is stratified on y",
+      description: "Class proportions preserved in the test set",
+      code: `import numpy as np
+_, counts = np.unique(y_test, return_counts=True)
+# Stratified 30% of class counts [59, 71, 48] -> [18, 21, 15]
+assert sorted(counts.tolist()) == [15, 18, 21], f"Got class counts {sorted(counts.tolist())}"`,
+    },
+    {
+      id: "gap",
+      name: "Training accuracy exceeds test accuracy",
+      description: "The overfitting gap is visible",
+      code: `assert train_acc is not None and test_acc is not None
+assert train_acc > test_acc, "Expected the unrestricted tree to overfit (train > test)"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why do we evaluate a model on a held-out test set instead of on the data it was trained on?
+
+- Because test sets are easier to compute metrics on
+- [o] Because a model can memorize its training data, so its training score reflects memory rather than its ability to generalize to new data
+  > The training score can be inflated by memorization. Only data the model never saw during training gives an honest estimate of future performance.
+- Because scikit-learn requires it
+- Because the training data is usually corrupted
+
+The held-out test set stands in for "data the model will face in the future."`}
+/>
+
+<MultipleChoice
+  markdown={`A decision tree scores 1.000 on the training data and 0.890 on the test data. What is the most reasonable interpretation?
+
+- The model is perfect and ready to ship
+- Something is broken; scores should be equal
+- [o] The model has overfit — it memorized the training data, and the test score (0.890) is the honest estimate of real-world performance
+  > A large train-minus-test gap is the signature of overfitting. Trust the test score, and consider a simpler or more regularized model.
+- The test set must be too small to trust at all
+
+A near-perfect training score next to a lower test score is the classic overfitting pattern.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`stratify=y\` do in \`train_test_split\`, and when does it matter most?
+
+- It sorts the rows by \`y\` before splitting
+- It removes the rare class to balance the data
+- [o] It preserves each class's proportion in both the train and test sets, which matters most when classes are imbalanced
+  > Stratifying keeps the class ratio of the full dataset in both halves, so a rare class is not accidentally concentrated in one side.
+- It scales the features to have equal variance
+
+Stratification is about *representation*, not sorting or deleting data.`}
+/>
+
+<MultipleChoice
+  markdown={`You are predicting tomorrow's sales from historical daily data. Why is a plain random \`train_test_split\` a poor choice here?
+
+- Random splits are slower on time-series data
+- [o] The rows are ordered in time; a random split lets the model train on future days to predict past ones, which it can never do in reality
+  > Time-series rows are not independent. Honest evaluation trains on the past and tests on later data, mirroring how the model will actually be used.
+- Time-series data cannot be used in scikit-learn
+- You must always use the entire dataset for training with time series
+
+When rows carry a time order, the split must respect that order.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is fixing \`random_state\` to the same value useful when comparing two models?
+
+- It makes the models train faster
+- It guarantees both models reach 100% accuracy
+- [o] It makes both models see exactly the same train/test rows, so any difference in scores reflects the models, not two different lucky splits
+  > Holding the split constant removes split-luck as a confounder, so the comparison is apples-to-apples.
+- It changes the metric used to score the models
+
+Reproducible splits are what let you attribute a score difference to the model itself.`}
+/>
