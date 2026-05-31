@@ -460,9 +460,3 @@ int main(void) {
 - [o] Stop using it (and ideally set it to \`NULL\` so accidental later uses become immediate NULL-pointer crashes instead of silent corruption).
   > \`free(p); p = NULL;\` is a well-known defensive pattern.`}
 />
-
-<Callout type="success" title="On to composite types">
-You can now allocate, resize, and free memory. Next: how to lay out
-multiple fields together with \`struct\` (and what padding does to
-your nice clean diagrams).
-</Callout>
