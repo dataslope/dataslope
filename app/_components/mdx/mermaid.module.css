@@ -4,8 +4,23 @@
      the same size — container controls what the SVG inherits */
   font-size: 15px;
   font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
-  display: flex;
-  justify-content: center;
+}
+
+/* Let the diagram fill the available column width and center within it.
+   Mermaid emits the SVG with width="100%" plus an inline `max-width:<W>px`
+   cap equal to the diagram's intrinsic width, which otherwise locks it to
+   that natural (often small) size. Overriding the cap lets the SVG — which
+   carries a viewBox — scale up uniformly to the column width. */
+.wrap > div:first-child {
+  width: 100%;
+}
+
+.wrap > div:first-child svg {
+  display: block;
+  margin-inline: auto;
+  width: 100%;
+  height: auto;
+  max-width: 100% !important;
 }
 
 .expandBtn {
