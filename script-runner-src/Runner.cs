@@ -76,7 +76,18 @@ public partial class Runner
             {
                 peStream.Position = 0;
                 var assembly = Assembly.Load(peStream.ToArray());
-                var entryPoint = assembly.EntryPoint;
+                // For top-level statements that use `await`, Roslyn makes the
+                // public EntryPoint a synchronous wrapper that blocks on the
+                // async body via `.GetAwaiter().GetResult()`. That blocking
+                // wait throws "Cannot wait on monitors on this runtime" on the
+                // single-threaded WASM interpreter, so prefer the generated
+                // async entry point (`<Main>$`) and await it instead.
+                var asyncEntry = assembly.GetTypes()
+                    .SelectMany(t => t.GetMethods(
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    .FirstOrDefault(m => m.Name == "<Main>$"
+                        && typeof(Task).IsAssignableFrom(m.ReturnType));
+                var entryPoint = asyncEntry ?? assembly.EntryPoint;
                 if (entryPoint != null)
                 {
                     var args = entryPoint.GetParameters().Length == 0 ? null : new object[] { Array.Empty<string>() };
@@ -121,6 +132,8 @@ public partial class Runner
         if (cachedReferences != null)
             return cachedReferences;
 
+        EnsureBclAssembliesLoaded();
+
         using var http = new HttpClient { BaseAddress = new Uri(GetDotnetBundleBaseUrl()) };
         var references = new List<MetadataReference>();
         var assemblyNames = AppDomain.CurrentDomain.GetAssemblies()
@@ -146,6 +159,20 @@ public partial class Runner
 
         cachedReferences = references.ToArray();
         return cachedReferences;
+    }
+
+    // Force-load BCL assemblies that the Packages drawer advertises but that
+    // Runner.cs itself never references (System.Numerics, RegularExpressions).
+    // Without this they're absent from AppDomain.CurrentDomain.GetAssemblies()
+    // and never become Roslyn metadata references, so user code using
+    // BigInteger, Complex or Regex fails to compile (CS0246) even with the
+    // correct `using`. These DLLs already ship in the boot bundle
+    // (dotnet.boot.js), so touching them adds no extra download.
+    private static void EnsureBclAssembliesLoaded()
+    {
+        _ = typeof(System.Numerics.BigInteger);
+        _ = typeof(System.Numerics.Complex);
+        _ = typeof(System.Text.RegularExpressions.Regex);
     }
 
     private static bool IsSafeAssemblyName(string name)
