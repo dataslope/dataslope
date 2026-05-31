@@ -4,23 +4,23 @@
     "root": true,
     "pages": [
         "index",
-        "---[Rocket]Getting Started---",
+        "---",
         "why-c-for-systems",
         "c-toolchain",
         "data-types-and-memory",
-        "---[MousePointer]Pointers & Arrays---",
+        "---",
         "pointers",
         "arrays-and-pointers",
         "strings",
-        "---[Layers]Memory Layout---",
+        "---",
         "memory-layout",
         "stack-and-functions",
         "heap-and-dynamic-allocation",
-        "---[Boxes]Composite Types & Bugs---",
+        "---",
         "structs-and-unions",
         "memory-bugs",
         "real-world-disasters",
-        "---[Flag]Wrap-up---",
+        "---",
         "next-steps"
     ]
 }
