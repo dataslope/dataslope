@@ -487,31 +487,6 @@ int main() {
 }
 `,
   },
-  {
-    cat: "Diagnostics",
-    icon: "🛑",
-    color: "#f472b6",
-    name: "stdexcept",
-    ver: "C++20",
-    desc: "Standard exception types: runtime_error, logic_error, ...",
-    example: `#include <iostream>
-#include <stdexcept>
-
-int safe_divide(int a, int b) {
-    if (b == 0) throw std::runtime_error("division by zero");
-    return a / b;
-}
-
-int main() {
-    try {
-        std::cout << safe_divide(10, 0) << std::endl;
-    } catch (const std::exception& e) {
-        std::cout << "caught: " << e.what() << std::endl;
-    }
-    return 0;
-}
-`,
-  },
 ];
 
 // ─── Worker-based runtime ────────────────────────────────────────────────

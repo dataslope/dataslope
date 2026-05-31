@@ -75,6 +75,50 @@ function post(msg: OutMessage) {
 let pyodide: PyodideInterface | null = null;
 let initPromise: Promise<void> | null = null;
 
+// Some packages advertised in the Packages drawer ship as pure-Python
+// wheels on PyPI but are NOT part of the Pyodide distribution, so
+// `loadPackagesFromImports()` can't see them (it only knows the bundled
+// lockfile). Map each importable module name to its PyPI requirement and
+// micropip-install it the first time the user's code imports it. `plotly`
+// is installed eagerly at init, so it doesn't need to be listed here.
+const MICROPIP_PACKAGES: Record<string, string> = {
+  openpyxl: "openpyxl",
+  seaborn: "seaborn",
+};
+const micropipInstalled = new Set<string>();
+
+/** True when `code` imports the top-level module `mod` (matches
+ *  `import mod`, `import mod as x`, `import a, mod`, `from mod import …`,
+ *  anchored to a line start so matches inside strings/comments are
+ *  ignored). Mirrors the adapter's `hasImport`. */
+function codeImportsModule(code: string, mod: string): boolean {
+  const esc = mod.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(
+    `^\\s*(?:from\\s+${esc}(?:\\.[\\w.]+)?\\s+import\\b|import\\s+(?:[\\w.]+\\s*,\\s*)*${esc}(?:\\.[\\w.]+)?(?:\\s+as\\s+\\w+)?\\s*(?:,|$|#))`,
+    "m",
+  );
+  return re.test(code);
+}
+
+/** Install any micropip-only drawer packages referenced by `code` that
+ *  haven't been installed yet. Throws on install failure so the caller can
+ *  surface it as an stderr cell. */
+async function ensureMicropipPackages(code: string): Promise<void> {
+  if (!pyodide) return;
+  const needed = Object.entries(MICROPIP_PACKAGES)
+    .filter(
+      ([mod, req]) =>
+        !micropipInstalled.has(req) && codeImportsModule(code, mod),
+    )
+    .map(([, req]) => req);
+  if (needed.length === 0) return;
+  const micropip = pyodide.pyimport("micropip");
+  for (const req of needed) {
+    await micropip.install(req);
+    micropipInstalled.add(req);
+  }
+}
+
 function isStringArray(v: unknown): v is string[] {
   return Array.isArray(v) && v.every((x) => typeof x === "string");
 }
@@ -320,6 +364,9 @@ async function runCode(
         console.error("[pyodide:loadPackage]", m);
       },
     });
+    // Pure-Python drawer packages that aren't in the Pyodide lockfile
+    // (e.g. openpyxl, seaborn) need an explicit micropip install.
+    await ensureMicropipPackages(code);
   } catch (err) {
     stderr += `Failed to auto-load packages: ${
       err instanceof Error ? err.message : String(err)

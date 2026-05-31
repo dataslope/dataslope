@@ -179,9 +179,23 @@ function entryStem(filename: string): string {
   return dot > 0 ? leaf.slice(0, dot) : leaf;
 }
 
+/** Render a Run-button label that wraps the entry-file stem in a
+ *  semantic `<code>` element (styled as a subtle inline chip) rather
+ *  than literal backticks, e.g. Run `main` → Run <code>main</code>.
+ *  `topLevel` appends the " (top-level)" qualifier used by C# entry
+ *  points in the chevron dropdown. */
+function runEntryLabel(stem: string, topLevel = false): ReactNode {
+  return (
+    <>
+      Run <code className="playground-run-entry">{stem}</code>
+      {topLevel ? " (top-level)" : null}
+    </>
+  );
+}
+
 /** Describes one option in the Run split-button dropdown. */
 interface RunDropdownItem {
-  label: string;
+  label: ReactNode;
   /** Workspace path of the file to execute when this item is clicked. */
   entryFilename: string;
 }
@@ -191,8 +205,8 @@ interface RunDropdownItem {
  *  Java, C#) and single-entry-point languages (Python, R, JS, TS,
  *  PHP). */
 interface RunButtonState {
-  /** Text rendered inside the primary button after the play icon. */
-  primaryLabel: string;
+  /** Content rendered inside the primary button after the play icon. */
+  primaryLabel: ReactNode;
   /** Workspace path of the file the primary button executes. `null`
    *  means "run the active editor as-is" (used when the active file
    *  is the canonical entry). */
@@ -235,17 +249,14 @@ function computeRunButtonState(
     if (activeEntry) {
       // C# top-level files use the bare "Run" label per spec — the
       // file simply executes itself top-to-bottom.
-      const label =
+      const label: ReactNode =
         activeEntry.kind === "topLevel"
           ? "Run"
-          : `Run \`${stemFor(activeEntry.filename)}\``;
+          : runEntryLabel(stemFor(activeEntry.filename));
       const dropdown = entries
         .filter((e) => e.filename !== activeEntry.filename)
         .map((e) => ({
-          label:
-            e.kind === "topLevel"
-              ? `Run \`${stemFor(e.filename)}\` (top-level)`
-              : `Run \`${stemFor(e.filename)}\``,
+          label: runEntryLabel(stemFor(e.filename), e.kind === "topLevel"),
           entryFilename: e.filename,
         }));
       return {
@@ -278,14 +289,11 @@ function computeRunButtonState(
     const dropdown = entries
       .filter((e) => e.filename !== primaryEntry.filename)
       .map((e) => ({
-        label:
-          e.kind === "topLevel"
-            ? `Run \`${stemFor(e.filename)}\` (top-level)`
-            : `Run \`${stemFor(e.filename)}\``,
+        label: runEntryLabel(stemFor(e.filename), e.kind === "topLevel"),
         entryFilename: e.filename,
       }));
     return {
-      primaryLabel: `Run \`${stemFor(primaryEntry.filename)}\``,
+      primaryLabel: runEntryLabel(stemFor(primaryEntry.filename)),
       primaryEntry: primaryEntry.filename,
       dropdownItems: dropdown,
     };
@@ -304,11 +312,11 @@ function computeRunButtonState(
     return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
   }
   return {
-    primaryLabel: `Run \`${stemFor(activeFile.filename)}\``,
+    primaryLabel: runEntryLabel(stemFor(activeFile.filename)),
     primaryEntry: null,
     dropdownItems: [
       {
-        label: `Run \`${stemFor(primaryFile.filename)}\``,
+        label: runEntryLabel(stemFor(primaryFile.filename)),
         entryFilename: primaryFile.filename,
       },
     ],

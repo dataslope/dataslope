@@ -76,7 +76,18 @@ public partial class Runner
             {
                 peStream.Position = 0;
                 var assembly = Assembly.Load(peStream.ToArray());
-                var entryPoint = assembly.EntryPoint;
+                // For top-level statements that use `await`, Roslyn makes the
+                // public EntryPoint a synchronous wrapper that blocks on the
+                // async body via `.GetAwaiter().GetResult()`. That blocking
+                // wait throws "Cannot wait on monitors on this runtime" on the
+                // single-threaded WASM interpreter, so prefer the generated
+                // async entry point (`<Main>$`) and await it instead.
+                var asyncEntry = assembly.GetTypes()
+                    .SelectMany(t => t.GetMethods(
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    .FirstOrDefault(m => m.Name == "<Main>$"
+                        && typeof(Task).IsAssignableFrom(m.ReturnType));
+                var entryPoint = asyncEntry ?? assembly.EntryPoint;
                 if (entryPoint != null)
                 {
                     var args = entryPoint.GetParameters().Length == 0 ? null : new object[] { Array.Empty<string>() };
@@ -127,6 +138,19 @@ public partial class Runner
             .Where(assembly => !assembly.IsDynamic)
             .Select(assembly => assembly.GetName().Name)
             .Where(name => !string.IsNullOrEmpty(name) && IsSafeAssemblyName(name))
+            // Assemblies the Packages drawer advertises but that aren't loaded
+            // into the AppDomain when the first script compiles, so they're
+            // missing from GetAssemblies() above and user code using
+            // BigInteger/Complex/Vector<T> (System.Runtime.Numerics,
+            // System.Numerics.Vectors) or Regex (System.Text.RegularExpressions)
+            // fails with CS0246. Add them by name; the DLLs already ship in the
+            // boot bundle, so this adds no payload.
+            .Concat(new[]
+            {
+                "System.Runtime.Numerics",
+                "System.Numerics.Vectors",
+                "System.Text.RegularExpressions",
+            })
             .Distinct()
             .OrderBy(name => name);
 

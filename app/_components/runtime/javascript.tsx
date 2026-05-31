@@ -118,17 +118,22 @@ console.log("EOL bytes =>", JSON.stringify(os.EOL));
     key: "multi_file",
     title: "Multi-File Modules",
     desc: "Split logic across files with require()",
-    code: `// Add another tab named "utils.js" with the contents:
-//
-//   exports.greet = (name) => \`Hello, \${name}!\`;
-//   exports.shout = (s) => s.toUpperCase() + "!";
-//
-// then run this file — \`require\` resolves from the workspace VFS.
+    code: `// utils.js sits alongside this file in the workspace — \`require\`
+// resolves it from the VFS. Edit either tab and re-run.
 const utils = require("./utils");
 
 console.log(utils.greet("almostnode"));
 console.log(utils.shout("multi-file modules just work"));
 `,
+    files: [
+      {
+        filename: "utils.js",
+        content: `exports.greet = (name) => \`Hello, \${name}!\`;
+exports.shout = (s) => s.toUpperCase() + "!";
+`,
+      },
+    ],
+    entryFilename: "index.js",
   },
   {
     key: "classes",
