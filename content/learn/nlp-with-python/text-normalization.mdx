@@ -228,7 +228,7 @@ assert all(t not in string.punctuation for t in clean), "pure-punctuation token 
 - It removes stopwords automatically.
   > Lowercasing doesn't remove any tokens; it only changes their case.
 - [o] It merges case-variants (\`Apple\`, \`APPLE\`, \`apple\`) into one token, shrinking the vocabulary and making counts more meaningful.
-  > Correct — collapsing case is a direct attack on the variation problem.
+  > Collapsing case is a direct attack on the variation problem.
 - It separates punctuation from words.
   > That's tokenization's job, not lowercasing.
 - It corrects spelling mistakes.
@@ -244,7 +244,7 @@ same word written differently counts as the same token.`}
 - Lowercasing is always wrong and should never be used.
   > It's often useful; the issue is specific to case-carried meaning.
 - [o] Lowercasing erases the capitalization that distinguishes entities like \`US\`/\`us\` and \`Apple\`/\`apple\`, which the task depends on.
-  > Exactly — for named-entity work, case *is* signal, and discarding it removes the very clue the task needs.
+  > For named-entity work, case *is* signal, and discarding it removes the very clue the task needs.
 - Lowercasing makes the text longer.
   > It doesn't change length.
 - Lowercasing only affects punctuation.
@@ -263,7 +263,7 @@ default there.`}
 - Because punctuation never appears inside meaningful tokens.
   > It does — in \`3.50\`, \`e-mail\`, \`best-performing\`.
 - [o] Because stripping inner punctuation would damage meaningful tokens like \`3.50\`, \`e-mail\`, and \`best-performing\`, while the whole-token check leaves them intact.
-  > Correct — dropping only standalone punctuation removes noise without mangling real tokens.
+  > Dropping only standalone punctuation removes noise without mangling real tokens.
 - Because \`string.punctuation\` is empty by default.
   > It contains the standard punctuation characters.
 

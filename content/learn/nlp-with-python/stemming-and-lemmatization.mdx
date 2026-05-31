@@ -269,7 +269,7 @@ assert d["mice"] == "mouse", f"expected 'mouse', got {d['mice']}"`,
 - Stemming works on sentences; lemmatization works on words.
   > Both operate on individual words.
 - [o] Stemming chops suffixes by fixed rules and may produce non-words; lemmatization looks words up in a dictionary and always returns a real base form.
-  > Correct — rule-based chopping vs. dictionary-based lookup is the core distinction.
+  > Rule-based chopping vs. dictionary-based lookup is the core distinction.
 - Stemming uses a dictionary; lemmatization uses rules.
   > It's the reverse — lemmatization is the dictionary-based one.
 - They are two names for the same algorithm.
@@ -286,7 +286,7 @@ lemmatization is a dictionary lookup that returns real lemmas like
 - It has a bug.
   > It's behaving exactly as designed.
 - [o] It mechanically strips the \`-es\` suffix without consulting any dictionary, so it produces a consistent key rather than a real word.
-  > Correct — the stem is an internal key, not meant to be a real word.
+  > The stem is an internal key, not meant to be a real word.
 - \`studi\` is the correct English base form of \`studies\`.
   > The real base form is \`study\`; \`studi\` is just the stem.
 - It first lemmatizes, then chops.
@@ -303,7 +303,7 @@ for tasks like search.`}
 - A stemmer, because it is faster.
   > Speed isn't the deciding factor here, and a stemmer would give \`wa\`/\`is\`/\`were\`, not \`be\`.
 - [o] A lemmatizer (with verb POS), because it maps irregular forms to the true base \`be\`, preserving meaning.
-  > Correct — semantic understanding needs real base forms, which only lemmatization provides.
+  > Semantic understanding needs real base forms, which only lemmatization provides.
 - Neither — stemming and lemmatization are interchangeable.
   > They are not; only lemmatization recovers \`be\` from \`was\`.
 - A stopword filter, because \`was\` and \`is\` are stopwords.
@@ -320,7 +320,7 @@ to \`be\`.`}
 - WordNet does not contain the word \`running\`.
   > It does; the issue is the assumed part of speech.
 - [o] The lemmatizer assumes a **noun** unless told otherwise, and \`running\` is a valid noun, so it isn't reduced. Passing \`pos="v"\` returns \`run\`.
-  > Correct — POS controls lemmatization, and the noun default leaves verb forms untouched.
+  > POS controls lemmatization, and the noun default leaves verb forms untouched.
 - The lemmatizer is broken without a stemmer.
   > It works fine; it just needs the right POS.
 - \`running\` is a stopword.

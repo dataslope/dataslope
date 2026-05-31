@@ -228,7 +228,7 @@ of why exposing the contraction matters.
 - They are the same; \`word_tokenize\` just runs \`split()\` internally.
   > It does not — it applies linguistic rules that \`split()\` has no concept of.
 - [o] A tokenizer applies linguistic rules (handling punctuation, contractions, numbers), while \`split()\` only cuts on whitespace.
-  > Correct — that rule-awareness is the entire difference.
+  > That rule-awareness is the entire difference.
 - \`split()\` is more accurate but slower than tokenization.
   > \`split()\` is faster but *less* accurate on natural text.
 - Tokenization only works on sentences, not words.
@@ -244,7 +244,7 @@ actually composes words, punctuation, and numbers.`}
 - Because sentences never end with a period.
   > They usually do — the problem is that periods appear in *other* places too.
 - [o] Because periods also appear in abbreviations (\`Dr.\`), decimals (\`3.50\`), and ellipses (\`...\`), so a period is not always a sentence end.
-  > Exactly — the sentence tokenizer must distinguish sentence-ending periods from these other uses.
+  > The sentence tokenizer must distinguish sentence-ending periods from these other uses.
 - Because Python's \`split\` can only cut on whitespace.
   > \`split('.')\` can cut on periods; the issue is that doing so is linguistically wrong.
 - Because sentences must be tokenized into words first.
@@ -263,7 +263,7 @@ tells these uses apart.`}
 - The default \`word_tokenize\`, because it is always best.
   > It shreds \`:)\` into \`:\` \`)\` and splits \`#deal\` into \`#\` \`deal\`, losing the social-media units.
 - [o] A specialized tokenizer such as NLTK's \`TweetTokenizer\`, which preserves hashtags, mentions, and emoticons as single tokens.
-  > Correct — matching the tokenizer to the text is the whole point.
+  > Matching the tokenizer to the text is the whole point.
 - No tokenizer can handle tweets.
   > Specialized tweet tokenizers handle them well.
 

@@ -125,7 +125,7 @@ chapter from here on is a deep dive into one of these arrows.
 - Because it is the slowest step and should be done while the machine is fresh.
   > Ordering in a pipeline is about data dependencies, not performance scheduling.
 - [o] Because every later step operates on tokens, so the text must be split into units before anything else can run.
-  > Correct — you cannot lowercase, filter, or count "words" until you've decided what the words are.
+  > You cannot lowercase, filter, or count "words" until you've decided what the words are.
 - Because tokenization removes stopwords.
   > Tokenization only splits text into units; stopword removal is a separate, later step.
 - Because the downstream task requires raw strings, not tokens.
@@ -144,7 +144,7 @@ spends.`}
 - Stopword removal is required for all NLP tasks.
   > It is genuinely optional and can hurt some tasks.
 - [o] Whether to remove stopwords depends on the task — it helps some (search, topic modeling) and hurts others (sentiment).
-  > Exactly — it is a deliberate, task-dependent choice, not an automatic step.
+  > It is a deliberate, task-dependent choice, not an automatic step.
 - Stopword removal must always be done before tokenization.
   > It operates on tokens, so it can only happen *after* tokenization.
 

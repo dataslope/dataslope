@@ -272,7 +272,7 @@ print("Verbs:", verbs)
 - Its sentiment (positive or negative).
   > That's sentiment analysis, a different task.
 - [o] Its grammatical category in context (noun, verb, adjective, etc.).
-  > Correct — POS tagging labels the word's syntactic role.
+  > POS tagging labels the word's syntactic role.
 - Its frequency in the document.
   > That's a frequency distribution, covered later.
 - Its dictionary definition.
@@ -288,7 +288,7 @@ label that depends on context.`}
 - The tagger is inconsistent and unreliable.
   > It's being *correct* — the two \`fish\`es really do have different roles.
 - [o] A word's part of speech depends on context, so the tagger uses surrounding words rather than the word alone.
-  > Exactly — context decides the tag, which is why a plain dictionary lookup can't do this.
+  > Context decides the tag, which is why a plain dictionary lookup can't do this.
 - \`fish\` is always a noun and the first tag is wrong.
   > \`fish\` is genuinely a verb in "I fish every Sunday."
 - The tagger first lemmatizes the word.
@@ -304,7 +304,7 @@ context-sensitivity is the entire reason POS tagging exists.`}
 - It removes stopwords for the lemmatizer.
   > Tagging doesn't remove anything.
 - [o] The lemmatizer needs each word's part of speech to choose the correct base form (e.g. \`running\`→\`run\` only when treated as a verb).
-  > Correct — feeding the POS into the lemmatizer fixes verbs and adjectives that the noun default would miss.
+  > Feeding the POS into the lemmatizer fixes verbs and adjectives that the noun default would miss.
 - Lemmatization is impossible without tagging.
   > It's possible (POS defaults to noun), just less accurate.
 - Tagging makes lemmatization run faster.

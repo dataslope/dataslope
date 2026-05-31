@@ -226,7 +226,7 @@ print(kept)
 - Stopwords are grammatically incorrect.
   > They are perfectly grammatical; the issue is information content.
 - [o] Stopwords appear in nearly every document, so they carry almost no information about which documents match a query.
-  > Correct — a word that is everywhere can't help you discriminate between documents.
+  > A word that is everywhere can't help you discriminate between documents.
 - Removing stopwords makes the remaining words longer.
   > It doesn't change word length.
 - Stopwords are always misspelled.
@@ -242,7 +242,7 @@ tasks, dropping them concentrates the signal in the content words.`}
 - The tokenizer failed to split the phrase.
   > Tokenization works fine; the damage is in stopword removal.
 - [o] NLTK's stopword list includes \`not\`, so the negation was deleted, leaving only \`good\`.
-  > Exactly — losing \`not\` inverts the sentiment of the phrase.
+  > Losing \`not\` inverts the sentiment of the phrase.
 - \`good\` is a stopword and was kept by mistake.
   > \`good\` is not a stopword; it's a content word and was correctly kept.
 - Sentiment analysis cannot use word counts at all.
@@ -261,7 +261,7 @@ sentiment.`}
 - Extracting keywords for a search index.
   > Keyword/search tasks remove stopwords to sharpen relevance.
 - [o] Authorship attribution, where a writer's unconscious use of function words is a stylistic fingerprint.
-  > Correct — for style-based tasks, function words are the signal, not noise.
+  > For style-based tasks, function words are the signal, not noise.
 - Counting how often each topic word appears.
   > Topic counting drops stopwords.
 
