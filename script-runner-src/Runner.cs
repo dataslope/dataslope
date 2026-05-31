@@ -132,14 +132,25 @@ public partial class Runner
         if (cachedReferences != null)
             return cachedReferences;
 
-        EnsureBclAssembliesLoaded();
-
         using var http = new HttpClient { BaseAddress = new Uri(GetDotnetBundleBaseUrl()) };
         var references = new List<MetadataReference>();
         var assemblyNames = AppDomain.CurrentDomain.GetAssemblies()
             .Where(assembly => !assembly.IsDynamic)
             .Select(assembly => assembly.GetName().Name)
             .Where(name => !string.IsNullOrEmpty(name) && IsSafeAssemblyName(name))
+            // Assemblies the Packages drawer advertises but that aren't loaded
+            // into the AppDomain when the first script compiles, so they're
+            // missing from GetAssemblies() above and user code using
+            // BigInteger/Complex/Vector<T> (System.Runtime.Numerics,
+            // System.Numerics.Vectors) or Regex (System.Text.RegularExpressions)
+            // fails with CS0246. Add them by name; the DLLs already ship in the
+            // boot bundle, so this adds no payload.
+            .Concat(new[]
+            {
+                "System.Runtime.Numerics",
+                "System.Numerics.Vectors",
+                "System.Text.RegularExpressions",
+            })
             .Distinct()
             .OrderBy(name => name);
 
@@ -159,20 +170,6 @@ public partial class Runner
 
         cachedReferences = references.ToArray();
         return cachedReferences;
-    }
-
-    // Force-load BCL assemblies that the Packages drawer advertises but that
-    // Runner.cs itself never references (System.Numerics, RegularExpressions).
-    // Without this they're absent from AppDomain.CurrentDomain.GetAssemblies()
-    // and never become Roslyn metadata references, so user code using
-    // BigInteger, Complex or Regex fails to compile (CS0246) even with the
-    // correct `using`. These DLLs already ship in the boot bundle
-    // (dotnet.boot.js), so touching them adds no extra download.
-    private static void EnsureBclAssembliesLoaded()
-    {
-        _ = typeof(System.Numerics.BigInteger);
-        _ = typeof(System.Numerics.Complex);
-        _ = typeof(System.Text.RegularExpressions.Regex);
     }
 
     private static bool IsSafeAssemblyName(string name)
