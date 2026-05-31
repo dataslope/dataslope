@@ -460,9 +460,10 @@ code.hljs {
   letter-spacing: 0;
 }
 
-/* ── Course breadcrumb label ─────────────────────────────────────────────
-   Rendered above DocsTitle on pages nested inside a course (slug length > 1).
-   Styled as a small, muted serif link so it reads as context, not a heading.
+/* ── Course label ────────────────────────────────────────────────────────
+   Rendered as the sidebar banner (below the search bar) on pages nested
+   inside a course, linking back to the course landing page. Styled as a
+   small, muted serif link so it reads as context, not a heading.
    ─────────────────────────────────────────────────────────────────────── */
 [data-course-label] {
   display: block;
