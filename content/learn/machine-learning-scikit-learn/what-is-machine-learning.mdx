@@ -1,0 +1,512 @@
+---
+title: What Is Machine Learning?
+description: The one idea that makes everything else click — learning patterns from examples instead of hand-coding rules. We contrast traditional programming with machine learning and define model, training, and prediction at an intuitive level.
+---
+
+Suppose your manager asks you to write a program that decides whether an
+email is spam. You sit down, and your first instinct is the natural one:
+write rules. *If the subject says "free money", flag it. If it has more
+than five exclamation marks, flag it. If the sender is on a blocklist, flag
+it.* You ship it, and for a week it works. Then the spammers write "fr33
+m0ney" instead, and your rule is blind. You add another rule. They adapt
+again. You are now in an arms race you cannot win by typing faster.
+
+Machine learning is what you reach for when the rules stop being something
+you can sensibly write by hand. Instead of *telling* the computer how to
+recognize spam, you *show* it thousands of emails already labeled "spam" or
+"not spam" and let it work out the pattern itself. That inversion — from
+writing rules to learning them from examples — is the entire idea, and once
+it clicks, every algorithm in this course is a variation on it.
+
+## Traditional programming: you supply the rules
+
+For most of the software you have ever written, *you* are the source of the
+intelligence. You think about the problem, you decide on the logic, and you
+encode that logic as explicit instructions. The computer just executes them
+faithfully.
+
+In that world, a program takes **rules** (the code you wrote) and **data**
+(the input) and produces **answers** (the output).
+
+```mermaid
+flowchart LR
+    R1["Rules<br/>(the code you write)"] --> P1["Program"]
+    D1["Data<br/>(the input)"] --> P1
+    P1 --> A1["Answers<br/>(the output)"]
+```
+
+This is how you compute a tax bill, sort a list, render a web page, or
+validate a form. And when you *can* state the rules, this is exactly the
+right approach. It is precise, predictable, debuggable, and you never need
+a single training example. Do not let anyone convince you that machine
+learning is the sophisticated choice and rules are the primitive one — for
+a problem with clear logic, hand-written rules are almost always the better
+engineering decision.
+
+<Callout type="tip" title="The first question to ask">
+Before reaching for machine learning, always ask: *can I just write the
+rule?* If a short, stable rule solves your problem, write it. Machine
+learning earns its complexity only when the rules are too numerous, too
+subtle, or too fast-changing to write by hand. We devote the entire next
+page to exactly when that line gets crossed.
+</Callout>
+
+## Machine learning: you supply examples, it learns the rules
+
+Now flip the diagram. With machine learning you no longer write the rules.
+Instead you provide **data** *paired with* the **answers** you want, and the
+algorithm produces the **rules** — a thing we call a **model**.
+
+```mermaid
+flowchart LR
+    D2["Data<br/>(example inputs)"] --> M["Learning<br/>algorithm"]
+    A2["Answers<br/>(the labels)"] --> M
+    M --> R2["Model<br/>(the learned rules)"]
+```
+
+Put the two diagrams side by side and the inversion is stark. In
+traditional programming, rules go *in* and answers come *out*. In machine
+learning, answers go *in* (alongside the data) and rules come *out*.
+
+```mermaid
+flowchart TD
+    subgraph TP["Traditional programming"]
+        direction LR
+        tr["Rules"] --> tp["Program"]
+        td["Data"] --> tp
+        tp --> ta["Answers"]
+    end
+    subgraph ML["Machine learning"]
+        direction LR
+        md["Data"] --> mp["Learning algorithm"]
+        ma["Answers"] --> mp
+        mp --> mr["Model (rules)"]
+    end
+    TP -.-> ML
+```
+
+That learned model is not magic. It is, quite literally, a set of rules — it
+is just that the computer discovered them by looking at examples, rather
+than receiving them from you. Sometimes those rules are human-readable (a
+decision tree is a stack of if/else questions you can read off). Sometimes
+they are a wall of numbers you would never want to read. Either way, the
+output of "doing machine learning" is a model: a thing that turns new
+inputs into predictions.
+
+<Callout type="info" title="A useful one-sentence definition">
+**Machine learning is the practice of getting a computer to learn patterns
+from data, so that it can make useful predictions or decisions about data
+it has never seen before.** Every word in that sentence earns its place,
+especially the last clause — performance on *unseen* data is the whole
+point, as the train/test page hammered home.
+</Callout>
+
+## Three words you will use on every page: model, training, prediction
+
+The field has a lot of jargon, but three terms carry most of the weight.
+Pin these down now and the rest of the vocabulary attaches to them.
+
+A **model** is the learned object — the rules the algorithm discovered. You
+can think of it as a function with knobs inside it. Before training, the
+knobs are at arbitrary settings and the function is useless. After training,
+the knobs are tuned so the function tends to produce the right answer.
+
+**Training** (also called *fitting*) is the process of adjusting those knobs
+by showing the model examples. In scikit-learn this is always one method
+call: `model.fit(X, y)`. You hand it the features `X` and the answers `y`,
+and it adjusts itself to capture the relationship between them.
+
+**Prediction** (also called *inference*) is using the trained model on new
+inputs to get answers. In scikit-learn this is `model.predict(X_new)`. The
+model never sees the true answers here — producing them is its job.
+
+```mermaid
+flowchart LR
+    A["Training data<br/>(X and y)"] -->|"fit"| B["Trained model"]
+    C["New data<br/>(X only)"] -->|"predict"| B
+    B --> D["Predictions"]
+```
+
+<Callout type="tip" title="An analogy that holds up">
+Training a model is like a child learning to recognize dogs. You do not
+recite a definition of "dog" — you point at hundreds of animals and say
+"dog" or "not a dog." Eventually the child generalizes to a breed they have
+never seen. The examples are the training data, the labels are your "dog /
+not dog" calls, and the child's eventual ability to judge a *new* animal is
+prediction. Crucially, you would test that ability on an animal they had
+*not* already seen — which is exactly why we hold out a test set.
+</Callout>
+
+### What "learning" actually means here
+
+It is worth dispelling a bit of mystique. When we say a model "learns," we
+do not mean it understands anything, forms beliefs, or reasons the way you
+do. Learning here is a mechanical, mathematical process: the algorithm has a
+measure of how wrong it currently is (an *error* or *loss*), and it adjusts
+its internal knobs in whatever direction reduces that error on the training
+examples. Repeat that adjustment enough times and the knobs settle into
+values that capture real structure in the data. "Learning" is just a vivid
+name for *automatic error reduction by tuning parameters against examples.*
+
+<Callout type="warn" title="The most important caveat in the whole field">
+A model can only learn patterns that are *present in its training data*. It
+has no common sense and no knowledge of the world beyond what it was shown.
+If your examples are biased, incomplete, or unrepresentative, the model
+faithfully learns those flaws. "Garbage in, garbage out" is not a slogan
+here — it is a law. A spam filter trained only on English email will be
+helpless on Spanish spam, and it will never tell you so.
+</Callout>
+
+## A tiny taste: learning to tell flowers apart
+
+Talk is cheap, so let us actually do it. The classic teaching dataset is a
+table of 150 iris flowers. Each flower has four measurements — the length
+and width of its petals and sepals — and belongs to one of three species.
+No human could write a clean rule like "if petal length > 2.45 cm then
+species A," because the species overlap and the boundaries are fuzzy. But a
+model can learn the pattern from examples.
+
+The algorithm below is **k-nearest neighbors**, and its rule is almost
+suspiciously simple: to classify a new flower, find the few training flowers
+most similar to it (nearest in measurement-space) and let them vote on the
+species. We will study it properly later; for now, just watch the *shape* of
+the program.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+# 1. Get the examples: 150 flowers, 4 measurements each, labeled by species.
+X, y = load_iris(return_X_y=True)
+print("Each flower has", X.shape[1], "measurements; we have", X.shape[0], "flowers.")
+
+# 2. Hold some flowers back so we can test on ones the model never saw.
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0
+)
+
+# 3. TRAIN: let the model learn the pattern from the training flowers.
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+# 4. PREDICT: ask it about flowers it has never seen.
+accuracy = model.score(X_test, y_test)
+print(f"It correctly identified {accuracy:.0%} of brand-new flowers.")
+`}
+/>
+
+Look at what just happened. You did not write a single rule about petals or
+sepals. You loaded examples, called `fit`, and the model worked out — on its
+own — how to separate three species from four numbers, then proved it on
+flowers held back from training. That is machine learning in five lines, and
+the shape is identical to what you saw on the welcome page: **load, split,
+fit, evaluate on the unseen.**
+
+<Callout type="info" title="Notice what we are NOT celebrating">
+We reported accuracy on the *held-out* flowers, not on the training
+flowers. That choice — measuring success on data the model never trained on
+— is the habit that separates honest machine learning from self-deception.
+The train/test page made the case; from here on we simply assume it.
+</Callout>
+
+### Peeking at a single prediction
+
+Accuracy is a summary. Let us slow down and watch the model classify one new
+flower, so "prediction" stops being abstract.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+X, y = load_iris(return_X_y=True)
+species = load_iris().target_names  # ['setosa' 'versicolor' 'virginica']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0
+)
+model = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
+
+# Take one held-out flower and look at its four measurements.
+one_flower = X_test[0]
+print("Measurements (cm):", one_flower)
+
+# The model turns those four numbers into a species guess.
+guess = model.predict([one_flower])[0]
+truth = y_test[0]
+print("Model predicts:", species[guess])
+print("Actually was:  ", species[truth])
+`}
+/>
+
+The model received four numbers and returned a category. That is the
+essence of prediction: a trained model is a function from inputs to outputs,
+and you apply it to inputs whose outputs you do not yet know.
+
+## How the pieces fit together
+
+It helps to see the whole lifecycle in one picture. Data and its labels flow
+into training, which produces a model; new data flows into that model, which
+produces predictions; and we judge the whole thing on held-out data.
+
+```mermaid
+flowchart TD
+    A["Collect labeled examples<br/>(features X, answers y)"] --> B["Split off a test set"]
+    B --> C["Train on the training set<br/>model.fit(X_train, y_train)"]
+    C --> D["Trained model"]
+    D --> E["Evaluate on the test set<br/>model.score(X_test, y_test)"]
+    D --> F["Predict on brand-new data<br/>model.predict(X_new)"]
+    E -. "good enough?" .-> F
+```
+
+Every project in this course is a walk through this diagram. The algorithms
+change, the data changes, the metrics change — but the lifecycle does not.
+
+<Callout type="success" title="The mental model to carry forward">
+Machine learning replaces *"figure out the rules and write them down"* with
+*"collect examples and let the rules be learned."* You provide data and
+answers; the algorithm provides the model; the model provides predictions
+on data it has never seen. Hold that shape in your head and every new
+technique becomes a way to do one of those steps better.
+</Callout>
+
+## A quick check before we go on
+
+<MultipleChoice
+  markdown={`In **traditional programming**, what goes *in* and what comes *out*?
+
+- Data and answers go in; rules come out
+- [o] Rules and data go in; answers come out
+  > In classic programming you write the rules (the code) and feed in data; the program executes the rules to produce answers.
+- Only data goes in; both rules and answers come out
+- A trained model goes in; predictions come out
+
+Machine learning is the inversion of this: answers go in alongside the data, and the rules (the model) come out.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague says, "Our login form should reject passwords shorter than 8 characters — let's train a machine learning model to do it." What is the best response?
+
+- Agree, since machine learning is always more accurate than hand-written rules
+- [o] Push back: this is a clear, stable rule that should just be written as a simple length check — machine learning would add cost and complexity for no benefit
+  > When a short, stable rule fully solves the problem, hand-writing it is simpler, faster, and more reliable than learning it from data. Machine learning is for patterns too complex to specify by hand.
+- Agree, because forms are exactly what machine learning is designed for
+- Suggest collecting a million example passwords first, then deciding
+
+Reaching for machine learning where a one-line rule suffices is a classic case of using the wrong tool.`}
+/>
+
+## When machine learning is *not* the answer
+
+Because this is the foundational page, it is worth being blunt about the
+limits up front. Machine learning is not a default, and a great many
+problems are better solved without it.
+
+- **When a simple rule works.** If "block emails from this exact address"
+  solves your problem, you do not need a model. We expand on this on the
+  next page.
+- **When you have no relevant data.** Models learn from examples. No
+  examples, no learning. You cannot machine-learn your way out of a
+  cold start with zero history.
+- **When you cannot tolerate being wrong.** Models are right *most* of the
+  time, not *all* of the time. For logic that must be exactly correct
+  every time — accounting, access control, anything safety-critical that
+  has a known correct answer — explicit rules are the responsible choice.
+- **When you need a guaranteed explanation.** Some models are
+  interpretable, but many are not. If a regulation requires you to justify
+  every individual decision, a transparent rule may beat an opaque model.
+
+<Callout type="danger" title="A common and costly misconception">
+"Machine learning will figure it out" is not a plan. A model cannot invent
+signal that is not in the data. If the information needed to make a decision
+simply is not present in your features, no algorithm — however fashionable —
+will conjure it. Decide *what to measure* before you decide *what to model*.
+The hard, valuable work is usually framing the problem and gathering the
+right data, not choosing the algorithm.
+</Callout>
+
+## Where this shows up in the real world
+
+The inversion you just learned powers an enormous amount of everyday
+technology, precisely because so many useful problems have rules no human
+could write:
+
+- **Spam and fraud detection** learn from billions of labeled examples and
+  adapt as the adversaries adapt — something static rules cannot do.
+- **Recommendation systems** (the next show, the next song, the next
+  product) learn your taste from your behavior rather than from a
+  hand-coded taste profile.
+- **Medical triage and imaging** learn subtle visual patterns from labeled
+  scans that even experts struggle to articulate as rules.
+- **Demand forecasting and pricing** learn how sales respond to season,
+  weather, and promotions far more flexibly than a fixed formula.
+- **Speech and handwriting recognition** map messy, variable signals to text
+  — a task where the rules are hopelessly complex but examples are abundant.
+
+In every case the pattern is the same: the relationship between input and
+output is real but too intricate to write down, and labeled examples are
+available. That is the sweet spot where machine learning earns its keep.
+
+## Your turn
+
+Time to make the shape your own. The challenge below hands you a dataset and
+asks you to walk the full lifecycle — load, split, train, evaluate — with a
+different model and a different dataset than the examples above. The point is
+not the specific model; it is that the *shape* is always the same.
+
+<ChallengeCard
+  adapter="python"
+  title="Walk the full machine learning lifecycle"
+  category="foundations · what is machine learning"
+  estimatedTime="~7 min"
+  instructions={`The wine dataset has 178 samples in 3 classes, each described
+by 13 chemical measurements. Walk the same load-split-train-evaluate shape
+you saw above.
+
+1. The features and labels are already loaded into \`X\` and \`y\`.
+2. Split them with \`train_test_split\` using \`test_size=0.25\` and
+   \`random_state=0\`. Name the four results
+   \`X_train, X_test, y_train, y_test\` (in that order).
+3. Create a \`KNeighborsClassifier(n_neighbors=5)\` and \`fit\` it on the
+   **training** set. Store the fitted model in \`model\`.
+4. Measure accuracy on the **test** set with \`model.score(...)\` and store
+   the number in \`accuracy\`.
+
+The hidden tests check the split sizes, that \`model\` is fitted, and that
+\`accuracy\` is a sensible held-out score.`}
+  initCode={`from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier`}
+  initialCode={`X, y = load_wine(return_X_y=True)
+
+# 1. Split off a test set (25% test, random_state=0)
+X_train, X_test, y_train, y_test = None, None, None, None
+
+# 2. Train a 5-neighbor classifier on the training set
+model = None
+
+# 3. Evaluate on the held-out test set
+accuracy = None
+
+print("Test accuracy:", accuracy)
+`}
+  solutionCode={`X, y = load_wine(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=0
+)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+accuracy = model.score(X_test, y_test)
+
+print("Test accuracy:", accuracy)
+`}
+  tests={[
+    {
+      id: "test_size",
+      name: "Test set is 25% of the data",
+      description: "45 of 178 rows held out",
+      code: `assert X_test.shape[0] == 45, f"Expected 45 test rows, got {X_test.shape[0]}"`,
+    },
+    {
+      id: "train_size",
+      name: "Training set is the other 75%",
+      description: "133 rows used for training",
+      code: `assert X_train.shape[0] == 133, f"Expected 133 train rows, got {X_train.shape[0]}"`,
+    },
+    {
+      id: "model_fitted",
+      name: "A KNeighborsClassifier was trained",
+      description: "model is a fitted KNN estimator",
+      code: `from sklearn.neighbors import KNeighborsClassifier
+assert isinstance(model, KNeighborsClassifier), "model should be a KNeighborsClassifier"
+assert hasattr(model, "classes_"), "model does not appear to be fitted; call model.fit(...)"`,
+    },
+    {
+      id: "accuracy_sane",
+      name: "Accuracy is a sensible held-out score",
+      description: "A real number strictly between 0 and 1",
+      code: `assert accuracy is not None, "accuracy is still None"
+assert 0.0 < accuracy <= 1.0, f"accuracy should be a fraction in (0, 1], got {accuracy}"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which statement best captures the core idea of machine learning?
+
+- Writing more detailed and robust if/else rules than a human normally would
+- [o] Learning the rules automatically from labeled examples, instead of having a human write the rules by hand
+  > Machine learning inverts traditional programming: rather than coding the logic, you supply examples paired with answers and let the algorithm derive the logic (the model).
+- Running ordinary programs on much faster hardware
+- Storing data so it can be looked up quickly later
+
+The defining move is replacing hand-written rules with rules learned from data.`}
+/>
+
+<MultipleChoice
+  markdown={`In scikit-learn, what does \`model.fit(X_train, y_train)\` do?
+
+- It makes predictions on new, unseen data
+- It measures the model's accuracy on a test set
+- [o] It trains the model — adjusting its internal parameters so it captures the relationship between the features \`X_train\` and the answers \`y_train\`
+  > \`fit\` is the training step. It shows the model the examples and their answers and tunes the model's internal knobs to fit that relationship.
+- It splits the data into training and test sets
+
+Training (fit) happens first; prediction and scoring come afterward, using the fitted model.`}
+/>
+
+<MultipleChoice
+  markdown={`A model is trained only on photos taken in bright daylight. In production it performs terribly on photos taken at night. What is the most likely explanation?
+
+- The model is broken and needs to be retrained with the exact same data
+- scikit-learn cannot handle image data
+- [o] A model only learns patterns present in its training data; it never saw nighttime photos, so it cannot be expected to handle them
+  > Models generalize from the examples they were given. If a condition is absent from training, performance on that condition is unpredictable. Representative training data is essential.
+- Night photos are mathematically impossible to classify
+
+This is the "garbage in, garbage out" principle: the data you train on bounds what the model can do.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these problems is the **weakest** candidate for machine learning?
+
+- Flagging fraudulent credit-card transactions from millions of labeled past transactions
+- Recommending the next video to a user based on their viewing history
+- [o] Computing the sales tax owed on an order, given the known tax rate and the order total
+  > Sales tax is a fixed, exact formula. A simple rule computes it perfectly every time; a learned model would only add complexity and introduce error where none need exist.
+- Recognizing spoken commands from audio recordings
+
+Machine learning shines when rules are too complex to write by hand — not when a clean, exact formula already exists.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a **model** in machine learning?
+
+- The raw dataset of examples used to train it
+- The Python library, such as scikit-learn, that you import
+- [o] The learned object — the set of rules or tuned parameters that the algorithm produced from the training data, used to turn new inputs into predictions
+  > The model is the *output* of training: a function-with-tuned-knobs that maps inputs to outputs. It is distinct from the data it learned from and from the library used to build it.
+- The accuracy score the model achieves on the test set
+
+A model is what training produces; you then call \`predict\` on it to get answers for new data.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is the distinction between "performance on training data" and "performance on unseen data" emphasized so heavily?
+
+- They are always identical, so it does not really matter which you report
+- Training-data performance is the only number that matters in practice
+- [o] A model can score well on data it memorized while still failing on new data; the whole point of machine learning is to perform well on data it has never seen
+  > Useful models must generalize. A high training score can come from memorization, so honest evaluation always uses held-out data — the central habit established by the train/test split.
+- Unseen-data performance is impossible to measure
+
+Generalization to new data is the actual goal; training-set performance can flatter a model that merely memorized.`}
+/>

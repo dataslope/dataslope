@@ -1,0 +1,654 @@
+---
+title: Your First Model, End to End
+description: The complete machine learning workflow on one tiny dataset — load, split, train, evaluate, predict — so the shape of every future model becomes second nature.
+---
+
+You have seen the cardinal rule (judge a model on data it has never seen)
+and you have seen `train_test_split` carve a dataset into a part to learn
+from and a part to be honest with. Now we put the whole thing together and
+build a real, working model from start to finish.
+
+By the end of this page you will have trained a classifier on the famous
+iris flowers, asked it to label flowers it never saw, and measured exactly
+how often it was right. More importantly, you will have internalized a
+shape — **load, split, train, evaluate** — that every model in this course
+repeats without exception. Once that shape is automatic, learning a new
+algorithm becomes a matter of swapping one line.
+
+<Callout type="info" title="What you already know going in">
+This page assumes you have read the welcome page and **The Train/Test
+Split**. We will not re-derive *why* we hold data back — we will just do
+it, correctly, as a habit. If the phrase "test set" feels fuzzy, revisit
+that page first; everything here builds on it.
+</Callout>
+
+## The problem this workflow solves
+
+You have a table of data and a question you want answered automatically.
+*Given a flower's measurements, which species is it? Given a patient's
+labs, is this tumor malignant? Given a house's features, what will it
+sell for?* Each of these is the same kind of task: learn a rule from
+labeled examples, then apply that rule to new, unlabeled cases.
+
+The end-to-end workflow is the disciplined way to do that **without
+fooling yourself**. Anyone can call `.fit()` and admire a number. The
+workflow's job is to make sure the number you admire actually predicts the
+future. It does that by enforcing one separation — the data you learn from
+versus the data you grade yourself on — at every single step.
+
+<Callout type="tip" title="Why memorize a shape?">
+Algorithms come and go, but the workflow is invariant. A linear regression,
+a hundred-tree random forest, and a nearest-neighbor classifier are all
+trained and evaluated with the *exact same four moves*. Learn the moves
+once and every new model is just a one-line substitution.
+</Callout>
+
+## The four moves, in order
+
+Here is the entire workflow as a picture. Read it top to bottom: data comes
+in, gets split, one half teaches the model, the other half grades it, and
+finally the finished model labels brand-new flowers.
+
+```mermaid
+flowchart TD
+    A["Raw labeled data<br/>X (features), y (labels)"] --> B{"train_test_split"}
+    B --> C["X_train, y_train"]
+    B --> D["X_test, y_test"]
+    C --> E["model.fit(X_train, y_train)<br/>LEARN the pattern"]
+    E --> F["Trained model"]
+    D --> G["model.score(X_test, y_test)<br/>GRADE on unseen data"]
+    F --> G
+    G --> H["Accuracy:<br/>an honest estimate"]
+    F --> I["model.predict(new_flower)<br/>USE it in the wild"]
+    I --> J["Predicted species"]
+```
+
+Notice the two arrows leaving the trained model. One goes to **evaluation**
+(the test set, to find out how good the model is) and one goes to **use**
+(genuinely new inputs, where there is no answer key). These are different
+activities and it is worth keeping them straight: you *score* on the test
+set, and you *predict* on the real world.
+
+## Move 1: load the data
+
+We will use `load_iris`, a dataset of 150 iris flowers. Each flower has
+four measurements — sepal length, sepal width, petal length, petal width —
+and belongs to one of three species: *setosa*, *versicolor*, or
+*virginica*. The features are `X` (150 rows, 4 columns) and the species
+labels are `y` (150 values, each 0, 1, or 2).
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+
+# return_X_y=True hands back the feature matrix and label vector directly.
+X, y = load_iris(return_X_y=True)
+
+print("Features X:", X.shape, "(rows = flowers, columns = measurements)")
+print("Labels   y:", y.shape, "-> values:", sorted(set(y)))
+print()
+print("First flower's measurements:", X[0])
+print("First flower's species code:", y[0])
+`}
+/>
+
+The four numbers in `X[0]` are that flower's measurements in centimeters,
+and the `0` in `y[0]` is its species code. The model's job is to learn the
+connection between those four numbers and that code, well enough to label a
+flower it has never measured.
+
+<Callout type="info" title="The numbers behind the names">
+scikit-learn stores labels as integers (0, 1, 2), not the species strings,
+because models do arithmetic on numbers, not words. The dataset keeps the
+human-readable names in `load_iris().target_names`, and we will use them
+later to print results people can actually read.
+</Callout>
+
+Let us peek at the names so the integer codes mean something.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+
+iris = load_iris()  # the full object, with names attached
+print("Feature names:", iris.feature_names)
+print("Species names:", list(iris.target_names))
+
+# Map each code to its species so the labels are readable.
+for code, name in enumerate(iris.target_names):
+    count = int((iris.target == code).sum())
+    print(f"  code {code} = {name:12s} ({count} flowers)")
+`}
+/>
+
+Fifty of each species, four measurements each. A balanced, tidy dataset —
+which is exactly why it is the classic first example. Real data is rarely
+this clean, and later pages deal with the mess. For now, a clean dataset
+lets us focus on the workflow itself.
+
+## Move 2: split into train and test
+
+We hold back a slice of flowers so we can grade the model on examples it
+never studied. We will put 25% in the test set, fix `random_state` so the
+split is reproducible, and **stratify** on `y` so all three species stay
+proportionally represented in both halves.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.25,    # 25% of flowers held out for the final grade
+    random_state=42,   # reproducible split
+    stratify=y,        # keep all 3 species balanced in both halves
+)
+
+print("Training flowers:", X_train.shape[0])
+print("Test flowers:    ", X_test.shape[0])
+print("Training set is the part the model LEARNS from.")
+print("Test set is locked away until the very end.")
+`}
+/>
+
+From here on, `X_test` and `y_test` go in a drawer. The model will not see
+them during training. We will only unlock them once — at the end — to get a
+single honest score.
+
+<Callout type="warn" title="Split before you touch the data">
+The split is the *first* thing you do, before any scaling, cleaning, or
+feature selection that learns from the numbers. If you compute something
+from the whole dataset and then split, information from the test set has
+already bled into training. We are using raw measurements here so there is
+nothing to leak, but keep the habit: split first, learn second.
+</Callout>
+
+## Move 3: choose an estimator and fit it
+
+Now we pick a model. In scikit-learn, every model is an **estimator** — an
+object with a `.fit()` method that learns from data and a `.predict()`
+method that applies what it learned. We will use
+`KNeighborsClassifier`, one of the most intuitive classifiers there is.
+
+Its idea, in one sentence: **to label a new flower, find the few training
+flowers most similar to it and let them vote.** "Similar" means closest in
+measurement-space. With `n_neighbors=5`, each new flower is labeled by the
+majority species among its five nearest training neighbors. There is no
+heavy math — the model essentially *remembers* the training flowers and
+compares.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+# 1. Create the estimator (set its options here).
+model = KNeighborsClassifier(n_neighbors=5)
+
+# 2. Fit it: this is where learning happens, using ONLY the training data.
+model.fit(X_train, y_train)
+
+print("Model trained on", X_train.shape[0], "flowers.")
+print(model)
+`}
+/>
+
+That is the whole of training: construct the estimator, then call `.fit()`
+on the **training** features and labels. The model has now "learned" — for
+KNN that simply means it has stored the training flowers in a way it can
+search quickly.
+
+<Callout type="tip" title="The fit / predict contract">
+Almost every scikit-learn estimator follows the same two-method contract:
+`.fit(X, y)` learns from labeled data, and `.predict(X)` produces labels for
+new data. Swap `KNeighborsClassifier` for `LogisticRegression` or
+`RandomForestClassifier` and these two lines do not change. That uniformity
+is the whole reason scikit-learn is pleasant to use.
+</Callout>
+
+If you would rather use a different estimator, the change is a single line.
+Here is the identical workflow with `LogisticRegression` — a linear model
+you will study in depth on its own page — to drive home how interchangeable
+estimators are.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+# The ONLY line that changed from the KNN example is this one:
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+print("Same workflow, different estimator.")
+print("Test accuracy:", round(model.score(X_test, y_test), 3))
+`}
+/>
+
+Same four moves, a different model, and the rest of your code is untouched.
+That is the payoff of memorizing the shape.
+
+## Move 4: predict and score
+
+A trained model is useful in two distinct ways, and the welcome diagram
+already hinted at both.
+
+**Predict** asks the model to label specific inputs. Let us hand it the
+first few test flowers and compare its guesses to the truth.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+iris = load_iris()
+X, y = iris.data, iris.target
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+# Predict the first 8 test flowers, then compare to the real answers.
+predictions = model.predict(X_test[:8])
+truth = y_test[:8]
+
+names = iris.target_names
+print("predicted -> actual")
+for p, t in zip(predictions, truth):
+    mark = "ok" if p == t else "WRONG"
+    print(f"  {names[p]:12s} -> {names[t]:12s}  {mark}")
+`}
+/>
+
+Most or all of those eight will match. But eight flowers is far too few to
+judge a model — you could get lucky or unlucky. For an honest, stable
+number we score on the *entire* test set at once.
+
+**Score** asks the model how often it is right across all held-out
+examples. For a classifier, `.score()` returns **accuracy**: the fraction
+of test flowers labeled correctly.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+# Accuracy on the held-out flowers: the honest grade.
+accuracy = model.score(X_test, y_test)
+print(f"Accuracy on unseen flowers: {accuracy:.1%}")
+
+# Score is just a convenience: accuracy = fraction predicted correctly.
+predictions = model.predict(X_test)
+manual = (predictions == y_test).mean()
+print(f"Same thing, computed by hand:  {manual:.1%}")
+`}
+/>
+
+The two numbers are identical, because `.score()` for a classifier is
+exactly "predict everything, then take the fraction correct." Around 97% on
+unseen flowers — a genuinely trustworthy result, because not one of those
+test flowers influenced training.
+
+<Callout type="info" title="What .score() means depends on the task">
+For a **classifier**, `.score()` returns accuracy (fraction correct). For a
+**regressor** — a model predicting a number — `.score()` returns R²
+instead, a different quantity entirely. Same method name, different meaning,
+because "how good is this?" means different things for categories versus
+numbers. The **Regression Metrics** page and the course's
+classification-evaluation material unpack what these scores do and do *not*
+tell you. For now, treat accuracy as a first, rough headline.
+</Callout>
+
+## Predicting on a brand-new flower
+
+In the real world you do not have an answer key — that is the entire point
+of a model. You measure a flower in the field, hand the four numbers to the
+trained model, and it tells you the species. Let us do exactly that.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+iris = load_iris()
+X, y = iris.data, iris.target
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+# A flower you just measured in the field (4 numbers, same order as training):
+# sepal length, sepal width, petal length, petal width
+new_flower = [[5.1, 3.5, 1.4, 0.2]]
+
+prediction = model.predict(new_flower)
+species = iris.target_names[prediction[0]]
+print("Measurements:", new_flower[0])
+print("Predicted species:", species)
+`}
+/>
+
+Two details here are easy to trip over, and both are worth burning in.
+
+First, the input is a list **of lists** — `[[...]]`, not `[...]`.
+scikit-learn always expects a 2D array of shape `(n_samples, n_features)`,
+even for a single sample. One flower is "one row of four features," so it
+is `[[5.1, 3.5, 1.4, 0.2]]`. Hand it a flat list and you will get a shape
+error.
+
+Second, `predict` returns an **array**, one prediction per input row, so we
+index `prediction[0]` to read the single answer.
+
+<Callout type="warn" title="The shape mistake everyone makes once">
+`model.predict([5.1, 3.5, 1.4, 0.2])` fails — that is a single flat list,
+which scikit-learn reads as ambiguous. Always pass a 2D structure:
+`[[5.1, 3.5, 1.4, 0.2]]` for one sample, or a list of such rows for many.
+The rule is "rows are samples, columns are features," even when there is
+only one row.
+</Callout>
+
+Try changing those four numbers and re-running. Large petal measurements
+(say `[6.5, 3.0, 5.5, 2.0]`) will push the prediction toward *virginica*;
+tiny petals lean *setosa*. You are now using a machine learning model the
+way it is meant to be used — feeding it new inputs and trusting its output
+because you measured its accuracy first.
+
+## The whole workflow on one screen
+
+Everything above, assembled into the canonical shape you will repeat for
+the rest of the course. This is the template; future pages mostly change
+which estimator sits on the highlighted line.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+# LOAD ----------------------------------------------------------------
+X, y = load_iris(return_X_y=True)
+
+# SPLIT ---------------------------------------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+# TRAIN ---------------------------------------------------------------
+model = KNeighborsClassifier(n_neighbors=5)   # <- swap this line for any estimator
+model.fit(X_train, y_train)
+
+# EVALUATE ------------------------------------------------------------
+accuracy = model.score(X_test, y_test)
+print(f"Test accuracy: {accuracy:.1%}")
+
+# USE -----------------------------------------------------------------
+new_flower = [[6.5, 3.0, 5.5, 2.0]]
+print("New flower predicted as:", load_iris().target_names[model.predict(new_flower)[0]])
+`}
+/>
+
+Six lines of logic, ignoring imports and comments. Load, split, train,
+evaluate, use. Read it until it feels boring — boring is the goal, because a
+workflow you do not have to think about frees your attention for the
+decisions that actually matter.
+
+## When this exact recipe is *not* enough
+
+The four-move workflow is always the backbone, but the simple version above
+takes some shortcuts that real problems will not allow. It is worth knowing
+where the shortcuts are so you recognize when a later page is filling a gap.
+
+- **The data needed no preparation.** Iris measurements are all clean
+  numbers on similar scales. Real datasets have missing values, text
+  categories, and features on wildly different scales. The fix —
+  `Pipeline` and `ColumnTransformer` — gets its own page, and crucially it
+  keeps the prep from leaking across the split.
+- **One split can be noisy.** With only 150 flowers, a single test set is a
+  thin sample; a different `random_state` shifts the score a little.
+  **Cross-validation** replaces one split with several and reports a steadier
+  estimate. That, too, is a dedicated page.
+- **We never tuned anything.** We picked `n_neighbors=5` out of thin air.
+  Choosing such settings *properly* — without peeking at the test set — is
+  what the tuning pages are about.
+
+<Callout type="danger" title="Never tune against the test set">
+It is tempting to try `n_neighbors=3`, check the test score, try `7`, check
+again, and keep the best. The instant you make choices based on the test
+score, that score stops being honest — you have started fitting the test
+set by hand. Model selection belongs to a validation set or
+cross-validation, never the final test set. We flag it here so the habit
+forms early.
+</Callout>
+
+None of this changes the shape. Every refinement slots *inside* load → split
+→ train → evaluate. You are not learning a new process later; you are
+learning to do each move more carefully.
+
+## Common misconceptions
+
+- **"Fitting and predicting are the same step."** They are deliberately
+  separate. `.fit()` learns from labeled data once; `.predict()` is then
+  called as often as you like on new inputs, with no further learning. A
+  deployed model fits during training and predicts forever after.
+- **"A higher training score means a better model."** The training score
+  measures memory, not skill. The number that matters is the **test**
+  score. A model can ace the training data and flop on new data — that gap
+  is overfitting, covered in its own page.
+- **"`.score()` always means accuracy."** Only for classifiers. For
+  regressors it returns R². The method name is shared; the meaning is not.
+- **"`predict` needs the labels too."** No — `predict` takes *only*
+  features and returns its guess for the labels. You pass `y` to `.fit()`
+  (to learn) and to `.score()` (to grade), but never to `.predict()`.
+- **"One sample can be a flat list."** scikit-learn always wants 2D input,
+  shape `(n_samples, n_features)`. A single sample is still a row inside a
+  list: `[[...]]`.
+
+## Real-world applications
+
+Strip away the flowers and this is the spine of essentially every
+supervised machine learning system in production:
+
+- An email provider **loads** millions of labeled messages, **splits** off
+  a held-out set, **trains** a spam classifier, **evaluates** its accuracy,
+  and then **predicts** spam-or-not on every new email that arrives.
+- A bank does the same with loan outcomes to predict default risk; a
+  hospital with labeled scans to flag disease; a streaming service with
+  watch history to predict what you will play next.
+
+The dataset is bigger, the estimator fancier, the preparation more
+elaborate — but the four moves are identical to what you just ran on 150
+flowers. That is why this page matters more than any single algorithm: you
+have learned the frame that holds all of them.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Build the full load to score flow on iris"
+  category="workflow · end to end"
+  estimatedTime="~7 min"
+  instructions={`Reproduce the complete workflow on the iris dataset, then store
+the final accuracy so the tests can check it.
+
+1. Load iris with \`load_iris(return_X_y=True)\` into \`X\` and \`y\`.
+2. Split into train/test with **20%** in the test set, \`random_state=0\`,
+   and **stratified** on \`y\`. Use the standard four-variable unpacking:
+   \`X_train, X_test, y_train, y_test\`.
+3. Create a \`KNeighborsClassifier(n_neighbors=5)\` called \`model\` and
+   \`.fit()\` it on the **training** data only.
+4. Store the model's accuracy on the **test** set in a variable named
+   \`accuracy\` (use \`model.score(...)\`).
+5. Use the trained model to predict the species code of the single new
+   flower \`[[6.0, 2.7, 5.1, 1.6]]\` and store the integer result in
+   \`new_pred\`.
+
+The hidden tests check the split sizes, that \`model\` is fitted, that
+\`accuracy\` is a sensible high number, and that \`new_pred\` is a valid
+species code (0, 1, or 2).`}
+  initCode={`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier`}
+  initialCode={`# 1. Load
+X, y = None, None
+
+# 2. Split (20% test, random_state=0, stratified)
+X_train, X_test, y_train, y_test = None, None, None, None
+
+# 3. Create and fit the model
+model = None
+
+# 4. Score on the test set
+accuracy = None
+
+# 5. Predict the new flower's species code
+new_pred = None
+
+print("accuracy:", accuracy, "new_pred:", new_pred)
+`}
+  solutionCode={`# 1. Load
+X, y = load_iris(return_X_y=True)
+
+# 2. Split (20% test, random_state=0, stratified)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=0, stratify=y
+)
+
+# 3. Create and fit the model
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+# 4. Score on the test set
+accuracy = model.score(X_test, y_test)
+
+# 5. Predict the new flower's species code
+new_pred = int(model.predict([[6.0, 2.7, 5.1, 1.6]])[0])
+
+print("accuracy:", accuracy, "new_pred:", new_pred)
+`}
+  tests={[
+    {
+      id: "test_size",
+      name: "Test set is 20% of 150 flowers",
+      description: "30 flowers held out",
+      code: `assert X_test.shape[0] == 30, f"Expected 30 test flowers, got {X_test.shape[0]}"`,
+    },
+    {
+      id: "train_size",
+      name: "Training set is the other 80%",
+      description: "120 flowers used to train",
+      code: `assert X_train.shape[0] == 120, f"Expected 120 train flowers, got {X_train.shape[0]}"`,
+    },
+    {
+      id: "model_fitted",
+      name: "model is a fitted KNeighborsClassifier",
+      description: "The estimator was trained",
+      code: `from sklearn.neighbors import KNeighborsClassifier
+assert isinstance(model, KNeighborsClassifier), "model should be a KNeighborsClassifier"
+assert hasattr(model, "classes_"), "model does not appear to be fitted (call .fit first)"`,
+    },
+    {
+      id: "accuracy_high",
+      name: "Accuracy on unseen flowers is high",
+      description: "A correctly built model scores well above chance",
+      code: `assert accuracy is not None, "accuracy is still None"
+assert accuracy > 0.85, f"Expected accuracy above 0.85, got {accuracy}"`,
+    },
+    {
+      id: "new_pred_valid",
+      name: "Prediction is a valid species code",
+      description: "0, 1, or 2",
+      code: `assert new_pred in (0, 1, 2), f"Expected a species code in 0/1/2, got {new_pred}"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What are the four moves of the end-to-end workflow, in order?
+
+- Split, load, evaluate, train
+- [o] Load the data, split into train/test, train (fit) on the training set, evaluate (score) on the test set
+  > Loading comes first, then the split, then fitting on the training portion, and finally scoring on the held-out portion. Using the model on new inputs comes after this honest evaluation.
+- Train, evaluate, load, split
+- Load, train, split, evaluate
+
+The split must happen before training so the test set stays unseen.`}
+/>
+
+<MultipleChoice
+  markdown={`To predict the species of a single new flower with measurements 5.1, 3.5, 1.4, 0.2, what do you pass to \`model.predict(...)\`?
+
+- A flat list: \`[5.1, 3.5, 1.4, 0.2]\`
+- The four numbers as separate arguments
+- [o] A 2D structure with one row: \`[[5.1, 3.5, 1.4, 0.2]]\`
+  > scikit-learn always expects input shaped (n_samples, n_features). A single sample is still one row inside a list, so it must be doubly nested.
+- The training labels \`y_train\` as well
+
+\`predict\` returns one prediction per row, so even one sample is wrapped as a row.`}
+/>
+
+<MultipleChoice
+  markdown={`For a classifier, what does \`model.score(X_test, y_test)\` return?
+
+- [o] Accuracy — the fraction of test samples the model labeled correctly
+  > For classifiers, \`.score()\` is accuracy: predict every test row, then take the fraction that match the true labels. It is identical to \`(model.predict(X_test) == y_test).mean()\`.
+- The number of training samples used
+- The model's internal loss value
+- The probability that the model is correct on average
+
+For regressors the same method returns R² instead, which is a different quantity.`}
+/>
+
+<MultipleChoice
+  markdown={`You want to try \`KNeighborsClassifier\` instead of \`LogisticRegression\` in your workflow. How much of the load/split/train/evaluate code has to change?
+
+- All of it — each estimator needs a different workflow
+- The split must be redone with a different \`random_state\`
+- [o] Essentially one line — the line that constructs the estimator; \`.fit()\`, \`.score()\`, and \`.predict()\` are called the same way
+  > Every scikit-learn estimator shares the fit/predict/score interface, so swapping models changes only the constructor line. That uniformity is the point of memorizing the workflow shape.
+- The data must be reloaded in a different format
+
+The shared interface is exactly why the workflow is worth internalizing once.`}
+/>
+
+<MultipleChoice
+  markdown={`A classmate calls \`model.predict(X_test)\` and is confused that they did not have to pass \`y_test\`. What is the right explanation?
+
+- \`predict\` always needs the labels; their code has a bug
+- \`predict\` uses \`y_test\` internally even though it is not written
+- [o] \`predict\` takes only features and returns the model's guessed labels; you pass \`y\` to \`.fit()\` to learn and to \`.score()\` to grade, but never to \`.predict()\`
+  > Prediction is the model applying what it already learned, so it needs only the inputs. The true labels are required to *learn* (fit) and to *grade* (score), not to predict.
+- \`predict\` and \`score\` are the same method
+
+In production there is no answer key at all — predict must work from features alone.`}
+/>

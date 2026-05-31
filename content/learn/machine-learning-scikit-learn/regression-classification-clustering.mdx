@@ -1,0 +1,524 @@
+---
+title: Regression, Classification, and Clustering
+description: The three core task types of classical machine learning, told apart by one thing — what comes out. A number means regression, a category means classification, and groups with no labels mean clustering. We see all three in code and pictures.
+---
+
+By now you can ask the two questions that frame any machine learning
+problem: *do I have labels?* (supervised vs. unsupervised) and *what type is
+my target?* (number vs. category). Combine those two questions and you land
+on one of three task types that cover the overwhelming majority of classical
+machine learning:
+
+- **Regression** — predict a *number*.
+- **Classification** — predict a *category*.
+- **Clustering** — discover *groups*, with no labels at all.
+
+The fastest way to tell them apart is also the most reliable: **look at what
+the model outputs.** Out comes a number on a continuous scale? Regression.
+Out comes a label from a fixed set of classes? Classification. Out come group
+assignments invented from unlabeled data? Clustering. This page makes each
+one concrete — in code, and in a picture — so the three become instantly
+recognizable.
+
+```mermaid
+flowchart TD
+    A["A machine learning task"] --> B{"Do you have labels?"}
+    B -->|"No labels"| CL["Clustering<br/>output: discovered groups"]
+    B -->|"Labeled target"| C{"Is the target a<br/>number or a category?"}
+    C -->|"A number<br/>(continuous)"| RG["Regression<br/>output: a quantity"]
+    C -->|"A category<br/>(a class)"| CF["Classification<br/>output: a label"]
+```
+
+<Callout type="info" title="Tell them apart by the output, every time">
+When you are unsure which task you face, ignore the algorithm name and ask
+one question: *what does a single prediction look like?* A dollar amount or a
+temperature is regression. A label like "spam" or "setosa" is
+classification. A group id assigned to unlabeled data is clustering. The
+shape of the output is the surest classifier of the task.
+</Callout>
+
+## Regression: predicting a number
+
+Regression predicts a **continuous quantity** — a value on a scale where
+in-between answers make sense. House prices, temperatures, a patient's blood
+pressure, tomorrow's demand: all numbers that could land anywhere in a range,
+not just on a few fixed options.
+
+The mental image is a **line (or curve) through a cloud of points.** The
+model learns the trend relating the input to the output, and to predict, it
+reads the height of that trend at a new input. Let us train the simplest
+regressor, `LinearRegression`, on synthetic data with one feature, and draw
+the line it learns.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_regression
+from sklearn.linear_model import LinearRegression
+
+# One feature, a noisy linear relationship.
+X, y = make_regression(n_samples=50, n_features=1, noise=15, random_state=0)
+
+model = LinearRegression()
+model.fit(X, y)
+
+# The model can predict a number for ANY input, including new ones.
+new_x = 1.5
+predicted = model.predict([[new_x]])[0]
+print(f"For input {new_x}, the model predicts the number {predicted:.1f}.")
+
+# Draw the data and the line the model learned.
+grid = np.linspace(X.min(), X.max(), 100).reshape(-1, 1)
+plt.figure(figsize=(5, 3.2))
+plt.scatter(X, y, alpha=0.6, label="training data")
+plt.plot(grid, model.predict(grid), color="crimson", linewidth=2, label="learned line")
+plt.xlabel("feature")
+plt.ylabel("target (a number)")
+plt.title("Regression: a line through the points")
+plt.legend()
+plt.show()
+`}
+/>
+
+The output is a *number*, and it is continuous: nudge the input and the
+prediction slides smoothly. There is no notion of "categories" here — the
+model is estimating a quantity. That is the unmistakable signature of
+regression. We will measure how good such predictions are (with metrics like
+mean absolute error and R²) in the *regression metrics* chapter; here, focus
+on the *shape* of the task: number in, number out.
+
+<Callout type="tip" title="Is it really continuous?">
+A quick test for regression: could the true answer reasonably be a value
+*between* two of your observed answers? Between a price of 300,000 and 310,000
+sits 305,000, a perfectly sensible price — so price is continuous, and
+predicting it is regression. If "in-between" answers are nonsensical
+(half-way between "cat" and "dog"?), you are not looking at regression.
+</Callout>
+
+## Classification: predicting a category
+
+Classification predicts a **category** — one label from a fixed, finite set.
+Spam or not spam (two classes); the species of an iris (three classes); which
+of five products a customer will buy (five classes). The output is not a
+quantity but a *choice among options*, and "in-between" answers do not exist:
+an email is spam or it is not.
+
+The mental image is a **boundary that carves up the feature space into
+regions**, one region per class. To classify a new point, the model sees
+which region it falls in. We will train `LogisticRegression` on two iris
+features (so we can plot it in 2-D) and color each flower by its species.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+
+data = load_iris()
+# Use just two features so we can see it in 2-D.
+X = data.data[:, 2:4]      # petal length, petal width
+y = data.target            # species: 0, 1, 2
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X, y)
+
+# The output is a CATEGORY: which species, from a fixed set of three.
+sample = [[4.0, 1.2]]
+predicted_class = model.predict(sample)[0]
+print("Prediction is a category (species index):", predicted_class)
+print("That is:", data.target_names[predicted_class])
+
+# Color each flower by its species -- distinct groups, not a scale.
+plt.figure(figsize=(5, 3.2))
+scatter = plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolor="k", s=40)
+plt.xlabel("petal length (cm)")
+plt.ylabel("petal width (cm)")
+plt.title("Classification: points colored by class")
+plt.legend(handles=scatter.legend_elements()[0], labels=list(data.target_names))
+plt.show()
+`}
+/>
+
+The output is a *label*, drawn from a fixed set of three species. There is no
+"2.5th species." That discreteness — a choice among named classes — is what
+makes this classification rather than regression, even though the *inputs*
+(petal measurements) are themselves continuous numbers. Remember: the task
+type is defined by the **output**, not the inputs.
+
+<Callout type="warn" title="Numbers used as class labels are still categories">
+A frequent confusion: iris classes are stored as 0, 1, 2 — numbers! — so
+people assume the task is regression. It is not. Those integers are just
+*names* for categories; class 2 is not "twice" class 1, and there is no
+class 1.5. Whenever the target is a fixed set of labels — whatever symbols
+encode them — the task is classification. The math underneath treats them as
+distinct categories, not as quantities on a scale.
+</Callout>
+
+## A quick check
+
+<MultipleChoice
+  markdown={`A model outputs a person's predicted annual income in dollars — any value on a continuous scale. What task type is this?
+
+- Classification, because income comes in brackets
+- Clustering, because incomes form groups
+- [o] Regression, because the output is a continuous number that could land anywhere on a scale
+  > A continuous quantity as output is the defining signature of regression. Income can reasonably take any in-between value, so predicting it is regression.
+- It cannot be determined from the output alone
+
+Continuous number out means regression — the output type settles it.`}
+/>
+
+## Clustering: discovering groups with no labels
+
+Clustering is the odd one out: it is **unsupervised**, so there are no labels
+at all. Instead of predicting a known answer, it *discovers* groups — sets of
+examples that are similar to each other and different from the rest. Nobody
+tells the algorithm what the groups are or even what they mean; it finds them
+from the structure of the features alone.
+
+The mental image is **points falling into natural clumps**, with the
+algorithm drawing a circle around each clump. We will run `KMeans` on blobs,
+asking it to find three groups, and color the points by the group it
+assigns. Notice we never pass any labels.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+
+# Make points that naturally clump, then DISCARD the true labels.
+X, _ = make_blobs(n_samples=150, centers=3, cluster_std=1.0, random_state=0)
+
+# KMeans sees only X -- no answers. It invents the groups.
+model = KMeans(n_clusters=3, n_init=10, random_state=0)
+model.fit(X)
+labels = model.labels_          # group id assigned to each point
+centers = model.cluster_centers_
+
+print("The algorithm discovered groups. First 10 assignments:", labels[:10])
+
+plt.figure(figsize=(5, 3.2))
+plt.scatter(X[:, 0], X[:, 1], c=labels, cmap="viridis", s=30, alpha=0.8)
+plt.scatter(centers[:, 0], centers[:, 1], c="red", marker="X", s=200, label="centers")
+plt.xlabel("feature 1")
+plt.ylabel("feature 2")
+plt.title("Clustering: groups discovered without labels")
+plt.legend()
+plt.show()
+`}
+/>
+
+The colors here did not come from any answer key — they are *invented* by the
+algorithm. Re-run with a different seed and the same three clumps might get
+numbered differently; the grouping is what matters, not the labels 0/1/2.
+Because there is no ground truth, you cannot compute "accuracy"; clustering is
+judged by how tight and separated the groups are, and by whether they are
+*useful* — the subject of the *evaluating clusters* chapter.
+
+<Callout type="danger" title="Clustering does not know what the groups mean">
+A clustering algorithm finds *that* points group together, never *why* or
+*what the groups represent*. If you cluster customers and get three groups,
+the algorithm cannot tell you "these are bargain hunters, these are loyalists,
+these are one-time buyers" — interpreting the clusters is a human job
+requiring domain knowledge. The algorithm supplies structure; you supply
+meaning.
+</Callout>
+
+## The three side by side
+
+Here is the whole page in one table-like view. Same library, three different
+shapes of problem and output.
+
+```mermaid
+flowchart LR
+    subgraph RG["Regression"]
+        direction TB
+        r1["Input: features"] --> r2["Output: a NUMBER"]
+        r3["e.g. predict price"]
+    end
+    subgraph CF["Classification"]
+        direction TB
+        c1["Input: features"] --> c2["Output: a CATEGORY"]
+        c3["e.g. spam or not"]
+    end
+    subgraph CL["Clustering"]
+        direction TB
+        l1["Input: features only"] --> l2["Output: DISCOVERED groups"]
+        l3["e.g. customer segments"]
+    end
+```
+
+And the code signatures, distilled:
+
+| Task | Has labels? | A single prediction is | scikit-learn call |
+| --- | --- | --- | --- |
+| Regression | Yes (a number) | a continuous value | `reg.fit(X, y)`; `reg.predict(X_new)` |
+| Classification | Yes (a class) | a category label | `clf.fit(X, y)`; `clf.predict(X_new)` |
+| Clustering | No | a discovered group id | `km.fit(X)`; `km.labels_` |
+
+<Callout type="success" title="The reliable test">
+To name any task: (1) Are there labels? No labels and you are clustering.
+(2) If labeled, is the target a number or a category? Number is regression,
+category is classification. Two questions, three tasks, every time.
+</Callout>
+
+## One dataset, three framings
+
+The claim that "the task is set by the question, not the data" sounds
+abstract, so let us prove it on a single dataset. We will take the diabetes
+dataset — whose target is a continuous measure of disease progression — and
+frame *the same data* as all three task types, just by changing the question
+we ask. This is the most direct way to see that the task type lives in your
+intent, not in the rows.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from sklearn.datasets import load_diabetes
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.cluster import KMeans
+
+X, y = load_diabetes(return_X_y=True)   # y: continuous disease-progression score
+
+# 1) REGRESSION: predict the continuous score directly.
+reg = LinearRegression().fit(X, y)
+print("Regression  -> predicts a number:",
+      round(float(reg.predict(X[:1])[0]), 1))
+
+# 2) CLASSIFICATION: bucket the SAME target into high vs low, then predict the class.
+y_class = (y > np.median(y)).astype(int)    # 1 = above-median progression, else 0
+clf = LogisticRegression(max_iter=1000).fit(X, y_class)
+print("Classification -> predicts a category (0/1):",
+      int(clf.predict(X[:1])[0]))
+
+# 3) CLUSTERING: ignore y entirely and discover groups of similar patients.
+km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
+print("Clustering  -> discovers a group id:", int(km.labels_[0]))
+`}
+/>
+
+Nothing about the underlying measurements changed between the three blocks.
+What changed was the *question*: "what is the exact score?" (regression),
+"is the score high or low?" (classification, after bucketing the target), and
+"which patients resemble each other?" (clustering, ignoring the target
+entirely). Same rows, three tasks — because the task type is a property of
+what you are trying to learn, not of the data sitting on disk.
+
+<Callout type="info" title="Bucketing trades precision for simplicity">
+Turning a continuous target into categories (regression → classification by
+"bucketing") is a real and common choice, not a trick. You might do it because
+a coarse "high / medium / low risk" decision is all the business needs, or
+because classes are easier to act on. The cost is thrown-away precision: you
+no longer distinguish a score of 81 from 250 if both land in "high." Whether
+that trade is worth it depends entirely on how the prediction will be used —
+a recurring theme in framing problems well.
+</Callout>
+
+## Common misconceptions
+
+- **"The inputs decide the task."** They do not — the *output* does. A model
+  with continuous numeric inputs can be a classifier (iris petals → species);
+  a model with categorical inputs can be a regressor (neighborhood → price).
+  Look at what comes *out*.
+- **"Integer labels mean regression."** No. Class labels are often stored as
+  integers (0, 1, 2) for convenience, but they are categories, not
+  quantities. If there is no meaningful "in-between," it is classification.
+- **"Clustering is just classification without training the labels."** No —
+  there are no labels at all, and there is no ground truth to be right or
+  wrong against. The goal is discovery, not prediction of a known answer.
+- **"You must pick exactly one task per dataset."** A single dataset can
+  support several. Customer data could feed a regression (predict spend), a
+  classification (predict churn), *and* a clustering (find segments). The task
+  is set by the *question you ask*, not by the data alone.
+- **"More clusters is always better."** Crank `n_clusters` to the number of
+  points and every point is its own perfect, useless group. Choosing a
+  sensible number is a genuine decision.
+
+## Real-world applications
+
+**Regression** is everywhere a number must be estimated: forecasting sales
+and demand, pricing houses and ad inventory, predicting delivery times,
+estimating a patient's risk score, projecting energy load. If the deliverable
+is "how much" or "how many," it is regression.
+
+**Classification** drives most automated decisions: spam filtering, fraud
+flags, disease diagnosis from labeled scans, sentiment (positive / negative),
+credit approval, image and speech labeling. If the deliverable is "which one"
+or "yes / no," it is classification.
+
+**Clustering** powers discovery and exploration: customer and market
+segmentation, grouping documents or images by similarity, anomaly detection
+(points belonging to no normal group), and compressing data for
+visualization. If the deliverable is "what natural groups exist here," it is
+clustering.
+
+## Your turn
+
+The challenge gives you several described scenarios. For each, name the task
+type — regression, classification, or clustering — using the output-based
+test from this page. This is exactly the judgment you make at the start of
+every project.
+
+<ChallengeCard
+  adapter="python"
+  title="Name the task: regression, classification, or clustering?"
+  category="foundations · task types"
+  estimatedTime="~7 min"
+  instructions={`For each scenario, decide whether it is **regression**,
+**classification**, or **clustering**. Use the output-based test: a
+continuous number -> regression; a category from a fixed set -> classification;
+discovering groups from UNLABELED data -> clustering.
+
+Fill in the dictionary \`tasks\` so each scenario key maps to exactly one of
+the strings \`"regression"\`, \`"classification"\`, or \`"clustering"\`:
+
+1. \`"predict_tomorrows_temperature"\` — predict tomorrow's high temperature
+   in degrees, from past weather.
+2. \`"is_email_spam"\` — label each incoming email as spam or not spam.
+3. \`"segment_shoppers"\` — group shoppers into natural segments when you have
+   NO predefined segments, only their behavior.
+4. \`"predict_house_price"\` — predict a house's sale price in dollars.
+5. \`"identify_flower_species"\` — predict which of three species a flower is,
+   from its measurements.
+6. \`"group_songs_by_audio"\` — organize an unlabeled music library into groups
+   of similar-sounding songs.
+
+The hidden tests check each individual answer.`}
+  initCode={``}
+  initialCode={`tasks = {
+    "predict_tomorrows_temperature": None,   # "regression" / "classification" / "clustering"
+    "is_email_spam": None,
+    "segment_shoppers": None,
+    "predict_house_price": None,
+    "identify_flower_species": None,
+    "group_songs_by_audio": None,
+}
+
+print(tasks)
+`}
+  solutionCode={`tasks = {
+    "predict_tomorrows_temperature": "regression",
+    "is_email_spam": "classification",
+    "segment_shoppers": "clustering",
+    "predict_house_price": "regression",
+    "identify_flower_species": "classification",
+    "group_songs_by_audio": "clustering",
+}
+
+print(tasks)
+`}
+  tests={[
+    {
+      id: "temperature",
+      name: "Temperature is regression",
+      description: "A continuous numeric output",
+      code: `assert tasks["predict_tomorrows_temperature"] == "regression", "A continuous temperature is a number -> regression."`,
+    },
+    {
+      id: "spam",
+      name: "Spam labeling is classification",
+      description: "A category from a fixed set",
+      code: `assert tasks["is_email_spam"] == "classification", "Spam / not-spam is a category -> classification."`,
+    },
+    {
+      id: "segment",
+      name: "Segmenting shoppers is clustering",
+      description: "Groups discovered with no labels",
+      code: `assert tasks["segment_shoppers"] == "clustering", "Discovering groups from unlabeled behavior -> clustering."`,
+    },
+    {
+      id: "price",
+      name: "House price is regression",
+      description: "A continuous numeric output",
+      code: `assert tasks["predict_house_price"] == "regression", "A sale price in dollars is a continuous number -> regression."`,
+    },
+    {
+      id: "species",
+      name: "Species identification is classification",
+      description: "A category from a fixed set",
+      code: `assert tasks["identify_flower_species"] == "classification", "Predicting one of three species is a category -> classification."`,
+    },
+    {
+      id: "songs",
+      name: "Grouping songs is clustering",
+      description: "Groups discovered with no labels",
+      code: `assert tasks["group_songs_by_audio"] == "clustering", "Grouping an unlabeled library by similarity -> clustering."`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the single most reliable way to tell regression, classification, and clustering apart?
+
+- By the size of the dataset
+- By which scikit-learn module the algorithm lives in
+- [o] By the output: a continuous number means regression, a category from a fixed set means classification, and discovered groups from unlabeled data means clustering
+  > The task type is defined by what a single prediction looks like. Number, category, or discovered group — the output settles which of the three you have.
+- By the number of features in \`X\`
+
+Look at what comes out of the model; the output type names the task.`}
+/>
+
+<MultipleChoice
+  markdown={`The iris target is stored as the integers 0, 1, and 2 for the three species. Is predicting it regression or classification, and why?
+
+- Regression, because the target values are numbers
+- Regression, because the model outputs values between 0 and 2
+- [o] Classification, because those integers are just names for three distinct categories — there is no meaningful "species 1.5"
+  > Integer labels are a convenient encoding of categories, not quantities. With no sensible in-between value, the task is classification regardless of how the labels are stored.
+- Clustering, because there are multiple species
+
+Numeric-looking labels can still be categories; with no meaningful in-between, it is classification.`}
+/>
+
+<MultipleChoice
+  markdown={`Which task is **unsupervised**, requiring no labels?
+
+- Regression
+- Classification
+- [o] Clustering — it discovers groups from the features alone, with no target \`y\`
+  > Clustering is the unsupervised task of the three. It finds structure in \`X\` without any answer key, whereas regression and classification both need a labeled target.
+- All three are unsupervised
+
+Clustering needs no labels; regression and classification both require a target.`}
+/>
+
+<MultipleChoice
+  markdown={`A bank wants to predict, for each loan applicant, the probability-driven decision of "approve" or "deny." What task type is this?
+
+- Regression, because probabilities are numbers
+- Clustering, because applicants form groups
+- [o] Classification, because the output is a category (approve or deny) chosen from a fixed set
+  > The deliverable is a class label — approve or deny — so this is classification. (Such models can also output a probability, but the task is still predicting a category.)
+- It is not a machine learning task
+
+The final output is a category from a fixed set, which makes it classification.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can't you compute "accuracy" on a clustering result the way you do for a classifier?
+
+- Because clustering is always perfectly accurate
+- Because accuracy is only defined for regression
+- [o] Because clustering has no ground-truth labels to compare against — the group ids are invented by the algorithm, so there is no "correct" answer to score
+  > Accuracy needs known answers. Clustering produces groups with no answer key, so accuracy is undefined; clusters are judged by tightness, separation, and usefulness instead.
+- Because clusters change every run, so accuracy is meaningless by chance
+
+Without ground-truth labels there is nothing to compare predictions to, so accuracy does not apply.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement about choosing a task type is correct?
+
+- Each dataset supports exactly one task type, fixed by the data
+- The inputs (features) determine whether it is regression or classification
+- [o] A single dataset can support several tasks — the task is set by the question you ask (predict a number, predict a class, or find groups), not by the data alone
+  > Customer data, for instance, could drive a regression (spend), a classification (churn), and a clustering (segments). What you ask determines the task; the inputs do not.
+- Clustering and regression are interchangeable for any dataset
+
+The question you pose chooses the task; one dataset can be framed several ways.`}
+/>

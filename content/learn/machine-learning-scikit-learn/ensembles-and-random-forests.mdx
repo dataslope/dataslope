@@ -1,0 +1,500 @@
+---
+title: Ensembles and Random Forests
+description: The wisdom of crowds, applied to models. One decision tree is clever but unstable; average hundreds of diverse trees and you get one of the most reliable, hardest-to-beat models in all of tabular machine learning.
+---
+
+On the decision trees page we ended on a frustration: a single tree is
+clever and readable, but **unstable**. Nudge the training data a little and
+the whole tree can rearrange itself. That instability is high variance, and
+high variance means the model is overfitting to the particular sample it
+happened to see.
+
+This page is the payoff. It turns out the cure for one unstable model is
+*many* unstable models. If you train hundreds of slightly different trees
+and let them vote, their individual errors — which point in random
+directions — tend to cancel out, while the signal they agree on reinforces.
+The result, a **random forest**, is dramatically more accurate and stable
+than any single tree, and it is the model most experienced practitioners
+reach for first on tabular data. Understanding *why* averaging works is one
+of the most valuable intuitions in classical machine learning.
+
+## The intuition: the wisdom of crowds
+
+There is a famous story: at a county fair, hundreds of people guessed the
+weight of an ox. No individual guess was exact, but the *average* of all the
+guesses was within a pound of the truth — better than any single expert.
+Each person's error was partly random; averaging cancelled the random part
+and left the collective signal.
+
+An **ensemble** applies this to models. Take many models that are each
+individually mediocre and somewhat *independent* in their mistakes, then
+combine their predictions. As long as the models are better than random and
+their errors are not all identical, the combination beats any one of them.
+The two requirements are right there: the members must be **reasonably
+good** and **diverse**. A crowd of identical clones tells you nothing new; a
+crowd of varied, independent guessers is wise.
+
+```mermaid
+flowchart TD
+    D["Training data"] --> T1["Tree 1<br/>(its own sample + features)"]
+    D --> T2["Tree 2<br/>(different sample + features)"]
+    D --> T3["Tree 3"]
+    D --> TN["... Tree N"]
+    T1 --> A["Combine:<br/>majority vote (classification)<br/>or average (regression)"]
+    T2 --> A
+    T3 --> A
+    TN --> A
+    A --> P["Final prediction"]
+```
+
+That diagram is the entire random forest in one picture: many trees, each
+trained a little differently, all feeding one aggregation step. The art is
+entirely in *how* you make the trees diverse.
+
+<Callout type="info" title="Ensemble, bagging, random forest — the nesting dolls">
+An **ensemble** is any combination of models. **Bagging** (bootstrap
+aggregating) is a specific recipe: train each model on a random resample of
+the data and average them. A **random forest** is bagging applied to
+decision trees, *plus* one extra trick (random feature subsets at each
+split) to make the trees even more diverse. So: random forest is a kind of
+bagging, which is a kind of ensemble.
+</Callout>
+
+## Trick one: bootstrap samples (bagging)
+
+How do you get many *different* trees from one dataset? The first idea is
+**bootstrapping**: instead of training every tree on the same data, give
+each tree its own random sample drawn *with replacement* from the training
+set. "With replacement" means some rows appear two or three times in a given
+sample and others not at all. Each tree therefore sees a slightly different
+slice of the world and grows a slightly different structure.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+rng = np.random.RandomState(0)
+data = np.arange(10)            # pretend these are 10 training rows
+
+# Each "tree" gets its own bootstrap sample: draw 10 rows WITH replacement.
+for i in range(3):
+    sample = rng.choice(data, size=10, replace=True)
+    # Some rows repeat; some are missing entirely.
+    missing = sorted(set(data) - set(sample))
+    print(f"tree {i} sample: {sorted(sample)}")
+    print(f"   rows it never saw: {missing}")
+`}
+/>
+
+Each sample is a distorted view of the same data — some rows duplicated,
+others absent. On average, each bootstrap sample omits about **37%** of the
+original rows (those left-out rows have a nice use: they form a built-in
+validation set, the *out-of-bag* sample). Training a tree on each distorted
+sample is what makes the trees disagree, and disagreement is exactly what we
+need for averaging to help.
+
+## Trick two: random feature subsets
+
+Bootstrapping alone is not quite enough, because strong features tend to
+dominate. If one feature is highly predictive, *every* tree will likely
+split on it first, and the trees end up looking alike — defeating the
+purpose. The random forest's signature trick fixes this: **at each split,
+the tree may only consider a random subset of the features.** Sometimes the
+dominant feature is not even in the running, forcing the tree to discover
+useful structure in the others.
+
+The combination — bootstrap rows *and* random feature subsets — produces a
+collection of genuinely decorrelated trees. That decorrelation is the secret
+to the variance reduction we are about to measure.
+
+<Callout type="tip" title="Why decorrelation matters more than it sounds">
+Averaging `n` models reduces variance, but only fully if their errors are
+*independent*. If all the trees make the same mistakes, averaging them
+changes nothing. Random feature subsets deliberately weaken the correlation
+between trees so their errors cancel more effectively. This is the single
+idea that makes a random forest better than plain bagging.
+</Callout>
+
+## A random forest beats a single tree
+
+Enough theory — let us see it. We will pit one unconstrained (overfit-prone)
+decision tree against a random forest of many such trees, on the breast
+cancer dataset, and compare their **test** accuracy.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0, stratify=y
+)
+
+# A single unrestricted tree: memorizes the training set, overfits.
+tree = DecisionTreeClassifier(random_state=0)
+tree.fit(X_train, y_train)
+
+# A forest of 200 such trees, each on its own bootstrap sample + feature subset.
+forest = RandomForestClassifier(n_estimators=200, random_state=0)
+forest.fit(X_train, y_train)
+
+print("Single tree   -> train:", round(tree.score(X_train, y_train), 3),
+      " test:", round(tree.score(X_test, y_test), 3))
+print("Random forest -> train:", round(forest.score(X_train, y_train), 3),
+      " test:", round(forest.score(X_test, y_test), 3))
+`}
+/>
+
+Both models hit (or nearly hit) `1.000` on the training data — individually,
+the forest's trees overfit just like the lone tree. The difference is on the
+**test** set: the single tree's score is noticeably lower, while the forest's
+is markedly higher. By averaging away the idiosyncratic mistakes of each
+tree, the forest keeps the genuine signal and discards much of the noise.
+**This is variance reduction made visible.**
+
+<Callout type="success" title="The headline result of this chapter">
+A random forest typically matches or beats a single tree on test data while
+being far more stable — and it usually needs no scaling and little tuning to
+get there. That combination of strong accuracy and low effort is why it is
+such a popular default for tabular problems.
+</Callout>
+
+## Forests for regression, too
+
+Everything transfers to regression by swapping the **vote** for an
+**average**. A `RandomForestRegressor` builds many regression trees and
+predicts the mean of their outputs. One pleasant side effect: averaging many
+staircase predictions yields a much smoother, less jagged function than a
+single regression tree's blocky steps.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+
+X, y = load_diabetes(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0
+)
+
+tree = DecisionTreeRegressor(random_state=0).fit(X_train, y_train)
+forest = RandomForestRegressor(n_estimators=200, random_state=0).fit(X_train, y_train)
+
+# .score returns R^2 for regressors (higher is better, 1.0 is perfect).
+print(f"Single tree   test R^2: {tree.score(X_test, y_test):.3f}")
+print(f"Random forest test R^2: {forest.score(X_test, y_test):.3f}")
+`}
+/>
+
+The lone regression tree, grown without limit, overfits and posts a weak
+test R^2 — sometimes barely above zero. The forest's averaging lifts the
+test R^2 substantially. Same data, same kind of base model; the only new
+ingredient is "many trees, averaged."
+
+## How many trees? `n_estimators` and diminishing returns
+
+`n_estimators` sets how many trees the forest grows. A natural question:
+should you crank it as high as possible? Here the intuition is reassuring
+and important.
+
+**More trees never hurt accuracy** — adding trees only refines the average,
+it cannot cause overfitting the way deepening a single tree does. But the
+benefit **flattens out**. The first 50 or 100 trees buy most of the
+improvement; going from 500 to 1000 barely moves the score while doubling
+the compute. So `n_estimators` trades runtime for diminishing accuracy gains,
+not for risk.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+X, y = load_wine(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0, stratify=y
+)
+
+print("n_estimators | test accuracy")
+print("-------------|--------------")
+for n in [1, 5, 25, 100, 300]:
+    forest = RandomForestClassifier(n_estimators=n, random_state=0)
+    forest.fit(X_train, y_train)
+    print(f"{n:>12} | {forest.score(X_test, y_test):.3f}")
+`}
+/>
+
+Watch the accuracy climb quickly from a tiny forest, then plateau. A single
+tree (`n_estimators=1`) is the shaky baseline; by 25–100 trees the score has
+essentially settled. The lesson: pick `n_estimators` large enough to reach
+the plateau (often a few hundred) and spend your real tuning effort on
+`max_depth`, `max_features`, or `min_samples_leaf` instead.
+
+```mermaid
+flowchart LR
+    A["Few trees<br/>(1-10)"] -->|"big gains per tree"| B["Accuracy rising fast"]
+    B --> C["Many trees<br/>(50-200)"]
+    C -->|"benefit flattens"| D["Plateau:<br/>more trees barely help"]
+    D --> E["Very many trees<br/>(1000+)"]
+    E -->|"more compute, ~same score"| F["Diminishing returns"]
+```
+
+<Callout type="warn" title="More trees is not more overfitting">
+A common confusion: people assume that since a deeper *single* tree
+overfits, a forest with more *trees* must overfit too. Not so — these are
+different knobs. Adding trees averages over more samples and only stabilizes
+the prediction. What controls a forest's complexity is how deep each
+individual tree is allowed to grow, not how many trees there are.
+</Callout>
+
+## A peek at feature importances
+
+Because a forest is built from trees, it can report which features were most
+useful for splitting, aggregated across all the trees:
+`forest.feature_importances_`. This is a quick way to see what the model
+leaned on.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from sklearn.datasets import load_wine
+from sklearn.ensemble import RandomForestClassifier
+
+data = load_wine()
+X, y = data.data, data.target
+
+forest = RandomForestClassifier(n_estimators=200, random_state=0)
+forest.fit(X, y)
+
+# Rank features by how much they reduced impurity across all trees.
+order = np.argsort(forest.feature_importances_)[::-1]
+print("Top 5 features by importance:")
+for i in order[:5]:
+    print(f"  {data.feature_names[i]:<28} {forest.feature_importances_[i]:.3f}")
+`}
+/>
+
+The importances sum to 1 and rank the features by their contribution. Treat
+this as a *hint*, not a verdict — these "impurity-based" importances can be
+misleading (they inflate high-cardinality features and split credit among
+correlated ones). The honest, model-agnostic way to measure importance, and
+the caveats around interpreting it, are the subject of the **Model
+Interpretation** page. For now, just know the capability exists.
+
+<Callout type="info" title="Importance is a hint, not a cause">
+A high importance means a feature was *useful for the forest's splits*, not
+that it *causes* the outcome or that it would matter to a different model.
+Resist reading causation into these bars. The Model Interpretation page
+covers permutation importance and other more trustworthy tools.
+</Callout>
+
+## When to use a random forest — and when not to
+
+A random forest is an outstanding default when:
+
+- **You want strong accuracy with minimal fuss.** It works well out of the
+  box on tabular data, needs no feature scaling, tolerates irrelevant
+  features, and rarely overfits catastrophically. It is the model to beat.
+- **You have a mix of feature types and nonlinear interactions.** Trees
+  handle these natively; the forest makes them reliable.
+- **Stability matters.** Where a single tree is brittle, a forest's
+  averaged prediction is steady.
+
+Reach for something else when:
+
+- **Interpretability is paramount.** You traded the single tree's readable
+  flowchart for hundreds of trees you cannot eyeball. If a regulator needs
+  the exact decision logic, a forest is a poor fit — prefer a shallow single
+  tree or a linear model.
+- **You need tiny models or millisecond predictions on constrained
+  hardware.** Hundreds of trees are larger and slower to evaluate than one
+  model.
+- **The signal is genuinely linear and smooth.** A well-specified linear
+  model may match a forest with far less compute and full interpretability.
+- **You are chasing the absolute top of a leaderboard.** Gradient-boosted
+  trees often edge out random forests on accuracy (at the cost of more
+  careful tuning). Boosting is beyond this foundations course, but it is the
+  natural next step.
+
+<Callout type="warn" title="Common misconceptions about random forests">
+- **"More trees can overfit the forest."** No — more trees stabilize the
+  average. Per-tree depth controls complexity, not the count.
+- **"A forest is just a bigger decision tree."** It is *many independent*
+  trees whose predictions are combined; there is no single giant tree.
+- **"Feature importances prove causation."** They flag what was useful for
+  splitting, with known biases. Interpret cautiously.
+- **"Forests need feature scaling."** They do not — like single trees, they
+  are invariant to feature scale.
+- **"A forest is always the best model."** It is an excellent default, but
+  smooth-linear problems, interpretability needs, or tight latency budgets
+  can each favor a different model.
+</Callout>
+
+## Real-world applications
+
+Random forests (and their boosted cousins) quietly run an enormous share of
+practical, tabular machine learning:
+
+- **Finance and risk.** Credit scoring, fraud detection, and insurance
+  pricing, where robustness and good out-of-the-box accuracy matter.
+- **Healthcare analytics.** Predicting readmission risk or disease onset
+  from many mixed clinical measurements.
+- **Industry and operations.** Demand forecasting, predictive maintenance,
+  churn prediction — anywhere there is a spreadsheet-shaped problem.
+- **Bioinformatics and ecology.** Classic strongholds, partly because
+  forests cope gracefully with many features and noisy measurements.
+
+When a data scientist faces an unfamiliar tabular dataset and wants a strong
+result quickly, a random forest is very often the first thing they try — and
+frequently the last, because it is so hard to beat without considerable
+extra effort.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Show a forest beating a single overfit tree"
+  category="models · ensembles and random forests"
+  estimatedTime="~7 min"
+  instructions={`Demonstrate the headline result: averaging many trees
+beats one overfit tree on held-out data.
+
+1. Load the data with \`load_wine(return_X_y=True)\` into \`X\` and \`y\`.
+2. Split into train/test with **30%** in the test set, \`random_state=0\`,
+   and **stratified** on \`y\`.
+3. Train a single \`DecisionTreeClassifier(random_state=0)\` (no depth limit)
+   on the training set. Store its **test** accuracy in \`tree_acc\`.
+4. Train a \`RandomForestClassifier(n_estimators=200, random_state=0)\` on the
+   training set. Name it \`forest\` and store its **test** accuracy in
+   \`forest_acc\`.
+
+The hidden tests check that \`forest\` is a 200-tree
+\`RandomForestClassifier\`, that the forest is accurate (test accuracy above
+0.95), and — the key point of the page — that the forest's test accuracy is
+**at least as high as** the single tree's (\`forest_acc >= tree_acc\`).`}
+  initCode={`from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier`}
+  initialCode={`X, y = load_wine(return_X_y=True)
+
+# 1. Split (30% test, random_state=0, stratified on y)
+X_train, X_test, y_train, y_test = None, None, None, None
+
+# 2. Single unrestricted tree -> its TEST accuracy
+tree_acc = None
+
+# 3. Random forest of 200 trees -> its TEST accuracy
+forest = None
+forest_acc = None
+
+print("single tree test:", tree_acc, " forest test:", forest_acc)
+`}
+  solutionCode={`X, y = load_wine(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0, stratify=y
+)
+
+tree = DecisionTreeClassifier(random_state=0)
+tree.fit(X_train, y_train)
+tree_acc = tree.score(X_test, y_test)
+
+forest = RandomForestClassifier(n_estimators=200, random_state=0)
+forest.fit(X_train, y_train)
+forest_acc = forest.score(X_test, y_test)
+
+print("single tree test:", tree_acc, " forest test:", forest_acc)
+`}
+  tests={[
+    {
+      id: "forest_config",
+      name: "Forest is a 200-tree RandomForestClassifier",
+      description: "n_estimators was set to 200",
+      code: `from sklearn.ensemble import RandomForestClassifier
+assert isinstance(forest, RandomForestClassifier), "forest should be a RandomForestClassifier"
+assert forest.n_estimators == 200, f"Expected n_estimators=200, got {forest.n_estimators}"`,
+    },
+    {
+      id: "forest_accurate",
+      name: "Forest is accurate on the test set",
+      description: "Test accuracy above 0.95",
+      code: `assert forest_acc is not None, "forest_acc was not set"
+assert forest_acc > 0.95, f"Expected forest test accuracy above 0.95, got {forest_acc:.3f}"`,
+    },
+    {
+      id: "forest_beats_tree",
+      name: "Forest matches or beats the single tree",
+      description: "forest_acc is at least tree_acc",
+      code: `assert tree_acc is not None and forest_acc is not None, "both accuracies must be set"
+assert forest_acc >= tree_acc, f"Expected the forest to match or beat the tree: forest {forest_acc:.3f} vs tree {tree_acc:.3f}"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the core reason a random forest usually generalizes better than a single decision tree?
+
+- Each tree in the forest is individually far more accurate than a standalone tree
+- The forest grows one enormous tree that is too big to overfit
+- [o] Averaging the predictions of many diverse, individually-overfit trees cancels out their independent errors, reducing variance while keeping the signal they agree on
+  > The members can each overfit, but because they are trained on different bootstrap samples and feature subsets, their mistakes are largely independent and cancel when combined. This variance reduction is the whole point of bagging.
+- The forest discards the training data and learns a smooth equation instead
+
+The power comes from combining many decorrelated models, not from any single member being excellent.`}
+/>
+
+<MultipleChoice
+  markdown={`In a random forest, what does training each tree on a **bootstrap sample** accomplish?
+
+- It guarantees every tree sees the exact same data for consistency
+- It permanently removes 37% of the dataset to speed up training
+- [o] Each tree is trained on a different random resample (drawn with replacement) of the data, so the trees grow different structures — the diversity that makes averaging effective
+  > Bootstrapping draws rows with replacement, so each tree sees a slightly different dataset (some rows repeated, some absent). Without this diversity, all trees would be identical and averaging them would do nothing.
+- It scales the features so distances are comparable
+
+Bootstrapping is what makes the trees disagree, and disagreement is what averaging exploits.`}
+/>
+
+<MultipleChoice
+  markdown={`Besides bootstrapping the rows, a random forest also considers only a **random subset of features at each split**. Why?
+
+- To make training slower so the model is more thorough
+- To ensure every tree uses all features equally
+- [o] To decorrelate the trees — if one feature is very strong, restricting the candidates at each split prevents every tree from looking the same, so their errors are more independent
+  > If all trees could always split on the single best feature, they would be highly similar and their errors would coincide. Random feature subsets force diversity, which makes the averaged prediction more reliable than plain bagging.
+- Because trees cannot handle more than a few features at once
+
+Random feature selection is the extra ingredient that distinguishes a random forest from ordinary bagging.`}
+/>
+
+<MultipleChoice
+  markdown={`You increase \`n_estimators\` from 100 to 1000. What is the most accurate expectation?
+
+- Test accuracy will keep rising sharply, so more is always clearly worth it
+- The forest will start to overfit because it now has too many trees
+- [o] Accuracy will change very little (it has likely plateaued), while training and prediction take roughly ten times longer — diminishing returns, not added risk
+  > More trees only refine the average; they do not cause overfitting. Most of the benefit arrives in the first 50-100 trees, so going much higher mainly costs compute for a negligible gain.
+- Accuracy will drop because extra trees add noise to the vote
+
+Adding trees is safe but subject to diminishing returns; per-tree depth, not tree count, governs overfitting.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a **single decision tree** preferable to a random forest?
+
+- When you need the highest possible test accuracy
+- When the features are on very different scales and need handling
+- [o] When you must be able to read and explain the exact decision logic — a shallow single tree is a literal flowchart, whereas a forest of hundreds of trees is far harder to interpret
+  > The main thing you give up moving from one tree to a forest is interpretability. If a regulator, clinician, or stakeholder needs to follow the precise rules, a shallow single tree (or a linear model) is the better choice despite lower accuracy.
+- Single trees are always faster to train than any forest
+
+The single tree's advantage is transparency, which the ensemble trades away for accuracy and stability.`}
+/>
