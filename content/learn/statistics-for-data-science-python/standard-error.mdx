@@ -1,0 +1,546 @@
+---
+title: Standard Error
+description: The standard error is the standard deviation of a statistic's sampling distribution — the spread of your estimate, not your data. The most-confused pair in statistics (SD vs SE), the square-root-of-n law, and why precision has diminishing returns.
+---
+
+You now know (from *Sampling Distributions* and *The Central Limit
+Theorem*) that a statistic like $\bar{x}$ has its own distribution across
+repeated samples, that it's centered on the parameter, and that for the
+mean it's approximately normal with spread $\sigma/\sqrt{n}$. This page
+names that spread — the **standard error (SE)** — and turns it into the
+single most useful number in applied inference.
+
+The standard error answers the practical question every estimate begs:
+*"How much would this number have changed if I'd collected a different
+sample?"* That's not a question about your data's variability — it's a
+question about your *estimate's* reliability. Keeping those two apart is
+the heart of this page, because conflating them is, without exaggeration,
+the most common quantitative mistake in data science.
+
+## Standard deviation vs. standard error
+
+These two are constantly confused, often even in published papers and
+dashboards. Burn the distinction in now:
+
+- **Standard deviation (SD)** measures the spread of the **data** — how
+  much *individual values* differ from their mean. It's a property of the
+  population (or your sample of it). With messy data, SD is large; that's
+  just a fact about the data, and **more data does not shrink it**.
+- **Standard error (SE)** measures the spread of an **estimate** — how
+  much a *statistic* (like $\bar{x}$) would differ from sample to sample.
+  It's the standard deviation of the *sampling distribution*. It **shrinks
+  as $n$ grows**, because bigger samples give steadier estimates.
+
+```mermaid
+flowchart TD
+    subgraph DATA["Standard deviation (SD)"]
+      D1["Spread of the DATA<br/>(how individual values vary)"]
+      D2["Property of the population.<br/>Does NOT shrink with more data."]
+    end
+    subgraph EST["Standard error (SE)"]
+      E1["Spread of the ESTIMATE<br/>(how x-bar varies sample to sample)"]
+      E2["= SD of the sampling distribution.<br/>SHRINKS as n grows: s / sqrt(n)."]
+    end
+    DATA -->|"divide by sqrt(n)"| EST
+```
+
+The formula linking them is short and worth memorizing: for the sample
+mean,
+
+$$ \text{SE} = \frac{s}{\sqrt{n}} $$
+
+where $s$ is the sample standard deviation (your estimate of $\sigma$) and
+$n$ is the sample size. The SD describes your data; divide it by
+$\sqrt{n}$ and you get the SE, which describes your *estimate of the
+mean*. They are different quantities answering different questions.
+
+<Callout type="danger" title="The most common confusion in all of statistics">
+SD and SE are **not** interchangeable. "Average customer age is 41 (SD
+12)" tells you ages *spread* from roughly 29 to 53 — a fact about people.
+"Average customer age is 41 (SE 0.4)" tells you the *estimate* of the
+mean is pinned down to about 41 ± 0.8 — a fact about your precision.
+Reporting one when you mean the other is rampant and badly misleads
+readers about either how variable the population is or how trustworthy
+your estimate is. Always label which one you mean.
+</Callout>
+
+## Computing both, and seeing they differ
+
+Let's compute SD and SE on the same sample and watch them diverge. The SD
+reflects the population's intrinsic spread; the SE is much smaller because
+it's been divided by $\sqrt{n}$.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(42)
+
+# One sample of n=200 customer ages.
+sample = rng.normal(loc=41, scale=12, size=200)
+
+n = len(sample)
+sd = sample.std(ddof=1)            # spread of the DATA
+se = sd / np.sqrt(n)               # spread of the ESTIMATE (mean)
+
+# scipy computes the SE of the mean directly:
+se_scipy = stats.sem(sample)       # same as sd/sqrt(n)
+
+print(f"sample size n          = {n}")
+print(f"sample mean x-bar      = {sample.mean():.2f}")
+print(f"standard DEVIATION  s  = {sd:.2f}   (how much ages vary)")
+print(f"standard ERROR  s/sqrt(n) = {se:.2f}   (how much x-bar varies)")
+print(f"scipy.stats.sem         = {se_scipy:.2f}   (matches)")
+print()
+print(f"SE is about sqrt(n) = {np.sqrt(n):.1f}x smaller than SD.")
+print("The DATA is wide; the ESTIMATE of its mean is precise.")
+`}
+/>
+
+The SD is around 12 — that's how much ages genuinely differ from person
+to person, and it would stay near 12 no matter how many people you
+surveyed. The SE is around 0.85 — roughly $\sqrt{200} \approx 14$ times
+smaller — because the *mean* of 200 people is far more stable than any one
+person's age. Same sample, two completely different messages.
+
+<Callout type="warn" title="Misconception: a small SE means the data is less variable">
+A shrinking SE does **not** mean your data became less spread out. The
+data's spread (the SD) is a fixed property of the population — collecting
+more observations doesn't make people's ages or incomes less variable. A
+small SE means only that your **estimate of the mean** is precise. You can
+have wildly variable data (huge SD) and a razor-sharp estimate (tiny SE)
+at the same time, simply by having a large $n$.
+</Callout>
+
+## Confirming SE *is* the sampling distribution's SD
+
+The SE isn't an abstract formula — it's literally the standard deviation
+of the sampling distribution we built by hand earlier. From a *single*
+sample we estimate it as $s/\sqrt{n}$. Let's prove that estimate matches
+the spread you'd see if you actually could draw many samples.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+rng = np.random.default_rng(7)
+
+# Known population.
+MU, SIGMA = 100.0, 25.0
+population = rng.normal(MU, SIGMA, size=1_000_000)
+n = 50
+
+# --- The thing we usually CAN'T do: draw many samples and measure x-bar's spread. ---
+many_means = np.array([
+    rng.choice(population, size=n, replace=False).mean()
+    for _ in range(10000)
+])
+true_sampling_sd = many_means.std()
+
+# --- The thing we CAN do with ONE sample: estimate SE as s/sqrt(n). ---
+one_sample = rng.choice(population, size=n, replace=False)
+estimated_se = one_sample.std(ddof=1) / np.sqrt(n)
+
+print(f"sigma / sqrt(n)  (if sigma known) = {SIGMA / np.sqrt(n):.3f}")
+print(f"SD of 10000 sample means (truth)  = {true_sampling_sd:.3f}")
+print(f"s / sqrt(n) from ONE sample (est) = {estimated_se:.3f}")
+print()
+print("All three roughly agree. The single-sample SE estimates the")
+print("spread of the whole sampling distribution -- without repeating the study.")
+`}
+/>
+
+This is the quiet miracle of the standard error: you collect **one**
+sample, compute $s/\sqrt{n}$, and you have a good estimate of how much
+your mean *would* have wobbled across the thousands of samples you never
+took. That's what lets a single study report a margin of error. The SE is
+the bridge from one sample to the entire sampling distribution.
+
+<MultipleChoice
+  markdown={`A dataset of 10,000 incomes has a standard deviation of \\$35,000. You compute the sample mean and its standard error. The standard error is about \\$350. Why is the SE so much smaller than the SD?
+
+- Because the incomes are actually less spread out than they appear
+  > The SD of \\$35,000 *is* the real spread of incomes; nothing makes it smaller. The SE is small for a different reason — it describes the estimate, not the data.
+- [o] Because SE measures the spread of the *mean estimate* (= SD / $\\sqrt{n}$), and dividing \\$35,000 by $\\sqrt{10000}=100$ gives \\$350
+  > The SE is the data's spread scaled down by $\\sqrt{n}$; with $n=10000$, $\\sqrt{n}=100$, so the estimate of the mean is about 100x more precise than an individual income is variable.
+- Because the SE ignores the most extreme incomes
+  > The SE uses the full SD, extremes included. It's smaller purely because of the $\\sqrt{n}$ division, not because any data was dropped.
+- Because standard error and standard deviation measure the same thing on different scales
+  > They measure fundamentally different things: SD is the spread of *data*, SE is the spread of an *estimate*. They're related by $\\sqrt{n}$, not just rescaled versions of one quantity.
+
+SE = SD / $\\sqrt{n}$: the estimate of the mean is far more precise than the underlying data is variable.`}
+/>
+
+## The square-root-of-n law and diminishing returns
+
+Because SE = $s/\sqrt{n}$, precision improves with the **square root** of
+sample size, not with sample size itself. This has a blunt, expensive
+consequence:
+
+<Callout type="info" title="The 4x rule">
+To **halve** your standard error, you need **four times** the data.
+To cut it to a **third**, you need **nine times** the data. To get **10x**
+the precision, you need **100x** the sample. Precision gets expensive fast.
+</Callout>
+
+Let's watch the SE fall as $n$ grows and feel the diminishing returns.
+The curve drops steeply at first, then flattens into a long, slow crawl.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+import plotly.express as px
+
+# Fix the data's spread; vary how many observations we collect.
+SIGMA = 20.0
+ns = np.array([10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400, 12800])
+se = SIGMA / np.sqrt(ns)
+
+fig = px.line(x=ns, y=se, markers=True,
+              title="Standard error vs sample size: steep, then flat (diminishing returns)",
+              labels={"x": "sample size n", "y": "standard error (sigma/sqrt(n))"})
+fig.show()
+
+print(f"{'n':>7} | {'SE':>7} | note")
+print("-" * 40)
+prev = None
+for n in ns:
+    val = SIGMA / np.sqrt(n)
+    note = ""
+    if prev is not None:
+        note = f"4x the data from n={prev} -> SE roughly halved"
+    print(f"{n:>7} | {val:>7.3f} | {note if n in (40, 100, 400, 1600, 6400) else ''}")
+    if n in (25, 100, 400, 1600):
+        prev = n
+
+print()
+print("Going 10 -> 100 (10x data) cuts SE a lot.")
+print("Going 1600 -> 12800 (8x data) barely moves it. Diminishing returns.")
+`}
+/>
+
+The shape tells the whole story. Early on, adding data slashes the SE.
+Past a point, you're spending enormous extra sampling effort for tiny
+precision gains. This is *exactly* why a national poll surveys ~1,500
+people instead of 15 million: going from 1,500 to 15,000 (10x the cost)
+only improves precision by about $\sqrt{10} \approx 3.2$x, and going
+further buys even less. Knowing this saves real money and time when you
+plan how much data to collect.
+
+```mermaid
+flowchart LR
+    A["Want 2x the precision<br/>(halve the SE)"] --> B["Need 4x the data"]
+    C["Want 3x the precision"] --> D["Need 9x the data"]
+    E["Want 10x the precision"] --> F["Need 100x the data"]
+```
+
+<MultipleChoice
+  markdown={`Your estimate of a mean has a standard error of 2.0 from a sample of \`n = 500\`. Your manager wants the SE down to 1.0. Roughly how large must the new sample be?
+
+- 1,000 (double the sample)
+  > Doubling $n$ only divides the SE by $\\sqrt{2}\\approx 1.41$, taking it to about 1.41, not 1.0. Halving the SE needs more than double.
+- [o] 2,000 (four times the sample)
+  > Because SE $\\propto 1/\\sqrt{n}$, halving it requires $2^2=4$ times the data: $500 \\times 4 = 2000$. That quadrupling is the cost of doubling precision.
+- 750 (50% more)
+  > A 50% larger sample reduces the SE only by a factor of $\\sqrt{1.5}\\approx 1.22$, to about 1.64 — well short of 1.0.
+- 250 (half the sample)
+  > Shrinking the sample *increases* the SE (to about 2.83), moving precision in the wrong direction entirely.
+
+Halving the SE always costs 4x the data — the square-root law's expensive consequence.`}
+/>
+
+## SE is the building block of inference
+
+Almost every classical inference tool is "an estimate, plus-or-minus some
+number of standard errors." That's not a coincidence — the SE is the
+natural ruler for measuring how far an estimate can stray.
+
+- A **confidence interval** for a mean is roughly $\bar{x} \pm 2 \times
+  \text{SE}$ (the "2" comes from the normal/t distribution and the CLT).
+  We build these properly in *Confidence Intervals*.
+- A **test statistic** like the t-statistic is (estimate − hypothesized
+  value) divided by the SE — it measures the gap *in units of standard
+  error*. We use these in *Hypothesis Testing* and *t-tests*.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(0)
+
+# A sample of conversion-time measurements (seconds).
+sample = rng.normal(loc=8.0, scale=2.5, size=120)
+
+n = len(sample)
+x_bar = sample.mean()
+se = stats.sem(sample)             # s / sqrt(n)
+
+# A rough 95% confidence interval: x-bar +/- ~2 * SE
+lo, hi = x_bar - 1.96 * se, x_bar + 1.96 * se
+
+# scipy can build the t-based interval directly:
+ci = stats.t.interval(0.95, df=n - 1, loc=x_bar, scale=se)
+
+print(f"x-bar = {x_bar:.3f} seconds")
+print(f"SE    = {se:.3f}")
+print(f"Rough 95% CI (x-bar +/- 1.96*SE): ({lo:.3f}, {hi:.3f})")
+print(f"Exact t-based 95% CI:             ({ci[0]:.3f}, {ci[1]:.3f})")
+print()
+print("The SE sets the WIDTH of the interval. Smaller SE -> tighter range.")
+print("Everything in inference is built on this one number.")
+`}
+/>
+
+Notice the interval is just the estimate $\pm$ about two standard errors.
+The SE *is* the width of your uncertainty. Make the SE smaller (bigger
+$n$) and the interval tightens; that's the entire mechanism behind "how
+precise is my estimate." The next two chapters — *Confidence Intervals*
+and *Hypothesis Testing* — are largely about using the SE correctly.
+
+## Practice with the standard error
+
+<ChallengeCard
+  adapter="python"
+  title="Compute the standard error of the mean"
+  instructions={`A single \`sample\` of sensor readings has been created. From the sample, compute a dict \`out\` with:
+
+- \`"sd"\` — the sample standard deviation using **ddof=1** (a float)
+- \`"se"\` — the standard error of the mean, \`sd / sqrt(n)\` (a float)
+- \`"ratio"\` — \`sd / se\` (a float)
+
+The \`ratio\` should equal $\\sqrt{n}$ (since SE = SD / $\\sqrt{n}$). All three must be plain Python floats. You may use \`scipy.stats.sem\` to check yourself, but compute \`se\` from \`sd\` and \`n\` so the relationship is explicit.`}
+  initCode={`import numpy as np
+rng = np.random.default_rng(314)
+
+sample = rng.normal(loc=500, scale=40, size=250)`}
+  initialCode={`# TODO: compute sd (ddof=1), se = sd/sqrt(n), and ratio = sd/se.
+out = {
+    "sd": None,
+    "se": None,
+    "ratio": None,
+}
+`}
+  solutionCode={`import numpy as np
+n = len(sample)
+sd = float(sample.std(ddof=1))
+se = float(sd / np.sqrt(n))
+out = {
+    "sd": sd,
+    "se": se,
+    "ratio": float(sd / se),
+}
+print(out, " sqrt(n) =", np.sqrt(n))
+`}
+  tests={[
+    {
+      id: "keys",
+      name: "out has sd, se, ratio",
+      description: "Dict has the right keys",
+      code: `assert set(out.keys()) == {"sd", "se", "ratio"}`,
+    },
+    {
+      id: "floats",
+      name: "all values are floats",
+      description: "Each output is a plain float",
+      code: `assert all(isinstance(out[k], float) for k in out)`,
+    },
+    {
+      id: "sd_value",
+      name: "sd uses ddof=1",
+      description: "Sample sd with the n-1 correction",
+      code: `import numpy as np
+assert abs(out["sd"] - float(np.std(sample, ddof=1))) < 1e-9`,
+    },
+    {
+      id: "se_value",
+      name: "se equals sd/sqrt(n)",
+      description: "Standard error of the mean",
+      code: `import numpy as np
+assert abs(out["se"] - out["sd"] / np.sqrt(len(sample))) < 1e-9`,
+    },
+    {
+      id: "ratio_is_sqrt_n",
+      name: "ratio equals sqrt(n)",
+      description: "SD / SE is the square root of n",
+      code: `import numpy as np
+assert abs(out["ratio"] - np.sqrt(len(sample))) < 1e-6`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="How much data to halve the standard error?"
+  instructions={`You currently have \`n_current = 600\` observations and a known data spread \`sigma = 18.0\`. You want to drive the standard error of the mean down to a **target** value.
+
+Write a function-free script that computes a dict \`plan\` with:
+
+- \`"se_current"\` — the current SE, \`sigma / sqrt(n_current)\` (a float)
+- \`"se_target"\` — **half** of \`se_current\` (a float)
+- \`"n_needed"\` — the **smallest integer** sample size whose SE is at most \`se_target\` (an int)
+- \`"multiple"\` — \`n_needed / n_current\` (a float), which should be about **4**
+
+Hint: solving $\\sigma/\\sqrt{n} \\le \\text{target}$ gives $n \\ge (\\sigma/\\text{target})^2$. Use \`math.ceil\` to round up to a whole sample.`}
+  initCode={`import numpy as np
+import math
+n_current = 600
+sigma = 18.0`}
+  initialCode={`# TODO: build the 'plan' dict (halve the SE; find the needed n).
+plan = {
+    "se_current": None,
+    "se_target": None,
+    "n_needed": None,
+    "multiple": None,
+}
+`}
+  solutionCode={`import numpy as np
+import math
+se_current = sigma / np.sqrt(n_current)
+se_target = se_current / 2.0
+n_needed = math.ceil((sigma / se_target) ** 2)
+plan = {
+    "se_current": float(se_current),
+    "se_target": float(se_target),
+    "n_needed": int(n_needed),
+    "multiple": float(n_needed / n_current),
+}
+print(plan)
+`}
+  tests={[
+    {
+      id: "keys",
+      name: "plan has the right keys",
+      description: "Dict has se_current, se_target, n_needed, multiple",
+      code: `assert set(plan.keys()) == {"se_current", "se_target", "n_needed", "multiple"}`,
+    },
+    {
+      id: "types",
+      name: "types are correct",
+      description: "n_needed is int, others are floats",
+      code: `assert isinstance(plan["n_needed"], int) and all(isinstance(plan[k], float) for k in ("se_current", "se_target", "multiple"))`,
+    },
+    {
+      id: "target_is_half",
+      name: "target SE is half the current SE",
+      description: "se_target = se_current / 2",
+      code: `assert abs(plan["se_target"] - plan["se_current"] / 2.0) < 1e-9`,
+    },
+    {
+      id: "n_achieves_target",
+      name: "n_needed actually hits the target",
+      description: "SE at n_needed is at most the target",
+      code: `import numpy as np
+assert 18.0 / np.sqrt(plan["n_needed"]) <= plan["se_target"] + 1e-9`,
+    },
+    {
+      id: "multiple_is_4",
+      name: "needed sample is about 4x larger",
+      description: "Halving the SE costs roughly 4x the data",
+      code: `assert 3.9 <= plan["multiple"] <= 4.1`,
+    },
+  ]}
+/>
+
+<Callout type="tip" title="A reporting habit worth adopting">
+Whenever you publish an estimated mean, attach its **standard error**
+(or, better, a confidence interval built from it) — not the data's
+standard deviation, unless your point really is "how spread out are the
+individual values." A clean sentence is: *"mean conversion time was 8.0s
+(95% CI 7.6–8.5)."* That tells the reader your *estimate's* precision.
+Quoting the SD instead would answer a different question and quietly
+overstate your uncertainty about the mean by a factor of $\sqrt{n}$.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the **standard error of the mean** measure?
+
+- How spread out the individual data values are
+  > That's the standard *deviation*. The standard error measures something else: the spread of the *mean estimate* across hypothetical repeated samples.
+- [o] How much the sample mean would vary from sample to sample — the spread of its sampling distribution
+  > The SE is the standard deviation of the sampling distribution of $\\bar{x}$, capturing the precision of the estimate rather than the variability of the data.
+- The largest error you could possibly make in estimating the mean
+  > The SE is a typical (standard-deviation-scale) amount of variation, not a worst-case bound. Estimates can occasionally land further than one SE away.
+- The bias of the estimate
+  > Bias is a systematic offset, a different concept. The SE measures random sample-to-sample variability, not directional error.
+
+The SE is the standard deviation of the *estimate*, i.e., of the sampling distribution.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement correctly distinguishes SD from SE?
+
+- SD describes the estimate; SE describes the data
+  > These are reversed. SD describes the spread of the *data*; SE describes the spread of the *estimate*.
+- [o] SD describes the spread of the data; SE = SD / $\\sqrt{n}$ describes the spread of the mean estimate
+  > Pairing SD with the data's variability and SE (= SD/$\\sqrt{n}$) with the estimate's precision matches their definitions exactly.
+- SD and SE are the same quantity with different names
+  > They differ by a factor of $\\sqrt{n}$ and answer different questions, so they are not interchangeable names for one quantity.
+- SE is always larger than SD
+  > For any $n>1$, SE = SD/$\\sqrt{n}$ is *smaller* than SD, not larger. The estimate of the mean is more precise than the data is variable.
+
+SD is about data spread; SE is about estimate precision, and SE = SD/$\\sqrt{n}$.`}
+/>
+
+<MultipleChoice
+  markdown={`You collect 10x as many observations. What happens to the **standard deviation of the data** and the **standard error of the mean**?
+
+- Both shrink by a factor of 10
+  > The SD doesn't shrink at all (it's a property of the data), and the SE shrinks by $\\sqrt{10}\\approx 3.2$, not 10. Only one of them changes, and not by 10.
+- Both stay the same
+  > The SD stays roughly the same, but the SE does shrink as $n$ grows. They don't behave identically.
+- [o] The SD stays roughly the same; the SE shrinks by about $\\sqrt{10} \\approx 3.2$
+  > More data doesn't change how variable individual values are (SD), but it makes the *mean* more precise, shrinking the SE by $\\sqrt{n}$.
+- The SD shrinks by $\\sqrt{10}$; the SE stays the same
+  > This is backwards. The data's spread (SD) is unchanged by sample size; it's the estimate's spread (SE) that falls with $\\sqrt{n}$.
+
+More data sharpens the *estimate* (SE falls) but doesn't change how *variable the data* is (SD steady).`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague reports "mean age 41, standard error 12" and interprets it as "most customers are between 29 and 53." What went wrong?
+
+- Nothing; SE and SD give the same range
+  > SE and SD are different. A range describing where *individual customers* fall should use the SD, not the SE — and a SE of 12 would be implausibly large for a real estimate anyway.
+- [o] They used the SE label for what is really the SD; the 29–53 spread of *people* is described by the SD, while the SE describes the precision of the *mean*
+  > The "most customers between 29 and 53" claim is about individual spread (SD = 12). Calling it the SE mislabels a data-spread number as an estimate-precision number.
+- The mean should have been the median
+  > The choice of center isn't the issue. The error is mislabeling the spread of *data* as a *standard error*, which describes the estimate instead.
+- The sample was too small
+  > Sample size isn't the stated problem; even with a fine sample, labeling the data's SD as the SE is the conceptual error here.
+
+A statement about where individual values lie needs the SD; the SE is reserved for the precision of an estimate.`}
+/>
+
+<MultipleChoice
+  markdown={`Your standard error is currently 4.0 and you want it at 1.0 (a 4x improvement in precision). Roughly how much more data do you need?
+
+- 4x the data
+  > A 4x larger sample only halves the SE (to 2.0), because precision scales with $\\sqrt{n}$. Cutting the SE to a quarter needs much more.
+- 8x the data
+  > 8x the data reduces the SE by $\\sqrt{8}\\approx 2.8$, to about 1.4 — still short of 1.0.
+- [o] 16x the data, because precision scales with $\\sqrt{n}$ and you need $4^2 = 16$
+  > To divide the SE by 4 you need $\\sqrt{n}$ to grow 4-fold, i.e., $n$ to grow $4^2=16$-fold. The square-root law makes high precision very expensive.
+- 2x the data
+  > Doubling $n$ shrinks the SE by only $\\sqrt{2}\\approx 1.41$ (to ~2.8), nowhere near a 4x improvement.
+
+To improve precision by a factor $k$, you need $k^2$ times the data — here $4^2 = 16$.`}
+/>
+
+<Callout type="success" title="Key takeaways">
+- The **standard error (SE)** is the standard deviation of a statistic's **sampling distribution** — the spread of your *estimate*, not your data.
+- For the mean, $\text{SE} = s/\sqrt{n}$. The **SD** describes the data and **does not shrink** with $n$; the **SE** describes the estimate and **does**.
+- A small SE means a **precise estimate**, not less-variable data. You can have a huge SD and a tiny SE simultaneously (large $n$).
+- Precision follows the **$\sqrt{n}$ law**: to halve the SE you need **4x** the data; for **10x** precision, **100x** the data — sharp diminishing returns.
+- The SE is the **building block** of confidence intervals ($\bar{x} \pm \approx 2\,\text{SE}$) and test statistics (gap measured in SEs).
+- Report the SE (or a CI) for an estimate; report the SD only when you mean the spread of individual values.
+</Callout>
+
+You can now estimate how much an estimate wobbles from a single sample.
+The natural next step is to turn that wobble into an honest *range* for
+the parameter you can't see — an estimate plus-or-minus a couple of
+standard errors. That's *Confidence Intervals*, and it leans on
+everything from these four sampling pages.
