@@ -6,8 +6,15 @@
 import { readFileSync } from "node:fs";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
 import { remarkMdxMermaid } from "fumadocs-core/mdx-plugins";
+
+// IMPORTANT: mirror the REAL fumadocs pipeline from source.config.ts, which
+// runs remarkMdxMermaid (plus fumadocs' built-in remark-gfm) and does NOT
+// run remark-math on the page body. Including remark-math here would mask
+// build failures: it protects `{`/`}` inside `$...$` math that the real
+// pipeline parses as JSX expressions. Keep math OUT so this reproduces the
+// production Turbopack/acorn errors exactly.
+const REMARK_PLUGINS = [remarkGfm, remarkMdxMermaid];
 
 const files = process.argv.slice(2);
 if (files.length === 0) {
@@ -32,9 +39,7 @@ let failed = 0;
 for (const file of files) {
   const src = stripFrontmatter(readFileSync(file, "utf8"));
   try {
-    await compile(src, {
-      remarkPlugins: [remarkGfm, remarkMath, remarkMdxMermaid],
-    });
+    await compile(src, { remarkPlugins: REMARK_PLUGINS });
   } catch (e) {
     failed++;
     const line = e?.line != null ? `:${e.line}:${e.column ?? ""}` : "";
