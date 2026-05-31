@@ -56,7 +56,13 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const showToast = useCallback(
     (msg: string, kind: "info" | "warn" = "info") => {
       startTransition(() => {
-        toastManager.add({ title: msg, data: { kind } });
+        // Failures ("warn") linger longer than transient "info" notices so
+        // the user has time to read (and Copy) the message.
+        toastManager.add({
+          title: msg,
+          data: { kind },
+          timeout: kind === "warn" ? 8000 : undefined,
+        });
       });
     },
     [toastManager],

@@ -66,7 +66,10 @@ import {
 // Local helpers
 // ────────────────────────────────────────────────────────────────────────
 
-function getSqliteErrorHint(error: string): string | null {
+/** Produce a friendly hint for a raw engine error string. Despite the
+ *  per-engine sections, this is shared across SQLite, DuckDB, and
+ *  PostgreSQL. */
+function getEngineErrorHint(error: string): string | null {
   // SQLite patterns
   const nearMatch = error.match(/^near "(.+)": syntax error$/i);
   if (nearMatch) {
@@ -122,6 +125,37 @@ function getSqliteErrorHint(error: string): string | null {
     return `Column "${pgAmbiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
   }
   return null;
+}
+
+/** Small self-contained button that copies an error string to the
+ *  clipboard and briefly shows a "Copied" confirmation. */
+function CopyErrorButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="sql-result-error-copy"
+      onClick={() => {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          })
+          .catch(() => undefined);
+      }}
+    >
+      {copied ? "Copied" : "Copy error"}
+    </button>
+  );
+}
+
+/** Heuristic: does this string look like a JSON object/array? Used to offer
+ *  pretty-print + validation in the edit-in-modal dialog. */
+function looksLikeJson(s: string): boolean {
+  const t = s.trim();
+  if (!t) return false;
+  return t[0] === "{" || t[0] === "[";
 }
 
 function quoteIdentSql(name: string): string {
@@ -909,10 +943,14 @@ function ResultViewImpl({
     );
   }
   if (result.error) {
-    const hint = getSqliteErrorHint(result.error);
+    const hint = getEngineErrorHint(result.error);
     return (
       <div className="sql-result-error">
-        <div className="sql-result-error-title">Query failed</div>
+        <div className="sql-result-error-header">
+          <span className="sql-result-error-title">Query failed</span>
+          <span className="sql-result-error-engine">{engineLabel}</span>
+          <CopyErrorButton text={result.error} />
+        </div>
         <pre className="sql-result-error-body">{result.error}</pre>
         {hint && <div className="sql-result-error-hint">{hint}</div>}
       </div>
@@ -1401,6 +1439,8 @@ export function ResultTableBody({
     colName: string;
     value: string;
   } | null>(null);
+  // Validation message for the edit-in-modal dialog (e.g. invalid JSON).
+  const [modalError, setModalError] = useState<string | null>(null);
 
   // ── Column rename state ────────────────────────────────────────────────
   const [renamedColumns, setRenamedColumns] = useState<Map<number, string>>(
@@ -2020,6 +2060,18 @@ export function ResultTableBody({
                   <div className="ex-title">Edit cell in modal</div>
                 </ContextMenu.Item>
               )}
+              {editable && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cell = rightClickedCellRef.current;
+                    if (cell === null || cell.colIdx < 0) return;
+                    onSetPendingEdit(`${absoluteRow}:${cell.colIdx}`, null);
+                  }}
+                >
+                  <div className="ex-title">Set to NULL</div>
+                </ContextMenu.Item>
+              )}
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => {
@@ -2180,7 +2232,10 @@ export function ResultTableBody({
       <Dialog.Root
         open={modalEditCell !== null}
         onOpenChange={(open) => {
-          if (!open) setModalEditCell(null);
+          if (!open) {
+            setModalEditCell(null);
+            setModalError(null);
+          }
         }}
       >
         <Dialog.Portal>
@@ -2197,23 +2252,67 @@ export function ResultTableBody({
                 className="sql-cell-modal-form"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  // Validate JSON-looking values so the user can't commit a
+                  // malformed document that the engine would then reject.
+                  if (looksLikeJson(modalEditCell.value)) {
+                    try {
+                      JSON.parse(modalEditCell.value);
+                    } catch (err) {
+                      setModalError(
+                        `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+                      );
+                      return;
+                    }
+                  }
+                  setModalError(null);
                   onSetPendingEdit(modalEditCell.cellKey, modalEditCell.value);
                   setModalEditCell(null);
                 }}
               >
                 <textarea
-                  className="sql-cell-modal-textarea"
+                  className="sql-cell-modal-textarea sql-cell-modal-textarea-mono"
                   value={modalEditCell.value}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    setModalError(null);
                     setModalEditCell({
                       ...modalEditCell,
                       value: e.target.value,
-                    })
-                  }
+                    });
+                  }}
                   autoFocus
-                  rows={8}
+                  rows={12}
+                  spellCheck={false}
                 />
+                {modalError && (
+                  <div className="sql-cell-modal-error">{modalError}</div>
+                )}
                 <div className="confirm-actions">
+                  {looksLikeJson(modalEditCell.value) && (
+                    <button
+                      type="button"
+                      className="confirm-btn confirm-btn-secondary sql-cell-modal-format"
+                      onClick={() => {
+                        try {
+                          const formatted = JSON.stringify(
+                            JSON.parse(modalEditCell.value),
+                            null,
+                            2,
+                          );
+                          setModalError(null);
+                          setModalEditCell({
+                            ...modalEditCell,
+                            value: formatted,
+                          });
+                        } catch (err) {
+                          setModalError(
+                            `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+                          );
+                        }
+                      }}
+                    >
+                      Format JSON
+                    </button>
+                  )}
                   <Dialog.Close className="confirm-btn confirm-btn-secondary">
                     Cancel
                   </Dialog.Close>

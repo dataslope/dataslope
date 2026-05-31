@@ -868,7 +868,12 @@ function PostgresPlaygroundInner() {
   const showToast = useCallback(
     (title: string, kind: "info" | "warn" = "info") => {
       startTransition(() => {
-        toastManager.add({ title, data: { kind } });
+        // Failures ("warn") linger longer than transient "info" notices.
+        toastManager.add({
+          title,
+          data: { kind },
+          timeout: kind === "warn" ? 8000 : undefined,
+        });
       });
     },
     [toastManager],
@@ -1021,7 +1026,7 @@ function PostgresPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
-  } = useQueryHistory();
+  } = useQueryHistory(storageKey("query_history"));
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);

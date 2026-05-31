@@ -6,7 +6,11 @@
 
 > **Note on the previous audit.** A prior pass (`20260524-0058-sql-playgrounds-ux-audit.md`) could only boot Postgres — SQLite and DuckDB WASM were blocked by the sandbox, so those engines were reviewed from source only. This pass loads **all three** by bypassing the sandbox's TLS‑intercepting proxy (`--ignore-certificate-errors` / `ignoreHTTPSErrors`), which is why several of its findings turned out to be stale or inverted. Section 11 lists every correction. **Do not action the old report's findings without checking them here first.**
 
-> **✅ Update — Phase 1 implemented (2026-05-31).** The five highest-priority findings (**UX-01, UX-02, UX-03, UX-05, UX-07**) have been fixed and verified live with Playwright (**12/12 checks pass**). Details, files changed, and before/after screenshots are in [§12 Phase 1](#12-implementation-phases). Phases 2–4 remain open. Fixed findings are marked **✅ Fixed** in the table below.
+> **✅ Update — Phases 1 & 2 implemented (2026-05-31).**
+> - **Phase 1** (UX-01, UX-02, UX-03, UX-05, UX-07) — fixed & verified live (**12/12 checks**). See [§12 Phase 1](#12-implementation-phases).
+> - **Phase 2** (UX-12, UX-13, UX-14, UX-20, and the modal slice of UX-04) — fixed & verified live (**7/7 checks**). The larger UX-04 work (bespoke inline editors), UX-06, UX-08, and UX-22 are carried into **Phase 2b**. See [§12 Phase 2](#12-implementation-phases).
+>
+> Fixed findings are marked **✅ Fixed** (or **✅ Partial**) in the tables below.
 
 ---
 
@@ -68,7 +72,7 @@ Each finding carries an ID (`UX-NN`) for cross-reference from the phased plan in
 | **UX-01 ✅ Fixed** | JSON/JSONB renders as `[object Object]` in grid **and** both editors; commit would write the literal string | 🔴 | All (PG/DuckDB JSON) | `runtime/postgres.ts` `toSqlValue` (origin); `utils/cellUtils.ts:17-23` |
 | **UX-02 ✅ Fixed** | Type list filters itself on open → shows only the current value, hides ~28–29 other types | 🔴 | PG, DuckDB | `postgres/PostgresPlayground.tsx` `PgTypeSelector`; `duckdb/DuckDbPlayground.tsx` `DuckDbTypeSelector` |
 | **UX-03 ✅ Fixed** | "Loading **SQLite** engine…" shown on Postgres/DuckDB pages (e.g. during DB switch) | 🔴 | PG, DuckDB | `components/ResultView.tsx` `engineLabel` prop; wired in all 3 playgrounds |
-| UX-04 | Inline edit = single-line `<input type=text>` for every type; modal = plain `<textarea>`; neither is type-aware | 🔴 | All | `components/ResultView.tsx:1803-1830, 2200-2211` |
+| **UX-04 ✅ Partial** | Inline edit = single-line `<input type=text>` for every type; modal = plain `<textarea>`; neither is type-aware | 🔴 | All | Modal now JSON-aware (validate + Format + monospace + column shown), `ResultView.tsx`. Bespoke **inline** editors (date/enum/boolean/blob/array) → Phase 2b |
 | **UX-05 ✅ Fixed** | Drop/Truncate hide CASCADE / RESTART IDENTITY; DuckDB "truncate"=`DELETE` | 🔴 | PG, DuckDB | `components/SchemaActionDialogs.tsx` (`dropDetail`/`truncateDetail`); disclosures in PG/DuckDB playgrounds (type-name guard deferred — see §12) |
 | UX-06 | Inline editing only works on **sidebar-opened** table previews, not hand-typed `SELECT * FROM t` — no hint why | 🟡 | All | `hooks/useQueryRunner.ts:93,143` (`sourceTable` gating) |
 | **UX-07 ✅ Fixed** | Array columns (`integer[]`, `text[]`) shown with type **`text`** in the result header | 🟡 | PG, DuckDB | `runtime/postgres.ts` `PG_TYPE_NAMES` (array OIDs added) |
@@ -76,15 +80,15 @@ Each finding carries an ID (`UX-NN`) for cross-reference from the phased plan in
 | UX-09 | `timestamptz`/date/time edited as raw UTC ISO text; no picker, no timezone hint | 🟡 | All | `components/ResultView.tsx:1803-1830` |
 | UX-10 | Commit affordance ("Update N cell…") sits far bottom-right; no per-row/column discard, no post-commit undo | 🟡 | All | `components/ResultView.tsx` (footer) |
 | UX-11 | No create/edit UI for indexes, triggers, views, CHECK/table constraints in PG/DuckDB; SQLite's table form **has** Index/Trigger tabs → inconsistent | 🟡 | All | `components/ModifyStructureForm.tsx` vs PG/DuckDB custom forms |
-| UX-12 | Toast auto-dismiss = 2400 ms — too short to read errors | 🟡 | All | `SqlPlayground.tsx:700`, `PostgresPlayground.tsx:5096`, `DuckDbPlayground.tsx:5694` |
-| UX-13 | Query history is in-memory only; lost on reload | 🟡 | All | `hooks/useQueryHistory.ts:20` |
-| UX-14 | Inline error block lacks Copy-error, SQLSTATE/engine label, and editor highlight | 🟡 | All | `components/ResultView.tsx:908-913` |
+| **UX-12 ✅ Fixed** | Toast auto-dismiss = 2400 ms — too short to read errors | 🟡 | All | Failure ("warn") toasts now 8 s; `hooks/useDatabaseActions.ts`, PG/DuckDB `showToast` |
+| **UX-13 ✅ Fixed** | Query history is in-memory only; lost on reload | 🟡 | All | Persisted (capped 200) to localStorage, `hooks/useQueryHistory.ts` |
+| **UX-14 ✅ Partial** | Inline error block lacks Copy-error, SQLSTATE/engine label, and editor highlight | 🟡 | All | Copy-error + engine badge added, `ResultView.tsx`. Editor line-highlight → Phase 2b (with UX-08) |
 | UX-15 | Type/identity terminology differs: "Auto-increment" / "Identity/serial" / "Identity"; header wraps mid-word | 🟢 | All | `ModifyStructureForm.tsx`; `PostgresPlayground.tsx` header; `DuckDbPlayground.tsx` header |
 | UX-16 | No live "Show generated SQL" preview in Create/Edit Table; no CHECK/comment UI; default value is bare free-text | 🟢/🟡 | All | Create-table dialogs |
 | UX-17 | DuckDB inline edits build `UPDATE` via string concatenation (PG uses parameter binding) — fragile for STRUCT/MAP/LIST | 🟡 | DuckDB | `runtime/duckdb.ts:827` |
 | UX-18 | Loading hero title is oversized; status caption tiny | 🟢 | All | `components/SqlPlaygroundShell.tsx:95-109` |
 | UX-19 | Add Table subtitle "Create a new table" rendered in **green** accent (reads like a status) | 🟢 | All | `PostgresPlayground.tsx:3758-3759`; `sqlPlayground.css:1529-1532` |
-| UX-20 | Cannot enter the literal string `"NULL"`; "NULL" is coerced to SQL NULL; no explicit Set-NULL affordance | 🟢 | All | `utils/cellUtils.ts:39-44` |
+| **UX-20 ✅ Partial** | Cannot enter the literal string `"NULL"`; "NULL" is coerced to SQL NULL; no explicit Set-NULL affordance | 🟢 | All | Explicit "Set to NULL" context-menu item added, `ResultView.tsx`. Literal-`"NULL"` escape hatch → Phase 2b |
 | UX-21 | BLOB shown as `BLOB (N bytes)`; modal editor mangles binary; no hex/base64/upload | 🟡 | All | `utils/cellUtils.ts:21`; `components/ResultView.tsx:2200` |
 | UX-22 | Generated/view/read-only columns not visually distinguished; edits fail only on commit | 🟡 ♿ | All | `components/ResultView.tsx:1833-1848` |
 | UX-23 | Not mobile-responsive: horizontal overflow at 390 px, 270 px sidebar dominates | 🔴 (mobile) | All | layout CSS (see §10) |
@@ -346,14 +350,25 @@ All five items implemented and verified live with Playwright (**12/12 checks pas
 
 **Files changed (Phase 1):** `app/_components/runtime/postgres.ts`, `app/_components/postgres/PostgresPlayground.tsx`, `app/_components/duckdb/DuckDbPlayground.tsx`, `app/_components/sql/components/ResultView.tsx`, `app/_components/sql/components/SchemaActionDialogs.tsx`, `app/_components/sql/SqlPlayground.tsx`, `app/_components/playground.css`.
 
-### Phase 2 — Editing ergonomics & error attribution
+### Phase 2 — Editing ergonomics & error attribution — ✅ COMPLETED (2026-05-31)
 
-6. **UX-04 Type-aware editors** (JSON tree/validator, date/time picker, boolean toggle, enum dropdown, array editor, blob hex+upload) driven by column type. (`ResultView.tsx`, new editor components.) (Covers UX-09, UX-21.)
-7. **UX-06 Editable hand-typed selects** — detect single-table `SELECT` and set `sourceTable`, or show a "open from sidebar to edit" hint. (`hooks/useQueryRunner.ts`, `sqlAnalysis.ts`.)
-8. **UX-08 / UX-14 Error attribution** — per-statement success/error badges, "statement N of M", editor line highlight, Copy-error + engine/SQLSTATE label; rename `getSqliteErrorHint`. (`useQueryRunner.ts`, `ResultView.tsx:69-124,908-913`.)
-9. **UX-10 Commit/undo** — per-row/column discard, keyboard commit/discard, and a one-step post-commit undo. (`ResultView.tsx`.)
-10. **UX-20 / UX-22 NULL + read-only** — explicit "Set to NULL" menu item, escape hatch for the literal string, and a lock/italic marker on read-only/generated columns.
-11. **UX-12 / UX-13 Toasts & history** — error toast timeout ≥ 8 s and a distinct `error` style; persist capped history to localStorage. (`*Playground.tsx` Toast.Provider, `ToastList.tsx`, `useQueryHistory.ts`.)
+Shipped the contained, low-risk, high-value slice of Phase 2 and verified live with Playwright (**7/7 checks pass**; ESLint 0 new errors; all routes compile). The larger inline-editor and runtime-touching items are carried into **Phase 2b** below.
+
+1. **UX-13 History persistence — ✅ Done.** `useQueryHistory(storageKey?)` now restores from localStorage via a lazy initializer (no SSR hydration mismatch) and writes a capped (200-entry) copy on change via the existing idle-deferred `persistAsync`; `clearHistory` writes `[]`. Threaded `storageKey("query_history")` from all three playgrounds. *Verified:* run a query → reload → the query is still in the History tab. `p2-sqlite-history-persisted.png`.
+2. **UX-12 Toasts — ✅ Done.** Failure ("warn") toasts now use an 8 s per-toast timeout (info stays at the 2.4 s default) in all three `showToast` helpers (`useDatabaseActions.ts` + PG/DuckDB). `.toast-warn` already had the red stripe + Copy button. *Verified:* a failed import toast is still visible after 4 s (old timeout was 2.4 s) and has Copy. `p2-warn-toast.png`.
+3. **UX-14 Error block — ✅ Partial.** Added an engine badge ("SQLite"/"PostgreSQL"/"DuckDB", reusing the Phase-1 `engineLabel`) and a "Copy error" button to the result error block, and renamed the (already multi-engine) `getSqliteErrorHint` → `getEngineErrorHint`. *Verified:* `p2-sqlite-error-block.png`. **Deferred:** editor line/column highlight of the failing token (lands with UX-08 in Phase 2b).
+4. **UX-20 NULL — ✅ Partial.** Added an explicit "Set to NULL" item to the cell context menu (sets a pending `null` edit). *Verified:* `p2-postgres-set-null.png`, `p2-postgres-context-menu.png`. **Deferred:** an escape hatch for storing the literal string `"NULL"`.
+5. **UX-04 (modal slice) — ✅ Done.** The "Edit cell in modal" editor is now JSON-aware: validates JSON-looking values on Apply (blocks malformed input with a clear message), adds a "Format JSON" pretty-printer, uses a larger monospace textarea, and shows the column name. *Verified:* invalid JSON is blocked with `Invalid JSON: …`; Format pretty-prints. `p2-postgres-modal-invalid-json.png`, `p2-postgres-modal-formatted.png`.
+
+**Files changed (Phase 2):** `app/_components/sql/hooks/useQueryHistory.ts`, `app/_components/sql/hooks/useDatabaseActions.ts`, `app/_components/sql/components/ResultView.tsx`, `app/_components/sql/SqlPlayground.tsx`, `app/_components/postgres/PostgresPlayground.tsx`, `app/_components/duckdb/DuckDbPlayground.tsx`, `app/_components/sqlPlayground.css`.
+
+### Phase 2b — remaining editing/attribution work (carried forward)
+
+6. **UX-04 inline type-aware editors** — boolean toggle, date/time picker (UX-09), enum dropdown, array editor, and a BYTEA/BLOB hex viewer + upload (UX-21), driven by `set.columnTypes`. Larger/new-component work; the modal already covers JSON.
+7. **UX-06 Editable hand-typed selects** — detect a simple single-table `SELECT` in `sqlAnalysis.ts`/`useQueryRunner.ts` and set `sourceTable` (or show a "open from the sidebar to edit" hint). Medium regression risk — gate tightly (no joins/aggregates).
+8. **UX-08 Error attribution** — per-statement success/error badges, "statement N of M", and an editor line highlight of the failing token (pairs with the UX-14 line-highlight deferral). Touches the runtime/`useQueryRunner` multi-statement path.
+9. **UX-10 Commit/undo** — per-row/column discard of pending edits, keyboard commit/discard, and a one-step post-commit undo.
+10. **UX-22 read-only columns** — a lock/italic marker on generated/view/join columns, blocking the edit gracefully (needs generated-column metadata threaded into `ResultView`).
 
 ### Phase 3 — Responsive & mobile (see §10)
 

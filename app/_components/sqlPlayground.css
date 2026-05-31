@@ -687,6 +687,42 @@
   margin-bottom: 6px;
 }
 
+.sql-result-error-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sql-result-error-header .sql-result-error-title {
+  margin-bottom: 0;
+}
+.sql-result-error-engine {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: var(--text-dim);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.sql-result-error-copy {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  padding: 3px 9px;
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+.sql-result-error-copy:hover {
+  background: var(--bg3);
+}
+
 .sql-result-error-body {
   background: var(--bg2);
   border-radius: 6px;
@@ -2806,6 +2842,24 @@
 
 .sql-cell-modal-textarea::placeholder {
   color: color-mix(in srgb, var(--text-dim) 55%, transparent);
+}
+
+/* Push "Format JSON" to the left of the Cancel/Apply actions. */
+.sql-cell-modal-format {
+  margin-right: auto;
+}
+
+.sql-cell-modal-error {
+  font-size: 12px;
+  color: var(--red);
+  font-family: var(--font-mono);
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
+  border-radius: 6px;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: -4px;
 }
 
 /* ─── Cascade dropdowns ─── */

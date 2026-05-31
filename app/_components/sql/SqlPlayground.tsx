@@ -1276,7 +1276,7 @@ function SqlPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
-  } = useQueryHistory();
+  } = useQueryHistory(storageKey("query_history"));
   const queryRunnerRefs = {
     engineRef,
     editorRef,
