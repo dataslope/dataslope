@@ -3,6 +3,8 @@ import {
   classifyCellEditor,
   toDateEditorValue,
   fromDateEditorValue,
+  hasTimeOfDay,
+  resolveTemporalEditorKind,
   bytesToHex,
   formatBytesHex,
   bytesToBase64,
@@ -146,6 +148,63 @@ describe("fromDateEditorValue", () => {
     const original = "2026-05-31T03:35:51Z";
     const input = toDateEditorValue(original, "datetime")!;
     expect(fromDateEditorValue(input, "datetime", original)).toBe(original);
+  });
+});
+
+describe("hasTimeOfDay", () => {
+  it("is false for pure dates and midnight", () => {
+    expect(hasTimeOfDay("2024-03-15")).toBe(false);
+    expect(hasTimeOfDay("2024-03-15T00:00:00.000Z")).toBe(false);
+    expect(hasTimeOfDay("2024-03-15 00:00:00")).toBe(false);
+    expect(hasTimeOfDay("2024-03-15T00:00")).toBe(false);
+  });
+
+  it("is true when there is a real clock time", () => {
+    expect(hasTimeOfDay("2024-03-15 14:30:00")).toBe(true);
+    expect(hasTimeOfDay("2024-03-15T09:15:00.000Z")).toBe(true);
+    expect(hasTimeOfDay("2024-03-15T00:00:30")).toBe(true); // seconds only
+    expect(hasTimeOfDay("2024-03-15T00:00:00.500")).toBe(true); // fraction only
+  });
+
+  it("ignores a timezone offset (the clock time, not +05:30, decides)", () => {
+    expect(hasTimeOfDay("2024-03-15T00:00:00+05:30")).toBe(false);
+    expect(hasTimeOfDay("2024-03-15T08:00:00+05:30")).toBe(true);
+  });
+
+  it("is false for non-strings / unparseable values", () => {
+    expect(hasTimeOfDay(null)).toBe(false);
+    expect(hasTimeOfDay(1717000000)).toBe(false);
+    expect(hasTimeOfDay("hello")).toBe(false);
+  });
+
+  it("accepts Date objects", () => {
+    expect(hasTimeOfDay(new Date("2024-03-15T14:30:00Z"))).toBe(true);
+  });
+});
+
+describe("resolveTemporalEditorKind (let users edit the time too)", () => {
+  it("upgrades a date column to datetime when the value carries a time", () => {
+    expect(resolveTemporalEditorKind("date", "2024-03-15 14:30:00")).toBe(
+      "datetime",
+    );
+    expect(resolveTemporalEditorKind("date", "2024-03-15T09:15:00.000Z")).toBe(
+      "datetime",
+    );
+  });
+
+  it("keeps a date column date-only for a pure / midnight date", () => {
+    expect(resolveTemporalEditorKind("date", "2024-03-15")).toBe("date");
+    expect(resolveTemporalEditorKind("date", "2024-03-15T00:00:00.000Z")).toBe(
+      "date",
+    );
+  });
+
+  it("passes datetime / time kinds through unchanged", () => {
+    expect(resolveTemporalEditorKind("datetime", "2024-03-15")).toBe("datetime");
+    expect(resolveTemporalEditorKind("time", "08:20:00")).toBe("time");
+    expect(resolveTemporalEditorKind("datetime", "2024-03-15 14:30:00")).toBe(
+      "datetime",
+    );
   });
 });
 

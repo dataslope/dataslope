@@ -66,6 +66,7 @@ import {
   classifyCellEditor,
   toDateEditorValue,
   fromDateEditorValue,
+  resolveTemporalEditorKind,
   formatBytesHex,
   bytesToBase64,
   type TemporalEditorKind,
@@ -1979,8 +1980,14 @@ export function ResultTableBody({
                   editorKind === "datetime" ||
                   editorKind === "time"
                 ) {
-                  const kind = editorKind as TemporalEditorKind;
                   const source = hasPendingEdit ? pendingValue : rawValue;
+                  // A `date`-typed column whose value actually carries a
+                  // time-of-day is edited with a datetime picker so the hours
+                  // and minutes are editable too (not silently dropped).
+                  const kind = resolveTemporalEditorKind(
+                    editorKind as TemporalEditorKind,
+                    source,
+                  );
                   const dateInputVal = toDateEditorValue(source, kind);
                   if (dateInputVal !== null) {
                     const inputType =
