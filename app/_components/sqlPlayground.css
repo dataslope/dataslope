@@ -2446,6 +2446,29 @@
   text-decoration: none;
 }
 
+/* Native date / time picker inline editor. Inherits .sql-cell-input; nudge
+   the spinner/calendar affordance so it doesn't overflow the cell. */
+.sql-cell-input-date {
+  font-family: var(--font-mono);
+  padding-block: 1px;
+}
+.sql-cell-input-date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  margin-left: 2px;
+  opacity: 0.6;
+}
+.sql-cell-input-date::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Read-only binary (BLOB / bytea) cell marker. */
+.sql-cell-blob {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--text-dim);
+  cursor: default;
+}
+
 /* <td> background highlight for edited cells */
 .sql-cell-edited-td {
   background: color-mix(in srgb,
@@ -2869,6 +2892,24 @@
 /* Push "Format JSON" to the left of the Cancel/Apply actions. */
 .sql-cell-modal-format {
   margin-right: auto;
+}
+
+/* Read-only hex / base64 viewer for binary (BLOB / bytea) cells. */
+.sql-blob-viewer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sql-blob-viewer-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.sql-blob-viewer .sql-cell-modal-textarea {
+  resize: none;
+  word-break: break-all;
 }
 
 .sql-cell-modal-error {

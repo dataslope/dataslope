@@ -62,6 +62,14 @@ import {
   pendingEditsAfterDeletedRows,
   inferColumnType,
 } from "../utils/cellUtils";
+import {
+  classifyCellEditor,
+  toDateEditorValue,
+  fromDateEditorValue,
+  formatBytesHex,
+  bytesToBase64,
+  type TemporalEditorKind,
+} from "../utils/cellEditing";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -1489,6 +1497,9 @@ export function ResultTableBody({
     cellKey: string;
     colName: string;
     value: string;
+    // Present for binary (BLOB / bytea) cells: a read-only hex + base64 view.
+    // When set, the modal is a viewer (no editable textarea / Apply).
+    binary?: { hex: string; base64: string; length: number };
   } | null>(null);
   // Validation message for the edit-in-modal dialog (e.g. invalid JSON).
   const [modalError, setModalError] = useState<string | null>(null);
@@ -1618,9 +1629,10 @@ export function ResultTableBody({
           ]
         : []),
       ...set.columns.map((c, ci) => {
-        const isBoolCol = isBooleanType(
-          set.columnTypes?.[ci] || inferColumnType(set.values, ci),
-        );
+        const resolvedType =
+          set.columnTypes?.[ci] || inferColumnType(set.values, ci);
+        const isBoolCol = isBooleanType(resolvedType);
+        const editorKind = classifyCellEditor(resolvedType);
         return {
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
@@ -1903,6 +1915,21 @@ export function ResultTableBody({
               const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
               const pendingValue = pendingEdits?.get(cellKey);
               const rawValue = info.getValue();
+              // Binary columns aren't editable inline — a text/date picker
+              // would corrupt the bytes. Render a read-only marker; the row
+              // context menu's "Edit cell in modal" opens a hex/base64 viewer.
+              if (editorKind === "blob" || rawValue instanceof Uint8Array) {
+                return (
+                  <span
+                    className={
+                      rawValue === null ? "sql-cell-null" : "sql-cell-blob"
+                    }
+                    title="Binary value — right-click → Edit cell in modal to view bytes"
+                  >
+                    {formatCellValue(rawValue)}
+                  </span>
+                );
+              }
               // Boolean columns render as a tri-state checkbox toggle instead
               // of a 0/1 text input. Clicking flips true/false (NULL via the
               // row context menu's "Set to NULL").
@@ -1941,6 +1968,61 @@ export function ResultTableBody({
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
               if (isActiveEdit) {
+                // Date/time columns get a native picker when the stored value
+                // is a recognizable date string. The committed value preserves
+                // the original's exact format (separator, fractional seconds,
+                // timezone suffix), so it round-trips just like the free-text
+                // editor — see cellEditing.ts. Falls back to the text input
+                // below when the value isn't a parseable temporal string.
+                if (
+                  editorKind === "date" ||
+                  editorKind === "datetime" ||
+                  editorKind === "time"
+                ) {
+                  const kind = editorKind as TemporalEditorKind;
+                  const source = hasPendingEdit ? pendingValue : rawValue;
+                  const dateInputVal = toDateEditorValue(source, kind);
+                  if (dateInputVal !== null) {
+                    const inputType =
+                      kind === "date"
+                        ? "date"
+                        : kind === "time"
+                          ? "time"
+                          : "datetime-local";
+                    return (
+                      <input
+                        className="sql-cell-input sql-cell-input-date"
+                        type={inputType}
+                        defaultValue={dateInputVal}
+                        step={kind === "date" ? undefined : 1}
+                        autoFocus
+                        aria-label={`Edit ${c}`}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          // Clearing a native picker is a no-op; use the row
+                          // context menu's "Set to NULL" to null the cell.
+                          if (raw === "") return;
+                          const stored = fromDateEditorValue(raw, kind, rawValue);
+                          if (stored !== formatCellValue(rawValue)) {
+                            onSetPendingEdit(cellKey, stored);
+                          } else if (hasPendingEdit) {
+                            onClearPendingEdit(cellKey);
+                          }
+                        }}
+                        onBlur={() => onSetActiveEditCell(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            (e.currentTarget as HTMLInputElement).blur();
+                          } else if (e.key === "Escape") {
+                            onSetActiveEditCell(null);
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        onDoubleClick={(e) => e.stopPropagation()}
+                      />
+                    );
+                  }
+                }
                 const editVal = hasPendingEdit
                   ? String(pendingValue ?? "")
                   : formatCellValue(rawValue);
@@ -1950,6 +2032,7 @@ export function ResultTableBody({
                     defaultValue={editVal}
                     autoFocus
                     type="text"
+                    aria-label={`Edit ${c}`}
                     inputMode={isNumeric ? "decimal" : undefined}
                     onChange={(e) => {
                       const raw = e.target.value;
@@ -2082,6 +2165,12 @@ export function ResultTableBody({
       const cellKey = `${absoluteRow}:${ci}`;
       const hasPendingEdit =
         !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
+      // Binary cells are inspected via the modal viewer, not edited inline.
+      const isBlobCell =
+        !isSelect &&
+        ci >= 0 &&
+        (rawVal instanceof Uint8Array ||
+          classifyCellEditor(set.columnTypes?.[ci]) === "blob");
       return (
         <td
           key={cell.id}
@@ -2105,7 +2194,7 @@ export function ResultTableBody({
               : undefined
           }
           onDoubleClick={
-            editable && !isSelect && ci >= 0
+            editable && !isSelect && ci >= 0 && !isBlobCell
               ? () => onSetActiveEditCell(cellKey)
               : undefined
           }
@@ -2151,6 +2240,22 @@ export function ResultTableBody({
                     const cell = rightClickedCellRef.current;
                     if (cell === null || cell.colIdx < 0) return;
                     const colName = set.columns[cell.colIdx] ?? "";
+                    const cellKey = `${absoluteRow}:${cell.colIdx}`;
+                    // Binary values open a read-only hex/base64 viewer — editing
+                    // bytes as text would corrupt them on commit.
+                    if (cell.value instanceof Uint8Array) {
+                      setModalEditCell({
+                        cellKey,
+                        colName,
+                        value: formatCellValue(cell.value),
+                        binary: {
+                          hex: formatBytesHex(cell.value),
+                          base64: bytesToBase64(cell.value),
+                          length: cell.value.length,
+                        },
+                      });
+                      return;
+                    }
                     if (keyHints?.readOnly?.has(colName)) {
                       toastManager.add({
                         title: `Column "${colName}" is read-only (generated).`,
@@ -2158,7 +2263,6 @@ export function ResultTableBody({
                       });
                       return;
                     }
-                    const cellKey = `${absoluteRow}:${cell.colIdx}`;
                     const current = pendingEdits?.has(cellKey)
                       ? String(pendingEdits.get(cellKey) ?? "")
                       : formatCellValue(cell.value);
@@ -2357,13 +2461,49 @@ export function ResultTableBody({
         <Dialog.Portal>
           <Dialog.Backdrop className="confirm-backdrop" />
           <Dialog.Popup className="confirm-popup sql-cell-modal-popup">
-            <Dialog.Title className="confirm-title">Edit cell</Dialog.Title>
+            <Dialog.Title className="confirm-title">
+              {modalEditCell?.binary ? "View binary cell" : "Edit cell"}
+            </Dialog.Title>
             {modalEditCell && (
               <Dialog.Description className="confirm-desc">
                 Column: <strong>{modalEditCell.colName}</strong>
+                {modalEditCell.binary
+                  ? ` · ${modalEditCell.binary.length} bytes`
+                  : ""}
               </Dialog.Description>
             )}
-            {modalEditCell && (
+            {modalEditCell?.binary && (
+              <div className="sql-cell-modal-form sql-blob-viewer">
+                <div className="sql-blob-viewer-field">
+                  <span className="sql-blob-viewer-label">Hex</span>
+                  <textarea
+                    className="sql-cell-modal-textarea sql-cell-modal-textarea-mono"
+                    value={modalEditCell.binary.hex}
+                    readOnly
+                    rows={8}
+                    spellCheck={false}
+                    aria-label={`${modalEditCell.colName} bytes as hex`}
+                  />
+                </div>
+                <div className="sql-blob-viewer-field">
+                  <span className="sql-blob-viewer-label">Base64</span>
+                  <textarea
+                    className="sql-cell-modal-textarea sql-cell-modal-textarea-mono"
+                    value={modalEditCell.binary.base64}
+                    readOnly
+                    rows={3}
+                    spellCheck={false}
+                    aria-label={`${modalEditCell.colName} bytes as base64`}
+                  />
+                </div>
+                <div className="confirm-actions">
+                  <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                    Close
+                  </Dialog.Close>
+                </div>
+              </div>
+            )}
+            {modalEditCell && !modalEditCell.binary && (
               <form
                 className="sql-cell-modal-form"
                 onSubmit={(e) => {
