@@ -6,11 +6,11 @@
   font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
 }
 
-/* Let the diagram fill the available column width and center within it.
+/* Render the diagram at its natural (intrinsic) size, centered in the column.
    Mermaid emits the SVG with width="100%" plus an inline `max-width:<W>px`
-   cap equal to the diagram's intrinsic width, which otherwise locks it to
-   that natural (often small) size. Overriding the cap lets the SVG — which
-   carries a viewBox — scale up uniformly to the column width. */
+   cap equal to the diagram's intrinsic width. Leaving that cap intact keeps
+   the diagram at its default size on wide columns while still letting it
+   scale down to fit narrower ones (the SVG carries a viewBox). */
 .wrap > div:first-child {
   width: 100%;
 }
@@ -18,9 +18,7 @@
 .wrap > div:first-child svg {
   display: block;
   margin-inline: auto;
-  width: 100%;
   height: auto;
-  max-width: 100% !important;
 }
 
 .expandBtn {
