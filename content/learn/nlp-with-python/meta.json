@@ -1,0 +1,28 @@
+{
+    "title": "Natural Language Processing with Python",
+    "description": "An intuition-first, hands-on introduction to classic NLP with NLTK — tokenization, normalization, stopwords, stemming vs. lemmatization, POS tagging, frequency analysis, n-grams, bag-of-words, and a rule-based text classifier. Learn not just how each step works, but why it exists and when to use it.",
+    "root": true,
+    "pages": [
+        "index",
+        "---",
+        "what-is-nlp",
+        "why-text-is-hard",
+        "the-nlp-pipeline",
+        "---",
+        "tokenization",
+        "---",
+        "text-normalization",
+        "stopwords",
+        "---",
+        "stemming-and-lemmatization",
+        "pos-tagging",
+        "---",
+        "frequency-distributions",
+        "ngrams",
+        "---",
+        "bag-of-words",
+        "rule-based-sentiment",
+        "---",
+        "next-steps"
+    ]
+}
