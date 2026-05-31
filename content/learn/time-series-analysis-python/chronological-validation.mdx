@@ -1,0 +1,627 @@
+---
+title: "The Cardinal Sin: Preventing Data Leakage with Chronological Validation Splits"
+description: Why a random train/test split is catastrophic for time series, how to evaluate forecasts honestly with chronological splits and walk-forward backtesting, the MAE/RMSE/MAPE metrics coded by hand, and the many sneaky ways the future leaks into the past.
+---
+
+This is the most important page in the course. You can fit a flawless ARIMA
+and still ship a disaster — if you *evaluate* it wrong. The discipline that
+separates a real forecaster from someone with a good-looking notebook is
+**honest validation**: measuring a model's true ability to project into a
+future it has never seen. Get this wrong and every accuracy number you report
+is a comfortable fiction.
+
+<Callout type="danger" title="The cardinal rule, one more time">
+**You may only use the past to predict the future, never the reverse.** Every
+validation technique on this page is a mechanism for enforcing that rule.
+Every leakage bug is a way it gets broken. If you remember one thing from
+this entire course, make it this.
+</Callout>
+
+## The cardinal sin: a random split
+
+The default split in nearly every ML tutorial — shuffle the rows, take 80%
+for training and 20% for testing — is **catastrophic** for time series. When
+you randomly assign rows, a test point from March ends up *surrounded in the
+training set* by February and April. The model gets to peek at both sides of
+every test point. It will score brilliantly in evaluation and collapse in
+production, where the future genuinely doesn't exist yet.
+
+```mermaid
+flowchart TB
+    subgraph BAD["WRONG: random / k-fold split (test points time-surrounded by train)"]
+        direction LR
+        b1["Jan<br/>train"] --> b2["Feb<br/>TEST"] --> b3["Mar<br/>train"] --> b4["Apr<br/>TEST"] --> b5["May<br/>train"]
+    end
+    subgraph GOOD["RIGHT: chronological split (train is the past, test is the future)"]
+        direction LR
+        g1["Jan<br/>train"] --> g2["Feb<br/>train"] --> g3["Mar<br/>train"] --> g4["Apr<br/>TEST"] --> g5["May<br/>TEST"]
+    end
+```
+
+Let's *measure* the leakage. We'll take a smooth-ish series and "predict"
+held-out points two ways: a random hold-out (where each test point still has
+neighbours on **both** sides inside the training set) versus a chronological
+hold-out (where the test points are at the **end**, with no future neighbour
+to lean on).
+
+<CodeBlock
+  adapter="python"
+  initCode={`import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(0)
+n = 120
+idx = pd.date_range("2010-01-01", periods=n, freq="D")
+# A smooth-ish series (random walk with drift): neighbours are very informative.
+y = pd.Series(np.cumsum(rng.normal(0, 1, n)) + 0.3*np.arange(n), index=idx)`}
+  initialCode={`import numpy as np
+
+vals = y.values
+positions = np.arange(n)
+
+# --- RANDOM hold-out: test points scattered through time ---
+test_pos = rng.choice(np.arange(3, n-3), size=24, replace=False)
+train_mask = np.ones(n, bool); train_mask[test_pos] = False
+# "Predict" each test point by interpolating between its TRAIN neighbours.
+# Because the split is random, those neighbours sit on BOTH sides in time.
+pred_random = np.interp(test_pos, positions[train_mask], vals[train_mask])
+mae_random = np.mean(np.abs(vals[test_pos] - pred_random))
+
+# --- CHRONOLOGICAL hold-out: test points are the LAST 24 ---
+split = n - 24
+# The same interpolation idea now has NO future neighbour, so it degenerates
+# into extrapolation (carry the last known value) -- the honest situation.
+pred_chrono = np.full(24, vals[:split][-1])
+mae_chrono = np.mean(np.abs(vals[split:] - pred_chrono))
+
+print(f"MAE with RANDOM hold-out (interpolating between past+future): {mae_random:6.2f}")
+print(f"MAE with CHRONOLOGICAL hold-out (honest extrapolation):       {mae_chrono:6.2f}")
+print()
+print("The random split looks far more accurate -- but only because it let the")
+print("'forecast' peek at future neighbours that will NOT exist in production.")
+print("That gap is pure data leakage. The chronological number is the real one.")
+`}
+/>
+
+The random hold-out reports a tiny error — and it's a lie. It only achieved
+that by interpolating between training points that lie in the test point's
+*future*. In production those future points don't exist, so the method can't
+work, and the honest chronological number is many times larger. **The random
+split didn't measure forecasting; it measured interpolation.**
+
+<MultipleChoice
+  markdown={`Why is k-fold cross-validation with random folds — the standard for ordinary tabular data — the *wrong* choice for time series?
+
+- It's too slow for large time series
+  > Speed isn't the problem. The flaw is that random folds destroy the temporal ordering that the evaluation must respect.
+- [o] Random folds put future observations in the training set for some folds, leaking future information into predictions about the past and inflating the score
+  > In a random fold, training rows can come from *after* a test row in time. The model effectively sees the future, so its measured accuracy is optimistic and unattainable in production.
+- It can only be used for classification
+  > k-fold works for regression too; the issue is specifically temporal leakage, not the task type.
+- It requires shuffling, which pandas can't do
+  > pandas shuffles fine. The point is that shuffling a time series is exactly what *causes* the leakage — it's a correctness problem, not a tooling one.
+
+Random folds mix future into training, leaking information; time series needs splits that keep train strictly before test.`}
+/>
+
+## Measuring error honestly: MAE, RMSE, MAPE
+
+Once you have an honest chronological forecast, you need a number for "how
+close." Three metrics dominate, and each makes a different trade-off. Code
+them by hand once and you'll never misread them again.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+def mae(y_true, y_pred):
+    # Mean Absolute Error: average size of the miss, in the data's own units.
+    return np.mean(np.abs(y_true - y_pred))
+
+def rmse(y_true, y_pred):
+    # Root Mean Squared Error: like MAE but SQUARES errors first, so big
+    # misses are punished much harder. Same units as the data.
+    return np.sqrt(np.mean((y_true - y_pred) ** 2))
+
+def mape(y_true, y_pred):
+    # Mean Absolute Percentage Error: scale-free, reported as a percent.
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+# Two forecasts of the same truth: one with small even misses, one that is
+# usually perfect but has a single huge blunder.
+y_true   = np.array([100, 100, 100, 100, 100], dtype=float)
+even     = np.array([105,  95, 104,  96, 100], dtype=float)  # small, spread out
+oneblump = np.array([100, 100, 100, 100, 140], dtype=float)  # one big miss
+
+for name, pred in [("even misses", even), ("one big blunder", oneblump)]:
+    print(f"{name:16s}  MAE={mae(y_true,pred):5.1f}  RMSE={rmse(y_true,pred):5.1f}  MAPE={mape(y_true,pred):4.1f}%")
+
+print()
+print("Same MAE-ish scale, but RMSE PUNISHES the single big blunder far more.")
+print("Choose RMSE when large errors are especially costly; MAE when every")
+print("unit of error counts equally; MAPE to compare across different scales.")
+`}
+/>
+
+| Metric | What it measures | Reach for it when | Watch out for |
+| --- | --- | --- | --- |
+| **MAE** | average absolute miss, in data units | you want a robust, interpretable number; every unit counts equally | doesn't single out big misses |
+| **RMSE** | like MAE but squares errors first | large errors are *disproportionately* costly (capacity, safety) | sensitive to outliers |
+| **MAPE** | average miss as a **percent** | comparing across series of different scales | **explodes near zero**, undefined at zero, asymmetric (over- vs under-forecast) |
+
+<Callout type="warn" title="MAPE has sharp edges">
+MAPE divides by the actual value, so it **blows up when the truth is near
+zero** and is **undefined at exactly zero**. It's also asymmetric — it
+punishes over-forecasting and under-forecasting unequally. It's wonderful for
+comparing a model across products of wildly different sales volumes, but a
+poor choice for series that pass through zero (temperatures in Celsius,
+net flows). When in doubt, report MAE *and* RMSE, and add MAPE only when a
+percentage genuinely makes sense.
+</Callout>
+
+## Beyond one split: walk-forward backtesting
+
+A single train/test split gives *one* estimate of forecast skill — and one
+estimate is noisy. Maybe that particular tail happened to be easy or hard.
+**Backtesting** (time-series cross-validation) re-runs the forecast across
+*many* successive cut-off points and averages the skill. The iron rule holds
+in every fold: **train is always strictly before test.**
+
+```mermaid
+flowchart TB
+    subgraph F1["Fold 1"]
+        direction LR
+        a1["train: months 1-60"] --> p1["test: 61-72"]
+    end
+    subgraph F2["Fold 2 (train grows)"]
+        direction LR
+        a2["train: months 1-72"] --> p2["test: 73-84"]
+    end
+    subgraph F3["Fold 3 (train grows)"]
+        direction LR
+        a3["train: months 1-84"] --> p3["test: 85-96"]
+    end
+```
+
+The picture above is the **expanding-window** (anchored) scheme: the training
+set grows each fold while the test window marches forward. A **rolling-window**
+scheme instead keeps the training window a fixed *size* and slides it — useful
+when old history stops being relevant. Either way, you get several honest
+out-of-sample scores instead of one.
+
+<CodeBlock
+  adapter="python"
+  initCode={`import numpy as np
+import pandas as pd
+_passengers = [
+    112,118,132,129,121,135,148,148,136,119,104,118,
+    115,126,141,135,125,149,170,170,158,133,114,140,
+    145,150,178,163,172,178,199,199,184,162,146,166,
+    171,180,193,181,183,218,230,242,209,191,172,194,
+    196,196,236,235,229,243,264,272,237,211,180,201,
+    204,188,235,227,234,264,302,293,259,229,203,229,
+    242,233,267,269,270,315,364,347,312,274,237,278,
+    284,277,317,313,318,374,413,405,355,306,271,306,
+    315,301,356,348,355,422,465,467,404,347,305,336,
+    340,318,362,348,363,435,491,505,404,359,310,337,
+    360,342,406,396,420,472,548,559,463,407,362,405,
+    417,391,419,461,472,535,622,606,508,461,390,432,
+]
+idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
+air = pd.Series(_passengers, index=idx, name="passengers")
+
+def mae(yt, yp):
+    return float(np.mean(np.abs(np.asarray(yt) - np.asarray(yp))))`}
+  initialCode={`import numpy as np
+
+# Expanding-window backtest of a SEASONAL-NAIVE forecaster (predict each month
+# with the value 12 months earlier). Fast, leakage-free, and a strong baseline.
+def seasonal_naive_forecast(train, horizon, m=12):
+    last_season = train.values[-m:]
+    reps = int(np.ceil(horizon / m))
+    return np.tile(last_season, reps)[:horizon]
+
+initial, horizon, step = 60, 12, 12
+fold_maes = []
+for cut in range(initial, len(air) - horizon + 1, step):
+    train = air.iloc[:cut]            # the PAST only
+    test  = air.iloc[cut:cut+horizon] # the next 12 months (the FUTURE)
+    pred  = seasonal_naive_forecast(train, horizon)
+    e = mae(test.values, pred)
+    fold_maes.append(e)
+    print(f"train up to {train.index[-1].date()}  ->  test MAE = {e:6.1f}")
+
+print()
+print(f"Backtest MAE across {len(fold_maes)} folds: mean = {np.mean(fold_maes):.1f}, "
+      f"std = {np.std(fold_maes):.1f}")
+print("One holdout would have given just ONE of these numbers -- and you'd never")
+print("know how lucky or unlucky that single tail was. Many folds = a stable estimate.")
+`}
+/>
+
+Each fold trains only on its past and is scored on its future; averaging the
+folds gives a far steadier estimate of real skill than any single split. And
+notice we backtested a **baseline** (seasonal-naive) — because the real
+question is never "what's my error?" but "**do I beat the baseline on the same
+honest test?**"
+
+<MultipleChoice
+  markdown={`What is the defining property that every fold of a *time-series* backtest must satisfy?
+
+- Each fold must contain the same number of points
+  > Equal sizes are convenient but not the defining requirement. In expanding-window backtesting the training set deliberately grows each fold.
+- [o] In every fold, all training timestamps come strictly *before* all test timestamps — the model only ever learns from the past
+  > Keeping train entirely before test in every fold is exactly what prevents future leakage and mirrors real forecasting. It's the non-negotiable property.
+- The folds must be chosen randomly for fairness
+  > Random folds are precisely what breaks time-series validation by leaking the future. Fairness here means temporal order, not randomness.
+- Each test point must appear in the training set of another fold
+  > A test point appearing in any fold's *training* set means the model trained on data it's later tested on — leakage. Test points must stay out of all training sets that precede them in time.
+
+The essential property is temporal: train strictly precedes test in every fold, so the model never sees the future.`}
+/>
+
+## The other ways the future leaks in
+
+A chronological split is necessary but not *sufficient*. Leakage sneaks in
+through preprocessing too. Each of these silently hands the model information
+it won't have at prediction time:
+
+- **Scaling/normalizing with global statistics.** Computing a mean/std (or
+  min/max) over the *entire* series, including the test portion, leaks the
+  future's distribution into training. Fit the scaler on **train only**.
+- **Future-aware feature engineering.** Centered rolling windows, `shift(-k)`
+  leads, `bfill`, and linear interpolation all read *future* values. Safe for
+  retrospective charts, leakage as model inputs.
+- **Imputation or decomposition on the full series.** Filling gaps or
+  decomposing using all the data lets test-period values influence training.
+- **Tuning on the test set.** If you pick `(p, d, q)` by trying many options
+  and keeping the one with the best *test* score, the test set has trained
+  your choices. You need a separate **validation** set (or nested CV); the
+  final test set is looked at **once**.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import numpy as np
+
+rng = np.random.default_rng(1)
+series = np.concatenate([rng.normal(10, 1, 80), rng.normal(40, 5, 20)])  # level jumps late
+split = 80
+train, test = series[:split], series[split:]
+
+# WRONG: standardize using stats from the WHOLE series (peeks at the test jump).
+g_mean, g_std = series.mean(), series.std()
+wrong_train = (train - g_mean) / g_std
+
+# RIGHT: standardize using TRAIN stats only.
+t_mean, t_std = train.mean(), train.std()
+right_train = (train - t_mean) / t_std
+
+print(f"Global mean used on train (LEAKY): {g_mean:5.2f}  <- pulled up by the test-era jump")
+print(f"Train-only mean (correct)        : {t_mean:5.2f}")
+print()
+print("The leaky version centers training data using a mean inflated by data")
+print("the model shouldn't have seen yet. Always fit transforms on TRAIN only.")
+`}
+/>
+
+<Callout type="danger" title="Look at preprocessing, not just the split">
+The split is the famous leak, but the subtle ones live in preprocessing.
+Before trusting any backtest, ask of every transformation: *"could this step
+have seen data from the test period?"* Scalers, imputers, decompositions,
+feature lags, and hyperparameter choices must all be derived from the
+training data of each fold — never from the whole series.
+</Callout>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Implement the three error metrics in NumPy"
+  instructions={`Code the forecasting metrics from scratch. Given true and predicted arrays, implement:
+
+- \`mae(y_true, y_pred)\` — mean absolute error
+- \`rmse(y_true, y_pred)\` — root mean squared error
+- \`mape(y_true, y_pred)\` — mean absolute percentage error (as a percent, i.e. multiplied by 100)
+
+Then evaluate them on the provided \`y_true\` and \`y_pred\` and store the results (as plain floats) in a dict \`scores\` with keys \`"mae"\`, \`"rmse"\`, \`"mape"\`.`}
+  initCode={`import numpy as np
+y_true = np.array([200.0, 210.0, 190.0, 220.0, 205.0])
+y_pred = np.array([198.0, 215.0, 185.0, 219.0, 210.0])`}
+  initialCode={`import numpy as np
+
+def mae(y_true, y_pred):
+    return None
+
+def rmse(y_true, y_pred):
+    return None
+
+def mape(y_true, y_pred):
+    return None
+
+scores = {"mae": None, "rmse": None, "mape": None}
+print(scores)
+`}
+  solutionCode={`import numpy as np
+
+def mae(y_true, y_pred):
+    return float(np.mean(np.abs(y_true - y_pred)))
+
+def rmse(y_true, y_pred):
+    return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
+
+def mape(y_true, y_pred):
+    return float(np.mean(np.abs((y_true - y_pred) / y_true)) * 100)
+
+scores = {
+    "mae": mae(y_true, y_pred),
+    "rmse": rmse(y_true, y_pred),
+    "mape": mape(y_true, y_pred),
+}
+print(scores)
+`}
+  tests={[
+    {
+      id: "mae",
+      name: "MAE is correct",
+      description: "Mean absolute error of the sample",
+      code: `import numpy as np
+assert abs(scores["mae"] - np.mean(np.abs(y_true - y_pred))) < 1e-9`,
+    },
+    {
+      id: "rmse",
+      name: "RMSE is correct",
+      description: "Root mean squared error of the sample",
+      code: `import numpy as np
+assert abs(scores["rmse"] - np.sqrt(np.mean((y_true - y_pred) ** 2))) < 1e-9`,
+    },
+    {
+      id: "mape",
+      name: "MAPE is a percent",
+      description: "Mean absolute percentage error times 100",
+      code: `import numpy as np
+assert abs(scores["mape"] - np.mean(np.abs((y_true - y_pred)/y_true))*100) < 1e-9`,
+    },
+    {
+      id: "rmse_ge_mae",
+      name: "RMSE >= MAE (a sanity identity)",
+      description: "RMSE never falls below MAE",
+      code: `assert scores["rmse"] >= scores["mae"] - 1e-9`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Generate leakage-free expanding-window folds"
+  instructions={`Write \`expanding_folds(n, initial, horizon, step)\` that yields \`(train_idx, test_idx)\` pairs for an **expanding-window** backtest over \`n\` points:
+
+- The first fold trains on indices \`0..initial-1\` and tests on \`initial..initial+horizon-1\`.
+- Each later fold's training set **grows** to include everything before its test window; the test window advances by \`step\`.
+- Stop when a full \`horizon\`-length test window no longer fits.
+
+Return the list of folds as \`folds\` (a list of \`(train_idx, test_idx)\` tuples, where each is a list/range of integer positions). Every fold's training indices must all be **less than** all of its test indices (leakage-free).`}
+  initCode={`n, initial, horizon, step = 100, 60, 12, 12`}
+  initialCode={`def expanding_folds(n, initial, horizon, step):
+    folds = []
+    # TODO: build (train_idx, test_idx) tuples
+    return folds
+
+folds = expanding_folds(n, initial, horizon, step)
+for tr, te in folds:
+    print(f"train 0..{tr[-1]}  test {te[0]}..{te[-1]}")
+`}
+  solutionCode={`def expanding_folds(n, initial, horizon, step):
+    folds = []
+    cut = initial
+    while cut + horizon <= n:
+        train_idx = list(range(0, cut))
+        test_idx = list(range(cut, cut + horizon))
+        folds.append((train_idx, test_idx))
+        cut += step
+    return folds
+
+folds = expanding_folds(n, initial, horizon, step)
+for tr, te in folds:
+    print(f"train 0..{tr[-1]}  test {te[0]}..{te[-1]}")
+`}
+  tests={[
+    {
+      id: "nonempty",
+      name: "produces folds",
+      description: "At least three fit for these settings",
+      code: `assert len(folds) >= 3, f"Expected several folds, got {len(folds)}"`,
+    },
+    {
+      id: "leakfree",
+      name: "every fold is leakage-free",
+      description: "All train indices precede all test indices",
+      code: `for tr, te in folds:
+    assert max(tr) < min(te), "Train must come strictly before test in every fold"`,
+    },
+    {
+      id: "expanding",
+      name: "training set expands",
+      description: "Each fold trains on more than the last",
+      code: `lens = [len(tr) for tr, te in folds]
+assert all(lens[i] < lens[i+1] for i in range(len(lens)-1)), "Training window should grow"`,
+    },
+    {
+      id: "horizon",
+      name: "test windows have the right length",
+      description: "Each test window is `horizon` long",
+      code: `assert all(len(te) == 12 for tr, te in folds)`,
+    },
+    {
+      id: "first_fold",
+      name: "first fold matches the spec",
+      description: "Train 0..59, test 60..71",
+      code: `tr, te = folds[0]
+assert tr[0] == 0 and tr[-1] == 59 and te[0] == 60 and te[-1] == 71`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Beat the baseline on an honest split"
+  instructions={`Evaluate a forecaster against the seasonal-naive baseline on a **single chronological** split. The airline \`air\` series is loaded; hold out the **last 24 months** as the test set (train = the rest).
+
+Compute the test-set **MAE** for two forecasts of those 24 months:
+
+- \`mae_snaive\` — the seasonal-naive forecast: each test month equals the value from the same month one year earlier. For this 24-month horizon that is the **last 12 training months repeated twice** (\`np.tile(train.values[-12:], 2)\`).
+- \`mae_mean\` — a trivial flat forecast equal to the training mean, repeated 24 times.
+
+Set \`baseline_wins\` to \`True\` if the seasonal-naive MAE is lower than the flat-mean MAE (it should be — seasonality matters here).`}
+  initCode={`import numpy as np
+import pandas as pd
+_passengers = [
+    112,118,132,129,121,135,148,148,136,119,104,118,
+    115,126,141,135,125,149,170,170,158,133,114,140,
+    145,150,178,163,172,178,199,199,184,162,146,166,
+    171,180,193,181,183,218,230,242,209,191,172,194,
+    196,196,236,235,229,243,264,272,237,211,180,201,
+    204,188,235,227,234,264,302,293,259,229,203,229,
+    242,233,267,269,270,315,364,347,312,274,237,278,
+    284,277,317,313,318,374,413,405,355,306,271,306,
+    315,301,356,348,355,422,465,467,404,347,305,336,
+    340,318,362,348,363,435,491,505,404,359,310,337,
+    360,342,406,396,420,472,548,559,463,407,362,405,
+    417,391,419,461,472,535,622,606,508,461,390,432,
+]
+idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
+air = pd.Series(_passengers, index=idx, name="passengers")`}
+  initialCode={`import numpy as np
+mae_snaive = None
+mae_mean = None
+baseline_wins = None
+print("seasonal-naive MAE:", mae_snaive, " flat-mean MAE:", mae_mean, " snaive wins:", baseline_wins)
+`}
+  solutionCode={`import numpy as np
+h = 24
+train, test = air.iloc[:-h], air.iloc[-h:]
+snaive_pred = np.tile(train.values[-12:], 2)    # seasonal naive: last 12 months, repeated
+mean_pred = np.full(h, train.mean())
+mae_snaive = float(np.mean(np.abs(test.values - snaive_pred)))
+mae_mean = float(np.mean(np.abs(test.values - mean_pred)))
+baseline_wins = mae_snaive < mae_mean
+print("seasonal-naive MAE:", round(mae_snaive,1), " flat-mean MAE:", round(mae_mean,1),
+      " snaive wins:", baseline_wins)
+`}
+  tests={[
+    {
+      id: "computed",
+      name: "both MAEs are floats",
+      description: "Evaluated on the held-out 24 months",
+      code: `assert isinstance(mae_snaive, float) and isinstance(mae_mean, float)`,
+    },
+    {
+      id: "snaive_better",
+      name: "seasonal-naive beats the flat mean",
+      description: "Using last year's pattern beats ignoring seasonality",
+      code: `assert mae_snaive < mae_mean, "Seasonal-naive should beat a flat mean on this seasonal series"`,
+    },
+    {
+      id: "flag",
+      name: "baseline_wins is set correctly",
+      description: "Consistent with the two MAEs",
+      code: `assert baseline_wins == (mae_snaive < mae_mean) and baseline_wins is True`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A model scores 2% error on a *random* 80/20 split but 18% error in production. What's the most likely explanation?
+
+- The production data is fundamentally different
+  > A 9x degradation that appears only after deployment is the classic fingerprint of evaluation leakage, not of the world suddenly changing.
+- [o] The random split leaked future information into training, so the 2% was optimistic; the honest, leakage-free error is closer to the 18% seen in production
+  > Random splitting let test points be time-surrounded by training points, measuring interpolation rather than forecasting. Production has no such future context, so the true error surfaces.
+- The model needs more training epochs
+  > Classical models like ARIMA aren't trained in "epochs," and more training wouldn't close a gap caused by a leaky *evaluation*. The fix is an honest chronological split.
+- 2% and 18% are both correct and unrelated
+  > They measure the same model's accuracy and should roughly agree under honest evaluation. The large discrepancy is the symptom that the 2% came from a leaky split.
+
+A great-in-testing, bad-in-production gap on temporal data points to leakage from a random split; the production figure is the honest one.`}
+/>
+
+<MultipleChoice
+  markdown={`You standardize your features using the mean and standard deviation computed over the **entire** dataset, then do a chronological train/test split. Is this safe?
+
+- Yes — a chronological split is all you need
+  > A chronological split fixes the *split*, but the scaler already peeked. Computing global statistics over all data lets the test period's distribution leak into training.
+- [o] No — the scaler's statistics include the test period, leaking future information; fit the scaler on the training data only
+  > Any transform whose parameters are learned from the whole series (mean, std, min/max, imputation values) leaks the future. Scalers must be fit on train and merely *applied* to test.
+- Yes, as long as you don't shuffle
+  > Not shuffling preserves order, but the global scaler still saw the test distribution. Order and preprocessing are two separate leakage channels.
+- It only matters for classification problems
+  > Scaling leakage affects forecasting and regression just as much. The principle — derive all transforms from training data only — is universal.
+
+Even with a chronological split, fitting a scaler (or imputer) on the full series leaks the future; learn such parameters from training data alone.`}
+/>
+
+<MultipleChoice
+  markdown={`Why report a forecast's error from a multi-fold **backtest** rather than a single train/test split?
+
+- A single split is mathematically invalid
+  > A single chronological split is perfectly valid; it's just *noisy*. Backtesting improves the estimate rather than fixing an invalidity.
+- [o] One split gives a single, noisy estimate that may have landed on an unusually easy or hard period; averaging several folds yields a more stable, trustworthy measure of skill
+  > Different tails of history vary in difficulty. Multiple folds average over that luck, so the reported skill is less dependent on which single window you happened to hold out.
+- Backtesting lets you train on the test set
+  > Backtesting does the opposite — it rigorously keeps train before test in every fold. It never trains on test data.
+- It makes the model itself more accurate
+  > Backtesting is an *evaluation* procedure; it measures skill, it doesn't change the model's accuracy. Its value is a more reliable estimate.
+
+Multiple folds average away the luck of a single holdout, giving a steadier estimate of true out-of-sample skill.`}
+/>
+
+<MultipleChoice
+  markdown={`Which metric would be the **most problematic** choice for evaluating forecasts of a series whose values regularly pass through and near **zero** (e.g., net hourly energy flow that can be positive, negative, or zero)?
+
+- MAE
+  > MAE just averages absolute misses in the data's units; zeros cause it no trouble at all.
+- RMSE
+  > RMSE squares errors but never divides by the actual value, so values near zero don't destabilize it.
+- [o] MAPE
+  > MAPE divides each error by the actual value, so it explodes as the truth approaches zero and is undefined at exactly zero — exactly the situation described.
+- They are all equally appropriate here
+  > They are not: only MAPE involves dividing by the (near-zero) actual, which makes it blow up. MAE and RMSE are fine here.
+
+MAPE divides by the actual value, so series that pass through zero make it unstable or undefined; prefer MAE/RMSE there.`}
+/>
+
+<MultipleChoice
+  markdown={`You try 30 different \`(p, d, q)\` combinations and keep the one with the lowest error **on your test set**. What's the hidden problem?
+
+- Nothing — picking the best test score is the goal
+  > If the *test* set chose your model, it's no longer an untouched measure of generalization. You've let it train your decision, so its score is optimistic.
+- [o] The test set has now influenced model selection, so its score is optimistic; you need a separate validation set (or nested CV), and the final test set should be evaluated only once
+  > Selecting among many models by test performance is a form of leakage — the test set tuned your choice. Hold out a separate validation set for tuning and reserve the test set for a single, final, honest estimate.
+- 30 combinations is too few to be reliable
+  > The count isn't the issue; even choosing among two by test score leaks. The problem is *using the test set to choose at all*.
+- ARIMA orders should never be compared
+  > Comparing orders is normal and useful — just not on the final test set. Use a validation split or information criteria for selection.
+
+Choosing a model by its test-set score lets the test set tune you; use a separate validation set and touch the test set only once.`}
+/>
+
+<Callout type="success" title="Key takeaways">
+- A **random / k-fold split leaks the future** into training and reports
+  fantasy accuracy. Time series demands **chronological** splits: train is the
+  past, test is the future.
+- **Backtest** with **walk-forward** folds (expanding or rolling window) for a
+  stable skill estimate — and in every fold, **train strictly precedes test**.
+- Code metrics by hand: **MAE** (robust, in-units), **RMSE** (punishes big
+  misses), **MAPE** (scale-free percent, but **breaks near zero**).
+- Leakage hides in **preprocessing** too: fit scalers/imputers/decompositions
+  on **train only**, avoid future-aware features (centered windows, leads,
+  bfill/interpolate as inputs), and never tune on the **test** set.
+- Always compare to a **baseline** on the *same* honest backtest — skill is
+  relative.
+</Callout>
+
+You now have every piece: shaping a timeline, reshaping its resolution,
+handling gaps, decomposing structure, achieving stationarity, reading
+ACF/PACF, fitting ARIMA, and — above all — validating honestly. The capstone
+threads them into one end-to-end pipeline.
