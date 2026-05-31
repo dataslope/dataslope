@@ -2248,7 +2248,19 @@ export function ResultTableBody({
           }
           onDoubleClick={
             editable && !isSelect && ci >= 0 && !isBlobCell
-              ? () => onSetActiveEditCell(cellKey)
+              ? () => {
+                  // Generated/read-only columns can't be edited — explain why
+                  // instead of silently doing nothing on double-click.
+                  const colName = set.columns[ci] ?? "";
+                  if (keyHints?.readOnly?.has(colName)) {
+                    toastManager.add({
+                      title: `"${colName}" is a generated column — its value is computed from other columns and can't be edited.`,
+                      data: { kind: "info" },
+                    });
+                    return;
+                  }
+                  onSetActiveEditCell(cellKey);
+                }
               : undefined
           }
         >
