@@ -23,6 +23,11 @@ import {
   DUCKDB_BLANK_DATABASE,
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
+import {
+  toDateOnlyString,
+  unscaledDecimalToString,
+  unscaledIntegerFrom,
+} from "./valueFormat";
 
 // ─── Local type shim for @duckdb/duckdb-wasm ─────────────────────────
 // Only the small surface area we actually touch is typed. The shim
@@ -218,16 +223,21 @@ function arrowToQueryExecResult(
       return "";
     }
   });
-  // Extract decimal scales so BigInt values from DECIMAL columns are
-  // formatted as proper decimal strings (e.g. 999n with scale=2 → "9.99")
-  // instead of raw unscaled integers (which would cause "two extra zeros"
-  // when the user edits and re-saves a cell).
+  // Extract decimal scales so DECIMAL values are formatted as proper decimal
+  // strings (e.g. unscaled 2999 with scale=2 → "29.99") instead of the raw
+  // unscaled integer (which would otherwise display as 2999 and round-trip to
+  // the wrong magnitude when the user edits and re-saves a cell).
   const columnScales: (number | null)[] = fields.map((f) => {
     if (typeof f.type.scale === "number" && f.type.scale > 0) {
       return f.type.scale;
     }
     return null;
   });
+  // DATE columns (Arrow `Date32<DAY>`/`Date64`) arrive as an epoch number;
+  // render them as a plain `YYYY-MM-DD` calendar date rather than a raw int.
+  const columnIsDate: boolean[] = fields.map((f) =>
+    /^date/i.test(String(f.type)),
+  );
   const vectors = fields.map((_f, i) => table.getChildAt(i));
   const values: SqlValue[][] = [];
   for (let r = 0; r < table.numRows; r++) {
@@ -236,17 +246,19 @@ function arrowToQueryExecResult(
       const vec = vectors[c];
       const raw = vec ? vec.get(r) : null;
       const scale = columnScales[c];
-      if (scale !== null && typeof raw === "bigint") {
-        // Apply the decimal scale: Arrow stores DECIMAL(p,s) as a scaled
-        // BigInt (e.g. 9.99 → 999n when scale=2). Convert to a canonical
-        // decimal string so the cell edit input is correctly pre-filled.
-        const divisor = 10n ** BigInt(scale);
-        const neg = raw < 0n;
-        const abs = neg ? -raw : raw;
-        const intPart = abs / divisor;
-        const fracPart = abs % divisor;
-        const fracStr = fracPart.toString().padStart(scale, "0");
-        row[c] = `${neg ? "-" : ""}${intPart}.${fracStr}`;
+      if (raw === null || raw === undefined) {
+        row[c] = null;
+      } else if (columnIsDate[c]) {
+        row[c] = toDateOnlyString(raw) ?? toSqlValue(raw);
+      } else if (scale !== null) {
+        // Arrow stores DECIMAL(p,s) as the unscaled integer — a BigInt in some
+        // builds, a Decimal object whose String() is the unscaled integer in
+        // duckdb-wasm. Re-apply the scale in both cases.
+        const unscaled = unscaledIntegerFrom(raw);
+        row[c] =
+          unscaled !== null
+            ? unscaledDecimalToString(unscaled, scale)
+            : toSqlValue(raw);
       } else {
         row[c] = toSqlValue(raw);
       }
