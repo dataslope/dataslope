@@ -486,14 +486,21 @@ function DuckDbTypeSelector({
   }, [value]);
 
   const query = inputVal.trim().toLowerCase();
-  const visibleGroups = useMemo(
-    () =>
-      DUCKDB_TYPE_GROUPS.map((group) => ({
-        ...group,
-        types: group.types.filter((type) => type.toLowerCase().includes(query)),
-      })).filter((group) => group.types.length > 0),
-    [query],
-  );
+  // When the field is empty or already holds a committed type (i.e. the user
+  // opened the list via the chevron rather than typing a search fragment),
+  // show every group so all types stay discoverable. Only filter once they
+  // type a partial that is not itself a known type.
+  const visibleGroups = useMemo(() => {
+    const showAll =
+      query === "" ||
+      DUCKDB_TYPE_OPTIONS.some((type) => type.toLowerCase() === query);
+    return DUCKDB_TYPE_GROUPS.map((group) => ({
+      ...group,
+      types: showAll
+        ? [...group.types]
+        : group.types.filter((type) => type.toLowerCase().includes(query)),
+    })).filter((group) => group.types.length > 0);
+  }, [query]);
 
   return (
     <Combobox.Root
@@ -4112,6 +4119,23 @@ function DuckDbPlaygroundInner() {
           truncatePending={pendingTruncate}
           onTruncateOpenChange={(next) => { if (!next) setPendingTruncate(null); }}
           onTruncateConfirm={() => void confirmTruncate()}
+          dropDetail={
+            pendingDropEntity &&
+            (pendingDropEntity.kind === "table" ||
+              pendingDropEntity.kind === "view") ? (
+              <>
+                Dependent objects are <strong>not</strong> cascaded; if another
+                object depends on it the drop may fail.
+              </>
+            ) : null
+          }
+          truncateDetail={
+            <>
+              Runs as a plain <strong>DELETE FROM</strong> (DuckDB has no
+              TRUNCATE): identity/sequence counters are <strong>not</strong>{" "}
+              reset.
+            </>
+          }
         />
 
         <SqlSettingsConfirmDialogs
@@ -5314,6 +5338,7 @@ function DuckDbPlaygroundInner() {
               <ResultView
                 result={result}
                 loading={statusState === "loading"}
+                engineLabel="DuckDB"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
                 onDeleteRows={deleteRowsFromTable}

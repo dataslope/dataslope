@@ -2554,6 +2554,10 @@ function SqlPlaygroundInner() {
                 every row but keeps the schema. The change is in-memory only and
                 will be undone next page load.
               </AlertDialog.Description>
+              <p className="confirm-desc-note">
+                Runs as a plain <strong>DELETE</strong> (SQLite has no
+                TRUNCATE).
+              </p>
               <div className="confirm-actions">
                 <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
@@ -4110,6 +4114,7 @@ function SqlPlaygroundInner() {
                 <ResultView
                   result={result}
                   loading={!loaded}
+                  engineLabel="SQLite"
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
                   constraintInfo={resultConstraintInfo}

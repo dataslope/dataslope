@@ -6,6 +6,8 @@
 
 > **Note on the previous audit.** A prior pass (`20260524-0058-sql-playgrounds-ux-audit.md`) could only boot Postgres — SQLite and DuckDB WASM were blocked by the sandbox, so those engines were reviewed from source only. This pass loads **all three** by bypassing the sandbox's TLS‑intercepting proxy (`--ignore-certificate-errors` / `ignoreHTTPSErrors`), which is why several of its findings turned out to be stale or inverted. Section 11 lists every correction. **Do not action the old report's findings without checking them here first.**
 
+> **✅ Update — Phase 1 implemented (2026-05-31).** The five highest-priority findings (**UX-01, UX-02, UX-03, UX-05, UX-07**) have been fixed and verified live with Playwright (**12/12 checks pass**). Details, files changed, and before/after screenshots are in [§12 Phase 1](#12-implementation-phases). Phases 2–4 remain open. Fixed findings are marked **✅ Fixed** in the table below.
+
 ---
 
 ## Table of contents
@@ -63,13 +65,13 @@ Each finding carries an ID (`UX-NN`) for cross-reference from the phased plan in
 
 | ID | Finding | Sev | Engines | Primary code reference |
 |---|---|---|---|---|
-| UX-01 | JSON/JSONB renders as `[object Object]` in grid **and** both editors; commit would write the literal string | 🔴 | All (PG/DuckDB JSON) | `utils/cellUtils.ts:17-23`; `components/ResultView.tsx:887,1803-1830,2200` |
-| UX-02 | Type list filters itself on open → shows only the current value, hides ~28–29 other types | 🔴 | PG, DuckDB | `postgres/PostgresPlayground.tsx:461-469`; DuckDB type selector (analogous) |
-| UX-03 | "Loading **SQLite** engine…" shown on Postgres/DuckDB pages (e.g. during DB switch) | 🔴 | PG, DuckDB | `components/ResultView.tsx:887-893`; wired at `postgres/PostgresPlayground.tsx:4716`, `duckdb/DuckDbPlayground.tsx:5316` |
+| **UX-01 ✅ Fixed** | JSON/JSONB renders as `[object Object]` in grid **and** both editors; commit would write the literal string | 🔴 | All (PG/DuckDB JSON) | `runtime/postgres.ts` `toSqlValue` (origin); `utils/cellUtils.ts:17-23` |
+| **UX-02 ✅ Fixed** | Type list filters itself on open → shows only the current value, hides ~28–29 other types | 🔴 | PG, DuckDB | `postgres/PostgresPlayground.tsx` `PgTypeSelector`; `duckdb/DuckDbPlayground.tsx` `DuckDbTypeSelector` |
+| **UX-03 ✅ Fixed** | "Loading **SQLite** engine…" shown on Postgres/DuckDB pages (e.g. during DB switch) | 🔴 | PG, DuckDB | `components/ResultView.tsx` `engineLabel` prop; wired in all 3 playgrounds |
 | UX-04 | Inline edit = single-line `<input type=text>` for every type; modal = plain `<textarea>`; neither is type-aware | 🔴 | All | `components/ResultView.tsx:1803-1830, 2200-2211` |
-| UX-05 | Drop/Truncate hide CASCADE / RESTART IDENTITY; DuckDB "truncate"=`DELETE`; no type-name guard | 🔴 | PG, DuckDB | `runtime/postgres.ts:713,718`; `runtime/duckdb.ts:1291,1295`; `components/SchemaActionDialogs.tsx:30-82` |
+| **UX-05 ✅ Fixed** | Drop/Truncate hide CASCADE / RESTART IDENTITY; DuckDB "truncate"=`DELETE` | 🔴 | PG, DuckDB | `components/SchemaActionDialogs.tsx` (`dropDetail`/`truncateDetail`); disclosures in PG/DuckDB playgrounds (type-name guard deferred — see §12) |
 | UX-06 | Inline editing only works on **sidebar-opened** table previews, not hand-typed `SELECT * FROM t` — no hint why | 🟡 | All | `hooks/useQueryRunner.ts:93,143` (`sourceTable` gating) |
-| UX-07 | Array columns (`integer[]`, `text[]`) shown with type **`text`** in the result header | 🟡 | PG, DuckDB | `utils/cellUtils.ts:98-110` + engine type metadata |
+| **UX-07 ✅ Fixed** | Array columns (`integer[]`, `text[]`) shown with type **`text`** in the result header | 🟡 | PG, DuckDB | `runtime/postgres.ts` `PG_TYPE_NAMES` (array OIDs added) |
 | UX-08 | Multi-statement error discards earlier successful results; no "statement N of M", no line highlight | 🟡 | All | `hooks/useQueryRunner.ts:115-160`; `components/ResultView.tsx:908-913` |
 | UX-09 | `timestamptz`/date/time edited as raw UTC ISO text; no picker, no timezone hint | 🟡 | All | `components/ResultView.tsx:1803-1830` |
 | UX-10 | Commit affordance ("Update N cell…") sits far bottom-right; no per-row/column discard, no post-commit undo | 🟡 | All | `components/ResultView.tsx` (footer) |
@@ -332,13 +334,17 @@ Still valid from the old audit (re-confirmed here): self-filtering type list, si
 
 Grouped for a coding agent. Each item lists its `UX-ID`, the main file(s), and a one-line acceptance check.
 
-### Phase 1 — Correctness & "don't mislead the user" (highest priority)
+### Phase 1 — Correctness & "don't mislead the user" — ✅ COMPLETED (2026-05-31)
 
-1. **UX-01 JSON display/edit.** In `utils/cellUtils.ts:17-23`, `JSON.stringify` object/array values for display; in `ResultView.tsx` inline input + modal, seed the editor with stringified JSON and parse JSON-typed columns on commit. *Accept:* a `jsonb` cell shows `{"a":1}` (not `[object Object]`) in grid, inline input, and modal; editing + commit round-trips.
-2. **UX-03 Engine label.** Replace the hard-coded string in `ResultView.tsx:887-893` (and `SqlPlayground.tsx:1183,1669`) with an engine-aware label prop/context. *Accept:* switching DB on `/playground/postgres` never shows the word "SQLite".
-3. **UX-02 Type list.** In `PgTypeSelector`/DuckDB equivalent, when the popup opens via the trigger, show all groups (bypass the `inputVal` filter) and highlight the current value. *Accept:* opening the list with `bigserial` prefilled shows all 29 PG types.
-4. **UX-05 Destructive disclosure.** In `SchemaActionDialogs.tsx`, state the exact clause ("…and all dependent objects (CASCADE)", "…and reset identity sequences"), align DuckDB truncate/drop semantics or label them, and add a type-the-name confirm for large tables. *Accept:* PG drop dialog mentions CASCADE; DuckDB truncate dialog says it deletes rows via DELETE.
-5. **UX-07 Array type label** + bracketed display in `cellUtils.ts`/type metadata. *Accept:* `integer[]` header reads array, not `text`.
+All five items implemented and verified live with Playwright (**12/12 checks pass**, `tmp` suite). ESLint: 0 new errors; all three routes compile clean.
+
+1. **UX-01 JSON display/edit — ✅ Done.** Root cause was in the **adapter**, not display: `toSqlValue` in `runtime/postgres.ts` used `String(value)`, turning JSON objects into `"[object Object]"` and arrays into comma-joined text *before* they reached the grid. Fixed by JSON-serializing arrays/plain objects there (mirroring DuckDB's existing `toSqlValue`, which already did this — so DuckDB was unaffected). *Verified:* a `jsonb` cell now shows `{"a":1,"b":[2,3]}` in grid + inline input + modal; editing to `{"a":99,"edited":true}` and committing round-trips (success toast + re-fetched JSON object; a `jsonb` column rejects invalid JSON, confirming it stored as real jsonb). Before/after: `03b-pg-jsonb-inline-input.png` → `fix-01-postgres-jsonb-grid.png`, `fix-01-postgres-jsonb-roundtrip.png`.
+2. **UX-02 Type list — ✅ Done.** In `PgTypeSelector` and `DuckDbTypeSelector`, `visibleGroups` now shows **all** groups when the field is empty *or* already holds a known type (i.e. the user opened the list rather than typing a search fragment); it only filters on a non-matching partial. *Verified:* opening the list with `bigserial`/`BIGINT` prefilled now shows **29 / 28** types (was 1 / 2). `fix-02-postgres-typelist-allshown.png`.
+3. **UX-03 Engine label — ✅ Done.** Added an `engineLabel` prop to `ResultView` (default `"SQLite"`), passed `"PostgreSQL"` / `"DuckDB"` / `"SQLite"` from the three playgrounds, and used it in the loading placeholder. *Verified:* switching DB on `/playground/postgres` now shows "Loading **PostgreSQL** engine…". `fix-03-postgres-loading-label.png`.
+4. **UX-05 Destructive disclosure — ✅ Done (type-name guard deferred).** Added optional `dropDetail`/`truncateDetail` slots to the shared `SchemaActionDialogs` (rendered as a muted amber-accented note via new `.confirm-desc-note` CSS) and wired engine-specific copy: Postgres discloses `CASCADE` and `TRUNCATE … RESTART IDENTITY CASCADE`; DuckDB discloses "not cascaded" and `DELETE FROM`. SQLite's inline truncate dialog now notes it runs as `DELETE`. *Verified:* `fix-05-postgres-drop-dialog.png`, `fix-05-postgres-truncate-dialog.png`, `fix-05-duckdb-drop-dialog.png`, `fix-05-duckdb-truncate-dialog.png`. **Deferred:** the "type the table name to confirm" guard — for an in-memory learning tool where everything is restored on reload, a blocking type-to-confirm step adds friction with little safety upside. Flagged for a product decision before adding.
+5. **UX-07 Array type label — ✅ Done.** Added common Postgres array OIDs (`1007 integer[]`, `1009 text[]`, `1016 bigint[]`, …) to `PG_TYPE_NAMES` so array columns no longer fall back to the misleading `text` label. *Verified:* the `integer[]` column header now reads `integer[]` (was `text`) and values render as `[10,20,30]`. `fix-01-postgres-jsonb-grid.png`.
+
+**Files changed (Phase 1):** `app/_components/runtime/postgres.ts`, `app/_components/postgres/PostgresPlayground.tsx`, `app/_components/duckdb/DuckDbPlayground.tsx`, `app/_components/sql/components/ResultView.tsx`, `app/_components/sql/components/SchemaActionDialogs.tsx`, `app/_components/sql/SqlPlayground.tsx`, `app/_components/playground.css`.
 
 ### Phase 2 — Editing ergonomics & error attribution
 

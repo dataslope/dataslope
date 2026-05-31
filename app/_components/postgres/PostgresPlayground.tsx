@@ -459,14 +459,21 @@ function PgTypeSelector({
   }, [value]);
 
   const query = inputVal.trim().toLowerCase();
-  const visibleGroups = useMemo(
-    () =>
-      PG_TYPE_GROUPS.map((group) => ({
-        ...group,
-        types: group.types.filter((type) => type.toLowerCase().includes(query)),
-      })).filter((group) => group.types.length > 0),
-    [query],
-  );
+  // When the field is empty or already holds a committed type (i.e. the user
+  // opened the list via the chevron rather than typing a search fragment),
+  // show every group so all types stay discoverable. Only filter once they
+  // type a partial that is not itself a known type.
+  const visibleGroups = useMemo(() => {
+    const showAll =
+      query === "" ||
+      PG_TYPE_OPTIONS.some((type) => type.toLowerCase() === query);
+    return PG_TYPE_GROUPS.map((group) => ({
+      ...group,
+      types: showAll
+        ? [...group.types]
+        : group.types.filter((type) => type.toLowerCase().includes(query)),
+    })).filter((group) => group.types.length > 0);
+  }, [query]);
 
   return (
     <Combobox.Root
@@ -3423,6 +3430,23 @@ function PostgresPlaygroundInner() {
           truncatePending={pendingTruncate}
           onTruncateOpenChange={(next) => { if (!next) setPendingTruncate(null); }}
           onTruncateConfirm={() => void confirmTruncate()}
+          dropDetail={
+            pendingDropEntity &&
+            (pendingDropEntity.kind === "table" ||
+              pendingDropEntity.kind === "view") ? (
+              <>
+                Uses <strong>CASCADE</strong>: objects that depend on it (views,
+                foreign keys, …) are dropped too.
+              </>
+            ) : null
+          }
+          truncateDetail={
+            <>
+              Runs <strong>TRUNCATE … RESTART IDENTITY CASCADE</strong>:
+              identity/serial counters reset and tables referencing this one via
+              foreign keys are truncated too.
+            </>
+          }
         />
 
         <SqlSettingsConfirmDialogs
@@ -4714,6 +4738,7 @@ function PostgresPlaygroundInner() {
               <ResultView
                 result={result}
                 loading={statusState === "loading"}
+                engineLabel="PostgreSQL"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
                 onDeleteRows={deleteRowsFromTable}

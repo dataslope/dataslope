@@ -390,6 +390,7 @@ export const ResultView = memo(ResultViewImpl);
 function ResultViewImpl({
   result,
   loading,
+  engineLabel = "SQLite",
   keyHints,
   sourceTable,
   constraintInfo,
@@ -406,6 +407,9 @@ function ResultViewImpl({
 }: {
   result: QueryRunResult | null;
   loading: boolean;
+  /** Human-readable engine name shown in the loading placeholder
+   *  (e.g. "PostgreSQL", "DuckDB", "SQLite"). Defaults to "SQLite". */
+  engineLabel?: string;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
@@ -887,7 +891,7 @@ function ResultViewImpl({
     return (
       <div className="welcome">
         <div className="welcome-icon">⌬</div>
-        <h3>Loading SQLite engine…</h3>
+        <h3>Loading {engineLabel} engine…</h3>
       </div>
     );
   }
