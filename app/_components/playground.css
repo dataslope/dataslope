@@ -1066,6 +1066,20 @@ body.playground-active {
   white-space: nowrap;
   min-width: 0;
 }
+/* The entry-file stem inside a Run label, rendered as inline <code>
+ * instead of literal backticks. The chip derives its background from
+ * `currentColor` so it reads naturally in every context the label
+ * appears: white-on-brand inside the primary button, and dark-on-light
+ * (or light-on-dark) inside the hover popover and chevron dropdown.
+ * `em`-based sizing keeps the chip proportional to each context's font
+ * size (13px button / 11px popover). */
+.playground-run-entry {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 3px;
+  padding: 0.05em 0.35em;
+}
 .playground-run-multi-chevron {
   background: transparent !important;
   border-radius: 0;

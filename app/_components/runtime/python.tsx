@@ -425,8 +425,14 @@ fig.show()
     desc: "Statistical visualization built on Matplotlib",
     example: `import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
-tips = sns.load_dataset("tips")
+# Built inline so the example doesn't depend on network access.
+tips = pd.DataFrame({
+    "day": ["Thu", "Fri", "Sat", "Sun"] * 5,
+    "total_bill": [12, 18, 25, 30, 15, 20, 28, 33, 11, 19,
+                   24, 31, 14, 17, 26, 29, 13, 21, 27, 32],
+})
 sns.boxplot(data=tips, x="day", y="total_bill")
 plt.title("Bill by day")
 plt.show()
@@ -440,7 +446,10 @@ import pandas as pd
 
 df = pd.DataFrame({"x": list("ABCDE"), "y": [3, 1, 4, 1, 5]})
 chart = alt.Chart(df).mark_bar().encode(x="x", y="y")
-chart.show()
+
+# This playground renders text, tables, and images rather than live Vega
+# views, so print the Vega-Lite spec the chart compiles to.
+print(chart.to_json(indent=2))
 `,
   },
   {
@@ -592,22 +601,6 @@ class Point:
 p = Point(3.0, 4.0)
 print(p)
 print("fields:", [f.name for f in attrs.fields(Point)])
-`,
-  },
-  {
-    cat: "Utilities", icon: "🏎️", color: "#60a5fa", name: "numba", ver: "0.59",
-    desc: "JIT compiler for numerical Python (LLVM-based)",
-    example: `from numba import njit
-import numpy as np
-
-@njit
-def sum_squares(n):
-    total = 0.0
-    for i in range(n):
-        total += i * i
-    return total
-
-print("sum of squares 0..999:", sum_squares(1000))
 `,
   },
   {

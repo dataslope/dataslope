@@ -55,3 +55,6 @@ script-runner-src/__pycache__/
 
 # Output of scripts/check-mermaid-errors.mjs (regenerated on demand).
 /mermaid-check-results.json
+
+# Playground audit output (e2e/playground-audit.spec.ts)
+audit-results/
