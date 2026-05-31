@@ -458,6 +458,7 @@ function ResultViewImpl({
       rowIndex: number;
       column: string;
       value: unknown;
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
     refetchSql?: string,
     refetchBaseSql?: string,
@@ -674,10 +675,22 @@ function ResultViewImpl({
       if (!sourceTable || !onUpdateRows) return;
       const edits = pendingEditsByIndex[setIdx];
       if (!edits || edits.size === 0) return;
+      // Resolve primary-key column indices once so each edited row can be
+      // identified by its PK value(s) — stable even if the row has moved
+      // position since the previous edit (Postgres changes ctid on UPDATE).
+      const pkCols = pkColumnsForSet(set);
+      const pkColIndexes = pkCols
+        ? pkCols.map((c) => set.columns.indexOf(c))
+        : null;
+      const lazyOffset =
+        result?.lazySql !== undefined && result?.lazyPage !== undefined
+          ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
+          : 0;
       const updates: Array<{
         rowIndex: number;
         column: string;
         value: unknown;
+        pk?: ReadonlyArray<{ column: string; value: unknown }>;
       }> = [];
       for (const [cellKey, value] of edits) {
         const [rowStr, colStr] = cellKey.split(":");
@@ -685,7 +698,14 @@ function ResultViewImpl({
         const colIdx = Number(colStr);
         const colName = set.columns[colIdx];
         if (!colName) continue;
-        updates.push({ rowIndex: absoluteRow, column: colName, value });
+        let pk: Array<{ column: string; value: unknown }> | undefined;
+        if (pkCols && pkColIndexes && pkColIndexes.every((i) => i >= 0)) {
+          const row = set.values[absoluteRow - lazyOffset];
+          if (row) {
+            pk = pkCols.map((c, i) => ({ column: c, value: row[pkColIndexes[i]] }));
+          }
+        }
+        updates.push({ rowIndex: absoluteRow, column: colName, value, pk });
       }
       if (updates.length === 0) return;
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
@@ -729,6 +749,7 @@ function ResultViewImpl({
       selectedByIndex,
       sortingByIndex,
       result,
+      globalPageSize,
       preserveStateForReload,
       pkColumnsForSet,
     ],

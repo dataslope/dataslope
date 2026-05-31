@@ -245,7 +245,15 @@ export interface PostgresEngine {
   ) => Promise<number>;
   updateRows: (
     tableName: string,
-    updates: ReadonlyArray<{ rowIndex: number; column: string; value: unknown }>,
+    updates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+      /** When present, identifies the target row by primary-key value(s)
+       *  instead of the (display-order-dependent) ctid offset. Robust to
+       *  rows moving position after a prior edit. */
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
+    }>,
     schema?: string,
   ) => Promise<number>;
   insertRow: (
@@ -840,14 +848,30 @@ export async function createPostgresEngine(
       let count = 0;
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       for (const update of updates) {
-        await db.query(
-          `UPDATE ${qualifiedTable}
-           SET ${quoteIdent(update.column)} = $1
-           WHERE ctid = (
-             SELECT ctid FROM ${qualifiedTable} ORDER BY ctid LIMIT 1 OFFSET $2
-           )`,
-          [update.value, update.rowIndex],
-        );
+        if (update.pk && update.pk.length > 0) {
+          // Primary-key identification: order-independent and stable even
+          // after a prior edit moved the row to a new ctid.
+          const where = update.pk
+            .map((p, i) => `${quoteIdent(p.column)} = $${i + 2}`)
+            .join(" AND ");
+          await db.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = $1
+             WHERE ${where}`,
+            [update.value, ...update.pk.map((p) => p.value)],
+          );
+        } else {
+          // Fallback for tables without a primary key: locate the row by
+          // its position in ctid (heap) order.
+          await db.query(
+            `UPDATE ${qualifiedTable}
+             SET ${quoteIdent(update.column)} = $1
+             WHERE ctid = (
+               SELECT ctid FROM ${qualifiedTable} ORDER BY ctid LIMIT 1 OFFSET $2
+             )`,
+            [update.value, update.rowIndex],
+          );
+        }
         count += 1;
       }
       return count;
