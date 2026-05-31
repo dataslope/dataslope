@@ -697,6 +697,44 @@ function ResultViewImpl({
     [],
   );
 
+  /** Discard every pending edit for one result set (the per-result Cancel). */
+  const discardEdits = useCallback((setIdx: number) => {
+    setPendingEditsByIndex((prev) => {
+      if (!prev[setIdx]) return prev;
+      const next = { ...prev };
+      delete next[setIdx];
+      return next;
+    });
+    setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+  }, []);
+
+  /** Discard pending edits across all result sets (the Escape shortcut). */
+  const discardAllEdits = useCallback(() => {
+    setPendingEditsByIndex((prev) =>
+      Object.keys(prev).length === 0 ? prev : {},
+    );
+    setActiveEditCellByIndex({});
+  }, []);
+
+  // Escape cancels pending cell edits. While a cell input is focused its own
+  // onKeyDown reverts just that cell; when nothing is being typed, Escape here
+  // discards *all* pending edits (paired with the Cancel button in the footer).
+  useEffect(() => {
+    if (Object.keys(pendingEditsByIndex).length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const el = document.activeElement;
+      const typing =
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        (el instanceof HTMLElement && el.isContentEditable);
+      if (typing) return; // don't hijack Escape from a focused field
+      discardAllEdits();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [pendingEditsByIndex, discardAllEdits]);
+
   const commitEdits = useCallback(
     (setIdx: number, set: QueryExecResult) => {
       if (!sourceTable || !onUpdateRows) return;
@@ -1344,6 +1382,7 @@ function ResultViewImpl({
                   onRequestDelete={() => requestDelete(idx)}
                   // eslint-disable-next-line react-hooks/refs
                   onCommitEdits={() => commitEdits(idx, set)}
+                  onDiscardEdits={() => discardEdits(idx)}
                   elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
                 >
@@ -2021,6 +2060,9 @@ export function ResultTableBody({
                           if (e.key === "Enter") {
                             (e.currentTarget as HTMLInputElement).blur();
                           } else if (e.key === "Escape") {
+                            // Escape reverts this cell's pending edit and exits.
+                            e.stopPropagation();
+                            onClearPendingEdit(cellKey);
                             onSetActiveEditCell(null);
                           }
                         }}
@@ -2041,6 +2083,7 @@ export function ResultTableBody({
                     type="text"
                     aria-label={`Edit ${c}`}
                     inputMode={isNumeric ? "decimal" : undefined}
+                    onFocus={(e) => e.currentTarget.select()}
                     onChange={(e) => {
                       const raw = e.target.value;
                       const newVal = parseCellEditValue(raw, isNumeric);
@@ -2057,6 +2100,9 @@ export function ResultTableBody({
                       if (e.key === "Enter") {
                         (e.currentTarget as HTMLInputElement).blur();
                       } else if (e.key === "Escape") {
+                        // Escape reverts this cell's pending edit and exits.
+                        e.stopPropagation();
+                        onClearPendingEdit(cellKey);
                         onSetActiveEditCell(null);
                       }
                     }}
@@ -2667,6 +2713,7 @@ export function ResultPager({
   selectedCount,
   onRequestDelete,
   onCommitEdits,
+  onDiscardEdits,
   elapsedMs,
   elapsedIsError,
   children,
@@ -2684,6 +2731,7 @@ export function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
+  onDiscardEdits: () => void;
   elapsedMs?: number;
   elapsedIsError?: boolean;
   children?: React.ReactNode;
@@ -2744,13 +2792,23 @@ export function ResultPager({
         )}
       </span>
       {editable && editCount > 0 && (
-        <button
-          type="button"
-          className="sql-edit-commit-btn"
-          onClick={onCommitEdits}
-        >
-          Update {editCount} cell{editCount === 1 ? "" : "s"}…
-        </button>
+        <span className="sql-edit-actions">
+          <button
+            type="button"
+            className="sql-edit-cancel-btn"
+            onClick={onDiscardEdits}
+            title="Discard pending edits (Esc)"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="sql-edit-commit-btn"
+            onClick={onCommitEdits}
+          >
+            Update {editCount} cell{editCount === 1 ? "" : "s"}…
+          </button>
+        </span>
       )}
       {deletable && selectedCount > 0 && (
         <button

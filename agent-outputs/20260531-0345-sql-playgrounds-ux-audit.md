@@ -9,8 +9,10 @@
 > **✅ Update — post-merge review follow-ups (2026-05-31, fourth pass).** A batch of reviewer-reported issues, each verified live with Playwright. Status checklist:
 > - **[done] Date display (PG + DuckDB).** Postgres `date` columns rendered as `2024-12-30T00:00:00.000Z` and DuckDB `Date32<DAY>` columns as raw epoch integers (`1704412800000`); both now show a plain `2024-12-30` calendar date like other SQL IDEs. New shared `runtime/valueFormat.ts` (`toDateOnlyString`), wired into both adapters' result mapping.
 > - **[done] DuckDB DECIMAL round-trip.** A `DECIMAL(10,2)` cell displayed its unscaled integer (`2999` not `29.99`) and an edit that added decimals round-tripped to the wrong magnitude (`1875.05` → `187505`). Arrow hands duckdb-wasm the value as a `Decimal` *object* (not a `BigInt`), so the prior scale code skipped it; now re-scaled. Postgres `numeric` (decimal strings) and SQLite `REAL` (floats) never had the bug — all three verified to round-trip a numeric edit on a clean table.
-> - **[in progress]** cell-edit layout shift + select-on-double-click; cancel pending edits (button + Esc); sidebar long-name/type overlap; Postgres SQL-dump export→import.
-> - New unit tests: `valueFormat.test.ts` (**11**). `tsc`/ESLint: 0 errors.
+> - **[done] Cell-editing ergonomics.** (a) The inline editor no longer grows the row on entering edit mode — the input fills the cell's existing box and draws its highlight with a box-shadow ring (no layout box), so the row height is stable. (b) The cell's value is now **selected on double-click** so you can type to replace immediately. (c) Pending edits can be **cancelled**: a **Cancel** button next to "Update N cells", **Esc reverts the active cell**, and **Esc again (not editing) discards all** pending edits. `ResultView.tsx`, `sqlPlayground.css`. Screenshot: `fu-editing-cancel.png`.
+> - **[done] Sidebar long-name overlap.** A long column name (e.g. `debt_to_income_pct`) overflowed and overlapped the right-aligned type label; `.sql-tree-column-name` now truncates with an ellipsis (`debt_to_incom…`). Screenshot: `fu7-sidebar-ellipsis.png`.
+> - **[in progress]** Postgres SQL-dump export→import.
+> - New unit tests: `valueFormat.test.ts` (**11**); all editing checks verified live (7/7). `tsc`/ESLint: 0 errors.
 >
 > **✅ Update — Phases 1 & 2 implemented (2026-05-31).**
 > - **Phase 1** (UX-01, UX-02, UX-03, UX-05, UX-07) — fixed & verified live (**12/12 checks**). See [§12 Phase 1](#12-implementation-phases).
