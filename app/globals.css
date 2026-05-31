@@ -15,4 +15,11 @@ html {
 
 *, *::before, *::after {
   box-sizing: border-box;
+  /* Disable font ligatures everywhere so sequences like => and == render as
+     separate glyphs instead of being combined into a single character. This
+     matters most for monospace fonts (JetBrains Mono, Fira Code, Cascadia
+     Code) used in code blocks, but we apply it to every element so no text
+     anywhere gets ligature substitution. */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0, "dlig" 0;
 }
