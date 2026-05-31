@@ -16,6 +16,7 @@ import {
   stripSqlComments,
   isSingleSelectSql,
   hasLimitClause,
+  bareTableSelectSource,
 } from "../utils/sqlAnalysis";
 import {
   exportResultToCsv,
@@ -108,6 +109,15 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const currentPageSize =
         explicitPageSize !== undefined ? explicitPageSize : globalPageSizeRef.current;
       const noComments = stripSqlComments(trimmed);
+      // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
+      // editable, just like opening the table from the sidebar — but only
+      // for an actual table (not a view), so edits never fail on commit.
+      if (!sourceTable) {
+        const detected = bareTableSelectSource(trimmed, noComments);
+        if (detected && useEngineStore.getState().tables.includes(detected)) {
+          sourceTable = detected;
+        }
+      }
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const lazyPageSizeForRun =

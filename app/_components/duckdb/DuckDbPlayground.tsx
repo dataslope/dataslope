@@ -160,6 +160,7 @@ import {
   isSingleSelectSql,
   hasLimitClause,
   stripSqlComments,
+  bareTableSelectSource,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import {
@@ -1058,6 +1059,13 @@ function DuckDbPlaygroundInner() {
     handleSchemaChange: handleSchemaChangeFromHook,
   } = schemaTree;
 
+  // Synchronous view of the table list so runSqlForTab can decide whether a
+  // hand-typed `SELECT * FROM <table>` should be made editable.
+  const tablesRef = useRef(tables);
+  useEffect(() => {
+    tablesRef.current = tables;
+  }, [tables]);
+
   // ─── Sidebar files view (DuckDB virtual filesystem) ───────────────────
   const [sidebarView, setSidebarView] = useState<"schema" | "files">("schema");
   const [virtualFiles, setVirtualFiles] = useState<VirtualFile[]>([]);
@@ -1409,6 +1417,15 @@ function DuckDbPlaygroundInner() {
       }
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
+      // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
+      // editable, just like opening the table from the sidebar — but only
+      // for an actual table (not a view), so edits never fail on commit.
+      if (!sourceTable) {
+        const detected = bareTableSelectSource(trimmed, noComments);
+        if (detected && tablesRef.current.includes(detected)) {
+          sourceTable = detected;
+        }
+      }
       const useLazy =
         isSingleSelectSql(trimmed, noComments) && !hasLimitClause(noComments);
       const effectivePageSize =
