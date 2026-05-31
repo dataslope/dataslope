@@ -1325,9 +1325,13 @@ export async function createSqliteEngineInProcess(
               stmt = d.prepare(sql);
               stmtCache.set(colKey, stmt);
             }
+            // SQLite stores booleans as 0/1 and sql.js can't bind a JS
+            // boolean, so coerce booleans (e.g. from the boolean toggle).
+            const toBind = (v: unknown): SqlValue =>
+              typeof v === "boolean" ? (v ? 1 : 0) : (v as SqlValue);
             const binds: SqlValue[] = usePk
-              ? [upd.value as SqlValue, ...upd.pk!.map((p) => p.value as SqlValue)]
-              : [upd.value as SqlValue, upd.rowIndex];
+              ? [toBind(upd.value), ...upd.pk!.map((p) => toBind(p.value))]
+              : [toBind(upd.value), upd.rowIndex];
             stmt.bind(binds);
             stmt.step();
             stmt.reset();

@@ -2432,6 +2432,20 @@
   cursor: default;
 }
 
+/* Inline boolean-column toggle in the result grid. */
+.sql-cell-bool {
+  cursor: pointer;
+  margin: 0;
+  vertical-align: middle;
+  accent-color: var(--primary, #2563eb);
+}
+.sql-cell-bool.sql-cell-edited {
+  outline: 2px solid var(--primary, #f0b400);
+  outline-offset: 1px;
+  border-radius: 3px;
+  text-decoration: none;
+}
+
 /* <td> background highlight for edited cells */
 .sql-cell-edited-td {
   background: color-mix(in srgb,

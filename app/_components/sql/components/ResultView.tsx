@@ -151,6 +151,23 @@ function CopyErrorButton({ text }: { text: string }) {
   );
 }
 
+/** True for a boolean column type across engines (Postgres `boolean`,
+ *  DuckDB Arrow `Bool`, SQLite declared `BOOLEAN`). */
+function isBooleanType(type: string | undefined): boolean {
+  return /^bool(ean)?$/i.test((type ?? "").trim());
+}
+
+/** Interpret a cell value (which may be 1/0, true/false, or "t"/"f"/"true"
+ *  /"false" depending on engine) as a boolean for the toggle checkbox. */
+function boolTruthy(v: unknown): boolean {
+  if (v === true || v === 1) return true;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    return s === "1" || s === "t" || s === "true";
+  }
+  return false;
+}
+
 /** Heuristic: does this string look like a JSON object/array? Used to offer
  *  pretty-print + validation in the edit-in-modal dialog. */
 function looksLikeJson(s: string): boolean {
@@ -1600,9 +1617,11 @@ export function ResultTableBody({
             } satisfies ColumnDef<ResultTableRow>,
           ]
         : []),
-      ...set.columns.map(
-        (c, ci) =>
-          ({
+      ...set.columns.map((c, ci) => {
+        const isBoolCol = isBooleanType(
+          set.columnTypes?.[ci] || inferColumnType(set.values, ci),
+        );
+        return {
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
             meta: { ci },
@@ -1884,6 +1903,41 @@ export function ResultTableBody({
               const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
               const pendingValue = pendingEdits?.get(cellKey);
               const rawValue = info.getValue();
+              // Boolean columns render as a tri-state checkbox toggle instead
+              // of a 0/1 text input. Clicking flips true/false (NULL via the
+              // row context menu's "Set to NULL").
+              if (isBoolCol) {
+                const effective = hasPendingEdit ? pendingValue : rawValue;
+                const isNull = effective === null || effective === undefined;
+                const checked = boolTruthy(effective);
+                return (
+                  <input
+                    type="checkbox"
+                    className={
+                      hasPendingEdit
+                        ? "sql-cell-bool sql-cell-edited"
+                        : "sql-cell-bool"
+                    }
+                    checked={checked}
+                    ref={(el) => {
+                      if (el) el.indeterminate = isNull;
+                    }}
+                    aria-label={`Toggle ${c}`}
+                    onChange={() => {
+                      const next = isNull ? true : !checked;
+                      const origNull =
+                        rawValue === null || rawValue === undefined;
+                      if (!origNull && next === boolTruthy(rawValue)) {
+                        if (hasPendingEdit) onClearPendingEdit(cellKey);
+                      } else {
+                        onSetPendingEdit(cellKey, next);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    onDoubleClick={(e) => e.stopPropagation()}
+                  />
+                );
+              }
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
               if (isActiveEdit) {
@@ -1938,8 +1992,8 @@ export function ResultTableBody({
                 </span>
               );
             },
-          }) satisfies ColumnDef<ResultTableRow>,
-      ),
+          } satisfies ColumnDef<ResultTableRow>;
+      }),
     ],
     [
       activeEditCell,
