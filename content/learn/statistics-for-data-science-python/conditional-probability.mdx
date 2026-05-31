@@ -22,17 +22,15 @@ of Python.
 
 ## What conditioning means
 
-The notation $P(A \mid B)$ reads "the probability of $A$ **given** $B$" —
-the probability that $A$ happens *in the world where we already know $B$
+The notation P(A | B) reads "the probability of A **given** B" —
+the probability that A happens *in the world where we already know B
 happened*. Conditioning is just **zooming in** on a slice of the sample
-space: you throw away every outcome where $B$ didn't happen, and ask how
-much of *what's left* is also $A$.
+space: you throw away every outcome where B didn't happen, and ask how
+much of *what's left* is also A.
 
-$$
-P(A \mid B) = \frac{P(A \text{ and } B)}{P(B)}
-$$
+`P(A | B) = P(A ∩ B) / P(B)`
 
-The denominator changed from "everything" to "just $B$." That's the
+The denominator changed from "everything" to "just B." That's the
 entire idea: new information shrinks your sample space, and probabilities
 get recomputed inside the smaller world.
 
@@ -50,15 +48,15 @@ question that way, you've identified the condition (B) and the event (A).
 Getting those two straight is half the battle.
 </Callout>
 
-A quick concrete version: in a deck of 52 cards, $P(\text{King}) = 4/52$.
+A quick concrete version: in a deck of 52 cards, P(King) = 4/52.
 But if someone tells you the card is a face card, you've zoomed into the
-12 face cards, and $P(\text{King} \mid \text{face card}) = 4/12 = 1/3$.
+12 face cards, and P(King | face card) = 4/12 = 1/3.
 Same card, different probability, because you knew more.
 
 ## Independence vs dependence
 
-Sometimes learning $B$ changes nothing. If $P(A \mid B) = P(A)$ — knowing
-$B$ leaves $A$'s probability untouched — then $A$ and $B$ are
+Sometimes learning B changes nothing. If P(A | B) = P(A) — knowing
+B leaves A's probability untouched — then A and B are
 **independent**. That's the clean case from *Probability Basics*, where
 you could just multiply. When the conditional probability *differs* from
 the unconditional one, the events are **dependent**, and that difference
@@ -79,12 +77,10 @@ flowchart LR
 The **general multiplication rule** works whether or not events are
 independent — you just have to use the conditional probability:
 
-$$
-P(A \text{ and } B) = P(A \mid B)\, P(B)
-$$
+`P(A and B) = P(A | B) · P(B)`
 
-When $A$ and $B$ happen to be independent, $P(A \mid B) = P(A)$ and this
-collapses back to the simple $P(A)\,P(B)$ you already know. The
+When A and B happen to be independent, P(A | B) = P(A) and this
+collapses back to the simple P(A) · P(B) you already know. The
 conditional form is the honest, always-correct version; the
 multiply-straight-across shortcut is just the special case where
 independence holds.
@@ -141,14 +137,14 @@ the mechanic: pick your condition (the row), then compute the fraction
 
 ## Bayes' rule: flipping the conditional
 
-Here's the trap that gives this whole topic its danger. **$P(A \mid B)$
-and $P(B \mid A)$ are different numbers**, and confusing them is so common
+Here's the trap that gives this whole topic its danger. **P(A | B)
+and P(B | A) are different numbers**, and confusing them is so common
 it has a name: the **confusion of the inverse**.
 
-- $P(\text{positive test} \mid \text{disease})$ — among *sick* people,
+- P(positive test | disease) — among *sick* people,
   how often does the test fire? (This is the test's sensitivity. Usually
   high.)
-- $P(\text{disease} \mid \text{positive test})$ — among people who
+- P(disease | positive test) — among people who
   *tested positive*, how many are actually sick? (This is what you
   actually want to know. Often *low*.)
 
@@ -164,13 +160,11 @@ here purely as a *tool for getting base rates right* — not as a gateway
 to Bayesian inference, priors, or posteriors (that machinery is out of
 scope for this course). The version worth knowing:
 
-$$
-P(A \mid B) = \frac{P(B \mid A)\, P(A)}{P(B)}
-$$
+`P(A | B) = (P(B | A) · P(A)) / P(B)`
 
-The crucial ingredient is $P(A)$ — the **base rate**, how common $A$ is
+The crucial ingredient is P(A) — the **base rate**, how common A is
 *before* you saw any evidence. Ignore the base rate and you'll badly
-overestimate $P(A \mid B)$. That single oversight is behind most
+overestimate P(A | B). That single oversight is behind most
 real-world probability disasters.
 
 <Callout type="danger" title="Misconception: P(A given B) equals P(B given A)">
@@ -187,9 +181,9 @@ This is the example every data scientist should be able to reproduce from
 memory. A disease affects **1 in 1,000** people (base rate 0.001). A test
 is **99% accurate** in both directions:
 
-- **Sensitivity** = $P(\text{positive} \mid \text{disease}) = 0.99$
+- **Sensitivity** = P(positive | disease) = 0.99
   (catches 99% of true cases).
-- **Specificity** = $P(\text{negative} \mid \text{healthy}) = 0.99$, so
+- **Specificity** = P(negative | healthy) = 0.99, so
   the **false-positive rate** is 1% — it wrongly flags 1% of healthy
   people.
 
@@ -301,11 +295,11 @@ Low base rate plus a nonzero false-positive rate yields mostly false alarms — 
 Step back from medicine: Bayes' rule is a general recipe for **updating a
 prior belief in light of evidence**. You start with a base rate (how
 likely something is before evidence), observe a clue, and combine them.
-The structure is always the same three inputs: the base rate $P(A)$, how
-informative the evidence is when $A$ is true $P(B \mid A)$, and how often
-the evidence shows up overall $P(B)$.
+The structure is always the same three inputs: the base rate P(A), how
+informative the evidence is when A is true P(B | A), and how often
+the evidence shows up overall P(B).
 
-A compact way to organize the calculation is to compute $P(B)$ from its
+A compact way to organize the calculation is to compute P(B) from its
 two paths (the **law of total probability**), then divide:
 
 <CodeBlock
@@ -559,10 +553,10 @@ Bayes' rule formalizes updating: prior 30% plus phrase evidence yields a higher 
 />
 
 <Callout type="success" title="Key takeaways">
-- $P(A \mid B)$ means "**among the B cases, how often is A also true**" — conditioning **zooms into a slice** of the sample space.
-- **Independent** means $P(A \mid B) = P(A)$ (the shortcut multiply); otherwise events are **dependent** and you need the conditional form.
-- $P(A \mid B) \ne P(B \mid A)$. Swapping them is the **confusion of the inverse** — the error behind most probability disasters.
-- **Bayes' rule** flips a conditional and forces you to include the **base rate** $P(A)$; ignore the base rate and you'll wildly overestimate.
+- P(A | B) means "**among the B cases, how often is A also true**" — conditioning **zooms into a slice** of the sample space.
+- **Independent** means P(A | B) = P(A) (the shortcut multiply); otherwise events are **dependent** and you need the conditional form.
+- P(A | B) ≠ P(B | A). Swapping them is the **confusion of the inverse** — the error behind most probability disasters.
+- **Bayes' rule** flips a conditional and forces you to include the **base rate** P(A); ignore the base rate and you'll wildly overestimate.
 - A "99% accurate" test for a **rare** event still yields **mostly false positives** — accuracy alone never tells you the PPV.
 </Callout>
 

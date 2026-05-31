@@ -23,8 +23,8 @@ real-world decisions.
 
 The mental model: the world rolls some dice you can't control, and the
 random variable reads off a number from the result. We usually write
-random variables with capital letters like $X$, and specific values they
-take with lowercase $x$.
+random variables with capital letters like `X`, and specific values they
+take with lowercase `x`.
 
 ```mermaid
 flowchart LR
@@ -37,10 +37,10 @@ flowchart LR
   N2 --> R
 ```
 
-Notice two outcomes (HT and TH) both map to $X = 1$. That's fine — a
+Notice two outcomes (HT and TH) both map to X = 1. That's fine — a
 random variable can send many outcomes to the same number. What matters
 is that *every* outcome gets exactly one number, so we can ask questions
-like "what's the average value of $X$?"
+like "what's the average value of `X`?"
 
 <Callout type="info" title="Why bother turning outcomes into numbers?">
 Because "average" and "spread" only make sense for numbers. You can't
@@ -84,21 +84,21 @@ type — and this is a spot where intuition matters more than the formal
 definitions.
 
 For a **discrete** variable, the **probability mass function (pmf)**
-gives the probability of *each individual value*: $P(X = 2) = 0.25$. The
+gives the probability of *each individual value*: P(X = 2) = 0.25. The
 masses are real probabilities, they're each between 0 and 1, and they sum
 to 1 across all values. You can point at a bar and read off "the chance
 of exactly this."
 
-For a **continuous** variable, asking $P(X = 3.14159\ldots)$ exactly is
+For a **continuous** variable, asking P(X = 3.14159…) exactly is
 meaningless — the probability of landing on any single precise value is
 0 (there are infinitely many values). Instead the **probability density
-function (pdf)** describes probability as **area**: the chance that $X$
+function (pdf)** describes probability as **area**: the chance that `X`
 falls *in an interval* is the area under the pdf curve over that
 interval. Density is not probability — it's "probability per unit of
-$x$," and only becomes probability once you integrate over a range.
+`x`," and only becomes probability once you integrate over a range.
 
 <Callout type="warn" title="Misconception: a pdf gives the probability of a single value">
-For continuous variables, $P(X = \text{exact value}) = 0$, always.
+For continuous variables, P(X = exact value) = 0, always.
 Height being "exactly 180.0000... cm" has probability zero; "between
 179.5 and 180.5 cm" has a real, positive probability. A pdf's *height*
 can even exceed 1 — it's a density, not a probability. Probability for
@@ -115,21 +115,19 @@ across values?" — just with masses vs density.
 ## Expectation: the long-run average
 
 The most important single number describing a random variable is its
-**expected value**, written $E[X]$. It's the **long-run average** value
-of $X$ — if you drew the variable over and over and averaged the results,
-$E[X]$ is the number that average settles down to (that's the Law of
+**expected value**, written E[X]. It's the **long-run average** value
+of `X` — if you drew the variable over and over and averaged the results,
+E[X] is the number that average settles down to (that's the Law of
 Large Numbers from *Probability Basics* at work).
 
-For a discrete variable, $E[X]$ is the **probability-weighted average**
+For a discrete variable, E[X] is the **probability-weighted average**
 of the possible values — each value times how likely it is, summed up:
 
-$$
-E[X] = \sum_x x \cdot P(X = x)
-$$
+`E[X] = Σ x · P(X = x)`
 
-A vivid way to picture it: $E[X]$ is the **balance point** (center of
+A vivid way to picture it: E[X] is the **balance point** (center of
 mass) of the pmf. If you put each probability as a weight at its value on
-a number line, $E[X]$ is where the line balances. Let's compute one by
+a number line, E[X] is where the line balances. Let's compute one by
 hand and then confirm it by simulation.
 
 <CodeBlock
@@ -154,13 +152,13 @@ print(f"Mean of 500,000 draws = {draws.mean():.3f}  (-> converges to E[X])")
 
 The hand calculation and the simulated average agree. That's the whole
 meaning of expectation: it's the value you'd average toward over many
-repetitions. Note something important about this example — $E[X]$ comes
+repetitions. Note something important about this example — E[X] comes
 out around 4.5, which *isn't even a face on the die you'd consider
 "typical."* Hold that thought; it's a classic trap.
 
 <Callout type="danger" title="Misconception: expectation is the most likely value">
-$E[X]$ is **not** the most probable outcome, and it need not even be a
-value $X$ can take. The expected number of heads in 3 flips is 1.5 —
+E[X] is **not** the most probable outcome, and it need not even be a
+value `X` can take. The expected number of heads in 3 flips is 1.5 —
 impossible to actually observe. The expected value of a single die roll
 is 3.5. Expectation is a *balance point*, an average over the long run,
 not a prediction of any single result. The most likely value is the
@@ -173,15 +171,13 @@ Expectation tells you the center; **variance** tells you how far the
 variable typically strays from that center. It's the expected squared
 distance from the mean:
 
-$$
-\text{Var}(X) = E\big[(X - E[X])^2\big]
-$$
+`Var(X) = E[ (X − E[X])² ]`
 
 We square the deviations so that overshoots and undershoots don't cancel,
 exactly as in *Measures of Spread*. The catch is that variance is in
 **squared units** — square dollars, square seconds — which nobody can
 interpret. So we usually report its square root, the **standard
-deviation** $\text{SD}(X) = \sqrt{\text{Var}(X)}$, which is back in the
+deviation** `SD(X) = √Var(X)`, which is back in the
 original units and reads as a typical distance from the mean.
 
 <CodeBlock
@@ -254,15 +250,13 @@ variable, made concrete.
 One property of expectation is so useful it deserves a callout:
 expectation is **linear**. For any random variables and constants,
 
-$$
-E[aX + bY] = a\,E[X] + b\,E[Y]
-$$
+`E[aX + bY] = a · E[X] + b · E[Y]`
 
-The remarkable part: this holds **even when $X$ and $Y$ are dependent** —
+The remarkable part: this holds **even when `X` and `Y` are dependent** —
 no independence required. It means you can break a messy total into
 simpler pieces, take each piece's expectation, and add them up. Want the
 expected total revenue from 1,000 customers who each have expected spend
-\\$40? It's just $1000 \times 40 = \$40,000$, regardless of how
+\$40? It's just 1000 × 40 = \$40,000, regardless of how
 customers' spending correlates.
 
 <CodeBlock
@@ -290,6 +284,7 @@ a week? Add the expected tickets per day. Expected revenue from a funnel?
 Sum the expected revenue at each stage. No independence assumption
 needed — which is rare and precious in probability.
 </Callout>
+
 
 ## Expected value for decisions
 
@@ -529,7 +524,7 @@ Negative expected value flags a long-run losing proposition, even though individ
 <Callout type="success" title="Key takeaways">
 - A **random variable** assigns a number to each random outcome — a *function* from outcomes to numbers — so you can do math on uncertainty.
 - **Discrete** variables (countable values) are described by a **pmf** (probability of each value); **continuous** ones by a **pdf** (probability = area, never the height at a point).
-- **Expectation** $E[X]$ is the **long-run average** / balance point — *not* the most likely value, and not necessarily attainable.
+- **Expectation** E[X] is the **long-run average** / balance point — *not* the most likely value, and not necessarily attainable.
 - **Variance** is the expected squared deviation (squared units); take the **standard deviation** to talk about spread in real units.
 - **Expected value** turns an uncertain decision into one comparable number — favorable when it beats the alternative — but it assumes a *repeated, survivable* gamble.
 </Callout>

@@ -76,7 +76,7 @@ controlling this in *Errors and Power*.
 
 ANOVA's test statistic, **F**, compares two kinds of spread:
 
-$$ F = \frac{\text{variance BETWEEN group means}}{\text{variance WITHIN groups}} $$
+`F = (variance BETWEEN group means) / (variance WITHIN groups)`
 
 The intuition: if the groups truly have the same mean, then the group
 averages should differ only as much as the noise *inside* the groups
@@ -134,11 +134,11 @@ else:
 
 **How to read it.** The hypotheses are:
 
-- $H_0$: all group means are equal ($\mu_1 = \mu_2 = \mu_3$).
-- $H_1$: **at least one** group mean differs from the rest.
+- H₀: all group means are equal (μ₁ = μ₂ = μ₃).
+- H₁: **at least one** group mean differs from the rest.
 
 A large F with a small p-value says the group means are spread out more
-than within-group noise can explain — so you reject $H_0$ and conclude
+than within-group noise can explain — so you reject H₀ and conclude
 *some* difference exists. Crucially, that is *all* it tells you.
 
 <Callout type="danger" title="Misconception: ANOVA tells you WHICH group differs">
@@ -179,7 +179,7 @@ ANOVA is the smoke alarm: it signals a difference exists somewhere, then post-ho
 
 ANOVA and t-tests need **numbers** (heights, times, dollars). But masses
 of real data are **categorical**: device type, subscription tier,
-yes/no churn, survey response. Chi-square ("$\chi^2$") tests are built
+yes/no churn, survey response. Chi-square (χ²) tests are built
 for exactly this. They come in two main flavors.
 
 ```mermaid
@@ -254,8 +254,8 @@ else:
 
 **How to read it.** The hypotheses are:
 
-- $H_0$: the two variables are **independent** (no association).
-- $H_1$: they are **associated** (not independent).
+- H₀: the two variables are **independent** (no association).
+- H₁: they are **associated** (not independent).
 
 `chi2_contingency` returns four things: the statistic, the p-value, the
 degrees of freedom, and the **expected** counts table. A small p-value
@@ -325,8 +325,8 @@ else:
 `}
 />
 
-The hypotheses: $H_0$ says the counts follow the expected proportions;
-$H_1$ says they don't. Same logic as before — observed vs expected — just
+The hypotheses: H₀ says the counts follow the expected proportions;
+H₁ says they don't. Same logic as before — observed vs expected — just
 for one variable against a reference pattern instead of two variables
 against each other.
 

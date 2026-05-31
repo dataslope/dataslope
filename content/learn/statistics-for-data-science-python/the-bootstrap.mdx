@@ -68,11 +68,11 @@ mimics drawing fresh samples from the population.
 
 The percentile bootstrap is short enough to state in full:
 
-1. Start with your observed sample of $n$ values.
-2. Draw a **resample**: pick $n$ values from it *with replacement*.
+1. Start with your observed sample of `n` values.
+2. Draw a **resample**: pick `n` values from it *with replacement*.
 3. Compute your statistic (mean, median, whatever) on that resample and
    record it.
-4. Repeat steps 2-3 a large number of times — call it $B$ (often
+4. Repeat steps 2-3 a large number of times — call it `B` (often
    2,000-10,000).
 5. The recorded values form the **bootstrap distribution**. Its
    **standard deviation** estimates the standard error; its **2.5th and
@@ -93,7 +93,7 @@ flowchart LR
 ## Bootstrapping a mean (and checking it)
 
 Let's implement it from scratch with NumPy. `rng.choice(data,
-size=len(data), replace=True)` draws one resample. We loop $B$ times,
+size=len(data), replace=True)` draws one resample. We loop `B` times,
 take the mean each time, and read off the percentiles. As a sanity
 check, we'll compare the bootstrap CI for the mean against the classic
 t-interval from *Confidence Intervals* — they should land in nearly the
@@ -137,7 +137,7 @@ print("for the mean, then generalizes to statistics that HAVE no formula.")
 `}
 />
 
-The bootstrap standard error and the $s/\sqrt{n}$ formula match closely,
+The bootstrap standard error and the `s / √n` formula match closely,
 and the two intervals overlap almost exactly. For the mean, the
 bootstrap is just a more roundabout way to get the familiar answer — the
 payoff comes when there *is* no familiar answer.
@@ -228,7 +228,7 @@ data's flaws and runs out of information when the sample is thin.
 
 **Be cautious — or don't — when:**
 
-- **$n$ is very small.** With, say, 8 points, your sample is a poor
+- **`n` is very small.** With, say, 8 points, your sample is a poor
   stand-in for the population, so the bootstrap distribution is built on
   too little information. It can't conjure detail that isn't there.
 - **The statistic depends on extremes**, like the **maximum** or
@@ -383,12 +383,12 @@ assert abs(boot_se - formula_se) < 0.30 * formula_se`,
 />
 
 <Callout type="tip" title="More resamples reduces simulation noise (not sampling noise)">
-$B$ — the number of resamples — controls only the **Monte Carlo** noise
-of the bootstrap itself: a bigger $B$ makes your estimated SE and CI
+`B` — the number of resamples — controls only the **Monte Carlo** noise
+of the bootstrap itself: a bigger `B` makes your estimated SE and CI
 *stable* across reruns, but it does **not** make your estimate more
-*accurate*. The accuracy is capped by your original sample size $n$.
-Increasing $B$ from 1,000 to 100,000 smooths the answer; only collecting
-more real data ($n$) actually sharpens it. A few thousand resamples is
+*accurate*. The accuracy is capped by your original sample size `n`.
+Increasing `B` from 1,000 to 100,000 smooths the answer; only collecting
+more real data (`n`) actually sharpens it. A few thousand resamples is
 usually plenty.
 </Callout>
 
@@ -473,8 +473,8 @@ The bootstrap measures precision, not accuracy — it can't rescue a sample that
 - The bootstrap **resamples your data with replacement**, treating the sample as a stand-in for the population, to approximate a statistic's **sampling distribution** — no formula, no normality assumption.
 - The **standard deviation** of the bootstrap distribution estimates the **standard error**; its **2.5th and 97.5th percentiles** give a **95% percentile confidence interval**.
 - It works for **any statistic** — median, trimmed mean, ratio, correlation, percentile — by swapping one function in the resample loop.
-- It struggles with **very small $n$**, **extreme-based statistics** (max/min), **heavy tails**, and **dependent data**.
-- It estimates **precision, not accuracy**: it does **not** create new information or fix a **biased** sample. $B$ controls only simulation noise; only more real data improves the estimate.
+- It struggles with **very small `n`**, **extreme-based statistics** (max/min), **heavy tails**, and **dependent data**.
+- It estimates **precision, not accuracy**: it does **not** create new information or fix a **biased** sample. `B` controls only simulation noise; only more real data improves the estimate.
 </Callout>
 
 You now have two complementary routes to a confidence interval: the

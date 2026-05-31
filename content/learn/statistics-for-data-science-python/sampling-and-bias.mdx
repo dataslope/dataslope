@@ -65,7 +65,7 @@ flowchart TD
 ```
 
 - **Simple random sampling (SRS).** Every unit is equally likely, and
-  every *subset* of size $n$ is equally likely. This is the gold standard
+  every *subset* of size `n` is equally likely. This is the gold standard
   the math assumes. In code it's `rng.choice(population, size=n,
   replace=False)`.
 - **Stratified sampling.** Split the population into non-overlapping
@@ -79,8 +79,8 @@ flowchart TD
   clusters and measure *everyone* in the chosen ones. It's cheaper when
   units are geographically scattered, at the cost of some precision.
 - **Systematic sampling.** Order the population, pick a random starting
-  point, then take every $k$-th unit. Simple and often fine — but
-  dangerous if the ordering has a hidden cycle that lines up with $k$.
+  point, then take every `k`-th unit. Simple and often fine — but
+  dangerous if the ordering has a hidden cycle that lines up with `k`.
 
 <Callout type="tip" title="Stratified vs cluster — don't mix them up">
 Both split the population into groups, but they do opposite things.
@@ -144,7 +144,7 @@ outrun it.
 ## The punchline: a bigger biased sample does not help
 
 Here is the idea that separates people who understand sampling from
-people who don't. **Noise shrinks as $n$ grows; bias does not.** If your
+people who don't. **Noise shrinks as `n` grows; bias does not.** If your
 selection method is skewed, growing the sample just gives you a sharper,
 more confident estimate of the *wrong* number.
 
@@ -186,8 +186,8 @@ print("Convenience estimate converges to a WRONG value and stays there.")
 />
 
 Watch the two lines. The random estimate homes in on the dashed truth
-line as $n$ grows. The convenience estimate also *stabilizes* — but on the
-wrong value. At $n = 100{,}000$ the biased estimate is rock-steady and
+line as `n` grows. The convenience estimate also *stabilizes* — but on the
+wrong value. At `n = 100,000` the biased estimate is rock-steady and
 badly wrong. It looks precise; it is precisely misleading.
 
 <Callout type="danger" title="Misconception: 'we have tons of data, so it must be accurate'">
@@ -211,7 +211,7 @@ keeping them separate is one of the most important habits in statistics.
   it with more data.**
 - **Variance** is a *random* miss — the estimate scatters around its
   center from sample to sample. Variance comes from *finite sample size*.
-  **You fix it with more data** (it shrinks like $1/\sqrt{n}$).
+  **You fix it with more data** (it shrinks like `1/√n`).
 
 The classic picture is a dartboard: bias is *where the cluster of darts
 is centered relative to the bullseye*; variance is *how spread out the
@@ -271,7 +271,7 @@ print("As n grows: SPREAD shrinks for both, but the convenience BIAS stays.")
 `}
 />
 
-Run it and compare the rows. Going from $n=200$ to $n=5000$ shrinks the
+Run it and compare the rows. Going from `n=200` to `n=5000` shrinks the
 *spread* of both methods dramatically — that's variance falling. But the
 convenience method's *bias* (its center minus the truth) barely budges.
 Variance is a sample-size problem; bias is a method problem. They do not
@@ -691,7 +691,7 @@ The chance mechanism — not effort or size — is what connects the sample to t
 <Callout type="success" title="Key takeaways">
 - **How you sample** decides whether inference is honest; the math assumes a random mechanism.
 - **Probability methods** (simple random, stratified, cluster, systematic) give every unit a known selection chance. **Convenience sampling** does not, and usually introduces bias.
-- **Bias** is a systematic, directional miss from *method* — it does **not** shrink with more data. **Variance** is random scatter from *sample size* — it **does** shrink (like $1/\sqrt{n}$).
+- **Bias** is a systematic, directional miss from *method* — it does **not** shrink with more data. **Variance** is random scatter from *sample size* — it **does** shrink (like `1/√n`).
 - Classic biases: **selection**, **self-selection**, **nonresponse**, **survivorship**, **undercoverage**. Always ask *who is missing*.
 - A bigger biased sample is a *more confident wrong answer*. "Random" means a deliberate chance mechanism, never "haphazard."
 </Callout>

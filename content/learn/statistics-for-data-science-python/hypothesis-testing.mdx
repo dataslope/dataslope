@@ -26,28 +26,28 @@ your exciting idea is true, you start by *assuming the boring explanation*
 and check whether the data is hard to reconcile with it.
 
 The boring explanation has a name: the **null hypothesis**, written
-$H_0$. It is the skeptic's default — "nothing is going on, the difference
+H₀. It is the skeptic's default — "nothing is going on, the difference
 is just chance, the coin is fair, the drug does nothing." Against it
-stands the **alternative hypothesis**, $H_1$ (sometimes $H_a$) — "there
+stands the **alternative hypothesis**, H₁ (sometimes Hₐ) — "there
 *is* an effect."
 
 | Hypothesis | What it says | Examples |
 | --- | --- | --- |
-| $H_0$ (null) | No effect, no difference, status quo | "The two flows convert equally." "$\mu = 100$." |
-| $H_1$ (alternative) | There is an effect or difference | "The new flow converts better." "$\mu \neq 100$." |
+| H₀ (null) | No effect, no difference, status quo | "The two flows convert equally." "μ = 100." |
+| H₁ (alternative) | There is an effect or difference | "The new flow converts better." "μ ≠ 100." |
 
 The whole procedure is a *proof by contradiction under uncertainty*. We
-provisionally believe $H_0$, then ask: **if $H_0$ were true, would data
+provisionally believe H₀, then ask: **if H₀ were true, would data
 like mine be surprising?** If it would be very surprising, we conclude
-$H_0$ is probably wrong and **reject** it. If the data is perfectly
-ordinary under $H_0$, we have no grounds to abandon it — we **fail to
+H₀ is probably wrong and **reject** it. If the data is perfectly
+ordinary under H₀, we have no grounds to abandon it — we **fail to
 reject** it.
 
 <Callout type="info" title="Why start from the skeptical hypothesis?">
 Science and analytics work this way for the same reason courts presume
 innocence: it is much easier to gather evidence that *contradicts* a
 specific claim ("nothing is going on") than to directly *prove* a vague
-one ("something is going on"). $H_0$ is specific enough to compute with —
+one ("something is going on"). H₀ is specific enough to compute with —
 it gives us an exact picture of what "just noise" looks like.
 </Callout>
 
@@ -75,19 +75,19 @@ flowchart LR
 The mapping is exact, and the most important cell is the bottom-right
 one:
 
-- **Presumption of innocence** = we assume $H_0$ until the data forces us
+- **Presumption of innocence** = we assume H₀ until the data forces us
   off it.
-- **Beyond reasonable doubt** = the significance level $\alpha$, the bar
+- **Beyond reasonable doubt** = the significance level α, the bar
   the evidence must clear.
-- **"Guilty"** = reject $H_0$.
-- **"Not guilty"** = fail to reject $H_0$ — and crucially, a "not guilty"
+- **"Guilty"** = reject H₀.
+- **"Not guilty"** = fail to reject H₀ — and crucially, a "not guilty"
   verdict does **not** declare the defendant *innocent*. It says the
   prosecution did not meet the bar. The defendant may well have done it;
   the evidence just was not strong enough.
 
 <Callout type="danger" title="The single biggest misconception: 'not guilty' is not 'innocent'">
-**Failing to reject $H_0$ does not prove $H_0$ is true.** It means your
-data was consistent with $H_0$ — but it would often *also* be consistent
+**Failing to reject H₀ does not prove H₀ is true.** It means your
+data was consistent with H₀ — but it would often *also* be consistent
 with a small real effect you did not have enough data to detect. "We
 found no significant difference" never means "there is no difference." It
 means "we could not rule out *no difference*." We will hammer this again
@@ -116,26 +116,26 @@ Let's unpack the two pieces that trip people up.
 ### The test statistic: collapsing your data into one surprising-or-not number
 
 A **test statistic** is a single number that measures how far your data
-sits from what $H_0$ predicts, in units of "ordinary noise." For
+sits from what H₀ predicts, in units of "ordinary noise." For
 comparing two means it's the *t*-statistic, roughly:
 
-$$ t = \frac{\text{observed difference}}{\text{noise in that difference}} $$
+`t = (observed difference) / (noise in that difference)`
 
-A big $t$ (far from zero) means the observed gap dwarfs the typical
-random wiggle — surprising under $H_0$. A small $t$ means the gap is the
+A big `t` (far from zero) means the observed gap dwarfs the typical
+random wiggle — surprising under H₀. A small `t` means the gap is the
 kind of thing noise produces all the time. The test statistic is just a
 ruler for surprise.
 
 ### The significance level α: the bar, chosen before you look
 
-$\alpha$ is the threshold for "too surprising to be coincidence." By
-convention it's often **0.05**, meaning: *if $H_0$ were true, I am willing
-to wrongly reject it 5% of the time.* You choose $\alpha$ **before**
+α is the threshold for "too surprising to be coincidence." By
+convention it's often **0.05**, meaning: *if H₀ were true, I am willing
+to wrongly reject it 5% of the time.* You choose α **before**
 seeing the data — it encodes how much risk of a false alarm you'll
 tolerate, not something you tune to get the answer you want.
 
 <Callout type="warn" title="Set α before you peek — never after">
-Choosing $\alpha$ (or your hypotheses) *after* seeing the data is a form
+Choosing α (or your hypotheses) *after* seeing the data is a form
 of cheating. If you let the data pick the threshold, you can always find
 a story that clears the bar. Decide the rules of the game first, then
 play. We will see in *P-values* how "looking until it's significant"
@@ -154,11 +154,11 @@ from 8,000?
 **Step 2 — Hypotheses.** This is a one-sample setup comparing a mean to a
 fixed number:
 
-- $H_0: \mu = 8000$ (the claim holds)
-- $H_1: \mu \neq 8000$ (the average is different — two-sided, because
+- H₀: μ = 8000 (the claim holds)
+- H₁: μ ≠ 8000 (the average is different — two-sided, because
   "different" could be higher or lower)
 
-**Step 3 — Significance level.** $\alpha = 0.05$, fixed now, before we
+**Step 3 — Significance level.** α = 0.05, fixed now, before we
 compute anything.
 
 **Steps 4 and 5 — Compute and decide:**
@@ -202,7 +202,7 @@ be unusual under the claim, so we doubt the claim." If it lands above
 0.05, we say: "this is an ordinary amount of wiggle; we have no grounds to
 dispute 8,000." Notice what we never say: we don't *prove* the average is
 8,000, and we don't say *how much* it differs. The test answers one narrow
-question — "is the data surprising under $H_0$?" — and nothing more.
+question — "is the data surprising under H₀?" — and nothing more.
 
 <Callout type="tip" title="Read the verdict out loud the right way">
 Practice phrasing decisions like a careful analyst:
@@ -220,7 +220,7 @@ difference."*
 
 Run the next cell. Two groups are drawn from the **identical** process
 (no real effect at all), yet their means differ — and the test correctly
-*fails to reject* $H_0$ most of the time, because the gap is the size of
+*fails to reject* H₀ most of the time, because the gap is the size of
 ordinary noise.
 
 <CodeBlock
@@ -247,8 +247,8 @@ print("fail to reject H0 — but watch for the occasional false alarm.")
 />
 
 You will usually see "fail to reject" — exactly what should happen when
-$H_0$ is true. But run it enough and a "reject" sneaks through. That
-occasional false alarm *is* the $\alpha = 0.05$ risk made visible, and
+H₀ is true. But run it enough and a "reject" sneaks through. That
+occasional false alarm *is* the α = 0.05 risk made visible, and
 it's the subject of *Errors and Power*.
 
 ## One-sided vs two-sided tests
@@ -256,10 +256,10 @@ it's the subject of *Errors and Power*.
 Your alternative hypothesis comes in two flavors, and the choice changes
 where you look for surprise.
 
-- **Two-sided** ($H_1: \mu \neq 8000$): you care about a difference in
+- **Two-sided** (H₁: μ ≠ 8000): you care about a difference in
   *either* direction. Surprise lives in both tails. This is the safe
   default.
-- **One-sided** ($H_1: \mu > 8000$, or $\mu < 8000$): you care about only
+- **One-sided** (H₁: μ > 8000, or μ < 8000): you care about only
   one direction, decided **before** seeing data, for a substantive
   reason ("the drug can only help, or do nothing — it won't hurt").
 
@@ -330,7 +330,7 @@ Hypothesis testing is a precision tool, not a hammer for every nail.
 - You have a specific yes/no claim to evaluate against a noisy sample
   ("did the new flow change conversion?").
 - The decision is binary — ship or don't, investigate or drop it.
-- You can state $H_0$ and $H_1$ *before* collecting data.
+- You can state H₀ and H₁ *before* collecting data.
 
 **Be cautious or look elsewhere when:**
 
@@ -347,7 +347,7 @@ Hypothesis testing is a precision tool, not a hammer for every nail.
 A test can only tell you whether an effect is *distinguishable from
 zero*, not whether it's *big enough to matter*. With 5 million users, a
 0.001% lift in conversion will be wildly "significant" and completely
-irrelevant to the business. Rejecting $H_0$ says "probably not exactly
+irrelevant to the business. Rejecting H₀ says "probably not exactly
 zero" — it says **nothing** about effect size. Always pair a test with a
 confidence interval or an effect size to learn how much.
 </Callout>
@@ -468,16 +468,16 @@ assert significant == bool(p_value <= alpha)`,
 ## Common misconceptions, gathered
 
 <Callout type="danger" title="Five things hypothesis testing does NOT do">
-1. **It does not prove $H_0$.** "Fail to reject" means insufficient
+1. **It does not prove H₀.** "Fail to reject" means insufficient
    evidence, not "no effect." (The not-guilty verdict.)
-2. **It does not give you the probability that $H_0$ is true.** The p-value
-   assumes $H_0$ and measures the data — it is not $P(H_0 \mid \text{data})$.
+2. **It does not give you the probability that H₀ is true.** The p-value
+   assumes H₀ and measures the data — it is not P(H₀ | data).
    That's the focus of *P-values*.
 3. **It does not measure effect size.** A tiny p-value can come from a
    huge sample detecting a microscopic effect.
 4. **Significance is not importance.** "Distinguishable from zero" is not
    "big enough to act on."
-5. **You can't choose $\alpha$ or the hypotheses after peeking.** The rules
+5. **You can't choose α or the hypotheses after peeking.** The rules
    are set before the data is seen.
 </Callout>
 
@@ -577,12 +577,12 @@ Use two-sided unless a substantive constraint genuinely rules out one direction 
 
 <Callout type="success" title="What to carry forward">
 - A hypothesis test asks one question: **would data like mine be
-  surprising if the skeptical null $H_0$ were true?**
-- Assume $H_0$, compute a **test statistic**, compare its **p-value** to a
-  pre-chosen **$\alpha$**, then **reject** or **fail to reject**.
+  surprising if the skeptical null H₀ were true?**
+- Assume H₀, compute a **test statistic**, compare its **p-value** to a
+  pre-chosen **α**, then **reject** or **fail to reject**.
 - **Fail to reject is not "accept."** Absence of evidence is not evidence
   of absence (the not-guilty verdict).
-- Choose **$\alpha$ and your hypotheses before** seeing the data; pick
+- Choose **α and your hypotheses before** seeing the data; pick
   two-sided unless a real constraint justifies one-sided.
 - A test tells you *whether* an effect is distinguishable from zero — never
   *how big* it is. For magnitude, you need *Confidence Intervals* and

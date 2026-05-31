@@ -30,12 +30,12 @@ heights, which we handle in *Continuous Distributions*.
 ## Bernoulli: a single yes/no trial
 
 The **Bernoulli** distribution is the atom of everything else here: a
-single trial with two outcomes, "success" (1) with probability $p$ and
-"failure" (0) with probability $1-p$. One coin flip. One visitor who
+single trial with two outcomes, "success" (1) with probability `p` and
+"failure" (0) with probability `1 − p`. One coin flip. One visitor who
 either converts or doesn't. One email that either bounces or doesn't.
 
-There's almost nothing to it — the mean is just $p$ and the variance is
-$p(1-p)$ — but it's the building block. Every other distribution on this
+There's almost nothing to it — the mean is just `p` and the variance is
+`p(1 − p)` — but it's the building block. Every other distribution on this
 page is what happens when you start combining Bernoulli trials.
 
 <CodeBlock
@@ -68,7 +68,7 @@ Distributions*.
 
 ## Binomial: counting successes in n independent trials
 
-Now stack $n$ identical, independent Bernoulli trials and **count the
+Now stack `n` identical, independent Bernoulli trials and **count the
 successes**. That count is **Binomial**. If 200 visitors each convert
 independently with probability 0.03, the number who convert is
 `Binomial(n=200, p=0.03)`. The binomial is the workhorse for any
@@ -88,9 +88,9 @@ flowchart LR
   S --> R["Binomial(n, p)<br/>= number of successes"]
 ```
 
-A binomial is literally a **sum of $n$ independent Bernoulli trials**,
-which is why its mean is $np$ (each trial contributes $p$ on average)
-and its variance is $np(1-p)$.
+A binomial is literally a **sum of `n` independent Bernoulli trials**,
+which is why its mean is `np` (each trial contributes `p` on average)
+and its variance is `np(1 − p)`.
 
 <CodeBlock
   adapter="python"
@@ -113,8 +113,8 @@ print(f"same via 1 - cdf(9)           = {1 - d.cdf(9):.4f}")
 />
 
 <Callout type="warn" title="Off-by-one: P(X ≥ k) is .sf(k − 1), not .sf(k)">
-For a discrete distribution, `.sf(k)` computes $P(X > k)$, which equals
-$P(X \ge k+1)$. So $P(X \ge 10)$ is `.sf(9)`, and $P(X \le 4)$ is
+For a discrete distribution, `.sf(k)` computes P(X > k), which equals
+P(X ≥ k+1). So P(X ≥ 10) is `.sf(9)`, and P(X ≤ 4) is
 `.cdf(4)`. Mixing up `>` and `≥` here is the single most common
 discrete-distribution bug. When in doubt, sanity-check that
 `d.cdf(k) + d.sf(k)` is *not* 1 (it double-counts) but
@@ -156,17 +156,17 @@ print("Most likely outcomes cluster around the mean of", d.mean())
 The binomial is only valid when **all** of these hold. Violate one and
 your probabilities can be badly wrong:
 
-1. **Fixed number of trials $n$**, decided in advance.
+1. **Fixed number of trials `n`**, decided in advance.
 2. **Each trial is independent** of the others.
-3. **Constant probability $p$** across all trials.
+3. **Constant probability `p`** across all trials.
 4. **Two outcomes** per trial (success / failure).
 
 <Callout type="danger" title="Misconception: 'it's yes/no, so it must be binomial'">
 Yes/no outcomes are necessary but **not sufficient**. If conversions are
 *correlated* — say a TV ad drives a burst of visitors who all behave
 alike — trials aren't independent and the binomial **understates** the
-real variability. If $p$ drifts over the day (mobile users convert less
-than desktop), the constant-$p$ assumption breaks. Real funnels often
+real variability. If `p` drifts over the day (mobile users convert less
+than desktop), the constant-`p` assumption breaks. Real funnels often
 violate these; the binomial is a *model*, and you should ask whether its
 assumptions actually fit before trusting its numbers.
 </Callout>
@@ -245,8 +245,8 @@ assert abs(p_at_least_25 - wrong) > 1e-12`,
 
 The **Poisson** distribution counts how many times a rare-ish event
 happens in a fixed window of time or space, when events occur
-independently at a constant average **rate** $\lambda$ (lambda). There's
-no fixed $n$ and no per-trial $p$ — just an average rate and an
+independently at a constant average **rate** λ (lambda). There's
+no fixed `n` and no per-trial `p` — just an average rate and an
 interval. Classic uses:
 
 - **Arrivals**: customers per minute, requests per second, calls per hour.
@@ -255,7 +255,7 @@ interval. Classic uses:
 - **Rare incidents**: accidents per intersection per month.
 
 The Poisson has one beautiful property: its mean **and** its variance
-both equal $\lambda$. If your event counts have a variance much larger
+both equal λ. If your event counts have a variance much larger
 than their mean, that's a red flag the Poisson doesn't fit
 (over-dispersion — often from events clumping together).
 
@@ -295,7 +295,7 @@ print("So a spike that big happens in roughly 1 hour out of 84.")
 <Callout type="tip" title="Scaling the rate to the interval">
 The Poisson rate must match the interval you care about. If you get 3
 tickets/hour and want a probability for a **full 8-hour shift**, use
-$\lambda = 3 \times 8 = 24$, not 3. Rates add: an interval twice as long
+`λ = 3 × 8 = 24`, not 3. Rates add: an interval twice as long
 has twice the expected count. This linear scaling is one of the
 Poisson's most useful features.
 </Callout>
@@ -310,11 +310,11 @@ The Poisson assumes events are **independent** and occur at a
   logs, so errors aren't independent. The variance then far exceeds the
   mean (over-dispersion), and Poisson understates the spikes.
 - **The rate isn't constant**: traffic at noon ≠ traffic at 3 a.m.
-  Pooling them into one $\lambda$ smears two different processes.
-- **The count has a natural ceiling**: if you can have at most $n$
-  events out of $n$ trials with non-tiny $p$, that's **binomial**, not
-  Poisson. (Poisson is the limit of a binomial when $n$ is large and
-  $p$ is small.)
+  Pooling them into one λ smears two different processes.
+- **The count has a natural ceiling**: if you can have at most `n`
+  events out of `n` trials with non-tiny `p`, that's **binomial**, not
+  Poisson. (Poisson is the limit of a binomial when `n` is large and
+  `p` is small.)
 </Callout>
 
 <ChallengeCard
@@ -403,16 +403,16 @@ print(f"P(more than 10 calls needed)          = {d.sf(10):.4f}")
 
 <Callout type="info" title="Watch the convention: scipy's geom starts at 1">
 `scipy.stats.geom` counts the **trial number of the first success**, so
-its support is 1, 2, 3, ... and its mean is $1/p$. Some textbooks define
+its support is 1, 2, 3, ... and its mean is `1/p`. Some textbooks define
 the geometric as the number of *failures before* the first success
-(support 0, 1, 2, ... with mean $(1-p)/p$). Same idea, shifted by one —
+(support 0, 1, 2, ... with mean `(1 − p)/p`). Same idea, shifted by one —
 always check which convention a tool uses before trusting the numbers.
 </Callout>
 
 ## Choosing the right discrete distribution
 
 When you face a counting question, the model usually falls out of three
-questions: Is it one trial or many? Is $n$ fixed? Are you counting
+questions: Is it one trial or many? Is `n` fixed? Are you counting
 events at a rate?
 
 ```mermaid
@@ -544,7 +544,7 @@ Counts are whole numbers; continuous measurements like time belong to the next c
 - **Bernoulli(p)** — one yes/no trial; the atom for the rest.
 - **Binomial(n, p)** — count of successes in a **fixed** number of
   independent trials with **constant** p (conversions, defects,
-  yes/no survey counts). Mean $np$, variance $np(1-p)$.
+  yes/no survey counts). Mean `np`, variance `np(1 − p)`.
 - **Poisson(λ)** — count of independent events at a **constant rate**
   over a fixed interval (arrivals, errors/hour, typos/page).
   Mean = variance = λ; rates scale linearly with the interval.

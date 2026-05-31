@@ -104,9 +104,7 @@ square minutes — which nobody can interpret. So we take the square root
 and get the **standard deviation**, which is back in the original units
 and reads as a typical distance from the mean.
 
-$$
-s = \sqrt{\frac{1}{n-1}\sum (x_i - \bar{x})^2}
-$$
+`s = √( Σ(xᵢ − x̄)² / (n − 1) )`
 
 You will rarely compute this by hand — `numpy` and `pandas` do it — but
 the shape matters: square the distances, average them, square-root back.

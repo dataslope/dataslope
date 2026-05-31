@@ -18,12 +18,12 @@ what it is.
 ## The one-sentence definition
 
 > A **p-value** is the probability of observing data **at least as
-> extreme** as what you saw, **assuming the null hypothesis $H_0$ is
+> extreme** as what you saw, **assuming the null hypothesis H₀ is
 > true**.
 
 Read it slowly. Three pieces carry all the meaning:
 
-- **"assuming $H_0$ is true"** — the whole calculation lives in a
+- **"assuming H₀ is true"** — the whole calculation lives in a
   hypothetical world where there is no effect. The p-value never asks
   whether that world is the real one.
 - **"at least as extreme"** — not the probability of *your exact* result
@@ -36,16 +36,16 @@ Everything else on this page is a consequence of, or a contrast with,
 that sentence.
 
 <Callout type="info" title="It's a conditional probability, and the condition matters">
-In symbols, a p-value is $P(\text{data this extreme or more} \mid H_0)$.
-The thing to the right of the bar — "given $H_0$" — is *assumed*, not
+In symbols, a p-value is `P(data this extreme or more | H₀)`.
+The thing to the right of the bar — "given H₀" — is *assumed*, not
 concluded. This is exactly why a p-value can never be the probability that
-$H_0$ is true: you cannot end up with a probability *about* the thing you
+H₀ is true: you cannot end up with a probability *about* the thing you
 *assumed* at the start.
 </Callout>
 
 ## Build it yourself: the p-value as a tail area
 
-Here is the idea that makes p-values click. Suppose $H_0$ is true. Then
+Here is the idea that makes p-values click. Suppose H₀ is true. Then
 there is a whole *distribution* of test-statistic values you might get,
 just from random sampling — the **null distribution**. Your observed
 statistic is one point on that distribution. The p-value is simply **how
@@ -66,8 +66,8 @@ flowchart TD
 
 Let's make that picture real. We'll simulate the null distribution for a
 coin-flip example, then read the p-value straight off it. A friend claims
-their coin is fair. You flip it 100 times and get 62 heads. Under $H_0$
-("the coin is fair, $p = 0.5$"), how surprising is 62-or-more-extreme?
+their coin is fair. You flip it 100 times and get 62 heads. Under H₀
+("the coin is fair, `p = 0.5`"), how surprising is 62-or-more-extreme?
 
 <CodeBlock
   adapter="python"
@@ -190,7 +190,7 @@ print("The p-value is the share of the histogram beyond the red lines.")
 `}
 />
 
-Look at the histogram. It is centered on **zero** — because under $H_0$
+Look at the histogram. It is centered on **zero** — because under H₀
 the two groups are identical, so most random gaps are near nothing. Your
 observed difference sits out in the tail. The further out it sits, the
 thinner the tail beyond it, and the smaller the p-value. *A small p-value
@@ -235,11 +235,11 @@ flowchart TD
 
 Let's take the four most damaging ones in turn.
 
-### It is NOT the probability that $H_0$ is true
+### It is NOT the probability that H₀ is true
 
-This is the big one. A p-value is computed *assuming* $H_0$. You cannot
-feed "$H_0$ is true" into a calculation and have its probability fall out
-the other end. $P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are
+This is the big one. A p-value is computed *assuming* H₀. You cannot
+feed "H₀ is true" into a calculation and have its probability fall out
+the other end. `P(data | H₀)` and `P(H₀ | data)` are
 different quantities, and confusing them is called the **prosecutor's
 fallacy**.
 
@@ -279,14 +279,14 @@ print("P(data | H0) is NOT P(H0 | data).")
 
 The false-positive rate is 5%, yet most positives are false alarms,
 because the disease is rare. In exactly the same way, a p-value of 0.05 is
-**not** a 5% chance that $H_0$ is true. To get $P(H_0 \mid \text{data})$
-you'd also need the prior plausibility of $H_0$ — which the p-value never
+**not** a 5% chance that H₀ is true. To get `P(H₀ | data)`
+you'd also need the prior plausibility of H₀ — which the p-value never
 uses.
 
 <Callout type="danger" title="The prosecutor's fallacy, in one line">
 "The p-value is 0.01, so there's a 99% chance the effect is real" is
-**false**. The p-value is $P(\text{data} \mid H_0)$, not
-$P(H_1 \mid \text{data})$. Swapping the two is the most expensive mistake
+**false**. The p-value is `P(data | H₀)`, not
+`P(H₁ | data)`. Swapping the two is the most expensive mistake
 in applied statistics.
 </Callout>
 
@@ -300,7 +300,7 @@ thing operating, how often does chance reach this far?
 
 ### It is NOT 1 − P(alternative), nor the effect size
 
-A p-value says nothing about how probable $H_1$ is, and nothing about how
+A p-value says nothing about how probable H₁ is, and nothing about how
 *big* an effect is. The next cell drives the last point home: keep the
 true effect *identical* and tiny, just grow the sample, and watch the
 p-value collapse toward zero. Same effect, wildly different p-values.
@@ -339,8 +339,8 @@ Intervals*.
 ### A non-significant p does NOT prove "no effect"
 
 The mirror image of the above. A large p-value (say 0.40) means your data
-was unremarkable under $H_0$ — but as the example just showed, a real
-effect can easily produce a large p-value when $n$ is small. "Not
+was unremarkable under H₀ — but as the example just showed, a real
+effect can easily produce a large p-value when `n` is small. "Not
 significant" means *undetected*, not *absent*. This is the same
 not-guilty-is-not-innocent point from *Hypothesis Testing*, and we'll
 quantify exactly when real effects go undetected in *Errors and Power*.
@@ -383,10 +383,10 @@ does not close it.
 
 ## The danger of looking many times: p-hacking
 
-Here is the practical reason all of this matters. If $H_0$ is true, a
+Here is the practical reason all of this matters. If H₀ is true, a
 p-value is essentially a uniform random number between 0 and 1. So if you
 test **20 independent things** that are all truly null, you *expect* one
-of them to come up "significant" at $\alpha = 0.05$ — by pure luck. Hunt
+of them to come up "significant" at α = 0.05 — by pure luck. Hunt
 through enough comparisons and you will always find a "discovery."
 
 <CodeBlock
@@ -642,14 +642,14 @@ Every extra look or extra test is another chance for chance to fool you.`}
 ## Key takeaways
 
 <Callout type="success" title="What to carry forward">
-- A p-value is $P(\text{data this extreme or more} \mid H_0)$ — a **tail
+- A p-value is `P(data this extreme or more | H₀)` — a **tail
   area** under the null distribution, which you can get by simulation or
   by formula.
-- It is **not** the probability $H_0$ is true, **not** the probability the
+- It is **not** the probability H₀ is true, **not** the probability the
   result is chance, **not** the probability you're wrong, **not**
-  $1 - P(H_1)$, **not** the effect size, and **not** the probability of
+  `1 − P(H₁)`, **not** the effect size, and **not** the probability of
   replication.
-- A small p-value says the data is surprising under $H_0$; it says nothing
+- A small p-value says the data is surprising under H₀; it says nothing
   about *how big* the effect is — for that, see *Effect Sizes* and
   *Confidence Intervals*.
 - A large p-value means *undetected*, not *absent* — a question of power,

@@ -26,13 +26,11 @@ function (PDF)** — a smooth curve. The curve itself is *not*
 probability. Probability is the **area** under the curve between two
 values:
 
-$$
-P(a < X < b) = \text{area under the PDF from } a \text{ to } b
-$$
+`P(a < X < b) = area under the PDF from a to b`
 
 The total area under any PDF is exactly 1 (something must happen). A
 single point has zero width, so it has zero area — which is why
-$P(X = \text{exact value}) = 0$ for continuous variables. You always ask
+P(X = exact value) = 0 for continuous variables. You always ask
 about ranges.
 
 ```mermaid
@@ -81,7 +79,7 @@ any pre-named exact point is zero. So we ask "within 1mm of here?"
 ## Uniform: every value equally likely
 
 The **Uniform** distribution spreads probability **evenly** over an
-interval $[a, b]$ — a flat PDF. It's the simplest continuous
+interval [a, b] — a flat PDF. It's the simplest continuous
 distribution and the natural model when you have no reason to favor any
 value over another in a range: a random timestamp within an hour, a
 spawn point along a line, the raw output of a random-number generator.
@@ -113,8 +111,8 @@ fig.show()
 />
 
 <Callout type="tip" title="Interval probability = cdf(b) − cdf(a)">
-The **cumulative distribution function (CDF)** gives $P(X \le x)$ — the
-area to the *left* of $x$. So the area between $a$ and $b$ is just
+The **cumulative distribution function (CDF)** gives P(X ≤ x) — the
+area to the *left* of x. So the area between a and b is just
 `cdf(b) - cdf(a)`. This one identity computes *every* interval
 probability for *every* continuous distribution. You'll use it
 constantly.
@@ -177,7 +175,7 @@ events or timing the gaps between them.
 ## Normal: the bell curve (a first look)
 
 The **Normal** (Gaussian) distribution is the famous symmetric bell
-curve, defined by a mean $\mu$ (center) and standard deviation $\sigma$
+curve, defined by a mean μ (center) and standard deviation σ
 (spread): `stats.norm(loc=mu, scale=sigma)`. It models quantities that
 pile up around a center with symmetric tails — measurement errors,
 aggregated noise, many natural and human measurements. It's so central
@@ -213,7 +211,7 @@ reverse: *probability → value*. "What wait time are 90% of waits below?"
 "What score puts you in the top 5%?" That's the **percent-point function
 (`ppf`)**, the inverse of the CDF, also called the **quantile function**.
 
-`ppf(0.9)` returns the value $x$ such that $P(X \le x) = 0.9$ — the 90th
+`ppf(0.9)` returns the value x such that P(X ≤ x) = 0.9 — the 90th
 percentile. It's the tool for setting thresholds, SLAs, and cutoffs.
 
 ```mermaid
@@ -450,8 +448,8 @@ Reading density heights as probabilities is the single most common error with co
 - Continuous variables use a **PDF**; **probability is area** under it,
   and the total area is 1.
 - The **PDF height is a density, not a probability** — it can exceed 1.
-  $P(X = \text{exact value}) = 0$; always ask about intervals.
-- **`cdf(b) − cdf(a)`** gives any interval probability $P(a < X < b)$;
+  P(X = exact value) = 0; always ask about intervals.
+- **`cdf(b) − cdf(a)`** gives any interval probability P(a < X < b);
   **`sf`** gives the right tail; **`ppf`** inverts the CDF to find
   percentiles and thresholds.
 - **Uniform** = flat density over a range; **Exponential** = waiting

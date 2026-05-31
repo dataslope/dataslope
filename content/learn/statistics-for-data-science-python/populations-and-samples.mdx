@@ -91,16 +91,16 @@ This is the distinction to burn into memory.
 
 | Quantity | Population **parameter** (unknown, fixed) | Sample **statistic** (known, varies) |
 | --- | --- | --- |
-| Mean | $\mu$ ("mu") | $\bar{x}$ ("x-bar") |
-| Standard deviation | $\sigma$ ("sigma") | $s$ |
-| Proportion | $p$ | $\hat{p}$ ("p-hat") |
-| Size | $N$ | $n$ |
-| Correlation | $\rho$ ("rho") | $r$ |
+| Mean | μ ("mu") | x̄ ("x-bar") |
+| Standard deviation | σ ("sigma") | `s` |
+| Proportion | `p` | p̂ ("p-hat") |
+| Size | `N` | `n` |
+| Correlation | ρ ("rho") | `r` |
 
 A clean way to keep them straight: **Greek = the truth you're after;
 Latin/hat = your best guess from data.** The statistic is the
-*estimator*; the parameter is the *estimand*. You use $\bar{x}$ to
-estimate $\mu$, $\hat{p}$ to estimate $p$, and so on.
+*estimator*; the parameter is the *estimand*. You use x̄ to
+estimate μ, p̂ to estimate `p`, and so on.
 
 ```mermaid
 flowchart TD
@@ -122,9 +122,9 @@ flowchart TD
 <Callout type="danger" title="The #1 confusion: reporting a statistic as a parameter">
 Writing "average revenue per user is \\$48.20" — full stop — quietly
 claims you measured the *population*. You didn't. You measured
-$\bar{x}=48.20$ from a sample, and the population $\mu$ is *near* it but
+`x̄ = 48.20` from a sample, and the population μ is *near* it but
 uncertain. The honest sentence names the estimate and its error:
-"$\bar{x}=\\$48.20$, and $\mu$ is plausibly within \\$45–\\$51." Collapsing
+"x̄ = \\$48.20, and μ is plausibly within \\$45–\\$51." Collapsing
 the statistic and the parameter into one number is how overconfident
 claims are born.
 </Callout>
@@ -169,8 +169,8 @@ mistake you made; it's the price of not seeing the whole population.
 
 <Callout type="warn" title="ddof=1 for a sample standard deviation">
 NumPy's `.std()` defaults to `ddof=0` (the *population* formula,
-dividing by $n$). When your data is a **sample** estimating a
-population $\sigma$, use `ddof=1` (dividing by $n-1$). Pandas' `.std()`
+dividing by `n`). When your data is a **sample** estimating a
+population σ, use `ddof=1` (dividing by `n-1`). Pandas' `.std()`
 already uses `ddof=1` by default. The correction matters most for small
 samples; we explain *why* in *Measures of Spread*.
 </Callout>
@@ -211,7 +211,7 @@ print(f"Spread of the sample means (std): {sample_means.std():.2f}")
 />
 
 Two things to notice, because they preview the next several pages.
-First, the sample means **pile up around the true $\mu$** — the
+First, the sample means **pile up around the true μ** — the
 statistic is "aimed" at the parameter (it's *unbiased*). Second, they
 have a **spread of their own**. That spread — how much an estimate
 wobbles sample-to-sample — is the *standard error*, and the whole
@@ -237,7 +237,7 @@ The sample mean estimates the population mean; it doesn't equal it.`}
 ## Estimates have error — and it shrinks as n grows
 
 Estimation error is unavoidable, but it's not uncontrollable. The most
-important lever is **sample size**: as $n$ grows, your statistic
+important lever is **sample size**: as `n` grows, your statistic
 homes in on the parameter. Watch the sample mean converge.
 
 <CodeBlock
@@ -267,20 +267,20 @@ for n, e in zip(sizes, errors):
 `}
 />
 
-The error trends toward zero as $n$ grows (it's jagged because each
+The error trends toward zero as `n` grows (it's jagged because each
 sample is still random, but the envelope shrinks). A key, often-missed
-detail: precision improves with $\sqrt{n}$, **not** $n$. To halve your
+detail: precision improves with √n, **not** `n`. To halve your
 error you need roughly **four times** the data. That diminishing return
 is exactly why a national poll uses ~1,500 people, not 1,500,000 — past
 a point, more data buys very little extra precision. We'll quantify this
-with the standard error formula $\sigma/\sqrt{n}$ in *Standard Error*.
+with the standard error formula `σ / √n` in *Standard Error*.
 
 <Callout type="danger" title="Misconception: a bigger sample changes the population">
 A bigger sample does **not** change the population or its parameters —
-$\mu$, $\sigma$, and $p$ are properties of the population and don't
-care how much you sampled. What grows with $n$ is the **precision of
-your estimate**: $\bar{x}$ clusters more tightly around the unchanged
-$\mu$. The target stays put; your aim gets steadier.
+μ, σ, and `p` are properties of the population and don't
+care how much you sampled. What grows with `n` is the **precision of
+your estimate**: x̄ clusters more tightly around the unchanged
+μ. The target stays put; your aim gets steadier.
 </Callout>
 
 <MultipleChoice
@@ -427,8 +427,8 @@ assert abs(p_hat - float(np.mean(sample))) < 1e-9`,
 />
 
 <Callout type="tip" title="What both challenges quietly demonstrate">
-You computed statistics ($\bar{x}$, $s$, $\hat{p}$) from a sample and
-compared them to parameters ($\mu$, $\sigma$, $p$) you'd normally never
+You computed statistics (x̄, `s`, p̂) from a sample and
+compared them to parameters (μ, σ, `p`) you'd normally never
 see. In real work the parameter stays hidden — so instead of measuring
 the error directly, you *estimate* it with a standard error or a
 confidence interval. That's the leap we make in *Standard Error* and
@@ -514,10 +514,10 @@ Greek letters (and plain symbols) name unknown population parameters; Latin lett
 
 <Callout type="success" title="Key takeaways">
 - The **population** is everything you care about (often conceptual/infinite); the **sample** is what you observed.
-- A **parameter** ($\mu$, $\sigma$, $p$) describes the population — fixed but unknown. A **statistic** ($\bar{x}$, $s$, $\hat{p}$) is computed from the sample — known but varies.
+- A **parameter** (μ, σ, `p`) describes the population — fixed but unknown. A **statistic** (x̄, `s`, p̂) is computed from the sample — known but varies.
 - You **estimate** parameters with statistics; the gap between them is unavoidable **estimation error**.
 - A statistic is a **random variable**: it changes sample to sample and has its own distribution.
-- Bigger $n$ **sharpens the estimate** (precision $\propto \sqrt{n}$); it does **not** change the population or its parameters.
+- Bigger `n` **sharpens the estimate** (precision ∝ √n); it does **not** change the population or its parameters.
 - We **sample** because a census is usually impossible, costly, or unnecessary — a well-collected sample is enough.
 </Callout>
 

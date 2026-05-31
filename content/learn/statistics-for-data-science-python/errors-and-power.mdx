@@ -17,8 +17,8 @@ the end of this page you'll be able to simulate exactly why.
 
 ## The 2x2 decision matrix
 
-Every test has an unknowable **truth** ($H_0$ is really true, or it's
-really false) and a **decision** you make (reject $H_0$, or fail to
+Every test has an unknowable **truth** (H₀ is really true, or it's
+really false) and a **decision** you make (reject H₀, or fail to
 reject). Cross them and you get four outcomes — two right, two wrong.
 
 ```mermaid
@@ -34,19 +34,19 @@ flowchart TD
 
 Read it as a table:
 
-| | **You fail to reject $H_0$** | **You reject $H_0$** |
+| | **You fail to reject H₀** | **You reject H₀** |
 | --- | --- | --- |
-| **$H_0$ is true** | Correct (specificity) | **Type I error** — false positive, rate $\alpha$ |
-| **$H_0$ is false** | **Type II error** — false negative, rate $\beta$ | Correct detection — **power** $= 1 - \beta$ |
+| **H₀ is true** | Correct (specificity) | **Type I error** — false positive, rate α |
+| **H₀ is false** | **Type II error** — false negative, rate β | Correct detection — **power** = 1 − β |
 
 Two definitions to memorize, because everything else builds on them:
 
-- **Type I error** ($\alpha$): rejecting a *true* null. A **false
+- **Type I error** (α): rejecting a *true* null. A **false
   positive** — you "discovered" an effect that isn't real. Its rate is
-  exactly the significance level $\alpha$ you chose.
-- **Type II error** ($\beta$): failing to reject a *false* null. A **false
+  exactly the significance level α you chose.
+- **Type II error** (β): failing to reject a *false* null. A **false
   negative** — there *was* a real effect and you missed it.
-- **Power** $= 1 - \beta$: the probability of *correctly* rejecting a false
+- **Power** = 1 − β: the probability of *correctly* rejecting a false
   null. The chance your test **catches a real effect** when one exists.
 
 <Callout type="info" title="A mnemonic for which is which">
@@ -59,9 +59,9 @@ alarm) and a fatal Type II error at the end (real wolf, ignored).
 
 ## The α/β tradeoff: you can't shrink both for free
 
-Here's the tension. $\alpha$ is the bar for "convincing." Lower the bar
-(smaller $\alpha$) and you make fewer false alarms — but you also reject
-*less often overall*, so you miss more real effects ($\beta$ goes up).
+Here's the tension. α is the bar for "convincing." Lower the bar
+(smaller α) and you make fewer false alarms — but you also reject
+*less often overall*, so you miss more real effects (β goes up).
 Raise the bar and the reverse happens. With a fixed sample, **pushing one
 error rate down pushes the other up.**
 
@@ -73,7 +73,7 @@ flowchart LR
   D --> F["More Type I errors<br/>(more false alarms)"]
 ```
 
-This is why the "right" $\alpha$ depends on which mistake is costlier. A
+This is why the "right" α depends on which mistake is costlier. A
 spam filter that flags a real email as spam (false positive) is annoying;
 one that lets spam through (false negative) is mildly annoying — so you
 might tolerate more false negatives. But a smoke detector should scream at
@@ -81,20 +81,20 @@ the faintest whiff: a false alarm is cheap, a missed fire is
 catastrophic, so you accept many Type I errors to crush Type II.
 
 <Callout type="tip" title="Choosing alpha is a values decision, not a math fact">
-There is nothing sacred about 0.05. Pick $\alpha$ by asking: *in my
+There is nothing sacred about 0.05. Pick α by asking: *in my
 problem, how bad is a false positive compared to a false negative?* When
 false alarms are expensive (a costly drug rollout), use a stricter
-$\alpha$. When missing a real effect is the disaster (early disease
-screening), loosen $\alpha$ or — better — buy more power with a bigger
+α. When missing a real effect is the disaster (early disease
+screening), loosen α or — better — buy more power with a bigger
 sample.
 </Callout>
 
 ## The only way to shrink both: more data
 
-The escape hatch from the tradeoff is **sample size**. With a fixed $n$
-you trade $\alpha$ against $\beta$. But collect more data and you can lower
+The escape hatch from the tradeoff is **sample size**. With a fixed `n`
+you trade α against β. But collect more data and you can lower
 *both* — a bigger sample sharpens the test's ability to tell signal from
-noise, so the same $\alpha$ buys you more power. Power has four levers.
+noise, so the same α buys you more power. Power has four levers.
 
 ```mermaid
 flowchart TD
@@ -110,9 +110,9 @@ flowchart TD
 ```
 
 Three of these you often can't control: the true effect size is whatever
-nature made it, $\alpha$ is usually pinned by convention, and variance is
+nature made it, α is usually pinned by convention, and variance is
 limited by how clean your measurement is. The one lever firmly in your
-hands is **$n$**. That's why "how many samples do I need?" is the central
+hands is **`n`**. That's why "how many samples do I need?" is the central
 question of experiment design.
 
 ## Simulating power: just run the test many times and count
@@ -121,7 +121,7 @@ Power sounds abstract until you compute it, and the simulation recipe is
 beautifully simple:
 
 1. Build a world where a *real effect exists* (you set its size).
-2. Draw a sample and run the test. Did it reject $H_0$? Yes or no.
+2. Draw a sample and run the test. Did it reject H₀? Yes or no.
 3. Repeat thousands of times.
 4. **Power = the fraction of repeats that rejected** — the rate at which
    your test catches the effect you planted.
@@ -165,7 +165,7 @@ test just wasn't strong enough.
 <Callout type="danger" title="The most dangerous misreading on this page">
 **A non-significant result from an underpowered study does not mean "no
 effect."** If power is 0.4, then even when the effect is unmistakably
-real, you'll fail to reject $H_0$ 60% of the time. "We found no
+real, you'll fail to reject H₀ 60% of the time. "We found no
 significant difference" with low power is almost uninformative — the
 effect could easily be there, undetected. Always ask "*what was my power?*"
 before reading a null result as evidence of absence.
@@ -174,7 +174,7 @@ before reading a null result as evidence of absence.
 ## Power rises with sample size and with effect size
 
 Two of the four levers are the ones you reason about most. Let's watch
-power climb as we increase $n$, and separately as we increase the true
+power climb as we increase `n`, and separately as we increase the true
 effect. We'll draw both curves with Plotly.
 
 <CodeBlock
@@ -214,10 +214,10 @@ print("The dashed line is the conventional 0.80 power target.")
 `}
 />
 
-The curve climbs toward 1.0 as $n$ grows: more data, more power. The green
+The curve climbs toward 1.0 as `n` grows: more data, more power. The green
 line marks **0.80**, the conventional minimum power people design for —
 you want at least an 80% chance of catching a real effect before you bother
-running the study. Now hold $n$ fixed and grow the effect instead:
+running the study. Now hold `n` fixed and grow the effect instead:
 
 <CodeBlock
   adapter="python"
@@ -259,15 +259,15 @@ print("so the 'power' there is just the Type I error rate ≈ alpha = 0.05.")
 />
 
 The two punchlines: big effects are easy to detect (high power even at
-modest $n$), tiny effects need either lots of data or they slip through.
+modest `n`), tiny effects need either lots of data or they slip through.
 And the leftmost point of the second chart is a gift — when the effect is
-*zero*, $H_0$ is true, so "rejecting" is a Type I error. That point sits
-near 0.05, which is exactly $\alpha$. Let's verify that directly.
+*zero*, H₀ is true, so "rejecting" is a Type I error. That point sits
+near 0.05, which is exactly α. Let's verify that directly.
 
 ## The Type I error rate really is α
 
-A well-behaved test, run when $H_0$ is *true*, should reject about
-$\alpha$ of the time — no more, no less. Let's confirm by simulating a
+A well-behaved test, run when H₀ is *true*, should reject about
+α of the time — no more, no less. Let's confirm by simulating a
 world with **no effect at all** and counting false positives.
 
 <CodeBlock
@@ -301,15 +301,15 @@ print("This is the price you agree to pay every time you set alpha.")
 />
 
 The false-positive rate lands right around 0.05. That is the literal
-meaning of $\alpha$: *the rate at which you'll cry wolf when there's no
-wolf.* It is **not** "the probability $H_0$ is true" — it's a property of
-your decision rule, fixed in advance, that holds whenever $H_0$ happens to
+meaning of α: *the rate at which you'll cry wolf when there's no
+wolf.* It is **not** "the probability H₀ is true" — it's a property of
+your decision rule, fixed in advance, that holds whenever H₀ happens to
 be true.
 
 <Callout type="danger" title="α is NOT the probability that H0 is true">
-$\alpha = 0.05$ means: *if $H_0$ is true, I will wrongly reject it 5% of
+α = 0.05 means: *if H₀ is true, I will wrongly reject it 5% of
 the time.* It is a long-run error rate of your procedure, not a statement
-about any particular hypothesis. The probability that $H_0$ is true isn't
+about any particular hypothesis. The probability that H₀ is true isn't
 something a single test can give you at all — same trap as misreading the
 p-value in *P-values*.
 </Callout>
@@ -526,7 +526,7 @@ flowchart TD
 ```
 
 Notice that **power analysis happens before you collect data**, not after.
-You decide the smallest effect worth detecting, then compute the $n$ that
+You decide the smallest effect worth detecting, then compute the `n` that
 gives you an 80% (or higher) chance of catching it. Running first and
 asking about power later is how underpowered studies happen.
 
@@ -626,15 +626,15 @@ Power analysis turns "how many samples do I need?" into a number you compute bef
 
 <Callout type="success" title="What to carry forward">
 - A test can err two ways: **Type I** (false positive, reject a true
-  $H_0$, rate $\alpha$) and **Type II** (false negative, miss a real
-  effect, rate $\beta$).
-- **Power $= 1 - \beta$** is the chance of detecting a real effect. Design
+  H₀, rate α) and **Type II** (false negative, miss a real
+  effect, rate β).
+- **Power = 1 − β** is the chance of detecting a real effect. Design
   for at least **0.80**.
-- With a fixed sample, $\alpha$ and $\beta$ **trade off**; the way to
-  shrink both is a **larger $n$**. Power grows with **effect size**,
-  **$n$**, **larger $\alpha$**, and **smaller variance**.
-- $\alpha$ is a false-positive *rate*, **not** the probability $H_0$ is
-  true. Power still matters when $p < 0.05$ — it governs trust and
+- With a fixed sample, α and β **trade off**; the way to
+  shrink both is a **larger `n`**. Power grows with **effect size**,
+  **`n`**, **larger α**, and **smaller variance**.
+- α is a false-positive *rate*, **not** the probability H₀ is
+  true. Power still matters when `p < 0.05` — it governs trust and
   replication.
 - A non-significant result from a **low-power** study means *undetected*,
   not *absent*; and low power **inflates** the effects it does detect (the

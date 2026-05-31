@@ -7,7 +7,7 @@ If there is one idea to truly *get* in this entire course, it is this
 one. Every confidence interval you'll ever build, every p-value you'll
 ever interpret, every "margin of error" you'll ever quote rests on a
 single concept: the **sampling distribution** — the distribution of a
-*statistic* (like $\bar{x}$) computed over *many repeated samples*.
+*statistic* (like x̄) computed over *many repeated samples*.
 
 It is also the most confused idea in statistics, because three different
 distributions are floating around at once, and they look superficially
@@ -40,17 +40,17 @@ flowchart TD
 
 1. **The population distribution** is the spread of the raw values across
    the *entire population*: every customer's spend, every part's
-   diameter. It has a mean $\mu$ and standard deviation $\sigma$. It is
+   diameter. It has a mean μ and standard deviation σ. It is
    fixed and usually unknown.
 2. **The distribution of one sample** is the spread of the raw values in
-   the $n$ data points you actually collected. It's a noisy snapshot of
+   the `n` data points you actually collected. It's a noisy snapshot of
    the population distribution — same general shape, and it looks *more
-   like* the population as $n$ grows. This is what a histogram of your
+   like* the population as `n` grows. This is what a histogram of your
    DataFrame shows.
 3. **The sampling distribution of a statistic** is something else
    entirely. It is the distribution of *a single summary number* — say
-   the sample mean $\bar{x}$ — computed over **many different samples**,
-   each of size $n$. It does **not** describe raw data at all. It
+   the sample mean x̄ — computed over **many different samples**,
+   each of size `n`. It does **not** describe raw data at all. It
    describes how your *estimate* bounces around from sample to sample.
 
 <Callout type="danger" title="The confusion that breaks everything">
@@ -122,11 +122,11 @@ print(f"SD of the sample means          = {means.std():.2f}   (MUCH smaller than
 
 Two facts jump out, and they are the two pillars of inference:
 
-- **The sampling distribution is centered on $\mu$.** The mean of all the
+- **The sampling distribution is centered on μ.** The mean of all the
   sample means lands right on the population mean. The sample mean is
   *unbiased* — aimed at the truth.
 - **The sampling distribution is much narrower than the population.** Its
-  spread (here ~3) is far smaller than $\sigma$ (here 18). Averaging $n$
+  spread (here ~3) is far smaller than σ (here 18). Averaging `n`
   values cancels out a lot of individual noise, so the *estimate* is much
   more stable than any single data point.
 
@@ -137,7 +137,7 @@ own page (*Standard Error*).
 ## Comparing the three side by side
 
 Let's put all three distributions on screen at once so the difference in
-*width* is impossible to miss. Same population, same $n$ — but three
+*width* is impossible to miss. Same population, same `n` — but three
 fundamentally different things.
 
 <CodeBlock
@@ -184,7 +184,7 @@ print(f"(c) sampling dist of x-bar  -> sd = {many_means.std():5.2f}  (FAR narrow
 Look at the widths. (a) and (b) are roughly the *same* width — because
 (b) is just a small, noisy sample of (a), so its raw values spread out
 about as much as the population's. But (c) is *dramatically* narrower,
-hugging $\mu$. The raw data spreads over tens of units; the *mean*
+hugging μ. The raw data spreads over tens of units; the *mean*
 barely moves. That gap in width is the entire reason a sample of 40 can
 estimate a population mean precisely even when individual values are all
 over the place.
@@ -206,10 +206,10 @@ A histogram of your collected data points is *one sample* — distribution (b) �
 
 ## Watch the spread shrink as n grows
 
-The center of the sampling distribution doesn't move with $n$ — it sits
-on $\mu$ regardless. What changes is the **spread**: bigger samples
-produce sample means that cluster more tightly around $\mu$. Let's vary
-$n$ and overlay the sampling distributions.
+The center of the sampling distribution doesn't move with `n` — it sits
+on μ regardless. What changes is the **spread**: bigger samples
+produce sample means that cluster more tightly around μ. Let's vary
+`n` and overlay the sampling distributions.
 
 <CodeBlock
   adapter="python"
@@ -247,8 +247,8 @@ print("Notice: SD roughly HALVES when n goes up 4x (5->20, 20->80, 80->320).")
 
 Two things to internalize. First, **every** curve is centered on 50 —
 more data doesn't move the target, it sharpens your aim at it. Second,
-look at the printed standard deviations: each time $n$ quadruples
-(5→20→80→320), the spread roughly *halves*. That's the $1/\sqrt{n}$ law
+look at the printed standard deviations: each time `n` quadruples
+(5→20→80→320), the spread roughly *halves*. That's the `1/√n` law
 peeking through; it's the protagonist of *Standard Error*.
 
 <Callout type="warn" title="Misconception: a wide sample means a wide sampling distribution">
@@ -257,7 +257,7 @@ how spread out any *one* sample looks. A single sample of skewed,
 high-variance data still produces a *mean* that's quite stable across
 repeats. People glance at one wide histogram of raw data and conclude
 "my estimate must be very uncertain" — but the estimate's uncertainty is
-governed by $\sigma/\sqrt{n}$, which shrinks fast. Wide data, narrow
+governed by `σ / √n`, which shrinks fast. Wide data, narrow
 estimate.
 </Callout>
 
@@ -273,7 +273,7 @@ classic error.
   it does **not** improve any single real-world estimate. In real life you
   only ever get *one* sample anyway — the thousands of samples are a
   simulation device.
-- Using a **larger sample size $n$** genuinely narrows the sampling
+- Using a **larger sample size `n`** genuinely narrows the sampling
   distribution and makes each estimate more precise. This is the lever
   that actually buys you precision.
 
@@ -304,9 +304,9 @@ print("  -> SD shrinks steadily. Larger n is what sharpens the estimate.")
 `}
 />
 
-The first block holds $n=40$ and cranks the number of samples from 500 to
+The first block holds `n=40` and cranks the number of samples from 500 to
 32,000 — and the spread of the sampling distribution *barely moves*. The
-second block holds the number of samples and grows $n$ — and the spread
+second block holds the number of samples and grows `n` — and the spread
 falls steadily. **Precision comes from bigger samples, not from more of
 them.** In the real world you get one sample; its size is the lever you
 actually control.
@@ -636,7 +636,7 @@ A small margin of error reflects a narrow *sampling distribution*, which depends
 <Callout type="success" title="Key takeaways">
 - Keep three things separate: **(a)** the population distribution of raw values, **(b)** one sample's distribution of raw values, **(c)** the **sampling distribution** of a *statistic* over many samples.
 - A histogram of your data is **(b)**, not (c). The sampling distribution describes an *estimate*, not raw data, and is **much narrower**.
-- The sampling distribution of the mean is **centered on $\mu$** and has spread $\sigma/\sqrt{n}$ — it tightens as $n$ grows.
+- The sampling distribution of the mean is **centered on μ** and has spread `σ / √n` — it tightens as `n` grows.
 - **Larger samples** sharpen the estimate; **more samples** only smooth the simulated picture (in real life you collect just one).
 - *Every* statistic — mean, median, max, proportion — has its own sampling distribution. This single idea underlies standard errors, confidence intervals, and p-values.
 </Callout>

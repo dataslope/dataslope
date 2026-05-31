@@ -77,7 +77,7 @@ The most common effect size for comparing two groups' means is
 **Cohen's d**. The idea is simple and intuitive: take the difference in
 means, but express it in units of the data's own spread.
 
-$$ d = \frac{\bar{x}_1 - \bar{x}_2}{s_{pooled}} $$
+`d = (x̄₁ − x̄₂) / s_pooled`
 
 A `d` of 1 means the two group means sit one full standard deviation
 apart. A `d` of 0.1 means they barely overlap-differ at all. Dividing by
@@ -262,7 +262,7 @@ so no extra scaling is needed.
 | ~0.3 | moderate |
 | ~0.5+ | strong |
 
-A handy companion is $r^2$, the **proportion of variance explained**:
+A handy companion is r², the **proportion of variance explained**:
 an `r` of 0.3 means the relationship accounts for only `0.09` — about 9%
 — of the variation. That reframing often deflates an impressive-sounding
 correlation.
@@ -303,9 +303,9 @@ recovered or not — the natural effect sizes compare two proportions.
 There are two complementary ways to do it, and they tell genuinely
 different stories.
 
-- **Risk difference** (absolute): $p_{treat} - p_{control}$. "The
+- **Risk difference** (absolute): `p_treat − p_control`. "The
   conversion rate went up by 2 percentage points."
-- **Relative risk / risk ratio** (relative): $p_{treat} / p_{control}$.
+- **Relative risk / risk ratio** (relative): `p_treat / p_control`.
   "The conversion rate was 1.4× higher."
 
 <CodeBlock
@@ -605,7 +605,7 @@ A bare effect size repeats the mistake of reporting a point estimate with no mea
 <Callout type="success" title="Key takeaways">
 - A **p-value answers "is there an effect?"**; an **effect size answers "how big?"** They are different axes.
 - With a large enough sample, **trivial effects become significant** — so significance alone never justifies acting.
-- **Cohen's d** standardizes a mean difference; **r** (and $r^2$) measures relationship strength; **risk difference and relative risk** compare proportions. Report relative *and* absolute for rates.
+- **Cohen's d** standardizes a mean difference; **r** (and r²) measures relationship strength; **risk difference and relative risk** compare proportions. Report relative *and* absolute for rates.
 - Unlike the p-value, an **effect size does not grow with sample size** — more data just makes it more precise.
 - Always pair an effect size with a **confidence interval**. We put this whole toolkit to work in *A/B Testing*.
 </Callout>

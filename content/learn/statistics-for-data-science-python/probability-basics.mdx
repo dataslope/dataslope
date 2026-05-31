@@ -22,10 +22,10 @@ the vocabulary and the handful of rules everything else rests on.
 Before you can assign a probability to anything, you have to be clear
 about the set of things that could happen. That set has a name.
 
-- The **sample space** (written $S$) is the complete list of possible
-  outcomes of some random process. For one die roll, $S = \{1, 2, 3, 4, 5, 6\}$.
+- The **sample space** (written S) is the complete list of possible
+  outcomes of some random process. For one die roll, S = {1, 2, 3, 4, 5, 6}.
 - An **event** is any subset of the sample space — a thing that either
-  happens or doesn't. "Roll an even number" is the event $\{2, 4, 6\}$.
+  happens or doesn't. "Roll an even number" is the event {2, 4, 6}.
 - The **probability** of an event is a number between 0 and 1 that says
   how much of the sample space that event covers (weighted by how likely
   each outcome is).
@@ -41,11 +41,9 @@ flowchart TD
 When every outcome is equally likely — a fair die, a fair coin, a
 well-shuffled deck — probability is just counting:
 
-$$
-P(\text{event}) = \frac{\text{number of outcomes in the event}}{\text{number of outcomes in } S}
-$$
+`P(event) = (number of outcomes in the event) / (number of outcomes in S)`
 
-So $P(\text{even}) = 3/6 = 0.5$. That counting shortcut only works under
+So P(even) = 3/6 = 0.5. That counting shortcut only works under
 equal likelihood, but it's the cleanest place to build intuition.
 
 <Callout type="info" title="Probability lives on a 0-to-1 scale">
@@ -62,16 +60,14 @@ Almost everything you'll do with probability comes from four small
 rules. None of them require proofs to believe — each one is common sense
 once you picture the sample space.
 
-**1. The range rule.** Every probability satisfies $0 \le P(A) \le 1$,
-and the probabilities of all distinct outcomes in $S$ add up to exactly
+**1. The range rule.** Every probability satisfies 0 ≤ P(A) ≤ 1,
+and the probabilities of all distinct outcomes in S add up to exactly
 1. Something in the sample space must happen.
 
 **2. The complement rule.** The chance an event does *not* happen is one
 minus the chance it does:
 
-$$
-P(\text{not } A) = 1 - P(A)
-$$
+`P(not A) = 1 − P(A)`
 
 This is the single most useful trick in the whole page. "At least one"
 problems are almost always easier to solve through their opposite
@@ -81,9 +77,7 @@ problems are almost always easier to solve through their opposite
 can't both happen at once — they're **mutually exclusive**, like "roll a
 2" and "roll a 5" — the chance that *either* one happens is the sum:
 
-$$
-P(A \text{ or } B) = P(A) + P(B) \quad\text{(when A, B can't co-occur)}
-$$
+`P(A or B) = P(A) + P(B)  (when A, B can't co-occur)`
 
 If they *can* overlap (like "even" and "greater than 4," which share the
 6), you'd be double-counting the overlap, so this simple form no longer
@@ -94,12 +88,10 @@ applies — you'd subtract the shared part.
 two separate coin flips, two unrelated users. For independent events,
 the chance they *both* happen is the product:
 
-$$
-P(A \text{ and } B) = P(A) \times P(B) \quad\text{(when A, B are independent)}
-$$
+`P(A and B) = P(A) × P(B)  (when A, B are independent)`
 
 This is why a run of outcomes gets unlikely fast: two fair-coin heads is
-$0.5 \times 0.5 = 0.25$; ten in a row is $0.5^{10} \approx 0.001$.
+0.5 × 0.5 = 0.25; ten in a row is 0.5¹⁰ ≈ 0.001.
 
 ```mermaid
 flowchart LR
@@ -175,7 +167,7 @@ messy, compound events with no clean formula. Suppose a checkout flow has
 three independent steps, each of which a user completes with probability
 0.8. What's the chance a user completes *all three* and converts?
 
-You could multiply ($0.8^3 = 0.512$) — but watch how simulation gets the
+You could multiply (0.8³ = 0.512) — but watch how simulation gets the
 same answer while staying flexible enough to handle steps that *aren't*
 independent or equally likely.
 
@@ -293,18 +285,16 @@ same thing, but they're easy to confuse, and the confusion can flip a
 decision.
 
 - **Probability** is `favorable / total`. If 1 of 5 equally likely
-  outcomes is a win, $P = 1/5 = 0.2$.
+  outcomes is a win, P = 1/5 = 0.2.
 - **Odds** are `favorable : unfavorable` — a ratio of the two *ways it
   can go*, not a fraction of the whole. The same scenario has odds of
-  $1 : 4$ ("1 to 4").
+  1 : 4 ("1 to 4").
 
 So "4-to-1 odds against" does **not** mean a 1-in-4 (25%) chance — it
 means 1 favorable for every 4 unfavorable, which is 1 out of 5, or 20%.
 The conversions:
 
-$$
-\text{odds} = \frac{P}{1 - P}, \qquad P = \frac{\text{odds}}{1 + \text{odds}}
-$$
+`odds = P / (1 − P)`   and   `P = odds / (1 + odds)`
 
 <CodeBlock
   adapter="python"
@@ -535,10 +525,10 @@ Frequentist probability is a long-run-frequency statement, which is exactly why 
 
 <Callout type="success" title="Key takeaways">
 - A **sample space** lists all outcomes; an **event** is a subset; a **probability** is a number in **[0, 1]** measuring how much of the space the event covers.
-- **Complement**: $P(\text{not }A) = 1 - P(A)$ — the go-to move for "at least one" problems.
+- **Complement**: `P(not A) = 1 − P(A)` — the go-to move for "at least one" problems.
 - **Add** mutually exclusive probabilities (either/or); **multiply** independent ones (both/and) — and only when those conditions hold.
 - Probability is a **long-run frequency**; the **Law of Large Numbers** is why simulation works and why streaks don't make outcomes "due."
-- **Odds** are part-to-part ($P / (1-P)$); **probability** is part-to-whole — don't mix them up.
+- **Odds** are part-to-part (`P / (1 − P)`); **probability** is part-to-whole — don't mix them up.
 </Callout>
 
 Next, in *Conditional Probability*, we tackle what happens when events
