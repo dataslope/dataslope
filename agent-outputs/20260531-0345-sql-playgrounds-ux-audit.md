@@ -12,6 +12,11 @@
 >
 > Fixed findings are marked **✅ Fixed** (or **✅ Partial**) in the tables below.
 
+> **✅ Follow-up fixes (from hands-on testing).** Three additional issues found while testing, fixed & verified live (**6/6 checks**):
+> 1. **CodeMirror active-line highlight removed on the GitHub Light/Dark themes** (the palette themes already suppressed it; the `@uiw` GitHub themes didn't). `cmExtensions.ts`.
+> 2. **Edited row no longer jumps to the bottom of the grid.** Postgres & DuckDB move an updated row to the end of the heap (MVCC), so the post-commit re-fetch is now ordered by the table's primary key when no user sort is applied. `ResultView.tsx` (`commitEdits`).
+> 3. **GitHub Light is now the default editor/playground theme** (was Lucario). `playgroundShared.tsx`, `useSettingsStore.ts`, `SqlPlayground.tsx`.
+
 ---
 
 ## Table of contents

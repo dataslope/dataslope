@@ -229,6 +229,15 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
 
 const themeCache = new Map<string, Extension>();
 
+/** An extension that suppresses active-line background highlighting.
+ *  Add to any editor where the current-line glow is distracting (e.g.
+ *  challenge-card read-only init editors, user code editors, and the
+ *  GitHub themes — see `themeFor`). */
+export const noActiveLine: Extension = EditorView.theme({
+  ".cm-activeLine": { backgroundColor: "transparent !important" },
+  ".cm-activeLineGutter": { backgroundColor: "transparent !important" },
+});
+
 // GitHub Dark with editor/gutter backgrounds overridden to match the
 // Fumadocs page background (`--color-fd-background`). We apply this as
 // a secondary EditorView.theme after githubDark so it wins via ordering
@@ -246,14 +255,22 @@ const githubDarkPageBgOverride = EditorView.theme(
   },
   { dark: true },
 );
-const githubDarkCustom: Extension = [githubDark, githubDarkPageBgOverride];
+// The @uiw GitHub themes paint an active-line background; the rest of our
+// editor themes (built via buildTheme) suppress it, so add `noActiveLine`
+// here to keep the current-line highlight off on the GitHub themes too.
+const githubDarkCustom: Extension = [
+  githubDark,
+  githubDarkPageBgOverride,
+  noActiveLine,
+];
+const githubLightCustom: Extension = [githubLight, noActiveLine];
 
 export function themeFor(name: string): Extension {
   // GitHub themes come directly from the @uiw package — bypass the
   // palette-based buildTheme so they use the package's own token
   // colors instead of our synthetic approximation.
   if (name === "github-dark") return githubDarkCustom;
-  if (name === "github-light") return githubLight;
+  if (name === "github-light") return githubLightCustom;
   const cached = themeCache.get(name);
   if (cached) return cached;
   const palette = THEME_PALETTES[name] ?? THEME_PALETTES.lucario;
@@ -261,11 +278,3 @@ export function themeFor(name: string): Extension {
   themeCache.set(name, ext);
   return ext;
 }
-
-/** An extension that suppresses active-line background highlighting.
- *  Add to any editor where the current-line glow is distracting (e.g.
- *  challenge-card read-only init editors and user code editors). */
-export const noActiveLine: Extension = EditorView.theme({
-  ".cm-activeLine": { backgroundColor: "transparent !important" },
-  ".cm-activeLineGutter": { backgroundColor: "transparent !important" },
-});

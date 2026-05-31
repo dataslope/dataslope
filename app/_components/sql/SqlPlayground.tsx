@@ -1626,7 +1626,8 @@ function SqlPlaygroundInner() {
 
     if (editorHostRef.current && !editorRef.current) {
       const initialTheme =
-        getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
+        getStoredEditorTheme(storageKey("editortheme")) ??
+        DEFAULT_PLAYGROUND_SETTINGS.editorTheme;
       const initialWordWrap =
         localStorage.getItem(storageKey("wordwrap")) !== "false";
       const compartments = makeSqlEditorCompartments();

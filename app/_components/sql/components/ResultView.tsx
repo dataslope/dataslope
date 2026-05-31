@@ -706,6 +706,17 @@ function ResultViewImpl({
           if (parsed) {
             refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
           }
+        } else {
+          // With no user-applied sort, order the re-fetch by the table's
+          // primary key so the edited row keeps its position. Postgres and
+          // DuckDB move an updated row to the end of the heap (MVCC), so an
+          // unordered re-fetch would otherwise make the row jump to the
+          // bottom of the grid right after a cell edit.
+          const pkCols = pkColumnsForSet(set);
+          if (pkCols && pkCols.length > 0) {
+            const orderBy = pkCols.map((c) => quoteIdentSql(c)).join(", ");
+            refetchSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${orderBy}`;
+          }
         }
         refetchSql = refetchSql ?? baseSql;
       }
@@ -719,6 +730,7 @@ function ResultViewImpl({
       sortingByIndex,
       result,
       preserveStateForReload,
+      pkColumnsForSet,
     ],
   );
 

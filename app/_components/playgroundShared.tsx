@@ -34,7 +34,7 @@ export const DEFAULT_PLAYGROUND_SETTINGS = {
   fontSize: 14,
   outputFontSize: 13,
   outputFontSizeEnabled: false,
-  editorTheme: "lucario",
+  editorTheme: "github-light",
   wordWrap: true,
   clearBeforeRun: false,
 } as const;
