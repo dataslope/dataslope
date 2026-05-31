@@ -271,16 +271,19 @@ for name, pred in [("Seasonal-naive (BASELINE)", fc_snaive),
     print(f"{name:30s}{mae(yt,pred):8.1f}{rmse(yt,pred):8.1f}{mape(yt,pred):7.1f}%")
 
 print()
-print("The SEASONAL model wins clearly -- it captures both trend AND the yearly")
-print("cycle. Plain ARIMA, missing seasonal terms, struggles against the very")
-print("baseline it's supposed to beat -- exactly what its lag-12 residual warned.")
+print("The SEASONAL model wins clearly -- it captures both the trend AND the")
+print("yearly cycle. Plain ARIMA handles the trend but leaves the seasonality in")
+print("its errors, so it trails the seasonal model -- exactly what its lag-12")
+print("residual spike warned about on the ARIMA page.")
 `}
 />
 
 The seasonal model posts the lowest error on data it never saw — and it
-**beats the baseline**, which is the bar every model must clear. Plain ARIMA,
-lacking seasonal terms, can't reliably out-forecast "same as last year." This
-is the residual diagnostic from the ARIMA page, paid off in hard numbers.
+**beats the baseline**, which is the bar every model must clear. Plain ARIMA
+captures the trend but, lacking seasonal terms, leaves the yearly cycle in its
+errors, so it trails the seasonal model. The gap between them is precisely the
+seasonality that plain ARIMA's lag-12 residual spike warned about on the ARIMA
+page — the residual diagnostic, paid off in hard numbers.
 
 ## Step 8 — Visualize the forecast against reality
 

@@ -206,16 +206,21 @@ adf_report(air.diff(), "First difference of passengers")
 adf_report(np.log(air).diff(), "First difference of log(passengers)")
 
 print()
-print("Raw series: high p -> non-stationary (the trend dominates).")
+print("Raw series: high p (~0.99) -> non-stationary (the trend dominates).")
 print("A log alone doesn't fix it (log tames variance, not the trend).")
-print("DIFFERENCING collapses the p-value -> that's the cure (next page).")
+print("One difference collapses p from ~0.99 to ~0.05-0.07 -- ALMOST there.")
+print("This series is famously BORDERLINE: the seasonal difference (next page)")
+print("is what finally tips it firmly below 0.05.")
 `}
 />
 
 The raw series has a large p-value — non-stationary, as promised. A log
-alone barely helps (it fixes *variance*, not the *trend*). But a single
-**difference** drops the p-value dramatically. That preview is the entire
-motivation for the next page.
+alone barely helps (it fixes *variance*, not the *trend*). A single
+**difference** drops the p-value dramatically — from about 0.99 to roughly
+0.05–0.07 — but this series is a famous *borderline* case that hovers right
+at the threshold because strong seasonality remains. It takes a **seasonal**
+difference, on the next page, to push it firmly into stationary territory.
+That preview is the entire motivation for what comes next.
 
 <MultipleChoice
   markdown={`You run \`adfuller\` on a series and get a p-value of **0.78**. What do you conclude?
@@ -344,10 +349,14 @@ assert adf["walk_is_stationary"] == (adf["walk_p"] < 0.05)`,
 
 <ChallengeCard
   adapter="python"
-  title="Find how many differences reach stationarity"
-  instructions={`The airline \`air\` series is non-stationary. Working on \`np.log(air)\` to tame the variance, find the **smallest number of first-differences** \`d\` (try 0, 1, 2) at which the Augmented Dickey-Fuller p-value first drops below 0.05.
+  title="Confirm the transform pipeline reaches stationarity"
+  instructions={`The airline \`air\` series is non-stationary. Build the fully transformed series and show it becomes stationary. Compute:
 
-Apply \`.diff()\` \`d\` times (dropping NaNs before testing). Store that smallest \`d\` in \`d_needed\` (an int), and the corresponding p-value in \`p_at_d\` (a float). For this series, one difference of the log is enough.`}
+- \`stationary\` = \`np.log(air).diff().diff(12)\` — a log to tame the growing variance, a first difference for the trend, and a seasonal difference at lag 12 for the yearly cycle.
+- \`p_raw\` = the ADF p-value of the raw \`air\` (a float).
+- \`p_stationary\` = the ADF p-value of \`stationary\` after dropping NaNs (a float).
+
+The raw series should be non-stationary (\`p_raw\` > 0.05) while the transformed series should be stationary (\`p_stationary\` < 0.05). (Note: a *single* difference of this series is famously borderline on the ADF test — the seasonal difference is what tips it firmly into stationarity.)`}
   initCode={`import numpy as np
 import pandas as pd
 import warnings
@@ -369,43 +378,40 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`series = np.log(air)
-d_needed = None
-p_at_d = None
-print("d:", d_needed, " p:", p_at_d)
+  initialCode={`stationary = None
+p_raw = None
+p_stationary = None
+print("p_raw:", p_raw, " p_stationary:", p_stationary)
 `}
-  solutionCode={`series = np.log(air)
-d_needed = None
-p_at_d = None
-for d in range(0, 3):
-    transformed = series.copy()
-    for _ in range(d):
-        transformed = transformed.diff()
-    p = float(adfuller(transformed.dropna())[1])
-    if p < 0.05:
-        d_needed = d
-        p_at_d = p
-        break
-print("d:", d_needed, " p:", p_at_d)
+  solutionCode={`stationary = np.log(air).diff().diff(12)
+p_raw = float(adfuller(air.dropna())[1])
+p_stationary = float(adfuller(stationary.dropna())[1])
+print("p_raw:", round(p_raw, 4), " p_stationary:", round(p_stationary, 4))
 `}
   tests={[
     {
-      id: "found",
-      name: "a stationary d was found",
-      description: "d_needed and p_at_d are set",
-      code: `assert d_needed is not None and p_at_d is not None`,
+      id: "set",
+      name: "p_raw and p_stationary are floats",
+      description: "Both ADF p-values computed",
+      code: `assert isinstance(p_raw, float) and isinstance(p_stationary, float)`,
     },
     {
-      id: "one_diff",
-      name: "one difference suffices",
-      description: "log + a single difference reaches stationarity",
-      code: `assert d_needed == 1, f"Expected d=1 for log(air), got {d_needed}"`,
+      id: "raw_nonstationary",
+      name: "raw air is non-stationary",
+      description: "High ADF p-value before transforming",
+      code: `assert p_raw > 0.05, f"Raw series should be non-stationary, got p={p_raw}"`,
     },
     {
-      id: "p_below",
-      name: "p-value is below 0.05 at that d",
-      description: "It really is stationary there",
-      code: `assert p_at_d < 0.05, f"p at d={d_needed} should be < 0.05, got {p_at_d}"`,
+      id: "transformed_stationary",
+      name: "transformed series is stationary",
+      description: "log + diff + seasonal diff passes ADF",
+      code: `assert p_stationary < 0.05, f"Transformed series should be stationary, got p={p_stationary}"`,
+    },
+    {
+      id: "improved",
+      name: "transforming lowered the p-value",
+      description: "The pipeline moved toward stationarity",
+      code: `assert p_stationary < p_raw`,
     },
   ]}
 />
