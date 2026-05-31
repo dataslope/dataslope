@@ -441,7 +441,10 @@ function formatCellAsSql(v: unknown): string {
 }
 
 function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
-  if (raw === "" || raw === "NULL") return null;
+  // Mirrors utils/cellUtils.parseCellEditValue: an empty field clears to NULL,
+  // but the literal text "NULL" is stored verbatim (explicit "Set to NULL"
+  // exists for SQL NULL — see UX-20).
+  if (raw === "") return null;
   if (!isNumeric) return raw;
   const n = Number(raw);
   // Keep as string if it doesn't parse cleanly so the user can see what

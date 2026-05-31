@@ -19,6 +19,14 @@ export function formatCellValue(v: unknown): string {
   if (typeof v === "string") return v;
   if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NaN";
   if (v instanceof Uint8Array) return `BLOB (${v.length} bytes)`;
+  if (v instanceof Date) return v.toISOString();
+  // Array columns (e.g. DuckDB LIST, which arrive as JS arrays) render with
+  // brackets so they read as a collection — `[10, 20, 30]` rather than the
+  // ambiguous `10,20,30` that `String([])` produces. (Postgres arrays already
+  // arrive pre-serialized as JSON text from the adapter.)
+  if (Array.isArray(v)) {
+    return `[${v.map((item) => formatCellValue(item)).join(", ")}]`;
+  }
   return String(v);
 }
 
@@ -37,7 +45,11 @@ export function formatCellAsSql(v: unknown): string {
 }
 
 export function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
-  if (raw === "" || raw === "NULL") return null;
+  // An empty field clears the cell to SQL NULL. The literal text "NULL" is
+  // intentionally NOT coerced to NULL: there is an explicit "Set to NULL"
+  // context-menu action for that, so typing N-U-L-L stores the string "NULL"
+  // (the escape hatch that was previously impossible — see UX-20).
+  if (raw === "") return null;
   if (!isNumeric) return raw;
   const n = Number(raw);
   return Number.isFinite(n) ? n : raw;
