@@ -1,0 +1,312 @@
+---
+title: "Text Normalization: Case Folding and Punctuation"
+description: Why we lowercase text and strip punctuation — to make tokens that should be equal actually compare equal — and what that normalization quietly throws away. When case folding helps, when it destroys meaning (acronyms, names, shouting), and how to strip punctuation safely.
+---
+
+After tokenization you have a list of word-shaped strings. But to a computer,
+`"The"`, `"the"`, and `"THE"` are three completely different strings, and
+`"dog"` and `"dog."` are two. If you counted words right now, you would
+triple-count "the" and miss matches constantly. **Normalization** is the step
+that reduces this surface-level variation so that tokens which *should* be
+treated as the same actually are.
+
+The two workhorse normalization steps — and the focus of this page — are
+**case folding** (lowercasing) and **punctuation stripping**. Both are
+simple to do and surprisingly consequential to get wrong.
+
+## Case folding: collapsing "The", "the", and "THE"
+
+Computers compare strings by their exact characters, so `"The" == "the"` is
+`False`. For most counting and matching tasks, that distinction is noise: you
+do not care that one "the" started a sentence and another did not. Case
+folding — usually just `str.lower()` — collapses all of them into one form.
+
+```mermaid
+flowchart LR
+    A["'The'"] --> X["lowercase"]
+    B["'the'"] --> X
+    C["'THE'"] --> X
+    X --> Y["'the'<br/>one token, counted once"]
+```
+
+<CodeBlock
+  adapter="python"
+  initialCode={`words = ["The", "the", "THE", "Dog", "dog", "DOG"]
+
+# Without normalization, casing creates spurious distinct words.
+print("Distinct as-is:    ", len(set(words)), "->", set(words))
+
+# Case folding collapses them.
+folded = [w.lower() for w in words]
+print("Distinct lowercased:", len(set(folded)), "->", set(folded))
+`}
+/>
+
+Six "different" words became two. If your goal is to count how often each
+word appears, that collapse is exactly right — "The" at the start of a
+sentence and "the" in the middle are the same word, and you want them tallied
+together.
+
+<Callout type="info" title="lower() vs casefold()">
+Python has two lowercasing methods. `str.lower()` is the everyday choice.
+`str.casefold()` is more aggressive and handles some non-English cases — most
+famously the German "ß", which `casefold()` turns into "ss". For English text
+they behave identically; reach for `casefold()` when you are doing
+case-insensitive matching across many languages. Throughout this course we
+use `lower()`.
+</Callout>
+
+## When you should NOT lowercase
+
+Here is where beginners get burned: lowercasing is **lossy**, and sometimes
+the case carries real information you need. Folding it away is a one-way
+door.
+
+- **Named entities.** "Apple" the company and "apple" the fruit are different
+  things, and capitalization is the main clue. Lowercase first and you have
+  thrown away the signal a name-recognition system relies on.
+- **Acronyms.** "US" (United States) becomes "us" (the pronoun). "WHO" (the
+  health organization) becomes "who". These collisions can be serious.
+- **Sentiment and emphasis.** "this is FINE" shouted in all caps carries
+  different emotional weight than "this is fine". For some sentiment tasks,
+  ALL-CAPS is a feature worth keeping, not erasing.
+- **Part-of-speech tagging.** Taggers use capitalization as a hint that a
+  word is a proper noun. Lowercasing *before* tagging removes that hint and
+  can make the tagger worse — a reason to tag first, normalize later.
+
+<Callout type="warn" title="Normalization is information destruction (on purpose)">
+Every normalization step *deletes* information so that the remaining tokens
+compare more easily. That is its entire job — but it means the step can never
+be undone, and if the information you deleted mattered to your task, you have
+quietly made things worse. Always ask: *what am I throwing away, and does my
+task need it?* For plain word-counting, casing is noise. For entity
+recognition, casing is signal.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  initialCode={`# Same letters, very different meanings — case is the only clue.
+print("US".lower(), "  <- 'US' the country becomes the pronoun 'us'")
+print("WHO".lower(), " <- 'WHO' the organization becomes the question word 'who'")
+print("Apple".lower(), "<- the company becomes the fruit")
+
+# For shouting, case can be a sentiment signal:
+review = "this product is GARBAGE"
+print("Has ALL-CAPS word:", any(w.isupper() and len(w) > 1 for w in review.split()))
+`}
+/>
+
+## Punctuation stripping
+
+The second normalization workhorse is removing punctuation. After
+tokenization you often have standalone punctuation tokens (`","`, `"!"`,
+`"."`) and sometimes punctuation still clinging to words. For most
+bag-of-words style tasks, punctuation is noise you want gone. There are a few
+common ways to strip it; know more than one.
+
+<CodeBlock
+  adapter="python"
+  initialCode={`import re
+import string
+
+text = "Hello, World! It's a GREAT day... isn't it?"
+
+# Approach 1 — keep only alphabetic tokens after a naive split.
+approach1 = [w for w in text.split() if w.isalpha()]
+print("1. isalpha filter: ", approach1)
+
+# Approach 2 — strip punctuation characters from each token with str.translate.
+table = str.maketrans("", "", string.punctuation)
+approach2 = [w.translate(table) for w in text.lower().split()]
+approach2 = [w for w in approach2 if w]   # drop any now-empty strings
+print("2. translate:      ", approach2)
+
+# Approach 3 — pull out runs of letters with a regular expression.
+approach3 = re.findall(r"[a-z]+", text.lower())
+print("3. regex findall:  ", approach3)
+
+print()
+print("string.punctuation =", repr(string.punctuation))
+`}
+/>
+
+Compare the three results carefully — they disagree, and the disagreements
+are instructive:
+
+- **Approach 1** (`isalpha` filter) drops "World!" *entirely* because the
+  whole token "World!" is not alphabetic. That is probably not what you
+  wanted — you lost the word, not just the punctuation.
+- **Approach 2** (`translate`) removes punctuation *characters*, turning
+  "World!" into "world" and "It's" into "its". It keeps the words but glues
+  contractions together ("its").
+- **Approach 3** (regex `[a-z]+`) extracts runs of letters, so "isn't"
+  becomes two tokens, "isn" and "t".
+
+There is no single right answer; each approach makes a different trade-off
+about contractions and partial-punctuation tokens. The lesson is to *look at
+what your stripping actually does* rather than trusting it blindly.
+
+<Callout type="tip" title="The order trap, again">
+Strip punctuation *after* tokenizing, not before. If you delete all the
+periods first, you destroy the very clues a sentence tokenizer needs to find
+sentence boundaries — and you may even merge two sentences into one run-on.
+Tokenize, then clean.
+</Callout>
+
+<MultipleChoice
+  markdown={`Why is lowercasing described as a *lossy* operation?
+
+- Because it makes the text take up less memory
+- [o] Because it permanently discards capitalization, which sometimes carries real meaning (e.g., "Apple" vs "apple", "US" vs "us"), and that information cannot be recovered afterward
+  > Case folding throws away the distinction between upper and lower case. For word-counting that distinction is noise, but for names and acronyms it is signal — and once folded, it is gone for good.
+- Because it always introduces spelling errors
+- Because it converts the text into a different language
+
+"Lossy" means information is destroyed; whether that matters depends entirely on your task.`}
+/>
+
+## What normalization gives and takes
+
+It is worth holding both effects in your head at once.
+
+```mermaid
+flowchart TB
+    R["Raw tokens:<br/>'The', 'Apple', 'is', 'GREAT', '!'"]
+    R --> G["Normalization gains:<br/>'the'='The', fewer distinct forms,<br/>cleaner counts and matches"]
+    R --> L["Normalization losses:<br/>'Apple' the company looks like 'apple' the fruit,<br/>shouting 'GREAT' looks calm, '!' is gone"]
+```
+
+For a search index or a word-frequency study, the gains dominate and the
+losses are irrelevant — lowercase away. For named-entity recognition or
+emphasis-sensitive sentiment, the losses can be fatal — be careful, or skip
+the step. Same operation, opposite verdict, depending on the task.
+
+## Your turn: write a normalizer
+
+<ChallengeCard
+  adapter="python"
+  title="Normalize text to lowercase words"
+  category="normalization · case folding · punctuation"
+  estimatedTime="~6 min"
+  instructions={`Write a function \`normalize(text)\` that returns a list of normalized words:
+
+1. Lowercase the whole string.
+2. Remove punctuation characters (the ones in \`string.punctuation\`).
+3. Split on whitespace and drop any empty strings.
+
+For example, \`normalize("Hello, World!")\` should return \`['hello',
+'world']\`. The \`string\` module is already imported for you.
+
+(Heads up: because step 2 removes the apostrophe, a contraction like "it's"
+will become "its". That is a real side effect of character-level punctuation
+stripping — you do not need to fix it here, just be aware of it.)`}
+  initCode={`import string`}
+  initialCode={`def normalize(text):
+    # 1. lowercase
+    # 2. remove punctuation characters
+    # 3. split and drop empties
+    return []
+
+print(normalize("Hello, World!"))
+print(normalize("Wow!!!  Amazing??"))
+`}
+  solutionCode={`def normalize(text):
+    text = text.lower()
+    table = str.maketrans("", "", string.punctuation)
+    text = text.translate(table)
+    return [w for w in text.split() if w]
+
+print(normalize("Hello, World!"))
+print(normalize("Wow!!!  Amazing??"))
+`}
+  tests={[
+    {
+      id: "basic",
+      name: "Lowercases and strips punctuation",
+      description: "'Hello, World!' -> ['hello', 'world']",
+      code: `assert normalize("Hello, World!") == ["hello", "world"], "Got: " + repr(normalize("Hello, World!"))`,
+    },
+    {
+      id: "multi_punct",
+      name: "Handles repeated punctuation and extra spaces",
+      description: "'Wow!!!  Amazing??' -> ['wow', 'amazing']",
+      code: `assert normalize("Wow!!!  Amazing??") == ["wow", "amazing"], "Got: " + repr(normalize("Wow!!!  Amazing??"))`,
+    },
+    {
+      id: "all_lower",
+      name: "Everything is lowercase",
+      description: "No uppercase letters survive",
+      code: `out = normalize("APPLE Banana cHeRrY")
+assert out == ["apple", "banana", "cherry"], "Got: " + repr(out)`,
+    },
+    {
+      id: "no_empties",
+      name: "No empty strings in the output",
+      description: "Stripped-away tokens must not leave empty items",
+      code: `out = normalize("!!! ... ???  hi")
+assert "" not in out, "Found an empty string in: " + repr(out)
+assert out == ["hi"], "Got: " + repr(out)`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`For a system that counts how often each word appears in a news article, why
+is lowercasing usually the right call?
+
+- It makes the article shorter
+- [o] Different capitalizations of the same word ("The", "the", "THE") are the same word for counting purposes, so folding them together gives accurate totals
+  > When the unit of interest is "how often does this word occur", casing is noise. Collapsing it prevents the same word from being split across several count buckets.
+- It translates the article into another language
+- It is required before any text can be stored
+
+Word-frequency counting is the textbook case where case folding clearly helps.`}
+/>
+
+<MultipleChoice
+  markdown={`A team building a system to detect company names in news ("Apple announced…")
+lowercases all text as the very first step and then complains the system
+confuses companies with common nouns. What went wrong?
+
+- Lowercasing is too slow for news text
+- [o] Capitalization is a key signal for recognizing names, and lowercasing first destroyed it — for this task, case folding is harmful
+  > Named-entity recognition leans heavily on capitalization to spot proper nouns. Folding case away up front removes the exact clue the task depends on. Some tasks should skip or delay normalization.
+- The system needed more punctuation, not less
+- News articles cannot be processed by computers
+
+Whether to normalize is task-dependent; here the "harmless" step was actively destructive.`}
+/>
+
+<MultipleChoice
+  markdown={`You strip punctuation by keeping only tokens where \`token.isalpha()\` is
+\`True\`. On the token \`"World!"\` what happens, and why might that surprise
+you?
+
+- "World!" becomes "World" with the "!" removed
+- [o] The entire token "World!" is dropped, because the whole string is not alphabetic — so you lose the word, not just the punctuation
+  > \`"World!".isalpha()\` is \`False\` because of the "!", so the filter discards the whole token. To keep the word and only remove the mark, strip the punctuation characters (e.g., with \`str.translate\` or a regex) instead of filtering whole tokens.
+- It raises an error
+- It splits into "World" and "!"
+
+Knowing exactly what each stripping technique does — including what it deletes — is the difference between clean data and silent data loss.`}
+/>
+
+<MultipleChoice
+  markdown={`Why should punctuation stripping generally come *after* sentence
+tokenization, not before?
+
+- Punctuation cannot be removed from a tokenized list
+- [o] Sentence tokenizers use periods, question marks, and exclamation points to find sentence boundaries; removing them first destroys those clues and can merge separate sentences
+  > The marks you want to strip are the same marks a sentence tokenizer relies on. Strip them up front and you blind the tokenizer. Tokenize into sentences first, then clean within them.
+- Stripping punctuation changes the language of the text
+- It does not matter; order is irrelevant here
+
+This is another instance of the recurring theme that *order matters* in a pipeline.`}
+/>
+
+Case folding and punctuation stripping shrink the *number of distinct
+spellings*. But two related words like "running" and "runs" still look
+unrelated, and ultra-common words like "the" still dominate the counts. We
+tackle the common words next: **stopwords**.
