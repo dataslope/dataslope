@@ -111,3 +111,81 @@ export function canClientFilterResult(params: {
   return startIdx === 0 && loadedRows >= totalRows;
 }
 
+// ────────────────────────────────────────────────────────────────────────
+// Server-side filter pushdown (for engine-paged / "lazy" results)
+//
+// When the whole result isn't in memory, filtering it client-side would only
+// see the loaded window. Instead — like DBeaver — we wrap the original query
+// as a subquery and push the filter down as a native SQL predicate, re-paged
+// through the engine so infinite scroll is preserved. The match is a
+// case-insensitive substring per column (LIKE on SQLite, ILIKE on Postgres /
+// DuckDB), with the same `column:term` scoping as the client-side filter.
+// ────────────────────────────────────────────────────────────────────────
+
+export type SqlDialect = "sqlite" | "postgres" | "duckdb";
+
+/** Map the human-readable engine label shown in the UI to a SQL dialect. */
+export function dialectFromEngineLabel(label: string | undefined): SqlDialect {
+  const l = (label ?? "").toLowerCase();
+  if (l.includes("postgres")) return "postgres";
+  if (l.includes("duck")) return "duckdb";
+  return "sqlite";
+}
+
+function quoteIdent(name: string): string {
+  return `"${name.replace(/"/g, '""')}"`;
+}
+
+/** Escape the LIKE metacharacters (`\`, `%`, `_`) in a search term so they are
+ *  matched literally; the caller wraps the result in `%…%` and adds
+ *  `ESCAPE '\'`. */
+function escapeLikeTerm(term: string): string {
+  return term.replace(/[\\%_]/g, (ch) => `\\${ch}`);
+}
+
+/** Render a JS string as a single-quoted SQL string literal (doubling embedded
+ *  single quotes). Together with `escapeLikeTerm` this keeps arbitrary user
+ *  text injection-safe when inlined into the generated SQL. */
+function sqlStringLiteral(s: string): string {
+  return `'${s.replace(/'/g, "''")}'`;
+}
+
+/** Build a SQL boolean condition (without a leading `WHERE`) that reproduces
+ *  the in-grid filter as a server-side predicate, for pushing down into an
+ *  engine-paged query. Returns `null` when the filter has no term (the caller
+ *  should query without a `WHERE`).
+ *
+ *  - Case-insensitive substring per column via `LIKE` (SQLite — ASCII
+ *    case-insensitive) or `ILIKE` (Postgres, DuckDB), against `CAST(col AS …)`
+ *    so non-text columns are searchable too.
+ *  - A leading `column:term` (when `column` names a real result column) scopes
+ *    the match to that one column; otherwise the term is matched against every
+ *    column with `OR`.
+ *  - The term is escaped for both the SQL string literal and `LIKE` wildcards
+ *    (`ESCAPE '\'`), so arbitrary text — quotes, `%`, `_` — is literal and
+ *    injection-safe. */
+export function buildResultFilterWhere(
+  columnNames: readonly string[],
+  raw: string,
+  dialect: SqlDialect,
+): string | null {
+  const parsed = parseResultFilter(raw, columnNames);
+  if (!parsed.term) return null;
+
+  const targets =
+    parsed.column !== null
+      ? columnNames.filter((c) => c.toLowerCase() === parsed.column)
+      : [...columnNames];
+  if (targets.length === 0) return null;
+
+  const op = dialect === "sqlite" ? "LIKE" : "ILIKE";
+  // SQLite has no boolean type and `CAST(x AS TEXT)`; Postgres/DuckDB accept
+  // `CAST(x AS TEXT)` too (TEXT/VARCHAR are interchangeable here).
+  const castType = "TEXT";
+  const pattern = sqlStringLiteral(`%${escapeLikeTerm(parsed.term)}%`);
+  const conds = targets.map(
+    (c) => `CAST(${quoteIdent(c)} AS ${castType}) ${op} ${pattern} ESCAPE '\\'`,
+  );
+  return conds.length === 1 ? conds[0] : `(${conds.join(" OR ")})`;
+}
+

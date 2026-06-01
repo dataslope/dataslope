@@ -76,6 +76,8 @@ import {
 import {
   filterResultRowIndices,
   canClientFilterResult,
+  buildResultFilterWhere,
+  dialectFromEngineLabel,
 } from "../utils/resultFilter";
 
 // ────────────────────────────────────────────────────────────────────────
@@ -538,14 +540,20 @@ function ResultViewImpl({
     setIdx: number;
     absoluteRow: number;
   } | null>(null);
-  // Result-set index awaiting a "load all rows so the whole result can be
-  // filtered" confirmation. Set when the user clicks the filter affordance on
-  // an engine-paged result whose rows aren't all in memory yet.
-  const [filterLoadPrompt, setFilterLoadPrompt] = useState<number | null>(null);
+  // Result-set indices currently showing a *server-side* filtered re-query
+  // (pushdown, for engine-paged results). Maps idx → the pre-filter total row
+  // count (for the "filtered from N" readout). Its presence means further
+  // filter edits re-query the engine — even after the filtered result becomes
+  // small enough to fit in memory — rather than switching to client-filtering.
+  const [serverFilterByIndex, setServerFilterByIndex] = useState<
+    Record<number, number>
+  >({});
   const preserveOnNextResultRef = useRef<{
     selectedByIndex: SelectedRowsByResult;
     pendingEditsByIndex: PendingEditsByResult;
     sortingByIndex: Record<number, SortingState>;
+    filterByIndex?: Record<number, string>;
+    serverFilterByIndex?: Record<number, number>;
   } | null>(null);
   // Keep a ref to the latest sortingByIndex so the result-change effect can
   // read it without adding sortingByIndex as a dependency (which would loop).
@@ -562,9 +570,10 @@ function ResultViewImpl({
   const noResultsRef = useRef<HTMLDivElement>(null);
   const resultSetsScrollRef = useRef<HTMLDivElement>(null);
   const prevResultRef = useRef<QueryRunResult | null>(null);
-  // When the user confirms "load all rows to filter", focus the (now enabled)
-  // filter input once the fully-loaded result arrives.
-  const focusFilterAfterLoadRef = useRef(false);
+  // After a server-side filter reload (which steals focus), re-focus the
+  // filter input. Plus the pending debounce timer for filter keystrokes.
+  const focusFilterAfterReloadRef = useRef(false);
+  const filterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Save sorting for the outgoing result so it can be restored on tab switch back.
@@ -577,11 +586,11 @@ function ResultViewImpl({
     preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
-    setFilterByIndex({});
+    setFilterByIndex(preserved?.filterByIndex ?? {});
+    setServerFilterByIndex(preserved?.serverFilterByIndex ?? {});
     setSelectedByIndex(preserved?.selectedByIndex ?? {});
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
-    setFilterLoadPrompt(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     // Prefer explicit preserved state (after a reload), then cached state
     // (returning to a tab), then fall back to a clean slate.
@@ -592,16 +601,19 @@ function ResultViewImpl({
     // Scroll the result table back to the top whenever a new result arrives
     // (fresh query run or lazy page navigation).
     resultSetsScrollRef.current?.scrollTo(0, 0);
-    if (focusFilterAfterLoadRef.current) {
-      focusFilterAfterLoadRef.current = false;
-      // The reloaded result is now fully loaded, so the filter field is an
-      // enabled input — focus it so the user can type the filter immediately.
+    if (focusFilterAfterReloadRef.current) {
+      focusFilterAfterReloadRef.current = false;
+      // A server-side filter reload re-mounts the grid and steals focus —
+      // restore it to the filter input (and its caret) so typing continues.
       requestAnimationFrame(() => {
-        document
-          .querySelector<HTMLInputElement>(
-            ".sql-result-filter-input:not(:disabled)",
-          )
-          ?.focus();
+        const el = document.querySelector<HTMLInputElement>(
+          ".sql-result-filter-input",
+        );
+        if (el) {
+          el.focus();
+          const len = el.value.length;
+          el.setSelectionRange(len, len);
+        }
       });
     }
     const el = flashWrapperRef.current;
@@ -629,6 +641,8 @@ function ResultViewImpl({
       selectedByIndex?: SelectedRowsByResult;
       pendingEditsByIndex?: PendingEditsByResult;
       sortingByIndex?: Record<number, SortingState>;
+      filterByIndex?: Record<number, string>;
+      serverFilterByIndex?: Record<number, number>;
     }) => {
       preserveOnNextResultRef.current = {
         selectedByIndex:
@@ -636,42 +650,129 @@ function ResultViewImpl({
         pendingEditsByIndex:
           overrides?.pendingEditsByIndex ?? clonePendingEdits(pendingEditsByIndex),
         sortingByIndex: overrides?.sortingByIndex ?? { ...sortingByIndex },
+        // Filter + server-filter state are preserved by default so a sort /
+        // edit reload of a filtered result keeps the filter; an explicit
+        // override (or a fresh query, which doesn't preserve at all) clears it.
+        filterByIndex: overrides?.filterByIndex ?? { ...filterByIndex },
+        serverFilterByIndex:
+          overrides?.serverFilterByIndex ?? { ...serverFilterByIndex },
       };
     },
-    [selectedByIndex, pendingEditsByIndex, sortingByIndex],
+    [
+      selectedByIndex,
+      pendingEditsByIndex,
+      sortingByIndex,
+      filterByIndex,
+      serverFilterByIndex,
+    ],
   );
 
-  // Confirmed "load all rows to filter": switch the engine-paged result to
-  // "All" so every row is materialized (the same path as choosing All in the
-  // pager), preserving the active sort. The result-change effect then focuses
-  // the now-enabled filter input. Engine-independent — it reuses the existing
-  // lazy reload, so it works the same for SQLite / Postgres / DuckDB.
-  const performLoadAllToFilter = useCallback(() => {
-    const idx = filterLoadPrompt;
-    setFilterLoadPrompt(null);
-    if (idx === null || !result) return;
-    const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-    if (!baseSql) return;
-    const sorting = sortingByIndex[idx] ?? [];
-    let sql = baseSql;
-    if (sorting.length > 0) {
-      const parsed = parseColumnId(sorting[0].id);
-      if (parsed) {
-        sql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+  // Compose the lazy SQL for a server-side filter + sort pushdown: wrap the
+  // original base query as a subquery with a native `WHERE` (LIKE/ILIKE), then
+  // apply ORDER BY for the active sort. Either part may be absent. This is the
+  // DBeaver model — the filtered query re-pages through the engine, so infinite
+  // scroll is preserved instead of loading the whole result into memory.
+  const composeLazyQuery = useCallback(
+    (
+      baseSql: string,
+      filterText: string,
+      columns: readonly string[],
+      sorting: SortingState,
+    ) => {
+      let sql = baseSql.replace(/\s*;+\s*$/, "");
+      const where = filterText.trim()
+        ? buildResultFilterWhere(
+            columns,
+            filterText,
+            dialectFromEngineLabel(engineLabel),
+          )
+        : null;
+      if (where) sql = `SELECT * FROM (${sql}) AS _filter WHERE ${where}`;
+      if (sorting.length > 0) {
+        const parsed = parseColumnId(sorting[0].id);
+        if (parsed) {
+          sql = `SELECT * FROM (${sql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+        }
       }
-    }
-    focusFilterAfterLoadRef.current = true;
-    preserveStateForReload();
-    onSetGlobalPageSize(0);
-    onLoadPage(sql, 0, 0);
-  }, [
-    filterLoadPrompt,
-    result,
-    sortingByIndex,
-    preserveStateForReload,
-    onSetGlobalPageSize,
-    onLoadPage,
-  ]);
+      return sql;
+    },
+    [engineLabel],
+  );
+
+  // Push a server-side filter for an engine-paged result: re-query the original
+  // base wrapped with a `WHERE` so only matching rows stream in (infinite
+  // scroll preserved). An empty term reloads the unfiltered base. Selection /
+  // pending edits are cleared because the row set (and absolute indices) change.
+  const triggerServerFilter = useCallback(
+    (
+      idx: number,
+      value: string,
+      columns: readonly string[],
+      unfilteredTotal: number,
+    ) => {
+      if (!result) return;
+      const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+      if (!baseSql) return;
+      const sorting = sortingByIndex[idx] ?? [];
+      const sql = composeLazyQuery(baseSql, value, columns, sorting);
+      const nextFilter = { ...filterByIndex };
+      if (value) nextFilter[idx] = value;
+      else delete nextFilter[idx];
+      const nextServer = { ...serverFilterByIndex };
+      if (value.trim()) nextServer[idx] = serverFilterByIndex[idx] ?? unfilteredTotal;
+      else delete nextServer[idx];
+      focusFilterAfterReloadRef.current = true;
+      preserveStateForReload({
+        filterByIndex: nextFilter,
+        serverFilterByIndex: nextServer,
+        selectedByIndex: {},
+        pendingEditsByIndex: {},
+      });
+      onLoadPage(sql, 0);
+    },
+    [
+      result,
+      sortingByIndex,
+      filterByIndex,
+      serverFilterByIndex,
+      composeLazyQuery,
+      preserveStateForReload,
+      onLoadPage,
+    ],
+  );
+
+  // Debounce filter keystrokes for the server-side path: mark the set as
+  // server-filtered immediately (so the grid stops client-filtering the rows
+  // it's about to replace), then re-query after a short idle. Kept as a stable
+  // callback so the debounce ref isn't touched from the render body.
+  const scheduleServerFilter = useCallback(
+    (
+      idx: number,
+      value: string,
+      columns: readonly string[],
+      unfilteredTotal: number,
+    ) => {
+      setServerFilterByIndex((prev) => {
+        const next = { ...prev };
+        if (value.trim()) next[idx] = prev[idx] ?? unfilteredTotal;
+        else delete next[idx];
+        return next;
+      });
+      if (filterDebounceRef.current) clearTimeout(filterDebounceRef.current);
+      filterDebounceRef.current = setTimeout(() => {
+        triggerServerFilter(idx, value, columns, unfilteredTotal);
+      }, 300);
+    },
+    [triggerServerFilter],
+  );
+
+  // Clear any pending filter debounce on unmount.
+  useEffect(
+    () => () => {
+      if (filterDebounceRef.current) clearTimeout(filterDebounceRef.current);
+    },
+    [],
+  );
 
   const getState = useCallback(
     (idx: number) => pageStates[idx] ?? { page: 0 },
@@ -1161,6 +1262,9 @@ function ResultViewImpl({
     if (!set) return null;
     const isLazy = result.lazySql !== undefined && idx === 0;
     const isInfiniteAll = isLazy && result.lazyInfinite === true;
+    // A server-side (pushdown) filter is active: the loaded rows are already
+    // the SQL-filtered matches, so they must not be client-filtered again.
+    const serverFiltered = isLazy && serverFilterByIndex[idx] !== undefined;
     const sorting = sortingByIndex[idx] ?? [];
     let totalRows: number;
     // The full (pre-filter) row count. Drives the export button, which always
@@ -1181,23 +1285,28 @@ function ResultViewImpl({
           ? globalPageSize
           : Math.max(result.lazyTotalCount ?? 0, 1);
       totalRows = result.lazyTotalCount ?? set.values.length;
-      unfilteredTotal = totalRows;
+      // For a server-side filtered result the loaded rows ARE the matches and
+      // `totalRows` is the filtered count, so surface the captured pre-filter
+      // total for the "filtered from N" readout.
+      unfilteredTotal = serverFiltered
+        ? (serverFilterByIndex[idx] ?? totalRows)
+        : totalRows;
       currentPage = isInfiniteAll ? 0 : (result.lazyPage ?? 0);
       startIdx = isInfiniteAll
         ? 0
         : currentPage * (result.lazyPageSize ?? effective);
       // A bare `SELECT … ` (no LIMIT) runs through the engine-paged lazy path
       // on all three engines. When the loaded rows are the *whole* result
-      // (single page that fit, or "All" fully loaded) we can apply the same
-      // client-side filter as for a materialized result; otherwise only a
-      // window is in memory and the field is hidden.
+      // (single page that fit, or "All" fully loaded) we client-filter them
+      // directly (exact displayed-text match); otherwise the filter is pushed
+      // down to SQL (see `triggerServerFilter`) and the rows already match.
       canFilter = canClientFilterResult({
         isLazy,
         loadedRows: set.values.length,
         totalRows,
         startIdx,
       });
-      if (canFilter && rawFilter) {
+      if (canFilter && rawFilter && !serverFiltered) {
         // startIdx is 0 here (fullyLoaded), so each row's index in `set.values`
         // is its absolute position — keep it as the original index so edits /
         // selection / delete stay correct.
@@ -1262,6 +1371,7 @@ function ResultViewImpl({
       set,
       isLazy,
       isInfiniteAll,
+      serverFiltered,
       sorting,
       totalRows,
       unfilteredTotal,
@@ -1275,12 +1385,6 @@ function ResultViewImpl({
 
   const activeSetData = computeSetRenderData(safeSetIdx);
   const activeSetIsNull = result.sets[safeSetIdx] === null;
-
-  // Counts for the "load all rows to filter" confirmation dialog.
-  const filterPromptSet =
-    filterLoadPrompt !== null ? (result.sets[filterLoadPrompt] ?? null) : null;
-  const filterPromptLoaded = filterPromptSet?.values.length ?? 0;
-  const filterPromptTotal = result.lazyTotalCount ?? filterPromptLoaded;
 
   return (
     <>
@@ -1346,29 +1450,28 @@ function ResultViewImpl({
                 if (isLazy) {
                   const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
                   const newSortingByIndex = { ...sortingByIndex, [idx]: resolved };
-                  if (resolved.length > 0) {
-                    const parsed = parseColumnId(resolved[0].id);
-                    if (parsed) {
-                      const sortedSql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${resolved[0].desc ? "DESC" : "ASC"}`;
-                      // eslint-disable-next-line react-hooks/refs
-                      preserveStateForReload({ sortingByIndex: newSortingByIndex });
-                      onLoadPage(sortedSql, 0);
-                    }
-                  } else {
-                    // eslint-disable-next-line react-hooks/refs
-                    preserveStateForReload({ sortingByIndex: newSortingByIndex });
-                    onLoadPage(baseSql, 0);
-                  }
+                  // Re-page with the active server-side filter (if any) AND the
+                  // new sort composed together, so sorting a filtered result
+                  // keeps the filter.
+                  const sortedSql = composeLazyQuery(
+                    baseSql,
+                    filterByIndex[idx] ?? "",
+                    set.columns,
+                    resolved,
+                  );
+                  // eslint-disable-next-line react-hooks/refs
+                  preserveStateForReload({ sortingByIndex: newSortingByIndex });
+                  onLoadPage(sortedSql, 0);
                 }
               };
+              // Load-more pages the exact query that produced the current rows
+              // (it already encodes any pushed-down filter + sort), so infinite
+              // scroll streams the filtered result rather than the full table.
+              const effectiveLazySql =
+                result.lazySql ?? result.lazyBaseSql ?? "";
+              // The original (unfiltered) base query, surfaced to the table body
+              // for its column "Filter NULL / NON-NULL" context-menu actions.
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              let effectiveLazySql = baseSql;
-              if (sorting.length > 0) {
-                const parsed = parseColumnId(sorting[0].id);
-                if (parsed) {
-                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
-                }
-              }
               const lazyPageSize = result.lazyPageSize ?? visibleRows.length;
               const hasMoreRows =
                 isInfiniteAll && visibleRows.length < totalRows;
@@ -1450,7 +1553,7 @@ function ResultViewImpl({
               set,
               isLazy,
               isInfiniteAll,
-              sorting,
+              serverFiltered,
               totalRows,
               unfilteredTotal,
               canFilter,
@@ -1461,13 +1564,10 @@ function ResultViewImpl({
             let handlePageSizeChange: (s: number) => void;
             if (isLazy) {
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
-              let effectiveLazySql = baseSql;
-              if (sorting.length > 0) {
-                const parsed = parseColumnId(sorting[0].id);
-                if (parsed) {
-                  effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
-                }
-              }
+              // Page / page-size changes re-page the *current* query, which
+              // already encodes any pushed-down filter + sort — so they keep the
+              // filter instead of reverting to the full table.
+              const effectiveLazySql = result.lazySql ?? baseSql;
               // eslint-disable-next-line react-hooks/refs
               handlePageChange = (p: number) => {
                 // eslint-disable-next-line react-hooks/refs
@@ -1494,24 +1594,36 @@ function ResultViewImpl({
             const selectedCount = selected?.size ?? 0;
             const pendingEdits = pendingEditsByIndex[idx];
             const editCount = pendingEdits?.size ?? 0;
-            // The export button always exports the full result, so its page /
-            // total counts are based on `unfilteredTotal` (identical to
-            // `totalRows` when no in-grid filter is active).
+            // Export operates on the *result* the engine returned. For a
+            // server-side (pushed-down) filter that IS the filtered set; for a
+            // client-side view-only filter it's still the full result. So the
+            // export button's page/total counts use `exportTotal`.
+            const exportTotal = serverFiltered ? totalRows : unfilteredTotal;
             const effectivePageSize =
-              globalPageSize > 0
-                ? globalPageSize
-                : Math.max(unfilteredTotal, 1);
+              globalPageSize > 0 ? globalPageSize : Math.max(exportTotal, 1);
             const hasMultiplePages =
-              globalPageSize > 0 && unfilteredTotal > effectivePageSize;
+              globalPageSize > 0 && exportTotal > effectivePageSize;
             const safePage = Math.min(
               currentPage,
-              Math.max(0, Math.ceil(unfilteredTotal / effectivePageSize) - 1),
+              Math.max(0, Math.ceil(exportTotal / effectivePageSize) - 1),
             );
             const pageStart = safePage * effectivePageSize;
             const currentPageRows = Math.min(
-              unfilteredTotal - pageStart,
+              exportTotal - pageStart,
               effectivePageSize,
             );
+            // Filtering: in-memory results filter client-side (exact displayed
+            // text); engine-paged (or already server-filtered) results push the
+            // filter down to SQL via a debounced re-query, so infinite scroll is
+            // preserved instead of loading every row.
+            const serverMode = isLazy && (!canFilter || serverFiltered);
+            const handleFilterChange = (v: string) => {
+              setFilter(idx, v);
+              if (serverMode) {
+                // eslint-disable-next-line react-hooks/refs
+                scheduleServerFilter(idx, v, set.columns, unfilteredTotal);
+              }
+            };
             return (
               <>
                 <ResultPager
@@ -1534,29 +1646,14 @@ function ResultViewImpl({
                   elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
                   filterValue={filterByIndex[idx] ?? ""}
-                  onFilterChange={(v) => setFilter(idx, v)}
+                  onFilterChange={handleFilterChange}
                   filterUnfilteredTotal={unfilteredTotal}
-                  // Engine-paged result whose rows aren't all in memory: when a
-                  // single "All" load would materialize the whole result, offer
-                  // a one-click "load all & filter" button (it opens a confirm
-                  // dialog). Otherwise the result is already loading "All" but
-                  // isn't complete, so fall back to a disabled field + tooltip.
-                  onRequestLoadAll={
-                    !canFilter && !isInfiniteAll
-                      ? () => setFilterLoadPrompt(idx)
-                      : undefined
-                  }
-                  filterDisabledReason={
-                    !canFilter && isInfiniteAll
-                      ? "Still loading every row — scroll to load the rest, then filter (or add a SQL WHERE clause)."
-                      : undefined
-                  }
                 >
                   {onExportResultSet && (
                     <ResultSetExportButton
                       hasMultiplePages={hasMultiplePages}
                       currentPageRows={currentPageRows}
-                      totalRows={unfilteredTotal}
+                      totalRows={exportTotal}
                       resultSetExportScope={resultSetExportScope}
                       onExportResultSet={onExportResultSet}
                       onSetResultSetExportScope={setResultSetExportScope}
@@ -1627,38 +1724,6 @@ function ResultViewImpl({
                 onClick={performDeleteSingleRow}
               >
                 Delete row
-              </AlertDialog.Close>
-            </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
-      <AlertDialog.Root
-        open={filterLoadPrompt !== null}
-        onOpenChange={(next) => {
-          if (!next) setFilterLoadPrompt(null);
-        }}
-      >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
-              Filter all rows?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
-              Only the current page is loaded ({filterPromptLoaded} of{" "}
-              {filterPromptTotal.toLocaleString()} rows). To search the whole
-              result, every row will be loaded into the grid and “Rows per page”
-              switches to <strong>All</strong>.
-            </AlertDialog.Description>
-            <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
-                Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
-                className="confirm-btn confirm-btn-primary"
-                onClick={performLoadAllToFilter}
-              >
-                Load all rows
               </AlertDialog.Close>
             </div>
           </AlertDialog.Popup>
@@ -2946,8 +3011,6 @@ export function ResultPager({
   filterValue,
   onFilterChange,
   filterUnfilteredTotal,
-  filterDisabledReason,
-  onRequestLoadAll,
   children,
 }: {
   totalRows: number;
@@ -2967,18 +3030,11 @@ export function ResultPager({
   elapsedMs?: number;
   elapsedIsError?: boolean;
   /** In-grid filter text. When `onFilterChange` is provided the filter field
-   *  is shown; omit both to hide it (e.g. for engine-paged/lazy results). */
+   *  is shown; omit both to hide it. */
   filterValue?: string;
   onFilterChange?: (value: string) => void;
   /** Full row count before filtering, for the "filtered from N" readout. */
   filterUnfilteredTotal?: number;
-  /** When set, the filter field is shown but disabled with this tooltip — used
-   *  for engine-paged results where only a window of rows is loaded. */
-  filterDisabledReason?: string;
-  /** Engine-paged result that a single "All" load can fully materialize: when
-   *  provided, the filter renders as a button that opens the "load all rows to
-   *  filter" confirmation instead of a (disabled) text field. */
-  onRequestLoadAll?: () => void;
   children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -3007,45 +3063,18 @@ export function ResultPager({
   };
 
   // The in-grid filter field is offered whenever a change handler is wired and
-  // there's at least one row to filter. When the whole result isn't in memory
-  // (an engine-paged result) it's shown but disabled, with a tooltip telling
-  // the user how to enable it. `isFiltering` (a non-blank value) switches the
-  // row readout to a "of N" / "filtered from N" form.
+  // there's at least one row to filter. It's always interactive: in-memory
+  // results filter client-side, engine-paged results push the filter down to
+  // SQL (the parent decides). `isFiltering` (a non-blank value) switches the
+  // row readout to the "of N" / "filtered from N" form.
   const filterText = filterValue ?? "";
-  const filterDisabled = !!filterDisabledReason;
   const showFilter = !!onFilterChange && (filterUnfilteredTotal ?? 0) > 0;
-  // When the whole result isn't in memory but a single "All" load would fix
-  // that, the filter is offered as a button (opening the load-all confirm)
-  // rather than a disabled field — so it's actionable, not dead.
-  const showLoadAll = showFilter && !!onRequestLoadAll;
-  const isFiltering =
-    showFilter &&
-    !filterDisabled &&
-    !showLoadAll &&
-    filterText.trim().length > 0;
+  const isFiltering = showFilter && filterText.trim().length > 0;
 
   return (
     <div className="sql-result-pager">
-      {showLoadAll ? (
-        <button
-          type="button"
-          className="sql-result-filter sql-result-filter-trigger"
-          onClick={onRequestLoadAll}
-          title="Load all rows so the whole result can be filtered"
-          aria-label="Filter rows — loads every row first"
-        >
-          <Search
-            size={12}
-            aria-hidden="true"
-            className="sql-result-filter-icon"
-          />
-          <span className="sql-result-filter-trigger-label">Filter rows…</span>
-        </button>
-      ) : showFilter ? (
-        <div
-          className={`sql-result-filter${filterDisabled ? " sql-result-filter--disabled" : ""}`}
-          title={filterDisabled ? filterDisabledReason : undefined}
-        >
+      {showFilter && (
+        <div className="sql-result-filter">
           <Search
             size={12}
             aria-hidden="true"
@@ -3057,7 +3086,6 @@ export function ResultPager({
             value={filterText}
             placeholder="Filter rows…"
             aria-label="Filter rows in this result"
-            disabled={filterDisabled}
             spellCheck={false}
             autoComplete="off"
             onChange={(e) => onFilterChange?.(e.target.value)}
@@ -3071,7 +3099,7 @@ export function ResultPager({
               }
             }}
           />
-          {!filterDisabled && filterText && (
+          {filterText && (
             <button
               type="button"
               className="sql-result-filter-clear"
@@ -3083,7 +3111,7 @@ export function ResultPager({
             </button>
           )}
         </div>
-      ) : null}
+      )}
       <span className="sql-result-pager-info">
         {editable && editCount > 0 ? (
           <>

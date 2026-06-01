@@ -1025,17 +1025,6 @@
   color: var(--text-dim);
 }
 
-/* Engine-paged result: the field is shown (for discoverability) but disabled,
-   with a tooltip explaining how to load the whole result so it can be filtered. */
-.sql-result-filter--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.sql-result-filter--disabled .sql-result-filter-input {
-  cursor: not-allowed;
-}
-
 .sql-result-filter-icon {
   flex: none;
   color: var(--text-dim);
@@ -1075,37 +1064,6 @@
 .sql-result-filter-clear:hover {
   background: var(--bg);
   color: var(--text);
-}
-
-/* Engine-paged result whose rows aren't all loaded yet: the filter renders as
-   a button that offers to load every row first (so the whole result can be
-   filtered), instead of a dead/disabled field. */
-.sql-result-filter-trigger {
-  border: none;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-
-.sql-result-filter-trigger:hover {
-  background: var(--bg);
-  color: var(--text);
-}
-
-.sql-result-filter-trigger:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-}
-
-.sql-result-filter-trigger-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .sql-result-pager-controls {

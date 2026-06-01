@@ -4,6 +4,8 @@ import {
   rowMatchesResultFilter,
   filterResultRowIndices,
   canClientFilterResult,
+  buildResultFilterWhere,
+  dialectFromEngineLabel,
 } from "../app/_components/sql/utils/resultFilter";
 
 const COLS = ["id", "name", "email", "active"];
@@ -216,5 +218,79 @@ describe("canClientFilterResult", () => {
         startIdx: 0,
       }),
     ).toBe(true);
+  });
+});
+
+describe("dialectFromEngineLabel", () => {
+  it("maps engine labels to dialects (default SQLite)", () => {
+    expect(dialectFromEngineLabel("PostgreSQL")).toBe("postgres");
+    expect(dialectFromEngineLabel("DuckDB")).toBe("duckdb");
+    expect(dialectFromEngineLabel("SQLite")).toBe("sqlite");
+    expect(dialectFromEngineLabel(undefined)).toBe("sqlite");
+    expect(dialectFromEngineLabel("something else")).toBe("sqlite");
+  });
+});
+
+describe("buildResultFilterWhere", () => {
+  it("returns null for a blank term (caller queries without WHERE)", () => {
+    expect(buildResultFilterWhere(COLS, "", "sqlite")).toBeNull();
+    expect(buildResultFilterWhere(COLS, "   ", "postgres")).toBeNull();
+    // A column scope with an empty term ("name:") also has no term.
+    expect(buildResultFilterWhere(COLS, "name:", "sqlite")).toBeNull();
+  });
+
+  it("ORs a case-insensitive substring across every column (SQLite → LIKE)", () => {
+    const where = buildResultFilterWhere(COLS, "ali", "sqlite");
+    expect(where).toBe(
+      `(CAST("id" AS TEXT) LIKE '%ali%' ESCAPE '\\' OR ` +
+        `CAST("name" AS TEXT) LIKE '%ali%' ESCAPE '\\' OR ` +
+        `CAST("email" AS TEXT) LIKE '%ali%' ESCAPE '\\' OR ` +
+        `CAST("active" AS TEXT) LIKE '%ali%' ESCAPE '\\')`,
+    );
+  });
+
+  it("uses ILIKE for Postgres and DuckDB", () => {
+    expect(buildResultFilterWhere(["name"], "bob", "postgres")).toBe(
+      `CAST("name" AS TEXT) ILIKE '%bob%' ESCAPE '\\'`,
+    );
+    expect(buildResultFilterWhere(["name"], "bob", "duckdb")).toBe(
+      `CAST("name" AS TEXT) ILIKE '%bob%' ESCAPE '\\'`,
+    );
+  });
+
+  it("scopes to a single column for column:term (no OR wrapper)", () => {
+    expect(buildResultFilterWhere(COLS, "name:alice", "sqlite")).toBe(
+      `CAST("name" AS TEXT) LIKE '%alice%' ESCAPE '\\'`,
+    );
+  });
+
+  it("escapes LIKE wildcards so they match literally", () => {
+    // 50% → the % is escaped (matched literally), not a wildcard.
+    expect(buildResultFilterWhere(["amount"], "50%", "sqlite")).toBe(
+      `CAST("amount" AS TEXT) LIKE '%50\\%%' ESCAPE '\\'`,
+    );
+    // underscore is also a LIKE wildcard.
+    expect(buildResultFilterWhere(["code"], "a_b", "sqlite")).toBe(
+      `CAST("code" AS TEXT) LIKE '%a\\_b%' ESCAPE '\\'`,
+    );
+  });
+
+  it("is injection-safe: single quotes are doubled, kept inside the literal", () => {
+    const where = buildResultFilterWhere(
+      ["name"],
+      "'; DROP TABLE users; --",
+      "sqlite",
+    );
+    // The whole payload stays inside one string literal (quote doubled), so it
+    // can't break out into executable SQL.
+    expect(where).toBe(
+      `CAST("name" AS TEXT) LIKE '%''; drop table users; --%' ESCAPE '\\'`,
+    );
+  });
+
+  it("quotes identifiers (defends against odd column names)", () => {
+    expect(buildResultFilterWhere(['we"ird'], "x", "postgres")).toBe(
+      `CAST("we""ird" AS TEXT) ILIKE '%x%' ESCAPE '\\'`,
+    );
   });
 });
