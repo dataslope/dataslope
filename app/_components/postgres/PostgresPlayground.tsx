@@ -111,7 +111,11 @@ import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
-import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
+import {
+  ensureActiveWorkspace,
+  setActiveWorkspaceId,
+  switchActiveWorkspace,
+} from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { type PostgresEngine } from "../runtime/postgres";
@@ -1916,6 +1920,60 @@ function PostgresPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
+  // "Open in new workspace": create a fresh workspace and switch to it WITHOUT
+  // reloading the page. A reload races PGlite's per-origin OPFS access-handle
+  // pool against the outgoing page's worker — the reloaded page then throws
+  // `createSyncAccessHandle ... already an open access handle` and hangs on
+  // "Loading PostgreSQL engine…". Doing it in-place lets us close the old
+  // engine (freeing the pool) *before* the new one opens.
+  const performNewWorkspaceSwitch = useCallback(
+    async (nextId: string) => {
+      const old = engineRef.current;
+      if (!old) return;
+      setStatusState("loading");
+      setDbLoading(true);
+      try {
+        const sample = findPostgresSampleDatabase(nextId);
+        const newWs = await createWorkspace(
+          `${sample.label} Workspace`,
+          PLAYGROUND_ID,
+        );
+        setActiveWorkspaceId(PLAYGROUND_ID, newWs.id);
+        engineRef.current = null;
+        await old.close();
+        const engine = await postgresAdapter.createEngine(nextId, newWs.id);
+        engineRef.current = engine;
+        setActiveWorkspace({ id: newWs.id, name: newWs.name });
+        setActiveDbId(sample.id);
+        try {
+          localStorage.setItem(storageKey("db"), sample.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(sample.id, sample.defaultTabs);
+        persistTabs(nextTabs, sample.id);
+        tabHistoryRef.current = [];
+        setActiveTabId(nextTabs[0]?.id ?? "");
+        setResultsByTab({});
+        selectedSchemaRef.current = "public";
+        setSelectedSchema("public");
+        setExpandedEntities(new Set());
+        await Promise.all([refreshSchema(), refreshSchemas()]);
+        setStatusState("ready");
+        showToast(`Loaded ${sample.filename} in a new workspace.`);
+      } catch (err) {
+        showToast(
+          `Load failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      } finally {
+        setDbLoading(false);
+      }
+    },
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
+  );
+
   const requestDbSwitch = useCallback(
     (nextId: string) => {
       if (nextId !== POSTGRES_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
@@ -3467,14 +3525,9 @@ function PostgresPlaygroundInner() {
             setPendingDbId(null);
           }}
           onCreateNew={async () => {
-            if (!pendingDbId) return;
-            try {
-              localStorage.setItem(storageKey("db"), pendingDbId);
-            } catch { /* ignore */ }
-            const label = findPostgresSampleDatabase(pendingDbId).label;
-            const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
+            const id = pendingDbId;
             setPendingDbId(null);
-            switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
+            if (id) await performNewWorkspaceSwitch(id);
           }}
         />
 
