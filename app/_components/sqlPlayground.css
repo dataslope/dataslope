@@ -1025,6 +1025,17 @@
   color: var(--text-dim);
 }
 
+/* Engine-paged result: the field is shown (for discoverability) but disabled,
+   with a tooltip explaining how to load the whole result so it can be filtered. */
+.sql-result-filter--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sql-result-filter--disabled .sql-result-filter-input {
+  cursor: not-allowed;
+}
+
 .sql-result-filter-icon {
   flex: none;
   color: var(--text-dim);

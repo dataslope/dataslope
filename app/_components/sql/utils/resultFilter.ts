@@ -88,3 +88,26 @@ export function filterResultRowIndices(
   }
   return out;
 }
+
+/** Whether the in-grid (client-side) filter can be offered for a result set —
+ *  i.e. the *whole* result is already in memory, so filtering its rows is
+ *  complete and correct.
+ *
+ *  Always true for a materialized (non-lazy) result. For an engine-paged
+ *  "lazy" result it is true only when the loaded rows cover the entire result
+ *  starting at offset 0: a single page that happened to fit the whole result
+ *  (rows ≤ the page size), or an "All"/infinite result that has been fully
+ *  loaded. A partially-loaded lazy result returns false — filtering only the
+ *  loaded window would mislead the user; covering it needs a SQL `WHERE`
+ *  pushdown (a separate change). */
+export function canClientFilterResult(params: {
+  isLazy: boolean;
+  loadedRows: number;
+  totalRows: number;
+  startIdx: number;
+}): boolean {
+  const { isLazy, loadedRows, totalRows, startIdx } = params;
+  if (!isLazy) return true;
+  return startIdx === 0 && loadedRows >= totalRows;
+}
+

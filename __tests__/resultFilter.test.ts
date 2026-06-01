@@ -3,6 +3,7 @@ import {
   parseResultFilter,
   rowMatchesResultFilter,
   filterResultRowIndices,
+  canClientFilterResult,
 } from "../app/_components/sql/utils/resultFilter";
 
 const COLS = ["id", "name", "email", "active"];
@@ -156,5 +157,64 @@ describe("filterResultRowIndices", () => {
 
   it("finds NULL rows via 'null'", () => {
     expect(filterResultRowIndices(values, COLS, "name:null")).toEqual([3]);
+  });
+});
+
+describe("canClientFilterResult", () => {
+  it("is always true for a materialized (non-lazy) result", () => {
+    expect(
+      canClientFilterResult({
+        isLazy: false,
+        loadedRows: 10,
+        totalRows: 9999,
+        startIdx: 320,
+      }),
+    ).toBe(true);
+  });
+
+  it("is true for a lazy result that fit in a single page (all rows loaded)", () => {
+    // e.g. 30-row table with the default page size of 50.
+    expect(
+      canClientFilterResult({
+        isLazy: true,
+        loadedRows: 30,
+        totalRows: 30,
+        startIdx: 0,
+      }),
+    ).toBe(true);
+  });
+
+  it("is false for a partially-loaded lazy result (more rows on the server)", () => {
+    expect(
+      canClientFilterResult({
+        isLazy: true,
+        loadedRows: 50,
+        totalRows: 200,
+        startIdx: 0,
+      }),
+    ).toBe(false);
+  });
+
+  it("is false for a lazy result paged past the first page", () => {
+    // A later page is loaded — filtering it would only see that window.
+    expect(
+      canClientFilterResult({
+        isLazy: true,
+        loadedRows: 50,
+        totalRows: 50,
+        startIdx: 50,
+      }),
+    ).toBe(false);
+  });
+
+  it("is true for a fully-loaded 'All'/infinite lazy result", () => {
+    expect(
+      canClientFilterResult({
+        isLazy: true,
+        loadedRows: 500,
+        totalRows: 500,
+        startIdx: 0,
+      }),
+    ).toBe(true);
   });
 });

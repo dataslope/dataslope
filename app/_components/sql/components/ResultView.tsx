@@ -73,7 +73,10 @@ import {
   bytesToBase64,
   type TemporalEditorKind,
 } from "../utils/cellEditing";
-import { filterResultRowIndices } from "../utils/resultFilter";
+import {
+  filterResultRowIndices,
+  canClientFilterResult,
+} from "../utils/resultFilter";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -1106,6 +1109,11 @@ function ResultViewImpl({
     let startIdx: number;
     let visibleRows: QueryExecResult["values"];
     let originalIndices: number[];
+    // Whether the in-grid filter can be offered: the whole result must be in
+    // memory (every materialized result, or a lazy result that fit one page /
+    // is fully loaded). See `canClientFilterResult`.
+    let canFilter: boolean;
+    const rawFilter = (filterByIndex[idx] ?? "").trim();
     if (isLazy) {
       const effective =
         globalPageSize > 0
@@ -1117,17 +1125,42 @@ function ResultViewImpl({
       startIdx = isInfiniteAll
         ? 0
         : currentPage * (result.lazyPageSize ?? effective);
-      visibleRows = set.values;
-      originalIndices = set.values.map((_, ri) => startIdx + ri);
+      // A bare `SELECT … ` (no LIMIT) runs through the engine-paged lazy path
+      // on all three engines. When the loaded rows are the *whole* result
+      // (single page that fit, or "All" fully loaded) we can apply the same
+      // client-side filter as for a materialized result; otherwise only a
+      // window is in memory and the field is hidden.
+      canFilter = canClientFilterResult({
+        isLazy,
+        loadedRows: set.values.length,
+        totalRows,
+        startIdx,
+      });
+      if (canFilter && rawFilter) {
+        // startIdx is 0 here (fullyLoaded), so each row's index in `set.values`
+        // is its absolute position — keep it as the original index so edits /
+        // selection / delete stay correct.
+        const matchedIdx = filterResultRowIndices(
+          set.values,
+          set.columns,
+          rawFilter,
+        );
+        visibleRows = matchedIdx.map((ri) => set.values[ri]);
+        originalIndices = matchedIdx;
+        totalRows = matchedIdx.length;
+      } else {
+        visibleRows = set.values;
+        originalIndices = set.values.map((_, ri) => startIdx + ri);
+      }
     } else {
       const st = getState(idx);
       unfilteredTotal = set.values.length;
+      canFilter = true;
       // In-grid filter: narrow the materialized rows to those whose displayed
       // text matches, *before* sorting/paginating, so the page count and row
       // readout reflect the filtered view. `originalIndex` stays the index into
       // the full `set.values` so cell edits, selection and delete remain
       // correct. Engine-independent and never re-queries the database.
-      const rawFilter = (filterByIndex[idx] ?? "").trim();
       let indexed = set.values.map((values, i) => ({
         values,
         originalIndex: i,
@@ -1171,6 +1204,7 @@ function ResultViewImpl({
       sorting,
       totalRows,
       unfilteredTotal,
+      canFilter,
       currentPage,
       startIdx,
       visibleRows,
@@ -1352,6 +1386,7 @@ function ResultViewImpl({
               sorting,
               totalRows,
               unfilteredTotal,
+              canFilter,
               currentPage,
               visibleRows,
             } = activeSetData;
@@ -1431,11 +1466,14 @@ function ResultViewImpl({
                   onDiscardEdits={() => discardEdits(idx)}
                   elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
-                  filterValue={isLazy ? undefined : (filterByIndex[idx] ?? "")}
-                  onFilterChange={
-                    isLazy ? undefined : (v) => setFilter(idx, v)
-                  }
+                  filterValue={filterByIndex[idx] ?? ""}
+                  onFilterChange={(v) => setFilter(idx, v)}
                   filterUnfilteredTotal={unfilteredTotal}
+                  filterDisabledReason={
+                    canFilter
+                      ? undefined
+                      : "Filtering covers the whole result — increase “Rows per page” (or choose All) so every row is loaded."
+                  }
                 >
                   {onExportResultSet && (
                     <ResultSetExportButton
@@ -2799,6 +2837,7 @@ export function ResultPager({
   filterValue,
   onFilterChange,
   filterUnfilteredTotal,
+  filterDisabledReason,
   children,
 }: {
   totalRows: number;
@@ -2823,6 +2862,9 @@ export function ResultPager({
   onFilterChange?: (value: string) => void;
   /** Full row count before filtering, for the "filtered from N" readout. */
   filterUnfilteredTotal?: number;
+  /** When set, the filter field is shown but disabled with this tooltip — used
+   *  for engine-paged results where only a window of rows is loaded. */
+  filterDisabledReason?: string;
   children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -2851,16 +2893,23 @@ export function ResultPager({
   };
 
   // The in-grid filter field is offered whenever a change handler is wired and
-  // there's at least one row to filter. `isFiltering` (a non-blank value)
-  // switches the row readout to a "of N" / "filtered from N" form.
+  // there's at least one row to filter. When the whole result isn't in memory
+  // (an engine-paged result) it's shown but disabled, with a tooltip telling
+  // the user how to enable it. `isFiltering` (a non-blank value) switches the
+  // row readout to a "of N" / "filtered from N" form.
   const filterText = filterValue ?? "";
+  const filterDisabled = !!filterDisabledReason;
   const showFilter = !!onFilterChange && (filterUnfilteredTotal ?? 0) > 0;
-  const isFiltering = showFilter && filterText.trim().length > 0;
+  const isFiltering =
+    showFilter && !filterDisabled && filterText.trim().length > 0;
 
   return (
     <div className="sql-result-pager">
       {showFilter && (
-        <div className="sql-result-filter">
+        <div
+          className={`sql-result-filter${filterDisabled ? " sql-result-filter--disabled" : ""}`}
+          title={filterDisabled ? filterDisabledReason : undefined}
+        >
           <Search
             size={12}
             aria-hidden="true"
@@ -2872,6 +2921,7 @@ export function ResultPager({
             value={filterText}
             placeholder="Filter rows…"
             aria-label="Filter rows in this result"
+            disabled={filterDisabled}
             spellCheck={false}
             autoComplete="off"
             onChange={(e) => onFilterChange?.(e.target.value)}
@@ -2885,7 +2935,7 @@ export function ResultPager({
               }
             }}
           />
-          {filterText && (
+          {!filterDisabled && filterText && (
             <button
               type="button"
               className="sql-result-filter-clear"
