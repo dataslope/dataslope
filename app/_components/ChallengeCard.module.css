@@ -812,17 +812,17 @@
   outline-offset: -2px;
 }
 
-/* "Click to expand" label centred at the bottom of the fade overlay.
-   Sits flush on a subtle rounded pill (no drop shadow, no border) so it
-   blends into the gradient fade rather than floating above it, while a
-   faint tinted background keeps the text + chevron legible even when code
-   lines show through the gradient behind them. On hover it picks up the
-   same subtle background as the "Click to collapse" button. */
+/* "Click to expand" label shown at the bottom of the collapsed fade
+   overlay. It spans the full width and mirrors the "Click to collapse"
+   button (no drop shadow, no border, no rounded pill) so it blends into
+   the gradient fade while staying legible, and on hover it picks up the
+   same full-width var(--ch-bg-hover) background as the collapse button. */
 .initFadeLabel {
   position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 500;
@@ -832,12 +832,10 @@
   display: inline-flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 3px 12px 4px;
+  padding: 5px 8px;
   background: color-mix(in srgb, var(--ch-bg) 80%, transparent);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border-radius: 8px;
   transition: color 0.12s, background 0.12s;
 }
 
