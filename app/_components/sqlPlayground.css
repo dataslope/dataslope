@@ -4009,6 +4009,94 @@
   border-color: var(--accent1);
 }
 
+/* ─── Saved queries (starred history entries) ─── */
+.sql-history-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.sql-history-save-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sql-history-save-btn.is-saved {
+  color: var(--accent1);
+}
+
+.sql-saved-section {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sql-saved-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-saved-section-title svg {
+  color: var(--accent1);
+}
+
+.sql-saved-list {
+  padding: 10px 0;
+}
+
+.sql-saved-entry {
+  margin-bottom: 14px;
+}
+
+.sql-history-entry-spacer {
+  margin-left: auto;
+}
+
+.sql-saved-entry-star {
+  color: var(--accent1);
+  flex-shrink: 0;
+}
+
+.sql-saved-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.sql-saved-remove-btn:hover {
+  background: var(--bg);
+  color: var(--red);
+}
+
 /* ─── History datetime popover ─── */
 .sql-history-datetime-popover-positioner {
   z-index: 600;

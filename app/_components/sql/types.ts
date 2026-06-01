@@ -201,3 +201,16 @@ export interface QueryHistoryEntry {
   /** Error message if the query failed. */
   error?: string;
 }
+
+/** A query the user has explicitly saved ("starred") so it survives a
+ *  history clear and is surfaced in its own list. */
+export interface SavedQuery {
+  /** Unique identifier for the saved entry. */
+  id: string;
+  /** The saved SQL (trimmed). */
+  sql: string;
+  /** Source label carried over from the history entry / tab. */
+  source: string;
+  /** Unix timestamp (ms) when the query was saved. */
+  savedAt: number;
+}

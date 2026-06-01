@@ -8,17 +8,18 @@
 
 > **Changelog (newest first).** Per-finding status is also marked **✅ Fixed / ✅ Partial** inline in the tables below — this list is just the high-level history, condensed (older passes' blow-by-blow prose was removed once the work landed).
 >
-> - **2026-06-01 — Result-grid enhancements (this PR, #438).** All in the shared `ResultView`, so SQLite/PostgreSQL/DuckDB get them at once, with no engine/runtime changes:
->   - **Column statistics** — a column-menu item opening a dialog with non-null / null %, distinct, numeric **min/max/mean/median/sum** and text **length** stats, plus a **most-frequent values** list; and a **"Copy column values"** action. Pure helper `utils/columnStats.ts` (**+20** unit tests, 341→361). Closes the §9 "column quick stats" gap.
+> - **2026-06-01 — SQL playground enhancements (this PR, #438).** All in shared components, so SQLite/PostgreSQL/DuckDB get them at once, with no engine/runtime changes:
+>   - **Column statistics** — a result-grid column-menu item opening a dialog with non-null / null %, distinct, numeric **min/max/mean/median/sum** and text **length** stats, plus a **most-frequent values** list; and a **"Copy column values"** action. Pure helper `utils/columnStats.ts` (**+20** unit tests, 341→361). Closes the §9 "column quick stats" gap.
 >   - **Cell-editing ergonomics (UX-10, partial)** — a **per-cell discard "✕"** that reverts a single pending edit (the audit's "no per-row/column discard"), and **Ctrl/⌘+Enter to commit** pending edits (the "no keyboard shortcut" gap; Esc already discards). Post-commit undo still open.
->   - Live-verified on all three engines: `e2e/sql-column-stats.spec.ts`, `e2e/sql-edit-ergonomics.spec.ts`.
+>   - **Saved queries** — a **★** on each History entry saves it to a **"Saved queries"** section that persists to localStorage (survives a history clear / reload). New `useSavedQueries` hook + shared `QueryHistoryPane`. Closes the §9 "saved queries / snippets" gap.
+>   - Live-verified on all three engines: `e2e/sql-column-stats.spec.ts`, `e2e/sql-edit-ergonomics.spec.ts`, `e2e/sql-saved-queries.spec.ts`.
 > - **2026-06-01 — Result filtering.** In-grid **"Filter rows…"** field on all three engines (client-side, with `column:term` scoping); engine-paged results push the filter **down to SQL** (subquery + `LIKE`/`ILIKE`) and re-page so infinite scroll is preserved; the filter input is debounced (fixed dropped keystrokes); inline-edit refetch preserves the query's `LIMIT`. `utils/resultFilter.ts`. (#434, #436)
 > - **2026-05-31 — Phase 1 (correctness).** UX-01 JSON `[object Object]` (adapter `toSqlValue`), UX-02 self-filtering type list, UX-03 "Loading SQLite" leak (`engineLabel`), UX-05 drop/truncate CASCADE disclosure, UX-07 array type labels.
 > - **2026-05-31 — Phase 2 / 2b (editing & errors).** Persisted query history (UX-13), 8 s failure toasts (UX-12), error block engine badge + Copy-error (UX-14), explicit Set-to-NULL + literal-`"NULL"` round-trip (UX-20); type-aware cell editors — JSON modal, boolean toggle, **date/time pickers** (UX-09), BLOB hex/base64 viewer (UX-21); read-only/generated-column markers (UX-22); editable hand-typed `SELECT * FROM t` (UX-06). `utils/cellEditing.ts`.
 > - **2026-05-31 — Phase 3 (mobile).** Below 768 px the 3-pane IDE collapses to a single-pane shell with a Schema/Editor/Results bottom bar, per-tab pane memory, and 0 horizontal overflow — entirely in the shared `SqlPlaygroundShell` (UX-23). `e2e/playground-mobile.spec.ts`.
 > - **2026-05-31 — Data round-trips & polish.** SQL-dump export→import fixed on all three engines (FK ordering, generated columns, booleans); date display (PG/DuckDB), DECIMAL round-trip, sidebar ellipsis; in-place DB-switch (OPFS access-handle race); muted dialog subtitle (UX-19), PG identity header (UX-15); workspace-registry migration + the failing `opfs.workspace` test (UX-Q4). DuckDB native-binary export/import was **removed** (broken in duckdb-wasm 1.32.0 — re-attempt after a version bump).
 >
-> **Still open / deferred** (see §12): UX-08 multi-statement error attribution, UX-10 *post-commit undo* (per-cell discard + keyboard commit now done), UX-11/UX-16 index/trigger/CHECK UI + live DDL preview, UX-17 DuckDB `UPDATE` param-binding, UX-18 desktop loading hero, UX-24 card-per-column structure editor, UX-Q1 SSR tab-id hydration (its own PR), enum/array inline editors, query cancellation, and saved snippets.
+> **Still open / deferred** (see §12): UX-08 multi-statement error attribution, UX-10 *post-commit undo* (per-cell discard + keyboard commit now done), UX-11/UX-16 index/trigger/CHECK UI + live DDL preview, UX-17 DuckDB `UPDATE` param-binding, UX-18 desktop loading hero, UX-24 card-per-column structure editor, UX-Q1 SSR tab-id hydration (its own PR), enum/array inline editors, and query cancellation.
 
 ---
 
@@ -189,7 +190,8 @@ Plus per-table export submenus (CSV/JSON/SQL/Parquet/XLSX) with live row counts 
 ### 4.9 Notifications, history, undo
 
 - ✅ **UX-12 — Toast timeout (Fixed).** Failure (`warn`) toasts now use an **8 s** per-toast timeout while transient `info` notices keep the 2.4 s default, in all three `showToast` helpers. `.toast-warn` already carries the red stripe + Copy button. (A distinct hard-`error` style remains a possible future polish.)
-- ✅ **UX-13 — Query history persistence (Fixed).** `useQueryHistory(storageKey?)` restores from localStorage via a lazy initializer (no SSR hydration mismatch — the list only renders when the History tab is opened) and writes a capped (200-entry) copy on change; `clearHistory` writes `[]`. Threaded from all three playgrounds. ("Saved queries" / named snippets remain a future feature.)
+- ✅ **UX-13 — Query history persistence (Fixed).** `useQueryHistory(storageKey?)` restores from localStorage via a lazy initializer (no SSR hydration mismatch — the list only renders when the History tab is opened) and writes a capped (200-entry) copy on change; `clearHistory` writes `[]`. Threaded from all three playgrounds.
+- ✅ **Saved queries (Fixed).** Each History entry has a **★** that saves it to a persisted **"Saved queries"** section (survives a history clear / reload); saved entries load back into a tab. `useSavedQueries` hook + shared `QueryHistoryPane`, threaded via a `saved_queries` storage key from all three playgrounds.
 - 🟡 No global undo for drop/drop-column/commit. The only "undo" is reload, which loses unsaved work.
 
 ---
@@ -269,7 +271,7 @@ Things a "basic" SQL IDE is generally expected to have. ✅ = already present (d
 - ✅ Syntax highlighting, autocomplete (`@codemirror/lang-sql` + `sqlCompletion.ts`), find/replace (`searchKeymap`), SQL format (`sql-formatter`), run shortcut, multi-result tabs.
 - ❌ **Query cancellation / timeout** for long-running queries (no AbortController/worker-terminate; no elapsed indicator beyond final timing). High value.
 - ❌ **Run-selection / run-statement-at-cursor** (today runs the whole tab).
-- ❌ **Saved queries / snippets**; ✅ history is now **persisted** to localStorage (UX-13).
+- ✅ **Saved queries / snippets** — **done.** Star a History entry → it lands in a persisted "Saved queries" section (`useSavedQueries` + shared `QueryHistoryPane`); ✅ history is also **persisted** to localStorage (UX-13).
 - ❌ **Command palette / keyboard-shortcut cheatsheet.**
 
 **Result grid**
@@ -292,7 +294,7 @@ Things a "basic" SQL IDE is generally expected to have. ✅ = already present (d
 - ❌ **Transaction awareness** (BEGIN/COMMIT/ROLLBACK state, "you're in a transaction" banner).
 - ❌ **Generate INSERTs / mock data** helper (nice-to-have for a learning tool).
 
-Priority order for this product (learning-focused): ~~type-aware cell viewers (esp. JSON)~~ ✅ → ~~in-grid filter/search~~ ✅ (tenth pass; lazy-result pushdown remains) → query cancellation → persistent history + saved snippets → create-index/view UI → EXPLAIN visualization.
+Priority order for this product (learning-focused): ~~type-aware cell viewers (esp. JSON)~~ ✅ → ~~in-grid filter/search~~ ✅ → ~~persistent history + saved snippets~~ ✅ → query cancellation → create-index/view UI → EXPLAIN visualization.
 
 ---
 
@@ -395,7 +397,7 @@ The "pragmatic first cut" from §10 (Phase A + the single-pane shell) is done an
 ### Phase 4 — Feature gaps & polish
 
 15. **UX-11 / UX-16** — create-index/trigger/view UI for PG/DuckDB (or port SQLite's tabbed form); CHECK/comment/table-constraint fields; "Show generated SQL" preview; default-value function picker.
-16. **Missing IDE features (§9):** ✅ **in-grid filter/search** on all three engines for any in-memory result (footer "Filter rows…" field, `column:term` scoping, `utils/resultFilter.ts`; engine-paged results push the filter down to SQL — subquery-wrap + `LIKE`/`ILIKE` `WHERE`, re-paged so infinite scroll is preserved). ✅ **column quick-stats** — "Column statistics" dialog (null %, distinct, numeric min/max/mean/median/sum, text length, most-frequent) + "Copy column values", shared `ResultView`, `utils/columnStats.ts`, live-verified (`e2e/sql-column-stats.spec.ts`). ✅ **run-selection** already ships (the editor's Run Selection / Run All toolbar). **Remaining:** query cancellation + elapsed timer; **run-statement-at-cursor**; saved snippets; EXPLAIN visualization.
+16. **Missing IDE features (§9):** ✅ **in-grid filter/search** on all three engines for any in-memory result (footer "Filter rows…" field, `column:term` scoping, `utils/resultFilter.ts`; engine-paged results push the filter down to SQL — subquery-wrap + `LIKE`/`ILIKE` `WHERE`, re-paged so infinite scroll is preserved). ✅ **column quick-stats** — "Column statistics" dialog (null %, distinct, numeric min/max/mean/median/sum, text length, most-frequent) + "Copy column values", shared `ResultView`, `utils/columnStats.ts`, live-verified (`e2e/sql-column-stats.spec.ts`). ✅ **run-selection** already ships (the editor's Run Selection / Run All toolbar). ✅ **saved queries** — star a History entry → persisted "Saved queries" section (`useSavedQueries` + shared `QueryHistoryPane`, `e2e/sql-saved-queries.spec.ts`). **Remaining:** query cancellation + elapsed timer; **run-statement-at-cursor**; EXPLAIN visualization.
 17. **UX-15 / UX-18 / UX-19 polish** — ✅ **UX-19 done** (dialog subtitle now muted `--text-dim`, verified live); ✅ **UX-15 done (partial)** (PG identity header mid-word wrap fixed → single-line "Identity" + tooltip, matches DuckDB; SQLite "Auto-increment" kept as its distinct `AUTOINCREMENT` concept). **Remaining:** UX-18 right-size the desktop loading hero.
 18. **UX-Q1/Q2/Q3 code quality** — deterministic tab ids (kill hydration mismatch); fix `<div>`-in-`<table>` nesting; nudge Settings gear off the dev-badge corner.
 
@@ -430,3 +432,4 @@ The "pragmatic first cut" from §10 (Phase A + the single-pane shell) is done an
 | `07-pg-loading-sqlite-leak.png` | "Loading SQLite engine…" on the Postgres page (UX-03) |
 | `08-pg-edit-structure.png` | Editable View/Edit Structure (alter table) |
 | `fix-colstats-numeric.png` / `fix-colstats-text.png` | Column statistics dialog — numeric (min/max/mean/median/sum) & text (length + most-frequent) |
+| `fix-saved-queries.png` | "Saved queries" section + per-entry ★ in the History pane |

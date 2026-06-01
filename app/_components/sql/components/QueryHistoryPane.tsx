@@ -10,13 +10,16 @@ import {
   Clock,
   ExternalLink,
   History,
+  Star,
   Timer,
   Trash2,
+  X,
   XCircle,
 } from "lucide-react";
 import { Popover } from "@base-ui-components/react/popover";
 import { themeFor } from "../../cmExtensions";
 import type { QueryHistoryEntry } from "../types";
+import { useSavedQueries } from "../hooks/useSavedQueries";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -158,6 +161,8 @@ interface HistoryEntryRowProps {
   isPostgres: boolean;
   now: number;
   onOpenQueryTab?: (title: string, sql: string) => void;
+  isSaved?: boolean;
+  onToggleSaved?: () => void;
 }
 
 function HistoryEntryRow({
@@ -166,6 +171,8 @@ function HistoryEntryRow({
   isPostgres,
   now,
   onOpenQueryTab,
+  isSaved,
+  onToggleSaved,
 }: HistoryEntryRowProps) {
   return (
     <div
@@ -217,6 +224,22 @@ function HistoryEntryRow({
             {formatElapsed(entry.elapsedMs)}
           </span>
         </span>
+        {onToggleSaved && (
+          <button
+            type="button"
+            className={`sql-history-save-btn${isSaved ? " is-saved" : ""}`}
+            onClick={onToggleSaved}
+            title={isSaved ? "Remove from saved" : "Save this query"}
+            aria-label={isSaved ? "Remove from saved" : "Save this query"}
+            aria-pressed={isSaved}
+          >
+            <Star
+              size={12}
+              aria-hidden="true"
+              fill={isSaved ? "currentColor" : "none"}
+            />
+          </button>
+        )}
         {onOpenQueryTab && (
           <button
             type="button"
@@ -242,6 +265,63 @@ function HistoryEntryRow({
   );
 }
 
+// ─── Saved query entry ─────────────────────────────────────────────────────────
+
+interface SavedEntryRowProps {
+  sql: string;
+  source: string;
+  theme: string;
+  isPostgres: boolean;
+  onOpenQueryTab?: (title: string, sql: string) => void;
+  onRemove: () => void;
+}
+
+function SavedEntryRow({
+  sql,
+  source,
+  theme,
+  isPostgres,
+  onOpenQueryTab,
+  onRemove,
+}: SavedEntryRowProps) {
+  return (
+    <div className="sql-history-entry sql-saved-entry">
+      <div className="sql-history-entry-header">
+        <Star
+          size={12}
+          className="sql-saved-entry-star"
+          fill="currentColor"
+          aria-hidden="true"
+        />
+        <span className="sql-history-entry-source">{source}</span>
+        <span className="sql-history-entry-spacer" />
+        {onOpenQueryTab && (
+          <button
+            type="button"
+            className="sql-history-open-btn"
+            onClick={() => onOpenQueryTab(source, sql)}
+            title="Open in query tab"
+            aria-label="Open in query tab"
+          >
+            <ExternalLink size={11} aria-hidden="true" />
+            Open in query tab
+          </button>
+        )}
+        <button
+          type="button"
+          className="sql-saved-remove-btn"
+          onClick={onRemove}
+          title="Remove from saved"
+          aria-label="Remove from saved"
+        >
+          <X size={13} aria-hidden="true" />
+        </button>
+      </div>
+      <HistoryEntryEditor sql={sql} theme={theme} isPostgres={isPostgres} />
+    </div>
+  );
+}
+
 // ─── Public component ─────────────────────────────────────────────────────────
 
 export interface QueryHistoryPaneProps {
@@ -250,6 +330,9 @@ export interface QueryHistoryPaneProps {
   isPostgres?: boolean;
   onClear: () => void;
   onOpenQueryTab?: (title: string, sql: string) => void;
+  /** localStorage key for the "starred"/saved-query list. When provided, each
+   *  history entry gets a star toggle and saved queries get their own list. */
+  savedStorageKey?: string;
 }
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
@@ -260,7 +343,10 @@ export function QueryHistoryPane({
   isPostgres = false,
   onClear,
   onOpenQueryTab,
+  savedStorageKey,
 }: QueryHistoryPaneProps) {
+  const { saved, savedSqlSet, toggleSaved, removeSaved } =
+    useSavedQueries(savedStorageKey);
   // Refresh "X ago" labels roughly every 30 seconds.
   const [now, setNow] = React.useState(() => Date.now());
   useEffect(() => {
@@ -322,6 +408,29 @@ export function QueryHistoryPane({
         )}
       </div>
 
+      {savedStorageKey && saved.length > 0 && (
+        <div className="sql-saved-section">
+          <div className="sql-saved-section-title">
+            <Star size={12} fill="currentColor" aria-hidden="true" />
+            Saved queries
+            <span className="sql-history-count">{saved.length}</span>
+          </div>
+          <div className="sql-history-list sql-saved-list">
+            {saved.map((s) => (
+              <SavedEntryRow
+                key={s.id}
+                sql={s.sql}
+                source={s.source}
+                theme={theme}
+                isPostgres={isPostgres}
+                onOpenQueryTab={onOpenQueryTab}
+                onRemove={() => removeSaved(s.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {history.length === 0 ? (
         <div className="sql-history-empty">
           <History size={32} aria-hidden="true" />
@@ -341,6 +450,13 @@ export function QueryHistoryPane({
                 isPostgres={isPostgres}
                 now={now}
                 onOpenQueryTab={onOpenQueryTab}
+                isSaved={savedSqlSet.has(entry.sql)}
+                onToggleSaved={
+                  savedStorageKey
+                    ? () =>
+                        toggleSaved({ sql: entry.sql, source: entry.source })
+                    : undefined
+                }
               />
             ))}
           </div>
