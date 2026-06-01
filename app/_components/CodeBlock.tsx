@@ -989,8 +989,8 @@ function CodeBlockInner({
                 onClick={() => setInitExpanded(true)}
               >
                 <span className={challengeStyles.initFadeLabel}>
-                  Click to expand
                   <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                  Click to expand
                 </span>
               </button>
             )}

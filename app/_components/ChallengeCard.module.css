@@ -813,9 +813,10 @@
 }
 
 /* "Click to expand" label centred at the bottom of the fade overlay.
-   Sits on a solid rounded pill with a soft shadow so the text + chevron
-   stay legible even when code lines show through the gradient behind
-   them. */
+   Sits flush on a subtle rounded pill (no drop shadow) so it blends into
+   the gradient fade rather than floating above it, while a faint tinted
+   background + hairline border keep the text + chevron legible even when
+   code lines show through the gradient behind them. */
 .initFadeLabel {
   position: absolute;
   bottom: 4px;
@@ -828,18 +829,15 @@
   pointer-events: none;
   white-space: nowrap;
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0px;
+  gap: 4px;
   padding: 3px 12px 4px;
-  background: var(--ch-bg);
-  border: 1px solid var(--ch-border-light);
+  background: color-mix(in srgb, var(--ch-bg) 80%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid color-mix(in srgb, var(--ch-border-light) 60%, transparent);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
-}
-
-:global(html.dark) .initFadeLabel {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .initFadeLabel svg {

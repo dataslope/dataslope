@@ -12,6 +12,7 @@
     "code-blocks-cpp",
     "code-blocks-java",
     "code-blocks-csharp",
+    "code-blocks-init-code",
     "---",
     "sql-code-blocks-sqlite",
     "sql-code-blocks-duckdb",

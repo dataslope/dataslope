@@ -1,0 +1,252 @@
+---
+title: Code Blocks — Initialization Code
+description: Executable code blocks that use read-only initialization code, demonstrated for every language alongside the raw JSX.
+---
+
+Every executable `CodeBlock` accepts an optional **`initCode`** prop: read-only
+setup code shown in a collapsible panel above the editor and prepended to your
+snippet on every Run. It's handy for imports, sample data, or helper
+definitions you want available without cluttering the part the learner edits.
+
+The init code is prepended *verbatim*, so it must be valid at the **top level**
+of the target language (e.g. `import` / `#include` / `using` directives, or a
+complete declaration the snippet can reference). Each example below shows the
+live, runnable code block followed by the exact JSX you would author in MDX.
+
+## Python
+
+<CodeBlock
+  adapter="python"
+  initCode={`import math
+
+RADIUS = 5`}
+  initialCode={`# RADIUS and math come from the initialization code above.
+area = math.pi * RADIUS ** 2
+print(f"A circle with r={RADIUS} has area {area:.2f}")
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="python"
+  initCode={`import math
+
+RADIUS = 5`}
+  initialCode={`# RADIUS and math come from the initialization code above.
+area = math.pi * RADIUS ** 2
+print(f"A circle with r={RADIUS} has area {area:.2f}")
+`}
+/>
+```
+
+## R
+
+<CodeBlock
+  adapter="r"
+  initCode={`radius <- 5`}
+  initialCode={`# 'radius' is defined by the initialization code above.
+cat("area =", pi * radius^2, fill = TRUE)
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="r"
+  initCode={`radius <- 5`}
+  initialCode={`# 'radius' is defined by the initialization code above.
+cat("area =", pi * radius^2, fill = TRUE)
+`}
+/>
+```
+
+## JavaScript
+
+<CodeBlock
+  adapter="javascript"
+  initCode={`const greeting = "Hello";`}
+  initialCode={`// 'greeting' is defined by the initialization code above.
+console.log(greeting + ", world!");
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="javascript"
+  initCode={`const greeting = "Hello";`}
+  initialCode={`// 'greeting' is defined by the initialization code above.
+console.log(greeting + ", world!");
+`}
+/>
+```
+
+## TypeScript
+
+<CodeBlock
+  adapter="typescript"
+  initCode={`interface Point {
+  x: number;
+  y: number;
+}`}
+  initialCode={`// The Point interface comes from the initialization code above.
+const p: Point = { x: 3, y: 4 };
+console.log("distance =", Math.hypot(p.x, p.y));
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="typescript"
+  initCode={`interface Point {
+  x: number;
+  y: number;
+}`}
+  initialCode={`// The Point interface comes from the initialization code above.
+const p: Point = { x: 3, y: 4 };
+console.log("distance =", Math.hypot(p.x, p.y));
+`}
+/>
+```
+
+## PHP
+
+<CodeBlock
+  adapter="php"
+  initCode={`<?php
+$names = ["Ada", "Linus", "Grace"];`}
+  initialCode={`// $names is defined by the initialization code above.
+foreach ($names as $i => $name) {
+    echo ($i + 1) . ". " . $name . PHP_EOL;
+}
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="php"
+  initCode={`<?php
+$names = ["Ada", "Linus", "Grace"];`}
+  initialCode={`// $names is defined by the initialization code above.
+foreach ($names as $i => $name) {
+    echo ($i + 1) . ". " . $name . PHP_EOL;
+}
+`}
+/>
+```
+
+## C
+
+<CodeBlock
+  adapter="c"
+  initCode={`#include <stdio.h>
+
+#define GREETING "Hello from C!"`}
+  initialCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+int main(void) {
+    puts(GREETING);
+    return 0;
+}
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="c"
+  initCode={`#include <stdio.h>
+
+#define GREETING "Hello from C!"`}
+  initialCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+int main(void) {
+    puts(GREETING);
+    return 0;
+}
+`}
+/>
+```
+
+## C++
+
+<CodeBlock
+  adapter="cpp"
+  initCode={`#include <iostream>
+#include <vector>
+using namespace std;`}
+  initialCode={`// The includes and "using namespace std" come from the init code above.
+int main() {
+    vector<int> xs = {1, 2, 3};
+    for (int x : xs) cout << x << " ";
+    cout << endl;
+    return 0;
+}
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="cpp"
+  initCode={`#include <iostream>
+#include <vector>
+using namespace std;`}
+  initialCode={`// The includes and "using namespace std" come from the init code above.
+int main() {
+    vector<int> xs = {1, 2, 3};
+    for (int x : xs) cout << x << " ";
+    cout << endl;
+    return 0;
+}
+`}
+/>
+```
+
+## Java
+
+<CodeBlock
+  adapter="java"
+  initCode={`import java.util.*;`}
+  initialCode={`// The java.util.* import comes from the initialization code above.
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = Arrays.asList(1, 2, 3);
+        System.out.println(xs);
+    }
+}
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="java"
+  initCode={`import java.util.*;`}
+  initialCode={`// The java.util.* import comes from the initialization code above.
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> xs = Arrays.asList(1, 2, 3);
+        System.out.println(xs);
+    }
+}
+`}
+/>
+```
+
+## C#
+
+<CodeBlock
+  adapter="csharp"
+  initCode={`using System;
+using System.Linq;`}
+  initialCode={`// The using directives come from the initialization code above.
+int[] xs = { 1, 2, 3 };
+Console.WriteLine($"sum = {xs.Sum()}");
+`}
+/>
+
+```jsx
+<CodeBlock
+  adapter="csharp"
+  initCode={`using System;
+using System.Linq;`}
+  initialCode={`// The using directives come from the initialization code above.
+int[] xs = { 1, 2, 3 };
+Console.WriteLine($"sum = {xs.Sum()}");
+`}
+/>
+```

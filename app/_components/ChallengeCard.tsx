@@ -1396,8 +1396,8 @@ export default function ChallengeCard({
                 onClick={() => setInitExpanded(true)}
               >
                 <span className={styles.initFadeLabel}>
-                  Click to expand
                   <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                  Click to expand
                 </span>
               </button>
             )}
