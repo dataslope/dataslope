@@ -55,6 +55,26 @@ head(df, 10)
 `,
   },
   {
+    key: "read_csv_url",
+    title: "Read CSV from URL",
+    desc: "Download a remote CSV & read it",
+    code: `# raw.githubusercontent.com sends permissive CORS headers, so the file can be
+# downloaded directly (no proxy needed). The download also shows up in the
+# Files pane on the left.
+url <- "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+download.file(url, "penguins.csv")
+
+penguins <- read.csv("penguins.csv")
+
+cat(nrow(penguins), "rows x", ncol(penguins), "columns\\n\\n")
+cat("Penguins per species:\\n")
+print(table(penguins$species))
+
+# A returned data.frame renders as a table.
+head(penguins)
+`,
+  },
+  {
     key: "lm",
     title: "Linear Model",
     desc: "Fit a linear regression",
