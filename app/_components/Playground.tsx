@@ -1673,6 +1673,62 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
     const firstId = outputCounter.current + 1;
     newRunFirstIdRef.current = firstId;
+
+    // Mirror files the runtime created during the run (e.g. an R
+    // download.file() destination) into the Files pane and persist them to
+    // OPFS so they survive reloads and are re-staged on the next run.
+    // Called in both the success and error paths — a file may have been
+    // written before later user code threw — and is safe to call twice
+    // because the runtime clears its tracking list after the first read.
+    const syncCreatedFiles = async () => {
+      if (!rt.collectCreatedFiles) return;
+      let created: Map<string, Uint8Array>;
+      try {
+        created = await rt.collectCreatedFiles();
+      } catch {
+        return;
+      }
+      if (created.size === 0) return;
+
+      const wsId = workspaceIdRef.current;
+      const codePaths = new Set(filesRef.current.map((f) => f.filename));
+      const added: string[] = [];
+      for (const [path, bytes] of created) {
+        // Don't shadow an open code tab with a same-named data file.
+        if (codePaths.has(path)) continue;
+        if (wsId) {
+          try {
+            await writeDataFile(wsId, path, bytes);
+          } catch {
+            // OPFS write failed — still surface it in the in-memory list.
+          }
+        }
+        setVirtualFiles((prev) => {
+          const filtered = prev.filter((f) => f.path !== path);
+          return [...filtered, { path, size: bytes.length, isFolder: false }];
+        });
+        // Auto-expand ancestor folders so a nested download is visible.
+        const segments = path.split("/").filter(Boolean);
+        if (segments.length > 1) {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            let cur = "";
+            for (let i = 0; i < segments.length - 1; i++) {
+              cur = cur ? `${cur}/${segments[i]}` : segments[i];
+              next.add(cur);
+            }
+            return next;
+          });
+        }
+        added.push(path);
+      }
+      if (added.length === 1) {
+        showToast(`Saved "${added[0]}" to Files.`);
+      } else if (added.length > 1) {
+        showToast(`Saved ${added.length} files to Files.`);
+      }
+    };
+
     try {
       // Stage all currently-open workspace files into the runtime's
       // virtual file system so multi-file `import`s, `include`s, etc.
@@ -1702,6 +1758,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         (cell) => collected.push(cell),
         entryFilename ? { entryFilename } : undefined,
       );
+      await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const merged = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
@@ -1721,6 +1778,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
       setStatusState("ready");
     } catch (err) {
+      // User code may have downloaded a file before later throwing — surface
+      // it in the Files pane even though the run ultimately errored.
+      await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const msg = err instanceof Error ? err.message : String(err);
       const mergedOnErr = mergeConsecutiveStdout(collected);

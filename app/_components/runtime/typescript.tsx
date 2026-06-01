@@ -147,6 +147,32 @@ console.log(\`\\nTotal wall time: \${elapsed}ms (parallel)\`);
 `,
   },
   {
+    key: "fetch_csv",
+    title: "Fetch CSV from URL",
+    desc: "Read a remote CSV with fetch()",
+    code: `// raw.githubusercontent.com sends permissive CORS headers, so fetch()
+// works directly. User code is wrapped in an async function, so
+// top-level await is fine.
+const url =
+  "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv";
+const text: string = await (await fetch(url)).text();
+
+// Minimal CSV parse — this dataset has no quoted/embedded commas.
+const [header, ...rows] = text.trim().split(/\\r?\\n/);
+const cols: string[] = header.split(",");
+
+type Penguin = Record<string, string>;
+const data: Penguin[] = rows.map((line) => {
+  const cells = line.split(",");
+  return Object.fromEntries(cols.map((c, i) => [c, cells[i]])) as Penguin;
+});
+
+console.log(\`\${data.length} rows × \${cols.length} columns\`);
+console.log("columns:", cols.join(", "));
+console.log("first 5 rows:", data.slice(0, 5));
+`,
+  },
+  {
     key: "node_modules",
     title: "Node.js Modules",
     desc: "Typed access to crypto, path, os",
