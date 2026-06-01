@@ -1055,6 +1055,36 @@ function ResultViewImpl({
     ],
   );
 
+  // Commit the pending edits when exactly one result set has them — used by the
+  // Ctrl/⌘+Enter shortcut. (Restricting to a single set avoids a stale-closure
+  // double-commit; the multi-set case is rare and still has per-set footer
+  // buttons.)
+  const commitSinglePendingSet = useCallback(() => {
+    const indices = Object.keys(pendingEditsByIndex).filter(
+      (k) => (pendingEditsByIndex[Number(k)]?.size ?? 0) > 0,
+    );
+    if (indices.length !== 1) return;
+    const idx = Number(indices[0]);
+    const set = result?.sets[idx];
+    if (set) commitEdits(idx, set);
+  }, [pendingEditsByIndex, result, commitEdits]);
+
+  // Ctrl/⌘+Enter commits pending cell edits. Scoped to when focus is NOT in the
+  // CodeMirror editor, whose own keymap owns Ctrl/⌘+Enter for "run query" — so
+  // the two never collide (the editor binding only fires while it's focused).
+  useEffect(() => {
+    if (Object.keys(pendingEditsByIndex).length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey)) return;
+      const el = document.activeElement;
+      if (el instanceof HTMLElement && el.closest(".cm-editor")) return;
+      e.preventDefault();
+      commitSinglePendingSet();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [pendingEditsByIndex, commitSinglePendingSet]);
+
   const requestDelete = useCallback((setIdx: number) => {
     setPendingDelete(setIdx);
   }, []);
@@ -2600,6 +2630,21 @@ export function ResultTableBody({
                   {hasPendingEdit
                     ? formatCellValue(pendingValue)
                     : formatCellValue(rawValue)}
+                  {hasPendingEdit && (
+                    <button
+                      type="button"
+                      className="sql-cell-discard"
+                      title="Discard this edit"
+                      aria-label={`Discard pending edit to ${c}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onClearPendingEdit(cellKey);
+                      }}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    >
+                      ×
+                    </button>
+                  )}
                 </span>
               );
             },
@@ -3486,6 +3531,7 @@ export function ResultPager({
             type="button"
             className="sql-edit-commit-btn"
             onClick={onCommitEdits}
+            title="Commit pending edits (Ctrl/⌘+Enter)"
           >
             Update {editCount} cell{editCount === 1 ? "" : "s"}…
           </button>

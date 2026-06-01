@@ -2577,6 +2577,33 @@
   cursor: default;
 }
 
+/* Per-cell "discard this edit" affordance — a small ✕ that reverts just this
+   cell's pending edit (revealed on hover/focus of the edited cell). */
+.sql-cell-discard {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 2px;
+  margin-left: 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  vertical-align: baseline;
+}
+
+.sql-result-table tbody td:hover .sql-cell-discard,
+.sql-cell-discard:focus-visible {
+  opacity: 1;
+}
+
+.sql-cell-discard:hover {
+  color: var(--red);
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+}
+
 /* Inline boolean-column toggle in the result grid. */
 .sql-cell-bool {
   cursor: pointer;
