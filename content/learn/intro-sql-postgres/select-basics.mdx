@@ -26,7 +26,7 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  initialCode={`SELECT name, salary
+  starterCode={`SELECT name, salary
 FROM employees;`}
 />
 
@@ -51,7 +51,7 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Alice', 'Engineering', 120000),
   ('Bob',   'Engineering',  95000),
   ('Carol', 'Sales',        80000);`}
-  initialCode={`SELECT *
+  starterCode={`SELECT *
 FROM employees;`}
 />
 
@@ -100,7 +100,7 @@ answer*, not echoing the table:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice', 'Engineering', 120000),
   ('Bob',   'Sales',        72000);`}
-  initialCode={`-- salary first, then dept, then name — any order you want
+  starterCode={`-- salary first, then dept, then name — any order you want
 SELECT salary, dept, name
 FROM employees;`}
 />
@@ -124,7 +124,7 @@ INSERT INTO employees (name, dept) VALUES
   ('Carol', 'Sales'),
   ('Dave',  'Sales'),
   ('Eve',   'Marketing');`}
-  initialCode={`SELECT DISTINCT dept
+  starterCode={`SELECT DISTINCT dept
 FROM employees
 ORDER BY dept;`}
 />

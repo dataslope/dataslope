@@ -89,7 +89,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(42)
@@ -142,7 +142,7 @@ fundamentally different things.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -213,7 +213,7 @@ produce sample means that cluster more tightly around μ. Let's vary
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -279,7 +279,7 @@ classic error.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(1)
 MU, SIGMA = 50.0, 18.0
@@ -337,7 +337,7 @@ number.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -411,7 +411,7 @@ population = rng.normal(50, 12, size=1_000_000)
 pop_sd = float(population.std())   # ~12, for your reference
 n = 50
 n_samples = 3000`}
-  initialCode={`# TODO: build 'means' (array of 3000 sample means) and 'summary' dict.
+  starterCode={`# TODO: build 'means' (array of 3000 sample means) and 'summary' dict.
 means = None
 
 summary = {
@@ -484,7 +484,7 @@ rng = np.random.default_rng(808)
 population = rng.normal(100, 20, size=1_000_000)
 n_small, n_big = 25, 100
 n_samples = 2000`}
-  initialCode={`# TODO: compute sd of sample means at each n, and their ratio.
+  starterCode={`# TODO: compute sd of sample means at each n, and their ratio.
 result = {
     "sd_small": None,
     "sd_big": None,

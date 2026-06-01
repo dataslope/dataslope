@@ -25,7 +25,7 @@ flowchart LR
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         respond("red");                 // What if you typo "Red"?
         respond("amber");
@@ -47,7 +47,7 @@ compiler cannot help you. Let's see the same idea with an enum.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         respond(Light.RED);
         respond(Light.AMBER);
@@ -101,7 +101,7 @@ classDiagram
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         for (Planet p : Planet.values()) {
             System.out.printf("%-8s g = %.2f m/s^2%n", p, p.surfaceGravity());
@@ -149,7 +149,7 @@ interface implemented by a fixed list of objects."
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         for (Operation op : Operation.values()) {
             System.out.println("10 " + op.symbol() + " 3 = " + op.apply(10, 3));

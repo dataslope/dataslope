@@ -14,7 +14,7 @@
  * <CodeBlock
  *   adapter="python"
  *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
- *   initialCode={`display(df)`}
+ *   starterCode={`display(df)`}
  * />
  * ```
  */
@@ -24,7 +24,7 @@ import { getAdapterById, type AdapterId } from "./runtime/adapters";
 
 interface MdxCodeBlockProps {
   adapter: AdapterId;
-  initialCode?: string;
+  starterCode?: string;
   files?: CodeBlockFile[];
   entryFilename?: string;
   initCode?: string;
@@ -33,7 +33,7 @@ interface MdxCodeBlockProps {
 
 export default function MdxCodeBlock({
   adapter,
-  initialCode,
+  starterCode,
   files,
   entryFilename,
   initCode,
@@ -50,7 +50,7 @@ export default function MdxCodeBlock({
   return (
     <CodeBlock
       adapter={resolved}
-      initialCode={initialCode}
+      starterCode={starterCode}
       files={files}
       entryFilename={entryFilename}
       initCode={initCode}

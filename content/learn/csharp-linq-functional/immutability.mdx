@@ -19,7 +19,7 @@ at what happens.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static decimal Total(List<decimal> cart)
@@ -65,7 +65,7 @@ positional properties are read-only and equality is by value.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 record Money(decimal Amount, string Currency);
 
@@ -91,7 +91,7 @@ set once during construction:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 class Config
 {
@@ -115,7 +115,7 @@ list when you "add" to it.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Immutable;
 
 var a = ImmutableList.Create(1, 2, 3);
@@ -138,7 +138,7 @@ update**. The `with` expression is its idiomatic form for records.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 record Player(string Name, int Score, int Level);
 

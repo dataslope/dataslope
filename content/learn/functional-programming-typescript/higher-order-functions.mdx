@@ -24,7 +24,7 @@ inherited it from Scheme.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Functions are values
+  starterCode={`// Functions are values
 const double = (x: number) => x * 2;
 
 // Store them in arrays
@@ -53,7 +53,7 @@ The three you already know:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const xs = [1, 2, 3, 4, 5];
+  starterCode={`const xs = [1, 2, 3, 4, 5];
 
 // map: apply a function to each element
 const doubled = xs.map((x) => x * 2);
@@ -92,7 +92,7 @@ different inner action, factor out a higher-order function.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Before: two functions that share 95% of their code
+  starterCode={`// Before: two functions that share 95% of their code
 function logTimings(label: string, work: () => void): void {
   const start = Date.now();
   work();
@@ -127,7 +127,7 @@ generic version is a *single* higher-order function:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function timed<T>(label: string, work: () => T): T {
+  starterCode={`function timed<T>(label: string, work: () => T): T {
   const start = Date.now();
   const result = work();
   const end = Date.now();
@@ -154,7 +154,7 @@ function (`work`) and runs it. We could equally well write a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A factory: returns a function configured with 'amount'
+  starterCode={`// A factory: returns a function configured with 'amount'
 function adder(amount: number): (n: number) => number {
   return (n) => n + amount;
 }
@@ -201,7 +201,7 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A "log calls" decorator
+  starterCode={`// A "log calls" decorator
 function withLogging<A extends readonly unknown[], R>(
   name: string,
   f: (...args: A) => R,
@@ -233,7 +233,7 @@ These come up so often they're worth memorizing.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// identity: the function that returns its argument unchanged
+  starterCode={`// identity: the function that returns its argument unchanged
 const identity = <A,>(a: A): A => a;
 
 // constant: a function that ignores its argument and always returns x
@@ -273,7 +273,7 @@ the function-as-value pattern shows up directly in the signature:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A generic "apply twice"
+  starterCode={`// A generic "apply twice"
 function twice<A>(f: (a: A) => A, a: A): A {
   return f(f(a));
 }

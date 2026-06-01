@@ -82,7 +82,7 @@ supervised learning needs the answers to learn from.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -131,7 +131,7 @@ point coordinates `X` and must discover the groupings on its own.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_blobs
+  starterCode={`from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
 # UNSUPERVISED: we generate points but DISCARD the true labels.
@@ -172,7 +172,7 @@ Same library, same `fit` method — but one gets answers and one does not.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris, make_blobs
+  starterCode={`from sklearn.datasets import load_iris, make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 
@@ -244,7 +244,7 @@ contrast in what is even *possible* is the clearest way to feel the divide.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris, make_blobs
+  starterCode={`from sklearn.datasets import load_iris, make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -413,7 +413,7 @@ string \`"supervised"\` or the string \`"unsupervised"\`:
 
 The hidden tests check each individual answer.`}
   initCode={``}
-  initialCode={`answers = {
+  starterCode={`answers = {
     "predict_house_price": None,           # "supervised" or "unsupervised"
     "segment_customers": None,
     "classify_email_spam": None,

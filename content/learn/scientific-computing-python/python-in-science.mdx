@@ -133,7 +133,7 @@ Each runs in your browser, right now.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import scipy
 import matplotlib
 import pandas as pd
@@ -167,7 +167,7 @@ A complete SciPy program often touches several of these:
 import pandas as pd
 from scipy import signal
 import matplotlib.pyplot as plt`}
-  initialCode={`# Generate a noisy signal: a 2 Hz sine plus 20 Hz noise
+  starterCode={`# Generate a noisy signal: a 2 Hz sine plus 20 Hz noise
 rng = np.random.default_rng(7)
 t = np.linspace(0, 5, 2000)
 clean = np.sin(2 * np.pi * 2 * t)
@@ -215,7 +215,7 @@ fragment:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Example pyproject.toml metadata (for illustration; not executed)
+  starterCode={`# Example pyproject.toml metadata (for illustration; not executed)
 example = """
 [project]
 name = "neutron-diffusion-2026"

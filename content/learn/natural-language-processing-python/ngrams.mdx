@@ -67,7 +67,7 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams`}
-  initialCode={`tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps")
+  starterCode={`tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps")
           if t.isalpha()]
 print("tokens:", tokens)
 print()
@@ -125,7 +125,7 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams`}
-  initialCode={`a = [t.lower() for t in word_tokenize("the food was not good")]
+  starterCode={`a = [t.lower() for t in word_tokenize("the food was not good")]
 b = [t.lower() for t in word_tokenize("the food was good")]
 
 # As a SET of single words, the only difference is the lone word 'not'.
@@ -177,7 +177,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
 from nltk.probability import FreqDist`}
-  initialCode={`text = """machine learning is fun. machine learning is powerful.
+  starterCode={`text = """machine learning is fun. machine learning is powerful.
 i love machine learning and natural language processing."""
 
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
@@ -238,7 +238,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
 from nltk.probability import FreqDist`}
-  initialCode={`text = """the cat sat on the mat. the dog sat on the log.
+  starterCode={`text = """the cat sat on the mat. the dog sat on the log.
 the cat sat on the log. the dog sat on the mat."""
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
 
@@ -300,7 +300,7 @@ import micropip
 await micropip.install("nltk")
 import nltk
 from nltk.util import ngrams`}
-  initialCode={`def get_ngrams(tokens, n):
+  starterCode={`def get_ngrams(tokens, n):
     # return a list of n-gram tuples
     return []
 

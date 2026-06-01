@@ -28,7 +28,7 @@ The simplest form: execute a block only if a condition is true.
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 10
+  starterCode={`x = 10
 if x > 0:
     print("positive")
 `}
@@ -36,7 +36,7 @@ if x > 0:
 
 <CodeBlock
   adapter="python"
-  initialCode={`password = "secret"
+  starterCode={`password = "secret"
 if len(password) < 8:
     print("too short")
 `}
@@ -46,7 +46,7 @@ If the condition is false, the block is skipped entirely.
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = -5
+  starterCode={`x = -5
 if x > 0:
     print("positive")
 print("done")
@@ -59,7 +59,7 @@ When you have multiple mutually exclusive conditions, use `elif` (short for "els
 
 <CodeBlock
   adapter="python"
-  initialCode={`score = 85
+  starterCode={`score = 85
 if score >= 90:
     print("A")
 elif score >= 80:
@@ -71,7 +71,7 @@ Python evaluates the conditions **in order** and stops at the first true one.
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 7
+  starterCode={`x = 7
 if x > 0:
     print("a")
 elif x > 5:
@@ -88,7 +88,7 @@ Add an `else` block to catch all remaining cases.
 
 <CodeBlock
   adapter="python"
-  initialCode={`score = 55
+  starterCode={`score = 55
 if score >= 90:
     print("A")
 elif score >= 80:
@@ -106,7 +106,7 @@ There can be any number of `elif` branches; `else` is optional. Each branch need
 
 <CodeBlock
   adapter="python"
-  initialCode={`def classify(score):
+  starterCode={`def classify(score):
     if score >= 90:
         return "A"
     elif score >= 80:
@@ -129,7 +129,7 @@ The `if` condition is evaluated for truthiness, not strict equality with `True`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`items = []
+  starterCode={`items = []
 if items:
     print("non-empty")
 else:
@@ -139,7 +139,7 @@ else:
 
 <CodeBlock
   adapter="python"
-  initialCode={`result = None
+  starterCode={`result = None
 if result is None:
     print("no result yet")
 `}
@@ -159,7 +159,7 @@ When you need a **value**, not a statement, use the inline form:
 
 <CodeBlock
   adapter="python"
-  initialCode={`age = 17
+  starterCode={`age = 17
 status = "adult" if age >= 18 else "minor"
 print(status)
 `}
@@ -167,7 +167,7 @@ print(status)
 
 <CodeBlock
   adapter="python"
-  initialCode={`score = 85
+  starterCode={`score = 85
 print(f"Grade: {'pass' if score >= 60 else 'fail'}")
 `}
 />
@@ -184,7 +184,7 @@ Python lets you chain comparison operators, which usually reads more naturally t
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 5
+  starterCode={`x = 5
 if 0 < x < 10:
     print("in range")
 `}
@@ -192,7 +192,7 @@ if 0 < x < 10:
 
 <CodeBlock
   adapter="python"
-  initialCode={`age = 25
+  starterCode={`age = 25
 if 18 <= age <= 65:
     print("working age")
 `}
@@ -202,7 +202,7 @@ This is **not** syntactic sugar for separate comparisons; Python evaluates each 
 
 <CodeBlock
   adapter="python"
-  initialCode={`a, b, c = 1, 2, 3
+  starterCode={`a, b, c = 1, 2, 3
 if a < b < c:
     print("ascending")
 `}
@@ -214,7 +214,7 @@ if a < b < c:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def describe(point):
+  starterCode={`def describe(point):
     match point:
         case (0, 0):
             return "origin"
@@ -238,7 +238,7 @@ Patterns can also match class instances, dict shapes, and sequences of varying l
 
 <CodeBlock
   adapter="python"
-  initialCode={`def http_status(code):
+  starterCode={`def http_status(code):
     match code:
         case 200:
             return "OK"
@@ -264,7 +264,7 @@ For simple value-to-value mappings, a dict is often clearer than `if`/`elif` or 
 
 <CodeBlock
   adapter="python"
-  initialCode={`def http_label(code):
+  starterCode={`def http_label(code):
     return {
         200: "OK",
         301: "Moved Permanently",
@@ -302,7 +302,7 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
 - \`"Fizz"\` if i is divisible by 3 only
 - \`"Buzz"\` if i is divisible by 5 only
 - The string form of i otherwise`}
-  initialCode={`def fizzbuzz(n):
+  starterCode={`def fizzbuzz(n):
     # your code here
     return []
 `}
@@ -337,7 +337,7 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
   adapter="python"
   title="Leap year"
   instructions={`A year is a leap year if it is divisible by 4, **except** century years (divisible by 100), which must also be divisible by 400. Define \`is_leap(year)\` returning \`True\` or \`False\`.`}
-  initialCode={`def is_leap(year):
+  starterCode={`def is_leap(year):
     # your code here
     return False
 `}
@@ -384,7 +384,7 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
 - \`"F"\` for below 60
 
 Assume \`score\` is an integer between 0 and 100.`}
-  initialCode={`def letter_grade(score):
+  starterCode={`def letter_grade(score):
     # your code here
     return "F"
 `}

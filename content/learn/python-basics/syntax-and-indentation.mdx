@@ -34,7 +34,7 @@ in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def shout(message):
+  starterCode={`def shout(message):
     if message:
         return message.upper() + "!"
     return ""
@@ -62,7 +62,7 @@ silently broken program (in older Python 2 codebases).
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Try un-indenting the 'return' line (remove the leading spaces)
+  starterCode={`# Try un-indenting the 'return' line (remove the leading spaces)
 # then run again to see the IndentationError.
 def square(x):
     return x * x
@@ -169,7 +169,7 @@ ways to span multiple lines:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Preferred: implicit continuation inside parentheses.
+  starterCode={`# Preferred: implicit continuation inside parentheses.
 total = (1 + 2 + 3
          + 4 + 5 + 6)
 
@@ -179,7 +179,7 @@ print("Total:", total)
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Works but ugly: explicit backslash continuation.
+  starterCode={`# Works but ugly: explicit backslash continuation.
 total2 = 1 + 2 + 3 \\
        + 4 + 5 + 6
 
@@ -199,7 +199,7 @@ polite language; the real sentiment is "never do this".
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Legal Python, but PEP 8 says no.
+  starterCode={`# Legal Python, but PEP 8 says no.
 a = 1; b = 2; print(a + b)
 `}
 />
@@ -243,7 +243,7 @@ avoid the complexity. Python goes all-in.
 - It returns the arithmetic mean of \`numbers\`, or \`0\` if the list is empty.
 
 The hidden tests will call \`average\` with several inputs.`}
-  initialCode={`def average(numbers):
+  starterCode={`def average(numbers):
   if not numbers:
         return 0;
    total = sum(numbers);return total / len(numbers)
@@ -283,7 +283,7 @@ print(average([1, 2, 3, 4]))
   instructions={`Rewrite the function \`long_sum\` below to use implicit continuation inside parentheses instead of backslash continuation. The function should return the sum of all its arguments.
 
 Do not change the function's behavior, just improve its style.`}
-  initialCode={`def long_sum(a, b, c, d, e):
+  starterCode={`def long_sum(a, b, c, d, e):
     result = a + b + c \\
            + d + e
     return result

@@ -17,7 +17,7 @@ Type hints are optional but increasingly standard in professional Python. They c
 
 <CodeBlock
   adapter="python"
-  initialCode={`from typing import Iterable
+  starterCode={`from typing import Iterable
 
 def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
     """Compute total with tax."""
@@ -44,7 +44,7 @@ Built-in `unittest` works, but most Python projects use [**pytest**](https://doc
 
 <CodeBlock
   adapter="python"
-  initialCode={`# test_total.py
+  starterCode={`# test_total.py
 def total(prices, tax_rate=0.07):
     return sum(prices) * (1 + tax_rate)
 
@@ -72,7 +72,7 @@ pytest
 
 <CodeBlock
   adapter="python"
-  initialCode={`import asyncio
+  starterCode={`import asyncio
 
 async def fetch(url):
     await asyncio.sleep(0.1)  # simulate network delay
@@ -110,7 +110,7 @@ Python dominates backend web development. The big three:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# FastAPI example (install with: pip install fastapi uvicorn)
+  starterCode={`# FastAPI example (install with: pip install fastapi uvicorn)
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -140,7 +140,7 @@ Python's killer app. The ecosystem is massive:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Example: pandas DataFrame
+  starterCode={`# Example: pandas DataFrame
 import pandas as pd
 
 data = {
@@ -170,7 +170,7 @@ Python excels at gluing systems together:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Example: fetch JSON from an API
+  starterCode={`# Example: fetch JSON from an API
 import requests
 
 response = requests.get("https://api.github.com/users/github")

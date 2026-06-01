@@ -23,7 +23,7 @@ same type, stored the same way. There is no distinction between
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(typeof 7);     // "number"
+  starterCode={`console.log(typeof 7);     // "number"
 console.log(typeof 7.0);   // "number"
 console.log(typeof -3.14); // "number"
 console.log(7 === 7.0);    // true — they are the same value.
@@ -54,7 +54,7 @@ Unary operators:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(7 / 2);       // 3.5  — NOT 3, because there is no integer division.
+  starterCode={`console.log(7 / 2);       // 3.5  — NOT 3, because there is no integer division.
 console.log(7 % 2);       // 1
 console.log(2 ** 10);     // 1024
 console.log(-5 + 8);      // 3
@@ -71,7 +71,7 @@ intent obvious.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(2 + 3 * 4);     // 14, not 20
+  starterCode={`console.log(2 + 3 * 4);     // 14, not 20
 console.log((2 + 3) * 4);   // 20
 console.log(2 ** 3 ** 2);   // 512  (exponent is right-associative: 2 ** (3 ** 2))
 console.log((2 ** 3) ** 2); // 64
@@ -100,7 +100,7 @@ is `x = x - 1`. These are common in loops; we will see them often.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let n = 10;
+  starterCode={`let n = 10;
 n += 5;   console.log(n); // 15
 n *= 2;   console.log(n); // 30
 n -= 100; console.log(n); // -70
@@ -127,7 +127,7 @@ encounter:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(1 / 0);          // Infinity
+  starterCode={`console.log(1 / 0);          // Infinity
 console.log(-1 / 0);         // -Infinity
 console.log(0 / 0);          // NaN
 console.log(Math.sqrt(-1));  // NaN
@@ -151,7 +151,7 @@ errors. The classic example:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(0.1 + 0.2);                   // 0.30000000000000004
+  starterCode={`console.log(0.1 + 0.2);                   // 0.30000000000000004
 console.log(0.1 + 0.2 === 0.3);           // false  (!)
 console.log(Math.abs((0.1 + 0.2) - 0.3) < 1e-9); // true  — the safe way to compare
 `}
@@ -179,7 +179,7 @@ A few built-ins you will use constantly:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Rounding
+  starterCode={`// Rounding
 console.log(Math.round(2.4));    // 2
 console.log(Math.round(2.5));    // 3
 console.log(Math.floor(2.9));    // 2  (round down)
@@ -235,7 +235,7 @@ that, you lose precision.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(Number.MAX_SAFE_INTEGER);          // 9007199254740991
+  starterCode={`console.log(Number.MAX_SAFE_INTEGER);          // 9007199254740991
 console.log(Number.MAX_SAFE_INTEGER + 1);      // 9007199254740992  (fine)
 console.log(Number.MAX_SAFE_INTEGER + 2);      // 9007199254740992  (!! same as +1)
 
@@ -256,7 +256,7 @@ learned. Try changing the inputs and see what happens.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function format(amount) {
+  starterCode={`function format(amount) {
   // 2 decimals + thousands separators, locale-dependent.
   return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -291,7 +291,7 @@ console.log("  Gain: ", format(gain));
 - \`toFahrenheit(c)\` — converts Celsius to Fahrenheit using \`c * 9 / 5 + 32\`.
 
 Both should return a *number*, not a string. The tests use a small tolerance to allow for floating-point rounding.`}
-  initialCode={`function toCelsius(f) {
+  starterCode={`function toCelsius(f) {
   // your code here
   return 0;
 }

@@ -22,7 +22,7 @@ non-zero value** as true.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int age = 20;
@@ -44,7 +44,7 @@ To do *one or the other*:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int age = 15;
@@ -65,7 +65,7 @@ For more than two branches, chain them:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int score = 78;
@@ -126,7 +126,7 @@ Combine conditions with logical operators:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int age = 25;
@@ -174,7 +174,7 @@ You can put `if` inside `if`:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int x = 7;
@@ -232,7 +232,7 @@ sometimes clearer than a long `if/else if` chain.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int day = 3;
@@ -302,7 +302,7 @@ Test cases the grader uses internally (you don't need to handle multiple inputs 
 - 1900 → not leap (divisible by 100 but not 400)
 - 2024 → leap (divisible by 4, not 100)
 - 2023 → not leap`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int year = 2000;

@@ -106,7 +106,7 @@ are all convenience samples wearing a data-science costume.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -150,7 +150,7 @@ more confident estimate of the *wrong* number.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -236,7 +236,7 @@ instinct for bias.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -363,7 +363,7 @@ interviewed. Any time your dataset is "the ones still here," ask what the
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(3)
 
@@ -435,7 +435,7 @@ true_mean = float(population.mean())
 # Convenience scheme: high scorers (>75) are ~10x more likely to be sampled.
 conv_weights = (population > 75).astype(float) + 0.1
 conv_weights /= conv_weights.sum()`}
-  initialCode={`# TODO: draw each method 300 times at n=800, record sample means,
+  starterCode={`# TODO: draw each method 300 times at n=800, record sample means,
 # then compute the bias of each method's average estimate.
 n = 800
 reps = 300
@@ -530,7 +530,7 @@ for name, (size, mu, sd) in specs.items():
 pop = pd.concat(frames, ignore_index=True)
 true_mean = float(pop["spend"].mean())
 total_n = 600`}
-  initialCode={`# TODO: proportional stratified sampling, pooled estimate, and error.
+  starterCode={`# TODO: proportional stratified sampling, pooled estimate, and error.
 # Hint: for each region, n_region = round(total_n * region_share);
 # sample that many rows without replacement, collect their spend values.
 sampled_spend = []

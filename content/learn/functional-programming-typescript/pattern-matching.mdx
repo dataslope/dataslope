@@ -18,7 +18,7 @@ A discriminated union is a sum type where every variant has a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle";    radius: number }
   | { kind: "square";    side: number   }
   | { kind: "rectangle"; w: number; h: number };
@@ -55,7 +55,7 @@ catches it.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle";    radius: number }
   | { kind: "square";    side: number   }
   | { kind: "rectangle"; w: number; h: number };
@@ -96,7 +96,7 @@ calling syntax:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle";    radius: number }
   | { kind: "square";    side: number   }
   | { kind: "rectangle"; w: number; h: number };
@@ -139,7 +139,7 @@ inside a case.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Json =
+  starterCode={`type Json =
   | { kind: "null" }
   | { kind: "bool";   value: boolean }
   | { kind: "num";    value: number  }
@@ -187,7 +187,7 @@ values:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Light = "red" | "yellow" | "green";
+  starterCode={`type Light = "red" | "yellow" | "green";
 
 // Pretend we're computing the next light from current + a flag
 function next(current: Light, emergency: boolean): Light {

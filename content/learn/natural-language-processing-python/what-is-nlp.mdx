@@ -114,7 +114,7 @@ comes next. Run this and read the output carefully.
 
 <CodeBlock
   adapter="python"
-  initialCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
+  starterCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
 
 # The naive approach: split on whitespace.
 naive = sentence.split()
@@ -161,7 +161,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize`}
-  initialCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
+  starterCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
 
 tokens = word_tokenize(sentence)
 print("word_tokenize gives:", tokens)

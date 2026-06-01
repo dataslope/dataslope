@@ -134,7 +134,7 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # A small mixed-type dataset: each column is a different data type.
 df = pd.DataFrame({
@@ -174,7 +174,7 @@ you a number. The dtype is `int64`; the meaning is gibberish.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "zip_code":   [10001, 60614, 94105, 30301],  # nominal, stored as int
@@ -248,7 +248,7 @@ Two practical moves. First, convert genuine categoricals to the
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 from pandas.api.types import CategoricalDtype
 
 df = pd.DataFrame({
@@ -309,7 +309,7 @@ df = pd.DataFrame({
     "num_purchases":  [1, 0, 7, 3],
     "account_balance":[120.50, 0.0, 980.25, 45.10],
 })`}
-  initialCode={`# TODO: classify each column by its STATISTICAL type (not its dtype)
+  starterCode={`# TODO: classify each column by its STATISTICAL type (not its dtype)
 types = {
     "customer_id":     None,
     "country":         None,
@@ -381,7 +381,7 @@ df = pd.DataFrame({
     "rating":  [5, 3, 4, 4, 2, 5],                     # ordinal (1-5)
     "price":   [19.99, 5.0, 42.5, 8.25, 30.0, 12.0],   # continuous
 })`}
-  initialCode={`# TODO: pick the summary that MATCHES each column's type
+  starterCode={`# TODO: pick the summary that MATCHES each column's type
 summary = {
     "country_mode":  None,
     "rating_median": None,

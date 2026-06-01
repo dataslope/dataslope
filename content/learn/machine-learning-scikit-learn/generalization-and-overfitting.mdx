@@ -47,7 +47,7 @@ almost anywhere (very flexible).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -105,7 +105,7 @@ data and on a held-out test set.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -172,7 +172,7 @@ emerge.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -303,7 +303,7 @@ y = np.sin(1.5 * x) + rng.normal(0, 0.25, x.size)
 X = x.reshape(-1, 1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=7)
 degrees = range(1, 11)`}
-  initialCode={`test_errors = []
+  starterCode={`test_errors = []
 
 # TODO: loop over degrees, fit, record test MSE
 

@@ -64,7 +64,7 @@ error, and hands back the two endpoints.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -163,7 +163,7 @@ important picture on the page.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -300,7 +300,7 @@ Let's watch the first two levers move.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -358,7 +358,7 @@ of a proportion is `√( p̂(1 − p̂) / n )`. The classic
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # A/B test variant: 540 conversions out of 3,000 visitors.
@@ -405,7 +405,7 @@ Steps:
   initCode={`import numpy as np
 rng = np.random.default_rng(11)
 sample = rng.normal(20.0, 3.0, size=64)`}
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 import numpy as np
 
 # TODO: build the 95% t-interval into ci = (low, high)
@@ -468,7 +468,7 @@ assert abs(mid - float(sample.mean())) < 1e-6`,
 - \`ci = (p_hat - z*se, p_hat + z*se)\`, both endpoints as floats.`}
   initCode={`successes = 312
 n = 1500`}
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 import numpy as np
 
 # TODO: build the 95% proportion CI into ci = (low, high)
@@ -530,7 +530,7 @@ Because width scales like \`1/sqrt(n)\`, going 25 -> 100 (x4) should roughly hal
 rng = np.random.default_rng(2024)
 sizes = [25, 100, 400]
 samples = {n: rng.normal(50.0, 10.0, size=n) for n in sizes}`}
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 import numpy as np
 
 sizes = [25, 100, 400]

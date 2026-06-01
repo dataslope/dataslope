@@ -12,7 +12,7 @@ engine compiled to WebAssembly, served from jsDelivr at first use.
   dialect="duckdb"
   title="Find numbers divisible by 7"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
-  initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
+  starterCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
 FROM range(1, 101) t(i)
 -- your filter and ordering here
@@ -41,7 +41,7 @@ FROM range(1, 101) t(i)
   dialect="duckdb"
   title="Find numbers divisible by 7"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
-  initialCode={`-- DuckDB's range(start, stop) is exclusive of stop.
+  starterCode={`-- DuckDB's range(start, stop) is exclusive of stop.
 SELECT i AS n
 FROM range(1, 101) t(i)
 -- your filter and ordering here
@@ -78,7 +78,7 @@ SELECT
   CASE WHEN d % 2 = 0 THEN 'North' ELSE 'South' END AS region,
   (d * 13) % 100 + 10                AS revenue
 FROM range(1, 9) t(d);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   sale_date,
   region,
   revenue,
@@ -128,7 +128,7 @@ SELECT
   CASE WHEN d % 2 = 0 THEN 'North' ELSE 'South' END AS region,
   (d * 13) % 100 + 10                AS revenue
 FROM range(1, 9) t(d);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   sale_date,
   region,
   revenue,
@@ -186,7 +186,7 @@ INSERT INTO movies VALUES
   (5, 'E', 2, 7.9),
   (6, 'F', 3, 6.5),
   (7, 'G', 3, 7.2);`}
-  initialCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
+  starterCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
 FROM movies m
 -- your JOIN, GROUP BY, ORDER BY here
 ;
@@ -230,7 +230,7 @@ INSERT INTO movies VALUES
   (5, 'E', 2, 7.9),
   (6, 'F', 3, 6.5),
   (7, 'G', 3, 7.2);`}
-  initialCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
+  starterCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
 FROM movies m
 -- your JOIN, GROUP BY, ORDER BY here
 ;
@@ -277,7 +277,7 @@ SELECT
   (i * 37 % 100) AS score
 FROM range(1, 10001) t(i);
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
 FROM big
 GROUP BY bucket
@@ -309,7 +309,7 @@ ORDER BY bucket;`}
 SELECT i AS id, ('user_' || i) AS name, (i * 37 % 100) AS score
 FROM range(1, 10001) t(i);
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
 FROM big GROUP BY bucket ORDER BY bucket;`}
   tests={[

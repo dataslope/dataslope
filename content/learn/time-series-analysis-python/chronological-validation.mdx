@@ -54,7 +54,7 @@ n = 120
 idx = pd.date_range("2010-01-01", periods=n, freq="D")
 # A smooth-ish series (random walk with drift): neighbours are very informative.
 y = pd.Series(np.cumsum(rng.normal(0, 1, n)) + 0.3*np.arange(n), index=idx)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 vals = y.values
 positions = np.arange(n)
@@ -112,7 +112,7 @@ them by hand once and you'll never misread them again.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def mae(y_true, y_pred):
     # Mean Absolute Error: average size of the miss, in the data's own units.
@@ -212,7 +212,7 @@ air = pd.Series(_passengers, index=idx, name="passengers")
 
 def mae(yt, yp):
     return float(np.mean(np.abs(np.asarray(yt) - np.asarray(yp))))`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Expanding-window backtest of a SEASONAL-NAIVE forecaster (predict each month
 # with the value 12 months earlier). Fast, leakage-free, and a strong baseline.
@@ -281,7 +281,7 @@ it won't have at prediction time:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(1)
 series = np.concatenate([rng.normal(10, 1, 80), rng.normal(40, 5, 20)])  # level jumps late
@@ -327,7 +327,7 @@ Then evaluate them on the provided \`y_true\` and \`y_pred\` and store the resul
   initCode={`import numpy as np
 y_true = np.array([200.0, 210.0, 190.0, 220.0, 205.0])
 y_pred = np.array([198.0, 215.0, 185.0, 219.0, 210.0])`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def mae(y_true, y_pred):
     return None
@@ -401,7 +401,7 @@ assert abs(scores["mape"] - np.mean(np.abs((y_true - y_pred)/y_true))*100) < 1e-
 
 Return the list of folds as \`folds\` (a list of \`(train_idx, test_idx)\` tuples, where each is a list/range of integer positions). Every fold's training indices must all be **less than** all of its test indices (leakage-free).`}
   initCode={`n, initial, horizon, step = 100, 60, 12, 12`}
-  initialCode={`def expanding_folds(n, initial, horizon, step):
+  starterCode={`def expanding_folds(n, initial, horizon, step):
     folds = []
     # TODO: build (train_idx, test_idx) tuples
     return folds
@@ -490,7 +490,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 mae_snaive = None
 mae_mean = None
 baseline_wins = None

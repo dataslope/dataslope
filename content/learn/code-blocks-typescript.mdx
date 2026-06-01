@@ -11,7 +11,7 @@ the [JavaScript](/learn/javascript) blocks are.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Point { x: number; y: number }
+  starterCode={`interface Point { x: number; y: number }
 const p: Point = { x: 3, y: 4 };
 const dist = Math.hypot(p.x, p.y);
 console.log(\`distance = \${dist}\`);
@@ -22,7 +22,7 @@ console.log(\`distance = \${dist}\`);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
+  starterCode={`function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
   return items.map((it) => it[key]);
 }
 

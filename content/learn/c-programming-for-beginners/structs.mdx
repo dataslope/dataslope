@@ -62,7 +62,7 @@ in modern C code.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     int x;
@@ -120,7 +120,7 @@ exactly equivalent to `(*p).x` but easier to read.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     int x;
@@ -145,7 +145,7 @@ int main(void) {
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 typedef struct {
@@ -213,7 +213,7 @@ up rich data without leaving C's type system.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct { int x, y; } Point;
 
@@ -263,7 +263,7 @@ chapter.
   instructions={`Define a \`Rect\` struct with integer fields \`width\` and \`height\`. Write a function \`int area(const Rect *r)\` that returns \`r->width * r->height\`. The provided \`main\` builds a 4x5 rectangle and prints the area.
 
 The program must print exactly \`20\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     // your fields here

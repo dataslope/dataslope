@@ -11,7 +11,7 @@ to *hand off* the result. Pandas can write to dozens of formats
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "id":   [1, 2, 3],
@@ -44,7 +44,7 @@ get a mystery unnamed column when someone re-reads the file.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "department": ["Eng","Sales","HR"],
@@ -60,7 +60,7 @@ Multiple sheets in one file:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 summary = pd.DataFrame({"metric": ["sales","cost"], "value":[1200, 800]})
 detail  = pd.DataFrame({"order":[1,2,3], "amount":[300,500,400]})
@@ -80,7 +80,7 @@ and the format is messier under the hood.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "id":     [1, 2, 3],
@@ -142,7 +142,7 @@ A small habit with huge dividends:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 from datetime import date
 
 df = pd.DataFrame({"value": [1,2,3]})
@@ -163,7 +163,7 @@ Before declaring "done", read the file back and confirm:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"id":[1,2,3], "value":[10,20,30]})
 df.to_csv("/tmp/check.csv", index=False)
@@ -209,7 +209,7 @@ df = pd.DataFrame({
     "Last":  ["Tanaka","Khan","Zhang","Ramirez"],
     "Age":   [29, np.nan, 35, 41],
 })`}
-  initialCode={`clean = None   # TODO
+  starterCode={`clean = None   # TODO
 back = None    # TODO
 
 print(clean)

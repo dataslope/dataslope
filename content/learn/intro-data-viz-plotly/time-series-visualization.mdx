@@ -19,7 +19,7 @@ is almost always the right starting point.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.stocks()
 
@@ -41,7 +41,7 @@ Plotly recognizes `date` as a datetime column and gives you a
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.stocks()
 long = df.melt(id_vars="date", var_name="ticker", value_name="price")
@@ -67,7 +67,7 @@ Pandas' `.resample()` is the workhorse:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 import plotly.express as px
 
@@ -102,7 +102,7 @@ the trend is visible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 import plotly.express as px
 
@@ -151,7 +151,7 @@ the noise. All three layered gives the whole story.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.stocks()
 
@@ -178,7 +178,7 @@ To compare years on the same calendar, facet by year (or use a
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 df = px.data.gapminder().query("country in ['China', 'India', 'United States']")

@@ -49,7 +49,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`}
-  initialCode={`stop = stopwords.words("english")
+  starterCode={`stop = stopwords.words("english")
 
 print("Number of English stopwords:", len(stop))
 print("First 25:", stop[:25])
@@ -102,7 +102,7 @@ await _load_nltk("corpora", "stopwords")
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize`}
-  initialCode={`text = "The quick brown fox jumps over the lazy dog in the park"
+  starterCode={`text = "The quick brown fox jumps over the lazy dog in the park"
 stop = set(stopwords.words("english"))   # a set -> fast membership tests
 
 tokens = [t.lower() for t in word_tokenize(text)]
@@ -157,7 +157,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`}
-  initialCode={`stop = set(stopwords.words("english"))
+  starterCode={`stop = set(stopwords.words("english"))
 
 for word in ["not", "no", "nor", "never", "but", "against", "don't", "won't"]:
     print(f"  is '{word}' a stopword? {word in stop}")
@@ -203,7 +203,7 @@ await _load_nltk("corpora", "stopwords")
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize`}
-  initialCode={`review = "The movie was not good at all"
+  starterCode={`review = "The movie was not good at all"
 stop = set(stopwords.words("english"))
 
 tokens = [t.lower() for t in word_tokenize(review)]
@@ -289,7 +289,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`}
-  initialCode={`base = set(stopwords.words("english"))
+  starterCode={`base = set(stopwords.words("english"))
 
 # Keep negation/contrast words so sentiment survives:
 keep = {"not", "no", "nor", "never", "but"}
@@ -363,7 +363,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`}
-  initialCode={`KEEP = {"not", "no", "nor", "never", "but"}
+  starterCode={`KEEP = {"not", "no", "nor", "never", "but"}
 
 def clean_keep_negation(tokens):
     # Build a custom stop set, then filter.

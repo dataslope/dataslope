@@ -51,7 +51,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT COUNT(*) AS order_count
+  starterCode={`SELECT COUNT(*) AS order_count
 FROM orders;`}
 />
 
@@ -80,7 +80,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT SUM(amount) AS total_sales
+  starterCode={`SELECT SUM(amount) AS total_sales
 FROM orders;`}
 />
 
@@ -103,7 +103,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT ROUND(AVG(amount), 2) AS average_order
+  starterCode={`SELECT ROUND(AVG(amount), 2) AS average_order
 FROM orders;`}
 />
 
@@ -141,7 +141,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   MIN(amount) AS smallest_order,
   MAX(amount) AS largest_order
 FROM orders;`}
@@ -166,7 +166,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*) AS order_count,
   SUM(amount) AS total_sales,
   ROUND(AVG(amount), 2) AS average_order,
@@ -206,7 +206,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Ada', 42.75),
   ('Maya', 16.25);`}
-  initialCode={`SELECT SUM(amount) AS ada_total
+  starterCode={`SELECT SUM(amount) AS ada_total
 FROM orders
 WHERE customer = 'Ada';`}
 />
@@ -245,7 +245,7 @@ INSERT INTO customers (name, phone) VALUES
   ('Grace', NULL),
   ('Linus', '555-0102'),
   ('Maya', NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*) AS total_customers,
   COUNT(phone) AS customers_with_phone
 FROM customers;`}
@@ -270,7 +270,7 @@ INSERT INTO reviews (product, rating) VALUES
   ('Notebook', 4),
   ('Notebook', NULL),
   ('Notebook', 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*) AS total_reviews,
   COUNT(rating) AS reviews_with_rating,
   AVG(rating) AS average_rating

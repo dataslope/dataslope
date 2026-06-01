@@ -813,10 +813,11 @@
 }
 
 /* "Click to expand" label centred at the bottom of the fade overlay.
-   Sits flush on a subtle rounded pill (no drop shadow) so it blends into
-   the gradient fade rather than floating above it, while a faint tinted
-   background + hairline border keep the text + chevron legible even when
-   code lines show through the gradient behind them. */
+   Sits flush on a subtle rounded pill (no drop shadow, no border) so it
+   blends into the gradient fade rather than floating above it, while a
+   faint tinted background keeps the text + chevron legible even when code
+   lines show through the gradient behind them. On hover it picks up the
+   same subtle background as the "Click to collapse" button. */
 .initFadeLabel {
   position: absolute;
   bottom: 4px;
@@ -836,8 +837,8 @@
   background: color-mix(in srgb, var(--ch-bg) 80%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  border: 1px solid color-mix(in srgb, var(--ch-border-light) 60%, transparent);
   border-radius: 8px;
+  transition: color 0.12s, background 0.12s;
 }
 
 .initFadeLabel svg {
@@ -846,7 +847,7 @@
 
 .initFade:hover .initFadeLabel {
   color: var(--ch-text);
-  border-color: var(--ch-border);
+  background: var(--ch-bg-hover);
 }
 
 /* "Click to collapse" button shown at the bottom of the expanded init panel. */

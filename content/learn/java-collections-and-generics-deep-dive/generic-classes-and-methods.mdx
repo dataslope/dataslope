@@ -17,7 +17,7 @@ typed versions.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         // Without generics — Object, cast everywhere
         UntypedBox a = new UntypedBox();
@@ -80,7 +80,7 @@ example is `Pair<A, B>`:
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
         System.out.println(nameAge.first() + " is " + nameAge.second());
@@ -120,7 +120,7 @@ public static <T> T identity(T x) { return x; }
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -230,7 +230,7 @@ is what **bounded type parameters** are for, in their simplest form:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -268,7 +268,7 @@ type to be `Comparable`:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

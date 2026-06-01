@@ -28,7 +28,7 @@ chapter — laziness for composability.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Task<A> = () => Promise<A>;
+  starterCode={`type Task<A> = () => Promise<A>;
 
 const of  = <A,>(a: A): Task<A> => () => Promise.resolve(a);
 
@@ -65,7 +65,7 @@ in parallel, combine their results.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Task<A> = () => Promise<A>;
+  starterCode={`type Task<A> = () => Promise<A>;
 
 const of    = <A,>(a: A): Task<A> => () => Promise.resolve(a);
 const sleep = (ms: number, label: string): Task<string> =>
@@ -119,7 +119,7 @@ the underlying promise are *not* part of the success channel.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 

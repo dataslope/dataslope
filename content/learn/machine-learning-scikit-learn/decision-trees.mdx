@@ -89,7 +89,7 @@ honest, then read its accuracy on held-out data.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -130,7 +130,7 @@ picture stays small) and cap the depth at 2 so every box is legible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -185,7 +185,7 @@ returning that leaf's average.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_diabetes
+  starterCode={`from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
@@ -212,7 +212,7 @@ next code block makes that vivid.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeRegressor
 
@@ -254,7 +254,7 @@ between train and test accuracy as depth grows.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -318,7 +318,7 @@ structure entirely.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -430,7 +430,7 @@ of.`}
   initCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier`}
-  initialCode={`X, y = load_breast_cancer(return_X_y=True)
+  starterCode={`X, y = load_breast_cancer(return_X_y=True)
 
 # 1. Split (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None

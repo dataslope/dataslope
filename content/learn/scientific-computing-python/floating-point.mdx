@@ -32,7 +32,7 @@ You can pry the bits open and look:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import struct
+  starterCode={`import struct
 
 def bits(x):
     [u] = struct.unpack(">Q", struct.pack(">d", x))
@@ -64,7 +64,7 @@ constant in numerical analysis.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import sys, math
+  starterCode={`import sys, math
 
 eps = sys.float_info.epsilon
 print(f"epsilon          = {eps}")
@@ -98,7 +98,7 @@ silently producing a finite garbage result).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 import numpy as np
 
 print(1.0 / 0.0 if False else float("inf"))
@@ -131,7 +131,7 @@ that plain "round half up" would introduce.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Python's built-in round() also uses banker's rounding
+  starterCode={`# Python's built-in round() also uses banker's rounding
 print(round(0.5))    # 0
 print(round(1.5))    # 2
 print(round(2.5))    # 2
@@ -150,7 +150,7 @@ and *relative* tolerance:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math, numpy as np
+  starterCode={`import math, numpy as np
 
 a = 0.1 + 0.2
 b = 0.3
@@ -184,7 +184,7 @@ The classic example: a midpoint approximation of the derivative.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 import numpy as np
 
 # f'(x) ≈ (f(x+h) - f(x-h)) / (2h)   for small h
@@ -222,7 +222,7 @@ subtract the maximum first.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.special import logsumexp
 
 xs = np.array([1000.0, 1001.0, 999.0])
@@ -269,7 +269,7 @@ def naive_variance(xs):
     xs = np.asarray(xs, dtype=float)
     return (xs**2).mean() - xs.mean()**2
 `}
-  initialCode={`def stable_variance(xs):
+  starterCode={`def stable_variance(xs):
     # TODO: two-pass algorithm
     return 0.0
 

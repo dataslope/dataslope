@@ -40,7 +40,7 @@ box.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// PURE: depends only on x and y, returns a value, touches nothing else.
+  starterCode={`// PURE: depends only on x and y, returns a value, touches nothing else.
 const add = (x: number, y: number): number => x + y;
 
 // PURE: builds and returns a new array, never mutates input.
@@ -82,7 +82,7 @@ no mocks, no teardown.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const add = (x: number, y: number): number => x + y;
+  starterCode={`const add = (x: number, y: number): number => x + y;
 
 const check = (label: string, cond: boolean) =>
   console.log(\`\${cond ? "OK  " : "FAIL"} \${label}\`);
@@ -112,7 +112,7 @@ remember it. This is called **memoization**.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
+  starterCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
   const cache = new Map<A, B>();
   return (a: A): B => {
     if (cache.has(a)) return cache.get(a)!;
@@ -194,7 +194,7 @@ I/O and time-reading into a pure value-builder plus a tiny shell.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Impure: logs, reads the clock, returns void
+  starterCode={`// Impure: logs, reads the clock, returns void
 function recordPurchase(userId: string, amount: number): void {
   const timestamp = Date.now();
   const id = \`p-\${Math.floor(Math.random() * 1e9)}\`;
@@ -208,7 +208,7 @@ recordPurchase("u-2", 49.00);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Pure: builds a value
+  starterCode={`// Pure: builds a value
 type Purchase = {
   readonly id: string;
   readonly userId: string;

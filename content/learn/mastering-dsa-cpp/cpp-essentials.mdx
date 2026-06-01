@@ -19,7 +19,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     std::cout << "C++ code starts in main()\\n";
@@ -42,7 +42,7 @@ A **reference** is another name for an existing object. A **pointer** stores an 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void add_one_by_reference(int& x) {
     x += 1;
@@ -72,7 +72,7 @@ Use `const` when a value should not change. Pass large objects as `const&` to av
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <vector>
 
@@ -111,7 +111,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -140,7 +140,7 @@ Templates let one function work for many types while still being checked and opt
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 template <typename T>
 T twice(T x) { return x + x; }
 int main() {
@@ -156,7 +156,7 @@ A lambda is an inline function object. Lambdas are used heavily with algorithms 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -175,7 +175,7 @@ int main() {
   adapter="cpp"
   title="Sum a vector"
   instructions={`Implement \`int sum(const std::vector<int>& v)\` so it returns the total of all values in the vector. Do not print inside the function; the provided \`main\` will print the result.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int sum(const std::vector<int>& v) {
@@ -218,7 +218,7 @@ int main() {
   adapter="cpp"
   title="Generic max of three"
   instructions={`Implement a templated function \`max3<T>\` that returns the largest of three values. The same function should work for both \`int\` and \`double\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 template <typename T>
 T max3(T a, T b, T c) {

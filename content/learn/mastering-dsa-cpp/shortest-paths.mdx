@@ -20,7 +20,7 @@ BFS would see `0 -> 1` as one edge, but the cheaper path is `0 -> 2 -> 1` with c
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int direct = 100;
@@ -74,7 +74,7 @@ Use an adjacency list where each edge is `(neighbor, weight)`. The min-heap stor
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <climits>
+  starterCode={`#include <climits>
 #include <functional>
 #include <iostream>
 #include <queue>
@@ -128,7 +128,7 @@ Relaxation means: if going through `u` improves `v`, update `dist[v]`.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <climits>
+  starterCode={`#include <climits>
 #include <iostream>
 #include <vector>
 
@@ -154,7 +154,7 @@ Maintain a `parent` array whenever a relaxation improves a vertex. To reconstruc
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <climits>
 #include <functional>
 #include <iostream>
@@ -223,7 +223,7 @@ BellmanFord(edges, n, src):
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     std::cout << "Dijkstra: non-negative weights\\n";
@@ -253,7 +253,7 @@ graph TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -288,7 +288,7 @@ int main() {
   adapter="cpp"
   title="Shortest distance from source"
   instructions={`Implement \`dijkstra\` for a directed weighted graph with non-negative edge weights. Return \`INT_MAX\` for unreachable vertices.`}
-  initialCode={`#include <climits>
+  starterCode={`#include <climits>
 #include <functional>
 #include <iostream>
 #include <queue>
@@ -377,7 +377,7 @@ int main() {
   adapter="cpp"
   title="Network delay time"
   instructions={`Implement \`networkDelayTime\`. Nodes are numbered from 1 to \`n\`. Return the maximum shortest distance from \`k\`, or -1 if any node is unreachable.`}
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <climits>
 #include <functional>
 #include <iostream>

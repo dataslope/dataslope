@@ -159,7 +159,7 @@ INSERT INTO order_spreadsheet VALUES
   (101, 'Ada Lovelace', 'ada@old.example', 'Notebook', 2),
   (102, 'Ada Lovelace', 'ada@old.example', 'Pen', 5),
   (103, 'Grace Hopper', 'grace@example.com', 'Notebook', 1);`}
-  initialCode={`UPDATE order_spreadsheet
+  starterCode={`UPDATE order_spreadsheet
 SET customer_email = 'ada@new.example'
 WHERE customer_name = 'Ada Lovelace';
 

@@ -48,7 +48,7 @@ produces its own number.
 INSERT INTO orders VALUES
   (1,'Ada',120),(2,'Bo',80),(3,'Ada',45),
   (4,'Cy',200),(5,'Bo',60),(6,'Cy',95),(7,'Ada',30);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)              AS num_orders,
   SUM(amount)           AS revenue,
   ROUND(AVG(amount), 2) AS avg_order,
@@ -79,7 +79,7 @@ analysis:
 INSERT INTO visits VALUES
   (1, 10, 'google'), (2, 10, NULL), (3, 11, 'google'),
   (4, 12, 'twitter'), (5, 11, NULL), (6, 10, 'twitter');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)                  AS total_visits,
   COUNT(referrer)           AS visits_with_referrer,
   COUNT(DISTINCT user_id)   AS unique_visitors
@@ -104,7 +104,7 @@ zero and drag an average down.
 );
 INSERT INTO ratings VALUES
   ('A', 5), ('A', 3), ('A', NULL), ('B', 4), ('B', NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   product,
   COUNT(*)            AS rows,
   COUNT(score)        AS scored,
@@ -133,7 +133,7 @@ average with a filter.
 );
 INSERT INTO orders VALUES
   (1,120),(2,30),(3,200),(4,45),(5,95),(6,15);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)              AS big_orders,
   ROUND(AVG(amount), 2) AS avg_big_order
 FROM orders

@@ -114,7 +114,7 @@ is `GENERATED ALWAYS AS IDENTITY`.
   email       TEXT NOT NULL UNIQUE,
   full_name   TEXT NOT NULL
 );`}
-  initialCode={`INSERT INTO customers (email, full_name)
+  starterCode={`INSERT INTO customers (email, full_name)
 VALUES
   ('ada@example.com', 'Ada Lovelace'),
   ('grace@example.com', 'Grace Hopper');

@@ -40,7 +40,7 @@ algorithm we mentioned in the stability chapter.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.array([[4.0, 1.0, 2.0],
               [1.0, 3.0, 0.0],
@@ -73,7 +73,7 @@ times faster. **Use them.**
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.linalg import cho_factor, cho_solve, solve
 import time
 
@@ -115,7 +115,7 @@ transformation. They tell us:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.array([[2.0, 1.0],
               [1.0, 3.0]])
@@ -137,7 +137,7 @@ which finds the directions of largest variance in a dataset.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -180,7 +180,7 @@ the ratio of largest to smallest singular value.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 v = np.array([3.0, 4.0])
 print("||v||_2 =", np.linalg.norm(v))            # 5
@@ -209,7 +209,7 @@ linear model to data.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -244,7 +244,7 @@ solvers.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 
@@ -279,7 +279,7 @@ substitution — and runs in $O(n)$ time, vs $O(n^3)$ for a dense
 
 Return the solution \`x\` as a NumPy array of length $n$. Do not
 build the dense matrix.`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def thomas(a, b, c, d):
     # a, c have length n-1; b, d have length n

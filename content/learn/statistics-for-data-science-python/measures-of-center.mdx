@@ -30,7 +30,7 @@ center you're actually asking for, and when each one quietly lies.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -72,7 +72,7 @@ default for money, sizes, durations, and counts, which are almost all
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 
 # Annual salaries (in thousands) for a small company.
@@ -202,7 +202,7 @@ compound.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # Right-skewed incomes (in thousands), with a couple of high earners.
@@ -249,7 +249,7 @@ read them together.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -297,7 +297,7 @@ from scipy import stats
 
 rng = np.random.default_rng(123)
 prices = pd.Series(np.round(rng.lognormal(mean=2.8, sigma=0.7, size=400), 2))`}
-  initialCode={`# TODO: build the dict 'result' and the bool 'report_median'
+  starterCode={`# TODO: build the dict 'result' and the bool 'report_median'
 result = {
     "mean": None,
     "median": None,

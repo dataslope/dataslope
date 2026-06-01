@@ -27,7 +27,7 @@ named column headers."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Build a tiny DataFrame from a Python dictionary:
 df = pd.DataFrame({
@@ -85,7 +85,7 @@ When you receive a DataFrame, your first instinct should be to
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -131,7 +131,7 @@ universal — use it.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -173,7 +173,7 @@ to you in context.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -203,7 +203,7 @@ order.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 
@@ -245,7 +245,7 @@ into a normal DataFrame so Plotly Express can consume it.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -301,7 +301,7 @@ The tool to do that is `df.melt(...)`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 wide = pd.DataFrame({

@@ -10,7 +10,7 @@ fully functional R session, running in your browser. Click **Run**.
 
 <CodeBlock
   adapter="r"
-  initialCode={`print("Hello, R!")`}
+  starterCode={`print("Hello, R!")`}
 />
 
 When you ran that, several things happened invisibly:
@@ -73,7 +73,7 @@ Both are useful; they are easy to confuse at first.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Auto-printing: the result of an unassigned expression is shown
+  starterCode={`# Auto-printing: the result of an unassigned expression is shown
 1 + 1
 
 # Explicit printing: same effect, but you typed the verb
@@ -107,7 +107,7 @@ it. It is designed for *making readable output*.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# print() gives you R-style display
+  starterCode={`# print() gives you R-style display
 print("Hello, R!")
 print(c(1, 2, 3))
 
@@ -136,7 +136,7 @@ Comments are notes you leave for the next human to read your code
 
 <CodeBlock
   adapter="r"
-  initialCode={`# This whole line is a comment
+  starterCode={`# This whole line is a comment
 x <- 10  # this part of the line is a comment, too
 
 # Comments are how you explain *why*, not just *what*
@@ -159,7 +159,7 @@ message is helpful, if a bit terse.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Misspelled function name
+  starterCode={`# Misspelled function name
 prnt("hello")
 `}
 />
@@ -178,7 +178,7 @@ Try fixing it:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Fix me!
+  starterCode={`# Fix me!
 prnt("hello")
 `}
 />
@@ -216,7 +216,7 @@ will compute a heart-health summary for a small group of people.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Tiny health checkup program
+  starterCode={`# Tiny health checkup program
 
 names    <- c("Alice", "Bob", "Carmen", "Dario")
 heights  <- c(165, 178, 170, 182)   # cm
@@ -309,7 +309,7 @@ decimal. Use the formula `F = C * 9/5 + 32`.
   instructions={`Given the vectors \`cities\` and \`temperatures_c\` (already loaded), print one line per city in the format \`<city>: <temp> C / <temp_f> F\`. Make sure \`temp_f\` is rounded to **1** decimal place.`}
   initCode={`cities         <- c("Auckland", "Tokyo", "Reykjavik", "Cairo")
 temperatures_c <- c(17.5, 24.0, 3.1, 35.6)`}
-  initialCode={`# Your code here
+  starterCode={`# Your code here
 
 `}
   solutionCode={`temperatures_f <- round(temperatures_c * 9/5 + 32, 1)

@@ -48,7 +48,7 @@ An adjacency matrix is a `V × V` table. `matrix[u][v]` tells whether edge `u ->
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -79,7 +79,7 @@ An adjacency list stores only existing neighbors. It uses **O(V + E)** space, so
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -107,7 +107,7 @@ For a weighted graph, store `(neighbor, weight)` pairs.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -140,7 +140,7 @@ An edge list stores edges directly. For weighted graphs, use `vector<tuple<int,i
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <tuple>
 #include <vector>
 
@@ -166,7 +166,7 @@ In an undirected graph, the **degree** of a vertex is its number of incident edg
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -209,7 +209,7 @@ graph TD
   adapter="cpp"
   title="Count edges in an undirected graph from adjacency list"
   instructions={`Implement \`countEdges\`. In an undirected adjacency list, each edge appears twice, so sum all degrees and divide by 2.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int countEdges(const std::vector<std::vector<int>>& adj) {
@@ -263,7 +263,7 @@ int main() {
   adapter="cpp"
   title="Convert adjacency list to adjacency matrix"
   instructions={`Implement \`toMatrix\` so every listed edge \`u -> v\` becomes a 1 in the returned matrix. The driver prints each row with spaces between values.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 std::vector<std::vector<int>> toMatrix(const std::vector<std::vector<int>>& adj, int n) {

@@ -27,7 +27,7 @@ Watch the geom change while everything else stays fixed:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy))
 
@@ -37,7 +37,7 @@ base + geom_point()    # marks = points  -> scatter plot
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy))
 
@@ -76,7 +76,7 @@ time). Using a line on unordered data produces the dreaded "spaghetti":
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # economics is a time series shipped with ggplot2: unemployment over time.
 ggplot(economics, aes(x = date, y = unemploy)) +

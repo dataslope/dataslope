@@ -85,7 +85,7 @@ commented-out line to watch the type system reject nonsense.
 INSERT INTO products (id, name, price, in_stock, added_on) VALUES
   (1, 'Keyboard', 79.99, true,  '2026-01-10'),
   (2, 'Monitor',  299.00, false, '2026-02-02');`}
-  initialCode={`SELECT name, price, price * 2 AS double_price, in_stock, added_on
+  starterCode={`SELECT name, price, price * 2 AS double_price, in_stock, added_on
 FROM products;
 
 -- Now uncomment the next line and run again to see a type be enforced:

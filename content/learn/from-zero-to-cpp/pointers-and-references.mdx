@@ -39,7 +39,7 @@ You read what a pointer points to with the **dereference** operator
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int n = 42;
@@ -68,7 +68,7 @@ and check before dereferencing.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void describe(int* p) {
     if (p == nullptr) {
@@ -126,7 +126,7 @@ want the caller to be able to modify a member of an object.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void increment(int& x) {     // by reference: modifies caller's variable
     x += 1;
@@ -174,7 +174,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int a[5] = {10, 20, 30, 40, 50};
@@ -254,7 +254,7 @@ references and with pointers, so you can compare.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void swap_ref(int& a, int& b) {
     int tmp = a;
@@ -292,7 +292,7 @@ references unless you really need to express "this might be absent."
   adapter="cpp"
   title="Add one through a pointer"
   instructions={`Implement \`void add_one(int* p)\`. If \`p\` is not null, increment the int it points to by 1. If \`p\` is null, do nothing. The provided \`main\` calls it on a real address and prints the resulting value; you should see exactly \`8\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void add_one(int* p) {
     // your code here
@@ -334,7 +334,7 @@ int main() {
   adapter="cpp"
   title="Sum a C-array with pointer arithmetic"
   instructions={`Implement \`int sum(const int* data, int n)\` that returns the sum of the first \`n\` ints starting at \`data\`. Use pointer arithmetic (or indexing — they're equivalent). \`main\` runs the function on \`{1, 2, 3, 4, 5}\` and should print \`15\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int sum(const int* data, int n) {
     // your code here

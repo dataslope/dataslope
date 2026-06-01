@@ -57,7 +57,7 @@ too and you are showing four variables at once.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Four variables in one plot, each through its own aesthetic channel.
 ggplot(mpg, aes(x = displ, y = hwy,
@@ -86,7 +86,7 @@ have trouble distinguishing colors):
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # drv drives BOTH color and shape: redundant encoding, easier to read.
 ggplot(mpg, aes(displ, hwy, color = drv, shape = drv)) +
@@ -106,7 +106,7 @@ arbitrary — it follows from *what kind of mark* the geom draws.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # 'fill' colors the interior of bars; 'color' would only outline them.
 ggplot(mpg, aes(x = class, fill = drv)) +

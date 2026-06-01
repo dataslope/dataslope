@@ -28,7 +28,7 @@ The literal syntax uses curly braces, but **without** colons.
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = {1, 2, 3}
+  starterCode={`nums = {1, 2, 3}
 print(nums)
 `}
 />
@@ -39,7 +39,7 @@ print(nums)
 
 <CodeBlock
   adapter="python"
-  initialCode={`empty = set()
+  starterCode={`empty = set()
 print(empty)
 print(type(empty))
 
@@ -52,14 +52,14 @@ The `set()` constructor converts any iterable into a set, automatically deduplic
 
 <CodeBlock
   adapter="python"
-  initialCode={`unique = set([1, 2, 2, 3, 3, 3])
+  starterCode={`unique = set([1, 2, 2, 3, 3, 3])
 print(unique)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`chars = set("banana")
+  starterCode={`chars = set("banana")
 print(chars)
 `}
 />
@@ -70,7 +70,7 @@ print(chars)
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = {1, 2, 3}
+  starterCode={`s = {1, 2, 3}
 s.add(4)
 print(s)
 `}
@@ -80,7 +80,7 @@ Adding an item that already exists does nothing (sets are unique by definition).
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = {1, 2, 3}
+  starterCode={`s = {1, 2, 3}
 s.add(2)
 print(s)
 `}
@@ -90,7 +90,7 @@ print(s)
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = {1, 2, 3}
+  starterCode={`s = {1, 2, 3}
 s.discard(2)
 s.discard(99)
 print(s)
@@ -101,7 +101,7 @@ print(s)
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = {1, 2, 3}
+  starterCode={`s = {1, 2, 3}
 s.remove(2)
 try:
     s.remove(99)
@@ -115,7 +115,7 @@ print(s)
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = {1, 2, 3}
+  starterCode={`s = {1, 2, 3}
 popped = s.pop()
 print("popped:", popped)
 print("remaining:", s)
@@ -138,7 +138,7 @@ This is the killer feature: classic mathematical set operations are built in wit
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = {1, 2, 3, 4}
+  starterCode={`a = {1, 2, 3, 4}
 b = {3, 4, 5, 6}
 
 print("union:        ", a | b)
@@ -151,7 +151,7 @@ print("symmetric:    ", a ^ b)
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = {1, 2, 3, 4}
+  starterCode={`a = {1, 2, 3, 4}
 print("subset?  ", {1, 2}.issubset(a))
 print("superset?", a.issuperset({1, 2}))
 print("disjoint?", a.isdisjoint({99}))
@@ -186,7 +186,7 @@ This is where sets shine. Membership testing in a list is O(n); in a set it is O
 
 <CodeBlock
   adapter="python"
-  initialCode={`import time
+  starterCode={`import time
 
 big_list = list(range(1_000_000))
 big_set = set(big_list)
@@ -210,14 +210,14 @@ Same rule as dict keys: ints, strings, tuples of hashables, and frozensets are f
 
 <CodeBlock
   adapter="python"
-  initialCode={`good = {(1, 2), "hi", 42, frozenset({1, 2})}
+  starterCode={`good = {(1, 2), "hi", 42, frozenset({1, 2})}
 print(good)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`try:
+  starterCode={`try:
     bad = {[1, 2]}
 except TypeError as e:
     print("TypeError:", e)
@@ -230,7 +230,7 @@ The requirement is **hashability**, not immutability. A tuple containing a mutab
 
 <CodeBlock
   adapter="python"
-  initialCode={`try:
+  starterCode={`try:
     bad = {(1, [2, 3])}
 except TypeError as e:
     print("TypeError:", e)
@@ -243,7 +243,7 @@ If you need an immutable, hashable set (for example to use as a dict key or anot
 
 <CodeBlock
   adapter="python"
-  initialCode={`tags = frozenset({"python", "tutorial"})
+  starterCode={`tags = frozenset({"python", "tutorial"})
 lookup = {tags: "course-1"}
 print(lookup[frozenset({"tutorial", "python"})])
 `}
@@ -251,7 +251,7 @@ print(lookup[frozenset({"tutorial", "python"})])
 
 <CodeBlock
   adapter="python"
-  initialCode={`set_of_sets = {frozenset({1, 2}), frozenset({3, 4})}
+  starterCode={`set_of_sets = {frozenset({1, 2}), frozenset({3, 4})}
 print(set_of_sets)
 `}
 />
@@ -262,7 +262,7 @@ print(set_of_sets)
   adapter="python"
   title="Common interests"
   instructions={`Define \`common_interests(a, b)\` that takes two lists of interest strings and returns a **set** of the interests that appear in both, case-insensitive.`}
-  initialCode={`def common_interests(a, b):
+  starterCode={`def common_interests(a, b):
     # your code here
     return set()
 `}
@@ -292,7 +292,7 @@ print(set_of_sets)
   adapter="python"
   title="Unique vowels"
   instructions={`Define \`unique_vowels(text)\` that returns the set of lowercase vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`) that appear in \`text\`, ignoring case.`}
-  initialCode={`def unique_vowels(text):
+  starterCode={`def unique_vowels(text):
     # your code here
     return set()
 `}

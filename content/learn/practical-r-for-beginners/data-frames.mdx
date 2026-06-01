@@ -18,7 +18,7 @@ You can build one with `data.frame()`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`employees <- data.frame(
+  starterCode={`employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   dept   = c("Eng", "Sales", "Eng", "HR"),
   salary = c(95000, 72000, 110000, 65000),
@@ -55,7 +55,7 @@ these at the start of *every* real analysis:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A built-in data frame
+  starterCode={`# A built-in data frame
 data(mtcars)
 
 dim(mtcars)        # rows, columns
@@ -80,7 +80,7 @@ or with `[["..."]]`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`employees <- data.frame(
+  starterCode={`employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   salary = c(95000, 72000, 110000, 65000)
 )
@@ -102,7 +102,7 @@ to mean "all":
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 mtcars[1, ]              # first row, all columns
 mtcars[, 1]              # all rows, first column (returns a vector)
@@ -120,7 +120,7 @@ Adding a new column is just like assigning to a name with `$`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`employees <- data.frame(
+  starterCode={`employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   salary = c(95000, 72000, 110000, 65000)
 )
@@ -146,7 +146,7 @@ freely. A few favorites we'll use throughout the course:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# mtcars: 32 cars (1974 Motor Trend magazine), 11 variables
+  starterCode={`# mtcars: 32 cars (1974 Motor Trend magazine), 11 variables
 head(mtcars)
 
 # iris: 150 flowers, 4 measurements, 3 species
@@ -209,7 +209,7 @@ Build a data frame `students` with columns `name` (character),
 - "Cleo", grade 10, score 85
 
 Then assign \`avg_score\` to the mean of the \`score\` column.`}
-  initialCode={`students  <- NULL  # build a data.frame with name, grade, score
+  starterCode={`students  <- NULL  # build a data.frame with name, grade, score
 avg_score <- NULL  # mean of students$score
 
 print(students)

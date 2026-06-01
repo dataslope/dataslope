@@ -29,7 +29,7 @@ After any non-trivial line, print and check.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "id":    [1, 2, 3, 4, 5],
@@ -51,7 +51,7 @@ is the cheapest bug-detector in Pandas.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"price": ["10", "20", "30"]})   # strings!
 
@@ -94,7 +94,7 @@ after the chart is in your boss's deck.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print("Shape:", df.shape)
+  starterCode={`print("Shape:", df.shape)
 print()
 df.info()
 `}
@@ -110,7 +110,7 @@ guessing.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "age": [25, 30, 28, 200, 35, -5, 40],
@@ -146,7 +146,7 @@ When stuck, recreate the problem with a tiny DataFrame.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Real data has 1M rows — too big to inspect.
 # Construct a 4-row mini that triggers the same bug:
@@ -170,7 +170,7 @@ for help, the 4-row example is what they need.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
 

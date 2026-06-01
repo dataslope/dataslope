@@ -44,7 +44,7 @@ Let us simulate, in Python, exactly how fast the work piles up.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# How long would a human computer take to integrate
+  starterCode={`# How long would a human computer take to integrate
 # the Earth-Moon-Sun system for one century?
 
 # Assume a step size of 1 hour and that a single update step
@@ -99,7 +99,7 @@ from scipy.interpolate import CubicSpline
 degrees = np.arange(0, 361, 10)
 table = np.sin(np.deg2rad(degrees))
 spline = CubicSpline(degrees, table)`}
-  initialCode={`# Look up sin(37.4°) by interpolating between table entries
+  starterCode={`# Look up sin(37.4°) by interpolating between table entries
 true_value = float(np.sin(np.deg2rad(37.4)))
 interpolated = float(spline(37.4))
 
@@ -169,7 +169,7 @@ the expression differs.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 
 # Compute  f(x) = (1 - cos(x)) / x**2  for very small x.
 # Mathematically this approaches 1/2 as x -> 0.

@@ -54,7 +54,7 @@ visits = pd.Series(
     (trend + weekend_dip + rng.normal(0, 6, 120)).round().astype(int),
     index=days, name="visits",
 )`}
-  initialCode={`print("Daily visits (first 10 days):")
+  starterCode={`print("Daily visits (first 10 days):")
 print(visits.head(10))
 print()
 
@@ -98,7 +98,7 @@ days = pd.date_range("2014-06-01", periods=30, freq="D")
 units_sold = pd.Series(rng.integers(20, 60, 30), index=days, name="units")
 temp_c     = pd.Series((22 + 4*np.sin(np.arange(30)/3) + rng.normal(0,1,30)).round(1),
                        index=days, name="temp_c")`}
-  initialCode={`# Roll both up to a single monthly number, the RIGHT way for each.
+  starterCode={`# Roll both up to a single monthly number, the RIGHT way for each.
 print("Units sold is a FLOW -> SUM:")
 print("  June total units:", units_sold.resample("ME").sum().iloc[0])
 print()
@@ -142,7 +142,7 @@ visits = pd.Series(
     (trend + weekend_dip + rng.normal(0, 6, 120)).round().astype(int),
     index=days, name="visits",
 )`}
-  initialCode={`weekly = visits.resample("W").agg(["sum", "mean", "min", "max"]).round(1)
+  starterCode={`weekly = visits.resample("W").agg(["sum", "mean", "min", "max"]).round(1)
 print("Per-week profile:")
 print(weekly.head())
 print()
@@ -173,7 +173,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`# Monthly -> yearly average: the trend, stripped of seasonality.
+  starterCode={`# Monthly -> yearly average: the trend, stripped of seasonality.
 print("Average monthly passengers, by YEAR:")
 print(air.resample("YE").mean().round(0))
 print()
@@ -212,7 +212,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air3 = pd.Series(_passengers, index=idx, name="passengers")  # first 3 years`}
-  initialCode={`# Upsample monthly -> daily. asfreq() lays down the finer grid and leaves
+  starterCode={`# Upsample monthly -> daily. asfreq() lays down the finer grid and leaves
 # the brand-new in-between days as NaN, because there is no data for them.
 daily = air3.resample("D").asfreq()
 
@@ -242,7 +242,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air3 = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`daily = air3.resample("D").asfreq()
+  starterCode={`daily = air3.resample("D").asfreq()
 
 # Assumption A: "the value holds until the next reading" (forward fill).
 held = daily.ffill()
@@ -319,7 +319,7 @@ import numpy as np
 rng = np.random.default_rng(7)
 days = pd.date_range("2014-01-01", periods=90, freq="D")
 visits = pd.Series(rng.integers(80, 200, 90), index=days, name="visits")`}
-  initialCode={`weekly_total = None   # total visits per week (sum)
+  starterCode={`weekly_total = None   # total visits per week (sum)
 busiest_week = None   # week-ending Timestamp with the max total
 print(weekly_total.head() if weekly_total is not None else None)
 print("busiest:", busiest_week)
@@ -374,7 +374,7 @@ days = pd.date_range("2014-06-01", periods=30, freq="D")
 rainfall_mm  = pd.Series(rng.gamma(1.2, 3.0, 30).round(1), index=days, name="rain")
 humidity_pct = pd.Series((60 + rng.normal(0, 8, 30)).clip(20, 100).round(1),
                          index=days, name="humidity")`}
-  initialCode={`june = {
+  starterCode={`june = {
     "total_rain": None,     # rainfall is a FLOW
     "avg_humidity": None,   # humidity is a LEVEL
 }

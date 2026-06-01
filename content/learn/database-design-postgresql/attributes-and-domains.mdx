@@ -73,7 +73,7 @@ The point is not just neatness. A narrow domain protects meaning. If
 INSERT INTO orders VALUES
   (1, 'pending', 2599, DATE '2025-01-10'),
   (2, 'paid',    1200, DATE '2025-01-11');`}
-  initialCode={`-- Try changing 'paid' to 'banana' or total_cents to -5.
+  starterCode={`-- Try changing 'paid' to 'banana' or total_cents to -5.
 INSERT INTO orders (id, status, total_cents, placed_on)
 VALUES (3, 'shipped', 3499, DATE '2025-01-12');
 

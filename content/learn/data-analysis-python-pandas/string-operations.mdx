@@ -15,7 +15,7 @@ behave element-wise.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series(["  Aiko  ", "BILAL", "chen", "Diego "])
 
@@ -37,7 +37,7 @@ These compose naturally:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series(["  Sales-Engineer ", "Marketing Lead", "  DevOps "])
 
@@ -52,7 +52,7 @@ print(normalized)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "title": ["Senior Data Engineer", "Marketing Lead", "Data Scientist", "Sales Rep"],
@@ -75,7 +75,7 @@ contains special chars).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 emails = pd.Series(["aiko@example.com", "bilal@work.io", "chen@uni.edu"])
 
@@ -108,7 +108,7 @@ named groups.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 logs = pd.Series([
     "2024-03-18 14:23:01 INFO  User logged in",
@@ -128,7 +128,7 @@ turning log files into a real DataFrame.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series(["(555) 123-4567", "(555) 987-6543", "(212) 555-0100"])
 
@@ -144,7 +144,7 @@ A grab bag of useful methods:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series(["5", "42", "123"])
 print(s.str.zfill(4))           # pad with leading zeros to length 4
@@ -160,7 +160,7 @@ print(names.str.swapcase())     # Invert case
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 comments = pd.Series([
     "Loved it!",
@@ -185,7 +185,7 @@ Bringing several pieces together — normalizing employee names:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 raw = pd.Series([
     " aiko TANAKA ",
@@ -215,7 +215,7 @@ optionally fill NaN with True/False using `na=`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series(["Engineer", None, "Sales", "Lead Engineer"])
 
@@ -254,7 +254,7 @@ titles = pd.Series([
     "",
     None,
 ])`}
-  initialCode={`clean = None   # TODO
+  starterCode={`clean = None   # TODO
 
 print(clean)
 `}

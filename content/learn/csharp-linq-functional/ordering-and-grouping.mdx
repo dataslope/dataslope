@@ -15,7 +15,7 @@ from each element with a selector lambda.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Person(string Name, int Age, string City);
@@ -56,7 +56,7 @@ When the primary key has ties, `ThenBy` decides them.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Person(string Name, int Age, string City);
@@ -100,7 +100,7 @@ itself an `IEnumerable<T>` (plus a `Key` property).
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Person(string Name, int Age, string City);
@@ -145,7 +145,7 @@ project them into summaries.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Sale(string Region, decimal Amount);
@@ -179,7 +179,7 @@ The key can be anything — including a tuple or anonymous type.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Sale(string Region, string Product, decimal Amount);
@@ -215,7 +215,7 @@ It returns a `Lookup<TKey, TElement>` you can index into.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 record Sale(string Region, decimal Amount);

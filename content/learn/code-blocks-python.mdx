@@ -15,7 +15,7 @@ binding. Try editing the multiplier and re-running.
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = "3" * 3 + "3"
+  starterCode={`x = "3" * 3 + "3"
 print(x)
 print("len(x) =", len(x))
 print("x.upper() =", x.upper())
@@ -35,7 +35,7 @@ code (Python)" to see what's running before your snippet.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.DataFrame({'A': [1, 2, 3], 'B': ['Hello', 'Bye', 'World']})`}
-  initialCode={`# 'df' was created by the initialization code above.
+  starterCode={`# 'df' was created by the initialization code above.
 print("Shape:", df.shape)
 display(df)
 `}
@@ -47,7 +47,7 @@ display(df)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 import numpy as np
 
 x = np.linspace(0, 2 * np.pi, 200)
@@ -67,7 +67,7 @@ path the [Python Playground](/playground/python) uses.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.graph_objects as go
+  starterCode={`import plotly.graph_objects as go
 import numpy as np
 
 t = np.linspace(0, 10, 200)

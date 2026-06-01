@@ -110,7 +110,7 @@ INSERT INTO tasks (title, status) VALUES
     ('Draft design', 'open'),
     ('Review keys', 'done');
 `}
-  initialCode={`ALTER TABLE tasks ADD COLUMN priority TEXT;
+  starterCode={`ALTER TABLE tasks ADD COLUMN priority TEXT;
 
 UPDATE tasks
 SET priority = 'normal'

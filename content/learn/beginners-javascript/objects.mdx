@@ -18,7 +18,7 @@ The classic syntax — **object literal** notation:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const user = {
+  starterCode={`const user = {
   name: "Ada",
   age: 28,
   email: "ada@example.com",
@@ -47,7 +47,7 @@ There are two ways to read a property:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const user = { name: "Ada", age: 28, "favourite color": "blue" };
+  starterCode={`const user = { name: "Ada", age: 28, "favourite color": "blue" };
 
 console.log(user.name);                  // "Ada"
 console.log(user["name"]);               // "Ada"
@@ -70,7 +70,7 @@ You can set (or change, or add) a property with assignment:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const user = { name: "Ada" };
+  starterCode={`const user = { name: "Ada" };
 
 user.age = 28;            // add a new property
 user.name = "Ada Lovelace"; // change an existing one
@@ -95,7 +95,7 @@ the same name, you can omit the repetition:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const name = "Ada";
+  starterCode={`const name = "Ada";
 const age = 28;
 
 // Long form:
@@ -125,7 +125,7 @@ There is a tidy shorthand for declaring methods:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const greeter = {
+  starterCode={`const greeter = {
   name: "Ada",
   // Long form:
   greet1: function (other) {
@@ -153,7 +153,7 @@ Three common ways to walk an object's contents.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const scores = { math: 90, science: 87, history: 73 };
+  starterCode={`const scores = { math: 90, science: 87, history: 73 };
 
 // Keys
 console.log(Object.keys(scores));            // ["math","science","history"]
@@ -186,7 +186,7 @@ line. This is one of modern JavaScript's most-loved features.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const user = { name: "Ada", age: 28, email: "ada@example.com" };
+  starterCode={`const user = { name: "Ada", age: 28, email: "ada@example.com" };
 
 // Basic destructuring
 const { name, age } = user;
@@ -215,7 +215,7 @@ replaces a stack of `options.x` lookups:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Without destructuring:
+  starterCode={`// Without destructuring:
 function describe1(user) {
   return user.name + " (" + user.age + ")";
 }
@@ -238,7 +238,7 @@ The `...` syntax works for objects too.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const base = { color: "red", size: "M" };
+  starterCode={`const base = { color: "red", size: "M" };
 const extra = { material: "cotton", size: "L" };   // overrides 'size'
 
 const merged = { ...base, ...extra };
@@ -271,7 +271,7 @@ objects.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const a = { count: 0 };
+  starterCode={`const a = { count: 0 };
 const b = a;
 b.count = 99;
 console.log("a:", a);    // { count: 99 } — surprising if you weren't expecting it
@@ -292,7 +292,7 @@ considered equal unless they are *literally the same object*.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const a = { x: 1 };
+  starterCode={`const a = { x: 1 };
 const b = { x: 1 };
 const c = a;
 
@@ -400,7 +400,7 @@ keeps the state of the program much easier to reason about.
 Examples:
 - \`mergeUser({name:"Ada",age:28}, {age:29})\` → \`{name:"Ada", age:29}\`
 - \`mergeUser({name:"Ada",age:28}, {age:undefined, role:"admin"})\` → \`{name:"Ada", age:28, role:"admin"}\``}
-  initialCode={`function mergeUser(base, updates) {
+  starterCode={`function mergeUser(base, updates) {
   // your code here
   return { ...base };
 }

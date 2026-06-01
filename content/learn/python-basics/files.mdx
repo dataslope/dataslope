@@ -42,7 +42,7 @@ Every snippet on this page runs in your browser — no setup required.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Write a small text file
+  starterCode={`# Write a small text file
 with open("poem.txt", "w") as f:
     f.write("Beautiful is better than ugly.\\n")
     f.write("Explicit is better than implicit.\\n")
@@ -74,7 +74,7 @@ Text mode (`"r"`, `"w"`) assumes the file contains text and handles encoding/dec
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Create a file first
+  starterCode={`# Create a file first
 with open("data.txt", "w") as f:
     f.write("line one\\nline two\\nline three\\n")
 
@@ -95,7 +95,7 @@ Other reading methods:
 
 <CodeBlock
   adapter="python"
-  initialCode={`with open("data.txt", "w") as f:
+  starterCode={`with open("data.txt", "w") as f:
     f.write("first\\nsecond\\nthird\\n")
 
 with open("data.txt") as f:
@@ -112,7 +112,7 @@ Iterating over a file object yields one line at a time. This is **memory-efficie
 
 <CodeBlock
   adapter="python"
-  initialCode={`with open("poem.txt", "w") as f:
+  starterCode={`with open("poem.txt", "w") as f:
     f.write("alpha\\nbeta\\ngamma\\ndelta\\n")
 
 with open("poem.txt") as f:
@@ -129,7 +129,7 @@ When iterating over lines, each line includes the trailing `\n`. Use `.rstrip()`
 
 <CodeBlock
   adapter="python"
-  initialCode={`with open("output.txt", "w") as f:
+  starterCode={`with open("output.txt", "w") as f:
     f.write("Hello, world!\\n")
     f.write("This is line two.\\n")
 
@@ -143,7 +143,7 @@ with open("output.txt") as f:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Use print(..., file=f) for auto-newline behavior
+  starterCode={`# Use print(..., file=f) for auto-newline behavior
 with open("numbers.txt", "w") as f:
     for n in range(5):
         print(n, n ** 2, file=f, sep=" -> ")
@@ -157,7 +157,7 @@ with open("numbers.txt") as f:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Create a file
+  starterCode={`# Create a file
 with open("log.txt", "w") as f:
     f.write("Program started\\n")
 
@@ -215,7 +215,7 @@ Forgetting to close files (or only closing them manually) can **leak file descri
 
 <CodeBlock
   adapter="python"
-  initialCode={`from pathlib import Path
+  starterCode={`from pathlib import Path
 
 p = Path("note.txt")
 p.write_text("hello from pathlib\\n", encoding="utf-8")
@@ -231,7 +231,7 @@ print("Contents:", p.read_text(encoding="utf-8"))
 
 <CodeBlock
   adapter="python"
-  initialCode={`from pathlib import Path
+  starterCode={`from pathlib import Path
 
 base = Path("logs")
 nested = base / "2024" / "january.log"
@@ -259,7 +259,7 @@ JSON is ubiquitous in web APIs and config files. Python's `json` module makes it
 
 <CodeBlock
   adapter="python"
-  initialCode={`import json
+  starterCode={`import json
 from pathlib import Path
 
 people = [
@@ -290,7 +290,7 @@ CSV (Comma-Separated Values) is the universal data interchange format. Python's 
 
 <CodeBlock
   adapter="python"
-  initialCode={`import csv
+  starterCode={`import csv
 
 # Write a CSV
 with open("data.csv", "w", newline="") as f:
@@ -317,7 +317,7 @@ Use `"rb"` or `"wb"` for binary files (images, executables, pickle files, etc.).
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Write binary data
+  starterCode={`# Write binary data
 with open("data.bin", "wb") as f:
     f.write(b"\\x89PNG\\r\\n\\x1a\\n")  # PNG magic bytes
     f.write(b"\\x00" * 10)
@@ -538,7 +538,7 @@ assert lines[2].strip() == "third"`,
   adapter="python"
   title="Count lines in a file"
   instructions={`Define a function \`count_lines(path)\` that opens the text file at \`path\` and returns the number of lines in it. Use a \`with\` block. Empty files should return 0.`}
-  initialCode={`def count_lines(path):
+  starterCode={`def count_lines(path):
     # your code here
     return 0
 `}

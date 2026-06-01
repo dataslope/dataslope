@@ -165,7 +165,7 @@ Define the comparison:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -188,7 +188,7 @@ need?
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
+  starterCode={`print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
 print("Missing Attrition:    ", df["Attrition"].isna().sum())
 print("Unique Attrition values:", df["Attrition"].unique())
 `}
@@ -203,7 +203,7 @@ are in good shape.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`summary = (
+  starterCode={`summary = (
     df.groupby("Attrition")["MonthlyIncome"]
       .describe()[["count", "25%", "50%", "75%"]]
       .round(0)

@@ -33,7 +33,7 @@ and displays it.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(42);
+  starterCode={`console.log(42);
 console.log("hello");
 console.log(true);
 console.log(null);
@@ -53,7 +53,7 @@ what type any value has with the `typeof` operator:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(typeof 42);            // "number"
+  starterCode={`console.log(typeof 42);            // "number"
 console.log(typeof 3.14);          // "number"
 console.log(typeof "hello");       // "string"
 console.log(typeof true);          // "boolean"
@@ -138,7 +138,7 @@ point to a new one.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let greeting = "hello";
+  starterCode={`let greeting = "hello";
 console.log(greeting); // "hello"
 
 greeting = greeting + " world";
@@ -162,7 +162,7 @@ parts of the language for beginners.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log("5" + 3);    // "53"  — number 3 was converted to the string "3", then strings were joined.
+  starterCode={`console.log("5" + 3);    // "53"  — number 3 was converted to the string "3", then strings were joined.
 console.log("5" - 3);    // 2     — string "5" was converted to the number 5, then subtracted.
 console.log(5 + null);   // 5     — null became 0.
 console.log(5 + undefined); // NaN — "Not a Number". undefined cannot meaningfully become a number.
@@ -205,7 +205,7 @@ equality is predictable.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(5 === 5);       // true
+  starterCode={`console.log(5 === 5);       // true
 console.log(5 === "5");     // false  (different types — good!)
 console.log("a" === "a");   // true
 console.log(true === 1);    // false  (boolean vs number — good!)
@@ -237,7 +237,7 @@ either is fine, as long as you are deliberate.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let x;                         // declared but not assigned
+  starterCode={`let x;                         // declared but not assigned
 console.log(x);                // undefined
 console.log(typeof x);         // "undefined"
 
@@ -278,7 +278,7 @@ boolean context.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function describe(value) {
+  starterCode={`function describe(value) {
   if (value) {
     console.log(JSON.stringify(value), "is TRUTHY");
   } else {

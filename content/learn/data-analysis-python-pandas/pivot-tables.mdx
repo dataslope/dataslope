@@ -22,7 +22,7 @@ third one."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 sales = pd.DataFrame({
     "region":  ["N","N","S","S","E","W","W","N"],
@@ -60,7 +60,7 @@ because it gracefully handles duplicates.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 sales = pd.DataFrame({
     "region":  ["N","N","S","S","E","W","W","N"],
@@ -86,7 +86,7 @@ want to flatten).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 sales = pd.DataFrame({
     "region":  ["N","N","S","S","E","W","W","N"],
@@ -114,7 +114,7 @@ overall sums — exactly like an Excel pivot's grand totals.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 orders = pd.DataFrame({
     "year":    [2023,2023,2024,2024,2023,2024],
@@ -144,7 +144,7 @@ When you need a "flat" DataFrame for export:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 sales = pd.DataFrame({
     "region":  ["N","N","S","S"],
@@ -175,7 +175,7 @@ CSV with no weird header rows.
 
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")
 `}
-  initialCode={`# Average monthly hours by department × salary bracket
+  starterCode={`# Average monthly hours by department × salary bracket
 summary = df.pivot_table(
     index="Department",
     columns="salary",
@@ -208,7 +208,7 @@ sales = pd.DataFrame({
     "product": ["A","B","A","B","A","A","B","B"],
     "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
 })`}
-  initialCode={`report = None   # TODO
+  starterCode={`report = None   # TODO
 
 print(report)
 `}

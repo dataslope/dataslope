@@ -36,7 +36,7 @@ sequenceDiagram
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Person p = new Person("Ada", 30);
         System.out.println(p.describe());
@@ -67,7 +67,7 @@ declare *any* constructor, that freebie disappears.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Empty e = new Empty();          // works: default no-arg constructor
         System.out.println("e built: " + (e != null));
@@ -93,7 +93,7 @@ refusing to be constructed in violation of it.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         try {
             Person p = new Person("", -1);    // both bad
@@ -142,7 +142,7 @@ flowchart LR
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         System.out.println(new Point());
         System.out.println(new Point(5));
@@ -184,7 +184,7 @@ accidental mutation.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Money price = new Money(1999, "USD");        // $19.99
         Money taxed = price.add(new Money(160, "USD"));

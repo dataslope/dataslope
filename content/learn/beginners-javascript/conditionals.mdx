@@ -26,7 +26,7 @@ block runs; otherwise it is skipped entirely.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const age = 17;
+  starterCode={`const age = 17;
 
 if (age >= 18) {
   console.log("You can vote.");
@@ -47,7 +47,7 @@ otherwise, add `else`:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const age = 17;
+  starterCode={`const age = 17;
 
 if (age >= 18) {
   console.log("You can vote.");
@@ -78,7 +78,7 @@ When there are several mutually exclusive cases:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function describeScore(score) {
+  starterCode={`function describeScore(score) {
   if (score >= 90) {
     return "A";
   } else if (score >= 80) {
@@ -132,7 +132,7 @@ Compare. Both functions compute the same thing.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Nested style — hard to read past a few levels.
+  starterCode={`// Nested style — hard to read past a few levels.
 function shippingCost1(weight, distance, isPriority) {
   let cost;
   if (weight > 0) {
@@ -195,7 +195,7 @@ When you are dispatching on the value of a single variable, the
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function describeDay(day) {
+  starterCode={`function describeDay(day) {
   switch (day) {
     case "Mon":
     case "Tue":
@@ -239,7 +239,7 @@ any of the above. Build a small table, look up the answer.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const ROLES_TO_GREETING = {
+  starterCode={`const ROLES_TO_GREETING = {
   admin:  "Welcome, administrator.",
   member: "Welcome back!",
   guest:  "Hello, guest.",
@@ -266,7 +266,7 @@ where the logical operators from the previous chapter come in.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function canRent(age, hasLicence, hasCard) {
+  starterCode={`function canRent(age, hasLicence, hasCard) {
   if (age < 25) return "Too young.";
   if (!hasLicence) return "Need a driving licence.";
   if (!hasCard) return "Need a credit card.";
@@ -293,7 +293,7 @@ replace multiples of 3 with `"Fizz"`, multiples of 5 with
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`for (let n = 1; n <= 30; n++) {
+  starterCode={`for (let n = 1; n <= 30; n++) {
   let out;
   if (n % 15 === 0) {
     out = "FizzBuzz";
@@ -331,7 +331,7 @@ For now, just take it on faith that the body runs once for each
 - \`"unknown signal"\` for anything else (including the empty string)
 
 Use comparisons and conditionals, not a lookup table — practise the syntax.`}
-  initialCode={`function action(color) {
+  starterCode={`function action(color) {
   // your code here
   return "";
 }

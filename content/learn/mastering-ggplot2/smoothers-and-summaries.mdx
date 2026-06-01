@@ -16,7 +16,7 @@ a smooth curve to the geom.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
@@ -35,7 +35,7 @@ line (linear model); the default follows the data's curves:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # A straight-line fit: assumes a linear relationship.
 ggplot(mpg, aes(displ, hwy)) +
@@ -70,7 +70,7 @@ without you pre-aggregating the data:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Mean highway MPG per class, computed at plot time, drawn as points.
 ggplot(mpg, aes(class, hwy)) +
@@ -89,7 +89,7 @@ You can add a range too:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Mean with a min-max range bar per class.
 ggplot(mpg, aes(class, hwy)) +
@@ -106,7 +106,7 @@ and the summary, so the reader sees the evidence *and* the claim:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.4) +                       # the evidence

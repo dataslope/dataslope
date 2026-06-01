@@ -23,7 +23,7 @@ The solution: **constrain** `T` to types that *do* have a `length` property.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Define a constraint: T must have a 'length' property
+  starterCode={`// Define a constraint: T must have a 'length' property
 interface Lengthwise {
   length: number;
 }
@@ -60,7 +60,7 @@ One of the most useful constraints is `keyof`, which gives you the union of all 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  starterCode={`function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
   return obj[key];
 }
 
@@ -91,7 +91,7 @@ The syntax `T[K]` is an **indexed access type** (also called a **lookup type**).
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Person = {
+  starterCode={`type Person = {
   name: string;
   age: number;
   active: boolean;
@@ -121,7 +121,7 @@ Sometimes you want a type parameter to have a **default** value if the caller do
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Default type parameter: T defaults to string if not provided
+  starterCode={`// Default type parameter: T defaults to string if not provided
 function createArray<T = string>(length: number, value: T): T[] {
   return Array(length).fill(value);
 }
@@ -149,7 +149,7 @@ The trick: use `extends` to constrain the input, but still bind to the precise t
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Without 'extends readonly': input widens to string[]
+  starterCode={`// Without 'extends readonly': input widens to string[]
 function firstBad<T>(arr: T[]): T | undefined {
   return arr[0];
 }
@@ -195,7 +195,7 @@ Let's build a `pluck` function that extracts a property from an array of objects
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pluck<T, K extends keyof T>(array: T[], key: K): T[K][] {
+  starterCode={`function pluck<T, K extends keyof T>(array: T[], key: K): T[K][] {
   return array.map(item => item[key]);
 }
 
@@ -223,7 +223,7 @@ Here's another useful utility: `pick`, which creates a new object with only the 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+  starterCode={`function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   const result = {} as Pick<T, K>;
   for (const key of keys) {
     result[key] = obj[key];
@@ -262,7 +262,7 @@ TypeScript infers variance automatically based on how the type parameter is used
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Covariant example: readonly containers
+  starterCode={`// Covariant example: readonly containers
 type ReadonlyBox<T> = {
   readonly value: T;
 };

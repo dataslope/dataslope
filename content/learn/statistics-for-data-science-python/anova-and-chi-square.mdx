@@ -31,7 +31,7 @@ by pure luck climbs well above 5%.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -106,7 +106,7 @@ question.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(11)
@@ -216,7 +216,7 @@ Let's test whether **device type** is associated with **churn**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -293,7 +293,7 @@ last year's category mix? Here you use `stats.chisquare`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(9)
@@ -374,7 +374,7 @@ method_a = rng.normal(72, 9, size=35)
 method_b = rng.normal(75, 9, size=35)
 method_c = rng.normal(81, 9, size=35)   # this method genuinely helps
 alpha = 0.05`}
-  initialCode={`# TODO: one-way ANOVA; set F_stat, p_value (floats) and conclusion (str)
+  starterCode={`# TODO: one-way ANOVA; set F_stat, p_value (floats) and conclusion (str)
 F_stat = None
 p_value = None
 conclusion = None
@@ -442,7 +442,7 @@ rate = np.where(plan == "basic", 0.30, np.where(plan == "pro", 0.16, 0.10))
 churned = rng.random(n) < rate
 df = pd.DataFrame({"plan": plan, "churned": churned})
 alpha = 0.05`}
-  initialCode={`# TODO: build 'table' with crosstab, run chi-square, set p_value (float) and associated (bool)
+  starterCode={`# TODO: build 'table' with crosstab, run chi-square, set p_value (float) and associated (bool)
 table = None
 p_value = None
 associated = None

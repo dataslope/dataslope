@@ -98,7 +98,7 @@ SQL and read the error: PostgreSQL refuses the bad row.
 );
 
 INSERT INTO products (name, price) VALUES ('Notebook', 4.50);`}
-  initialCode={`-- A negative price violates the CHECK constraint.
+  starterCode={`-- A negative price violates the CHECK constraint.
 INSERT INTO products (name, price) VALUES ('Broken price', -3.00);
 
 -- The bad product is not stored.

@@ -50,7 +50,7 @@ The domain layer contains types and functions that model your problem. It depend
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// domain.ts
+  starterCode={`// domain.ts
 export type User = {
   id: string;
   name: string;
@@ -170,7 +170,7 @@ Dependency inversion is simple in TypeScript: define an interface (or a function
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Application layer defines the contract
+  starterCode={`// Application layer defines the contract
 type Logger = {
   log(message: string): void;
 };
@@ -362,7 +362,7 @@ Use types to enforce invariants at module boundaries. For example, ensure that a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`declare const OrderBrand: unique symbol;
+  starterCode={`declare const OrderBrand: unique symbol;
 type Order = {
   orderId: string;
   total: number;

@@ -26,7 +26,7 @@ analyst needs.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.describe().round(2).T)
+  starterCode={`print(df.describe().round(2).T)
 `}
 />
 
@@ -40,7 +40,7 @@ For non-numeric columns:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.describe(include="object"))
+  starterCode={`print(df.describe(include="object"))
 `}
 />
 
@@ -50,7 +50,7 @@ You get `count`, `unique`, `top` (most common), and `freq`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # A small team where one CEO skews everything
 salaries = pd.Series([45_000, 52_000, 48_000, 55_000, 60_000, 47_000, 850_000])
@@ -76,7 +76,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series([1, 2, 4, 5, 7, 9, 12, 15, 20, 35, 50])
 
@@ -95,7 +95,7 @@ finish in under X ms") or pay-band analyses.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.Series([50, 50, 50, 50, 50])           # no spread
 b = pd.Series([20, 30, 50, 70, 80])           # moderate
@@ -117,7 +117,7 @@ spread. IQR is more robust to outliers; std is more sensitive.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df["Department"].value_counts())
+  starterCode={`print(df["Department"].value_counts())
 print()
 print("As percentages:")
 print((df["Department"].value_counts(normalize=True) * 100).round(1))
@@ -133,7 +133,7 @@ for "what share of our customers are in each tier?".
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`numeric = df.select_dtypes(include="number")
+  starterCode={`numeric = df.select_dtypes(include="number")
 corr = numeric.corr().round(2)
 print(corr)
 `}
@@ -163,7 +163,7 @@ The natural extension — `describe` per group:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`# Tenure summary per department
+  starterCode={`# Tenure summary per department
 print(df.groupby("Department")["time_spend_company"].describe().round(2))
 `}
 />
@@ -175,7 +175,7 @@ A common rule of thumb: anything beyond Q1 − 1.5×IQR or Q3 +
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series([10, 12, 11, 13, 12, 11, 14, 13, 12, 95])
 
@@ -209,7 +209,7 @@ the most important customer on the list.
 import numpy as np
 
 values = pd.Series([5, 7, 6, 8, 7, 5, 9, 8, 6, 7, 6, 100, 5, 7, 8, np.nan, 6])`}
-  initialCode={`summary = {}   # TODO
+  starterCode={`summary = {}   # TODO
 
 print(summary)
 `}

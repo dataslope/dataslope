@@ -21,7 +21,7 @@ The character `'\0'` is the byte `0`, *not* the digit `'0'` (which is
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     char s[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};
@@ -61,7 +61,7 @@ when you need to modify the contents.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     char mutable_copy[] = "hi";      // copy of "hi" plus '\\0'
@@ -98,7 +98,7 @@ how big `dst` is. You are responsible for that.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -136,7 +136,7 @@ That second case is the bug factory. Many codebases now use
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -164,7 +164,7 @@ null-termination.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 size_t my_strlen(const char *s) {
@@ -187,7 +187,7 @@ The idiomatic version uses a moving pointer:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 size_t my_strlen(const char *s) {
@@ -212,7 +212,7 @@ buffer size.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 #include <ctype.h>
 
@@ -247,7 +247,7 @@ plain `char` is signed on some platforms.
   adapter="c"
   title="Implement your own strcmp"
   instructions={`Implement \`int my_strcmp(const char *a, const char *b)\` that returns a negative value if \`a < b\`, zero if equal, and positive if \`a > b\` — using byte-wise comparison. The provided \`main\` prints \`<\`, \`=\`, or \`>\` for a few pairs.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int my_strcmp(const char *a, const char *b) {
     // your code here
@@ -302,7 +302,7 @@ int main(void) {
   adapter="c"
   title="Reverse a C string in place"
   instructions={`Implement \`void reverse_str(char *s)\` so that the string \`s\` is reversed without using any helper buffer. The provided \`main\` calls it on \`"systems"\` and prints the result on one line.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 void reverse_str(char *s) {

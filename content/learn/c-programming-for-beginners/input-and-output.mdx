@@ -39,7 +39,7 @@ the corresponding argument.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int n = 42;
@@ -64,7 +64,7 @@ You can ask for a minimum field width — useful for tables:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     printf("%-10s %5s\\n", "name", "score");
@@ -100,7 +100,7 @@ pointers, this will make even more sense.)
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int age;
@@ -131,7 +131,7 @@ for `%c`).
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a, b;
@@ -168,7 +168,7 @@ For character-by-character I/O, the standard library offers
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     // Echo every character from stdin until EOF.
@@ -234,7 +234,7 @@ Use the field widths:
 - \`%-8s\` for \`item\`
 - plain \`%d\` for \`qty\`
 - \`%.2f\` for prices`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     const char *item = "Widget";

@@ -41,7 +41,7 @@ with a single number — the whole table collapsed to a count:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT COUNT(*) AS employee_count
+  starterCode={`SELECT COUNT(*) AS employee_count
 FROM employees;`}
 />
 
@@ -59,7 +59,7 @@ same set of rows and produces its own summary:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)            AS headcount,
   SUM(salary)         AS total_payroll,
   ROUND(AVG(salary))  AS avg_salary,
@@ -87,7 +87,7 @@ Engineering*" is just an average with a filter:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT ROUND(AVG(salary)) AS avg_eng_salary
+  starterCode={`SELECT ROUND(AVG(salary)) AS avg_eng_salary
 FROM employees
 WHERE dept = 'Engineering';`}
 />
@@ -119,7 +119,7 @@ between them tells you how many values are missing:
 );
 INSERT INTO customers (name, phone) VALUES
   ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)     AS total_rows,
   COUNT(phone) AS rows_with_phone
 FROM customers;`}

@@ -171,7 +171,7 @@ working tool.
 
 <CodeBlock
   adapter="r"
-  initialCode={`group_a <- c(5.2, 5.4, 5.1, 5.6, 5.3, 5.5)
+  starterCode={`group_a <- c(5.2, 5.4, 5.1, 5.6, 5.3, 5.5)
 group_b <- c(4.8, 4.9, 5.1, 4.7, 4.6, 5.0)
 
 result <- t.test(group_a, group_b)
@@ -189,7 +189,7 @@ trend line:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
@@ -211,7 +211,7 @@ data manipulation become a readable chain:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>

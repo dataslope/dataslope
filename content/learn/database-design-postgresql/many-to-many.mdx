@@ -161,7 +161,7 @@ INSERT INTO enrollments (student_id, course_id) VALUES
   (1, 10), (1, 11),
   (2, 10), (2, 12),
   (3, 11);`}
-  initialCode={`SELECT s.name AS student, c.title AS course
+  starterCode={`SELECT s.name AS student, c.title AS course
 FROM enrollments e
 JOIN students s ON s.id = e.student_id
 JOIN courses c ON c.id = e.course_id

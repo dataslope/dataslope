@@ -24,7 +24,7 @@ Many built-in types implement it: `Integer`, `Double`, `String`
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.Arrays;
+  starterCode={`import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ makes sense most of the time:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.Arrays;
+  starterCode={`import java.util.Arrays;
 
 public class Main {
     record Version(int major, int minor, int patch) implements Comparable<Version> {
@@ -92,7 +92,7 @@ type:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.*;
+  starterCode={`import java.util.*;
 
 public class Main {
     record Person(String name, int age) {}
@@ -129,7 +129,7 @@ The real elegance of `Comparator` is composition. You can chain
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.*;
+  starterCode={`import java.util.*;
 
 public class Main {
     record Employee(String dept, String name, int salary) {}
@@ -168,7 +168,7 @@ null-tolerant one:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.*;
+  starterCode={`import java.util.*;
 
 public class Main {
     public static void main(String[] args) {

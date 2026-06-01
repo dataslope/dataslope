@@ -29,7 +29,7 @@ flowchart LR
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # A single column by name (returns a vector)
 mtcars[, "mpg"][1:6]
@@ -56,7 +56,7 @@ multiple columns or pass `drop = FALSE`.
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # Rows by position
 mtcars[1:5, ]
@@ -82,7 +82,7 @@ You can do both in one expression:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # Fuel-efficient cars: just mpg, cyl, and weight
 mtcars[mtcars$mpg > 25, c("mpg", "cyl", "wt")]
@@ -103,7 +103,7 @@ combine many `==` with `|`. Use `%in%`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(iris)
+  starterCode={`data(iris)
 
 # Tedious and error-prone:
 sub1 <- iris[iris$Species == "setosa" | iris$Species == "virginica", ]
@@ -129,7 +129,7 @@ with `NA` yields a row of all `NA`s.
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(airquality)
+  starterCode={`data(airquality)
 
 # Naive filter — includes rows of all NAs!
 naive <- airquality[airquality$Ozone > 100, ]
@@ -155,7 +155,7 @@ the helper:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # Sort by mpg ascending
 head(mtcars[order(mtcars$mpg), c("mpg","cyl","wt")])
@@ -213,7 +213,7 @@ only the rows where `wt > 4` and `mpg < 18`, and only the columns
   adapter="r"
   title="Filter and select"
   instructions={`Use base R subsetting to filter \`mtcars\` to cars with \`wt > 4\` and \`mpg < 18\`, keeping only the \`mpg\`, \`cyl\`, and \`wt\` columns. Assign the result to \`heavy_inefficient\`.`}
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 heavy_inefficient <- NULL  # replace with a subset of mtcars
 

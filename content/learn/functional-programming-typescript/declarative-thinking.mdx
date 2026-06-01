@@ -22,7 +22,7 @@ $50, take their customer names, deduplicate, and sort alphabetically.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Order = {
+  starterCode={`type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -65,7 +65,7 @@ step by step.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Order = {
+  starterCode={`type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -165,7 +165,7 @@ realistic example — computing per-customer paid totals.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Order = {
+  starterCode={`type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -210,7 +210,7 @@ The mental shift applies far beyond list processing.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Validator = {
+  starterCode={`type Validator = {
   readonly required?: boolean;
   readonly minLen?: number;
   readonly maxLen?: number;

@@ -142,7 +142,7 @@ S in 1985 or in R today. The semantics are nearly identical.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Code that is essentially identical to 1985-era S
+  starterCode={`# Code that is essentially identical to 1985-era S
 heights <- c(168, 172, 165, 180, 175, 170, 169)
 weights <- c(63, 70, 58, 85, 75, 68, 65)
 
@@ -170,7 +170,7 @@ But R added things S never had. A modern R script can use
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # A dplyr pipeline — distinctly modern-R idiom
@@ -266,7 +266,7 @@ linear model.
 2. Fit a linear model \`weight ~ height\` and assign it to \`model\`.
 3. Extract the slope coefficient (the "height" coefficient) into a numeric scalar \`slope\`.`}
   initCode={`data(women)`}
-  initialCode={`avg_weight <- NA
+  starterCode={`avg_weight <- NA
 model      <- NULL
 slope      <- NA
 `}

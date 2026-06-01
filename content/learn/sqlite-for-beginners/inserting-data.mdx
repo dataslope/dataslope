@@ -24,7 +24,7 @@ Here is a complete example: create a table, insert one row, then read it back.
 <SqlCodeBlock
   dialect="sqlite"
   title="Insert one row"
-  initialCode={`CREATE TABLE tasks (
+  starterCode={`CREATE TABLE tasks (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   done INTEGER DEFAULT 0
@@ -46,7 +46,7 @@ When a table has `id INTEGER PRIMARY KEY`, you usually leave `id` out of the ins
 <SqlCodeBlock
   dialect="sqlite"
   title="Leave out the id"
-  initialCode={`CREATE TABLE tasks (
+  starterCode={`CREATE TABLE tasks (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   done INTEGER DEFAULT 0
@@ -89,7 +89,7 @@ You can add multiple rows with one `INSERT` by separating value groups with comm
 <SqlCodeBlock
   dialect="sqlite"
   title="Insert multiple rows"
-  initialCode={`CREATE TABLE tasks (
+  starterCode={`CREATE TABLE tasks (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   done INTEGER DEFAULT 0
@@ -123,7 +123,7 @@ The column list and values match by position. The first value goes into the firs
 <SqlCodeBlock
   dialect="sqlite"
   title="Match columns to values"
-  initialCode={`CREATE TABLE contacts (
+  starterCode={`CREATE TABLE contacts (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT,
@@ -168,7 +168,7 @@ You do not have to fill every column every time. Name the columns you are provid
 <SqlCodeBlock
   dialect="sqlite"
   title="Provide only some columns"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   author TEXT,
@@ -203,7 +203,7 @@ Then select \`name\` and \`quantity\` from \`pantry\` ordered by \`id\`.`}
   name TEXT NOT NULL,
   quantity INTEGER DEFAULT 0
 );`}
-  initialCode={`-- Insert the two rows here:
+  starterCode={`-- Insert the two rows here:
 
 
 -- Then read them:

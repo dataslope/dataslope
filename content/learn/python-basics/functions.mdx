@@ -56,7 +56,7 @@ A function is **defined once** with `def`, then **called many times**. Each call
 
 <CodeBlock
   adapter="python"
-  initialCode={`def greet(name):
+  starterCode={`def greet(name):
     """Return a friendly greeting."""
     return f"Hello, {name}!"
 
@@ -68,7 +68,7 @@ A function that does not explicitly `return` returns `None`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`def say_hello():
+  starterCode={`def say_hello():
     print("Hello!")
 
 result = say_hello()
@@ -86,7 +86,7 @@ Python distinguishes between **positional** and **keyword** arguments.
 
 <CodeBlock
   adapter="python"
-  initialCode={`def deposit(account, amount, currency="USD"):
+  starterCode={`def deposit(account, amount, currency="USD"):
     return f"Deposited {amount} {currency} into {account}"
 
 # positional
@@ -110,7 +110,7 @@ Defaults are evaluated **once**, when the function is **defined** (not when it's
 
 <CodeBlock
   adapter="python"
-  initialCode={`# WRONG: the same list is reused across calls!
+  starterCode={`# WRONG: the same list is reused across calls!
 def add_item_bad(item, items=[]):
     items.append(item)
     return items
@@ -127,7 +127,7 @@ print(add_item_bad("c"))   # surprise: ["a", "b", "c"]
 
 <CodeBlock
   adapter="python"
-  initialCode={`# RIGHT: use None as the sentinel
+  starterCode={`# RIGHT: use None as the sentinel
 def add_item(item, items=None):
     if items is None:
         items = []
@@ -146,7 +146,7 @@ print(add_item("c"))   # ["c"]
 
 <CodeBlock
   adapter="python"
-  initialCode={`def log_event(name, *tags, **metadata):
+  starterCode={`def log_event(name, *tags, **metadata):
     print("event:", name)
     print("tags:", tags)           # tuple
     print("metadata:", metadata)   # dict
@@ -159,7 +159,7 @@ When **calling** a function, `*` and `**` **unpack** iterables/dicts back into a
 
 <CodeBlock
   adapter="python"
-  initialCode={`def add3(a, b, c):
+  starterCode={`def add3(a, b, c):
     return a + b + c
 
 nums = [1, 2, 3]
@@ -189,7 +189,7 @@ def func(pos_only, /, pos_or_kw, *, kw_only):
 
 <CodeBlock
   adapter="python"
-  initialCode={`def divide(a, b, /, *, rounded=False):
+  starterCode={`def divide(a, b, /, *, rounded=False):
     # 'a' and 'b' are positional-only (left of /).
     # 'rounded' is keyword-only (right of *).
     result = a / b
@@ -215,7 +215,7 @@ A `return` statement exits the function immediately and sends a value back to th
 
 <CodeBlock
   adapter="python"
-  initialCode={`def absolute(x):
+  starterCode={`def absolute(x):
     if x < 0:
         return -x
     return x
@@ -229,7 +229,7 @@ You can return **multiple values** by separating them with commas. Python packs 
 
 <CodeBlock
   adapter="python"
-  initialCode={`def divmod_custom(a, b):
+  starterCode={`def divmod_custom(a, b):
     quotient = a // b
     remainder = a % b
     return quotient, remainder
@@ -243,7 +243,7 @@ Use **early return** to avoid deep nesting:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def process(value):
+  starterCode={`def process(value):
     if value is None:
         return "nothing to do"
     if value < 0:
@@ -263,7 +263,7 @@ A `lambda` is an **anonymous, single-expression function**. They are useful as `
 
 <CodeBlock
   adapter="python"
-  initialCode={`words = ["banana", "apple", "cherry"]
+  starterCode={`words = ["banana", "apple", "cherry"]
 print(sorted(words, key=lambda w: w[-1]))   # sort by last letter
 
 doubler = lambda x: x * 2
@@ -281,7 +281,7 @@ Type hints (PEP 484+) are **optional annotations**. Python itself does not enfor
 
 <CodeBlock
   adapter="python"
-  initialCode={`def total(prices: list[float], tax_rate: float = 0.07) -> float:
+  starterCode={`def total(prices: list[float], tax_rate: float = 0.07) -> float:
     """Compute total price including tax."""
     return sum(prices) * (1 + tax_rate)
 
@@ -307,7 +307,7 @@ In Python, functions are **first-class objects**: you can pass them as arguments
 
 <CodeBlock
   adapter="python"
-  initialCode={`def apply_twice(func, x):
+  starterCode={`def apply_twice(func, x):
     return func(func(x))
 
 def add_one(n):
@@ -333,7 +333,7 @@ These built-ins take a function and an iterable.
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = [1, 2, 3, 4, 5]
+  starterCode={`nums = [1, 2, 3, 4, 5]
 
 print(list(map(lambda x: x * x, nums)))
 print(list(filter(lambda x: x % 2 == 0, nums)))
@@ -385,7 +385,7 @@ Here, `lru_cache` is a **decorator** — a function that takes a function and re
   adapter="python"
   title="Compose two functions"
   instructions={`Define a function \`compose(f, g)\` that takes two single-argument functions and returns a new function \`h\` such that \`h(x) == f(g(x))\` for any \`x\`.`}
-  initialCode={`def compose(f, g):
+  starterCode={`def compose(f, g):
     # your code here
     return lambda x: x
 `}
@@ -419,7 +419,7 @@ Example:
 greet_all("Ada", "Grace", greeting="Hi")
 # -> "Hi, Ada!\\nHi, Grace!"
 \`\`\``}
-  initialCode={`def greet_all(*names, greeting="Hello"):
+  starterCode={`def greet_all(*names, greeting="Hello"):
     # your code here
     return ""
 `}
@@ -449,7 +449,7 @@ greet_all("Ada", "Grace", greeting="Hi")
   adapter="python"
   title="Fix the mutable default"
   instructions={`The function below has a mutable default argument bug. Fix it by using \`None\` as a sentinel and creating a new list inside the function when needed.`}
-  initialCode={`def collect_events(event, log=[]):
+  starterCode={`def collect_events(event, log=[]):
     log.append(event)
     return log
 `}
@@ -481,7 +481,7 @@ assert my_log is result`,
   adapter="python"
   title="Recursive factorial"
   instructions={`Define a function \`factorial(n)\` that computes \`n!\` recursively. \`factorial(0)\` should return \`1\`.`}
-  initialCode={`def factorial(n):
+  starterCode={`def factorial(n):
     # your code here
     return 1
 `}

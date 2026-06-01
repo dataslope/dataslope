@@ -15,7 +15,7 @@ The simplest generic function: identity.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const id = <A,>(a: A): A => a;
+  starterCode={`const id = <A,>(a: A): A => a;
 
 console.log(id(42));
 console.log(id("hello"));
@@ -40,7 +40,7 @@ types tell you a great deal before you've read any code.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// All of these are fully parametric: they make no assumptions
+  starterCode={`// All of these are fully parametric: they make no assumptions
 // about A or B, so they can only do what the types literally allow.
 
 const head = <A,>(xs: ReadonlyArray<A>): A | undefined => xs[0];
@@ -86,7 +86,7 @@ generic function uses it.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// "Type-class-as-record"
+  starterCode={`// "Type-class-as-record"
 type Eq<A> = { equals: (x: A, y: A) => boolean };
 
 // Some instances
@@ -132,7 +132,7 @@ tuples lexicographically.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Ordering = -1 | 0 | 1;
+  starterCode={`type Ordering = -1 | 0 | 1;
 type Ord<A> = { compare: (x: A, y: A) => Ordering };
 
 const ordNumber: Ord<number> = {

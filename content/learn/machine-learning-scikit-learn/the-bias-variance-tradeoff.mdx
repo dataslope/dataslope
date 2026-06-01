@@ -53,7 +53,7 @@ bullseye. Each dart is the model's prediction; the bullseye is the truth.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(1)
@@ -101,7 +101,7 @@ low-variance model produces nearly the same curve every time.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -251,7 +251,7 @@ def make_dataset():
 x_star = np.array([[2.0]])
 simple = make_pipeline(PolynomialFeatures(1), LinearRegression())
 flexible = make_pipeline(PolynomialFeatures(15), LinearRegression())`}
-  initialCode={`var_simple = None
+  starterCode={`var_simple = None
 var_flexible = None
 
 # TODO: refit each model on 60 fresh datasets, collect predictions at x_star,

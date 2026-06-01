@@ -16,7 +16,7 @@ a y.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Only x is mapped. Yet the bars have heights. Where is y?
 ggplot(mpg, aes(x = class)) +
@@ -69,7 +69,7 @@ hood:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 sales <- data.frame(product = c("A", "B", "C"),
                     revenue = c(120, 85, 47))
@@ -90,7 +90,7 @@ the y-axis:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # after_stat(density) maps the stat's computed 'density' to y.
 ggplot(mpg, aes(x = hwy)) +

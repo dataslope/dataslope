@@ -40,7 +40,7 @@ that cannot be converted into an integer.
 );
 
 INSERT INTO order_items (sku, quantity) VALUES ('PEN-1', 3);`}
-  initialCode={`-- The type INTEGER rejects text that is not a number.
+  starterCode={`-- The type INTEGER rejects text that is not a number.
 INSERT INTO order_items (sku, quantity) VALUES ('BOOK-1', 'many');
 
 SELECT id, sku, quantity FROM order_items;`}
@@ -123,7 +123,7 @@ measurements, but money usually needs exact decimal behavior.
 
 INSERT INTO money_demo (exact_amount, approximate_amount)
 VALUES (0.1 + 0.2, 0.1::double precision + 0.2::double precision);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   exact_amount,
   approximate_amount,
   exact_amount = 0.3 AS numeric_is_exact,

@@ -20,7 +20,7 @@ A logical vector is just a vector whose elements are `TRUE` or
 
 <CodeBlock
   adapter="r"
-  initialCode={`flags <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
+  starterCode={`flags <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
 print(flags)
 length(flags)
 `}
@@ -31,7 +31,7 @@ You rarely *type* logical vectors out by hand. Almost always, you
 
 <CodeBlock
   adapter="r"
-  initialCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # Which scores are 80 or above?
 scores >= 80
@@ -56,7 +56,7 @@ Here is one of the most useful R tricks of all time: **`sum()` and
 
 <CodeBlock
   adapter="r"
-  initialCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # How many scores are 80 or above?
 sum(scores >= 80)
@@ -89,7 +89,7 @@ and `!` (not):
 
 <CodeBlock
   adapter="r"
-  initialCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # Scores between 75 and 90 (inclusive)
 scores >= 75 & scores <= 90
@@ -115,7 +115,7 @@ another vector. R keeps only the positions where the logical is
 
 <CodeBlock
   adapter="r"
-  initialCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 names  <- c("alice","bob","carol","dan","eve","frank","grace","heidi","ivan","judy")
 
 # Just the high scores
@@ -152,7 +152,7 @@ string enclosed in double or single quotes:
 
 <CodeBlock
   adapter="r"
-  initialCode={`fruits <- c("apple", "banana", "cherry", "date")
+  starterCode={`fruits <- c("apple", "banana", "cherry", "date")
 print(fruits)
 length(fruits)
 nchar(fruits)        # number of characters in each string
@@ -172,7 +172,7 @@ coercion) into one:
 
 <CodeBlock
   adapter="r"
-  initialCode={`first <- c("Alice", "Bob", "Carol")
+  starterCode={`first <- c("Alice", "Bob", "Carol")
 last  <- c("Smith", "Jones", "Lee")
 
 # paste() puts a space between by default
@@ -203,7 +203,7 @@ For checking which strings contain something, the workhorse is
 
 <CodeBlock
   adapter="r"
-  initialCode={`emails <- c("alice@a.com", "bob@b.org", "carol@a.com", "dan@c.net")
+  starterCode={`emails <- c("alice@a.com", "bob@b.org", "carol@a.com", "dan@c.net")
 
 # Which emails are from the ".com" domain?
 grepl(".com", emails, fixed = TRUE)
@@ -229,7 +229,7 @@ quick exposure:
 
 <CodeBlock
   adapter="r"
-  initialCode={`severity <- c("low", "high", "medium", "low", "high", "low")
+  starterCode={`severity <- c("low", "high", "medium", "low", "high", "low")
 severity_f <- factor(severity, levels = c("low", "medium", "high"))
 
 print(severity_f)
@@ -287,7 +287,7 @@ higher.
   initCode={`students <- c("Ada", "Ben", "Cleo", "Drew", "Ella")
 scores   <- c(82, 64, 91, 70, 58)
 `}
-  initialCode={`# students and scores are already defined
+  starterCode={`# students and scores are already defined
 passed <- NULL  # replace with the filtered names
 
 print(passed)

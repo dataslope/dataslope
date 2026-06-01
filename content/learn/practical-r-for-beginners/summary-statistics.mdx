@@ -34,7 +34,7 @@ flowchart TB
 
 <CodeBlock
   adapter="r"
-  initialCode={`incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
+  starterCode={`incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
 
 mean(incomes)     # average — pulled up by the 250
 median(incomes)   # middle value — robust to outliers
@@ -61,7 +61,7 @@ both).
 
 <CodeBlock
   adapter="r"
-  initialCode={`a <- c(48, 49, 50, 51, 52)        # tight
+  starterCode={`a <- c(48, 49, 50, 51, 52)        # tight
 b <- c(10, 30, 50, 70, 90)        # spread
 
 mean(a); mean(b)     # same mean!
@@ -93,7 +93,7 @@ most common.
 
 <CodeBlock
   adapter="r"
-  initialCode={`scores <- c(60, 65, 67, 70, 72, 75, 78, 80, 82, 85, 88, 90, 92, 95, 100)
+  starterCode={`scores <- c(60, 65, 67, 70, 72, 75, 78, 80, 82, 85, 88, 90, 92, 95, 100)
 
 # Quartiles (default)
 quantile(scores)
@@ -117,7 +117,7 @@ five-number summary plus the mean, for free:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 summary(mtcars$mpg)
 summary(mtcars$hp)
@@ -133,7 +133,7 @@ Combine `dplyr` with the summary statistics we know:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(iris)
 
 iris |>
@@ -176,7 +176,7 @@ summary statistics can describe wildly different datasets:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(anscombe)
+  starterCode={`data(anscombe)
 
 # Compute means and sds of all four (x, y) pairs
 sapply(1:4, function(i) {
@@ -240,7 +240,7 @@ iqr) — ignoring NAs throughout.
   adapter="r"
   title="Build a describe() helper"
   instructions={`Implement \`describe(x)\` so that it returns a named numeric vector with the listed statistics. NAs should be ignored.`}
-  initialCode={`describe <- function(x) {
+  starterCode={`describe <- function(x) {
   # return a named numeric vector with:
   # n, mean, median, sd, min, max, iqr
   NULL

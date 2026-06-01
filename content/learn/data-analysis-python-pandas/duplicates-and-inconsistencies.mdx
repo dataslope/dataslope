@@ -22,7 +22,7 @@ uniquely identify a row?*
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "customer_id": [1, 2, 3, 2, 4, 1],
@@ -62,7 +62,7 @@ df = pd.DataFrame({
     "name":        ["Aiko","Bilal","Chen","Bilal","Diego","Aiko"],
     "spend":       [100, 200, 300, 200, 50, 100],
 })`}
-  initialCode={`# Drop full-row duplicates
+  starterCode={`# Drop full-row duplicates
 print(df.drop_duplicates())
 print()
 
@@ -92,7 +92,7 @@ category can appear under many syntactic forms.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
@@ -108,7 +108,7 @@ A canonical-mapping cleanup:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
@@ -163,7 +163,7 @@ keep a column for the original currency if useful.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "price":    [10.00, 1500,    9.50, 1200],
@@ -192,7 +192,7 @@ joins. Check with:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"x": [1, 2, 3]}, index=["a", "b", "a"])  # duplicate "a"
 print("Index unique?", df.index.is_unique)

@@ -11,7 +11,7 @@ fits a different situation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen"],
@@ -42,7 +42,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140],
     "bonus":  [12, 8, 20],
 })`}
-  initialCode={`new_df = (
+  starterCode={`new_df = (
     df
     .assign(total_comp=lambda x: x["salary"] + x["bonus"])
     .assign(bonus_pct=lambda x: (x["bonus"] / x["salary"] * 100).round(1))
@@ -91,7 +91,7 @@ ized ternary.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"salary": [120, 95, 140, 80, 128]})
@@ -107,7 +107,7 @@ For more than two branches, `np.select` is cleaner than nested
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
@@ -131,7 +131,7 @@ When the new column is a lookup from old values:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "currency": ["USD","EUR","GBP","USD","JPY"],
@@ -155,7 +155,7 @@ flexible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 def grade(score):
     if score >= 90: return "A"
@@ -181,7 +181,7 @@ when you can.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"age": [22, 35, 47, 61, 18, 29, 71, 45]})
 df["age_group"] = pd.cut(df["age"],
@@ -197,7 +197,7 @@ For equal-frequency buckets (quartiles, quintiles) use
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"income": [25, 35, 45, 60, 80, 110, 150, 200, 400]})
 df["quartile"] = pd.qcut(df["income"], q=4, labels=["Q1","Q2","Q3","Q4"])
@@ -212,7 +212,7 @@ fields.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.read_csv(

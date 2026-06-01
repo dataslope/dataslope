@@ -16,7 +16,7 @@ mask is `True`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -59,7 +59,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
 })`}
-  initialCode={`print(df[df["salary"] >= 100])
+  starterCode={`print(df[df["salary"] >= 100])
 print()
 print(df[df["dept"] == "Eng"])
 print()
@@ -82,7 +82,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
 })`}
-  initialCode={`# Engineers AND high earners
+  starterCode={`# Engineers AND high earners
 print(df[(df["dept"] == "Eng") & (df["salary"] > 120)])
 print()
 
@@ -113,7 +113,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
 })`}
-  initialCode={`# Cleaner than chaining many "or" clauses
+  starterCode={`# Cleaner than chaining many "or" clauses
 print(df[df["dept"].isin(["Eng","Sales"])])
 `}
 />
@@ -128,7 +128,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
 })`}
-  initialCode={`print(df[df["salary"].between(90, 130)])
+  starterCode={`print(df[df["salary"].between(90, 130)])
 `}
 />
 
@@ -141,7 +141,7 @@ df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 })`}
-  initialCode={`print(df[df["name"].str.contains("e", case=False)])
+  starterCode={`print(df[df["name"].str.contains("e", case=False)])
 `}
 />
 
@@ -149,7 +149,7 @@ df = pd.DataFrame({
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"x": [1, 2, np.nan, 4, np.nan]})
@@ -175,7 +175,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
 })`}
-  initialCode={`print(df.query("dept == 'Eng' and salary > 120"))
+  starterCode={`print(df.query("dept == 'Eng' and salary > 120"))
 print()
 print(df.query("dept in ['Eng','Sales']"))
 `}
@@ -188,7 +188,7 @@ choice. Most codebases use masks; `query` shows up in notebooks.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -218,7 +218,7 @@ column on just that subset. Use `.loc` for the assignment:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -250,7 +250,7 @@ Then build a DataFrame called \`young_low_pay\` containing **only** employees wh
 - Did **not** leave the company (\`Attrition == "No"\`).
 
 Keep all columns.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)

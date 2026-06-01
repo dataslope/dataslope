@@ -38,7 +38,7 @@ not know someone's age, you also do not know "their age plus one."
 <SqlCodeBlock
   dialect="postgres"
   title="Arithmetic with NULL yields NULL"
-  initialCode={`SELECT
+  starterCode={`SELECT
   5 + NULL      AS five_plus_null,
   'Hi ' || NULL AS greeting,
   NULL = NULL   AS is_null_equal_null;`}
@@ -69,7 +69,7 @@ INSERT INTO customers (name, phone) VALUES
   ('Grace', NULL),
   ('Linus', '555-0102'),
   ('Mae', NULL);`}
-  initialCode={`-- Customers we cannot phone:
+  starterCode={`-- Customers we cannot phone:
 SELECT name
 FROM customers
 WHERE phone IS NULL;`}
@@ -95,7 +95,7 @@ Often you want to display a friendly fallback instead of a blank.
 );
 INSERT INTO customers (name, phone) VALUES
   ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
 FROM customers

@@ -36,7 +36,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   price,
   quantity,
@@ -73,7 +73,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   price,
   ROUND(price * 1.08, 2) AS price_with_tax
@@ -115,7 +115,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Notebook', 'School', 3.50, 4),
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   price * quantity,
   price * quantity AS line_total
@@ -151,7 +151,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   category || ': ' || item AS shelf_label
 FROM sales;`}
@@ -187,7 +187,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   UPPER(item) AS item_upper,
   LOWER(category) AS category_lower,
@@ -210,7 +210,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   substr(item, 1, 4) AS first_four_characters
 FROM sales;`}
@@ -238,7 +238,7 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   ('Pencil pack', 'School', 2.25, 6),
   ('Coffee mug', 'Kitchen', 8.00, 2),
   ('Tea towel', 'Kitchen', 5.75, 3);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   item,
   price * quantity AS line_total
 FROM sales

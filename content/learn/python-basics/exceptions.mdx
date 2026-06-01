@@ -17,7 +17,7 @@ If an exception is raised and **no** `try`/`except` catches it, Python does thre
 
 <CodeBlock
   adapter="python"
-  initialCode={`def divide(a, b):
+  starterCode={`def divide(a, b):
     return a / b
 
 def main():
@@ -90,7 +90,7 @@ Each frame in the traceback is one step in this unwinding.
 
 <CodeBlock
   adapter="python"
-  initialCode={`try:
+  starterCode={`try:
     n = int("not a number")
 except ValueError as e:
     print("could not parse:", e)
@@ -107,7 +107,7 @@ Every exception is an object. You can inspect its type (`type(e)`), its message 
 
 <CodeBlock
   adapter="python"
-  initialCode={`def safe_div(a, b):
+  starterCode={`def safe_div(a, b):
     try:
         return a / b
     except (TypeError, ZeroDivisionError) as e:
@@ -144,7 +144,7 @@ finally:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def parse_int(text):
+  starterCode={`def parse_int(text):
     try:
         n = int(text)
     except ValueError:
@@ -170,7 +170,7 @@ Use `raise` to signal an error from your own code. Use a specific built-in type 
 
 <CodeBlock
   adapter="python"
-  initialCode={`def withdraw(balance, amount):
+  starterCode={`def withdraw(balance, amount):
     if amount < 0:
         raise ValueError("amount must be non-negative")
     if amount > balance:
@@ -201,7 +201,7 @@ When you wrap a lower-level error in a higher-level one, use `from` to keep the 
 
 <CodeBlock
   adapter="python"
-  initialCode={`class ConfigError(Exception):
+  starterCode={`class ConfigError(Exception):
     pass
 
 def load_config(text):
@@ -232,7 +232,7 @@ Make your own exception types by subclassing `Exception` (or a more specific bui
 
 <CodeBlock
   adapter="python"
-  initialCode={`class InsufficientFundsError(Exception):
+  starterCode={`class InsufficientFundsError(Exception):
     """Raised when a withdrawal exceeds the available balance."""
 
 class Account:
@@ -272,7 +272,7 @@ Every exception inherits from `BaseException`. The ones you usually care about i
 
 <CodeBlock
   adapter="python"
-  initialCode={`import sys
+  starterCode={`import sys
 
 # Built-in exception hierarchy (simplified)
 hierarchy = """
@@ -317,7 +317,7 @@ Python culture strongly prefers **EAFP** (Easier to Ask for Forgiveness than Per
 
 <CodeBlock
   adapter="python"
-  initialCode={`# LBYL: check first
+  starterCode={`# LBYL: check first
 data = {"key": "value"}
 if "key" in data:
     print(data["key"])
@@ -344,7 +344,7 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
   adapter="python"
   title="Safer integer parsing"
   instructions={`Define a function \`to_int(text, default=0)\` that returns \`int(text)\` if possible, otherwise \`default\`. It should not propagate any exception to the caller.`}
-  initialCode={`def to_int(text, default=0):
+  starterCode={`def to_int(text, default=0):
     # your code here
     return default
 `}
@@ -382,7 +382,7 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
   adapter="python"
   title="Withdraw with a custom exception"
   instructions={`Define a class \`InsufficientFundsError\` that inherits from \`Exception\`, then define a function \`withdraw(balance, amount)\` that returns the new balance after withdrawing \`amount\`, or raises \`InsufficientFundsError\` if \`amount > balance\`. \`amount\` must be non-negative; raise \`ValueError\` otherwise.`}
-  initialCode={`class InsufficientFundsError(Exception):
+  starterCode={`class InsufficientFundsError(Exception):
     pass
 
 def withdraw(balance, amount):
@@ -432,7 +432,7 @@ else:
   adapter="python"
   title="Safe divide with default"
   instructions={`Define a function \`safe_divide(a, b, default=None)\` that returns \`a / b\` if possible, otherwise \`default\`. Catch both \`ZeroDivisionError\` and \`TypeError\`.`}
-  initialCode={`def safe_divide(a, b, default=None):
+  starterCode={`def safe_divide(a, b, default=None):
     # your code here
     return default
 `}
@@ -469,7 +469,7 @@ else:
 Define \`RateLimitError\` as a custom exception class.
 
 For testing, assume a function that raises \`RateLimitError\` on the first \`n-1\` calls and succeeds on the \`n\`th call.`}
-  initialCode={`class RateLimitError(Exception):
+  starterCode={`class RateLimitError(Exception):
     pass
 
 def retry_on_rate_limit(max_retries=3):

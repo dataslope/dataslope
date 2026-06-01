@@ -77,7 +77,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize`}
-  initialCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
+  starterCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 
 def naive_sentiment(text):
@@ -137,7 +137,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize`}
-  initialCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
+  starterCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 NEGATIONS = {"not", "no", "never", "n't"}
 RESET = {".", "!", "?", ",", ";", "but"}   # clause boundaries reset negation
@@ -282,7 +282,7 @@ POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring", "broken"}
 NEGATIONS = {"not", "no", "never", "n't"}
 RESET = {".", "!", "?", ",", ";", "but"}`}
-  initialCode={`def classify(text):
+  starterCode={`def classify(text):
     tokens = [t.lower() for t in word_tokenize(text)]
     score = 0
     negate = False

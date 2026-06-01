@@ -29,7 +29,7 @@ timestamp into an explicit `NaN` you can see and deal with.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Daily readings, but Jan 3 and Jan 4 were never recorded -- the rows are
 # simply absent, so the series LOOKS like 4 tidy points.
@@ -82,7 +82,7 @@ different answers. Let's compute exactly that:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 s = pd.Series([10, np.nan, np.nan, 40],
@@ -119,7 +119,7 @@ print("Three different stories about the same two unknown days.")
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -195,7 +195,7 @@ different, and choosing wrong fabricates data.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 # A shop's daily sales. It is CLOSED on Sundays, so those days have no sales
@@ -262,7 +262,7 @@ status = pd.Series(
     index=pd.to_datetime(["2014-07-01", "2014-07-02", "2014-07-05"]),
     name="power",
 )`}
-  initialCode={`filled = None  # reindex to daily, then forward-fill
+  starterCode={`filled = None  # reindex to daily, then forward-fill
 print(filled)
 `}
   solutionCode={`full = pd.date_range(status.index.min(), status.index.max(), freq="D")
@@ -312,7 +312,7 @@ Then compute \`may4\` — the interpolated value on \`2014-05-04\`, which sits e
 import numpy as np
 idx = pd.date_range("2014-05-01", periods=7, freq="D")
 temp = pd.Series([18.0, 19.0, 20.0, np.nan, 24.0, 25.0, 26.0], index=idx, name="temp")`}
-  initialCode={`smooth = None  # linear interpolation of the interior gap
+  starterCode={`smooth = None  # linear interpolation of the interior gap
 may4 = None     # the value on 2014-05-04
 print(smooth)
 print("May 4:", may4)

@@ -30,7 +30,7 @@ parameter in the same position — first to first, second to second.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function divide(numerator, denominator) {
+  starterCode={`function divide(numerator, denominator) {
   return numerator / denominator;
 }
 
@@ -54,7 +54,7 @@ arguments. Both are legal.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function describe(name, age, city) {
+  starterCode={`function describe(name, age, city) {
   console.log("name:", name);
   console.log("age: ", age);
   console.log("city:", city);
@@ -80,7 +80,7 @@ not pass anything for it (or passes `undefined`).
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function greet(name, greeting = "Hello") {
+  starterCode={`function greet(name, greeting = "Hello") {
   return greeting + ", " + name + "!";
 }
 
@@ -101,7 +101,7 @@ with, gather them with a **rest parameter** (`...name`):
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function sum(...numbers) {
+  starterCode={`function sum(...numbers) {
   let total = 0;
   for (const n of numbers) total += n;
   return total;
@@ -133,7 +133,7 @@ call site:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function add(a, b, c) {
+  starterCode={`function add(a, b, c) {
   return a + b + c;
 }
 
@@ -164,7 +164,7 @@ things to know:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function findFirstNegative(numbers) {
+  starterCode={`function findFirstNegative(numbers) {
   for (const n of numbers) {
     if (n < 0) return n;     // exit the function the moment we find one
   }
@@ -187,7 +187,7 @@ return several related results.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function summarize(numbers) {
+  starterCode={`function summarize(numbers) {
   let min = numbers[0], max = numbers[0], total = 0;
   for (const n of numbers) {
     if (n < min) min = n;
@@ -218,7 +218,7 @@ more readable than passing many separate positional arguments.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Hard to read: which argument is which?
+  starterCode={`// Hard to read: which argument is which?
 function format1(text, upper, trim, prefix, suffix) {
   let s = text;
   if (trim) s = s.trim();
@@ -258,7 +258,7 @@ behaviours:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function f() {}
+  starterCode={`function f() {}
 f.label = "my function";
 console.log(f.label);            // "my function"
 console.log(typeof f);           // "function"
@@ -279,7 +279,7 @@ to add a **JSDoc** comment block above it:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`/**
+  starterCode={`/**
  * Convert a temperature from Celsius to Fahrenheit.
  *
  * @param {number} celsius - The temperature in degrees Celsius.
@@ -312,7 +312,7 @@ Examples:
 - \`range(2, 8, 3)\` → \`[2, 5]\`
 
 Assume \`step\` is always positive and \`start <= end\`.`}
-  initialCode={`function range(start, end, step = 1) {
+  starterCode={`function range(start, end, step = 1) {
   // your code here
   return [];
 }

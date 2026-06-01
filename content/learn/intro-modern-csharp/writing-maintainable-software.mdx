@@ -33,7 +33,7 @@ Compare:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 // hard to read
 double F(double a, double b) => a / (b * b);
@@ -44,7 +44,7 @@ Console.WriteLine(F(70, 1.75));
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 double Bmi(double weightKg, double heightMeters)
     => weightKg / (heightMeters * heightMeters);
@@ -78,7 +78,7 @@ it's the single biggest readability lever.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -102,7 +102,7 @@ ProcessOrders(new List<int> { 50, 120, 30, 200 });
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -142,7 +142,7 @@ diverge tomorrow. Be pragmatic.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`// BAD: restates the code
+  starterCode={`// BAD: restates the code
 i += 1; // increment i by 1
 
 // GOOD: explains why
@@ -176,7 +176,7 @@ about. Where you can:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 public record Money(decimal Amount, string Currency);
 

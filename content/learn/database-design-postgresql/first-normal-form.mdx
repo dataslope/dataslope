@@ -146,7 +146,7 @@ INSERT INTO student_phones VALUES
   (101, 1, '555-1000'),
   (102, 1, '555-2000'),
   (103, 2, '555-3000');`}
-  initialCode={`-- Each phone number is now its own row.
+  starterCode={`-- Each phone number is now its own row.
 SELECT s.name, p.phone_number
 FROM students s
 JOIN student_phones p ON p.student_id = s.id

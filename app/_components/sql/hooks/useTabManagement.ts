@@ -51,12 +51,12 @@ export function useTabManagement(
 
   const addTab = useCallback(() => {
     const nextNum = tabsRef.current.length + 1;
-    const initialCode = "";
+    const starterCode = "";
     const tab: QueryTab = {
       id: newTabId(),
       title: `Query ${nextNum}`,
-      code: initialCode,
-      pristineCode: initialCode,
+      code: starterCode,
+      pristineCode: starterCode,
     };
     const next = [...tabsRef.current, tab];
     tabsRef.current = next;

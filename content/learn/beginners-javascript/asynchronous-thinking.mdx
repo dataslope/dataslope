@@ -64,7 +64,7 @@ can be called back later. Many older async APIs use this pattern.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log("1: requesting");
+  starterCode={`console.log("1: requesting");
 
 setTimeout(() => {
   console.log("3: timer fired");
@@ -90,7 +90,7 @@ a timer.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function fakeFetchUser(id, callback) {
+  starterCode={`function fakeFetchUser(id, callback) {
   console.log("Pretending to call API...");
   setTimeout(() => {
     // Pretend this is the response from the server.
@@ -125,7 +125,7 @@ end up with deeply nested code.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function later(value, ms, cb) {
+  starterCode={`function later(value, ms, cb) {
   setTimeout(() => cb(null, value), ms);
 }
 
@@ -189,7 +189,7 @@ isn't always the order it *runs* in.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log("A");
+  starterCode={`console.log("A");
 
 setTimeout(() => console.log("B"), 0);
 
@@ -219,7 +219,7 @@ counting.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function loadAll(urls, done) {
+  starterCode={`function loadAll(urls, done) {
   const results = new Array(urls.length);
   let remaining = urls.length;
 
@@ -329,7 +329,7 @@ pattern the DOM uses (`element.addEventListener`), Node uses
 - If any task calls its callback with an error, call \`done(err)\` immediately and run no more tasks.
 
 This is a small but realistic exercise in "callback orchestration".`}
-  initialCode={`function runSequentially(tasks, done) {
+  starterCode={`function runSequentially(tasks, done) {
   // your code here
 }
 

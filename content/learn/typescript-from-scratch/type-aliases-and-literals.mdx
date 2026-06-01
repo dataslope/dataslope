@@ -18,7 +18,7 @@ types instead of values:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Point = { x: number; y: number };
+  starterCode={`type Point = { x: number; y: number };
 
 const origin: Point = { x: 0, y: 0 };
 const end: Point = { x: 10, y: 20 };
@@ -37,7 +37,7 @@ You can alias any type, not just objects:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type ID = number;
+  starterCode={`type ID = number;
 type Name = string;
 type Callback = (result: string) => void;
 
@@ -81,7 +81,7 @@ Here's a comparison:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Interface with extension
+  starterCode={`// Interface with extension
 interface Animal {
   name: string;
 }
@@ -112,7 +112,7 @@ value. For example, the type `"red"` contains only the string `"red"`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let color: "red" = "red";
+  starterCode={`let color: "red" = "red";
 console.log("color:", color);
 
 // This would be a compile-time error:
@@ -125,7 +125,7 @@ several with a **union**, you get a lightweight enumeration:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type PrimaryColor = "red" | "green" | "blue";
+  starterCode={`type PrimaryColor = "red" | "green" | "blue";
 
 let color: PrimaryColor = "red";
 console.log("color:", color);
@@ -144,7 +144,7 @@ compiler catches the mistake.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Direction = "north" | "south" | "east" | "west";
+  starterCode={`type Direction = "north" | "south" | "east" | "west";
 
 function move(direction: Direction, distance: number): void {
   console.log(\`Moving \${direction} by \${distance} units\`);
@@ -166,7 +166,7 @@ You can also have **number literals** and **boolean literals**:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Zero = 0;
+  starterCode={`type Zero = 0;
 type One = 1;
 type ZeroOrOne = 0 | 1;
 
@@ -196,7 +196,7 @@ type, not the general primitive:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const message = "Hello";  // inferred as "Hello" (literal)
+  starterCode={`const message = "Hello";  // inferred as "Hello" (literal)
 let greeting = "Hi";       // inferred as string (general)
 
 console.log("message:", message);
@@ -219,7 +219,7 @@ not just top-level `const` bindings? Use the **`as const`** assertion:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Without 'as const'
+  starterCode={`// Without 'as const'
 const config = { mode: "production", port: 3000 };
 // Type: { mode: string; port: number }
 
@@ -243,7 +243,7 @@ the values are fixed at compile time:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const STATUS_CODES = {
+  starterCode={`const STATUS_CODES = {
   OK: 200,
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
@@ -273,7 +273,7 @@ TypeScript has a dedicated `enum` keyword, but many developers prefer
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Traditional enum
+  starterCode={`// Traditional enum
 enum Color {
   Red = "RED",
   Green = "GREEN",
@@ -313,7 +313,7 @@ Intersections](./unions-and-intersections), but here's a taste:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Success = { status: "success"; data: string };
+  starterCode={`type Success = { status: "success"; data: string };
 type Failure = { status: "failure"; error: string };
 type Result = Success | Failure;
 
@@ -346,7 +346,7 @@ function that transitions between states.
   adapter="typescript"
   title="Traffic Light Transition"
   instructions={`Define a type \`TrafficLight = "red" | "yellow" | "green"\`. Implement the function \`next(current: TrafficLight): TrafficLight\` that returns the next state in the cycle: red → green → yellow → red. The test checks that red → green, green → yellow, yellow → red.`}
-  initialCode={`type TrafficLight = "red" | "yellow" | "green";
+  starterCode={`type TrafficLight = "red" | "yellow" | "green";
 
 function next(current: TrafficLight): TrafficLight {
   // Your code here
@@ -390,7 +390,7 @@ construct new string literal types from existing ones:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Greeting = "hello" | "hi";
+  starterCode={`type Greeting = "hello" | "hi";
 type Name = "world" | "TypeScript";
 type GreetingMessage = \`\${Greeting}, \${Name}!\`;
 // GreetingMessage is "hello, world!" | "hello, TypeScript!" | "hi, world!" | "hi, TypeScript!"

@@ -51,7 +51,7 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   (102, 1, 18),
   (103, 2, 99),
   (104, 7, 55);`}
-  initialCode={`SELECT c.name, o.id AS order_id, o.amount
+  starterCode={`SELECT c.name, o.id AS order_id, o.amount
 FROM customers c
 INNER JOIN orders o ON o.customer_id = c.id
 ORDER BY c.name, o.id;`}
@@ -94,7 +94,7 @@ Most people write just `JOIN` because inner join is the default.
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
-  initialCode={`SELECT c.name, o.amount
+  starterCode={`SELECT c.name, o.amount
 FROM customers c
 JOIN orders o ON o.customer_id = c.id
 ORDER BY c.name;`}
@@ -134,7 +134,7 @@ INSERT INTO books (id, author_id, title) VALUES
   (10, 1, 'Kindred'),
   (11, 2, 'A Wizard of Earthsea'),
   (12, 1, 'Parable of the Sower');`}
-  initialCode={`SELECT a.name AS author, b.title
+  starterCode={`SELECT a.name AS author, b.title
 FROM authors a
 JOIN books b ON b.author_id = a.id
 ORDER BY a.name, b.title;`}
@@ -153,7 +153,7 @@ Aliases make inner joins readable. Prefixing columns with aliases also avoids co
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
 INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 1, 18), (103, 2, 99);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   c.id AS customer_id,
   c.name,
   o.id AS order_id,
@@ -188,7 +188,7 @@ INSERT INTO orders (id, customer_id, product_id) VALUES
   (101, 1, 10),
   (102, 1, 11),
   (103, 2, 10);`}
-  initialCode={`SELECT c.name, p.title, p.price
+  starterCode={`SELECT c.name, p.title, p.price
 FROM orders o
 JOIN customers c ON c.id = o.customer_id
 JOIN products p ON p.id = o.product_id

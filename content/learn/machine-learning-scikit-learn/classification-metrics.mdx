@@ -19,7 +19,7 @@ watch this happen for real.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_classification
+  starterCode={`from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score
@@ -82,7 +82,7 @@ lays it out with actual classes as rows and predicted classes as columns.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_classification
+  starterCode={`from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
@@ -169,7 +169,7 @@ Moving that threshold is exactly how you trade precision against recall.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -228,7 +228,7 @@ true examples of each class there were).
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_classification
+  starterCode={`from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
@@ -331,7 +331,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
 y_pred = model.predict(X_test)`}
-  initialCode={`cm = None
+  starterCode={`cm = None
 tn = fp = fn = tp = None
 precision = None
 recall = None

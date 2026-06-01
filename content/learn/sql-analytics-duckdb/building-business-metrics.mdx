@@ -45,7 +45,7 @@ INSERT INTO events VALUES
   (3,'organic','visit'),(3,'organic','purchase'),
   (4,'organic','visit'),(5,'organic','visit'),(5,'organic','purchase'),
   (6,'ads','visit'),(6,'ads','purchase');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   channel,
   COUNT(DISTINCT user_id) FILTER (WHERE action = 'visit')    AS visitors,
   COUNT(DISTINCT user_id) FILTER (WHERE action = 'purchase') AS buyers,
@@ -79,7 +79,7 @@ INSERT INTO users SELECT i FROM range(1, 11) t(i);   -- 10 users
 CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8,2));
 INSERT INTO payments VALUES
   (1, 50), (1, 20), (3, 100), (7, 30);               -- only 3 users paid`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   (SELECT COUNT(*) FROM users)                          AS all_users,
   COUNT(DISTINCT user_id)                               AS paying_users,
   SUM(amount)                                           AS revenue,
@@ -107,7 +107,7 @@ SELECT
   DATE '2024-01-01' + (i * 9) AS order_date,
   (i * 23) % 150 + 50         AS amount
 FROM range(0, 30) t(i);`}
-  initialCode={`WITH monthly AS (
+  starterCode={`WITH monthly AS (
   SELECT
     date_trunc('month', order_date) AS month,
     SUM(amount)                     AS revenue

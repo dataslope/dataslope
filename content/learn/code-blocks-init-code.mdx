@@ -20,7 +20,7 @@ live, runnable code block followed by the exact JSX you would author in MDX.
   initCode={`import math
 
 RADIUS = 5`}
-  initialCode={`# RADIUS and math come from the initialization code above.
+  starterCode={`# RADIUS and math come from the initialization code above.
 area = math.pi * RADIUS ** 2
 print(f"A circle with r={RADIUS} has area {area:.2f}")
 `}
@@ -32,7 +32,7 @@ print(f"A circle with r={RADIUS} has area {area:.2f}")
   initCode={`import math
 
 RADIUS = 5`}
-  initialCode={`# RADIUS and math come from the initialization code above.
+  starterCode={`# RADIUS and math come from the initialization code above.
 area = math.pi * RADIUS ** 2
 print(f"A circle with r={RADIUS} has area {area:.2f}")
 `}
@@ -44,7 +44,7 @@ print(f"A circle with r={RADIUS} has area {area:.2f}")
 <CodeBlock
   adapter="r"
   initCode={`radius <- 5`}
-  initialCode={`# 'radius' is defined by the initialization code above.
+  starterCode={`# 'radius' is defined by the initialization code above.
 cat("area =", pi * radius^2, fill = TRUE)
 `}
 />
@@ -53,7 +53,7 @@ cat("area =", pi * radius^2, fill = TRUE)
 <CodeBlock
   adapter="r"
   initCode={`radius <- 5`}
-  initialCode={`# 'radius' is defined by the initialization code above.
+  starterCode={`# 'radius' is defined by the initialization code above.
 cat("area =", pi * radius^2, fill = TRUE)
 `}
 />
@@ -64,7 +64,7 @@ cat("area =", pi * radius^2, fill = TRUE)
 <CodeBlock
   adapter="javascript"
   initCode={`const greeting = "Hello";`}
-  initialCode={`// 'greeting' is defined by the initialization code above.
+  starterCode={`// 'greeting' is defined by the initialization code above.
 console.log(greeting + ", world!");
 `}
 />
@@ -73,7 +73,7 @@ console.log(greeting + ", world!");
 <CodeBlock
   adapter="javascript"
   initCode={`const greeting = "Hello";`}
-  initialCode={`// 'greeting' is defined by the initialization code above.
+  starterCode={`// 'greeting' is defined by the initialization code above.
 console.log(greeting + ", world!");
 `}
 />
@@ -87,7 +87,7 @@ console.log(greeting + ", world!");
   x: number;
   y: number;
 }`}
-  initialCode={`// The Point interface comes from the initialization code above.
+  starterCode={`// The Point interface comes from the initialization code above.
 const p: Point = { x: 3, y: 4 };
 console.log("distance =", Math.hypot(p.x, p.y));
 `}
@@ -100,7 +100,7 @@ console.log("distance =", Math.hypot(p.x, p.y));
   x: number;
   y: number;
 }`}
-  initialCode={`// The Point interface comes from the initialization code above.
+  starterCode={`// The Point interface comes from the initialization code above.
 const p: Point = { x: 3, y: 4 };
 console.log("distance =", Math.hypot(p.x, p.y));
 `}
@@ -113,7 +113,7 @@ console.log("distance =", Math.hypot(p.x, p.y));
   adapter="php"
   initCode={`<?php
 $names = ["Ada", "Linus", "Grace"];`}
-  initialCode={`// $names is defined by the initialization code above.
+  starterCode={`// $names is defined by the initialization code above.
 foreach ($names as $i => $name) {
     echo ($i + 1) . ". " . $name . PHP_EOL;
 }
@@ -125,7 +125,7 @@ foreach ($names as $i => $name) {
   adapter="php"
   initCode={`<?php
 $names = ["Ada", "Linus", "Grace"];`}
-  initialCode={`// $names is defined by the initialization code above.
+  starterCode={`// $names is defined by the initialization code above.
 foreach ($names as $i => $name) {
     echo ($i + 1) . ". " . $name . PHP_EOL;
 }
@@ -140,7 +140,7 @@ foreach ($names as $i => $name) {
   initCode={`#include <stdio.h>
 
 #define GREETING "Hello from C!"`}
-  initialCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+  starterCode={`/* GREETING and <stdio.h> come from the initialization code above. */
 int main(void) {
     puts(GREETING);
     return 0;
@@ -154,7 +154,7 @@ int main(void) {
   initCode={`#include <stdio.h>
 
 #define GREETING "Hello from C!"`}
-  initialCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+  starterCode={`/* GREETING and <stdio.h> come from the initialization code above. */
 int main(void) {
     puts(GREETING);
     return 0;
@@ -170,7 +170,7 @@ int main(void) {
   initCode={`#include <iostream>
 #include <vector>
 using namespace std;`}
-  initialCode={`// The includes and "using namespace std" come from the init code above.
+  starterCode={`// The includes and "using namespace std" come from the init code above.
 int main() {
     vector<int> xs = {1, 2, 3};
     for (int x : xs) cout << x << " ";
@@ -186,7 +186,7 @@ int main() {
   initCode={`#include <iostream>
 #include <vector>
 using namespace std;`}
-  initialCode={`// The includes and "using namespace std" come from the init code above.
+  starterCode={`// The includes and "using namespace std" come from the init code above.
 int main() {
     vector<int> xs = {1, 2, 3};
     for (int x : xs) cout << x << " ";
@@ -202,7 +202,7 @@ int main() {
 <CodeBlock
   adapter="java"
   initCode={`import java.util.*;`}
-  initialCode={`// The java.util.* import comes from the initialization code above.
+  starterCode={`// The java.util.* import comes from the initialization code above.
 public class Main {
     public static void main(String[] args) {
         List<Integer> xs = Arrays.asList(1, 2, 3);
@@ -216,7 +216,7 @@ public class Main {
 <CodeBlock
   adapter="java"
   initCode={`import java.util.*;`}
-  initialCode={`// The java.util.* import comes from the initialization code above.
+  starterCode={`// The java.util.* import comes from the initialization code above.
 public class Main {
     public static void main(String[] args) {
         List<Integer> xs = Arrays.asList(1, 2, 3);
@@ -233,7 +233,7 @@ public class Main {
   adapter="csharp"
   initCode={`using System;
 using System.Linq;`}
-  initialCode={`// The using directives come from the initialization code above.
+  starterCode={`// The using directives come from the initialization code above.
 int[] xs = { 1, 2, 3 };
 Console.WriteLine($"sum = {xs.Sum()}");
 `}
@@ -244,7 +244,7 @@ Console.WriteLine($"sum = {xs.Sum()}");
   adapter="csharp"
   initCode={`using System;
 using System.Linq;`}
-  initialCode={`// The using directives come from the initialization code above.
+  starterCode={`// The using directives come from the initialization code above.
 int[] xs = { 1, 2, 3 };
 Console.WriteLine($"sum = {xs.Sum()}");
 `}

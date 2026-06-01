@@ -108,7 +108,7 @@ subtotal.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function finalTotal(items, code) {
+  starterCode={`function finalTotal(items, code) {
   let subtotal = 0;
   for (const item of items) {
     subtotal += item.price * item.quantity;
@@ -133,7 +133,7 @@ discount logic:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function finalTotal(items, code) {
+  starterCode={`function finalTotal(items, code) {
   let subtotal = 0;
   for (const item of items) {
     subtotal += item.price * item.quantity;
@@ -196,7 +196,7 @@ improve it.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function subtotal(items) {
+  starterCode={`function subtotal(items) {
   let s = 0;
   for (const item of items) s += item.price * item.quantity;
   return s;

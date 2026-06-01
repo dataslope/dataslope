@@ -33,7 +33,7 @@ someone else's bytes, sometimes it crashes.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -78,7 +78,7 @@ allocators it can silently corrupt the heap.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -109,7 +109,7 @@ unreachable, until the process exits.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 void leaky(int times) {
@@ -145,7 +145,7 @@ function's return address, leading to remote code execution.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -184,7 +184,7 @@ you meant `<`).
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -213,7 +213,7 @@ previous user's data.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -245,7 +245,7 @@ another mention here because the failure mode is so quiet.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int *make(void) {
     int x = 42;
@@ -281,7 +281,7 @@ type. The compiler trusts you to know what you are doing.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     long x = 0x4142434445464748L;     // 'ABCDEFGH' as bytes on a little-endian box
@@ -329,7 +329,7 @@ the language:
   adapter="c"
   title="Allocate, use, and free correctly"
   instructions={`Implement \`char *make_greeting(const char *name)\` so that it returns a heap-allocated string of the form \`Hello, NAME!\` (without the literal word "NAME" — substitute the parameter). The provided \`main\` calls it, prints the result, and frees it. Make sure not to leak and not to overflow.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -382,7 +382,7 @@ int main(void) {
   adapter="c"
   title="Build a string by repeated append"
   instructions={`Implement \`char *repeat(const char *s, int times)\` that returns a fresh heap string containing \`s\` repeated \`times\` times. Use a single \`malloc\` (no \`realloc\` needed). Do not leak; do not overflow. \`repeat("ab", 3)\` must produce \`ababab\`. The provided \`main\` prints and frees the result.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

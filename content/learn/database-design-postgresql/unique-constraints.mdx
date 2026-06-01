@@ -43,7 +43,7 @@ second account reuses the same email, so PostgreSQL rejects it.
 
 INSERT INTO accounts (email, username)
 VALUES ('ada@example.com', 'ada');`}
-  initialCode={`-- This email is already used by Ada.
+  starterCode={`-- This email is already used by Ada.
 INSERT INTO accounts (email, username)
 VALUES ('ada@example.com', 'ada_2');
 
@@ -123,7 +123,7 @@ from repeating.
 );
 
 INSERT INTO enrollments (student_id, course_id) VALUES (1, 10);`}
-  initialCode={`-- Same student, same course: duplicate pair.
+  starterCode={`-- Same student, same course: duplicate pair.
 INSERT INTO enrollments (student_id, course_id) VALUES (1, 10);
 
 SELECT student_id, course_id, enrolled_on FROM enrollments;`}

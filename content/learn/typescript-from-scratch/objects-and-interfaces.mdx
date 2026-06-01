@@ -23,7 +23,7 @@ curly-brace block listing the property names and their types:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const point: { x: number; y: number } = { x: 10, y: 20 };
+  starterCode={`const point: { x: number; y: number } = { x: 10, y: 20 };
 
 console.log("point:", point);
 console.log("x:", point.x);
@@ -39,7 +39,7 @@ You can nest object types arbitrarily:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const user: {
+  starterCode={`const user: {
   name: string;
   age: number;
   address: {
@@ -71,7 +71,7 @@ the name wherever you need that shape:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Point {
+  starterCode={`interface Point {
   x: number;
   y: number;
 }
@@ -91,7 +91,7 @@ You can also define methods in interfaces:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Rectangle {
+  starterCode={`interface Rectangle {
   width: number;
   height: number;
   area(): number;
@@ -121,7 +121,7 @@ A property marked with `?` is **optional** — it may be present or absent:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface User {
+  starterCode={`interface User {
   name: string;
   age?: number;  // optional
 }
@@ -152,7 +152,7 @@ reassigned:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Config {
+  starterCode={`interface Config {
   readonly apiUrl: string;
   timeout: number;
 }
@@ -184,7 +184,7 @@ An **index signature** says "this object can have any property name
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface StringMap {
+  starterCode={`interface StringMap {
   [key: string]: string;
 }
 
@@ -209,7 +209,7 @@ an index signature with named properties:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface MixedMap {
+  starterCode={`interface MixedMap {
   count: number;  // specific property
   [key: string]: number;  // any other property is a number
 }
@@ -237,7 +237,7 @@ Interfaces can **extend** other interfaces, inheriting their properties:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Animal {
+  starterCode={`interface Animal {
   name: string;
   age: number;
 }
@@ -266,7 +266,7 @@ You can extend multiple interfaces at once:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Named {
+  starterCode={`interface Named {
   name: string;
 }
 
@@ -311,7 +311,7 @@ TypeScript merges the declarations:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface User {
+  starterCode={`interface User {
   name: string;
 }
 
@@ -355,7 +355,7 @@ Here's a side-by-side comparison:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Using interface
+  starterCode={`// Using interface
 interface PointI {
   x: number;
   y: number;
@@ -388,7 +388,7 @@ inheritance.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Point2D {
+  starterCode={`interface Point2D {
   x: number;
   y: number;
 }
@@ -416,7 +416,7 @@ fewer properties (in most contexts):
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Named {
+  starterCode={`interface Named {
   name: string;
 }
 
@@ -441,7 +441,7 @@ gracefully:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Address {
+  starterCode={`interface Address {
   street: string;
   city: string;
   country: string;
@@ -491,7 +491,7 @@ implement a function that pretty-prints the profile.
   adapter="typescript"
   title="User Profile Formatter"
   instructions={`Define an interface \`Profile\` with the following properties: \`username: string\`, \`email: string\`, \`age?: number\` (optional), and \`settings: { theme: string; notifications: boolean }\` (nested object). Then implement the function \`formatProfile(profile: Profile): string\` that returns a formatted string like "Username: alice, Email: alice@example.com, Theme: dark". The test checks that the output contains the username and theme.`}
-  initialCode={`interface Profile {
+  starterCode={`interface Profile {
   // Define the interface here
 }
 

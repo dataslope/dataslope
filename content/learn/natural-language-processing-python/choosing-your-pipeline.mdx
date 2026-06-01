@@ -139,7 +139,7 @@ await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.util import ngrams`}
-  initialCode={`review = "The plot was not good, but the acting was brilliant!"
+  starterCode={`review = "The plot was not good, but the acting was brilliant!"
 stop = set(stopwords.words("english"))
 
 # TOPIC pipeline: lowercase, drop punctuation, drop ALL stopwords.
@@ -274,7 +274,7 @@ await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 stop = set(stopwords.words("english"))`}
-  initialCode={`def preprocess(text, remove_stopwords):
+  starterCode={`def preprocess(text, remove_stopwords):
     tokens = word_tokenize(text)
     # lowercase + keep alphabetic
     # then conditionally remove stopwords

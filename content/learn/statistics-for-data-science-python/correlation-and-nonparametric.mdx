@@ -55,7 +55,7 @@ Let's compute both and test whether each differs from zero.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(1)
@@ -92,7 +92,7 @@ ranks, sees the perfect order and reports ≈ 1. Pearson, demanding a
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(2)
@@ -133,7 +133,7 @@ not about relationships in general.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -186,7 +186,7 @@ the slope.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -277,7 +277,7 @@ Here heavy outliers wreck the t-test but barely faze Mann–Whitney.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(6)
@@ -319,7 +319,7 @@ positive or negative.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(8)
@@ -397,7 +397,7 @@ rng = np.random.default_rng(505)
 x = np.linspace(1, 10, 70)
 # Monotonic but curved -> Spearman should exceed Pearson in magnitude.
 y = x**3 + rng.normal(0, 30, size=70)`}
-  initialCode={`# TODO: set pearson_r, spearman_r, pearson_p (floats) and spearman_stronger (bool)
+  starterCode={`# TODO: set pearson_r, spearman_r, pearson_p (floats) and spearman_stronger (bool)
 pearson_r = None
 spearman_r = None
 pearson_p = None
@@ -468,7 +468,7 @@ group_b[:2] = [700, 480]
 time_on_page_a = group_a
 time_on_page_b = group_b
 alpha = 0.05`}
-  initialCode={`# TODO: run the right nonparametric test for INDEPENDENT groups
+  starterCode={`# TODO: run the right nonparametric test for INDEPENDENT groups
 # set p_value (float) and differ (bool)
 p_value = None
 differ = None

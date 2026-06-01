@@ -59,7 +59,7 @@ collection?" Because the answer literally is not stored anywhere.
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -88,7 +88,7 @@ the compiler cannot generate a meaningful element-type check for
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         // T[] arr = new T[10];     // not allowed
         // Pair<String,Integer>[] ps = new Pair<String,Integer>[10];  // not allowed
@@ -130,7 +130,7 @@ parameterizations.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     static class Counter<T> {
         static int instances = 0;       // ONE counter, shared
         Counter() { instances++; }
@@ -163,7 +163,7 @@ you can suppress the warning with `@SafeVarargs`:
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -220,7 +220,7 @@ constructing arrays, looking up in a registry — accept a
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

@@ -111,7 +111,7 @@ defending the uniqueness rule.
   name TEXT
 );
 INSERT INTO customers (id, name) VALUES (1, 'Ada');`}
-  initialCode={`-- This tries to reuse id = 1, which already exists.
+  starterCode={`-- This tries to reuse id = 1, which already exists.
 INSERT INTO customers (id, name) VALUES (1, 'Grace');
 
 -- The insert above fails; the table still has only Ada.

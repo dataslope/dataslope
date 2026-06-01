@@ -53,7 +53,7 @@ production. Make this a habit:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int safe = 0;       // good: initialized.
@@ -125,7 +125,7 @@ field), use `<cstdint>` types like `int16_t`, `int32_t`, `int64_t`.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <cstdint>
 
 int main() {
@@ -153,7 +153,7 @@ initializer. This is handy for long type names.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int main() {
@@ -192,7 +192,7 @@ flowchart TB
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int a = 1;
@@ -252,7 +252,7 @@ overwrite.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     const int max_users = 100;
@@ -278,7 +278,7 @@ truncates, `signed` to `unsigned` wraps).
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     double pi = 3.14159;
@@ -302,7 +302,7 @@ a conversion. It makes the intent explicit and easier to grep for.
   adapter="cpp"
   title="Celsius to Fahrenheit"
   instructions={`Implement \`celsius_to_fahrenheit\` so the program prints \`98.6\` (no trailing newline, just \`98.6\`).\n\nThe formula is \`F = C * 9/5 + 32\`. Watch out: \`9/5\` in integer arithmetic is \`1\`, not \`1.8\`!`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 double celsius_to_fahrenheit(double c) {
     // your code here

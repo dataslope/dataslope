@@ -42,7 +42,7 @@ occasionally you create one yourself.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function wait(ms) {
+  starterCode={`function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -63,7 +63,7 @@ You *consume* a promise with `.then()` (for success), `.catch()`
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function fetchUser(id) {
+  starterCode={`function fetchUser(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (id <= 0) reject(new Error("Invalid id"));
@@ -90,7 +90,7 @@ Remember callback hell? Here it is with Promises instead.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function later(value, ms) {
+  starterCode={`function later(value, ms) {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
@@ -122,7 +122,7 @@ the syntax most modern code uses.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function later(value, ms) {
+  starterCode={`function later(value, ms) {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
@@ -149,7 +149,7 @@ the default style.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function fetchUser(id) {
+  starterCode={`function fetchUser(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (id <= 0) reject(new Error("Invalid id"));
@@ -188,7 +188,7 @@ start *several* operations at once and wait for all of them.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function fakeFetch(url, ms) {
+  starterCode={`function fakeFetch(url, ms) {
   return new Promise((resolve) =>
     setTimeout(() => resolve("data for " + url), ms),
   );
@@ -241,7 +241,7 @@ A quick tour of the other combinators:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const p = (v, ms, fail = false) =>
+  starterCode={`const p = (v, ms, fail = false) =>
   new Promise((res, rej) => setTimeout(() => (fail ? rej(new Error(v)) : res(v)), ms));
 
 (async () => {
@@ -280,7 +280,7 @@ A short list of "gotchas" that catch beginners.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`async function fetchValue() {
+  starterCode={`async function fetchValue() {
   return 42;
 }
 
@@ -308,7 +308,7 @@ your code doesn't wait.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+  starterCode={`function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function broken() {
   ["a","b","c"].forEach(async (x) => {
@@ -445,7 +445,7 @@ module.exports = { getUserAndPosts };
 Hints:
 - Use a \`for\` loop with \`try/catch\`.
 - Keep track of the last error so you can throw it at the end.`}
-  initialCode={`async function retry(fn, attempts) {
+  starterCode={`async function retry(fn, attempts) {
   // your code here
 }
 

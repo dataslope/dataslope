@@ -73,7 +73,7 @@ and array indices. It is *unsigned*, which leads to a classic trap:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -106,7 +106,7 @@ exactly store many "nice" decimal numbers.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <iomanip>
 
 int main() {
@@ -158,7 +158,7 @@ C++ has two big categories of conversions:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int    n = 7;
@@ -186,7 +186,7 @@ is false; any non-null pointer is true).
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void describe(int n) {
     if (n) {
@@ -217,7 +217,7 @@ constant is needed (e.g. as an array size).
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 constexpr int kBoardSize = 8;
 
@@ -242,7 +242,7 @@ use a `enum class`:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 enum class TrafficLight { Red, Yellow, Green };
 
@@ -302,7 +302,7 @@ Practice this on small examples; the same pattern scales up.
   adapter="cpp"
   title="Average of a vector"
   instructions={`Implement \`double average(const std::vector<int>& xs)\` that returns the mean of \`xs\`. Pay attention to the types: \`xs.size()\` is \`std::size_t\` and the sum is \`int\` — you'll need a cast or careful arithmetic to get the right \`double\` result. The fixed input prints exactly \`3\` on success.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 double average(const std::vector<int>& xs) {

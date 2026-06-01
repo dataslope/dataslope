@@ -15,7 +15,7 @@ Take a moment to read this object slowly:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const order = {
+  starterCode={`const order = {
   id: 101,
   customer: {
     name: "Ada Lovelace",
@@ -84,7 +84,7 @@ expression returns `undefined` instead of throwing.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const noisy = { user: { profile: { name: "Ada" } } };
+  starterCode={`const noisy = { user: { profile: { name: "Ada" } } };
 const sparse = { user: null };
 
 console.log(noisy.user?.profile?.name);    // "Ada"
@@ -113,7 +113,7 @@ recursion). Let's add up the total cost of the order above:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const order = {
+  starterCode={`const order = {
   id: 101,
   items: [
     { sku: "BK-001", qty: 2, price: 4.50 },
@@ -139,7 +139,7 @@ of nesting. The same pattern scales to any depth.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const class1 = [
+  starterCode={`const class1 = [
   { name: "Ada",  grades: [82, 95, 78] },
   { name: "Linus", grades: [60, 70, 65] },
   { name: "Grace", grades: [91, 88, 100] },
@@ -171,7 +171,7 @@ something deep inside a nested structure?
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const order = {
+  starterCode={`const order = {
   id: 101,
   customer: { name: "Ada", email: "ada@example.com" },
   status: "pending",
@@ -207,7 +207,7 @@ Updating one element of an array, immutably, is a common task. Use
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const items = [
+  starterCode={`const items = [
   { sku: "BK-001", qty: 2 },
   { sku: "PN-014", qty: 1 },
   { sku: "IK-002", qty: 3 },
@@ -239,7 +239,7 @@ text and live values:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const order = {
+  starterCode={`const order = {
   id: 101,
   customer: { name: "Ada", email: "ada@example.com" },
   items: [{ sku: "BK-001", qty: 2 }],
@@ -372,7 +372,7 @@ Examples:
 - \`getPath({ a: { b: {} } }, "a.b.c", 0)\` → \`0\`
 - \`getPath({ a: null }, "a.b.c", "n/a")\` → \`"n/a"\`
 - \`getPath({}, "x", "n/a")\` → \`"n/a"\``}
-  initialCode={`function getPath(obj, path, defaultValue) {
+  starterCode={`function getPath(obj, path, defaultValue) {
   // your code here
   return defaultValue;
 }

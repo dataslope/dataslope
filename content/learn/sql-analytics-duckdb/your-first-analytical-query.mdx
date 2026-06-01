@@ -33,7 +33,7 @@ INSERT INTO trips VALUES
   (6, 'Boise',    'Eli',   19, 13.50),
   (7, 'Seattle',  'Bo',     6,  5.00),
   (8, 'Portland', 'Cy',    22, 16.25);`}
-  initialCode={`-- Always start by *looking*. LIMIT keeps it cheap.
+  starterCode={`-- Always start by *looking*. LIMIT keeps it cheap.
 SELECT *
 FROM trips
 LIMIT 5;`}
@@ -60,7 +60,7 @@ INSERT INTO trips VALUES
   (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
   (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
   (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
-  initialCode={`SELECT rider, minutes, fare
+  starterCode={`SELECT rider, minutes, fare
 FROM trips
 WHERE city = 'Seattle'
   AND minutes >= 20
@@ -98,7 +98,7 @@ INSERT INTO trips VALUES
   (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
   (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
   (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
-  initialCode={`SELECT city, rider, fare
+  starterCode={`SELECT city, rider, fare
 FROM trips
 ORDER BY fare DESC
 LIMIT 3;`}
@@ -121,7 +121,7 @@ INSERT INTO trips VALUES
   (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
   (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
   (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   rider,
   minutes,
   fare,

@@ -60,7 +60,7 @@ makes the mechanics visible.
 INSERT INTO sales VALUES
   ('West','Q1',100),('West','Q2',140),('West','Q1',20),
   ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   SUM(amount) FILTER (WHERE quarter = 'Q1') AS q1,
   SUM(amount) FILTER (WHERE quarter = 'Q2') AS q2
@@ -88,7 +88,7 @@ the aggregate, and DuckDB discovers the distinct values for you.
 INSERT INTO sales VALUES
   ('West','Q1',100),('West','Q2',140),('West','Q1',20),
   ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
-  initialCode={`PIVOT sales
+  starterCode={`PIVOT sales
 ON quarter                 -- values of this column become columns
 USING SUM(amount)          -- aggregate that fills each cell
 GROUP BY region            -- one row per region
@@ -115,7 +115,7 @@ into rows.
 INSERT INTO wide_sales VALUES
   ('West', 100, 140, 90),
   ('East', 200,  60, 120);`}
-  initialCode={`UNPIVOT wide_sales
+  starterCode={`UNPIVOT wide_sales
 ON jan, feb, mar           -- these columns become rows
 INTO
   NAME month               -- new column holding 'jan'/'feb'/'mar'

@@ -71,7 +71,7 @@ their coin is fair. You flip it 100 times and get 62 heads. Under H₀
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -122,7 +122,7 @@ analytically. Let's check against an exact binomial test.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -156,7 +156,7 @@ the p-value is the shaded probability beyond them.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -250,7 +250,7 @@ rare. Flipping the condition changes the answer entirely.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# A rare disease: 1% of people have it.
+  starterCode={`# A rare disease: 1% of people have it.
 # Test: if you have it, it flags positive 99% of the time (p-value-like:
 # P(positive | healthy) = 5%, a "5% false-positive rate").
 prevalence       = 0.01
@@ -307,7 +307,7 @@ p-value collapse toward zero. Same effect, wildly different p-values.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -391,7 +391,7 @@ through enough comparisons and you will always find a "discovery."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(123)
@@ -449,7 +449,7 @@ rng = np.random.default_rng(5)
 # Null distribution of some statistic (centered near 0 under H0).
 null_stats = rng.normal(0, 1, size=50_000)
 observed_stat = 1.9`}
-  initialCode={`# TODO: right-tailed p-value = fraction of null_stats >= observed_stat
+  starterCode={`# TODO: right-tailed p-value = fraction of null_stats >= observed_stat
 p_value = None
 `}
   solutionCode={`p_value = float(np.mean(null_stats >= observed_stat))
@@ -500,7 +500,7 @@ Hint: compare \`np.abs(null_stats)\` to \`abs(observed_stat)\`. The two-sided p-
 rng = np.random.default_rng(5)
 null_stats = rng.normal(0, 1, size=50_000)
 observed_stat = 1.9`}
-  initialCode={`# TODO: two-sided p-value = fraction of |null_stats| >= |observed_stat|
+  starterCode={`# TODO: two-sided p-value = fraction of |null_stats| >= |observed_stat|
 p_two_sided = None
 `}
   solutionCode={`p_two_sided = float(np.mean(np.abs(null_stats) >= abs(observed_stat)))

@@ -37,7 +37,7 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  initialCode={`SELECT name, dept, salary
+  starterCode={`SELECT name, dept, salary
 FROM employees
 WHERE dept = 'Engineering';`}
 />
@@ -69,7 +69,7 @@ You can compare with more than just equality:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT name, salary
+  starterCode={`SELECT name, salary
 FROM employees
 WHERE salary >= 90000
 ORDER BY salary DESC;`}
@@ -93,7 +93,7 @@ So `'A%'` means "starts with A," `'%son'` means "ends with son," and
 );
 INSERT INTO employees (name) VALUES
   ('Alice'),('Bob'),('Carol'),('Dave'),('Eve');`}
-  initialCode={`SELECT name
+  starterCode={`SELECT name
 FROM employees
 WHERE name LIKE 'A%' OR name LIKE 'E%';`}
 />
@@ -113,7 +113,7 @@ Real questions often have several parts. Combine conditions with
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT name, dept, salary
+  starterCode={`SELECT name, dept, salary
 FROM employees
 WHERE dept = 'Engineering' AND salary > 100000;`}
 />

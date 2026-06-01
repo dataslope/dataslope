@@ -48,7 +48,7 @@ Functions return `Result` instead of throwing. Callers must check `.ok` to acces
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<T, E> =
+  starterCode={`type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
@@ -90,7 +90,7 @@ Transforms the success value if present, otherwise propagates the error:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<T, E> =
+  starterCode={`type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
@@ -130,7 +130,7 @@ Chains operations that also return `Result`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<T, E> =
+  starterCode={`type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
@@ -180,7 +180,7 @@ Extracts the value or returns a default:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<T, E> =
+  starterCode={`type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
@@ -215,7 +215,7 @@ Let's build a pipeline that parses input, validates it, and computes a result:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<T, E> =
+  starterCode={`type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 

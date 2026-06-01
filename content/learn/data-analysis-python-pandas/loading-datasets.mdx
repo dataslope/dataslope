@@ -30,7 +30,7 @@ are fetched over HTTPS in the background and parsed.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Direct URL — works because raw.githubusercontent.com supports CORS
 df = pd.read_csv(
@@ -75,7 +75,7 @@ Let us try a real example with several of these.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv",
@@ -102,7 +102,7 @@ Whenever you load a new dataset, run these three commands
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -134,7 +134,7 @@ CORS proxy you can route through:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Going through the proxy. The original URL is URL-encoded into ?url=...
 url = "https://dataslope-cors-proxy.subwaymatch.workers.dev/?url=https%3A%2F%2Fgithub.com%2Fbdi475%2Fdatasets%2Fraw%2Frefs%2Fheads%2Fmain%2FHR-dataset-v14.csv"
@@ -176,7 +176,7 @@ Pandas can flatten simple cases:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import io
 
 json_text = """
@@ -257,7 +257,7 @@ But:
 - Convert \`Department\` and \`Attrition\` to the \`category\` dtype as you load.
 
 Store the result in a DataFrame called \`df\`.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 

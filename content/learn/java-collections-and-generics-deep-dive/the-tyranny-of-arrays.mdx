@@ -50,7 +50,7 @@ slots forever.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         int[] scores = new int[5];   // five slots, all default 0
         scores[0] = 90;
@@ -83,7 +83,7 @@ yourself by allocating a bigger array and copying.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     // Hand-rolled "growing array of Strings".
     static String[] data = new String[2];
     static int      size = 0;
@@ -187,7 +187,7 @@ Compare the hand-rolled growing array above with the same thing using
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.ArrayList;
+  starterCode={`import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

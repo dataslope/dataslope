@@ -35,7 +35,7 @@ Compare the default grey theme with a few alternatives:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
 
@@ -45,7 +45,7 @@ p + theme_gray()      # the default: grey panel, white gridlines
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
 
@@ -55,7 +55,7 @@ p + theme_minimal()   # no panel background, light grid
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
 
@@ -80,7 +80,7 @@ For surgical tweaks, `theme()` exposes hundreds of individual
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point() +
@@ -120,7 +120,7 @@ specific one:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Set the base text size ONCE at the root; everything inherits it.
 ggplot(mpg, aes(displ, hwy)) +

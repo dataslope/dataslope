@@ -90,7 +90,7 @@ houses = pd.DataFrame({
     "neighborhood": ["downtown", "suburb", "suburb", "downtown", "rural", "suburb"],
     "price":        [320000, 410000, 480000, 350000, 520000, 445000],
 })`}
-  initialCode={`# 'houses' is provided above. Take a look at the whole table.
+  starterCode={`# 'houses' is provided above. Take a look at the whole table.
 print(houses)
 print()
 print("Shape of the full table:", houses.shape, "(rows, columns)")
@@ -113,7 +113,7 @@ houses = pd.DataFrame({
     "neighborhood": ["downtown", "suburb", "suburb", "downtown", "rural", "suburb"],
     "price":        [320000, 410000, 480000, 350000, 520000, 445000],
 })`}
-  initialCode={`# The target: the column we want to predict.
+  starterCode={`# The target: the column we want to predict.
 y = houses["price"]
 
 # The features: everything we are allowed to use as input.
@@ -150,7 +150,7 @@ do I have* (rows) and *how many features describe each one* (columns).
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 
 X, y = load_iris(return_X_y=True)
 
@@ -186,7 +186,7 @@ errors.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Five examples, ONE feature each. A flat list is 1-D -- NOT a valid X.
 one_feature_flat = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
@@ -237,7 +237,7 @@ df = pd.DataFrame({
     "feature_b": [9, 8, 7, 6],
     "feature_c": [3, 1, 4, 1],
 })`}
-  initialCode={`# The target may sit anywhere -- here 'label' is the SECOND column.
+  starterCode={`# The target may sit anywhere -- here 'label' is the SECOND column.
 # Select it by NAME, never by position.
 y = df["label"]
 
@@ -427,7 +427,7 @@ patients = pd.DataFrame({
     "max_heartrate": [170, 150, 185, 160, 130, 175],
     "has_condition": [0, 1, 0, 1, 1, 0],
 })`}
-  initialCode={`# 'patients' is provided above (6 patients, 5 columns).
+  starterCode={`# 'patients' is provided above (6 patients, 5 columns).
 
 # 1. Target: the column we want to predict.
 y = None

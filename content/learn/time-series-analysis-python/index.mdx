@@ -54,7 +54,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`# Correlation of each month with the PREVIOUS month (lag-1 autocorrelation).
+  starterCode={`# Correlation of each month with the PREVIOUS month (lag-1 autocorrelation).
 ordered_corr = air.corr(air.shift(1))
 
 # Now shuffle the values, destroying their time order, and measure again.

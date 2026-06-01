@@ -35,7 +35,7 @@ many values fall in each. The result is a picture of where values
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 hist(mtcars$mpg,
      main = "Fuel economy (mtcars)",
      xlab = "Miles per gallon",
@@ -65,7 +65,7 @@ easier to compare, especially across groups:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 d <- density(mtcars$mpg)
 plot(d,
      main = "Density of mpg",
@@ -89,7 +89,7 @@ for marking outliers.
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 boxplot(mtcars$mpg,
         main = "mpg distribution",
         ylab = "Miles per gallon",
@@ -109,7 +109,7 @@ distributions across groups**:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 boxplot(mpg ~ cyl, data = mtcars,
         main = "mpg by cylinder count",
         xlab = "Cylinders",
@@ -130,7 +130,7 @@ verbose but enormously more flexible. Here's a sneak peek:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = mpg)) +
@@ -140,7 +140,7 @@ ggplot(mtcars, aes(x = mpg)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
@@ -158,7 +158,7 @@ at low-to-medium values with a long tail of high values.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A skewed distribution: simulated incomes
+  starterCode={`# A skewed distribution: simulated incomes
 set.seed(42)
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
@@ -182,7 +182,7 @@ becomes easier to work with statistically.
 
 <CodeBlock
   adapter="r"
-  initialCode={`set.seed(42)
+  starterCode={`set.seed(42)
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
 par(mfrow = c(1, 2))
@@ -235,7 +235,7 @@ just checks the plot was produced.
   adapter="r"
   title="Histogram + boxplot for Ozone"
   instructions={`Produce two side-by-side plots: (1) a histogram of \`airquality$Ozone\` (NAs ignored), (2) a boxplot of the same. Set the layout with \`par(mfrow = c(1, 2))\`.`}
-  initialCode={`data(airquality)
+  starterCode={`data(airquality)
 oz <- airquality$Ozone   # has NAs
 
 par(mfrow = c(1, 2))

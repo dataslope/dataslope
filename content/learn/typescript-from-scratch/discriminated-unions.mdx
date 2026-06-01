@@ -15,7 +15,7 @@ A discriminated union is a union of object types that share a common property â€
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number }
   | { kind: "triangle"; base: number; height: number };
@@ -68,7 +68,7 @@ Here's the trick: assign the unhandled case to `never`. If you've covered all va
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Status =
+  starterCode={`type Status =
   | { kind: "idle" }
   | { kind: "loading" }
   | { kind: "success"; data: string }
@@ -113,7 +113,7 @@ Consider a data-fetching flow: you start idle, transition to loading, and then l
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type FetchState<T> =
+  starterCode={`type FetchState<T> =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "success"; data: T }
@@ -178,7 +178,7 @@ Discriminated unions are perfect for modeling **domain events** â€” things that 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type AppEvent =
+  starterCode={`type AppEvent =
   | { type: "user-logged-in"; userId: string; timestamp: number }
   | { type: "user-logged-out"; userId: string }
   | { type: "page-viewed"; path: string; referrer: string | null }

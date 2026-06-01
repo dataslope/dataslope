@@ -264,7 +264,7 @@ behavior *envies* the data — it wants to live on `Invoice`.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Invoice inv = new Invoice(100.0, 50.0);
         // Awkward: outsider doing the math
@@ -296,7 +296,7 @@ fields.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Invoice inv = new Invoice(100.0, 50.0);
         System.out.println("tax = " + inv.tax());

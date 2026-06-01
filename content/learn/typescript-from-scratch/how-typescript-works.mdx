@@ -17,7 +17,7 @@ Let's see this in action:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Plain JavaScript — no type annotations
+  starterCode={`// Plain JavaScript — no type annotations
 let x = 10;
 x = "hello"; // JavaScript allows this
 console.log(x);
@@ -75,7 +75,7 @@ One of TypeScript's defining features is its **structural type system** (also kn
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface User {
+  starterCode={`interface User {
   name: string;
   age: number;
 }
@@ -202,7 +202,7 @@ One of TypeScript's most powerful features is **control flow analysis** — the 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function processValue(value: string | number) {
+  starterCode={`function processValue(value: string | number) {
   // At this point, value could be string OR number
 
   if (typeof value === "string") {

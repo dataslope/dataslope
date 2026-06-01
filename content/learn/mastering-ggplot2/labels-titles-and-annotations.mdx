@@ -18,7 +18,7 @@ aesthetic:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point() +
@@ -58,7 +58,7 @@ text label or shape at coordinates you choose — *not* tied to the data:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
@@ -81,7 +81,7 @@ baseline to compare against — an average, a target, a threshold:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 avg <- mean(mpg$hwy)
 

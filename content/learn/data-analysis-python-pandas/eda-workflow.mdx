@@ -33,7 +33,7 @@ column was actually full of garbage.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print("Shape:", df.shape)            # rows, columns
+  starterCode={`print("Shape:", df.shape)            # rows, columns
 print()
 print("Dtypes:")
 print(df.dtypes)
@@ -56,7 +56,7 @@ Questions to answer:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.head())
+  starterCode={`print(df.head())
 print()
 print(df.sample(5, random_state=0))   # random rows often reveal weirdness
 `}
@@ -73,7 +73,7 @@ know about.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`missing = df.isna().sum()
+  starterCode={`missing = df.isna().sum()
 pct = (missing / len(df) * 100).round(2)
 report = pd.DataFrame({"missing": missing, "pct": pct})
 print(report[report["missing"] > 0].sort_values("missing", ascending=False))
@@ -93,7 +93,7 @@ For numeric columns, look at `describe()`:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.describe().T)
+  starterCode={`print(df.describe().T)
 `}
 />
 
@@ -103,7 +103,7 @@ For categorical columns, look at `value_counts()`:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`for col in df.select_dtypes(include="object").columns:
+  starterCode={`for col in df.select_dtypes(include="object").columns:
     print(f"--- {col} ({df[col].nunique()} unique) ---")
     print(df[col].value_counts().head(10))
     print()
@@ -123,7 +123,7 @@ Questions:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`numeric = df.select_dtypes(include="number")
+  starterCode={`numeric = df.select_dtypes(include="number")
 print("Correlation matrix:")
 print(numeric.corr().round(2))
 `}
@@ -139,7 +139,7 @@ For categorical-vs-numeric relationships, group:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.groupby("salary")["satisfaction_level"].describe().round(2))
+  starterCode={`print(df.groupby("salary")["satisfaction_level"].describe().round(2))
 `}
 />
 

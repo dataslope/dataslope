@@ -130,7 +130,7 @@ INSERT INTO orders VALUES
   (101, 1, DATE '2025-01-05'),
   (102, 1, DATE '2025-01-20'),
   (103, 2, DATE '2025-01-21');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   customers.name,
   COUNT(orders.id) AS order_count
 FROM customers

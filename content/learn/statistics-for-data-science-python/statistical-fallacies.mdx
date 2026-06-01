@@ -49,7 +49,7 @@ flip when we disaggregate.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Two departments. "Easy" admits ~60%, "Hard" admits ~25% — for EVERYONE.
 # Within each department, women are admitted at a HIGHER rate than men.
@@ -175,7 +175,7 @@ reported noise as signal. Let's watch it happen.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(1)
@@ -236,7 +236,7 @@ about **9%**. Run the numbers on 100,000 people:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Disease prevalence and test accuracy.
+  starterCode={`# Disease prevalence and test accuracy.
 prevalence       = 1 / 1000     # 0.1% of people have it
 false_pos_rate   = 0.01         # 1% of healthy people test positive
 sensitivity      = 1.00         # catches every true case
@@ -333,7 +333,7 @@ both groups were partly lucky/unlucky and drift back regardless.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(3)
 
@@ -448,7 +448,7 @@ df = pd.DataFrame([
     ["desktop", "A",  100,  70],   # 70.0%
     ["desktop", "B",  900, 657],   # 73.0%  (B higher)
 ], columns=["device", "group", "visitors", "conversions"])`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # TODO: compute agg_winner and within_winner (each "A" or "B")
 agg_winner = None
@@ -518,7 +518,7 @@ from scipy import stats
 rng = np.random.default_rng(42)
 n = 150
 outcome = rng.normal(0, 1, size=n)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 alpha = 0.05

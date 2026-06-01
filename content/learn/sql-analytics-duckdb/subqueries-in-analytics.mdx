@@ -36,7 +36,7 @@ average?"
 );
 INSERT INTO orders VALUES
   (1,120),(2,80),(3,45),(4,200),(5,60),(6,95);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   amount,
   (SELECT ROUND(AVG(amount), 1) FROM orders) AS overall_avg,
@@ -68,7 +68,7 @@ CREATE TABLE customers (
 );
 INSERT INTO customers VALUES
   (10,'gold'),(11,'silver'),(12,'gold'),(13,'bronze');`}
-  initialCode={`SELECT id, customer_id, amount
+  starterCode={`SELECT id, customer_id, amount
 FROM orders
 WHERE customer_id IN (
   SELECT id FROM customers WHERE tier = 'gold'
@@ -95,7 +95,7 @@ function or join is often clearer.
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   o.id,
   o.region,
   o.amount,
@@ -124,7 +124,7 @@ placed *any* order" without caring how many.
 INSERT INTO customers VALUES (1,'Ada'),(2,'Bo'),(3,'Cy');
 CREATE TABLE orders (id INTEGER, customer_id INTEGER);
 INSERT INTO orders VALUES (101,1),(102,1),(103,3);`}
-  initialCode={`SELECT name
+  starterCode={`SELECT name
 FROM customers c
 WHERE EXISTS (
   SELECT 1 FROM orders o WHERE o.customer_id = c.id

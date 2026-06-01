@@ -74,9 +74,9 @@ interface CodeBlockProps {
   adapter: LanguageAdapter;
   /** Initial source the editor is populated with. The Reset button
    *  restores the editor to this value. Ignored when `files` is set. */
-  initialCode?: string;
+  starterCode?: string;
   /** Multi-file workspace. When set, takes precedence over
-   *  `initialCode`. A non-sortable, non-closeable tab bar appears above
+   *  `starterCode`. A non-sortable, non-closeable tab bar appears above
    *  the editor so the learner can switch between files. Code is run
    *  against `entryFilename` (or the first file when omitted); every
    *  other file is staged into the runtime's virtual file system via
@@ -316,7 +316,7 @@ export default function CodeBlock(props: CodeBlockProps) {
 
 function CodeBlockInner({
   adapter,
-  initialCode,
+  starterCode,
   initCode,
   files,
   entryFilename,
@@ -354,14 +354,14 @@ function CodeBlockInner({
 
   // ─── Multi-file workspace ───────────────────────────────────────────
   // Normalise into a list of files: single-file authors pass
-  // `initialCode`; multi-file authors pass `files`. The rest of the
+  // `starterCode`; multi-file authors pass `files`. The rest of the
   // component always works with the array form, matching how
   // ChallengeCard manages its workspace.
   const workspaceFiles: CodeBlockFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
-    return [{ filename: defaultName, initialContent: initialCode ?? "" }];
-  }, [files, initialCode, adapter.defaultFileExtension]);
+    return [{ filename: defaultName, initialContent: starterCode ?? "" }];
+  }, [files, starterCode, adapter.defaultFileExtension]);
   const isMultiFile = workspaceFiles.length > 1;
   const resolvedEntryFilename =
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
@@ -388,12 +388,12 @@ function CodeBlockInner({
   );
 
   // Stable localStorage key for single-file mode. Hashing
-  // `adapter.id + initialCode` means: same block across reloads → same
-  // key (state restored); author edits `initialCode` in MDX → new key
+  // `adapter.id + starterCode` means: same block across reloads → same
+  // key (state restored); author edits `starterCode` in MDX → new key
   // (old buffer naturally retired, user sees the new starter).
   const persistedKey = useMemo(
-    () => persistKey("codeblock", `${adapter.id}|${initialCode ?? ""}`),
-    [adapter.id, initialCode],
+    () => persistKey("codeblock", `${adapter.id}|${starterCode ?? ""}`),
+    [adapter.id, starterCode],
   );
 
   const persistActiveFile = useCallback(

@@ -30,7 +30,7 @@ Plotly Express offers `px.imshow` (for image-like 2-D matrices) and
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.tips()
 
@@ -55,7 +55,7 @@ correlated against every other.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.iris().select_dtypes("number")
 corr = df.corr().round(2)
@@ -89,7 +89,7 @@ Heatmaps also show counts across two categorical axes:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 df = px.data.tips()

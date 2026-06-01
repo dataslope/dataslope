@@ -11,7 +11,7 @@ On ten items, almost any correct solution feels instant. On ten million items, a
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     for (int n : {10, 100, 1000, 10000}) {
@@ -41,7 +41,7 @@ Formally, `f(n) = O(g(n))` if there exist constants `c` and `n0` such that `f(n)
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int sum(const std::vector<int>& xs) {
@@ -86,7 +86,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <chrono>
+  starterCode={`#include <chrono>
 #include <iostream>
 
 int main() {
@@ -127,7 +127,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -165,7 +165,7 @@ When a problem asks for complexity, state which case you mean. Interviews and al
   instructions={`Implement \`int countPairs(const std::vector<int>& v, int target)\` to count pairs \`(i, j)\` where \`i < j\` and \`v[i] + v[j] == target\`.
 
 Use the straightforward O(n^2) nested-loop version for this challenge. Later, you will learn how a hash map can reduce this idea to O(n).`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int countPairs(const std::vector<int>& v, int target) {
@@ -206,7 +206,7 @@ int main() {
   instructions={`Implement \`bool hasDuplicate(const std::vector<int>& v)\` so it returns true if any value appears at least twice.
 
 A naive O(n^2) solution is accepted here. If you already know \`std::unordered_set\`, that gives an O(n) average-time approach.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 bool hasDuplicate(const std::vector<int>& v) {

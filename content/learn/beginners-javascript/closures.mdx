@@ -15,7 +15,7 @@ Watch this carefully:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function makeGreeter(greeting) {
+  starterCode={`function makeGreeter(greeting) {
   return function (name) {
     return greeting + ", " + name + "!";
   };
@@ -64,7 +64,7 @@ across calls, without exposing it to the outside world.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function makeCounter() {
+  starterCode={`function makeCounter() {
   let count = 0;            // private — no one else can see it directly
   return function () {
     count = count + 1;
@@ -106,7 +106,7 @@ A classic closure puzzle:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Build an array of functions, one per number 0..4.
+  starterCode={`// Build an array of functions, one per number 0..4.
 const fs = [];
 for (let i = 0; i < 5; i++) {
   fs.push(function () {
@@ -132,7 +132,7 @@ function-scoped, not block-scoped):
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const fs = [];
+  starterCode={`const fs = [];
 for (var i = 0; i < 5; i++) {
   fs.push(function () {
     return i;
@@ -164,7 +164,7 @@ Closures are how JavaScript expresses many practical patterns.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function makeTaxCalculator(rate) {
+  starterCode={`function makeTaxCalculator(rate) {
   return function (amount) {
     return amount + amount * rate;
   };
@@ -187,7 +187,7 @@ into the closure once and never has to be passed again.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function memoize(fn) {
+  starterCode={`function memoize(fn) {
   const cache = new Map();
   return function (x) {
     if (cache.has(x)) {
@@ -227,7 +227,7 @@ pre-2015 JavaScript used closures explicitly:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const counterModule = (function () {
+  starterCode={`const counterModule = (function () {
   let count = 0;            // private state
   function increment() { count += 1; }
   function value() { return count; }
@@ -326,7 +326,7 @@ created, you are looking at a closure.
 - \`value()\` — return the current value without changing it.
 
 The starting value of the counter is the \`start\` argument (default \`0\`). Each call to \`makeCounter\` should produce an independent counter.`}
-  initialCode={`function makeCounter(start = 0) {
+  starterCode={`function makeCounter(start = 0) {
   // your code here — keep \`count\` private via closure.
   return {
     increment() { return 0; },

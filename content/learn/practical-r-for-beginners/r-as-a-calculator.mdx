@@ -26,7 +26,7 @@ give you both halves of a division.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Each line produces an answer
+  starterCode={`# Each line produces an answer
 
 2 + 3            # addition
 10 - 4           # subtraction
@@ -49,7 +49,7 @@ subtraction**, with **parentheses overriding** everything.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# These two expressions are NOT the same
+  starterCode={`# These two expressions are NOT the same
 print(2 + 3 * 4)       # 2 + 12 = 14
 print((2 + 3) * 4)     # 5 * 4  = 20
 
@@ -75,7 +75,7 @@ R has two kinds of numbers you will routinely encounter:
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- 42       # double (the default in R!)
+  starterCode={`x <- 42       # double (the default in R!)
 y <- 42L      # integer (the L stands for "long integer")
 
 cat("type of x:", typeof(x), "\\n")
@@ -101,7 +101,7 @@ R has a few special "numbers" that pop up in real data analysis:
 
 <CodeBlock
   adapter="r"
-  initialCode={`print(1 / 0)        # Inf
+  starterCode={`print(1 / 0)        # Inf
 print(-1 / 0)       # -Inf
 print(0 / 0)        # NaN — "not a number"
 print(NA + 5)       # NA — anything plus a missing value is missing
@@ -133,7 +133,7 @@ Each comparison returns a **logical** value: `TRUE` or `FALSE`.
 
 <CodeBlock
   adapter="r"
-  initialCode={`5 == 5          # TRUE
+  starterCode={`5 == 5          # TRUE
 5 != 5          # FALSE
 5 < 10          # TRUE
 5 > 10          # FALSE
@@ -155,7 +155,7 @@ binary. The right way to compare numbers like this is with
 
 <CodeBlock
   adapter="r"
-  initialCode={`# The "is it basically equal?" check
+  starterCode={`# The "is it basically equal?" check
 print(all.equal(0.1 + 0.2, 0.3))
 `}
 />
@@ -177,7 +177,7 @@ Once you have logical values, you can combine them.
 
 <CodeBlock
   adapter="r"
-  initialCode={`age      <- 30
+  starterCode={`age      <- 30
 income   <- 55000
 
 # Eligible if age between 25 and 60 AND income at least 40000
@@ -207,7 +207,7 @@ program:
 
 <CodeBlock
   adapter="r"
-  initialCode={`width  <- 8
+  starterCode={`width  <- 8
 height <- 5
 
 area      <- width * height
@@ -249,7 +249,7 @@ R ships with dozens of math functions. You will use these often:
 
 <CodeBlock
   adapter="r"
-  initialCode={`cat("abs(-7)        =", abs(-7), "\\n")
+  starterCode={`cat("abs(-7)        =", abs(-7), "\\n")
 cat("sqrt(16)       =", sqrt(16), "\\n")
 cat("exp(1)         =", exp(1), "\\n")
 cat("log(exp(5))    =", log(exp(5)), "\\n")
@@ -334,7 +334,7 @@ Both should be plain numeric scalars.
 - \`total\`: \`bill + tip\`, rounded to 2 decimals.`}
   initCode={`bill    <- 42.75
 tip_pct <- 18`}
-  initialCode={`tip   <- NA
+  starterCode={`tip   <- NA
 total <- NA
 
 cat("Bill:  $", bill, "\\n", sep = "")

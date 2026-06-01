@@ -25,7 +25,7 @@ SELECT
   DATE '2024-01-01' + (i * 5)  AS order_date,
   (i * 17) % 200 + 20          AS amount
 FROM range(0, 40) t(i);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   date_trunc('month', order_date) AS month,
   COUNT(*)                        AS orders,
   SUM(amount)                     AS revenue
@@ -60,7 +60,7 @@ busiest?" by grouping across all weeks.
   initSql={`CREATE TABLE orders AS
 SELECT DATE '2024-01-01' + i AS order_date
 FROM range(0, 60) t(i);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   EXTRACT(dow FROM order_date) AS weekday,   -- 0 = Sunday
   dayname(order_date)          AS name,
   COUNT(*)                     AS orders
@@ -93,7 +93,7 @@ INSERT INTO users VALUES
   (2, DATE '2024-05-20'),
   (3, DATE '2024-04-10'),
   (4, DATE '2024-05-28');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   signup_date,
   DATE '2024-05-30' - signup_date           AS days_ago,
@@ -121,7 +121,7 @@ INSERT INTO orders VALUES
   (DATE '2024-03-01', 50),
   (DATE '2024-03-03', 80),
   (DATE '2024-03-05', 120);`}
-  initialCode={`-- Build a continuous spine of dates, then attach revenue.
+  starterCode={`-- Build a continuous spine of dates, then attach revenue.
 SELECT
   d::DATE                       AS day,
   COALESCE(SUM(o.amount), 0)    AS revenue

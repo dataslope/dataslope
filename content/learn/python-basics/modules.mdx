@@ -22,7 +22,7 @@ When you do `import pandas as pd`, you're pulling in hundreds of modules, all or
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 print(math.pi)
 print(math.sqrt(2))
 
@@ -48,7 +48,7 @@ Python comes with a famously rich standard library. A small tour:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import json
+  starterCode={`import json
 import datetime
 import random
 import collections
@@ -81,7 +81,7 @@ When you write `import foo`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import sys
+  starterCode={`import sys
 for p in sys.path[:5]:   # show first 5
     print(p)
 `}
@@ -107,7 +107,7 @@ It pulls every public name into the current namespace, which makes it impossible
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Bad: where does 'sqrt' come from?
+  starterCode={`# Bad: where does 'sqrt' come from?
 # from math import *
 # print(sqrt(2))
 
@@ -171,7 +171,7 @@ Python 3.3+ has "namespace packages" which don't require `__init__.py`. But most
 
 <CodeBlock
   adapter="python"
-  initialCode={`# inside myapp/db/queries.py
+  starterCode={`# inside myapp/db/queries.py
 # from .connection import open_db        # sibling module
 # from ..cli import parse_args            # one level up
 
@@ -271,7 +271,7 @@ assert variance([3, 3, 3]) == 0`,
   adapter="python"
   title="Filter even numbers"
   instructions={`Define a function \`filter_even(numbers)\` that returns a new list containing only the even numbers from \`numbers\`.`}
-  initialCode={`def filter_even(numbers):
+  starterCode={`def filter_even(numbers):
     # your code here
     return []
 `}

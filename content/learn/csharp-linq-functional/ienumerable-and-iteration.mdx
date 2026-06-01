@@ -63,7 +63,7 @@ A `foreach` loop in C# is just a sugar over `GetEnumerator`/
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 var nums = new List<int> { 10, 20, 30 };
@@ -98,7 +98,7 @@ implements `IEnumerator<T>` for you.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Naturals()
@@ -131,7 +131,7 @@ To prove how simple the contract is, let's implement our own `Where`.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static IEnumerable<T> MyWhere<T>(IEnumerable<T> source, Func<T, bool> predicate)
@@ -169,7 +169,7 @@ Practical example of the "iterate twice" trap:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Source()
@@ -198,7 +198,7 @@ collection:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -230,7 +230,7 @@ data sitting in memory".
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 var nums = Enumerable.Range(1, 5);            // deferred

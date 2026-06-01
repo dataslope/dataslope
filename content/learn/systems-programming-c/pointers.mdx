@@ -18,7 +18,7 @@ specifier prints it in hex (after a cast to `void *`).
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int x = 42;
@@ -62,7 +62,7 @@ flowchart LR
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int x = 10;
@@ -86,7 +86,7 @@ A pointer that does not point anywhere meaningful should be `NULL`
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 void print_if_some(int *p) {
@@ -119,7 +119,7 @@ gets a copy. Modifying that copy does nothing to the caller.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void try_to_swap(int a, int b) {
     int t = a;
@@ -143,7 +143,7 @@ variables, pass their addresses:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
     int t = *a;
@@ -165,7 +165,7 @@ output pointers.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 // Returns 0 on success and fills *quot and *rem.
 // Returns -1 if denom is zero.
@@ -218,7 +218,7 @@ does not know how many bytes to read or how to interpret them.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -242,7 +242,7 @@ variables.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int x = 7;
@@ -269,7 +269,7 @@ needs to *replace* the caller's pointer with a new allocation.
   adapter="c"
   title="Implement swap()"
   instructions={`Implement \`void swap(int *a, int *b)\` so that, after the call, the values pointed to by \`a\` and \`b\` are exchanged. The provided \`main\` calls \`swap\` and prints the result.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
     // your code here
@@ -312,7 +312,7 @@ int main(void) {
   adapter="c"
   title="Return two values via output pointers"
   instructions={`Implement \`void min_max(int a, int b, int c, int *out_min, int *out_max)\` so it writes the minimum of \`a, b, c\` to \`*out_min\` and the maximum to \`*out_max\`. The provided \`main\` calls it for \`(7, 2, 9)\` and prints \`min=2 max=9\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void min_max(int a, int b, int c, int *out_min, int *out_max) {
     // your code here

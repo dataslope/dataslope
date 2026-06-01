@@ -17,14 +17,14 @@ The simplest tuple is written with parentheses, separating items with commas.
 
 <CodeBlock
   adapter="python"
-  initialCode={`empty = ()
+  starterCode={`empty = ()
 print(empty)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`two = (1, 2)
+  starterCode={`two = (1, 2)
 print(two)
 `}
 />
@@ -33,7 +33,7 @@ Parentheses are often optional when the context is unambiguous.
 
 <CodeBlock
   adapter="python"
-  initialCode={`also_two = 1, 2
+  starterCode={`also_two = 1, 2
 print(also_two)
 print(type(also_two))
 `}
@@ -43,7 +43,7 @@ print(type(also_two))
 
 <CodeBlock
   adapter="python"
-  initialCode={`one = (1,)
+  starterCode={`one = (1,)
 not_a_tuple = (1)
 print("one:", one, type(one))
 print("not_a_tuple:", not_a_tuple, type(not_a_tuple))
@@ -58,7 +58,7 @@ The `tuple()` constructor converts any iterable into a tuple.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from_list = tuple([1, 2, 3])
+  starterCode={`from_list = tuple([1, 2, 3])
 from_str = tuple("hello")
 print(from_list)
 print(from_str)
@@ -71,7 +71,7 @@ Tuples support the same `[i]` and `[start:stop:step]` syntax as lists.
 
 <CodeBlock
   adapter="python"
-  initialCode={`t = (10, 20, 30, 40)
+  starterCode={`t = (10, 20, 30, 40)
 print(t[0])
 print(t[-1])
 `}
@@ -79,7 +79,7 @@ print(t[-1])
 
 <CodeBlock
   adapter="python"
-  initialCode={`t = (10, 20, 30, 40)
+  starterCode={`t = (10, 20, 30, 40)
 print(t[1:3])
 print(len(t))
 `}
@@ -89,7 +89,7 @@ Tuples are **immutable**: you cannot change them after creation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`t = (10, 20, 30, 40)
+  starterCode={`t = (10, 20, 30, 40)
 try:
     t[0] = 99
 except TypeError as e:
@@ -101,7 +101,7 @@ Iteration works just like lists.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for x in (10, 20, 30):
+  starterCode={`for x in (10, 20, 30):
     print(x)
 `}
 />
@@ -115,7 +115,7 @@ Two big wins:
 
 <CodeBlock
   adapter="python"
-  initialCode={`locations = {
+  starterCode={`locations = {
     (40.7128, -74.0060): "New York",
     (51.5074, -0.1278): "London",
     (35.6762, 139.6503): "Tokyo",
@@ -130,7 +130,7 @@ A tuple is immutable, but that **does not** mean its contents are. If a tuple co
 
 <CodeBlock
   adapter="python"
-  initialCode={`t = (1, [2, 3])
+  starterCode={`t = (1, [2, 3])
 # t[0] = 99  # would fail
 t[1].append(4)  # but this works!
 print(t)
@@ -156,7 +156,7 @@ This is one of Python's most elegant features. The number of names on the left m
 
 <CodeBlock
   adapter="python"
-  initialCode={`point = (3, 4)
+  starterCode={`point = (3, 4)
 x, y = point
 print("x:", x, "y:", y)
 `}
@@ -166,7 +166,7 @@ Unpacking works with **any iterable**, not just tuples.
 
 <CodeBlock
   adapter="python"
-  initialCode={`a, b, c = "abc"
+  starterCode={`a, b, c = "abc"
 print(a, b, c)
 
 d, e = [10, 20]
@@ -178,7 +178,7 @@ Star (`*`) catches the leftover items as a list.
 
 <CodeBlock
   adapter="python"
-  initialCode={`first, *middle, last = [1, 2, 3, 4, 5]
+  starterCode={`first, *middle, last = [1, 2, 3, 4, 5]
 print("first:", first)
 print("middle:", middle)
 print("last:", last)
@@ -187,7 +187,7 @@ print("last:", last)
 
 <CodeBlock
   adapter="python"
-  initialCode={`head, *tail = [1, 2, 3]
+  starterCode={`head, *tail = [1, 2, 3]
 print("head:", head)
 print("tail:", tail)
 `}
@@ -197,7 +197,7 @@ You can use `*_` to discard the middle items.
 
 <CodeBlock
   adapter="python"
-  initialCode={`a, *_, z = [1, 2, 3, 4, 5]
+  starterCode={`a, *_, z = [1, 2, 3, 4, 5]
 print("a:", a, "z:", z)
 `}
 />
@@ -208,7 +208,7 @@ Functions "return multiple values" by returning a tuple, which the caller can un
 
 <CodeBlock
   adapter="python"
-  initialCode={`def minmax(values):
+  starterCode={`def minmax(values):
     return min(values), max(values)
 
 lo, hi = minmax([3, 1, 4, 1, 5, 9, 2, 6])
@@ -218,7 +218,7 @@ print("min:", lo, "max:", hi)
 
 <CodeBlock
   adapter="python"
-  initialCode={`def divmod_manual(a, b):
+  starterCode={`def divmod_manual(a, b):
     return (a // b, a % b)
 
 quotient, remainder = divmod_manual(17, 5)
@@ -232,7 +232,7 @@ print("quotient:", quotient, "remainder:", remainder)
 
 <CodeBlock
   adapter="python"
-  initialCode={`from collections import namedtuple
+  starterCode={`from collections import namedtuple
 
 Point = namedtuple("Point", ["x", "y"])
 p = Point(3, 4)
@@ -246,7 +246,7 @@ The newer `typing.NamedTuple` version lets you add type hints.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from typing import NamedTuple
+  starterCode={`from typing import NamedTuple
 
 class Color(NamedTuple):
     r: int
@@ -268,7 +268,7 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
   adapter="python"
   title="Split min and max"
   instructions={`Define a function \`split_minmax(values)\` that returns a tuple \`(minimum, maximum)\` of \`values\`. Assume \`values\` always has at least one item.`}
-  initialCode={`def split_minmax(values):
+  starterCode={`def split_minmax(values):
     # your code here
     return (0, 0)
 `}
@@ -298,7 +298,7 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
   adapter="python"
   title="Unpack a record"
   instructions={`A function \`stats_of(record)\` is given a 4-tuple \`(name, scores, attempts, best)\` where \`scores\` is a list. Return a new tuple \`(name, average_score)\` where \`average_score\` is the mean of \`scores\` rounded to one decimal place. Use tuple unpacking to extract \`name\` and \`scores\` from the record.`}
-  initialCode={`def stats_of(record):
+  starterCode={`def stats_of(record):
     # your code here
     return ("", 0.0)
 `}
