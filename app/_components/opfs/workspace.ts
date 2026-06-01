@@ -47,6 +47,12 @@ interface WorkspaceMeta {
 // ---------------------------------------------------------------------------
 
 const REGISTRY_KEY = "playground_workspaces";
+// The registry key was `pg_workspaces` before the #409 `pg_` → `playground_`
+// storage-namespace rename. Read it once as a fallback (and migrate it
+// forward) so users who created workspaces on the old build don't lose their
+// workspace list on upgrade — mirroring `getStoredEditorTheme`'s legacy-key
+// handling.
+const LEGACY_REGISTRY_KEY = "pg_workspaces";
 const WORKSPACES_DIR = "workspaces";
 
 // ---------------------------------------------------------------------------
@@ -71,10 +77,21 @@ export function getWorkspaceRegistry(): WorkspaceEntry[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(REGISTRY_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isValidEntry);
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown;
+      return Array.isArray(parsed) ? parsed.filter(isValidEntry) : [];
+    }
+    // One-time migration from the pre-#409 `pg_workspaces` key.
+    const legacyRaw = localStorage.getItem(LEGACY_REGISTRY_KEY);
+    if (legacyRaw) {
+      const legacyParsed = JSON.parse(legacyRaw) as unknown;
+      const entries = Array.isArray(legacyParsed)
+        ? legacyParsed.filter(isValidEntry)
+        : [];
+      if (entries.length > 0) updateWorkspaceRegistry(entries);
+      return entries;
+    }
+    return [];
   } catch {
     return [];
   }
