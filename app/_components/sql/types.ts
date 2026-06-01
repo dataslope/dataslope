@@ -45,6 +45,10 @@ export interface QueryRunResult {
   /** True when the result is incrementally loading all rows for the
    *  virtualized "All" result view. */
   lazyInfinite?: boolean;
+  /** The exact (semicolon-stripped) SQL that produced this result. Used to
+   *  re-run the *same* query after an inline edit — preserving any `LIMIT`/
+   *  shape — for materialized results that have no `lazyBaseSql` to re-page. */
+  querySql?: string;
 }
 
 export interface ResultTableRow {

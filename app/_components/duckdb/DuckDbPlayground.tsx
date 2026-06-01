@@ -1469,6 +1469,7 @@ function DuckDbPlaygroundInner() {
             lazyPage,
             lazyPageSize,
             lazyInfinite: effectivePageSize === 0 && useLazy,
+            querySql: trimmed.replace(/\s*;+\s*$/, ""),
           },
         }));
         addHistoryEntry({
@@ -1478,7 +1479,10 @@ function DuckDbPlaygroundInner() {
           elapsedMs,
           success: true,
         });
-        await refreshSchema();
+        // Refresh the schema sidebar in the background — don't hold the run
+        // lock (which blocks the next re-page: filter / sort / page) on schema
+        // introspection, since a re-page doesn't change the schema.
+        void refreshSchema().catch(() => undefined);
         // Keep the running overlay visible long enough for the 180ms CSS
         // transition to complete and be perceptible to the user.
         const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);

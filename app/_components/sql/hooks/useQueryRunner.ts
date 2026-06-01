@@ -157,6 +157,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPage,
           lazyPageSize,
           lazyInfinite: currentPageSize === 0 && useLazy,
+          querySql: trimmed.replace(/\s*;+\s*$/, ""),
         });
         addHistoryEntry({
           sql: trimmed,
