@@ -39,7 +39,7 @@ The problems are concentrated in **two areas that sit *around* the good content*
 
 2. **A class of multiple-choice content bugs makes some questions unwinnable or misleading.** One Java question can never be answered correctly (no option is marked correct). Four questions contain two *verbatim-identical* options where only one is marked correct, so a learner who picks the identical-but-unmarked option is told they are wrong. ~270 explanations open with an affirmation ("Yes.", "Right.", "Exactly.") in violation of the project's own `AGENTS.md` rule — confusing when shown to a learner who answered incorrectly.
 
-Additionally, **every page emits two console errors** (a React `key` warning from the sidebar and a hydration mismatch), and a couple of dev-only surfaces leak into the public UI (a `/color-test` CTA on the homepage; author-facing component-showcase pages in the learner sidebar).
+Additionally, **every page emits two console errors** (a React `key` warning from the sidebar and a hydration mismatch), and author-facing component-showcase pages (`code-blocks-*`, `challenge-cards-*`, …) occupy the learner sidebar in place of the courses.
 
 None of these require touching the content components themselves — they are navigation wiring, a finite set of content fixes, and rendering hygiene. The phased plan in §6 is ordered so a coding agent can resolve "learner gets stranded / misled" first, then discoverability, then polish.
 
@@ -70,13 +70,12 @@ None of these require touching the content components themselves — they are na
 | 6 | 🟠 P1 | Rendering | Hydration mismatch on **every** page | `interact-log.txt` |
 | 7 | 🟠 P1 | Nav | Bare 404 (no header/nav/links) — no recovery path | `06-broken-link-404.png` |
 | 8 | 🟡 P2 | MCQ | ~270 explanations open with an affirmation (violates `AGENTS.md`) | `mcq-lint.mjs` output |
-| 9 | 🟡 P2 | Nav | `/color-test` dev page exposed as a homepage CTA | `05-home-catalog.png` |
-| 10 | 🟡 P2 | Nav | Author-facing showcase pages (`code-blocks-*`, etc.) live in the learner sidebar | `03-sidebar-full.png` |
-| 11 | 🟡 P2 | Consistency | `code-blocks-c.mdx` title uses a hyphen vs. em-dash on all 8 siblings | `code-blocks-c.mdx:2` |
-| 12 | 🟠 P1 | Loading | First-run cold boot (~10.7 s for Python) has weak progress affordance | `40-python-codeblock-after.png` |
-| 13 | 🔵 P3 | Curriculum | SQL/viz courses have ~0 challenge cards (vs. 60+ in others) | per-course table, §4.8 |
-| 14 | 🔵 P3 | Curriculum | 7/27 courses open with a non-interactive (history/prose) chapter | §4.9 |
-| 15 | 🔵 P3 | Feature | No progress tracking / chapter completion / resume | §4.9 |
+| 9 | 🟡 P2 | Nav | Author-facing showcase pages (`code-blocks-*`, etc.) live in the learner sidebar | `03-sidebar-full.png` |
+| 10 | 🟡 P2 | Consistency | `code-blocks-c.mdx` title uses a hyphen vs. em-dash on all 8 siblings | `code-blocks-c.mdx:2` |
+| 11 | 🟠 P1 | Loading | First-run cold boot (~10.7 s for Python) has weak progress affordance | `40-python-codeblock-after.png` |
+| 12 | 🔵 P3 | Curriculum | SQL/viz courses have ~0 challenge cards (vs. 60+ in others) | per-course table, §4.8 |
+| 13 | 🔵 P3 | Curriculum | 7/27 courses open with a non-interactive (history/prose) chapter | §4.9 |
+| 14 | 🔵 P3 | Feature | No progress tracking / chapter completion / resume | §4.9 |
 
 ---
 
@@ -93,8 +92,7 @@ This is the highest-impact cluster. There are effectively **two competing front 
 - 🔴 **#1 — Nine dead links.** `content/learn/index.mdx` has a "Languages" list linking to `/learn/python`, `/learn/r`, `/learn/javascript`, `/learn/typescript`, `/learn/php`, `/learn/c`, `/learn/cpp`, `/learn/java`, `/learn/csharp`. **All nine return HTTP 404** (verified via direct requests). None of those slugs exist — the demo pages are `code-blocks-<lang>` and the courses are e.g. `python-basics`. A learner clicking "Python" on the landing page hits a dead end.
 - 🔴 **#2 — Courses are absent from the `/learn` nav.** The top-level `content/learn/meta.json` `pages` array lists **only** the demo/showcase pages (`code-blocks-*`, `sql-code-blocks-*`, `challenge-cards-*`, `sql-challenge-cards-*`, `multiple-choice`, `mermaid-test`) and contains a `"---"` separator 5 times. **None of the 27 course folders are listed**, and the rendered sidebar confirms it: 36 sidebar links, 0 of which point to a real course (`03-sidebar-full.png`). The courses are reachable *only* by typing a direct URL or arriving from the `/` catalog.
 - 🟠 **#7 — No recovery from 404.** The dead links land on a bare Next.js `404 — This page could not be found.` with no header, no nav, no link back to `/learn` or the catalog (`06-broken-link-404.png`). The browser back button is the only escape.
-- 🟡 **#9 — Dev page in public CTA.** The homepage (`app/page.tsx:74`) renders a prominent **"Color Theme Test"** CTA → `/color-test`, a QA page. It should not ship in the public homepage.
-- 🟡 **#10 — Showcase pages in the learner sidebar.** The component-demo pages (`code-blocks-python`, `challenge-cards-java`, `mermaid-test`, `multiple-choice`, …) are author/QA references but are the *only* thing in the `/learn` sidebar, so learners see "Code Blocks — Python", "Challenge Cards — R", etc. instead of courses.
+- 🟡 **#9 — Showcase pages in the learner sidebar.** The component-demo pages (`code-blocks-python`, `challenge-cards-java`, `mermaid-test`, `multiple-choice`, …) are author/QA references but are the *only* thing in the `/learn` sidebar, so learners see "Code Blocks — Python", "Challenge Cards — R", etc. instead of courses.
 - 🟡 **No cross-course navigation.** On a course page the sidebar correctly shows that course's chapters (`04-course-sidebar.png`), but there is no "back to all courses", breadcrumb, or link to any other course. Once inside a course, the catalog is unreachable without editing the URL.
 
 **Net learner experience:** Homepage → "Browse Learn" → `/learn` → broken links + no course list. The good catalog at `/` is easy to miss, and the `/learn` page actively misleads.
@@ -168,7 +166,7 @@ Code execution works and the output UI is clean (`30/31-js-codeblock-*.png`, `40
 
 - ✅ JavaScript (native) ran in ~**280 ms**; output rendered correctly.
 - ✅ Python (Pyodide, CDN) cold-boot + first run completed in ~**10.7 s** and printed `Hello, World!`. Subsequent runs reuse the shared worker.
-- 🟠 **#12 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view.
+- 🟠 **#11 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view.
 - 🟡 The `<CodeBlock>` Run button has no stable `data-testid`/`aria-label` (it's a class-hashed button whose accessible name is "RunCtrl+↵"). Minor, but it complicates automated testing and screen-reader labeling vs. the challenge card's `data-testid="challenge-submit"`.
 
 ---
@@ -199,7 +197,7 @@ Among the strongest parts of the platform. Verified end-to-end by driving the ca
 ### 4.8 SQL components & challenge-coverage gap
 
 - ✅ SQLite code blocks execute and return real, paginated result grids with row counts and timing (`51-sql-after-run.png`), including a 10,000-row infinite-scroll example.
-- 🔵 **#13 — SQL & visualization courses barely use challenge cards.** Despite a working `<SqlChallengeCard>` component, the actual SQL/viz *courses* are almost entirely code-blocks + MCQs with no graded practice:
+- 🔵 **#12 — SQL & visualization courses barely use challenge cards.** Despite a working `<SqlChallengeCard>` component, the actual SQL/viz *courses* are almost entirely code-blocks + MCQs with no graded practice:
 
   | Course | Code blocks | Challenges | MCQs |
   |---|--:|--:|--:|
@@ -216,8 +214,8 @@ Among the strongest parts of the platform. Verified end-to-end by driving the ca
 
 ### 4.9 Curriculum & pedagogy
 
-- 🔵 **#14 — History-first openings (7/27 courses).** Seven courses open with a chapter that has **zero** executable components (e.g. `beginners-javascript/story-of-programming`, `data-analysis-python-pandas/history-of-data`, `from-zero-to-cpp/a-brief-history`, `practical-r-for-beginners/the-age-of-data`). Narrative framing is valuable, but a learner who came to *write code* doesn't touch any for one or more chapters. Consider an early "try it" hook even inside narrative chapters (a tiny runnable snippet or a 1-question check).
-- 🔵 **#15 — No progress/completion tracking.** There's no per-chapter "done" state, no course progress bar, no "resume where you left off." Editor buffers persist per-block (good), but a learner navigating 28+ chapters has no sense of progress. (`zustand` + `localStorage` are already in the stack.)
+- 🔵 **#13 — History-first openings (7/27 courses).** Seven courses open with a chapter that has **zero** executable components (e.g. `beginners-javascript/story-of-programming`, `data-analysis-python-pandas/history-of-data`, `from-zero-to-cpp/a-brief-history`, `practical-r-for-beginners/the-age-of-data`). Narrative framing is valuable, but a learner who came to *write code* doesn't touch any for one or more chapters. Consider an early "try it" hook even inside narrative chapters (a tiny runnable snippet or a 1-question check).
+- 🔵 **#14 — No progress/completion tracking.** There's no per-chapter "done" state, no course progress bar, no "resume where you left off." Editor buffers persist per-block (good), but a learner navigating 28+ chapters has no sense of progress. (`zustand` + `localStorage` are already in the stack.)
 - 🔵 Course landing pages (`/learn/<course>`) are thin indexes; a syllabus with chapter count, estimated time, and prerequisites would orient learners.
 - 🟡 Component density varies enormously (e.g. `python-basics` ≈ 13 code blocks/page vs. narrative SQL/viz chapters with mostly prose+Mermaid+MCQ). Not wrong, but worth a consistency pass on "every chapter ends with a check / a challenge."
 
@@ -286,10 +284,10 @@ Each phase is self-contained and can be handed to a coding agent independently, 
    b. Add the course folders to the learn **sidebar/page tree** (extend top-level `meta.json` `pages`, or configure the `source` loader to include course roots) so the sidebar lists courses, not just demo pages.
 2. **Add cross-course navigation.** A persistent "← All courses" / breadcrumb in the course sidebar banner (the `SidebarCourseTitle` slot is a natural home) linking back to the catalog.
 3. **Custom 404.** Add `app/not-found.tsx` (or a learn-scoped `not-found`) with the Dataslope header and links to the catalog + `/learn`.
-4. **Remove dev surfaces from public UI.** Drop the **"Color Theme Test"** CTA from `app/page.tsx`; decide whether the component-showcase pages (`code-blocks-*`, `challenge-cards-*`, `multiple-choice`, `mermaid-test`) belong in the learner sidebar — if they're author docs, move them to an unlisted/`/dev` area or gate them.
-5. **Reconcile `/` vs `/learn`.** Make the homepage "Browse Learn" CTA and `/learn` consistent (either `/learn` *is* the catalog, or it clearly links to it).
+4. **Decide on showcase-page visibility.** The component-showcase pages (`code-blocks-*`, `challenge-cards-*`, `multiple-choice`, `mermaid-test`) currently occupy the learner sidebar in place of the courses — if they're author docs, move them to an unlisted/`/dev` area or gate them so courses lead.
+5. **Make `/learn` self-sufficient.** Ensure `/learn` either *is* the course catalog or links to it prominently, so a learner who lands on `/learn` can reach any course without leaving the route.
 
-**Acceptance:** from `/learn`, all 27 courses are reachable in ≤1 click; every course page has a one-click path back to the catalog; hitting a nonexistent `/learn/*` URL shows a branded page with recovery links; no `/color-test` link in production UI.
+**Acceptance:** from `/learn`, all 27 courses are reachable in ≤1 click; every course page has a one-click path back to the catalog; hitting a nonexistent `/learn/*` URL shows a branded page with recovery links.
 
 ---
 
@@ -361,7 +359,7 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 |---|---|
 | `01-learn-index.png`, `03-sidebar-full.png` | `/learn` landing + sidebar (no courses listed) |
 | `04-course-sidebar.png` | Within-course chapter sidebar (works) |
-| `05-home-catalog.png` | The real catalog at `/` (incl. "Color Theme Test" CTA) |
+| `05-home-catalog.png` | The course catalog at `/` (lists all 27 courses) |
 | `06-broken-link-404.png` | Bare 404 from a dead `/learn/python` link |
 | `07-dark-lesson.png` | Dark-mode lesson (polished) |
 | `10/13-mcq-*.png` | MCQ initial + submitted state (duplicate-option bug visible) |
