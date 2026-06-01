@@ -4327,6 +4327,21 @@
   display: none;
 }
 
+/* UX-18: the loading hero stamps the title at up to 180px (`playground.css`),
+   which towers over the status caption + progress bar on a desktop monitor.
+   Right-size it on desktop so the rolling title stays bold but no longer
+   swamps the viewport, and give the caption a touch more prominence. Scoped
+   to the SQL playgrounds (this stylesheet only loads on their routes), like
+   the mobile hero override below. */
+@media (min-width: 769px) {
+  .pyodide-loading .loading-hero-text {
+    font-size: clamp(48px, 8vw, 104px);
+  }
+  .pyodide-loading .loading-quip {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 768px) {
   /* ── Header: keep brand + switcher + workspace pill inside the viewport.
      The full action set is already `.desktop-only`; here we drop the brand
