@@ -1,0 +1,42 @@
+
+════ MCQ interactions (/learn/multiple-choice) ════
+MCQs found: 6
+Q1 mode label: "Select one"
+Q1 inputs: 4, type=radio
+Q1 banner appeared after a single click (no Submit btn)? no
+Q1 inputs disabled after submit (locked)? false
+Q1 has 'Try again'? false
+
+Multi-answer MCQ at index 2: "Select all that apply (3)"
+  Submit disabled with nothing selected? true
+  After submitting 1 choice → banner: ""
+
+════ Mermaid (/learn/mermaid-test) ════
+Mermaid diagrams rendered: 3
+Fullscreen modal opened? true
+Zoom controls: in=1 out=1 reset=1
+
+════ JS CodeBlock run (/learn/code-blocks-javascript) ════
+  JS run produced output in 280ms
+  JS output: "Hello, learner!
+π ≈ 3.1416"
+
+════ Python run + challenge (/learn/python-basics/hello-world) ════
+  Booting Pyodide (CDN)…
+  Python first-run (incl Pyodide boot): 10709ms → "Hello, World!"
+
+  -- Challenge: load reference solution & submit --
+  solve via registry: {"ok":true,"key":"python::Greet a name","banner":"pass","status":"ready","tests":[{"id":"exact_output","name":"Prints the right greeting","state":"pass","detail":null}]}
+
+  -- Challenge: submit wrong code → fail state --
+  wrong submit → {"banner":"fail","tests":[{"id":"exact_output","name":"Prints the right greeting","state":"fail","detail":"Line 1 mismatch.\n  expected: \"Hello, Grace!\"\n  got:      \"wrong output\""}]}
+  Solution modal screenshot captured
+
+════ SQL run (/learn/sql-code-blocks-sqlite) ════
+  Run buttons on SQL page: 5
+  SQL first-run waited 8092ms
+  result tables/grids on page: 12
+
+════ FULL CONSOLE ERRORS (deduped) ════
+• Each child in a list should have a unique "key" prop.%s%s See https://react.dev/link/warning-keys for more information. Check the render method of `Sidebar`. It was passed a child from LearnLayout.
+• A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window !== 'undefined')`. - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called. - Date formatting in a user's locale which doesn't match the server. - External changing data without sending a snapshot of it along with the HTML. - Invalid HTML ta
