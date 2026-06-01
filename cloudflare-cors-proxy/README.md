@@ -61,8 +61,31 @@ The following origins are whitelisted by default:
 | `https://dataslope.com` | Production site |
 | `https://www.dataslope.com` | Production site (www) |
 | `https://dataslope.vercel.app` | Vercel preview/staging |
+| `https://dataslope-*-ye-joo-parks-projects.vercel.app` | Vercel branch/commit preview deployments |
 
 Any `localhost` port is also allowed automatically during local development (`wrangler dev`).
+
+#### Wildcard entries (Vercel previews)
+
+Vercel generates a unique hostname for every branch and commit deployment, e.g.
+
+```
+https://dataslope-git-claude-focused-barde-c4a546-ye-joo-parks-projects.vercel.app
+https://dataslope-git-claude-vigilant-feyn-a92c1c-ye-joo-parks-projects.vercel.app
+```
+
+Listing each one is impractical, so an `ALLOWED_ORIGINS` entry may contain a `*`
+wildcard. The `*` matches **one hostname label** — one or more characters that
+are not a `.` or `/` — so it stays scoped to a single host and can never match a
+different registrable domain.
+
+The default entry `https://dataslope-*-ye-joo-parks-projects.vercel.app` matches
+both examples above. Note the team-scope suffix (`-ye-joo-parks-projects`) is
+deliberately part of the pattern: only the project owner can deploy under that
+scope, so an attacker cannot register a `dataslope`-named project elsewhere and
+get a matching preview host. Avoid an over-broad pattern such as
+`https://dataslope-*.vercel.app`, which *would* match an attacker-controlled
+`dataslope-xyz-evil-team.vercel.app`.
 
 To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sensitive values) or set it as a Cloudflare secret for production (see [Configuration](#configuration)).
 

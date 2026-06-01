@@ -55,6 +55,26 @@ head(df, 10)
 `,
   },
   {
+    key: "read_csv_url",
+    title: "Read CSV from URL",
+    desc: "Download a remote CSV & read it",
+    code: `# raw.githubusercontent.com sends permissive CORS headers, so the file can be
+# downloaded directly (no proxy needed). The download also shows up in the
+# Files pane on the left.
+url <- "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+download.file(url, "penguins.csv")
+
+penguins <- read.csv("penguins.csv")
+
+cat(nrow(penguins), "rows x", ncol(penguins), "columns\\n\\n")
+cat("Penguins per species:\\n")
+print(table(penguins$species))
+
+# A returned data.frame renders as a table.
+head(penguins)
+`,
+  },
+  {
     key: "lm",
     title: "Linear Model",
     desc: "Fit a linear regression",
@@ -536,6 +556,7 @@ interface WebRShelterConstructor {
 }
 interface WebRFS {
   writeFile(path: string, data: Uint8Array): Promise<void>;
+  readFile(path: string): Promise<Uint8Array>;
   mkdir(path: string): Promise<void>;
   unlink(path: string): Promise<void>;
 }
@@ -687,6 +708,103 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // Working directory inside the WebR Emscripten FS (matches `getwd()` output).
 const WEB_USER_HOME = "/home/web_user";
 
+// Newline-separated list of absolute paths created during a run (currently
+// download.file() destinations). Read back by collectCreatedFiles() so
+// downloads appear in the Files pane, then cleared.
+const CREATED_FILES_PATH = "/tmp/.pg_created_files";
+
+// One-time R setup, run once after the runtime initialises and kept on the
+// search path so it survives the per-run wipe of the global environment (and
+// never shows up in the user's ls()).
+//
+// 1. download.file(): WebR's built-in download.file() already works in the
+//    playground (it performs the request synchronously inside the worker). We
+//    wrap it to (a) mirror the destination file into the Files pane and
+//    (b) print its "trying URL" / "downloaded …" progress to stdout instead of
+//    stderr, which the playground styles as an error. The actual fetch is
+//    delegated unchanged to utils::download.file(), so cross-origin hosts still
+//    need permissive CORS headers (or the CORS proxy), exactly like
+//    pandas.read_csv in the Python runtime.
+//
+// 2. print(): base R prints every row of a plain data.frame, which can freeze
+//    the page for large frames. We override the print generic (an ordinary
+//    search-path lookup, unlike an S3 method which UseMethod won't pick up from
+//    an attached env) to show the first 10 and last 5 rows with an ellipsis —
+//    the same Jupyter-style truncation already used for auto-printed frames
+//    (see dataFrameToHtml). Only plain data.frames are affected; tibbles,
+//    data.tables, etc. keep their own already-truncating print methods.
+const R_SESSION_SETUP = String.raw`
+suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
+
+local({
+  download_file <- function(url, destfile,
+                            method = getOption("download.file.method", "auto"),
+                            quiet = FALSE, ...) {
+    # Mirror R's familiar progress lines to stdout instead of stderr. The
+    # playground styles any stderr output as an error, which made a successful
+    # download look like it had failed. download.file's own messages are
+    # silenced with quiet = TRUE and re-emitted here via cat().
+    if (!isTRUE(quiet)) cat(sprintf("trying URL '%s'\n", url))
+    status <- utils::download.file(url, destfile, method = method, quiet = TRUE, ...)
+    if (is.character(destfile) && length(destfile) == 1L && nzchar(destfile) &&
+        file.exists(destfile)) {
+      abs <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
+      try(cat(abs, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE),
+          silent = TRUE)
+      if (!isTRUE(quiet)) {
+        size <- file.info(destfile)$size
+        cat(sprintf("downloaded %s bytes\n",
+                    format(size, big.mark = ",", scientific = FALSE)))
+      }
+    }
+    invisible(status)
+  }
+
+  print_override <- function(x, ...) {
+    # Only plain data.frames (e.g. from read.csv / data.frame). tibbles,
+    # data.tables, etc. keep their own already-truncating print methods.
+    if (identical(class(x), "data.frame")) {
+      n <- nrow(x)
+      if (is.finite(n) && n > 20L && ncol(x) >= 1L) {
+        done <- tryCatch({
+          head_n <- 10L; tail_n <- 5L
+          top <- format(utils::head(x, head_n))
+          bot <- format(utils::tail(x, tail_n))
+          sep <- top[1, , drop = FALSE]; sep[] <- "..."; rownames(sep) <- "..."
+          block <- as.matrix(rbind(top, sep, bot))
+          base::print(block, quote = FALSE, right = TRUE)
+          cat(sprintf("# %s rows total; showing first %d and last %d\n",
+                      format(n, big.mark = ","), head_n, tail_n))
+          TRUE
+        }, error = function(e) FALSE)
+        if (isTRUE(done)) return(invisible(x))
+      }
+    }
+    base::print(x, ...)
+  }
+
+  while ("webr:playground" %in% search()) detach("webr:playground")
+  attach(list(download.file = download_file, print = print_override),
+         name = "webr:playground", warn.conflicts = FALSE)
+})
+`;
+
+// Backstop against a single run flooding the UI with megabytes of text (e.g.
+// printing a huge vector or matrix), which can freeze the browser. Keep the
+// head and tail so the output stays useful. Large data frames are truncated
+// more nicely by the print.data.frame override above; this catches everything
+// else.
+const MAX_CELL_TEXT_CHARS = 250_000;
+function capCellText(text: string): string {
+  if (text.length <= MAX_CELL_TEXT_CHARS) return text;
+  const headLen = Math.floor(MAX_CELL_TEXT_CHARS * 0.75);
+  const tailLen = MAX_CELL_TEXT_CHARS - headLen;
+  const head = text.slice(0, headLen);
+  const tail = text.slice(text.length - tailLen);
+  const hidden = text.length - head.length - tail.length;
+  return `${head}\n\n… ${hidden.toLocaleString()} characters of output hidden …\n\n${tail}`;
+}
+
 class WebRRuntime implements LanguageRuntime {
   private installedPackages = new Set<string>();
   // Absolute FS paths written during the previous prepareFileSystem call.
@@ -767,7 +885,8 @@ class WebRRuntime implements LanguageRuntime {
     const installWarnings = await this.ensurePackages(code);
 
     await this.webR.evalRVoid(
-      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
+      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)
+unlink("${CREATED_FILES_PATH}")`,
     );
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
@@ -797,9 +916,9 @@ class WebRRuntime implements LanguageRuntime {
         else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
       }
       if (stdoutBuf.trim())
-        emit({ type: "stdout", content: stdoutBuf.trim() });
+        emit({ type: "stdout", content: capCellText(stdoutBuf.trim()) });
       if (stderrBuf.trim())
-        emit({ type: "stderr", content: stderrBuf.trim() });
+        emit({ type: "stderr", content: capCellText(stderrBuf.trim()) });
 
       for (const bmp of result.images) {
         const b64 = await imageBitmapToPngBase64(bmp);
@@ -859,9 +978,9 @@ class WebRRuntime implements LanguageRuntime {
               else if (o.type === "stderr") printStderr += String(o.data) + "\n";
             }
             if (printStdout.trim())
-              emit({ type: "stdout", content: printStdout.trim() });
+              emit({ type: "stdout", content: capCellText(printStdout.trim()) });
             if (printStderr.trim())
-              emit({ type: "stderr", content: printStderr.trim() });
+              emit({ type: "stderr", content: capCellText(printStderr.trim()) });
             for (const bmp of printCapture.images) {
               const b64 = await imageBitmapToPngBase64(bmp);
               emit({ type: "image", content: b64 });
@@ -875,6 +994,56 @@ class WebRRuntime implements LanguageRuntime {
     } finally {
       await shelter.purge();
     }
+  }
+
+  /**
+   * Returns files created during the run that should appear in the Files
+   * pane — currently the destinations written by our download.file()
+   * override, recorded in CREATED_FILES_PATH. Paths are returned relative
+   * to the WebR home directory (the playground's working directory) so they
+   * line up with the names shown in the Files pane. The tracking list is
+   * cleared after reading so each file is reported at most once.
+   */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    const out = new Map<string, Uint8Array>();
+
+    let listBytes: Uint8Array;
+    try {
+      listBytes = await this.webR.FS.readFile(CREATED_FILES_PATH);
+    } catch {
+      // No download happened this run — the tracking file doesn't exist.
+      return out;
+    }
+
+    const paths = [
+      ...new Set(
+        new TextDecoder()
+          .decode(listBytes)
+          .split("\n")
+          .map((p) => p.trim())
+          .filter(Boolean),
+      ),
+    ];
+
+    for (const abs of paths) {
+      try {
+        const bytes = await this.webR.FS.readFile(abs);
+        const rel = abs.startsWith(`${WEB_USER_HOME}/`)
+          ? abs.slice(WEB_USER_HOME.length + 1)
+          : (abs.split("/").pop() ?? abs);
+        if (rel) out.set(rel, bytes);
+      } catch {
+        // File was removed before we read it back — skip it.
+      }
+    }
+
+    try {
+      await this.webR.FS.unlink(CREATED_FILES_PATH);
+    } catch {
+      // Best-effort cleanup; the next run also clears it.
+    }
+
+    return out;
   }
 }
 
@@ -935,6 +1104,15 @@ export const rAdapter: LanguageAdapter = {
     await webR.evalRVoid(
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );
+
+    // Install the Files-pane download hook and large-data.frame print
+    // truncation (see R_SESSION_SETUP). Best-effort: a failure here shouldn't
+    // block the runtime from starting.
+    try {
+      await webR.evalRVoid(R_SESSION_SETUP);
+    } catch (err) {
+      console.error("[webr] failed to install playground session setup", err);
+    }
 
     return new WebRRuntime(webR);
   },

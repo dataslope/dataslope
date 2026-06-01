@@ -120,6 +120,18 @@ export interface LanguageRuntime {
    *  the runtime created on previous runs that are no longer in `files`
    *  should be removed so renames and deletions in the UI propagate. */
   prepareFileSystem?(files: Map<string, Uint8Array>): Promise<void>;
+  /** Optional: after `run()` resolves, return any files the runtime
+   *  created during the run that should be surfaced in the Files pane,
+   *  keyed by their workspace-relative path (e.g. a CSV fetched by R's
+   *  `download.file()`). The playground persists these to OPFS and adds
+   *  them to the Files pane so they survive reloads and are re-staged on
+   *  subsequent runs. Returns an empty map when nothing was created.
+   *
+   *  Called once per run (in both the success and error paths, since a
+   *  file may have been written before user code later threw), so
+   *  implementations must clear their internal tracking after returning
+   *  to avoid reporting the same file twice. */
+  collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
 }
 
 export interface LanguageAdapter {

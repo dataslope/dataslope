@@ -71,6 +71,26 @@ display(df.head(10))
 `,
   },
   {
+    key: "read_csv_url",
+    title: "Read CSV from URL",
+    desc: "Load a remote CSV with pandas",
+    code: `import pandas as pd
+
+# raw.githubusercontent.com sends permissive CORS headers, so pandas can
+# read the CSV straight from the URL — no download or proxy needed.
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+penguins = pd.read_csv(url)
+
+print(f"{penguins.shape[0]} rows × {penguins.shape[1]} columns")
+print()
+print("Penguins per species:")
+print(penguins["species"].value_counts())
+
+# A returned DataFrame renders as a table.
+penguins.head()
+`,
+  },
+  {
     key: "plotly_line",
     title: "Plotly Line Chart",
     desc: "Interactive time-series plot",
