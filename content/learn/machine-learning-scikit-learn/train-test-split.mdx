@@ -60,7 +60,7 @@ them into two groups.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 X, y = load_iris(return_X_y=True)
@@ -95,7 +95,7 @@ it memorized, and on the held-out test data. Watch the gap.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -148,7 +148,7 @@ class's proportion in both halves.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.model_selection import train_test_split
 
 # An imbalanced target: 90% class 0, 10% class 1.
@@ -256,7 +256,7 @@ overfitting gap).`}
   initCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier`}
-  initialCode={`X, y = load_wine(return_X_y=True)
+  starterCode={`X, y = load_wine(return_X_y=True)
 
 # 1. Split (30% test, random_state=42, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None

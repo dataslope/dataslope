@@ -21,7 +21,7 @@ There are three to know:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 
 class Widget {
@@ -72,7 +72,7 @@ When the count hits zero, the object is deleted.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 
 class Note {
@@ -174,7 +174,7 @@ in a heterogeneous container.
   adapter="cpp"
   title="A unique owner"
   instructions={`Replace the raw \`new\`/\`delete\` in the provided \`main\` with \`std::make_unique\` and \`std::unique_ptr\`. The behaviour and output must be unchanged: prints \`Widget 1 created\`, then \`123\`, then \`Widget 1 destroyed\`, each on its own line.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 
 class Widget {

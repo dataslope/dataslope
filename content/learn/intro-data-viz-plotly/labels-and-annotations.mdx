@@ -26,7 +26,7 @@ The bare minimum on any chart:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 
@@ -63,7 +63,7 @@ outlier, the day something happened — use `fig.add_annotation(...)`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("country == 'Japan'")
 
@@ -104,7 +104,7 @@ threshold. Use `fig.add_hline` or `fig.add_vline`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -136,7 +136,7 @@ can add one via a layout annotation at the bottom:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 

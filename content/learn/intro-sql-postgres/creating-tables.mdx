@@ -17,7 +17,7 @@ To make a table, you list its columns and each column's type inside
 <SqlCodeBlock
   dialect="postgres"
   title="Create a table, then read it"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id     INTEGER,
   title  TEXT,
   author TEXT,
@@ -62,7 +62,7 @@ intent about the data:
 <SqlCodeBlock
   dialect="postgres"
   title="A table that protects itself"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id     INTEGER PRIMARY KEY,
   title  TEXT NOT NULL,
   author TEXT NOT NULL,
@@ -98,7 +98,7 @@ database assign the next number automatically on each insert:
 <SqlCodeBlock
   dialect="postgres"
   title="Let PostgreSQL number the rows"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id     SERIAL PRIMARY KEY,
   title  TEXT NOT NULL
 );

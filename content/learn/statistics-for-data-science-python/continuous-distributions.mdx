@@ -91,7 +91,7 @@ through almost every scipy distribution — learn it once here.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -136,7 +136,7 @@ shift, but you'll almost always leave it at 0.)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -185,7 +185,7 @@ continuous distribution and practice the same area-based questions.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -223,7 +223,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # Response times, exponential with mean 200 ms.
 d = stats.expon(scale=200)
@@ -261,7 +261,7 @@ Using \`scipy.stats.norm\`, compute the probability that a randomly chosen perso
 - Store the answer as a plain Python \`float\` in **\`p_between\`**.`}
   initCode={`from scipy import stats
 mu, sigma = 70, 8`}
-  initialCode={`# TODO: compute P(60 < X < 80)
+  starterCode={`# TODO: compute P(60 < X < 80)
 p_between = None
 
 print("P(60 < X < 80):", p_between)
@@ -308,7 +308,7 @@ You want to publish a service-level promise: "**90%** of customers are served wi
 - Store the answer as a plain Python \`float\` in **\`cutoff\`**.`}
   initCode={`from scipy import stats
 mean_wait = 4`}
-  initialCode={`# TODO: find the 90th-percentile wait time
+  starterCode={`# TODO: find the 90th-percentile wait time
 cutoff = None
 
 print("90% served within:", cutoff, "minutes")
@@ -352,7 +352,7 @@ and *areas*, never absolute heights as probabilities.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # A tight normal: small spread pushes the peak density above 1.

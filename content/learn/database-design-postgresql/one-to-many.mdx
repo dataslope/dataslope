@@ -126,7 +126,7 @@ INSERT INTO orders (customer_id, placed_on, total) VALUES
   (1, DATE '2025-01-10', 42.50),
   (1, DATE '2025-01-12', 18.00),
   (2, DATE '2025-01-13', 27.25);`}
-  initialCode={`SELECT c.name, o.id AS order_id, o.placed_on, o.total
+  starterCode={`SELECT c.name, o.id AS order_id, o.placed_on, o.total
 FROM customers c
 JOIN orders o ON o.customer_id = c.id
 ORDER BY c.name, o.placed_on;`}

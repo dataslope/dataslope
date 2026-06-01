@@ -31,7 +31,7 @@ The simplest form: iterate over a sequence.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for fruit in ["apple", "banana", "cherry"]:
+  starterCode={`for fruit in ["apple", "banana", "cherry"]:
     print(fruit)
 `}
 />
@@ -40,14 +40,14 @@ The simplest form: iterate over a sequence.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for char in "hello":
+  starterCode={`for char in "hello":
     print(char)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`for key in {"a": 1, "b": 2, "c": 3}:
+  starterCode={`for key in {"a": 1, "b": 2, "c": 3}:
     print(key)
 `}
 />
@@ -62,7 +62,7 @@ Iterating a dict yields **keys** by default. Use `.items()` for key-value pairs,
 
 <CodeBlock
   adapter="python"
-  initialCode={`for i in range(5):
+  starterCode={`for i in range(5):
     print(i, end=" ")
 print()
 `}
@@ -70,7 +70,7 @@ print()
 
 <CodeBlock
   adapter="python"
-  initialCode={`for i in range(1, 6):
+  starterCode={`for i in range(1, 6):
     print(i, end=" ")
 print()
 `}
@@ -78,7 +78,7 @@ print()
 
 <CodeBlock
   adapter="python"
-  initialCode={`for i in range(0, 20, 5):
+  starterCode={`for i in range(0, 20, 5):
     print(i, end=" ")
 print()
 `}
@@ -86,7 +86,7 @@ print()
 
 <CodeBlock
   adapter="python"
-  initialCode={`for i in range(10, 0, -2):
+  starterCode={`for i in range(10, 0, -2):
     print(i, end=" ")
 print()
 `}
@@ -102,7 +102,7 @@ If your loop needs the index, **do not write `range(len(xs))`**. Use `enumerate`
 
 <CodeBlock
   adapter="python"
-  initialCode={`fruits = ["apple", "banana", "cherry"]
+  starterCode={`fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits):
     print(i, fruit)
 `}
@@ -110,7 +110,7 @@ for i, fruit in enumerate(fruits):
 
 <CodeBlock
   adapter="python"
-  initialCode={`fruits = ["apple", "banana", "cherry"]
+  starterCode={`fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits, start=1):
     print(i, fruit)
 `}
@@ -124,7 +124,7 @@ for i, fruit in enumerate(fruits, start=1):
 
 <CodeBlock
   adapter="python"
-  initialCode={`fruits = ["apple", "banana", "cherry"]
+  starterCode={`fruits = ["apple", "banana", "cherry"]
 prices = [1.0, 0.5, 3.0]
 for fruit, price in zip(fruits, prices):
     print(f"{fruit}: \${price:.2f}")
@@ -133,7 +133,7 @@ for fruit, price in zip(fruits, prices):
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = [1, 2, 3]
+  starterCode={`a = [1, 2, 3]
 b = ["a", "b", "c"]
 c = [10, 20, 30]
 for x, y, z in zip(a, b, c):
@@ -145,7 +145,7 @@ If the sequences have different lengths, `zip` stops at the shortest.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for x, y in zip([1, 2, 3], ["a", "b"]):
+  starterCode={`for x, y in zip([1, 2, 3], ["a", "b"]):
     print(x, y)
 `}
 />
@@ -156,7 +156,7 @@ Iterate a sequence backwards without mutating it.
 
 <CodeBlock
   adapter="python"
-  initialCode={`for fruit in reversed(["apple", "banana", "cherry"]):
+  starterCode={`for fruit in reversed(["apple", "banana", "cherry"]):
     print(fruit)
 `}
 />
@@ -167,7 +167,7 @@ Iterate a sequence backwards without mutating it.
 
 <CodeBlock
   adapter="python"
-  initialCode={`n = 16
+  starterCode={`n = 16
 steps = 0
 while n != 1:
     n = n // 2 if n % 2 == 0 else 3 * n + 1
@@ -180,7 +180,7 @@ Use `while True` plus `break` for "loop until something happens" code where the 
 
 <CodeBlock
   adapter="python"
-  initialCode={`count = 0
+  starterCode={`count = 0
 while True:
     count += 1
     if count > 5:
@@ -200,7 +200,7 @@ while True:
 
 <CodeBlock
   adapter="python"
-  initialCode={`for n in range(1, 11):
+  starterCode={`for n in range(1, 11):
     if n == 7:
         print("found 7, stopping")
         break
@@ -210,7 +210,7 @@ while True:
 
 <CodeBlock
   adapter="python"
-  initialCode={`for n in range(1, 11):
+  starterCode={`for n in range(1, 11):
     if n % 2 == 0:
         continue
     print("odd:", n)
@@ -219,7 +219,7 @@ while True:
 
 <CodeBlock
   adapter="python"
-  initialCode={`for n in range(1, 11):
+  starterCode={`for n in range(1, 11):
     if n == 7:
         print("found 7, stopping")
         break
@@ -235,7 +235,7 @@ Both `for` and `while` accept an `else:` block, which runs **only if the loop co
 
 <CodeBlock
   adapter="python"
-  initialCode={`def first_factor(n):
+  starterCode={`def first_factor(n):
     for i in range(2, n):
         if n % i == 0:
             print(f"{n} = {i} * {n // i}")
@@ -256,7 +256,7 @@ The `for...else` pattern is Pythonic, but it confuses many readers because "else
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Alternative without for...else
+  starterCode={`# Alternative without for...else
 def first_factor_alt(n):
     found = False
     for i in range(2, n):
@@ -278,7 +278,7 @@ The same `else` logic applies to `while` loops.
 
 <CodeBlock
   adapter="python"
-  initialCode={`count = 0
+  starterCode={`count = 0
 while count < 3:
     print(count)
     count += 1
@@ -289,7 +289,7 @@ else:
 
 <CodeBlock
   adapter="python"
-  initialCode={`count = 0
+  starterCode={`count = 0
 while count < 5:
     if count == 3:
         break
@@ -308,7 +308,7 @@ Changing a list's length during iteration invalidates the iterator and leads to 
 
 <CodeBlock
   adapter="python"
-  initialCode={`xs = [1, 2, 3, 4, 5]
+  starterCode={`xs = [1, 2, 3, 4, 5]
 # Iterate over a copy so we can safely mutate the original
 for x in xs[:]:
     if x % 2 == 0:
@@ -321,7 +321,7 @@ Better: use a list comprehension to build a new list.
 
 <CodeBlock
   adapter="python"
-  initialCode={`xs = [1, 2, 3, 4, 5]
+  starterCode={`xs = [1, 2, 3, 4, 5]
 xs = [x for x in xs if x % 2 != 0]
 print(xs)
 `}
@@ -333,7 +333,7 @@ print(xs)
   adapter="python"
   title="Sum of digits"
   instructions={`Define a function \`digit_sum(n)\` that takes a non-negative integer \`n\` and returns the sum of its decimal digits. Use a \`while\` loop. For example, \`digit_sum(1234)\` returns \`10\`.`}
-  initialCode={`def digit_sum(n):
+  starterCode={`def digit_sum(n):
     # your code here
     return 0
 `}
@@ -367,7 +367,7 @@ print(xs)
   adapter="python"
   title="First prime over N"
   instructions={`Define a function \`first_prime_over(n)\` that returns the smallest prime number strictly greater than \`n\`. Use the \`for ... else\` pattern from above for the inner primality test.`}
-  initialCode={`def first_prime_over(n):
+  starterCode={`def first_prime_over(n):
     # your code here
     return 2
 `}
@@ -409,7 +409,7 @@ print(xs)
   adapter="python"
   title="Count vowels"
   instructions={`Define a function \`count_vowels(text)\` that returns the number of vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`, case-insensitive) in \`text\`. Use a \`for\` loop.`}
-  initialCode={`def count_vowels(text):
+  starterCode={`def count_vowels(text):
     # your code here
     return 0
 `}

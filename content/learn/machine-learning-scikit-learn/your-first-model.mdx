@@ -79,7 +79,7 @@ labels are `y` (150 values, each 0, 1, or 2).
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 
 # return_X_y=True hands back the feature matrix and label vector directly.
 X, y = load_iris(return_X_y=True)
@@ -108,7 +108,7 @@ Let us peek at the names so the integer codes mean something.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 
 iris = load_iris()  # the full object, with names attached
 print("Feature names:", iris.feature_names)
@@ -135,7 +135,7 @@ proportionally represented in both halves.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 X, y = load_iris(return_X_y=True)
@@ -182,7 +182,7 @@ compares.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -222,7 +222,7 @@ estimators are.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -253,7 +253,7 @@ first few test flowers and compare its guesses to the truth.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -288,7 +288,7 @@ of test flowers labeled correctly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -334,7 +334,7 @@ trained model, and it tells you the species. Let us do exactly that.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -390,7 +390,7 @@ which estimator sits on the highlighted line.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -517,7 +517,7 @@ species code (0, 1, or 2).`}
   initCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier`}
-  initialCode={`# 1. Load
+  starterCode={`# 1. Load
 X, y = None, None
 
 # 2. Split (20% test, random_state=0, stratified)

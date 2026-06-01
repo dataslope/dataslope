@@ -19,7 +19,7 @@ good name *tells them*.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// HARD: every name is generic. The reader has to decode the math.
+  starterCode={`// HARD: every name is generic. The reader has to decode the math.
 function f(a, b) {
   let t = 0;
   for (let i = 0; i < a.length; i++) {
@@ -71,7 +71,7 @@ change. Split it.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// HARD: one function juggling four jobs.
+  starterCode={`// HARD: one function juggling four jobs.
 function processOrder(order) {
   if (order.amount <= 0) throw new Error("bad amount");
   const tax = order.amount * 0.1;
@@ -115,7 +115,7 @@ also called *guard clauses* — flatten the code.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// HARD: rightward drift.
+  starterCode={`// HARD: rightward drift.
 function checkout(cart, user) {
   if (cart) {
     if (cart.items.length > 0) {
@@ -160,7 +160,7 @@ A value that appears out of nowhere with no explanation is called
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// HARD: what is 0.0825? why 86400000?
+  starterCode={`// HARD: what is 0.0825? why 86400000?
 function withTax(price) {
   return price * 1.0825;
 }
@@ -233,7 +233,7 @@ Two anti-patterns to avoid:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// BAD: swallow the error silently. You'll never know it happened.
+  starterCode={`// BAD: swallow the error silently. You'll never know it happened.
 function fetchData(url) {
   try {
     // ... pretend network call
@@ -296,7 +296,7 @@ sprinkling defensive checks throughout your logic.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// At the boundary: validate.
+  starterCode={`// At the boundary: validate.
 function parseAge(raw) {
   const n = Number(raw);
   if (!Number.isInteger(n) || n < 0 || n > 150) {
@@ -426,7 +426,7 @@ Rules:
 - Reject if \`student.age < 16\` → \`"ERROR: too young"\`
 - Reject if \`student.consent !== true\` → \`"ERROR: no consent"\`
 - Otherwise → \`"OK: <name>"\``}
-  initialCode={`function enrollStudent(student) {
+  starterCode={`function enrollStudent(student) {
   // your refactor here
 }
 

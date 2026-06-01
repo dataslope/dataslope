@@ -29,7 +29,7 @@ INSERT INTO daily VALUES
   (DATE '2024-01-03',  90),
   (DATE '2024-01-04', 200),
   (DATE '2024-01-05', 120);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   day,
   revenue,
   SUM(revenue) OVER (ORDER BY day) AS running_total
@@ -70,7 +70,7 @@ INSERT INTO sales VALUES
   ('East', DATE '2024-01-01', 200),
   ('East', DATE '2024-01-02',  60),
   ('East', DATE '2024-01-03', 120);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   day,
   revenue,
@@ -103,7 +103,7 @@ INSERT INTO daily VALUES
   (DATE '2024-01-02', 140),
   (DATE '2024-01-03',  90),
   (DATE '2024-01-04', 200);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   day,
   revenue,
   LAG(revenue) OVER (ORDER BY day)              AS prev_day,
@@ -137,7 +137,7 @@ INSERT INTO daily VALUES
   (DATE '2024-01-04', 200),
   (DATE '2024-01-05', 120),
   (DATE '2024-01-06', 160);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   day,
   revenue,
   ROUND(AVG(revenue) OVER (

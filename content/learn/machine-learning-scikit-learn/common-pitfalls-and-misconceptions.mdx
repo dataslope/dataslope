@@ -45,7 +45,7 @@ difference.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
@@ -109,7 +109,7 @@ about: "how well does the model recall what it has already seen?"
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -144,7 +144,7 @@ The number looks superb and the model is useless.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 
@@ -217,7 +217,7 @@ that have nothing to do with the thing you changed.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -280,7 +280,7 @@ constant, because it can never output a value beyond what it saw in training.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 
@@ -348,7 +348,7 @@ still has never seen.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import make_pipeline
@@ -427,7 +427,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
 X, y = load_breast_cancer(return_X_y=True)`}
-  initialCode={`# LEAKY starter (for reference): scales the whole dataset before CV.
+  starterCode={`# LEAKY starter (for reference): scales the whole dataset before CV.
 # X_leaked = StandardScaler().fit_transform(X)
 # leaky_cv = cross_val_score(LogisticRegression(max_iter=5000), X_leaked, y, cv=5).mean()
 
@@ -496,7 +496,7 @@ y = np.array([0] * 950 + [1] * 50)
 X = np.zeros((1000, 1))
 model = DummyClassifier(strategy="most_frequent").fit(X, y)
 pred = model.predict(X)`}
-  initialCode={`# 1. Plain accuracy of the majority-class predictor
+  starterCode={`# 1. Plain accuracy of the majority-class predictor
 acc = None
 
 # 2. Recall on the rare class (class 1)

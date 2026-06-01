@@ -27,7 +27,7 @@ At each node, compare the target with the current value and choose one branch.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -65,7 +65,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -98,7 +98,7 @@ The minimum is found by walking left until no left child remains. The maximum wa
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -138,7 +138,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -199,7 +199,7 @@ AVL and Red-Black trees rotate nodes to stay balanced. `std::set` and `std::map`
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <map>
 #include <set>
 
@@ -222,7 +222,7 @@ Because all left values come first, then the root, then all right values, in-ord
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
@@ -251,7 +251,7 @@ Checking only immediate children is wrong because a deeper node can violate an a
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <climits>
+  starterCode={`#include <climits>
 #include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
@@ -286,7 +286,7 @@ int main() {
   adapter="cpp"
   title="Insert into BST"
   instructions={`Implement \`TreeNode* insert(TreeNode* root, int val)\`. The driver inserts values and prints in-order traversal.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -343,7 +343,7 @@ int main() {
   adapter="cpp"
   title="Search BST"
   instructions={`Implement \`bool contains(TreeNode* root, int val)\` using the BST ordering.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -391,7 +391,7 @@ int main() {
   adapter="cpp"
   title="Lowest common ancestor in a BST"
   instructions={`Implement \`TreeNode* lca(TreeNode* root, int a, int b)\`. Use the BST property to walk toward the split point.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 

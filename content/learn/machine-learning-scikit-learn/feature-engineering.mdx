@@ -58,7 +58,7 @@ numerator and denominator each tell only half the story.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "rooms":  [3, 5, 2, 8, 4],
@@ -83,7 +83,7 @@ term) and it can.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
@@ -138,7 +138,7 @@ low/medium/high.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"age": [5, 17, 18, 25, 40, 64, 65, 82]})
 
@@ -179,7 +179,7 @@ informative ones.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "date": pd.to_datetime(["2021-01-15", "2021-07-04", "2021-12-25", "2021-03-22"]),
@@ -224,7 +224,7 @@ then fits a parabola in the original variable.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
@@ -393,7 +393,7 @@ df = pd.DataFrame({
     "num_rooms":  num_rooms,
     "price":      price,
 })`}
-  initialCode={`# 1. Engineer the ratio feature: space per room.
+  starterCode={`# 1. Engineer the ratio feature: space per room.
 df["sqft_per_room"] = None
 
 # 2. Correlation of the engineered feature with price.

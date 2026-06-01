@@ -30,7 +30,7 @@ is it?*
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -67,7 +67,7 @@ and is the dataset going to fit in memory?*
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print(df.dtypes)
+  starterCode={`print(df.dtypes)
 print()
 df.info(memory_usage="deep")
 `}
@@ -97,7 +97,7 @@ also describe text/categorical columns.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`print("Numeric columns:")
+  starterCode={`print("Numeric columns:")
 print(df.describe().round(1))
 print()
 print("Categorical / object columns:")
@@ -130,7 +130,7 @@ The fourth question: *where is data missing?*
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`# Count missing values per column
+  starterCode={`# Count missing values per column
 missing = df.isna().sum()
 missing_pct = (df.isna().mean() * 100).round(1)
 
@@ -162,7 +162,7 @@ For every text-like column, look at the values:
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`for col in df.select_dtypes(include="object").columns:
+  starterCode={`for col in df.select_dtypes(include="object").columns:
     counts = df[col].value_counts(dropna=False)
     n_unique = df[col].nunique()
     print(f"--- {col} ({n_unique} unique) ---")
@@ -190,7 +190,7 @@ After the five-minute ritual, do a few quick cross-tabulations.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`# Attrition rate by department — already gives you a feel for the data
+  starterCode={`# Attrition rate by department — already gives you a feel for the data
 print("Attrition by department:")
 ct = pd.crosstab(df["Department"], df["Attrition"])
 ct["pct_left"] = (ct["Yes"] / (ct["Yes"] + ct["No"]) * 100).round(1)
@@ -247,7 +247,7 @@ Then compute four values and assign them to specific variables:
 4. \`departments\` — a sorted list of unique values in the \`Department\` column
 
 Use Pandas, not hard-coded numbers.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)

@@ -36,7 +36,7 @@ what makes NumPy so fast.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.arange(24).reshape(2, 3, 4)
 print("shape   =", A.shape)
@@ -63,7 +63,7 @@ The handful of constructors you will use 99% of the time:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 print("zeros:\\n", np.zeros((2, 3)))
 print("ones:\\n", np.ones((2, 3)))
@@ -83,7 +83,7 @@ reproducible and stateless):
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 print("uniform:", rng.uniform(0, 1, size=4))
@@ -109,7 +109,7 @@ a **copy**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.arange(20).reshape(4, 5)
 print("A =\\n", A)
@@ -124,7 +124,7 @@ print(A)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.arange(20).reshape(4, 5)
 
@@ -155,7 +155,7 @@ always copies.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 A = np.arange(12).reshape(3, 4)
 print("A.reshape(2, 6) shares memory with A?",
@@ -176,7 +176,7 @@ products use `@` (or `np.matmul` / `np.dot`).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
@@ -210,7 +210,7 @@ which lets you write Einstein-summation notation directly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Matrix multiply written as einsum:  C[i,j] = Σ_k A[i,k] B[k,j]
 A = np.array([[1, 2], [3, 4]])
@@ -299,7 +299,7 @@ $$ c = \\frac\{\\sum_i w_i \\, p_i\}\{\\sum_i w_i\} \\in \\mathbb\{R\}^d $$
 
 as a 1-D array of shape \`(d,)\`. Do it **without any explicit
 Python loops** — use broadcasting and a single reduction.`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def weighted_centroid(points, weights):
     # TODO: vectorized weighted average along axis 0

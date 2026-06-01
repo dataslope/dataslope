@@ -25,7 +25,7 @@ Let's make the delivery story concrete. Both services have a mean of
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 
 # Two delivery services, both averaging 30 minutes.
@@ -70,7 +70,7 @@ different sample sizes.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 small = rng.normal(50, 5, size=20)
@@ -111,7 +111,7 @@ the shape matters: square the distances, average them, square-root back.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 data = np.array([28, 29, 30, 30, 31, 32, 30, 29, 31, 30])
 
@@ -167,7 +167,7 @@ source of "why don't my numbers match?" bugs.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 
 sample = np.array([42, 45, 48, 50, 52, 55, 58, 60, 62, 65])
@@ -216,7 +216,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -252,7 +252,7 @@ measured robustly."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 data = np.array([38, 41, 44, 47, 49, 52, 55, 60, 120, 9000])
@@ -284,7 +284,7 @@ totally different scales.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # Two metrics on completely different scales.
@@ -334,7 +334,7 @@ skew are present.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -381,7 +381,7 @@ from scipy import stats
 rng = np.random.default_rng(2024)
 group_a = pd.Series(rng.normal(100, 8, size=300))
 group_b = pd.Series(rng.normal(100, 15, size=300))`}
-  initialCode={`# TODO: build spread_a and set more_variable
+  starterCode={`# TODO: build spread_a and set more_variable
 spread_a = {
     "std": None,
     "iqr": None,

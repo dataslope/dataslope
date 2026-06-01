@@ -12,7 +12,7 @@ before execution).
   adapter="typescript"
   title="Generic identity function"
   instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
-  initialCode={`function identity<T>(x: T): T {
+  starterCode={`function identity<T>(x: T): T {
   // your code here
   return x;
 }
@@ -54,7 +54,7 @@ console.log(identity<string>("hello"));
   adapter="typescript"
   title="Generic identity function"
   instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
-  initialCode={`function identity<T>(x: T): T {
+  starterCode={`function identity<T>(x: T): T {
   // your code here
   return x;
 }
@@ -107,7 +107,7 @@ console.log(identity<string>("hello"));
   | { kind: "square"; side: number }
   | { kind: "rect"; width: number; height: number };
 `}
-  initialCode={`function area(shape: Shape): number {
+  starterCode={`function area(shape: Shape): number {
   // your code here
   return 0;
 }
@@ -164,7 +164,7 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
   | { kind: "square"; side: number }
   | { kind: "rect"; width: number; height: number };
 `}
-  initialCode={`function area(shape: Shape): number {
+  starterCode={`function area(shape: Shape): number {
   // your code here
   return 0;
 }
@@ -213,7 +213,7 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 <ChallengeCard
   adapter="typescript"
   title="Print Hello, TS!"
-  initialCode={`// Print the exact greeting below.
+  starterCode={`// Print the exact greeting below.
 `}
   instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";
@@ -233,7 +233,7 @@ console.log(message);
 <ChallengeCard
   adapter="typescript"
   title="Print Hello, TS!"
-  initialCode={`// Print the exact greeting below.
+  starterCode={`// Print the exact greeting below.
 `}
   instructions={`Make the program print exactly \`Hello, TS!\`.`}
   solutionCode={`const message: string = "Hello, TS!";

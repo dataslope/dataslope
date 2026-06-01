@@ -62,7 +62,7 @@ much that number was free to move.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(11)
 
@@ -105,7 +105,7 @@ trend whatsoever.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(3)
@@ -143,7 +143,7 @@ range, it's plausibly just noise.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -255,7 +255,7 @@ because it carries its own error bars.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -385,7 +385,7 @@ rng = np.random.default_rng(123)
 def draw_sample():
     # One fixed process: true mean 75, true sd 12.
     return rng.normal(75, 12, size=150)`}
-  initialCode={`# TODO: draw 2000 samples, take each one's mean, collect into 'means'
+  starterCode={`# TODO: draw 2000 samples, take each one's mean, collect into 'means'
 # Then compute the std of those means into 'wobble'
 means = None
 wobble = None
@@ -454,7 +454,7 @@ def null_gap():
     perm = rng.permutation(_pooled)
     a, b = perm[:len(control)], perm[len(control):]
     return b.mean() - a.mean()`}
-  initialCode={`# TODO
+  starterCode={`# TODO
 observed = None
 null_gaps = None
 plausibly_noise = None

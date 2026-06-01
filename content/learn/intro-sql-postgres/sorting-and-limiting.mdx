@@ -23,7 +23,7 @@ ascending (the default) or `DESC` for descending:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT name, salary
+  starterCode={`SELECT name, salary
 FROM employees
 ORDER BY salary DESC;`}
 />
@@ -46,7 +46,7 @@ each grade:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT dept, name, salary
+  starterCode={`SELECT dept, name, salary
 FROM employees
 ORDER BY dept ASC, salary DESC;`}
 />
@@ -74,7 +74,7 @@ flowchart LR
 INSERT INTO employees (name, salary) VALUES
   ('Alice',120000),('Bob',95000),('Carol',80000),
   ('Dave',72000),('Eve',68000);`}
-  initialCode={`SELECT name, salary
+  starterCode={`SELECT name, salary
 FROM employees
 ORDER BY salary DESC
 LIMIT 3;`}
@@ -104,7 +104,7 @@ so on:
 INSERT INTO employees (name, salary) VALUES
   ('Alice',120000),('Bob',95000),('Carol',80000),
   ('Dave',72000),('Eve',68000);`}
-  initialCode={`SELECT name, salary
+  starterCode={`SELECT name, salary
 FROM employees
 ORDER BY salary DESC
 LIMIT 2 OFFSET 2;`}

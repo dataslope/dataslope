@@ -28,7 +28,7 @@ Here's a simple example that copies a type unchanged:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; active: boolean };
+  starterCode={`type User = { id: number; name: string; active: boolean };
 
 type CopiedUser = { [K in keyof User]: User[K] };
 
@@ -52,7 +52,7 @@ Here's a type that makes every property readonly:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 type ReadonlyUser = { readonly [K in keyof User]: User[K] };
 
@@ -66,7 +66,7 @@ And here's one that makes every property optional:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 type PartialUser = { [K in keyof User]?: User[K] };
 
@@ -84,7 +84,7 @@ You can also *remove* modifiers with `-`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type OptionalUser = { id?: number; name?: string };
+  starterCode={`type OptionalUser = { id?: number; name?: string };
 
 type RequiredUser = { [K in keyof OptionalUser]-?: OptionalUser[K] };
 
@@ -105,7 +105,7 @@ Here's a type that prefixes every key with `get`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 type Getters<T> = {
   [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K];
@@ -127,7 +127,7 @@ You can also filter keys by remapping to `never`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; active: boolean };
+  starterCode={`type User = { id: number; name: string; active: boolean };
 
 type StringPropsOnly<T> = {
   [K in keyof T as T[K] extends string ? K : never]: T[K];
@@ -167,7 +167,7 @@ Here's a simple example:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type IsString<T> = T extends string ? "yes" : "no";
+  starterCode={`type IsString<T> = T extends string ? "yes" : "no";
 
 type A = IsString<string>; // "yes"
 type B = IsString<number>; // "no"
@@ -188,7 +188,7 @@ When a conditional type is applied to a **naked type parameter** (one not wrappe
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type ToArray<T> = T extends any ? T[] : never;
+  starterCode={`type ToArray<T> = T extends any ? T[] : never;
 
 type Result = ToArray<string | number>;
 // Distributes: ToArray<string> | ToArray<number>
@@ -206,7 +206,7 @@ To prevent distribution, wrap the type parameter in brackets:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type ToArrayNoDistribute<T> = [T] extends [any] ? T[] : never;
+  starterCode={`type ToArrayNoDistribute<T> = [T] extends [any] ? T[] : never;
 
 type Result = ToArrayNoDistribute<string | number>;
 // Result: (string | number)[]
@@ -220,7 +220,7 @@ Distributive behavior is useful for filtering unions. For example, extracting no
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type NonNullable<T> = T extends null | undefined ? never : T;
+  starterCode={`type NonNullable<T> = T extends null | undefined ? never : T;
 
 type Result = NonNullable<string | number | null | undefined>;
 // Distributes over union: string | number | never | never
@@ -242,7 +242,7 @@ For example, here's how to extract the return type of a function:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+  starterCode={`type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
 function greet(name: string): string {
   return \`Hello, \${name}!\`;
@@ -264,7 +264,7 @@ You can use `infer` in multiple positions:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any ? F : never;
+  starterCode={`type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any ? F : never;
 
 function add(a: number, b: number): number {
   return a + b;
@@ -281,7 +281,7 @@ console.log(x);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Unpack<T> = T extends (infer U)[] ? U : T;
+  starterCode={`type Unpack<T> = T extends (infer U)[] ? U : T;
 
 type Result1 = Unpack<number[]>; // number
 type Result2 = Unpack<string>; // string
@@ -306,7 +306,7 @@ Let's build a type that makes all function properties in an object optional, lea
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type OptionalFunctions<T> = {
+  starterCode={`type OptionalFunctions<T> = {
   [K in keyof T]: T[K] extends (...args: any[]) => any
     ? T[K] | undefined
     : T[K];
@@ -343,7 +343,7 @@ Here, the conditional type checks if `T[K]` is a function. If so, it unions with
 **Hint**: Use a mapped type with the \`-readonly\` modifier.`}
   initCode={`type Mutable<T> = any; // Replace 'any' with your implementation
 `}
-  initialCode={`type Mutable<T> = any;
+  starterCode={`type Mutable<T> = any;
 
 type ReadonlyUser = { readonly id: number; readonly name: string };
 type MutableUser = Mutable<ReadonlyUser>;

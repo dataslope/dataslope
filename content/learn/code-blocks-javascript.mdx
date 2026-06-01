@@ -11,7 +11,7 @@ scope, so `let`/`const` declarations don't leak across blocks.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const greet = (who) => \`Hello, \${who}!\`;
+  starterCode={`const greet = (who) => \`Hello, \${who}!\`;
 console.log(greet("learner"));
 console.log("π ≈", Math.PI.toFixed(4));
 `}
@@ -24,7 +24,7 @@ promises directly at the top level.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  starterCode={`const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 await wait(50);
 console.log("Done waiting!");
 `}
@@ -34,7 +34,7 @@ console.log("Done waiting!");
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const sales = [
+  starterCode={`const sales = [
   { product: "A", revenue: 42000 },
   { product: "B", revenue: 51000 },
   { product: "C", revenue: 29000 },
@@ -107,3 +107,34 @@ module.exports = { hello, bye };
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for imports or sample data without cluttering the part you edit. Init of 3
+lines or fewer shows a compact read-only header; 4 lines or more collapses
+behind a "Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="javascript"
+  initCode={`const greeting = "Hello";`}
+  starterCode={`// 'greeting' comes from the initialization code above.
+console.log(greeting + ", world!");
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="javascript"
+  initCode={`const orders = [
+  { id: 1, total: 42 },
+  { id: 2, total: 17 },
+];`}
+  starterCode={`// 'orders' comes from the initialization code above.
+const total = orders.reduce((sum, o) => sum + o.total, 0);
+console.log("total:", total);
+`}
+/>

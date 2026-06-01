@@ -21,7 +21,7 @@ make sense given the types?*
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 int age = 30;
 string name = "Ada";
@@ -83,7 +83,7 @@ you with no syntax:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 int small = 100;
 long big = small;        // implicit int -> long (always safe)
@@ -102,7 +102,7 @@ unless you cast explicitly with `(type)value`:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 double price = 19.99;
 int rounded = (int)price;   // explicit cast — drops the .99
@@ -125,7 +125,7 @@ A very common operation: turn a string like `"42"` into an `int`.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 string text = "42";
 
@@ -171,7 +171,7 @@ flowchart LR
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 int a = 5;
 int b = a;    // copies the value 5
@@ -204,7 +204,7 @@ flowchart LR
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
@@ -224,7 +224,7 @@ If you wanted a real copy, you'd ask explicitly:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
@@ -244,7 +244,7 @@ cannot change the contents of a string once it's created. Every
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 string a = "hello";
 string b = a;          // copies the reference
@@ -265,7 +265,7 @@ Reference behavior also matters when you *pass* objects to methods.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 void AppendOne(List<int> list)
@@ -311,7 +311,7 @@ means "no object at all."
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 string? maybeName = null;        // 'string?' = "string or null"
 

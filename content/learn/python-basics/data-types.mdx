@@ -84,7 +84,7 @@ This is a quirk of Python's design: `True` and `False` are instances of `bool`, 
 
 <CodeBlock
   adapter="python"
-  initialCode={`values = [1, 1.0, True, "1", [1], (1,), {1}, {"1": 1}, None]
+  starterCode={`values = [1, 1.0, True, "1", [1], (1,), {1}, {"1": 1}, None]
 
 for v in values:
     print(f"{v!r:>15}  type={type(v).__name__}")
@@ -95,7 +95,7 @@ for v in values:
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(isinstance(True, bool))   # True
+  starterCode={`print(isinstance(True, bool))   # True
 print(isinstance(True, int))    # True (bool is a subclass of int)
 print(isinstance(1, bool))      # False (int is not a subclass of bool)
 `}
@@ -118,7 +118,7 @@ Every built-in type doubles as a converter when you call it as a function.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# String to int / float
+  starterCode={`# String to int / float
 print(int("42"))
 print(float("3.14"))
 `}
@@ -126,7 +126,7 @@ print(float("3.14"))
 
 <CodeBlock
   adapter="python"
-  initialCode={`# int to string
+  starterCode={`# int to string
 print(str(255))
 print(hex(255), bin(255), oct(255))
 `}
@@ -134,7 +134,7 @@ print(hex(255), bin(255), oct(255))
 
 <CodeBlock
   adapter="python"
-  initialCode={`# float to int (truncates toward zero)
+  starterCode={`# float to int (truncates toward zero)
 print(int(3.9))
 print(int(-3.9))
 `}
@@ -142,7 +142,7 @@ print(int(-3.9))
 
 <CodeBlock
   adapter="python"
-  initialCode={`# list / tuple / set are interchangeable in many cases
+  starterCode={`# list / tuple / set are interchangeable in many cases
 items = [1, 2, 2, 3]
 print(tuple(items))
 print(set(items))   # duplicates removed
@@ -159,7 +159,7 @@ Two patterns to remember:
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = "hello"
+  starterCode={`s = "hello"
 s.upper()       # returns "HELLO" but does not change s
 print("s is still", s)
 `}
@@ -167,7 +167,7 @@ print("s is still", s)
 
 <CodeBlock
   adapter="python"
-  initialCode={`s = "hello"
+  starterCode={`s = "hello"
 s = s.upper()   # rebinding is how you "change" an immutable
 print("now s is", s)
 `}
@@ -175,7 +175,7 @@ print("now s is", s)
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = [1, 2, 3]
+  starterCode={`nums = [1, 2, 3]
 nums.append(4)  # changes the list in place
 print("nums is now", nums)
 `}
@@ -187,7 +187,7 @@ print("nums is now", nums)
 
 <CodeBlock
   adapter="python"
-  initialCode={`result = None
+  starterCode={`result = None
 if result is None:
     print("nothing yet")
 `}
@@ -195,7 +195,7 @@ if result is None:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# A function with no return statement returns None.
+  starterCode={`# A function with no return statement returns None.
 def shout(msg):
     print(msg.upper())
 
@@ -221,7 +221,7 @@ print("shout returned:", ret)
 4. The boolean \`True\`
 
 Hard-code the types (you do not need to detect them automatically).`}
-  initialCode={`line = "42,3.14,hello,True"
+  starterCode={`line = "42,3.14,hello,True"
 parts = line.split(",")
 print(parts)
 
@@ -259,7 +259,7 @@ assert type(parsed[3]) is bool`,
   adapter="python"
   title="Safe int conversion"
   instructions={`Write a function \`safe_int(s, default=0)\` that tries to convert the string \`s\` to an integer. If the conversion fails (e.g., \`s\` is \`"abc"\`), return \`default\` instead. Use a try/except block.`}
-  initialCode={`def safe_int(s, default=0):
+  starterCode={`def safe_int(s, default=0):
     # Your code here
     return default
 

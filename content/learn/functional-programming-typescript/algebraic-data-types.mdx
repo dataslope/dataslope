@@ -47,7 +47,7 @@ The cardinality literally follows the rules of arithmetic — hence
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Record / object: a product
+  starterCode={`// Record / object: a product
 type User = {
   readonly name: string;
   readonly age: number;
@@ -76,7 +76,7 @@ record types, each with a unique tag field.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle";    radius: number }
   | { kind: "rectangle"; width: number; height: number }
   | { kind: "triangle";  base: number; height: number };
@@ -113,7 +113,7 @@ A few things to notice:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle";    radius: number }
   | { kind: "rectangle"; width: number; height: number };
 
@@ -150,7 +150,7 @@ states to exist in the type. Sums let you forbid them.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type BadUser = {
+  starterCode={`type BadUser = {
   readonly id: string;
   readonly isActive: boolean;
   readonly isSuspended: boolean;
@@ -178,7 +178,7 @@ really suspended?*
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type UserStatus =
+  starterCode={`type UserStatus =
   | { kind: "active" }
   | { kind: "suspended"; reason: string; until: number }
   | { kind: "deleted";   deletedAt: number };
@@ -221,7 +221,7 @@ chapters explore them in depth.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> =
+  starterCode={`type Option<A> =
   | { kind: "none" }
   | { kind: "some"; value: A };
 
@@ -244,7 +244,7 @@ Replaces `null` and `undefined` with a type the compiler tracks.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> =
+  starterCode={`type Result<E, A> =
   | { kind: "ok"; value: A }
   | { kind: "err"; error: E };
 
@@ -268,7 +268,7 @@ the error case.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Tree<A> =
+  starterCode={`type Tree<A> =
   | { kind: "leaf" }
   | { kind: "node"; value: A; left: Tree<A>; right: Tree<A> };
 
@@ -312,7 +312,7 @@ In TypeScript:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type PaymentMethod =
+  starterCode={`type PaymentMethod =
   | { kind: "card";   last4: string; brand: "visa" | "mastercard" | "amex" }
   | { kind: "bank";   iban: string;  sortCode: string }
   | { kind: "crypto"; currency: "BTC" | "ETH"; txHash: string };

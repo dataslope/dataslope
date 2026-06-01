@@ -32,7 +32,7 @@ single variable, prefer a **histogram**. Bar charts are for
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame({
@@ -65,7 +65,7 @@ time.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame({
@@ -97,7 +97,7 @@ readable than vertical bars with rotated labels.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 df = df.sort_values("lifeExp")
@@ -125,7 +125,7 @@ with `color="..."` and `barmode="group"`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.tips()
 
@@ -155,7 +155,7 @@ break into parts.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 df = px.data.tips()
 

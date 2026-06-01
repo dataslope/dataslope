@@ -34,7 +34,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, price
+  starterCode={`SELECT title, price
 FROM books
 ORDER BY price ASC;`}
 />
@@ -56,7 +56,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, price
+  starterCode={`SELECT title, price
 FROM books
 ORDER BY price DESC;`}
 />
@@ -87,7 +87,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, author
+  starterCode={`SELECT title, author
 FROM books
 ORDER BY title;`}
 />
@@ -115,7 +115,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT genre, title, price
+  starterCode={`SELECT genre, title, price
 FROM books
 ORDER BY genre ASC, price DESC;`}
 />
@@ -152,7 +152,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, price
+  starterCode={`SELECT title, price
 FROM books
 ORDER BY price ASC
 LIMIT 3;`}
@@ -193,7 +193,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, price
+  starterCode={`SELECT title, price
 FROM books
 ORDER BY price ASC
 LIMIT 2 OFFSET 2;`}
@@ -234,7 +234,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre, price
+  starterCode={`SELECT title, genre, price
 FROM books
 WHERE price < 25
 ORDER BY price DESC

@@ -15,7 +15,7 @@ Before decorators, a quick reminder: a **closure** is a function that captures v
 
 <CodeBlock
   adapter="python"
-  initialCode={`def outer(x):
+  starterCode={`def outer(x):
     def inner(y):
         return x + y
     return inner
@@ -32,7 +32,7 @@ print(add_five(20))  # 25
 
 <CodeBlock
   adapter="python"
-  initialCode={`def shout(fn):
+  starterCode={`def shout(fn):
     def wrapper(*args, **kwargs):
         result = fn(*args, **kwargs)
         return result.upper()
@@ -70,7 +70,7 @@ Without `wraps`, the wrapped function loses its name, docstring, and signature:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def shout(fn):
+  starterCode={`def shout(fn):
     def wrapper(*args, **kwargs):
         return fn(*args, **kwargs).upper()
     return wrapper
@@ -89,7 +89,7 @@ print(greet.__doc__)    # None -- lost!
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def shout(fn):
     @wraps(fn)
@@ -115,7 +115,7 @@ Tools, debuggers, and stack traces rely on \`__name__\`, \`__doc__\`, and \`__mo
 
 <CodeBlock
   adapter="python"
-  initialCode={`import time
+  starterCode={`import time
 from functools import wraps
 
 def timed(fn):
@@ -147,7 +147,7 @@ If your decorator needs parameters, you need **three** levels of nesting. The ou
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def repeat(times):
     def decorator(fn):
@@ -200,7 +200,7 @@ You can apply multiple decorators. They nest bottom-up (the closest to the funct
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def bracketed(fn):
     @wraps(fn)
@@ -241,7 +241,7 @@ Sometimes you need state that survives across calls. A class with `__call__` can
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 class CountCalls:
     def __init__(self, fn):
@@ -272,7 +272,7 @@ When decorating class methods, remember that the first argument is `self`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def logged(fn):
     @wraps(fn)
@@ -317,7 +317,7 @@ Applying \`@staticmethod\` first (closest to the function) can cause errors beca
 
 <CodeBlock
   adapter="python"
-  initialCode={`from functools import cache
+  starterCode={`from functools import cache
 
 @cache
 def fib(n):
@@ -337,7 +337,7 @@ Without `@cache`, computing `fib(100)` recursively would take millions of years.
   instructions={`Define a decorator \`timing\` that prints how long a function took to run (in milliseconds) and returns the result. Use \`time.perf_counter()\` for timing and \`functools.wraps\` to preserve metadata.
 
 Example output: \`add took 0.05 ms\``}
-  initialCode={`import time
+  starterCode={`import time
 from functools import wraps
 
 def timing(fn):
@@ -396,7 +396,7 @@ assert "fast took" in output and "ms" in output`,
   instructions={`Define a decorator factory \`retry(n)\` that retries a function up to \`n\` times if it raises an exception. If all attempts fail, let the exception propagate. Use \`functools.wraps\`.
 
 Example: \`@retry(3)\` tries the function up to 3 times.`}
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def retry(n):
     # your code here
@@ -469,7 +469,7 @@ assert my_func.__name__ == "my_func"`,
   instructions={`Define a decorator \`memoize\` that caches function results based on arguments. Store the cache in a dict on the wrapper. Use \`functools.wraps\`.
 
 Assume all arguments are hashable. The cache should persist across calls.`}
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def memoize(fn):
     # your code here
@@ -527,7 +527,7 @@ assert foo.__name__ == "foo"`,
   instructions={`Define a decorator \`only_positive\` that raises \`ValueError\` if any positional argument is not a positive number (> 0). Use \`functools.wraps\`.
 
 Example: \`@only_positive\` on \`add(a, b)\` should raise if \`a <= 0\` or \`b <= 0\`.`}
-  initialCode={`from functools import wraps
+  starterCode={`from functools import wraps
 
 def only_positive(fn):
     # your code here

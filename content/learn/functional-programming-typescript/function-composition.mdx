@@ -36,7 +36,7 @@ binary composer:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function compose2<A, B, C>(g: (b: B) => C, f: (a: A) => B): (a: A) => C {
+  starterCode={`function compose2<A, B, C>(g: (b: B) => C, f: (a: A) => B): (a: A) => C {
   return (a) => g(f(a));
 }
 
@@ -66,7 +66,7 @@ what `pipe` does:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pipe<A>(a: A): A;
+  starterCode={`function pipe<A>(a: A): A;
 function pipe<A, B>(a: A, f1: (a: A) => B): B;
 function pipe<A, B, C>(a: A, f1: (a: A) => B, f2: (b: B) => C): C;
 function pipe<A, B, C, D>(a: A, f1: (a: A) => B, f2: (b: B) => C, f3: (c: C) => D): D;
@@ -94,7 +94,7 @@ counterpart:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function compose<A>(): (a: A) => A;
+  starterCode={`function compose<A>(): (a: A) => A;
 function compose<A, B>(f1: (a: A) => B): (a: A) => B;
 function compose<A, B, C>(f2: (b: B) => C, f1: (a: A) => B): (a: A) => C;
 function compose<A, B, C, D>(f3: (c: C) => D, f2: (b: B) => C, f1: (a: A) => B): (a: A) => D;
@@ -117,7 +117,7 @@ when you want to *name* a composed function for reuse:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -142,7 +142,7 @@ Before pipelines:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
+  starterCode={`const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
 
 const result = xs.map((s) => \`#\${s.trim().toLowerCase().replace(/\\s+/g, "-")}\`);
 console.log(result);
@@ -153,7 +153,7 @@ With named composed steps:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -178,7 +178,7 @@ arguments into a *chain* of one-argument functions.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Uncurried (the usual way)
+  starterCode={`// Uncurried (the usual way)
 const add = (a: number, b: number): number => a + b;
 
 // Curried
@@ -207,7 +207,7 @@ some arguments and leaving others as parameters.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A small "partial" helper for ordinary functions
+  starterCode={`// A small "partial" helper for ordinary functions
 function partial<A, B, C>(f: (a: A, b: B) => C, a: A): (b: B) => C {
   return (b) => f(a, b);
 }
@@ -236,7 +236,7 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -264,7 +264,7 @@ Same problem we used in [Declarative Thinking](./declarative-thinking):
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 

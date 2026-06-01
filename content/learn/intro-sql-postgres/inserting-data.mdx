@@ -25,7 +25,7 @@ supply matching values:
 <SqlCodeBlock
   dialect="postgres"
   title="Insert one row and several rows"
-  initialCode={`CREATE TABLE tasks (
+  starterCode={`CREATE TABLE tasks (
   id    SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   done  BOOLEAN DEFAULT false
@@ -70,7 +70,7 @@ INSERT INTO tasks (title, done) VALUES
   ('Buy milk', false),
   ('Walk the dog', false),
   ('Write report', false);`}
-  initialCode={`UPDATE tasks
+  starterCode={`UPDATE tasks
 SET done = true
 WHERE title = 'Buy milk';
 
@@ -96,7 +96,7 @@ INSERT INTO tasks (title, done) VALUES
   ('Buy milk', true),
   ('Walk the dog', false),
   ('Write report', true);`}
-  initialCode={`DELETE FROM tasks
+  starterCode={`DELETE FROM tasks
 WHERE done = true;
 
 SELECT * FROM tasks ORDER BY id;`}
@@ -141,7 +141,7 @@ INSERT INTO tasks (title, done) VALUES
   ('Buy milk', false),
   ('Walk the dog', false),
   ('Write report', false);`}
-  initialCode={`-- Step 1: SELECT to preview which rows match.
+  starterCode={`-- Step 1: SELECT to preview which rows match.
 SELECT * FROM tasks WHERE title LIKE 'W%';
 
 -- Step 2 (once you're sure), the matching change would be:

@@ -38,7 +38,7 @@ whatever you aggregated.
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',30);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   COUNT(*)       AS orders,
   SUM(amount)    AS revenue,
@@ -77,7 +77,7 @@ flowchart LR
 INSERT INTO sales VALUES
   ('West','Widget',120),('West','Gadget',80),('East','Widget',200),
   ('East','Gadget',50),('North','Widget',75),('West','Widget',60);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,                 -- grouped
   product,                -- grouped
   COUNT(*)    AS n,       -- aggregated
@@ -108,7 +108,7 @@ This is where grouping becomes genuinely creative.
 );
 INSERT INTO orders VALUES
   (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   CASE
     WHEN amount < 50  THEN 'small'
     WHEN amount < 200 THEN 'medium'

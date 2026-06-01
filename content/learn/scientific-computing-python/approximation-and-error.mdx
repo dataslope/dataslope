@@ -44,7 +44,7 @@ picture.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 # Approximate f'(1) with f(x) = sin(x).  True derivative = cos(1) ≈ 0.5403
@@ -96,7 +96,7 @@ $$ p \\approx \\log_2 \\frac\{E(h_1)\}\{E(h_2)\} $$
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Simpson's rule for ∫_0^1 e^x dx = e - 1
 def simpson(f, a, b, n):
@@ -151,7 +151,7 @@ of a handful of terms.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Partial sums of the Leibniz series for π/4
 N = 30
@@ -188,7 +188,7 @@ Try integrating something with a sharp spike.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.integrate import quad, simpson
 
 # A function with a sharp Lorentzian peak at x = 0
@@ -222,7 +222,7 @@ to.**
 For consecutive errors $E_1, E_2$ at step sizes $h$ and $h/2$,
 $p \\approx \\log_2(E_1 / E_2)$. Return the **mean** of those
 estimates across consecutive pairs.`}
-  initialCode={`import math
+  starterCode={`import math
 
 def estimate_order(errors):
     # TODO: average log2(E_i / E_{i+1}) across consecutive pairs

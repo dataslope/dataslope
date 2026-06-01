@@ -19,7 +19,7 @@ That is the whole rule. Everything else is examples.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
@@ -49,7 +49,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  initialCode={`print(">>> df.loc['Aiko':'Chen']     # 3 rows — INCLUSIVE of Chen")
+  starterCode={`print(">>> df.loc['Aiko':'Chen']     # 3 rows — INCLUSIVE of Chen")
 print(df.loc["Aiko":"Chen"])
 print()
 print(">>> df.iloc[0:3]              # 3 rows — EXCLUSIVE of position 3")
@@ -74,7 +74,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "tenure": [3, 6, 7, 2, 4],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  initialCode={`# loc: labels for rows AND columns
+  starterCode={`# loc: labels for rows AND columns
 print(df.loc[["Aiko","Chen"], ["salary","tenure"]])
 print()
 
@@ -104,7 +104,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "tenure": [3, 6, 7, 2, 4],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  initialCode={`mask = df["dept"] == "Eng"
+  starterCode={`mask = df["dept"] == "Eng"
 
 print(">>> df.loc[mask]")
 print(df.loc[mask])
@@ -129,7 +129,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  initialCode={`# Give every Engineer a 10% raise. Use loc — never chained []:
+  starterCode={`# Give every Engineer a 10% raise. Use loc — never chained []:
 df.loc[df["dept"] == "Eng", "salary"] *= 1.10
 print(df)
 `}
@@ -163,7 +163,7 @@ and position becomes very obvious in this case.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"x": [100, 200, 300]}, index=[10, 20, 30])
 print(df)

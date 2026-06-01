@@ -1,0 +1,406 @@
+---
+title: The Anatomy of an NLP Pipeline
+description: The standard sequence of preprocessing steps text flows through — tokenize, normalize, filter, reduce, analyze — seen as one picture. Why it is a pipeline of transformations, why most steps are optional, and why order matters.
+---
+
+On the last page we said NLP adds structure to text in *layers*. Those layers
+are usually arranged as a **pipeline**: a fixed sequence of steps where the
+output of each step becomes the input to the next. Before we spend a page
+each on the individual steps, it is worth seeing the whole assembly line at
+once, because the shape will repeat on nearly every page that follows.
+
+## The standard text preprocessing pipeline
+
+Here is the canonical flow. Almost every classic NLP project is some subset
+of these steps, in roughly this order.
+
+```mermaid
+flowchart TD
+    A["Raw text<br/>(a string)"] --> B["Sentence tokenization<br/>split into sentences (optional)"]
+    B --> C["Word tokenization<br/>split into words and punctuation"]
+    C --> D["Case folding<br/>lowercase the tokens"]
+    D --> E["Cleaning<br/>drop punctuation and non-words"]
+    E --> F["Stopword removal<br/>drop ultra-common words (optional)"]
+    F --> G["Stemming or lemmatization<br/>reduce words to a root (optional)"]
+    G --> H["Analysis<br/>counts, n-grams, POS tags, features"]
+```
+
+Read it top to bottom. Raw text comes in; a clean, normalized list of units
+comes out, ready to be counted or fed into a model. Three things about this
+picture matter more than the picture itself.
+
+**First, it is a pipeline of transformations.** At each step you are holding
+a value — first a string, then a list of tokens — and you apply one
+transformation to get the next value. This is exactly the list-comprehension
+style of Python you already know: `tokens = [t.lower() for t in tokens]` *is*
+the case-folding step.
+
+**Second, most steps are optional.** Only tokenization is nearly always
+present. Whether you lowercase, whether you remove stopwords, whether you
+stem or lemmatize — those are *choices*, and making them well is the single
+most important skill in classic NLP. We give that skill its own page later
+([Designing the Right Pipeline](./choosing-your-pipeline)).
+
+**Third, order matters.** Removing punctuation before tokenizing can destroy
+information a tokenizer needs (those periods help it find sentence ends).
+Lowercasing before part-of-speech tagging can confuse a tagger that uses
+capitalization as a clue. The same steps in a different order can give
+different — sometimes worse — results.
+
+<Callout type="info" title="The pipeline is a sequence of transformations on a list">
+After tokenization, your text is just a Python list of strings, and every
+later step is a transformation of that list into another list: filter out
+some items, lowercase the rest, replace each with its root. If you are
+comfortable with list comprehensions, you already understand the *mechanics*
+of an NLP pipeline. The hard part is never the code — it is deciding which
+transformations to apply.
+</Callout>
+
+## Watching a list flow through the pipeline
+
+Let us make "a pipeline is a sequence of list transformations" concrete. The
+block below runs the standard steps and prints the list after each one, so
+you can watch it shrink and change. Read each printed line against the
+diagram above.
+
+<CodeBlock
+  adapter="python"
+  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+# Installs NLTK and loads the data this page needs. nltk.download() isn't
+# available in this environment, so we fetch the data archives directly
+# and unpack them into NLTK's data directory.
+import io, os, zipfile
+import micropip
+await micropip.install("nltk")
+import nltk
+from pyodide.http import pyfetch
+
+_GH = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages"
+if "/nltk_data" not in nltk.data.path:
+    nltk.data.path.insert(0, "/nltk_data")
+
+async def _load_nltk(category, package):
+    dest = os.path.join("/nltk_data", category)
+    os.makedirs(dest, exist_ok=True)
+    if os.path.exists(os.path.join(dest, package)):
+        return
+    resp = await pyfetch(_GH + "/" + category + "/" + package + ".zip")
+    if resp.status != 200:
+        raise RuntimeError("Could not download " + category + "/" + package)
+    with zipfile.ZipFile(io.BytesIO(await resp.bytes())) as zf:
+        zf.extractall(dest)
+
+await _load_nltk("tokenizers", "punkt_tab")
+await _load_nltk("corpora", "stopwords")
+await _load_nltk("corpora", "wordnet")
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer`}
+  starterCode={`text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
+
+# Step 1 — word tokenization
+tokens = word_tokenize(text)
+print("1. tokenized: ", tokens)
+
+# Step 2 — case folding (lowercase)
+tokens = [t.lower() for t in tokens]
+print("2. lowercased:", tokens)
+
+# Step 3 — cleaning (keep only alphabetic tokens)
+tokens = [t for t in tokens if t.isalpha()]
+print("3. cleaned:   ", tokens)
+
+# Step 4 — stopword removal
+stop = set(stopwords.words("english"))
+tokens = [t for t in tokens if t not in stop]
+print("4. no stops:  ", tokens)
+
+# Step 5 — lemmatization (reduce to dictionary form)
+lemmatizer = WordNetLemmatizer()
+tokens = [lemmatizer.lemmatize(t) for t in tokens]
+print("5. lemmatized:", tokens)
+`}
+/>
+
+Each `print` is one row of the pipeline diagram. The list started as nine
+tokens including punctuation and shrank to a handful of meaningful roots. Try
+commenting out step 4 (stopword removal) and re-running — notice how much
+longer the final list becomes, and ask yourself whether those extra words
+would help or hurt whatever you planned to do next. That question has no
+universal answer, which is exactly why these steps are choices.
+
+<Callout type="tip" title="Experiment: reorder the steps">
+Move the lowercasing step (step 2) to *after* stopword removal and re-run.
+The stopword list is all lowercase, so comparing un-lowercased tokens like
+`"The"` against it silently fails to remove them. This is a tiny taste of why
+*order matters* — a theme we will keep returning to.
+</Callout>
+
+## The two families of steps: cleaning vs. analysis
+
+It helps to mentally split the pipeline into two halves.
+
+```mermaid
+flowchart LR
+    subgraph PRE["Preprocessing (cleaning)"]
+        direction TB
+        p1["Tokenize"] --> p2["Normalize"] --> p3["Filter / reduce"]
+    end
+    subgraph ANA["Analysis (extracting value)"]
+        direction TB
+        a1["Count frequencies"]
+        a2["Tag parts of speech"]
+        a3["Build n-grams"]
+        a4["Make features"]
+    end
+    PRE --> ANA
+```
+
+The **preprocessing** half turns raw text into clean, comparable units. It is
+mostly mechanical and mostly the same from project to project. The
+**analysis** half is where you actually extract value, and it depends on your
+goal: a search engine counts and indexes, an autocomplete builds n-grams, a
+classifier builds features. Crucially, *the analysis you intend to do should
+drive the preprocessing choices you make* — not the other way around. We will
+see this dependency again and again.
+
+<MultipleChoice
+  markdown={`In the pipeline, why is it accurate to say "most steps are optional, but
+tokenization usually is not"?
+
+- Tokenization is the only step that is fast enough to run
+- [o] Almost every later step operates on *tokens*, so you need tokens before you can lowercase, filter, count, or tag them — whereas lowercasing, stopword removal, and stemming are choices that depend on the task
+  > Tokenization produces the list of units everything else transforms. Without it there is nothing to lowercase or count. The later steps add or remove information and are applied (or skipped) based on what you are trying to achieve.
+- Tokenization is the last thing you do, after counting
+- Stopword removal must always happen before tokenization
+
+You cannot transform a list of tokens you have not produced yet.`}
+/>
+
+## Order matters: a concrete example
+
+We just hinted at it; let us prove it. The block below runs the *same three
+operations* — lowercase, remove stopwords, keep alphabetic — but in two
+different orders, and compares the results.
+
+<CodeBlock
+  adapter="python"
+  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+import io, os, zipfile
+import micropip
+await micropip.install("nltk")
+import nltk
+from pyodide.http import pyfetch
+
+_GH = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages"
+if "/nltk_data" not in nltk.data.path:
+    nltk.data.path.insert(0, "/nltk_data")
+
+async def _load_nltk(category, package):
+    dest = os.path.join("/nltk_data", category)
+    os.makedirs(dest, exist_ok=True)
+    if os.path.exists(os.path.join(dest, package)):
+        return
+    resp = await pyfetch(_GH + "/" + category + "/" + package + ".zip")
+    if resp.status != 200:
+        raise RuntimeError("Could not download " + category + "/" + package)
+    with zipfile.ZipFile(io.BytesIO(await resp.bytes())) as zf:
+        zf.extractall(dest)
+
+await _load_nltk("tokenizers", "punkt_tab")
+await _load_nltk("corpora", "stopwords")
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords`}
+  starterCode={`text = "The The THE end is near"
+stop = set(stopwords.words("english"))   # all lowercase, includes 'the'
+tokens = word_tokenize(text)
+
+# Order A: lowercase FIRST, then remove stopwords  (correct)
+a = [t.lower() for t in tokens]
+a = [t for t in a if t not in stop]
+
+# Order B: remove stopwords FIRST, then lowercase  (buggy)
+b = [t for t in tokens if t not in stop]
+b = [t.lower() for t in b]
+
+print("Order A (lowercase then filter):", a)
+print("Order B (filter then lowercase):", b)
+`}
+/>
+
+Order A correctly removes all three "the"s, because by the time we compare
+against the lowercase stopword list, every token is lowercase. Order B leaves
+`"The"` and `"THE"` behind, because they did not match the lowercase `"the"`
+in the stoplist at the moment we filtered. Same operations, different order,
+different — and in this case wrong — result.
+
+<Callout type="warn" title="Order bugs are silent">
+Notice that Order B did not crash. It produced a perfectly reasonable-looking
+list that happened to be wrong. Pipeline ordering bugs almost never raise an
+error; they quietly corrupt your data and you only notice when your downstream
+results look off. Reasoning carefully about order is a real part of the craft.
+</Callout>
+
+## Your turn: assemble a mini pipeline
+
+Time to build the cleaning half yourself. The challenge below asks you to
+write a `preprocess` function that runs the standard cleaning steps in the
+right order. The hidden tests check the output on a couple of sentences,
+including one where a stopword changes everything.
+
+<ChallengeCard
+  adapter="python"
+  title="Build a text-cleaning pipeline"
+  category="pipeline · tokenize · normalize · filter"
+  estimatedTime="~7 min"
+  instructions={`Write a function \`preprocess(text)\` that returns a list of clean tokens by
+running these steps **in this order**:
+
+1. Word-tokenize the text with \`word_tokenize\`.
+2. Lowercase every token.
+3. Keep only tokens that are fully alphabetic (use \`.isalpha()\` to drop
+   punctuation and numbers).
+4. Remove English stopwords (use the provided \`stop\` set).
+
+Return the resulting list. For example, \`preprocess("The quick brown
+foxes!")\` should return \`['quick', 'brown', 'foxes']\`.
+
+The \`word_tokenize\` function and the \`stop\` set are already available from
+the setup section.`}
+  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+import io, os, zipfile
+import micropip
+await micropip.install("nltk")
+import nltk
+from pyodide.http import pyfetch
+
+_GH = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages"
+if "/nltk_data" not in nltk.data.path:
+    nltk.data.path.insert(0, "/nltk_data")
+
+async def _load_nltk(category, package):
+    dest = os.path.join("/nltk_data", category)
+    os.makedirs(dest, exist_ok=True)
+    if os.path.exists(os.path.join(dest, package)):
+        return
+    resp = await pyfetch(_GH + "/" + category + "/" + package + ".zip")
+    if resp.status != 200:
+        raise RuntimeError("Could not download " + category + "/" + package)
+    with zipfile.ZipFile(io.BytesIO(await resp.bytes())) as zf:
+        zf.extractall(dest)
+
+await _load_nltk("tokenizers", "punkt_tab")
+await _load_nltk("corpora", "stopwords")
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+stop = set(stopwords.words("english"))`}
+  starterCode={`def preprocess(text):
+    # your code here — return a list of clean tokens
+    tokens = word_tokenize(text)
+    # ... lowercase, keep alphabetic, drop stopwords ...
+    return tokens
+
+print(preprocess("The quick brown foxes are jumping!"))
+print(preprocess("It is NOT a good day."))
+`}
+  solutionCode={`def preprocess(text):
+    tokens = word_tokenize(text)
+    tokens = [t.lower() for t in tokens]
+    tokens = [t for t in tokens if t.isalpha()]
+    tokens = [t for t in tokens if t not in stop]
+    return tokens
+
+print(preprocess("The quick brown foxes are jumping!"))
+print(preprocess("It is NOT a good day."))
+`}
+  tests={[
+    {
+      id: "returns_list",
+      name: "Returns a list",
+      description: "preprocess should return a Python list",
+      code: `assert isinstance(preprocess("Hello world"), list), "preprocess must return a list"`,
+    },
+    {
+      id: "basic_clean",
+      name: "Cleans a simple sentence",
+      description: "Stopwords removed, punctuation dropped, lowercased",
+      code: `assert preprocess("The quick brown foxes are jumping!") == ["quick", "brown", "foxes", "jumping"], \
+    "Got: " + repr(preprocess("The quick brown foxes are jumping!"))`,
+    },
+    {
+      id: "stopwords_and_punct",
+      name: "Drops stopwords and punctuation",
+      description: "'It is NOT a good day.' should reduce to ['good', 'day']",
+      code: `assert preprocess("It is NOT a good day.") == ["good", "day"], \
+    "Got: " + repr(preprocess("It is NOT a good day."))`,
+    },
+    {
+      id: "all_lowercase",
+      name: "Output is all lowercase",
+      description: "No uppercase letters should survive",
+      code: `out = preprocess("APPLE Banana CHERRY")
+assert all(w == w.lower() for w in out), "Found a non-lowercase token: " + repr(out)`,
+    },
+    {
+      id: "no_punctuation",
+      name: "No punctuation tokens remain",
+      description: "Pure-punctuation tokens must be filtered out",
+      code: `out = preprocess("Wow!!! Really??? Yes...")
+assert all(w.isalpha() for w in out), "Found a non-alphabetic token: " + repr(out)`,
+    },
+  ]}
+/>
+
+<Callout type="success" title="Notice what the second test taught you">
+`preprocess("It is NOT a good day.")` returned `['good', 'day']`. The word
+**"not"** vanished — it is on NLTK's stopword list — and with it, the entire
+meaning of the sentence flipped from negative to positive. That is a preview
+of one of the most important cautionary tales in this course, which we will
+tell in full on the [stopwords page](./stopwords). Removing stopwords is not
+free; sometimes it throws away the very words that matter.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why can applying the *same* preprocessing steps in a *different* order
+produce different results?
+
+- It cannot — order never affects the outcome of preprocessing
+- [o] Each step transforms the data the next step sees, so (for example) filtering before lowercasing compares differently-cased tokens against a lowercase stopword list and misses some
+  > Steps are not independent; each one changes the input to the next. Lowercasing after filtering means the filter saw the original casing, so case-mismatched stopwords slip through. Order changes what each step actually operates on.
+- Reordering steps changes which version of Python runs
+- Only the first step has any effect; the rest are ignored
+
+Pipelines are sequential transformations, so the order of those transformations is part of the logic.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague says, "I always remove stopwords and stem every text, no matter
+the project — it's just good hygiene." What is the best response?
+
+- They are right; more preprocessing is always better
+- [o] Preprocessing steps are choices that should be driven by the downstream task; some steps that help one task (like topic counting) actively hurt another (like sentiment analysis)
+  > There is no universally correct pipeline. Stopword removal helps when you want content words for topic analysis but can destroy sentiment or phrase meaning. The right steps depend on what you are trying to do — which is why "choosing the pipeline" gets its own page.
+- They are right, because stemming and stopword removal are required by NLTK
+- They are wrong because preprocessing should never be done at all
+
+"It depends on the task" is the honest, correct answer — and the core skill this course builds.`}
+/>
+
+<MultipleChoice
+  markdown={`Thinking of the pipeline as "a sequence of transformations on a list of
+tokens" is useful mainly because:
+
+- It proves that NLP requires no programming
+- [o] Once text is tokenized, each later step is just a filter or map over a list — a pattern you already know — so the difficulty shifts from *coding* the steps to *choosing* them
+  > After tokenization you are holding a Python list of strings, and lowercasing, filtering stopwords, and stemming are ordinary list comprehensions. The mechanics are familiar; the judgment about which transformations to apply is the real work.
+- It means the order of operations is irrelevant
+- It guarantees every pipeline gives the same output
+
+The mental model reframes NLP preprocessing as list-wrangling plus good judgment.`}
+/>
+
+With the whole assembly line in view, we can now study each station properly.
+We start where the pipeline starts: **tokenization** — and why breaking text
+into words and sentences is far subtler than it looks.

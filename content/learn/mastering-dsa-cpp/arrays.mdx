@@ -11,7 +11,7 @@ A C-style array such as `int a[5]` has a fixed size known at compile time. It is
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 void print_first(int* values) {
     std::cout << values[0] << "\\n";
@@ -34,7 +34,7 @@ You almost never want raw arrays for DSA practice because `std::array` and `std:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <array>
+  starterCode={`#include <array>
 #include <iostream>
 
 int main() {
@@ -55,7 +55,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -93,7 +93,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -114,7 +114,7 @@ Index-based loops are useful when you need positions. Range-for loops are clean 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -145,7 +145,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -172,7 +172,7 @@ Browser timing is noisy, but this shows how to measure a sequence of pushes with
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <chrono>
+  starterCode={`#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -196,7 +196,7 @@ A matrix is often represented as `std::vector<std::vector<int>>`: a vector of ro
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -233,7 +233,7 @@ int main() {
   adapter="cpp"
   title="Reverse a vector in-place"
   instructions={`Implement \`reverseInPlace\` without using \`std::reverse\`. Swap from both ends until the pointers meet.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 void reverseInPlace(std::vector<int>& values) {
@@ -282,7 +282,7 @@ int main() {
   adapter="cpp"
   title="Find the second-largest value"
   instructions={`Implement \`secondLargest\` in one pass without sorting. Keep the best value and the runner-up as you scan.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <limits>
 #include <vector>
 

@@ -53,7 +53,7 @@ CREATE TABLE orders (
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
 INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   orders.id        AS order_id,
   customers.name   AS customer,
   orders.amount
@@ -84,7 +84,7 @@ CREATE TABLE orders (
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
 INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
-  initialCode={`SELECT o.id AS order_id, c.name AS customer, o.amount
+  starterCode={`SELECT o.id AS order_id, c.name AS customer, o.amount
 FROM orders o
 JOIN customers c ON o.customer_id = c.id;`}
 />

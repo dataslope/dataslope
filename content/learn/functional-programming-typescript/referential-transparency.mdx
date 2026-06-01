@@ -18,7 +18,7 @@ Impure functions don't.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Pure: referentially transparent
+  starterCode={`// Pure: referentially transparent
 const square = (x: number): number => x * x;
 
 const a = square(3) + square(3);
@@ -37,7 +37,7 @@ Compare with an impure function:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let counter = 0;
+  starterCode={`let counter = 0;
 function nextId(): number {
   counter = counter + 1;
   return counter;
@@ -97,7 +97,7 @@ at each step.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const double = (x: number): number => x * 2;
+  starterCode={`const double = (x: number): number => x * 2;
 const inc    = (x: number): number => x + 1;
 
 const result = double(inc(3));
@@ -129,7 +129,7 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
+  starterCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
   const cache = new Map<A, B>();
   return (a: A): B => {
     if (cache.has(a)) return cache.get(a)!;
@@ -167,7 +167,7 @@ expression twice in one block, you can compute it once and reuse it.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  starterCode={`function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
   // dx and dy are computed twice in the naive version
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
@@ -223,7 +223,7 @@ Anything impure:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Innocent-looking but NOT referentially transparent
+  starterCode={`// Innocent-looking but NOT referentially transparent
 function greetWith(name: string): string {
   console.log(\`(building greeting for \${name})\`);
   return \`Hello, \${name}!\`;
@@ -252,7 +252,7 @@ exposing the randomness as an input.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Before: not referentially transparent — output depends on the RNG
+  starterCode={`// Before: not referentially transparent — output depends on the RNG
 function pickWinner(candidates: readonly string[]): string {
   const idx = Math.floor(Math.random() * candidates.length);
   return candidates[idx];
@@ -265,7 +265,7 @@ console.log(pickWinner(["A", "B", "C"])); // ??? depends on RNG
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// After: pure. The randomness is now an explicit input.
+  starterCode={`// After: pure. The randomness is now an explicit input.
 function pickWinner(candidates: readonly string[], roll01: number): string {
   const idx = Math.floor(roll01 * candidates.length);
   return candidates[idx];

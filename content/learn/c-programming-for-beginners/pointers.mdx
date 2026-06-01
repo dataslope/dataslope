@@ -48,7 +48,7 @@ To **read or write through the pointer**, use `*` (the
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int n = 42;
@@ -137,7 +137,7 @@ variable, you pass a **pointer** to it.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void increment(int *x) {
     (*x)++;
@@ -167,7 +167,7 @@ several output parameters via pointers:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void divmod(int a, int b, int *q, int *r) {
     *q = a / b;
@@ -242,7 +242,7 @@ variables:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
     int tmp = *a;
@@ -280,7 +280,7 @@ printf("%d\\n", x);   // should print 17
 \`\`\`
 
 The program must print exactly \`17\` and nothing else.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void add_to(int *value, int delta) {
     // your code here

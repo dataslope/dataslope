@@ -28,7 +28,7 @@ the plot is the original.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -76,7 +76,7 @@ points). There is no single "objective" bin count.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -126,7 +126,7 @@ two-humped distribution looks just like a box plot of a one-humped one.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -160,7 +160,7 @@ and more reliable than they are.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -209,7 +209,7 @@ features without worrying you've smoothed them away.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -276,7 +276,7 @@ Use \`np.histogram(values, bins=10)\` and unpack its two return values.`}
 
 rng = np.random.default_rng(42)
 values = rng.normal(100, 15, size=500)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # TODO: bin 'values' into 10 equal-width bins
 counts = None
@@ -362,7 +362,7 @@ Use the provided \`data\` array and \`threshold\` value.`}
 rng = np.random.default_rng(7)
 data = rng.normal(50, 10, size=400)
 threshold = 55.0`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # TODO: build the ECDF and read it at 'threshold'
 x_sorted = None

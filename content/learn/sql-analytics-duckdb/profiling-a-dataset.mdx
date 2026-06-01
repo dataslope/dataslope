@@ -51,7 +51,7 @@ SELECT
   DATE '2024-01-01' + (i % 200)  AS signup_date,
   (i * 11) % 5                    AS plan_id
 FROM range(1, 1201) t(i);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)          AS rows,
   MIN(signup_date)  AS earliest,
   MAX(signup_date)  AS latest
@@ -77,7 +77,7 @@ SELECT
   DATE '2024-01-01' + (i % 200)  AS signup_date,
   (i * 11) % 5                    AS plan_id
 FROM range(1, 1201) t(i);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)                  AS rows,
   COUNT(DISTINCT id)        AS distinct_ids,
   COUNT(DISTINCT plan_id)   AS distinct_plans,
@@ -103,7 +103,7 @@ check.
 INSERT INTO users VALUES
   (1, 'a@x.com', 'US'), (2, NULL, 'US'), (3, 'c@x.com', NULL),
   (4, NULL, 'CA'), (5, 'e@x.com', 'US'), (6, 'f@x.com', NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)                        AS rows,
   COUNT(email)                    AS has_email,
   COUNT(*) - COUNT(email)         AS missing_email,
@@ -131,7 +131,7 @@ SELECT
   ['Books','Electronics','Home'][(i % 3) + 1]  AS category,
   (i * 13) % 300 + 20                          AS amount
 FROM range(1, 501) t(i);`}
-  initialCode={`SUMMARIZE orders;`}
+  starterCode={`SUMMARIZE orders;`}
 />
 
 One line, a complete profile. `SUMMARIZE` is the first thing many DuckDB

@@ -15,7 +15,7 @@ In TypeScript, a type is compatible with another if it has *at least* the requir
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Point {
+  starterCode={`interface Point {
   x: number;
   y: number;
 }
@@ -76,7 +76,7 @@ This design choice unlocks powerful patterns:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Two unrelated interfaces with the same shape
+  starterCode={`// Two unrelated interfaces with the same shape
 interface DatabaseUser {
   id: string;
   name: string;
@@ -112,7 +112,7 @@ Structural typing says "extra properties are OK," but TypeScript has a special r
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Config {
+  starterCode={`interface Config {
   host: string;
   port: number;
 }
@@ -156,7 +156,7 @@ If you genuinely need extra properties, you have a few options:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Config {
+  starterCode={`interface Config {
   host: string;
   port: number;
 }
@@ -195,7 +195,7 @@ Let's see a realistic example. Suppose you're building a logging system and want
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Loggable {
+  starterCode={`interface Loggable {
   message: string;
 }
 
@@ -274,7 +274,7 @@ Let's test your understanding. You'll fix a function so it works with any object
 **Your task:**
 1. Change the parameter type of \`logItem\` from \`LogEntry\` to a more general shape.
 2. The test will pass various objects with extra properties — all should work as long as they have \`level\` and \`message\`.`}
-  initialCode={`interface LogEntry {
+  starterCode={`interface LogEntry {
   level: string;
   message: string;
 }

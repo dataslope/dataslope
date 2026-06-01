@@ -46,7 +46,7 @@ once, solve many times**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.linalg import lu, lu_factor, lu_solve
 import time
 
@@ -82,7 +82,7 @@ Cholesky attempt fails, the matrix is not SPD.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.linalg import cholesky
 
 # Build a covariance-like SPD matrix
@@ -103,7 +103,7 @@ and set $x = L z$ where $z \sim \mathcal\{N\}(0, I)$.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.linalg import cholesky
 
 # Target covariance
@@ -135,7 +135,7 @@ practice — modified Gram–Schmidt is unstable, but Householder QR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Fit a degree-3 polynomial to noisy data using QR
 rng = np.random.default_rng(0)
@@ -174,7 +174,7 @@ The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -211,7 +211,7 @@ low-rank adapters (LoRA).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 # Construct a clean low-rank "image"
@@ -247,7 +247,7 @@ $V e^\{t\Lambda\} V^\{-1\}$.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.linalg import expm
 
 A = np.array([[0.0,  1.0],

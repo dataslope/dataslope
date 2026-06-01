@@ -106,7 +106,7 @@ real clustering situation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -144,7 +144,7 @@ cluster and mark the centers with big stars.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -192,7 +192,7 @@ points hug their centers more closely.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_blobs
+  starterCode={`from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
 X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
@@ -251,7 +251,7 @@ then flattens. That bend is the **elbow**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -317,7 +317,7 @@ page; here is why it is non-negotiable for distance-based methods.)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
@@ -375,7 +375,7 @@ any human eye separates instantly. Watch k-means butcher them.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import make_moons
 from sklearn.cluster import KMeans
 
@@ -503,7 +503,7 @@ X, _ = make_blobs(
     n_samples=[120, 100, 80], centers=None,
     cluster_std=0.8, random_state=0
 )`}
-  initialCode={`# 1. Standardize the features
+  starterCode={`# 1. Standardize the features
 X_scaled = None
 
 # 2. Fit KMeans (n_clusters=3, n_init=10, random_state=0) and get labels

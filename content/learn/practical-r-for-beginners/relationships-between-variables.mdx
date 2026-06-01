@@ -25,7 +25,7 @@ observation, position by (x, y).
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 plot(mtcars$wt, mtcars$mpg,
      pch  = 19,
      col  = "steelblue",
@@ -58,7 +58,7 @@ scale from -1 to +1:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 cor(mtcars$wt, mtcars$mpg)              # very negative
 cor(mtcars$hp, mtcars$qsec)             # somewhat negative
@@ -71,7 +71,7 @@ returns a matrix:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 round(cor(mtcars[, c("mpg","hp","wt","qsec")]), 2)
 `}
 />
@@ -108,7 +108,7 @@ you have *counts of combinations*. `table()` does this in base R:
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # Counts: cylinders × transmission
 table(mtcars$cyl, mtcars$am)
@@ -132,7 +132,7 @@ what you see:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(iris)
 
 # Numbers
@@ -148,7 +148,7 @@ iris |>
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(iris)
+  starterCode={`data(iris)
 
 boxplot(Petal.Length ~ Species, data = iris,
         col  = c("lightblue","lightgreen","lightpink"),
@@ -199,7 +199,7 @@ Y." Don't. The correlation is a *clue*, not a *conclusion*.
 
 <CodeBlock
   adapter="r"
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 # Numerically
 cor(mtcars$disp, mtcars$mpg)   # strongly negative
@@ -268,7 +268,7 @@ For `mtcars`, compute the correlation matrix of just `mpg`,
   adapter="r"
   title="A small correlation matrix"
   instructions={`Build \`cor_mat\` — a 4×4 numeric matrix of correlations among the columns \`mpg\`, \`hp\`, \`wt\`, and \`qsec\`, rounded to 2 decimal places.`}
-  initialCode={`data(mtcars)
+  starterCode={`data(mtcars)
 
 cor_mat <- NULL  # 4x4 rounded correlation matrix
 

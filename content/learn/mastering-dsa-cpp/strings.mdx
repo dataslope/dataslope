@@ -11,7 +11,7 @@ A string owns its characters and tracks its length. Like `std::vector`, indexing
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int main() {
@@ -33,7 +33,7 @@ Characters are values of type `char`. You can iterate by index when you need pos
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int main() {
@@ -60,7 +60,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int main() {
@@ -88,7 +88,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <vector>
 
@@ -111,7 +111,7 @@ A C-string is a null-terminated character array usually represented as `const ch
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <cstring>
+  starterCode={`#include <cstring>
 #include <iostream>
 #include <string>
 
@@ -137,7 +137,7 @@ A pointer returned by `.c_str()` is only valid while the string object is alive 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <string_view>
 
@@ -167,7 +167,7 @@ A simple split helper repeatedly calls `find` and `substr`. This is a useful pat
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <vector>
 
@@ -201,7 +201,7 @@ A two-pointer scan can compare the first and last characters, then move inward.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 bool isPalindrome(const std::string& s) {
@@ -233,7 +233,7 @@ Like `std::vector<char>`, `std::string` can reallocate when it grows. Prefer app
   adapter="cpp"
   title="isPalindrome(const std::string& s)"
   instructions={`Implement \`isPalindrome\` using a two-pointer scan. The driver prints \`true\` or \`false\` for a hardcoded test string.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 bool isPalindrome(const std::string& s) {
@@ -275,7 +275,7 @@ int main() {
   adapter="cpp"
   title="countVowels(const std::string& s)"
   instructions={`Implement \`countVowels\` for lowercase vowels \`a/e/i/o/u\`. The driver prints the count for a hardcoded string.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int countVowels(const std::string& s) {

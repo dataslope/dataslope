@@ -19,7 +19,7 @@ A variable is a name that points to a value. The `=` sign
 
 <CodeBlock
   adapter="python"
-  initialCode={`name = "Aiko"
+  starterCode={`name = "Aiko"
 age = 29
 is_active = True
 
@@ -64,7 +64,7 @@ A few examples:
 
 <CodeBlock
   adapter="python"
-  initialCode={`# A list of column names
+  starterCode={`# A list of column names
 cols = ["name", "salary", "department"]
 
 # A dict mapping old column names to new ones
@@ -88,7 +88,7 @@ messages.
 
 <CodeBlock
   adapter="python"
-  initialCode={`name = "Aiko"
+  starterCode={`name = "Aiko"
 salary = 120000
 rate = 0.075
 
@@ -110,7 +110,7 @@ Pandas filtering is built entirely on boolean comparisons.
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 5
+  starterCode={`x = 5
 
 print(x == 5)   # equal
 print(x != 5)   # not equal
@@ -136,7 +136,7 @@ integers, starting at 0.
 
 <CodeBlock
   adapter="python"
-  initialCode={`names = ["Aiko", "Bilal", "Chen", "Diego"]
+  starterCode={`names = ["Aiko", "Bilal", "Chen", "Diego"]
 
 print(names[0])    # first
 print(names[-1])   # last
@@ -159,7 +159,7 @@ as small lookup tables and for column renames.
 
 <CodeBlock
   adapter="python"
-  initialCode={`exchange = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27}
+  starterCode={`exchange = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27}
 
 print(exchange["EUR"])
 print("JPY" in exchange)
@@ -179,7 +179,7 @@ A function bundles up reusable logic. The classic shape:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def years_until_retirement(age, retire_at=65):
+  starterCode={`def years_until_retirement(age, retire_at=65):
     """Return how many years until retirement."""
     return retire_at - age
 
@@ -217,7 +217,7 @@ column transformations.
 
 <CodeBlock
   adapter="python"
-  initialCode={`square = lambda x: x * x
+  starterCode={`square = lambda x: x * x
 print(square(7))
 
 # Equivalent to:
@@ -239,7 +239,7 @@ Every analytical script starts with imports. The two essentials:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 # The aliases pd and np are universal conventions.
@@ -292,7 +292,7 @@ Use it on:
 - salary 50000, tax rate 0.18
 
 Store the three take-home values in a list called \`results\` in that order.`}
-  initialCode={`def take_home(salary, tax_rate):
+  starterCode={`def take_home(salary, tax_rate):
     # TODO
     pass
 

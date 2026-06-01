@@ -76,7 +76,7 @@ CREATE TABLE orders (
 INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
 INSERT INTO orders (id, customer_id, amount) VALUES
   (101,1,42),(102,1,18),(103,2,99),(104,2,15),(105,2,30);`}
-  initialCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort —
+  starterCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort —
 -- every major idea from the course in one readable query.
 SELECT c.name, COUNT(*) AS order_count, SUM(o.amount) AS total_spent
 FROM customers c

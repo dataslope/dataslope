@@ -33,7 +33,7 @@ These are **illegal states**: combinations that don't make sense in your domain.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// The bad model
+  starterCode={`// The bad model
 type BadUser = {
   id: string;
   name: string;
@@ -83,7 +83,7 @@ The fix is to model the user's **status** as a discriminated union. A user can b
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type UserStatus =
+  starterCode={`type UserStatus =
   | { status: "active"; role: "member" | "admin" }
   | { status: "suspended"; reason: string }
   | { status: "inactive" };
@@ -325,7 +325,7 @@ The `type` discriminant replaces the boolean, and now the compiler knows which f
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type PaymentMethod =
+  starterCode={`type PaymentMethod =
   | { type: "credit-card"; cardNumber: string; cvv: string }
   | { type: "bank-account"; accountNumber: string; routingNumber: string }
   | { type: "paypal"; email: string };
@@ -358,7 +358,7 @@ Sometimes a field can only take a few valid values. Use **literal types** instea
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Priority = "low" | "medium" | "high" | "urgent";
+  starterCode={`type Priority = "low" | "medium" | "high" | "urgent";
 
 type Task = {
   id: string;

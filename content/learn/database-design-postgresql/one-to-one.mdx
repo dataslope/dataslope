@@ -122,7 +122,7 @@ INSERT INTO users (email) VALUES
 
 INSERT INTO user_profiles (user_id, display_name, bio) VALUES
   (1, 'Ada', 'Enjoys careful schema design.');`}
-  initialCode={`SELECT u.email, p.display_name, p.bio
+  starterCode={`SELECT u.email, p.display_name, p.bio
 FROM users u
 LEFT JOIN user_profiles p ON p.user_id = u.id
 ORDER BY u.id;`}

@@ -71,7 +71,7 @@ is.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_blobs
+  starterCode={`from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -98,7 +98,7 @@ clusters. Try several values of `k`, score each, and let the data vote.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -139,7 +139,7 @@ negative points even when the average looks fine.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
@@ -183,7 +183,7 @@ answer.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_moons
+  starterCode={`from sklearn.datasets import make_moons
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -236,7 +236,7 @@ together.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_blobs
+  starterCode={`from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 
@@ -302,7 +302,7 @@ from sklearn.metrics import silhouette_score
 
 X, _ = make_blobs(n_samples=400, centers=5, cluster_std=0.6, random_state=42)
 candidate_ks = list(range(2, 8))`}
-  initialCode={`sil_scores = []
+  starterCode={`sil_scores = []
 
 # TODO: for each k in candidate_ks, fit KMeans and append its silhouette score
 

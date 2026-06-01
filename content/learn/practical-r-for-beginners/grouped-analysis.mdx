@@ -35,7 +35,7 @@ In dplyr, you do it in two lines: `group_by()` + `summarise()`.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Average mpg per number of cylinders
@@ -59,7 +59,7 @@ call:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -83,7 +83,7 @@ Group by more than one column to get all combinations:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -108,7 +108,7 @@ a shortcut: `count()`. These two are equivalent:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Long form
@@ -138,7 +138,7 @@ row.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Add each car's mpg as a fraction of the average mpg for cars with that many cyl
@@ -169,7 +169,7 @@ verb is `slice_max()` (and friends).
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Top 2 most fuel-efficient cars per cylinder count
@@ -192,7 +192,7 @@ summary statistics are the natural question:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(iris)
 
 iris |>
@@ -225,7 +225,7 @@ one main script that computes a monthly summary.
 - \`n_obs\`     (number of rows in that month)
 
 You can use the helper \`mean_na()\` from \`utils.R\`.`}
-  initialCode={null}
+  starterCode={null}
   entryFilename="main.R"
   files={[
     {

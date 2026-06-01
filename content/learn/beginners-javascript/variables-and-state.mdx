@@ -54,7 +54,7 @@ the program easier to reason about.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const PI = 3.14159;
+  starterCode={`const PI = 3.14159;
 // PI = 3.14;  // TypeError: Assignment to constant variable.
 
 let counter = 0;
@@ -87,7 +87,7 @@ Three words that beginners often mix up:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let x;             // declaration only — x is undefined
+  starterCode={`let x;             // declaration only — x is undefined
 console.log(x);    // undefined
 
 x = 5;             // assignment
@@ -119,7 +119,7 @@ readability. Some rules and conventions:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Bad: one-letter names everywhere
+  starterCode={`// Bad: one-letter names everywhere
 const a = 84.5;
 const b = 0.18;
 const c = a + a * b;
@@ -174,7 +174,7 @@ Run the program and confirm:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let x = 5;
+  starterCode={`let x = 5;
 let y = 10;
 let z = x + y;
 x = z;
@@ -193,7 +193,7 @@ those braces. This is called **block scope**.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const outside = "I am global to this script";
+  starterCode={`const outside = "I am global to this script";
 
 if (true) {
   const inside = "I only exist inside the if-block";
@@ -252,7 +252,7 @@ state evolves over the program.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Initial state.
+  starterCode={`// Initial state.
 let userName = "guest";
 let isLoggedIn = false;
 let actionCount = 0;
@@ -302,7 +302,7 @@ After all four steps:
 - \`balance\` should be \`130\`
 - \`deposits\` should be \`80\`
 - \`withdrawals\` should be \`50\``}
-  initialCode={`let balance = 100;
+  starterCode={`let balance = 100;
 let deposits = 0;
 let withdrawals = 0;
 

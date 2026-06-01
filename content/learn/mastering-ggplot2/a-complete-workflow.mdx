@@ -25,7 +25,7 @@ geom* gets us looking immediately:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point()
@@ -41,7 +41,7 @@ Try **color** first, since it keeps everything in one panel:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point() +
@@ -57,7 +57,7 @@ grammar offers **facets** as the next move.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
@@ -90,7 +90,7 @@ labels, a deliberate color scale, and a clean theme:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point(alpha = 0.5) +

@@ -28,7 +28,7 @@ INSERT INTO sales (product, price, qty) VALUES
   ('Latte', 4.50, 3),
   ('Mocha', 5.00, 2),
   ('Tea',   3.00, 5);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   product,
   price,
   qty,
@@ -78,7 +78,7 @@ and `LENGTH` transform it:
 INSERT INTO people (first, last) VALUES
   ('Ada', 'Lovelace'),
   ('Alan', 'Turing');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   first || ' ' || last        AS full_name,
   UPPER(last)                 AS last_upper,
   LENGTH(first)               AS first_length
@@ -109,7 +109,7 @@ on:
 );
 INSERT INTO sales (product, price, qty) VALUES
   ('Latte',4.50,3),('Mocha',5.00,2),('Tea',3.00,5);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   product,
   ROUND(price * qty * 1.08, 2) AS total_with_tax
 FROM sales;`}
@@ -132,7 +132,7 @@ them as well:
 );
 INSERT INTO sales (product, price, qty) VALUES
   ('Latte',4.50,3),('Mocha',5.00,2),('Tea',3.00,5),('Water',1.00,1);`}
-  initialCode={`SELECT product, price * qty AS line_total
+  starterCode={`SELECT product, price * qty AS line_total
 FROM sales
 WHERE price * qty > 10
 ORDER BY price * qty DESC;`}

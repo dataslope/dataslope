@@ -42,7 +42,7 @@ INSERT INTO customers (name, city) VALUES
 INSERT INTO orders (customer_id, amount, placed_on) VALUES
   (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
   (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,NULL,'2024-03-06');`}
-  initialCode={`SELECT name
+  starterCode={`SELECT name
 FROM sqlite_master
 WHERE type = 'table'
 ORDER BY name;`}
@@ -66,7 +66,7 @@ column.
   title="Inspect a table's columns"
   initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
 INSERT INTO orders (customer_id, amount, placed_on) VALUES (1,42.0,'2024-01-03');`}
-  initialCode={`PRAGMA table_info(orders);`}
+  starterCode={`PRAGMA table_info(orders);`}
 />
 
 Each row tells you the column's name, its declared type, whether it
@@ -84,7 +84,7 @@ Numbers and types only tell you so much. Always look at real rows.
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);`}
-  initialCode={`SELECT *
+  starterCode={`SELECT *
 FROM customers
 LIMIT 5;`}
 />
@@ -109,7 +109,7 @@ Now ask quantitative questions. Three are almost always useful:
 INSERT INTO orders (customer_id, amount, placed_on) VALUES
   (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
   (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,55.00,'2024-03-06');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)        AS row_count,
   MIN(amount)     AS smallest,
   MAX(amount)     AS largest,
@@ -129,7 +129,7 @@ categories, or skew:
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),
   ('Mary','Oslo'),('Femi','Lagos'),('Nils',NULL);`}
-  initialCode={`SELECT city, COUNT(*) AS how_many
+  starterCode={`SELECT city, COUNT(*) AS how_many
 FROM customers
 GROUP BY city
 ORDER BY how_many DESC;`}
@@ -146,7 +146,7 @@ missing values. A single query can count the holes:
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),('Nils',NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   COUNT(*)                              AS total_rows,
   COUNT(city)                           AS city_present,
   COUNT(*) - COUNT(city)                AS city_missing

@@ -174,7 +174,7 @@ the program.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -218,7 +218,7 @@ flower, so "prediction" stops being abstract.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -380,7 +380,7 @@ The hidden tests check the split sizes, that \`model\` is fitted, and that
   initCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier`}
-  initialCode={`X, y = load_wine(return_X_y=True)
+  starterCode={`X, y = load_wine(return_X_y=True)
 
 # 1. Split off a test set (25% test, random_state=0)
 X_train, X_test, y_train, y_test = None, None, None, None

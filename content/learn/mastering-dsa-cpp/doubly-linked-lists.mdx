@@ -19,7 +19,7 @@ A singly linked list can move forward only. A doubly linked list can walk backwa
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -46,7 +46,7 @@ This class keeps both `head` and `tail`, so pushing at either end is O(1). It al
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 class DoublyLinkedList {
     struct Node {
@@ -118,7 +118,7 @@ If you already have a pointer to a middle node, a doubly linked list can unlink 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <list>
 
 int main() {
@@ -148,7 +148,7 @@ Almost never as a default. `std::vector` or `std::deque` usually wins because co
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <list>
 
 int main() {
@@ -173,7 +173,7 @@ With `std::list`, erasing through an iterator returns the next iterator, which i
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <list>
 
 int main() {
@@ -201,7 +201,7 @@ A list may advertise O(1) insertion once you have an iterator, but walking to th
   adapter="cpp"
   title="Print a doubly linked list backward"
   instructions={`Walk from \`tail\` to \`head\` using \`prev\` pointers and print each value on its own line.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -264,7 +264,7 @@ int main() {
   adapter="cpp"
   title="Detect a cycle in a singly linked list"
   instructions={`Implement Floyd's slow/fast pointer algorithm in \`hasCycle\`. The driver builds a small cycled list and prints the result.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;

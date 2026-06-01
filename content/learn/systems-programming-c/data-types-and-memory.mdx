@@ -29,7 +29,7 @@ is 4 bytes.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <limits.h>
 #include <float.h>
 
@@ -53,7 +53,7 @@ silently grow a Python `int` can silently *truncate* in C.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <limits.h>
 
 int main(void) {
@@ -95,7 +95,7 @@ fixed-width types from `<stdint.h>`.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
 
@@ -123,7 +123,7 @@ Mixing signed and unsigned values is one of the most popular C bugs.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int s = -1;
@@ -170,7 +170,7 @@ integer through a `char *`:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 
 int main(void) {
@@ -206,7 +206,7 @@ structs.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdalign.h>
 #include <stdint.h>
 
@@ -227,7 +227,7 @@ int main(void) {
   adapter="c"
   title="Count the number of 1 bits in a uint32_t"
   instructions={`Implement \`int popcount(uint32_t x)\` that returns how many bits of \`x\` are set to 1. Do not call any library popcount intrinsic — write the loop yourself. The provided \`main\` calls it for several values and prints the results, one per line.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 
 int popcount(uint32_t x) {
@@ -280,7 +280,7 @@ int main(void) {
   adapter="c"
   title="Print 'little' or 'big'"
   instructions={`Print \`little\` if this machine is little-endian and \`big\` otherwise. Hint: place a known multi-byte integer at a known address and read its first byte through a \`char *\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 
 int main(void) {

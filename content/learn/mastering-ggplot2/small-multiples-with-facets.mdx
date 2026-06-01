@@ -16,7 +16,7 @@ mapping struggle:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Seven classes overlaid by color: busy and hard to compare.
 ggplot(mpg, aes(displ, hwy, color = class)) +
@@ -29,7 +29,7 @@ Now give each class its **own panel** instead:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # One panel per class -> compare like with like, at a glance.
 ggplot(mpg, aes(displ, hwy)) +
@@ -67,7 +67,7 @@ like text. Control the shape with `nrow` or `ncol`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
@@ -83,7 +83,7 @@ This is ideal for crossing two categorical variables:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Rows = drivetrain, columns = number of cylinders.
 ggplot(mpg, aes(displ, hwy)) +
@@ -110,7 +110,7 @@ each panel scale independently:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +

@@ -51,7 +51,7 @@ threshold; `roc_auc_score` returns the area underneath.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -123,7 +123,7 @@ equivalence by brute force.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -161,7 +161,7 @@ genuine model is compared against a deliberately weak one.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -273,7 +273,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 logreg = LogisticRegression(max_iter=5000).fit(X_train, y_train)
 tree = DecisionTreeClassifier(max_depth=2, random_state=0).fit(X_train, y_train)`}
-  initialCode={`auc_logreg = None
+  starterCode={`auc_logreg = None
 auc_tree = None
 better = None
 

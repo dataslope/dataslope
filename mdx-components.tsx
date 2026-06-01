@@ -7,7 +7,7 @@
  * any lesson:
  *
  * ```mdx
- * <CodeBlock adapter="python" initialCode={`print("hello")`} />
+ * <CodeBlock adapter="python" starterCode={`print("hello")`} />
  * ```
  */
 import defaultMdxComponents from "fumadocs-ui/mdx";

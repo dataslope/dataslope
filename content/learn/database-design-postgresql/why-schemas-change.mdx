@@ -209,7 +209,7 @@ INSERT INTO tasks (title, status) VALUES
     ('Draft schema', 'open'),
     ('Review constraints', 'done');
 `}
-  initialCode={`CREATE TABLE projects (
+  starterCode={`CREATE TABLE projects (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );

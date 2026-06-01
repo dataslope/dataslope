@@ -38,7 +38,7 @@ parameter.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A lambda is just a value that happens to be a function
+  starterCode={`// A lambda is just a value that happens to be a function
 const identity = <T,>(x: T): T => x;
 const apply = <A, B>(f: (a: A) => B, a: A): B => f(a);
 
@@ -103,7 +103,7 @@ TypeScript's discriminated unions are a direct descendant.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// ML-style "Maybe a" (an algebraic data type)
+  starterCode={`// ML-style "Maybe a" (an algebraic data type)
 type Maybe<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(a: A): Maybe<A> => ({ kind: "some", value: a });
@@ -234,7 +234,7 @@ historical voices:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// 1. Imperative (1970s-style for loop in modern JS)
+  starterCode={`// 1. Imperative (1970s-style for loop in modern JS)
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 let sum = 0;
@@ -249,7 +249,7 @@ console.log("imperative:", sum);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// 2. Lisp/Scheme-style: recursion over a list
+  starterCode={`// 2. Lisp/Scheme-style: recursion over a list
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 function sumSquaresOfEvens(list: readonly number[]): number {
@@ -265,7 +265,7 @@ console.log("recursive:", sumSquaresOfEvens(xs));
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// 3. ML/Haskell-style: pipelined transformations
+  starterCode={`// 3. ML/Haskell-style: pipelined transformations
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const result = xs

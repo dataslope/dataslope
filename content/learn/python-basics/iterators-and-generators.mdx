@@ -15,7 +15,7 @@ When Python sees `for item in collection:`, it calls `iter(collection)` to get a
 
 <CodeBlock
   adapter="python"
-  initialCode={`xs = [10, 20, 30]
+  starterCode={`xs = [10, 20, 30]
 it = iter(xs)
 
 print(next(it))
@@ -56,7 +56,7 @@ You rarely call `next()` by hand, but understanding it clarifies how generators 
 
 <CodeBlock
   adapter="python"
-  initialCode={`data = ["alpha", "beta", "gamma"]
+  starterCode={`data = ["alpha", "beta", "gamma"]
 it = iter(data)
 
 # Pull one item
@@ -77,7 +77,7 @@ If you need complex state, write your own iterator with `__iter__` and `__next__
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Countdown:
+  starterCode={`class Countdown:
     def __init__(self, start):
         self.current = start
 
@@ -103,7 +103,7 @@ Writing `__iter__` and `__next__` by hand is tedious. A function that uses `yiel
 
 <CodeBlock
   adapter="python"
-  initialCode={`def countdown(n):
+  starterCode={`def countdown(n):
     while n > 0:
         yield n
         n -= 1
@@ -125,7 +125,7 @@ Here's proof that local variables survive across `yield` calls:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def stateful():
+  starterCode={`def stateful():
     count = 0
     while count < 3:
         count += 1
@@ -146,7 +146,7 @@ Generators can run forever. You take as much as you need and stop:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def naturals():
+  starterCode={`def naturals():
     n = 1
     while True:
         yield n
@@ -169,7 +169,7 @@ You've met list comprehensions. A **generator expression** uses `()` instead of 
 
 <CodeBlock
   adapter="python"
-  initialCode={`squares = (x * x for x in range(1_000_000))
+  starterCode={`squares = (x * x for x in range(1_000_000))
 print(sum(squares))
 `}
 />
@@ -180,7 +180,7 @@ When a generator expression is the sole argument to a function, the inner parens
 
 <CodeBlock
   adapter="python"
-  initialCode={`# These are equivalent:
+  starterCode={`# These are equivalent:
 total1 = sum((x*x for x in range(10)))
 total2 = sum(x*x for x in range(10))
 print(total1, total2)
@@ -193,7 +193,7 @@ Generators chain naturally. Each stage processes one item at a time:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def read_lines():
+  starterCode={`def read_lines():
     """Simulate reading lines from a huge file."""
     for line in ["alpha", "  beta  ", "", "gamma", "  ", "delta", "zeta"]:
         yield line
@@ -228,7 +228,7 @@ In production, you might chain generators to process log files too large for RAM
 
 <CodeBlock
   adapter="python"
-  initialCode={`def chain(*iterables):
+  starterCode={`def chain(*iterables):
     for it in iterables:
         yield from it
 
@@ -252,7 +252,7 @@ The `itertools` module is a treasure chest of lazy functions. A small sample:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from itertools import (
+  starterCode={`from itertools import (
     count, cycle, repeat, chain, islice,
     takewhile, accumulate, combinations, product
 )
@@ -291,7 +291,7 @@ Once exhausted, a generator cannot be restarted:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def gen():
+  starterCode={`def gen():
     yield 1
     yield 2
 
@@ -311,7 +311,7 @@ If you need to iterate multiple times, either call the generator function again 
   instructions={`Define a generator function \`take(n, iterable)\` that yields the first \`n\` items from \`iterable\`. If \`iterable\` has fewer than \`n\` items, yield all of them.
 
 Example: \`list(take(3, [1, 2, 3, 4, 5]))\` returns \`[1, 2, 3]\`.`}
-  initialCode={`def take(n, iterable):
+  starterCode={`def take(n, iterable):
     # your code here
     if False:
         yield None
@@ -351,7 +351,7 @@ assert isinstance(take(3, [1, 2, 3]), types.GeneratorType)`,
   adapter="python"
   title="Infinite Fibonacci generator"
   instructions={`Define a generator function \`fib()\` that yields the Fibonacci sequence indefinitely, starting with \`0, 1, 1, 2, 3, 5, 8, ...\`. The tests will take a finite slice.`}
-  initialCode={`def fib():
+  starterCode={`def fib():
     # your code here
     yield 0
 `}
@@ -390,7 +390,7 @@ assert f[20] == 6765`,
   instructions={`Define a generator function \`running_avg(iterable)\` that yields the running average of the items seen so far.
 
 Example: \`list(running_avg([10, 20, 30]))\` returns \`[10.0, 15.0, 20.0]\`.`}
-  initialCode={`def running_avg(iterable):
+  starterCode={`def running_avg(iterable):
     # your code here
     if False:
         yield 0.0
@@ -435,7 +435,7 @@ assert result == expected`,
   instructions={`Define a generator function \`batched(iterable, n)\` that yields tuples of \`n\` consecutive items from \`iterable\`. If the final batch has fewer than \`n\` items, yield it as-is.
 
 Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\`.`}
-  initialCode={`def batched(iterable, n):
+  starterCode={`def batched(iterable, n):
     # your code here
     if False:
         yield ()

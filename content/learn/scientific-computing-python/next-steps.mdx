@@ -51,7 +51,7 @@ vectorization (e.g. a stencil with data-dependent control flow).
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Numba is not bundled with the in-browser Python.
+  starterCode={`# Numba is not bundled with the in-browser Python.
 # This snippet shows the pattern you would use in a local environment.
 
 CODE = """
@@ -103,7 +103,7 @@ batching. Beloved in scientific ML and probabilistic programming.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# JAX example (display only; JAX is not in the in-browser environment).
+  starterCode={`# JAX example (display only; JAX is not in the in-browser environment).
 EXAMPLE = '''
 import jax.numpy as jnp
 from jax import grad, jit, vmap
@@ -170,7 +170,7 @@ system.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import sympy as sp
+  starterCode={`import sympy as sp
 
 x = sp.symbols("x")
 expr = sp.sin(x) * sp.exp(-x**2)

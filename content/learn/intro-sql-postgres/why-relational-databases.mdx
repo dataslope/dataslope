@@ -111,7 +111,7 @@ INSERT INTO orders (id, customer_id, item) VALUES
   (102, 1, 'Boots'),
   (103, 2, 'Umbrella'),
   (104, 3, 'Hat');`}
-  initialCode={`-- Customers from Ohio and what they ordered
+  starterCode={`-- Customers from Ohio and what they ordered
 SELECT c.name, c.state, o.item
 FROM customers c
 JOIN orders o ON o.customer_id = c.id

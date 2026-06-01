@@ -32,7 +32,7 @@ scope, which is one of the reasons we avoid `var`.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const outside = "I am global";
+  starterCode={`const outside = "I am global";
 
 function show() {
   const inside = "I am inside show";
@@ -54,7 +54,7 @@ one-way mirrors.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function example() {
+  starterCode={`function example() {
   const x = "function-scope x";
   if (true) {
     const x = "block-scope x";   // a brand new x, only inside the if
@@ -92,7 +92,7 @@ first match it finds.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const greeting = "Hello";
+  starterCode={`const greeting = "Hello";
 
 function greet(name) {
   if (true) {
@@ -118,7 +118,7 @@ into another.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function counter() {
+  starterCode={`function counter() {
   let n = 0;        // a fresh n every time counter() is called
   n = n + 1;
   return n;
@@ -143,7 +143,7 @@ outer is still there, just hidden inside the inner scope.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let user = "outer";
+  starterCode={`let user = "outer";
 
 function modify() {
   let user = "inner";   // shadows the outer 'user'
@@ -170,7 +170,7 @@ defined.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const country = "Wonderland";
+  starterCode={`const country = "Wonderland";
 
 function describe() {
   console.log("country is", country);
@@ -210,7 +210,7 @@ are used as possible.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Bad style: a global counter modified from anywhere
+  starterCode={`// Bad style: a global counter modified from anywhere
 let count = 0;
 
 function add() { count += 1; }
@@ -249,7 +249,7 @@ with `function`), the important things to remember are:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// This works because of function hoisting:
+  starterCode={`// This works because of function hoisting:
 console.log(square(4));   // 16
 
 function square(n) {
@@ -273,7 +273,7 @@ what each `console.log` will print, given the scope rules above.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const planet = "Earth";
+  starterCode={`const planet = "Earth";
 
 function outer(name) {
   const greeting = "Hello";
@@ -313,7 +313,7 @@ Two things to notice:
   instructions={`The function \`compute\` below has a subtle scope problem: a local variable accidentally shadows another. Without changing the test, modify the function so that the outer \`total\` (declared at the top of the function) is the one updated and returned.
 
 The function should return the sum of \`1 + 2 + 3\` which is \`6\`. As-is, it returns \`0\`.`}
-  initialCode={`function compute() {
+  starterCode={`function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
     let total = i;   // BUG: this declares a NEW total, shadowing the outer one

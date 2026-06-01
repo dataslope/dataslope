@@ -15,7 +15,7 @@ reality.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 struct Point {
     double x;
@@ -42,7 +42,7 @@ Most modern C codebases `typedef` their structs so callers can write
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     double x;
@@ -86,7 +86,7 @@ every `i` aligned).
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 struct Bad {
@@ -125,7 +125,7 @@ code, and any "container of" macro.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 typedef struct {
@@ -150,7 +150,7 @@ Structs compose naturally; the layout rules apply recursively.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     double x, y;
@@ -183,7 +183,7 @@ Big structs are usually passed by pointer so you do not copy them.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -225,7 +225,7 @@ lists, trees, and graphs are built.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
@@ -276,7 +276,7 @@ union's size is the size of its largest member.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 
 union FloatBits {
@@ -302,7 +302,7 @@ union of payloads — is how C encodes sum types like `Result<Ok, Err>`.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef enum { JSON_NULL, JSON_INT, JSON_STR } JsonKind;
 
@@ -345,7 +345,7 @@ byte.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 typedef struct {
     unsigned int read    : 1;   // 1 bit
@@ -380,7 +380,7 @@ unspecified size that lets you allocate the struct and its data in
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -418,7 +418,7 @@ where `data` is its own allocation.
   adapter="c"
   title="Pack and unpack a pixel"
   instructions={`Implement \`uint32_t pack_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)\` so the bytes are laid out with \`r\` in the *highest* byte and \`a\` in the *lowest* byte. The provided \`main\` prints the result in hex; \`pack_rgba(0xAA, 0xBB, 0xCC, 0xDD)\` must print \`AABBCCDD\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdint.h>
 
 uint32_t pack_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -460,7 +460,7 @@ int main(void) {
   adapter="c"
   title="Length of a singly linked list"
   instructions={`Implement \`size_t list_length(const Node *head)\` that returns the number of nodes in the list. The provided \`main\` builds a 5-node list and prints the length on one line. Do not free the list — \`main\` handles that.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {

@@ -25,7 +25,7 @@ The word "class" comes from **classification** — the practice of grouping thin
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Dog:
+  starterCode={`class Dog:
     """A very simple dog."""
     pass
 
@@ -44,7 +44,7 @@ print(isinstance(d, Dog))
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Dog:
+  starterCode={`class Dog:
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -82,7 +82,7 @@ An **instance attribute** belongs to a single object. A **class attribute** is s
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Dog:
+  starterCode={`class Dog:
     species = "Canis familiaris"   # class attribute
 
     def __init__(self, name):
@@ -131,7 +131,7 @@ A **method** is a function defined inside a class. The first parameter is always
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Dog:
+  starterCode={`class Dog:
     def __init__(self, name):
         self.name = name
 
@@ -147,7 +147,7 @@ When you write `d.bark()`, Python translates it to `Dog.bark(d)` — the instanc
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Counter:
+  starterCode={`class Counter:
     def __init__(self, start=0):
         self.value = start
 
@@ -169,7 +169,7 @@ Sometimes you want a method that operates on the **class** itself, or a utility 
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Temperature:
+  starterCode={`class Temperature:
     def __init__(self, celsius):
         self.celsius = celsius
 
@@ -202,7 +202,7 @@ Use `@property` to define a method that looks like an attribute.
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Circle:
+  starterCode={`class Circle:
     def __init__(self, radius):
         self.radius = radius
 
@@ -239,7 +239,7 @@ Methods with double underscores ("dunder") define how instances interact with Py
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Money:
+  starterCode={`class Money:
     def __init__(self, amount, currency="USD"):
         self.amount = amount
         self.currency = currency
@@ -286,7 +286,7 @@ Writing `__init__`, `__repr__`, and `__eq__` for every data-holding class is ted
 
 <CodeBlock
   adapter="python"
-  initialCode={`from dataclasses import dataclass
+  starterCode={`from dataclasses import dataclass
 
 @dataclass
 class Point:
@@ -309,7 +309,7 @@ print(p.x, p.y)
 
 <CodeBlock
   adapter="python"
-  initialCode={`from dataclasses import dataclass
+  starterCode={`from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Point:
@@ -609,7 +609,7 @@ assert "3.0" in repr(p)`,
 - An \`__init__(self, start=0)\` constructor that stores the starting value in \`self.value\`.
 - A method \`increment(step=1)\` that adds \`step\` to \`self.value\` and returns the new value.
 - A method \`reset()\` that sets \`self.value\` back to 0.`}
-  initialCode={`class Counter:
+  starterCode={`class Counter:
     pass
 `}
   solutionCode={`class Counter:

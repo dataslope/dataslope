@@ -19,7 +19,7 @@ Makes all properties of `T` optional.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; email: string };
+  starterCode={`type User = { id: number; name: string; email: string };
 
 type PartialUser = Partial<User>;
 
@@ -33,7 +33,7 @@ console.log(u1, u2);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; email: string };
+  starterCode={`type User = { id: number; name: string; email: string };
 
 function updateUser(id: number, changes: Partial<User>): User {
   // In real code, merge with existing user from database
@@ -59,7 +59,7 @@ Makes all properties of `T` required (removes optionality).
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id?: number; name?: string };
+  starterCode={`type User = { id?: number; name?: string };
 
 type RequiredUser = Required<User>;
 
@@ -84,7 +84,7 @@ Makes all properties of `T` readonly.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 type ReadonlyUser = Readonly<User>;
 
@@ -110,7 +110,7 @@ Constructs a type by picking a set of properties `K` from `T`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; email: string; age: number };
+  starterCode={`type User = { id: number; name: string; email: string; age: number };
 
 type UserPreview = Pick<User, "id" | "name">;
 
@@ -135,7 +135,7 @@ Constructs a type by omitting a set of properties `K` from `T`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; email: string; password: string };
+  starterCode={`type User = { id: number; name: string; email: string; password: string };
 
 type PublicUser = Omit<User, "password">;
 
@@ -160,7 +160,7 @@ Constructs an object type with keys `K` and values of type `T`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Role = "admin" | "user" | "guest";
+  starterCode={`type Role = "admin" | "user" | "guest";
 
 type Permissions = Record<Role, string[]>;
 
@@ -193,7 +193,7 @@ Removes types from `UnionType` that are assignable to `ExcludedMembers`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type All = "a" | "b" | "c" | "d";
+  starterCode={`type All = "a" | "b" | "c" | "d";
 
 type Result = Exclude<All, "a" | "c">;
 
@@ -220,7 +220,7 @@ Extracts from `UnionType` those types that are assignable to `Union`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type All = "a" | "b" | "c" | 1 | 2;
+  starterCode={`type All = "a" | "b" | "c" | 1 | 2;
 
 type Strings = Extract<All, string>;
 
@@ -247,7 +247,7 @@ Removes `null` and `undefined` from `T`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type MaybeString = string | null | undefined;
+  starterCode={`type MaybeString = string | null | undefined;
 
 type DefiniteString = NonNullable<MaybeString>;
 
@@ -277,7 +277,7 @@ Extracts the return type of a function type `T`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function greet(name: string): string {
+  starterCode={`function greet(name: string): string {
   return \`Hello, \${name}!\`;
 }
 
@@ -304,7 +304,7 @@ Extracts the parameter types of a function type `T` as a tuple.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function add(a: number, b: number): number {
+  starterCode={`function add(a: number, b: number): number {
   return a + b;
 }
 
@@ -331,7 +331,7 @@ Extracts the parameter types of a constructor function type.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`class User {
+  starterCode={`class User {
   constructor(public id: number, public name: string) {}
 }
 
@@ -358,7 +358,7 @@ Extracts the instance type of a constructor function type.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`class User {
+  starterCode={`class User {
   constructor(public id: number, public name: string) {}
 }
 
@@ -385,7 +385,7 @@ Extracts the type of the `this` parameter from a function type (or `unknown` if 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function greet(this: { name: string }, message: string): string {
+  starterCode={`function greet(this: { name: string }, message: string): string {
   return \`\${message}, \${this.name}!\`;
 }
 
@@ -414,7 +414,7 @@ Recursively unwraps a `Promise` (or nested promises) to get the final resolved t
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Nested = Promise<Promise<string>>;
+  starterCode={`type Nested = Promise<Promise<string>>;
 
 type Unwrapped = Awaited<Nested>;
 
@@ -439,7 +439,7 @@ Let's combine several utilities to build a type-safe API response handler:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string; email: string; password: string };
+  starterCode={`type User = { id: number; name: string; email: string; password: string };
 
 // 1. Omit sensitive fields
 type PublicUser = Omit<User, "password">;
@@ -474,7 +474,7 @@ console.log(directory);
 **Hint**: Map over \`K\` (not \`keyof T\`) and use indexed access \`T[P]\` to get each property's type.`}
   initCode={`type MyPick<T, K extends keyof T> = any; // Replace 'any'
 `}
-  initialCode={`type MyPick<T, K extends keyof T> = any;
+  starterCode={`type MyPick<T, K extends keyof T> = any;
 
 type User = { id: number; name: string; email: string };
 type UserPreview = MyPick<User, "id" | "name">;
@@ -515,7 +515,7 @@ if (p.id !== 1 || p.name !== "Alice") throw new Error("Pick failed");`,
 **Hint**: Use a distributive conditional type that returns \`never\` for excluded members.`}
   initCode={`type MyExclude<T, U> = any; // Replace 'any'
 `}
-  initialCode={`type MyExclude<T, U> = any;
+  starterCode={`type MyExclude<T, U> = any;
 
 type All = "a" | "b" | "c";
 type Result = MyExclude<All, "a" | "c">;

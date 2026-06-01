@@ -22,7 +22,7 @@ exist on *all* members:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function print(value: string | number): void {
+  starterCode={`function print(value: string | number): void {
   // console.log(value.length);  // ❌ Property 'length' does not exist on type 'number'
   console.log("value:", value);
 }
@@ -42,7 +42,7 @@ recognizes `typeof` checks and narrows the type accordingly:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function print(value: string | number): void {
+  starterCode={`function print(value: string | number): void {
   if (typeof value === "string") {
     // In this branch, value is narrowed to string
     console.log("String length:", value.length);
@@ -66,7 +66,7 @@ assertion.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function describe(value: string | number | boolean | undefined): string {
+  starterCode={`function describe(value: string | number | boolean | undefined): string {
   if (typeof value === "string") {
     return \`String: "\${value}"\`;
   } else if (typeof value === "number") {
@@ -95,7 +95,7 @@ class. TypeScript narrows based on `instanceof`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`class Dog {
+  starterCode={`class Dog {
   bark() { console.log("Woof!"); }
 }
 
@@ -127,7 +127,7 @@ narrows the type:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function process(value: string | null): void {
+  starterCode={`function process(value: string | null): void {
   if (value === null) {
     console.log("Value is null");
   } else {
@@ -148,7 +148,7 @@ You can also compare against literal types:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Direction = "north" | "south" | "east" | "west";
+  starterCode={`type Direction = "north" | "south" | "east" | "west";
 
 function turn(direction: Direction): void {
   if (direction === "north") {
@@ -173,7 +173,7 @@ uses this to narrow object unions:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Circle = { kind: "circle"; radius: number };
+  starterCode={`type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Shape = Circle | Rectangle;
 
@@ -205,7 +205,7 @@ truthy or falsy:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function printLength(value: string | null | undefined): void {
+  starterCode={`function printLength(value: string | null | undefined): void {
   if (value) {
     // value is truthy, so it's narrowed to string (null and undefined are falsy)
     console.log("Length:", value.length);
@@ -235,7 +235,7 @@ The `switch` statement also triggers narrowing:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result = 
+  starterCode={`type Result = 
   | { status: "success"; data: string }
   | { status: "failure"; error: string }
   | { status: "pending" };
@@ -291,7 +291,7 @@ Sometimes the compiler can't infer narrowing on its own. You can define a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function isString(value: unknown): value is string {
+  starterCode={`function isString(value: unknown): value is string {
   return typeof value === "string";
 }
 
@@ -318,7 +318,7 @@ Another example with custom objects:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Dog {
+  starterCode={`interface Dog {
   breed: string;
   bark(): void;
 }
@@ -360,7 +360,7 @@ if a condition is false, and *assert* the type if they return:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function assertIsString(value: unknown): asserts value is string {
+  starterCode={`function assertIsString(value: unknown): asserts value is string {
   if (typeof value !== "string") {
     throw new Error(\`Expected string, got \${typeof value}\`);
   }
@@ -391,7 +391,7 @@ Assertion functions are useful for validation logic:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function assertNonNull<T>(value: T | null | undefined): asserts value is T {
+  starterCode={`function assertNonNull<T>(value: T | null | undefined): asserts value is T {
   if (value === null || value === undefined) {
     throw new Error("Value is null or undefined");
   }
@@ -420,7 +420,7 @@ predicates:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const mixed: (string | number)[] = [1, "two", 3, "four"];
+  starterCode={`const mixed: (string | number)[] = [1, "two", 3, "four"];
 
 // Filter to only strings
 const strings = mixed.filter((x): x is string => typeof x === "string");
@@ -445,7 +445,7 @@ area using narrowing.
   adapter="typescript"
   title="Shape Area with Type Guards"
   instructions={`Define a discriminated union \`Shape = Circle | Rectangle | Triangle\` where \`Circle = { kind: "circle"; radius: number }\`, \`Rectangle = { kind: "rectangle"; width: number; height: number }\`, and \`Triangle = { kind: "triangle"; base: number; height: number }\`. Implement \`area(shape: Shape): number\` that computes the area (circle: π·r², rectangle: w·h, triangle: ½·b·h). Use a \`switch\` statement with exhaustiveness checking.`}
-  initialCode={`type Circle = { kind: "circle"; radius: number };
+  starterCode={`type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Triangle = { kind: "triangle"; base: number; height: number };
 type Shape = Circle | Rectangle | Triangle;

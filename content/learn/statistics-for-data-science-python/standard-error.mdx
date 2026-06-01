@@ -72,7 +72,7 @@ it's been divided by √n.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -122,7 +122,7 @@ the spread you'd see if you actually could draw many samples.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -189,7 +189,7 @@ The curve drops steeply at first, then flattens into a long, slow crawl.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 # Fix the data's spread; vary how many observations we collect.
@@ -265,7 +265,7 @@ natural ruler for measuring how far an estimate can stray.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -315,7 +315,7 @@ The \`ratio\` should equal $\\sqrt{n}$ (since SE = SD / $\\sqrt{n}$). All three 
 rng = np.random.default_rng(314)
 
 sample = rng.normal(loc=500, scale=40, size=250)`}
-  initialCode={`# TODO: compute sd (ddof=1), se = sd/sqrt(n), and ratio = sd/se.
+  starterCode={`# TODO: compute sd (ddof=1), se = sd/sqrt(n), and ratio = sd/se.
 out = {
     "sd": None,
     "se": None,
@@ -387,7 +387,7 @@ Hint: solving $\\sigma/\\sqrt{n} \\le \\text{target}$ gives $n \\ge (\\sigma/\\t
 import math
 n_current = 600
 sigma = 18.0`}
-  initialCode={`# TODO: build the 'plan' dict (halve the SE; find the needed n).
+  starterCode={`# TODO: build the 'plan' dict (halve the SE; find the needed n).
 plan = {
     "se_current": None,
     "se_target": None,

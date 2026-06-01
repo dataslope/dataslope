@@ -20,7 +20,7 @@ C++ is compiled ahead of time to machine code. There is no interpreter in the ho
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 #include <numeric>
 
@@ -56,7 +56,7 @@ The **Standard Template Library (STL)** gives you production-quality containers 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -90,7 +90,7 @@ That is why a vector can beat a list even when both have O(n) traversal: Big-O d
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -115,7 +115,7 @@ Templates let you write algorithms once and let the compiler generate type-speci
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 template <typename T>
@@ -137,7 +137,7 @@ Here is a tiny program that builds a vector, sorts it with `std::sort`, prints t
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <vector>
@@ -197,7 +197,7 @@ Expected output:
 \`\`\`
 55 61 72 88 90
 \`\`\``}
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -235,7 +235,7 @@ int main() {
   adapter="cpp"
   title="Find the most urgent task"
   instructions={`Use a \`std::priority_queue<int>\` to print the largest task priority from the vector. Print exactly \`top priority: 9\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 

@@ -24,7 +24,7 @@ NaN/NaT.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 s = pd.Series([1.0, np.nan, 3.0, None, 5.0])
@@ -41,7 +41,7 @@ The basics:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
@@ -91,7 +91,7 @@ The remediation differs for each.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
@@ -126,7 +126,7 @@ analysis and may be noise.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
@@ -148,7 +148,7 @@ Fill in a plausible value. The simplest options:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 s = pd.Series([10, 20, np.nan, 40, np.nan])
@@ -198,7 +198,7 @@ downstream code to handle them.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
@@ -221,7 +221,7 @@ A real-world cleaning step often mixes:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
@@ -296,7 +296,7 @@ df = pd.DataFrame({
     "age":         [25, 30, 35, 40, 45],
     "city":        ["NY", "LA", "unknown", "SF", "NY"],
 })`}
-  initialCode={`print("Any NaN remaining?", df.isna().any().any())
+  starterCode={`print("Any NaN remaining?", df.isna().any().any())
 print()
 print("Per-column counts:")
 print(df.isna().sum())

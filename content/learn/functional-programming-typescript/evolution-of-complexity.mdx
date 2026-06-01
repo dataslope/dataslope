@@ -62,7 +62,7 @@ Consider the simplest possible mutable program:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let count = 0;
+  starterCode={`let count = 0;
 
 function increment(): void {
   count = count + 1;
@@ -112,7 +112,7 @@ have *costs*:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A function that depends on hidden state and time
+  starterCode={`// A function that depends on hidden state and time
 let lastId = 0;
 function nextId(): string {
   lastId = lastId + 1;
@@ -134,7 +134,7 @@ Compare with a pure version:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function nextId(previous: number, nowMs: number): { id: string; next: number } {
+  starterCode={`function nextId(previous: number, nowMs: number): { id: string; next: number } {
   const n = previous + 1;
   return { id: \`id-\${n}-\${nowMs}\`, next: n };
 }

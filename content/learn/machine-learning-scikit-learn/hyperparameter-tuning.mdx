@@ -67,7 +67,7 @@ dataset and watch the cross-validated accuracy move.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
@@ -222,7 +222,7 @@ hyperparameter, wrapped around a small model, judged by cross-validation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
@@ -280,7 +280,7 @@ test set. We evaluate `best_estimator_` on it exactly once.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
@@ -328,7 +328,7 @@ underscores, then the **parameter name**, like `model__C`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -507,7 +507,7 @@ X, y = load_wine(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )`}
-  initialCode={`# 1. Build the parameter grid (try max_depth 2, 3, 4)
+  starterCode={`# 1. Build the parameter grid (try max_depth 2, 3, 4)
 param_grid = None
 
 # 2. Create and fit GridSearchCV on the TRAINING data only

@@ -25,7 +25,7 @@ modeling function expects tidy input. Getting your data tidy is
 
 <CodeBlock
   adapter="r"
-  initialCode={`tidy <- data.frame(
+  starterCode={`tidy <- data.frame(
   city        = c("NYC", "NYC", "LA", "LA"),
   year        = c(2022, 2023, 2022, 2023),
   population  = c(8.3, 8.4, 3.9, 3.9)
@@ -44,7 +44,7 @@ Here is the same data, but **wide** — years spread across columns:
 
 <CodeBlock
   adapter="r"
-  initialCode={`wide <- data.frame(
+  starterCode={`wide <- data.frame(
   city  = c("NYC", "LA"),
   y2022 = c(8.3, 3.9),
   y2023 = c(8.4, 3.9)
@@ -102,7 +102,7 @@ written two ways:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Tidy data
+  starterCode={`# Tidy data
 tidy <- data.frame(
   city = c("NYC","NYC","LA","LA"),
   year = c(2022,2023,2022,2023),
@@ -116,7 +116,7 @@ aggregate(pop ~ city, data = tidy, FUN = mean)
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Wide data
+  starterCode={`# Wide data
 wide <- data.frame(
   city  = c("NYC", "LA"),
   y2022 = c(8.3, 3.9),
@@ -250,7 +250,7 @@ b <- data.frame(
   sales   = c(120, 150, 170, 200, 230, 210)
 )
 `}
-  initialCode={`# Two data frames are available: a (wide) and b (tidy?)
+  starterCode={`# Two data frames are available: a (wide) and b (tidy?)
 print(a)
 print(b)
 

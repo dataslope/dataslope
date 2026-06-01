@@ -12,7 +12,7 @@ Sort by a single column:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -37,7 +37,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
 })`}
-  initialCode={`# By department ascending, then by salary descending within department
+  starterCode={`# By department ascending, then by salary descending within department
 print(df.sort_values(["dept", "salary"], ascending=[True, False]))
 `}
 />
@@ -55,7 +55,7 @@ Sort by the index instead of a column:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen","Aiko","Bilal"])
 print(df.sort_index())
@@ -73,7 +73,7 @@ to "sort by A, breaking ties by B":
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "team": ["A","A","B","B"],
@@ -101,7 +101,7 @@ direct and slightly faster.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -123,7 +123,7 @@ You can change this:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"x": [3, 1, np.nan, 2, np.nan, 4]})
@@ -143,7 +143,7 @@ representing its position in the sort, leaving row order alone.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -166,7 +166,7 @@ are broken:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series([100, 80, 100, 60, 80])
 
@@ -182,7 +182,7 @@ the top 3 earners?"* That is a sort + group + head problem.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"

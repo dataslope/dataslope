@@ -104,7 +104,7 @@ geometry.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 employees = pd.DataFrame({
     "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -133,7 +133,7 @@ employees = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 })`}
-  initialCode={`# Filter: rows where the department attribute equals "Eng"
+  starterCode={`# Filter: rows where the department attribute equals "Eng"
 eng = employees[employees["department"] == "Eng"]
 print("Engineers:")
 print(eng)
@@ -223,7 +223,7 @@ columns-as-attributes idea.
 - \`passed_math\` — a boolean
 
 You can pick any names, grades, GPAs, and pass/fail values.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 students = None  # TODO: replace with a real DataFrame
 

@@ -25,7 +25,7 @@ For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -53,7 +53,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -83,7 +83,7 @@ Remove the root by moving the last value to index 0, then swapping down with the
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -127,7 +127,7 @@ for i from parent(last_index) down to 0:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -173,7 +173,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -212,7 +212,7 @@ The standard priority queue is a max-heap by default. Use `std::greater<int>` to
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <functional>
+  starterCode={`#include <functional>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -240,7 +240,7 @@ Heaps appear whenever you need the next best item quickly.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <functional>
+  starterCode={`#include <functional>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -269,7 +269,7 @@ A heap only guarantees that the top element has highest priority. Siblings and c
   adapter="cpp"
   title="Kth largest element"
   instructions={`Implement \`int kthLargest(std::vector<int> nums, int k)\` using a min-heap of size \`k\`.`}
-  initialCode={`#include <functional>
+  starterCode={`#include <functional>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -312,7 +312,7 @@ int main() {
   adapter="cpp"
   title="Merge K sorted lists"
   instructions={`Merge K sorted vectors into one sorted vector. The driver prints one merged value per line.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <tuple>
 #include <vector>
@@ -366,7 +366,7 @@ int main() {
   adapter="cpp"
   title="Last stone weight"
   instructions={`Repeatedly take the two largest stones. If they differ, push their difference back. Return the final stone weight or 0.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 

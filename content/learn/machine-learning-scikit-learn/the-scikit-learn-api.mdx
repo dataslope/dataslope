@@ -73,7 +73,7 @@ yet from the outside they are nearly indistinguishable.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_regression, load_iris, make_blobs
+  starterCode={`from sklearn.datasets import make_regression, load_iris, make_blobs
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
@@ -147,7 +147,7 @@ and unit variance — and confirm it exposes `transform`, not `predict`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.preprocessing import StandardScaler
+  starterCode={`from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import load_iris
 
@@ -195,7 +195,7 @@ perfect).
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -233,7 +233,7 @@ classes sum to 1 for each row.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_iris
+  starterCode={`from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 
 data = load_iris()
@@ -274,7 +274,7 @@ same model, all with the standard methods.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -375,7 +375,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
 )
 model = KNeighborsClassifier(n_neighbors=5)`}
-  initialCode={`# 'model' and the train/test split are provided above.
+  starterCode={`# 'model' and the train/test split are provided above.
 
 # 1. Train the model
 # (call .fit on the training data)

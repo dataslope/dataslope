@@ -39,7 +39,7 @@ For lowercase English letters, `std::array<TrieNode*, 26>` is compact and fast. 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <array>
+  starterCode={`#include <array>
 #include <iostream>
 
 struct TrieNode {
@@ -64,7 +64,7 @@ This version is easy to read and works for any character.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -129,7 +129,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -159,7 +159,7 @@ Exact search requires the final node to have `isWord = true`. Prefix search only
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -194,7 +194,7 @@ Once you walk to a prefix node, collect all words below that node.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -231,7 +231,7 @@ Tries are useful for autocomplete, spellcheck, IP routing, longest-prefix matchi
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <vector>
 
@@ -249,7 +249,7 @@ int main() {
   adapter="cpp"
   title="Implement a Trie"
   instructions={`Complete the \`Trie\` class with \`insert\`, \`search\`, and \`startsWith\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -352,7 +352,7 @@ int main() {
   adapter="cpp"
   title="Count words starting with prefix"
   instructions={`Build a trie from the words and return how many inserted words start with the given prefix.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -416,7 +416,7 @@ int main() {
   adapter="cpp"
   title="Longest common prefix"
   instructions={`Build a trie and walk while there is exactly one child and the current node is not the end of a word.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>

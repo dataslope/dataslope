@@ -49,7 +49,7 @@ rectangles.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A collection of widths and a collection of heights
+  starterCode={`# A collection of widths and a collection of heights
 widths  <- c(5, 7, 2)
 heights <- c(4, 3, 8)
 
@@ -84,7 +84,7 @@ just the input does:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# 1,000 random widths and heights, all between 1 and 10
+  starterCode={`# 1,000 random widths and heights, all between 1 and 10
 set.seed(42)
 widths  <- runif(1000, 1, 10)
 heights <- runif(1000, 1, 10)
@@ -199,7 +199,7 @@ which months did sales beat the annual average?
 
 <CodeBlock
   adapter="r"
-  initialCode={`# 12 monthly sales numbers (in thousands of dollars)
+  starterCode={`# 12 monthly sales numbers (in thousands of dollars)
 months <- c("Jan","Feb","Mar","Apr","May","Jun",
             "Jul","Aug","Sep","Oct","Nov","Dec")
 sales  <- c(120, 132, 101, 134, 90, 110,
@@ -299,7 +299,7 @@ vectorized expression.
   title="Convert Fahrenheit to Celsius (vectorized)"
   instructions={`Given the vector \`temps_f\` (already loaded), create a vector \`temps_c\` of the same length, where each element is the Celsius equivalent of the corresponding Fahrenheit value. Use a single vectorized expression — no loops, no \`sapply\`.`}
   initCode={`temps_f <- c(32, 50, 68, 86, 104, 212)`}
-  initialCode={`temps_c <- NA  # TODO: vectorized expression
+  starterCode={`temps_c <- NA  # TODO: vectorized expression
 
 print(round(temps_c, 2))
 `}

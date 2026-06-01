@@ -98,7 +98,7 @@ combines both groups' spread.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -153,7 +153,7 @@ negligible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -220,7 +220,7 @@ to the p-value versus the estimated `d` as `n` grows.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(123)
@@ -269,7 +269,7 @@ correlation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(5)
@@ -310,7 +310,7 @@ different stories.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # A/B test on a checkout button. Counts of conversions out of visitors.
 conv_control,   n_control   = 90,  3000   # control arm
@@ -358,7 +358,7 @@ That interval does triple duty:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(11)
@@ -418,7 +418,7 @@ Use the **pooled standard deviation** with sample variances (\`ddof=1\`):
 rng = np.random.default_rng(99)
 before = rng.normal(50, 8, size=150)
 after  = rng.normal(55, 8, size=150)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # TODO: compute Cohen's d (after - before) into a float called d
 d = None
@@ -478,7 +478,7 @@ rng = np.random.default_rng(2024)
 n = 80_000
 a = rng.normal(100.00, 15, size=n)
 b = rng.normal(100.12, 15, size=n)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # TODO: compute p (from ttest_ind) and d (Cohen's d for b - a)

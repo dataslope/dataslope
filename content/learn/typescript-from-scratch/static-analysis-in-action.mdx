@@ -26,7 +26,7 @@ These proofs eliminate entire classes of bugs. Let's see them in action.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 function greet(user: User): string {
   return \`Hello, \${user.name}!\`;
@@ -52,7 +52,7 @@ With `strictNullChecks` enabled (part of `strict` mode), the compiler forces you
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function getLength(s: string | null): number {
+  starterCode={`function getLength(s: string | null): number {
   // return s.length; // Error: s is possibly null
   if (s === null) {
     return 0;
@@ -75,7 +75,7 @@ When you have a discriminated union and switch on the discriminant, the compiler
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Shape =
+  starterCode={`type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number };
 
@@ -132,7 +132,7 @@ Let's see a refactor in action:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; fullName: string };
+  starterCode={`type User = { id: number; fullName: string };
 
 function greet(user: User): string {
   return \`Hello, \${user.fullName}!\`;
@@ -205,7 +205,7 @@ Let's refactor a function signature and see how the compiler guides us:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 // Original signature
 function getUser(id: number): User {
@@ -223,7 +223,7 @@ Now suppose we change the signature to accept an options object instead of a bar
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: number; name: string };
+  starterCode={`type User = { id: number; name: string };
 
 // New signature
 function getUser(options: { id: number; includeEmail?: boolean }): User {
@@ -250,7 +250,7 @@ The `never` type helps detect unreachable code. If a branch is provably unreacha
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function processValue(value: number): string {
+  starterCode={`function processValue(value: number): string {
   if (value > 0) {
     return "positive";
   } else if (value < 0) {
@@ -285,7 +285,7 @@ function processPayment(payment: Payment): string {
   return "Not implemented";
 }
 `}
-  initialCode={`type Payment = any;
+  starterCode={`type Payment = any;
 
 function processPayment(payment: Payment): string {
   return "Not implemented";

@@ -40,7 +40,7 @@ box.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 // PURE: depends only on x and y, returns a value, touches nothing else.
@@ -89,7 +89,7 @@ f(input))`. There's no setup, no mocking, no teardown.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 static int Add(int x, int y) => x + y;
 
@@ -121,7 +121,7 @@ remember it. This is called **memoization**.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static Func<TArg, TRes> Memoize<TArg, TRes>(Func<TArg, TRes> f) where TArg : notnull

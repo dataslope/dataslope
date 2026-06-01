@@ -29,7 +29,7 @@ Each part is added with `+`.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -52,7 +52,7 @@ Try different geoms on the same data:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg))
@@ -91,7 +91,7 @@ This is the single most common confusion for ggplot beginners.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 # MAPPING color to a column (cyl): one color per unique value of cyl
@@ -120,7 +120,7 @@ variable. ggplot makes this trivial with `facet_wrap()` and
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
@@ -141,7 +141,7 @@ group-level differences.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -166,7 +166,7 @@ A bar chart with counts (categorical x):
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = factor(cyl))) +
@@ -179,7 +179,7 @@ A grouped boxplot (numeric y by categorical x):
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +
@@ -193,7 +193,7 @@ A line chart over time:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(airquality)
 
 ggplot(airquality, aes(x = Day, y = Temp)) +
@@ -215,7 +215,7 @@ also ships with several full themes:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -287,7 +287,7 @@ title and axis labels.
 - have a title and meaningful axis labels (use \`labs()\`)
 
 Then print(p) to render it.`}
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(iris)
 
 p <- NULL   # build the plot

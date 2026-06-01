@@ -88,7 +88,7 @@ We will generate a cloud of points with `make_regression`, fit a
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
@@ -139,7 +139,7 @@ language.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import make_regression
+  starterCode={`from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
 
 X, y = make_regression(n_samples=100, n_features=1, noise=12, random_state=1)
@@ -190,7 +190,7 @@ identical.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_diabetes
+  starterCode={`from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -237,7 +237,7 @@ overall quality.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_diabetes
+  starterCode={`from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -330,7 +330,7 @@ is actually curved, and you can see the line systematically miss.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
@@ -432,7 +432,7 @@ expected strong positive value, and that \`pred_at_1_5\` matches the line's
 own formula \`intercept + slope * 1.5\`.`}
   initCode={`from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression`}
-  initialCode={`# 1. Generate the data
+  starterCode={`# 1. Generate the data
 X, y = None, None
 
 # 2. Create and fit the model

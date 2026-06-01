@@ -36,7 +36,7 @@ Because BFS visits by increasing number of edges, it finds shortest paths in **u
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -87,7 +87,7 @@ DFS(u):
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 void dfsRecursive(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
@@ -112,7 +112,7 @@ The iterative version uses a stack. Push neighbors in reverse order if you want 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <stack>
 #include <vector>
 
@@ -167,7 +167,7 @@ To count connected components in an undirected graph, start a BFS or DFS from ev
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -210,7 +210,7 @@ For an undirected graph, DFS tracks the parent. Seeing a visited neighbor that i
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 bool dfsCycleUndirected(int u, int parent, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
@@ -238,7 +238,7 @@ For a directed graph, use colors: white = unvisited, gray = currently in recursi
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 bool hasDirectedCycleFrom(int u, const std::vector<std::vector<int>>& adj, std::vector<int>& color) {
@@ -266,7 +266,7 @@ A topological ordering places every directed edge `u -> v` with `u` before `v`. 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -299,7 +299,7 @@ BFS can also record distance and parent arrays.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -346,7 +346,7 @@ A number-of-islands solution starts BFS from every unvisited land cell and marks
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>
@@ -395,7 +395,7 @@ int main() {
   adapter="cpp"
   title="BFS from source"
   instructions={`Implement \`bfsOrder\` to return the BFS visit order starting at \`src\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -465,7 +465,7 @@ int main() {
   adapter="cpp"
   title="Number of connected components"
   instructions={`Implement \`countComponents\` by starting a traversal from every unvisited vertex.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -534,7 +534,7 @@ int main() {
   adapter="cpp"
   title="Number of islands"
   instructions={`Implement \`numIslands\`. Mutating the grid to mark visited land is allowed.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>

@@ -20,7 +20,7 @@ single most useful pair of patterns in this entire course.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> =
+  starterCode={`type Option<A> =
   | { kind: "none" }
   | { kind: "some"; value: A };
 
@@ -54,7 +54,7 @@ once, and from then on you transform `Option` values directly.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -95,7 +95,7 @@ might or might not be there" without a single `if`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 const flatMap = <A, B>(o: Option<A>, f: (a: A) => Option<B>): Option<B> =>
@@ -140,7 +140,7 @@ not just its absence.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> =
+  starterCode={`type Result<E, A> =
   | { kind: "ok";  value: A }
   | { kind: "err"; error: E };
 
@@ -174,7 +174,7 @@ Same three operators, with error-handling versions:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
@@ -254,7 +254,7 @@ boundary so the rest of your code only sees `Option`/`Result`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 

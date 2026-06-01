@@ -17,7 +17,7 @@ caller that uses the user afterward.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { id: string; name: string; age: number };
+  starterCode={`type User = { id: string; name: string; age: number };
 
 function birthday(u: User): void {
   u.age = u.age + 1;
@@ -43,7 +43,7 @@ The immutable version is unambiguous:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
+  starterCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
 
 function birthday(u: User): User {
   return { ...u, age: u.age + 1 };
@@ -68,7 +68,7 @@ liberally.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// readonly on a single field
+  starterCode={`// readonly on a single field
 type Point = { readonly x: number; readonly y: number };
 
 // readonly on an array — disables push/pop/splice etc.
@@ -108,7 +108,7 @@ Once you commit to immutability, you stop *changing* values and start
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
+  starterCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
 
 const alice: User = { id: "u1", name: "Alice", age: 29 };
 
@@ -129,7 +129,7 @@ a brand-new object that shares everything with `x` except `k`.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Address = { readonly city: string; readonly country: string };
+  starterCode={`type Address = { readonly city: string; readonly country: string };
 type User = {
   readonly id: string;
   readonly name: string;
@@ -162,7 +162,7 @@ altogether.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Todo = { readonly id: number; readonly text: string; readonly done: boolean };
+  starterCode={`type Todo = { readonly id: number; readonly text: string; readonly done: boolean };
 
 const todos: readonly Todo[] = [
   { id: 1, text: "Buy milk",  done: false },
@@ -238,7 +238,7 @@ Consider an "undo" feature.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type State = { readonly counter: number; readonly note: string };
+  starterCode={`type State = { readonly counter: number; readonly note: string };
 
 // Pure transformations
 const inc       = (s: State): State => ({ ...s, counter: s.counter + 1 });
@@ -284,7 +284,7 @@ A few sneaky ways mutation gets in even when you're "trying":
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// 1. Methods that mutate AND return a value (lying about purity)
+  starterCode={`// 1. Methods that mutate AND return a value (lying about purity)
 const xs = [3, 1, 2];
 const sorted = xs.sort(); // sort() mutates xs AND returns it
 console.log("xs:    ", xs);     // [1, 2, 3]  (mutated!)
@@ -300,7 +300,7 @@ console.log("sorted2:", sorted2);
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// 2. Date objects are mutable
+  starterCode={`// 2. Date objects are mutable
 const d = new Date(2024, 0, 1);
 const tomorrow = d;
 tomorrow.setDate(tomorrow.getDate() + 1);

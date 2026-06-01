@@ -102,7 +102,7 @@ The four knobs trade off against each other:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # How many users per arm to detect a lift from 10% -> 12% conversion,
@@ -149,7 +149,7 @@ the same question.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -207,7 +207,7 @@ each arm's conversion rate with an error bar (the CI half-width).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy import stats
@@ -344,7 +344,7 @@ Steps for the z-test:
 - \`z = (p_b - p_a) / se\`, then \`p_value = 2*(1 - norm.cdf(abs(z)))\`.`}
   initCode={`conv_a, n_a = 480, 6000   # control
 conv_b, n_b = 570, 6000   # treatment`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # TODO: compute rel_lift and p_value (both floats)
@@ -414,7 +414,7 @@ assert abs(p_value - expected) < 1e-9`,
 Then set a boolean \`excludes_zero\` to \`True\` if the whole interval is above 0 (a significant positive difference), else \`False\`.`}
   initCode={`conv_a, n_a = 500, 5000   # control  (10.0%)
 conv_b, n_b = 610, 5000   # treatment (12.2%)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 # TODO: build ci = (low, high) and the boolean excludes_zero

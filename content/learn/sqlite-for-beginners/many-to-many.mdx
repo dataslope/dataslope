@@ -114,7 +114,7 @@ INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
   (2, 10, '2024-09-01'),
   (2, 12, '2024-09-03'),
   (3, 11, '2024-09-02');`}
-  initialCode={`SELECT * FROM enrollments ORDER BY student_id, course_id;`}
+  starterCode={`SELECT * FROM enrollments ORDER BY student_id, course_id;`}
 />
 
 The primary key is the pair `(student_id, course_id)`. That means the same student cannot be enrolled in the same course twice.
@@ -148,7 +148,7 @@ INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
   (2, 10, '2024-09-01'),
   (2, 12, '2024-09-03'),
   (3, 11, '2024-09-02');`}
-  initialCode={`SELECT s.name, c.title, e.enrolled_on
+  starterCode={`SELECT s.name, c.title, e.enrolled_on
 FROM enrollments e
 JOIN students s ON s.id = e.student_id
 JOIN courses c ON c.id = e.course_id
@@ -177,7 +177,7 @@ INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
 INSERT INTO enrollments (student_id, course_id) VALUES
   (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
-  initialCode={`SELECT c.title, COUNT(e.student_id) AS student_count
+  starterCode={`SELECT c.title, COUNT(e.student_id) AS student_count
 FROM courses c
 JOIN enrollments e ON e.course_id = c.id
 GROUP BY c.id, c.title
@@ -194,7 +194,7 @@ INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
 INSERT INTO enrollments (student_id, course_id) VALUES
   (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
-  initialCode={`SELECT s.name, COUNT(e.course_id) AS course_count
+  starterCode={`SELECT s.name, COUNT(e.course_id) AS course_count
 FROM students s
 JOIN enrollments e ON e.student_id = s.id
 GROUP BY s.id, s.name
@@ -224,7 +224,7 @@ INSERT INTO enrollments (student_id, course_id, grade) VALUES
   (2, 10, 'A'),
   (2, 12, 'A'),
   (3, 11, 'B');`}
-  initialCode={`SELECT s.name, c.title, e.grade
+  starterCode={`SELECT s.name, c.title, e.grade
 FROM enrollments e
 JOIN students s ON s.id = e.student_id
 JOIN courses c ON c.id = e.course_id

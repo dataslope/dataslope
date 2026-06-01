@@ -11,7 +11,7 @@ downloads the first time you click Run.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     printf("Hello, C!\\n");
@@ -27,7 +27,7 @@ int main(void) {
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
@@ -125,3 +125,42 @@ int mul(int a, int b) { return a * b; }
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for includes or helpers without cluttering the part you edit. Init of 3
+lines or fewer shows a compact read-only header; 4 lines or more collapses
+behind a "Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="c"
+  initCode={`#include <stdio.h>
+
+#define GREETING "Hello from C!"`}
+  starterCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+int main(void) {
+    puts(GREETING);
+    return 0;
+}
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="c"
+  initCode={`#include <stdio.h>
+
+static int square(int x) {
+    return x * x;
+}`}
+  starterCode={`/* square() and <stdio.h> come from the initialization code above. */
+int main(void) {
+    printf("square(7) = %d", square(7));
+    return 0;
+}
+`}
+/>

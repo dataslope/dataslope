@@ -22,7 +22,7 @@ A **union type** `A | B` represents a value that is *either* type `A`
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type StringOrNumber = string | number;
+  starterCode={`type StringOrNumber = string | number;
 
 let value: StringOrNumber = "hello";
 console.log("value:", value);
@@ -42,7 +42,7 @@ Unions shine when a function can accept multiple input types:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function printId(id: string | number): void {
+  starterCode={`function printId(id: string | number): void {
   console.log("ID:", id);
 }
 
@@ -63,7 +63,7 @@ exist on *all* members:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function printLength(value: string | number): void {
+  starterCode={`function printLength(value: string | number): void {
   // console.log(value.length);  // ❌ Property 'length' does not exist on type 'number'
   console.log("value:", value);
 }
@@ -79,7 +79,7 @@ narrowing in detail in [Type Narrowing](./type-narrowing)):
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function printLength(value: string | number): void {
+  starterCode={`function printLength(value: string | number): void {
   if (typeof value === "string") {
     console.log("Length:", value.length);  // ✅ value is narrowed to string
   } else {
@@ -102,7 +102,7 @@ An **intersection type** `A & B` represents a value that is *both* type
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Named = { name: string };
+  starterCode={`type Named = { name: string };
 type Aged = { age: number };
 type Person = Named & Aged;
 
@@ -124,7 +124,7 @@ or types into one:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface Timestamped {
+  starterCode={`interface Timestamped {
   createdAt: Date;
   updatedAt: Date;
 }
@@ -181,7 +181,7 @@ For primitive types, intersections can produce an *empty* set:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Impossible = string & number;
+  starterCode={`type Impossible = string & number;
 // Impossible is 'never' — no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
@@ -203,7 +203,7 @@ uniquely identifies the variant:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Circle = { kind: "circle"; radius: number };
+  starterCode={`type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Shape = Circle | Rectangle;
 
@@ -244,7 +244,7 @@ checking**:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Success = { status: "success"; data: string };
+  starterCode={`type Success = { status: "success"; data: string };
 type Failure = { status: "failure"; error: string };
 type Pending = { status: "pending" };
 type Result = Success | Failure | Pending;
@@ -279,7 +279,7 @@ variable in the final `else`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Status = "success" | "failure" | "pending";
+  starterCode={`type Status = "success" | "failure" | "pending";
 
 function logStatus(status: Status): void {
   if (status === "success") {
@@ -309,7 +309,7 @@ You can also have unions of function types, though this is less common:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type StringFunc = (x: string) => string;
+  starterCode={`type StringFunc = (x: string) => string;
 type NumberFunc = (x: number) => number;
 type Func = StringFunc | NumberFunc;
 
@@ -333,7 +333,7 @@ both:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Positioned = { x: number; y: number };
+  starterCode={`type Positioned = { x: number; y: number };
 type Colored = { color: string };
 type Sprite = Positioned & Colored;
 
@@ -346,7 +346,7 @@ This is equivalent to declaring an interface that extends both:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface PositionedI { x: number; y: number }
+  starterCode={`interface PositionedI { x: number; y: number }
 interface ColoredI { color: string }
 interface SpriteI extends PositionedI, ColoredI {}
 
@@ -365,7 +365,7 @@ If you intersect two types with conflicting properties, the result is
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type A = { value: string };
+  starterCode={`type A = { value: string };
 type B = { value: number };
 type Conflict = A & B;
 // Conflict is { value: string & number }, which is { value: never }
@@ -390,7 +390,7 @@ string:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Config = { host: string; port: number };
+  starterCode={`type Config = { host: string; port: number };
 type Input = Config | string;
 
 function connect(input: Input): void {
@@ -420,7 +420,7 @@ implement functions that construct and consume it.
   adapter="typescript"
   title="Result Type for Error Handling"
   instructions={`Define a discriminated union \`Result<T> = { ok: true; value: T } | { ok: false; error: string }\`. Implement two functions: \`success<T>(value: T): Result<T>\` (constructs a success result) and \`unwrap<T>(result: Result<T>): T\` (returns the value if ok, throws an error otherwise). Test with \`unwrap(success(42))\` (should return 42) and \`unwrap({ ok: false, error: "fail" })\` (should throw).`}
-  initialCode={`type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+  starterCode={`type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 function success<T>(value: T): Result<T> {
   // Your code here

@@ -33,7 +33,7 @@ nothing to show. In ggplot2 the data is almost always a *data frame*
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 # 'mpg' ships with ggplot2. Look at its structure.
 str(mpg)
 head(mpg)
@@ -90,7 +90,7 @@ to point to where each component lives.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +  # data + mappings
   geom_point() +                                      # geometry

@@ -48,7 +48,7 @@ yet when `WHERE` is evaluated:
   amount NUMERIC
 );
 INSERT INTO orders (id, amount) VALUES (1,20),(2,80),(3,60);`}
-  initialCode={`-- This FAILS: "doubled" does not exist yet when WHERE runs.
+  starterCode={`-- This FAILS: "doubled" does not exist yet when WHERE runs.
 -- SELECT amount * 2 AS doubled FROM orders WHERE doubled > 100;
 
 -- This works: repeat the expression, since WHERE runs before SELECT.
@@ -84,7 +84,7 @@ result to the next:
 );
 INSERT INTO orders (id, customer_id, amount) VALUES
   (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40);`}
-  initialCode={`SELECT customer_id, SUM(amount) AS total
+  starterCode={`SELECT customer_id, SUM(amount) AS total
 FROM orders
 WHERE amount > 10
 GROUP BY customer_id

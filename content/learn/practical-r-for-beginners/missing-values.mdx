@@ -19,7 +19,7 @@ know one of the inputs, you don't know the answer either.
 
 <CodeBlock
   adapter="r"
-  initialCode={`5 + NA            # unknown plus 5 = unknown
+  starterCode={`5 + NA            # unknown plus 5 = unknown
 NA > 3            # unknown vs. 3 = unknown
 NA == NA          # unknown vs. unknown = unknown (!)
 mean(c(1, 2, NA))
@@ -36,7 +36,7 @@ missing?":
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- c(1, 2, NA, 4, NA, 6)
+  starterCode={`x <- c(1, 2, NA, 4, NA, 6)
 
 is.na(x)            # logical vector: which positions are NA
 sum(is.na(x))       # count of missings
@@ -56,7 +56,7 @@ quietly removes `NA`s before computing.
 
 <CodeBlock
   adapter="r"
-  initialCode={`temps <- c(68, 70, NA, 72, 75, NA, 69)
+  starterCode={`temps <- c(68, 70, NA, 72, 75, NA, 69)
 
 mean(temps)               # NA — there are missings
 mean(temps, na.rm = TRUE) # works: average of the non-NA values
@@ -77,7 +77,7 @@ before doing anything else:
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- c(1, 2, NA, 4, NA, 6)
+  starterCode={`x <- c(1, 2, NA, 4, NA, 6)
 
 # Keep only non-NA values
 x[!is.na(x)]
@@ -92,7 +92,7 @@ Other times, you want to *replace* NAs with some sensible value
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- c(10, 20, NA, 40, NA, 60)
+  starterCode={`x <- c(10, 20, NA, 40, NA, 60)
 
 # Replace NA with 0
 x2 <- x
@@ -158,7 +158,7 @@ confuse with `NA`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`0 / 0     # NaN
+  starterCode={`0 / 0     # NaN
 1 / 0     # Inf
 -1 / 0    # -Inf
 
@@ -223,7 +223,7 @@ failed, leaving `NA`. Compute:
   instructions={`Given the \`week\` vector, set \`n_missing\` to the count of NAs and \`avg_temp\` to the mean of the non-NA values.`}
   initCode={`week <- c(68, NA, 72, 70, NA, 75, 71)
 `}
-  initialCode={`# week is already defined: 7 daily temps with NAs
+  starterCode={`# week is already defined: 7 daily temps with NAs
 
 n_missing <- NULL   # replace with the count of NAs
 avg_temp  <- NULL   # replace with the mean ignoring NAs

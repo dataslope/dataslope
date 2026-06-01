@@ -64,7 +64,7 @@ INSERT INTO orders_bad VALUES
   (100, 1, 'Ada',   'London'),
   (101, 1, 'Ada',   'London'),
   (102, 2, 'Grace', 'Baltimore');`}
-  initialCode={`-- A partial update makes one customer appear to live in two cities.
+  starterCode={`-- A partial update makes one customer appear to live in two cities.
 UPDATE orders_bad
 SET customer_city = 'Oxford'
 WHERE order_id = 100;
@@ -160,7 +160,7 @@ INSERT INTO orders VALUES
   (100, 1, DATE '2026-01-10'),
   (101, 1, DATE '2026-01-11'),
   (102, 2, DATE '2026-01-12');`}
-  initialCode={`-- Ada moves once, in the one row that stores Ada's city.
+  starterCode={`-- Ada moves once, in the one row that stores Ada's city.
 UPDATE customers
 SET city = 'Oxford'
 WHERE id = 1;

@@ -205,7 +205,7 @@ INSERT INTO orders (customer_id, total) VALUES
   (1, 24.99),
   (1, 15.50),
   (2, 9.99);`}
-  initialCode={`SELECT customers.name, orders.total
+  starterCode={`SELECT customers.name, orders.total
 FROM customers
 JOIN orders ON orders.customer_id = customers.id;`}
 />

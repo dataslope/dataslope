@@ -31,7 +31,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # A Series — a single labeled column
 s = pd.Series([120, 95, 140, 80], index=["Aiko","Bilal","Chen","Diego"], name="salary")
@@ -62,7 +62,7 @@ a Series.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "salary":     [120, 95, 140, 80],
@@ -99,7 +99,7 @@ the whole thing at once — no for-loop required.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 salaries = pd.Series([120, 95, 140, 80], index=["Aiko","Bilal","Chen","Diego"])
 
@@ -134,7 +134,7 @@ together, Pandas **aligns them by index** before adding.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 q1 = pd.Series([100, 120, 90],  index=["Aiko","Bilal","Chen"], name="q1")
 q2 = pd.Series([110, 95, 130],  index=["Chen","Aiko","Diego"], name="q2")
@@ -162,7 +162,7 @@ You can confirm this by reaching in:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "salary":     [120, 95, 140],
@@ -182,7 +182,7 @@ column-wise. For example:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "salary":  [120, 95, 140, 80],

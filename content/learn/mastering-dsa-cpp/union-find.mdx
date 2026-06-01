@@ -30,7 +30,7 @@ A basic DSU stores a parent array. `find` walks up to the root. Without optimiza
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 class NaiveDSU {
@@ -73,7 +73,7 @@ graph LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 class DSUPathCompression {
@@ -117,7 +117,7 @@ With both path compression and union by rank or size, operations take near **O(Î
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -167,7 +167,7 @@ Start with `n` separate sets. Every successful union reduces the component count
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -210,7 +210,7 @@ When processing an undirected edge `(u, v)`, if `u` and `v` are already in the s
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -270,7 +270,7 @@ graph LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <tuple>
@@ -325,7 +325,7 @@ Classic DSU is excellent for incremental connectivity where edges are added. Ful
   adapter="cpp"
   title="Number of connected components using DSU"
   instructions={`Implement \`countComponents\` using DSU. Start with \`n\` components and decrement only when a union succeeds.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -418,7 +418,7 @@ int main() {
   adapter="cpp"
   title="Kruskal's MST total weight"
   instructions={`Implement \`mstWeight\`. Sort edges by weight and add an edge only when DSU says it connects two different components.`}
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <tuple>

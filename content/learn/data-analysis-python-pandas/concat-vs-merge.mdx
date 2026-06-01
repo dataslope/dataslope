@@ -26,7 +26,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 jan = pd.DataFrame({"date": ["2024-01-15","2024-01-20"], "sales": [100, 150]})
 feb = pd.DataFrame({"date": ["2024-02-05","2024-02-18"], "sales": [200, 175]})
@@ -44,7 +44,7 @@ You can also concat horizontally:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 ids   = pd.DataFrame({"id": [1, 2, 3]})
 names = pd.DataFrame({"name": ["Aiko","Bilal","Chen"]})
@@ -63,7 +63,7 @@ differently, you'd silently mis-pair people with names. Prefer
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 employees = pd.DataFrame({
     "emp_id":  [1, 2, 3, 4],
@@ -88,7 +88,7 @@ from the other table by matching `dept_id`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Two months of orders — concat them
 m1 = pd.DataFrame({"order_id": [1,2], "customer_id": [10, 11], "amount": [50, 75]})
@@ -128,7 +128,7 @@ data sources), then **merge** in lookup tables to enrich.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.DataFrame({"x": [1,2,3]}, index=[0,1,2])
 b = pd.DataFrame({"y": [10,20,30]}, index=[5,6,7])   # different index!

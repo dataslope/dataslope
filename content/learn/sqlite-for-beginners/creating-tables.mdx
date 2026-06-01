@@ -14,7 +14,7 @@ To create a table, give SQLite a table name and a list of columns. Each column h
 <SqlCodeBlock
   dialect="sqlite"
   title="Create an empty books table"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id INTEGER,
   title TEXT,
   author TEXT,
@@ -71,7 +71,7 @@ SQLite will try to store values in a sensible way based on the column's declared
 <SqlCodeBlock
   dialect="sqlite"
   title="Create a table with common SQLite types"
-  initialCode={`CREATE TABLE products (
+  starterCode={`CREATE TABLE products (
   id INTEGER,
   name TEXT,
   price REAL,
@@ -110,7 +110,7 @@ That column becomes a unique row id. If you omit it during an insert, SQLite can
 <SqlCodeBlock
   dialect="sqlite"
   title="Let SQLite assign ids"
-  initialCode={`CREATE TABLE books (
+  starterCode={`CREATE TABLE books (
   id INTEGER PRIMARY KEY,
   title TEXT,
   author TEXT
@@ -142,7 +142,7 @@ A table can include rules called **constraints**. Two beginner-friendly constrai
 <SqlCodeBlock
   dialect="sqlite"
   title="Add simple rules to a table"
-  initialCode={`CREATE TABLE habits (
+  starterCode={`CREATE TABLE habits (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
   times_done INTEGER DEFAULT 0
@@ -161,7 +161,7 @@ The rows have `times_done` set to `0` even though the insert did not mention tha
 <SqlCodeBlock
   dialect="sqlite"
   title="A small table with several rules"
-  initialCode={`CREATE TABLE movies (
+  starterCode={`CREATE TABLE movies (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   release_year INTEGER,
@@ -214,7 +214,7 @@ A default is a fallback value for missing input.`}
 
 Then select all columns from \`notes\`.`}
   initSql={``}
-  initialCode={`-- Create the table here:
+  starterCode={`-- Create the table here:
 
 
 -- Then read it:

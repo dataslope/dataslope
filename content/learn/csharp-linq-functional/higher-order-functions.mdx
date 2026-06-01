@@ -23,7 +23,7 @@ Look at three "search" methods written in classic imperative style:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static int? FirstEven(IEnumerable<int> xs)
@@ -62,7 +62,7 @@ A higher-order function lets us extract behavior as an *argument*:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static int? FirstWhere(IEnumerable<int> xs, Func<int, bool> predicate)
@@ -102,7 +102,7 @@ There's a special case for predicates:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 Func<int, int>          square    = x => x * x;
 Func<int, int, int>     add       = (a, b) => a + b;
@@ -126,7 +126,7 @@ a function is sometimes called a **function factory**.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 static Func<int, int> Multiplier(int factor) => x => x * factor;
 
@@ -146,7 +146,7 @@ A practical example — a predicate factory:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 static Func<int, bool> Above(int threshold) => x => x > threshold;
@@ -167,7 +167,7 @@ two other functions*: feed the output of one into the other.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 static Func<A, C> Compose<A, B, C>(Func<A, B> f, Func<B, C> g) =>
     x => g(f(x));
@@ -221,7 +221,7 @@ named functions.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 static string Trim(string s)     => s.Trim();

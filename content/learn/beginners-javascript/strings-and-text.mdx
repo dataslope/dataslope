@@ -23,7 +23,7 @@ multi-line strings (more on that in a moment).
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const a = 'single quotes';
+  starterCode={`const a = 'single quotes';
 const b = "double quotes";
 const c = \`backticks\`;
 console.log(a, b, c);
@@ -48,7 +48,7 @@ newline or a tab, you escape it with a backslash:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log("She said \\"hi\\".");
+  starterCode={`console.log("She said \\"hi\\".");
 console.log('It\\'s fine.');
 console.log("first line\\nsecond line");
 console.log("col1\\tcol2\\tcol3");
@@ -65,7 +65,7 @@ things that ordinary strings cannot:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const name = "Ada";
+  starterCode={`const name = "Ada";
 const age = 28;
 
 // Old-school: concatenation with +
@@ -98,7 +98,7 @@ leaves the original alone.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let s = "hello";
+  starterCode={`let s = "hello";
 const louder = s.toUpperCase();
 console.log(s);       // "hello"  — unchanged
 console.log(louder);  // "HELLO"  — a new string
@@ -121,7 +121,7 @@ it. You can read an individual character with bracket notation:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const word = "javascript";
+  starterCode={`const word = "javascript";
 
 console.log(word.length);  // 10
 console.log(word[0]);      // "j"   (the first character)
@@ -144,7 +144,7 @@ for these constantly.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const s = "  Hello, JavaScript World!  ";
+  starterCode={`const s = "  Hello, JavaScript World!  ";
 
 // Case
 console.log(s.toUpperCase());
@@ -193,7 +193,7 @@ display, parsing a piece of text into a value to compute with.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// String -> Number
+  starterCode={`// String -> Number
 console.log(Number("42"));        // 42
 console.log(Number("3.14"));      // 3.14
 console.log(Number(""));          // 0    (!)
@@ -234,7 +234,7 @@ human-character counts in the presence of emoji, use
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log("abc".length);          // 3 — easy
+  starterCode={`console.log("abc".length);          // 3 — easy
 console.log("café".length);         // 4 — easy (if é is precomposed)
 console.log("😀".length);            // 2 — surprising!
 console.log(Array.from("😀").length); // 1 — better
@@ -299,7 +299,7 @@ Examples:
 - \`titleCase("hello world")\` → \`"Hello World"\`
 - \`titleCase("javaScript is GREAT")\` → \`"Javascript Is Great"\`
 - \`titleCase("")\` → \`""\``}
-  initialCode={`function titleCase(text) {
+  starterCode={`function titleCase(text) {
   // your code here
   return text;
 }

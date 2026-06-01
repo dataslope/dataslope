@@ -94,7 +94,7 @@ the quartiles that hint at skew.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -118,7 +118,7 @@ to see the categories and how (im)balanced they are.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -139,7 +139,7 @@ extreme values.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -173,7 +173,7 @@ realistic gap to demonstrate the checks you'd run on messy data.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(0)
@@ -213,7 +213,7 @@ more than 1.5 times the interquartile range are flagged for inspection
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -250,7 +250,7 @@ matrix** (linear association between numeric columns).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 tips["tip_pct"] = tips["tip"] / tips["total_bill"] * 100
@@ -275,7 +275,7 @@ hypotheses.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 tips = px.data.tips()
 
@@ -358,7 +358,7 @@ EDA generates hypotheses; confirmation tests them — on different data.`}
 This grouped summary is a *generated hypothesis* — "tip % varies by day" — not yet a confirmed conclusion.`}
   initCode={`import plotly.express as px
 tips = px.data.tips()`}
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 # TODO: build a Series of mean tip percentage by day -> tip_pct_by_day
 tip_pct_by_day = None
@@ -415,7 +415,7 @@ Produce two variables:
 The pair order within the tuple does not matter for grading. This is the strongest relationship EDA surfaces — a hypothesis worth confirming, not yet a conclusion.`}
   initCode={`import plotly.express as px
 tips = px.data.tips()`}
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 import numpy as np
 
 # TODO: find the most-correlated distinct numeric pair

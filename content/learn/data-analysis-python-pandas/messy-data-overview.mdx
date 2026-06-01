@@ -90,7 +90,7 @@ spot each issue before reading on.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 messy = pd.DataFrame({
@@ -145,7 +145,7 @@ messy = pd.DataFrame({
     "spend":       ["100", "200", "300", "abc", "-50", "-50", "9999999", "150", ""],
     "tier":        ["gold","silver","gold","bronze","silver","silver","gold","silver",None],
 })`}
-  initialCode={`clean = (
+  starterCode={`clean = (
     messy
     # 1. Drop duplicates
     .drop_duplicates()

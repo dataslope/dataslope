@@ -28,7 +28,7 @@ A complete example:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int square(int n) {
     return n * n;
@@ -63,7 +63,7 @@ caller's variables.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void try_to_increment(int x) {
     x = x + 1;
@@ -91,7 +91,7 @@ has nothing meaningful to return, use `void` as the return type.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void banner(void) {
     printf("============================\\n");
@@ -118,7 +118,7 @@ site.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int max(int a, int b) {
     if (a > b) {
@@ -218,7 +218,7 @@ file, you need to tell the compiler the signature first. That's a
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int max(int a, int b);   // prototype: tell the compiler the signature
 
@@ -248,7 +248,7 @@ example is factorial:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 long factorial(int n) {
     if (n <= 1) {
@@ -291,7 +291,7 @@ naturally recursive (trees, divide-and-conquer, parsing).
 5
 7
 \`\`\``}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int is_prime(int n) {
     // your code here

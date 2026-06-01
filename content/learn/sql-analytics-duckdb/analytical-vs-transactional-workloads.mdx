@@ -101,7 +101,7 @@ SELECT
   (i * 37) % 500 + 10                 AS amount,
   ['West','East','North','South'][(i % 4) + 1] AS region
 FROM range(1, 5001) t(i);`}
-  initialCode={`-- Reads only the columns it needs (region, amount)
+  starterCode={`-- Reads only the columns it needs (region, amount)
 -- across 5,000 rows, and returns just 4 summary rows.
 SELECT
   region,

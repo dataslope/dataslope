@@ -48,7 +48,7 @@ Built-in tools:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A pretend "population" of 100,000 adult heights (cm)
+  starterCode={`# A pretend "population" of 100,000 adult heights (cm)
 set.seed(1)
 population <- rnorm(100000, mean = 170, sd = 9)
 
@@ -102,7 +102,7 @@ Let's actually do it:
 
 <CodeBlock
   adapter="r"
-  initialCode={`set.seed(1)
+  starterCode={`set.seed(1)
 population <- rnorm(100000, mean = 170, sd = 9)
 
 # Repeat: draw a sample of 50, compute its mean
@@ -144,7 +144,7 @@ a long right tail):
 
 <CodeBlock
   adapter="r"
-  initialCode={`set.seed(1)
+  starterCode={`set.seed(1)
 
 # An extremely right-skewed population
 population <- rexp(100000, rate = 1)   # mean = 1, sd = 1
@@ -201,7 +201,7 @@ the average rating?
 
 <CodeBlock
   adapter="r"
-  initialCode={`set.seed(2)
+  starterCode={`set.seed(2)
 
 # Pretend "true" population of 5000 ratings, mostly 4s and 5s
 population <- sample(1:5, 5000, replace = TRUE, prob = c(0.05, 0.10, 0.20, 0.35, 0.30))
@@ -267,7 +267,7 @@ the rule x̄ ± 2·SE.
   adapter="r"
   title="Sample mean + rough 95% CI"
   instructions={`Use \`set.seed(123)\`, take a sample of size 30 from \`pop\`, store its mean in \`x_bar\` and standard error in \`se\` (use \`sd / sqrt(n)\`), and build a length-2 numeric vector \`ci\` containing \`x_bar - 2*se\` and \`x_bar + 2*se\`.`}
-  initialCode={`set.seed(123)
+  starterCode={`set.seed(123)
 pop <- rnorm(100000, mean = 50, sd = 12)
 
 x_bar <- NULL

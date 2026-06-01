@@ -24,7 +24,7 @@ INSERT INTO books (title, author, year) VALUES
   ('Snow Crash', 'Neal Stephenson', 1992),
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  initialCode={`-- Your query here:
+  starterCode={`-- Your query here:
 SELECT * FROM books;
 `}
   solutionSql={`SELECT title, author, year FROM books ORDER BY year ASC;`}
@@ -77,7 +77,7 @@ INSERT INTO books (title, author, year) VALUES
   ('Snow Crash', 'Neal Stephenson', 1992),
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  initialCode={`-- Your query here:
+  starterCode={`-- Your query here:
 SELECT * FROM books;
 `}
   solutionSql={`SELECT title, author, year FROM books ORDER BY year ASC;`}
@@ -135,7 +135,7 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',         8.5),
   ('Food',        'Tea',            5.0),
   ('Food',        'Bread',          3.0);`}
-  initialCode={`SELECT category, SUM(revenue) AS total_revenue
+  starterCode={`SELECT category, SUM(revenue) AS total_revenue
 FROM sales
 -- your code here
 ;
@@ -181,7 +181,7 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',         8.5),
   ('Food',        'Tea',            5.0),
   ('Food',        'Bread',          3.0);`}
-  initialCode={`SELECT category, SUM(revenue) AS total_revenue
+  starterCode={`SELECT category, SUM(revenue) AS total_revenue
 FROM sales
 -- your code here
 ;
@@ -222,7 +222,7 @@ ORDER BY total_revenue DESC;`}
 INSERT INTO users (name, email) VALUES
   ('Alice', 'alice@example.com'),
   ('Bob',   'bob@example.com');`}
-  initialCode={`-- INSERT a new row for Carol
+  starterCode={`-- INSERT a new row for Carol
 `}
   tests={[
     {
@@ -256,7 +256,7 @@ INSERT INTO users (name, email) VALUES
 INSERT INTO users (name, email) VALUES
   ('Alice', 'alice@example.com'),
   ('Bob',   'bob@example.com');`}
-  initialCode={`-- INSERT a new row for Carol
+  starterCode={`-- INSERT a new row for Carol
 `}
   tests={[
     {
@@ -298,7 +298,7 @@ WITH RECURSIVE n(i) AS (
 INSERT INTO big
 SELECT i, 'user_' || i, (i * 37 % 100) FROM n;
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
 FROM big
 GROUP BY bucket
@@ -333,7 +333,7 @@ WITH RECURSIVE n(i) AS (
 INSERT INTO big
 SELECT i, 'user_' || i, (i * 37 % 100) FROM n;
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
 FROM big GROUP BY bucket ORDER BY bucket;`}
   tests={[

@@ -9,7 +9,7 @@ name, an arrow, and a value, and R remembers it.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# The basic shape: name <- value
+  starterCode={`# The basic shape: name <- value
 x <- 42
 greeting <- "Hello, R!"
 prices <- c(9.99, 14.50, 24.00)
@@ -124,7 +124,7 @@ see the value.
 
 <CodeBlock
   adapter="r"
-  initialCode={`a <- 100        # no output — assignment is silent
+  starterCode={`a <- 100        # no output — assignment is silent
 print(a)        # shows 100
 
 # Trick: parenthesize the assignment to both store and print
@@ -143,7 +143,7 @@ you — it just replaces the old value.
 
 <CodeBlock
   adapter="r"
-  initialCode={`count <- 0
+  starterCode={`count <- 0
 print(count)
 
 count <- count + 1   # this is fine: read the right side, then store on the left
@@ -200,7 +200,7 @@ an *independent* copy. Changing one does not change the other.
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- c(1, 2, 3)
+  starterCode={`x <- c(1, 2, 3)
 y <- x         # y now refers to a copy of x's data
 y[1] <- 999    # change y's first element
 
@@ -227,7 +227,7 @@ you can remove them.
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- 1
+  starterCode={`x <- 1
 y <- 2
 z <- 3
 
@@ -320,7 +320,7 @@ correct remaining balance.
 - subtract 8 (parking)
 
 After all three updates, \`budget\` should equal \`100 - 25 - 12 - 8 = 55\`.`}
-  initialCode={`budget <- 100
+  starterCode={`budget <- 100
 
 # Three updates here
 

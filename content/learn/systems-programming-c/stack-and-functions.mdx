@@ -46,7 +46,7 @@ You can see the call chain by printing addresses of local variables.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void inner(void) {
     int x = 0;
@@ -81,7 +81,7 @@ a *stack size* limit.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 long fib(int n) {
     if (n < 2) return n;
@@ -116,7 +116,7 @@ this will crash before `main` runs a single line. Use the heap
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 // Run this and watch how deep the recursion gets before stack overflow.
 // We print a count once per 1000 levels so output stays readable.
@@ -143,7 +143,7 @@ stack instead of O(n). Compare:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 // Recursive — uses n stack frames.
 long fact_rec(int n) {
@@ -200,7 +200,7 @@ The single most important stack rule:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int *bad(void) {
     int x = 42;
@@ -230,7 +230,7 @@ The pattern that *is* safe: write into a buffer the caller owns.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 // Fill the caller's buffer; never returns a pointer to our own locals.
@@ -261,7 +261,7 @@ This *caller owns the buffer* idiom is everywhere in C APIs: think
   adapter="c"
   title="Compute base^exp iteratively"
   instructions={`Implement \`long my_pow(int base, int exp)\` for non-negative \`exp\` using a loop — not recursion. \`my_pow(2, 10)\` must return \`1024\`. The provided \`main\` prints results.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 long my_pow(int base, int exp) {
     // your code here
@@ -307,7 +307,7 @@ int main(void) {
   adapter="c"
   title="Implement gcd iteratively"
   instructions={`Implement \`int gcd(int a, int b)\` using the iterative Euclidean algorithm so that it uses O(1) stack frames regardless of input size. The provided \`main\` calls it for three pairs.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int gcd(int a, int b) {
     // your code here

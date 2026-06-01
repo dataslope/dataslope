@@ -26,7 +26,7 @@ will assume you think in arrays.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import time
 
 N = 1_000_000
@@ -107,7 +107,7 @@ The classic example: an outer product written as broadcasting.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 x = np.arange(1, 6)          # shape (5,)
 y = np.arange(1, 4)          # shape (3,)
@@ -136,7 +136,7 @@ lines.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 pts = rng.uniform(0, 10, size=(8, 2))      # 8 points in 2-D
@@ -163,7 +163,7 @@ operation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # A small dataset: 6 patients × 4 measurements
 X = np.array([
@@ -250,7 +250,7 @@ trajectory runs independently:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 # Bifurcation diagram of the logistic map
@@ -288,7 +288,7 @@ work best on contiguous reads.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import time
 
 n = 10_000

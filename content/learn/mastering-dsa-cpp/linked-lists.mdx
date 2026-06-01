@@ -11,7 +11,7 @@ A minimal node stores data and a pointer to the next node.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -43,7 +43,7 @@ Traversal starts at `head` and follows `next` until `nullptr`.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -74,7 +74,7 @@ Prepending creates a new node, points it at the old head, then updates the head 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -113,7 +113,7 @@ Appending without a tail pointer requires walking to the end. Deleting a value r
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -189,7 +189,7 @@ Manual `new` and `delete` are useful for learning pointers, but production C++ s
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 
 struct Node {
@@ -228,7 +228,7 @@ When you reverse or delete nodes, you are rewiring addresses. Draw the links bef
   adapter="cpp"
   title="Reverse a linked list"
   instructions={`Implement \`Node* reverse(Node* head)\`. The driver builds \`1->2->3->4\` and prints the reversed values.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;
@@ -303,7 +303,7 @@ int main() {
   adapter="cpp"
   title="Length of a linked list"
   instructions={`Implement \`length\` by traversing from head to null and counting nodes.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct Node {
     int data;

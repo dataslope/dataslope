@@ -27,7 +27,7 @@ all of type `T`." For example, `number[]` is an array of numbers,
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const numbers: number[] = [1, 2, 3, 4, 5];
+  starterCode={`const numbers: number[] = [1, 2, 3, 4, 5];
 const names: string[] = ["Alice", "Bob", "Charlie"];
 
 console.log("numbers:", numbers);
@@ -47,7 +47,7 @@ functionally identical to `T[]`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const numbers: Array<number> = [10, 20, 30];
+  starterCode={`const numbers: Array<number> = [10, 20, 30];
 const words: Array<string> = ["hello", "world"];
 
 console.log("numbers:", numbers);
@@ -66,7 +66,7 @@ type:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Inferred as number[]
+  starterCode={`// Inferred as number[]
 const scores = [95, 87, 92];
 
 // Inferred as string[]
@@ -97,7 +97,7 @@ be modified. Enter `readonly`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const fixed: readonly number[] = [1, 2, 3];
+  starterCode={`const fixed: readonly number[] = [1, 2, 3];
 
 console.log("fixed:", fixed);
 console.log("First element:", fixed[0]);
@@ -124,7 +124,7 @@ Alternatively, you can use the `ReadonlyArray<T>` generic:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const immutable: ReadonlyArray<string> = ["a", "b", "c"];
+  starterCode={`const immutable: ReadonlyArray<string> = ["a", "b", "c"];
 
 console.log("immutable:", immutable);
 console.log("Length:", immutable.length);
@@ -147,7 +147,7 @@ two-element tuple: the first element is a `string`, the second is a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A tuple: [name, age]
+  starterCode={`// A tuple: [name, age]
 const person: [string, number] = ["Alice", 30];
 
 console.log("Name:", person[0]);  // string
@@ -168,7 +168,7 @@ Tuples shine when a function returns multiple values:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function divmod(a: number, b: number): [number, number] {
+  starterCode={`function divmod(a: number, b: number): [number, number] {
   const quotient = Math.floor(a / b);
   const remainder = a % b;
   return [quotient, remainder];
@@ -190,7 +190,7 @@ readability without changing the runtime behavior:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Named tuple: [name, age]
+  starterCode={`// Named tuple: [name, age]
 type Person = [name: string, age: number];
 
 const alice: Person = ["Alice", 30];
@@ -214,7 +214,7 @@ You can mark tuple elements as optional with `?`:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A tuple with an optional third element
+  starterCode={`// A tuple with an optional third element
 type Point = [x: number, y: number, z?: number];
 
 const point2D: Point = [10, 20];
@@ -239,7 +239,7 @@ number of trailing elements:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A tuple: [name, ...scores]
+  starterCode={`// A tuple: [name, ...scores]
 type StudentRecord = [name: string, ...scores: number[]];
 
 const alice: StudentRecord = ["Alice", 95, 87, 92];
@@ -264,7 +264,7 @@ feature (we'll revisit it when we cover generics), but here's a taste:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// A function that prepends an element to a tuple
+  starterCode={`// A function that prepends an element to a tuple
 function prepend<T, U extends any[]>(head: T, tail: U): [T, ...U] {
   return [head, ...tail];
 }
@@ -372,7 +372,7 @@ length: if you declare `pair: [number, number]`, the compiler knows
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const arr: number[] = [1, 2, 3];
+  starterCode={`const arr: number[] = [1, 2, 3];
 const tuple: [number, number] = [1, 2];
 
 // Array indexing gives number (but could be undefined at runtime)

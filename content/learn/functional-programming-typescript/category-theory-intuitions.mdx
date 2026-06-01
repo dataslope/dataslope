@@ -37,7 +37,7 @@ together with a lawful `map` operation.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -97,7 +97,7 @@ With those, you can lift any n-argument function.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -141,7 +141,7 @@ A famous use of applicative: validate several fields and gather
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; errors: ReadonlyArray<E> };
+  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; errors: ReadonlyArray<E> };
 const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
 const err = <E, A>(...es: E[]): Result<E, A> => ({ kind: "err", errors: es });
 
@@ -197,7 +197,7 @@ merges them into one.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 

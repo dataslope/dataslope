@@ -138,7 +138,7 @@ draw samples and watch the statistics estimate the (now visible) truth.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -186,7 +186,7 @@ different sample.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -242,7 +242,7 @@ homes in on the parameter. Watch the sample mean converge.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(1)
@@ -319,7 +319,7 @@ MU_TRUE = 480.0      # true population mean (parameter)
 SIGMA_TRUE = 60.0    # true population sd  (parameter)
 
 sample = rng.normal(MU_TRUE, SIGMA_TRUE, size=120)`}
-  initialCode={`# TODO: build the 'estimates' dict from the sample only
+  starterCode={`# TODO: build the 'estimates' dict from the sample only
 estimates = {
     "x_bar": None,
     "s": None,
@@ -389,7 +389,7 @@ P_TRUE = 0.18   # true population churn proportion (parameter)
 
 # A 0/1 sample drawn from the population.
 sample = rng.binomial(1, P_TRUE, size=400)`}
-  initialCode={`# TODO
+  starterCode={`# TODO
 p_hat = None
 abs_error = None
 `}

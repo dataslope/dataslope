@@ -31,7 +31,7 @@ real:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a[5] = {10, 20, 30, 40, 50};
@@ -72,7 +72,7 @@ array with a pointer is just incrementing the pointer.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a[5] = {10, 20, 30, 40, 50};
@@ -106,7 +106,7 @@ pointer-arithmetic loop in C:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void my_puts(const char *s) {
     while (*s != '\\0') {
@@ -164,7 +164,7 @@ between them, in elements:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -191,7 +191,7 @@ elements with a single pointer:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int grid[3][4] = {
@@ -268,7 +268,7 @@ printf("%d\\n", total);   // should print 15
 \`\`\`
 
 The program must print exactly \`15\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int sum(const int *begin, const int *end) {
     // walk from begin up to (but not including) end

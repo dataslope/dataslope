@@ -16,7 +16,7 @@ overlap on a vertical axis:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Vertical bars: long class names crowd the x-axis.
 ggplot(mpg, aes(x = class)) +
@@ -26,7 +26,7 @@ ggplot(mpg, aes(x = class)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # coord_flip(): same chart, horizontal -> labels get room to breathe.
 ggplot(mpg, aes(x = class)) +
@@ -53,7 +53,7 @@ one bar, segmented by drivetrain:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # A single stacked bar. x is a constant; fill segments it by drv.
 ggplot(mpg, aes(x = factor(1), fill = drv)) +
@@ -67,7 +67,7 @@ circle with `coord_polar(theta = "y")`. **Nothing else changes:**
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # EXACT same plot + one line: bend the y-axis into a circle.
 ggplot(mpg, aes(x = factor(1), fill = drv)) +
@@ -97,7 +97,7 @@ made famous:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = class, fill = class)) +
   geom_bar() +

@@ -25,7 +25,7 @@ that lands inside the unit quarter-disk approximates $\pi/4$.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 N = 1_000_000
@@ -58,7 +58,7 @@ accuracy.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Volume of a 10-D hypersphere of radius 1 inscribed in [-1,1]^10
 rng = np.random.default_rng(0)
@@ -95,7 +95,7 @@ $$
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Estimate  ∫₀^∞ x · exp(-x) dx  (= 1)
 rng = np.random.default_rng(0)
@@ -127,7 +127,7 @@ tissue.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -165,7 +165,7 @@ signals.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 # dX = -theta·X dt + sigma·dW,   discretized via Euler-Maruyama
@@ -208,7 +208,7 @@ of resampled statistics estimates the spread of the estimator.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
 data = rng.gamma(shape=2.0, scale=1.5, size=80)   # skewed sample
@@ -290,7 +290,7 @@ power and the limitation of Monte Carlo.
 Use \`numpy.random.default_rng(seed)\` for reproducibility.
 
 Test on the unit disk where the true area is $\\pi$.`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def mc_area(predicate, bounds, n_samples, seed=0):
     # TODO: sample uniformly in the rectangle, count predicate hits, scale by rect area

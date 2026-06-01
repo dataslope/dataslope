@@ -22,7 +22,7 @@ int>` is the type of functions from `int` to `int`.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 // A delegate variable holds a reference to a function.
 Func<int, int> square = x => x * x;
@@ -64,7 +64,7 @@ A **lambda** is an inline literal of a delegate type. It is written
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 Func<int, int>      a = x => x * 2;            // single param, no parens
 Func<int, int, int> b = (x, y) => x + y;       // multiple params
@@ -99,7 +99,7 @@ pass the method directly — no need to wrap it in a lambda.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 static int Double(int x) => x * 2;
@@ -123,7 +123,7 @@ called a **closure**.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 int threshold = 10;
@@ -148,7 +148,7 @@ The most famous closure bug in C# is capturing a loop variable.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 // In C# 5+ this prints 0,1,2,3,4 (the loop variable is per-iteration).
@@ -180,7 +180,7 @@ is `Expression<Func<...>>`.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq.Expressions;
 
 // Compiled to executable code — you can call it.
@@ -226,7 +226,7 @@ entirely as data.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 using System.Linq;
 

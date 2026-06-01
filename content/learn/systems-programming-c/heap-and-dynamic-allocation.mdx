@@ -36,7 +36,7 @@ flowchart LR
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -72,7 +72,7 @@ runtime.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -105,7 +105,7 @@ It is a small habit that prevents large bugs.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -139,7 +139,7 @@ safe pattern is to use a temporary.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -173,7 +173,7 @@ A small, complete `vec` type to show how growable arrays really work.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -243,7 +243,7 @@ make **ownership** explicit:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -273,7 +273,7 @@ pointer with the new address. That's a pointer-to-pointer parameter.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int make_zeros(size_t n, int **out) {
@@ -303,7 +303,7 @@ eventually exhaust memory and crash.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 void leak(void) {
@@ -331,7 +331,7 @@ use-after-frees — in the *Memory Bugs* chapter.
   adapter="c"
   title="Allocate, fill, average, free"
   instructions={`Allocate a heap array of \`N = 5\` ints, fill it with the values 10, 20, 30, 40, 50 (in that order), print their integer average, then \`free\` the array. The output must be exactly \`30\`.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -373,7 +373,7 @@ int main(void) {
   adapter="c"
   title="Implement my_strdup"
   instructions={`Implement \`char *my_strdup(const char *s)\` that returns a heap-allocated copy of \`s\` (caller frees it). The provided \`main\` calls it, prints the copy, and frees it.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

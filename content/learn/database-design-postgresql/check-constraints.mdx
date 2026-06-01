@@ -68,7 +68,7 @@ status must be one of a small set of allowed values.
 
 INSERT INTO products (name, price, status)
 VALUES ('Notebook', 4.50, 'active');`}
-  initialCode={`-- Negative prices are not valid products.
+  starterCode={`-- Negative prices are not valid products.
 INSERT INTO products (name, price, status)
 VALUES ('Impossible discount', -2.00, 'active');
 
@@ -105,7 +105,7 @@ flowchart LR
   end_date   DATE NOT NULL,
   CHECK (end_date > start_date)
 );`}
-  initialCode={`-- The end date is before the start date, so the row is rejected.
+  starterCode={`-- The end date is before the start date, so the row is rejected.
 INSERT INTO events (name, start_date, end_date)
 VALUES ('Backwards conference', '2026-06-10', '2026-06-08');
 

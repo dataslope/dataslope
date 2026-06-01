@@ -26,7 +26,7 @@ while (condition) {
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`let n = 1;
+  starterCode={`let n = 1;
 while (n <= 5) {
   console.log("n =", n);
   n = n + 1;
@@ -78,7 +78,7 @@ for (init; condition; update) {
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`for (let i = 0; i < 5; i++) {
+  starterCode={`for (let i = 0; i < 5; i++) {
   console.log("i =", i);
 }
 
@@ -115,7 +115,7 @@ all.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const colors = ["red", "green", "blue"];
+  starterCode={`const colors = ["red", "green", "blue"];
 
 for (const color of colors) {
   console.log("color:", color);
@@ -133,7 +133,7 @@ If you *do* need the index alongside the element, use
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const colors = ["red", "green", "blue"];
+  starterCode={`const colors = ["red", "green", "blue"];
 
 for (const [index, color] of colors.entries()) {
   console.log(index, "->", color);
@@ -154,7 +154,7 @@ to look at every named property. It is not appropriate for arrays
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const user = { name: "Ada", age: 28, role: "admin" };
+  starterCode={`const user = { name: "Ada", age: 28, role: "admin" };
 
 for (const key in user) {
   console.log(key, "=", user[key]);
@@ -176,7 +176,7 @@ ahead:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Find the first number bigger than 50.
+  starterCode={`// Find the first number bigger than 50.
 const numbers = [3, 17, 42, 9, 88, 13, 99];
 
 let found;
@@ -208,7 +208,7 @@ blank result, walk a list, update the result**.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const numbers = [10, 22, 3, 47, 9];
+  starterCode={`const numbers = [10, 22, 3, 47, 9];
 
 // Sum
 let total = 0;
@@ -252,7 +252,7 @@ chapter to these, but here is a small taste:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const numbers = [1, 2, 3, 4, 5];
+  starterCode={`const numbers = [1, 2, 3, 4, 5];
 
 // forEach — just run a function for each element
 numbers.forEach((n) => console.log("element:", n));
@@ -288,7 +288,7 @@ item to every other item.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// A small multiplication table.
+  starterCode={`// A small multiplication table.
 for (let row = 1; row <= 5; row++) {
   let line = "";
   for (let col = 1; col <= 5; col++) {
@@ -362,7 +362,7 @@ goes in this cycle.
 For example, \`fizzbuzz(5)\` should return \`["1", "2", "Fizz", "4", "Buzz"]\`.
 
 Implement it with a \`for\` loop and an array you build up with \`.push()\`.`}
-  initialCode={`function fizzbuzz(n) {
+  starterCode={`function fizzbuzz(n) {
   const out = [];
   // your code here
   return out;

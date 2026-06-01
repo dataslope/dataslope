@@ -18,7 +18,7 @@
  *
  * Group by \`category\` and compute totals.`}
  *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
- *   initialCode={`summary = None`}
+ *   starterCode={`summary = None`}
  *   tests={[
  *     {
  *       id: "summary_exists",
