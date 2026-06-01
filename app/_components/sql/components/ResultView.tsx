@@ -1021,7 +1021,7 @@ function ResultViewImpl({
 
   if (loading) {
     return (
-      <div className="welcome">
+      <div className="welcome" data-result-empty="loading">
         <div className="welcome-icon">⌬</div>
         <h3>Loading {engineLabel} engine…</h3>
       </div>
@@ -1029,7 +1029,7 @@ function ResultViewImpl({
   }
   if (!result) {
     return (
-      <div className="welcome">
+      <div className="welcome" data-result-empty="idle">
         <div className="welcome-icon">⌬</div>
         <h3>Run a query to see results</h3>
         <p>

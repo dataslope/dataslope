@@ -4109,6 +4109,13 @@
     color: var(--primary);
     border-top-color: var(--primary);
   }
+  .sql-mobile-tab.disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  .sql-mobile-tab.disabled:active {
+    background: transparent;
+  }
   .sql-mobile-tab span {
     line-height: 1;
   }

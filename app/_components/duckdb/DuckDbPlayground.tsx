@@ -104,7 +104,6 @@ import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
-import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
@@ -1115,8 +1114,6 @@ function DuckDbPlaygroundInner() {
     useState<ParquetImportState | null>(null);
   const [importSqlDumpOpen, setImportSqlDumpOpen] = useState(false);
   const [importSqlDumpDragging, setImportSqlDumpDragging] = useState(false);
-  const [importDuckDbOpen, setImportDuckDbOpen] = useState(false);
-  const [importDuckDbDragging, setImportDuckDbDragging] = useState(false);
 
   // ─── Rename / custom filename state ───────────────────────────────────
   const [renameDbOpen, setRenameDbOpen] = useState(false);
@@ -2425,75 +2422,6 @@ function DuckDbPlaygroundInner() {
     [persistTabs, refreshSchema, showToast],
   );
 
-  const performImportDuckDb = useCallback(
-    async (bytes: Uint8Array, filename: string) => {
-      const engine = engineRef.current;
-      if (!engine) return;
-      setStatusState("loading");
-      try {
-        // importFromBinary wipes the schema before attaching; on failure it
-        // restores the previous sample internally so the user database is
-        // not left empty. Only clear UI state once import has succeeded.
-        await engine.importFromBinary(bytes);
-        setTables([]);
-        setViews([]);
-        setIndexes([]);
-        setTriggers([]);
-        setColumnsByEntity({});
-        setForeignKeysByEntity({});
-        setRowCountByTable({});
-        setExpandedEntities(new Set());
-        setActiveDbId(DUCKDB_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(
-          DUCKDB_BLANK_DATABASE.id,
-          DUCKDB_BLANK_DATABASE.defaultTabs,
-        );
-        persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
-        tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
-        setResultsByTab({});
-        setImportDuckDbOpen(false);
-        setImportDuckDbDragging(false);
-        await refreshSchemas();
-        await refreshSchema();
-        setStatusState("ready");
-        showToast(`Loaded "${filename}".`);
-      } catch (err) {
-        // importFromBinary restored the previous sample on failure; reread
-        // the schema so the sidebar reflects the restored state.
-        try {
-          await refreshSchemas();
-          await refreshSchema();
-        } catch {
-          /* ignore */
-        }
-        showToast(
-          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
-          "warn",
-        );
-        setStatusState("ready");
-      }
-    },
-    [persistTabs, refreshSchema, refreshSchemas, showToast],
-  );
-
   const {
     addTab,
     openTabAndRun,
@@ -3407,27 +3335,6 @@ function DuckDbPlaygroundInner() {
 
   // ─── Export database helpers ──────────────────────────────────────────
 
-  const exportDuckDbBinary = useCallback(async () => {
-    const engine = engineRef.current;
-    if (!engine || tables.length === 0) return;
-    try {
-      const bytes = await engine.exportAsBinary();
-      const baseName =
-        displayFilename.replace(/\.[^.]+$/, "") || "database";
-      const filename = `${baseName}.duckdb`;
-      triggerDownload(
-        new Blob([bytes], { type: "application/octet-stream" }),
-        filename,
-      );
-      showToast(`Exported ${filename}.`);
-    } catch (err) {
-      showToast(
-        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
-        "warn",
-      );
-    }
-  }, [tables, displayFilename, showToast]);
-
   const exportDuckDbDatabase = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || tables.length === 0) return;
@@ -3812,20 +3719,6 @@ function DuckDbPlaygroundInner() {
                         </div>
                       </div>
                     </Menu.Item>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => setImportDuckDbOpen(true)}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from DuckDB
-                          <span className="ext-badge">.duckdb</span>
-                        </div>
-                        <div className="ex-desc">
-                          Load database from a DuckDB file
-                        </div>
-                      </div>
-                    </Menu.Item>
                     <div className="import-section-label">Tables</div>
                     <Menu.Item
                       className="example-item export-item"
@@ -3936,20 +3829,6 @@ function DuckDbPlaygroundInner() {
                       </div>
                       <Menu.Item
                         className="example-item export-item"
-                        onClick={() => void exportDuckDbBinary()}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            DuckDB Binary
-                            <span className="ext-badge">.duckdb</span>
-                          </div>
-                          <div className="ex-desc">
-                            Native DuckDB file format
-                          </div>
-                        </div>
-                      </Menu.Item>
-                      <Menu.Item
-                        className="example-item export-item"
                         onClick={() => void exportDuckDbDatabase()}
                       >
                         <div className="export-item-text">
@@ -4050,33 +3929,6 @@ function DuckDbPlaygroundInner() {
           onClose={() => setImportSqlDumpOpen(false)}
           onDraggingChange={setImportSqlDumpDragging}
           onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
-        />
-
-        <ImportBinaryFileDialog
-          open={importDuckDbOpen}
-          dragging={importDuckDbDragging}
-          onClose={() => setImportDuckDbOpen(false)}
-          onDraggingChange={setImportDuckDbDragging}
-          onImport={(data, filename) => void performImportDuckDb(data, filename)}
-          title="Import DuckDB File"
-          description={
-            <>
-              Open a local <code>.duckdb</code> file as a new in-memory
-              database.
-            </>
-          }
-          warningText={
-            <>
-              This will replace the current database with the contents of the
-              file. Your file will <strong>not</strong> be uploaded or persisted
-              — it is only loaded into browser memory and will be gone on
-              reload.
-            </>
-          }
-          dropText="Drop a DuckDB file here"
-          browseHint="or click to browse — .duckdb"
-          accept=".duckdb"
-          inputAriaLabel="Choose DuckDB file"
         />
 
         {/* ── Create Schema popover ── */}

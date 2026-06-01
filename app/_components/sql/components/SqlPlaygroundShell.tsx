@@ -100,14 +100,23 @@ export function SqlPlaygroundShell({
   // state has no effect on desktop (the CSS that reads `data-mobile-pane`
   // is scoped to the mobile media query), so it's safe to keep mounted.
   const [mobilePane, setMobilePane] = useState<SqlMobilePane>("editor");
+  // Whether the active query tab currently has something worth showing on
+  // the Results surface (a table, an error, or a "statement executed"
+  // notice). Drives the mobile Results tab's disabled state so users can't
+  // tab into an empty pane before they've run anything. Detected from the
+  // rendered DOM (see the observer below) so the three playground bodies
+  // stay untouched.
+  const [hasResults, setHasResults] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Comfort affordance: when the user runs a query (Run button) or opens a
   // table by double-clicking it in the schema tree, jump the mobile view to
   // the surface that's about to show the answer — Results — so they don't
-  // have to hunt for the right tab after every run. Implemented with event
-  // delegation on the shell so the individual playgrounds stay untouched;
-  // it's a no-op on desktop where the bottom bar is hidden.
+  // have to hunt for the right tab after every run. Creating a new query tab
+  // (the "+" button) instead jumps to the Editor, where the user will start
+  // typing. Implemented with event delegation on the shell so the individual
+  // playgrounds stay untouched; it's a no-op on desktop where the bottom bar
+  // is hidden.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -117,7 +126,9 @@ export function SqlPlaygroundShell({
     const onClick = (e: Event) => {
       if (!isMobile()) return;
       const t = e.target as HTMLElement | null;
-      if (t?.closest(".run-btn, .run-btn-split-main")) {
+      if (t?.closest(".playground-tab-add")) {
+        setMobilePane("editor");
+      } else if (t?.closest(".run-btn, .run-btn-split-main")) {
         setMobilePane("results");
       }
     };
@@ -140,6 +151,26 @@ export function SqlPlaygroundShell({
       root.removeEventListener("click", onClick);
       root.removeEventListener("dblclick", onDblClick);
     };
+  }, []);
+
+  // Track whether the results pane is showing real content vs. the
+  // "Run a query to see results" / loading placeholder. ResultView tags
+  // both placeholder states with `data-result-empty`; everything else
+  // (table, error, "no rows") is real output. A MutationObserver keeps the
+  // flag in sync as the user runs queries, switches tabs, or reloads a
+  // sample — without threading a prop through every playground.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const recompute = () => {
+      const pane = root.querySelector(".sql-results-pane");
+      const empty = pane?.querySelector("[data-result-empty]");
+      setHasResults(!!pane && !empty);
+    };
+    recompute();
+    const observer = new MutationObserver(recompute);
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -187,21 +218,33 @@ export function SqlPlaygroundShell({
               ["editor", "Editor", Code2],
               ["results", "Results", Table2],
             ] as const
-          ).map(([pane, label, Icon]) => (
-            <button
-              key={pane}
-              type="button"
-              role="tab"
-              aria-selected={mobilePane === pane}
-              className={`sql-mobile-tab${
-                mobilePane === pane ? " active" : ""
-              }`}
-              onClick={() => setMobilePane(pane)}
-            >
-              <Icon size={18} aria-hidden="true" />
-              <span>{label}</span>
-            </button>
-          ))}
+          ).map(([pane, label, Icon]) => {
+            // Results stays disabled until a query has produced output, so
+            // users can't tab into an empty pane. It's never disabled while
+            // it's the active pane (e.g. mid-run, showing the run overlay).
+            const disabled =
+              pane === "results" && !hasResults && mobilePane !== "results";
+            return (
+              <button
+                key={pane}
+                type="button"
+                role="tab"
+                aria-selected={mobilePane === pane}
+                disabled={disabled}
+                aria-disabled={disabled}
+                className={`sql-mobile-tab${
+                  mobilePane === pane ? " active" : ""
+                }${disabled ? " disabled" : ""}`}
+                onClick={() => {
+                  if (disabled) return;
+                  setMobilePane(pane);
+                }}
+              >
+                <Icon size={18} aria-hidden="true" />
+                <span>{label}</span>
+              </button>
+            );
+          })}
         </nav>
       </div>
     </div>
