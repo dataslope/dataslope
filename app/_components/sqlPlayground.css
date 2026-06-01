@@ -1580,7 +1580,7 @@
 .sql-modify-drawer-subtitle {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--accent1);
+  color: var(--text-dim);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;

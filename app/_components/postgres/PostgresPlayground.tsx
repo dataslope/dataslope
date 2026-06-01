@@ -3663,10 +3663,8 @@ function PostgresPlaygroundInner() {
                                       <th>Not null</th>
                                       <th>Primary</th>
                                       <th>Unique</th>
-                                      <th>
-                                        Identity/
-                                        <br />
-                                        serial
+                                      <th title="Identity / serial (auto-incrementing) column">
+                                        Identity
                                       </th>
                                       <th>Default</th>
                                       <th>FK table</th>
@@ -3958,10 +3956,8 @@ function PostgresPlaygroundInner() {
                                       <th>Not null</th>
                                       <th>Primary</th>
                                       <th>Unique</th>
-                                      <th>
-                                        Identity/
-                                        <br />
-                                        serial
+                                      <th title="Identity / serial (auto-incrementing) column">
+                                        Identity
                                       </th>
                                       <th>Default</th>
                                       <th>FK table</th>
