@@ -88,6 +88,42 @@ test.describe("SQL playgrounds — mobile layout (390×844)", () => {
       expect(await hasNoHorizontalOverflow(page)).toBe(true);
     });
   }
+
+  // ── Request 3: per-query-tab bottom-pane memory ──────────────────────
+  // Each query tab remembers which bottom pane it was last on; activating a
+  // tab restores that pane (a brand-new tab defaults to Editor). Verified
+  // engine-free with Schema/Editor — the Results-specific "empty ⇒ editor"
+  // fallback is covered by the `paneForActivatedTab` unit test, since reaching
+  // Results requires a booted engine + a query run.
+  test("sqlite: each query tab restores its own bottom pane on activation", async ({
+    page,
+  }) => {
+    await gotoPlayground(page, "sqlite");
+    const root = page.locator(".playground-root");
+    const tabBar = page.locator(".sql-mobile-tabs");
+    const tabs = page.locator(".playground-tab");
+
+    const initialCount = await tabs.count();
+
+    // Put the first tab on the Schema pane.
+    await tabs.first().click();
+    await tabBar.getByRole("tab", { name: "Schema" }).click();
+    await expect(root).toHaveAttribute("data-mobile-pane", "schema");
+
+    // A brand-new query tab ("+") becomes active and defaults to the Editor,
+    // not the previous tab's Schema pane.
+    await page.locator(".playground-tab-add").click();
+    await expect(tabs).toHaveCount(initialCount + 1);
+    await expect(root).toHaveAttribute("data-mobile-pane", "editor");
+
+    // Re-activating the first tab restores *its* remembered Schema pane …
+    await tabs.first().click();
+    await expect(root).toHaveAttribute("data-mobile-pane", "schema");
+
+    // … and going back to the new tab restores its Editor pane.
+    await tabs.last().click();
+    await expect(root).toHaveAttribute("data-mobile-pane", "editor");
+  });
 });
 
 test.describe("SQL playgrounds — desktop layout unchanged (1280×800)", () => {
