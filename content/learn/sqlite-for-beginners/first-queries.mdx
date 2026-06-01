@@ -14,7 +14,7 @@ The keyword `SELECT` means: *compute something and show me the result.* You can 
 <SqlCodeBlock
   dialect="sqlite"
   title="Select one literal value"
-  initialCode={`SELECT 'Hello, SQLite!' AS message;`}
+  starterCode={`SELECT 'Hello, SQLite!' AS message;`}
 />
 
 The result is a tiny table: one row and one column. The value is text, so it is wrapped in single quotes.
@@ -32,7 +32,7 @@ SQLite can also act like a calculator. Arithmetic expressions go after `SELECT`.
 <SqlCodeBlock
   dialect="sqlite"
   title="SELECT as a calculator"
-  initialCode={`SELECT
+  starterCode={`SELECT
   2 + 2 AS sum,
   10 - 3 AS difference,
   6 * 7 AS product,
@@ -76,7 +76,7 @@ Later, when you read stored data, you add `FROM table_name` to say where the row
 <SqlCodeBlock
   dialect="sqlite"
   title="Several values in one result row"
-  initialCode={`SELECT
+  starterCode={`SELECT
   'Ada' AS first_name,
   'Lovelace' AS last_name,
   1843 AS important_year;`}
@@ -91,7 +91,7 @@ This block creates a small table, inserts two rows, and reads the rows back.
 <SqlCodeBlock
   dialect="sqlite"
   title="Create, insert, and select"
-  initialCode={`CREATE TABLE pets (
+  starterCode={`CREATE TABLE pets (
   name TEXT,
   species TEXT
 );
@@ -128,7 +128,7 @@ INSERT INTO snacks (name, kind, calories) VALUES
   ('Apple', 'fruit', 95),
   ('Pretzels', 'snack', 110),
   ('Yogurt', 'dairy', 150);`}
-  initialCode={`SELECT name, calories
+  starterCode={`SELECT name, calories
 FROM snacks;`}
 />
 
@@ -146,7 +146,7 @@ INSERT INTO snacks (name, kind, calories) VALUES
   ('Apple', 'fruit', 95),
   ('Pretzels', 'snack', 110),
   ('Yogurt', 'dairy', 150);`}
-  initialCode={`SELECT *
+  starterCode={`SELECT *
 FROM snacks;`}
 />
 

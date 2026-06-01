@@ -48,7 +48,7 @@ misbehave.
 import micropip
 await micropip.install("nltk")
 import nltk`}
-  initialCode={`from nltk.stem import PorterStemmer
+  starterCode={`from nltk.stem import PorterStemmer
 
 stemmer = PorterStemmer()
 
@@ -116,7 +116,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "wordnet")
 from nltk.stem import WordNetLemmatizer`}
-  initialCode={`lemmatizer = WordNetLemmatizer()
+  starterCode={`lemmatizer = WordNetLemmatizer()
 
 # WordNetLemmatizer defaults to treating each word as a NOUN.
 print("Default (noun) lemmas:")
@@ -184,7 +184,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "wordnet")
 from nltk.stem import PorterStemmer, WordNetLemmatizer`}
-  initialCode={`stemmer = PorterStemmer()
+  starterCode={`stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
 words = ["studies", "studying", "happily", "better", "was", "mice", "feet"]
@@ -298,7 +298,7 @@ async def _load_nltk(category, package):
 await _load_nltk("corpora", "wordnet")
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()`}
-  initialCode={`def verb_lemmas(words):
+  starterCode={`def verb_lemmas(words):
     # Lemmatize each word as a verb (pos="v") and return the list.
     return words
 

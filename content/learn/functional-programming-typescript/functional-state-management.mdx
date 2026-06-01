@@ -22,7 +22,7 @@ much every modern state library.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type State = { readonly count: number };
+  starterCode={`type State = { readonly count: number };
 type Action =
   | { kind: "inc" }
   | { kind: "dec" }
@@ -68,7 +68,7 @@ point in time.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type State = { readonly count: number };
+  starterCode={`type State = { readonly count: number };
 type Action = { kind: "inc" } | { kind: "add"; by: number } | { kind: "reset" };
 const initial: State = { count: 0 };
 const reducer = (s: State, a: Action): State => {
@@ -108,7 +108,7 @@ data structure:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Doc = { readonly text: string };
+  starterCode={`type Doc = { readonly text: string };
 
 type Editor = {
   readonly past:    ReadonlyArray<Doc>;
@@ -183,7 +183,7 @@ produce a value and the next state".
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// State<S, A> = a function from state to [value, newState]
+  starterCode={`// State<S, A> = a function from state to [value, newState]
 type State<S, A> = (s: S) => readonly [A, S];
 
 const of  = <S, A>(a: A): State<S, A> => (s) => [a, s];

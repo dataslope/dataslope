@@ -21,7 +21,7 @@ histograms, scatter plots, and lines.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame({
@@ -49,7 +49,7 @@ A single function call:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`fig = px.histogram(df, x="satisfaction_level", nbins=30,
+  starterCode={`fig = px.histogram(df, x="satisfaction_level", nbins=30,
                    title="Distribution of employee satisfaction")
 fig.show()
 `}
@@ -70,7 +70,7 @@ for:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`fig = px.box(df, x="salary", y="satisfaction_level",
+  starterCode={`fig = px.box(df, x="salary", y="satisfaction_level",
              title="Satisfaction by salary bracket")
 fig.show()
 `}
@@ -86,7 +86,7 @@ glance. Use it to compare a numeric column across categories.
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`fig = px.scatter(df, x="average_montly_hours", y="satisfaction_level",
+  starterCode={`fig = px.scatter(df, x="average_montly_hours", y="satisfaction_level",
                  color="salary", opacity=0.5,
                  title="Hours worked vs satisfaction, by salary")
 fig.show()
@@ -99,7 +99,7 @@ Opacity is your friend when many points overlap.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import plotly.express as px
 
 dates = pd.date_range("2024-01-01", periods=60, freq="D")
@@ -129,7 +129,7 @@ A few line-chart rules:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  initialCode={`fig = px.histogram(df, x="satisfaction_level", facet_col="salary",
+  starterCode={`fig = px.histogram(df, x="satisfaction_level", facet_col="salary",
                    nbins=30, title="Satisfaction by salary bracket")
 fig.show()
 `}
@@ -202,7 +202,7 @@ rng = np.random.RandomState(0)
 sales = pd.DataFrame({
     "amount": rng.gamma(shape=2.0, scale=50, size=500),
 })`}
-  initialCode={`import plotly.express as px
+  starterCode={`import plotly.express as px
 
 fig = None   # TODO
 

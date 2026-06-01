@@ -48,7 +48,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(10, 4))
 air.plot(ax=ax, title="Monthly airline passengers, 1949-1960")
@@ -94,7 +94,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
 def p(series): return adfuller(series.dropna())[1]
@@ -136,7 +136,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 dec = seasonal_decompose(air, model="multiplicative", period=12)
@@ -180,7 +180,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
@@ -242,7 +242,7 @@ air = pd.Series(_passengers, index=idx, name="passengers")
 def mae(a, b):  return float(np.mean(np.abs(np.asarray(a) - np.asarray(b))))
 def rmse(a, b): return float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
 def mape(a, b): return float(np.mean(np.abs((np.asarray(a) - np.asarray(b)) / np.asarray(a))) * 100)`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
@@ -310,7 +310,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
@@ -395,7 +395,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
 report = {
@@ -484,7 +484,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 evaluation = {
     "snaive_mae": None, "snaive_rmse": None,

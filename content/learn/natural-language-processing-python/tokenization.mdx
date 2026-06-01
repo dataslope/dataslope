@@ -75,7 +75,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize, sent_tokenize`}
-  initialCode={`text = "I don't think Mr. Lee's plan will work, but we'll see!"
+  starterCode={`text = "I don't think Mr. Lee's plan will work, but we'll see!"
 
 print("split():        ", text.split())
 print("word_tokenize():", word_tokenize(text))
@@ -162,7 +162,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import sent_tokenize`}
-  initialCode={`text = "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?"
+  starterCode={`text = "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?"
 
 # Naive: split on every period.
 naive = text.split(".")
@@ -229,7 +229,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize, TweetTokenizer`}
-  initialCode={`tweet = "Loving #NLP @dataslope, this is sooo cool!!! :)"
+  starterCode={`tweet = "Loving #NLP @dataslope, this is sooo cool!!! :)"
 
 print("Default word_tokenize:")
 print("  ", word_tokenize(tweet))
@@ -317,7 +317,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import sent_tokenize, word_tokenize`}
-  initialCode={`text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
+  starterCode={`text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
 
 sentences = None  # sent_tokenize the text
 tokens = None     # word_tokenize the text

@@ -24,7 +24,7 @@ Understanding the quirks of Python's numeric types—especially the precision li
 
 <CodeBlock
   adapter="python"
-  initialCode={`big = 2 ** 200
+  starterCode={`big = 2 ** 200
 print(big)
 print("digits:", len(str(big)))
 `}
@@ -38,7 +38,7 @@ Integer literals support several bases:
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(0b1010)   # binary -> 10
+  starterCode={`print(0b1010)   # binary -> 10
 print(0o17)     # octal  -> 15
 print(0xff)     # hex    -> 255
 `}
@@ -46,7 +46,7 @@ print(0xff)     # hex    -> 255
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Underscores for readability (Python 3.6+)
+  starterCode={`# Underscores for readability (Python 3.6+)
 print(1_000_000)
 print(0b1111_0000)
 `}
@@ -60,7 +60,7 @@ print(0b1111_0000)
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(0.1 + 0.2)
+  starterCode={`print(0.1 + 0.2)
 print(0.1 + 0.2 == 0.3)
 `}
 />
@@ -86,7 +86,7 @@ For exact decimal arithmetic—like money—use `decimal.Decimal`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from decimal import Decimal
+  starterCode={`from decimal import Decimal
 
 price = Decimal("19.99")
 quantity = Decimal("3")
@@ -97,7 +97,7 @@ print(total)
 
 <CodeBlock
   adapter="python"
-  initialCode={`from decimal import Decimal
+  starterCode={`from decimal import Decimal
 
 # Float precision fails for currency
 print(0.1 + 0.1 + 0.1 == 0.3)
@@ -123,7 +123,7 @@ For exact rational arithmetic (fractions), use `fractions.Fraction`:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from fractions import Fraction
+  starterCode={`from fractions import Fraction
 
 x = Fraction(1, 3)
 y = Fraction(1, 6)
@@ -137,7 +137,7 @@ Python has built-in support for complex numbers using `j` (not `i`) for the imag
 
 <CodeBlock
   adapter="python"
-  initialCode={`z = 3 + 4j
+  starterCode={`z = 3 + 4j
 print(z.real, z.imag)
 print(abs(z))  # magnitude
 `}
@@ -145,7 +145,7 @@ print(abs(z))  # magnitude
 
 <CodeBlock
   adapter="python"
-  initialCode={`z = 3 + 4j
+  starterCode={`z = 3 + 4j
 w = 1 + 2j
 print(z * w)
 print(z / w)
@@ -168,7 +168,7 @@ A common surprise: `/` **always** returns a float in Python 3, even when both op
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(7 / 2)   # 3.5 (float)
+  starterCode={`print(7 / 2)   # 3.5 (float)
 print(7 // 2)  # 3 (int)
 `}
 />
@@ -177,14 +177,14 @@ Floor division rounds toward negative infinity, which can surprise C programmers
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(7 // 2)    # 3
+  starterCode={`print(7 // 2)    # 3
 print(-7 // 2)   # -4, not -3
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(7 % 2)
+  starterCode={`print(7 % 2)
 print(2 ** 0.5)  # square root via exponentiation
 `}
 />
@@ -193,7 +193,7 @@ Augmented assignment operators work as expected:
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 10
+  starterCode={`x = 10
 x += 5
 x *= 2
 print(x)
@@ -206,7 +206,7 @@ print(x)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 
 print(math.pi, math.e)
 print(math.sqrt(2))
@@ -215,7 +215,7 @@ print(math.sqrt(2))
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 
 print(math.sin(math.pi / 2))
 print(math.log(100, 10))
@@ -226,7 +226,7 @@ print(math.gcd(24, 36))
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 
 print(math.floor(3.7), math.ceil(3.2))
 print(round(3.5))
@@ -251,7 +251,7 @@ For non-cryptographic randomness, use `random`. For cryptography, use `secrets`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import random
+  starterCode={`import random
 random.seed(42)  # makes output reproducible
 
 print(random.random())            # float in [0.0, 1.0)
@@ -262,7 +262,7 @@ print(random.choice(["a", "b", "c"]))
 
 <CodeBlock
   adapter="python"
-  initialCode={`import random
+  starterCode={`import random
 random.seed(42)
 
 print(random.sample(range(100), 5))  # 5 unique items
@@ -275,7 +275,7 @@ print(random.sample(range(100), 5))  # 5 unique items
   adapter="python"
   title="Round to cents using Decimal"
   instructions={`Write a function \`round_to_cents(amount)\` that takes a string representing a dollar amount (e.g., \`"19.996"\`) and returns a \`Decimal\` rounded to two decimal places. Use \`Decimal\` and its \`.quantize()\` method with \`ROUND_HALF_UP\`.`}
-  initialCode={`from decimal import Decimal, ROUND_HALF_UP
+  starterCode={`from decimal import Decimal, ROUND_HALF_UP
 
 def round_to_cents(amount):
     # Your code here
@@ -316,7 +316,7 @@ print(round_to_cents("0.004"))
   adapter="python"
   title="Greatest common divisor"
   instructions={`Define a function \`gcd(a, b)\` that returns the greatest common divisor of two positive integers using the Euclidean algorithm. Do **not** use \`math.gcd\`—implement it yourself using a loop or recursion.`}
-  initialCode={`def gcd(a, b):
+  starterCode={`def gcd(a, b):
     # Your code here
     return 1
 
@@ -354,7 +354,7 @@ print(gcd(100, 25))
   adapter="python"
   title="Compound interest"
   instructions={`Write a function \`compound_interest(principal, rate, years)\` that calculates the final amount using the formula \`A = P * (1 + r)^t\`. \`rate\` is a decimal (e.g., \`0.05\` for 5%). Return a float rounded to 2 decimal places.`}
-  initialCode={`def compound_interest(principal, rate, years):
+  starterCode={`def compound_interest(principal, rate, years):
     # Your code here
     return 0.0
 

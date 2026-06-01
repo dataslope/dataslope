@@ -67,7 +67,7 @@ ma = np.zeros(n)
 for t in range(1, n):
     ma[t] = e[t] + 0.8 * e[t-1]
 ma1 = pd.Series(ma[100:])`}
-  initialCode={`from statsmodels.tsa.arima.model import ARIMA
+  starterCode={`from statsmodels.tsa.arima.model import ARIMA
 
 ar_fit = ARIMA(ar1, order=(1, 0, 0)).fit()   # one AR term, no differencing, no MA
 ma_fit = ARIMA(ma1, order=(0, 0, 1)).fit()   # no AR, no differencing, one MA term
@@ -150,7 +150,7 @@ idx = pd.date_range("2010-01-01", periods=n, freq="MS")
 series = pd.Series(50 + 0.3*np.arange(n) + ar, index=idx, name="y")
 
 train, test = series.iloc[:-24], series.iloc[-24:]   # hold out the last 24 months`}
-  initialCode={`from statsmodels.tsa.arima.model import ARIMA
+  starterCode={`from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
 
 # Fit on TRAIN only. (p,d,q) = (1,1,1): one AR term, one difference, one MA term.
@@ -212,7 +212,7 @@ for t in range(1, n):
 idx = pd.date_range("2010-01-01", periods=n, freq="MS")
 series = pd.Series(50 + 0.3*np.arange(n) + ar, index=idx, name="y")
 train = series.iloc[:-24]`}
-  initialCode={`from statsmodels.tsa.arima.model import ARIMA
+  starterCode={`from statsmodels.tsa.arima.model import ARIMA
 
 print(f"{'order':>10} | {'AIC':>9}")
 print("-" * 24)
@@ -267,7 +267,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`from statsmodels.tsa.arima.model import ARIMA
+  starterCode={`from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -343,7 +343,7 @@ for t in range(1, n):
     ar[t] = 0.5 * ar[t-1] + e[t]
 idx = pd.date_range("2012-01-01", periods=n, freq="MS")
 train = pd.Series(20 + 0.4*np.arange(n) + ar, index=idx, name="y")`}
-  initialCode={`fitted = None
+  starterCode={`fitted = None
 forecast = None
 print(forecast)
 `}
@@ -405,7 +405,7 @@ for t in range(1, n):
     ma[t] = e[t] + 0.7 * e[t-1]   # an MA-flavored series
 idx = pd.date_range("2011-01-01", periods=n, freq="MS")
 train = pd.Series(10 + np.cumsum(ma) * 0.0 + ma, index=idx, name="y")`}
-  initialCode={`pick = {
+  starterCode={`pick = {
     "aic_111": None,
     "aic_011": None,
     "best_order": None,

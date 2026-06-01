@@ -130,7 +130,7 @@ one of the most powerful tools in a data scientist's kit.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -173,7 +173,7 @@ independent or equally likely.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -221,7 +221,7 @@ around; as the flip count climbs it homes in on 0.5.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(1)
@@ -298,7 +298,7 @@ The conversions:
 
 <CodeBlock
   adapter="python"
-  initialCode={`def prob_to_odds(p):
+  starterCode={`def prob_to_odds(p):
     return p / (1 - p)        # returns "to 1" odds
 
 def odds_to_prob(odds):
@@ -363,7 +363,7 @@ The exact answer is \`6/36 ≈ 0.1667\`, so a good simulation should land within
   initCode={`import numpy as np
 rng = np.random.default_rng(2024)
 n = 200_000`}
-  initialCode={`# TODO: simulate n rolls of two dice and estimate P(sum == 7) as a float p7
+  starterCode={`# TODO: simulate n rolls of two dice and estimate P(sum == 7) as a float p7
 p7 = None
 `}
   solutionCode={`die1 = rng.integers(1, 7, size=n)
@@ -410,7 +410,7 @@ rng = np.random.default_rng(99)
 p_success = 0.7
 n_attempts = 4
 n_trials = 100_000`}
-  initialCode={`# TODO: compute p_exact via the complement rule, and p_sim via simulation
+  starterCode={`# TODO: compute p_exact via the complement rule, and p_sim via simulation
 p_exact = None
 p_sim = None
 `}

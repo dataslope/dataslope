@@ -38,7 +38,7 @@ The simplest possible function:
 
 <CodeBlock
   adapter="r"
-  initialCode={`square <- function(x) {
+  starterCode={`square <- function(x) {
   x * x
 }
 
@@ -57,7 +57,7 @@ arguments by name in any order:
 
 <CodeBlock
   adapter="r"
-  initialCode={`greet <- function(name, greeting = "Hello") {
+  starterCode={`greet <- function(name, greeting = "Hello") {
   paste0(greeting, ", ", name, "!")
 }
 
@@ -77,7 +77,7 @@ vector and returns a small named list summarizing it.
 
 <CodeBlock
   adapter="r"
-  initialCode={`describe <- function(x, na.rm = TRUE) {
+  starterCode={`describe <- function(x, na.rm = TRUE) {
   list(
     n      = length(x),
     n_na   = sum(is.na(x)),
@@ -116,7 +116,7 @@ removes the repetition:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Compact: one function call per column you care about
+  starterCode={`# Compact: one function call per column you care about
 means <- sapply(mtcars[, c("mpg", "hp", "wt", "qsec")], mean)
 print(means)
 
@@ -137,7 +137,7 @@ useful for comparing variables on different scales):
 
 <CodeBlock
   adapter="r"
-  initialCode={`standardize <- function(x) {
+  starterCode={`standardize <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
 
@@ -151,7 +151,7 @@ You can now apply it to many columns:
 
 <CodeBlock
   adapter="r"
-  initialCode={`standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+  starterCode={`standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 
 z_mtcars <- as.data.frame(lapply(mtcars[, c("mpg", "hp", "wt")], standardize))
 head(z_mtcars)
@@ -198,7 +198,7 @@ Better to separate:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Pure: just computes and returns
+  starterCode={`# Pure: just computes and returns
 signal_to_noise <- function(x) {
   mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE)
 }
@@ -225,7 +225,7 @@ don't leak out to your global environment:
 
 <CodeBlock
   adapter="r"
-  initialCode={`temp_var_in_global <- "I exist out here"
+  starterCode={`temp_var_in_global <- "I exist out here"
 
 scoped <- function() {
   temp_var_in_global <- "I'm only inside the function"
@@ -285,7 +285,7 @@ the SD.
   adapter="r"
   title="Build summarize_group()"
   instructions={`Define \`summarize_group <- function(x) { ... }\` so that calling it on a numeric vector returns a list with elements \`n\` (length), \`mean\` (mean, ignoring NAs), and \`sd\` (sd, ignoring NAs).`}
-  initialCode={`summarize_group <- function(x) {
+  starterCode={`summarize_group <- function(x) {
   # TODO: return list(n = ..., mean = ..., sd = ...)
 }
 

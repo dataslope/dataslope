@@ -73,7 +73,7 @@ will dispatch to the actual concrete class's version:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -200,7 +200,7 @@ that derived classes must implement.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -245,7 +245,7 @@ int main() {
   adapter="cpp"
   title="Shapes hierarchy"
   instructions={`Add a \`Rectangle\` class derived from the abstract \`Shape\` that takes \`width\` and \`height\` and returns \`width * height\` from \`area()\`. \`main\` already creates a \`Rectangle(3.0, 4.0)\`, calls \`area()\`, and expects \`12\` on stdout.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <memory>
 
 class Shape {

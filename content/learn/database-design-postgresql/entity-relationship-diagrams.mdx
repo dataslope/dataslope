@@ -116,7 +116,7 @@ CREATE TABLE orders (
 );
 INSERT INTO customers VALUES (1, 'Ada', 'ada@example.com');
 INSERT INTO orders VALUES (101, 1, DATE '2025-02-01', 'placed');`}
-  initialCode={`SELECT c.name, o.id AS order_id, o.status
+  starterCode={`SELECT c.name, o.id AS order_id, o.status
 FROM customers c
 JOIN orders o ON o.customer_id = c.id;`}
 />

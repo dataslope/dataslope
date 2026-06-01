@@ -33,7 +33,7 @@ points depending on order:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Points first, then the line on TOP of them.
 ggplot(mpg, aes(displ, hwy)) +
@@ -44,7 +44,7 @@ ggplot(mpg, aes(displ, hwy)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Line first, then points on TOP of it.
 ggplot(mpg, aes(displ, hwy)) +
@@ -65,7 +65,7 @@ layer** a different data frame:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Base layer: all cars in grey. Second layer: only 7+ seat-equivalent
 # big engines (displ > 5), redrawn larger and in red, on top.
@@ -97,7 +97,7 @@ variables — handy for experimenting:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy))   # shared base, no layers yet
 

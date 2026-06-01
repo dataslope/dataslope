@@ -41,7 +41,7 @@ pass to LINQ.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 Func<int, int>      square      = x => x * x;
 Func<int, int, int> add         = (a, b) => a + b;
@@ -58,7 +58,7 @@ a **closure**.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 int factor = 10;
 Func<int, int> times = x => x * factor;
@@ -80,7 +80,7 @@ time, lazily. It's the secret behind almost every LINQ operator.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Counting()
@@ -111,7 +111,7 @@ and `return`.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 record Circle(double Radius)
 {
@@ -134,7 +134,7 @@ is the closest thing C# has to Haskell-style pattern matching.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 static string Describe(object o) => o switch
 {
@@ -166,7 +166,7 @@ Records are the workhorse of immutable data in modern C#.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 record Person(string Name, int Age);
 
@@ -192,7 +192,7 @@ the class.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 int[] nums = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -215,7 +215,7 @@ multiple values without inventing a class.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 static (int min, int max, double avg) Stats(int[] xs) =>
@@ -233,7 +233,7 @@ the compiler picks the right type.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Collections.Generic;
 
 int[]      a = [1, 2, 3];
@@ -250,7 +250,7 @@ By 2024-era C#, "functional" idioms look like this:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 using System.Collections.Generic;
 

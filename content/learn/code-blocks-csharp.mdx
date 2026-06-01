@@ -11,7 +11,7 @@ scripts without a wrapping class.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 Console.WriteLine("Hello, C#!");
 for (int i = 1; i <= 3; i++) {
@@ -24,7 +24,7 @@ for (int i = 1; i <= 3; i++) {
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 var xs = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
@@ -102,3 +102,38 @@ Console.WriteLine(g.Bye());
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for `using` directives without cluttering the part you edit. Init of 3 lines
+or fewer shows a compact read-only header; 4 lines or more collapses behind a
+"Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="csharp"
+  initCode={`using System;
+using System.Linq;`}
+  starterCode={`// The using directives come from the initialization code above.
+int[] xs = { 1, 2, 3 };
+Console.WriteLine($"sum = {xs.Sum()}");
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="csharp"
+  initCode={`using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;`}
+  starterCode={`// The using directives come from the initialization code above.
+var names = new List<string> { "Ada", "Linus", "Grace" };
+var sb = new StringBuilder();
+foreach (var n in names.OrderBy(x => x)) sb.Append(n).Append(" ");
+Console.WriteLine(sb.ToString().Trim());
+`}
+/>

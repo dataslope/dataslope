@@ -51,7 +51,7 @@ narrower. The shape is always the same symmetric bell.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy import stats
@@ -102,7 +102,7 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 d = stats.norm(loc=0, scale=1)   # standard normal
 
@@ -122,7 +122,7 @@ same multiple of σ for every normal — only the scale changes.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -182,7 +182,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # IQ-like scores: mean 100, sd 15. How unusual is a score of 130?
 mu, sigma = 100, 15
@@ -224,7 +224,7 @@ interchangeable. Pick the right tool for the direction you need:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 mu, sigma = 100, 15
 d = stats.norm(loc=mu, scale=sigma)
@@ -261,7 +261,7 @@ Hints:
   initCode={`from scipy import stats
 mu, sigma = 1050, 200
 scores = [900, 1050, 1300]`}
-  initialCode={`# TODO: compute z_scores and percentiles (both lists of 3 floats, same order)
+  starterCode={`# TODO: compute z_scores and percentiles (both lists of 3 floats, same order)
 z_scores = None
 percentiles = None
 
@@ -322,7 +322,7 @@ Find the **minimum score** needed to be in the top 5% — i.e. the value with **
 - Store the answer as a plain Python \`float\` in **\`cutoff\`**.`}
   initCode={`from scipy import stats
 mu, sigma = 1050, 200`}
-  initialCode={`# TODO: find the top-5% cutoff score
+  starterCode={`# TODO: find the top-5% cutoff score
 cutoff = None
 
 print("Top-5% cutoff score:", cutoff)
@@ -379,7 +379,7 @@ Let's *see* the misfit by forcing a normal onto right-skewed income data.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 

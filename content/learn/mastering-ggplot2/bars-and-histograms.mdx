@@ -26,7 +26,7 @@ story the histogram tells:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Too few bins: detail is hidden.
 ggplot(mpg, aes(hwy)) +
@@ -36,7 +36,7 @@ ggplot(mpg, aes(hwy)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Too many bins: noisy and spiky.
 ggplot(mpg, aes(hwy)) +
@@ -74,7 +74,7 @@ See all three on the same data:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # STACK (default): total height = count, split into drv segments.
 ggplot(mpg, aes(x = class, fill = drv)) +
@@ -84,7 +84,7 @@ ggplot(mpg, aes(x = class, fill = drv)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # DODGE: sub-bars side by side -> compare drv WITHIN each class.
 ggplot(mpg, aes(x = class, fill = drv)) +
@@ -94,7 +94,7 @@ ggplot(mpg, aes(x = class, fill = drv)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # FILL: every bar stretched to 1.0 -> compare PROPORTIONS, lose totals.
 ggplot(mpg, aes(x = class, fill = drv)) +
@@ -120,7 +120,7 @@ points nudges overlapping dots apart so you can see density —
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # class vs drv are both discrete -> points overlap perfectly.
 # Jitter spreads them so you can see how many fall on each combination.

@@ -63,7 +63,7 @@ any method, access any property, and the compiler won't complain:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let x: any = 42;
+  starterCode={`let x: any = 42;
 console.log("x:", x);
 
 x = "hello";
@@ -92,7 +92,7 @@ console.log("any bypasses all type checking");
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function double(x: any): any {
+  starterCode={`function double(x: any): any {
   return x * 2;
 }
 
@@ -114,7 +114,7 @@ an `unknown` value until you narrow it:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let x: unknown = 42;
+  starterCode={`let x: unknown = 42;
 console.log("x:", x);
 
 x = "hello";
@@ -132,7 +132,7 @@ To use an `unknown` value, you must prove its type via narrowing:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function process(value: unknown): void {
+  starterCode={`function process(value: unknown): void {
   if (typeof value === "string") {
     console.log("String length:", value.length);  // ✅ value is narrowed to string
   } else if (typeof value === "number") {
@@ -162,7 +162,7 @@ Compare `any` vs `unknown` side by side:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function dangerousAny(x: any): number {
+  starterCode={`function dangerousAny(x: any): number {
   return x.length;  // No error, but crashes if x is a number
 }
 
@@ -194,7 +194,7 @@ These functions throw or loop forever, so they don't have a return value at all:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function throwError(message: string): never {
+  starterCode={`function throwError(message: string): never {
   throw new Error(message);
 }
 
@@ -218,7 +218,7 @@ try {
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function assertNever(x: never): never {
+  starterCode={`function assertNever(x: never): never {
   throw new Error("Unexpected value: " + x);
 }
 
@@ -249,7 +249,7 @@ error, forcing you to handle it.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Impossible = string & number;
+  starterCode={`type Impossible = string & number;
 // Impossible is 'never' — no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
@@ -270,7 +270,7 @@ functions that return `void` typically return `undefined` at runtime):
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function logMessage(message: string): void {
+  starterCode={`function logMessage(message: string): void {
   console.log("LOG:", message);
   // No return statement, or 'return;' with no value
 }
@@ -286,7 +286,7 @@ but the compiler won't let you use it in a meaningful way:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function doNothing(): void {
+  starterCode={`function doNothing(): void {
   return;
 }
 
@@ -309,7 +309,7 @@ There's a subtle distinction:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function returnsVoid(): void {
+  starterCode={`function returnsVoid(): void {
   // No return, or 'return;'
 }
 
@@ -345,7 +345,7 @@ Here's how the four types relate in terms of assignability:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`let a: any = 42;
+  starterCode={`let a: any = 42;
 let u: unknown = 42;
 let n: never;  // You can't construct a never value, so we leave it uninitialized
 
@@ -375,7 +375,7 @@ that parses JSON and uses `unknown` to ensure type safety.
   adapter="typescript"
   title="Type-Safe JSON Parser"
   instructions={`Implement \`parseJSON(text: string): unknown\` that wraps \`JSON.parse\` and returns \`unknown\` (not \`any\`). Then implement \`getString(value: unknown): string\` that returns the value if it's a string, or throws an error otherwise. Test with valid and invalid inputs.`}
-  initialCode={`function parseJSON(text: string): unknown {
+  starterCode={`function parseJSON(text: string): unknown {
   return JSON.parse(text);
 }
 

@@ -67,7 +67,7 @@ Here is a pre-pattern-recognition version of a simple program:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     int a = 5, b = 10, c = 3;
@@ -92,7 +92,7 @@ function.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <cmath>   // std::abs
 
 double deviation(double v, double avg) {
@@ -126,7 +126,7 @@ algorithms that work on *anything that behaves like a sequence*.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <numeric>   // std::accumulate
 #include <vector>
 
@@ -165,7 +165,7 @@ Now the translation into C++ is almost mechanical:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 #include <stdexcept>
 
@@ -232,7 +232,7 @@ Now the C++ practically writes itself:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     for (int i = 1; i <= 15; ++i) {       // shortened to 15 for brevity
@@ -274,7 +274,7 @@ yourself to enumerate them *before* you finish the code.
   adapter="cpp"
   title="Count vowels"
   instructions={`Implement a function \`int count_vowels(const std::string& s)\` that returns how many characters in \`s\` are vowels. Treat both upper- and lower-case \`a, e, i, o, u\` as vowels. \`main\` already prints the result for a fixed input — your job is to implement the function.\n\nThink through edge cases: empty string, all-vowel string, no vowels, mixed case.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 
 int count_vowels(const std::string& s) {

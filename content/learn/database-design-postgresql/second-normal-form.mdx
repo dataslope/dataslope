@@ -173,7 +173,7 @@ INSERT INTO order_items VALUES
   (100, 10, 2),
   (100, 20, 5),
   (101, 10, 1);`}
-  initialCode={`-- Product names are stored once, then joined when needed.
+  starterCode={`-- Product names are stored once, then joined when needed.
 SELECT oi.order_id, p.name AS product_name, oi.quantity
 FROM order_items oi
 JOIN products p ON p.id = oi.product_id

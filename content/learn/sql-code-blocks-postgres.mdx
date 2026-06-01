@@ -27,7 +27,7 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  initialCode={`SELECT name, dept, salary
+  starterCode={`SELECT name, dept, salary
 FROM employees
 ORDER BY salary DESC;`}
 />
@@ -48,7 +48,7 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  initialCode={`SELECT name, dept, salary
+  starterCode={`SELECT name, dept, salary
 FROM employees
 ORDER BY salary DESC;`}
 />
@@ -62,7 +62,7 @@ building rowsets without a table.
 <SqlCodeBlock
   dialect="postgres"
   title="A week of dates"
-  initialCode={`SELECT
+  starterCode={`SELECT
   d::date                  AS day,
   to_char(d, 'Dy')         AS weekday
 FROM generate_series('2026-01-01'::timestamp,
@@ -74,7 +74,7 @@ FROM generate_series('2026-01-01'::timestamp,
 <SqlCodeBlock
   dialect="postgres"
   title="A week of dates"
-  initialCode={`SELECT
+  starterCode={`SELECT
   d::date                  AS day,
   to_char(d, 'Dy')         AS weekday
 FROM generate_series('2026-01-01'::timestamp,
@@ -91,7 +91,7 @@ data required.
 <SqlCodeBlock
   dialect="postgres"
   title="Running total"
-  initialCode={`SELECT
+  starterCode={`SELECT
   n,
   SUM(n) OVER (ORDER BY n) AS running_total
 FROM generate_series(1, 10) AS n;`}
@@ -101,7 +101,7 @@ FROM generate_series(1, 10) AS n;`}
 <SqlCodeBlock
   dialect="postgres"
   title="Running total"
-  initialCode={`SELECT
+  starterCode={`SELECT
   n,
   SUM(n) OVER (ORDER BY n) AS running_total
 FROM generate_series(1, 10) AS n;`}
@@ -136,7 +136,7 @@ INSERT INTO employees (name, dept_id, salary) VALUES
   ('Carol', 2,  80000),
   ('Dave',  2,  72000),
   ('Eve',   3,  68000);`}
-  initialCode={`SELECT d.name AS department,
+  starterCode={`SELECT d.name AS department,
        COUNT(*) AS headcount,
        ROUND(AVG(e.salary)) AS avg_salary
 FROM employees e
@@ -169,7 +169,7 @@ INSERT INTO employees (name, dept_id, salary) VALUES
   ('Carol', 2,  80000),
   ('Dave',  2,  72000),
   ('Eve',   3,  68000);`}
-  initialCode={`SELECT d.name AS department,
+  starterCode={`SELECT d.name AS department,
        COUNT(*) AS headcount,
        ROUND(AVG(e.salary)) AS avg_salary
 FROM employees e
@@ -194,7 +194,7 @@ SELECT
   'row-' || g       AS label,
   ROUND(g * 1.5, 2) AS value
 FROM generate_series(1, 10000) AS g;`}
-  initialCode={`SELECT id, label, value
+  starterCode={`SELECT id, label, value
 FROM metrics
 ORDER BY id;`}
 />
@@ -209,7 +209,7 @@ SELECT
   'row-' || g       AS label,
   ROUND(g * 1.5, 2) AS value
 FROM generate_series(1, 10000) AS g;`}
-  initialCode={`SELECT id, label, value
+  starterCode={`SELECT id, label, value
 FROM metrics
 ORDER BY id;`}
 />

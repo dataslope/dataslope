@@ -29,7 +29,7 @@ score — and the *way* you summarize them encodes what you care about.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -77,7 +77,7 @@ X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`}
-  initialCode={`from sklearn.metrics import mean_absolute_error
+  starterCode={`from sklearn.metrics import mean_absolute_error
 
 mae = mean_absolute_error(y_test, y_pred)
 print(f"MAE: {mae:.1f}")
@@ -139,7 +139,7 @@ X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`}
-  initialCode={`from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error
+  starterCode={`from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error
 
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
@@ -160,7 +160,7 @@ prediction and watch each metric react.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 
 # Ten near-perfect predictions...
@@ -206,7 +206,7 @@ error of a dumb baseline that always predicts the mean. So:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -259,7 +259,7 @@ randomly around zero with no pattern.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
@@ -358,7 +358,7 @@ X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`}
-  initialCode={`mae = None
+  starterCode={`mae = None
 rmse = None
 r2 = None
 

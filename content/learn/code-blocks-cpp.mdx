@@ -11,7 +11,7 @@ and `<algorithm>` are available.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 int main() {
     std::cout << "Hello, C++!" << std::endl;
@@ -24,7 +24,7 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -149,3 +149,41 @@ std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for includes or helpers without cluttering the part you edit. Init of 3
+lines or fewer shows a compact read-only header; 4 lines or more collapses
+behind a "Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="cpp"
+  initCode={`#include <iostream>
+using namespace std;`}
+  starterCode={`// <iostream> and std come from the initialization code above.
+int main() {
+    cout << "Hello, C++!" << endl;
+    return 0;
+}
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="cpp"
+  initCode={`#include <iostream>
+#include <vector>
+#include <numeric>
+using namespace std;`}
+  starterCode={`// The includes and std come from the initialization code above.
+int main() {
+    vector<int> xs = {1, 2, 3, 4};
+    cout << "sum = " << accumulate(xs.begin(), xs.end(), 0) << endl;
+    return 0;
+}
+`}
+/>

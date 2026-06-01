@@ -25,7 +25,7 @@ continuous or messy column into clean, analysis-ready categories.
 );
 INSERT INTO orders VALUES
   (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   amount,
   CASE
@@ -56,7 +56,7 @@ your toolkit for good.
 );
 INSERT INTO orders VALUES
   (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   CASE
     WHEN amount < 50  THEN 'small'
     WHEN amount < 200 THEN 'medium'
@@ -86,7 +86,7 @@ INSERT INTO orders VALUES
   (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
   (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95),
   (7,'East','refunded',30),(8,'North','paid',100);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   SUM(CASE WHEN status = 'paid'     THEN amount ELSE 0 END) AS paid_revenue,
   SUM(CASE WHEN status = 'refunded' THEN amount ELSE 0 END) AS refunded_revenue,
@@ -125,7 +125,7 @@ which expresses conditional aggregation more clearly than `CASE` inside
 INSERT INTO orders VALUES
   (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
   (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   SUM(amount) FILTER (WHERE status = 'paid')     AS paid_revenue,
   SUM(amount) FILTER (WHERE status = 'refunded') AS refunded_revenue,
@@ -156,7 +156,7 @@ Two small but constant companions of conditional logic:
 );
 INSERT INTO line_items VALUES
   (1, 100, 4, NULL), (2, 60, 0, 5), (3, 80, 2, NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   COALESCE(discount, 0)                  AS discount_filled,
   ROUND(amount / NULLIF(quantity, 0), 2) AS price_each  -- NULL, not error, when qty=0

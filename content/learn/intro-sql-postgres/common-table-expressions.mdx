@@ -39,7 +39,7 @@ as a CTE — notice how the CTE version reads top-to-bottom:
 );
 INSERT INTO orders (id, customer_id, amount) VALUES
   (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95);`}
-  initialCode={`WITH big_orders AS (
+  starterCode={`WITH big_orders AS (
   SELECT customer_id, amount
   FROM orders
   WHERE amount > 50
@@ -78,7 +78,7 @@ ones before it:
 );
 INSERT INTO orders (id, customer_id, amount) VALUES
   (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40);`}
-  initialCode={`WITH per_customer AS (
+  starterCode={`WITH per_customer AS (
   SELECT customer_id, SUM(amount) AS total
   FROM orders
   GROUP BY customer_id

@@ -218,7 +218,7 @@ INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
     (1, 1, 2, 10.00),
     (1, 2, 1, 24.00);
 `}
-  initialCode={`SELECT o.id AS order_id,
+  starterCode={`SELECT o.id AS order_id,
        c.full_name AS customer,
        p.name AS product,
        oi.quantity,
@@ -265,7 +265,7 @@ CREATE TABLE order_items (
 INSERT INTO orders DEFAULT VALUES;
 INSERT INTO products (name) VALUES ('Postgres Mug');
 `}
-  initialCode={`INSERT INTO order_items (order_id, product_id, quantity, unit_price)
+  starterCode={`INSERT INTO order_items (order_id, product_id, quantity, unit_price)
 VALUES (1, 1, 0, 12.00);`}
 />
 

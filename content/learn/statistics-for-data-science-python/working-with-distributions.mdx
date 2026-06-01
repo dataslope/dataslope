@@ -68,7 +68,7 @@ can see how the pieces relate.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # Delivery times: Normal, mean 30 min, sd 6 min.
 d = stats.norm(loc=30, scale=6)
@@ -106,7 +106,7 @@ call. It's cleaner and prevents parameter-mismatch bugs.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # Frozen (preferred): bake parameters in once, reuse everywhere.
 d = stats.norm(loc=30, scale=6)
@@ -131,7 +131,7 @@ standard deviation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -178,7 +178,7 @@ good; **you** have to check. Two standard checks:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -225,7 +225,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -290,7 +290,7 @@ Hints:
 from scipy import stats
 rng = np.random.default_rng(7)
 data = rng.normal(80, 12, size=400)`}
-  initialCode={`# TODO: fit the normal and compute the tail probability
+  starterCode={`# TODO: fit the normal and compute the tail probability
 loc = None
 scale = None
 p_above_100 = None
@@ -356,7 +356,7 @@ Hints:
 from scipy import stats
 rng = np.random.default_rng(7)
 data = rng.normal(80, 12, size=400)`}
-  initialCode={`# TODO: fit the model and find the 95th-percentile cutoff
+  starterCode={`# TODO: fit the model and find the 95th-percentile cutoff
 cutoff_95 = None
 
 print("95th-percentile cutoff:", cutoff_95)
@@ -404,7 +404,7 @@ answering a question the data never spoke to.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)

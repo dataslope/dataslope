@@ -29,7 +29,7 @@ flowchart TB
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 employees = pd.DataFrame({
     "emp_id":  [1, 2, 3, 4, 5],
@@ -55,7 +55,7 @@ default.
 
 <CodeBlock
   adapter="python"
-  initialCode={`inner = employees.merge(departments, on="dept_id", how="inner")
+  starterCode={`inner = employees.merge(departments, on="dept_id", how="inner")
 print(inner)
 `}
 />
@@ -70,7 +70,7 @@ columns with NaN.
 
 <CodeBlock
   adapter="python"
-  initialCode={`left = employees.merge(departments, on="dept_id", how="left")
+  starterCode={`left = employees.merge(departments, on="dept_id", how="left")
 print(left)
 `}
 />
@@ -87,7 +87,7 @@ more naturally.
 
 <CodeBlock
   adapter="python"
-  initialCode={`right = employees.merge(departments, on="dept_id", how="right")
+  starterCode={`right = employees.merge(departments, on="dept_id", how="right")
 print(right)
 `}
 />
@@ -100,7 +100,7 @@ Keep everything from both sides.
 
 <CodeBlock
   adapter="python"
-  initialCode={`outer = employees.merge(departments, on="dept_id", how="outer")
+  starterCode={`outer = employees.merge(departments, on="dept_id", how="outer")
 print(outer)
 `}
 />
@@ -112,7 +112,7 @@ Great for spotting *what doesn't match*.
 
 <CodeBlock
   adapter="python"
-  initialCode={`check = employees.merge(departments, on="dept_id", how="outer", indicator=True)
+  starterCode={`check = employees.merge(departments, on="dept_id", how="outer", indicator=True)
 print(check)
 print()
 print(check["_merge"].value_counts())
@@ -130,7 +130,7 @@ When the join key is named differently in each table:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 orders = pd.DataFrame({"order_id":[1,2,3], "cust":[10,11,12], "amount":[50,80,30]})
 customers = pd.DataFrame({"customer_id":[10,11,12], "name":["Aiko","Bilal","Chen"]})
@@ -148,7 +148,7 @@ product per key value — often a disaster.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.DataFrame({"k":[1,1,2], "x":["a1","a2","a3"]})
 b = pd.DataFrame({"k":[1,1,3], "y":["b1","b2","b3"]})
@@ -162,7 +162,7 @@ Pandas can warn you about unexpected cardinalities:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.DataFrame({"k":[1,2,3], "x":["a","b","c"]})
 b = pd.DataFrame({"k":[1,2,3], "y":["X","Y","Z"]})
@@ -181,7 +181,7 @@ data doesn't match.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.DataFrame({"id":[1,2], "value":[10,20]})
 b = pd.DataFrame({"id":[1,2], "value":[100,200]})
@@ -212,7 +212,7 @@ customers = pd.DataFrame({
     "name":       ["Aiko","Bilal","Chen","Diego"],
     "country":    ["JP","PK","CN","MX"],
 })`}
-  initialCode={`# How many orders have no matching customer record?
+  starterCode={`# How many orders have no matching customer record?
 check = orders.merge(customers, on="customer", how="left", indicator=True)
 print(check)
 print()
@@ -247,7 +247,7 @@ customers = pd.DataFrame({
     "customer_id": [10,11,12,13],
     "name":        ["Aiko","Bilal","Chen","Diego"],
 })`}
-  initialCode={`orphans = None   # TODO
+  starterCode={`orphans = None   # TODO
 
 print(orphans)
 `}

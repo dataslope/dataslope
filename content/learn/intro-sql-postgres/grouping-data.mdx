@@ -40,7 +40,7 @@ department* — a far more useful answer.
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   dept,
   COUNT(*)           AS headcount,
   ROUND(AVG(salary)) AS avg_salary
@@ -99,7 +99,7 @@ by both region and year:
 INSERT INTO sales (region, year, amount) VALUES
   ('West', 2025, 100), ('West', 2025, 50), ('West', 2026, 200),
   ('East', 2025, 80),  ('East', 2026, 120), ('East', 2026, 60);`}
-  initialCode={`SELECT region, year, SUM(amount) AS total
+  starterCode={`SELECT region, year, SUM(amount) AS total
 FROM sales
 GROUP BY region, year
 ORDER BY region, year;`}
@@ -122,7 +122,7 @@ restrict which rows enter the groups:
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Alice','Engineering',120000,false),('Bob','Engineering',95000,false),
   ('Carol','Sales',80000,false),('Dave','Sales',40000,true),('Eve','Sales',72000,false);`}
-  initialCode={`SELECT dept, ROUND(AVG(salary)) AS avg_salary
+  starterCode={`SELECT dept, ROUND(AVG(salary)) AS avg_salary
 FROM employees
 WHERE is_intern = false
 GROUP BY dept

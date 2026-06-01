@@ -106,7 +106,7 @@ SELECT
   ['Widget','Gadget','Gizmo'][(i % 3) + 1]     AS product,
   (i * 29) % 400 + 20              AS amount
 FROM range(1, 1001) t(i);`}
-  initialCode={`-- GROUP BY ALL: group by every non-aggregated column automatically.
+  starterCode={`-- GROUP BY ALL: group by every non-aggregated column automatically.
 -- SUMMARIZE-style ergonomics with no extra ceremony.
 SELECT
   region,

@@ -15,7 +15,7 @@ mappings. Points + a smoother is the canonical example:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
@@ -43,7 +43,7 @@ So a `color = drv` mapping in `ggplot()` reaches *every* layer:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # color = drv is in ggplot(), so BOTH layers are split by drivetrain:
 # colored points AND one smoother per drivetrain.
@@ -61,7 +61,7 @@ point layer only:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # color lives ONLY in geom_point, so the smoother stays a single line.
 ggplot(mpg, aes(displ, hwy)) +
@@ -82,7 +82,7 @@ highlight. Here we label only the most fuel-efficient cars:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 best <- subset(mpg, hwy >= 40)
 

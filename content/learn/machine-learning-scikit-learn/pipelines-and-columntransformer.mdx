@@ -92,7 +92,7 @@ Here is the simplest possible pipeline, end to end:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -138,7 +138,7 @@ object and names each step after its class automatically:
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -175,7 +175,7 @@ structurally impossible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -250,7 +250,7 @@ df = pd.DataFrame({
 })
 # The target depends on both a numeric and a categorical feature.
 df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`}
-  initialCode={`from sklearn.compose import ColumnTransformer
+  starterCode={`from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -307,7 +307,7 @@ df = pd.DataFrame({
     "city":   rng.choice(["NY", "LA", "SF"], n),
     "plan":   rng.choice(["free", "pro"], n),
 })`}
-  initialCode={`from sklearn.compose import ColumnTransformer
+  starterCode={`from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 numeric_cols = ["age", "income"]
@@ -370,7 +370,7 @@ df = pd.DataFrame({
     "plan":   rng.choice(["free", "pro"], n),
 })
 df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`}
-  initialCode={`from sklearn.compose import ColumnTransformer
+  starterCode={`from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -505,7 +505,7 @@ y = df["passed"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )`}
-  initialCode={`# 1. ColumnTransformer: scale numeric, one-hot encode categorical.
+  starterCode={`# 1. ColumnTransformer: scale numeric, one-hot encode categorical.
 preprocess = None
 
 # 2. Pipeline: preprocessing -> LogisticRegression.

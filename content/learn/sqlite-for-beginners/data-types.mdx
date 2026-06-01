@@ -97,7 +97,7 @@ INSERT INTO examples (label, value) VALUES
   ('decimal text', '3.14'),
   ('word text', 'banana'),
   ('missing value', NULL);`}
-  initialCode={`SELECT label, value, typeof(value) AS storage_class
+  starterCode={`SELECT label, value, typeof(value) AS storage_class
 FROM examples
 ORDER BY id;`}
 />
@@ -219,7 +219,7 @@ This example stores values in columns with different affinities and uses `typeof
 INSERT INTO type_demo (as_integer, as_text, as_real, as_numeric, is_active, created_on) VALUES
   ('42', 42, '3.5', '19.99', 1, '2026-03-14'),
   ('not a number', 99, '8', 'banana', 0, NULL);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   as_integer, typeof(as_integer) AS integer_type,
   as_text, typeof(as_text) AS text_type,

@@ -40,7 +40,7 @@ page is what happens when you start combining Bernoulli trials.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # A visitor converts with probability p = 0.3.
 p = 0.3
@@ -94,7 +94,7 @@ and its variance is `np(1 − p)`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # 200 visitors, each converts independently with probability 0.03.
 n, p = 200, 0.03
@@ -129,7 +129,7 @@ possible count, with bar heights summing to 1.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -189,7 +189,7 @@ Hints:
   initCode={`from scipy import stats
 n = 500
 p = 0.04`}
-  initialCode={`# TODO: build the distribution and compute the two values
+  starterCode={`# TODO: build the distribution and compute the two values
 expected = None
 p_at_least_25 = None
 
@@ -274,7 +274,7 @@ more** — a spike worth staffing for?
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # Average rate: 3 tickets per hour.
 lam = 3
@@ -333,7 +333,7 @@ Hints:
 - \`P(X > 9)\` is exactly \`d.sf(9)\` (the survival function).`}
   initCode={`from scipy import stats
 rate = 4.5`}
-  initialCode={`# TODO: build the Poisson model and compute the two values
+  starterCode={`# TODO: build the Poisson model and compute the two values
 mean_errors = None
 p_more_than_9 = None
 
@@ -388,7 +388,7 @@ succeeds, days until the first failure.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from scipy import stats
+  starterCode={`from scipy import stats
 
 # Each call closes a sale with probability 0.2.
 p = 0.2
@@ -444,7 +444,7 @@ your confidence the model is set up correctly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)

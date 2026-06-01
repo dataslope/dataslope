@@ -50,7 +50,7 @@ object itself. Both variables now point at the *same* heap object.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Dog a = new Dog("Rex");
         Dog b = a;             // b is another label pointing at the SAME Dog
@@ -92,7 +92,7 @@ whether the contents are equal. (For content equality you call
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Dog a = new Dog("Rex");
         Dog c = new Dog("Rex");   // brand new object, same name
@@ -149,7 +149,7 @@ to do something."
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Dog d = null;
         System.out.println("Before: d = " + d);
@@ -187,7 +187,7 @@ caller.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     static void rename(Dog dog, String newName) {
         dog.name = newName;       // mutates the shared heap object
     }
@@ -225,7 +225,7 @@ the caller, because the parameter is its own local variable.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     static void replace(Dog dog) {
         dog = new Dog("Other");   // only the local var changes
     }

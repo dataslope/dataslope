@@ -9,7 +9,7 @@ hope.
 
 <CodeBlock
   adapter="python"
-  initialCode={`print("Hello, World!")
+  starterCode={`print("Hello, World!")
 `}
 />
 
@@ -57,7 +57,7 @@ output. It is more flexible than it might look at first.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Multiple arguments are joined with spaces.
+  starterCode={`# Multiple arguments are joined with spaces.
 print("Hello,", "World!")
 `}
 />
@@ -66,7 +66,7 @@ print("Hello,", "World!")
 
 <CodeBlock
   adapter="python"
-  initialCode={`# 'sep' changes the separator.
+  starterCode={`# 'sep' changes the separator.
 print("2025", "11", "30", sep="-")
 `}
 />
@@ -75,7 +75,7 @@ print("2025", "11", "30", sep="-")
 
 <CodeBlock
   adapter="python"
-  initialCode={`# 'end' changes what is appended (default is "\\n").
+  starterCode={`# 'end' changes what is appended (default is "\\n").
 print("loading", end="...")
 print("done")
 `}
@@ -88,7 +88,7 @@ directly. Python will call `str(obj)` on each argument:
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(42)
+  starterCode={`print(42)
 print([1, 2, 3])
 print({"name": "Ada", "year": 1815})
 print(3.14, type(3.14))
@@ -103,7 +103,7 @@ string literals for that, but a string is not the same as a comment.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# This is a comment. The interpreter skips it.
+  starterCode={`# This is a comment. The interpreter skips it.
 x = 1 + 2  # Comments can sit at the end of a line, too.
 
 print(x)
@@ -120,7 +120,7 @@ enough.
 
 <CodeBlock
   adapter="python"
-  initialCode={`"""
+  starterCode={`"""
 This is a string literal, not a comment.
 Python does evaluate it, then immediately throws it away
 because nothing keeps a reference. It is fine for short
@@ -140,7 +140,7 @@ these to show documentation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`def add(a, b):
+  starterCode={`def add(a, b):
     """Return the sum of two numbers."""
     return a + b
 
@@ -174,7 +174,7 @@ Hello, Grace!
 Do not hardcode the literal string \`"Hello, Grace!"\`; instead, define a
 variable \`name = "Grace"\` and use it in your \`print\` call. You can use
 string concatenation, f-strings, or \`.format()\`.`}
-  initialCode={`name = "Grace"
+  starterCode={`name = "Grace"
 # your code here
 `}
   solutionCode={`name = "Grace"
@@ -202,7 +202,7 @@ apple:banana:cherry
 \`\`\`
 
 Pass three separate arguments to \`print\` (not one concatenated string) and use the \`sep\` parameter to join them with \`":"\`.`}
-  initialCode={`# your code here
+  starterCode={`# your code here
 `}
   solutionCode={`print("apple", "banana", "cherry", sep=":")
 `}

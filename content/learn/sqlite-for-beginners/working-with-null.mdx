@@ -42,7 +42,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT name, phone, reward_points
+  starterCode={`SELECT name, phone, reward_points
 FROM contacts;`}
 />
 
@@ -81,7 +81,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT name, phone
+  starterCode={`SELECT name, phone
 FROM contacts
 WHERE phone IS NULL;`}
 />
@@ -100,7 +100,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT name, phone
+  starterCode={`SELECT name, phone
 FROM contacts
 WHERE phone IS NOT NULL;`}
 />
@@ -130,7 +130,7 @@ flowchart LR
 <SqlCodeBlock
   dialect="sqlite"
   title="Comparing with NULL"
-  initialCode={`SELECT
+  starterCode={`SELECT
   NULL = NULL AS null_equals_null,
   5 = NULL AS five_equals_null,
   NULL IS NULL AS null_is_null;`}
@@ -168,7 +168,7 @@ flowchart TB
 <SqlCodeBlock
   dialect="sqlite"
   title="NULL in arithmetic and text"
-  initialCode={`SELECT
+  starterCode={`SELECT
   5 + NULL AS five_plus_null,
   10 * NULL AS ten_times_null,
   'Hello, ' || NULL AS greeting;`}
@@ -191,7 +191,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   reward_points,
   reward_points + 5 AS points_after_bonus
@@ -220,7 +220,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
 FROM contacts;`}
@@ -243,7 +243,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   reward_points,
   COALESCE(reward_points, 0) + 5 AS points_after_bonus
@@ -274,7 +274,7 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   IFNULL(phone, 'No phone on file') AS phone_display
 FROM contacts;`}

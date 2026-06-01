@@ -43,7 +43,7 @@ step, easy to code, and almost always wrong.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 # dy/dt = -2 y,  y(0) = 1.   Exact solution: y = exp(-2 t)
@@ -92,7 +92,7 @@ halving $h$ shrinks the error by **sixteen**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 def rk4_step(f, t, y, h):
     k1 = f(t, y)
@@ -125,7 +125,7 @@ RK4 with a built-in error estimator.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
@@ -165,7 +165,7 @@ something happens. `events` lets you catch those moments exactly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.integrate import solve_ivp
 
 # A ball thrown upward in gravity, with the ground at y = 0
@@ -193,7 +193,7 @@ how big the state is.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
@@ -225,7 +225,7 @@ slowly. The classic example is the chemical kinetics problem
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.integrate import solve_ivp
 import time
 
@@ -314,7 +314,7 @@ few time units — yet the system is fully deterministic.
 Implement \`time_to_apex(v0)\` that returns the apex time as a float.
 
 Verify against the closed-form answer $t^* = v_0 / g$.`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.integrate import solve_ivp
 
 def time_to_apex(v0):

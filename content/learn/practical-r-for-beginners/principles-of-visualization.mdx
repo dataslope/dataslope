@@ -159,7 +159,7 @@ the one you'd put in a report.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A bad chart: rainbow colors, 3D-looking effect, no labels
+  starterCode={`# A bad chart: rainbow colors, 3D-looking effect, no labels
 data(mtcars)
 mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]
@@ -173,7 +173,7 @@ barplot(top$mpg,
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A better chart: single color, sorted, real title, axis label
+  starterCode={`# A better chart: single color, sorted, real title, axis label
 data(mtcars)
 mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]

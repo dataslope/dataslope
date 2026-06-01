@@ -26,7 +26,7 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1, 120.00), (2,  80.00),
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
@@ -83,7 +83,7 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1, 120.00), (2,  80.00),
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
@@ -142,7 +142,7 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1, 120.00), (2,  80.00),
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
-  initialCode={`-- Your query here:
+  starterCode={`-- Your query here:
 SELECT c.name AS customer_name, 0 AS total_spent
 FROM customers c
 LIMIT 1;
@@ -192,7 +192,7 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1, 120.00), (2,  80.00),
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
-  initialCode={`-- Your query here:
+  starterCode={`-- Your query here:
 SELECT c.name AS customer_name, 0 AS total_spent
 FROM customers c
 LIMIT 1;
@@ -235,7 +235,7 @@ LIMIT 1;`}
   amount NUMERIC(10, 2)
 );
 INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
-  initialCode={`-- UPDATE the rows where amount > 100
+  starterCode={`-- UPDATE the rows where amount > 100
 `}
   tests={[
     {
@@ -267,7 +267,7 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
   amount NUMERIC(10, 2)
 );
 INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
-  initialCode={`-- UPDATE the rows where amount > 100
+  starterCode={`-- UPDATE the rows where amount > 100
 `}
   tests={[
     {
@@ -310,7 +310,7 @@ SELECT
   (s.i * 37 % 100) AS score
 FROM generate_series(1, 10000) AS s(i);
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*)::int AS n
 FROM big
 GROUP BY bucket
@@ -342,7 +342,7 @@ ORDER BY bucket;`}
 SELECT s.i AS id, ('user_' || s.i) AS name, (s.i * 37 % 100) AS score
 FROM generate_series(1, 10000) AS s(i);
 `}
-  initialCode={`SELECT * FROM big LIMIT 5;`}
+  starterCode={`SELECT * FROM big LIMIT 5;`}
   solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*)::int AS n
 FROM big GROUP BY bucket ORDER BY bucket;`}
   tests={[

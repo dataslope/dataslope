@@ -55,7 +55,7 @@ randomness).
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 static int Pure(int x, int y) => x + y;
 
@@ -80,7 +80,7 @@ An **immutable** value cannot change after it is constructed. To
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`record Point(double X, double Y);
+  starterCode={`record Point(double X, double Y);
 
 var p = new Point(1, 2);
 var moved = p with { X = 10 };
@@ -99,7 +99,7 @@ argument or returns one. Every LINQ operator is higher-order.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5 };
@@ -121,7 +121,7 @@ Each one is reusable. The whole pipeline reads top to bottom.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 using System.Linq;
 
 static bool IsEven(int n) => n % 2 == 0;

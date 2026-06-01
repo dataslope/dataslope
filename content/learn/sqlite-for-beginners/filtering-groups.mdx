@@ -51,7 +51,7 @@ INSERT INTO employees (name, dept) VALUES
   ('Dave', 'Sales'),
   ('Eve', 'Sales'),
   ('Finn', 'Marketing');`}
-  initialCode={`SELECT dept, COUNT(*) AS headcount
+  starterCode={`SELECT dept, COUNT(*) AS headcount
 FROM employees
 GROUP BY dept
 HAVING COUNT(*) > 2
@@ -113,7 +113,7 @@ INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Dave', 'Sales', 75000, 0),
   ('Eve', 'Sales', 72000, 0),
   ('Finn', 'Marketing', 68000, 0);`}
-  initialCode={`SELECT dept, ROUND(AVG(salary), 0) AS average_salary
+  starterCode={`SELECT dept, ROUND(AVG(salary), 0) AS average_salary
 FROM employees
 WHERE is_intern = 0
 GROUP BY dept
@@ -156,7 +156,7 @@ INSERT INTO sales (product, amount) VALUES
   ('Backpack', 45.00),
   ('Pencil', 2.50),
   ('Notebook', 9.00);`}
-  initialCode={`SELECT product, SUM(amount) AS total_sales
+  starterCode={`SELECT product, SUM(amount) AS total_sales
 FROM sales
 GROUP BY product
 HAVING SUM(amount) >= 30
@@ -185,7 +185,7 @@ INSERT INTO sales (product, amount, channel) VALUES
   ('Backpack', 45.00, 'Store'),
   ('Backpack', 20.00, 'Online'),
   ('Pencil', 3.00, 'Online');`}
-  initialCode={`SELECT product, SUM(amount) AS online_sales
+  starterCode={`SELECT product, SUM(amount) AS online_sales
 FROM sales
 WHERE channel = 'Online'
 GROUP BY product
@@ -247,7 +247,7 @@ INSERT INTO orders (customer, amount) VALUES
   ('Linus', 12.00),
   ('Linus', 9.00),
   ('Linus', 6.00);`}
-  initialCode={`SELECT customer
+  starterCode={`SELECT customer
 FROM orders
 GROUP BY customer
 HAVING COUNT(*) >= 2

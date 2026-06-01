@@ -41,7 +41,7 @@ super-linearly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import brentq, newton
 
 # Find where cos(x) = x  (a classic transcendental equation)
@@ -70,7 +70,7 @@ method — secant-based, derivative-free, generally robust.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import root
 
 # Solve   x² + y² = 4,   x - y = 1
@@ -99,7 +99,7 @@ approximation, fine up to a few hundred variables) or **L-BFGS-B**
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import minimize
 
 # Rosenbrock's "banana" function — the standard optimization test bed
@@ -126,7 +126,7 @@ analytic gradient is the single largest performance win available.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import minimize
 
 def rosen(x):
@@ -156,7 +156,7 @@ functions).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import minimize, NonlinearConstraint
 
 # Minimize  (x-1)² + (y-2.5)² subject to  x + y ≥ 3,  x ≥ 0, y ≥ 0
@@ -183,7 +183,7 @@ sum-of-squares structure for faster, more reliable convergence.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
@@ -222,7 +222,7 @@ landscape has many local minima, use **global** methods:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy.optimize import differential_evolution, minimize
 
 # Rastrigin: highly multimodal, global minimum at the origin
@@ -304,7 +304,7 @@ $$x_\{n+1\} = x_n - f(x_n)/f'(x_n)$$
 starting from \`x0\`. Stop when $|f(x_n)| < \\text\{tol\}$ or when \`max_iter\` is exceeded (raise \`RuntimeError\` in that case).
 
 Test cases use $f(x) = x^2 - 2$ and $f(x) = \\cos x - x$, both with known good initial guesses.`}
-  initialCode={`def newton_root(f, fprime, x0, tol=1e-10, max_iter=100):
+  starterCode={`def newton_root(f, fprime, x0, tol=1e-10, max_iter=100):
     # TODO: implement
     return 0.0
 `}

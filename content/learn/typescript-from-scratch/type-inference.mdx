@@ -13,7 +13,7 @@ The simplest case: when you declare a variable with an initial value, TypeScript
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const message = "Hello, TypeScript!";
+  starterCode={`const message = "Hello, TypeScript!";
 const count = 42;
 const isActive = true;
 
@@ -35,7 +35,7 @@ Here's where inference gets interesting. TypeScript infers **different types** d
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const literal = "hello";
+  starterCode={`const literal = "hello";
 let mutableString = "hello";
 
 // Hover over these in your editor:
@@ -65,7 +65,7 @@ Sometimes the compiler infers types by looking at **context** — where a value 
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const numbers = [1, 2, 3, 4, 5];
+  starterCode={`const numbers = [1, 2, 3, 4, 5];
 
 // The callback parameter 'n' is inferred as number
 // because .map is defined as: map<U>(fn: (value: number) => U)
@@ -100,7 +100,7 @@ Functions infer their return type from the `return` statements inside.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function add(a: number, b: number) {
+  starterCode={`function add(a: number, b: number) {
   return a + b; // return type inferred as number
 }
 
@@ -128,7 +128,7 @@ Even though the compiler can infer return types, many teams **annotate them expl
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Explicit return type for a public API
+  starterCode={`// Explicit return type for a public API
 function divide(a: number, b: number): number | null {
   if (b === 0) {
     return null; // signal error
@@ -153,7 +153,7 @@ When you initialize an array with mixed values, the compiler tries to find a **b
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// All numbers → inferred as number[]
+  starterCode={`// All numbers → inferred as number[]
 const nums = [1, 2, 3];
 console.log(\`nums: number[] = [\${nums.join(", ")}]\`);
 
@@ -171,7 +171,7 @@ If no single type fits all elements, the compiler creates a **union** of the can
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Without annotation: inferred as (string | number)[]
+  starterCode={`// Without annotation: inferred as (string | number)[]
 const loose = [42];
 loose.push("hello"); // allowed
 console.log(loose); // [42, "hello"]
@@ -190,7 +190,7 @@ Let's see inference in action across a more complex expression. The compiler bui
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function getConfig() {
+  starterCode={`function getConfig() {
   return {
     host: "localhost",
     port: 3000,
@@ -246,7 +246,7 @@ If the compiler can't figure out a type, you'll see the dreaded `any`. This usua
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// ❌ Bad: No initializer, no annotation → inferred as any
+  starterCode={`// ❌ Bad: No initializer, no annotation → inferred as any
 // let data; // Uncomment to see implicit any error
 
 // ✅ Good: Explicit annotation
@@ -273,7 +273,7 @@ Now it's your turn. The compiler has inferred types throughout this example, but
 1. Add an explicit type annotation to \`values\` to restrict it to \`number[]\`.
 2. Remove the string element \`"oops"\` so the code compiles.
 3. The test will verify that the sum is computed correctly.`}
-  initialCode={`function process(nums: number[]): number {
+  starterCode={`function process(nums: number[]): number {
   return nums.reduce((sum, n) => sum + n, 0);
 }
 

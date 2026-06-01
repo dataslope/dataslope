@@ -123,7 +123,7 @@ INSERT INTO customers (id, name) VALUES
   (1, 'Ada'), (2, 'Grace');
 INSERT INTO orders (id, customer_id, amount) VALUES
   (101, 1, 42), (102, 1, 18), (103, 2, 99);`}
-  initialCode={`-- Ada's name is stored ONCE, yet both her orders can find it
+  starterCode={`-- Ada's name is stored ONCE, yet both her orders can find it
 SELECT c.name, o.id AS order_id, o.amount
 FROM orders o
 JOIN customers c ON c.id = o.customer_id

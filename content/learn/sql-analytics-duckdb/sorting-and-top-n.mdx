@@ -24,7 +24,7 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 201) t(i);`}
-  initialCode={`SELECT id, region, amount
+  starterCode={`SELECT id, region, amount
 FROM orders
 ORDER BY amount DESC
 LIMIT 5;`}
@@ -49,7 +49,7 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 31) t(i);`}
-  initialCode={`SELECT region, id, amount
+  starterCode={`SELECT region, id, amount
 FROM orders
 ORDER BY region ASC, amount DESC;`}
 />
@@ -73,7 +73,7 @@ INSERT INTO snacks VALUES
   ('Almonds', 6.00, 200), ('Chips', 3.50, 150),
   ('Trail Mix', 8.00, 400), ('Pretzels', 2.00, 100),
   ('Jerky', 9.00, 90);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   name,
   ROUND(price / grams, 4) AS price_per_gram
 FROM snacks
@@ -117,7 +117,7 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 31) t(i);`}
-  initialCode={`SELECT region, id, amount
+  starterCode={`SELECT region, id, amount
 FROM orders
 QUALIFY ROW_NUMBER() OVER (
           PARTITION BY region

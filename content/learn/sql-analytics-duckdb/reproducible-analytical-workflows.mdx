@@ -48,7 +48,7 @@ rows tie on the sort key, SQL may return them in either order — so a
 );
 INSERT INTO products VALUES
   (1,'A',100),(2,'B',100),(3,'C',100),(4,'D',90),(5,'E',80);`}
-  initialCode={`SELECT id, name, sales
+  starterCode={`SELECT id, name, sales
 FROM products
 ORDER BY sales DESC, id ASC   -- id breaks ties → reproducible order
 LIMIT 3;`}
@@ -68,7 +68,7 @@ without "already exists" errors.
 <SqlCodeBlock
   dialect="duckdb"
   title="CREATE OR REPLACE makes rebuilds safe"
-  initialCode={`-- Run this block twice — it never errors, and the result is identical.
+  starterCode={`-- Run this block twice — it never errors, and the result is identical.
 CREATE OR REPLACE TABLE clean_orders AS
 SELECT * FROM (VALUES
   (1, 'paid',     120),
@@ -101,7 +101,7 @@ metric's meaning consistent.
 INSERT INTO orders VALUES
   (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
   (4,'East','paid',50),(5,'North','paid',60),(6,'West','paid',95);`}
-  initialCode={`CREATE OR REPLACE VIEW paid_revenue_by_region AS
+  starterCode={`CREATE OR REPLACE VIEW paid_revenue_by_region AS
 SELECT region, SUM(amount) AS revenue
 FROM orders
 WHERE status = 'paid'

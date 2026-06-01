@@ -25,7 +25,7 @@ graph TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 void mergeRange(std::vector<int>& v, int left, int mid, int right) {
     std::vector<int> temp;
@@ -60,7 +60,7 @@ Quicksort chooses a pivot, partitions values around it, then recursively sorts b
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 int partition(std::vector<int>& v, int low, int high) {
@@ -111,7 +111,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int main() {
@@ -129,7 +129,7 @@ Use `std::stable_sort` when equal keys must keep their original relative order. 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -149,7 +149,7 @@ Sorting `std::pair` values by their second field is a common lambda example.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -173,7 +173,7 @@ int main() {
   adapter="cpp"
   title="Implement merge sort"
   instructions={`Implement \`void mergeSort(std::vector<int>& v)\`. The driver sorts \`{5,2,8,1,9,3,7,4}\` and prints each value on its own line.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 void mergeSort(std::vector<int>& v) {
     // your code here
@@ -225,7 +225,7 @@ int main() {
   adapter="cpp"
   title="Sort vector of pairs by second value descending"
   instructions={`Sort the given \`std::vector<std::pair<std::string,int>>\` by the integer value in descending order, then print each pair as \`name=value\`.`}
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <string>
 #include <utility>

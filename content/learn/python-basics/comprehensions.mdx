@@ -28,21 +28,21 @@ The general form:
 
 <CodeBlock
   adapter="python"
-  initialCode={`squares = [x * x for x in range(1, 6)]
+  starterCode={`squares = [x * x for x in range(1, 6)]
 print(squares)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`evens = [x for x in range(20) if x % 2 == 0]
+  starterCode={`evens = [x for x in range(20) if x % 2 == 0]
 print(evens)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`upper = [w.upper() for w in ["a", "b", "c"]]
+  starterCode={`upper = [w.upper() for w in ["a", "b", "c"]]
 print(upper)
 `}
 />
@@ -64,7 +64,7 @@ The `if` clause is optional.
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  starterCode={`nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 evens = [x for x in nums if x % 2 == 0]
 print(evens)
 `}
@@ -72,7 +72,7 @@ print(evens)
 
 <CodeBlock
   adapter="python"
-  initialCode={`words = ["apple", "banana", "cherry", "date"]
+  starterCode={`words = ["apple", "banana", "cherry", "date"]
 long_words = [w for w in words if len(w) > 5]
 print(long_words)
 `}
@@ -82,7 +82,7 @@ You can combine transformation and filtering.
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = [1, 2, 3, 4, 5]
+  starterCode={`nums = [1, 2, 3, 4, 5]
 doubled_evens = [x * 2 for x in nums if x % 2 == 0]
 print(doubled_evens)
 `}
@@ -94,14 +94,14 @@ Multiple `for` clauses behave like nested loops, left to right.
 
 <CodeBlock
   adapter="python"
-  initialCode={`pairs = [(x, y) for x in range(3) for y in range(3)]
+  starterCode={`pairs = [(x, y) for x in range(3) for y in range(3)]
 print(pairs)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`pairs = [(x, y) for x in range(3) for y in range(3) if x != y]
+  starterCode={`pairs = [(x, y) for x in range(3) for y in range(3) if x != y]
 print(pairs)
 `}
 />
@@ -110,7 +110,7 @@ Nested comprehensions are useful for flattening lists.
 
 <CodeBlock
   adapter="python"
-  initialCode={`nested = [[1, 2], [3, 4], [5, 6]]
+  starterCode={`nested = [[1, 2], [3, 4], [5, 6]]
 flat = [n for row in nested for n in row]
 print(flat)
 `}
@@ -126,14 +126,14 @@ Use `{key: value for ...}` to build a dict.
 
 <CodeBlock
   adapter="python"
-  initialCode={`squares_map = {x: x * x for x in range(1, 6)}
+  starterCode={`squares_map = {x: x * x for x in range(1, 6)}
 print(squares_map)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+  starterCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 expensive = {fruit: price for fruit, price in prices.items() if price >= 1.0}
 print(expensive)
 `}
@@ -143,7 +143,7 @@ Inverting a dict is a one-liner.
 
 <CodeBlock
   adapter="python"
-  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+  starterCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 inverted = {v: k for k, v in prices.items()}
 print(inverted)
 `}
@@ -153,7 +153,7 @@ Dict comprehensions are especially useful when reshaping API responses or config
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Normalize keys to lowercase
+  starterCode={`# Normalize keys to lowercase
 raw = {"Name": "Ada", "Year": 1815}
 normalized = {k.lower(): v for k, v in raw.items()}
 print(normalized)
@@ -166,14 +166,14 @@ Use `{expression for ...}` to build a set.
 
 <CodeBlock
   adapter="python"
-  initialCode={`vowels = {c for c in "hello world" if c in "aeiou"}
+  starterCode={`vowels = {c for c in "hello world" if c in "aeiou"}
 print(vowels)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`nums = [1, 2, 2, 3, 3, 3]
+  starterCode={`nums = [1, 2, 2, 3, 3, 3]
 unique = {x for x in nums}
 print(unique)
 `}
@@ -187,7 +187,7 @@ Drop the brackets and you get a **generator expression** instead. It produces it
 
 <CodeBlock
   adapter="python"
-  initialCode={`# List comprehension allocates the full list up front.
+  starterCode={`# List comprehension allocates the full list up front.
 list_total = sum([x * x for x in range(1_000_000)])
 print("list total:", list_total)
 `}
@@ -195,7 +195,7 @@ print("list total:", list_total)
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Generator expression streams one square at a time.
+  starterCode={`# Generator expression streams one square at a time.
 gen_total = sum(x * x for x in range(1_000_000))
 print("gen total:", gen_total)
 `}
@@ -211,7 +211,7 @@ When a generator expression is the only argument to a function, the inner parent
 
 <CodeBlock
   adapter="python"
-  initialCode={`total = sum(x * x for x in range(10))
+  starterCode={`total = sum(x * x for x in range(10))
 print(total)
 `}
 />
@@ -233,7 +233,7 @@ This is equivalent to `sum((x * x for x in range(10)))` but cleaner.
   adapter="python"
   title="Squares of even numbers"
   instructions={`Define \`even_squares(n)\` that returns a list of the squares of every even number from 0 to \`n-1\`, in order. Use a single list comprehension.`}
-  initialCode={`def even_squares(n):
+  starterCode={`def even_squares(n):
     # your code here
     return []
 `}
@@ -267,7 +267,7 @@ This is equivalent to `sum((x * x for x in range(10)))` but cleaner.
 For example, \`group_by_length(["a", "bb", "cc", "d"])\` returns \`{1: ["a", "d"], 2: ["bb", "cc"]}\`.
 
 A regular loop is fine here; you do not have to use a single comprehension.`}
-  initialCode={`def group_by_length(words):
+  starterCode={`def group_by_length(words):
     # your code here
     return {}
 `}
@@ -302,7 +302,7 @@ A regular loop is fine here; you do not have to use a single comprehension.`}
   instructions={`Define \`cartesian(a, b)\` that returns a list of all \`(x, y)\` pairs where \`x\` is from list \`a\` and \`y\` is from list \`b\`, in the order produced by nested loops. Use a single list comprehension with two \`for\` clauses.
 
 For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2, "a"), (2, "b")]\`.`}
-  initialCode={`def cartesian(a, b):
+  starterCode={`def cartesian(a, b):
     # your code here
     return []
 `}

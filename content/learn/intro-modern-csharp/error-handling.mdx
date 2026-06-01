@@ -28,7 +28,7 @@ found, the program crashes.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 try
 {
@@ -70,7 +70,7 @@ up by stack unwinding plus `finally` blocks.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 try
 {
@@ -107,7 +107,7 @@ return wrong data.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 double Divide(int a, int b)
 {
@@ -146,7 +146,7 @@ This is a really common beginner trap:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 // BAD — using exceptions as if they were "if not a number"
 int ParseOrZero(string s)
@@ -166,7 +166,7 @@ of `TryParse` is to *not* throw for the perfectly ordinary case
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 // GOOD — use TryParse for an expected failure
 int ParseOrZero(string s) =>
@@ -190,7 +190,7 @@ specific exceptions you actually know how to handle.
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 // BAD — hides everything, including bugs
 try { /* important work */ }
@@ -212,7 +212,7 @@ actually know how to recover, **re-throw**:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 void Risky()
 {
@@ -243,7 +243,7 @@ a variable that turned out to be `null`:
 
 <CodeBlock
   adapter="csharp"
-  initialCode={`using System;
+  starterCode={`using System;
 
 string? maybeName = null;
 

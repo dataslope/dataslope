@@ -20,7 +20,7 @@ value from its own past (a **lag**). `shift(-k)` does the reverse (a
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series([10, 12, 11, 15, 14],
               index=pd.date_range("2014-01-01", periods=5, freq="D"),
@@ -97,7 +97,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 
 window = 12   # <-- change me! try 3 (noisy), 12 (kills seasonality), 36 (very smooth)
 
@@ -146,7 +146,7 @@ import numpy as np
 _passengers = [112,118,132,129,121,135,148,148,136,119,104,118]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`print("Default: needs a full window, so the first 2 are NaN:")
+  starterCode={`print("Default: needs a full window, so the first 2 are NaN:")
 print(air.rolling(3).mean().round(1).head())
 print()
 print("min_periods=1: compute as soon as there's at least 1 point:")
@@ -176,7 +176,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 s = pd.Series([10, 20, 30, 40, 50],
               index=pd.date_range("2014-01-01", periods=5, freq="D"), name="y")
@@ -237,7 +237,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 
 ma = air.rolling(12).mean()
 
@@ -296,7 +296,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 
 roll_std = air.rolling(12).std()
 
@@ -322,7 +322,7 @@ including now." It's the honest, leakage-free way to say "the typical value
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 rng = np.random.default_rng(0)
@@ -363,7 +363,7 @@ rng = np.random.default_rng(11)
 days = pd.date_range("2014-01-01", periods=40, freq="D")
 visits = pd.Series((150 + rng.normal(0, 20, 40)).round().astype(int),
                    index=days, name="visits")`}
-  initialCode={`smooth = None  # 7-day TRAILING moving average
+  starterCode={`smooth = None  # 7-day TRAILING moving average
 print(smooth.head(10) if smooth is not None else None)
 `}
   solutionCode={`smooth = visits.rolling(window=7).mean()
@@ -413,7 +413,7 @@ Then set \`uses_future\` to \`True\` if the centered value at position 1 depends
   initCode={`import pandas as pd
 s = pd.Series([10.0, 20.0, 30.0, 40.0, 50.0],
               index=pd.date_range("2014-01-01", periods=5, freq="D"), name="s")`}
-  initialCode={`trailing_at_1 = None
+  starterCode={`trailing_at_1 = None
 centered_at_1 = None
 uses_future = None
 print(trailing_at_1, centered_at_1, uses_future)

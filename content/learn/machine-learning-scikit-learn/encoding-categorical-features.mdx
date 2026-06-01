@@ -42,7 +42,7 @@ Watch what it implies:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"color": ["red", "green", "blue", "red", "blue"]})
 
@@ -92,7 +92,7 @@ as S = 0, M = 1, L = 2 *preserves real information* the model can use.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({"size": ["S", "M", "L", "M", "S", "L"]})
 
@@ -159,7 +159,7 @@ it in a moment.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
 # A tiny, realistic table with three categorical columns.
@@ -224,7 +224,7 @@ city = rng.choice(cities, n)
 prob = np.array([risk[c] for c in city])
 y = (rng.uniform(0, 1, n) < prob).astype(int)
 df = pd.DataFrame({"city": city})`}
-  initialCode={`from sklearn.linear_model import LogisticRegression
+  starterCode={`from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
@@ -283,7 +283,7 @@ value, effectively saying "this record's city is none of the ones I know."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
 # Fit on training cities the encoder will "know".
@@ -421,7 +421,7 @@ df = pd.DataFrame({
     "fruit":   ["apple", "banana", "apple", "cherry", "banana", "apple"],
     "country": ["US", "US", "MX", "MX", "CA", "CA"],
 })`}
-  initialCode={`# 1. Build the encoder (handle_unknown="ignore", sparse_output=False).
+  starterCode={`# 1. Build the encoder (handle_unknown="ignore", sparse_output=False).
 encoder = None
 
 # 2. Fit and transform df into a dense array.

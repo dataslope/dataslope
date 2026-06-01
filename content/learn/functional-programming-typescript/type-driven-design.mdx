@@ -24,7 +24,7 @@ Consider a "remote data" wrapper used to model an API request:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// ✗ WEAK MODEL — many illegal combinations
+  starterCode={`// ✗ WEAK MODEL — many illegal combinations
 type ProfileWeak = {
   loading: boolean;
   data:    { name: string } | null;
@@ -46,7 +46,7 @@ representable:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// ✓ TIGHT MODEL — only valid states can be written
+  starterCode={`// ✓ TIGHT MODEL — only valid states can be written
 type Profile<A> =
   | { kind: "idle" }
   | { kind: "loading" }
@@ -113,7 +113,7 @@ constraint is satisfied because of the type signature.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// ✗ VALIDATE — the constraint is checked, then immediately forgotten
+  starterCode={`// ✗ VALIDATE — the constraint is checked, then immediately forgotten
 function validateNonEmpty(s: string): boolean {
   return s.length > 0;
 }
@@ -159,7 +159,7 @@ plain string.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 

@@ -47,7 +47,7 @@ about `SUM(amount)` — a group total — so it belongs in `HAVING`.
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',30);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   SUM(amount) AS revenue
 FROM orders
@@ -76,7 +76,7 @@ INSERT INTO orders VALUES
   (1,'West','paid',120),(2,'East','paid',80),(3,'West','refunded',45),
   (4,'East','paid',200),(5,'North','paid',60),(6,'West','paid',95),
   (7,'East','refunded',300),(8,'North','paid',100);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   COUNT(*)    AS paid_orders,
   SUM(amount) AS paid_revenue

@@ -89,7 +89,7 @@ Let us see them in action.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import io
 
 csv_text = """name,age,city,joined
@@ -119,7 +119,7 @@ Aiko,29,Tokyo,2022-01-15
 Bilal,42,Karachi,2019-07-03
 Chen,35,Shanghai,2023-11-20
 """`}
-  initialCode={`df = pd.read_csv(io.StringIO(csv_text), parse_dates=["joined"])
+  starterCode={`df = pd.read_csv(io.StringIO(csv_text), parse_dates=["joined"])
 print(df.dtypes)
 print()
 print(df)
@@ -215,7 +215,7 @@ Let us deliberately confuse Pandas and watch it happen.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import io
 
 # Note the leading zero on the second ZIP code:
@@ -243,7 +243,7 @@ Alice,04210
 Bob,90210
 Carol,02134
 """`}
-  initialCode={`df = pd.read_csv(io.StringIO(csv), dtype={"zip": "string"})
+  starterCode={`df = pd.read_csv(io.StringIO(csv), dtype={"zip": "string"})
 print(df)
 print()
 print("zip dtype:", df["zip"].dtype)

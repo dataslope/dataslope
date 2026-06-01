@@ -24,7 +24,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode {
     int val;
@@ -57,7 +57,7 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 struct GeneralNode {
@@ -82,7 +82,7 @@ A linked representation is flexible and works well for sparse trees.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode {
     int val;
@@ -114,7 +114,7 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 
 int main() {
@@ -156,7 +156,7 @@ For this tree:
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
@@ -206,7 +206,7 @@ Level-order is breadth-first search. A queue processes nodes one level at a time
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
@@ -238,7 +238,7 @@ The recursion stack can be simulated with `std::stack`.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <stack>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
@@ -272,7 +272,7 @@ Most tree properties are naturally recursive: solve the left subtree, solve the 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <climits>
 #include <cstdlib>
 #include <iostream>
@@ -323,7 +323,7 @@ int main() {
   adapter="cpp"
   title="Sum of all node values"
   instructions={`Implement \`int sumTree(TreeNode* root)\`. The driver builds a binary tree and prints the sum of all values.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 
 struct TreeNode {
     int val;
@@ -372,7 +372,7 @@ int main() {
   adapter="cpp"
   title="Maximum depth of binary tree"
   instructions={`Implement \`int maxDepth(TreeNode* root)\`. Count nodes on the longest root-to-leaf path.`}
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 
 struct TreeNode { int val; TreeNode* left; TreeNode* right; };
@@ -415,7 +415,7 @@ int main() {
   adapter="cpp"
   title="Level-order traversal"
   instructions={`Return the tree values grouped by level as \`std::vector<std::vector<int>>\`. The driver prints each level on its own line.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <queue>
 #include <vector>
 

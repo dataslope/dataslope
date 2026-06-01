@@ -20,7 +20,7 @@ hand:
 
 <CodeBlock
   adapter="r"
-  initialCode={`temperatures <- c(68, 71, 70, 74, 72, 69, 75)
+  starterCode={`temperatures <- c(68, 71, 70, 74, 72, 69, 75)
 print(temperatures)
 length(temperatures)
 `}
@@ -39,7 +39,7 @@ length 1:
 
 <CodeBlock
   adapter="r"
-  initialCode={`x <- 42
+  starterCode={`x <- 42
 print(x)         # [1] 42
 length(x)        # [1] 1
 is.vector(x)     # [1] TRUE
@@ -77,7 +77,7 @@ shortcuts.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Integer range
+  starterCode={`# Integer range
 1:10
 
 # Same in reverse
@@ -117,7 +117,7 @@ a common type:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# Mixing logical + numeric -> numeric
+  starterCode={`# Mixing logical + numeric -> numeric
 c(TRUE, FALSE, 3)
 
 # Mixing anything + character -> character
@@ -138,7 +138,7 @@ You access elements with `[ ]`. The first element is `[1]`, not
 
 <CodeBlock
   adapter="r"
-  initialCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+  starterCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 days[1]            # first element
 days[3]            # third
@@ -167,7 +167,7 @@ frame.
 
 <CodeBlock
   adapter="r"
-  initialCode={`ages <- c(alice = 30, bob = 25, carol = 41)
+  starterCode={`ages <- c(alice = 30, bob = 25, carol = 41)
 print(ages)
 
 # Access by name
@@ -186,7 +186,7 @@ statistics, you will see this constantly:
 
 <CodeBlock
   adapter="r"
-  initialCode={`summary(c(1, 2, 3, 4, 5, 100))
+  starterCode={`summary(c(1, 2, 3, 4, 5, 100))
 `}
 />
 
@@ -260,7 +260,7 @@ Friday.
   instructions={`Use indexing to assign \`weekdays\` to the first 5 elements of \`days\`.`}
   initCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 `}
-  initialCode={`# days is already defined: c("Mon", ..., "Sun")
+  starterCode={`# days is already defined: c("Mon", ..., "Sun")
 weekdays <- NULL   # replace NULL with the right slice
 
 print(weekdays)

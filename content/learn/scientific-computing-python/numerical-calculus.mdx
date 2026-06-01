@@ -47,7 +47,7 @@ $h \approx \sqrt\{\epsilon_\text\{mach\}\} \approx 10^\{-8\}$.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 def f(x): return np.sin(x)
@@ -79,7 +79,7 @@ For most production work, use `scipy.differentiate.derivative`
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Numerical gradient on sampled data
 x = np.linspace(0, 2*np.pi, 200)
@@ -108,7 +108,7 @@ and weights $w_i$, multiply, add. The art is in choosing them.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import integrate
 
 def f(x): return np.exp(-x**2) * np.cos(3*x)
@@ -138,7 +138,7 @@ estimated error is below the requested tolerance.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import integrate
 
 # Integrable singularity at x = 0
@@ -164,7 +164,7 @@ For 2-D and 3-D, deterministic rules still work:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import integrate
 
 # Volume under f(x,y) = exp(-(x²+y²)) over the unit square
@@ -259,7 +259,7 @@ sophisticated relative, but the idea is the same.
 Implement \`estimate_pi()\` using \`scipy.integrate.quad\` on the appropriate integrand. Return the estimate of $\\pi$ (not $\\pi/2$).
 
 Your answer should agree with \`math.pi\` to at least 10 decimal places.`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import integrate
 
 def estimate_pi():

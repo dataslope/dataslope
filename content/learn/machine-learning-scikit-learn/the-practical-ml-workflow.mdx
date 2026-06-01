@@ -113,7 +113,7 @@ from the appearance of skill.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
@@ -156,7 +156,7 @@ followed by the model.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.pipeline import Pipeline
+  starterCode={`from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
@@ -184,7 +184,7 @@ Run it on the training data only. The test set is still sealed.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -221,7 +221,7 @@ the CV score risks overfitting the validation folds.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -266,7 +266,7 @@ real-world performance, the one you report and the one you can defend.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -333,7 +333,7 @@ evaluation. This is the shape of nearly every honest scikit-learn project.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_breast_cancer
+  starterCode={`from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -451,7 +451,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
 X, y = load_wine(return_X_y=True)`}
-  initialCode={`# 1. Split FIRST (25% test, random_state=0, stratified)
+  starterCode={`# 1. Split FIRST (25% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Build the pipeline: steps named "scaler" and "model"

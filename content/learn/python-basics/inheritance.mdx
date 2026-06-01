@@ -25,7 +25,7 @@ Every Django model inherits from \`django.db.models.Model\`. That base class pro
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Animal:
+  starterCode={`class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -63,7 +63,7 @@ When a subclass defines a method with the same name as a parent method, the subc
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Animal:
+  starterCode={`class Animal:
     def speak(self):
         return "some sound"
 
@@ -86,7 +86,7 @@ Override a method when you need **different behavior** for the subclass. If you 
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Animal:
+  starterCode={`class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -124,7 +124,7 @@ In single inheritance, \`super()\` just calls the parent. In multiple inheritanc
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Dog:
+  starterCode={`class Dog:
     def speak(self):
         return "woof!"
 
@@ -154,7 +154,7 @@ Use these instead of `type(x) is SomeClass` when you want to allow subclasses.
 
 <CodeBlock
   adapter="python"
-  initialCode={`class Animal: pass
+  starterCode={`class Animal: pass
 class Dog(Animal): pass
 
 d = Dog()
@@ -177,7 +177,7 @@ Python allows a class to inherit from **multiple** parents. Method lookup uses t
 
 <CodeBlock
   adapter="python"
-  initialCode={`class A:
+  starterCode={`class A:
     def hello(self):
         return "A"
 
@@ -223,7 +223,7 @@ An **abstract base class (ABC)** is a class that cannot be instantiated directly
 
 <CodeBlock
   adapter="python"
-  initialCode={`from abc import ABC, abstractmethod
+  starterCode={`from abc import ABC, abstractmethod
 
 class Shape(ABC):
     @abstractmethod
@@ -576,7 +576,7 @@ assert m.base_salary == 60000`,
   adapter="python"
   title="Override a method"
   instructions={`Define a base class \`Vehicle\` with a method \`start()\` that returns \`"Vehicle starting"\`. Then define a subclass \`Car(Vehicle)\` that overrides \`start()\` to return \`"Car engine starting"\`.`}
-  initialCode={`class Vehicle:
+  starterCode={`class Vehicle:
     pass
 
 class Car(Vehicle):

@@ -11,7 +11,7 @@ uses. Let us dissect it and prove the grammar has become second nature.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point(alpha = 0.7) +
@@ -67,7 +67,7 @@ would do — without running them. Test yourself, then run to confirm.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # PREDICT before running: moving color into geom_point's own aes()
 # means geom_smooth no longer sees it. How many lines per panel now?
@@ -91,7 +91,7 @@ Experienced ggplot users do not type that whole block at once. They
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Start minimal, then add components one at a time.
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
@@ -101,7 +101,7 @@ p   # check: do the points and colors look right?
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
 # Add the next component and re-check.

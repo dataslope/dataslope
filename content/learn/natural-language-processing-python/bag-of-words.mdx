@@ -68,7 +68,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize`}
-  initialCode={`from collections import Counter
+  starterCode={`from collections import Counter
 import pandas as pd
 
 corpus = [
@@ -120,7 +120,7 @@ count.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from collections import Counter
+  starterCode={`from collections import Counter
 
 vocab = ["cheap", "free", "meeting", "report", "winner"]
 
@@ -214,7 +214,7 @@ For example, with \`vocab = ["cat", "dog", "fish"]\` and
 
 Tip: \`collections.Counter\` makes this clean (it returns 0 for missing keys).`}
   initCode={`from collections import Counter`}
-  initialCode={`def bow_vector(tokens, vocab):
+  starterCode={`def bow_vector(tokens, vocab):
     # return a list of counts aligned to vocab
     return []
 

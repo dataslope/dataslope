@@ -152,7 +152,7 @@ CREATE TABLE daily_sales_summary (
   order_count INTEGER NOT NULL,
   total_amount NUMERIC NOT NULL
 );`}
-  initialCode={`-- A reporting table stores a derived read shape.
+  starterCode={`-- A reporting table stores a derived read shape.
 INSERT INTO daily_sales_summary (sales_date, order_count, total_amount)
 SELECT o.order_date,
        COUNT(DISTINCT o.id) AS order_count,

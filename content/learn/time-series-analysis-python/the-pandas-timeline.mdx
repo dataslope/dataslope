@@ -19,7 +19,7 @@ the workhorse.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 raw = ["2014-01-05", "2014-02-10", "2014-03-30"]
 ts = pd.to_datetime(raw)
@@ -54,7 +54,7 @@ When some values are unparseable, choose your failure mode explicitly:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 messy = pd.Series(["2014-01-05", "not-a-date", "2014-03-30"])
 
@@ -79,7 +79,7 @@ The pivotal move: take a parsed date column and make it the index.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "date":  ["2014-01-05", "2014-01-06", "2014-01-07", "2014-01-08"],
@@ -114,7 +114,7 @@ generates one. The `freq` argument sets the spacing.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 print("Six month-STARTS (freq='MS'):")
 print(pd.date_range("2014-01-01", periods=6, freq="MS").tolist())
@@ -183,7 +183,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`# A whole year, just by naming it:
+  starterCode={`# A whole year, just by naming it:
 print("All of 1955:")
 print(air.loc["1955"].tolist())
 print()
@@ -244,7 +244,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 # Directly off the index:
 print("First five years :", air.index.year[:5].tolist())
@@ -295,7 +295,7 @@ keeps you from nonsense like "the sales at exactly midnight on the 1st."
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 instant = pd.Timestamp("2014-03-15 14:32:05")
 month   = pd.Period("2014-03", freq="M")
@@ -345,7 +345,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 a = pd.Series([1, 2, 3],
               index=pd.to_datetime(["2014-01-01", "2014-01-02", "2014-01-03"]))
@@ -407,7 +407,7 @@ log = pd.DataFrame({
     "day":   ["2014-02-03", "2014-02-01", "2014-02-04", "2014-02-02", "2014-02-05"],
     "units": [9, 5, 12, 7, 3],
 })`}
-  initialCode={`# Build the time-indexed Series 'daily' here.
+  starterCode={`# Build the time-indexed Series 'daily' here.
 daily = None
 print(daily)
 `}
@@ -473,7 +473,7 @@ store_b = pd.Series(
     [4, 6, 8],
     index=pd.to_datetime(["2014-03-02", "2014-03-03", "2014-03-04"]),
 )`}
-  initialCode={`total = None  # combine with alignment; missing -> 0
+  starterCode={`total = None  # combine with alignment; missing -> 0
 print(total)
 `}
   solutionCode={`total = store_a.add(store_b, fill_value=0).sort_index()

@@ -29,7 +29,7 @@ expressions**.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`console.log(5 === 5);     // true
+  starterCode={`console.log(5 === 5);     // true
 console.log(5 === "5");   // false (different types)
 console.log(3 < 4);       // true
 console.log("apple" < "banana"); // true — strings compare lexicographically
@@ -57,7 +57,7 @@ operators:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const isAdmin = true;
+  starterCode={`const isAdmin = true;
 const isActive = false;
 
 console.log(isAdmin && isActive);   // false — needs both
@@ -114,7 +114,7 @@ might never run.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function expensive() {
+  starterCode={`function expensive() {
   console.log("(expensive was called)");
   return true;
 }
@@ -142,7 +142,7 @@ triggers on `null`/`undefined` (not `0` or `""`):
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function withDefault(value) {
+  starterCode={`function withDefault(value) {
   return value ?? "default";
 }
 
@@ -181,7 +181,7 @@ idioms:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function greet(name) {
+  starterCode={`function greet(name) {
   if (name) {
     console.log("Hello, " + name + "!");
   } else {
@@ -216,7 +216,7 @@ negations into cleaner conditions.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Original:
+  starterCode={`// Original:
 //   if (!(isAdmin && isActive)) ...
 // Equivalent (often clearer):
 //   if (!isAdmin || !isActive) ...
@@ -256,7 +256,7 @@ cleverness.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function describeNumber(n) {
+  starterCode={`function describeNumber(n) {
   const sign = n < 0 ? "negative" : n > 0 ? "positive" : "zero";
   const parity = n % 2 === 0 ? "even" : "odd";
   return n + " is " + sign + " and " + parity + ".";
@@ -279,7 +279,7 @@ line.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function canComment(user, article) {
+  starterCode={`function canComment(user, article) {
   const isAuthor = user && user.id === article.authorId;
   const isMember = user && user.role === "member";
   const isAdmin  = user && user.role === "admin";
@@ -318,7 +318,7 @@ Examples:
 - 2023 → \`false\`
 
 Write \`isLeapYear(year)\` that returns the correct boolean.`}
-  initialCode={`function isLeapYear(year) {
+  starterCode={`function isLeapYear(year) {
   // your code here
   return false;
 }

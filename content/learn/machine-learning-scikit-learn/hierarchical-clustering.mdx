@@ -113,7 +113,7 @@ random starts to retry.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
@@ -164,7 +164,7 @@ scale for the labels.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -216,7 +216,7 @@ exactly this.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import linkage, fcluster
@@ -269,7 +269,7 @@ default.)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
@@ -312,7 +312,7 @@ keeping around.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
@@ -477,7 +477,7 @@ X, _ = make_blobs(
     n_samples=[70, 50, 30], centers=None,
     cluster_std=0.7, random_state=0
 )`}
-  initialCode={`# 1. Standardize the features
+  starterCode={`# 1. Standardize the features
 X_scaled = None
 
 # 2. Fit AgglomerativeClustering (n_clusters=3, linkage="ward") and get labels

@@ -107,7 +107,7 @@ to drive home why looking matters:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 library(tidyr)
 library(dplyr)
 
@@ -137,7 +137,7 @@ deviations, correlations, and regression lines. They look
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(airquality)
 
 ggplot(airquality, aes(x = Temp, y = Ozone)) +
@@ -227,7 +227,7 @@ string, and uses pie/3D-style ornamentation we should drop.
   adapter="r"
   title="Fix the bad chart"
   instructions={`Rewrite the ggplot below into a clean one with: meaningful axis labels (mpg → "Miles per gallon", wt → "Weight"), a real title, and color mapped to \`factor(cyl)\` (a real categorical variable). Assign the improved chart to \`fixed\`.`}
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 data(mtcars)
 
 # A bad chart:

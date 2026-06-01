@@ -378,6 +378,21 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* The viewport is portaled under <body>, outside the `.card` /
+     `.outputScope` scope, so the `--cb-*` / `--ch-*` design tokens are not
+     inherited here. Re-declare the toast tokens with concrete values so
+     the panel's background, border and text colours actually resolve
+     (previously they were undefined → a background-less toast). */
+  --cb-black: #000;
+  --cb-slate-200: #e8e8e8;
+  --cb-slate-500: #9aa4b2;
+  --cb-slate-700: #3a3a3a;
+  --cb-slate-800: #2a2a2a;
+  --cb-slate-900: #1e1e1e;
+  --cb-gray-200: #e5e7eb;
+  --cb-gray-800: #1f2937;
+  --cb-neutral-100: #ffffff;
+  --cb-neutral-300: #e5e7eb;
 }
 
 .toastRoot {
@@ -417,6 +432,7 @@
     sans-serif;
   font-size: 12.5px;
   line-height: 1.4;
+  letter-spacing: -0.01em;
   transform-origin: bottom center;
   cursor: default;
   user-select: none;
@@ -511,7 +527,7 @@
 }
 
 .toastTitle {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 12.5px;
   line-height: 1.35;
   color: inherit;

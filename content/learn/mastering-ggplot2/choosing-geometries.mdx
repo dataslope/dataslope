@@ -34,7 +34,7 @@ density:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = hwy)) +
   geom_histogram(bins = 15, fill = "steelblue", color = "white")
@@ -43,7 +43,7 @@ ggplot(mpg, aes(x = hwy)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = hwy)) +
   geom_density(fill = "steelblue", alpha = 0.4)
@@ -56,7 +56,7 @@ To count how many rows fall in each category, use `geom_bar()`:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = class)) +
   geom_bar(fill = "darkorange")
@@ -69,7 +69,7 @@ The classic scatter plot, optionally with a trend line:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point()
@@ -82,7 +82,7 @@ Boxplots and violins compare a numeric variable *across* categories:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = class, y = hwy)) +
   geom_boxplot(fill = "lightblue")
@@ -91,7 +91,7 @@ ggplot(mpg, aes(x = class, y = hwy)) +
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(x = class, y = hwy)) +
   geom_violin(fill = "plum")
@@ -110,7 +110,7 @@ is a top-five beginner error:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # geom_col: heights are GIVEN by a column.
 sales <- data.frame(

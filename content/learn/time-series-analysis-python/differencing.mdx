@@ -42,7 +42,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`# Differencing by hand is just "value minus its lag":
+  starterCode={`# Differencing by hand is just "value minus its lag":
 manual  = air - air.shift(1)
 builtin = air.diff()           # the convenient version
 
@@ -69,7 +69,7 @@ has no trend.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 # A PERFECT linear trend: y = 3t + 10.
@@ -116,7 +116,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 
 diff1 = air.diff().dropna()
@@ -176,7 +176,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 
@@ -224,7 +224,7 @@ that went *up* instead of down.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 import numpy as np
 
 rng = np.random.default_rng(0)
@@ -283,7 +283,7 @@ _passengers = [112,118,132,129,121,135,148,148,136,119,104,118,
                115,126,141,135,125,149,170,170,158,133,114,140]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 changes = air.diff().dropna()           # the differenced series
 start   = air.iloc[0]                    # the one anchor we must remember
@@ -345,7 +345,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`manual_sdiff = None   # air(t) - air(t-12), using shift
+  starterCode={`manual_sdiff = None   # air(t) - air(t-12), using shift
 matches = None        # True if it equals air.diff(12)
 print(manual_sdiff.dropna().head() if manual_sdiff is not None else None)
 print("matches:", matches)
@@ -392,7 +392,7 @@ from statsmodels.tsa.stattools import adfuller
 rng = np.random.default_rng(7)
 # Random walk with drift -> stationary after ONE difference.
 s = pd.Series(np.cumsum(rng.normal(0.3, 1.0, 300)), name="s")`}
-  initialCode={`best_d = None        # smallest d with ADF p < 0.05
+  starterCode={`best_d = None        # smallest d with ADF p < 0.05
 over_diff_ac = None  # lag-1 autocorrelation at d = 2
 print("best_d:", best_d, " over-diff lag-1 ac:", over_diff_ac)
 `}

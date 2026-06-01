@@ -100,7 +100,7 @@ interface DisplayedTest {
 }
 
 /** One file in a multi-file challenge workspace. Authors who only need
- *  a single editable file should pass `initialCode` instead — `files`
+ *  a single editable file should pass `starterCode` instead — `files`
  *  is for cases where the learner edits more than one file (e.g. a
  *  Java challenge with both `Main.java` and `Dog.java`). */
 export interface ChallengeFile {
@@ -170,9 +170,9 @@ export interface ChallengeCardProps {
   initCode?: string;
   /** Starting source loaded into the editor. The Reset button restores
    *  this exact text. Ignored when `files` is supplied. */
-  initialCode?: string;
+  starterCode?: string;
   /** Multi-file workspace. When set, takes precedence over
-   *  `initialCode`. A non-sortable, non-closeable tab bar appears above
+   *  `starterCode`. A non-sortable, non-closeable tab bar appears above
    *  the editor so the learner can switch between files. Tests still
    *  run against `entryFilename` (or the first file when omitted) —
    *  every other file is staged into the runtime's virtual file system
@@ -289,7 +289,7 @@ export default function ChallengeCard({
   badge = "Challenge",
   instructions,
   initCode,
-  initialCode,
+  starterCode,
   files,
   entryFilename,
   solutionCode,
@@ -302,13 +302,13 @@ export default function ChallengeCard({
   const initPanelId = `${blockId}-init`;
 
   // Normalize prop shape into a list of files. Single-file authors pass
-  // `initialCode`; multi-file authors pass `files`. We always work with
+  // `starterCode`; multi-file authors pass `files`. We always work with
   // the array internally so the rest of the component is uniform.
   const workspaceFiles: ChallengeFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
-    return [{ filename: defaultName, initialContent: initialCode ?? "" }];
-  }, [files, initialCode, adapter.defaultFileExtension]);
+    return [{ filename: defaultName, initialContent: starterCode ?? "" }];
+  }, [files, starterCode, adapter.defaultFileExtension]);
 
   const isMultiFile = workspaceFiles.length > 1;
   const resolvedEntryFilename =
@@ -383,8 +383,8 @@ export default function ChallengeCard({
   // their saved buffers when this multi-file support shipped.
   const persistedKey = useMemo(
     () =>
-      persistKey("challenge", `${adapter.id}|${title}|${initialCode ?? ""}`),
-    [adapter.id, title, initialCode],
+      persistKey("challenge", `${adapter.id}|${title}|${starterCode ?? ""}`),
+    [adapter.id, title, starterCode],
   );
   // Shared per-adapter runtime, scoped to the fumadocs surface: every
   // `<CodeBlock>` / `<ChallengeCard>` rendered on the /learn route
@@ -1396,8 +1396,8 @@ export default function ChallengeCard({
                 onClick={() => setInitExpanded(true)}
               >
                 <span className={styles.initFadeLabel}>
-                  Click to expand
                   <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                  Click to expand
                 </span>
               </button>
             )}

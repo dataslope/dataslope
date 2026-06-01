@@ -34,7 +34,7 @@ Let's make the contract explicit:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type UserId = string;
+  starterCode={`type UserId = string;
 
 type User = {
   id: UserId;
@@ -205,7 +205,7 @@ You can generalize the response pattern with a generic `Result<T, E>` or `ApiRes
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type ApiResponse<T> =
+  starterCode={`type ApiResponse<T> =
   | { status: "ok"; data: T }
   | { status: "error"; message: string };
 
@@ -415,7 +415,7 @@ Sometimes a single endpoint returns different shapes based on the request. Use d
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type SearchRequest = {
+  starterCode={`type SearchRequest = {
   query: string;
   type: "user" | "order";
 };

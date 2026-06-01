@@ -69,7 +69,7 @@ on wildly different scales — some near 0.1, others in the hundreds.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
 
@@ -117,7 +117,7 @@ split so the comparison is fair.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -214,7 +214,7 @@ scaler peeks at the test set to compute a mean, that promise is broken.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -244,7 +244,7 @@ longer truly held out.
 
 <CodeBlock
   adapter="python"
-  initialCode={`from sklearn.datasets import load_wine
+  starterCode={`from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -318,7 +318,7 @@ range (max minus min).
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 # Three features on very different scales.
@@ -432,7 +432,7 @@ X, y = load_breast_cancer(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
 )`}
-  initialCode={`# 1. Create and fit a StandardScaler on the TRAINING data only.
+  starterCode={`# 1. Create and fit a StandardScaler on the TRAINING data only.
 scaler = None
 
 # 2. Transform both halves with that SAME fitted scaler.

@@ -28,14 +28,14 @@ The simplest dict is written with curly braces, separating `key: value` pairs wi
 
 <CodeBlock
   adapter="python"
-  initialCode={`empty = {}
+  starterCode={`empty = {}
 print(empty)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 print(person)
 `}
 />
@@ -44,14 +44,14 @@ The `dict()` constructor accepts keyword arguments or an iterable of `(key, valu
 
 <CodeBlock
   adapter="python"
-  initialCode={`also_person = dict(name="Ada", year=1815)
+  starterCode={`also_person = dict(name="Ada", year=1815)
 print(also_person)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`from_pairs = dict([("a", 1), ("b", 2), ("c", 3)])
+  starterCode={`from_pairs = dict([("a", 1), ("b", 2), ("c", 3)])
 print(from_pairs)
 `}
 />
@@ -62,7 +62,7 @@ Use `[]` to access a value by key.
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 print(person["name"])
 `}
 />
@@ -71,7 +71,7 @@ Missing keys raise a `KeyError`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 try:
     print(person["email"])
 except KeyError as e:
@@ -83,14 +83,14 @@ except KeyError as e:
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 print(person.get("email"))
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 print(person.get("email", "no email on file"))
 `}
 />
@@ -105,7 +105,7 @@ Assign through `[]` to add or overwrite a key.
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada"}
+  starterCode={`person = {"name": "Ada"}
 person["year"] = 1815
 print(person)
 `}
@@ -113,7 +113,7 @@ print(person)
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 person["year"] = 1816
 print(person)
 `}
@@ -123,7 +123,7 @@ print(person)
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada"}
+  starterCode={`person = {"name": "Ada"}
 person.update({"role": "mathematician", "year": 1815})
 print(person)
 `}
@@ -133,7 +133,7 @@ Delete a key with `del` or `.pop`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815}
+  starterCode={`person = {"name": "Ada", "year": 1815}
 del person["year"]
 print(person)
 `}
@@ -141,7 +141,7 @@ print(person)
 
 <CodeBlock
   adapter="python"
-  initialCode={`person = {"name": "Ada", "year": 1815, "role": "mathematician"}
+  starterCode={`person = {"name": "Ada", "year": 1815, "role": "mathematician"}
 removed = person.pop("role")
 print("removed:", removed)
 print("person:", person)
@@ -154,7 +154,7 @@ By default, iteration yields keys.
 
 <CodeBlock
   adapter="python"
-  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+  starterCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 for fruit in prices:
     print(fruit)
 `}
@@ -164,7 +164,7 @@ for fruit in prices:
 
 <CodeBlock
   adapter="python"
-  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+  starterCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 for fruit, price in prices.items():
     print(f"{fruit}: \${price:.2f}")
 `}
@@ -174,7 +174,7 @@ for fruit, price in prices.items():
 
 <CodeBlock
   adapter="python"
-  initialCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
+  starterCode={`prices = {"apple": 1.0, "banana": 0.5, "cherry": 3.0}
 print(list(prices.values()))
 `}
 />
@@ -185,7 +185,7 @@ Since Python 3.7, dicts officially preserve insertion order. The first item you 
 
 <CodeBlock
   adapter="python"
-  initialCode={`d = {}
+  starterCode={`d = {}
 for k in "python":
     d[k] = k.upper()
 print(d)
@@ -198,14 +198,14 @@ Keys can be any **hashable** type: strings, numbers, booleans, tuples-of-hashabl
 
 <CodeBlock
   adapter="python"
-  initialCode={`good = {("x", 1): "ok", 42: "also ok", "hi": "yep"}
+  starterCode={`good = {("x", 1): "ok", 42: "also ok", "hi": "yep"}
 print(good)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`try:
+  starterCode={`try:
     bad = {[1, 2]: "nope"}
 except TypeError as e:
     print("TypeError:", e)
@@ -222,7 +222,7 @@ The `|` operator creates a new dict; the right operand wins on conflicts.
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = {"x": 1, "y": 2}
+  starterCode={`a = {"x": 1, "y": 2}
 b = {"y": 99, "z": 3}
 print(a | b)
 `}
@@ -232,7 +232,7 @@ print(a | b)
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = {"x": 1, "y": 2}
+  starterCode={`a = {"x": 1, "y": 2}
 b = {"y": 99, "z": 3}
 a |= b
 print(a)
@@ -243,7 +243,7 @@ Before Python 3.9, use `.update()` or `{**a, **b}`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = {"x": 1, "y": 2}
+  starterCode={`a = {"x": 1, "y": 2}
 b = {"y": 99, "z": 3}
 merged = {**a, **b}
 print(merged)
@@ -256,7 +256,7 @@ print(merged)
 
 <CodeBlock
   adapter="python"
-  initialCode={`from collections import Counter
+  starterCode={`from collections import Counter
 
 text = "to be or not to be that is the question to be"
 freq = Counter(text.split())
@@ -267,7 +267,7 @@ print(freq.most_common(3))
 
 <CodeBlock
   adapter="python"
-  initialCode={`from collections import defaultdict
+  starterCode={`from collections import defaultdict
 
 words = ["apple", "ant", "banana", "berry", "cherry"]
 groups = defaultdict(list)
@@ -283,7 +283,7 @@ Dicts and JSON objects share syntax for a reason. The `json` module converts bot
 
 <CodeBlock
   adapter="python"
-  initialCode={`import json
+  starterCode={`import json
 
 person = {"name": "Ada", "year": 1815, "skills": ["math", "logic"]}
 text = json.dumps(person, indent=2)
@@ -293,7 +293,7 @@ print(text)
 
 <CodeBlock
   adapter="python"
-  initialCode={`import json
+  starterCode={`import json
 
 text = '{"name": "Ada", "year": 1815}'
 restored = json.loads(text)
@@ -312,7 +312,7 @@ Every web API you call returns JSON, which Python decodes into dicts and lists. 
   adapter="python"
   title="Word frequency"
   instructions={`Define a function \`word_freq(sentence)\` that returns a dict mapping each lowercase word in \`sentence\` to its frequency. Split on whitespace and treat words case-insensitively. For example, \`word_freq("To be or not to be")\` returns \`{"to": 2, "be": 2, "or": 1, "not": 1}\`.`}
-  initialCode={`def word_freq(sentence):
+  starterCode={`def word_freq(sentence):
     # your code here
     return {}
 `}
@@ -345,7 +345,7 @@ Every web API you call returns JSON, which Python decodes into dicts and lists. 
   adapter="python"
   title="Invert a dict"
   instructions={`Define \`invert(d)\` that swaps keys and values of \`d\`. You may assume all values are unique and hashable. For example, \`invert({"a": 1, "b": 2})\` returns \`{1: "a", 2: "b"}\`.`}
-  initialCode={`def invert(d):
+  starterCode={`def invert(d):
     # your code here
     return {}
 `}
@@ -382,7 +382,7 @@ merge_sum({"a": 1, "b": 2}, {"b": 3, "c": 4})
 \`\`\`
 
 Assume all values are numbers.`}
-  initialCode={`def merge_sum(d1, d2):
+  starterCode={`def merge_sum(d1, d2):
     # your code here
     return {}
 `}

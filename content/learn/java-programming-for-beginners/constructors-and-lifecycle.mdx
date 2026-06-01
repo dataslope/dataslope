@@ -22,7 +22,7 @@ A constructor:
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Point p = new Point(3, 4);
         System.out.println("p = (" + p.x() + ", " + p.y() + ")");
@@ -79,7 +79,7 @@ constructor *and* a custom one, you have to declare both yourself.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Box b1 = new Box();          // default, sets size to 1
         Box b2 = new Box(5);         // explicit size
@@ -120,7 +120,7 @@ object.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         try {
             Person p = new Person("Ada", -5);

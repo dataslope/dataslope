@@ -98,7 +98,7 @@ Re-running it reproduces every step:
 
 <CodeBlock
   adapter="r"
-  initialCode={`# A tiny reproducible analysis: average mpg per cylinder group
+  starterCode={`# A tiny reproducible analysis: average mpg per cylinder group
 data(mtcars)
 
 # Filter to cars with at least 4 cylinders
@@ -185,7 +185,7 @@ explaining what it is doing:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Question: for each cylinder group, what is the average fuel
@@ -305,7 +305,7 @@ You may use base R or dplyr — either is fine.`}
   price  = c(5,      4,      6,       5,      4,      7,       5,      4),
   stringsAsFactors = FALSE
 )`}
-  initialCode={`# Compute by_region here
+  starterCode={`# Compute by_region here
 by_region <- NULL
 
 print(by_region)

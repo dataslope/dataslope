@@ -24,7 +24,7 @@ Let us see each in action on the same little DataFrame.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
@@ -48,7 +48,7 @@ df = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`}
-  initialCode={`s = df["salary"]
+  starterCode={`s = df["salary"]
 print(s)
 print()
 print("Type:", type(s).__name__)
@@ -66,7 +66,7 @@ df = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`}
-  initialCode={`sub = df[["salary", "tenure_yrs"]]
+  starterCode={`sub = df[["salary", "tenure_yrs"]]
 print(sub)
 print("Type:", type(sub).__name__)
 `}
@@ -83,7 +83,7 @@ df = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`}
-  initialCode={`# One row by label
+  starterCode={`# One row by label
 print(df.loc["Bilal"])
 print()
 
@@ -110,7 +110,7 @@ df = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`}
-  initialCode={`# Row at position 0
+  starterCode={`# Row at position 0
 print(df.iloc[0])
 print()
 
@@ -136,7 +136,7 @@ df = pd.DataFrame({
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`}
-  initialCode={`mask = df["salary"] > 100
+  starterCode={`mask = df["salary"] > 100
 print("Mask:")
 print(mask)
 print()
@@ -202,7 +202,7 @@ Then produce three results:
 1. \`income_series\` — the \`MonthlyIncome\` column as a Series.
 2. \`age_income\` — a DataFrame with just \`Age\` and \`MonthlyIncome\`.
 3. \`first_ten\` — the first 10 rows of the original DataFrame using \`iloc\`.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)

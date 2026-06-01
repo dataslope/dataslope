@@ -102,7 +102,7 @@ simulation.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -161,7 +161,7 @@ is *identical* to the mean case except for one word.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -275,7 +275,7 @@ Use \`np.percentile(boot, [2.5, 97.5])\`.`}
 rng = np.random.default_rng(123)
 data = rng.lognormal(mean=3.0, sigma=0.5, size=80)
 B = 4000`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # TODO: fill boot with B bootstrap medians, then take the 2.5/97.5 percentiles
 boot = np.empty(B)
@@ -342,7 +342,7 @@ The bootstrap SE should land close to the textbook \`data.std(ddof=1) / sqrt(len
 rng = np.random.default_rng(7)
 data = rng.normal(50.0, 8.0, size=100)
 B = 4000`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # TODO: collect B bootstrap means, then set boot_se = their std (ddof=1)
 boot_means = np.empty(B)

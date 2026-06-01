@@ -38,7 +38,7 @@ A real example:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function double(n) {
+  starterCode={`function double(n) {
   return n * 2;
 }
 
@@ -82,7 +82,7 @@ Compare these two equivalent programs:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Without functions — the formula is repeated and unnamed.
+  starterCode={`// Without functions — the formula is repeated and unnamed.
 const bill1 = 80;
 const tip1 = bill1 * 0.18;
 const total1 = bill1 + tip1;
@@ -102,7 +102,7 @@ console.log("Table 3 total:", total3);
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// With a function — the formula has a name and lives in one place.
+  starterCode={`// With a function — the formula has a name and lives in one place.
 function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
@@ -163,7 +163,7 @@ Arrow functions have a few useful shorthand rules:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Three equivalent ways to define the same function:
+  starterCode={`// Three equivalent ways to define the same function:
 function squareA(n) { return n * n; }
 const squareB = function (n) { return n * n; };
 const squareC = (n) => n * n;
@@ -196,7 +196,7 @@ the secret weapon of modern JavaScript.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// A function in a variable.
+  starterCode={`// A function in a variable.
 const greet = (name) => "Hello, " + name + "!";
 console.log(greet("Ada"));
 
@@ -253,7 +253,7 @@ design is to keep them in well-marked, predictable places.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Pure: depends only on its inputs, returns a value, no side effects.
+  starterCode={`// Pure: depends only on its inputs, returns a value, no side effects.
 function add(a, b) {
   return a + b;
 }
@@ -388,7 +388,7 @@ Then define a function \`bmiCategory(bmi)\` that returns:
 - \`"normal"\` if 18.5 ≤ bmi < 25
 - \`"overweight"\` if 25 ≤ bmi < 30
 - \`"obese"\` if bmi ≥ 30`}
-  initialCode={`function bmi(weightKg, heightM) {
+  starterCode={`function bmi(weightKg, heightM) {
   // your code here
   return 0;
 }

@@ -54,7 +54,7 @@ idx = pd.date_range("2014-01-01", periods=n, freq="D")
 stationary    = pd.Series(rng.normal(0, 1, n), index=idx)                       # fixed rules
 moving_mean   = pd.Series(rng.normal(0, 1, n) + np.linspace(0, 8, n), index=idx) # mean drifts up
 moving_var    = pd.Series(rng.normal(0, 1, n) * np.linspace(0.3, 5, n), index=idx) # spread grows`}
-  initialCode={`fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+  starterCode={`fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
 
 for ax, s, title in zip(
     axes,
@@ -153,7 +153,7 @@ def adf_report(series, name):
     print(f"   verdict       : {verdict}\\n")
 
 rng = np.random.default_rng(0)`}
-  initialCode={`# A genuinely stationary series: white noise around 0.
+  starterCode={`# A genuinely stationary series: white noise around 0.
 white = rng.normal(0, 1, 300)
 adf_report(white, "White noise (should be STATIONARY)")
 
@@ -200,7 +200,7 @@ def adf_report(series, name):
     stat, p, *_ = adfuller(s)
     verdict = "STATIONARY" if p < 0.05 else "NON-stationary"
     print(f"{name:38s} p-value = {p:7.4f}  ->  {verdict}")`}
-  initialCode={`adf_report(air, "Raw airline passengers")
+  starterCode={`adf_report(air, "Raw airline passengers")
 adf_report(np.log(air), "log(passengers)")
 adf_report(air.diff(), "First difference of passengers")
 adf_report(np.log(air).diff(), "First difference of log(passengers)")
@@ -298,7 +298,7 @@ from statsmodels.tsa.stattools import adfuller
 rng = np.random.default_rng(123)
 noise = rng.normal(0, 1, 400)
 walk = np.cumsum(rng.normal(0, 1, 400))`}
-  initialCode={`adf = {
+  starterCode={`adf = {
     "noise_p": None,
     "walk_p": None,
     "noise_is_stationary": None,
@@ -378,7 +378,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`stationary = None
+  starterCode={`stationary = None
 p_raw = None
 p_stationary = None
 print("p_raw:", p_raw, " p_stationary:", p_stationary)

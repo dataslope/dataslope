@@ -93,7 +93,7 @@ purposes; we'll use `|>` throughout.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Single condition
@@ -122,7 +122,7 @@ want.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # By name
@@ -151,7 +151,7 @@ ergonomic.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -173,7 +173,7 @@ To *replace* a column, mutate with the same name:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -187,7 +187,7 @@ mtcars |>
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 # Ascending
@@ -209,7 +209,7 @@ statistics:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -230,7 +230,7 @@ their own. The magic happens when you combine it with
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -295,7 +295,7 @@ Using `dplyr` and the pipe, from `mtcars`:
   adapter="r"
   title="A small dplyr pipeline"
   instructions={`Use the pipe and four dplyr verbs (\`filter\`, \`mutate\`, \`select\`, \`arrange\`) to produce \`top_eff\` as described.`}
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 data(mtcars)
 
 top_eff <- NULL   # build a pipeline that produces a data.frame

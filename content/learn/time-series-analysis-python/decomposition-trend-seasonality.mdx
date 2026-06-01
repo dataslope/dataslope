@@ -40,7 +40,7 @@ true_trend    = 50 + 0.8 * t             # a straight climb we put in by hand
 true_seasonal = 12 * np.sin(2*np.pi*t/12)  # a yearly wave, constant size
 true_noise    = rng.normal(0, 3, n)      # random haze
 y = pd.Series(true_trend + true_seasonal + true_noise, index=idx, name="y")`}
-  initialCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 # period=12 tells it the seasonal cycle is 12 months long.
@@ -109,7 +109,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 # Decompose the airline series BOTH ways and compare the RESIDUALS.
@@ -188,7 +188,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4))
@@ -237,7 +237,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 dec = seasonal_decompose(air, model="multiplicative", period=12)
@@ -284,7 +284,7 @@ idx = pd.date_range("2015-01-01", periods=n, freq="MS")
 t = np.arange(n)
 y = pd.Series(40 + 0.5*t + 8*np.sin(2*np.pi*t/12) + rng.normal(0, 2, n),
               index=idx, name="y")`}
-  initialCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
 dec = None
 recon = None
 max_err = None
@@ -352,7 +352,7 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  initialCode={`yearly_mean = None
+  starterCode={`yearly_mean = None
 yearly_range = None
 swing_level_corr = None
 is_multiplicative = None

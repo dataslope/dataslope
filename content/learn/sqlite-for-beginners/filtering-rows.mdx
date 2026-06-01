@@ -39,7 +39,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre, price
+  starterCode={`SELECT title, genre, price
 FROM books
 WHERE genre = 'Technology';`}
 />
@@ -78,7 +78,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, price
+  starterCode={`SELECT title, price
 FROM books
 WHERE price < 20;`}
 />
@@ -100,7 +100,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, pages
+  starterCode={`SELECT title, pages
 FROM books
 WHERE pages BETWEEN 200 AND 320;`}
 />
@@ -153,7 +153,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre, price
+  starterCode={`SELECT title, genre, price
 FROM books
 WHERE genre = 'Technology' AND price < 30;`}
 />
@@ -175,7 +175,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre
+  starterCode={`SELECT title, genre
 FROM books
 WHERE genre = 'Fiction' OR genre = 'Travel';`}
 />
@@ -199,7 +199,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre, price
+  starterCode={`SELECT title, genre, price
 FROM books
 WHERE price < 20 AND (genre = 'Fiction' OR genre = 'Travel');`}
 />
@@ -226,7 +226,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title, genre
+  starterCode={`SELECT title, genre
 FROM books
 WHERE genre IN ('Fiction', 'Travel');`}
 />
@@ -258,7 +258,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title
+  starterCode={`SELECT title
 FROM books
 WHERE title LIKE 'sql%';`}
 />
@@ -280,7 +280,7 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  initialCode={`SELECT title
+  starterCode={`SELECT title
 FROM books
 WHERE title LIKE '%ar%';`}
 />

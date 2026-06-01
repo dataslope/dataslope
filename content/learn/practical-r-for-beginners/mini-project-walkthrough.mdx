@@ -23,7 +23,7 @@ Look before you leap. Always.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# airquality is built into R — no loading needed
+  starterCode={`# airquality is built into R — no loading needed
 dim(airquality)
 head(airquality)
 str(airquality)
@@ -55,7 +55,7 @@ flowchart TD
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>           # drop rows missing the response
@@ -84,7 +84,7 @@ A few notes:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
@@ -121,7 +121,7 @@ Plots will tell us more than summary tables ever can.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 library(ggplot2)
 
 aq <- airquality |>
@@ -153,7 +153,7 @@ temperatures.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 library(ggplot2)
 
 aq <- airquality |>
@@ -183,7 +183,7 @@ strong is it? And is it surprising given the noise?
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>

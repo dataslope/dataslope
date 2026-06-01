@@ -45,7 +45,7 @@ sequenceDiagram
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 long long factorial(int n) {
     if (n == 0) return 1;
     return n * factorial(n - 1);
@@ -63,7 +63,7 @@ The Fibonacci sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 int fib(int n) {
     if (n <= 1) return n;
     return fib(n - 1) + fib(n - 2);
@@ -97,7 +97,7 @@ A recursive array function often carries an index that moves toward the end.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int sumFrom(const std::vector<int>& v, int index) {
     if (index == static_cast<int>(v.size())) return 0;
@@ -117,7 +117,7 @@ Naive recursive power multiplies by `a` exactly `n` times, so it is O(n).
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 long long powerNaive(long long a, int n) {
     if (n == 0) return 1;
     return a * powerNaive(a, n - 1);
@@ -133,7 +133,7 @@ Fast exponentiation squares a half-power and reduces the exponent by half, givin
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 long long powerFast(long long a, int n) {
     if (n == 0) return 1;
     long long half = powerFast(a, n / 2);
@@ -155,7 +155,7 @@ Tail recursion means the recursive call is the final action. Clang may optimize 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 long long factorialTail(int n, long long acc) {
     if (n == 0) return acc;
     return factorialTail(n - 1, acc * n);
@@ -177,7 +177,7 @@ Recursion can make tree-shaped logic elegant and close to the math. Iteration us
   adapter="cpp"
   title="Count digits of a positive integer recursively"
   instructions={`Implement \`int countDigits(int n)\`. The input is positive. Do not print inside the function; the driver prints several calls.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 int countDigits(int n) {
     // your code here
 }
@@ -213,7 +213,7 @@ int main() {
   adapter="cpp"
   title="Reverse a string recursively"
   instructions={`Implement \`std::string reverseStr(const std::string& s)\` recursively. The driver prints the reverse of \`recursion\`.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <string>
 std::string reverseStr(const std::string& s) {
     // your code here

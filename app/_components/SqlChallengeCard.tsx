@@ -159,7 +159,7 @@ export interface SqlChallengeCardProps {
    *  `pre-exercise-code` block. */
   initSql?: string;
   /** Starter SQL shown in the editor. */
-  initialCode: string;
+  starterCode: string;
   /** Canonical reference solution. When provided, a "Show Solution"
    *  button appears in the toolbar; tests can also reference it via
    *  `matchesSolution: true`. */
@@ -807,7 +807,7 @@ export default function SqlChallengeCard({
   badge = "SQL Challenge",
   instructions,
   initSql,
-  initialCode,
+  starterCode,
   solutionSql,
   tables,
   tableRowLimit = 50,
@@ -830,8 +830,8 @@ export default function SqlChallengeCard({
   // historically DuckDB), and `title` disambiguates challenges that
   // happen to share starter text.
   const persistedKey = useMemo(
-    () => persistKey("sql-challenge", `${dialect}|${title}|${initialCode}`),
-    [dialect, title, initialCode],
+    () => persistKey("sql-challenge", `${dialect}|${title}|${starterCode}`),
+    [dialect, title, starterCode],
   );
 
   // Each card owns its own engine instance — sharing across cards
@@ -898,7 +898,7 @@ export default function SqlChallengeCard({
     // Restore any previously-saved SQL buffer; fall back to the MDX
     // starter when nothing is stored.
     const persisted = loadPersistedCode(persistedKey);
-    const initialDoc = persisted ?? initialCode;
+    const initialDoc = persisted ?? starterCode;
 
     const view = new EditorView({
       doc: initialDoc,
@@ -1422,7 +1422,7 @@ export default function SqlChallengeCard({
     const view = editorRef.current;
     if (view) {
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: initialCode },
+        changes: { from: 0, to: view.state.doc.length, insert: starterCode },
       });
     }
     // Drop the persisted buffer and cancel the debounced save the
@@ -1454,7 +1454,7 @@ export default function SqlChallengeCard({
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";

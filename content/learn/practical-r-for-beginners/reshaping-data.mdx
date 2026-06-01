@@ -49,7 +49,7 @@ Same data, two shapes. Same six numbers either way.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(tidyr)
+  starterCode={`library(tidyr)
 
 wide <- data.frame(
   country = c("USA", "UK"),
@@ -82,7 +82,7 @@ You can also clean up the year strings on the fly:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(tidyr)
+  starterCode={`library(tidyr)
 
 wide <- data.frame(
   country = c("USA", "UK"),
@@ -115,7 +115,7 @@ to compute differences between columns.
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(tidyr)
+  starterCode={`library(tidyr)
 
 long <- data.frame(
   country = rep(c("USA", "UK"), each = 3),
@@ -146,7 +146,7 @@ let's deliberately make it wide and then pivot it back:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(dplyr)
+  starterCode={`library(dplyr)
 library(tidyr)
 
 data(airquality)
@@ -185,7 +185,7 @@ function splits them:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(tidyr)
+  starterCode={`library(tidyr)
 
 df <- data.frame(
   period = c("2022-Q1", "2022-Q2", "2023-Q1", "2023-Q2"),
@@ -276,7 +276,7 @@ it into a tidy long-form data frame `sales_long` with columns
   Q4     = c(160, 95, 130, 120)
 )
 `}
-  initialCode={`library(tidyr)
+  starterCode={`library(tidyr)
 
 # sales_wide is already defined
 sales_long <- NULL   # pivot it longer

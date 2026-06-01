@@ -14,7 +14,7 @@ ints, side by side, and names the start `nums`.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int nums[5] = {10, 20, 30, 40, 50};
@@ -47,7 +47,7 @@ is defined as `*(a + i)`. The `+ i` part is *typed* — it advances by
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a[4] = {10, 20, 30, 40};
@@ -73,7 +73,7 @@ called *array-to-pointer decay*.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 void show_size_inside(int a[]) {
     // Inside the function, a is just int *.
@@ -114,7 +114,7 @@ If `p` is a pointer to a `T`, then:
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a[] = {10, 20, 30, 40, 50};
@@ -146,7 +146,7 @@ function, treat `arr` and `n` as inseparable.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 long sum(const int *arr, size_t n) {
@@ -187,7 +187,7 @@ behavior.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int grid[3][4] = {
@@ -221,7 +221,7 @@ stack. That is *the* C bug.
 
 <CodeBlock
   adapter="c"
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int main(void) {
     int a[3] = {1, 2, 3};
@@ -248,7 +248,7 @@ this in the *Memory Bugs* chapter.
   adapter="c"
   title="Rotate left in-place"
   instructions={`Implement \`void rotate_left(int *arr, size_t n)\` so that the element at index 0 moves to the end and every other element shifts one position to the left. For \`{1,2,3,4,5}\` the result is \`{2,3,4,5,1}\`. The provided \`main\` prints the array space-separated on one line.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 #include <stddef.h>
 
 void rotate_left(int *arr, size_t n) {
@@ -306,7 +306,7 @@ int main(void) {
   adapter="c"
   title="Sum the main diagonal of a 4x4 matrix"
   instructions={`Implement \`int diag_sum(int m[4][4])\` that returns \`m[0][0] + m[1][1] + m[2][2] + m[3][3]\`. The provided \`main\` defines a 4x4 matrix and prints the result followed by a newline.`}
-  initialCode={`#include <stdio.h>
+  starterCode={`#include <stdio.h>
 
 int diag_sum(int m[4][4]) {
     // your code here

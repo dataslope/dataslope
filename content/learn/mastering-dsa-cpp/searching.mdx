@@ -11,7 +11,7 @@ Linear search checks each element from left to right until it finds the target o
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int linearSearch(const std::vector<int>& v, int target) {
     for (int i = 0; i < static_cast<int>(v.size()); i++) {
@@ -46,7 +46,7 @@ Use `low <= high` when both endpoints are inclusive. Compute `mid` as `low + (hi
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int binarySearch(const std::vector<int>& v, int target) {
     int low = 0;
@@ -74,7 +74,7 @@ C++ already includes binary-search algorithms for sorted ranges.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int main() {
@@ -106,7 +106,7 @@ When duplicates exist, ordinary binary search may return any matching index. To 
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int firstOccurrence(const std::vector<int>& v, int target) {
     int low = 0, high = static_cast<int>(v.size()) - 1;
@@ -134,7 +134,7 @@ The insert position is the first index where the target could be placed while ke
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <algorithm>
+  starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int insertPosition(const std::vector<int>& v, int target) {
@@ -156,7 +156,7 @@ int main() {
   adapter="cpp"
   title="Implement binary search"
   instructions={`Implement \`int binarySearch(const std::vector<int>& v, int target)\` for a sorted vector. Return the index if found, or \`-1\` if missing.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int binarySearch(const std::vector<int>& v, int target) {
     // your code here
@@ -201,7 +201,7 @@ int main() {
   adapter="cpp"
   title="Find first occurrence in a sorted array with duplicates"
   instructions={`Implement \`int firstOccurrence(const std::vector<int>& v, int target)\`. Return the first matching index, or \`-1\` if absent.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 int firstOccurrence(const std::vector<int>& v, int target) {
     // your code here

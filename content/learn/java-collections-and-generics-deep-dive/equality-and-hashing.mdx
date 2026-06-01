@@ -28,7 +28,7 @@ once and for all.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         String a = "hello";
         String b = new String("hello");   // different object, same value
@@ -199,7 +199,7 @@ Java 16+ has **records**, which generate a correct `equals`,
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.HashSet;
+  starterCode={`import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -229,7 +229,7 @@ there, but the collection looks for it in the wrong bucket.
 
 <CodeBlock
   adapter="java"
-  initialCode={`import java.util.HashSet;
+  starterCode={`import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 

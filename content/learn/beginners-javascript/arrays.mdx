@@ -14,7 +14,7 @@ An array is written with square brackets and commas:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const empty = [];
+  starterCode={`const empty = [];
 const nums = [1, 2, 3, 4, 5];
 const colors = ["red", "green", "blue"];
 const mixed = [1, "two", true, null, [10, 20]];  // any types, even nested arrays
@@ -37,7 +37,7 @@ it.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = [10, 20, 30, 40];
+  starterCode={`const xs = [10, 20, 30, 40];
 console.log(xs.length);    // 4
 
 console.log([].length);    // 0
@@ -50,7 +50,7 @@ Read or write an element by its **index**, starting at `0`.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = [10, 20, 30, 40];
+  starterCode={`const xs = [10, 20, 30, 40];
 
 console.log(xs[0]);   // 10  — first
 console.log(xs[1]);   // 20
@@ -84,7 +84,7 @@ purpose — use `.push` instead.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = [];
+  starterCode={`const xs = [];
 xs.push("a");
 xs.push("b");
 xs.push("c");
@@ -111,7 +111,7 @@ We met loops in the control-flow chapter. Recall:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const fruits = ["apple", "banana", "cherry"];
+  starterCode={`const fruits = ["apple", "banana", "cherry"];
 
 // for...of — cleanest when you only need the element
 for (const fruit of fruits) {
@@ -144,7 +144,7 @@ Two methods that look similar but are completely different:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = ["a", "b", "c", "d", "e"];
+  starterCode={`const xs = ["a", "b", "c", "d", "e"];
 
 // slice: non-destructive — original is unchanged
 const middle = xs.slice(1, 4);     // ["b","c","d"]
@@ -176,7 +176,7 @@ A starter set, with the most common patterns:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = [3, 1, 4, 1, 5, 9, 2, 6];
+  starterCode={`const xs = [3, 1, 4, 1, 5, 9, 2, 6];
 
 // Membership / search
 console.log(xs.includes(5));     // true
@@ -224,7 +224,7 @@ Two pieces of modern syntax that come up everywhere with arrays.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const a = [1, 2, 3];
+  starterCode={`const a = [1, 2, 3];
 const b = [4, 5];
 
 // Combine
@@ -250,7 +250,7 @@ console.log(Math.max(...a));         // 3
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const xs = [10, 20, 30, 40, 50];
+  starterCode={`const xs = [10, 20, 30, 40, 50];
 
 const [first, second] = xs;
 console.log(first, second);          // 10 20
@@ -288,7 +288,7 @@ are sharing the same underlying array.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const a = [1, 2, 3];
+  starterCode={`const a = [1, 2, 3];
 const b = a;            // NOT a copy — b points at the same array
 b.push(99);
 console.log("a:", a);   // [1, 2, 3, 99]   — surprising if you weren't expecting it!
@@ -385,7 +385,7 @@ Examples:
 - \`rotate([], 3)\` → \`[]\`
 
 Hint: use the modulo operator (\`%\`) to handle \`k\` larger than the array length, then combine \`slice\` with the spread operator.`}
-  initialCode={`function rotate(xs, k) {
+  starterCode={`function rotate(xs, k) {
   // your code here
   return xs;
 }

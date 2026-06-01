@@ -39,7 +39,7 @@ ever since.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -63,7 +63,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
     "salary": [120, 95, 140, 80, 128, 110, 92],
 })`}
-  initialCode={`print(df.groupby("dept")["salary"].agg(["mean","median","min","max","count"]))
+  starterCode={`print(df.groupby("dept")["salary"].agg(["mean","median","min","max","count"]))
 `}
 />
 
@@ -71,7 +71,7 @@ Or apply different aggregations to different columns:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -94,7 +94,7 @@ columns. This is the modern recommended style.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -122,7 +122,7 @@ Pass a list of column names:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
@@ -145,7 +145,7 @@ df = pd.DataFrame({
     "level":  ["jr","sr","jr","sr","jr","jr"],
     "salary": [110, 160, 80, 120, 95, 75],
 })`}
-  initialCode={`flat = df.groupby(["dept","level"])["salary"].mean().reset_index()
+  starterCode={`flat = df.groupby(["dept","level"])["salary"].mean().reset_index()
 print(flat)
 `}
 />
@@ -157,7 +157,7 @@ add a column to the *original* rows containing a group statistic.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -181,7 +181,7 @@ satisfy a condition.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -205,7 +205,7 @@ the named aggregations, but flexible.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
@@ -229,7 +229,7 @@ rate by department.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -270,7 +270,7 @@ Build a DataFrame called \`summary\` indexed by \`Department\` with **exactly** 
 3. \`attrition_pct\` — percentage of employees with \`Attrition == "Yes"\`, rounded to 1 decimal place
 
 Sort the result by \`attrition_pct\` descending.`}
-  initialCode={`import pandas as pd
+  starterCode={`import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)

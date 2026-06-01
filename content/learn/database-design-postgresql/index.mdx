@@ -138,7 +138,7 @@ CREATE TABLE orders_flat (
 INSERT INTO orders_flat VALUES
   (1, 'Ada', 'ada@x.com', 'Book', 20),
   (2, 'Ada', 'ada@x.com', 'Pen',  3);`}
-  initialCode={`-- Ada's email is repeated on every order.
+  starterCode={`-- Ada's email is repeated on every order.
 -- If she changes it, we must update EVERY row or the data disagrees
 -- with itself. That fragility is a design problem, not a query problem.
 SELECT * FROM orders_flat;`}

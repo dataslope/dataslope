@@ -37,7 +37,7 @@ which you compare against in a `WHERE` clause:
 );
 INSERT INTO orders (id, amount) VALUES
   (1, 20), (2, 5), (3, 80), (4, 35), (5, 60);`}
-  initialCode={`SELECT id, amount
+  starterCode={`SELECT id, amount
 FROM orders
 WHERE amount > (SELECT AVG(amount) FROM orders)
 ORDER BY amount;`}
@@ -70,7 +70,7 @@ CREATE TABLE orders (
 );
 INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
 INSERT INTO orders (id, customer_id) VALUES (101,1),(102,1),(103,2);`}
-  initialCode={`SELECT name
+  starterCode={`SELECT name
 FROM customers
 WHERE id IN (SELECT customer_id FROM orders)
 ORDER BY name;`}

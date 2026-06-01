@@ -50,7 +50,7 @@ scale ggplot2 was adding silently:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Default: the x scale is implicit.
 ggplot(mpg, aes(displ, hwy)) + geom_point()
@@ -59,7 +59,7 @@ ggplot(mpg, aes(displ, hwy)) + geom_point()
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Identical result, but the x scale is now explicit.
 ggplot(mpg, aes(displ, hwy)) +
@@ -85,7 +85,7 @@ labeled. Concretely, you reach for a scale to set:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +

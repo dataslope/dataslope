@@ -22,7 +22,7 @@ Each has its own family of scales: `scale_color_*()` and
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Bars are areas -> use fill, and therefore scale_fill_*.
 ggplot(mpg, aes(class, fill = drv)) +
@@ -51,7 +51,7 @@ are easy to tell apart but none looks "bigger":
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = class)) +
   geom_point(size = 2) +
@@ -66,7 +66,7 @@ the color changes smoothly from low to high:
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = cty)) +
   geom_point(size = 2) +
@@ -91,7 +91,7 @@ around a meaningful midpoint (great for "above/below average"):
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 # Diverging scale centered at the mean: below = blue, above = red.
 mean_cty <- mean(mpg$cty)
@@ -116,7 +116,7 @@ When you need specific brand or semantic colors, map them by hand with
 
 <CodeBlock
   adapter="r"
-  initialCode={`library(ggplot2)
+  starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(class, fill = drv)) +
   geom_bar() +

@@ -96,7 +96,7 @@ await _load_nltk("corpora", "wordnet")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer`}
-  initialCode={`text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
+  starterCode={`text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
 
 # Step 1 — word tokenization
 tokens = word_tokenize(text)
@@ -211,7 +211,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords`}
-  initialCode={`text = "The The THE end is near"
+  starterCode={`text = "The The THE end is near"
 stop = set(stopwords.words("english"))   # all lowercase, includes 'the'
 tokens = word_tokenize(text)
 
@@ -294,7 +294,7 @@ await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 stop = set(stopwords.words("english"))`}
-  initialCode={`def preprocess(text):
+  starterCode={`def preprocess(text):
     # your code here — return a list of clean tokens
     tokens = word_tokenize(text)
     # ... lowercase, keep alphabetic, drop stopwords ...

@@ -63,7 +63,7 @@ breast-cancer data, which ships with named features.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -132,7 +132,7 @@ This works for a single tree and, more reliably, for a whole random forest
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
@@ -206,7 +206,7 @@ model memorized.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -280,7 +280,7 @@ matplotlib — the kind of plot you will make constantly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
@@ -431,7 +431,7 @@ from sklearn.ensemble import RandomForestClassifier
 data = load_wine()
 X, y = data.data, data.target
 feature_names = list(data.feature_names)`}
-  initialCode={`# 1. Fit the random forest
+  starterCode={`# 1. Fit the random forest
 forest = None
 
 # 2. Pull out the impurity-based importances

@@ -89,7 +89,7 @@ but is that a genuine breach of the promise, or just a slow afternoon?
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -125,7 +125,7 @@ that, pair the test with a **confidence interval** for the mean.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -186,7 +186,7 @@ test. It's the safer choice and what most statisticians now recommend.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -228,7 +228,7 @@ effect size to learn *how much*.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -305,7 +305,7 @@ that to ourselves.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -339,7 +339,7 @@ two independent groups — the person-to-person spread swamps the signal.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -391,7 +391,7 @@ enough.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -476,7 +476,7 @@ rng = np.random.default_rng(101)
 control   = rng.normal(140, 35, size=200)   # seconds on page
 treatment = rng.normal(150, 55, size=190)   # different spread on purpose
 alpha = 0.05`}
-  initialCode={`# TODO: run Welch's two-sample t-test; set p_value (float) and reject (bool)
+  starterCode={`# TODO: run Welch's two-sample t-test; set p_value (float) and reject (bool)
 p_value = None
 reject = None
 `}
@@ -541,7 +541,7 @@ rng = np.random.default_rng(202)
 before = rng.normal(2.4, 0.6, size=30)            # seconds, per page
 after = before - rng.normal(0.25, 0.3, size=30)   # caching shaves time off
 alpha = 0.05`}
-  initialCode={`# TODO: paired t-test; set p_value (float), mean_improvement (float), verdict (str)
+  starterCode={`# TODO: paired t-test; set p_value (float), mean_improvement (float), verdict (str)
 p_value = None
 mean_improvement = None
 verdict = None

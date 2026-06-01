@@ -99,7 +99,7 @@ rejected because the required email is missing.
   email  TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active'
 );`}
-  initialCode={`-- status is omitted, so the DEFAULT fills in 'active'.
+  starterCode={`-- status is omitted, so the DEFAULT fills in 'active'.
 INSERT INTO accounts (email) VALUES ('ada@example.com');
 
 -- email is required, so this insert is rejected.
@@ -145,7 +145,7 @@ INSERT INTO contacts (name, nickname) VALUES
   ('Ada', 'A'),
   ('Grace', NULL),
   ('Linus', NULL);`}
-  initialCode={`-- This is the correct way to find missing nicknames.
+  starterCode={`-- This is the correct way to find missing nicknames.
 SELECT name, nickname
 FROM contacts
 WHERE nickname IS NULL;`}

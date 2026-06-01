@@ -19,7 +19,7 @@ With an early-exit flag, bubble sort is O(n) on already sorted input. Its averag
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 void bubbleSort(std::vector<int>& v) {
@@ -50,7 +50,7 @@ Selection sort finds the smallest element in the unsorted suffix and swaps it in
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 void selectionSort(std::vector<int>& v) {
@@ -80,7 +80,7 @@ Insertion sort builds a sorted prefix. For each new value, it shifts larger elem
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 void insertionSort(std::vector<int>& v) {
     for (int i = 1; i < static_cast<int>(v.size()); i++) {
@@ -120,7 +120,7 @@ A helper that prints vectors cleanly is useful while debugging sorts.
 
 <CodeBlock
   adapter="cpp"
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 void printCommaSeparated(const std::vector<int>& v) {
     for (int i = 0; i < static_cast<int>(v.size()); i++) {
@@ -145,7 +145,7 @@ Insertion sort's invariant is: before each outer-loop iteration, elements before
   adapter="cpp"
   title="Implement bubble sort with early exit"
   instructions={`Implement \`void bubbleSort(std::vector<int>& v)\` using adjacent swaps and an early-exit flag. The driver prints the sorted vector with comma separators.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
 void bubbleSort(std::vector<int>& v) {
@@ -204,7 +204,7 @@ int main() {
   adapter="cpp"
   title="Implement insertion sort"
   instructions={`Implement \`void insertionSort(std::vector<int>& v)\`. The driver prints the sorted result with comma separators.`}
-  initialCode={`#include <iostream>
+  starterCode={`#include <iostream>
 #include <vector>
 void insertionSort(std::vector<int>& v) {
     // your code here

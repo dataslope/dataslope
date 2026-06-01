@@ -144,7 +144,7 @@ want to know whether they look reliably different.
 
 <CodeBlock
   adapter="r"
-  initialCode={`# 5 plots each of two wheat varieties (bushels per acre)
+  starterCode={`# 5 plots each of two wheat varieties (bushels per acre)
 variety_A <- c(48, 52, 47, 50, 53)
 variety_B <- c(45, 47, 44, 46, 48)
 
@@ -177,7 +177,7 @@ more line:
   adapter="r"
   initCode={`variety_A <- c(48, 52, 47, 50, 53)
 variety_B <- c(45, 47, 44, 46, 48)`}
-  initialCode={`# R's built-in t-test for two samples
+  starterCode={`# R's built-in t-test for two samples
 t.test(variety_A, variety_B, var.equal = TRUE)
 `}
 />
@@ -260,7 +260,7 @@ the true mean is `40`.
 
 You can use base R only — no packages needed.`}
   initCode={`yield <- c(42, 39, 45, 41, 44, 40, 43, 38, 46, 42)`}
-  initialCode={`m      <- NA
+  starterCode={`m      <- NA
 s      <- NA
 t_stat <- NA
 

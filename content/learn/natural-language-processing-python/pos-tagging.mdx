@@ -62,7 +62,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize`}
-  initialCode={`for sentence in ["I caught a big fish.",
+  starterCode={`for sentence in ["I caught a big fish.",
                  "We fish on weekends."]:
     tokens = word_tokenize(sentence)
     tagged = pos_tag(tokens)
@@ -149,7 +149,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize`}
-  initialCode={`sentence = "The tall man reads books."
+  starterCode={`sentence = "The tall man reads books."
 tagged = pos_tag(word_tokenize(sentence))
 
 for word, tag in tagged:
@@ -192,7 +192,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize`}
-  initialCode={`text = "The talented young engineer quietly designed a brilliant new system."
+  starterCode={`text = "The talented young engineer quietly designed a brilliant new system."
 tagged = pos_tag(word_tokenize(text))
 
 nouns = [w for w, t in tagged if t.startswith("NN")]
@@ -246,7 +246,7 @@ from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet`}
-  initialCode={`lemmatizer = WordNetLemmatizer()
+  starterCode={`lemmatizer = WordNetLemmatizer()
 
 def to_wordnet_pos(treebank_tag):
     # Map a Penn Treebank tag to the coarse POS WordNet expects.
@@ -350,7 +350,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize`}
-  initialCode={`def get_nouns(text):
+  starterCode={`def get_nouns(text):
     # tokenize -> pos_tag -> keep words whose tag starts with "NN"
     return []
 

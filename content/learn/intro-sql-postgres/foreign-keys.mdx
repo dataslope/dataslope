@@ -72,7 +72,7 @@ CREATE TABLE orders (
   amount      NUMERIC
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');`}
-  initialCode={`-- Customer 1 (Ada) exists, so this is fine:
+  starterCode={`-- Customer 1 (Ada) exists, so this is fine:
 INSERT INTO orders (customer_id, amount) VALUES (1, 42);
 
 -- Customer 99 does NOT exist; the foreign key blocks this:

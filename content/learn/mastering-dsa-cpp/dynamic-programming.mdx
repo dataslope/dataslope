@@ -26,7 +26,7 @@ Before coding, say exactly what `dp[i]` or `dp[i][j]` means. The transition usua
 
 Naive recursion is exponential because it repeats work.
 
-<CodeBlock adapter="cpp" initialCode={`#include <iostream>
+<CodeBlock adapter="cpp" starterCode={`#include <iostream>
 int fib(int n) {
     if (n <= 1) return n;
     return fib(n - 1) + fib(n - 2);
@@ -48,7 +48,7 @@ graph TD
     C --> G["fib(1)"]
 ```
 
-<CodeBlock adapter="cpp" initialCode={`#include <iostream>
+<CodeBlock adapter="cpp" starterCode={`#include <iostream>
 #include <vector>
 int fibMemo(int n, std::vector<int>& memo) {
     if (n <= 1) return n;
@@ -62,7 +62,7 @@ int main() {
 }
 `} />
 
-<CodeBlock adapter="cpp" initialCode={`#include <iostream>
+<CodeBlock adapter="cpp" starterCode={`#include <iostream>
 #include <vector>
 int fibTab(int n) {
     if (n <= 1) return n;
@@ -77,7 +77,7 @@ int main() {
 }
 `} />
 
-<CodeBlock adapter="cpp" initialCode={`#include <iostream>
+<CodeBlock adapter="cpp" starterCode={`#include <iostream>
 int fibSpace(int n) {
     if (n <= 1) return n;
     int a = 0, b = 1;
@@ -104,7 +104,7 @@ flowchart LR
     B["step n-1"] --> D["+1"] --> N
 ```
 
-<CodeBlock adapter="cpp" initialCode={`#include <iostream>
+<CodeBlock adapter="cpp" starterCode={`#include <iostream>
 int climbStairs(int n) {
     if (n <= 2) return n;
     int a = 1, b = 2;
@@ -125,7 +125,7 @@ int main() {
 
 Let `dp[a]` be the minimum coins for amount `a`; try each coin as the last coin.
 
-<CodeBlock adapter="cpp" initialCode={`#include <algorithm>
+<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int coinChange(const std::vector<int>& coins, int amount) {
@@ -163,7 +163,7 @@ flowchart TD
     B --> M
 ```
 
-<CodeBlock adapter="cpp" initialCode={`#include <algorithm>
+<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int knapsack(int W, const std::vector<int>& wt, const std::vector<int>& val) {
@@ -193,7 +193,7 @@ flowchart TD
     G --> A["bottom-right = 4"]
 ```
 
-<CodeBlock adapter="cpp" initialCode={`#include <algorithm>
+<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -212,7 +212,7 @@ int main() {
 
 For LIS, `dp[i]` is the longest increasing subsequence ending at `i`. The O(n log n) patience-sort version is faster, but O(n²) is the clearest DP.
 
-<CodeBlock adapter="cpp" initialCode={`#include <algorithm>
+<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int lis(const std::vector<int>& nums) {
@@ -234,7 +234,7 @@ int main() {
 
 Use DP when you see optimal substructure and overlapping subproblems. Optimize space with rolling arrays when a row only depends on previous rows.
 
-<ChallengeCard adapter="cpp" title="Climbing stairs" instructions={`Implement \`int climbStairs(int n)\` for n=1..45. The driver prints several values.`} initialCode={`#include <iostream>
+<ChallengeCard adapter="cpp" title="Climbing stairs" instructions={`Implement \`int climbStairs(int n)\` for n=1..45. The driver prints several values.`} starterCode={`#include <iostream>
 int climbStairs(int n) { return 0; }
 int main() {
     for (int n : {1, 2, 3, 5, 10}) std::cout << climbStairs(n) << "\n";
@@ -253,7 +253,7 @@ int main() {
 }
 `} tests={[{ id: "climb", name: "Computes stair counts", expect: { stdoutLines: ["1", "2", "3", "8", "89"], stdoutLinesExact: true } }]} />
 
-<ChallengeCard adapter="cpp" title="Coin change min coins" instructions={`Implement \`int coinChange(std::vector<int> coins, int amount)\`. Return -1 if impossible.`} initialCode={`#include <algorithm>
+<ChallengeCard adapter="cpp" title="Coin change min coins" instructions={`Implement \`int coinChange(std::vector<int> coins, int amount)\`. Return -1 if impossible.`} starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int coinChange(std::vector<int> coins, int amount) { return 0; }
@@ -281,7 +281,7 @@ int main() {
 }
 `} tests={[{ id: "coins", name: "Minimum coins", expect: { stdoutLines: ["3", "-1", "2"], stdoutLinesExact: true } }]} />
 
-<ChallengeCard adapter="cpp" title="0/1 Knapsack max value" instructions={`Implement \`int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values)\`.`} initialCode={`#include <algorithm>
+<ChallengeCard adapter="cpp" title="0/1 Knapsack max value" instructions={`Implement \`int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values)\`.`} starterCode={`#include <algorithm>
 #include <iostream>
 #include <vector>
 int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values) { return 0; }

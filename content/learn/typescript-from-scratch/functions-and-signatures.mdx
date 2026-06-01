@@ -23,7 +23,7 @@ the return type:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function add(a: number, b: number): number {
+  starterCode={`function add(a: number, b: number): number {
   return a + b;
 }
 
@@ -44,7 +44,7 @@ the `return` statements:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function multiply(a: number, b: number) {
+  starterCode={`function multiply(a: number, b: number) {
   return a * b;  // inferred return type: number
 }
 
@@ -62,7 +62,7 @@ A parameter marked with `?` is **optional** — callers can omit it:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function greet(name: string, greeting?: string): string {
+  starterCode={`function greet(name: string, greeting?: string): string {
   if (greeting === undefined) {
     return \`Hello, \${name}!\`;
   }
@@ -86,7 +86,7 @@ argument:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function greet(name: string, greeting: string = "Hello"): string {
+  starterCode={`function greet(name: string, greeting: string = "Hello"): string {
   return \`\${greeting}, \${name}!\`;
 }
 
@@ -106,7 +106,7 @@ into an array:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function sum(...numbers: number[]): number {
+  starterCode={`function sum(...numbers: number[]): number {
   let total = 0;
   for (const num of numbers) {
     total += num;
@@ -133,7 +133,7 @@ them as arguments, return them from other functions. To annotate a
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type BinaryOp = (a: number, b: number) => number;
+  starterCode={`type BinaryOp = (a: number, b: number) => number;
 
 const add: BinaryOp = (a, b) => a + b;
 const multiply: BinaryOp = (a, b) => a * b;
@@ -151,7 +151,7 @@ Here's a higher-order function that accepts a callback:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function applyTwice(
+  starterCode={`function applyTwice(
   fn: (x: number) => number,
   value: number
 ): number {
@@ -177,7 +177,7 @@ interface or type literal:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface MathOp {
+  starterCode={`interface MathOp {
   (a: number, b: number): number;
 }
 
@@ -196,7 +196,7 @@ properties (e.g., a function with a `.version` property).
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface CallableWithVersion {
+  starterCode={`interface CallableWithVersion {
   (x: number): number;
   version: string;
 }
@@ -219,7 +219,7 @@ A function that doesn't return a value has return type **`void`**:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function logMessage(message: string): void {
+  starterCode={`function logMessage(message: string): void {
   console.log("LOG:", message);
 }
 
@@ -245,7 +245,7 @@ function explicitly returns `undefined`":
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`function doNothing(): void {
+  starterCode={`function doNothing(): void {
   // No return statement
 }
 
@@ -273,7 +273,7 @@ patterns:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`// Overload signatures
+  starterCode={`// Overload signatures
 function format(value: number): string;
 function format(value: string): string;
 
@@ -307,7 +307,7 @@ typing**:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`const numbers = [1, 2, 3, 4, 5];
+  starterCode={`const numbers = [1, 2, 3, 4, 5];
 
 // The callback's parameter type is inferred from Array.map's signature
 const doubled = numbers.map((n) => n * 2);
@@ -417,7 +417,7 @@ compare to TypeScript:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`interface FetchOptions {
+  starterCode={`interface FetchOptions {
   timeout?: number;
   retries?: number;
 }

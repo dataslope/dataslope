@@ -25,7 +25,7 @@ A **pure function** is one that:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// PURE: depends only on its arguments, returns a value, changes nothing.
+  starterCode={`// PURE: depends only on its arguments, returns a value, changes nothing.
 function add(a, b) {
   return a + b;
 }
@@ -96,7 +96,7 @@ treats them as if they weren't.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// MUTATING style: change the array in place.
+  starterCode={`// MUTATING style: change the array in place.
 const nums = [1, 2, 3];
 nums.push(4);                // nums is now [1,2,3,4] — the SAME array
 console.log(nums);
@@ -155,7 +155,7 @@ are values like any other. You can:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Pass a function as an argument.
+  starterCode={`// Pass a function as an argument.
 const nums = [1, 2, 3, 4];
 console.log(nums.map((n) => n * 10));
 
@@ -194,7 +194,7 @@ bigger one. You can compose at the function level too.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const trim       = (s) => s.trim();
+  starterCode={`const trim       = (s) => s.trim();
 const lower      = (s) => s.toLowerCase();
 const dashify    = (s) => s.replace(/\\s+/g, "-");
 
@@ -239,7 +239,7 @@ functional. None of these versions is "wrong" — they're trade-offs.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`const orders = [
+  starterCode={`const orders = [
   { id: 1, amount: 120, status: "paid" },
   { id: 2, amount: 80,  status: "cancelled" },
   { id: 3, amount: 60,  status: "paid" },
@@ -367,7 +367,7 @@ Rules:
 - If no student matches, return an equivalent new array.
 
 This is a classic immutable update.`}
-  initialCode={`function incrementScores(students, name) {
+  starterCode={`function incrementScores(students, name) {
   // your code here — no mutation!
   return students;
 }

@@ -128,7 +128,7 @@ beautifully simple:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -179,7 +179,7 @@ effect. We'll draw both curves with Plotly.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -221,7 +221,7 @@ running the study. Now hold `n` fixed and grow the effect instead:
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -272,7 +272,7 @@ world with **no effect at all** and counting false positives.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -345,7 +345,7 @@ the overshoots. Let's see it.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(4)
@@ -416,7 +416,7 @@ effect = 0.6
 n_per_group = 40
 alpha = 0.05
 n_experiments = 3000`}
-  initialCode={`# TODO: simulate n_experiments t-tests and set power = fraction that reject H0
+  starterCode={`# TODO: simulate n_experiments t-tests and set power = fraction that reject H0
 power = None
 `}
   solutionCode={`rejections = 0
@@ -475,7 +475,7 @@ rng = np.random.default_rng(2025)
 n_per_group = 50
 alpha = 0.05
 n_experiments = 8000`}
-  initialCode={`# TODO: simulate under H0 (no effect) and set type_I_rate = fraction that reject
+  starterCode={`# TODO: simulate under H0 (no effect) and set type_I_rate = fraction that reject
 type_I_rate = None
 `}
   solutionCode={`false_positives = 0

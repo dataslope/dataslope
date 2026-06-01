@@ -51,7 +51,7 @@ than a couple of correct bits**.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # Conditioning of evaluating sin(x) near a root, e.g. near pi
 def cond_sin(x):
@@ -85,7 +85,7 @@ Let us watch both happen.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # A 2x2 system  Ax = b  that is well-conditioned
 A = np.array([[1.0, 1.0],
@@ -134,7 +134,7 @@ numbers.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import math
+  starterCode={`import math
 
 # Forward recurrence (UNSTABLE)
 I = math.log(1.1)
@@ -157,7 +157,7 @@ $10$ per step.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Backward recurrence (STABLE), starting from an arbitrary guess at n = 40
+  starterCode={`# Backward recurrence (STABLE), starting from an arbitrary guess at n = 40
 N = 40
 I = 0.0           # any starting guess
 for n in range(N, 0, -1):
@@ -200,7 +200,7 @@ the *algorithm*.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 
 # A Hilbert matrix is a famous ill-conditioned problem
 def hilbert(n):
@@ -244,7 +244,7 @@ recovers most of the digits a naive sum throws away.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import numpy as np
+  starterCode={`import numpy as np
 import math
 
 # Sum a million numbers, each ~1e-10

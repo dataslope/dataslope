@@ -21,7 +21,7 @@ that, when called, produces a value:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type IO<A> = () => A;
+  starterCode={`type IO<A> = () => A;
 
 // "describe" some effects (no execution yet)
 const sayHi:   IO<void>   = () => console.log("hi");
@@ -50,7 +50,7 @@ Once you have `IO<A>`, you can build the familiar trio:
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type IO<A> = () => A;
+  starterCode={`type IO<A> = () => A;
 
 const of  = <A,>(a: A): IO<A> => () => a;
 
@@ -109,7 +109,7 @@ against actual implementations.
 
 <CodeBlock
   adapter="typescript"
-  initialCode={`type Op =
+  starterCode={`type Op =
   | { kind: "log";   msg: string }
   | { kind: "now" };
 

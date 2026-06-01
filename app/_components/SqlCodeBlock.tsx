@@ -83,7 +83,7 @@ export interface SqlCodeBlockProps {
    *  seeds data, etc. */
   initSql?: string;
   /** Starter SQL shown in the editor. */
-  initialCode: string;
+  starterCode: string;
   /** Hand-picked tables (and optional schemas) to display in the table
    *  viewer. When omitted, every user table in the default schema is
    *  shown. Set to `false` to suppress the viewer entirely. */
@@ -111,7 +111,7 @@ export default function SqlCodeBlock({
   title,
   badge = "SQL",
   initSql,
-  initialCode,
+  starterCode,
   tables,
   tableRowLimit = 50,
 }: SqlCodeBlockProps) {
@@ -125,8 +125,8 @@ export default function SqlCodeBlock({
   // things across engines, and `title` disambiguates blocks that share
   // starter text.
   const persistedKey = useMemo(
-    () => persistKey("sql-codeblock", `${dialect}|${title ?? ""}|${initialCode}`),
-    [dialect, title, initialCode],
+    () => persistKey("sql-codeblock", `${dialect}|${title ?? ""}|${starterCode}`),
+    [dialect, title, starterCode],
   );
 
   // Each block owns its own engine instance — sharing across blocks
@@ -176,7 +176,7 @@ export default function SqlCodeBlock({
     const languageComp = new Compartment();
 
     const persisted = loadPersistedCode(persistedKey);
-    const initialDoc = persisted ?? initialCode;
+    const initialDoc = persisted ?? starterCode;
 
     const view = new EditorView({
       doc: initialDoc,
@@ -430,7 +430,7 @@ export default function SqlCodeBlock({
     const view = editorRef.current;
     if (view) {
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: initialCode },
+        changes: { from: 0, to: view.state.doc.length, insert: starterCode },
       });
     }
     if (persistSaveTimerRef.current !== null) {
@@ -458,7 +458,7 @@ export default function SqlCodeBlock({
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [initialCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";

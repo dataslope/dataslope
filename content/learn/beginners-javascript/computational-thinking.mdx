@@ -37,7 +37,7 @@ Here is a tiny version where the sub-problems are obvious:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Sub-problem 1: compute the tip from the bill and the tip rate.
+  starterCode={`// Sub-problem 1: compute the tip from the bill and the tip rate.
 function computeTip(billTotal, tipRate) {
   return billTotal * tipRate;
 }
@@ -94,7 +94,7 @@ Here is one of the most fundamental patterns in all of programming
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`// Pattern: start with a "blank" result, walk the list, update the result.
+  starterCode={`// Pattern: start with a "blank" result, walk the list, update the result.
 const numbers = [10, 22, 3, 47, 9];
 
 // Sum:
@@ -172,7 +172,7 @@ We can abstract *further* by giving the steps themselves names:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function totalWithTip(bill, tipRate) {
+  starterCode={`function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
 
@@ -226,7 +226,7 @@ Now we translate the recipe into code:
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function isPrime(n) {
+  starterCode={`function isPrime(n) {
   if (n < 2) return false;          // Step 1.
   for (let i = 2; i < n; i++) {     // Step 2.
     if (n % i === 0) return false;  // Step 3.
@@ -274,7 +274,7 @@ instances of the "accumulator over a list" pattern. Count is too.
 
 <CodeBlock
   adapter="javascript"
-  initialCode={`function average(numbers) {
+  starterCode={`function average(numbers) {
   let total = 0;
   for (const n of numbers) total += n;
   return total / numbers.length;
@@ -333,7 +333,7 @@ For example:
 - \`countWords("   spaced   out   ")\` should return \`2\`.
 
 Hint: \`"a b  c".split(/\\s+/)\` splits on one-or-more whitespace characters. You may need to filter out empty strings.`}
-  initialCode={`function countWords(text) {
+  starterCode={`function countWords(text) {
   // your code here
   return 0;
 }

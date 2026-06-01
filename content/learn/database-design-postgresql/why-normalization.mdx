@@ -70,7 +70,7 @@ INSERT INTO orders_flat VALUES
   (1, 'Ada',   'ada@old.test',   'Notebook', 8.00),
   (2, 'Ada',   'ada@old.test',   'Pencil',   1.50),
   (3, 'Grace', 'grace@test.test', 'Notebook', 8.00);`}
-  initialCode={`-- A rushed update changes only one of Ada's rows.
+  starterCode={`-- A rushed update changes only one of Ada's rows.
 UPDATE orders_flat
 SET customer_email = 'ada@new.test'
 WHERE order_id = 1;

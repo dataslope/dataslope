@@ -52,7 +52,7 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.probability import FreqDist`}
-  initialCode={`text = """The fox runs. The dog runs too. The fox and the dog run together,
+  starterCode={`text = """The fox runs. The dog runs too. The fox and the dog run together,
 and the fox is faster than the dog, but the dog is happier than the fox."""
 
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
@@ -123,7 +123,7 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize`}
-  initialCode={`def lexical_diversity(tokens):
+  starterCode={`def lexical_diversity(tokens):
     if not tokens:
         return 0.0
     return len(set(tokens)) / len(tokens)
@@ -188,7 +188,7 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.probability import FreqDist`}
-  initialCode={`import matplotlib.pyplot as plt
+  starterCode={`import matplotlib.pyplot as plt
 
 text = """A search engine reads text and indexes the words in the text so that
 a user can search for words. When a user searches, the engine finds the text
@@ -252,7 +252,7 @@ await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist`}
-  initialCode={`text = """A search engine reads text and indexes the words in the text so that
+  starterCode={`text = """A search engine reads text and indexes the words in the text so that
 a user can search for words. When a user searches, the engine finds the text
 that best matches the words the user typed, ranking the best text first."""
 
@@ -318,7 +318,7 @@ import micropip
 await micropip.install("nltk")
 import nltk
 from nltk.probability import FreqDist`}
-  initialCode={`def lexical_diversity(tokens):
+  starterCode={`def lexical_diversity(tokens):
     # distinct / total, or 0.0 if empty
     return 0.0
 

@@ -21,7 +21,7 @@ Python's truthiness rules make code concise and readable. Instead of `if len(ite
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(type(True))
+  starterCode={`print(type(True))
 print(type(False))
 `}
 />
@@ -36,14 +36,14 @@ The term "boolean" comes from **George Boole** (1815–1864), an English mathema
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(True == 1, False == 0)
+  starterCode={`print(True == 1, False == 0)
 print(isinstance(True, int))
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(True + True + True)  # 3
+  starterCode={`print(True + True + True)  # 3
 print(False * 100)          # 0
 `}
 />
@@ -73,20 +73,20 @@ if items:  # Pythonic truthiness check
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(3 < 5 <= 5)  # chained comparisons! Same as (3 < 5) and (5 <= 5)
+  starterCode={`print(3 < 5 <= 5)  # chained comparisons! Same as (3 < 5) and (5 <= 5)
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`print("a" in "banana")
+  starterCode={`print("a" in "banana")
 print(2 in [1, 2, 3])
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(None is None)
+  starterCode={`print(None is None)
 print(True is True)
 `}
 />
@@ -97,7 +97,7 @@ print(True is True)
 
 <CodeBlock
   adapter="python"
-  initialCode={`a = [1, 2, 3]
+  starterCode={`a = [1, 2, 3]
 b = [1, 2, 3]
 print(a == b)   # True, same contents
 print(a is b)   # False, different list objects
@@ -106,7 +106,7 @@ print(a is b)   # False, different list objects
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = None
+  starterCode={`x = None
 print(x is None)   # the idiomatic check
 `}
 />
@@ -122,7 +122,7 @@ Any object can be tested in a boolean context (e.g., `if`, `while`, `and`, `or`)
 
 <CodeBlock
   adapter="python"
-  initialCode={`for value in [0, 1, "", "hi", [], [0], None, {}, {0: 0}]:
+  starterCode={`for value in [0, 1, "", "hi", [], [0], None, {}, {0: 0}]:
     print(f"{value!r:>10} -> {bool(value)}")
 `}
 />
@@ -131,7 +131,7 @@ This is why idiomatic Python writes `if items:` instead of `if len(items) > 0:`.
 
 <CodeBlock
   adapter="python"
-  initialCode={`items = [1, 2, 3]
+  starterCode={`items = [1, 2, 3]
 if items:
     print("We have items!")
 `}
@@ -139,7 +139,7 @@ if items:
 
 <CodeBlock
   adapter="python"
-  initialCode={`items = []
+  starterCode={`items = []
 if not items:
     print("Empty list!")
 `}
@@ -169,7 +169,7 @@ Python's logical operators are written as English words, not symbols (`&&`, `||`
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(True and False)
+  starterCode={`print(True and False)
 print(True or False)
 print(not True)
 `}
@@ -181,7 +181,7 @@ print(not True)
 
 <CodeBlock
   adapter="python"
-  initialCode={`def expensive():
+  starterCode={`def expensive():
     print("expensive() called")
     return True
 
@@ -191,7 +191,7 @@ print(False and expensive())  # expensive() is never called
 
 <CodeBlock
   adapter="python"
-  initialCode={`def expensive():
+  starterCode={`def expensive():
     print("expensive() called")
     return True
 
@@ -208,14 +208,14 @@ print(True or expensive())  # expensive() is never called
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(True and "hello")   # 'hello'
+  starterCode={`print(True and "hello")   # 'hello'
 print(False or "default") # 'default'
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`print(None or 0 or "first truthy")  # 'first truthy'
+  starterCode={`print(None or 0 or "first truthy")  # 'first truthy'
 print("a" and "b" and "c")           # 'c'
 `}
 />
@@ -244,14 +244,14 @@ count = user_count if user_count is not None else 10
 
 <CodeBlock
   adapter="python"
-  initialCode={`name = ""
+  starterCode={`name = ""
 print(name or "Anonymous")  # "Anonymous"
 `}
 />
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Careful: 0 is falsy, so 'or' replaces it
+  starterCode={`# Careful: 0 is falsy, so 'or' replaces it
 count = 0
 print(count or 10)  # 10, probably not what you want!
 `}
@@ -259,7 +259,7 @@ print(count or 10)  # 10, probably not what you want!
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Use a None check for cases where 0 is valid
+  starterCode={`# Use a None check for cases where 0 is valid
 count = 0
 print(count if count is not None else 10)  # 0
 `}
@@ -271,7 +271,7 @@ Python's ternary form puts the condition in the **middle**:
 
 <CodeBlock
   adapter="python"
-  initialCode={`age = 17
+  starterCode={`age = 17
 status = "adult" if age >= 18 else "minor"
 print(status)
 `}
@@ -279,7 +279,7 @@ print(status)
 
 <CodeBlock
   adapter="python"
-  initialCode={`x = 10
+  starterCode={`x = 10
 abs_x = x if x >= 0 else -x
 print(abs_x)
 `}
@@ -291,7 +291,7 @@ print(abs_x)
   adapter="python"
   title="XOR without ^"
   instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator—use \`and\`, \`or\`, and \`not\`.`}
-  initialCode={`def xor(a, b):
+  starterCode={`def xor(a, b):
     # Your code here
     return False
 
@@ -334,7 +334,7 @@ print(xor(False, False))
   adapter="python"
   title="All-truthy detector"
   instructions={`Write a function \`all_truthy(items)\` that returns \`True\` if **all** items in the list are truthy, and \`False\` otherwise. Do not use the built-in \`all()\`—implement it yourself with a loop or comprehension.`}
-  initialCode={`def all_truthy(items):
+  starterCode={`def all_truthy(items):
     # Your code here
     return False
 

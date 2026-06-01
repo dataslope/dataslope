@@ -47,7 +47,7 @@ flowchart LR
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Animal a = new Dog();         // compile-time type Animal, runtime type Dog
         System.out.println(a.speak()); // -> "Woof!" (Dog's override)
@@ -208,7 +208,7 @@ expression and may fail at runtime if you're wrong.
 
 <CodeBlock
   adapter="java"
-  initialCode={`public class Main {
+  starterCode={`public class Main {
     public static void main(String[] args) {
         Animal a1 = new Dog();
         Animal a2 = new Cat();

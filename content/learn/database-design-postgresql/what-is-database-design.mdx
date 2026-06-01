@@ -162,7 +162,7 @@ INSERT INTO posts (title, slug, published) VALUES
 INSERT INTO comments (post_id, author, body, created_on) VALUES
   (1, 'Ada', 'This made relationships clearer.', DATE '2025-02-01'),
   (1, 'Linus', 'The slug rule is helpful.', DATE '2025-02-02');`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   posts.title,
   COUNT(comments.id) AS comment_count
 FROM posts

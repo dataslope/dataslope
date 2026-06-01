@@ -812,15 +812,17 @@
   outline-offset: -2px;
 }
 
-/* "Click to expand" label centred at the bottom of the fade overlay.
-   Sits on a solid rounded pill with a soft shadow so the text + chevron
-   stay legible even when code lines show through the gradient behind
-   them. */
+/* "Click to expand" label shown at the bottom of the collapsed fade
+   overlay. It spans the full width and mirrors the "Click to collapse"
+   button (no drop shadow, no border, no rounded pill) so it blends into
+   the gradient fade while staying legible, and on hover it picks up the
+   same full-width var(--ch-bg-hover) background as the collapse button. */
 .initFadeLabel {
   position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 500;
@@ -828,18 +830,13 @@
   pointer-events: none;
   white-space: nowrap;
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0px;
-  padding: 3px 12px 4px;
-  background: var(--ch-bg);
-  border: 1px solid var(--ch-border-light);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
-}
-
-:global(html.dark) .initFadeLabel {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background: color-mix(in srgb, var(--ch-bg) 80%, transparent);
+  transition: color 0.12s, background 0.12s;
 }
 
 .initFadeLabel svg {
@@ -848,7 +845,7 @@
 
 .initFade:hover .initFadeLabel {
   color: var(--ch-text);
-  border-color: var(--ch-border);
+  background: var(--ch-bg-hover);
 }
 
 /* "Click to collapse" button shown at the bottom of the expanded init panel. */
@@ -2369,6 +2366,8 @@
   color: #e8e8e8;
   font-size: 13px;
   font-family: var(--ch-font-ui);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   border-radius: 6px;
   box-shadow:
     0 10px 25px color-mix(in srgb, var(--ch-black) 15%, transparent),

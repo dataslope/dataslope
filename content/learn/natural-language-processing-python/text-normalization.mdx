@@ -31,7 +31,7 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initialCode={`words = ["The", "the", "THE", "Dog", "dog", "DOG"]
+  starterCode={`words = ["The", "the", "THE", "Dog", "dog", "DOG"]
 
 # Without normalization, casing creates spurious distinct words.
 print("Distinct as-is:    ", len(set(words)), "->", set(words))
@@ -85,7 +85,7 @@ recognition, casing is signal.
 
 <CodeBlock
   adapter="python"
-  initialCode={`# Same letters, very different meanings — case is the only clue.
+  starterCode={`# Same letters, very different meanings — case is the only clue.
 print("US".lower(), "  <- 'US' the country becomes the pronoun 'us'")
 print("WHO".lower(), " <- 'WHO' the organization becomes the question word 'who'")
 print("Apple".lower(), "<- the company becomes the fruit")
@@ -106,7 +106,7 @@ common ways to strip it; know more than one.
 
 <CodeBlock
   adapter="python"
-  initialCode={`import re
+  starterCode={`import re
 import string
 
 text = "Hello, World! It's a GREAT day... isn't it?"
@@ -201,7 +201,7 @@ For example, \`normalize("Hello, World!")\` should return \`['hello',
 will become "its". That is a real side effect of character-level punctuation
 stripping — you do not need to fix it here, just be aware of it.)`}
   initCode={`import string`}
-  initialCode={`def normalize(text):
+  starterCode={`def normalize(text):
     # 1. lowercase
     # 2. remove punctuation characters
     # 3. split and drop empties

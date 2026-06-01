@@ -160,7 +160,7 @@ INSERT INTO customers VALUES (1, 'Ada', 'ada@example.com');
 INSERT INTO orders VALUES (101, 1, DATE '2025-04-01', 'placed');
 INSERT INTO products VALUES (10, 'Notebook', 8.50), (11, 'Pen', 1.25);
 INSERT INTO order_items VALUES (101, 1, 10, 2), (101, 2, 11, 3);`}
-  initialCode={`SELECT c.name AS customer,
+  starterCode={`SELECT c.name AS customer,
        o.id AS order_id,
        oi.line_number,
        p.name AS product,

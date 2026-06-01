@@ -26,7 +26,7 @@ once you have decided the order.
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   id,
   amount,
   ROW_NUMBER() OVER (ORDER BY amount DESC) AS rn
@@ -52,7 +52,7 @@ how you ask "rank within each region" — every region gets its own 1, 2,
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   id,
   amount,
@@ -88,7 +88,7 @@ run.
 INSERT INTO orders VALUES
   (1,'West',120),(2,'East',80),(3,'West',45),
   (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',150);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   region,
   id,
   amount
@@ -125,7 +125,7 @@ source of confusion.
 );
 INSERT INTO scores VALUES
   ('Ada',100),('Bo',100),('Cy',90),('Di',80),('Eli',80);`}
-  initialCode={`SELECT
+  starterCode={`SELECT
   player,
   points,
   ROW_NUMBER()  OVER (ORDER BY points DESC) AS row_number,
