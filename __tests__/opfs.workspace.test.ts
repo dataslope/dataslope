@@ -85,7 +85,7 @@ describe("registry", () => {
   });
 
   it("ignores corrupt JSON", async () => {
-    store.set("pg_workspaces", "NOT JSON");
+    store.set("playground_workspaces", "NOT JSON");
     const { getWorkspaceRegistry } = await import(
       "../app/_components/opfs/workspace"
     );
@@ -94,7 +94,7 @@ describe("registry", () => {
 
   it("filters out invalid entries", async () => {
     store.set(
-      "pg_workspaces",
+      "playground_workspaces",
       JSON.stringify([
         { id: "good", name: "G", playground: "py", createdAt: 1, lastUsedAt: 1 },
         { id: 42, name: "bad" }, // missing required fields
@@ -106,6 +106,51 @@ describe("registry", () => {
     const result = getWorkspaceRegistry();
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("good");
+  });
+
+  it("migrates the legacy pg_workspaces key forward", async () => {
+    // Pre-#409 builds stored the registry under `pg_workspaces`; the
+    // current key is `playground_workspaces`. Reading the registry should
+    // surface the legacy entries and copy them onto the new key so the
+    // migration only happens once.
+    store.set(
+      "pg_workspaces",
+      JSON.stringify([
+        { id: "old", name: "Old", playground: "sqlite", createdAt: 2, lastUsedAt: 9 },
+        { id: 7, name: "bad" }, // invalid — must be filtered out
+      ]),
+    );
+    const { getWorkspaceRegistry } = await import(
+      "../app/_components/opfs/workspace"
+    );
+    const result = getWorkspaceRegistry();
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("old");
+    // Migrated forward onto the current key (only the valid entry).
+    const migrated = JSON.parse(store.get("playground_workspaces") ?? "[]");
+    expect(migrated).toHaveLength(1);
+    expect(migrated[0].id).toBe("old");
+  });
+
+  it("prefers the current key over the legacy key", async () => {
+    store.set(
+      "playground_workspaces",
+      JSON.stringify([
+        { id: "current", name: "C", playground: "duckdb", createdAt: 5, lastUsedAt: 5 },
+      ]),
+    );
+    store.set(
+      "pg_workspaces",
+      JSON.stringify([
+        { id: "stale", name: "S", playground: "sqlite", createdAt: 1, lastUsedAt: 1 },
+      ]),
+    );
+    const { getWorkspaceRegistry } = await import(
+      "../app/_components/opfs/workspace"
+    );
+    const result = getWorkspaceRegistry();
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("current");
   });
 });
 

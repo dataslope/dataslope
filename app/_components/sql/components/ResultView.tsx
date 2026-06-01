@@ -66,6 +66,7 @@ import {
   classifyCellEditor,
   toDateEditorValue,
   fromDateEditorValue,
+  resolveTemporalEditorKind,
   formatBytesHex,
   bytesToBase64,
   type TemporalEditorKind,
@@ -696,6 +697,44 @@ function ResultViewImpl({
     [],
   );
 
+  /** Discard every pending edit for one result set (the per-result Cancel). */
+  const discardEdits = useCallback((setIdx: number) => {
+    setPendingEditsByIndex((prev) => {
+      if (!prev[setIdx]) return prev;
+      const next = { ...prev };
+      delete next[setIdx];
+      return next;
+    });
+    setActiveEditCellByIndex((prev) => ({ ...prev, [setIdx]: null }));
+  }, []);
+
+  /** Discard pending edits across all result sets (the Escape shortcut). */
+  const discardAllEdits = useCallback(() => {
+    setPendingEditsByIndex((prev) =>
+      Object.keys(prev).length === 0 ? prev : {},
+    );
+    setActiveEditCellByIndex({});
+  }, []);
+
+  // Escape cancels pending cell edits. While a cell input is focused its own
+  // onKeyDown reverts just that cell; when nothing is being typed, Escape here
+  // discards *all* pending edits (paired with the Cancel button in the footer).
+  useEffect(() => {
+    if (Object.keys(pendingEditsByIndex).length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const el = document.activeElement;
+      const typing =
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        (el instanceof HTMLElement && el.isContentEditable);
+      if (typing) return; // don't hijack Escape from a focused field
+      discardAllEdits();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [pendingEditsByIndex, discardAllEdits]);
+
   const commitEdits = useCallback(
     (setIdx: number, set: QueryExecResult) => {
       if (!sourceTable || !onUpdateRows) return;
@@ -982,7 +1021,7 @@ function ResultViewImpl({
 
   if (loading) {
     return (
-      <div className="welcome">
+      <div className="welcome" data-result-empty="loading">
         <div className="welcome-icon">⌬</div>
         <h3>Loading {engineLabel} engine…</h3>
       </div>
@@ -990,7 +1029,7 @@ function ResultViewImpl({
   }
   if (!result) {
     return (
-      <div className="welcome">
+      <div className="welcome" data-result-empty="idle">
         <div className="welcome-icon">⌬</div>
         <h3>Run a query to see results</h3>
         <p>
@@ -1343,6 +1382,7 @@ function ResultViewImpl({
                   onRequestDelete={() => requestDelete(idx)}
                   // eslint-disable-next-line react-hooks/refs
                   onCommitEdits={() => commitEdits(idx, set)}
+                  onDiscardEdits={() => discardEdits(idx)}
                   elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
                 >
@@ -1570,6 +1610,20 @@ export function ResultTableBody({
     deletable &&
     !allVisibleSelected &&
     originalIndices.some((i) => selectedRows?.has(i));
+  // The editor cell reads the live pending-edit / active-cell state through
+  // refs so the `columns` memo below does NOT depend on them. Without this the
+  // memo recomputes on every keystroke, TanStack rebuilds the columns, and the
+  // inline <input> remounts each keystroke — which re-fires autofocus+select
+  // (so the value re-selects as you type) and resets the caret.
+  const pendingEditsRef = useRef(pendingEdits);
+  pendingEditsRef.current = pendingEdits;
+  const activeEditCellRef = useRef(activeEditCell);
+  activeEditCellRef.current = activeEditCell;
+  // `originalIndices` is rebuilt every render by the parent (new array, same
+  // content) — read it via a ref in the `columns` memo so that memo (and thus
+  // the editor <input>) doesn't churn/remount on each keystroke.
+  const originalIndicesRef = useRef(originalIndices);
+  originalIndicesRef.current = originalIndices;
   const data = useMemo<ResultTableRow[]>(
     () =>
       visible.map((values, ri) => ({
@@ -1592,7 +1646,7 @@ export function ResultTableBody({
                   checked={allVisibleSelected}
                   indeterminate={someVisibleSelected}
                   onCheckedChange={(v) =>
-                    onToggleVisible(originalIndices, v === true)
+                    onToggleVisible(originalIndicesRef.current, v === true)
                   }
                   aria-label={
                     allVisibleSelected
@@ -1911,9 +1965,10 @@ export function ResultTableBody({
               }
               const absoluteRow = info.row.original.absoluteRow;
               const cellKey = `${absoluteRow}:${ci}`;
-              const isActiveEdit = activeEditCell === cellKey;
-              const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
-              const pendingValue = pendingEdits?.get(cellKey);
+              const isActiveEdit = activeEditCellRef.current === cellKey;
+              const hasPendingEdit =
+                pendingEditsRef.current?.has(cellKey) ?? false;
+              const pendingValue = pendingEditsRef.current?.get(cellKey);
               const rawValue = info.getValue();
               // Binary columns aren't editable inline — a text/date picker
               // would corrupt the bytes. Render a read-only marker; the row
@@ -1979,8 +2034,14 @@ export function ResultTableBody({
                   editorKind === "datetime" ||
                   editorKind === "time"
                 ) {
-                  const kind = editorKind as TemporalEditorKind;
                   const source = hasPendingEdit ? pendingValue : rawValue;
+                  // A `date`-typed column whose value actually carries a
+                  // time-of-day is edited with a datetime picker so the hours
+                  // and minutes are editable too (not silently dropped).
+                  const kind = resolveTemporalEditorKind(
+                    editorKind as TemporalEditorKind,
+                    source,
+                  );
                   const dateInputVal = toDateEditorValue(source, kind);
                   if (dateInputVal !== null) {
                     const inputType =
@@ -2014,6 +2075,9 @@ export function ResultTableBody({
                           if (e.key === "Enter") {
                             (e.currentTarget as HTMLInputElement).blur();
                           } else if (e.key === "Escape") {
+                            // Escape reverts this cell's pending edit and exits.
+                            e.stopPropagation();
+                            onClearPendingEdit(cellKey);
                             onSetActiveEditCell(null);
                           }
                         }}
@@ -2032,8 +2096,12 @@ export function ResultTableBody({
                     defaultValue={editVal}
                     autoFocus
                     type="text"
+                    /* size={1} so the input's intrinsic width doesn't widen the
+                       column; `width:100%` still fills the cell. */
+                    size={1}
                     aria-label={`Edit ${c}`}
                     inputMode={isNumeric ? "decimal" : undefined}
+                    onFocus={(e) => e.currentTarget.select()}
                     onChange={(e) => {
                       const raw = e.target.value;
                       const newVal = parseCellEditValue(raw, isNumeric);
@@ -2050,6 +2118,9 @@ export function ResultTableBody({
                       if (e.key === "Enter") {
                         (e.currentTarget as HTMLInputElement).blur();
                       } else if (e.key === "Escape") {
+                        // Escape reverts this cell's pending edit and exits.
+                        e.stopPropagation();
+                        onClearPendingEdit(cellKey);
                         onSetActiveEditCell(null);
                       }
                     }}
@@ -2078,24 +2149,23 @@ export function ResultTableBody({
           } satisfies ColumnDef<ResultTableRow>;
       }),
     ],
+    // `activeEditCell` and `pendingEdits` are read via refs (above), and the
+    // `on*` callbacks are stable in behaviour — each is an inline arrow in the
+    // parent that only forwards to a stable setter bound to a stable `idx`, so
+    // a stale identity is equivalent. Excluding both keeps this memo stable
+    // across keystrokes so the editor <input> doesn't remount each keystroke
+    // (which would re-select the value and reset the caret).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      activeEditCell,
       allVisibleSelected,
       deletable,
       editable,
       keyHints,
-      onClearPendingEdit,
-      onSetActiveEditCell,
-      onSetPendingEdit,
-      onToggleRow,
-      onToggleVisible,
-      pendingEdits,
       selectedRows,
       set.columns,
       set.columnTypes,
       set.values,
       someVisibleSelected,
-      originalIndices,
     ],
   );
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for stable result-table customization.
@@ -2195,7 +2265,19 @@ export function ResultTableBody({
           }
           onDoubleClick={
             editable && !isSelect && ci >= 0 && !isBlobCell
-              ? () => onSetActiveEditCell(cellKey)
+              ? () => {
+                  // Generated/read-only columns can't be edited — explain why
+                  // instead of silently doing nothing on double-click.
+                  const colName = set.columns[ci] ?? "";
+                  if (keyHints?.readOnly?.has(colName)) {
+                    toastManager.add({
+                      title: `"${colName}" is a generated column — its value is computed from other columns and can't be edited.`,
+                      data: { kind: "info" },
+                    });
+                    return;
+                  }
+                  onSetActiveEditCell(cellKey);
+                }
               : undefined
           }
         >
@@ -2660,6 +2742,7 @@ export function ResultPager({
   selectedCount,
   onRequestDelete,
   onCommitEdits,
+  onDiscardEdits,
   elapsedMs,
   elapsedIsError,
   children,
@@ -2677,6 +2760,7 @@ export function ResultPager({
   selectedCount: number;
   onRequestDelete: () => void;
   onCommitEdits: () => void;
+  onDiscardEdits: () => void;
   elapsedMs?: number;
   elapsedIsError?: boolean;
   children?: React.ReactNode;
@@ -2737,13 +2821,23 @@ export function ResultPager({
         )}
       </span>
       {editable && editCount > 0 && (
-        <button
-          type="button"
-          className="sql-edit-commit-btn"
-          onClick={onCommitEdits}
-        >
-          Update {editCount} cell{editCount === 1 ? "" : "s"}…
-        </button>
+        <span className="sql-edit-actions">
+          <button
+            type="button"
+            className="sql-edit-cancel-btn"
+            onClick={onDiscardEdits}
+            title="Discard pending edits (Esc)"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="sql-edit-commit-btn"
+            onClick={onCommitEdits}
+          >
+            Update {editCount} cell{editCount === 1 ? "" : "s"}…
+          </button>
+        </span>
       )}
       {deletable && selectedCount > 0 && (
         <button

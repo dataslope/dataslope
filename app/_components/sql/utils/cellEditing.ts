@@ -55,6 +55,48 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
 /** Editor kinds that use a native date/time `<input>`. */
 export type TemporalEditorKind = "date" | "datetime" | "time";
 
+/** Does a stored temporal value carry a real (non-midnight) time-of-day?
+ *
+ *  A column may be declared `date` yet hold a value with a meaningful time —
+ *  this is common with flexibly-typed engines (SQLite stores whatever string
+ *  you give it) and also happens when a value like `2024-03-15 14:30:00` lands
+ *  in a date-ish column. In those cases a date-only `<input type="date">`
+ *  would silently hide and drop the time, so the caller upgrades to a
+ *  `datetime-local` picker. Pure dates (no time, or an all-zero `T00:00:00`
+ *  suffix as produced for a true SQL `date`) return `false` and keep the
+ *  date-only picker. Timezone suffixes (`+05:30`) are never mistaken for the
+ *  time-of-day because the first `HH:MM` in the string is the clock time. */
+export function hasTimeOfDay(stored: unknown): boolean {
+  const s =
+    typeof stored === "string"
+      ? stored
+      : stored instanceof Date
+        ? stored.toISOString()
+        : "";
+  // A bare date (`2024-03-15`) has no colon and never matches.
+  const m = s.match(/(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?/);
+  if (!m) return false;
+  const [, hh, mm, ss, frac] = m;
+  return (
+    Number(hh) > 0 ||
+    Number(mm) > 0 ||
+    Number(ss ?? 0) > 0 ||
+    Number(frac ?? 0) > 0
+  );
+}
+
+/** Resolve the *effective* editor kind for a cell from its column-derived kind
+ *  and the actual stored value: a `date` column whose value carries a real
+ *  time-of-day is upgraded to `datetime` so the user can edit hours/minutes
+ *  too. Everything else passes through unchanged. */
+export function resolveTemporalEditorKind(
+  columnKind: TemporalEditorKind,
+  storedValue: unknown,
+): TemporalEditorKind {
+  if (columnKind === "date" && hasTimeOfDay(storedValue)) return "datetime";
+  return columnKind;
+}
+
 /** Extract the `YYYY-MM-DD` date part from a stored temporal string. */
 function datePart(s: string): string | null {
   const m = s.match(/(\d{4})-(\d{2})-(\d{2})/);

@@ -605,62 +605,66 @@ export function ModifyStructureForm({
         <>
           <div className="sql-modify-columns">
             {regularColumns.length > 0 ? (
-              <div
-                className="sql-modify-table-wrap"
-                style={isDragging ? { overflowX: "hidden" } : undefined}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={() => setIsDragging(true)}
+                onDragEnd={handleDragEnd}
               >
-                <table className="sql-modify-table">
-                  <thead>
-                    <tr>
-                      <th className="sql-modify-th-drag" />
-                      <th>Name</th>
-                      <th style={{ minWidth: "90px" }}>
-                        Type <ColumnHeaderPopover pragma="type" />
-                      </th>
-                      <th>
-                        Not null <ColumnHeaderPopover pragma="notNull" />
-                      </th>
-                      <th>
-                        Primary <ColumnHeaderPopover pragma="primary" />
-                      </th>
-                      <th>
-                        Unique <ColumnHeaderPopover pragma="unique" />
-                      </th>
-                      <th>
-                        Auto-
-                        <br />
-                        increment{" "}
-                        <ColumnHeaderPopover pragma="autoIncrement" />
-                      </th>
-                      <th>
-                        Default value{" "}
-                        <ColumnHeaderPopover pragma="defaultValue" />
-                      </th>
-                      <th>
-                        FK table <ColumnHeaderPopover pragma="fkTable" />
-                      </th>
-                      <th>
-                        FK column <ColumnHeaderPopover pragma="fkColumn" />
-                      </th>
-                      <th>
-                        On delete <ColumnHeaderPopover pragma="onDelete" />
-                      </th>
-                      <th>
-                        On update <ColumnHeaderPopover pragma="onUpdate" />
-                      </th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragStart={() => setIsDragging(true)}
-                    onDragEnd={handleDragEnd}
+                <SortableContext
+                  items={regularColumns.map((c) => c.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {/* DndContext renders its hidden a11y live-region as a
+                      sibling of its children; keep it (and SortableContext)
+                      *outside* the <table> so those <div>s never nest
+                      directly inside <table> (invalid DOM). */}
+                  <div
+                    className="sql-modify-table-wrap"
+                    style={isDragging ? { overflowX: "hidden" } : undefined}
                   >
-                    <SortableContext
-                      items={regularColumns.map((c) => c.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
+                    <table className="sql-modify-table">
+                      <thead>
+                        <tr>
+                          <th className="sql-modify-th-drag" />
+                          <th>Name</th>
+                          <th style={{ minWidth: "90px" }}>
+                            Type <ColumnHeaderPopover pragma="type" />
+                          </th>
+                          <th>
+                            Not null <ColumnHeaderPopover pragma="notNull" />
+                          </th>
+                          <th>
+                            Primary <ColumnHeaderPopover pragma="primary" />
+                          </th>
+                          <th>
+                            Unique <ColumnHeaderPopover pragma="unique" />
+                          </th>
+                          <th>
+                            Auto-
+                            <br />
+                            increment{" "}
+                            <ColumnHeaderPopover pragma="autoIncrement" />
+                          </th>
+                          <th>
+                            Default value{" "}
+                            <ColumnHeaderPopover pragma="defaultValue" />
+                          </th>
+                          <th>
+                            FK table <ColumnHeaderPopover pragma="fkTable" />
+                          </th>
+                          <th>
+                            FK column <ColumnHeaderPopover pragma="fkColumn" />
+                          </th>
+                          <th>
+                            On delete <ColumnHeaderPopover pragma="onDelete" />
+                          </th>
+                          <th>
+                            On update <ColumnHeaderPopover pragma="onUpdate" />
+                          </th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
                       <tbody>
                         {regularColumns.map((col) => (
                           <ModifyColumnRow
@@ -680,10 +684,10 @@ export function ModifyStructureForm({
                           />
                         ))}
                       </tbody>
-                    </SortableContext>
-                  </DndContext>
-                </table>
-              </div>
+                    </table>
+                  </div>
+                </SortableContext>
+              </DndContext>
             ) : (
               <div className="sql-modify-empty">No columns. Add one below.</div>
             )}

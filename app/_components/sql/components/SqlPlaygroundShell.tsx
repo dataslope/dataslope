@@ -1,9 +1,22 @@
 "use client";
 
-import React, { type ReactNode } from "react";
+import React, { useEffect, useRef, useState, type ReactNode } from "react";
+import { Database, Code2, Table2 } from "lucide-react";
 import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
+import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
+
+/**
+ * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
+ * importers of `SqlMobilePane` keep working. The single-pane mobile layout
+ * shows one of these surfaces at a time; desktop ignores it (the CSS only acts
+ * on it below the mobile breakpoint). It lets the shared bottom tab bar — and
+ * the jump-to-results / per-query-tab-restore affordances — work for all three
+ * SQL playgrounds without each playground body knowing anything about
+ * responsiveness.
+ */
+export type { SqlMobilePane };
 
 /**
  * Visual + interactive states the loading overlay can be in. Mirrors
@@ -82,8 +95,141 @@ export function SqlPlaygroundShell({
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
+
+  // ─── Mobile single-pane navigation ───────────────────────────────────
+  // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
+  // full-width surface at a time, switched from the bottom tab bar. The
+  // state has no effect on desktop (the CSS that reads `data-mobile-pane`
+  // is scoped to the mobile media query), so it's safe to keep mounted.
+  const [mobilePane, setMobilePane] = useState<SqlMobilePane>("editor");
+  // Whether the active query tab currently has something worth showing on
+  // the Results surface (a table, an error, or a "statement executed"
+  // notice). Drives the mobile Results tab's disabled state so users can't
+  // tab into an empty pane before they've run anything. Detected from the
+  // rendered DOM (see the observer below) so the three playground bodies
+  // stay untouched.
+  const [hasResults, setHasResults] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Per-query-tab memory of the last bottom pane the user looked at, keyed by
+  // the tab's `data-tab-id` (rendered by the shared TabBar). Activating a tab
+  // restores its remembered pane instead of carrying the previous tab's pane
+  // over — so leaving tab A on Results and switching to a never-run tab B lands
+  // on B's Editor, not an empty Results. A ref (not state): it's a side table
+  // that must never itself trigger a render. Session-scoped (not persisted).
+  const tabPaneMemory = useRef<Map<string, SqlMobilePane>>(new Map());
+  // The query tab the shell currently considers active, derived from the DOM by
+  // the observer below. Lets the pane handlers attribute a choice to the right
+  // tab, and lets the observer detect tab switches.
+  const activeTabIdRef = useRef<string | null>(null);
+
+  // Comfort affordance: when the user runs a query (Run button) or opens a
+  // table by double-clicking it in the schema tree, jump the mobile view to
+  // the surface that's about to show the answer — Results — so they don't
+  // have to hunt for the right tab after every run. Creating a new query tab
+  // (the "+" button) instead jumps to the Editor, where the user will start
+  // typing. Implemented with event delegation on the shell so the individual
+  // playgrounds stay untouched; it's a no-op on desktop where the bottom bar
+  // is hidden.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const isMobile = () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 768px)").matches;
+    // Record a pane as the active tab's remembered choice (see tabPaneMemory).
+    const remember = (pane: SqlMobilePane) => {
+      const id = activeTabIdRef.current;
+      if (id) tabPaneMemory.current.set(id, pane);
+    };
+    const onClick = (e: Event) => {
+      if (!isMobile()) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest(".playground-tab-add")) {
+        // A brand-new tab has no remembered pane; the observer below lands it on
+        // Editor once it becomes active. Set it eagerly too so the jump feels
+        // instant. Deliberately *not* recorded against the current tab, which is
+        // still the active one at click time.
+        setMobilePane("editor");
+      } else if (t?.closest(".run-btn, .run-btn-split-main")) {
+        setMobilePane("results");
+        remember("results");
+      }
+    };
+    const onDblClick = (e: Event) => {
+      if (!isMobile()) return;
+      const t = e.target as HTMLElement | null;
+      // A double-click on a schema *leaf* (table/view row) opens & runs it;
+      // double-clicks on section headers (which only collapse a group) are
+      // ignored so we don't yank the user to a stale Results pane.
+      if (
+        t?.closest(".sql-tree") &&
+        !t.closest(".sql-tree-section-header")
+      ) {
+        setMobilePane("results");
+        remember("results");
+      }
+    };
+    root.addEventListener("click", onClick);
+    root.addEventListener("dblclick", onDblClick);
+    return () => {
+      root.removeEventListener("click", onClick);
+      root.removeEventListener("dblclick", onDblClick);
+    };
+  }, []);
+
+  // Track whether the results pane is showing real content vs. the
+  // "Run a query to see results" / loading placeholder. ResultView tags
+  // both placeholder states with `data-result-empty`; everything else
+  // (table, error, "no rows") is real output. A MutationObserver keeps the
+  // flag in sync as the user runs queries, switches tabs, or reloads a
+  // sample — without threading a prop through every playground.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const recompute = () => {
+      // (a) Does the *active* query tab have real output? Only the active tab's
+      // results live in `.sql-results-pane`, so this reflects that tab.
+      const pane = root.querySelector(".sql-results-pane");
+      const empty = pane?.querySelector("[data-result-empty]");
+      const nowHasResults = !!pane && !empty;
+      setHasResults(nowHasResults);
+
+      // (b) Did the active query tab change? React swaps the tab's `.active`
+      // class and the results-pane contents in the same commit, so by the time
+      // the observer runs we can read the new tab's id *and* its result-state
+      // together. On a switch, restore that tab's remembered bottom pane —
+      // falling back to the Editor rather than landing on an empty Results.
+      const activeId =
+        root
+          .querySelector(".playground-tab.active")
+          ?.getAttribute("data-tab-id") ?? null;
+      if (activeId !== activeTabIdRef.current) {
+        activeTabIdRef.current = activeId;
+        if (activeId) {
+          setMobilePane(
+            paneForActivatedTab(
+              tabPaneMemory.current.get(activeId),
+              nowHasResults,
+            ),
+          );
+        }
+      }
+    };
+    recompute();
+    // Watch childList (results swapping in/out) *and* class attributes (the
+    // query tab's `.active` toggle) so both (a) and (b) stay live.
+    const observer = new MutationObserver(recompute);
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="playground-root">
+    <div className="playground-root" ref={rootRef} data-mobile-pane={mobilePane}>
       {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
@@ -116,6 +262,49 @@ export function SqlPlaygroundShell({
           {headerActions}
         </header>
         {children}
+        <nav
+          className="sql-mobile-tabs"
+          role="tablist"
+          aria-label="Playground section"
+        >
+          {(
+            [
+              ["schema", "Schema", Database],
+              ["editor", "Editor", Code2],
+              ["results", "Results", Table2],
+            ] as const
+          ).map(([pane, label, Icon]) => {
+            // Results stays disabled until a query has produced output, so
+            // users can't tab into an empty pane. It's never disabled while
+            // it's the active pane (e.g. mid-run, showing the run overlay).
+            const disabled =
+              pane === "results" && !hasResults && mobilePane !== "results";
+            return (
+              <button
+                key={pane}
+                type="button"
+                role="tab"
+                aria-selected={mobilePane === pane}
+                disabled={disabled}
+                aria-disabled={disabled}
+                className={`sql-mobile-tab${
+                  mobilePane === pane ? " active" : ""
+                }${disabled ? " disabled" : ""}`}
+                onClick={() => {
+                  if (disabled) return;
+                  setMobilePane(pane);
+                  // Remember this explicit choice for the active query tab so
+                  // returning to the tab later restores the same pane.
+                  const id = activeTabIdRef.current;
+                  if (id) tabPaneMemory.current.set(id, pane);
+                }}
+              >
+                <Icon size={18} aria-hidden="true" />
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );

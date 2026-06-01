@@ -23,6 +23,11 @@ import {
   DUCKDB_BLANK_DATABASE,
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
+import {
+  toDateOnlyString,
+  unscaledDecimalToString,
+  unscaledIntegerFrom,
+} from "./valueFormat";
 
 // ─── Local type shim for @duckdb/duckdb-wasm ─────────────────────────
 // Only the small surface area we actually touch is typed. The shim
@@ -218,16 +223,21 @@ function arrowToQueryExecResult(
       return "";
     }
   });
-  // Extract decimal scales so BigInt values from DECIMAL columns are
-  // formatted as proper decimal strings (e.g. 999n with scale=2 → "9.99")
-  // instead of raw unscaled integers (which would cause "two extra zeros"
-  // when the user edits and re-saves a cell).
+  // Extract decimal scales so DECIMAL values are formatted as proper decimal
+  // strings (e.g. unscaled 2999 with scale=2 → "29.99") instead of the raw
+  // unscaled integer (which would otherwise display as 2999 and round-trip to
+  // the wrong magnitude when the user edits and re-saves a cell).
   const columnScales: (number | null)[] = fields.map((f) => {
     if (typeof f.type.scale === "number" && f.type.scale > 0) {
       return f.type.scale;
     }
     return null;
   });
+  // DATE columns (Arrow `Date32<DAY>`/`Date64`) arrive as an epoch number;
+  // render them as a plain `YYYY-MM-DD` calendar date rather than a raw int.
+  const columnIsDate: boolean[] = fields.map((f) =>
+    /^date/i.test(String(f.type)),
+  );
   const vectors = fields.map((_f, i) => table.getChildAt(i));
   const values: SqlValue[][] = [];
   for (let r = 0; r < table.numRows; r++) {
@@ -236,17 +246,19 @@ function arrowToQueryExecResult(
       const vec = vectors[c];
       const raw = vec ? vec.get(r) : null;
       const scale = columnScales[c];
-      if (scale !== null && typeof raw === "bigint") {
-        // Apply the decimal scale: Arrow stores DECIMAL(p,s) as a scaled
-        // BigInt (e.g. 9.99 → 999n when scale=2). Convert to a canonical
-        // decimal string so the cell edit input is correctly pre-filled.
-        const divisor = 10n ** BigInt(scale);
-        const neg = raw < 0n;
-        const abs = neg ? -raw : raw;
-        const intPart = abs / divisor;
-        const fracPart = abs % divisor;
-        const fracStr = fracPart.toString().padStart(scale, "0");
-        row[c] = `${neg ? "-" : ""}${intPart}.${fracStr}`;
+      if (raw === null || raw === undefined) {
+        row[c] = null;
+      } else if (columnIsDate[c]) {
+        row[c] = toDateOnlyString(raw) ?? toSqlValue(raw);
+      } else if (scale !== null) {
+        // Arrow stores DECIMAL(p,s) as the unscaled integer — a BigInt in some
+        // builds, a Decimal object whose String() is the unscaled integer in
+        // duckdb-wasm. Re-apply the scale in both cases.
+        const unscaled = unscaledIntegerFrom(raw);
+        row[c] =
+          unscaled !== null
+            ? unscaledDecimalToString(unscaled, scale)
+            : toSqlValue(raw);
       } else {
         row[c] = toSqlValue(raw);
       }
@@ -494,24 +506,14 @@ export interface DuckDbEngine {
   /** Remove a file from DuckDB's virtual filesystem. Safe to call on a
    *  name that wasn't registered. */
   dropFile: (name: string) => Promise<void>;
-  /** Export the entire in-memory database as a native DuckDB binary file
-   *  by ATTACHing a temporary virtual-filesystem file, copying all data
-   *  via `COPY FROM DATABASE`, then reading the bytes back out.
-   *  Throws if the WASM build doesn't support `copyFileToBuffer`. */
-  exportAsBinary: () => Promise<Uint8Array>;
-  /** Replace the current in-memory database with the contents of a
-   *  native DuckDB binary file produced by `exportAsBinary` or the CLI.
-   *  Registers the bytes in the virtual filesystem, cleans the live
-   *  schema, ATTACHes the file read-only, and copies via `COPY FROM DATABASE`. */
-  importFromBinary: (bytes: Uint8Array) => Promise<void>;
   /** Try to import a SQL dump as a new blank database. If any statement
    *  fails partway through, restores the previously active sample so the
    *  user's database is never left in a half-populated state. Throws the
    *  underlying SQL error after a successful restore. */
   importSqlDump: (sql: string) => Promise<DuckDbSampleDatabase>;
-  /** Best-effort whole-database export. Falls back to a multi-statement
-   *  SQL script when binary export isn't available in the in-memory
-   *  build (the common case in WASM). */
+  /** Whole-database export as a portable multi-statement SQL script
+   *  (CREATE TABLE / INSERT statements) that round-trips through any
+   *  DuckDB instance. */
   exportDatabase: () => Promise<{ data: Uint8Array; mimeType: string; suggestedExtension: string }>;
   activeSample: () => DuckDbSampleDatabase;
   runtimeVersion: () => string;
@@ -681,9 +683,9 @@ export async function createDuckDbEngine(
   // DuckDB-Wasm has no native OPFS VFS, so persistence is implemented
   // via periodic snapshot-and-restore against the workspace's
   // `db/duckdb.db` file in OPFS. Snapshots are produced by
-  // `exportAsBinary` (ATTACH + COPY FROM DATABASE) and queued through
-  // `databaseStorage.writeDatabase`, which debounces writes and flushes
-  // on `pagehide` / `visibilitychange`.
+  // `exportAsBinaryInternal` (ATTACH + COPY FROM DATABASE) and queued
+  // through `databaseStorage.writeDatabase`, which debounces writes and
+  // flushes on `pagehide` / `visibilitychange`.
   const DUCKDB_FILE = "duckdb.db";
   let snapshotTimer: ReturnType<typeof setTimeout> | null = null;
   let snapshotInFlight = false;
@@ -724,8 +726,9 @@ export async function createDuckDbEngine(
 
   /** Inline snapshot helper that doesn't go through the engine surface
    *  (so it stays available when the engine is being constructed and
-   *  during `destroy`). Mirrors the public `exportAsBinary` method
-   *  defined further down. */
+   *  during `destroy`). ATTACHes a temporary virtual-filesystem file,
+   *  copies the whole catalog via `COPY FROM DATABASE`, and reads the
+   *  bytes back out for OPFS persistence. */
   async function exportAsBinaryInternal(): Promise<Uint8Array> {
     const { db } = await getDuckDbInstance();
     if (!db.copyFileToBuffer) {
@@ -1478,108 +1481,6 @@ export async function createDuckDbEngine(
       }
     },
 
-    async exportAsBinary() {
-      const { db } = await getDuckDbInstance();
-      if (!db.copyFileToBuffer) {
-        throw new Error(
-          "This DuckDB-Wasm build does not support binary file export.",
-        );
-      }
-      const exportFile = "_playground_export_tmp.duckdb";
-      const alias = "_playground_export_alias";
-      // Register an empty buffer so the virtual filesystem recognises the
-      // path before DuckDB ATTACHes and writes the real file header.
-      await db.registerFileBuffer(exportFile, new Uint8Array());
-      try {
-        await conn.query(
-          `ATTACH '${exportFile}' AS ${quoteIdent(alias)}`,
-        );
-        await conn.query(
-          `COPY FROM DATABASE memory TO ${quoteIdent(alias)}`,
-        );
-        await conn.query(`DETACH ${quoteIdent(alias)}`);
-        const bytes = await db.copyFileToBuffer(exportFile);
-        return bytes;
-      } finally {
-        try {
-          await conn.query(`DETACH ${quoteIdent(alias)}`);
-        } catch {
-          /* already detached — ignore */
-        }
-        try {
-          await db.dropFile?.(exportFile);
-        } catch {
-          /* ignore */
-        }
-      }
-    },
-
-    async importFromBinary(bytes) {
-      const { db } = await getDuckDbInstance();
-      const importFile = "_playground_import_tmp.duckdb";
-      const alias = "_playground_import_alias";
-      await db.registerFileBuffer(importFile, bytes);
-      const previousSample = sample;
-      let importFailed = false;
-      try {
-        // cleanDuckDbSchema wipes the main schema; then we copy from the
-        // attached file database into the now-empty memory catalog.
-        await cleanDuckDbSchema(conn);
-        // Also drop any user-created schemas so the import is clean.
-        const schemaTable = await conn.query(
-          `SELECT schema_name FROM duckdb_schemas()
-           WHERE database_name = current_database()
-             AND NOT internal
-             AND schema_name <> 'main'`,
-        );
-        for (let r = 0; r < schemaTable.numRows; r++) {
-          const schName = schemaTable.getChildAt(0)?.get(r);
-          if (schName != null) {
-            try {
-              await conn.query(
-                `DROP SCHEMA IF EXISTS ${quoteIdent(String(schName))} CASCADE`,
-              );
-            } catch {
-              /* ignore */
-            }
-          }
-        }
-        await conn.query(
-          `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
-        );
-        await conn.query(
-          `COPY FROM DATABASE ${quoteIdent(alias)} TO memory`,
-        );
-        await conn.query(`DETACH ${quoteIdent(alias)}`);
-      } catch (err) {
-        importFailed = true;
-        // Schema was wiped before the failing step; restore the previous
-        // sample so the user is never stranded on an empty database.
-        const restored = await bootstrapDatabase(previousSample);
-        try {
-          await conn.close();
-        } catch {
-          /* ignore */
-        }
-        conn = restored;
-        sample = previousSample;
-        throw err;
-      } finally {
-        if (!importFailed) {
-          try {
-            await conn.query(`DETACH ${quoteIdent(alias)}`);
-          } catch {
-            /* already detached — ignore */
-          }
-        }
-        try {
-          await db.dropFile?.(importFile);
-        } catch {
-          /* ignore */
-        }
-      }
-    },
-
     async exportDatabase() {
       // DuckDB-Wasm in-memory builds don't expose a compact binary
       // dump that round-trips back through `OPEN`. Generate a SQL
@@ -1664,7 +1565,6 @@ export async function createDuckDbEngine(
       "loadSampleDatabase",
       "loadBlankDatabase",
       "importSqlDump",
-      "importFromBinary",
       "rebuildTable",
       "dropEntity",
       "truncateTable",

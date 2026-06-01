@@ -21,6 +21,7 @@ import {
   type PostgresSampleDatabase,
 } from "./postgresSamples";
 import { PGLITE_WORKER_CDN } from "./cdn";
+import { toDateOnlyString } from "./valueFormat";
 
 let _pgliteWorkerModulePromise: Promise<{ PGliteWorker: typeof PGliteWorkerType }> | null = null;
 
@@ -188,11 +189,19 @@ function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { colu
   if (result.fields.length === 0) return null;
   const columns = result.fields.map((field) => field.name);
   const columnTypes = result.fields.map((field) => pgTypeName(field.dataTypeID));
+  // PGlite returns a `date` column (OID 1082) as a JS Date at UTC midnight,
+  // which would render as the noisy `2024-12-30T00:00:00.000Z`. Render those as
+  // a plain `YYYY-MM-DD` calendar date (timestamps keep their time component).
+  const columnIsDate = result.fields.map((field) => field.dataTypeID === 1082);
   return {
     columns,
     columnTypes,
     values: result.rows.map((row) =>
-      columns.map((column) => toSqlValue((row as Record<string, unknown>)[column])),
+      columns.map((column, i) => {
+        const value = (row as Record<string, unknown>)[column];
+        if (columnIsDate[i]) return toDateOnlyString(value) ?? toSqlValue(value);
+        return toSqlValue(value);
+      }),
     ),
   };
 }

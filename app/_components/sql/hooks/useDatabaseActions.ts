@@ -262,16 +262,19 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     if (!engine) return;
     void (async () => {
       try {
-        const [tableList, viewList, indexList, triggerList] = await Promise.all([
+        const [tableList, viewList, triggerList] = await Promise.all([
           engine.listTables(),
           engine.listViews(),
-          engine.listIndexes(),
           engine.listTriggers(),
         ]);
 
         const lines: string[] = [
+          // foreign_keys OFF lets tables import regardless of FK ordering.
+          // No explicit BEGIN/COMMIT: the OPFS-backed worker manages its own
+          // transaction, and wrapping the dump in one makes the import fail
+          // ("no such table") as the engine's commit resets the open
+          // user transaction mid-script.
           "PRAGMA foreign_keys = OFF;",
-          "BEGIN TRANSACTION;",
           "",
         ];
 
@@ -280,17 +283,28 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
           const ddl = await engine.getDDL(name);
           lines.push(`${ddl};`, "");
 
+          // Generated columns are computed by the engine and can't be inserted
+          // into, so omit them from the INSERT column list / values (otherwise
+          // the re-import fails with "cannot INSERT into generated column").
+          const colInfo = await engine.listColumns(name);
+          const generatedCols = new Set(
+            colInfo.filter((c) => c.generated).map((c) => c.name),
+          );
           const results = await engine.exec(
             `SELECT * FROM "${name.replace(/"/g, '""')}"`,
           );
           if (results && results.length > 0) {
             const { columns, values } = results[0];
-            const colList = columns
-              .map((c) => `"${c.replace(/"/g, '""')}"`)
+            const keepIdx = columns
+              .map((c, i) => (generatedCols.has(c) ? -1 : i))
+              .filter((i) => i >= 0);
+            const colList = keepIdx
+              .map((i) => `"${columns[i].replace(/"/g, '""')}"`)
               .join(", ");
             for (const row of values) {
-              const valList = row
-                .map((v) => {
+              const valList = keepIdx
+                .map((i) => {
+                  const v = row[i];
                   if (v === null) return "NULL";
                   if (typeof v === "number" || typeof v === "bigint")
                     return String(v);
@@ -309,13 +323,14 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
           }
         }
 
-        // DDL for views, indexes, triggers
-        for (const name of [...viewList, ...indexList, ...triggerList]) {
+        // DDL for views and triggers. Indexes are intentionally NOT re-emitted
+        // here: getDDL(table) already includes each table's CREATE INDEX
+        // statements, so listing them again would fail the re-import with
+        // "index … already exists".
+        for (const name of [...viewList, ...triggerList]) {
           const ddl = await engine.getDDL(name);
           lines.push(`${ddl};`, "");
         }
-
-        lines.push("COMMIT;");
 
         const sqlText = lines.join("\n");
         const sample = await engine.activeSample();
