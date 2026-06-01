@@ -16,12 +16,12 @@ shows you how to recognize when a problem is **stiff**.
 ## The initial-value problem
 
 $$
-\frac\{dy\}\{dt\} = f(t, y), \qquad y(t_0) = y_0
+\frac{dy}{dt} = f(t, y), \qquad y(t_0) = y_0
 $$
 
 Given the law $f$ and a starting state $y_0$, find $y(t)$ for
 $t > t_0$. Every solver does the same dance: it takes a step from
-$t_n$ to $t_\{n+1\} = t_n + h$, predicting $y_\{n+1\}$ from $y_n$. The
+$t_n$ to $t_{n+1} = t_n + h$, predicting $y_{n+1}$ from $y_n$. The
 differences are *how* the prediction is made and *how* the step
 size $h$ is chosen.
 
@@ -38,7 +38,7 @@ flowchart TD
 ## Euler's method — the simplest possible solver
 
 Pretend the slope is constant over the step:
-$y_\{n+1\} = y_n + h \, f(t_n, y_n)$. One function evaluation per
+$y_{n+1} = y_n + h \, f(t_n, y_n)$. One function evaluation per
 step, easy to code, and almost always wrong.
 
 <CodeBlock
@@ -78,13 +78,13 @@ Probe the slope at four cleverly-chosen points within the step and
 combine them with the right weights:
 
 $$
-\begin\{aligned\}
+\begin{aligned}
 k_1 &= f(t_n, y_n) \\
 k_2 &= f(t_n + h/2,\, y_n + h k_1/2) \\
 k_3 &= f(t_n + h/2,\, y_n + h k_2/2) \\
 k_4 &= f(t_n + h,\, y_n + h k_3) \\
-y_\{n+1\} &= y_n + \tfrac\{h\}\{6\}(k_1 + 2 k_2 + 2 k_3 + k_4)
-\end\{aligned\}
+y_{n+1} &= y_n + \tfrac{h}{6}(k_1 + 2 k_2 + 2 k_3 + k_4)
+\end{aligned}
 $$
 
 Cost: four evaluations per step. Reward: fourth-order accuracy —
@@ -300,7 +300,7 @@ plt.show()
 />
 
 That butterfly-shaped curve is the visual signature of
-*deterministic chaos*. Two trajectories starting $10^\{-9\}$ apart
+*deterministic chaos*. Two trajectories starting $10^{-9}$ apart
 diverge to completely different parts of the attractor within a
 few time units — yet the system is fully deterministic.
 

@@ -66,10 +66,10 @@ times faster. **Use them.**
 
 | Structure | NumPy / SciPy call | Speedup vs general |
 | --- | --- | --- |
-| Triangular | `scipy.linalg.solve_triangular` | ~$3\\times$ |
-| Symmetric positive definite | `scipy.linalg.cho_solve` (Cholesky) | ~$2\\times$ |
-| Tridiagonal | `scipy.linalg.solve_banded` | ~$100\\times$ on large $n$ |
-| Sparse | `scipy.sparse.linalg.spsolve` | $\\propto$ sparsity |
+| Triangular | `scipy.linalg.solve_triangular` | ~$3\times$ |
+| Symmetric positive definite | `scipy.linalg.cho_solve` (Cholesky) | ~$2\times$ |
+| Tridiagonal | `scipy.linalg.solve_banded` | ~$100\times$ on large $n$ |
+| Sparse | `scipy.sparse.linalg.spsolve` | $\propto$ sparsity |
 
 <CodeBlock
   adapter="python"
@@ -198,7 +198,7 @@ print("κ(A)    =", np.linalg.cond(A))            # huge — A is nearly singula
 
 When `cond(A)` is large and your inputs only have a few correct
 digits, no algorithm can recover a high-precision answer for
-$x = A^\{-1\} b$.
+$x = A^{-1} b$.
 
 ## Least squares
 

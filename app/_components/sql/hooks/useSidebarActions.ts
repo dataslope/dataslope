@@ -33,7 +33,7 @@ export function useSidebarActions(
   refs: SidebarActionsRefs,
   openTabAndRun: (title: string, sql: string, source?: string, sourceTable?: string) => void,
 ) {
-  const { engineRef, activeTabIdRef, activeDbIdRef } = refs;
+  const { engineRef, activeDbIdRef } = refs;
 
   const toastManager = Toast.useToastManager();
   const showToast = useCallback(
@@ -58,7 +58,6 @@ export function useSidebarActions(
   const setResultsByTab = useTabStore((s) => s.setResultsByTab);
 
   const setPendingDropEntity = useDialogStore((s) => s.setPendingDropEntity);
-  const pendingDropEntity = useDialogStore((s) => s.pendingDropEntity);
   const setDdlDialog = useDialogStore((s) => s.setDdlDialog);
   const setModifyDialog = useDialogStore((s) => s.setModifyDialog);
   const setModifyInvalidColIds = useDialogStore((s) => s.setModifyInvalidColIds);
@@ -66,11 +65,7 @@ export function useSidebarActions(
   const setAddTableDialog = useDialogStore((s) => s.setAddTableDialog);
   const setAddTableInvalidColIds = useDialogStore((s) => s.setAddTableInvalidColIds);
   const setTruncateConfirm = useDialogStore((s) => s.setTruncateConfirm);
-  const truncateConfirm = useDialogStore((s) => s.truncateConfirm);
   const setModifyStructureRefreshKey = useDialogStore((s) => s.setModifyStructureRefreshKey);
-  const modifyDialog = useDialogStore((s) => s.modifyDialog);
-  const addRowDialog = useDialogStore((s) => s.addRowDialog);
-  const addTableDialog = useDialogStore((s) => s.addTableDialog);
 
   const quoteIdent = useCallback(
     (name: string) => `"${name.replace(/"/g, '""')}"`,
@@ -213,17 +208,20 @@ export function useSidebarActions(
         });
         setColumnsByEntity((prev) => {
           if (!(name in prev)) return prev;
-          const { [name]: _, ...rest } = prev;
+          const rest = { ...prev };
+          delete rest[name];
           return rest;
         });
         setForeignKeysByEntity((prev) => {
           if (!(name in prev)) return prev;
-          const { [name]: _, ...rest } = prev;
+          const rest = { ...prev };
+          delete rest[name];
           return rest;
         });
         setConstraintsByEntity((prev) => {
           if (!(name in prev)) return prev;
-          const { [name]: _, ...rest } = prev;
+          const rest = { ...prev };
+          delete rest[name];
           return rest;
         });
       }

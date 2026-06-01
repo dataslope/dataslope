@@ -33,7 +33,7 @@ errors average out. This asymmetry shapes every algorithm below.
 
 ## Finite differences
 
-The definition $f'(x) = \lim_\{h\to 0\} (f(x+h)-f(x))/h$ suggests we
+The definition $f'(x) = \lim_{h\to 0} (f(x+h)-f(x))/h$ suggests we
 just pick a small $h$. In floating point, two things fight:
 
 - **Truncation error** decreases as $h$ shrinks (the formula gets
@@ -43,7 +43,7 @@ just pick a small $h$. In floating point, two things fight:
 
 The optimal $h$ is a *balance*. For the forward difference
 $f'(x)\approx (f(x+h)-f(x))/h$, the sweet spot is around
-$h \approx \sqrt\{\epsilon_\text\{mach\}\} \approx 10^\{-8\}$.
+$h \approx \sqrt{\epsilon_\text{mach}} \approx 10^{-8}$.
 
 <CodeBlock
   adapter="python"
@@ -72,7 +72,7 @@ Two lessons:
 - The **centered difference** is one order more accurate ($O(h^2)$
   vs $O(h)$) for the same cost.
 - The optimal $h$ is *not* "as small as possible". Going below
-  $10^\{-8\}$ makes things *worse*.
+  $10^{-8}$ makes things *worse*.
 
 For most production work, use `scipy.differentiate.derivative`
 (modern SciPy) or `numpy.gradient` for sampled data.
@@ -179,7 +179,7 @@ print(f"dblquad: {val:.8f}   err≤{err:.1e}")
 
 But cost explodes: a rule that uses $n$ nodes per axis costs $n^d$
 total. Beyond 4-5 dimensions, switch to **Monte Carlo**, whose
-error scales as $1/\sqrt\{N\}$ regardless of dimension (we devote a
+error scales as $1/\sqrt{N}$ regardless of dimension (we devote a
 whole chapter to it later).
 
 ## A multi-file calculus toolkit

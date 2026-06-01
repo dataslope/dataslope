@@ -2311,6 +2311,7 @@ export function TableViewer({
 
   useEffect(() => {
     if (resultTabData == null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset synced to the resultTabData prop
       setResultTabDismissed(false);
       setResultIsActive(false);
       return;

@@ -63,6 +63,7 @@ export function SqlTabBar({
   // Reset position to the end whenever the settings tab is removed so
   // that it starts fresh the next time the user opens it.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset synced to the extraTabs prop
     if (!extraTabs || extraTabs.length === 0) setSettingsIdx(Infinity);
   }, [extraTabs]);
 
