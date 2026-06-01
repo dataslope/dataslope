@@ -538,6 +538,10 @@ function ResultViewImpl({
     setIdx: number;
     absoluteRow: number;
   } | null>(null);
+  // Result-set index awaiting a "load all rows so the whole result can be
+  // filtered" confirmation. Set when the user clicks the filter affordance on
+  // an engine-paged result whose rows aren't all in memory yet.
+  const [filterLoadPrompt, setFilterLoadPrompt] = useState<number | null>(null);
   const preserveOnNextResultRef = useRef<{
     selectedByIndex: SelectedRowsByResult;
     pendingEditsByIndex: PendingEditsByResult;
@@ -558,6 +562,9 @@ function ResultViewImpl({
   const noResultsRef = useRef<HTMLDivElement>(null);
   const resultSetsScrollRef = useRef<HTMLDivElement>(null);
   const prevResultRef = useRef<QueryRunResult | null>(null);
+  // When the user confirms "load all rows to filter", focus the (now enabled)
+  // filter input once the fully-loaded result arrives.
+  const focusFilterAfterLoadRef = useRef(false);
 
   useEffect(() => {
     // Save sorting for the outgoing result so it can be restored on tab switch back.
@@ -574,6 +581,7 @@ function ResultViewImpl({
     setSelectedByIndex(preserved?.selectedByIndex ?? {});
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
+    setFilterLoadPrompt(null);
     setPendingEditsByIndex(preserved?.pendingEditsByIndex ?? {});
     // Prefer explicit preserved state (after a reload), then cached state
     // (returning to a tab), then fall back to a clean slate.
@@ -584,6 +592,18 @@ function ResultViewImpl({
     // Scroll the result table back to the top whenever a new result arrives
     // (fresh query run or lazy page navigation).
     resultSetsScrollRef.current?.scrollTo(0, 0);
+    if (focusFilterAfterLoadRef.current) {
+      focusFilterAfterLoadRef.current = false;
+      // The reloaded result is now fully loaded, so the filter field is an
+      // enabled input — focus it so the user can type the filter immediately.
+      requestAnimationFrame(() => {
+        document
+          .querySelector<HTMLInputElement>(
+            ".sql-result-filter-input:not(:disabled)",
+          )
+          ?.focus();
+      });
+    }
     const el = flashWrapperRef.current;
     const noEl = noResultsRef.current;
     if (el) {
@@ -620,6 +640,38 @@ function ResultViewImpl({
     },
     [selectedByIndex, pendingEditsByIndex, sortingByIndex],
   );
+
+  // Confirmed "load all rows to filter": switch the engine-paged result to
+  // "All" so every row is materialized (the same path as choosing All in the
+  // pager), preserving the active sort. The result-change effect then focuses
+  // the now-enabled filter input. Engine-independent — it reuses the existing
+  // lazy reload, so it works the same for SQLite / Postgres / DuckDB.
+  const performLoadAllToFilter = useCallback(() => {
+    const idx = filterLoadPrompt;
+    setFilterLoadPrompt(null);
+    if (idx === null || !result) return;
+    const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
+    if (!baseSql) return;
+    const sorting = sortingByIndex[idx] ?? [];
+    let sql = baseSql;
+    if (sorting.length > 0) {
+      const parsed = parseColumnId(sorting[0].id);
+      if (parsed) {
+        sql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
+      }
+    }
+    focusFilterAfterLoadRef.current = true;
+    preserveStateForReload();
+    onSetGlobalPageSize(0);
+    onLoadPage(sql, 0, 0);
+  }, [
+    filterLoadPrompt,
+    result,
+    sortingByIndex,
+    preserveStateForReload,
+    onSetGlobalPageSize,
+    onLoadPage,
+  ]);
 
   const getState = useCallback(
     (idx: number) => pageStates[idx] ?? { page: 0 },
@@ -1215,6 +1267,12 @@ function ResultViewImpl({
   const activeSetData = computeSetRenderData(safeSetIdx);
   const activeSetIsNull = result.sets[safeSetIdx] === null;
 
+  // Counts for the "load all rows to filter" confirmation dialog.
+  const filterPromptSet =
+    filterLoadPrompt !== null ? (result.sets[filterLoadPrompt] ?? null) : null;
+  const filterPromptLoaded = filterPromptSet?.values.length ?? 0;
+  const filterPromptTotal = result.lazyTotalCount ?? filterPromptLoaded;
+
   return (
     <>
       {result.sets.length > 1 && (
@@ -1469,10 +1527,20 @@ function ResultViewImpl({
                   filterValue={filterByIndex[idx] ?? ""}
                   onFilterChange={(v) => setFilter(idx, v)}
                   filterUnfilteredTotal={unfilteredTotal}
+                  // Engine-paged result whose rows aren't all in memory: when a
+                  // single "All" load would materialize the whole result, offer
+                  // a one-click "load all & filter" button (it opens a confirm
+                  // dialog). Otherwise the result is already loading "All" but
+                  // isn't complete, so fall back to a disabled field + tooltip.
+                  onRequestLoadAll={
+                    !canFilter && !isInfiniteAll
+                      ? () => setFilterLoadPrompt(idx)
+                      : undefined
+                  }
                   filterDisabledReason={
-                    canFilter
-                      ? undefined
-                      : "Filtering covers the whole result — increase “Rows per page” (or choose All) so every row is loaded."
+                    !canFilter && isInfiniteAll
+                      ? "Still loading every row — scroll to load the rest, then filter (or add a SQL WHERE clause)."
+                      : undefined
                   }
                 >
                   {onExportResultSet && (
@@ -1550,6 +1618,38 @@ function ResultViewImpl({
                 onClick={performDeleteSingleRow}
               >
                 Delete row
+              </AlertDialog.Close>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
+      <AlertDialog.Root
+        open={filterLoadPrompt !== null}
+        onOpenChange={(next) => {
+          if (!next) setFilterLoadPrompt(null);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="confirm-backdrop" />
+          <AlertDialog.Popup className="confirm-popup">
+            <AlertDialog.Title className="confirm-title">
+              Filter all rows?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirm-desc">
+              Only the current page is loaded ({filterPromptLoaded} of{" "}
+              {filterPromptTotal.toLocaleString()} rows). To search the whole
+              result, every row will be loaded into the grid and “Rows per page”
+              switches to <strong>All</strong>.
+            </AlertDialog.Description>
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </AlertDialog.Close>
+              <AlertDialog.Close
+                className="confirm-btn confirm-btn-primary"
+                onClick={performLoadAllToFilter}
+              >
+                Load all rows
               </AlertDialog.Close>
             </div>
           </AlertDialog.Popup>
@@ -2838,6 +2938,7 @@ export function ResultPager({
   onFilterChange,
   filterUnfilteredTotal,
   filterDisabledReason,
+  onRequestLoadAll,
   children,
 }: {
   totalRows: number;
@@ -2865,6 +2966,10 @@ export function ResultPager({
   /** When set, the filter field is shown but disabled with this tooltip — used
    *  for engine-paged results where only a window of rows is loaded. */
   filterDisabledReason?: string;
+  /** Engine-paged result that a single "All" load can fully materialize: when
+   *  provided, the filter renders as a button that opens the "load all rows to
+   *  filter" confirmation instead of a (disabled) text field. */
+  onRequestLoadAll?: () => void;
   children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -2900,12 +3005,34 @@ export function ResultPager({
   const filterText = filterValue ?? "";
   const filterDisabled = !!filterDisabledReason;
   const showFilter = !!onFilterChange && (filterUnfilteredTotal ?? 0) > 0;
+  // When the whole result isn't in memory but a single "All" load would fix
+  // that, the filter is offered as a button (opening the load-all confirm)
+  // rather than a disabled field — so it's actionable, not dead.
+  const showLoadAll = showFilter && !!onRequestLoadAll;
   const isFiltering =
-    showFilter && !filterDisabled && filterText.trim().length > 0;
+    showFilter &&
+    !filterDisabled &&
+    !showLoadAll &&
+    filterText.trim().length > 0;
 
   return (
     <div className="sql-result-pager">
-      {showFilter && (
+      {showLoadAll ? (
+        <button
+          type="button"
+          className="sql-result-filter sql-result-filter-trigger"
+          onClick={onRequestLoadAll}
+          title="Load all rows so the whole result can be filtered"
+          aria-label="Filter rows — loads every row first"
+        >
+          <Search
+            size={12}
+            aria-hidden="true"
+            className="sql-result-filter-icon"
+          />
+          <span className="sql-result-filter-trigger-label">Filter rows…</span>
+        </button>
+      ) : showFilter ? (
         <div
           className={`sql-result-filter${filterDisabled ? " sql-result-filter--disabled" : ""}`}
           title={filterDisabled ? filterDisabledReason : undefined}
@@ -2947,7 +3074,7 @@ export function ResultPager({
             </button>
           )}
         </div>
-      )}
+      ) : null}
       <span className="sql-result-pager-info">
         {editable && editCount > 0 ? (
           <>
