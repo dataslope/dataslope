@@ -2366,6 +2366,8 @@
   color: #e8e8e8;
   font-size: 13px;
   font-family: var(--ch-font-ui);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   border-radius: 6px;
   box-shadow:
     0 10px 25px color-mix(in srgb, var(--ch-black) 15%, transparent),

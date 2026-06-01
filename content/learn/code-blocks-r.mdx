@@ -109,3 +109,33 @@ bye <- function(name) {
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for imports or sample data without cluttering the part you edit. Init of 3
+lines or fewer shows a compact read-only header; 4 lines or more collapses
+behind a "Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="r"
+  initCode={`radius <- 5`}
+  starterCode={`# 'radius' is defined by the initialization code above.
+cat("area =", pi * radius^2, fill = TRUE)
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="r"
+  initCode={`df <- data.frame(
+  name = c("Ada", "Linus", "Grace"),
+  score = c(92, 88, 95)
+)`}
+  starterCode={`# 'df' is defined by the initialization code above.
+print(df)
+`}
+/>

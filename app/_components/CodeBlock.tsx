@@ -821,11 +821,15 @@ function CodeBlockInner({
     setOutputs([]);
     setStatus("idle");
     setStatusMessage("");
+    startTransition(() => {
+      toastManager.add({ title: "Reset to starter code." });
+    });
   }, [
     workspaceFiles,
     isMultiFile,
     persistedKey,
     persistedKeyForFile,
+    toastManager,
   ]);
 
   const MIN_FORMAT_MS = 300;

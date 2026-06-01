@@ -136,3 +136,36 @@ def bye(name: str) -> str:
   ]}
 />
 ```
+
+## Initialization code
+
+`initCode` is read-only setup prepended to your snippet on every Run — handy
+for imports or sample data without cluttering the part you edit. Init of 3
+lines or fewer shows a compact read-only header; 4 lines or more collapses
+behind a "Click to expand" toggle.
+
+A short init (3 lines or fewer):
+
+<CodeBlock
+  adapter="python"
+  initCode={`import math
+
+RADIUS = 5`}
+  starterCode={`# RADIUS and math come from the initialization code above.
+print(f"area = {math.pi * RADIUS ** 2:.2f}")
+`}
+/>
+
+A longer init (4 lines or more), collapsed by default:
+
+<CodeBlock
+  adapter="python"
+  initCode={`import pandas as pd
+
+df = pd.DataFrame(
+    {"name": ["Ada", "Linus", "Grace"], "score": [92, 88, 95]}
+)`}
+  starterCode={`# 'df' was created by the initialization code above.
+display(df)
+`}
+/>
