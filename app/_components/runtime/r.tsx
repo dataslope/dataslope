@@ -699,10 +699,12 @@ const CREATED_FILES_PATH = "/tmp/.pg_created_files";
 //
 // 1. download.file(): WebR's built-in download.file() already works in the
 //    playground (it performs the request synchronously inside the worker). We
-//    only wrap it so the destination file is mirrored into the Files pane — the
-//    actual fetch is delegated unchanged to utils::download.file(), so
-//    cross-origin hosts still need permissive CORS headers (or the CORS proxy),
-//    exactly like pandas.read_csv in the Python runtime.
+//    wrap it to (a) mirror the destination file into the Files pane and
+//    (b) print its "trying URL" / "downloaded …" progress to stdout instead of
+//    stderr, which the playground styles as an error. The actual fetch is
+//    delegated unchanged to utils::download.file(), so cross-origin hosts still
+//    need permissive CORS headers (or the CORS proxy), exactly like
+//    pandas.read_csv in the Python runtime.
 //
 // 2. print(): base R prints every row of a plain data.frame, which can freeze
 //    the page for large frames. We override the print generic (an ordinary
@@ -715,13 +717,25 @@ const R_SESSION_SETUP = String.raw`
 suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 
 local({
-  download_file <- function(url, destfile, ...) {
-    status <- utils::download.file(url, destfile, ...)
-    if (!missing(destfile) && is.character(destfile) && length(destfile) == 1L &&
-        nzchar(destfile) && file.exists(destfile)) {
+  download_file <- function(url, destfile,
+                            method = getOption("download.file.method", "auto"),
+                            quiet = FALSE, ...) {
+    # Mirror R's familiar progress lines to stdout instead of stderr. The
+    # playground styles any stderr output as an error, which made a successful
+    # download look like it had failed. download.file's own messages are
+    # silenced with quiet = TRUE and re-emitted here via cat().
+    if (!isTRUE(quiet)) cat(sprintf("trying URL '%s'\n", url))
+    status <- utils::download.file(url, destfile, method = method, quiet = TRUE, ...)
+    if (is.character(destfile) && length(destfile) == 1L && nzchar(destfile) &&
+        file.exists(destfile)) {
       abs <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
       try(cat(abs, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE),
           silent = TRUE)
+      if (!isTRUE(quiet)) {
+        size <- file.info(destfile)$size
+        cat(sprintf("downloaded %s bytes\n",
+                    format(size, big.mark = ",", scientific = FALSE)))
+      }
     }
     invisible(status)
   }

@@ -92,13 +92,22 @@ test.describe("R playground data handling", () => {
 
     const cells = await runAndCollect(page);
     const allText = cells.map((c) => `[${c.type}] ${c.body}`).join("\n");
+    const stdoutText = cells
+      .filter((c) => c.type === "stdout")
+      .map((c) => c.body)
+      .join("\n");
+    const stderrText = cells
+      .filter((c) => c.type === "stderr")
+      .map((c) => c.body)
+      .join("\n");
 
-    // download.file() prints "trying URL" / "downloaded N bytes" via message()
-    // (an stderr cell) — those are expected, so look for genuine failure
-    // markers rather than treating any stderr as a failure.
     expect(allText, allText).not.toMatch(/cannot open URL/i);
     expect(allText, allText).not.toMatch(/could not find function/i);
     expect(allText, allText).not.toMatch(/download failed/i);
+
+    // The progress lines are shown as normal output, not as an error cell.
+    expect(stdoutText, stdoutText).toContain("trying URL");
+    expect(stderrText, stderrText).not.toContain("trying URL");
 
     // The file exists in the R working directory with real content…
     expect(allText).toContain("exists: TRUE");
