@@ -7,5 +7,11 @@ compatibility_flags = ["nodejs_compat"]
 # Comma-separated list of allowed Origin hosts (no trailing slash).
 # Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
 # for production secrets, or set them here for non-sensitive defaults.
-ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app"
+#
+# A "*" in an entry is a wildcard that matches one hostname label (no dots,
+# no slashes), so Vercel preview deployments are matched by including the
+# team scope suffix. The scope suffix is what keeps this safe: only the
+# project owner can deploy under "*-ye-joo-parks-projects.vercel.app", so an
+# attacker cannot register a project that produces a matching preview host.
+ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app,https://dataslope-*-ye-joo-parks-projects.vercel.app"
 

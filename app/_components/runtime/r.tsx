@@ -536,6 +536,7 @@ interface WebRShelterConstructor {
 }
 interface WebRFS {
   writeFile(path: string, data: Uint8Array): Promise<void>;
+  readFile(path: string): Promise<Uint8Array>;
   mkdir(path: string): Promise<void>;
   unlink(path: string): Promise<void>;
 }
@@ -687,6 +688,115 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // Working directory inside the WebR Emscripten FS (matches `getwd()` output).
 const WEB_USER_HOME = "/home/web_user";
 
+// Newline-separated list of absolute paths written by our download.file()
+// override during a run. Read back by collectCreatedFiles() so downloads show
+// up in the Files pane, then cleared.
+const CREATED_FILES_PATH = "/tmp/.pg_created_files";
+
+// One-time R setup that installs a working download.file().
+//
+// WebR's built-in download.file() performs a synchronous network request
+// through its main↔worker channel, which only succeeds when the page is
+// cross-origin isolated (SharedArrayBuffer available). The playground is not
+// cross-origin isolated, so the built-in stalls after printing "trying URL"
+// and never writes the file. We replace it with a synchronous XMLHttpRequest
+// run directly inside the WebR worker via webr::eval_js — fully self-contained,
+// so it works regardless of the communication channel. Cross-origin hosts
+// still need permissive CORS headers (or the CORS proxy), exactly like
+// pandas.read_csv in the Python runtime.
+//
+// The override is attached to the search path (not .GlobalEnv) so it survives
+// the per-run wipe of the global environment in run() and never appears in the
+// user's ls(). Each successful download appends its destination path to
+// CREATED_FILES_PATH so the playground can mirror it into the Files pane.
+const R_NET_SETUP = String.raw`
+suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
+
+.pg_download_file <- function(url, destfile, quiet = FALSE, mode = "wb", ...) {
+  if (missing(destfile) || is.null(destfile) || !nzchar(destfile)) {
+    stop("'destfile' must be a non-empty file path")
+  }
+  if (length(url) != 1L) stop("'url' must be a single string")
+  if (!quiet) message(sprintf("trying URL '%s'", url))
+
+  url_path    <- "/tmp/.pg_dl_url"
+  data_path   <- "/tmp/.pg_dl_data"
+  status_path <- "/tmp/.pg_dl_status"
+  unlink(c(data_path, status_path))
+  writeBin(charToRaw(enc2utf8(url)), url_path)
+
+  js <- r"---(
+(function () {
+  try {
+    var fs = Module.FS;
+    var raw = fs.readFile('/tmp/.pg_dl_url');
+    var url = '';
+    for (var i = 0; i < raw.length; i++) url += String.fromCharCode(raw[i]);
+    url = url.trim();
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    try { xhr.responseType = 'arraybuffer'; } catch (e) {}
+    xhr.send(null);
+    var status = xhr.status || 0;
+    fs.writeFile('/tmp/.pg_dl_status', new TextEncoder().encode(String(status)));
+    if (status >= 200 && status < 300) {
+      var bytes;
+      if (xhr.response && typeof xhr.response.byteLength === 'number') {
+        bytes = new Uint8Array(xhr.response);
+      } else {
+        var text = xhr.responseText || '';
+        bytes = new Uint8Array(text.length);
+        for (var j = 0; j < text.length; j++) bytes[j] = text.charCodeAt(j) & 255;
+      }
+      fs.writeFile('/tmp/.pg_dl_data', bytes);
+    }
+    return status;
+  } catch (err) {
+    try {
+      Module.FS.writeFile('/tmp/.pg_dl_status', new TextEncoder().encode('-1'));
+    } catch (e2) {}
+    return -1;
+  }
+})()
+)---"
+
+  invisible(webr::eval_js(js))
+
+  status <- tryCatch(
+    as.integer(readLines(status_path, warn = FALSE))[1],
+    error = function(e) NA_integer_
+  )
+  if (length(status) == 0L || is.na(status)) status <- -1L
+
+  if (status >= 200 && status < 300 && file.exists(data_path)) {
+    dest_dir <- dirname(destfile)
+    if (nzchar(dest_dir) && dest_dir != "." && !dir.exists(dest_dir)) {
+      dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+    }
+    ok <- file.copy(data_path, destfile, overwrite = TRUE)
+    unlink(data_path)
+    if (!isTRUE(ok)) stop(sprintf("cannot write downloaded data to '%s'", destfile))
+    size <- file.info(destfile)$size
+    if (!quiet) message(sprintf("downloaded %d bytes", as.integer(size)))
+    abs_path <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
+    cat(abs_path, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE)
+    return(invisible(0L))
+  }
+
+  stop(sprintf(
+    "cannot open URL '%s'%s",
+    url,
+    if (status > 0) sprintf(": HTTP status was %d", status) else ": download failed"
+  ))
+}
+
+while ("webr:playground-net" %in% search()) detach("webr:playground-net")
+attach(list(download.file = .pg_download_file),
+       name = "webr:playground-net", warn.conflicts = FALSE)
+rm(.pg_download_file)
+`;
+
 class WebRRuntime implements LanguageRuntime {
   private installedPackages = new Set<string>();
   // Absolute FS paths written during the previous prepareFileSystem call.
@@ -767,7 +877,8 @@ class WebRRuntime implements LanguageRuntime {
     const installWarnings = await this.ensurePackages(code);
 
     await this.webR.evalRVoid(
-      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
+      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)
+unlink(c("${CREATED_FILES_PATH}", "/tmp/.pg_dl_url", "/tmp/.pg_dl_data", "/tmp/.pg_dl_status"))`,
     );
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
@@ -876,6 +987,56 @@ class WebRRuntime implements LanguageRuntime {
       await shelter.purge();
     }
   }
+
+  /**
+   * Returns files created during the run that should appear in the Files
+   * pane — currently the destinations written by our download.file()
+   * override, recorded in CREATED_FILES_PATH. Paths are returned relative
+   * to the WebR home directory (the playground's working directory) so they
+   * line up with the names shown in the Files pane. The tracking list is
+   * cleared after reading so each file is reported at most once.
+   */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    const out = new Map<string, Uint8Array>();
+
+    let listBytes: Uint8Array;
+    try {
+      listBytes = await this.webR.FS.readFile(CREATED_FILES_PATH);
+    } catch {
+      // No download happened this run — the tracking file doesn't exist.
+      return out;
+    }
+
+    const paths = [
+      ...new Set(
+        new TextDecoder()
+          .decode(listBytes)
+          .split("\n")
+          .map((p) => p.trim())
+          .filter(Boolean),
+      ),
+    ];
+
+    for (const abs of paths) {
+      try {
+        const bytes = await this.webR.FS.readFile(abs);
+        const rel = abs.startsWith(`${WEB_USER_HOME}/`)
+          ? abs.slice(WEB_USER_HOME.length + 1)
+          : (abs.split("/").pop() ?? abs);
+        if (rel) out.set(rel, bytes);
+      } catch {
+        // File was removed before we read it back — skip it.
+      }
+    }
+
+    try {
+      await this.webR.FS.unlink(CREATED_FILES_PATH);
+    } catch {
+      // Best-effort cleanup; the next run also clears it.
+    }
+
+    return out;
+  }
 }
 
 export const rAdapter: LanguageAdapter = {
@@ -935,6 +1096,15 @@ export const rAdapter: LanguageAdapter = {
     await webR.evalRVoid(
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );
+
+    // Install a browser-native download.file() that works without
+    // cross-origin isolation (see R_NET_SETUP). Best-effort: a failure here
+    // shouldn't block the runtime from starting.
+    try {
+      await webR.evalRVoid(R_NET_SETUP);
+    } catch (err) {
+      console.error("[webr] failed to install download.file override", err);
+    }
 
     return new WebRRuntime(webR);
   },

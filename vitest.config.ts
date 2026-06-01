@@ -9,6 +9,9 @@ export default defineConfig({
     // E2E tests live in `e2e/` and are run by Playwright
     // (`npm run test:e2e`). Keep Vitest from picking them up so that
     // `npm test` stays a fast Node-only check.
-    exclude: ["node_modules/**", "dist/**", ".next/**", "e2e/**"],
+    // Match nested node_modules too (e.g. cloudflare-cors-proxy/node_modules)
+    // so we never pick up third-party package tests when the worker's deps
+    // are installed locally.
+    exclude: ["**/node_modules/**", "dist/**", ".next/**", "e2e/**"],
   },
 });
