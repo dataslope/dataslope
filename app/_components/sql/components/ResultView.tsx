@@ -881,6 +881,15 @@ function ResultViewImpl({
           }
         }
         refetchSql = refetchSql ?? baseSql;
+      } else if (result?.querySql) {
+        // Materialized result (no lazy paging) — e.g. a query with its own
+        // `LIMIT`. Re-run the *exact* original query so the result keeps its
+        // shape/LIMIT, instead of letting the engine fall back to
+        // `SELECT * FROM <table>` (which drops the LIMIT and shows every row).
+        // Sorting for a materialized result is applied client-side and is
+        // preserved across the reload by `preserveStateForReload`.
+        refetchSql = result.querySql;
+        refetchBaseSql = result.querySql;
       }
       onUpdateRows(sourceTable, updates, refetchSql, refetchBaseSql);
     },

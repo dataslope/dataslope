@@ -1416,6 +1416,7 @@ function PostgresPlaygroundInner() {
             lazyPage,
             lazyPageSize,
             lazyInfinite: effectivePageSize === 0 && useLazy,
+            querySql: trimmed.replace(/\s*;+\s*$/, ""),
           },
         }));
         addHistoryEntry({

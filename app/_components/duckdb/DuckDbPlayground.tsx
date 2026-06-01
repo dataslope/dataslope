@@ -1469,6 +1469,7 @@ function DuckDbPlaygroundInner() {
             lazyPage,
             lazyPageSize,
             lazyInfinite: effectivePageSize === 0 && useLazy,
+            querySql: trimmed.replace(/\s*;+\s*$/, ""),
           },
         }));
         addHistoryEntry({
