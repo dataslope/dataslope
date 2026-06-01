@@ -1,0 +1,367 @@
+---
+title: Bar and Count Plots
+description: catplot kind='bar' and kind='count' — summarizing categories, and the trap of plotting only the mean.
+---
+
+The bar is the most familiar chart in the world, which is exactly why it is
+so easy to misuse. In Seaborn two close relatives both draw bars across
+categories but answer very different questions. A **count plot** asks *how
+many* observations are in each group. A **bar plot** asks *what is a
+typical value* of some measurement in each group — by default, its mean.
+
+Both live under `catplot`: a count plot is `kind="count"`, a bar plot is
+`kind="bar"`. The crucial difference is what they need and what they put on
+the value axis, and — for the bar plot — a quiet way it can mislead you that
+every analyst should learn to see.
+
+## Count plot: how many in each group?
+
+A **count plot** tallies the rows in each category. It needs **one
+categorical variable** and nothing else — there is no numeric measurement
+involved, just a head-count per group.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+titanic = sns.load_dataset("titanic")
+
+# One categorical variable; the other axis is the count of rows.
+sns.catplot(data=titanic, x="class", kind="count", height=4)
+`}
+/>
+
+The height of each bar is simply *how many passengers* travelled in that
+class. Third class dwarfs the others. Notice you supplied only `x="class"`
+— the count goes on the y-axis automatically, because counting is the whole
+job.
+
+<Callout type="info" title="catplot vs countplot">
+`sns.catplot(..., kind="count")` is the figure-level version (it returns a
+grid and can facet with `col`/`row`). The axes-level twin is
+`sns.countplot(...)`, which draws onto a single Axes. Same bars; they differ
+in what they return and how they compose — a distinction we cover on its own
+page. Reach for `catplot` when you might want panels.
+</Callout>
+
+A count plot is the right tool whenever the question is literally "how many?"
+— rows per category, the class balance of a dataset, the most and least
+common groups. It says nothing about any *measurement*; for that, you need
+its sibling.
+
+## Bar plot: a typical value per group
+
+A **bar plot** is different in kind. It takes a **categorical x** and a
+**numeric y**, and within each category it computes an **aggregate** of the
+numeric values — by default the **mean** — and draws that as the bar height.
+On top of each bar sits a thin **error bar** showing the uncertainty of the
+estimate (a 95% confidence interval by default).
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Categorical x + numeric y: each bar is the MEAN total_bill that day.
+sns.catplot(data=tips, x="day", y="total_bill", kind="bar", height=4)
+`}
+/>
+
+Each bar is the *average* bill for that day, and the little line on top is
+the confidence interval around that average. This is a genuinely useful
+summary — but it is also where bars get dangerous, so let's slow down.
+
+## The trap: a bar of means hides the distribution
+
+Here is the single most important idea on this page. A bar reduces an entire
+group of numbers to **one** number — its mean. Two groups can have the
+*exact same mean* and yet be wildly different: one tightly clustered, the
+other spread from floor to ceiling, or split into two clumps. As bars, they
+look **identical**. The bar literally cannot show the difference, because it
+threw the difference away.
+
+<MultipleChoice
+  markdown={`Group A is \`[50, 50, 50, 50]\` and Group B is \`[0, 0, 100, 100]\`. You draw a
+bar plot of the mean of each group. What do the two bars look like?
+
+- Group B's bar is taller, because its values reach 100.
+  > The bar height is the *mean*, not the maximum. Both groups average to 50, so the value B reaches doesn't make its bar taller.
+- [o] The two bars are the same height, because both groups have a mean of 50.
+  > A bar shows only the mean (50 for both), so identical-mean groups produce identical bars — even though B is split at the extremes and A is perfectly uniform.
+- Group A's bar is taller, because its values are more consistent.
+  > Consistency affects the *spread*, which a bar does not draw; it does not change the mean or the bar height.
+- Seaborn will refuse to draw because the spreads differ.
+  > Seaborn computes and draws the means without complaint; that is precisely why the hidden difference is a trap.
+
+Equal means give equal bars regardless of spread — the bar discards exactly
+the information (the distribution) that distinguishes these two groups.`}
+/>
+
+That is the trap in one example: the bar chart of those two groups is a pair
+of identical rectangles, even though the groups could not be more different.
+The mean is a real summary, but it is *only* a summary, and a bar shows
+nothing else.
+
+<Callout type="warn" title="When the spread matters, do not use a bar of means">
+A bar plot is fine when you genuinely only care about the average and the
+groups are reasonably well-behaved. The moment the *shape* of each group
+matters — outliers, skew, two clumps, very different spreads — switch to a
+chart that draws the distribution: a **box** or **violin** plot (next page),
+or a **strip**/**swarm** plot that shows every point. Those reveal exactly
+what a bar hides.
+</Callout>
+
+## Showing the uncertainty: the error bar
+
+The line on top of each bar is not decoration — it encodes how *trustworthy*
+the mean is. By default Seaborn draws a **95% confidence interval**, computed
+by bootstrapping. You can change what it represents, or turn it off:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# errorbar choices:
+#   ("ci", 95)  -> 95% confidence interval (the default)
+#   "sd"        -> one standard deviation (spread of the data itself)
+#   None        -> no error bar at all
+sns.catplot(data=tips, x="day", y="total_bill", kind="bar",
+            errorbar="sd", height=4)
+`}
+/>
+
+Switching to `errorbar="sd"` is a small but meaningful honesty upgrade: the
+bars now carry a hint of each group's *spread*, partly answering the
+objection above. Try editing it to `errorbar=("ci", 95)` and to
+`errorbar=None` to feel the difference between "uncertainty of the mean" and
+"spread of the data" and "no error information at all."
+
+<Callout type="tip" title="Use the modern errorbar=, not the old ci=">
+Older Seaborn code used `ci=95` or `ci="sd"`. The current, clearer spelling
+is `errorbar=("ci", 95)`, `errorbar="sd"`, or `errorbar=None`. Prefer
+`errorbar=` in anything you write today.
+</Callout>
+
+## Changing the estimator
+
+The mean is just the default aggregate. The **`estimator`** argument lets you
+summarize each group differently — the **median** (more robust to outliers),
+the **sum** (a total rather than a typical value), or any function that
+reduces a list of numbers to one.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# estimator="median" is more robust when a group has extreme outliers.
+sns.catplot(data=tips, x="day", y="total_bill", kind="bar",
+            estimator="median", height=4)
+`}
+/>
+
+If a single huge bill would drag a day's *mean* upward, the **median** bar
+barely moves — it reports the typical bill rather than the average one.
+Switch `estimator="sum"` to ask a different question entirely: the *total*
+revenue per day, which also reflects how busy that day was.
+
+## A second category with `hue`
+
+Map a second categorical variable to **`hue`** and Seaborn splits each
+category into a cluster of side-by-side bars — one per hue level. This is how
+you compare an aggregate across *two* groupings at once.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Each day splits into two bars: mean bill for each sex.
+sns.catplot(data=tips, x="day", y="total_bill", hue="sex",
+            kind="bar", height=4)
+`}
+/>
+
+Now you can read two things at once: the day-to-day pattern, and within each
+day how the average bill differs by `sex`. Seaborn places the bars
+side-by-side (a *grouped* bar chart) and builds the legend for you. Keep the
+number of hue levels small — two or three — or the clusters get hard to
+compare.
+
+## Too many categories: order and flip
+
+Bar charts get unreadable two ways: too many bars, and bars in a meaningless
+order. Both have simple fixes.
+
+First, **ordering**. By default the categories appear in whatever order they
+occur (or alphabetically). Pass `order=` an explicit list to control it — and
+a bar chart sorted by *value* is far easier to read than one in arbitrary
+order. Second, **orientation**. When labels are long or numerous, put the
+category on **y** for horizontal bars whose names read cleanly left to right.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+# Many origins/regions with multi-word context? Go horizontal and order them.
+sns.catplot(
+    data=mpg, y="origin", x="horsepower", kind="bar",
+    order=["usa", "japan", "europe"],   # explicit, meaningful order
+    errorbar=None, height=4,
+)
+`}
+/>
+
+The category sits on `y`, so each label gets its own row and never overlaps,
+and `order=` puts the groups in the sequence *you* chose rather than an
+arbitrary one. For a long list of categories, horizontal-plus-ordered is the
+readable default.
+
+## What bar and count plots show, hide, and break on
+
+- **Data types.** *Count* needs **one categorical** variable (it tallies
+  rows). *Bar* needs a **categorical** variable plus a **numeric** one (it
+  aggregates the numeric values per group).
+- **What they highlight.** Count makes group *frequencies* and class balance
+  obvious. Bar makes a single aggregate (mean by default) easy to *compare*
+  across groups, with an error bar for uncertainty.
+- **What they hide.** A bar hides the entire distribution behind one number
+  — spread, skew, clumps, and outliers all vanish. A count hides everything
+  except how many rows there are.
+- **When they break.** With many categories the bars become a thicket;
+  reorder with `order=` and flip to horizontal. And a bar of means is
+  actively misleading whenever the groups' *shapes* differ — reach for a
+  distribution plot instead.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Count passengers by class"
+  instructions={`Use \`sns.catplot\` on the \`titanic\` dataset to show **how many
+passengers were in each travel class**.
+
+- Use \`kind="count"\`.
+- Put \`class\` on the x-axis (the count goes on the other axis
+  automatically).
+- Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+titanic = sns.load_dataset("titanic")
+
+# Build the count plot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+titanic = sns.load_dataset("titanic")
+
+g = sns.catplot(data=titanic, x="class", kind="count", height=4)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses catplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.catplot(...) to g'",
+    },
+    {
+      id: "x_is_class",
+      name: "class is on the x-axis",
+      description: "The category sits on x; count goes on y",
+      code: "assert g.ax.get_xlabel() == 'class', f'x should be class, got {g.ax.get_xlabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the key difference between a **count** plot and a **bar** plot in
+Seaborn?
+
+- A count plot uses vertical bars and a bar plot uses horizontal bars.
+  > Orientation is independent of the chart type — either plot can be vertical or horizontal depending on which axis holds the category.
+- [o] A count plot tallies how many rows are in each category; a bar plot aggregates a numeric variable (the mean by default) per category.
+  > Count needs only a categorical variable and reports frequencies; bar needs a categorical *and* a numeric variable and reports an aggregate of the numbers.
+- A count plot shows the mean and a bar plot shows the median.
+  > A count plot shows a frequency, not a mean; a bar plot defaults to the mean (and can be switched to the median with \`estimator=\`).
+- They are identical; \`count\` is just an alias for \`bar\`.
+  > They answer different questions and require different inputs — \`count\` needs no numeric variable, while \`bar\` requires one to aggregate.
+
+Count answers "how many?"; bar answers "what is a typical value?" — and only
+bar consumes a numeric variable.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague shows a bar plot of mean test score per study group and
+concludes the groups are "basically the same" because the bars are nearly
+equal height. What is the most important caveat?
+
+- Bar plots are always misleading and should never be used.
+  > Bars are a legitimate summary when you care about the average; the issue is treating the mean as the *whole* story, not the chart existing at all.
+- The bars should have been sorted by value first.
+  > Sorting affects readability, not the conclusion; equal-height bars stay equal whatever order they sit in.
+- [o] Equal means can hide very different spreads or shapes, so "same bars" does not mean "same distributions."
+  > A bar shows only the mean; groups with identical means can differ wildly in spread, skew, or modality, so a distribution plot is needed before concluding they are alike.
+- Confidence intervals are never trustworthy.
+  > Confidence intervals are useful; the real gap is that even with them, a bar still summarizes the mean and omits the full shape of each group.
+
+The bar-of-means trap: matching means do not imply matching distributions —
+check the spread with a box, violin, or strip plot.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`sns.catplot(data=tips, x="day", y="total_bill", kind="bar", errorbar="sd")\`,
+what does \`errorbar="sd"\` make the error bars represent?
+
+- The 95% confidence interval of the mean.
+  > That is the default, written \`errorbar=("ci", 95)\`. The \`"sd"\` setting reports something different.
+- [o] One standard deviation — a measure of the spread of the data in each group.
+  > \`"sd"\` draws ± one standard deviation, so the bars reflect how spread out each group's values are rather than the precision of the mean.
+- The minimum and maximum value in each group.
+  > The full range is neither the default CI nor the \`"sd"\` option; standard deviation summarizes typical spread, not the extremes.
+- Nothing; \`"sd"\` turns the error bars off.
+  > Turning error bars off is \`errorbar=None\`; \`"sd"\` actively draws standard-deviation bars.
+
+\`errorbar="sd"\` swaps the default confidence interval for a standard-deviation
+bar, hinting at each group's spread.`}
+/>
+
+<MultipleChoice
+  markdown={`You have a bar plot of mean price for **22 product categories** with long
+names, and it is an unreadable mess of tilted labels. What is the most
+effective fix?
+
+- Add a \`hue\` variable to break up the bars.
+  > Adding \`hue\` multiplies the bars into clusters, making an already crowded chart busier, not clearer.
+- [o] Put the categories on \`y\` for horizontal bars and pass \`order=\` to sort them meaningfully.
+  > Horizontal bars give each long label its own readable row, and ordering (often by value) lets the eye scan the ranking instead of fighting an arbitrary sequence.
+- Remove the error bars with \`errorbar=None\`.
+  > Dropping error bars declutters slightly but does nothing about 22 cramped, tilted category labels.
+- Switch to \`kind="count"\`.
+  > \`count\` answers a different question (frequencies, not mean price) and still has to place all 22 labels somewhere.
+
+Long or numerous categories read best as ordered, horizontal bars — flip the
+axis and pass \`order=\`.`}
+/>
+
+You can now summarize categories with bars and counts — and, just as
+importantly, you know when a bar is lying to you by omission. Next we go one
+notch up the detail dial to **box and violin plots**, which draw the full
+shape a bar leaves out.

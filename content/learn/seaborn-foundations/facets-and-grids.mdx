@@ -1,0 +1,286 @@
+---
+title: Facets and Grids
+description: Small multiples — splitting data by category into a grid of panels with col and row, the FacetGrid workflow underneath, and when a grid becomes too much.
+---
+
+One of the most powerful moves in all of visualization is the **small
+multiple**: instead of cramming every group onto one busy chart, draw the
+*same* chart many times — once per group — and lay the copies out in a grid.
+The eye compares panels effortlessly, because only the data changes from
+cell to cell, never the encoding.
+
+Seaborn calls this **faceting**, and it's built into every figure-level
+function through two keywords: `col` and `row`.
+
+## Faceting is just `col` and `row`
+
+We've used `col` already. Add `row` and you get a 2-D grid — one panel for
+every *combination* of the two faceting variables:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# One column per time, one row per sex -> a 2 x 2 grid of scatter plots.
+sns.relplot(
+    data=tips, x="total_bill", y="tip",
+    col="time", row="sex",
+    height=3.2,
+)
+`}
+/>
+
+Each panel holds the same scatter plot for its slice of the data, and —
+crucially — every panel **shares the same axes by default**, so a point in
+one cell is directly comparable to a point in another. That shared scale is
+what makes small multiples honest.
+
+<Callout type="info" title="hue overlays; col/row separate">
+`hue` draws groups *on top of each other* in one panel (good for direct
+overlap and a few groups). `col`/`row` give each group *its own panel* (good
+for many groups, or when overlap would be a mess). You can combine them:
+color by `hue` *and* split by `col`. Choosing between overlay and separation
+is one of the everyday judgment calls of faceting.
+</Callout>
+
+## Wrapping many categories with `col_wrap`
+
+A single faceting variable with many levels would stretch into one very wide
+row. `col_wrap` wraps the panels after N columns into a tidy block:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+# Six model years, wrapped 3-per-row into a 2 x 3 block.
+sns.relplot(
+    data=mpg[mpg["model_year"].isin([70, 73, 76, 78, 80, 82])],
+    x="weight", y="mpg",
+    col="model_year", col_wrap=3,
+    height=2.8,
+)
+`}
+/>
+
+## The FacetGrid workflow underneath
+
+The figure-level functions do their faceting through a class called
+**`FacetGrid`**. You rarely call it directly, but understanding its
+three-step workflow demystifies what `relplot` and friends are doing — and
+lets you build custom grids when you need them.
+
+```mermaid
+flowchart TD
+    DATA["Full tidy dataset"] --> SPLIT["Split by the facet variables<br/>col= and/or row="]
+    SPLIT --> GRID["An empty grid of axes:<br/>one cell per category combination"]
+    GRID --> MAP["map() a plotting function<br/>onto each data subset"]
+    MAP --> DRAW["Every cell draws the same plot<br/>for its slice of the data"]
+    DRAW --> LEG["add_legend() and final touches"]
+```
+
+In code, those steps look like this:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# 1. Create the grid: one column per time, colored by sex.
+g = sns.FacetGrid(tips, col="time", hue="sex", height=4)
+
+# 2. Map a plotting function onto each subset.
+g.map_dataframe(sns.scatterplot, x="total_bill", y="tip")
+
+# 3. Add the legend and tidy up.
+g.add_legend()
+`}
+/>
+
+That is exactly the machinery `sns.relplot(..., col="time", hue="sex")` runs
+for you. Reach for an explicit `FacetGrid` only when you want to map a custom
+function or layer several plots per panel; otherwise let the figure-level
+function do it.
+
+<Callout type="tip" title="Three grid classes, one idea">
+Seaborn has three grid classes: **`FacetGrid`** (same plot across category
+panels — this page), **`PairGrid`** (every variable against every other —
+the pair-plots chapter), and **`JointGrid`** (one center plot with marginal
+distributions — the joint-plots chapter). All three follow the same
+"set up the grid, then `map` plots onto it" pattern.
+</Callout>
+
+## Shared scales — usually keep them
+
+By default facets share x- and y-limits. That's almost always what you want,
+because it keeps panels comparable. Occasionally one group's range dwarfs the
+others and you'll want to free a scale with `sharey=False` (via
+`facet_kws={"sharey": False}` on the figure-level functions) — but do it
+*consciously*, and tell your reader, because un-shared axes make panels look
+similar when they aren't.
+
+<MultipleChoice
+  markdown={`Why does Seaborn make facets **share the same axis limits** by default?
+
+- To make the figure render faster.
+  > Shared limits are about interpretation, not performance.
+- [o] So panels are directly comparable — a position in one panel means the same as the same position in another.
+  > A common scale is what lets the eye compare small multiples honestly; otherwise two panels could look alike while representing very different ranges.
+- Because Seaborn cannot compute separate limits per panel.
+  > It can — \`sharey=False\`/\`sharex=False\` do exactly that; shared limits are a deliberate default.
+- To save vertical space.
+  > Any space difference is incidental; the real reason is comparability across panels.
+
+Shared scales keep small multiples comparable; only un-share them
+deliberately, and flag it for the reader.`}
+/>
+
+## When a grid becomes too much
+
+Faceting multiplies panels: `col` levels **×** `row` levels. That's its
+weakness as well as its strength.
+
+- **Too many facets.** Twenty tiny panels are as hard to read as one
+  overcrowded chart. Keep a facet variable to a handful of levels; use
+  `col_wrap` to keep the block compact.
+- **A high-cardinality facet variable.** Faceting on something with 50+
+  categories produces 50+ unreadable thumbnails. Group rare categories
+  together, filter to the ones you care about, or pick a different view.
+- **Sparse cells.** If some category combinations have almost no data, those
+  panels are nearly empty and waste space — consider a single faceting
+  dimension instead of two.
+
+<Callout type="warn" title="Facet count = col × row">
+Before adding a `row`, do the multiplication. A `col` with 4 levels and a
+`row` with 5 is already 20 panels. Small multiples are a scalpel, not a
+firehose — a few well-chosen facets beat a wall of thumbnails.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Build a 2-by-2 facet grid"
+  instructions={`Using \`tips\`, draw a scatter of \`total_bill\` (x) vs \`tip\` (y) with
+\`sns.relplot\`, faceted into a grid with:
+
+- one **column** per \`time\` (Lunch, Dinner), and
+- one **row** per \`sex\` (Male, Female).
+
+Assign the result to \`g\`. Since each variable has two levels, you should get
+a 2 × 2 grid of panels.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Build the 2x2 faceted relplot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+g = sns.relplot(
+    data=tips, x="total_bill", y="tip",
+    col="time", row="sex",
+    height=3.2,
+)
+`}
+  tests={[
+    {
+      id: "is_grid",
+      name: "Uses a figure-level facet grid",
+      description: "g is a FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Use sns.relplot(...) with col and row, and assign it to g'",
+    },
+    {
+      id: "two_by_two",
+      name: "Is a 2 x 2 grid",
+      description: "col=time (2) by row=sex (2)",
+      code: "assert g.axes.shape == (2, 2), f'Expected a 2x2 grid, got shape {g.axes.shape}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is "faceting" (drawing small multiples) in Seaborn?
+
+- Overlaying every group's data in a single set of axes using different colors.
+  > That's what \`hue\` does. Faceting gives each group its *own* panel rather than overlaying them.
+- [o] Splitting the data by one or two categorical variables and drawing the same plot once per group, arranged in a grid.
+  > Faceting (\`col\`/\`row\`) repeats one chart across panels — one per category (combination) — so groups can be compared side by side.
+- Computing summary statistics for each group.
+  > Faceting is about layout, not aggregation; the per-panel plot may or may not aggregate.
+- Changing the color palette across the figure.
+  > Palettes are cosmetic; faceting changes how many panels there are and what data each shows.
+
+Faceting = the same chart repeated across a grid of category panels (small
+multiples).`}
+/>
+
+<MultipleChoice
+  markdown={`You facet with \`col\` (3 levels) **and** \`row\` (4 levels). How many panels
+do you get?
+
+- 7, one per category level.
+  > Faceting isn't additive across the two dimensions.
+- [o] 12 — the product of the levels (3 × 4).
+  > A 2-D facet grid has one panel for every *combination* of col and row levels, so 3 × 4 = 12.
+- 1, with all groups overlaid.
+  > Overlaying is \`hue\`; \`col\`/\`row\` produce separate panels.
+- 3, ignoring the row variable.
+  > Both faceting variables apply; the row variable multiplies the panel count.
+
+The grid size is \`col\` levels × \`row\` levels — which is exactly why grids
+can explode if you're not careful.`}
+/>
+
+<MultipleChoice
+  markdown={`In the explicit \`FacetGrid\` workflow, what does the \`map\` (or
+\`map_dataframe\`) step do?
+
+- It creates the grid of empty axes.
+  > That happens when you construct the \`FacetGrid\` object; \`map\` comes afterward.
+- [o] It applies a plotting function to each data subset, drawing the same plot in every panel.
+  > After the grid is set up, \`map\`/\`map_dataframe\` runs your chosen plotting function on each facet's slice of the data.
+- It adds the legend to the figure.
+  > That's \`add_legend()\`, a separate final step.
+- It melts the data into long form.
+  > Reshaping is a pandas concern done before plotting; \`map\` only draws.
+
+The workflow is: construct the grid, \`map\` a plot onto each subset, then
+\`add_legend()\` — which is precisely what \`relplot\` automates.`}
+/>
+
+<MultipleChoice
+  markdown={`You facet a plot on a column that has 60 distinct values. What's the likely
+result, and a better approach?
+
+- A single clear chart; no problem at all.
+  > Faceting on 60 levels makes 60 panels, which is the opposite of clear.
+- [o] About 60 tiny, unreadable panels — better to filter to a few categories of interest or group the rare ones.
+  > Each level becomes its own panel, so high-cardinality faceting produces a wall of thumbnails; reducing the number of facets restores readability.
+- Seaborn automatically picks the 5 most important categories.
+  > Seaborn faithfully facets every level; it won't silently drop categories for you.
+- The panels will overlap into one.
+  > They won't merge; you'll get many separate, cramped panels.
+
+Faceting is for a *handful* of categories; with high cardinality, filter,
+group, or choose a different view.`}
+/>
+
+You can now break a dataset into comparable panels and know when not to.
+Two specialized grids remain — the all-pairs **pair plot** and the
+margin-equipped **joint plot** — which apply this same "set up a grid, map
+plots onto it" idea to specific questions.

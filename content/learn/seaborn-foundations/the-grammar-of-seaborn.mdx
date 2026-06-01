@@ -1,0 +1,390 @@
+---
+title: "How Seaborn Thinks"
+description: "Seaborn's declarative, dataset-oriented mental model — and how it sits on top of matplotlib."
+---
+
+There are two ways to ask a computer to draw a chart, and the difference
+between them is the difference between fighting your tools and flowing with
+them.
+
+The first way is **imperative**: you give step-by-step drawing instructions.
+*Loop over the groups. For each group, pick a color. Scatter these points in
+that color. Now build a legend. Now label the axes.* You are the one doing
+the bookkeeping, and the code reads like a recipe for a machine.
+
+The second way is **declarative**: you describe the *result* you want and let
+the library figure out the steps. *Put this column on x, that column on y,
+and color by this third column.* You describe the chart in the vocabulary of
+your data, and the plumbing disappears.
+
+Seaborn is built around the declarative idea, and matplotlib — the library
+Seaborn draws on — is the imperative one underneath. Understanding that
+relationship is the mental model that makes everything else in this course
+click.
+
+## The imperative way (matplotlib by hand)
+
+Let's draw a concrete chart the imperative way first, so the contrast lands.
+We want flipper length vs. body mass for the `penguins` dataset, with each
+**species** in its own color and a legend explaining the colors.
+
+In raw matplotlib, *you* are responsible for every group, every color, and
+the legend:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import matplotlib.pyplot as plt
+import seaborn as sns  # only used here to fetch the example data
+
+penguins = sns.load_dataset("penguins")
+
+fig, ax = plt.subplots(figsize=(6, 4))
+
+# We must split the data into groups ourselves...
+species_list = penguins["species"].unique()
+colors = ["tab:blue", "tab:orange", "tab:green"]
+
+# ...loop over each group, pick a color, and scatter it...
+for species, color in zip(species_list, colors):
+    subset = penguins[penguins["species"] == species]
+    ax.scatter(
+        subset["flipper_length_mm"],
+        subset["body_mass_g"],
+        color=color,
+        label=species,   # remember the label for the legend
+        alpha=0.8,
+    )
+
+# ...then build the legend and label the axes by hand.
+ax.set_xlabel("flipper_length_mm")
+ax.set_ylabel("body_mass_g")
+ax.legend(title="species")
+`}
+/>
+
+Count what you had to manage: finding the unique species, choosing a color
+list (and hoping there are enough colors for the groups), filtering the
+DataFrame three times, remembering a `label` on every call so the legend
+works, and writing the axis labels and legend yourself. Add a fourth species
+and you must extend the color list. Want to also split by `sex` into separate
+panels? Now you are managing a grid of subplots too. Every new question costs
+more scaffolding.
+
+None of that bookkeeping is the *idea* you care about. It is overhead.
+
+## The declarative way (Seaborn)
+
+Here is the exact same picture in Seaborn. You name the columns and the
+**roles** they play; Seaborn does the grouping, the colors, the legend, and
+the labels.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# One call. Name the columns and their roles; Seaborn does the rest.
+sns.relplot(
+    data=penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    hue="species",
+    height=4, aspect=1.2,
+)
+`}
+/>
+
+That is the whole thing. No loop, no color list, no manual legend, no axis
+labels — Seaborn inferred all of it from the data and the roles you assigned.
+Change `hue="species"` to `hue="island"` and it recolors, re-groups, and
+rebuilds the legend automatically. Add `col="sex"` and it lays out a panel
+per sex with shared axes. The code stays the size of the *question*, not the
+size of the drawing instructions.
+
+<Callout type="tip" title="The core shift">
+Stop thinking *"loop, draw, label, legend."* Start thinking *"which column
+plays which **role**?"* That single reframing — from drawing steps to
+column-to-role assignments — is what "thinking in Seaborn" means.
+</Callout>
+
+<MultipleChoice
+  markdown={`The two code blocks above produce essentially the same chart. What is the
+main thing the Seaborn version did *for* you that you had to do by hand in
+matplotlib?
+
+- It computed more accurate point positions.
+  > Both versions plot the same points at the same positions; accuracy is identical. The difference is who manages the grouping and legend.
+- [o] It split the data into species groups, assigned colors, and built the legend automatically from the \`hue\` column.
+  > Mapping a column to \`hue\` told Seaborn to group, color, and legend by that column — replacing the manual loop, color list, and \`ax.legend\` call.
+- It made the figure render faster.
+  > Speed is not the point and is roughly the same. The win is that declarative role-assignment removes the manual bookkeeping.
+- It used a completely different drawing engine instead of matplotlib.
+  > Seaborn still draws with matplotlib underneath. It adds a declarative layer on top rather than replacing the engine.
+
+Declarative means you describe the chart in terms of your data; the library
+translates that into the imperative drawing steps.`}
+/>
+
+## The vocabulary: columns mapped to roles
+
+Almost every Seaborn function speaks the same small language. You always
+start from one **tidy DataFrame** (`data=`) and then assign its columns to
+**roles**. Learn these roles once and they transfer to every chart type in
+the course.
+
+**Positional channels** place a point in space — the encodings the eye reads
+most precisely:
+
+* `x` — the column on the horizontal axis.
+* `y` — the column on the vertical axis.
+
+**Semantic channels** add extra variables by varying an appearance:
+
+* `hue` — color. A categorical column gets distinct colors and a legend; a
+  numeric column gets a continuous color gradient and a colorbar.
+* `size` — marker (or line) size, for a roughly-read numeric or categorical
+  variable.
+* `style` — marker shape and/or dash pattern, for a categorical variable.
+
+**Facet channels** split one plot into a grid of small panels — sometimes
+called *small multiples*:
+
+* `col` — one column of panels per category.
+* `row` — one row of panels per category.
+
+And one more selector that picks *which kind* of chart to draw:
+
+* `kind` — e.g. `relplot(kind="scatter")` vs `relplot(kind="line")`, or
+  `displot(kind="hist")` vs `displot(kind="kde")`.
+
+| Role | Visual property | Typical column type |
+| ---- | --------------- | ------------------- |
+| `x`, `y` | position on an axis | numeric or categorical |
+| `hue` | color | categorical or numeric |
+| `size` | marker / line size | numeric (or categorical) |
+| `style` | marker shape / dashes | categorical |
+| `col`, `row` | which panel | categorical |
+
+<Callout type="info" title="Position is precise; shape and size are not">
+The eye reads **position** (x, y) most accurately, **color** well for a few
+categories, and **shape** and **size** only roughly. Map your most important
+variables to x and y, reach for `hue` next, and save `size` and `style` for a
+secondary variable you only need to read approximately. More channels is not
+the same as more insight.
+</Callout>
+
+## Seaborn computes statistics for you
+
+Here is the part that earns the word *statistical* in "statistical
+visualization." Seaborn does not just place dots — for many chart types it
+**computes a statistical transform** from your raw rows and plots the result.
+You hand it observations; it hands you back a summary, drawn.
+
+* `countplot` **counts** how many rows fall in each category.
+* `barplot` and `pointplot` compute a **mean** per group and draw an error
+  bar — a **confidence interval** — around it by default.
+* `histplot` / `displot` **bin** values to estimate a distribution; add
+  `kde=True` for a smooth **density** curve.
+* `lineplot` aggregates repeated y-values at each x into a **mean with a
+  confidence band**.
+* `regplot` / `lmplot` fit and draw a **regression** line with its uncertainty.
+* `heatmap` renders a **matrix** of values (often a correlation matrix) as
+  colored cells.
+
+You will meet each of these in its own chapter. The pattern to absorb now:
+you give Seaborn raw data and a question; it does the grouping and the
+arithmetic and shows you the answer.
+
+<Callout type="warn" title="Modern argument: errorbar, not ci">
+When you reach the chart types that draw uncertainty, control it with
+`errorbar` — for example `errorbar=("ci", 95)` for a 95% confidence interval,
+or `errorbar=None` to switch it off. Older tutorials use a `ci=` argument that
+newer Seaborn has replaced; prefer `errorbar`.
+</Callout>
+
+## It still returns matplotlib — so you can fine-tune
+
+Declarative does not mean a locked black box. Because Seaborn draws *on top
+of* matplotlib, every call hands back real matplotlib objects you can keep
+adjusting:
+
+* **Axes-level** functions (`scatterplot`, `histplot`, `boxplot`, `heatmap`,
+  ...) draw onto a single matplotlib `Axes` and **return that Axes**. You can
+  then call `ax.set_title(...)`, `ax.set_xlabel(...)`, and so on.
+* **Figure-level** functions (`relplot`, `displot`, `catplot`, `lmplot`,
+  `pairplot`, `jointplot`) create and manage their *own* figure and **return a
+  grid object** (a `FacetGrid` and its relatives). You adjust it with grid
+  methods like `g.set_axis_labels(...)`, `g.set_titles(...)`, and
+  `g.figure.suptitle(...)`.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# A figure-level call returns a grid object, here named g.
+g = sns.relplot(
+    data=penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    hue="species",
+    height=4, aspect=1.2,
+)
+
+# Seaborn picked sensible defaults; now we touch them up via the grid.
+g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
+g.legend.set_title("Species")
+g.figure.suptitle("Penguin size by species", y=1.03)
+`}
+/>
+
+So the workflow is: let Seaborn make a good chart fast, then drop down to
+matplotlib for the last 10% of polish. We give that polish its own page later;
+for now, just know the escape hatch is always there.
+
+<Callout type="tip" title="Figure-level vs. axes-level (a coming chapter)">
+That split — functions that build a whole *figure* and return a grid, versus
+functions that draw on one *Axes* and return it — is one of the most useful
+distinctions in Seaborn, and it has its own dedicated page later. The quick
+rule for now: reach for a **figure-level** function (like `relplot`) when you
+might want multiple panels via `col`/`row`, and an **axes-level** function
+(like `scatterplot`) when you are placing one chart onto an Axes you control.
+</Callout>
+
+## A common mistake: titling a figure-level grid
+
+Because figure-level functions return a *grid* rather than a single Axes,
+reaching for the usual `plt.title("...")` does not do what you expect — it
+acts on matplotlib's notion of the "current axes," which on a multi-panel grid
+is just the last panel. The result is a title stuck on one sub-panel instead
+of the whole figure.
+
+The fix is to talk to the grid. Use `g.figure.suptitle("...")` for a
+figure-wide title, and `g.set_titles("{col_name}")` to control the per-panel
+captions. Match the method to the object you actually have, and surprises like
+this disappear.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Describe a grouped scatter in one line"
+  instructions={`Put the declarative model into practice. Using the \`tips\` dataset and a
+single \`sns.relplot\` call, draw a scatter plot of:
+
+- \`total_bill\` on the x-axis,
+- \`tip\` on the y-axis,
+- colored by \`time\` (lunch vs. dinner) — assign it to the \`hue\` role.
+
+Assign the returned grid object to a variable named \`g\`. You should not need
+a loop, a color list, or any manual legend code — that is the whole point.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Build the grouped scatter with one relplot call, assigned to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+g = sns.relplot(
+    data=tips,
+    x="total_bill",
+    y="tip",
+    hue="time",
+    height=4, aspect=1.2,
+)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses a figure-level relplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.relplot(...) to g'",
+    },
+    {
+      id: "axes",
+      name: "Correct x and y columns",
+      description: "total_bill vs tip",
+      code: "ax = g.ax\nassert ax.get_xlabel() == 'total_bill', f'x should be total_bill, got {ax.get_xlabel()!r}'\nassert ax.get_ylabel() == 'tip', f'y should be tip, got {ax.get_ylabel()!r}'",
+    },
+    {
+      id: "legend",
+      name: "Colored by time (legend present)",
+      description: "Mapping hue builds a legend automatically",
+      code: "assert g._legend is not None, 'Map hue=\"time\" so Seaborn colors the points and builds a legend'",
+    },
+  ]}
+/>
+
+Notice the test simply checks that a legend *exists* — you never wrote a line
+of legend code. Mapping a column to `hue` is what produced it. That is
+declarative plotting in miniature.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which description best captures Seaborn's **declarative, dataset-oriented**
+approach?
+
+- You issue low-level drawing commands (move here, draw a point, draw a line) one at a time.
+  > That is the *imperative* style, which is how raw matplotlib works. Seaborn sits a declarative layer above it.
+- [o] You pass a tidy DataFrame and assign its columns to visual roles (\`x\`, \`y\`, \`hue\`, \`col\`, ...), and Seaborn handles the grouping, statistics, and legend.
+  > Declarative means you describe the desired result in terms of your data's columns and let the library translate that into drawing steps.
+- You must reshape every dataset into a NumPy array before plotting.
+  > Seaborn is built around labeled DataFrame columns, not raw arrays. You name columns; you do not hand it bare arrays.
+- You write the legend and color assignments yourself for full control.
+  > Writing those by hand is the matplotlib approach. Seaborn derives them from your role assignments automatically.
+
+You describe *what* you want to see in terms of columns and roles; Seaborn
+works out *how* to draw it.`}
+/>
+
+<MultipleChoice
+  markdown={`You map \`hue\` to a column. Seaborn shows a continuous **color gradient with a
+colorbar** instead of a set of distinct colors with a category legend. What
+does that tell you about the column?
+
+- The column has too many categories for a legend.
+  > A column with many *categories* still gets discrete colors (and a possibly long legend), not a continuous gradient. The gradient signals a different data type.
+- [o] The column is **numeric (continuous)**, so Seaborn maps it to a continuous color scale.
+  > Seaborn inspects the column's type: numeric \`hue\` becomes a gradient with a colorbar, while categorical \`hue\` becomes distinct colors with a legend.
+- You accidentally passed a list to \`hue\` instead of a column name.
+  > Passing a column name is exactly right; the gradient is the normal behavior for a numeric column, not a sign of a mistake.
+- Seaborn could not find the column and fell back to a default.
+  > If the column were missing you would get an error, not a colorbar. The colorbar is a deliberate choice for numeric data.
+
+The *same* \`hue\` parameter behaves two ways — discrete for categorical
+columns, continuous for numeric ones — chosen automatically from the column's
+type.`}
+/>
+
+<MultipleChoice
+  markdown={`Seaborn is often called a layer that "sits on top of matplotlib." What is one
+practical consequence of that relationship?
+
+- Seaborn charts cannot be customized at all once drawn.
+  > The opposite is true: because Seaborn returns matplotlib objects (an \`Axes\` or a grid), you can keep adjusting titles, labels, and more.
+- You must import and call matplotlib for every Seaborn chart to render.
+  > Seaborn renders its charts on its own; you only reach for matplotlib when you want extra fine-tuning, not to make plots appear.
+- [o] Seaborn returns real matplotlib objects, so you can fine-tune a chart with matplotlib methods after Seaborn builds it.
+  > Axes-level functions return an \`Axes\` and figure-level functions return a grid backed by a matplotlib figure, both of which expose matplotlib methods for further tweaks.
+- Seaborn replaces matplotlib entirely and shares no objects with it.
+  > Seaborn does not replace matplotlib; it builds on it and hands matplotlib objects back to you.
+
+Declarative convenience on top, full imperative control underneath — you get
+both.`}
+/>
+
+You now have the mental model the rest of the course rests on: **a tidy table,
+columns assigned to roles, statistics computed for you, and matplotlib
+underneath for polish.** Next we put it to work in a repeatable habit — the
+**exploratory data analysis** loop for getting to know a brand-new dataset.

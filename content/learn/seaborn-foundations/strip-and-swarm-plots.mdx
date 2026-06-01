@@ -1,0 +1,280 @@
+---
+title: Strip and Swarm Plots
+description: catplot kind='strip' and kind='swarm' — showing every single observation across categories.
+---
+
+Bars and boxes summarize. Sometimes that is exactly wrong: you want to *see
+the data itself* — every observation, in every group, with nothing averaged
+away. That is what **strip** and **swarm** plots do. They put a categorical
+variable on one axis, a numeric variable on the other, and draw **one mark
+per row**. Nothing is hidden, because nothing is summarized.
+
+Both are `catplot` kinds: `kind="strip"` and `kind="swarm"`. They show the
+same thing — all the points — and differ only in *how they arrange* points
+that would otherwise land on top of each other.
+
+## Strip plot: every point, with jitter
+
+A **strip plot** is a scatter of all the observations over each category.
+The problem it has to solve: every point in a group shares the same category,
+so they would all stack onto a single vertical line and you could not tell
+one from a hundred. The fix is **jitter** — a small random horizontal
+nudge that spreads the points out so you can see them.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# One dot per bill, jittered within each day so they don't stack up.
+sns.catplot(data=tips, x="day", y="total_bill", kind="strip", height=4)
+`}
+/>
+
+Every bill is on the chart. You can *see* that weekends carry more
+observations, where the bills cluster, and the few high outliers sitting
+well above the crowd. The horizontal spread within each day is meaningless —
+it is just jitter to separate the dots — but the vertical position is the
+real `total_bill`.
+
+You can control the jitter. `jitter=False` collapses every point back onto
+the category line (useful only when values rarely collide); a number like
+`jitter=0.3` widens the spread. The default is usually right.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Turn jitter off to see WHY it exists: points collapse onto one line.
+sns.catplot(data=tips, x="day", y="total_bill", kind="strip",
+            jitter=False, height=4)
+`}
+/>
+
+With jitter off, dense regions become a solid stripe and you lose the sense
+of how many points are there. That stripe is the problem jitter solves.
+
+## Swarm plot: nudge every point so none overlap
+
+A **swarm plot** takes the idea further. Instead of *random* jitter, it
+places points with a deliberate sideways nudge so that **no two points
+overlap at all**. The result is that each category's points fan out into a
+shape — and that shape's width at any height tells you the **density** of
+points there. It is a strip plot and a rough distribution in one.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Points nudged apart so none overlap; the width shows where they pile up.
+sns.catplot(data=tips, x="day", y="total_bill", kind="swarm", height=4)
+`}
+/>
+
+Look at the *shape* each day makes: it bulges where bills are common and
+narrows where they are rare. You are reading a density curve and counting
+individual points at the same time. For small and medium datasets, a swarm
+is often the most information-rich way to show a group.
+
+<Callout type="warn" title="Swarm does not scale">
+A swarm has to find a non-overlapping spot for *every* point, which is slow
+and — past a few hundred points per category — simply impossible within the
+category's width. Seaborn then prints a warning and quietly lets some points
+overlap, so the "no overlap" guarantee silently breaks. When you hit that,
+switch to a **strip** plot with a low `alpha` (so density shows through
+opacity), or summarize with a **box** or **violin** plot.
+</Callout>
+
+## Why show every point at all
+
+A summary like a bar or a box answers "what is typical?" Showing every point
+answers a richer set of questions that summaries quietly hide:
+
+- **Group sizes (n).** You can literally see that one group has 12
+  observations and another has 200 — a fact a box or bar plot completely
+  conceals.
+- **Clusters and gaps.** Two separate clumps within a group, or an empty
+  band where no values fall, jump out from the raw points and are invisible
+  in a single mean.
+- **Outliers as individuals.** You see the *actual* stray points, not a rule
+  about whiskers — and you can tell one freak value from a genuine second
+  cluster.
+
+This is why raw-point plots shine in **exploration** of small-to-medium
+data: before you trust any summary, the points tell you whether that summary
+is honest.
+
+<Callout type="tip" title="Raw points plus a summary: best of both">
+A popular move is to overlay raw points *on top of* a summary — say a strip
+or swarm drawn over a box or violin — so you get the compact summary and the
+honest individual points together. Doing it robustly means using the
+axes-level functions (`stripplot`, `boxplot`, ...) drawn on the *same* Axes,
+which we build up on the figure-level-vs-axes-level page. For now, know that
+the combination exists and is often the most informative single chart.
+</Callout>
+
+## A second category with `hue` and `dodge`
+
+Map a second categorical variable to **`hue`** to color the points by a
+subgroup. By default the colored points share the same strip; add
+**`dodge=True`** to split the subgroups into separate side-by-side columns so
+you can compare them cleanly.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Color by sex, and dodge so the two groups sit side by side per day.
+sns.catplot(data=tips, x="day", y="total_bill", hue="sex",
+            kind="strip", dodge=True, height=4)
+`}
+/>
+
+With `dodge=True` each day shows two separate little clouds — one per `sex` —
+so you can compare the groups directly instead of squinting at overlapping
+colors. Try setting `dodge=False` to see why the separation helps.
+
+## What strip and swarm plots show, hide, and break on
+
+- **Data types.** Both need a **categorical** variable (the groups) and a
+  **numeric** variable (the value each point carries) — the same inputs as a
+  box or bar plot, just drawn point-by-point.
+- **What they highlight.** Every individual observation: group sizes,
+  clusters, gaps, and true outliers — the texture of the data a summary
+  smooths over.
+- **What they hide.** No explicit summary statistic. There is no drawn mean,
+  median, or quartile unless you overlay one; you read center and spread by
+  eye from the cloud.
+- **When they break.** With **hundreds or thousands of points per category**
+  the dots overplot into a smear (strip) or refuse to stay separated (swarm,
+  which warns and overlaps). At that scale, switch to a low-`alpha` strip, or
+  to a box/violin summary.
+
+<MultipleChoice
+  markdown={`What is the purpose of **jitter** in a strip plot?
+
+- It adds random noise to the numeric measurement to anonymize the data.
+  > Jitter never changes the measured value (the position along the numeric axis); altering the data would misrepresent it.
+- [o] It spreads points apart along the category axis so overlapping observations become visible.
+  > Without jitter, every point in a group lands on the same line and dense regions look like a single mark; the small random offset separates them so you can see how many there are.
+- It computes a smoothed density curve for each group.
+  > A smoothed density is what a KDE or violin draws; jitter just nudges discrete points sideways, it does not estimate a curve.
+- It sorts the points from smallest to largest within each category.
+  > Jitter is a random horizontal offset, not a sort; it does not reorder points by value.
+
+Jitter is a small sideways nudge that stops points from stacking onto one
+line — it changes only their horizontal placement, never the value.`}
+/>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Show every penguin"
+  instructions={`Use \`sns.catplot\` on the \`penguins\` dataset to show **every penguin's
+body mass**, grouped by species.
+
+- Put \`species\` on the x-axis and \`body_mass_g\` on the y-axis.
+- Use \`kind="swarm"\` (or \`kind="strip"\` — either shows every point).
+- Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Build the plot showing every observation, and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+g = sns.catplot(data=penguins, x="species", y="body_mass_g",
+                kind="swarm", height=4)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses catplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.catplot(...) to g'",
+    },
+    {
+      id: "x_is_species",
+      name: "species is on the x-axis",
+      description: "The category sits on x",
+      code: "assert g.ax.get_xlabel() == 'species', f'x should be species, got {g.ax.get_xlabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does a **swarm** plot do that a **strip** plot does not?
+
+- It summarizes each group with quartiles and whiskers.
+  > Quartiles and whiskers describe a box plot; a swarm still draws every individual point, not a summary.
+- [o] It nudges points so none overlap, making the width of each group reflect its density.
+  > A strip uses random jitter (points can still overlap), while a swarm deliberately places points side by side with no overlap, so the resulting shape reveals where values pile up.
+- It plots fewer points to avoid clutter.
+  > A swarm tries to plot *every* point; it draws the same observations as a strip, just arranged so they do not collide.
+- It changes the numeric values to spread them out.
+  > Neither plot alters the measured values; the swarm only adjusts each point's position along the category axis.
+
+A swarm trades speed and scalability for a guarantee of no overlap, turning
+the cloud's width into a readable density.`}
+/>
+
+<MultipleChoice
+  markdown={`You draw a swarm plot of a numeric variable across three categories, each
+with about 2,000 points. Seaborn prints a warning that it could not place all
+the points, and they overlap anyway. What is the best response?
+
+- Ignore the warning, since the plot still rendered.
+  > The warning means the swarm's defining promise — no overlapping points — has broken, so the density it appears to show is no longer trustworthy.
+- Increase the figure height so all points fit.
+  > A taller figure adds vertical room, but swarm crowding is about horizontal width within each category; it will not make thousands of points per group fit without overlap.
+- [o] Switch to a strip plot with a low \`alpha\`, or summarize with a box or violin plot.
+  > At thousands of points per category a swarm cannot keep points separated; a low-opacity strip lets density show through overlap, and a box or violin summarizes cleanly at any scale.
+- Remove two of the three categories so only one remains.
+  > Dropping categories throws away the comparison you set out to make; the readable fix is to change the chart type, not the data.
+
+When a swarm can no longer separate its points, change the encoding — a
+low-\`alpha\` strip or a distribution summary handles large groups gracefully.`}
+/>
+
+<MultipleChoice
+  markdown={`Compared with a bar plot of the mean, what is the main advantage of showing
+**every observation** with a strip or swarm plot?
+
+- It guarantees a cleaner chart with fewer marks to render.
+  > A point-per-row plot has *more* marks, not fewer, and can become cluttered; its advantage is information, not tidiness.
+- It computes confidence intervals more accurately.
+  > Strip and swarm plots draw no interval at all; their value is showing the raw data, not estimating one better.
+- [o] It reveals group sizes, clusters, gaps, and individual outliers that a single summary number conceals.
+  > Drawing each observation exposes how many points there are, whether a group splits into clumps, and which exact values are extreme — all of which a mean (or a bar) collapses away.
+- It works better than any other chart for millions of points.
+  > At very large scales raw-point plots overplot badly; they shine on small-to-medium data, where each point is still visible.
+
+Showing every point trades compactness for honesty: you see the texture of
+each group instead of one summarizing number.`}
+/>
+
+That completes the categorical family, from a single summarizing bar all the
+way to every individual point. You now have a full toolkit for comparing a
+numeric measurement across groups — and the judgment to choose how much of
+the data to reveal. Next we shift from comparing groups to modeling
+relationships, with **regression and trend** plots.

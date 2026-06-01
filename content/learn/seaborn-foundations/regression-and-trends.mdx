@@ -1,0 +1,362 @@
+---
+title: Regression and Trend Lines
+description: lmplot and regplot — fitting a line or curve through a scatter to summarize a relationship, without fooling yourself.
+---
+
+A scatter plot shows you *every* point. Often you want one more thing: a
+single line drawn through the cloud that says "on average, as x goes up, y
+does *this*." That line is a **regression fit**, and Seaborn can add it on
+top of the scatter for you.
+
+A fitted line is a powerful summary — and a powerful way to mislead
+yourself. It can imply a relationship is simpler, stronger, or more
+trustworthy than the data really supports. So this page teaches the tools
+*and* the discipline: how to draw a trend line, and how to keep it honest.
+
+## What a regression line is (and isn't)
+
+Seaborn has two functions that draw a scatter **plus** a fitted line:
+
+- **`sns.regplot`** — axes-level. Draws onto a single Axes and returns it.
+- **`sns.lmplot`** — figure-level. Makes its own figure and, crucially,
+  supports `hue`, `col`, and `row` to fit lines per group or per panel.
+
+Both draw the same two things: the **points**, and a line that estimates
+the *central tendency of y for each value of x* — your best single guess
+for y given x. Around that line is a translucent band.
+
+<Callout type="info" title="What the shaded band means">
+The band is a **95% confidence interval for the fitted line itself** — a
+measure of how well-pinned-down the *line* is, given this sample. It is
+**not** a range that contains 95% of the data points, and it is not a
+prediction interval for a new observation. A narrow band means "we're
+fairly sure where the average sits," not "most points fall in here."
+</Callout>
+
+## The minimum
+
+Map two numeric columns and let `lmplot` fit a straight line:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Scatter + a straight-line fit + a 95% CI band, in one call.
+sns.lmplot(data=tips, x="total_bill", y="tip", height=4)
+`}
+/>
+
+The line slopes up: larger bills tend to come with larger tips. The band is
+narrow in the middle — where most bills sit, so the average is well
+estimated — and flares at the extremes, where there are fewer points to
+pin it down. Notice the points are still there: the line is a *summary
+laid over the evidence*, never a replacement for it.
+
+## A line per group with `hue`
+
+Because `lmplot` is figure-level, mapping a categorical column to **`hue`**
+fits a *separate* line for each group and colors them. This answers a
+sharper question: does the relationship *differ* between groups?
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# One fitted line per smoker / non-smoker group.
+sns.lmplot(data=tips, x="total_bill", y="tip", hue="smoker", height=4, aspect=1.2)
+`}
+/>
+
+Now you can compare slopes directly. If two lines are nearly parallel, the
+groups respond to `total_bill` similarly; if they fan apart, the
+relationship itself depends on the group. (Want them side by side instead
+of overlaid? Use `col="smoker"` for one panel each — the same faceting idea
+from the relational plots.)
+
+## The key lesson: a straight line on a curve lies
+
+A straight fit assumes the relationship *is* a straight line. When it
+isn't, the line is not just imprecise — it is **wrong**, and it will lie to
+you confidently. The `mpg` dataset shows this beautifully: fuel efficiency
+versus engine horsepower.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+# Force a STRAIGHT line through a clearly curved relationship.
+sns.lmplot(data=mpg, x="horsepower", y="mpg", height=4, aspect=1.3)
+`}
+/>
+
+Look closely at how the line sits against the points. The relationship
+bends — mpg falls steeply at low horsepower and then flattens — but the
+straight line splits the difference. It runs *above* the data at both ends
+and *below* it in the middle. Read off any prediction and it is off. The
+line is precise-looking and simply incorrect.
+
+There are two honest fixes.
+
+**Fit a curve with `order`.** Setting `order=2` fits a degree-2 polynomial
+(a parabola), which can follow a single bend:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+# A degree-2 polynomial bends to follow the curve.
+sns.lmplot(data=mpg, x="horsepower", y="mpg", order=2, height=4, aspect=1.3)
+`}
+/>
+
+**Or let the data choose its own shape with `lowess=True`.** LOWESS is a
+*locally weighted* smoother: instead of assuming any global formula, it
+fits the trend in small neighborhoods and stitches them together. It is the
+best "just show me the shape, don't impose one" option.
+
+```text
+sns.lmplot(data=mpg, x="horsepower", y="mpg", lowess=True)
+```
+
+The polynomial curve hugs the points far better than the straight line did,
+and a LOWESS fit would bend with them even more flexibly. The lesson
+generalizes: **always eyeball the scatter first.** If it bends, a straight
+`lmplot` is the wrong summary, and you reach for `order=` or `lowess=True`.
+
+<MultipleChoice
+  markdown={`You draw \`sns.lmplot(data=mpg, x="horsepower", y="mpg")\` and the straight
+line clearly sits *above* the points at both ends and *below* them in the
+middle. What is the right conclusion?
+
+- Horsepower and mpg are unrelated, so the line is flat noise.
+  > The points show a strong, clear relationship — it is just *curved*. "Unrelated" would look like a shapeless cloud with a roughly flat fit.
+- [o] The relationship is curved, so a straight-line fit is the wrong model; use \`order=2\` or \`lowess=True\`.
+  > A systematic over/under/over pattern is the signature of fitting a line to a curve. Letting the fit bend — a polynomial or a LOWESS smoother — matches the data's actual shape.
+- The confidence band is too narrow and should be widened.
+  > The band describes uncertainty in the fitted line; it cannot rescue a fit whose *shape* is wrong. The fix is a better curve, not a wider band.
+- You should remove the points and keep only the line for clarity.
+  > The mismatch is only visible *because* the points are shown. Hiding them would conceal exactly the problem you need to see.
+
+When a straight fit shows a systematic high-low-high pattern against the
+points, the model shape is wrong, not merely the precision.`}
+/>
+
+## Two more fitting options, briefly
+
+**`robust=True`** down-weights outliers so a few extreme points can't drag
+the whole line toward themselves. Use it when a handful of stray points are
+distorting an otherwise clear linear trend (it is slower, since it
+re-weights iteratively).
+
+```text
+sns.lmplot(data=tips, x="total_bill", y="tip", robust=True)
+```
+
+**`logistic=True`** is for a **binary** outcome — a y that is only 0 or 1.
+Instead of a straight line, it fits an S-shaped logistic curve estimating
+the *probability* that y = 1 as x changes. The `titanic` dataset has a 0/1
+`survived` column:
+
+```text
+# survived is 0/1; a logistic fit estimates P(survived) vs age.
+sns.lmplot(data=titanic, x="age", y="survived", logistic=True)
+```
+
+A straight line here would happily predict probabilities above 1 or below
+0, which is nonsense; the logistic curve stays between 0 and 1 by design.
+
+## Diagnosing a fit with `residplot`
+
+How do you *check* whether a straight line was appropriate, rather than
+just eyeballing it? Plot the **residuals** — the leftover gap between each
+point and the line — against x. `sns.residplot` does this. The rule is
+simple:
+
+- **Patternless cloud around zero** → the straight-line model captured the
+  trend; what's left is just noise.
+- **A visible curve in the residuals** → the model missed a bend, so the
+  straight fit is wrong (exactly the `horsepower`/`mpg` situation).
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+# Residuals of a STRAIGHT fit. A curve here = the line was wrong.
+sns.residplot(data=mpg, x="horsepower", y="mpg")
+`}
+/>
+
+The residuals smile (a U-shape) rather than scattering flatly around zero —
+a clear signal that the relationship bent and a straight line could not
+follow it.
+
+## The cautions that matter most
+
+A trend line is the easiest plot to over-trust. Three rules keep you
+honest.
+
+<Callout type="danger" title="Association is not causation">
+A sloping line means x and y *move together* in this data. It says nothing
+about whether changing x would *cause* y to change. Larger bills come with
+larger tips — but that does not prove that inflating a bill *causes* a
+bigger tip; party size, service, and occasion all lurk behind both. A
+regression line describes an association; only careful study design earns
+the word "causes."
+</Callout>
+
+<Callout type="warn" title="Never extrapolate past the data">
+The fit is only evidence *within* the range of x you actually observed.
+Extending the line to horsepower values you have no data for is guesswork
+dressed up as a measurement — and if the true relationship curves (as
+`mpg` does), the extrapolation is not just uncertain, it is wrong. Trust
+the line only over the x-range the points cover.
+</Callout>
+
+<Callout type="tip" title="Always show the points">
+The band is *not* the data, and the line is *not* the data — the points
+are. Showing them is what let you catch the curved-fit problem above. A
+lonely line with a shaded band hides whether the fit is any good. Keep the
+scatter visible so the summary stays accountable to the evidence.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Fit a line per group"
+  instructions={`Using the \`tips\` dataset, draw a regression plot with **\`sns.lmplot\`**:
+
+- \`total_bill\` on the x-axis,
+- \`tip\` on the y-axis,
+- a separate fitted line per \`smoker\` group (use \`hue\`).
+
+Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Build the lmplot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+g = sns.lmplot(
+    data=tips,
+    x="total_bill",
+    y="tip",
+    hue="smoker",
+    height=4,
+    aspect=1.2,
+)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses lmplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.lmplot(...) to g'",
+    },
+    {
+      id: "x_axis",
+      name: "total_bill is on the x-axis",
+      description: "x maps to total_bill",
+      code: "assert g.ax.get_xlabel() == 'total_bill', f'x should be total_bill, got {g.ax.get_xlabel()!r}'",
+    },
+    {
+      id: "hue_legend",
+      name: "Colored by smoker",
+      description: "A legend is present for the hue groups",
+      code: "assert g._legend is not None, 'Map hue=\"smoker\" so each group gets its own line and a legend'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the line drawn by \`regplot\` / \`lmplot\` represent?
+
+- The path connecting every data point in order.
+  > That describes a line *plot* of ordered data. A regression line is a single fitted summary, not a connect-the-dots path.
+- [o] An estimate of the average value of y for each value of x.
+  > The fit summarizes the central tendency of y given x — your best single guess for y at a given x — drawn over the scatter of individual points.
+- The boundary that separates outliers from normal points.
+  > Regression does not classify points as in/out; it summarizes the overall trend, and outliers still influence (and appear on) the plot.
+- The 95% range that contains most of the data.
+  > That confuses the line with its band — and even the band is a CI for the *line*, not a range covering most points.
+
+The fitted line estimates the conditional average of y as x varies.`}
+/>
+
+<MultipleChoice
+  markdown={`The translucent band around an \`lmplot\` line is best described as:
+
+- A region guaranteed to contain 95% of the data points.
+  > Many points routinely fall outside the band. It quantifies uncertainty in the *line*, not the spread of observations.
+- The range of a future single prediction.
+  > That is a prediction interval, which is wider. The default band is about the fitted line, not individual new points.
+- [o] A 95% confidence interval for the fitted line itself.
+  > It expresses how well the sample pins down the line's position — narrow where data is dense, wider where it is sparse.
+- The standard deviation of x.
+  > The band concerns uncertainty in the y-direction fit; it is unrelated to the spread of x.
+
+The shaded region is uncertainty about the line, which is why it widens
+where observations thin out.`}
+/>
+
+<MultipleChoice
+  markdown={`Your scatter of \`horsepower\` vs \`mpg\` is clearly curved. Which approach
+gives an honest trend?
+
+- Keep the straight fit but widen the confidence band.
+  > A wider band cannot fix a fit whose *shape* is wrong; it would still run above the data at the ends and below it in the middle.
+- Drop the points so only the straight line shows.
+  > Hiding the points conceals the mismatch instead of addressing it — the opposite of honest.
+- [o] Use \`order=2\` for a polynomial fit, or \`lowess=True\` to follow the local trend.
+  > Both let the fit *bend* to match the data's real shape rather than forcing a straight line through a curve.
+- Swap to \`regplot\`; it automatically detects curvature.
+  > \`regplot\` fits a straight line by default just like \`lmplot\`; you must explicitly ask for \`order=\` or \`lowess=\`.
+
+When the relationship bends, the fix is to let the fit bend too — via a
+polynomial order or a LOWESS smoother.`}
+/>
+
+<MultipleChoice
+  markdown={`A regression of ice-cream sales on drowning incidents shows a strong upward
+line. What can you correctly conclude?
+
+- Buying ice cream causes drownings.
+  > A line shows association, not causation. Inventing a causal arrow from a slope is precisely the mistake to avoid.
+- Drownings cause people to buy ice cream.
+  > Reversing the causal arrow is no more justified — the fit is symmetric about which variable "causes" the other.
+- [o] The two variables are associated in this data; a lurking factor (like hot weather) may drive both.
+  > A slope establishes that the variables move together; an unmeasured common cause such as summer heat can produce that association with no direct link between them.
+- Nothing — a positive slope carries no information at all.
+  > It does carry information: the variables co-vary. The error is leaping from co-variation to causation, not the existence of the association.
+
+A trend line measures association; attributing cause requires reasoning and
+design beyond the plot itself.`}
+/>
+
+You can now lay an honest trend over a scatter — and spot when that trend is
+lying. Next we widen the lens from one pair of variables to *all* of them
+at once, with the **correlation heatmap**.

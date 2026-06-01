@@ -1,0 +1,390 @@
+---
+title: Telling a Story with Data
+description: From exploration to communication — choose the right chart, cut the clutter, and guide the reader's eye.
+---
+
+Up to now most of your charts have been for an audience of one: **you**.
+Exploratory charts are fast, messy, and disposable — you draw twenty of them
+to *find* the interesting thing. But the moment you want to *show* that
+thing to someone else, the job changes completely. The chart stops being a
+tool for looking and becomes a tool for **persuading**.
+
+This page is about that shift, from **exploratory** to **explanatory**.
+Exploratory charts answer *"what is going on in this data?"* and you draw
+them for yourself. Explanatory charts answer *"here is the one thing you
+should take away,"* and you draw them for an audience that will give you a
+few seconds of attention. The data work is the same; the *editing* is
+different.
+
+## Choosing the right chart
+
+Before any polish, the picture has to be the *right kind* of picture. Most
+chart choices follow directly from the **question** you are asking and the
+**types** of the variables involved. This table is your starting map — it
+covers the families this course teaches:
+
+| Your question | Chart family | Seaborn entry point |
+| ------------- | ------------ | ------------------- |
+| How do two **numeric** variables relate? | scatter / line | `relplot`, `scatterplot`, `lineplot` |
+| What does **one** distribution look like? | histogram / KDE / ECDF | `displot`, `histplot`, `kdeplot`, `ecdfplot` |
+| How does a **number** compare across categories? | bar / box / violin | `catplot`, `barplot`, `boxplot`, `violinplot` |
+| How **many** are in each category? | count plot | `countplot`, `catplot(kind="count")` |
+| How do **all pairs** of variables relate? | pair plot | `pairplot` |
+| What is the **correlation structure**? | heatmap | `heatmap` |
+
+Read it as *question → family*. "Relationship between two numbers" almost
+always means a scatter (or a line, if the x-axis is ordered like time). "One
+distribution" means a histogram, KDE, or ECDF. "Compare a number across
+groups" means bar, box, or violin — depending on how much of the
+distribution you want to show. The point is to let the *question* pick the
+chart, not habit or whichever function you remember first.
+
+The same mapping reads naturally as a decision flow — start from the
+question, and the chart family falls out:
+
+```mermaid
+flowchart TD
+    START{"What is your question?"}
+    START -->|"How are two numbers related?"| REL["Scatter / line<br/>relplot"]
+    START -->|"What does one variable look like?"| DIST["Histogram / KDE / ECDF<br/>displot"]
+    START -->|"Compare a number across categories?"| CAT["Bar / box / violin<br/>catplot"]
+    START -->|"How many in each category?"| CNT["Count plot<br/>catplot kind=count"]
+    START -->|"All pairwise relationships?"| PAIR["Pair plot<br/>pairplot"]
+    START -->|"How do variables correlate?"| HEAT["Heatmap of a<br/>correlation matrix"]
+```
+
+The point is to let the *question* pick the chart, not the other way around.
+
+## Cut the clutter
+
+Once the chart type is right, the most reliable way to improve an
+explanatory figure is to **remove** things, not add them. Every gridline,
+border, tick, color, and label competes for the reader's limited attention.
+Anything that is not carrying meaning is **chartjunk**, and it makes the
+signal harder to find.
+
+A short decluttering checklist:
+
+1. **Drop the frame.** `sns.despine()` removes the top and right spines
+   (especially with `style="ticks"` or `"white"`).
+2. **Limit colors.** A figure with eight colors asks the reader to memorize
+   a legend. Fewer, more deliberate colors read faster.
+3. **Prefer direct, short labels.** A unit-bearing axis label
+   (`"Body mass (g)"`) beats a cryptic column name; a direct label next to a
+   line can beat a separate legend entirely.
+4. **Do not over-decorate.** Skip 3-D effects, heavy backgrounds, and
+   gradients-for-decoration. They add ink, not information.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+# A clean canvas plus despine is the fastest decluttering move.
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+g = sns.relplot(
+    data=penguins, x="flipper_length_mm", y="body_mass_g",
+    height=4, aspect=1.2,
+)
+g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
+sns.despine()
+`}
+/>
+
+## Guide the reader's eye
+
+A cluttered chart treats every mark as equally important. An explanatory
+chart does not — it has *one* point to make, and it should steer attention
+straight to it. The most effective tool is **contrast**: make the one thing
+you care about stand out and let everything else recede.
+
+The classic move is a single **accent color** against a gray background.
+Color one group; gray out the rest. The eye goes to the colored element
+immediately, and the grayed groups still provide context without competing:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Highlight ONE day with an accent color; the rest stay neutral gray.
+day_colors = {
+    "Thur": "lightgray",
+    "Fri": "lightgray",
+    "Sat": "#d1495b",   # the one we want the eye to land on
+    "Sun": "lightgray",
+}
+
+g = sns.catplot(
+    data=tips, x="day", y="total_bill", kind="bar",
+    hue="day", palette=day_colors, legend=False,
+    height=4, aspect=1.3, errorbar=None,
+)
+g.set_axis_labels("Day", "Mean total bill (USD)")
+g.figure.suptitle("Saturday brings the biggest bills")
+g.figure.subplots_adjust(top=0.88)
+`}
+/>
+
+A short text annotation can do the same job: one arrow or label on the
+single most important point says "look here" far more clearly than hoping
+the reader finds it. The principle is the same either way — **spend
+contrast on the one thing that matters, and nothing else.**
+
+## Be honest
+
+A chart that misleads — even by accident — costs you the reader's trust the
+moment they notice. A few rules keep you honest:
+
+- **Do not truncate axes to exaggerate.** Starting a bar chart's y-axis at
+  90 instead of 0 can turn a 2% difference into a dramatic-looking cliff.
+  For bars, which encode value by *length*, start at zero.
+- **Show the distribution, not just a mean.** Recall the bar-of-means
+  warning: a single bar hides spread, skew, and outliers. When the shape
+  matters, a box or violin (or the raw points) is more honest than one bar.
+- **Label units.** "Mass" could be grams or kilograms; "price" could be
+  dollars or euros. Unlabeled numbers invite the wrong conclusion.
+
+<Callout type="warn" title="The most common dishonest chart">
+A truncated y-axis on a bar chart is the single most frequent way charts
+mislead, usually unintentionally. Because a bar says "compare these
+*lengths*", cutting off the bottom inflates small differences. Save axis
+truncation for *position*-based charts (like a line plot) where it is a
+legitimate zoom, and even then, say so.
+</Callout>
+
+## Make it accessible
+
+A chart that some of your audience literally cannot read is not doing its
+job. Two habits cover most of it:
+
+- **Use colorblind-friendly palettes.** Roughly 1 in 12 men has some form of
+  color-vision deficiency, and the default red/green contrast is exactly the
+  hard case. Seaborn ships a `palette="colorblind"` option designed to stay
+  distinguishable. (Choosing palettes well — qualitative, sequential,
+  diverging, and colorblind-safe — is the subject of the color palettes
+  page.)
+- **Never rely on color *alone*.** If color is the only thing separating two
+  groups, anyone who can't distinguish those colors loses the message.
+  Reinforce it with a second channel — different marker shapes (`style=`),
+  direct labels, or facets (`col=`) — so the distinction survives in
+  grayscale too.
+
+<MultipleChoice
+  markdown={`Why is it risky to distinguish two groups using **color alone** (for
+example, one red line and one green line with no other difference)?
+
+- Seaborn cannot draw two colors on the same axes.
+  > Seaborn draws multiple colors easily; the concern is whether every reader can *tell them apart*.
+- [o] Readers with color-vision deficiency — or anyone viewing it in grayscale — may not be able to tell the groups apart.
+  > Color alone fails for colorblind readers and in black-and-white printouts; a second channel like marker shape or a direct label keeps the distinction readable.
+- Colored lines are always less accurate than black lines.
+  > Accuracy comes from the data and encoding, not the line color; the issue is perceptual distinguishability.
+- It forces the chart to use a sequential palette.
+  > Palette type is an independent choice; relying on color alone is about redundancy of encoding, not which palette you picked.
+
+Encode group identity with more than one channel so the message does not
+depend on a reader perceiving specific colors.`}
+/>
+
+## Make the title say the message
+
+On an exploratory chart, a title like "Body mass vs. flipper length" is
+fine — it just names the axes for you. On an **explanatory** chart, that is
+a wasted line. The title is the most-read text on the figure, so spend it on
+the **takeaway**, not a restatement of the axes.
+
+- Axes-naming (exploratory): *"Body mass vs. flipper length"*
+- Message-stating (explanatory): *"Heavier penguins have longer flippers"*
+
+The second title tells the reader what to conclude *before* they have
+decoded a single dot — and the chart then confirms it. A good test: if your
+title could sit on top of a completely different dataset's chart, it is
+naming axes, not stating a message.
+
+<MultipleChoice
+  markdown={`Which title is best suited to an **explanatory** chart meant to deliver a
+single takeaway to an audience?
+
+- "body_mass_g vs flipper_length_mm"
+  > Raw column names name the axes and read as a debugging label, not a message for an audience.
+- "Scatter plot of penguin measurements"
+  > This describes the chart type and topic but states no conclusion, so the reader still has to work out the point themselves.
+- [o] "Heavier penguins have longer flippers"
+  > This states the takeaway in plain language, so the audience knows what to conclude before decoding the dots; the chart then confirms it.
+- "Figure 3"
+  > A figure number is a reference label with no content about what the chart shows.
+
+An explanatory title states the *message*; if it could sit on any dataset's
+chart, it is only naming axes.`}
+/>
+
+## A worked example: one clean explanatory figure
+
+Let's build a single explanatory figure end to end. The message: **heavier
+penguins tend to have longer flippers.** We pick the right chart (a scatter,
+since both variables are numeric), declutter (clean style, despine), keep it
+to a modest size, label the axes with units, and — most importantly — give
+it a message-style title.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+g = sns.relplot(
+    data=penguins,
+    x="body_mass_g",
+    y="flipper_length_mm",
+    height=4, aspect=1.3,
+)
+
+# Units on the axes, a message in the title, a light frame.
+g.set_axis_labels("Body mass (g)", "Flipper length (mm)")
+g.figure.suptitle("Heavier penguins have longer flippers")
+g.figure.subplots_adjust(top=0.9)
+sns.despine()
+`}
+/>
+
+Everything on that figure earns its place. There is no extra color (one
+relationship, one mark style), no boxed-in frame, units on both axes, and a
+title that hands the reader the conclusion. That is the difference between a
+chart you *explored* with and a chart you can *show*.
+
+<Callout type="tip" title="The explanatory checklist">
+Before you ship a chart: (1) does the chart *type* fit the question? (2)
+have you removed everything that isn't carrying meaning? (3) does *one*
+element stand out as the point? (4) is it honest — full axes, distribution
+shown, units labeled? (5) does the *title* state the message? Five quick
+questions turn an exploratory sketch into a communicative figure.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Give a chart a message-style title"
+  instructions={`Build a clear scatter of the \`penguins\` dataset showing the relationship
+between flipper length and body mass, then title it with its *message*.
+
+1. With \`sns.scatterplot\`, put \`flipper_length_mm\` on the x-axis and
+   \`body_mass_g\` on the y-axis. Capture the returned \`Axes\` in a variable
+   named \`ax\`.
+2. Set the title to exactly \`Heavier penguins have longer flippers\` (a
+   message-style title, not an axis restatement).`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Draw the scatter and capture the Axes in ax:
+ax = None
+
+# Give it a message-style title:
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+ax = sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+ax.set_title("Heavier penguins have longer flippers")
+`}
+  tests={[
+    {
+      id: "is_axes",
+      name: "ax is a matplotlib Axes",
+      description: "scatterplot is axes-level and returns an Axes",
+      code: "import matplotlib\nassert isinstance(ax, matplotlib.axes.Axes), 'Capture the result of sns.scatterplot(...) in ax'",
+    },
+    {
+      id: "title",
+      name: "Title states the message",
+      description: "The title matches exactly",
+      code: "assert ax.get_title() == 'Heavier penguins have longer flippers', f'Title is {ax.get_title()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What best captures the difference between an **exploratory** and an
+**explanatory** chart?
+
+- Exploratory charts use Seaborn; explanatory charts use matplotlib.
+  > Both can be built with Seaborn plus light matplotlib polish; the difference is purpose, not library.
+- [o] Exploratory charts are for *you* to find what's interesting; explanatory charts are edited to deliver one takeaway to an audience.
+  > Exploration is fast and disposable and answers "what's here?"; explanation is edited down to communicate a single point to someone else.
+- Exploratory charts must be black and white; explanatory charts must be colorful.
+  > Color is a design choice in both; it does not define the distinction.
+- Explanatory charts always contain more data than exploratory ones.
+  > Explanatory charts usually contain *less* — they remove everything that isn't carrying the message.
+
+The split is about audience and intent: discovering for yourself versus
+communicating to others.`}
+/>
+
+<MultipleChoice
+  markdown={`On an explanatory chart, what is the most effective way to direct the
+reader's attention to the single most important group?
+
+- Give every group its own bright, distinct color.
+  > Coloring everything makes all groups compete equally, so nothing stands out — the opposite of guiding attention.
+- [o] Use one accent color (or a short annotation) for that group and gray out the rest.
+  > A single point of contrast against neutral context makes the eye land on the important element immediately while the rest still provides background.
+- Add gridlines and a heavy border to frame the chart.
+  > Extra frame and gridlines are chartjunk that add ink without pointing the reader anywhere.
+- Increase the figure size as much as possible.
+  > A bigger canvas does not create focus; without contrast the reader still has nowhere in particular to look.
+
+Attention follows contrast: spend it on the one element that carries your
+message and let everything else recede.`}
+/>
+
+<MultipleChoice
+  markdown={`You compare average revenue across three regions with a bar chart and start
+the y-axis at 95 (the values are around 98 to 102) so the differences "look
+clearer." Why is this a problem?
+
+- Bar charts cannot have a numeric y-axis.
+  > Bar charts routinely use a numeric y-axis; the issue is *where* it starts.
+- Seaborn refuses to draw bars unless the axis starts at zero.
+  > Seaborn will draw whatever range you set; honesty here is your responsibility, not an enforced rule.
+- [o] A bar encodes value by length, so truncating the axis exaggerates small differences and misleads the reader.
+  > Because the eye compares bar *lengths*, cutting off the bottom turns a few-percent gap into a dramatic-looking one; bars should start at zero.
+- Truncating the axis is fine for bars but not for line plots.
+  > It is the reverse: truncation can be a legitimate zoom on a *position*-based line plot, but it distorts length-based bars.
+
+Bars compare lengths, so a non-zero baseline inflates differences — keep bar
+axes anchored at zero.`}
+/>
+
+<MultipleChoice
+  markdown={`Your figure distinguishes two product lines using a red line and a green
+line, with no other difference between them. What is the best single
+improvement for accessibility?
+
+- Make both lines thicker.
+  > Thicker lines do not help a reader who cannot distinguish red from green; the groups still differ only by color.
+- Switch the background to dark.
+  > A dark background changes the look but does not add a non-color way to tell the two lines apart.
+- [o] Add a second distinguishing channel — different line styles or direct labels — and use a colorblind-friendly palette.
+  > Encoding the difference with more than color (a dashed vs. solid line, or labeling each line) keeps the groups distinguishable for colorblind readers and in grayscale.
+- Remove the legend so readers focus on the lines.
+  > Removing the legend makes the colors *harder* to interpret, not easier, and still leaves color as the only cue.
+
+Never let color be the sole carrier of meaning; reinforce it with shape,
+labels, or facets, and prefer a colorblind-safe palette.`}
+/>
+
+That completes the foundations: you can shape your data, pick the right
+chart, read what it reveals and hides, polish it, and edit it down to a clear
+message. From here it is practice — and the capstone is where you put the
+whole workflow together on a fresh dataset.

@@ -1,0 +1,393 @@
+---
+title: Loading Data and Setting a Theme
+description: Meet Seaborn's built-in datasets and make every chart look good with one call to set_theme.
+---
+
+Before you can practice plotting, you need data — and you would rather not
+go hunting for CSV files for every exercise. Seaborn solves this for you:
+it ships with a handful of small, clean, **already-tidy** datasets that
+load in an instant. Every example and challenge in this course is built on
+them, so it is worth a proper introduction.
+
+You also want your charts to *look* good without fiddling. Seaborn gives
+you that in a single line, `sns.set_theme()`, which sets a pleasant style,
+sizes everything sensibly, and chooses a color palette for every plot you
+draw afterward. This page covers both: where the data comes from, and how
+to make it presentable.
+
+## Loading a built-in dataset
+
+`sns.load_dataset("name")` fetches a named dataset and hands you back an
+ordinary pandas `DataFrame` — the same kind of table you already know how
+to filter, group, and describe. There is nothing to download or install;
+it just works in your browser.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+tips = sns.load_dataset("tips")
+
+# It's a normal pandas DataFrame.
+print(type(tips))
+print(tips.shape)
+display(tips.head())
+`}
+/>
+
+Because the result is a regular DataFrame, every pandas habit you have
+still applies — `.shape`, `.head()`, `.describe()`, `.groupby(...)`, and so
+on. Seaborn just gives you a convenient, reliable starting table.
+
+## The datasets we'll use
+
+A few small built-ins show up again and again in this course. Knowing
+their columns ahead of time means you can read every example without
+guessing. Here are the ones to know.
+
+**`tips`** (244 rows) — one row per restaurant bill. A classic for
+relating a numeric variable to several categories.
+
+* `total_bill`, `tip` — numeric (dollars)
+* `sex`, `smoker`, `day`, `time` — categorical
+* `size` — party size (small integer)
+
+**`penguins`** (344 rows) — body measurements of three penguin species.
+Great for scatter plots and group comparisons. It contains a few missing
+values, which Seaborn quietly drops when plotting.
+
+* `species`, `island`, `sex` — categorical
+* `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, `body_mass_g` —
+  numeric
+
+**`mpg`** (398 rows) — fuel efficiency of cars from the 1970s–80s. A good
+mix of numeric and categorical columns.
+
+* `mpg`, `displacement`, `horsepower`, `weight`, `acceleration` — numeric
+* `cylinders`, `model_year`, `origin`, `name` — categorical-ish
+
+**`iris`** (150 rows) — the most famous dataset in statistics: four flower
+measurements across three species.
+
+* `sepal_length`, `sepal_width`, `petal_length`, `petal_width` — numeric
+* `species` — categorical
+
+**`flights`** (144 rows) — monthly airline passengers from 1949 to 1960.
+Its ordered time axis makes it perfect for line plots and heatmaps.
+
+* `year` — numeric (ordered)
+* `month` — categorical (ordered)
+* `passengers` — numeric
+
+Let's actually look at a couple of them rather than just listing columns.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+penguins = sns.load_dataset("penguins")
+display(penguins.head())
+`}
+/>
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+flights = sns.load_dataset("flights")
+print(flights.shape)
+display(flights.head())
+`}
+/>
+
+<Callout type="tip" title="See what's available">
+Curious what else ships with Seaborn? `sns.get_dataset_names()` returns the
+full list. Stick to the small ones above for fast, snappy exercises — a few
+listed datasets are large enough to slow a plot down.
+</Callout>
+
+## One call to make everything look good: `set_theme`
+
+By default, Seaborn draws on matplotlib's plain look: a white background, no
+gridlines, fairly small text. It is perfectly functional but a little
+spartan. Watch what a bare plot looks like with no theme applied.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+# No set_theme() here — this is the unstyled matplotlib default.
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+Now add **one line** — `sns.set_theme()` — before the same plot. You get a
+soft gray background, clean white gridlines, a tuned color palette, and
+slightly larger, more readable text. Nothing about the *data* changed; only
+its presentation did.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme()  # the whole makeover, in one call
+
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+The difference is purely cosmetic, but cosmetics matter when you are trying
+to *see* and to *communicate*. `set_theme()` bundles several choices —
+**style** (backgrounds and gridlines), **context** (how big everything is),
+and **palette** (the default colors) — into one sensible default. The next
+sections let you steer each of those.
+
+<Callout type="info" title="Why a function and not a setting?">
+`set_theme()` changes matplotlib's global defaults, so it affects every plot
+that comes *after* it. You typically call it once at the top of a notebook
+or script and forget about it. We repeat it in every example here only
+because each block on this page runs on its own.
+</Callout>
+
+## Styles: backgrounds and gridlines
+
+The **style** controls the "canvas" — the background color and whether
+gridlines are drawn. Pass it as `set_theme(style=...)`. There are five
+choices:
+
+* `"darkgrid"` — gray background with white gridlines (the default). Grid
+  helps read values; the muted background keeps data colors popping.
+* `"whitegrid"` — white background with light gridlines. Cleaner, common
+  for print.
+* `"white"` — white background, no grid.
+* `"dark"` — gray background, no grid.
+* `"ticks"` — white background, no grid, with small tick marks on the axes.
+
+Here is `whitegrid` — a white canvas with subtle gridlines.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+Compare that with `ticks`, which drops the grid entirely and adds tick
+marks on the axes — a tidy, minimal look favored in many publications.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+And `dark` — a gray background with no gridlines, which can make brightly
+colored points stand out.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="dark")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+There is no single "right" style. Gridded styles help readers read off
+values; ungridded styles feel cleaner and put more focus on the data
+shapes. Pick based on whether your audience needs to *look up numbers* or
+just *see the pattern*.
+
+<MultipleChoice
+  markdown={`Which \`set_theme\` **style** gives you a plain white background with **no**
+gridlines and small tick marks on the axes?
+
+- \`"whitegrid"\`
+  > That is a white background *with* light gridlines, not tick marks.
+- \`"darkgrid"\`
+  > That is the default: a gray background with white gridlines.
+- [o] \`"ticks"\`
+  > \`"ticks"\` removes the grid and adds short tick marks on the axes — a minimal look common in publications.
+- \`"dark"\`
+  > \`"dark"\` is a gray background with no grid and no tick marks.
+
+The five styles are \`darkgrid\`, \`whitegrid\`, \`dark\`, \`white\`, and \`ticks\`;
+only \`ticks\` adds axis tick marks to an otherwise grid-free canvas.`}
+/>
+
+## Contexts: scaling for the medium
+
+The **context** controls *size* — how large the fonts, lines, and markers
+are — without changing the style. The idea is to match the medium: a chart
+on a slide needs bigger text than the same chart in a journal figure. Pass
+it as `set_theme(context=...)`, from smallest to largest: `"paper"`,
+`"notebook"` (the default), `"talk"`, `"poster"`.
+
+Here is the default `notebook` context.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(context="notebook", style="whitegrid")
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+Now the **same plot** at `talk` context. Everything — labels, ticks, the
+points themselves — scales up, so it stays legible when projected to a
+room. Notice that the data and the style are identical; only the *sizes*
+grew.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(context="talk", style="whitegrid")
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+<Callout type="tip" title="Pick context last, by where the chart will live">
+Choose `style` for the *look* you want and `context` for the *medium* it
+will appear in. A figure headed for slides? `context="talk"` or
+`"poster"`. A dense multi-panel figure for a paper? `context="paper"`.
+</Callout>
+
+## `set_theme` is global and sticky
+
+One subtlety worth internalizing: `set_theme()` does not return a styled
+object or attach to a particular chart. It mutates matplotlib's global
+defaults, so it affects **every plot drawn afterward in the same session**,
+until you call it again with different arguments. Call it once near the top
+of your work, and every subsequent figure inherits the look.
+
+<Callout type="warn" title="Order matters">
+Because the effect is global and forward-looking, `set_theme()` must run
+*before* the plotting call you want it to affect. A plot drawn *before* you
+set the theme keeps the old look. In these single-block examples we always
+put `set_theme()` first for exactly this reason.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Inspect the mpg dataset"
+  instructions={`Load the \`mpg\` dataset with \`sns.load_dataset\`, then compute two
+summary numbers:
+
+1. Store the **number of rows** in a variable named \`n_rows\`.
+2. Store the **mean of the \`"mpg"\` column**, rounded to **1 decimal
+place**, in a variable named \`mean_mpg\` (use Python's \`round(value, 1)\`).
+
+You do not need to draw anything — just create the two variables.`}
+  starterCode={`import seaborn as sns
+
+mpg = sns.load_dataset("mpg")
+
+# 1. Number of rows:
+n_rows = None
+
+# 2. Mean of the "mpg" column, rounded to 1 decimal place:
+mean_mpg = None
+`}
+  solutionCode={`import seaborn as sns
+
+mpg = sns.load_dataset("mpg")
+
+n_rows = len(mpg)
+mean_mpg = round(mpg["mpg"].mean(), 1)
+`}
+  tests={[
+    {
+      id: "n_rows",
+      name: "n_rows counts the rows",
+      description: "mpg has 398 rows",
+      code: "assert n_rows == 398, f'Expected 398 rows, got {n_rows}'",
+    },
+    {
+      id: "mean_mpg",
+      name: "mean_mpg is the rounded mean",
+      description: "Mean mpg to 1 decimal place",
+      code: "import seaborn as sns\nexpected = round(sns.load_dataset('mpg')['mpg'].mean(), 1)\nassert mean_mpg == expected, f'Expected {expected}, got {mean_mpg}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`sns.load_dataset("penguins")\` return?
+
+- A Seaborn-specific chart object that you then display.
+  > \`load_dataset\` loads *data*, not a chart. Nothing is plotted by this call.
+- [o] An ordinary pandas \`DataFrame\` containing the penguins data.
+  > It hands back a normal DataFrame, so all your pandas tools — \`.head()\`, \`.groupby()\`, filtering — work on it directly.
+- A NumPy array of raw values with no column names.
+  > The result is a labeled DataFrame with named columns, not a bare array.
+- A file path string pointing to a CSV on disk.
+  > You get the loaded table itself, ready to use — there is no file to open.
+
+\`load_dataset\` is just a convenient way to get a clean, tidy pandas
+DataFrame to practice on.`}
+/>
+
+<MultipleChoice
+  markdown={`You run \`sns.set_theme(context="poster")\` once and then draw three charts.
+Which statement is true?
+
+- Only the first chart after the call is affected; later charts revert to the default.
+  > The change is persistent, not one-shot — it stays in effect until you call \`set_theme\` again.
+- Nothing changes until you also pass a \`style\` argument.
+  > \`context\` works on its own; \`style\` and \`palette\` are independent, optional settings.
+- [o] All three charts use the larger \`poster\` sizing, because \`set_theme\` changes the global defaults for the rest of the session.
+  > \`set_theme\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the new context until it is changed again.
+- The call resizes charts you already drew before it.
+  > The effect is forward-looking only; plots created before the call keep their previous appearance.
+
+\`set_theme\` is global and sticky: set it once, and it shapes every
+*subsequent* plot in the session.`}
+/>
+
+<MultipleChoice
+  markdown={`You are preparing a figure for **projected slides** in a large room and want
+the text and markers to be comfortably large, without otherwise changing the
+look. Which argument should you reach for?
+
+- \`style="darkgrid"\`
+  > \`style\` controls the background and gridlines, not how large the text and markers are.
+- [o] \`context="talk"\`
+  > \`context\` scales fonts, lines, and markers for the medium; \`"talk"\` (or \`"poster"\`) sizes things up for presentation.
+- \`palette="deep"\`
+  > \`palette\` only changes the colors used, not the sizing of elements.
+- \`height=8\`
+  > \`height\` enlarges the figure canvas for figure-level functions, but it does not scale the fonts and line weights the way \`context\` does.
+
+\`context\` (\`paper\` → \`notebook\` → \`talk\` → \`poster\`) is the dial for
+matching element sizes to where the chart will be seen.`}
+/>
+
+You now know where the data comes from and how to make every chart
+presentable with one line. Next we look at a structural distinction that
+shapes *which* function you call: Seaborn's **figure-level** versus
+**axes-level** plotting functions.

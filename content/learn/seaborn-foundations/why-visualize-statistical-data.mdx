@@ -1,0 +1,333 @@
+---
+title: "Why Visualize Statistical Data?"
+description: "What summary statistics hide and the human eye reveals — the case for turning numbers into pictures."
+---
+
+You can describe a dataset with a handful of numbers — a mean here, a
+standard deviation there, a correlation between two columns — and feel like
+you *know* it. Those summaries are genuinely useful. They are also famous
+for being **liars**.
+
+A summary statistic is, by definition, a compression: it throws most of the
+data away and keeps one number. Two datasets that look nothing alike can be
+squeezed down to the *same* mean, the *same* spread, and the *same*
+correlation. If you only ever look at the numbers, you would swear they were
+identical. The moment you **plot** them, the illusion shatters.
+
+This page is about that gap — between what statistics *say* and what the
+data is *actually doing* — and why a picture closes it. It is the reason the
+rest of this course exists.
+
+## The eye is a pattern detector
+
+Before we touch any code, hold onto one idea. Your visual system is the most
+powerful pattern-recognition machine you will ever use. In a fraction of a
+second it picks out **shape** (is the relationship straight or curved?),
+**clusters** (are there separate groups?), **trends** (does y rise with x?),
+**outliers** (is one point flung far from the rest?), and **gaps** (is a
+region suspiciously empty?).
+
+A table of summary numbers offers none of that. A mean tells you where the
+center sits, not whether the data is one tidy cloud or two clouds with a
+canyon between them. Standard deviation measures spread, not whether the
+spread is symmetric or skewed. Correlation measures *linear* association,
+and quietly ignores any pattern that is not a straight line.
+
+So the case for statistical visualization is simple: **plots restore the
+information that summaries compress away.** Let's prove it.
+
+## Meet Anscombe's quartet
+
+In 1973 the statistician Francis Anscombe built four small datasets to make
+exactly this point. Each has 11 `(x, y)` pairs. They are now a rite of
+passage, and they ship right inside Seaborn — `sns.load_dataset("anscombe")`
+returns all four stacked in a tidy table with three columns: `dataset` (the
+group label, `"I"` through `"IV"`), `x`, and `y`.
+
+Let's start the way many people start with a new dataset: by computing
+summary statistics per group and reading the numbers off a table.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+# Four datasets (I-IV), stacked tidy: columns dataset, x, y.
+anscombe = sns.load_dataset("anscombe")
+
+# Summarize each group: mean of x, mean of y, their standard deviations,
+# and the correlation between x and y.
+summary = anscombe.groupby("dataset").agg(
+    x_mean=("x", "mean"),
+    y_mean=("y", "mean"),
+    x_std=("x", "std"),
+    y_std=("y", "std"),
+)
+
+# Correlation has to be computed per group separately.
+corr = anscombe.groupby("dataset").apply(
+    lambda g: g["x"].corr(g["y"]), include_groups=False
+)
+summary["corr_xy"] = corr
+
+display(summary.round(2))
+`}
+/>
+
+Read that table the way a busy analyst would. Every column is essentially
+**constant across the four groups**: each `x` averages 9.0, each `y` averages
+about 7.50, the standard deviations match to two decimals, and the
+correlation between `x` and `y` is about 0.82 every time. By every number
+here, the four datasets are *the same dataset*.
+
+If summaries were the whole story, we would stop now and treat all four
+identically. That would be a mistake.
+
+<Callout type="info" title="Why these particular numbers?">
+Anscombe reverse-engineered the four groups so their summaries would
+coincide. The shared correlation of ~0.82 even implies the *same* best-fit
+regression line — same slope, same intercept. The statistics are not
+approximately equal by luck; they were *designed* to be equal.
+</Callout>
+
+## Now look at them
+
+Here is the payoff. We hand the same table to Seaborn and ask for one panel
+per `dataset`. `lmplot` draws a scatter of the points **and** overlays the
+straight regression line that those identical statistics describe.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+anscombe = sns.load_dataset("anscombe")
+
+# One panel per dataset; a regression line in each.
+sns.lmplot(
+    data=anscombe,
+    x="x", y="y",
+    col="dataset", col_wrap=2,
+    height=3,
+    facet_kws={"sharex": True, "sharey": True},
+    line_kws={"color": "crimson"},
+)
+`}
+/>
+
+Four wildly different worlds — and the *same* red line slicing through each:
+
+* **Dataset I** is what the statistics led you to expect: a genuine, noisy
+  linear relationship. The line is honest here.
+* **Dataset II** is a clean **curve**. There is a strong relationship, but it
+  is not a straight line at all. A correlation of 0.82 and a straight fit
+  badly misrepresent it.
+* **Dataset III** is a tight straight line *except for one outlier* that
+  drags the fitted line off the true trend. Without the plot you would never
+  suspect a single rogue point is steering your model.
+* **Dataset IV** is the most unsettling: `x` is constant for ten points, and a
+  *single* far-right point — a **high-leverage** observation — invents an
+  entire slope out of nothing. Remove that one point and the "relationship"
+  evaporates.
+
+Same mean, same spread, same correlation, same regression line — four
+completely different stories. That is the gap between numbers and reality,
+made visible in a single figure.
+
+<Callout type="warn" title="A correlation is not a shape">
+A correlation coefficient answers one narrow question: *how close to a
+straight line is this?* It says nothing about curves, clusters, or outliers.
+Datasets II, III, and IV all score ~0.82 while violating the spirit of that
+number entirely. Always plot before you trust a single statistic to
+summarize a relationship.
+</Callout>
+
+<MultipleChoice
+  markdown={`All four Anscombe datasets share nearly the same mean, standard deviation,
+and correlation. What does plotting them reveal that those statistics hide?
+
+- That the datasets actually have different means once you look closely.
+  > The means really are (essentially) equal — that is the whole setup. Plotting does not contradict the summary numbers; it adds information they never carried.
+- [o] That the *shape* of each relationship is completely different — one linear, one curved, one outlier-driven, one leverage-driven.
+  > Summary statistics compress away shape, clustering, and outliers. The four panels expose structure (a curve, a rogue point, a single high-leverage point) that identical numbers simply cannot encode.
+- That the correlation coefficient was computed incorrectly.
+  > The correlations are correct; each is about 0.82. The lesson is that a correct correlation can still describe four very different pictures.
+- That three of the four datasets are too small to analyze.
+  > All four have the same number of points (11). Size is not the issue — the issue is that equal summaries can hide unequal shapes.
+
+The numbers agree; the pictures disagree. That disagreement is exactly the
+information statistical visualization recovers.`}
+/>
+
+## Exploratory vs. explanatory visualization
+
+It helps to name *why* you are drawing a chart, because the two main reasons
+pull in different directions.
+
+**Exploratory** visualization is for **you**, while you still don't know what
+the data holds. You make many quick, rough plots — change a variable, add a
+color, switch chart types — hunting for structure and surprises. Speed and
+breadth matter more than polish. Anscombe's quartet is a parable about this
+phase: skip it and you ship conclusions built on a mirage.
+
+**Explanatory** visualization is for an **audience**, once you *have* found
+something and want to communicate it clearly. Now you slow down: one careful
+chart, good labels, a deliberate color choice, everything in service of a
+single message.
+
+Most of this course lives in the exploratory world — building the instinct to
+*see* structure — but the aesthetic skills we cover later (themes, palettes,
+annotations) are what carry a finding across the bridge into explanation.
+
+<Callout type="tip" title="The goal of statistical visualization">
+Boiled down to one sentence: **the goal is to see structure** — the shape,
+groups, trends, and anomalies that summary numbers average away. Keep asking
+the three questions from the introduction of every plot you make: what does
+it reveal, what does it hide, and when would it break?
+</Callout>
+
+## It is not a fluke: the Datasaurus
+
+If you suspect Anscombe rigged a rare special case, the **Datasaurus dozen**
+puts that to rest. It is a modern set of thirteen datasets — including one
+shaped, unmistakably, like a **dinosaur** — that all share the same means,
+the same standard deviations, and the same correlation to two decimal places.
+You can morph a blob of points into a star, an X, parallel lines, or the
+dinosaur while every summary statistic holds rock-steady.
+
+The takeaway is not subtle: *for any* set of summary numbers there are
+endlessly many datasets that produce them. Summaries narrow the possibilities;
+only a picture pins down which one you actually have. (We don't load the
+Datasaurus here — Seaborn doesn't ship it — but it is worth a web search; the
+animations are unforgettable.)
+
+## Your turn
+
+Let's make the "the numbers agree" half of the lesson concrete with your own
+hands. You'll compute the mean of `y` within each Anscombe group and confirm
+they really do collapse to the same value.
+
+<ChallengeCard
+  adapter="python"
+  title="Confirm the four means agree"
+  instructions={`Anscombe's quartet hides four different shapes behind identical
+statistics. Prove the "identical" half yourself.
+
+Using the \`anscombe\` dataset:
+
+1. Group by \`dataset\` and compute the **mean of \`y\`** for each group.
+2. Round each mean to **2 decimal places**.
+3. Store the result in a variable named \`y_means\` (a pandas Series indexed
+   by dataset label \`I\`-\`IV\`).
+
+If the legend of Anscombe holds, all four values should round to **7.50**.`}
+  starterCode={`import seaborn as sns
+
+anscombe = sns.load_dataset("anscombe")
+
+# Compute the per-group mean of y, rounded to 2 decimals, into y_means:
+y_means = None
+
+display(y_means)
+`}
+  solutionCode={`import seaborn as sns
+
+anscombe = sns.load_dataset("anscombe")
+
+y_means = anscombe.groupby("dataset")["y"].mean().round(2)
+
+display(y_means)
+`}
+  tests={[
+    {
+      id: "has_four_groups",
+      name: "One mean per dataset",
+      description: "y_means covers all four groups I-IV",
+      code: "assert y_means is not None, 'Assign the per-group means to y_means'\nassert len(y_means) == 4, f'Expected 4 group means, got {len(y_means)}'",
+    },
+    {
+      id: "all_round_to_seven_five",
+      name: "All four means are about 7.50",
+      description: "Each group's mean of y rounds to 7.5",
+      code: "vals = [round(float(v), 1) for v in y_means]\nassert all(v == 7.5 for v in vals), f'Each mean should round to 7.5; got {vals}'",
+    },
+  ]}
+/>
+
+Four groups, four identical means — and yet, as you saw above, four utterly
+different pictures. Holding both of those facts in your head at once is the
+whole point of this page.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is a summary statistic like the mean described as a "compression" of a
+dataset?
+
+- Because it makes the file smaller on disk.
+  > "Compression" here is about information, not storage. The point is conceptual, not about bytes.
+- [o] Because it represents many data points with a single number, discarding the detail of how those points are arranged.
+  > A mean keeps one fact (the center) and throws away shape, spread, clustering, and outliers — which is exactly why different datasets can share a mean.
+- Because it always underestimates the true value.
+  > A mean is not biased low by nature; it is simply a summary. The issue is lost detail, not a systematic error.
+- Because it can only be computed on small datasets.
+  > Means are computed on datasets of any size. The lesson is about what summaries omit, not about dataset size.
+
+Every summary keeps a little and discards a lot; visualization is how you
+inspect what was discarded.`}
+/>
+
+<MultipleChoice
+  markdown={`Which task is a **scatter plot** of two numeric variables clearly better at
+than reading their correlation coefficient?
+
+- Reporting a single number you can paste into a sentence.
+  > A coefficient wins on conciseness — that is a point *for* the statistic, not the plot.
+- [o] Revealing whether the relationship is straight, curved, clustered, or driven by an outlier.
+  > Correlation collapses a relationship to one number about straight-line association; the scatter shows the actual shape, including curves and rogue points it cannot capture.
+- Storing the relationship compactly for later computation.
+  > A coefficient is the compact form; the plot is the expansive one. Compactness favors the statistic.
+- Guaranteeing the relationship is causal.
+  > Neither a plot nor a correlation establishes causation. The advantage of the plot is showing *shape*, not proving cause.
+
+A coefficient summarizes; a scatter plot shows. Anscombe's quartet is the
+classic demonstration of the difference.`}
+/>
+
+<MultipleChoice
+  markdown={`In Anscombe's **Dataset III**, ten points fall almost perfectly on a line and
+one point sits far off it. How does that single point affect a fitted
+straight-line regression?
+
+- It has no effect, because one point cannot change a line fitted to eleven.
+  > A single point can move a least-squares line substantially — that is precisely the danger the plot exposes.
+- It makes the correlation exactly 1.0.
+  > The outlier *lowers* the correlation from a perfect fit; it does not raise it to 1.0.
+- [o] It pulls the fitted line away from the trend the other ten points follow.
+  > Least-squares fitting is sensitive to outliers, so the lone off-line point drags the line off the otherwise clean trend — visible instantly in the panel, invisible in the summary.
+- It splits the data into two separate clusters.
+  > There are not two clusters; there is one clear line plus a single stray point. The point distorts the fit rather than forming a group.
+
+Outliers can hijack a fitted line, and a plot is usually the fastest way to
+catch one in the act.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the central lesson shared by **Anscombe's quartet** and the
+**Datasaurus dozen**?
+
+- Correlation always equals 0.82 for real datasets.
+  > 0.82 is just the value Anscombe chose; it is not a universal constant. The lesson is about the limits of summaries generally.
+- Larger datasets are always more trustworthy than smaller ones.
+  > Both examples use small datasets and say nothing about size being a remedy. More rows would not have revealed these shapes — only plotting does.
+- [o] Many different datasets can share identical summary statistics, so you must visualize the data to know its true shape.
+  > Both are explicitly constructed so the means, spreads, and correlations coincide while the shapes differ wildly — proving that summaries alone cannot identify a dataset.
+- Standard deviation is a more reliable summary than the mean.
+  > Both examples hold the standard deviation constant *too*; no single summary escapes the problem. The fix is a picture, not a different statistic.
+
+Equal summaries, unequal shapes: always plot before you trust the numbers.`}
+/>
+
+You have the founding motivation for everything ahead: **numbers compress,
+pictures reveal.** Next we look at *how Seaborn thinks* — the declarative,
+column-to-role mental model that lets you turn a tidy table into a revealing
+picture in a single line.

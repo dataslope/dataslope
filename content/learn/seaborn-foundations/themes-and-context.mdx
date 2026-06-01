@@ -1,0 +1,359 @@
+---
+title: Themes and Context
+description: set_theme, styles, and contexts — control the overall look and scale your plots for the medium.
+---
+
+Every chart you have drawn so far inherited a look from a single call:
+`sns.set_theme()`. That one line is Seaborn's **global styling entry
+point**. It does not attach to a chart or return an object — it changes
+matplotlib's defaults so that *every* plot you draw afterward picks up the
+same style, sizing, and colors. Set it once near the top of your work and
+forget about it.
+
+This page is about steering that one call. `set_theme` takes four dials you
+will use constantly:
+
+```python
+sns.set_theme(
+    style="whitegrid",   # the canvas: background + gridlines
+    context="notebook",  # the scale: how big fonts, lines, markers are
+    palette="deep",      # the default colors (covered on its own page)
+    font_scale=1.0,      # multiply all text sizes
+)
+```
+
+We will spend this page on **style** (the canvas) and **context** (the
+scale), because those two carry most of the visual decision-making. We
+mention `palette=` only in passing — choosing colors well is a topic of its
+own, covered in depth on the color palettes page.
+
+## Style: the canvas behind your data
+
+The **style** controls the *non-data* parts of the plot: the background
+color and whether gridlines are drawn. Seaborn ships five:
+
+| `style` | Background | Gridlines | Good for |
+| ------- | ---------- | --------- | -------- |
+| `"darkgrid"` | gray | yes (white) | the default; reading values off a busy plot |
+| `"whitegrid"` | white | yes (light) | most analysis and print figures |
+| `"white"` | white | no | a clean, minimal look |
+| `"dark"` | gray | no | making bright colors pop |
+| `"ticks"` | white | no (adds tick marks) | a tidy publication look |
+
+The choice is not cosmetic noise — it answers a real question: **does my
+reader need to look up numbers, or just see the pattern?** Gridded styles
+(`darkgrid`, `whitegrid`) lay down reference lines so a reader can trace a
+point back to the axis. Grid-free styles (`white`, `ticks`) remove that
+scaffolding and put all the visual weight on the data itself.
+
+Let's draw the *same* simple plot under three styles so the difference is
+about the canvas, not the data. First `whitegrid` — the workhorse for most
+analysis:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+Now `white` — the same points on a bare white canvas with no grid. Cleaner,
+more "finished", but you can no longer read an approximate body mass by
+eye:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+And `ticks` — like `white`, but with short tick marks on the axes that give
+the eye just enough of a reference without a full grid. This is a favorite
+for publication figures:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+`}
+/>
+
+A reasonable default rule: reach for **`whitegrid`** while you are
+*analyzing* (you often want to read values), and switch to **`white`** or
+**`ticks`** when you are *presenting* a clean figure where the shape is the
+message.
+
+<MultipleChoice
+  markdown={`You are building a figure for a journal where readers will want to read
+approximate values off the axes, but you also want a clean white background
+rather than the default gray. Which \`style\` fits best?
+
+- \`"dark"\`
+  > That gives a gray background with no gridlines — neither the white canvas nor the readable reference lines you want.
+- [o] \`"whitegrid"\`
+  > A white background with light gridlines lets readers trace points back to the axes while keeping the canvas clean.
+- \`"white"\`
+  > A white background with no grid looks clean, but it removes the reference lines that help readers read off values.
+- \`"darkgrid"\`
+  > This is the default and does have gridlines, but on a gray background rather than the white one you asked for.
+
+Pick a gridded style when readers need to look up values, and a white
+background when you want a clean print look — \`whitegrid\` gives you both.`}
+/>
+
+## Context: scaling everything for the medium
+
+A chart that looks perfectly balanced in a notebook can be unreadable when
+projected onto a screen at the front of a room — the text is too small, the
+lines too thin. The fix is **context**. It scales the *sizes* of elements
+(fonts, line widths, marker sizes) up or down as a group, without touching
+the style or the data.
+
+There are four, from smallest to largest:
+
+`"paper"` &nbsp;&lt;&nbsp; `"notebook"` (the default) &nbsp;&lt;&nbsp; `"talk"` &nbsp;&lt;&nbsp; `"poster"`
+
+The names tell you the intended medium. `paper` is sized for dense
+multi-panel figures in a publication; `notebook` for working at your
+screen; `talk` for slides; `poster` for something viewed from across a
+room.
+
+Here is the default `notebook` context on a plain plot:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(context="notebook", style="whitegrid")
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+Now the **same plot** at `talk` context. The data, the axes, and the style
+are identical — only the element *sizes* grew. The labels, tick numbers,
+and even the points scale up so they stay legible from a distance:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(context="talk", style="whitegrid")
+tips = sns.load_dataset("tips")
+
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+Why bump it up for a slide? Because the figure will be shrunk to fit a slide
+and then blown back up by a projector, viewed from meters away. Text sized
+for arm's-length reading becomes a squint-fest on a wall. `talk` (or
+`poster`) pre-compensates by making everything bolder and bigger, so the
+audience reads it effortlessly.
+
+<Callout type="tip" title="Style and context are independent dials">
+`style` answers *what should the canvas look like?* and `context` answers
+*how big should everything be?* They do not interfere — you mix and match
+freely, e.g. `set_theme(style="ticks", context="talk")` for a clean,
+slide-sized figure. `font_scale=1.2` is a quick way to nudge just the text
+larger on top of whatever context you chose.
+</Callout>
+
+<MultipleChoice
+  markdown={`You designed a chart in a notebook and it looks balanced there. You now
+need it on **projected slides** for a large room, with bigger text and
+markers but the *same* overall look. What is the most direct change?
+
+- \`sns.set_theme(style="dark")\`
+  > \`style\` changes the background and gridlines, not how large the text and markers are.
+- [o] \`sns.set_theme(context="talk")\`
+  > \`context\` scales fonts, lines, and markers as a group for the medium; \`"talk"\` (or \`"poster"\`) sizes them up for a room without altering the style.
+- \`sns.scatterplot(..., s=200)\`
+  > Enlarging the marker size alone leaves the axis labels and tick text small, so the chart is still hard to read from a distance.
+- \`sns.set_theme(palette="bright")\`
+  > Swapping the palette changes colors only; it does nothing about element sizes.
+
+\`context\` (\`paper\` → \`notebook\` → \`talk\` → \`poster\`) is the single dial for
+matching element sizes to where the chart will be seen.`}
+/>
+
+## A lighter frame with `despine`
+
+Even after picking a style, plots carry a full rectangular border — a
+**spine** on all four sides. The top and right spines rarely add anything;
+they just box the data in. `sns.despine()` removes them, leaving only the
+left and bottom axes. The result feels lighter and more open, and it draws
+the eye toward the data rather than the frame.
+
+`despine()` acts on the *current* figure, so call it **after** the plotting
+command:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+
+# Drop the top and right spines for a lighter frame.
+sns.despine()
+`}
+/>
+
+The combination of **`style="ticks"` + `despine()`** is a classic
+publication look: a clean white canvas, small tick marks for reference, and
+only two axis lines. Notice that `despine()` does nothing on a gridded style
+where the spines are already faint — it shines on `white` and `ticks`.
+
+<Callout type="info" title="despine has options">
+By default `despine()` removes the top and right spines. You can also offset
+the remaining spines from the data (`despine(offset=10)`) or trim them to
+the data range (`despine(trim=True)`) for an even airier look. The defaults
+are the 90% case.
+</Callout>
+
+## Styling just one plot, temporarily
+
+`set_theme` is global, which is exactly what you want most of the time — one
+consistent look for everything. But occasionally you want **one** plot to
+differ without disturbing the rest of your session. Seaborn gives you two
+context managers for that: `axes_style` (for the style) and
+`plotting_context` (for the context). Inside the `with` block the override
+applies; outside it, your global theme is untouched.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="darkgrid")   # the global look for the session
+tips = sns.load_dataset("tips")
+
+# Just THIS plot uses a white canvas; the global darkgrid is unchanged.
+with sns.axes_style("white"):
+    sns.scatterplot(data=tips, x="total_bill", y="tip")
+`}
+/>
+
+`plotting_context` works the same way for sizing — wrap a single plot in
+`with sns.plotting_context("talk"):` to scale up just that one figure. Reach
+for these only when you genuinely need a one-off; for the look of your whole
+analysis, set it once with `set_theme` and move on.
+
+<Callout type="warn" title="set_theme is global and sticky">
+Because `set_theme` mutates matplotlib's defaults, it affects **every plot
+drawn after it**, until you call it again. Two consequences: (1) a plot drawn
+*before* `set_theme` keeps the old look — order matters; and (2) in a long
+session, a `set_theme` buried in the middle silently restyles everything
+below it. Set it once at the very top. (Every block on this page repeats it
+only because each block runs on its own.)
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Set a theme, then build a plot"
+  instructions={`Two steps in one block:
+
+1. Call \`sns.set_theme(style="whitegrid")\` to set the global look.
+2. Build **any** figure-level plot on the \`tips\` dataset with
+   \`sns.relplot\` (for example, \`total_bill\` on x and \`tip\` on y) and assign
+   the result to a variable named \`g\`.
+
+You are not tested on the style itself — just that you called \`set_theme\`
+and produced a Seaborn grid.`}
+  starterCode={`import seaborn as sns
+
+# 1. Set the global theme:
+
+# 2. Build a relplot on tips and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+g = sns.relplot(data=tips, x="total_bill", y="tip", height=4)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Builds a Seaborn grid",
+      description: "g is a FacetGrid from a figure-level plot",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.relplot(...) to g'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which \`set_theme\` argument controls the **background and gridlines**, and
+which controls the **size** of fonts, lines, and markers?
+
+- \`palette\` controls the background; \`font_scale\` controls the sizes.
+  > \`palette\` sets the data colors and \`font_scale\` nudges only text, so neither is the background-vs-element-size pairing being asked about.
+- [o] \`style\` controls the background and gridlines; \`context\` controls the element sizes.
+  > \`style\` is the canvas (darkgrid, whitegrid, white, dark, ticks) and \`context\` is the scale (paper, notebook, talk, poster) — two independent dials.
+- \`context\` controls the background; \`style\` controls the sizes.
+  > This reverses the two: \`context\` scales element sizes and \`style\` sets the background and gridlines.
+- \`style\` controls both the background and the element sizes.
+  > \`style\` only governs the canvas; the element sizes are a separate dial, \`context\`.
+
+\`style\` = the look of the canvas; \`context\` = how big everything is drawn.`}
+/>
+
+<MultipleChoice
+  markdown={`You call \`sns.set_theme(style="white")\` once at the top of your work and
+then draw five charts. Which statement is true?
+
+- Only the first chart picks up the white style; the rest revert to the default.
+  > The change is persistent, not one-shot — it stays in effect until you call \`set_theme\` again.
+- The charts keep the default style until you also pass a \`context\`.
+  > \`style\` takes effect on its own; \`context\` and \`palette\` are independent, optional settings.
+- [o] All five charts use the white style, because \`set_theme\` changes the global defaults for the rest of the session.
+  > \`set_theme\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the style until it is changed again.
+- The call also restyles any charts you drew *before* it.
+  > The effect is forward-looking only; plots created before the call keep their previous appearance.
+
+\`set_theme\` is global and sticky: set it once, and it shapes every
+*subsequent* plot in the session.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`sns.despine()\` do, and when do you call it?
+
+- It deletes the legend from the current figure.
+  > Removing a legend is a different operation; \`despine\` acts on the axis spines, not the legend.
+- [o] It removes the top and right axis spines for a lighter frame, and you call it *after* the plotting command.
+  > \`despine\` strips the two spines that usually just box in the data; because it acts on the current figure, it runs after you have drawn the plot.
+- It applies a global theme like \`set_theme\`, so you call it once at the top.
+  > \`despine\` is not a global theme setter — it modifies the spines of the figure that already exists.
+- It scales the figure up for presentation.
+  > Scaling for a medium is what \`context\` does; \`despine\` only removes spines.
+
+\`despine()\` is a finishing touch on an already-drawn plot, pairing
+especially well with \`style="ticks"\`.`}
+/>
+
+You can now control the overall look in one place: pick a `style` for the
+canvas, a `context` for the medium, and reach for `despine()` to lighten the
+frame. Next we go deep on the one dial we deliberately skipped — **color
+palettes**, and how to choose colors that inform rather than decorate.

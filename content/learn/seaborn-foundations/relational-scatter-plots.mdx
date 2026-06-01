@@ -1,0 +1,279 @@
+---
+title: Scatter Plots
+description: The chart for seeing how two numeric variables relate — correlation, clusters, and outliers — plus how hue, style, and size add more dimensions.
+---
+
+A **scatter plot** puts one numeric variable on the x-axis, another on the
+y-axis, and draws a single dot for every row. It is the most direct way to
+answer the question *"how do these two measurements relate?"* — and it is
+often the very first plot you should reach for in exploration.
+
+Both axes use **position**, which is the encoding the human eye reads most
+accurately. That is why a scatter plot can reveal correlation, clusters,
+gaps, and outliers all at once, in about half a second.
+
+## What a scatter plot needs and shows
+
+- **Data it needs:** two **numeric (continuous)** variables — one for x,
+  one for y. One dot per observation.
+- **What it highlights best:** the *shape* of a relationship — is it
+  increasing or decreasing? linear or curved? tight or loose? Are there
+  separate clusters or stray outliers?
+- **What it hides:** exact counts where dots overlap, and any variable you
+  did not map. It shows *individuals*, not summaries.
+- **When it breaks:** with tens of thousands of points the dots pile up
+  into a solid blob (**overplotting**), and with too many color groups the
+  legend becomes a guessing game. We'll fix both below.
+
+## The minimum
+
+`relplot` ("relational plot") is Seaborn's figure-level entry point for
+scatter and line charts. With `kind="scatter"` (the default) you get a
+scatter plot:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.relplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    height=4,
+)
+`}
+/>
+
+That cloud already tells a story: bill length and depth are *loosely*
+related, and there seem to be two or three blobs. But what are those
+blobs? The plot can't say — until we add another variable.
+
+## A third variable with `hue`
+
+Mapping a column to **`hue`** colors each dot by its group. This is where
+scatter plots become genuinely powerful: a hidden grouping snaps into view.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.relplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    height=4,
+)
+`}
+/>
+
+The mystery blobs were **species** all along. Within each species the two
+measurements are *positively* related, even though the overall cloud looked
+shapeless. (This reversal — a trend inside groups that vanishes or flips
+when you pool them — is worth remembering; it's the visual face of
+*Simpson's paradox*.)
+
+<Callout type="info" title="hue can be categorical or numeric">
+If you map `hue` to a **categorical** column (like `species`), Seaborn picks
+distinct colors and builds a category legend. If you map it to a **numeric**
+column, Seaborn uses a continuous color *gradient* and shows a colorbar
+instead. The same parameter, two behaviors — chosen by the column's type.
+</Callout>
+
+## Even more dimensions: `style` and `size`
+
+You can push extra variables onto a scatter plot with **`style`** (marker
+shape, for a categorical variable) and **`size`** (marker area, for a
+numeric one):
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.relplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    style="sex",
+    size="body_mass_g",
+    height=5, aspect=1.2,
+)
+`}
+/>
+
+Four variables on one chart. Impressive — but pause. Can you *actually*
+read the body mass of a single dot from its size? Or tell a circle from a
+cross at a glance? Usually not. Each extra channel costs the viewer effort.
+
+<Callout type="warn" title="More channels is not more insight">
+Position (x, y) is read precisely. Color (`hue`) is read well for a handful
+of categories. **Shape (`style`) and size are read poorly.** Reserve them
+for a secondary variable you only need *roughly*, and resist the urge to map
+something to every channel just because you can. A clear three-variable plot
+beats a cluttered five-variable one.
+</Callout>
+
+## Overplotting: when the dots pile up
+
+A scatter plot's weakness is density. With thousands of overlapping points
+the busy regions all render as the same solid color, and you lose exactly
+the structure you came to see. The first and easiest fix is **`alpha`**
+(opacity): semi-transparent dots make dense regions visibly darker.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+
+# diamonds is large, so take a manageable random sample to plot.
+diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
+
+sns.relplot(
+    data=diamonds, x="carat", y="price",
+    alpha=0.3,            # let dense regions stack up visually
+    height=4, aspect=1.3,
+)
+`}
+/>
+
+Lower the `alpha` and the cloud reveals where points actually concentrate.
+Try editing it to `alpha=1.0` and back to feel the difference. For *truly*
+dense data, you would switch encodings entirely — to a 2-D histogram or a
+density plot, which we'll meet in the distributions chapters.
+
+## `relplot` vs `scatterplot`
+
+You'll see two ways to draw the same scatter:
+
+- `sns.relplot(..., kind="scatter")` — **figure-level**. Returns a grid,
+  manages its own figure, and can split into panels with `col`/`row`.
+- `sns.scatterplot(...)` — **axes-level**. Draws onto a single matplotlib
+  Axes you can combine with other plots.
+
+They produce the same dots; they differ in what they *return* and how they
+*compose*. We devote a whole page to that distinction — for now, reach for
+`relplot` when you might want facets, and `scatterplot` when you're placing
+one chart on an Axes you control.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Color a scatter by group"
+  instructions={`Using the \`penguins\` dataset, draw a **scatter plot** with
+\`sns.relplot\`:
+
+- \`bill_length_mm\` on the x-axis,
+- \`bill_depth_mm\` on the y-axis,
+- colored by \`species\` (use \`hue\`).
+
+Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Build the relplot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+g = sns.relplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    height=4,
+)
+`}
+  tests={[
+    {
+      id: "is_grid",
+      name: "Uses relplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.relplot(...) to g'",
+    },
+    {
+      id: "axes",
+      name: "Correct x and y variables",
+      description: "bill_length_mm vs bill_depth_mm",
+      code: "ax = g.ax\nassert ax.get_xlabel() == 'bill_length_mm', f'x should be bill_length_mm, got {ax.get_xlabel()!r}'\nassert ax.get_ylabel() == 'bill_depth_mm', f'y should be bill_depth_mm, got {ax.get_ylabel()!r}'",
+    },
+    {
+      id: "hue",
+      name: "Colored by species",
+      description: "A species legend is present",
+      code: "leg = g._legend\nassert leg is not None, 'Map hue=\"species\" so points are colored by species'\nlabels = [t.get_text() for t in leg.get_texts()]\nassert 'Adelie' in labels, f'Legend should list species; got {labels}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is a scatter plot fundamentally best at revealing?
+
+- The composition of a whole into parts.
+  > That's a job for a bar or stacked chart, not a scatter plot.
+- A single variable's frequency distribution.
+  > One variable's distribution is what histograms, KDEs, and ECDFs are for. A scatter plot needs *two* numeric variables.
+- [o] The relationship between two numeric variables — its direction, shape, clustering, and outliers.
+  > A scatter maps both variables to position (the most precise encoding), so the eye reads correlation, curvature, clusters, and outliers directly.
+- A ranking of categories from largest to smallest.
+  > Ranking categories is a bar-chart task; a scatter plot compares two continuous measurements.
+
+When the question is "how do these two numbers move together?", the scatter
+plot is the default answer.`}
+/>
+
+<MultipleChoice
+  markdown={`Your scatter plot of 40,000 points looks like one solid dark blob. Which
+fix most directly addresses the problem?
+
+- Increase the marker size so the points are easier to see.
+  > Bigger markers overlap *more*, making the blob worse.
+- [o] Lower the opacity with \`alpha\` (e.g. \`alpha=0.2\`), or switch to a density-style plot.
+  > Semi-transparent points let overlapping dots accumulate into visibly darker regions, so density becomes readable again; for extreme density a 2-D histogram/density plot is even better.
+- Remove the axis gridlines.
+  > Gridlines aren't the issue — overlapping points are hiding the structure.
+- Sort the data before plotting.
+  > Row order doesn't change where dots land, so sorting can't relieve overplotting.
+
+Overplotting hides structure; the cure is to change the *encoding* (opacity
+or a density representation), not the cosmetics.`}
+/>
+
+<MultipleChoice
+  markdown={`You map \`hue\`, \`style\`, AND \`size\` to three different variables on one
+scatter plot. What is the main risk?
+
+- Seaborn will raise an error because only one extra channel is allowed.
+  > Seaborn happily accepts all three; the problem is perceptual, not technical.
+- The plot will be statistically incorrect.
+  > The numbers are fine — nothing is miscomputed. The issue is whether a human can *read* it.
+- [o] Shape and size are read imprecisely, so the extra channels add clutter faster than insight.
+  > Position and (a few) colors are read well; marker shape and size are read poorly, so overloading channels usually costs clarity more than it adds information.
+- The legend will be hidden automatically.
+  > Seaborn will show legends for each channel — arguably part of the clutter problem.
+
+Every visual channel has a perceptual cost. Map extra variables only when a
+*rough* reading is genuinely useful.`}
+/>
+
+You can now see how two variables relate and layer in a third. Next we keep
+the relational family going with **line plots** — what changes when the
+x-axis represents an ordered progression like time.

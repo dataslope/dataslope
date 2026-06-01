@@ -1,0 +1,299 @@
+---
+title: "Joint Plots"
+description: "sns.jointplot — a pair of variables shown as a center plot plus each variable's marginal distribution."
+---
+
+A plain scatter plot answers "how do these two variables relate?" — but it
+stays silent on a second question that often matters just as much: *"how is
+each variable distributed on its own?"* A **joint plot** answers both at
+once.
+
+**`sns.jointplot`** draws two numeric variables as a central **bivariate**
+plot, and tucks each variable's **univariate** distribution into the
+**margins** — one along the top, one down the right side. The center shows
+the *joint* relationship; the margins show the two *marginals*. You get the
+relationship and both distributions in one compact figure.
+
+## The minimal joint plot
+
+By default the center is a scatter plot and the margins are histograms:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm")
+`}
+/>
+
+Read it in two directions. The **center** is the familiar scatter — bill
+length against bill depth. The **top margin** is the distribution of
+`bill_length_mm` alone; the **right margin** is the distribution of
+`bill_depth_mm` alone. Notice the top histogram looks distinctly
+two-humped — a clue there are subgroups hiding in this data that a bare
+scatter wouldn't have surfaced as clearly.
+
+<Callout type="info" title="Why the margins earn their space">
+A scatter shows the *joint* behaviour but squashes each variable's own shape
+into a thin strip along the edge that your eye can't read. The marginal
+plots make that shape explicit: skew, multiple peaks, and outliers in *each*
+variable become obvious without leaving the figure. Reach for a joint plot
+(over a plain scatter) precisely when those marginal shapes matter too.
+</Callout>
+
+<MultipleChoice
+  markdown={`In a \`jointplot\`, what is shown in the **top and right margins**?
+
+- Zoomed-in copies of the central scatter plot.
+  > The margins aren't copies of the center; they summarize each variable separately.
+- [o] The univariate distribution of each variable — \`x\` along the top, \`y\` down the right.
+  > The center shows the joint relationship, while each margin shows one variable's own distribution, so you read the relationship and both marginals together.
+- The x-axis and y-axis labels, enlarged.
+  > Those are just labels; the margins hold actual distribution plots (histograms or densities), not text.
+- The residuals from a regression line.
+  > Margins always show the marginal distributions; residuals are not what a joint plot puts there.
+
+The defining feature of a joint plot is the pairing of a central bivariate
+view with each variable's marginal distribution.`}
+/>
+
+## Choosing the center with `kind`
+
+The `kind` parameter swaps out what the central plot is, while the margins
+adapt to match. The options:
+
+- `kind="scatter"` — the default; one dot per observation.
+- `kind="kde"` — smooth density **contours**, like a topographic map of
+  where points concentrate.
+- `kind="hist"` — a **2-D histogram**, binning the plane into colored
+  rectangles.
+- `kind="hex"` — **hexagonal bins**; the go-to fix for overplotting in dense
+  data (more on this below).
+- `kind="reg"` — a scatter with a **regression line** (and confidence band)
+  drawn through it.
+
+Here is `kind="kde"`, which trades individual points for density contours —
+useful when you care about *where the mass is* rather than each observation:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", kind="kde")
+`}
+/>
+
+## Handling density with `kind="hex"`
+
+A scatter's weakness is **overplotting**: with thousands of points the dots
+pile into a solid blob and you lose the very structure you came to see. A
+**hexbin** plot fixes this by dividing the plane into hexagonal bins and
+**coloring each bin by how many points fall in it** — darker means denser.
+No dot is ever hidden behind another, because you're counting, not stacking.
+
+To show real density we need more points than the small built-ins offer, so
+here we draw a manageable random **sample** of the larger `diamonds`
+dataset:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+
+# diamonds is large, so take a random sample to keep it snappy.
+diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
+
+sns.jointplot(data=diamonds, x="carat", y="price", kind="hex")
+`}
+/>
+
+A plain scatter of carat against price would be a dark smear in the
+bottom-left corner. The hexbin instead *shows* where diamonds actually
+concentrate — most are small and cheap, with a thinning tail toward larger,
+pricier stones — and the marginal histograms confirm both variables are
+heavily right-skewed.
+
+<Callout type="tip" title="Dense data? Stop scattering, start binning">
+When a scatter turns into a featureless blob, switch the *encoding* rather
+than fiddling with cosmetics. `kind="hex"` (counts per hexagonal bin) and
+`kind="kde"` (smooth density) both reveal concentration that overlapping
+dots hide. Lowering `alpha` helps a little; binning or density helps a lot.
+</Callout>
+
+<MultipleChoice
+  markdown={`You plot 50,000 rows with \`jointplot(..., kind="scatter")\` and the center
+is one solid dark mass. Which \`kind\` most directly fixes the overplotting?
+
+- \`kind="reg"\`
+  > Adding a regression line doesn't un-pile the points; the underlying scatter is still a solid blob.
+- [o] \`kind="hex"\`
+  > Hexbin divides the plane into bins and colors each by its point count, so dense regions are revealed by color instead of being hidden behind overlapping dots.
+- \`kind="scatter"\` with a larger marker size.
+  > Bigger markers overlap *more*, making the blob worse, not better.
+- There is no way to show dense data in a joint plot.
+  > Both \`kind="hex"\` and \`kind="kde"\` are built precisely for dense data.
+
+When points overlap into a blob, counting them (hexbin) or smoothing them
+(KDE) restores the density structure a raw scatter loses.`}
+/>
+
+## Splitting groups with `hue`
+
+Just like a scatter plot, a joint plot accepts a **`hue`** column. The
+center colors points by group, and — neatly — the margins split into one
+distribution per group, so you see how the categories differ on each axis:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+sns.jointplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+)
+`}
+/>
+
+That two-humped top margin from the very first plot now explains itself: the
+humps are different **species**. With `hue` the center resolves into clean
+clusters, and each margin shows three separate distributions — the same
+group-revealing payoff you saw with pair plots, focused on a single pair.
+
+<Callout type="info" title="Under the hood: JointGrid">
+`jointplot` is a high-level wrapper around **`JointGrid`**, the lower-level
+engine that lays out the central Axes plus the two marginal Axes. With
+`JointGrid` you draw the center and each margin yourself (via
+`plot_joint(...)` and `plot_marginals(...)`), which is handy when you want a
+combination `jointplot` doesn't offer out of the box. For everyday use,
+`jointplot` and its `kind=` options are all you need.
+</Callout>
+
+## What a joint plot shows — and when to skip it
+
+- **Data it needs:** two **numeric** columns, plus an optional
+  **categorical** column for `hue`.
+- **What it highlights best:** a single pair's relationship *together with*
+  each variable's marginal distribution — skew, peaks, and outliers you'd
+  miss in a bare scatter.
+- **When to prefer a plain scatter:** when you only care about the
+  relationship and the marginals are noise, a `relplot`/`scatterplot` is
+  simpler and composes more flexibly (facets, custom Axes).
+- **When it breaks:** large `n` with `kind="scatter"` overplots the center —
+  switch to `kind="hex"` or `kind="kde"`.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Build a joint plot with marginals"
+  instructions={`Using the \`penguins\` dataset, build a **joint plot** with \`sns.jointplot\`:
+
+- \`bill_length_mm\` on the x-axis,
+- \`bill_depth_mm\` on the y-axis,
+- with a scatter center (\`kind="scatter"\`, the default — or try \`"hex"\`).
+
+Assign the result to a variable named \`g\`. The marginal distributions
+should appear automatically along the top and right.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+# Build the joint plot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="white")
+penguins = sns.load_dataset("penguins")
+
+g = sns.jointplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    kind="scatter",
+)
+`}
+  tests={[
+    {
+      id: "is_jointgrid",
+      name: "Uses jointplot",
+      description: "g is a Seaborn JointGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.JointGrid), 'Assign the result of sns.jointplot(...) to g'",
+    },
+    {
+      id: "x_label",
+      name: "x is bill_length_mm",
+      description: "The central plot's x-axis is bill_length_mm",
+      code: "assert g.ax_joint.get_xlabel() == 'bill_length_mm', f'x should be bill_length_mm, got {g.ax_joint.get_xlabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`sns.jointplot\` add compared with a plain scatter plot?
+
+- It facets the data into one panel per category.
+  > That's faceting with \`col\`/\`row\` on a figure-level function; a joint plot keeps a single pair in one center plot.
+- [o] It draws each variable's marginal distribution along the top and right of the central plot.
+  > A joint plot pairs the central bivariate view with each variable's univariate distribution in the margins, so you read the relationship and both marginals together.
+- It computes a correlation matrix across all numeric columns.
+  > That's closer to a pair plot or a correlation heatmap; a joint plot focuses on exactly two variables.
+- It always fits and reports a regression model.
+  > A regression line appears only with \`kind="reg"\`; the default joint plot does not fit one.
+
+The marginal distributions flanking the center are what distinguish a joint
+plot from an ordinary scatter.`}
+/>
+
+<MultipleChoice
+  markdown={`Which \`kind\` turns the center of a joint plot into smooth density
+**contours**?
+
+- \`kind="hist"\`
+  > That produces a 2-D histogram of binned rectangles, not smooth contours.
+- \`kind="hex"\`
+  > Hexbin colors hexagonal bins by point count — discrete bins, not continuous contours.
+- [o] \`kind="kde"\`
+  > A kernel density estimate draws smooth contour lines showing where point density is highest, like a topographic map of the data.
+- \`kind="reg"\`
+  > That overlays a regression line on a scatter; it doesn't render density contours.
+
+`kind="kde"` replaces individual points with a smooth estimate of where the
+data concentrates.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a joint plot a better choice than a plain \`scatterplot\`?
+
+- Always — a joint plot is strictly superior and should replace every scatter.
+  > It's not free: the margins add space and complexity, and a plain scatter composes more flexibly (facets, shared Axes). Use the joint plot when the marginals actually earn their keep.
+- When you need to place the chart on a specific matplotlib Axes alongside other plots.
+  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control — that favors \`scatterplot\`.
+- [o] When the marginal distributions of each variable matter, or you want a quick density view of a single pair.
+  > The joint plot's whole value-add is showing each variable's distribution alongside the relationship, so it shines exactly when those marginals (or a density center like hex/kde) are worth seeing.
+- When you want one panel per category.
+  > Splitting into panels per category is faceting (\`col\`/\`row\`), not what a joint plot does.
+
+Choose a joint plot when a single pair's marginals or density add real
+insight; otherwise a plain scatter is simpler and more composable.`}
+/>
+
+You've now zoomed all the way in — from the whole-dataset pair-plot grid to
+a single, richly annotated pair of variables with its marginals. With
+relational and pairwise views in hand, the next chapters turn to the
+distribution plots (histograms, KDEs, ECDFs) that power those margins.

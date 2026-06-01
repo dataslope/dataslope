@@ -1,0 +1,344 @@
+---
+title: Light Touches with Matplotlib
+description: Seaborn returns matplotlib objects — add titles, labels, and limits with a few lines, without leaving Seaborn behind.
+---
+
+Seaborn does not replace matplotlib — it is built **on top** of it. Every
+Seaborn function ultimately draws with matplotlib and hands you back a
+matplotlib object when it is done. That is great news: it means you can do
+all the hard statistical work in Seaborn's concise vocabulary, and then
+reach for a *little* matplotlib only for the final **polish** — a real
+title, human-readable axis labels, a sensible axis range.
+
+This is not a matplotlib course, so we keep it light. The goal is to learn
+the handful of one-liners that turn a good exploratory chart into a
+presentable one, and — just as important — to learn which object you got
+back so you call the *right* one-liner.
+
+## Two kinds of return value
+
+Seaborn has two families of plotting functions, and they hand back two
+different things:
+
+| Family | Examples | Returns | Polish via |
+| ------ | -------- | ------- | ---------- |
+| **Axes-level** | `scatterplot`, `histplot`, `boxplot`, `heatmap` | a matplotlib `Axes` | `ax.set_title(...)`, `ax.set_xlabel(...)`, ... |
+| **Figure-level** | `relplot`, `displot`, `catplot`, `pairplot` | a Seaborn grid `g` | `g.set_axis_labels(...)`, `g.figure.suptitle(...)`, ... |
+
+The rule of thumb: an **axes-level** function draws on a single `Axes` and
+gives it back, so you customize that `Axes` directly. A **figure-level**
+function builds and manages its own figure (possibly with many panels), so
+you customize through the *grid* it returns. Using the wrong one is the most
+common source of "why did my title land on the wrong panel?" confusion.
+
+## Polishing an axes-level plot
+
+Axes-level functions return a matplotlib `Axes`. Capture it in a variable —
+conventionally `ax` — and then call its setter methods:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Axes-level functions return the Axes they drew on.
+ax = sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
+
+ax.set_title("Flipper length vs. body mass")
+ax.set_xlabel("Flipper length (mm)")
+ax.set_ylabel("Body mass (g)")
+ax.set_xlim(160, 240)
+ax.set_ylim(2500, 6500)
+`}
+/>
+
+Four small calls and the chart reads like a finished figure: a title that
+names the comparison, axes labeled with units, and limits that frame the
+data deliberately. None of this required leaving Seaborn for more than a
+line at a time.
+
+### Controlling the figure size
+
+Sometimes you want to set the figure *size* before drawing. Create the
+figure and axes yourself with `plt.subplots`, then pass that `ax` into the
+Seaborn function. This is the one place you reach for
+`import matplotlib.pyplot as plt`:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Make the figure first, then draw onto its Axes.
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.scatterplot(data=tips, x="total_bill", y="tip", ax=ax)
+
+ax.set_title("Tips rise with the bill")
+`}
+/>
+
+Because you made the `Axes`, you control its size and placement, and you can
+even put several Seaborn plots onto different axes of the same figure. This
+`plt.subplots(...)` + `ax=ax` pattern only works with **axes-level**
+functions — figure-level functions insist on making their own figure.
+
+<Callout type="warn" title="Never wrap a figure-level plot in plt.subplots">
+A figure-level function (`relplot`, `displot`, `catplot`, ...) creates its
+own figure and ignores any `ax=` you pass. If you make a `fig, ax` and then
+call `relplot`, you'll get *two* figures — your empty one and Seaborn's. Use
+`plt.subplots` only with axes-level functions.
+</Callout>
+
+## Polishing a figure-level grid
+
+Figure-level functions return a grid object, conventionally `g` (a
+`FacetGrid`, `PairGrid`, or `JointGrid`). It is *not* an `Axes`, so it has
+its own polishing methods that apply across all panels at once:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+g = sns.relplot(
+    data=penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    col="sex",
+    height=4,
+)
+
+# Label every panel's shared axes at once.
+g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
+
+# Per-panel titles from the faceting column's value.
+g.set_titles("{col_name}")
+
+# A single big title over the whole figure (with room made for it).
+g.figure.suptitle("Penguin size by sex")
+g.figure.subplots_adjust(top=0.9)
+`}
+/>
+
+A few things to notice:
+
+- **`g.set_axis_labels("X", "Y")`** labels the shared x and y across all
+  panels — you do not label each one separately.
+- **`g.set_titles("{col_name}")`** sets each panel's title from the value of
+  the faceting column (here, each `sex`). The `{col_name}` is a template
+  Seaborn fills in per panel.
+- **`g.figure.suptitle("...")`** adds one overarching title for the whole
+  figure. Because it sits above the panels, you usually follow it with
+  `g.figure.subplots_adjust(top=0.9)` to make room so it does not overlap
+  the panel titles.
+
+When the grid has a legend (from `hue`), you can rename it with
+`g.legend.set_title("...")`. To set a shared axis range across all panels,
+use `g.set(xlim=(...), ylim=(...))`. And if you need a *single* underlying
+`Axes` — say, to draw one more thing on it — reach it with `g.ax` (for a
+single-panel grid) or `g.axes` (the array of all panels).
+
+<Callout type="warn" title="Do not use plt.title() on a figure-level grid">
+`plt.title(...)` sets the title of matplotlib's *current* axes — which, on a
+multi-panel grid, is whichever panel was drawn last. Your title lands on the
+wrong panel. For a one big title use `g.figure.suptitle(...)`; for per-panel
+titles use `g.set_titles(...)`. The same caution applies to `plt.xlabel` /
+`plt.ylabel` — prefer `g.set_axis_labels(...)`.
+</Callout>
+
+<MultipleChoice
+  markdown={`You wrote \`g = sns.relplot(data=tips, x="total_bill", y="tip", col="time")\`
+and want **one** overall title centered above both panels. Which call is
+right?
+
+- \`plt.title("Tips by service time")\`
+  > \`plt.title\` titles matplotlib's current axes — the last panel drawn — so the text lands on one panel instead of above the whole figure.
+- [o] \`g.figure.suptitle("Tips by service time")\`
+  > \`suptitle\` places a single title over the entire figure; pairing it with \`g.figure.subplots_adjust(top=0.9)\` leaves room so it doesn't overlap the panels.
+- \`g.set_xlabel("Tips by service time")\`
+  > \`FacetGrid\` has no \`set_xlabel\`, and an x-label is not a figure title anyway; use \`g.set_axis_labels(...)\` for axis text.
+- \`ax.set_title("Tips by service time")\`
+  > A figure-level call returns a grid \`g\`, not an \`ax\`, so there is no \`ax\` variable to title here.
+
+On a figure-level grid, the whole-figure title is \`g.figure.suptitle(...)\`,
+not \`plt.title(...)\`.`}
+/>
+
+## Rotating crowded tick labels
+
+When category names along the x-axis overlap, rotate them. On an `Axes`,
+`ax.tick_params(axis="x", rotation=45)` does it in one line:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+mpg = sns.load_dataset("mpg")
+
+ax = sns.countplot(data=mpg, x="model_year")
+ax.set_title("Cars per model year")
+
+# Tilt the year labels so they don't collide.
+ax.tick_params(axis="x", rotation=45)
+`}
+/>
+
+An equivalent, slightly more flexible approach is
+`plt.setp(ax.get_xticklabels(), rotation=45)`, which lets you also set
+things like horizontal alignment. Either is fine; pick whichever reads
+better to you. (On a figure-level grid you would rotate via
+`g.tick_params(axis="x", rotation=45)` or by looping over `g.axes.flat`.)
+
+## A worked example: from raw to readable
+
+Putting it together on a single axes-level chart. We start with a bare
+`scatterplot` and apply the polish in a few lines: a title that frames the
+relationship, axis labels with units, and a deliberate y-range starting at
+zero.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.set_theme(style="ticks")
+mpg = sns.load_dataset("mpg")
+
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.scatterplot(data=mpg, x="weight", y="mpg", hue="origin", ax=ax)
+
+ax.set_title("Heavier cars get fewer miles per gallon")
+ax.set_xlabel("Weight (lbs)")
+ax.set_ylabel("Fuel economy (mpg)")
+ax.set_ylim(0, 50)
+
+# A clean, lighter frame to finish.
+sns.despine()
+`}
+/>
+
+The statistics — the grouping by `origin`, the color mapping, the legend —
+were all Seaborn. The polish — the title, the unit-bearing labels, the
+y-range, the lighter frame — was a handful of matplotlib lines on the `Axes`
+Seaborn handed back. That division of labor is the whole idea: **Seaborn for
+the substance, a light touch of matplotlib for the finish.**
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Title and label a histogram"
+  instructions={`Draw a histogram of \`total_bill\` from the \`tips\` dataset with
+\`sns.histplot\`, capturing the returned \`Axes\` in a variable named \`ax\`.
+Then:
+
+1. Set the title to exactly \`Distribution of total bills\`.
+2. Set the x-axis label to exactly \`Total bill (USD)\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Draw the histogram and capture the Axes in ax:
+ax = None
+
+# Set the title and x-axis label:
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+ax = sns.histplot(data=tips, x="total_bill")
+ax.set_title("Distribution of total bills")
+ax.set_xlabel("Total bill (USD)")
+`}
+  tests={[
+    {
+      id: "is_axes",
+      name: "ax is a matplotlib Axes",
+      description: "histplot is axes-level and returns an Axes",
+      code: "import matplotlib\nassert isinstance(ax, matplotlib.axes.Axes), 'Capture the result of sns.histplot(...) in ax'",
+    },
+    {
+      id: "title",
+      name: "Title is set correctly",
+      description: "ax.get_title() matches",
+      code: "assert ax.get_title() == 'Distribution of total bills', f'Title is {ax.get_title()!r}'",
+    },
+    {
+      id: "xlabel",
+      name: "X-axis label is set correctly",
+      description: "ax.get_xlabel() matches",
+      code: "assert ax.get_xlabel() == 'Total bill (USD)', f'X label is {ax.get_xlabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`You call \`ax = sns.boxplot(data=tips, x="day", y="total_bill")\`. What is
+\`ax\`, and how do you give the chart a title?
+
+- A Seaborn \`FacetGrid\`; title it with \`ax.set_titles(...)\`.
+  > \`boxplot\` is axes-level and returns a matplotlib \`Axes\`, not a \`FacetGrid\`; there is no \`set_titles\` on an \`Axes\`.
+- [o] A matplotlib \`Axes\`; title it with \`ax.set_title("...")\`.
+  > Axes-level functions like \`boxplot\` return the \`Axes\` they drew on, and \`set_title\` is the \`Axes\` method for a title.
+- A pandas DataFrame; add a title by adding a column.
+  > A plotting call returns a plot object, not data; titles are not DataFrame columns.
+- A figure-level grid; title it with \`g.figure.suptitle(...)\`.
+  > \`suptitle\` is for figure-level grids; \`boxplot\` is axes-level and returns an \`Axes\`.
+
+Axes-level functions hand back a matplotlib \`Axes\`, which you customize with
+\`set_title\`, \`set_xlabel\`, and friends.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can you write \`fig, ax = plt.subplots(figsize=(7,4))\` and then
+\`sns.scatterplot(..., ax=ax)\`, but the same trick does **not** work with
+\`sns.relplot\`?
+
+- Because \`relplot\` cannot draw scatter plots.
+  > \`relplot\` draws scatter and line plots; the difference is about figure management, not chart type.
+- Because \`scatterplot\` does not accept an \`ax\` argument.
+  > It is precisely \`scatterplot\` (axes-level) that *does* accept \`ax=\`; the figure-level \`relplot\` is the one that ignores it.
+- [o] Because \`scatterplot\` is axes-level and draws on the \`Axes\` you pass, while \`relplot\` is figure-level and builds its own figure.
+  > Axes-level functions accept \`ax=\` and draw there; figure-level functions manage their own figure and ignore any \`ax=\`, so passing one would just leave your \`plt.subplots\` figure empty.
+- Because \`plt.subplots\` only works after \`set_theme\`.
+  > \`plt.subplots\` works regardless of theme; the real distinction is axes-level versus figure-level.
+
+To control size with \`plt.subplots\` and \`ax=\`, use an axes-level function;
+figure-level functions size themselves with \`height\` and \`aspect\`.`}
+/>
+
+<MultipleChoice
+  markdown={`On a faceted grid \`g = sns.catplot(data=tips, x="day", y="tip", col="time",
+kind="box")\`, how do you label the shared x and y axes across both panels?
+
+- \`plt.xlabel("Day"); plt.ylabel("Tip")\`
+  > \`plt.xlabel\`/\`plt.ylabel\` target the current axes — the last panel — so only one panel gets labeled.
+- [o] \`g.set_axis_labels("Day", "Tip")\`
+  > \`set_axis_labels\` sets the shared x and y labels for every panel of the grid in one call.
+- \`g.set_title("Day", "Tip")\`
+  > \`set_title\` is not a \`FacetGrid\` method, and axis labels are not titles; use \`set_axis_labels\` for axis text.
+- \`ax.set_xlabel("Day"); ax.set_ylabel("Tip")\`
+  > A figure-level call returns a grid \`g\`, not an \`ax\`; the grid-wide method is \`g.set_axis_labels(...)\`.
+
+For figure-level grids, label the shared axes with \`g.set_axis_labels(...)\`
+rather than the per-axes \`plt\` functions.`}
+/>
+
+You now have the light-touch matplotlib you need: capture the `Axes` from an
+axes-level call (or the grid from a figure-level one), then add a title,
+labels, and limits in a few lines. Next we put it all together — themes,
+color, and these finishing touches — into the craft of **telling a clear
+story with data**.

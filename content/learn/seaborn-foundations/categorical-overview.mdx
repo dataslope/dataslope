@@ -1,0 +1,321 @@
+---
+title: The Categorical Plot Family
+description: A map of catplot — when x is a category and y is numeric, which kind reveals what you need?
+---
+
+So far the x-axis has held a *number*. But an enormous amount of real
+analysis asks a different question: **how does a numeric measurement differ
+across groups?** Tips by day of the week. Body mass by penguin species.
+Survival by passenger class. Here one axis is a **category** — a label, not
+a quantity — and the chart's job is to compare the groups.
+
+Seaborn gathers every chart for this situation under one figure-level
+function: **`catplot`** ("categorical plot"). You always call it the same
+way — name the categorical column, the numeric column, and then choose a
+**`kind`**. That single `kind` argument swaps the entire view, from "show me
+every raw point" to "show me one summarizing number per group." Learning the
+categorical family is really learning *which `kind` answers which question*.
+
+## One function, many views
+
+The trick to keeping the kinds straight is to stop memorizing them
+individually and instead sort them by **how much of the distribution they
+let you see**. Every group of numbers has a full shape — where it clusters,
+how spread out it is, where the outliers sit. A categorical plot makes a
+choice about how much of that shape to draw versus boil away.
+
+```mermaid
+flowchart TD
+    CAT["catplot<br/>categorical x, usually numeric y"] --> RAW["Show every point"]
+    CAT --> SUM["Summarize the distribution"]
+    CAT --> EST["Show one estimate"]
+    CAT --> CNT["Count occurrences"]
+    RAW --> R1["strip, swarm"]
+    SUM --> S1["box, violin, boxen"]
+    EST --> E1["bar, point"]
+    CNT --> C1["count"]
+```
+
+| `kind` | What it draws | How much it reveals | Needs |
+| ------ | ------------- | ------------------- | ----- |
+| `"strip"` | Every point, with jitter | **All** observations | category + numeric |
+| `"swarm"` | Every point, nudged apart | **All** observations | category + numeric |
+| `"box"` | Quartiles + whiskers + outliers | A **summary** of the spread | category + numeric |
+| `"violin"` | A mirrored density curve | A **summary** of the spread | category + numeric |
+| `"boxen"` | Many quantile boxes | A **summary** of the spread | category + numeric |
+| `"bar"` | One bar = the **mean** (+ CI) | A **single estimate** | category + numeric |
+| `"point"` | One dot = the **mean** (+ CI) | A **single estimate** | category + numeric |
+| `"count"` | One bar = how **many rows** | A **single count** | category only |
+
+Read that table top to bottom and you are turning a dial from *maximum
+detail* to *maximum summary*:
+
+1. **Show every observation** — `"strip"` and `"swarm"` draw one mark per
+   row. Nothing is hidden; you see group sizes, clusters, gaps, and every
+   outlier.
+2. **Summarize the distribution** — `"box"`, `"violin"`, and `"boxen"`
+   replace the raw points with a compact description of their *shape*
+   (center, spread, tails).
+3. **Show a single estimate** — `"bar"` and `"point"` collapse each group to
+   one number, by default the **mean**, with an error bar for uncertainty.
+4. **Count occurrences** — `"count"` is the special case that needs no
+   numeric variable at all: it just tallies how many rows fall in each
+   category.
+
+<Callout type="info" title="The data types each kind needs">
+Almost every categorical plot needs **one categorical variable** (the
+groups) plus **one numeric variable** (the thing being measured or
+summarized). The exception is `"count"`, which needs **only the
+categorical** column — it is counting rows, so there is nothing numeric to
+put on the other axis.
+</Callout>
+
+## The same data, three ways
+
+Nothing makes the "detail vs summary" dial clearer than drawing the *exact
+same numbers* at three settings. We'll use `tips`: the **categorical**
+`day` on x, the **numeric** `total_bill` on y. Watch how the picture
+changes while the data does not.
+
+First, **`kind="strip"`** — every single bill as a dot:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Show EVERY observation: one dot per bill, jittered within each day.
+sns.catplot(data=tips, x="day", y="total_bill", kind="strip", height=4)
+`}
+/>
+
+You can count the busy days, spot the high-bill outliers, and see that most
+bills cluster low with a long tail upward. That is the *raw* data — no
+processing.
+
+Now **`kind="box"`** — summarize each day's spread:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Summarize the SHAPE: box = middle 50%, line = median, dots = outliers.
+sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
+`}
+/>
+
+The individual dots are gone, replaced by a tidy summary: the box spans the
+middle 50% of bills, the line inside is the **median**, and the whiskers
+reach out to the bulk of the rest. You trade knowing every point for an
+instant read on center and spread.
+
+Finally **`kind="bar"`** — one number per day:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Collapse to a SINGLE estimate: each bar is the mean bill that day.
+sns.catplot(data=tips, x="day", y="total_bill", kind="bar", height=4)
+`}
+/>
+
+Now each day is a single bar — its **mean** total bill — with a thin error
+bar showing the uncertainty in that mean. This is the most compact view and
+the easiest to compare at a glance, but notice how much you gave up: the
+outliers, the spread, the *shape* are all gone. (We'll return to exactly
+what that hides on the bar-and-count page.)
+
+<MultipleChoice
+  markdown={`You drew the same \`tips\` data as a strip plot, a box plot, and a bar plot.
+What changed between the three figures?
+
+- The underlying data, which Seaborn re-sampled for each \`kind\`.
+  > Seaborn read the identical DataFrame all three times. Nothing about the data changed — only the way it was drawn.
+- [o] How much of each group's distribution was shown versus summarized.
+  > The strip showed every point, the box summarized the spread into quartiles, and the bar collapsed each group to a single mean — same data, different levels of detail.
+- The number of categories on the x-axis.
+  > All three put the same four days on the x-axis; \`kind\` does not add or remove categories.
+- Whether the variables were numeric or categorical.
+  > \`day\` stayed categorical and \`total_bill\` stayed numeric in every version; \`kind\` only changes the drawing, not the variable types.
+
+The \`kind\` argument is a dial from raw detail to compact summary — the data
+is constant; only the amount of it you see changes.`}
+/>
+
+## Choosing a kind
+
+So how do you pick? Two questions decide it almost every time:
+
+1. **How much detail does the question want?** If you need to *see the data*
+   — its clusters, gaps, and individual outliers — show every observation
+   (`strip`/`swarm`). If you need the *shape* of each group, summarize it
+   (`box`/`violin`/`boxen`). If you just need to *compare one number* across
+   groups, use a single estimate (`bar`/`point`). If you only care *how
+   many* are in each group, count them (`count`).
+2. **How many points and categories do you have?** Drawing every point is
+   wonderful for small and medium data but turns into an unreadable smear
+   with many thousands of rows — there, a summary wins. And a chart with
+   thirty categories crammed on the x-axis is unreadable regardless of
+   `kind`; you'll want to reorder, filter, or flip it sideways.
+
+<Callout type="tip" title="Detail and sample size pull in opposite directions">
+Showing every point is most honest but scales worst. Summaries scale
+beautifully but can hide a multimodal or skewed group behind a friendly
+shape. A common, powerful move is to start with raw points to *check* the
+data, then switch to a summary to *communicate* it.
+</Callout>
+
+## Orientation: vertical or horizontal
+
+By default the category goes on **x** and the plot is vertical. Put the
+category on **y** instead and the whole chart rotates to horizontal — which
+is the cure for long category labels that would otherwise overlap or tilt
+awkwardly along the bottom.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Category on y => horizontal. Labels read left-to-right, never cramped.
+sns.catplot(data=tips, y="day", x="total_bill", kind="box", height=4)
+`}
+/>
+
+Same summary as before, just lying on its side. Reach for horizontal
+whenever your group names are long or numerous.
+
+## A quick tour of what's ahead
+
+This page is the map; the next three pages are the territory. Each takes one
+band of the detail dial and goes deep:
+
+- **Bar and count plots** — the single-estimate end of the dial.
+  `count` tallies how many rows are in each category; `bar` shows an
+  aggregate (mean by default) per group, with the all-important caution
+  that *a bar of means hides the distribution*.
+- **Box and violin plots** *(the next page)* — the distribution-summary
+  band. How a box encodes quartiles and outliers, how a violin draws a
+  density curve, and when each is the right summary.
+- **Strip and swarm plots** — the show-everything band. Drawing every
+  observation with jitter (`strip`) or non-overlapping nudges (`swarm`), and
+  when that becomes too dense to read.
+
+<Callout type="info" title="catplot is the hub; the kinds are the spokes">
+You will keep calling `catplot` the same way — `data`, a categorical
+variable, a numeric variable, and a `kind`. Once that pattern is muscle
+memory, exploring a new categorical view is just a matter of changing one
+word.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Make your first categorical plot"
+  instructions={`Use \`sns.catplot\` on the \`tips\` dataset to compare total bills
+across days of the week.
+
+- Put the categorical \`day\` on the x-axis.
+- Put the numeric \`total_bill\` on the y-axis.
+- Choose \`kind="box"\` (any valid categorical \`kind\` is fine).
+- Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# Build the categorical plot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+g = sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses catplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.catplot(...) to g'",
+    },
+    {
+      id: "x_is_day",
+      name: "day is on the x-axis",
+      description: "The category sits on x",
+      code: "assert g.ax.get_xlabel() == 'day', f'x should be day, got {g.ax.get_xlabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the \`kind\` argument to \`sns.catplot\` control?
+
+- The DataFrame that gets plotted.
+  > The data comes from the \`data\` argument; \`kind\` does not choose or change the dataset.
+- [o] Which categorical chart is drawn — how much of each group's distribution is shown or summarized.
+  > \`catplot\` is one function that draws many chart types; \`kind\` selects among them, from raw points (\`strip\`) to a single estimate (\`bar\`).
+- Whether the x variable is treated as numeric or categorical.
+  > Variable types come from the columns themselves; \`kind\` only changes how the groups are drawn, not their types.
+- The color palette used for the groups.
+  > Palette is set with \`palette=\`; \`kind\` selects the chart type, not its colors.
+
+\`catplot\` is a hub: the same call with a different \`kind\` gives you a strip,
+box, violin, bar, point, or count plot.`}
+/>
+
+<MultipleChoice
+  markdown={`You want to know, for the \`titanic\` dataset, **how many passengers were in
+each travel class** — first, second, and third. Which \`kind\` fits, and why?
+
+- \`kind="bar"\`, because bars are for categories.
+  > A bar plot needs a numeric \`y\` to average and would show a *mean*, not a head-count. "How many passengers" is a frequency, not an average.
+- \`kind="box"\`, to summarize each class.
+  > A box plot summarizes the *spread* of a numeric variable within each group. With only the class label and no numeric measurement, there is nothing for it to summarize.
+- [o] \`kind="count"\`, because you are tallying rows per category and have no numeric variable.
+  > "How many in each group?" is exactly a frequency count, and \`count\` is the one kind that needs only the categorical column.
+- \`kind="strip"\`, to show every passenger as a point.
+  > A strip plot plots a numeric value for each row along the other axis; with only a category and no numeric variable, there is nothing to position the points against.
+
+When the question is a pure head-count and there is no numeric variable,
+\`count\` is the natural choice.`}
+/>
+
+<MultipleChoice
+  markdown={`Your categorical variable has long names ("Economy with extra legroom",
+"Premium economy", ...) and on a vertical plot they overlap and tilt along
+the bottom. What is the simplest fix in Seaborn?
+
+- Map the long variable to \`hue\` instead of \`x\`.
+  > \`hue\` colors groups rather than placing them along an axis; it changes the encoding entirely and does not solve cramped axis labels.
+- [o] Put the categorical variable on \`y\` instead of \`x\` so the plot is horizontal.
+  > With the category on \`y\`, each label gets its own horizontal row and reads cleanly left-to-right — the standard cure for long or numerous category names.
+- Switch to \`kind="count"\` so the labels shrink.
+  > Changing the \`kind\` redraws the data but does nothing about where or how the category labels are placed.
+- Remove the categorical variable from the plot.
+  > Dropping the variable removes the very comparison you are trying to make.
+
+Orientation is set by which axis holds the category: \`x\` for vertical, \`y\`
+for horizontal, and horizontal is the readable choice for long labels.`}
+/>
+
+You now have the map of the categorical family and the one decision that
+drives it: *how much of the distribution do you want to see?* Next we start
+at the summary end of that dial with **bar and count plots** — and meet the
+single most common way a categorical chart can mislead.

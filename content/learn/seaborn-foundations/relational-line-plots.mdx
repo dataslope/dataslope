@@ -1,0 +1,367 @@
+---
+title: Line Plots
+description: relplot with kind='line' for ordered data — trends, automatic aggregation, and confidence bands.
+---
+
+A scatter plot shows a *cloud* of independent points. A **line plot** is
+different in one crucial way: it connects points with segments, and that
+connection makes a promise — that the space *between* two points is
+meaningful, a continuous path from one to the next. You only get to make
+that promise when the x-axis is **ordered**.
+
+That is the whole idea behind a line plot: it is the chart for an **ordered
+x** — usually time, or a measured sequence — where you want to see a
+**trend**, a direction of travel. Reach for it when "what happens as x
+increases?" is the question.
+
+## What a line plot needs and shows
+
+* **Data it needs:** an **ordered** x (numeric or time-like) and a
+  **numeric** y. The order of x is what gives the connecting line its
+  meaning.
+* **What it highlights best:** the *trend* over the ordered axis — rising,
+  falling, cyclical, leveling off. The eye follows the slope.
+* **What it hides or distorts:** the individual observations behind an
+  aggregated line, and — dangerously — it *implies* a path even where none
+  exists if x is not really ordered.
+* **When it breaks:** too many overlapping lines turn into unreadable
+  "spaghetti," and an unsorted x makes the line zig-zag back on itself.
+
+In Seaborn you draw one with the same `relplot` you already know, switching
+`kind="scatter"` to **`kind="line"`**.
+
+## A single line: a clear trend over time
+
+The `flights` dataset records monthly airline passengers from 1949 to 1960.
+Putting the ordered `year` on x and `passengers` on y gives a textbook
+upward trend.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+flights = sns.load_dataset("flights")
+
+sns.relplot(
+    data=flights,
+    x="year",
+    y="passengers",
+    kind="line",
+    height=4, aspect=1.4,
+)
+`}
+/>
+
+Air travel grew steadily over the decade — you read that off the slope
+instantly. But look closely: there are **twelve** rows for each year (one
+per month), yet you see a *single* line with a shaded band around it. That
+is not an accident. It is Seaborn doing statistics for you.
+
+## The key behavior: aggregation and a confidence band
+
+Here is the most important thing to understand about Seaborn line plots:
+**when there are multiple y-values at the same x, Seaborn aggregates them.**
+By default it plots their **mean** as the line, and draws a translucent
+**confidence band** around it to show how *uncertain* that mean is.
+
+The `fmri` dataset makes this vivid — it has many measurements at each
+timepoint. Color by `event` and you get one aggregated line per event,
+each with its own band.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="darkgrid")
+fmri = sns.load_dataset("fmri")
+
+sns.relplot(
+    data=fmri,
+    x="timepoint",
+    y="signal",
+    kind="line",
+    hue="event",
+    height=4, aspect=1.5,
+)
+`}
+/>
+
+The solid line is the **mean signal** at each timepoint; the shaded ribbon
+is a **95% confidence interval** for that mean. A *narrow* band means the
+mean is well-pinned-down (many consistent observations); a *wide* band
+means it is uncertain. You did not group, average, or compute an interval —
+naming the columns was enough.
+
+<Callout type="info" title="A line plot is often a summary, not raw data">
+With repeated y-values per x, the line you see is a *computed mean*, not
+your original rows. That is a feature: it turns a noisy mess of points into
+a readable trend with honest uncertainty attached. Just remember the
+individual observations are summarized away.
+</Callout>
+
+## Controlling the band: the `errorbar` argument
+
+What the band represents is up to you, via the **`errorbar`** argument:
+
+* `errorbar=("ci", 95)` — a **95% confidence interval** of the mean (the
+  default). It answers "how sure am I about where the *mean* is?"
+* `errorbar="sd"` — one **standard deviation** of the data. It answers "how
+  *spread out* are the individual observations?" — a different question.
+* `errorbar=None` — **no band at all**, just the mean line.
+
+Watch the band switch meaning. With `"sd"`, it shows the spread of the raw
+signal, which is typically wider than a confidence interval.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="darkgrid")
+fmri = sns.load_dataset("fmri")
+
+sns.relplot(
+    data=fmri,
+    x="timepoint",
+    y="signal",
+    kind="line",
+    errorbar="sd",   # spread of the data, not uncertainty of the mean
+    height=4, aspect=1.5,
+)
+`}
+/>
+
+And turn it off entirely with `errorbar=None` when you want a clean trend
+line and the uncertainty is not the point.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="darkgrid")
+fmri = sns.load_dataset("fmri")
+
+sns.relplot(
+    data=fmri,
+    x="timepoint",
+    y="signal",
+    kind="line",
+    errorbar=None,   # just the mean line
+    height=4, aspect=1.5,
+)
+`}
+/>
+
+<Callout type="warn" title="A confidence interval is not the data's spread">
+A 95% CI says where the *mean* probably lies; standard deviation says how
+far individual points scatter. They are different quantities and usually
+different widths. State which one your band shows — readers cannot tell
+them apart by looking, and confusing them overstates or understates your
+certainty.
+</Callout>
+
+## Multiple lines with `hue` and `style`
+
+Just like scatter plots, line plots take `hue` to color by a group and
+`style` to vary the *dash pattern* of the line for a second grouping.
+Here both `region` and `event` are encoded at once.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+fmri = sns.load_dataset("fmri")
+
+sns.relplot(
+    data=fmri,
+    x="timepoint",
+    y="signal",
+    kind="line",
+    hue="region",
+    style="event",
+    height=4, aspect=1.5,
+)
+`}
+/>
+
+Color separates the regions; dash style separates the events — four lines
+that you can still tell apart. But this is also where line plots start to
+strain: every extra line competes for the same space.
+
+## The pitfalls: order and spaghetti
+
+Two mistakes hurt line plots more than any others.
+
+**1. Don't draw a line between unordered categories.** A line *asserts*
+that x flows from one value to the next. If x is a set of unordered
+categories — `species`, `island`, `payment_method` — there is no
+"between," and the connecting segments invent a progression that does not
+exist. That is misleading. Use a bar or point plot for unordered
+categories; save the line for genuinely ordered axes.
+
+**2. Watch for spaghetti.** Pile on too many groups and the lines tangle
+into an unreadable knot — the infamous "spaghetti plot." Past a handful of
+series, color stops disambiguating them. The fixes: plot fewer lines,
+split them into panels with `col=`, or highlight just the one or two that
+matter.
+
+<Callout type="tip" title="Sort your x, or the line will zig-zag">
+Seaborn sorts by x before drawing by default, so a tidy column is fine. But
+if you ever disable sorting (`sort=False`) or feed pre-shaped data in a
+strange order, an unsorted x makes the line jump backward and forward and
+the "trend" becomes nonsense. Ordered x in, sensible line out.
+</Callout>
+
+<MultipleChoice
+  markdown={`Why is a **line** plot the wrong choice for showing average \`tip\` across the
+unordered categories \`day\` = Thur, Fri, Sat, Sun when treated as plain
+categories?
+
+- A line plot cannot display categorical data at all; Seaborn will error.
+  > Seaborn will happily draw it — the problem is that the result *misleads*, not that it fails.
+- [o] The connecting segments imply a continuous progression *between* categories that has no real meaning.
+  > A line asserts that the space between points is a path. Between unordered categories there is no "between," so the slopes invent a trend that does not exist.
+- Lines can only be drawn for numeric x-values, never for dates.
+  > Lines work for dates and other ordered axes; the issue here is that the categories are *unordered*, not that they are non-numeric.
+- A line plot would hide the individual tip amounts.
+  > Summarizing is true of line plots generally, but it is not what makes them *wrong* for unordered categories — the false implied path is.
+
+A line earns its connecting segments only when x is genuinely ordered; for
+unordered categories, a bar or point plot tells the truth.`}
+/>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="A line plot of brain signal over time"
+  instructions={`Using the \`fmri\` dataset, draw a **line** plot with \`sns.relplot\`:
+
+- \`timepoint\` on the x-axis,
+- \`signal\` on the y-axis,
+- \`kind="line"\`,
+- one colored line per \`region\` (use \`hue\`).
+
+Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+fmri = sns.load_dataset("fmri")
+
+# Build the line relplot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+fmri = sns.load_dataset("fmri")
+
+g = sns.relplot(
+    data=fmri,
+    x="timepoint",
+    y="signal",
+    kind="line",
+    hue="region",
+    height=4, aspect=1.5,
+)
+`}
+  tests={[
+    {
+      id: "is_grid",
+      name: "Uses relplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.relplot(...) to g'",
+    },
+    {
+      id: "xlabel",
+      name: "x-axis is timepoint",
+      description: "x maps to timepoint",
+      code: "assert g.ax.get_xlabel() == 'timepoint', f'x should be timepoint, got {g.ax.get_xlabel()!r}'",
+    },
+    {
+      id: "legend",
+      name: "Colored by region",
+      description: "A hue legend is present",
+      code: "assert g._legend is not None, 'Map hue=\"region\" so each region gets its own colored line'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What single property of the x-variable most justifies using a **line** plot
+instead of a scatter plot?
+
+- The x-variable is stored as a string rather than a number.
+  > Storage type is not the deciding factor — an ordered string axis can suit a line, and a numeric but unordered axis can ruin one.
+- [o] The x-variable is **ordered**, so the segment connecting two points represents a meaningful progression.
+  > A line plot's connecting segments encode "what happens between these x-values," which is only honest when x has a real order, like time or a sequence.
+- The x-variable has more unique values than the y-variable.
+  > The count of unique values says nothing about whether connecting points is meaningful.
+- The x-variable contains no missing values.
+  > Completeness does not determine whether a connecting line is appropriate; order does.
+
+The connecting line is a claim about the space *between* points, so it is
+only appropriate when x is genuinely ordered.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`sns.relplot(data=fmri, x="timepoint", y="signal", kind="line")\`, the
+\`fmri\` data has many \`signal\` values at each \`timepoint\`. What does Seaborn
+draw by default?
+
+- A separate line through every individual observation.
+  > That would produce a dense tangle; Seaborn instead summarizes the repeated values into one line.
+- One line connecting the *maximum* signal at each timepoint.
+  > The default aggregate is the mean, not the maximum.
+- [o] A single line of the **mean** signal at each timepoint, surrounded by a translucent confidence band.
+  > With multiple y-values per x, Seaborn aggregates to the mean and shades a 95% confidence interval around it by default.
+- Nothing — it raises an error because there are duplicate x-values.
+  > Duplicate x-values are exactly the case line plots handle by aggregating; no error occurs.
+
+Repeated y-values at the same x trigger Seaborn's default aggregation: a
+mean line plus a confidence band.`}
+/>
+
+<MultipleChoice
+  markdown={`You want your shaded band to show **how spread out the individual
+observations are**, rather than how uncertain the mean is. Which argument do
+you set?
+
+- \`errorbar=("ci", 95)\`
+  > A confidence interval describes uncertainty about the *mean*, which is the opposite of what you want here.
+- [o] \`errorbar="sd"\`
+  > \`"sd"\` draws a band of one standard deviation, which reflects the spread of the underlying data points.
+- \`errorbar=None\`
+  > That removes the band entirely, showing no spread information at all.
+- \`hue="sd"\`
+  > \`hue\` maps a column to color; it has nothing to do with what the band represents, and there is no \`sd\` column.
+
+\`errorbar="sd"\` shows the data's spread; \`("ci", 95)\` shows uncertainty of
+the mean; \`None\` shows neither.`}
+/>
+
+<MultipleChoice
+  markdown={`You plot 30 separate companies' stock prices over time as 30 colored lines on
+one chart, and it becomes an unreadable tangle. What is the most useful
+description and fix?
+
+- It is **overplotting**, fixed by lowering \`alpha\` until the lines fade.
+  > Lowering opacity on 30 overlapping lines still leaves 30 crossing paths; the core problem is too many *series*, not pixel density.
+- It is fine as-is; readers can trace 30 colors with effort.
+  > Color stops distinguishing series after a handful, so a 30-line chart is genuinely unreadable, not merely effortful.
+- [o] It is a **spaghetti plot**; fix it by showing fewer lines, faceting with \`col=\`, or highlighting only the series that matter.
+  > Too many lines exceed what color can separate; reducing the series, splitting them across panels, or emphasizing a chosen few restores readability.
+- It means the x-axis is unordered and should be melted.
+  > Time is already ordered here; the trouble is the *number of lines*, not the shape or order of x.
+
+When line count outruns what color can separate, the cure is fewer lines or
+small multiples — not transparency.`}
+/>
+
+You have now met both members of the relational family: scatter plots for
+clouds of points and line plots for ordered trends. Next we turn to a
+different question entirely — not how two variables relate, but how a
+*single* variable is distributed — starting with **histograms**.
