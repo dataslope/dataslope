@@ -1,0 +1,188 @@
+---
+title: Next Steps
+description: A recap of the mental models you built — and where to take them next.
+---
+
+You started this course able to make *a* chart. You are leaving it able to
+choose the *right* chart — and to say what it reveals, what it hides, and
+when it would break. That shift, from calling functions to reasoning about
+data, is the whole point. Let's name what you now carry with you, and then
+look at where to go from here.
+
+## What you can now do
+
+- **Get the data shape right first.** You reach for **tidy/long** data by
+  default — one variable per column, one observation per row — and you know
+  to `melt` a wide table before fighting with a plot. Most "why won't this
+  work?" moments are a shape problem, not a parameter problem.
+- **Interrogate every chart.** You ask the three questions of anything you
+  draw: *What does it reveal? What does it hide? When does it break?* That
+  habit catches misleading bin widths, overplotted scatters, and confounded
+  groups before they reach a reader.
+- **Pick from the chart families on purpose.** You know the map:
+  **relational** plots (scatter, line) for how two numbers move together;
+  **distribution** plots (histogram, KDE, ECDF, rug) for the shape of one;
+  **categorical** plots (bar, count, box, violin, boxen, strip, swarm) for
+  comparing groups; **regression** plots for trends; and **multivariate
+  grids** (facets, pair plots, joint plots, heatmaps) for many variables at
+  once.
+- **Choose figure-level vs axes-level deliberately.** You reach for the
+  figure-level functions (`relplot`, `displot`, `catplot`, `lmplot`,
+  `pairplot`, `jointplot`) when you might want facets or a self-contained
+  figure, and the axes-level ones (`scatterplot`, `histplot`, `boxplot`,
+  `heatmap`, ...) when you are placing one chart on an Axes you control.
+- **Use aesthetics to communicate, not decorate.** Themes, contexts, and
+  color palettes are tools in service of a message — a diverging palette
+  centered at zero, a message-style title, clear labels — not garnish you
+  add at the end.
+
+<Callout type="success" title="The one habit that outlasts the syntax">
+Function names fade; the questions stay. If you remember nothing else,
+remember to look at the *data's shape* first and to ask what each chart
+*reveals, hides, and breaks on*. Everything else is lookup.
+</Callout>
+
+## Where to go next
+
+You have a solid foundation. Here are the most rewarding directions to take
+it.
+
+### The seaborn objects interface
+
+Everything in this course used Seaborn's **function interface** —
+`relplot`, `catplot`, and friends. Seaborn also ships a newer, more
+composable **objects interface**, imported as `seaborn.objects`. Instead of
+choosing a function up front, you start a `Plot` describing your data and
+roles, then **add** layers onto it with a small, consistent grammar:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn.objects as so
+import seaborn as sns
+
+tips = sns.load_dataset("tips")
+
+# Describe the data and roles, then ADD a layer of marks.
+so.Plot(tips, x="total_bill", y="tip").add(so.Dots())
+`}
+/>
+
+The idea is that `so.Plot(...)` sets up *what* you are plotting and
+`.add(...)` says *how* to draw it — and you can chain more `.add(...)`
+calls, statistical transforms, and scales to build a figure up piece by
+piece. It is the same statistical thinking you already have, expressed as a
+**grammar of layers** rather than a menu of functions. If you have met
+ggplot2 in R or a "grammar of graphics" before, this will feel familiar; if
+not, the mental model you built here transfers directly.
+
+<Callout type="info" title="Same foundations, new grammar">
+The objects interface is worth growing into, not a prerequisite to redo.
+Tidy data, the chart families, and the reveal/hide/break questions all
+apply unchanged — only the way you *spell* a plot becomes more composable.
+</Callout>
+
+### Deeper matplotlib, modeling, and your own data
+
+- **Matplotlib for total control.** Seaborn draws on top of matplotlib, so
+  when you need a custom annotation, an unusual layout, or pixel-level
+  control, dropping down to the Axes and Figure objects underneath is always
+  available. You touched this whenever you set a title or adjusted spacing.
+- **Statistical modeling for what plots only hint at.** A chart can *suggest*
+  a relationship; tools like `statsmodels` or `scikit-learn` let you
+  *quantify* it — fit the regression, test whether a difference is real,
+  estimate uncertainty. Visualization and modeling are partners: plot to
+  form the hypothesis, model to test it, plot again to communicate it.
+- **Practice on your own data.** The fastest way to cement all of this is to
+  point it at a dataset *you* care about. Load it, run the EDA loop from the
+  capstone — glance, question, chart, notice, repeat — and make one figure
+  you would actually show someone.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Across this whole course, what most reliably determines which chart you
+should reach for?
+
+- The number of lines of code each chart takes to draw.
+  > Brevity is a nice side effect of tidy data, but it is not how you *choose* a chart. The choice follows from the data and the question, not the keystroke count.
+- [o] The kinds of variables you have (numeric vs categorical, and how many of each) together with the question you are asking.
+  > One numeric column suggests a distribution plot; two suggest a scatter; a category plus a number suggests the categorical family. The data types and the question drive the choice.
+- Whichever chart has the most visually impressive default styling.
+  > Styling serves communication once you have the right chart; it never decides *which* chart answers your question.
+- The alphabetical order of the Seaborn function names.
+  > Function names are just lookup. What matters is matching the chart to the variable types and the question being asked.
+
+Chart choice flows from the variable types you have and the question you are
+asking — the through-line of the entire course.`}
+/>
+
+<MultipleChoice
+  markdown={`How does the **objects interface** (\`import seaborn.objects as so\`) differ
+in spirit from the function interface (\`relplot\`, \`catplot\`, ...) you used
+throughout this course?
+
+- It abandons tidy data, so you no longer need a long-format table.
+  > The objects interface expects the same tidy/long input. Tidy data remains the foundation regardless of which interface draws the plot.
+- [o] You start a \`Plot\` describing the data and roles, then compose the figure by adding layers with \`.add(...)\`, rather than picking one function up front.
+  > It expresses a chart as a composable grammar of layers — \`so.Plot(...).add(...)\` — instead of selecting a single ready-made function, while relying on the same statistical thinking.
+- It removes the need to think about what a chart reveals or hides.
+  > The interface changes how you *spell* a plot, not the judgment behind it. The reveal/hide/break questions apply just as much.
+- It only works for interactive web dashboards, not static figures.
+  > The objects interface produces ordinary Seaborn/matplotlib figures; it is about composability, not a different output medium.
+
+The objects interface swaps a menu of functions for a composable grammar of
+layers, while the tidy-data and chart-judgment foundations carry over
+unchanged.`}
+/>
+
+## One last challenge
+
+No new concept — just you, a dataset, and a chart of your choosing. Pick any
+built-in dataset (`tips`, `mpg`, or `iris` are all good), decide what
+question to ask, and draw the chart that answers it. The only requirement is
+that you assign your plot to `g` so the check can confirm you made
+*something*.
+
+<ChallengeCard
+  adapter="python"
+  title="Make a chart of your choice"
+  instructions={`Load any built-in dataset — \`tips\`, \`mpg\`, or \`iris\` — and
+draw **any chart you like** that tells you something about it. A scatter, a
+histogram, a box plot, a pair plot: your call. The point is to run the loop
+one more time on your own.
+
+Assign your plot to a variable named \`g\`. (For a figure-level function like
+\`relplot\`/\`displot\`/\`catplot\`, that is the returned grid; for an axes-level
+function like \`scatterplot\`/\`histplot\`/\`boxplot\`, that is the returned
+Axes.)`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+
+# Pick a dataset: "tips", "mpg", or "iris".
+df = sns.load_dataset("tips")
+
+# Draw any chart you like and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+df = sns.load_dataset("tips")
+
+g = sns.relplot(data=df, x="total_bill", y="tip", hue="time", height=4)
+`}
+  tests={[
+    {
+      id: "made_a_plot",
+      name: "You created a chart and assigned it to g",
+      description: "g is a Seaborn grid or a matplotlib Axes",
+      code: "import seaborn as sns\nassert g is not None, 'Assign your chart to g'\nassert isinstance(g, sns.axisgrid.Grid) or hasattr(g, 'figure'), 'g should be a Seaborn grid (from relplot/displot/catplot/...) or an Axes (from scatterplot/histplot/...)'",
+    },
+  ]}
+/>
+
+That is the loop you will run for the rest of your data life: get the shape
+right, ask what you want to see, draw it, read it honestly, and — when it
+matters — polish it for someone else. You have the foundations now. Go make
+pictures that tell the truth about your data.

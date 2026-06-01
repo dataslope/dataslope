@@ -1,0 +1,354 @@
+---
+title: Box and Violin Plots
+description: Summarizing a distribution with quartiles — the anatomy of a box plot, the shape a violin adds, and the one thing a box plot dangerously hides.
+---
+
+When you have a numeric variable split across several categories, you often
+don't want every raw point *or* a single bar — you want a compact **summary
+of each group's distribution** so you can compare them at a glance. That's
+what box plots and violin plots are for.
+
+This page is foundational: box plots are everywhere, and the one thing they
+hide can genuinely mislead you, so we'll go carefully.
+
+## Anatomy of a box plot
+
+A **box plot** (or box-and-whisker plot) compresses a distribution into a
+handful of robust summary numbers based on **quartiles** — the values that
+cut the sorted data into four equal parts.
+
+```mermaid
+flowchart LR
+    subgraph BOX["The box spans Q1 to Q3: the middle 50% of the data (IQR)"]
+        Q1["Q1<br/>25th percentile<br/>(near edge of box)"]
+        MED["Median<br/>50th percentile<br/>(line inside box)"]
+        Q3["Q3<br/>75th percentile<br/>(far edge of box)"]
+    end
+    LW["Lower whisker:<br/>reaches the furthest point<br/>within 1.5 IQR below Q1"] --> Q1
+    Q3 --> UW["Upper whisker:<br/>reaches the furthest point<br/>within 1.5 IQR above Q3"]
+    UW --> OUT["Outliers:<br/>points beyond the whiskers,<br/>drawn one by one"]
+```
+
+Reading the parts:
+
+- **The box** spans the first quartile (**Q1**, 25th percentile) to the
+  third quartile (**Q3**, 75th percentile). Its height is the
+  **interquartile range (IQR)** — the middle 50% of the data.
+- **The line inside the box** is the **median** (Q2, 50th percentile).
+- **The whiskers** extend to the most extreme points still within **1.5 ×
+  IQR** of the box edges.
+- **Anything past the whiskers** is drawn as an individual **outlier**.
+
+You can read *spread* from the box height, *skew* from where the median sits
+in the box and from unequal whisker lengths, and *outliers* directly. Here's
+a real one, annotated:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+x = tips["total_bill"]
+
+q1, med, q3 = np.percentile(x, [25, 50, 75])
+iqr = q3 - q1
+print(f"Q1={q1:.2f}  median={med:.2f}  Q3={q3:.2f}  IQR={iqr:.2f}")
+
+fig, ax = plt.subplots(figsize=(7, 3.6))
+sns.boxplot(x=x, ax=ax, color="#9ecae1")
+for val, label in [(q1, "Q1"), (med, "median"), (q3, "Q3")]:
+    ax.annotate(label, xy=(val, 0), xytext=(val, 0.34),
+                ha="center", arrowprops=dict(arrowstyle="->"))
+ax.set_ylim(-0.5, 0.6)
+ax.set_title("Anatomy of a box plot (total_bill)")
+`}
+/>
+
+## Comparing groups with box plots
+
+The real power of box plots is **comparison**: line several up, one per
+category, and differences in center and spread jump out. Use `catplot` with
+`kind="box"`:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+sns.catplot(
+    data=tips, x="day", y="total_bill",
+    kind="box", height=4, aspect=1.3,
+)
+`}
+/>
+
+Four groups, four five-number summaries, instantly comparable. Box plots
+stay readable even with *many* categories, which is exactly why analysts
+reach for them so often. Data types: a **categorical** grouping variable and
+a **numeric** variable to summarize.
+
+## The dangerous thing a box plot hides
+
+A box plot only knows about quartiles. It is completely blind to the
+**shape** of the data *between* those landmarks — most importantly, it can't
+show whether a group is **bimodal** (has two peaks). Two wildly different
+distributions can produce the *same* box plot.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import numpy as np
+import pandas as pd
+
+sns.set_theme(style="whitegrid")
+rng = np.random.default_rng(0)
+
+# Group A: one central cluster. Group B: two separated clusters.
+a = rng.normal(50, 12, 400)
+b = np.concatenate([rng.normal(30, 4, 200), rng.normal(70, 4, 200)])
+df = pd.DataFrame({
+    "value": np.concatenate([a, b]),
+    "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
+})
+
+sns.catplot(data=df, x="group", y="value", kind="box", height=4, aspect=1.1)
+`}
+/>
+
+The two boxes look nearly identical — yet group B is strongly bimodal and
+group A is not. The box plot erased that completely. Now swap to a violin:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import numpy as np
+import pandas as pd
+
+sns.set_theme(style="whitegrid")
+rng = np.random.default_rng(0)
+
+a = rng.normal(50, 12, 400)
+b = np.concatenate([rng.normal(30, 4, 200), rng.normal(70, 4, 200)])
+df = pd.DataFrame({
+    "value": np.concatenate([a, b]),
+    "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
+})
+
+sns.catplot(data=df, x="group", y="value", kind="violin", height=4, aspect=1.1)
+`}
+/>
+
+The difference is now obvious: group B's violin has two bulges. This is the
+single most important reason to know about violin plots.
+
+<MultipleChoice
+  markdown={`Two groups produce **nearly identical box plots**. What can you safely
+conclude?
+
+- The two groups have the same distribution.
+  > Box plots only match on quartiles; the groups can still differ dramatically in shape (for example, one bimodal and one not).
+- [o] They have similar quartiles, but could still have very different *shapes* (e.g. one bimodal).
+  > A box plot summarizes only the five-number summary, so matching boxes guarantee similar quartiles — nothing about modality or the shape between them.
+- One group must contain outliers and the other must not.
+  > Outliers are shown separately and aren't implied by matching boxes; both or neither could have them.
+- The medians are different.
+  > Identical-looking boxes would have *similar* medians, not different ones.
+
+Matching boxes mean matching quartiles, not matching distributions — switch
+to a violin (or a strip/swarm) when shape matters.`}
+/>
+
+## Violin plots: box plus shape
+
+A **violin plot** combines a box plot's summary with a **KDE** (the smooth
+density from the previous chapters) mirrored on both sides. The width at any
+height shows how many observations sit there, so you see modality and skew
+that a box hides. The `inner` argument controls what's drawn inside:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+# inner="quartile" draws the quartile lines inside each violin.
+sns.catplot(
+    data=tips, x="day", y="total_bill",
+    kind="violin", inner="quartile",
+    height=4, aspect=1.3,
+)
+`}
+/>
+
+Because a violin *is* a KDE, it inherits the KDE's caveats: it needs enough
+data per group to be trustworthy, and its smoothing can spill past the
+data's real range. A violin drawn over five points is decoration, not
+evidence.
+
+<Callout type="warn" title="Violins need data; box plots tolerate scarcity">
+With small groups, a box plot's quartiles are still meaningful, but a
+violin's smooth curve is largely made up. As a rough guide, prefer box (or
+just show the raw points with a strip/swarm) for small groups, and bring in
+violins when each group has plenty of observations.
+</Callout>
+
+## Boxen plots: detail in the tails
+
+For **large** datasets, a `kind="boxen"` (letter-value) plot extends the box
+idea by drawing progressively smaller boxes for further-out quantiles. It
+shows the tails in much more detail than a single pair of whiskers, without
+the smoothing assumptions of a violin:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+diamonds = sns.load_dataset("diamonds").sample(n=3000, random_state=0)
+
+sns.catplot(
+    data=diamonds, x="cut", y="price",
+    kind="boxen", height=4, aspect=1.4,
+)
+`}
+/>
+
+## Choosing among the three
+
+| Plot | Shows | Best when | Weakness |
+| --- | --- | --- | --- |
+| **Box** (`kind="box"`) | quartiles, whiskers, outliers | comparing many groups; robust summary | blind to shape/modality |
+| **Violin** (`kind="violin"`) | full density + quartiles | each group has plenty of data and shape matters | unreliable / made-up for small groups |
+| **Boxen** (`kind="boxen"`) | many quantiles, detailed tails | large datasets where the tails matter | less familiar to readers |
+
+And remember the option from the next page: when groups are small, just show
+**every point** with a strip or swarm plot.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Compare distributions with a violin plot"
+  instructions={`Using \`penguins\`, draw a **violin plot** with \`sns.catplot\` that
+compares \`body_mass_g\` across the three \`species\`:
+
+- \`x="species"\`, \`y="body_mass_g"\`, \`kind="violin"\`.
+
+Assign the result to \`g\`. The violins will show each species' full mass
+distribution, not just its quartiles.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Build the violin plot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+g = sns.catplot(
+    data=penguins, x="species", y="body_mass_g",
+    kind="violin", height=4, aspect=1.2,
+)
+`}
+  tests={[
+    {
+      id: "is_grid",
+      name: "Uses catplot",
+      description: "g is a FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.catplot(...) to g'",
+    },
+    {
+      id: "x_species",
+      name: "Species on the x-axis",
+      code: "assert g.ax.get_xlabel() == 'species', f'x-axis should be species, got {g.ax.get_xlabel()!r}'",
+    },
+    {
+      id: "y_mass",
+      name: "Body mass on the y-axis",
+      code: "assert g.ax.get_ylabel() == 'body_mass_g', f'y-axis should be body_mass_g, got {g.ax.get_ylabel()!r}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In a standard box plot, what does the **box itself** (from one edge to the
+other) represent?
+
+- The full range from the minimum to the maximum value.
+  > That's closer to what the whiskers-plus-outliers cover; the box is narrower.
+- [o] The interquartile range — from Q1 (25th percentile) to Q3 (75th percentile), i.e. the middle 50% of the data.
+  > The box spans Q1 to Q3, so its length is the IQR and it contains the central half of the observations.
+- One standard deviation on either side of the mean.
+  > Box plots are built from quartiles (a median-based summary), not from the mean and standard deviation.
+- The 95% confidence interval of the mean.
+  > That's what an error bar on a bar/point plot shows; a box plot's box is the IQR.
+
+The box is the IQR (Q1 to Q3); the line inside it is the median.`}
+/>
+
+<MultipleChoice
+  markdown={`A point is drawn **beyond the whisker** of a box plot. By the usual rule,
+what does that mean?
+
+- It is the maximum value, which is always drawn separately.
+  > The maximum is only drawn separately if it falls beyond the whisker; otherwise the whisker reaches it.
+- [o] It lies more than 1.5 × IQR beyond the nearer quartile, so it's flagged as an outlier.
+  > Whiskers stop at the furthest point within 1.5 IQR of the box; anything past that is marked as an individual outlier.
+- It is any value above the median.
+  > Roughly half the data sits above the median and stays inside the box/whiskers; being above the median doesn't make a point an outlier.
+- It is a data-entry error.
+  > An outlier may be perfectly valid data; the plot only flags its position, not its correctness.
+
+The 1.5 × IQR rule defines the whiskers; points beyond them are shown as
+outliers (which may still be genuine values).`}
+/>
+
+<MultipleChoice
+  markdown={`When is a **violin plot** a poor choice compared with a box plot or a
+strip/swarm plot?
+
+- When you have many categories to compare.
+  > Having many categories isn't the violin's core problem; its reliability problem is about how much data each group has.
+- [o] When each group has very few observations, so its smoothed density is largely invented.
+  > A violin is a KDE, and a KDE over a handful of points produces a smooth shape that the data can't actually support.
+- When the variable on the y-axis is numeric.
+  > A numeric y is exactly what violins (and box plots) expect; that's normal usage.
+- When you want to compare medians.
+  > Violins can show quartiles/medians via \`inner\`, so comparing medians is fine.
+
+Violins need enough data per group; with tiny groups, prefer a box plot or
+just show the raw points.`}
+/>
+
+<MultipleChoice
+  markdown={`You have a **large** dataset and care specifically about how the
+*tails* behave across categories. Which plot is designed for that?
+
+- A standard box plot.
+  > A box plot collapses each tail into a single whisker and a scatter of outliers, so it shows little tail detail.
+- [o] A boxen (letter-value) plot.
+  > Boxen plots draw extra, progressively smaller boxes for further-out quantiles, which reveals tail structure that a single whisker can't.
+- A count plot.
+  > A count plot tallies category frequencies and says nothing about a numeric variable's tails.
+- A bar plot of means.
+  > A bar of means shows one summary number per group and hides the tails entirely.
+
+Boxen plots extend the box idea to expose tail quantiles, which is most
+useful when you have lots of data.`}
+/>
+
+Box plots summarize, violins reveal shape, boxen plots expose tails — but all
+three still *summarize*. Next we go the other direction and plot **every
+single observation** with strip and swarm plots.

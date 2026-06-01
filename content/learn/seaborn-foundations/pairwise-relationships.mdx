@@ -1,0 +1,339 @@
+---
+title: "Pair Plots"
+description: "sns.pairplot — a grid of every numeric variable against every other, the fastest first look at a dataset."
+---
+
+When you meet a new dataset, the first question is rarely about one pair of
+columns — it's *"how does everything relate to everything?"*. Drawing a
+separate scatter plot for each pair of numeric columns by hand is tedious,
+and you'd still have to line them up to compare. **`sns.pairplot`** does the
+whole grid for you in a single call.
+
+A pair plot is a **scatterplot matrix**: every numeric column is plotted
+against every other numeric column, laid out in a square grid. It is the
+fastest way to go from "I just loaded this table" to "I can see its
+structure."
+
+## What a pair plot draws
+
+Read the grid like a multiplication table. For columns *A*, *B*, *C*, the
+cell in row *A*, column *B* is a scatter plot of *A* (y-axis) against *B*
+(x-axis). So:
+
+- **Off-diagonal cells** are **bivariate scatter plots** — one numeric
+  column against another, exactly like the scatter plots you've already
+  seen.
+- **Diagonal cells** would be a variable against *itself* (a useless
+  straight line), so Seaborn replaces them with that variable's
+  **univariate distribution** — a histogram by default.
+
+That single layout lets you scan every pairwise relationship *and* every
+variable's spread at once.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# One call: every numeric column against every other.
+sns.pairplot(penguins)
+`}
+/>
+
+Penguins has four numeric columns, so you get a 4×4 grid: sixteen panels,
+twelve of which are scatter plots and four of which (the diagonal) are
+histograms. Already you can spot that `body_mass_g` and `flipper_length_mm`
+rise together tightly, while `bill_depth_mm` looks like it might split into
+clumps.
+
+<Callout type="info" title="It only uses the numeric columns">
+By default `pairplot` quietly ignores non-numeric columns like `species`,
+`island`, and `sex` — there's no meaningful scatter axis for a category. You
+*can* bring a categorical column back in, but as **color**, not as an axis.
+That's what `hue` is for, next.
+</Callout>
+
+## The headline move: color by group with `hue`
+
+A bare pair plot shows the data as one undifferentiated cloud. The single
+most useful thing you can do — the move you'll reach for on almost every new
+dataset — is map a categorical column to **`hue`**. Two things change at
+once:
+
+1. Every scatter point is **colored by its group**, so clusters that belong
+   to different categories separate visually.
+2. The diagonal switches from one pooled histogram to **one distribution
+   per group**, overlaid — so you see how each group is spread on each
+   variable.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Color every panel by species — clusters and group distributions appear.
+sns.pairplot(penguins, hue="species")
+`}
+/>
+
+Look what fell out for free. In the `bill_length_mm` vs `bill_depth_mm`
+panel the three species form three tidy clusters; on the diagonal you can
+see that Gentoo penguins are clearly heavier and have longer flippers than
+the other two. You did not compute a single group statistic — you assigned
+one column to `hue` and the **separability of the groups** revealed itself.
+This is exploratory data analysis at its most efficient.
+
+<MultipleChoice
+  markdown={`In a \`pairplot\`, what is drawn on the **diagonal** of the grid?
+
+- A bivariate scatter of two different numeric columns.
+  > The *off-diagonal* cells are the bivariate scatters. The diagonal compares a column with itself.
+- [o] Each variable's own univariate distribution (a histogram by default).
+  > A variable plotted against itself would be a useless straight line, so Seaborn shows that variable's distribution instead — and with \`hue\`, one distribution per group.
+- A correlation coefficient printed as a number.
+  > \`pairplot\` draws plots, not annotated correlation values; a numeric correlation grid is the job of a heatmap of \`df.corr()\`.
+- Nothing — the diagonal cells are left blank.
+  > The diagonal is used, just not for a scatter. It carries each variable's univariate distribution.
+
+The diagonal is where a scatter would be meaningless, so it's repurposed to
+show how each single variable is distributed.`}
+/>
+
+## Controlling size and clutter
+
+A pair plot's great weakness is that it grows as the **square** of the
+number of numeric columns. With four columns you get sixteen panels; with
+ten columns you'd get one hundred tiny, unreadable ones. Three parameters
+keep it under control.
+
+**`vars=[...]`** restricts the grid to a chosen subset of columns — the
+single most important lever for readability. Pick the handful you actually
+care about:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Only three columns -> a compact, readable 3x3 grid.
+sns.pairplot(
+    penguins,
+    hue="species",
+    vars=["bill_length_mm", "flipper_length_mm", "body_mass_g"],
+)
+`}
+/>
+
+**`corner=True`** drops the upper triangle. The grid is symmetric — the
+panel for *A* vs *B* shows the same relationship as *B* vs *A*, just with
+the axes swapped — so the upper half is redundant. Hiding it nearly halves
+the ink and the clutter:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# corner=True keeps only the lower triangle (drops the mirror-image half).
+sns.pairplot(penguins, hue="species", corner=True)
+`}
+/>
+
+**`diag_kind`** controls the diagonal: `"hist"` for histograms or `"kde"`
+for smooth density curves. With `hue` set, `"kde"` often reads more cleanly
+than several overlaid histograms because the curves don't visually collide:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Smooth per-group density curves on the diagonal.
+sns.pairplot(penguins, hue="species", diag_kind="kde")
+`}
+/>
+
+<Callout type="warn" title="When a pair plot becomes unreadable">
+Two failure modes, two fixes:
+
+- **Too many variables.** The panel count is `n²`, so ten numeric columns
+  means a hundred postage-stamp plots. Use `vars=` to pick the few that
+  matter, and `corner=True` to drop the redundant half.
+- **Too many points.** Every one of those panels is a scatter, so a large
+  dataset overplots in *all* of them at once. Take a sample (e.g.
+  `df.sample(n=2000, random_state=0)`) before plotting, or set
+  `diag_kind="kde"` and switch the off-diagonals to density (see `PairGrid`
+  below).
+</Callout>
+
+<MultipleChoice
+  markdown={`You call \`pairplot\` on a DataFrame with **12 numeric columns** and the
+result is an unreadable wall of tiny panels. What is the most direct fix?
+
+- Increase the figure \`height\` so each panel is bigger.
+  > A bigger figure still contains 12×12 = 144 panels; it just makes a larger wall. You need *fewer* panels, not a bigger canvas.
+- [o] Pass \`vars=[...]\` with the handful of columns you actually care about.
+  > A pair plot grows as the square of the column count, so restricting to a few columns with \`vars=\` is the direct way to cut the panel count down to something readable.
+- Map every column to \`hue\` at once.
+  > \`hue\` takes a single categorical column and adds color; it does nothing to reduce the number of panels.
+- Set \`kind="line"\`.
+  > \`pairplot\` shows pairwise scatters and diagonal distributions; there's no line mode that would help here, and lines wouldn't make 144 panels readable.
+
+Because the grid is \`n × n\`, the lever that matters most for readability is
+reducing \`n\` — that's exactly what \`vars=\` does.`}
+/>
+
+## Under the hood: `PairGrid`
+
+`pairplot` is a convenient wrapper around a lower-level engine called
+**`PairGrid`**. `PairGrid` sets up the same square grid of axes but draws
+*nothing* until you tell it what to put where. You map a plotting function
+onto the diagonal and onto the off-diagonal cells yourself:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Build the empty grid, then decide what each region draws.
+g = sns.PairGrid(penguins)
+g.map_diag(sns.histplot)        # diagonal: univariate
+g.map_offdiag(sns.scatterplot)  # off-diagonal: bivariate
+`}
+/>
+
+That reproduces a basic pair plot, but the power is that you can map *any*
+function — a KDE on the lower triangle, a scatter on the upper, a histogram
+on the diagonal — for full control. Reach for `pairplot` when you want a
+fast, sensible default (which is most of the time), and drop down to
+`PairGrid` only when you need to customize what each region shows.
+
+## What a pair plot shows — and what it doesn't
+
+- **Data it needs:** several **numeric** columns, plus an optional
+  **categorical** column for `hue`.
+- **What it highlights best:** *all* pairwise relationships at once, how
+  groups separate (with `hue`), and each variable's distribution (on the
+  diagonal) — the ideal first sweep of a new dataset.
+- **What it hides:** anything that isn't a pairwise, two-variable view. A
+  three-way interaction won't show up, and with many points the individual
+  dots blur together in every panel.
+- **When it breaks:** many columns (`n²` tiny panels — subset with `vars=`)
+  or many rows (every panel overplots — sample, or use `corner`/`kde`).
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Build a focused pair plot"
+  instructions={`Using the \`penguins\` dataset, build a **pair plot** with \`sns.pairplot\`
+that:
+
+- is colored by \`species\` (use \`hue\`), and
+- includes only these three columns, via \`vars\`:
+  \`bill_length_mm\`, \`flipper_length_mm\`, and \`body_mass_g\`.
+
+Assign the result to a variable named \`g\`. (Restricting to three columns
+keeps it a tidy 3×3 grid.)`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+# Build the pair plot and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="ticks")
+penguins = sns.load_dataset("penguins")
+
+g = sns.pairplot(
+    penguins,
+    hue="species",
+    vars=["bill_length_mm", "flipper_length_mm", "body_mass_g"],
+)
+`}
+  tests={[
+    {
+      id: "is_pairgrid",
+      name: "Uses pairplot",
+      description: "g is a Seaborn PairGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.PairGrid), 'Assign the result of sns.pairplot(...) to g'",
+    },
+    {
+      id: "grid_shape",
+      name: "Grid is 3x3",
+      description: "Three vars give a 3x3 matrix of panels",
+      code: "assert g.axes.shape == (3, 3), f'Expected a 3x3 grid (three vars), got {g.axes.shape}'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does a \`pairplot\` fundamentally draw?
+
+- A single scatter plot of the two most correlated columns.
+  > A pair plot is a whole *matrix* of scatters, not one auto-selected pair.
+- [o] A scatterplot matrix — every numeric column against every other — with each variable's distribution on the diagonal.
+  > Off-diagonal cells are bivariate scatters of every column pair, and the diagonal carries each variable's univariate distribution; together they give an at-a-glance view of the whole dataset.
+- A correlation heatmap of the numeric columns.
+  > A heatmap shows correlation *values* as colored cells; a pair plot shows the actual scattered points, which reveal shape, clusters, and outliers a single number can't.
+- A bar chart of each column's mean.
+  > Pair plots compare pairs of variables and show distributions, not category means.
+
+The pair plot's identity is the scatterplot matrix plus diagonal
+distributions — the fastest broad look at a numeric table.`}
+/>
+
+<MultipleChoice
+  markdown={`Adding \`hue="species"\` to \`sns.pairplot(penguins, ...)\` changes the plot
+how?
+
+- It removes the diagonal distributions to make room for a legend.
+  > The diagonal stays; it actually becomes *more* informative, splitting into one distribution per group.
+- It restricts the grid to only the \`species\` column.
+  > \`hue\` adds color information; it does not choose which columns appear (that's \`vars=\`).
+- [o] It colors every scatter point by its group and splits each diagonal into one distribution per group.
+  > Mapping a categorical column to \`hue\` recolors all panels by group and turns each diagonal into per-group distributions, so cluster separation and group spreads become visible at once.
+- It converts the scatter panels into line plots.
+  > \`hue\` only controls color grouping; the off-diagonal panels remain scatter plots.
+
+\`hue\` is what turns a pair plot from a shapeless overview into a tool for
+seeing how groups separate.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical difference between \`pairplot\` and \`PairGrid\`?
+
+- They are identical; \`PairGrid\` is just an alias.
+  > They're related but not the same — one is a ready-made wrapper, the other a build-it-yourself engine.
+- \`PairGrid\` only works for two columns at a time.
+  > \`PairGrid\` handles the full square grid just like \`pairplot\`; it simply leaves the drawing up to you.
+- [o] \`pairplot\` is a high-level wrapper with sensible defaults; \`PairGrid\` is the lower-level engine where you map your own functions onto the diagonal and off-diagonal cells.
+  > \`pairplot\` decides what to draw for you, while \`PairGrid\` sets up the empty grid and lets you call \`map_diag\`, \`map_offdiag\` (or \`map_upper\`/\`map_lower\`) with any plotting function for full control.
+- \`pairplot\` cannot show \`hue\`, but \`PairGrid\` can.
+  > \`pairplot\` supports \`hue\` directly; the real distinction is the level of control, not whether color grouping is available.
+
+Use \`pairplot\` for a fast default and \`PairGrid\` when you need to customize
+what each region of the matrix draws.`}
+/>
+
+A pair plot answers "how does *everything* relate?" in one glance. Next,
+we'll zoom from the whole grid down to a single, richly annotated pair of
+variables with the **joint plot** — a center plot flanked by each variable's
+marginal distribution.

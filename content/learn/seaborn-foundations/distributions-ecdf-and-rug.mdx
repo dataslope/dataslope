@@ -1,0 +1,296 @@
+---
+title: ECDF and Rug Plots
+description: displot with kind='ecdf' and rug marks — distribution views that use no bins and hide nothing.
+---
+
+A histogram has to make a choice — where to put the bin edges — and that
+choice can quietly reshape the story. What if you could see a distribution
+*without* choosing anything: no bins to set, no smoothing bandwidth to tune,
+nothing averaged away?
+
+That is the appeal of two underused views. The **ECDF** plots the running
+proportion of your data, and the **rug** plots the raw observations
+themselves. Neither hides anything behind a parameter, which makes them
+honest companions to the histogram.
+
+## The ECDF: a running tally of proportions
+
+The **empirical cumulative distribution function** (ECDF) answers a precise
+question at every point on the x-axis: *what fraction of the observations
+are less than or equal to this value?* Sort the data, then walk left to
+right; each observation steps the curve up a little, so it climbs from
+**0** at the smallest value to **1** at the largest.
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.displot(penguins, x="flipper_length_mm", kind="ecdf", height=4)
+`}
+/>
+
+There are no bars and no curve-fitting here — just the data, accumulated.
+Every observation is represented exactly once, in its true position.
+
+### How to read it
+
+The y-axis is a **proportion**, from 0 to 1, and that makes the curve a
+percentile-reading machine:
+
+- **The median** is wherever the curve crosses **y = 0.5** — drop straight
+  down to the x-axis to read it.
+- **Any percentile** works the same way: the 90th percentile sits where the
+  curve reaches **y = 0.9**, the 25th where it reaches **0.25**, and so on.
+- **Steepness encodes density.** Where the curve rises *steeply*, many
+  observations are packed into a small x-range — that's a dense region (a
+  peak in the histogram). Where it is **flat**, data is sparse (a valley or
+  a gap).
+
+So the same modality a histogram shows as *peaks* appears in an ECDF as
+*steep stretches separated by flatter ones* — readable, though less
+pictorial. In exchange you get exact percentiles straight off the axis, with
+no binning required.
+
+<MultipleChoice
+  markdown={`On an ECDF of \`flipper_length_mm\`, you find the x-value where the curve
+crosses **y = 0.5**. What have you just read off?
+
+- The mean flipper length.
+  > The ECDF reads *percentiles* by proportion below a value. The point at y = 0.5 is the median, which equals the mean only for symmetric data.
+- [o] The median flipper length — the value with half the observations at or below it.
+  > By definition the ECDF's height is the proportion of observations $\\le$ x, so y = 0.5 marks the value where half the data lies at or below: the median.
+- The most common flipper length.
+  > The most common value is the mode, which corresponds to the *steepest* part of the ECDF, not the crossing at y = 0.5.
+- The total number of penguins.
+  > The y-axis is a proportion from 0 to 1, not a count; the sample size is not read off the curve's height.
+
+The ECDF's y-axis is the cumulative proportion, so reading across at any
+height gives you that percentile's value — y = 0.5 is the median.`}
+/>
+
+## Its superpower: comparing groups
+
+A histogram struggles to compare more than a couple of groups, because
+overlapping bars occlude one another. ECDF curves have no such problem: each
+group is a single thin line, and lines can cross and overlap **without
+hiding each other**. That makes the ECDF one of the best tools for comparing
+several distributions at once. Just map a categorical column to `hue`:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf", height=4)
+`}
+/>
+
+Read it directly: at any flipper length, the curve that is **higher** has a
+larger share of its penguins at or below that length — that is, it sits
+**further to the left** overall. Here Gentoo's curve climbs last and
+furthest right, confirming it as the long-flipper group, while Adelie and
+Chinstrap rise earlier on the left. Three distributions compared cleanly, no
+occlusion, no bins.
+
+<Callout type="tip" title="Reach for ECDF when groups pile up">
+The moment a multi-group histogram or KDE turns into an unreadable tangle,
+try `kind="ecdf"`. Several monotonic curves stay legible where several
+filled shapes do not — and you can still read each group's median and
+quartiles straight off the y-axis.
+</Callout>
+
+## The tradeoff
+
+Nothing is free. The ECDF's great virtue — it hides nothing — comes with a
+cost in **intuitiveness**:
+
+- **What you gain:** no bin edges to bias the picture, no smoothing
+  bandwidth to choose. Percentiles, medians, and group comparisons are exact
+  and uncluttered. Nothing is hidden or invented by a parameter.
+- **What you give up:** humans read **shape** and **modality** far more
+  naturally from a histogram's literal humps than from the slope changes of
+  a cumulative curve. A two-peaked distribution is obvious as two bumps; as
+  two steep stretches in an ECDF it takes a trained eye.
+
+So the two views are partners, not rivals. Use a **histogram** when you want
+someone to *see* the shape at a glance; use an **ECDF** when you need exact
+percentiles or a clean comparison of several groups. Showing both is often
+the most honest move of all.
+
+## Rug plots: the raw data, one tick at a time
+
+A **rug plot** is the most literal distribution view there is: it draws a
+short tick mark for **every single observation** along an axis, like fringe
+on a rug. On its own it is spare, but as an **add-on** it is invaluable —
+laid under a histogram, a KDE, or beside a scatter, it shows exactly where
+the real data points sit, with no binning or smoothing in between.
+
+Here it is on its own, via the axes-level `sns.rugplot`:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# One tick per penguin along the x-axis — the raw 1-D positions.
+sns.rugplot(data=penguins, x="flipper_length_mm", height=0.1)
+`}
+/>
+
+Its real value shows when you layer it onto another plot. `displot` will add
+one for you with `rug=True`, so the smooth or binned summary sits *above*
+the actual observations that produced it:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Histogram of the shape, with a rug of the raw points underneath it.
+sns.displot(penguins, x="flipper_length_mm", kind="hist", rug=True, height=4)
+`}
+/>
+
+The rug is just as natural as fringe along the axes of a **scatter** plot,
+where it shows how each variable is distributed in one dimension while the
+dots show the joint relationship:
+
+<CodeBlock
+  adapter="python"
+  starterCode={`import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+fig, ax = plt.subplots(figsize=(6, 4))
+sns.scatterplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", ax=ax)
+# Add 1-D rugs on both axes to show each variable's marginal spread.
+sns.rugplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", ax=ax)
+`}
+/>
+
+<Callout type="warn" title="Rugs need breathing room">
+A rug shines when points are *sparse* enough to tell apart. With hundreds or
+thousands of observations the ticks crowd together and merge into a solid
+black bar — present, but uninformative. When that happens, a rug is the
+wrong tool: switch to a histogram or ECDF, which summarize density instead
+of plotting every point.
+</Callout>
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Compare distributions with an ECDF"
+  instructions={`Using the \`penguins\` dataset, draw an **ECDF** with \`sns.displot\`:
+
+- put \`flipper_length_mm\` on the x-axis,
+- color by \`species\` (use \`hue\`),
+- use \`kind="ecdf"\`.
+
+Assign the result to a variable named \`g\`.`}
+  starterCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+# Build the ECDF and assign it to g:
+g = None
+`}
+  solutionCode={`import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = sns.load_dataset("penguins")
+
+g = sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf")
+`}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses displot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.displot(...) to g'",
+    },
+    {
+      id: "xlabel",
+      name: "flipper_length_mm is on the x-axis",
+      description: "g.ax.get_xlabel() == 'flipper_length_mm'",
+      code: "assert g.ax.get_xlabel() == 'flipper_length_mm', f\"x should be flipper_length_mm, got {g.ax.get_xlabel()!r}\"",
+    },
+    {
+      id: "legend",
+      name: "Colored by species",
+      description: "A hue legend is present",
+      code: "assert g._legend is not None, 'Map hue=\"species\" so the curves are colored by species'",
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the height of an ECDF curve at a given x-value represent?
+
+- The count of observations equal to that x-value.
+  > The ECDF tracks a cumulative *proportion*, not a count at a single value, and its y-axis runs from 0 to 1.
+- [o] The proportion of observations less than or equal to that x-value.
+  > By definition the ECDF's height is the fraction of the data at or below x, so it rises monotonically from 0 to 1.
+- The probability density at that x-value.
+  > Density at a point is what a KDE estimates; the ECDF gives the *cumulative* proportion up to and including that point, not the density at it.
+- The number of bins covering that x-value.
+  > The ECDF uses no bins at all — that is one of its main advantages over a histogram.
+
+An ECDF reads off cumulative proportions: at x, the curve's height is the
+share of observations $\\le$ x.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is an ECDF often a better choice than overlapping histograms for
+comparing **several** groups on one axis?
+
+- ECDFs use more bins, so they capture finer detail.
+  > ECDFs use *no* bins; the advantage is about occlusion, not bin resolution.
+- [o] Each group is a single line, so multiple curves can cross and overlap without hiding one another.
+  > Filled histogram bars occlude the groups behind them, but thin monotonic ECDF curves stay readable even when several overlap.
+- ECDFs show the mode of each group more clearly than a histogram.
+  > Modes (peaks) are read more easily from a histogram's humps; the ECDF's strength is exact percentiles and clean group comparison, not modality.
+- ECDFs automatically remove outliers.
+  > An ECDF plots every observation, including outliers; it does not discard any data.
+
+Because each distribution becomes one thin monotonic line, ECDFs compare
+many groups without the occlusion that plagues overlapping filled
+histograms.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a **rug plot** the right tool?
+
+- As the main view for a column with tens of thousands of observations.
+  > With that many points the ticks merge into a solid bar and stop being informative; a histogram or ECDF summarizes density better at scale.
+- [o] As an add-on to another plot, showing the raw individual positions when points are sparse enough to distinguish.
+  > A rug layered under a histogram or beside a scatter marks where the actual observations sit, which is most useful when the points are few enough to tell apart.
+- To display the relationship between two numeric variables.
+  > Two-variable relationships are a scatter plot's job; a rug marks 1-D positions along an axis.
+- To compute and display group means.
+  > A rug plots individual observations, not aggregates; it does no summarizing or averaging.
+
+A rug adds the raw 1-D positions to a plot and is most useful as a sparse
+companion to another view, not as a standalone chart for large data.`}
+/>
+
+You now have two bin-free, low-distortion ways to read a distribution: the
+**ECDF** for exact percentiles and clean group comparisons, and the **rug**
+for the raw observations themselves. Together with the histogram and KDE,
+they give you a full toolkit for seeing a single variable from every angle.
+Next we leave one-variable distributions behind and turn to **categorical**
+plots.
